@@ -315,3 +315,16 @@ rep: tests/acceptance/W1-17/test_w1_17_digest.py  # one row per parametrised fun
 rep: tests/acceptance/W1-17/test_w1_17_exact_query.py::test_a_string_with_query_syntax_characters_is_read_as_the_string_it_is  # one row
 rep: tests/acceptance/W1-17/test_w1_17_family_check.py  # one row per parametrised function
 rep: tests/acceptance/W1-17/test_w1_17_freshness.py  # one row per parametrised function
+
+# acceptance/W1-19
+tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_no_text_the_secret_filter_refuses_is_embedded_or_returned  # cap
+tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass  # cap
+tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_a_changed_file_is_embedded_before_the_next_retrieval_and_stale_vectors_are_reported  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_the_semantic_route_says_unavailable_when_ollama_is_absent  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_building_the_vectors_says_unavailable_when_ollama_is_absent  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_search_that_may_not_write_reports_a_missing_index_and_writes_nothing  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_without_ollama_the_fused_list_is_the_lexical_routes_reranked_in_one_pass  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_limit_cuts_the_list_after_the_rerank_not_before  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises  # cap

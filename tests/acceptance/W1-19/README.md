@@ -517,3 +517,19 @@ failed with `No such file or directory: 'gitleaks'` on every tree. Only the fixt
 - Nothing on the machine changes (`~/.local/bin` is only read).
 
 No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: DEC-1046`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_unavailable.py::test_there_is_no_manifest_before_there_is_an_index`, `test_w1_19_semantic_index.py::test_a_question_no_line_holds_reaches_its_chunk_by_its_vector`, `test_w1_19_semantic_index.py::test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent` | README |
+| S2: Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1... | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` | README |
+| S3: Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py::test_the_manifest_records_the_model_ids_and_their_revisions`, `test_w1_19_semantic_index.py::test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant`, `test_w1_19_semantic_index.py::test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama` | README |
+| F1: Mean hit@5 falls below 80 | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
+| F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
+
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 11 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
