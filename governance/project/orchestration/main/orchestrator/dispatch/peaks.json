@@ -1,55 +1,55 @@
 {
- "computed": "2026-11-03 11:09:54",
+ "computed": "2026-11-03 12:10:05",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 10.9,
+   "cpu_p95": 10.87,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 4828276,
-   "rss_kb_max": 7480440,
-   "samples": 3269
+   "rss_kb_p95": 4965512,
+   "rss_kb_max": 8534000,
+   "samples": 3318
   },
   "embedding": {
    "cpu_p95": 7.98,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2823912,
+   "rss_kb_p95": 2756192,
    "rss_kb_max": 8676476,
-   "samples": 3269
+   "samples": 3318
   },
   "rebuild": {
    "cpu_p95": 12.15,
    "cpu_max": 126.32,
    "rss_kb_p95": 518296,
    "rss_kb_max": 637492,
-   "samples": 2026
+   "samples": 2028
   },
   "test_run": {
-   "cpu_p95": 18.05,
+   "cpu_p95": 18.04,
    "cpu_max": 294.7,
-   "rss_kb_p95": 4076112,
+   "rss_kb_p95": 4056876,
    "rss_kb_max": 6778004,
-   "samples": 2621
+   "samples": 2641
   },
   "claude": {
-   "cpu_p95": 3.8,
+   "cpu_p95": 3.57,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2657424,
+   "rss_kb_p95": 2611032,
    "rss_kb_max": 4055288,
-   "samples": 2846
+   "samples": 2895
   },
   "reranker": {
    "cpu_p95": 6.07,
    "cpu_max": 13.9,
    "rss_kb_p95": 9368700,
    "rss_kb_max": 14331404,
-   "samples": 2122
+   "samples": 2124
   },
   "gitleaks": {
    "cpu_p95": 0.33,
    "cpu_max": 4.08,
    "rss_kb_p95": 2161396,
    "rss_kb_max": 3528312,
-   "samples": 1442
+   "samples": 1451
   },
   "git": {
    "cpu_p95": 0.02,
@@ -70,7 +70,7 @@
    "cpu_max": 126.32,
    "rss_kb_p95": 3441468,
    "rss_kb_max": 9074876,
-   "samples": 2026
+   "samples": 2028
   }
  },
  "lead": {
@@ -158,9 +158,9 @@
   "samples": 7801
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 718062.0,
+  "rss_kb_p95": 717290.6666666666,
   "rss_kb_max": 1464452.0,
-  "samples": 2621
+  "samples": 2641
  },
  "slot_run_kb": 1873832
 }

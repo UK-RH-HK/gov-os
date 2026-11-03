@@ -1,10 +1,16 @@
 """land.py under DEC-1050: G-1 (before a ticket is queued, every commit of its range that changes tests/acceptance/
 carries Role: independent-test-designer or Role: owner, else the landing refuses, naming the commits) and Q-1 (no
 nightly baseline: the queue traces each red once each way against the head without the batch, 3 rounds only for the
-load-sensitive list). The file under test: LAND_UNDER_TEST, default land.candidate.py beside this file (land.py once
-promoted). Planted repositories under tmp_path only.
+load-sensitive list). The file under test: LAND_UNDER_TEST, default land.candidate.py beside this file while it exists,
+else land.py (once promoted). Planted repositories under tmp_path only.
 
     PYTHONPATH= python3 -m pytest -q -p no:cacheprovider test_land_dec1050.py
+
+A merge counts when its result under tests/acceptance/ differs from git's own merge of its two parents (`git log
+--remerge-diff`): a conflict resolved, an edit made in the merge, or one side's change dropped; a clean merge (of the
+test designer's branch, or of w2/integrate) brings only commits judged on their own (in the range) or landed already
+(not in it). An octopus merge (git's own merge is for two parents) counts when it changes tests/acceptance/ against
+its first parent.
 """
 import importlib.util
 import os
@@ -17,7 +23,8 @@ import pytest
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-UNDER_TEST = Path(os.environ.get("LAND_UNDER_TEST") or HERE / "land.candidate.py")
+UNDER_TEST = Path(os.environ.get("LAND_UNDER_TEST") or (HERE / "land.candidate.py" if (HERE / "land.candidate.py").is_file()
+                                                        else HERE / "land.py"))
 
 
 @pytest.fixture
@@ -121,6 +128,64 @@ def test_an_edit_made_in_a_merge_is_refused(land, repo):
     merge = git(repo, "rev-parse", "HEAD")
     bad, n = authors(land, repo)
     assert n == 2 and bad == [f"{merge[:12]} (Role: orchestrator) Merge the tests branch"]
+
+
+def designer_branch_and_code(repo):
+    git(repo, "checkout", "-q", "-b", "tests")
+    commit(repo, {"tests/acceptance/W2-1/test_old.py": "def test_old():\n    assert 1\n"}, "the designer's edit",
+           "independent-test-designer")
+    git(repo, "checkout", "-q", "w2/W2-1")
+    commit(repo, {"src/a.py": "A = 2\n"}, "the code", "engineer")
+
+
+def test_a_merge_that_drops_the_designers_change_is_refused(land, repo):
+    """The merge's result equals one parent (so `diff-tree -c` names nothing) and the merge against its first parent
+    shows no change, yet it undid the test designer's edit: judged against git's own merge of its parents."""
+    designer_branch_and_code(repo)
+    git(repo, "merge", "-q", "--no-ff", "--no-commit", "tests")
+    git(repo, "checkout", "HEAD", "--", "tests/acceptance/W2-1/test_old.py")  # the engineer's side kept
+    git(repo, "commit", "-q", "-m", "Merge the tests branch", "--trailer", "Role: engineer")
+    merge = git(repo, "rev-parse", "HEAD")
+    bad, n = authors(land, repo)
+    assert n == 2 and bad == [f"{merge[:12]} (Role: engineer) Merge the tests branch"]
+
+
+def test_a_conflict_resolved_in_a_merge_is_refused(land, repo):
+    designer_branch_and_code(repo)
+    commit(repo, {"tests/acceptance/W2-1/test_old.py": "def test_old():\n    assert 2\n"}, "a builder edit",
+           "independent-test-designer")  # (so only the merge is the builder's)
+    r = subprocess.run(["git", "-C", str(repo), "merge", "-q", "--no-ff", "tests"], capture_output=True, text=True)
+    assert r.returncode == 1  # the conflict
+    (repo / "tests/acceptance/W2-1/test_old.py").write_text("def test_old():\n    pass\n")
+    git(repo, "add", "-A")
+    git(repo, "commit", "-q", "-m", "Merge the tests branch", "--trailer", "Role: orchestrator")
+    merge = git(repo, "rev-parse", "HEAD")
+    bad, n = authors(land, repo)
+    assert n == 3 and bad == [f"{merge[:12]} (Role: orchestrator) Merge the tests branch"]
+
+
+def test_a_true_merge_of_the_integration_branch_is_not_this_tickets(land, repo):
+    """The lead brings the branch up to date by a merge commit: the acceptance tests it brings landed already (and its
+    diff against the first parent names them): not counted."""
+    commit(repo, {"src/a.py": "A = 2\n"}, "the code", "engineer")
+    git(repo, "checkout", "-q", "w2/integrate")
+    commit(repo, {"tests/acceptance/W2-9/test_z.py": "def test_z():\n    pass\n"}, "an older landing", "engineer")
+    git(repo, "checkout", "-q", "w2/W2-1")
+    git(repo, "merge", "-q", "--no-ff", "-m", "Merge w2/integrate", "-m", "Role: engineer", "w2/integrate")
+    assert authors(land, repo) == ([], 0)
+
+
+def test_an_octopus_merge_is_judged_against_its_first_parent(land, repo):
+    """git's own merge is defined for two parents only: an octopus merge that changes tests/acceptance/ against its
+    first parent counts (fails closed)."""
+    designer_branch_and_code(repo)
+    git(repo, "checkout", "-q", "-b", "other", "w2/integrate")
+    commit(repo, {"src/b.py": "B = 1\n"}, "other code", "engineer")
+    git(repo, "checkout", "-q", "w2/W2-1")
+    git(repo, "merge", "-q", "--no-ff", "-m", "Octopus", "-m", "Role: orchestrator", "tests", "other")
+    merge = git(repo, "rev-parse", "HEAD")
+    bad, n = authors(land, repo)
+    assert n == 2 and bad == [f"{merge[:12]} (Role: orchestrator) Octopus"]
 
 
 def test_a_range_git_cannot_read_fails_closed(land, repo):

@@ -1571,3 +1571,11 @@
 {"at": "2026-11-03 12:04:12", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:04:01", "pending_tool": null, "age_min": 0, "verdict": "alive"}
 {"at": "2026-11-03 12:06:16", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:06:01", "pending_tool": null, "age_min": 0, "verdict": "alive"}
 {"at": "2026-11-03 12:08:22", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:06:22", "pending_tool": null, "age_min": 1, "verdict": "alive"}
+{"at": "2026-11-03 12:10:28", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:10:20", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-03 12:12:34", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:10:57", "pending_tool": null, "age_min": 1, "verdict": "alive"}
+{"at": "2026-11-03 12:14:38", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:10:57", "pending_tool": null, "age_min": 3, "verdict": "alive"}
+{"at": "2026-11-03 12:16:45", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:10:57", "pending_tool": null, "age_min": 5, "verdict": "alive"}
+{"at": "2026-11-03 12:18:49", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:10:57", "pending_tool": null, "age_min": 7, "verdict": "alive"}
+{"at": "2026-11-03 12:20:55", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:20:02", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-03 12:23:01", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:20:02", "pending_tool": null, "age_min": 2, "verdict": "alive"}
+{"at": "2026-11-03 12:25:05", "transcript": "bb5cd8bd-6803-4c96-b327-d35486c4ae8c.jsonl", "last_assistant": "2026-11-03 12:25:04", "pending_tool": null, "age_min": 0, "verdict": "alive"}

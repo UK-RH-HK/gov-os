@@ -49,6 +49,21 @@ refreshed there. `tools/guard4_check.py`'s two rule-2 cases repointed from W2-87
 W2-13's (backup `.pre-d0`). HOLD ON: `log/act-in-progress.txt` written; no main-tree commit until the owner says
 done; then `mv` it, confirm `readlink -f ~/.local/bin/gov` = pin-9894b0cf, a search, and go on with D-2 (E1 first,
 `EMG-queue`'s uncommitted work).
+**12:20:** E1 DONE: `emg/queue` merge `daef9a55bab8` + Q-1 `04568e140703` (108 queue tests); `tools/land.candidate.py`
+(G-1, merges by `--remerge-diff`; 22/22; promoted copy 26 passed). Review (Sonnet, read-only) writes
+`reviews/e1-q1-g1.md`; READY by `tools/verdict.py`. Promotion after READY, when no landing runs and the ACT hold has
+ended: `mv tools/land.candidate.py tools/land.py` (backup `land.py.pre-dec1050` exists) together with merging
+`emg/queue` (the new land.py passes `--load-sensitive`). Open for later: `close_build.py`'s attribution (Q-1's other
+half, or retire it); the queue's `--base` path unused (O-8); `land.candidate.applied-2112.py` a dead copy (O-8).
+**12:27: ACT-REPIN-W2 DONE (owner): pin-9894b0cf live, registry `b74d2c7f`; hold ended (`mv`); confirmed from this
+session (link, a search with both facets).** Owner: deleting the CTO's own scratch is not a slip (DEC-1050 (8)): not
+logged. **E1 LIVE:** review `reviews/e1-q1-g1.md` (the reviewer's Write to reviews/ refused twice by the guard: a false
+rule-5 refusal; transcribed by the CTO), READY (True, []); F1 fixed before promotion (`core.quotepath=off`, probe);
+F2, F3 Wave 3 rows; emg/queue merged `2d968b5089c5`; `tools/land.py` promoted (backup `land.py.pre-dec1050`); land
+tests 26, queue Q-1 + base 31 passed. **D-2 running, three engineers:** R1-21 (`tools/structural_pass.py` +
+`tools/land.candidate.py`), E3 (`drafts/act-guard-fix-4/`, with the reviews/ rule-5 case; then one review, then
+ACT-GUARD-FIX-4 to the owner), LB held-slot fix + O-A1 (`EMG-lb2`; then one review, then merge). G-14's path-map
+role checks after E3.
 
 **THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
 "DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:

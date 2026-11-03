@@ -1,0 +1,1 @@
+2026-11-03 12:10 ACT-REPIN-W2 handed to the owner's operator (packages/ACT-REPIN-W2.md, 70a82a72): no CTO main-tree commit until the owner says done (DEC-1028 item 6).
