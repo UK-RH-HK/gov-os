@@ -34,6 +34,11 @@ SECRETS_FILE = "secrets.yaml"
 SECRETS_SCHEMA = {"scan": {"required": False, "type": str}}
 SCAN_VALUES = ("on", "off")
 KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA}
+# A namespace's keyword-index policy (DEC-1066 (3)): optional, one of two values; absent is indexed. Any other value is
+# CONFIG_INVALID in either form of the path map, so a misspelt exclusion never leaves its files in the index.
+LEXICAL_POLICY = "lexical_policy"
+INDEXED, NOT_INDEXED = "indexed", "not indexed"
+LEXICAL_POLICIES = (INDEXED, NOT_INDEXED)
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
@@ -96,6 +101,14 @@ def _validate_namespace(ns_name, ns_value, rel):
     for field in NAMESPACE_OPTIONAL_FIELDS:
         if field in ns_value:
             _validate_namespace_field(ns_name, field, ns_value[field], rel)
+    validate_lexical_policy(ns_name, ns_value, rel)
+
+
+def validate_lexical_policy(ns_name, ns_value, rel):
+    """CONFIG_INVALID unless the namespace's ``lexical_policy`` is absent or one of ``LEXICAL_POLICIES``."""
+    if LEXICAL_POLICY in ns_value and ns_value[LEXICAL_POLICY] not in LEXICAL_POLICIES:
+        raise _invalid(rel, f"namespaces.{ns_name}.{LEXICAL_POLICY}",
+                       f"must be one of {LEXICAL_POLICIES} (absent: {INDEXED})")
 
 
 def _validate_capabilities(caps, rel):
@@ -214,6 +227,7 @@ def _validate_namespace_minimal(ns_name, ns_value, rel):
     paths = ns_value.get("paths")
     if paths is not None and (not isinstance(paths, list) or not paths):
         raise _invalid(rel, f"namespaces.{ns_name}.paths", "must be a non-empty list")
+    validate_lexical_policy(ns_name, ns_value, rel)
 
 
 def _validate_path_map(document, rel):

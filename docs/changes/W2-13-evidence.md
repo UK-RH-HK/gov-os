@@ -31,6 +31,7 @@ worktree. Unit = `tests/unit/retrieval/test_w2_13_ranked.py`, `test_w2_13_id_boo
 | S3 "unavailable" instead of raising; latency within the retrieve budget on the dev tiers | `gov accept` line success-3; the latency file alone; unit `test_w2_13_rerank_work.py` | `gov accept`; `pytest tests/acceptance/W2-13/test_w2_13_latency.py` through `heavy_slot.sh` | pass, 25 of 25 alone (load 1.6 at its start); under load (the scoped run beside it, load near 20): 24 of 25, the one red the load-sensitive latency case; the latency file alone: 2 of 2 (load 1.1 at its start; 261 s, the real-model case's call 14.2 s after a 189 s setup, the lexical case 57.7 s) | `06e5ae70a4a7` (`gov accept`); `3c0320080829` (latency alone) |
 | S4 an id that exists nowhere: the stated gap | `gov accept` line success-4; unit `tests/unit/retrieve/test_w2_13_stated_gap.py` | `gov accept`; unit | pass, 8 of 8; unit pass (one case's double fixed for the merge, below) | `06e5ae70a4a7` |
 | S5 search respects role separation (DEC-1065 (2)): every route of `gov retrieve` and `gov context`'s supplementary block filtered by the caller's role_paths; what is withheld named by count and rule; no section, no filter | `gov accept` line success-5 (the designer's tests at `5828714c`, merged by the CTO; not yet run); unit `tests/unit/guard/test_role_paths.py`, `tests/unit/retrieval/test_w2_13_role_filter.py` (S5 below) | `gov accept`, after the CTO's merge; unit: `PYTHONPATH=<tree>/src bash heavy_slot.sh python3 -m pytest tests/unit/guard/test_role_paths.py tests/unit/retrieval/test_w2_13_role_filter.py tests/unit/context tests/unit/retrieve` | unit pass: 30 of 30 for S5 (with review S5-F1's three, `6e6922439577`); with `tests/unit/context` and `tests/unit/retrieve`, 120 passed; `gov accept` (the CTO, outside the sandbox, on `78bf6b34`): 67 of 68, S5 11 of 12, the red `test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests[flag]` (`gov context --role`); fixed by `f54decffcaf3` (the role through `context()` to the block) and `23bef297a204` (`command.py` passes the parsed `--role`); `gov accept` re-run: the CTO's, outside the sandbox | `5b42e9810996`; `f54decffcaf3`; `23bef297a204` |
+| S6 the keyword index honours the path map's `lexical_policy` (DEC-1066 (3), G4): `not indexed` keeps a namespace's files out (absent: indexed); the validators accept the field's two values; a file kept out is named in the rebuild's report | `gov accept` line success-6 (the designer's tests, once merged); unit `tests/unit/retrieval/test_w2_13_lexical_policy.py` (S6 below) | `gov accept`, after the CTO's merge; unit: `PYTHONPATH=<tree>/src python3 -m pytest tests/unit/retrieval/test_w2_13_lexical_policy.py --optin=lifted,breadth` | unit pass, 13 of 13; `tests/unit/{retrieval,retrieve,check,secrets_check,rebuild,store,semantic}` through `heavy_slot.sh` (the real-model exclusion, `HOME` empty): 407 passed, 17 failed, all `test_w2_112_shared_reranker.py`, the same 17 red on the base `c2be9ccd` (the sandbox makes no reranker socket); `gov accept`: not yet run (the designer's tests not merged); the rebuild's report: waits for the one line in `src/gov/rebuild/command.py` (outside the paths, S6 below) | the S6 commit |
 | F1 RETR-A-04's bundle unchanged | `gov accept` line failure-1 | `gov accept` | pass, 3 of 3 | `06e5ae70a4a7` |
 | F2 the secrets filter on the FTS5 table: a planted canary never indexed | `gov accept` line failure-2, after DEC-1045's change to `lexical.py` on integrate (merged without conflict) | `gov accept` | pass, 4 of 4 (both runs) | `06e5ae70a4a7` |
 
@@ -76,6 +77,34 @@ The two builder tests changed for the merge (`06e5ae70a4a7`), each the smallest 
   stand-in (`lambda *args`) expects.
 - **Fails closed:** a section or ticket that cannot be read stops `gov retrieve` with `ROLE_PATHS_UNREADABLE`; the
   supplementary block is then empty and its `dropped` says why.
+
+## S6: the keyword index honours the path map's `lexical_policy` (DEC-1066 (3), G4)
+
+- **The field:** a namespace's optional `lexical_policy`, `indexed` or `not indexed`; absent is `indexed`, as before.
+  `gov.config.loader` refuses any other value (`CONFIG_INVALID`, in both forms of the path map) and `core-pathmap`
+  (`gov.check.pathmap`, now 1.2.0) reports it as `PATH_MAP_INVALID`: a misspelt exclusion never leaves its files
+  indexed. The path map itself is not changed here: which namespaces say `not indexed` (lens B's report,
+  `fixtures/evaluation/**`) is D-7's, the CTO's.
+- **The index (`src/gov/retrieval/lexical.py`):** `kept_out(root, paths)` names, for each path, the namespace saying
+  `not indexed` that matches it (a link also by its target). `_update` asks it before the secrets filter, so a file
+  kept out is neither given to the filter nor read. It is recorded in `lexical_file` with `indexed = 2` (`KEPT_OUT`;
+  0 stays the filter's refusal). The path map is one of the filter's judges, so a change of policy judges every file
+  again: a file newly kept out loses its chunks, and a file indexed again is chunked. The semantic vectors are built
+  from the lexical chunks, so a file kept out reaches neither index.
+- **The report:** `lexical.refresh()` returns `kept_out` (namespace to its sorted paths, every file kept out, not only
+  this call's). **The rebuild's report needs one line outside the ticket's paths:** `src/gov/rebuild/command.py:150-151`
+  drops `refresh()`'s answer. The line asked of the CTO:
+  `stores["lexical"] = {"status": "recreated", "kept_out": lexical_refresh(root)["kept_out"]}`, in place of the two
+  lines `lexical_refresh(root)` / `stores["lexical"] = {"status": "recreated"}` (there is no `src/gov/rebuild/lexical*`).
+  The commit-time re-index (`src/gov/store/loader.py:444`) could carry it the same way; S6 does not ask for that.
+- **Unit tests** (`tests/unit/retrieval/test_w2_13_lexical_policy.py`, 13; stand-ins for the secrets filter; no model):
+  a namespace `not indexed` keeps its files out, unread and not asked of the filter, and `refresh` names them; absent
+  or `indexed` is indexed; a change of policy drops and restores the files; a link to a file kept out is kept out; an
+  invalid value is `CONFIG_INVALID` and `search` answers `unreadable` instead of raising; both validators accept the
+  two values and absence, and refuse five other values.
+- **Builder fixtures:** `kept_out` validates only the namespaces' `lexical_policy` and reads the path map with
+  `read_yaml` (not `load_config`): the secrets filter already loads and validates the whole path map for every file it
+  judges, and the W2-87 and S5 fixtures plant a path map with no `namespaces` beside a stand-in filter.
 
 ## S2: the dev queryset's lexical-only hit@5
 
