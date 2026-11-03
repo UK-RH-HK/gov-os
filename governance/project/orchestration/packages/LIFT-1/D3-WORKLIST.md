@@ -1,6 +1,7 @@
 # D-3 — the configuration and text lifts, worked in this order (DEC-1052; P1-PLAN §A P1-2, §B)
 
-**NOT STARTED (2026-11-03): the owner stopped before D-3 for a fresh session; nothing below was changed but item 0.**
+**UNDER WAY (2026-11-03, session 33b3628c):** item 8 done; item 5 moved to D-4; items 11 and 12 drafted by product-spec
+in `.gov-runtime/scratch/orchestrator/drafts/d3/` for the owner; items 9 and 10 by the CTO next.
 **Moved to D-4 (decided by the CTO while writing this list):** items 2-4 (T-6, T-7, T-10: the selection) and 6-7 (Q-8,
 Q-10: the ratchet keys): the path map and the test map are in the selection's shared core (a change to either runs
 everything), and these rows touch the very suites D-4 cuts, so they go with D-4's test designers and the selection.
@@ -18,10 +19,10 @@ the briefs are rebuilt from the templates in D-5, so brief edits here are only t
 | 2 | T-6 | W1-19/W1-21 selected only by model-path changes; the path-map and gitleaks-config couplings dropped | `governance/project/test-map.yaml` | to do |
 | 3 | T-7 | a helper import reaches only the suites that call the helper: a `helpers:` exception for `tests/acceptance/W1-07/w1_07_support.py` | `governance/project/test-map.yaml` | to do |
 | 4 | T-10 | the suites of features lifted here leave tickets' selections (nightly only), and the owner says whether they count in P1-12's full run | `.gov-runtime/scratch/orchestrator/tools/nightly_only.txt`, `select_tests.py` | to do; the P1-12 question goes with D-4's list |
-| 5 | T-11 | CI off here (always red: 42 of 42 pushes) | `.github/workflows/ci.yml` | to do (the template half is P1-11) |
+| 5 | T-11 | CI off here (always red: 42 of 42 pushes) | `.github/workflows/ci.yml` | **moved to D-4** (CTO, 2026-11-03): W1-40's acceptance cases read this repository's own push workflows (`test_w1_40_workflow_text.py`, `support.push_workflows()`), so the switch-off goes with W1-40's fate in D-4's list (the template half is P1-11) |
 | 6 | Q-8 | trailers are not refusals; `accepted_history` and `trailers_base` deleted here | `governance/project/path-map.yaml` | after D-4's list: W1-01's history case reads them |
 | 7 | Q-10 | the ratchet lists frozen here; the load-sensitive list kept as the CTO's (`tools/load_sensitive.txt`, done in E1) | `governance/project/path-map.yaml` | after D-4's list (the same tests) |
-| 8 | G-10 | `refusal_watch.sh` lifted (the harvest already stopped) | `.gov-runtime/scratch/orchestrator/tools/` | to do |
+| 8 | G-10 | `refusal_watch.sh` lifted (the harvest already stopped) | `.gov-runtime/scratch/orchestrator/tools/` | DONE 2026-11-03: not running, no caller; moved to `archive/lifted-d3/` |
 | 9 | T-1, M-1, R-6, R-12 | the brief's wrong lines only: T-1's reason (the queue runs no `gov check`), step 6a and DEC-1027 H's trimming, the step-6 `gov checkpoint` record, the two-commit rule | `governance/project/briefs/LEAD-w2-common.md` | to do |
 | 10 | R-6, R-8, R-12, O-11 | register amendments: DEC-511 lifted; delegated choices as ticket or close-record lines; DEC-896 item 2 and DEC-927 item 2 lifted; DEC-1012 and DEC-1003 scoped | `docs/DECISION_REGISTER.md` (one entry) | to do |
 | 11 | R-9, R-11, R-12, O-6, O-11 | the prompt: one DECISIONS-IN-FORCE list (§0 points to it), pings only when work waits on the owner, the two-commit rule, ACTs only for machine changes with restarts by class, DEC-1012/DEC-1003 scoped | `governance/project/prompts/w2-orchestrator.md` | a patch to the owner |
