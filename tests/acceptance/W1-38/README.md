@@ -873,3 +873,19 @@ P-1 and P-2 are decided: P-1 by DEC-468 (option a; its cases are `TestOpenSpecSk
   (the role's tools) the project is generated again, so rulesync's own check is clean (asserted).
 - A stand-in rulesync binary is written outside the project; where it only changes one answer (the version), it
   hands every other call to the installed rulesync.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec comma... | `test_w1_38_rulesync.py::TestRoleFieldAgreement::test_role_fields_match_kernel`, `test_w1_38_rulesync.py::TestRoleFieldAgreement::test_role_fields_match_kernel`, `test_w1_38_rulesync.py::TestSkillGeneration::test_skill_body_matches_source` | README |
+| S2: Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI | `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestGenerateCheck::test_check_clean_after_generate` | README |
+| S3: Registers the adapter/model-portability family check: generated adapters match their source for Claude Code and AGENTS.md [CAP-38.b] | `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family`, `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project`, `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_red_after_a_hand_edit` | README |
+| F1: generate --delete removes OpenSpec or vendored skills | `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_commands`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_skills`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_vendored_skills` | README |
+| F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_agents_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_role_file` | README |
+
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 69 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
