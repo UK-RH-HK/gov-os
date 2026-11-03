@@ -145,6 +145,10 @@ closed: such a merge is made by a test designer, or the owner decides.
 
 These tests build their repositories under pytest's temporary directory. They write nothing in this repository.
 
+### A merge listed for its own changes (DEC-1031 item 3, 2026-11-03)
+
+`merge_offences` exempts a merge whose own full id is in the path map's `acceptance_exemptions` for the changes the merge commit makes itself; the commits it brings are judged as before. The owner listed `0568d91baf56` (2026-10-31, `w2/integrate` into `w2/W2-67`, `Role: orchestrator`): its resolution of one conflict in `tests/acceptance/W1-30/test_w1_30_close.py` was a test designer's (td-9), committed by the lead (P1-NIGHTLY-2026-11-02 (a)). Standing since: such a merge carries the test designer's role. Cases: `test_a_listed_merge_is_exempt_for_its_own_conflict_resolution_only_by_its_full_id` (full id, abbreviated ids, unlisted) and `test_a_listed_merge_still_answers_for_an_unlisted_commit_it_brings`; with them `test_only_the_test_designer_commits_to_acceptance_tests` and `test_the_integration_merges_of_this_repository_pass` are green again.
+
 ## Retired cases (DEC-925 item 1, 2026-10-27)
 
 Retired by a fresh Independent Test Designer on ticket `DAEO-2azm` (W2-74), `Rewrite-Reason: DEC-925 item 1, P-I1-2`.
