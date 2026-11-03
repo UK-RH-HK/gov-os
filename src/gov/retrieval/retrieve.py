@@ -1,7 +1,8 @@
 """``gov retrieve``: one cited evidence bundle with one stopping reason (W1-21; DEC-080, DEC-419, DEC-422–425).
 
-``retrieve`` asks the lexical and the semantic route, closes over a ticket or ids with ``gov.closure``, merges the
-three by chunk hash, drops what the store says is superseded or must-not-cite (DEC-329, G-19, DEC-423), reranks
+``retrieve`` asks the lexical and the semantic route, closes over a ticket, ids or the records the question names
+(``graph_route``) with ``gov.closure``, asks the code index for the symbols it names (``code_route``), merges them
+by chunk hash, drops what the store says is superseded or must-not-cite (DEC-329, G-19, DEC-423), reranks
 the rest once (DP-9) and expands a child hit to its parent within the bundle budget (DEC-091, DP-3). It only
 reads (DEC-322).
 
@@ -23,9 +24,10 @@ import yaml
 from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
-from gov.retrieval import authority, lexical, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
+from gov.store import loader
 
 CLOSURE = "closure"
 SATURATED, BUDGET_EXHAUSTED = "SATURATED", "BUDGET_EXHAUSTED_WITH_GAPS"
@@ -38,17 +40,34 @@ ROUNDS_BY_RADIUS = {0: 1, 1: 1, 2: 3, 3: 8, 4: 8}
 DEFAULT_BATCH_SIZE = 10
 MUST_NOT_CITE_STATUSES = frozenset({"DEPRECATED", "REJECTED", "WITHDRAWN"})
 AHEAD_TYPES = frozenset({"failure", "lesson"})
+# What sqlite raises for a store that cannot be opened, holds no record graph or is no database; no fault of a query
+STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
+NO_RECORD_GRAPH = "the record graph is unreadable, so whether this record is current cannot be judged"  # DEC-1019
+
+
+def _declares_record(root: Path, rel: str) -> str | None:
+    """The id a file's front matter declares, read as the store's loader reads a record; None for no record."""
+    try:
+        front = loader._frontmatter((root / rel).read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError):
+        return None
+    return str(front["id"]) if isinstance(front, dict) and "id" in front else None
+
+
+def _named_register(root: Path) -> str | None:
+    """The register the path map names under the loader's key, read without the record graph; None for none."""
+    try:
+        named = yaml.safe_load((root / loader.PATH_MAP_REL).read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return None
+    return named.get(loader.REGISTER_KEY) if isinstance(named, dict) else None
 
 
 def _graph(root: Path) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     """``path -> id`` of every record, ``id -> reason`` for not-current records (superseded or must-not-cite),
-    and ``id -> type`` for every record."""
-    try:
-        known = records.records(root)
-        superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
-    except sqlite3.OperationalError:
-        raise GovError("STORE_MISSING", f"no record graph in the store at {root}; load it first",
-                       {"root": str(root)}) from None
+    and ``id -> type`` for every record. Raises what the store raises when it is missing or cannot be read."""
+    known = records.records(root)
+    superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
     record_of = {record["path"]: record["id"] for record in known}
     not_current: dict[str, str] = {}
     for record in known:
@@ -116,20 +135,36 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget)
 
     root = Path(root)
-    record_of, not_current, record_types = _graph(root)
-    # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
-    known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
+    unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
+    try:
+        record_of, not_current, record_types = _graph(root)
+        # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
+        known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
+    except sqlite3.DatabaseError as error:  # no store file at all stays connect's STORE_MISSING: no route answers
+        if type(error) not in STORE_FAULTS:
+            raise  # a fault that is not the store's is no unavailable route
+        missing = str(error).startswith("no such table")
+        unread = (f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure;"
+                  " record files are left out, as their currency cannot be judged without the record graph")
+        record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
-    order = authority.order(root, known, edges, entry_of)  # DEC-952 item 1: the path map's retrieval_authority
+    if unread is not None:
+        register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
+    order = (authority.order(root, known, edges, entry_of) if unread is None  # DEC-952 item 1: retrieval_authority
+             else authority.Order(None, known, edges, entry_of))  # no record graph: no authority order (DEC-1006)
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
                semantic.FACET: semantic.search(root, query, refresh=False)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer["hits"] for name, answer in answers.items()}
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
     closure_gaps, start = [], [*([ticket] if ticket else []), *ids]
+    depth = closures.depth_of_radius(radius if start else min(radius, 1))  # W2-92: a question's records at R0 or R1
+    start += [rid for rid in graph_route.start_ids(root, query, known) if rid not in start]  # W2-92: the record route
     reached = set()
-    if start:
-        closed = closures.closure(root, start, closures.depth_of_radius(radius))
+    if unread is not None:
+        facets[CLOSURE] = {"available": False, "reason": unread}
+    elif start:
+        closed = closures.closure(root, start, depth)
         reached = {item["id"] for item in closed["closure"]}
         routes[CLOSURE] = [chunk for chunk in chunks.values()
                            if (record_of.get(chunk["path"]) if chunk["path"] != register
@@ -137,6 +172,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
+    coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
+    if coded is not None:
+        routes[code_route.FACET], facets[code_route.FACET] = coded
 
     fused = rrf(routes)
     fused = order.fused(fused, chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
@@ -192,6 +230,14 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         # W2-87: a register chunk is never dropped for another entry's status, and its own entry's drops nothing
         # new here: leaving entries out is W2-55's (DEC-791 item 1)
         in_register = chunk["path"] == register
+
+        # DEC-1019: without the record graph no record is judged current, so no record file is cited at all
+        if unread is not None:
+            declared = None if in_register else _declares_record(root, chunk["path"])
+            if in_register or declared is not None:
+                dropped.setdefault(chunk["path"], {"path": chunk["path"], "id": declared or chunk["path"],
+                                                   "reason": NO_RECORD_GRAPH})
+                continue
 
         # DEC-329, G-19: superseded records
         if not in_register and record_id is not None and record_id in not_current:
