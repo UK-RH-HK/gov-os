@@ -876,7 +876,10 @@ def run(root: Path, args, config: dict) -> dict | tuple:
         }
     finally:
         _probe_deadline = None
-    sections["adoption_level"] = _part("adoption_level", _check_adoption_level, root, config, sections)
+    from gov.secrets import SCAN_OFF, scan_on
+    if not scan_on(root):  # DEC-1045: said where it acts, never silent; on, doctor is as it was
+        sections["secrets_scan"] = {"status": "report", "scan": "off", "reason": SCAN_OFF}
+    sections["adoption_level"] =_part("adoption_level", _check_adoption_level, root, config, sections)
     from gov.rebuild.command import none_embedded
     semantic = sections["canaries"].get("indices", {}).get("semantic")
     note = none_embedded(config)

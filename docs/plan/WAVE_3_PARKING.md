@@ -22,5 +22,8 @@ Every new idea, the owner's or the orchestrator's, comes here unless it blocks E
 | W3-P16 | The dead-man's switch as a product feature: a sentinel session that pushes when the orchestrator's session has stalled (this repository's ACT-SENTINEL-1 as the model); the push channel is the host's, not cron's | DEC-994 item 3, DEC-1004 | 2026-11-01 |
 | W3-P17 | W2-81's judge, general hardening: any hidden-half input it cannot match to the built repository refused, not dropped (review 5's F1 and F2 beyond W2-93's own validation); `-l` never prints synthetic secrets (F3) | DEC-1010 item 4 | 2026-11-01 |
 | W3-P18 | An export command that refuses a namespace whose export_policy is denied (the governance overlay), with a planted export case (W2-91's KPI 3's export half, narrowed by DEC-1013) | DEC-1013 | 2026-11-01 |
+| W3-P19 | Impossible-task canaries on the proving ground: tests that contradict the spec, so any pass is a cheat; the propensity measured per role and model (RESEARCH-AGENT-FAILURES-1 row 7) | DEC-1014 | 2026-11-01 |
+| W3-P20 | An independent auditor samples the orchestrator's operational commits weekly, as the audit role does for tickets (RESEARCH-AGENT-FAILURES-1 row 15) | DEC-1014 | 2026-11-01 |
+| W3-P21 | Reviewer recall per model: the proving ground's planted problems also measure the share of planted defects a review finds, reported per model (SMART-WORK-4 line 3; no home in Wave 2: W2-81 landed without a round, W2-93 has no scorer) | DEC-1022 | 2026-11-02 |
 
 Not parked: the mutation-testing trial after W2-11 is already decided (DEC-941 item 6) and stays in Wave 2.

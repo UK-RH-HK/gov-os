@@ -26,8 +26,11 @@ allowed_paths:
 - tests/unit/hooks/test_w2_118*
 kpis:
   success:
-  - '`gov watch` wakes its caller when a lead''s worktree gains a commit whose subject marks a key result (a probe record, a measure, a package, a baseline) and when a lead returns, each once, named [DEC-952 item 3, DEC-983, DEC-982]'
+  - '`gov watch` wakes its caller when a lead''s worktree gains a commit whose subject marks a key result (a probe record, a measure, a package, a baseline) and when a lead returns, each once, named [DEC-952 item 3, DEC-983, DEC-982]; where a dispatcher runs, gov watch only reads its inbox and never marks a return seen [DEC-1009, SMART-WORK-3]'
   - 'The subagent-stop hook checks a lead''s return for the `brief_gaps:` section beside the twelve fields (W3-P02) [DEC-943, DEC-983, DEC-982]'
+  - 'A commit brought into a lead''s branch by a merge from the integration branch never wakes the caller [DEC-1003, SMART-WORK-3]'
+  - 'Every commit id and path a return names is resolved against git; one that does not resolve is named in the inbox item [DEC-1014 item 2, SMART-WORK-4 line 2]'
+  - 'No watcher needs re-arming; every wake is an inbox item a pass writes [DEC-1014 item 2, SMART-WORK-4 line 12]'
   failure:
   - 'A key result or a return reported twice, or not at all.'
   - 'A worker''s return refused for a missing `brief_gaps:` section (only a lead''s is checked).'

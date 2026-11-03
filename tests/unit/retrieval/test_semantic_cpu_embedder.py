@@ -1,4 +1,5 @@
-"""Builder tests for the CPU-only query embedder (W2-54 round 4; DEC-798, DEC-261 as amended).
+"""Builder tests for the query embedder (W2-54 round 4; DEC-798, DEC-261 as amended; its CPU-only rule replaced by
+DEC-1033: a question's vector is used from any device, and the query server is started with the GPU visible).
 
 Regression evidence only (DEC-136). No process is started and no Ollama is needed: the start, the requests and the
 device listing are replaced by recorders; each project is a temporary folder.
@@ -28,13 +29,13 @@ def test_the_query_address_is_the_setting_else_the_shared_default_port_plus_one(
         "http://127.0.0.1:9"
 
 
-def test_the_cpu_embedder_is_started_at_its_own_address_with_the_gpu_hidden(monkeypatch):
+def test_the_query_embedder_is_started_at_its_own_address_with_the_gpu_left_as_the_caller_has_it(monkeypatch):
     seen = []
     monkeypatch.setattr(ollama, "ensure_available", lambda **kwargs: seen.append(kwargs) or {"available": True})
     env = {"OLLAMA_HOST": "127.0.0.1:11434", "GOV_QUERY_OLLAMA_HOST": "127.0.0.1:7", "PATH": "/bin",
            "CUDA_VISIBLE_DEVICES": "0"}
     assert ollama.ensure_query_available(timeout_s=3, env=env) == {"available": True}
-    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7", "CUDA_VISIBLE_DEVICES": "-1"}}]
+    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7"}}]
     assert env["OLLAMA_HOST"] == "127.0.0.1:11434"  # the caller's environment is not changed
 
 
@@ -49,48 +50,48 @@ def _model(name=semantic.MODEL, size=2371270737, vram=0):
     return {"name": name, "model": name, "size": size, "size_vram": vram}
 
 
-@pytest.mark.parametrize("models, on_cpu", [
-    ([_model()], True),
-    ([_model(vram=2371270737)], False),
-    ([_model(vram=1185635368)], False),
-    ([], False),
-    ([_model(name="nomic-embed-text:latest")], False),
-    ([_model(size=0)], False),
-    ([{"name": semantic.MODEL, "size": 5}], False),
-    (None, False),
+@pytest.mark.parametrize("models, device", [
+    ([_model()], "cpu"),
+    ([_model(vram=2371270737)], "gpu"),
+    ([_model(vram=1185635368)], "gpu"),
+    ([], None),
+    ([_model(name="nomic-embed-text:latest")], None),
+    ([_model(size=0)], None),
+    ([{"name": semantic.MODEL, "size": 5}], None),
+    (None, None),
 ])
-def test_only_the_model_listed_wholly_on_the_cpu_counts(monkeypatch, models, on_cpu):
+def test_the_device_is_the_one_the_listing_reports_for_the_model_loaded(monkeypatch, models, device):
     monkeypatch.setattr(semantic, "_ask", _listing(models))
-    assert semantic._on_cpu("h:1") is on_cpu
+    assert semantic._device("h:1") == device
 
 
 @pytest.fixture()
 def recorded(tmp_path, monkeypatch):
     (tmp_path / ".gov-runtime").mkdir()
-    state = {"order": [], "on_cpu": True}
+    state = {"order": [], "device": "cpu"}
 
     def embed(texts, host=None):
         state["order"].append(("embed", host))
         return [struct.pack("2f", len(text), 1.0) for text in texts]
 
-    def on_cpu(host):
+    def device(host):
         state["order"].append(("ps", host))
-        return state["on_cpu"]
+        return state["device"]
 
     monkeypatch.setenv(ollama.QUERY_HOST_SETTING, "h:1")
     monkeypatch.setattr(semantic, "_embed", embed)
     monkeypatch.setattr(semantic, "_revision", lambda host=None: DIGEST)
-    monkeypatch.setattr(semantic, "_on_cpu", on_cpu)
+    monkeypatch.setattr(semantic, "_device", device)
     return tmp_path, state
 
 
-def test_the_device_is_read_after_the_vector_is_computed_and_a_vector_off_the_cpu_is_not_used(recorded):
+def test_the_device_is_read_after_the_vector_is_computed_and_a_model_not_listed_gives_no_vector(recorded):
     root, state = recorded
-    state["on_cpu"] = False
-    assert semantic.query_vector(root, "q") == (None, semantic.NOT_ON_CPU)
+    state["device"] = None
+    assert semantic.query_vector(root, "q") == (None, semantic.NOT_LOADED)
     assert state["order"] == [("embed", "h:1"), ("ps", "h:1")]
     assert not (root / semantic.QUERY_VECTORS_REL).exists()
-    state["on_cpu"] = True
+    state["device"] = "cpu"
     assert semantic.query_vector(root, "q")[0] == struct.pack("2f", len(I + "q"), 1.0)
     assert (root / semantic.QUERY_VECTORS_REL).exists()
 
