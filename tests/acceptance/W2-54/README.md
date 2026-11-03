@@ -93,7 +93,7 @@ and the support reads the check's output in each form it prints: a list of findi
 | **S4** `audit-report` exactly W2-02's; nothing of W2-02's other types; core-schema green here, W1-43 untouched | `test_w2_54_audit_report.py`: `test_the_schema_file_is_w2_02_s_byte_for_byte`, `test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[2]`, `test_a_record_of_type_audit_report_owes_no_shared_frontmatter[2]`, `test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[3]`, `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`; `test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here` (in a close, gate (b)'s `gov check`: "W2-75") | **red** |
 | S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD, 4ce16df2]`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict × HEAD, 4ce16df2]` (read through git since run 5: "Run 5 (DEC-874)", at the end), `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` (in a close, after gate (b)'s `gov check`: "W2-75") | pass |
 | **F1** a context whose items or hash differ still fails the check, naming the ticket | `test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_the_check_names_only_the_ticket_whose_context_differs` | pass |
-| **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass |
+| **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass; since DEC-1045 the weakening case accepts that decision's three lines appended to secrets-indexing.yaml and nothing else (Rewrite-Reason DEC-1045, below) |
 | **F3** outside `docs/audit/` with no `type` still fails; an audit report lacking `milestone`, `commit` or `pack_sha256` fails naming the field | `test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/notes, docs/audit-archive, docs/reports/audit]` (pass); `test_an_audit_report_lacking_a_required_field_fails_naming_it[folder, stated × milestone, commit, pack_sha256]` (**red**) | mixed |
 
 ## Red reasons (as seen at `b644d28a`)
@@ -1074,7 +1074,8 @@ from W2-126's ticket and README interface, without its implementation.
   the question with one letter's case changed, is sent to the second project's own embedder and answered with its
   vector (the forge; under another revision, or unavailable with no hit), never the first project's; every request
   names the pinned model. Passes on `w2/integrate`, and must stay green with the cache. `test_w2_54_query_vector.py`
-  now holds 17 cases (12 functions), the suite 98.
+  now holds 17 cases (12 functions). The suite, as merged with W2-04's revisions on `w2/integrate` (`70965cf61311`):
+  105 cases, 103 selected and the 2 `shared_gpu` cases deselected.
 - **Reference stores get a cache of their own** (`cache=` on `semantic_project` and `embed_env`): the twin of
   `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it`, the twin of
   `test_a_vector_cached_under_round_3_s_key_is_never_served` (sharing the case's cache, W2-126 would rightly serve
@@ -1109,4 +1110,23 @@ case its own machine-wide folder (`case-vector-cache`); "deleted" removes both c
 read-only" makes the machine folder read-only too, "the cache's files read-only" acts on either cache's files, and
 "full" lowers both bounds. The reads that make each state are W2-04's; the caches they act on are W2-126's. No
 assertion of either side was dropped.
+
+## DEC-1045: the secrets-indexing declaration's decided change (`Rewrite-Reason: DEC-1045`, 2026-11-03)
+
+DEC-1045 (owner, 2026-11-02) switched the secrets scan off on this repository by configuration, the feature kept
+built and on by default elsewhere. Its commit `ddcec657c278` appended three lines to
+`template/governance/kernel/checks/secrets-indexing.yaml` (two comment lines and `allows-not-applicable: "true"`), so
+that with `scan: off` the check answers not applicable, YELLOW, naming the switch.
+`test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened` (DEC-768 item 4: every declaration byte for byte as
+at the base `b644d28a`, but the context check's line) failed on it ("secrets-indexing.yaml is changed").
+
+- **Revised:** the case names that change in `DECIDED_CHANGES` (the file, the decision, its exact three lines). That
+  declaration must be its base bytes, or those bytes followed by exactly those lines; every other declaration stays
+  byte for byte as at the base, and none is added or removed. Its intent is kept: no hard-block check is weakened
+  beyond what an owner's decision named.
+- **Shown:** on `70965cf61311` the case passes. A throwaway probe outside the tree (the file's bytes replaced in the
+  reading process only) shows it still fails for the secrets-indexing check downgraded to advisory, for another line
+  appended to it, and for core-schema given the same `allows-not-applicable` line; it passes for the declaration
+  back at its base bytes.
+- **Counts:** unchanged, 10 cases in the file, 105 in the suite (103 selected).
 
