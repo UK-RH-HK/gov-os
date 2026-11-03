@@ -121,7 +121,8 @@ def _text(root: Path, item: dict, files: dict) -> str:
     return b"".join(lines[chunk["start_line"] - 1:chunk["end_line"]]).decode("utf-8", "replace")
 
 
-def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), skip_entries=(), role=None) -> dict:
+def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), skip_entries=(), role=None,
+          ticket=None) -> dict:
     """The supplementary block for ``room`` tokens: ``{"query", "supplementary", "dropped", "further_batch",
     "supplementary_batches", "left_out"}``, each batch the ranked items it read and its limit, in the order taken.
     ``Unavailable`` where the lexical index does not answer."""
@@ -130,7 +131,8 @@ def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), 
 
     asked = query(title, kpis)
     # W2-13 S5: GOV_ROLE, a --role beside it (``role``: adds, never lifts) and GOV_TICKET; RolePathsError when unreadable
-    withhold = role_paths.caller(root, role)
+    # review S5-F1: the packet's own ``ticket`` judged beside GOV_TICKET (the union: it only adds)
+    withhold = role_paths.caller(root, role, also=(ticket,) if ticket else ())
     ranked, left_out = _ranked(Path(root), terms(asked), set(skip_paths), set(skip_entries), withhold)
     files: dict[str, tuple] = {}
     supplementary, dropped, batches = [], [], []

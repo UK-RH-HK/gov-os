@@ -490,10 +490,11 @@ class Filter:
                 "by": by}
 
 
-def caller(root, role=None, ticket=None, main=None, links=None) -> Filter | None:
-    """The filter for the caller (``GOV_ROLE`` and ``role``; ``ticket``, else ``GOV_TICKET``) searching the tree at
-    ``root``; None when the main tree's path map has no ``role_paths:`` section, names none of the roles, or no rule
-    is filled. Raises ``RolePathsError`` when the section or the ticket cannot be read."""
+def caller(root, role=None, ticket=None, main=None, links=None, also=()) -> Filter | None:
+    """The filter for the caller (``GOV_ROLE`` and ``role``; ``ticket``, else ``GOV_TICKET``, and each ticket in
+    ``also``, as a packet's own ticket: the union of their rules, which can only add) searching the tree at ``root``;
+    None when the main tree's path map has no ``role_paths:`` section, names none of the roles, or no rule is
+    filled. Raises ``RolePathsError`` when the section or a ticket cannot be read."""
     roles = roles_of(role)
     if not roles:
         return None
@@ -504,7 +505,8 @@ def caller(root, role=None, ticket=None, main=None, links=None) -> Filter | None
         return None
     if ticket is None:
         ticket = os.environ.get("GOV_TICKET") or None
-    found = judges(sec, roles, root, ticket, [root, main], main=main, links=links)
+    tickets = [t for t in dict.fromkeys([ticket, *also]) if t] or [None]  # review S5-F1: the packet's ticket too
+    found = [j for t in tickets for j in judges(sec, roles, root, t, [root, main], main=main, links=links)]
     if not any(j.denied for j in found):
         return None
-    return Filter(root, [j.role for j in found], ticket, found)
+    return Filter(root, list(dict.fromkeys(j.role for j in found)), ", ".join(t for t in tickets if t) or None, found)

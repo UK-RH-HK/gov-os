@@ -249,3 +249,31 @@ def test_gov_context_command_passes_role_through_to_the_block(project):
     assert [entry["id"] for entry in packet["dropped"]].count("role_filter") == 1
     assert _CTX_CASE in _packet_paths(context_command.run(project, argparse.Namespace(**{**vars(args), "role": None}),
                                                           {}))
+
+
+def test_a_packet_built_from_another_tickets_session_judges_the_packets_own_ticket_too(project, monkeypatch):
+    """Review S5-F1: the CTO's session (W2-00's ticket) builds an engineer's packet for TK-1: TK-1's tests withheld."""
+    from gov.context import command as context_command
+    args = argparse.Namespace(ticket="TK-1", brief=False, budget=None, dry_run=False, in_force=False, role="engineer")
+    monkeypatch.setenv("GOV_ROLE", "orchestrator")
+    for session_ticket in ("DAEO-sdxk", None):  # another ticket's session, and no GOV_TICKET at all
+        if session_ticket:
+            monkeypatch.setenv("GOV_TICKET", session_ticket)
+        else:
+            monkeypatch.delenv("GOV_TICKET", raising=False)
+        packet = context_command.run(project, args, {})
+        assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
+        named = [entry["reason"] for entry in packet["dropped"] if entry["id"] == "role_filter"]
+        assert len(named) == 1 and "1 paths" in named[0] and "TK-1" in named[0]
+
+
+def test_a_leads_own_packet_is_unchanged_by_the_packets_ticket(project):
+    """GOV_TICKET is the packet's own ticket: the same filter and the same words as before S5-F1."""
+    from gov.guard import role_paths
+    from gov.retrieval import supplementary
+    before = role_paths.caller(project, "engineer")
+    after = role_paths.caller(project, "engineer", also=("TK-1",))
+    assert before is not None and after is not None and len(after._judges) == len(before._judges)
+    block = supplementary.stack(project, "zebra ticket", ["the quokka line holds"], 5000, role="engineer",
+                                ticket="TK-1")
+    assert block["role_filter"]["ticket"] == "TK-1" and block["role_filter"]["withheld"]["paths"] == 1

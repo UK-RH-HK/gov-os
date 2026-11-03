@@ -145,3 +145,15 @@ def test_the_main_tree_is_the_common_git_folders_and_a_folder_without_git_is_its
     (repo / "sub").mkdir()
     assert role_paths.main_tree(repo / "sub") == str(repo.resolve())
     assert role_paths.main_tree(tmp_path) == str(tmp_path.resolve())
+
+
+def test_the_tickets_also_judged_add_their_rules_and_never_lift_one(tree):
+    (tree / ".tickets/DAEO-quay.md").write_text("---\nid: DAEO-quay\nwbs_id: W2-98\n---\n# x\n", encoding="utf-8")
+    f = role_paths.caller(tree, "engineer", "DAEO-pier", main=str(tree), links=lambda *_a: set(), also=("DAEO-quay",))
+    assert f.denied("tests/acceptance/W2-99/a.py") and f.denied("tests/acceptance/W2-98/b.py")
+    assert f.ticket == "DAEO-pier, DAEO-quay" and f.roles == ["engineer"]
+    alone = role_paths.caller(tree, "engineer", None, main=str(tree), links=lambda *_a: set(), also=("DAEO-quay",))
+    assert alone.denied("tests/acceptance/W2-98/b.py") and not alone.denied("tests/acceptance/W2-99/a.py")
+    same = role_paths.caller(tree, "engineer", "DAEO-pier", main=str(tree), links=lambda *_a: set(),
+                             also=("DAEO-pier",))
+    assert same.ticket == "DAEO-pier" and len(same._judges) == 1  # the lead's own ticket: judged once
