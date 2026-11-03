@@ -202,3 +202,23 @@ in eleven files, run file by file; the five real-models and `local_only` cases w
 the sandbox reaches no shared Ollama). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
 query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
 expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Paging with continuation; facets; dedup by chunk hash; authority/current filter drops superseded and must-not-cite records; one reran... | `test_w1_21_command.py::test_a_bundle_cut_by_the_budget_is_continued_by_its_token`, `test_w1_21_merge.py::test_the_bundle_names_the_routes_and_their_state`, `test_w1_21_merge.py::test_a_chunk_both_routes_return_is_cited_once_and_names_both` | README |
+| S2: Every bundle cites by id and sha256 and carries one stopping reason from the fixed list [CAP-55.a] | `test_w1_21_bundle.py::test_every_bundle_cites_by_id_and_sha256_and_carries_one_stopping_reason`, `test_w1_21_bundle.py::test_a_bundle_without_the_embedding_endpoint_has_the_same_form`, `test_w1_21_bundle.py::test_the_stopping_reason_is_one_value_and_no_second_one_is_carried` | README |
+| S3: RETR-A-04 and RETR-X-02 dev runs produce multi-batch bundles [CAP-16.b] | `test_w1_21_closure_and_gaps.py::test_a_tickets_closure_is_gathered_over_several_hops`, `test_w1_21_dev_tier.py::test_retr_a_04_gives_a_bundle_of_several_batches`, `test_w1_21_dev_tier.py::test_retr_x_02_a_record_that_does_not_exist_is_a_stated_gap` | README |
+| S4: A child hit is expanded to its parent span only within the bundle budget, and the bundle names each expansion (DEC-091) [CAP-18.b] | `test_w1_21_expansion.py::test_a_child_hit_is_expanded_to_its_parent_and_the_expansion_is_named`, `test_w1_21_expansion.py::test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded`, `test_w1_21_expansion.py::test_a_bundle_budget_of_nothing_expands_nothing` | README |
+| S5: Registers the retrieval-regression family check: the dev query set meets its recorded hit@5 and forbidden-citation baselines [CAP-38.b] | `test_w1_21_family_check.py::test_the_check_is_registered_with_its_five_fields`, `test_w1_21_family_check.py::test_where_nothing_is_indexed_the_check_is_not_green_and_builds_nothing`, `test_w1_21_family_check.py::test_the_check_is_green_when_the_dev_tiers_meet_the_baselines` | README |
+| S6: Retrieval spend has its own radius-scaled budget (follow-up rounds by profile), separate from the packet ceiling; reaching it ends wi... | `test_w1_21_paging.py::test_the_follow_up_rounds_scale_with_the_radius`, `test_w1_21_paging.py::test_a_larger_radius_gathers_more`, `test_w1_21_paging.py::test_the_spend_budget_is_separate_from_the_bundle_budget` | README |
+| S7: For a ticket whose scope matches a committed failure or lesson record, the bundle returns that record ahead of implementation evidenc... | `test_w1_21_failure_memory.py::test_a_record_in_the_tickets_scope_is_returned`, `test_w1_21_failure_memory.py::test_failure_and_lesson_records_come_ahead_of_implementation_evidence`, `test_w1_21_failure_memory.py::test_a_record_out_of_scope_is_not_returned` | README |
+| F1: A batch-size limit is reported as completeness | `test_w1_21_paging.py::test_a_batch_size_limit_is_never_reported_as_completeness`, `test_w1_21_paging.py::test_the_gap_list_names_what_was_not_gathered`, `test_w1_21_paging.py::test_a_small_batch_size_gives_several_batches_and_everything_is_gathered` | README |
+| F2: A superseded record is cited as current | `test_w1_21_authority.py::test_the_fixture_offers_every_superseded_record_to_the_filter`, `test_w1_21_authority.py::test_current_records_are_cited`, `test_w1_21_authority.py::test_a_superseded_record_found_by_the_exact_string_is_not_cited` | README |
+
+Tier 2's cap here: 54 functions (9 KPI lines x 6); 31 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
