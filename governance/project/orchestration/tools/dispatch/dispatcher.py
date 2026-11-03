@@ -38,10 +38,10 @@ error in its own checks; every external command has a 60 s limit, a timeout coun
   6. status.json and status.txt; 7. inbox-stale.txt, one stable line per cause (the sentinel's watch silent, the
      embedding server HUNG, a GPU alert unread or 0 layers, a slot holder IDLE, an inbox item unread 30 minutes),
      each written once per stall.
-Admission (step 3, DEC-1032) needs room on every resource, each from measured peaks: the real CPU, memory (with the
-lead cap derived from it), GPU memory (from the last pass's read), and counts the rerankers; the heavy slots it
-reckons with follow where the shared embedder runs (`slots_gpu` on the GPU, `slots_cpu` otherwise). The status's
-`Balance:` line shows them all.
+Admission (step 3, DEC-1032) needs room on every resource, each from measured peaks: the real CPU, memory (by the
+Load Balancer's forecast above the floor, DEC-1052 O-A1: the slots rule lifted; the literal rule with its lead cap an
+explicit option), GPU memory (from the last pass's read), and counts the rerankers; the heavy slots shown follow where
+the shared embedder runs (`slots_gpu` on the GPU, `slots_cpu` otherwise). The status's `Balance:` line shows them all.
 It never starts what is not in ready.txt and never lands what is not in land.txt (the CTO's lists).
 Every external command and path can be replaced through DISPATCH_* variables, for the tests only.
 """
@@ -343,7 +343,9 @@ HEAVY = ("gov.context.context_check", "gov.retrieval.retrieve_check", "gov.check
 def config():
     c = {"K": 2,  # no longer used: the lead cap comes from memory (DEC-1032), not slots x K
          "outside_slot_limit_s": 300, "peaks_refresh_s": 3600, "peaks_max_age_s": 7 * 86400,
-         "history_days": 7, "memory_rule": "slots", "min_outside_samples": 120,
+         # DEC-1052 O-A1: memory is admitted by the Load Balancer's forecast; the slots rule is lifted ("slots" in a
+         # config.json is read as "forecast"); "literal" (DEC-1008 item 5 as written) stays an explicit option
+         "history_days": 7, "memory_rule": "forecast",
          "cpu_margin": 2,
          # DEC-1015 item 2: the embedding server's health, and the slot holders' progress
          "embed_check_every": 5, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
@@ -624,7 +626,9 @@ def admit_safely(t, newcomer_tid, phases=None):
     """F3: a bad peaks.json or config never raises out of the tick: it refuses, naming why. DEC-1039 (1b): what the
     rules admit, the forecast must admit too (`forecast_admission`): the running jobs' current-phase peaks plus the
     newcomer's worst phase (a lead: its phases without another gate, and `phases`, its first one when given) within
-    every resource; the reason names the binding resource either way."""
+    every resource; the reason names the binding resource either way. Under the forecast memory rule (DEC-1052 O-A1)
+    the forecast is the memory admission: applied whatever `forecast_admission` says, and a forecast that did not
+    judge RAM refuses (fail closed)."""
     if t.get("config_error"):
         return False, "not admitted: " + t["config_error"]
     try:
@@ -632,14 +636,18 @@ def admit_safely(t, newcomer_tid, phases=None):
         if not ok:
             return ok, why
         c = t["_c"] or {}
+        by_forecast = memory_by_forecast(c) and t["_pk"] is not None  # no peaks: gate_check judged memory
+        applied = c.get("forecast_admission", True) or by_forecast
         if t.get("forecast_error"):
-            return (False, t["forecast_error"]) if c.get("forecast_admission", True) else (ok, why)
+            return (False, t["forecast_error"]) if applied else (ok, why)
         f = t["forecast"]["lead"]
         if phases:
             f = balancer.forecast(forecast_state(t, c), t["_phase_peaks"], "lead",
                                   tuple(balancer.UNGATED) + tuple(phases))
-        if not f["ok"] and c.get("forecast_admission", True):
+        if not f["ok"] and applied:
             return False, f["reason"]
+        if by_forecast and "ram" not in f["resources"]:
+            return False, "memory: the forecast did not judge RAM (no MemAvailable or no floor): fail closed"
         return ok, f"{why}; {f['reason']}" + ("" if f["ok"] else " (not applied: forecast_admission false)")
     except Exception as exc:
         return False, f"admission error: {exc!r}"[:200]
@@ -1121,16 +1129,46 @@ def gpu_room(t, c):
     return True, f"GPU memory {g['free_mib']} MiB free >= {need} MiB"
 
 
+FORECAST_RULES = ("forecast", "slots")  # DEC-1052 O-A1: the slots rule lifted; "slots" in config.json means the forecast
+
+
+def memory_by_forecast(c):
+    """DEC-1052 O-A1: whether memory is admitted by the Load Balancer's forecast (the default, and a config.json that
+    still names the lifted slots rule) rather than the literal rule."""
+    return (c or {}).get("memory_rule", "forecast") in FORECAST_RULES
+
+
+def forecast_memory(t, c):
+    """DEC-1052 O-A1: (admit, reason) for memory under the forecast. The slots rule reserved each heavy slot's peak on
+    top of the memory the running slot jobs already held (2026-11-02 22:17: "-2580 MB of room" with 15.9 GB available,
+    W2-112's lead refused while the forecast admitted it): lifted. The forecast judges RAM (available - the running
+    jobs' current-phase peaks above their RSS - the newcomer's worst phase >= the floor; admit_safely applies it). The
+    floor stays: gate-config.json's, which tools/oom_watch.sh (the out-of-memory trip-wire) raises; no floor, or no
+    MemAvailable, refuses (fail closed)."""
+    try:
+        floor = json.loads(GATE_CONFIG.read_text())["floor_kb"]
+    except (OSError, ValueError, KeyError):
+        return False, "no floor in gate-config.json (fail closed)"
+    if t.get("mem_available_mb") is None:
+        return False, "memory: MemAvailable unread (fail closed)"
+    rule = (c or {}).get("memory_rule", "forecast")
+    return True, (f"memory by the Load Balancer's forecast above the floor {floor // 1024} MB (the out-of-memory "
+                  f"trip-wire's; the slots rule lifted, DEC-1052 O-A1"
+                  + ("; memory_rule \"slots\" in config.json read as the forecast" if rule == "slots" else "") + ")")
+
+
 def memory_room(t, c, pk):
-    """The memory rule's parts: {floor, have, p95, own, slots_n, slots_kb, headroom, rule, how_lead}, or (None, why)
-    when the rule cannot price (no floor: refuse; too little history: gate_check decides)."""
+    """The literal memory rule's parts: {floor, have, p95, own, slots_n, slots_kb, headroom, rule, how_lead}, or
+    (None, why) when the rule cannot price (no floor: refuse). Under the forecast (DEC-1052 O-A1) there is no such
+    rule: (None, forecast_memory's verdict)."""
+    if memory_by_forecast(c):
+        return None, forecast_memory(t, c)
     try:
         floor = json.loads(GATE_CONFIG.read_text())["floor_kb"]
     except (OSError, ValueError, KeyError):
         return None, (False, "no floor in gate-config.json (fail closed)")
     have = (t["mem_available_mb"] or 0) * 1024 + sum(t["lead_rss_kb"].values())
-    rule = c.get("memory_rule", "slots")
-    lo = pk.get("lead_outside")
+    rule = c.get("memory_rule", "forecast")
     # F2: the shared services' headroom (each at most its p95 above what it holds now), counted once
     headroom = sum(max(0, (pk.get("kinds", {}).get(k, {}).get("rss_kb_p95") or 0) - t.get("services_kb", {}).get(k, 0))
                    for k in SERVICES)
@@ -1142,20 +1180,11 @@ def memory_room(t, c, pk):
         if reserve is None:
             reserve = pk.get("kinds", {}).get("reranker", {}).get("rss_kb_p95") or 0
         headroom += max(0, reserve - t.get("rerankers_outside_kb", 0))
-    if rule == "slots":
-        if not (lo and lo["samples"] >= c["min_outside_samples"] and pk.get("slot_run_kb")):  # F4: too little history
-            return None, (t["gate_open"], ("fallback to gate_check (fewer than "
-                                           f"{c['min_outside_samples']} minutes outside verification): "
-                                           + t["gate"][:120]))
-        p95, own = lo["rss_kb_p95"], pk.get("lead_own_outside_max_kb", {})
-        # DEC-1032: the slots by the embedder's device, never fewer than the slots held now
-        slots_n = max(int(t.get("slots_target") or c["slots"]), len(t.get("slots_held") or []))
-        slots_kb = slots_n * pk["slot_run_kb"]
-        how_lead = "outside verification"
-    else:  # the literal rule (DEC-1008 item 5 as written)
-        p95, own = pk["lead"]["rss_kb_p95"], pk.get("lead_own_max_kb", {})
-        slots_n, slots_kb = 0, 0
-        how_lead = "all samples"
+    # the literal rule (DEC-1008 item 5 as written): each lead at its all-sample p95, nothing reserved for slot runs
+    # (DEC-1052 O-A1 lifted the slots rule, which reserved each heavy slot's peak on top of what its jobs held)
+    p95, own = pk["lead"]["rss_kb_p95"], pk.get("lead_own_max_kb", {})
+    slots_n, slots_kb = 0, 0
+    how_lead = "all samples"
     return dict(floor=floor, have=have, p95=p95, own=own, slots_n=slots_n, slots_kb=slots_kb, headroom=headroom,
                 rule=rule, how_lead=how_lead), None
 
@@ -1163,7 +1192,8 @@ def memory_room(t, c, pk):
 def lead_cap(t, c, pk):
     """DEC-1032: the lead cap from memory, replacing slots x K: floor(room / a lead's p95), where room is the memory
     the leads may hold (available + the leads' current trees - the floor - the slot runs - the services' headroom).
-    {cap, room_kb, p95_kb} or None when the memory rule cannot price."""
+    {cap, room_kb, p95_kb} or None when the memory rule cannot price, and under the forecast (DEC-1052 O-A1: no
+    lead cap; the forecast admits each start on its own)."""
     m, _ = memory_room(t, c, pk)
     if not m or not m["p95"]:
         return None
@@ -1172,9 +1202,10 @@ def lead_cap(t, c, pk):
 
 
 def _admission_rules(t, c, pk, newcomer_tid=None):
-    """(admit, reason). Never while a heavy step runs outside a slot; the lead cap from memory (DEC-1032); memory:
-    available + the leads' current memory >= floor + each running lead's peak + the new lead's peak + the slot runs +
-    the services' headroom. No peaks: gate_check."""
+    """(admit, reason). Never while a heavy step runs outside a slot. Memory: by the forecast (the default, DEC-1052
+    O-A1: the floor checked here, the forecast applied by admit_safely); under the literal rule, the lead cap from
+    memory (DEC-1032) and available + the leads' current memory >= floor + each running lead's peak + the new lead's
+    peak + the services' headroom. No peaks: gate_check."""
     if pk is None:
         return t["gate_open"], "fallback to gate_check (peaks.json missing or older than 7 days): " + t["gate"][:120]
     if t["outside_slot"]:
@@ -2664,7 +2695,8 @@ def balance(t, emb, c):
     target, device = slots_by_device(c)
     cap = t.get("lead_cap")
     caps = (f"lead cap {cap['cap']} from memory ({gb(cap['room_kb'])} GB room / {gb(cap['p95_kb'])} GB a lead)"
-            if cap else "lead cap ? (no peaks or no memory rule)")
+            if cap else "no lead cap (memory by the forecast: DEC-1052 O-A1)" if memory_by_forecast(c)
+            else "lead cap ? (no peaks or no memory rule)")
     rr = t.get("rerankers") or {}
     res = t.get("reranker_reserve")
     rer = (f"rerankers {rr.get('n', 0)} ({gb(rr.get('rss_kb', 0))} GB RSS; "
@@ -3009,7 +3041,9 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
         f"{t.get('embedding_cores')}); memory available {t.get('mem_available_mb')} MB; gate_check (for comparison) {'open' if t['gate_open'] else 'SHUT'}"
         f" ({t['gate'][:120]}); disk {'open' if t['disk_open'] else 'SHUT'}",
         bal_line] + lb_lines + [
-        f"admission (by peaks, DEC-1008 item 5): {t['admit_reason'][:400]}",
+        (f"admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): "
+         if memory_by_forecast(t.get("_c")) else "admission (by peaks, DEC-1008 item 5): ")
+        + t["admit_reason"][:400],
         (f"peaks {t['peaks']['computed']}: a lead p95 {t['peaks']['lead_p95_mb']} MB, max {t['peaks']['lead_max_mb']} MB"
          if t.get("peaks") else "peaks: none (gate_check decides)"),
         ("FINDING: heavy step(s) outside a slot: " + "; ".join(t["outside_slot"][:3])) if t["outside_slot"] else

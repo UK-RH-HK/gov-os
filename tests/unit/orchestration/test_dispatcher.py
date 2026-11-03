@@ -551,7 +551,8 @@ def mixed_history(w):
     (w.orch / "log" / "lead-mem.jsonl").write_text("\n".join(mem) + "\n")
 
 
-def test_the_slots_rule_admits_what_the_literal_rule_refuses(wp):
+def test_the_forecast_admits_what_the_literal_rule_refuses(wp):
+    """DEC-1052 O-A1: a config.json that still names the slots rule (the live one does) is admitted by the forecast."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     mixed_history(wp)
     leads(wp, 4)  # 4 leads at 0.3 GB now
@@ -561,7 +562,9 @@ def test_the_slots_rule_admits_what_the_literal_rule_refuses(wp):
     pk = json.loads((wp.d / "peaks.json").read_text())
     assert pk["lead_outside"]["rss_kb_p95"] == 500_000 and pk["lead_inside"]["rss_kb_p95"] == 2_500_000
     assert pk["slot_run_kb"] == 2_000_000  # the leads' rise beats the test run's own 1 GB share
-    assert s["admit"] and "slots rule" in s["admit_reason"] and calls(wp)[0].startswith("launch W2-A")
+    assert s["admit"] and s["admit_reason"].startswith("memory by the Load Balancer's forecast above the floor 3072 MB")
+    assert 'memory_rule "slots" in config.json read as the forecast' in s["admit_reason"]
+    assert "forecast admits" in s["admit_reason"] and calls(wp)[0].startswith("launch W2-A")
 
 
 def test_the_literal_rule_is_kept_as_an_option(wp):
@@ -574,12 +577,15 @@ def test_the_literal_rule_is_kept_as_an_option(wp):
     assert not s["admit"] and "literal rule" in s["admit_reason"] and calls(wp) == []
 
 
-def test_the_slots_rule_without_enough_history_falls_back_to_gate_check(wp):
+def test_too_little_history_outside_verification_no_longer_falls_back_to_gate_check(wp):
+    """DEC-1052 O-A1: that fallback was the slots rule's; the forecast prices a lead from its phases' floors."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     leads(wp, 1)  # wp's history has a test run every minute: no minute outside verification
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
-    tick(wp)
-    assert status(wp)["admit_reason"].startswith("fallback to gate_check (fewer than 120 minutes")
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    s = status(wp)
+    assert s["admit"] and s["admit_reason"].startswith("memory by the Load Balancer's forecast")
+    assert calls(wp)[0].startswith("launch W2-A")
 
 
 # ---- the review of dispatcher_next.py (F1 to F5) ------------------------------------------------------------------
@@ -641,7 +647,8 @@ def test_f3_a_bad_config_value_refuses(wp):
 
 
 def test_f4_the_newcomer_is_priced_at_its_own_max(wp):
-    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
+    """Under the literal rule (DEC-1052 O-A1 lifted the slots rule this test was first written for)."""
+    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "literal"}))
     mixed_history(wp)
     lines = (wp.orch / "log" / "lead-mem.jsonl").read_text().splitlines()
     r = json.loads(lines[0])
@@ -1950,6 +1957,7 @@ def test_admission_a_gpu_read_older_than_its_limit_is_not_judged(wp):
 
 
 def test_slots_follow_the_shared_embedders_device(wp):
+    """The slots by device, in the status (DEC-1052 O-A1: no longer reserved in a memory rule)."""
     (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
     mixed_history(wp)
     (wp.d / "ready.txt").write_text("")
@@ -1962,31 +1970,18 @@ def test_slots_follow_the_shared_embedders_device(wp):
         return status(wp)["slots_target"], status(wp)["admit_reason"], (wp.d / "status.txt").read_text()
     target(NOW)  # the first pass reads the layers
     n, why, text = target(NOW + 60)
-    assert n == 3 and "+ 3 slot runs at" in why and "slots 3 by device (gpu 29/29)" in text
+    assert n == 3 and "slot runs at" not in why and "slots 3 by device (gpu 29/29)" in text
     glog(wp, "shared", "load_tensors: offloaded 20/29 layers to GPU\n")
     target(NOW + 120)
     n, why, text = target(NOW + 180)
-    assert n == 2 and "+ 2 slot runs at" in why and "slots 2 by device (partial 20/29)" in text
+    assert n == 2 and "slots 2 by device (partial 20/29)" in text
     glog(wp, "shared", ON_CPU)
     target(NOW + 240)
     assert target(NOW + 300)[0] == 2 and "slots 2 by device (cpu 0/29)" in target(NOW + 360)[2]
-    conf(wp, memory_rule="slots", slots_gpu=4, slots_cpu=1)  # configured
+    conf(wp, slots_gpu=4, slots_cpu=1)  # configured
     glog(wp, "shared", LOADED)
     target(NOW + 420)
     assert target(NOW + 480)[0] == 4
-
-
-def test_slots_never_count_fewer_than_the_slots_held(wp):
-    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
-    mixed_history(wp)
-    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
-    smi(wp)
-    glog(wp, "shared", ON_CPU)
-    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
-    wp.held.write_text(json.dumps(["/tmp/gov-os-heavy-slot-1.lock", "/tmp/gov-os-heavy-slot-2.lock",
-                                   "/tmp/gov-os-heavy-slot-3.lock"]))
-    tick(wp, DISPATCH_NOW=NOW + 60)
-    assert status(wp)["slots_target"] == 2 and "+ 3 slot runs at" in status(wp)["admit_reason"]
 
 
 def test_gpu_a_partial_load_is_one_alert_per_incident(w):
@@ -2681,3 +2676,83 @@ def test_lb2_both_reranker_slots_held_is_no_gpu_budget_alert(w, slot1):
     row = json.loads((w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
     assert row["rr_held"] == 2 and row["rr_gpu"] == (2 if slot1 == "worker" else 1)
     assert s["forecast"]["lead"]["resources"]["gpu"]["text"].endswith("the newcomer's 0.0; 0 GPU reranker slot(s) free)")
+
+
+# ---- DEC-1052 O-A1: the slots rule lifted; the Load Balancer's forecast is the memory admission -----------------------
+
+SLOT_RUN_2217_KB = 5134 * 1024  # a slot run's memory in that hour's peaks.json, as the slots rule reserved it
+TRIP_FLOOR_KB = 6_710_886  # the floor tools/oom_watch.sh (the out-of-memory trip-wire) puts back (DEC-961)
+
+
+def case_2217(wp, avail_mb, floor_kb=3 * GB, **kv):
+    """log/incidents/2026-11-02-2217-T1.md: no lead running (the owner's stop); a landing in its rebuild (0.2 GB) and a
+    slot's test run (3.2 GB); GPU 7457 of 16303 MiB; config.json still naming the slots rule (as the live one does);
+    W2-112's lead the newcomer. The slots rule reserved 3 slot runs at 5134 MB on top of the 3.2 GB the running one
+    already held: 15894 - floor 3072 - 3 x 5134 = -2580 MB of room, so a lead cap of 0. Returns the status."""
+    assert 15894 - 3072 - 3 * 5134 == -2580  # the incident's figure, from these planted numbers
+    conf(wp, memory_rule="slots", **kv)
+    (wp.orch / "tools" / "gate-config.json").write_text(json.dumps({"floor_kb": floor_kb}))
+    (wp.d / "peaks.json").write_text(json.dumps({
+        "computed": datetime.fromtimestamp(NOW).strftime("%Y-%m-%d %H:%M:%S"), "days": 7, "kinds": {},
+        "lead": {"rss_kb_p95": 2_180_248, "rss_kb_max": 4 * GB, "samples": 900}, "lead_own_max_kb": {},
+        "lead_outside": {"rss_kb_p95": 2_180_248, "rss_kb_max": 3 * GB, "samples": 300}, "lead_own_outside_max_kb": {},
+        "lead_inside": {"rss_kb_p95": 4_090_592, "rss_kb_max": 5 * GB, "samples": 600}, "slot_run_kb": SLOT_RUN_2217_KB}))
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {avail_mb * 1024} kB\n")
+    gpu_used(wp, 7457)
+    wp.procs.write_text(json.dumps([
+        {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1, "rss_kb": 50_000},
+        {"cmd": "/usr/bin/python3 -m gov.cli.main rebuild", "cwd": "/", "pid": 201, "ppid": 200, "rss_kb": 150_000},
+        {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+         "pid": 1593972, "ppid": 1, "rss_kb": 2000},
+        {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 1593973, "ppid": 1593972, "rss_kb": 3_355_443}]))
+    ready = (wp.d / "ready.txt").read_text()
+    (wp.d / "ready.txt").write_text("")
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1)  # the first pass reads the GPU
+    (wp.d / "ready.txt").write_text(ready)
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 60)
+    return status(wp)
+
+
+def test_o_a1_the_2217_case_is_admitted_by_the_forecast(wp):
+    s = case_2217(wp, 15894)
+    jobs = {j["kind"]: j for j in s["jobs"]}
+    assert jobs["landing"]["phase"].startswith("rebuild.") and jobs["slot"]["phase"] == "test", s["jobs"]
+    reason = s["admit_reason"]
+    assert s["admit"] and calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"], reason
+    assert "lead cap" not in reason and "of room" not in reason and "slot runs at" not in reason
+    assert reason.startswith("memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory "
+                             "trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule \"slots\" in config.json "
+                             "read as the forecast)"), reason
+    assert "forecast admits (binding " in reason and s["lead_cap"] is None
+    text = (wp.d / "status.txt").read_text()
+    assert "admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by " in text
+    assert "no lead cap (memory by the forecast: DEC-1052 O-A1)" in status_line(wp, "Balance: ")
+    ram = s["forecast"]["lead"]["resources"]["ram"]
+    assert ram["ok"] and ram["cap"] == (15894 - 3072) * 1024 and ram["need"] < 5 * GB, ram
+
+
+@pytest.mark.parametrize("forecast_admission", [True, False])
+def test_o_a1_a_real_shortage_is_still_refused_by_the_forecast(wp, forecast_admission):
+    """6 GB available: 3 GB above the floor, less than the slot run's rise to its peak (1.8 GB), the landing's (0.3)
+    and the newcomer's 2.1 GB: refused, RAM named. Under the forecast memory rule the forecast is the memory
+    admission, so forecast_admission false does not switch it off (it would leave memory unjudged: fails open)."""
+    s = case_2217(wp, 6144, forecast_admission=forecast_admission)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (RAM binding): RAM "), s["admit_reason"]
+    assert s["admit_reason"].endswith("(floor 3.0; running jobs' peaks 2.1 + the newcomer's 2.1)") and calls(wp) == []
+    assert all(r.startswith("not admitted: forecast refuses (RAM binding)") for r in s["ready_waits"].values())
+
+
+def test_o_a1_the_floor_and_the_trip_wire_are_kept(wp):
+    """The floor gate-config.json holds, which the out-of-memory trip-wire raises: 9 GB available admits above the
+    3 GB floor and is refused above the trip-wire's 6.4 GB; no floor at all refuses (fail closed)."""
+    s = case_2217(wp, 9216, floor_kb=TRIP_FLOOR_KB)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (RAM binding)"), s["admit_reason"]
+    assert "(floor 6.4; " in s["admit_reason"] and calls(wp) == []
+    s = case_2217(wp, 9216)
+    assert s["admit"] and "above the floor 3072 MB" in s["admit_reason"] and len(calls(wp)) == 1
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    (wp.orch / "tools" / "gate-config.json").write_text("{}")
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 600)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"] == "no floor in gate-config.json (fail closed)" and calls(wp) == []
