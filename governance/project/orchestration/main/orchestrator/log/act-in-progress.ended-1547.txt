@@ -1,0 +1,1 @@
+2026-11-02 14:17:57 ACT-QUERY-CPUS-1 handed to the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO or its tools until the owner says done; a landing in flight may commit at its end (W2-122+W2-123).

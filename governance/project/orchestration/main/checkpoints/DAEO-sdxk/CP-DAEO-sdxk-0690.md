@@ -1,0 +1,24 @@
+---
+id: CP-DAEO-sdxk-0690
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-sdxk at stop
+task: DAEO-sdxk
+task_status: open
+trigger: stop
+next_action: 'Handover before the owner''s restart: RESUME HERE (DEC-1052 plan first)
+  and MORNING-RESTART-2026-11-03.md; nothing running but the dispatcher'
+created: '2026-11-03T00:00:57Z'
+inputs:
+- id: DAEO-sdxk
+  version: b8571d9d
+  hash: sha256:e3bc3c636cac0a66e0ff7f46e3c4e9115735ce5f4a4c49f9393635fafb4f9b3e
+head_commit: 2eb1655b5f5ab1523d2feb34bd4dcf66ca388504
+---
+
+# CP-DAEO-sdxk-0690 — DAEO-sdxk at stop
+
+## Next action
+
+Handover before the owner's restart: RESUME HERE (DEC-1052 plan first) and MORNING-RESTART-2026-11-03.md; nothing running but the dispatcher

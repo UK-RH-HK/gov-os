@@ -3,16 +3,27 @@
 # Judged by each process's working folder, never by `pgrep -f` on a path (that matches the caller's own shell:
 # slipped twice, DEC-1012). The caller's own chain of processes is left out.
 # Usage: tree_busy.sh <W2-id | worktree path>
+#        tree_busy.sh --cmd <path>   any process whose command line or executable names <path> (e.g. an old pin's
+#                                    folder: the ACTs' wait for old-pin processes, owner 2026-11-02 ~18:20)
 set -u
-arg=${1:?usage: tree_busy.sh <W2-id | worktree path>}
+mode=cwd
+[ "${1:-}" = --cmd ] && { mode=cmd; shift; }
+arg=${1:?usage: tree_busy.sh <W2-id | worktree path> | --cmd <path>}
+if [ $mode = cmd ]; then tree=$arg; else
 case "$arg" in /*) tree=$arg ;; *) tree=$HOME/gov-os-worktrees/$arg ;; esac
 tree=$(readlink -f "$tree") || { echo "no such tree: $arg" >&2; exit 2; }
+fi
 mine=" "; p=$$
 while [ -n "$p" ] && [ "$p" -gt 1 ]; do mine="$mine$p "; p=$(awk '/^PPid:/{print $2}' /proc/$p/status 2>/dev/null); done
 busy=0
 for d in /proc/[0-9]*; do
   pid=${d#/proc/}
   case "$mine" in *" $pid "*) continue ;; esac
+  if [ $mode = cmd ]; then
+    line="$(readlink "$d/exe" 2>/dev/null) $(tr '\0' ' ' < "$d/cmdline" 2>/dev/null)"
+    case "$line" in *"$tree"*) busy=1; echo "BUSY $pid $(tr '\0' ' ' < "$d/cmdline" 2>/dev/null | cut -c1-120)" ;; esac
+    continue
+  fi
   cwd=$(readlink "$d/cwd" 2>/dev/null) || continue
   case "$cwd/" in "$tree"/*) busy=1; echo "BUSY $pid $(tr '\0' ' ' < "$d/cmdline" 2>/dev/null | cut -c1-120)" ;; esac
 done

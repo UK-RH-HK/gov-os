@@ -1,0 +1,66 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "8c817af2cc1f",
+   "after": "80ee632d7659"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/ACT-QUERY-GPU-2.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M .tickets/DAEO-1vka.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "head",
+   "before": "2a3c998fe786",
+   "after": "8c3ea9964218"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/.lock-held"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_cache_is_one_file_of_0/box/site/sqlite_vec"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_cache_is_one_file_of_0/box/w2_126_driver.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_cache_is_one_file_of_0/first/"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-0/test_the_cache_is_one_file_of_current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? pytest-of-usain/pytest-current"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-126/test_zz_probe_home.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-tests",
+   "change": "acceptance folder",
+   "folder": "W2-126"
+  }
+ ]
+}

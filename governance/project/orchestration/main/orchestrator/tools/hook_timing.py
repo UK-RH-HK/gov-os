@@ -4,7 +4,7 @@ import subprocess
 import time
 
 ROOT = "/home/usain/Dynamic-Agentic-Engineering-OS"
-PY = open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()
+PY = os.environ.get("GOV_PIN_PY") or open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()  # DEC-1037: a pin before its switch
 event = open(ROOT + "/.gov-runtime/scratch/orchestrator/drafts/act1-sample-event.json").read()
 env = dict(os.environ, GOV_ROLE="engineer", GOV_TICKET="DAEO-sdxk", CLAUDE_PROJECT_DIR=ROOT)
 times = []

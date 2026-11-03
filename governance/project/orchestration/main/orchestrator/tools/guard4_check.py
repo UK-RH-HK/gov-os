@@ -15,7 +15,7 @@ if len(sys.argv) > 2 and sys.argv[1] == "--settings":  # python3 guard4_check.py
     ROOT = PROJECT  # the planted paths are the tested tree's own
 elif len(sys.argv) > 1:  # python3 guard4_check.py <hook path>: a candidate hook, run against the main tree
     HOOK = sys.argv[1]
-PY = open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()
+PY = os.environ.get("GOV_PIN_PY") or open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()  # DEC-1037: a pin before its switch
 HELD = ROOT + "/governance/project/held-out.yaml"
 
 # The hidden set's own glob and a measured role, read from the path map (no contents read).

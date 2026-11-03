@@ -1,0 +1,9 @@
+log: W2-126-A5-run1.json
+W2: W2-126
+status: PACKAGES. Stopped on the owner's order (via the CTO): the run started after the owner's 17:00 stop; W2-126 continues as an emergency patch under DEC-1039
+
+I stopped W2-126 on the owner's order, which the CTO passed on. The acceptance tests are written and merged into the ticket branch, but verification is incomplete: one serial test case was cut off. Nothing of mine is running, the tree is clean, and the head is `75c4db0e08f7`. This run should not have started: the dispatcher launched it after the owner's 17:00 stop. W2-126 now continues as an emergency patch under DEC-1039.
+
+```
+task: W2-126 (DAEO-jpr0) run 1, the independent acceptance tests only: write them, merge them, verify, return the interface
+status: PACKAGES. Stopped on the owner's ord

@@ -1,0 +1,527 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+............................................F........................... [ 10%]
+........................................................................ [ 12%]
+......................F................................................. [ 13%]
+........................................................................ [ 15%]
+.................F...................................................... [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+....................................FF.................................. [ 22%]
+......................F................................................. [ 24%]
+............F............F......................F....................... [ 26%]
+.............................F.......................................... [ 27%]
+.......F................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+.......F................................................................ [ 38%]
+........................................................................ [ 39%]
+..................................................................F..... [ 41%]
+........................................................................ [ 43%]
+............................................F........................... [ 45%]
+........................F............................................F.. [ 46%]
+.......................F................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+.......................................ssssss........................... [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+.............................s.......................................... [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.......................................                                  [100%]
+=================================== FAILURES ===================================
+__________________ test_least_recently_used_entries_go_first ___________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce12e7e270>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e6bda0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_least_recently_used_entri0')
+
+    def test_least_recently_used_entries_go_first(box, stand_in, tmp_path):
+        stand_in.dimensions = DIMENSIONS
+        project = S.plant(tmp_path / "project", corpus={})
+        kept, old = question("kept-0"), [question(f"old-{n}") for n in range(1, 10)]
+        steps = [S.query(kept), *[S.query(text) for text in old], S.query(kept)]
+        for n in range(FRESH):
+            steps.append(S.query(question(f"fresh-{n}")))
+            if n % TOUCH_EVERY == TOUCH_EVERY - 1:
+                steps.append(S.query(kept))
+        last = question(f"fresh-{FRESH - 1}")
+        steps += [S.query(last), S.query(kept), S.query(old[0])]
+        env = box.env(**{S.CACHE_BOUND_SETTING: BOUND})
+        answers = box.run(project, steps, env)
+        assert all(answer["vector"] for answer in answers), {answer["reason"] for answer in answers}
+    
+>       assert len(stand_in.sent_with(kept)) == 1, "the most recently used entry was evicted"
+E       AssertionError: the most recently used entry was evicted
+E       assert 33 == 1
+E        +  where 33 = len(['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: what does the ledger sa...earch query, retrieve relevant passages that answer the query\nQuery: what does the ledger say about item kept-0', ...])
+E        +    where ['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: what does the ledger sa...earch query, retrieve relevant passages that answer the query\nQuery: what does the ledger say about item kept-0', ...] = sent_with('what does the ledger say about item kept-0')
+E        +      where sent_with = <w2_126_support.StandIn object at 0x7bce11e6bda0>.sent_with
+
+tests/acceptance/W2-126/test_w2_126_bound.py:33: AssertionError
+__________________ test_a_revision_change_is_a_new_key_space ___________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce18ac37d0>
+stand_in = <w2_126_support.StandIn object at 0x7bce183c7800>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_revision_change_is_a_ne0')
+
+    def test_a_revision_change_is_a_new_key_space(box, stand_in, tmp_path):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        [one] = box.run(first, [S.query(QUESTION)])
+        texts_one = sorted(stand_in.texts())
+    
+        stand_in.revision = S.REVISION_2
+        stand_in.reset()
+        second = S.clone(first, tmp_path / "second")
+        box.build(second)
+        [two] = box.run(second, [S.query(QUESTION)])
+        assert sorted(stand_in.texts()) == texts_one, "with a new revision, texts were served from the old one's cache"
+        old, new = S.store_vectors(first), S.store_vectors(second)
+        assert not set(old.values()) & set(new.values()), "a vector of the old revision was served for the new one"
+        assert two["vector"] != one["vector"]
+    
+        stand_in.revision = S.REVISION_1
+        stand_in.reset()
+        third = S.clone(first, tmp_path / "third")
+        box.build(third)
+        [three] = box.run(third, [S.query(QUESTION)])
+>       assert stand_in.texts() == [], "the first revision's entries were lost when the revision changed"
+E       AssertionError: the first revision's entries were lost when the revision changed
+E       assert ['"""Connecti... low.\n', ...] == []
+E         
+E         Left contains 9 more items, first extra item: '"""Connection pool."""\n\n\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_bound.py:64: AssertionError
+______________________ test_a_later_check_embeds_nothing _______________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e35040>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e371a0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_later_check_embeds_noth0')
+
+    def test_a_later_check_embeds_nothing(box, stand_in, tmp_path):
+        tiers = tmp_path / "dev-tiers"
+        for name, files in TIERS.items():
+            S.plant(tiers / name, corpus=files)
+        S.write(tiers, "dev-queryset.yaml", yaml.safe_dump({"queries": QUERIES}, sort_keys=False))
+        project = check_project(tmp_path)
+    
+        run_check(box, project, tiers)
+        for entry in QUERIES:
+            assert stand_in.sent_with(entry["query"]), f"the set-up: {entry['id']} was not asked in the first check"
+        stand_in.reset()
+        run_check(box, project, tiers)
+>       assert stand_in.texts() == [], f"a later check embedded {len(stand_in.texts())} texts cold"
+E       AssertionError: a later check embedded 60 texts cold
+E       assert ['.gov-runtim... six.\n', ...] == []
+E         
+E         Left contains 60 more items, first extra item: '.gov-runtime/\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_dev_tiers.py:67: AssertionError
+_________ test_a_later_check_on_this_machines_dev_tiers_embeds_nothing _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e34ce0>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e35c10>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_later_check_on_this_mac0')
+
+    @pytest.mark.local_only
+    def test_a_later_check_on_this_machines_dev_tiers_embeds_nothing(box, stand_in, tmp_path):
+        tiers = Path(os.environ.get("GOV_DEV_TIERS") or "~/gov-os-workbench/synthetic").expanduser()
+        if not (tiers / "dev-queryset.yaml").is_file():
+            pytest.skip("no dev tiers on this machine (GOV_DEV_TIERS)")
+        project = check_project(tmp_path)
+        run_check(box, project, tiers)
+        assert stand_in.texts(), "the set-up: the first check embedded nothing"
+        stand_in.reset()
+        run_check(box, project, tiers)
+>       assert stand_in.texts() == [], f"a later check embedded {len(stand_in.texts())} texts cold"
+E       AssertionError: a later check embedded 1337 texts cold
+E       assert ['# CI workfl...ION\n\n', ...] == []
+E         
+E         Left contains 1337 more items, first extra item: '# CI workflow stub (not yet functional)\n# Requires: cargo, python3, node\n\nname: CI\n\non:\n  push:\n    branches: ...build:\n  #   runs-on: ubuntu-latest\n  #   steps:\n  #     - uses: actions/checkout@v4\n  #     - name: Build Rust wo'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_dev_tiers.py:80: AssertionError
+_______________ test_the_evidence_file_states_the_named_figures ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_evidence_file_states_the_named_figures():
+        path = S.REPO_ROOT / EVIDENCE_REL
+>       assert path.is_file(), f"{EVIDENCE_REL} does not exist"
+E       AssertionError: docs/changes/W2-126-evidence.md does not exist
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-126/docs/changes/W2-126-evidence.md').is_file
+
+tests/acceptance/W2-126/test_w2_126_evidence.py:23: AssertionError
+_________________ test_a_second_tree_and_a_clone_send_nothing __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e53650>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e531d0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_second_tree_and_a_clone0')
+
+    def test_a_second_tree_and_a_clone_send_nothing(box, stand_in, tmp_path):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        sent = stand_in.texts()
+        assert sent, "the first tree's chunks were not sent to the embedder (the case's set-up)"
+    
+        stand_in.reset()
+        box.build(S.clone(first, tmp_path / "the-clone"))
+        box.build(S.plant(tmp_path / "second"))   # another tree, planted on its own, the same texts
+>       assert stand_in.texts() == [], "a tree whose texts are all cached sent texts to the embedder"
+E       AssertionError: a tree whose texts are all cached sent texts to the embedder
+E       assert ['"""Connecti... low.\n', ...] == []
+E         
+E         Left contains 14 more items, first extra item: '"""Connection pool."""\n\n\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_hits.py:22: AssertionError
+________________________ test_a_changed_text_is_a_miss _________________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11d579e0>
+stand_in = <w2_126_support.StandIn object at 0x7bce11d55e80>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_changed_text_is_a_miss0')
+
+    def test_a_changed_text_is_a_miss(box, stand_in, tmp_path):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        before = set(stand_in.texts())
+    
+        other = S.clone(first, tmp_path / "other")
+        S.write(other, "notes/tides.md", S.CORPUS["notes/tides.md"].replace("harbour pilot", "harbour Pilot"))
+        S.commit(other)
+        stand_in.reset()
+        box.build(other)
+        sent = stand_in.texts()
+        assert any("harbour Pilot" in text for text in sent), "a text changed by one letter was served from the cache"
+>       assert not set(sent) & before, "texts already cached were sent again"
+E       AssertionError: texts already cached were sent again
+E       assert not ({'"""Connection pool."""\n\n\n', '# Apiary\n\nThe beekeeper smokes the hive gently before lifting the brood frames.\n'...he sap is still low.\n', '# Tides\n\nThe harbour Pilot reads the tide tables at dawn and logs the spring tide.\n', ...} & {'"""Connection pool."""\n\n\n', '# Apiary\n\nThe beekeeper smokes the hive gently before lifting the brood frames.\n'...he sap is still low.\n', '# Tides\n\nThe harbour pilot reads the tide tables at dawn and logs the spring tide.\n', ...})
+E        +  where {'"""Connection pool."""\n\n\n', '# Apiary\n\nThe beekeeper smokes the hive gently before lifting the brood frames.\n'...he sap is still low.\n', '# Tides\n\nThe harbour Pilot reads the tide tables at dawn and logs the spring tide.\n', ...} = set(['"""Connection pool."""\n\n\n', 'def drain(pool):\n    """Close every connection."""\n    for connection in pool:\n  ...acked the evening before.\n', '# Orchard\n\nThe quince trees are pruned in February when the sap is still low.\n', ...])
+
+tests/acceptance/W2-126/test_w2_126_hits.py:37: AssertionError
+_______________ test_a_question_from_two_trees_is_embedded_once ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e36b70>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e36450>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_question_from_two_trees0')
+
+    def test_a_question_from_two_trees_is_embedded_once(box, stand_in, tmp_path):
+        first = S.plant(tmp_path / "first")
+        second = S.clone(first, tmp_path / "second")
+        [one] = box.run(first, [S.query(QUESTION)])
+        [two] = box.run(second, [S.query(QUESTION)])
+        assert one["vector"] and two["vector"], f"no question vector: {one['reason']}, {two['reason']}"
+>       assert len(stand_in.sent_with(QUESTION)) == 1, "the question was embedded once per tree"
+E       AssertionError: the question was embedded once per tree
+E       assert 2 == 1
+E        +  where 2 = len(['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: when does the baker sco...search query, retrieve relevant passages that answer the query\nQuery: when does the baker score the sourdough loaves'])
+E        +    where ['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: when does the baker sco...search query, retrieve relevant passages that answer the query\nQuery: when does the baker score the sourdough loaves'] = sent_with('when does the baker score the sourdough loaves')
+E        +      where sent_with = <w2_126_support.StandIn object at 0x7bce11e36450>.sent_with
+
+tests/acceptance/W2-126/test_w2_126_hits.py:47: AssertionError
+___________________ test_the_cache_is_one_file_of_mode_0600 ____________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce12dc5cd0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_the_cache_is_one_file_of_0')
+
+    def test_the_cache_is_one_file_of_mode_0600(box, tmp_path):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        box.run(first, [S.query(QUESTION)])
+>       entry = S.cache_entry(box)
+                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-126/test_w2_126_hits.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_126_support.Box object at 0x7bce12dc5cd0>, cache_dir = None
+
+    def cache_entry(box, cache_dir=None):
+        """The one file of the cache folder (KPI 1)."""
+        files = files_under(cache_dir or box.cache_dir)
+>       assert len(files) == 1, f"the cache folder must hold one file, not {[str(path) for path in files]}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: the cache folder must hold one file, not []
+
+tests/acceptance/W2-126/w2_126_support.py:404: AssertionError
+____________ test_by_default_the_cache_sits_in_the_users_own_folder ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11ef02f0>
+stand_in = <w2_126_support.StandIn object at 0x7bce11ef3c80>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_by_default_the_cache_sits0')
+
+    def test_by_default_the_cache_sits_in_the_users_own_folder(box, stand_in, tmp_path):
+        """The user's folder already holds what a build writes there besides the cache (the base keeps its secrets
+        scan there): what the cache adds is what appears once the location setting is left out."""
+        box.build(S.plant(tmp_path / "baseline", corpus={"notes/kiln.md": "# Kiln\n\nFired on Thursdays.\n"}))
+        before = users_files(box)
+        env = box.env(use_setting=False)
+        first = S.plant(tmp_path / "first")
+        box.build(first, env)
+        stand_in.reset()
+        box.build(S.clone(first, tmp_path / "second"), env)
+>       assert stand_in.texts() == [], "without the location setting, a second tree sent its texts again"
+E       AssertionError: without the location setting, a second tree sent its texts again
+E       assert ['"""Connecti... low.\n', ...] == []
+E         
+E         Left contains 7 more items, first extra item: '"""Connection pool."""\n\n\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_hits.py:73: AssertionError
+____________ test_a_cached_vector_is_the_one_the_embedder_returned _____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11ec4080>
+stand_in = <w2_126_support.StandIn object at 0x7bce11ec69f0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_a_cached_vector_is_the_on0')
+
+    def test_a_cached_vector_is_the_one_the_embedder_returned(box, stand_in, tmp_path):
+        """The stand-in gives other vectors at every request: a vector computed again would differ."""
+        stand_in.varying = True
+        first = S.plant(tmp_path / "first")
+        cold = box.build(first)
+        sent_cold = len(stand_in.texts())
+        [asked] = box.run(first, [S.query(QUESTION)])
+        stored, returned = S.store_vectors(first), stand_in.returned()
+        assert stored and set(stored.values()) <= returned, "the cold build stored vectors the embedder did not return"
+        assert bytes.fromhex(asked["vector"]) in returned
+        sent = len(stand_in.texts())
+    
+        second = S.clone(first, tmp_path / "second")
+        warm = box.build(second)
+        [again] = box.run(second, [S.query(QUESTION)])
+>       assert len(stand_in.texts()) == sent, "a tree whose texts are all cached sent texts to the embedder"
+E       AssertionError: a tree whose texts are all cached sent texts to the embedder
+E       assert 18 == 9
+E        +  where 18 = len(['"""Connection pool."""\n\n\n', 'def drain(pool):\n    """Close every connection."""\n    for connection in pool:\n  ...acked the evening before.\n', '# Orchard\n\nThe quince trees are pruned in February when the sap is still low.\n', ...])
+E        +    where ['"""Connection pool."""\n\n\n', 'def drain(pool):\n    """Close every connection."""\n    for connection in pool:\n  ...acked the evening before.\n', '# Orchard\n\nThe quince trees are pruned in February when the sap is still low.\n', ...] = texts()
+E        +      where texts = <w2_126_support.StandIn object at 0x7bce11ec69f0>.texts
+
+tests/acceptance/W2-126/test_w2_126_same_vector.py:26: AssertionError
+______ test_an_all_cached_rebuild_gives_the_store_built_without_the_cache ______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e36690>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e35700>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_an_all_cached_rebuild_giv0')
+
+    def test_an_all_cached_rebuild_gives_the_store_built_without_the_cache(box, stand_in, tmp_path):
+        """The reference store is built with a cache folder of its own, empty: every vector comes from the embedder."""
+        reference = S.plant(tmp_path / "reference")
+        box.build(reference, box.env(cache_dir=tmp_path / "empty-cache"))
+        assert set(S.store_vectors(reference).values()) <= stand_in.returned()
+    
+        box.build(S.plant(tmp_path / "warming"))
+        stand_in.reset()
+        rebuilt = S.plant(tmp_path / "rebuilt")
+        box.build(rebuilt)
+>       assert stand_in.texts() == [], "the rebuild of an all-cached tree embedded texts"
+E       AssertionError: the rebuild of an all-cached tree embedded texts
+E       assert ['"""Connecti... low.\n', ...] == []
+E         
+E         Left contains 7 more items, first extra item: '"""Connection pool."""\n\n\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_same_vector.py:45: AssertionError
+________ test_concurrent_rebuilds_and_searches_serve_only_right_vectors ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e69c10>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e68080>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_concurrent_rebuilds_and_s0')
+
+    def test_concurrent_rebuilds_and_searches_serve_only_right_vectors(box, stand_in, tmp_path):
+        stand_in.delay_s = 0.05   # widens the overlap of the writers
+        trees = [S.plant(tmp_path / f"tree-{n}", extra=own_file(n)) for n in range(WRITERS)]
+        running = [box.start(tree, [S.refresh(), S.search(QUESTIONS[n % 2]), S.query(QUESTIONS[(n + 1) % 2])])
+                   for n, tree in enumerate(trees)]
+        for process in running:
+            built, searched, _ = box.finish(process)
+            assert built["available"] and searched["available"], (built.get("reason"), searched.get("reason"))
+    
+        extra = {rel: text for n in range(WRITERS) for rel, text in own_file(n).items()}
+        reference = S.plant(tmp_path / "reference", extra=extra)
+        box.build(reference, box.env(cache_dir=tmp_path / "empty-cache"))
+        returned = {question: {vector for text, vector, _ in stand_in.records if text.endswith(question)}
+                    for question in QUESTIONS}   # the stand-in is deterministic: one vector per question
+        stand_in.reset()
+        served = S.plant(tmp_path / "served", extra=extra)
+        asked = box.run(served, [S.refresh(), *[S.query(question) for question in QUESTIONS]])
+>       assert stand_in.texts() == [], "texts every writer stored were sent again: a write was lost"
+E       AssertionError: texts every writer stored were sent again: a write was lost
+E       assert ['"""Connecti... low.\n', ...] == []
+E         
+E         Left contains 15 more items, first extra item: '"""Connection pool."""\n\n\n'
+E         Use -v to get more diff
+
+tests/acceptance/W2-126/test_w2_126_writers.py:40: AssertionError
+_______________ test_no_lock_is_held_across_an_embedding_request _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11ec6570>
+stand_in = <w2_126_support.StandIn object at 0x7bce11ec6540>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_no_lock_is_held_across_an0')
+
+    def test_no_lock_is_held_across_an_embedding_request(box, stand_in, tmp_path):
+        stand_in.hold = "HELD-OPEN-MARK"
+        held = S.plant(tmp_path / "held", extra={"notes/held.md": "# Held\n\nHELD-OPEN-MARK is kept open.\n"})
+        other = S.plant(tmp_path / "other", corpus={"notes/kiln.md": "# Kiln\n\nThe kiln is fired on Thursdays.\n"})
+        first = box.start(held, [S.refresh()])
+        try:
+            assert stand_in.held.wait(timeout=120), "the held text never reached the embedder (the case's set-up)"
+            began = time.monotonic()
+            built, searched = box.run(other, [S.refresh(), S.search("when is the kiln fired")], timeout=90)
+            assert first.poll() is None and not stand_in.released.is_set(), "the held request ended early"
+            assert built["available"] and searched["available"], (built.get("reason"), searched.get("reason"))
+>           assert S.counts(built)["skipped"] is None and S.counts(searched)["skipped"] is None, \
+                   ^^^^^^^^^^^^^^^
+                f"the cache was skipped while another process's request was open: {S.counts(built)}"
+
+tests/acceptance/W2-126/test_w2_126_writers.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = {'available': True, 'facet': 'semantic', 'reason': None, 'state': 'AVAILABLE'}
+
+    def counts(result):
+        """The result's naming of the cache (README, interface): {"hits", "misses", "skipped"}."""
+>       assert RESULT_KEY in result, f"the result does not name the vector cache ({RESULT_KEY!r}): {sorted(result)}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the result does not name the vector cache ('vector_cache'): ['available', 'facet', 'reason', 'state']
+
+tests/acceptance/W2-126/w2_126_support.py:410: AssertionError
+___________ test_an_unusable_cache_is_skipped_and_named[unreadable] ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e6a360>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e693a0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_an_unusable_cache_is_skip0')
+state = 'unreadable'
+
+    @pytest.mark.parametrize("state", ["unreadable", "locked", "garbage"])
+    def test_an_unusable_cache_is_skipped_and_named(box, stand_in, tmp_path, state):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        expected, sent = S.store_vectors(first), len(stand_in.texts())
+>       entry = S.cache_entry(box)
+                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-126/test_w2_126_writers.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_126_support.Box object at 0x7bce11e6a360>, cache_dir = None
+
+    def cache_entry(box, cache_dir=None):
+        """The one file of the cache folder (KPI 1)."""
+        files = files_under(cache_dir or box.cache_dir)
+>       assert len(files) == 1, f"the cache folder must hold one file, not {[str(path) for path in files]}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: the cache folder must hold one file, not []
+
+tests/acceptance/W2-126/w2_126_support.py:404: AssertionError
+_____________ test_an_unusable_cache_is_skipped_and_named[locked] ______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11ef1e80>
+stand_in = <w2_126_support.StandIn object at 0x7bce11ef3ef0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_an_unusable_cache_is_skip1')
+state = 'locked'
+
+    @pytest.mark.parametrize("state", ["unreadable", "locked", "garbage"])
+    def test_an_unusable_cache_is_skipped_and_named(box, stand_in, tmp_path, state):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        expected, sent = S.store_vectors(first), len(stand_in.texts())
+>       entry = S.cache_entry(box)
+                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-126/test_w2_126_writers.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_126_support.Box object at 0x7bce11ef1e80>, cache_dir = None
+
+    def cache_entry(box, cache_dir=None):
+        """The one file of the cache folder (KPI 1)."""
+        files = files_under(cache_dir or box.cache_dir)
+>       assert len(files) == 1, f"the cache folder must hold one file, not {[str(path) for path in files]}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: the cache folder must hold one file, not []
+
+tests/acceptance/W2-126/w2_126_support.py:404: AssertionError
+_____________ test_an_unusable_cache_is_skipped_and_named[garbage] _____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_126_support.Box object at 0x7bce11e53d10>
+stand_in = <w2_126_support.StandIn object at 0x7bce11e53110>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-126/pytest-of-usain/pytest-1/popen-gw4/test_an_unusable_cache_is_skip2')
+state = 'garbage'
+
+    @pytest.mark.parametrize("state", ["unreadable", "locked", "garbage"])
+    def test_an_unusable_cache_is_skipped_and_named(box, stand_in, tmp_path, state):
+        first = S.plant(tmp_path / "first")
+        box.build(first)
+        expected, sent = S.store_vectors(first), len(stand_in.texts())
+>       entry = S.cache_entry(box)
+                ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-126/test_w2_126_writers.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_126_support.Box object at 0x7bce11e53d10>, cache_dir = None
+
+    def cache_entry(box, cache_dir=None):
+        """The one file of the cache folder (KPI 1)."""
+        files = files_under(cache_dir or box.cache_dir)
+>       assert len(files) == 1, f"the cache folder must hold one file, not {[str(path) for path in files]}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: the cache folder must hold one file, not []
+
+tests/acceptance/W2-126/w2_126_support.py:404: AssertionError
+=========================== short test summary info ============================
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:923: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:936: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:948: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+17 failed, 4119 passed, 7 skipped in 1444.95s (0:24:04)

@@ -1,0 +1,8 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261102-222503.out
+W2: (land batch)
+status: W2-123=3de9bcf44d91 no outcome in the output (refused or stopped); W2-122=3fc448601e2d no outcome in the output (refused or stopped); W2-126=2785b2e47432 no outcome in the output (refused or stopped)
+
+last output:
+n its nightly's record with the same failure (['AssertionError']): unowned (no baseline build): tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-02 23:07:13 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
+

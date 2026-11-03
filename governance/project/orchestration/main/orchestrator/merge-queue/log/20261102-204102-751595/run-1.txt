@@ -1,0 +1,238 @@
+e, f"{name} raised because sqlite_vec cannot be imported: {call['error']}"
+E           AssertionError: semantic.refresh raised because sqlite_vec cannot be imported: {'type': 'FileNotFoundError', 'message': "[Errno 2] No such file or directory: 'gitleaks'"}
+E           assert {'message': "[Errno 2] No such file or directory: 'gitleaks'", 'type': 'FileNotFoundError'} is None
+
+tests/acceptance/W1-19/test_w1_19_unavailable.py:155: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x7dce2f173290>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+>       documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-08/test_w1_08_probe.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-08/w1_08_support.py:167: in load_record
+    document = load_yaml(frontmatter_text(path), Path(path).name)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/docs/probes/EMG-gitleaks/PR-EMG-gitleaks.md')
+
+    def frontmatter_text(path):
+        """The YAML frontmatter of a record file, or the whole text of a ``.yaml``/``.yml``/``.json`` file."""
+        path = Path(path)
+        text = path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+        if lines and lines[0].strip() == "---":
+            for index in range(1, len(lines)):
+                if lines[index].strip() == "---":
+                    return "\n".join(lines[1:index]) + "\n"
+            raise AssertionError(f"{path.name}: the frontmatter that opens with '---' is never closed")
+        if path.suffix in (".yaml", ".yml", ".json"):
+            return text
+>       raise AssertionError(f"{path.name}: no YAML frontmatter (the file does not open with a '---' line) "
+                             f"and it is not a .yaml, .yml or .json file")
+E       AssertionError: PR-EMG-gitleaks.md: no YAML frontmatter (the file does not open with a '---' line) and it is not a .yaml, .yml or .json file
+
+tests/acceptance/W1-08/w1_08_support.py:161: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-icdczdpu/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-icdczdpu/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-icdczdpu/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-8049/popen-gw3/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-icdczdpu/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-8049/popen-gw3/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-icdczdpu'), wheel=PosixPath('/tmp/w259-pin-icdczdpu/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-icdczdpu/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-icdczdpu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x79ee3aec8c20>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+>           raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+                                   ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/docs/probes/EMG-gitleaks/PR-EMG-gitleaks.md')
+
+    def _frontmatter(path):
+        lines = path.read_text(encoding="utf-8").split("\n")
+>       assert lines[0].strip() == "---", f"{path.name} has no frontmatter"
+E       AssertionError: PR-EMG-gitleaks.md has no frontmatter
+E       assert '# Independen...ndidate gate)' == '---'
+E         
+E         - ---
+E         + # Independent review: EMG-gitleaks (branch emg/gitleaks; the candidate gate)
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:276: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:942: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:955: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:967: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+22 failed, 6277 passed, 10 skipped, 26 errors in 4896.71s (1:21:36)
+heavy_slot: all 3 slots taken; waiting (2026-11-02 20:43:33)

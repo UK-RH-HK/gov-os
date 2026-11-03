@@ -1,0 +1,522 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+.F.........s..FF......F................................................. [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+...............................................................ssssss... [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+.....................................................s.................. [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+..................FF.......FF.FF........................................ [ 98%]
+.................................................                        [100%]
+=================================== FAILURES ===================================
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw4/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug'), wheel=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin...kbbcug/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-112/w259-pin-cwkbbcug/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f16193febd0>
+cpu = <w2_54_support.EmbedderStandIn object at 0x7f16193fe4b0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_an_embedder_at_the_cpu_ad0')
+reported = 'gpu'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST.
+    
+        Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): ``gov retrieve`` asks PHRASE, a
+        phrase the kiln note holds, where it asked QUESTION, which no note holds as a phrase (so the lexical route had no
+        evidence to give whatever the semantic facet did); the no-fallback check looks for PHRASE, which every text sent
+        for either read ends with. The lexical route and every other assertion are unchanged."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'gpu', yet the search answered (available is True, no reason (None), 6 hits); nearest [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:200: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[partial] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f16193d2c30>
+cpu = <w2_54_support.EmbedderStandIn object at 0x7f16193d1250>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_an_embedder_at_the_cpu_ad1')
+reported = 'partial'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST.
+    
+        Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): ``gov retrieve`` asks PHRASE, a
+        phrase the kiln note holds, where it asked QUESTION, which no note holds as a phrase (so the lexical route had no
+        evidence to give whatever the semantic facet did); the no-fallback check looks for PHRASE, which every text sent
+        for either read ends with. The lexical route and every other assertion are unchanged."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'partial', yet the search answered (available is True, no reason (None), 6 hits); nearest [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:200: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f1613f186b0>
+daemons = <w2_54_support.Daemons object at 0x7f1613f1aa80>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_a_read_starts_the_cpu_emb0')
+place = 'GOV_OLLAMA_BIN'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x7f1613f1aa80>
+address = '127.0.0.1:47401'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+        assert serves, "the read started no Ollama executable"
+        for entry in serves:
+            told = S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
+            assert told == S.host_of(address), \
+                f"the executable was told to serve at {told}, not at the CPU embedder's address {address}: {entry}"
+>           assert S.gpu_hidden(entry["env"]), (
+                f"the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or "
+                f"OLLAMA_LLM_LIBRARY=cpu): {entry['env']}")
+E           AssertionError: the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or OLLAMA_LLM_LIBRARY=cpu): {'OLLAMA_HOST': '127.0.0.1:47401'}
+E           assert False
+E            +  where False = <function gpu_hidden at 0x7f161bc10720>({'OLLAMA_HOST': '127.0.0.1:47401'})
+E            +    where <function gpu_hidden at 0x7f161bc10720> = S.gpu_hidden
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:275: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[PATH] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f16193fe240>
+daemons = <w2_54_support.Daemons object at 0x7f16193fd400>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_a_read_starts_the_cpu_emb1')
+place = 'PATH'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x7f16193fd400>
+address = '127.0.0.1:34875'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+        assert serves, "the read started no Ollama executable"
+        for entry in serves:
+            told = S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
+            assert told == S.host_of(address), \
+                f"the executable was told to serve at {told}, not at the CPU embedder's address {address}: {entry}"
+>           assert S.gpu_hidden(entry["env"]), (
+                f"the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or "
+                f"OLLAMA_LLM_LIBRARY=cpu): {entry['env']}")
+E           AssertionError: the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or OLLAMA_LLM_LIBRARY=cpu): {'OLLAMA_HOST': '127.0.0.1:34875'}
+E           assert False
+E            +  where False = <function gpu_hidden at 0x7f161bc10720>({'OLLAMA_HOST': '127.0.0.1:34875'})
+E            +    where <function gpu_hidden at 0x7f161bc10720> = S.gpu_hidden
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:275: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[HOME] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f16193d2d50>
+daemons = <w2_54_support.Daemons object at 0x7f16193d2cc0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_a_read_starts_the_cpu_emb2')
+place = 'HOME'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x7f16193d2cc0>
+address = '127.0.0.1:36151'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+        assert serves, "the read started no Ollama executable"
+        for entry in serves:
+            told = S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
+            assert told == S.host_of(address), \
+                f"the executable was told to serve at {told}, not at the CPU embedder's address {address}: {entry}"
+>           assert S.gpu_hidden(entry["env"]), (
+                f"the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or "
+                f"OLLAMA_LLM_LIBRARY=cpu): {entry['env']}")
+E           AssertionError: the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or OLLAMA_LLM_LIBRARY=cpu): {'OLLAMA_HOST': '127.0.0.1:36151'}
+E           assert False
+E            +  where False = <function gpu_hidden at 0x7f161bc10720>({'OLLAMA_HOST': '127.0.0.1:36151'})
+E            +    where <function gpu_hidden at 0x7f161bc10720> = S.gpu_hidden
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:275: AssertionError
+_ test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+box = <w2_54_support.Box object at 0x7f161a8daf90>
+shared = <w2_54_support.EmbedderStandIn object at 0x7f1613f1ba40>
+daemons = <w2_54_support.Daemons object at 0x7f1613f181a0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-112/pytest-of-usain/pytest-11/popen-gw5/test_two_reads_at_once_leave_o0')
+
+    @STAND_IN
+    def test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer(
+            box, shared, daemons, tmp_path):
+        """*Red.* Two ``gov retrieve`` started together, nothing at the CPU embedder's address, the stand-in executable
+        at ``GOV_OLLAMA_BIN`` (it takes a second to listen, so both reads find nothing): both end with exit code 0 and
+        their semantic answer; every start was told that address and no GPU; afterwards one embedder serves there, and
+        nothing stopped it. Today neither read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), "GOV_OLLAMA_BIN")
+        waits = [daemons.start(S.gov_argv("retrieve", "--json", "--root", project, text), cwd=box.workdir / "elsewhere",
+                               env=env) for text in (QUESTION, OTHER)]
+        runs = [wait(S.CALL_TIMEOUT_S) for wait in waits]
+        for text, run in zip((QUESTION, OTHER), runs):
+            assert not S.clean(run), f"the read of {text!r} was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+            assert (S.facets_of(run).get("semantic") or {}).get("available") is True, \
+                f"the read of {text!r} did not get its semantic answer: {S.facets_of(run)}; runs {daemons.records()}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x7f1613f181a0>
+address = '127.0.0.1:40281'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+        assert serves, "the read started no Ollama executable"
+        for entry in serves:
+            told = S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
+            assert told == S.host_of(address), \
+                f"the executable was told to serve at {told}, not at the CPU embedder's address {address}: {entry}"
+>           assert S.gpu_hidden(entry["env"]), (
+                f"the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or "
+                f"OLLAMA_LLM_LIBRARY=cpu): {entry['env']}")
+E           AssertionError: the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or OLLAMA_LLM_LIBRARY=cpu): {'OLLAMA_HOST': '127.0.0.1:40281'}
+E           assert False
+E            +  where False = <function gpu_hidden at 0x7f161bc10720>({'OLLAMA_HOST': '127.0.0.1:40281'})
+E            +    where <function gpu_hidden at 0x7f161bc10720> = S.gpu_hidden
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:275: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:942: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:955: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [2] tests/unit/orchestration/test_dispatcher.py:967: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+10 failed, 4783 passed, 8 skipped in 2054.58s (0:34:14)

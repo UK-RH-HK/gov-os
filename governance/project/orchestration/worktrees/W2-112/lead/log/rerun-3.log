@@ -1,0 +1,33 @@
+10429 MiB, 5569 MiB
+=== tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+.                                                                        [100%]
+1 passed in 2.82s
+exit 0
+10440 MiB, 5558 MiB
+=== tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The probe did not run. The `PreToolUse:Bash` hook refused the command before it started, because its script `.claude/hooks/pretooluse.py` does not exist in the repo. Per your instructions I did not retry or work around it.
+
+I'm not answering DONE, since the step failed. To proceed, the hook configuration or the missing hook file needs to be fixed, or the hook needs to be disabled, by you.
+
+stderr:
+
+1 failed in 7.31s
+exit 1
+10438 MiB, 5560 MiB
+=== tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+.                                                                        [100%]
+1 passed in 175.96s (0:02:55)
+exit 0
+10424 MiB, 5574 MiB
+=== tests/acceptance/W1-46/test_w1_46_live_sessions.py
+....................................                                     [100%]
+36 passed in 26.47s
+exit 0
+10424 MiB, 5574 MiB

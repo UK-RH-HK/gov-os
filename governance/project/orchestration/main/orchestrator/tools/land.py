@@ -4,8 +4,9 @@
 
 For each ticket (default commit: the head of w2/<W2>, its lead's final, verified result; one merge per ticket):
   1. the close's practices that need no test run, BEFORE anything lands: a FULL ticket has a passing independent
-     review record in docs/probes/<id>/ at that commit; gitleaks on the ticket's change; every changed YAML file
-     parses; the disk gate is open;
+     review record in docs/probes/<id>/ at that commit; gitleaks on the ticket's change (not
+     run when governance/project/secrets.yaml says scan: off, DEC-1045, and named; a value other than on or off
+     refuses); every changed YAML file parses; the disk gate is open;
   2. enqueue and approve it (the CTO approves until the three layers start);
 then one queue run (merge_queue.py run, --base: the attribution baseline, DEC-989: the last nightly with a verdict
 until a green one after ACT 1, then the last green one; read from log/nightly/status.txt unless given), and for every
@@ -25,7 +26,10 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(os.environ.get("LAND_ROOT", "/home/usain/Dynamic-Agentic-Engineering-OS"))  # LAND_ROOT: tests only
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from secrets_switch import OFF_LINE, REL as SWITCH_REL, SwitchError, scan_on  # noqa: E402  (DEC-1045)
+
+ROOT =Path(os.environ.get("LAND_ROOT", "/home/usain/Dynamic-Agentic-Engineering-OS"))  # LAND_ROOT: tests only
 ORCH = ROOT / ".gov-runtime/scratch/orchestrator"
 MQ = ROOT / "governance/project/orchestration/tools/merge_queue.py"
 QUEUE = ORCH / "merge-queue"
@@ -99,6 +103,27 @@ def ticket_of(w2):
     sys.exit(f"no ticket for {w2}")
 
 
+SCAN = True  # DEC-1045: the repository's switch, read once in main() (secrets_switch.py); off: no gitleaks call
+
+
+def scan_change(w2, commit):
+    """gitleaks on the ticket's change (True: a leak); with the switch off, no call, and False."""
+    if not SCAN:
+        return False
+    diff = git("diff", f"w2/integrate...{commit}")
+    tmp = ORCH / "log" / f"land-{w2}.diff"
+    tmp.write_text(diff)
+    gl = sh(["gitleaks", "detect", "--no-git", "--source", str(tmp), "--no-banner", "--redact"])
+    tmp.unlink()
+    return bool(gl.returncode)
+
+
+def gitleaks_line():
+    """The close record's gitleaks line: the scan's, or the switch named (DEC-1045)."""
+    return ("- gitleaks on the change: clean (checked before it was queued)" if SCAN
+            else f"- {OFF_LINE}: the change was not scanned")
+
+
 def precheck(w2, tid, profile, commit):
     """The practices that need no test run; returns a list of refusals (empty: fine) and the review it found."""
     bad, review = [], "not required (" + (profile or "no profile") + ")"
@@ -116,12 +141,7 @@ def precheck(w2, tid, profile, commit):
         review = ", ".join(passing)
         if not passing:
             bad.append(f"{w2}: FULL ticket without a passing independent review record at {commit[:12]}")
-    diff = git("diff", f"w2/integrate...{commit}")
-    tmp = ORCH / "log" / f"land-{w2}.diff"
-    tmp.write_text(diff)
-    gl = sh(["gitleaks", "detect", "--no-git", "--source", str(tmp), "--no-banner", "--redact"])
-    tmp.unlink()
-    if gl.returncode:
+    if scan_change(w2, commit):
         bad.append(f"{w2}: gitleaks found a leak in its change")
     for f in git("diff", "--name-only", f"w2/integrate...{commit}").splitlines():
         if f.endswith((".yaml", ".yml")) and git("cat-file", "-t", f"{commit}:{f}") == "blob":
@@ -149,10 +169,16 @@ def close_record(w2, tid, profile, landed, rec, review, base_why):
              f"DEC-968): {', '.join(rec.get('unowned') or []) or 'none'}",
              f"- Core changed (scoped, not full, DEC-968): {', '.join(sel.get('core_changed') or []) or 'none'}; "
              f"unplaced: {', '.join(sel.get('unplaced') or []) or 'none'}",
-             f"- Review: {review}", "- gitleaks on the change: clean (checked before it was queued)",
+             f"- Review: {review}", gitleaks_line(),
              f"- Queue run: {rec.get('started')} to {rec.get('finished')}",
              f"- Closed: {time.strftime('%F %T %Z')}, by the orchestrator under DEC-953 items 1 and 5, DEC-989", ""]
     return "\n".join(lines)
+
+
+def strays(queue, names):
+    """Approvals in the queue for tickets this call does not name (DEC-1037 (5)): a queue run lands every approval, so
+    one left from a stopped landing would ride along (2026-11-02 14:16: six stopped tickets batched with two fixes)."""
+    return sorted(p.stem for p in (Path(queue) / "approved").glob("*.json") if p.stem not in set(names))
 
 
 def main():
@@ -161,6 +187,14 @@ def main():
     ap.add_argument("--base")
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
+    global SCAN
+    try:
+        SCAN = scan_on(ROOT)
+    except SwitchError as e:  # fails closed: nothing is queued on a switch that cannot be read
+        print(f"REFUSED before anything was queued: the secrets-scan switch: {e}", flush=True)
+        sys.exit(2)
+    if not SCAN:
+        print(f"{OFF_LINE}: no ticket's change is scanned ({ROOT / SWITCH_REL})", flush=True)
     if a.base:
         base, base_why = git("rev-parse", a.base), f"given with --base"
     else:
@@ -169,6 +203,10 @@ def main():
     items, bad = [], []
     if sh(["bash", str(ORCH / "tools/disk_gate.sh")]).returncode:
         bad.append("disk gate shut")
+    left = strays(QUEUE, [t.partition("=")[0] for t in a.tickets])
+    if left:
+        bad.append(f"approved in the queue but not in this landing: {', '.join(left)} (park them with "
+                   f"tools/queue_park.py park, or name them)")
     for t in a.tickets:
         w2, _, commit = t.partition("=")
         tid, profile = ticket_of(w2)

@@ -1,0 +1,98 @@
+........................................................................ [ 39%]
+........................................................................ [ 79%]
+................F.F.F............F....                                   [100%]
+=================================== FAILURES ===================================
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The command did not run. The `PreToolUse` hook failed before `probe.sh` started, because it points to `.claude/hooks/pretooluse.py` in the repo, and that file does not exist. I did not retry or work around it.
+
+So I can't answer DONE. The probe has not run. Fixing the hook path or restoring the missing hook file would be needed before the probe can run.
+
+stderr:
+
+_ test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment _
+
+api = <w1_19_support.Api object at 0x7accb518e060>
+
+    @pytest.mark.needs("reranker")
+    def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment(api):
+        # DEC-397 and ADR-0002 §2. No `reranker` is given, in this machine's own environment: the default scores the
+        # candidates in a process started with the interpreter of ~/.local/share/gov-os/reranker-venv, never one of the
+        # workbench, and the calling process loads none of the reranker's libraries. How the two processes talk to each
+        # other is not looked at.
+        outcome = api.run([(support.RERANK, "rerank", (RERANK_QUERY, RERANK_CANDIDATES), {})], env=api.real_env(),
+                          watch=True, timeout=support.MEASURE_TIMEOUT_S)
+        call = outcome.calls[0]
+        assert call["error"] is None, f"rerank raised with the default reranker: {call['error']}"
+        ordered = outcome.value()
+        assert sorted(entry["chunk_id"] for entry in ordered) == sorted(entry["chunk_id"] for entry in RERANK_CANDIDATES)
+        scores = [entry.get("rerank_score") for entry in ordered]
+        assert all(isinstance(score, float) for score in scores), \
+            f"the default reranker scored nothing although its environment and its snapshot are here: {ordered!r}"
+        assert scores == sorted(scores, reverse=True), f"the candidates are not in the order of their scores: {scores}"
+        assert ordered[0]["chunk_id"] == "seam", \
+            f"the pinned reranker does not put the one text that answers the question first: {ordered!r}"
+        assert outcome.loads == 0, "the tests' stand-in reranker was used: it was not given"
+        assert outcome.heavy_after_import == [] and call["heavy_after"] == [], \
+            f"the calling process loaded {call['heavy_after'] or outcome.heavy_after_import}: the reranker is a " \
+            "process of its own (ADR-0002 §2)"
+        started = [peak["argv"] for peak in outcome.peaks if not peak["self"]]
+        interpreter = support.reranker_python()
+>       assert any(support.started_from(peak, interpreter) for peak in outcome.peaks if not peak["self"]), \
+            f"no process started with {interpreter} was seen under the calling process (DEC-397): {started}"
+E       AssertionError: no process started with /home/usain/.local/share/gov-os/reranker-venv/bin/python was seen under the calling process (DEC-397): []
+E       assert False
+E        +  where False = any(<generator object test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment.<locals>.<genexpr> at 0x7accb4f81e00>)
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:96: AssertionError
+____________ test_a_warm_query_answers_within_half_a_second_at_p95 _____________
+
+measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...7967199907, 6.432532598963007, 6.392596228979528, 6.3337765438482165, 6.604040364967659, 6.557992736110464, ...], ...}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        # The timed pass's times: no memory sampler ran in that process (W2-M332).
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 6.694 s over 52 queries (limit 0.5 s; the three slowest: [6.694, 6.755, 6.773])
+E       assert 6.694351071957499 <= 0.5
+E        +  where 6.694351071957499 = <function p95 at 0x7accb54556c0>([6.671348308213055, 6.513196649029851, 6.445415758993477, 6.494872345821932, 6.755353199085221, 6.587036493001506, ...])
+E        +    where <function p95 at 0x7accb54556c0> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:204: AssertionError
+___________ test_every_measured_bundle_was_reranked_from_both_routes ___________
+
+measured = [({'caps': ['CAP-51', 'CAP-10'], 'class': 'decisions', 'gold': {'answer': 'ADR-006 superseded ADR-002: JSON is directl...': 1, 'chunk_id': 'b9e3194c272e0d9cf0a868d9', 'end_line': 30, 'id': 'b9e3194c272e0d9cf0a868d9', ...}, ...], ...}), ...]
+
+    @REAL
+    def test_every_measured_bundle_was_reranked_from_both_routes(measured):
+        for query, bundle in measured:
+>           assert bundle[support.K_FACETS][support.ROUTE_SEMANTIC]["available"] is True, query["id"]
+E           AssertionError: DQ-A-08
+E           assert False is True
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:193: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:174: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 80.00 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 50.0, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-08', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+4 failed, 178 passed, 1 warning in 2969.67s (0:49:29)

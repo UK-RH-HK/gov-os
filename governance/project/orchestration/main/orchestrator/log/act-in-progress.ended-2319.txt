@@ -1,0 +1,1 @@
+2026-11-02 22:48:48 ACT-SCHEDULE-STOP-2 handed to the owner's operator: the crontab's 09:30 runs-sweep line commented out. No CTO main-tree commit until the owner says done (DEC-1028 item 6). The dispatcher's landing (W2-123/122/126, since 22:25) and W2-112's lead may commit meanwhile; the ACT touches only the crontab.

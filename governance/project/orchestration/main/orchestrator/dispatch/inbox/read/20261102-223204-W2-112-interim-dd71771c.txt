@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-112
+status: interim result dd71771c: W2-112 (DAEO-clon): the stopgap stays as the machine-wide guard; KPI success-7 re-baselined (DEC-1048)

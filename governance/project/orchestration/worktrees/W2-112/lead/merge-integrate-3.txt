@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge w2/integrate at 3630679c (DEC-1037 emergency re-pin, DEC-1038, DEC-1039)
+
+Task: DAEO-clon
+Implements: DEC-1039,DEC-1038
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

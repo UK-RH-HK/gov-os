@@ -1,15 +1,20 @@
-dispatcher 2026-11-02 14:17:09
-leads running (1, from the processes): W2-112
-load 16.6/12.5/14.9; real busy cores 16.21 of 20 (the embedding server 5.02); memory available 15411 MB; gate_check (for comparison) open (OPEN leads=1 load=16.6/14.9 nproc=20 have=16366144kB need=7426200kB); disk open
-Balance: CPU 16.21/20 busy (band 14-18: within); RAM 15.0 GB available (floor 3.0 GB); GPU 3.1/15.9 GB used, 12.8 free (headroom 2.0 GB; embedders' layers: shared 29/29; holders: none listed); embedders: shared BUSY 1270 tasks/min; query BUSY 6 tasks/min; slots 3 by device (gpu 29/29); lead cap 0 from memory (-0.5 GB room / 2.1 GB a lead); rerankers 1 (3.4 GB RSS; 0 of 2 GPU slots held; reserve 9.4 GB: the rerankers' p95 (88 of 30 samples, 0.5 of 24 h, since 2026-11-02 13:00))
-admission (by peaks, DEC-1008 item 5): real CPU: 16.21 busy cores + 3.06 for the embedding server's p95 >= 20 - margin 2
-peaks 2026-11-02 13:27:09: a lead p95 4097 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 106 min, /home/usain/gov-os-worktrees/W2-122)
-heavy slots held: gov-os-heavy-slot-1.lock; queue busy; land: in flight; main tree clean on w2/integrate
+dispatcher 2026-11-03 00:00:04
+leads running (0, from the processes): none
+load 0.2/0.2/1.0; real busy cores 0.19 of 20 (the embedding server 0.0); memory available 20470 MB; gate_check (for comparison) open (OPEN leads=0 load=0.2/1.0 nproc=20 have=20957940kB need=5285964kB); disk open
+Balance: CPU 0.19/20 busy (band 14-18: below); RAM 20.0 GB available (floor 3.0 GB); GPU 5.8/15.9 GB used, 10.1 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: none listed); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); lead cap 4 from memory (9.3 GB room / 2.1 GB a lead); rerankers 0 (0.0 GB RSS; 0 of 2 GPU slots held; reserve 8.9 GB: the rerankers' p95 (1422 of 30 samples, 10.2 of 24 h, since 2026-11-02 13:00))
+Forecast: lead: admits, binding GPU: GPU memory 8.6 of 13.9 GB (used 5.8 + running jobs' peaks 0.0 + the newcomer's 2.8; 2 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 8.6 of 13.9 GB (used 5.8 + running jobs' peaks 0.0 + the newcomer's 2.8; 2 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 8.6 of 13.9 GB (used 5.8 + running jobs' peaks 0.0 + the newcomer's 2.8; 2 GPU reranker slot(s) free); pairing loads CPU 0.01, GPU 0.42
+Jobs by phase: none
+GPU rule: GPU memory 5.8 of 13.9 GB (used 5.8 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 579 MiB (floor 1019 MiB): no spill
+Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
+Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 2), spill floor 1019 MiB; config.json overrides: none
+admission (by peaks, DEC-1008 item 5): admits: 0 of 4 leads (cap from memory); memory 20470 MB >= 13097 MB (slots rule: floor + 0 running + 0 launching at 2129 MB (outside verification) or their own max + the newcomer 2129 MB + 3 slot runs at 1829 MB + services' headroom 2407 MB; rerankers 0 at 0 MB now, 0 MB outside the leads); GPU memory 10384 MiB free >= 5632 MiB; forecast admits (binding GPU: GPU memory 8.6 of 13.9 GB (used 5.8 + r
+peaks 2026-11-02 23:31:04: a lead p95 4091 MB, max 9580 MB
+heavy steps outside a slot: none
+heavy slots held: none; queue free; land: nothing to land; main tree NOT clean on w2/integrate
 inbox unread: 0
-ready list: W2-112 DAEO-clon: running; W2-126 DAEO-jpr0: not admitted: real CPU: 16.21 busy cores + 3.06 for the embedding server's p95 >= 20 - margin 2; W2-123 DAEO-qzrq: already started for W2-123-A5-r2-retry.json; W2-122 DAEO-blwa: already started for W2-122-A5-r2-nok5.json
+ready list: nothing waiting
 sentinel: watched
-guard harvest: last 2026-11-02 14:13:28, rc 0, 19.5 s of 300 s
-embedding server: shared BUSY 1270 tasks/min (1 waiting, the oldest 0.3 s); query BUSY 6 tasks/min
-GPU: RTX 5070 Ti 3.1/15.9 GB, 31 %; holders: embedder shared (0), reranker (0); layers: shared 29/29, query cpu-only by design
-heavy slot holders: slot 1 pid 1728873 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm ) idle 0 min
+guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
+embedding server: shared IDLE 0 tasks/min; query IDLE 0 tasks/min
+GPU: RTX 5070 Ti 5.8/15.9 GB, 0 %; holders: embedder shared (0), reranker (0); layers: shared 29/29, query 29/29; last alert 2026-11-02 23:04:06: GPU budget
+heavy slot holders: none

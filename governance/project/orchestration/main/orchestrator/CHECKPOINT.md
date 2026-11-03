@@ -1,10 +1,70 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — handover of 2026-11-01 22:45 GMT, for the fresh session after the reload (DEC-994, DEC-1018)
+## RESUME HERE — 2026-11-03 00:00: handover from session `debdb3f7` before the owner's restart of WSL and the machine
 
-**EMERGENCY IN FORCE (DEC-1033, 2026-11-02 13:01): read `.gov-runtime/scratch/orchestrator/EMERGENCY-PLAN-2026-11-02.md`
-FIRST: it holds each fix's state and time, what was stopped and where it resumes, the decisions since DEC-1033, the
-ACTs, the re-pin question and the after figures due. It supersedes the older notes below where they differ.**
+**THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
+"DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:
+`governance/project/orchestration/INTENT-DEC-1052.md` (one question, five tests; templates; READY and DONE by code;
+path-map roles; what memory holds). **After the restart: `governance/project/orchestration/MORNING-RESTART-2026-11-03.md`**
+(what to start again, in order, and what must not start).
+
+**Read first:** the prompt's §0 (DEC-1047, DEC-1049, DEC-1051, DEC-1052 hold over everything below);
+`governance/project/orchestration/DECISIONS-IN-FORCE.md`; the register's last entries DEC-1040 to DEC-1052; this block.
+Next free id DEC-1053.
+
+**State at the handover:** EVERYTHING STOPPED (DEC-1051, 23:08): no lead, no landing, no agent, no test run; nothing
+scheduled but the dispatcher (cron, every minute; ready list empty; no `dispatch/land.txt`; the queue's approvals
+parked in `merge-queue/parked-by-emergency/`); the nightly and the runs sweep commented out in the crontab
+(ACT-NIGHTLY-STOP-1, ACT-SCHEDULE-STOP-2); the guard harvest off; `bench_loop.sh` and `usage_watch.sh` stopped. Where
+each piece stopped and how it resumes: `log/emergency-stops-20261102.md` (its 23:08 and 23:39 sections).
+`w2/integrate` at its last records commit (the owner pushes); main tree clean.
+
+**The order of work (DEC-1052), for the fresh session:**
+1. D-0 clean-up (O-8, O-13): list anything unmerged that may hold work TO THE OWNER before deleting it.
+2. D-1 merge directly into `w2/integrate`, accepted as built, no queue run: W2-122 `3fc448601e2d`, W2-123
+   `3de9bcf44d91`, W2-126 `2785b2e47432` (an engineer resolves its `semantic.py` conflict with W2-123, then KPI 7),
+   W2-112 `d5216599e6fd`, W2-04 `a0c79a6c970e`, `emg/noscan` `ddcec657c278` (the DEC-1045 product switch), `emg/select`
+   `194e3289c540` (T-4; one W2-66 case for a designer). Then re-pin window 2 with its checks (an ACT).
+3. D-2 the CTO's tools: E1 (Q-1, G-1; its partial work in worktree `EMG-queue`, uncommitted), then R1-21, then E3's guard
+   ACT (`drafts/act-guard-fix-4/`, partial), then G-14's path-map role checks; O-A1; the LB held-slot fix (`EMG-lb2`,
+   uncommitted).
+4. D-3 configuration and text lifts (T-3 first). D-4 the test suite cut to about 5,000 cases before any full suite,
+   the deletions listed to the owner first, counts and times before and after. D-5 templates (scripts first), READY and
+   DONE by code. D-6 the code tidy-up. D-7 memory's scope (M-4) with W2-61's measure. D-8 G-3.
+5. D-9 the WBS refactor with the homes (KPI lines in the home tickets; every affected ticket points to the intent note);
+   the tests run per ticket, before and after.
+6. D-10 the full suite on the refactored repository, on the owner's word only; then the lift, the restart of tickets,
+   the formal closes, EXAMIN's adoption.
+**No run uses the old way:** gitleaks off; no full suite but D-10's; scoped selection; attribution once each way.
+
+**Open with the owner:** nothing blocking; the CTO lists D-0's unmerged work to the owner first. P-LB-PRODUCT-1 is
+covered by the homes (D-9). Two engineer tickets cover `tests/acceptance/` in their paths (core-mutation): DAEO-a3u2
+fixed (`8562ae79`); DAEO-tgk2 still to fix in D-3.
+
+**Standing practice:** record times only from `date`; only a ticket's probe record, with its frontmatter, under
+`docs/probes/`; no main-tree commit while `log/act-in-progress.txt` exists; stops cover every standing script, not only
+running tests (slips of 2026-11-02 in `log/drift-2026-w44.txt`).
+
+
+## (history, superseded by the RESUME HERE above) — 2026-11-02 ~18:30 GMT: handover from session `07f25884` (W2O V3) to the FRESH SESSION; window 1 and ACT-QUERY-GPU-2 DONE
+
+**EMERGENCY IN FORCE (DEC-1033; DEC-1037, DEC-1038, DEC-1039): read
+`.gov-runtime/scratch/orchestrator/EMERGENCY-PLAN-2026-11-02.md` FIRST: "THE OWNER'S PLAN (DEC-1039)" at its top is
+the work, in order, **including step 1b (the owner, ~18:40): the Gov Load Balancer** (phases and their measured peaks
+on CPU, RAM, GPU and its memory; GPU-heavy work paired with CPU-heavy work; embedders and rerankers within the GPU's
+budget even if leads are limited to two or three; the rule that the GPU's dedicated memory never spills into shared
+memory nor runs out into a CUDA crash, tested; the CTO's tools first, then a DEC-1003 proposal: its own ticket or
+W2-20/W2-121 KPI lines); then "State at ~18:30". At start: register in `log/cto-session.txt`, end the stand-by with `mv
+log/cto-standby.txt log/cto-standby.ended-$(date +%H%M).txt`, arm `bash tools/inbox_wait_quiet.sh` in the background.
+The dispatcher starts nothing (empty ready list) until you restart work under DEC-1039. Checkpoints only by
+`tools/cto_checkpoint.sh`; processes judged by `tools/tree_busy.sh` (never `pgrep -f`); every heavy run through
+`tools/heavy_slot.sh`; anything outside the repository that changes the machine is an owner ACT (DEC-1038). The push
+of w2/integrate is the owner's (refused by the CTO session's permissions). The older summaries below are history: (1) watch the W2-122 + W2-123 landing (since 15:48; no commit to w2/integrate until it ends); (2) commit
+DEC-1037, the re-pin P1, ACT-QUERY-GPU-2's step 0 and the plan; (3) refresh the integration store; (4) **window 1's
+preparation** (the re-pin, every check incl. the guard's; any failure: back to the old pin, tell the owner), then
+ACT-QUERY-GPU-2; (5) the full suite on the re-pinned head; (6) the clean restart until green. The plan supersedes the
+older notes below where they differ. At start: steps 1-2 of "At start, in order" below (register in
+`log/cto-session.txt`, end the stand-by with `mv`), arm the inbox waiter, then the plan.**
 
 **Read first:** `governance/project/prompts/w2-orchestrator.md` §0; `governance/project/orchestration/DECISIONS-IN-FORCE.md`;
 this block. Older history: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (read only for a named question). Register: DEC-1009
@@ -267,8 +327,8 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-01T21:48:55Z e07513828259a7b2e3a543ae9dc3c0dd9ea8ba9422457f39bc27c80f0df4ac19
-git head: e639b83908c87b83f8ddcb922a6d6f0f3d23dc5a
+generated: 2026-11-02T14:25:00Z 11715889ad43893f7b3b5d2c8a1ff93400b0ce47097255b73b91fe65cc399bb1
+git head: a7182f6c7de00d91b3c5161e10590e06641f0baa
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
   DAEO-3r1j [in_progress] - W2-110 A product's CTO-only install rule
@@ -277,9 +337,11 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-a3u2 [in_progress] - W2-91 Full embeddings: the root files, the governance overlay and schemas/ <- [DAEO-jsg1]
   DAEO-arrl [in_progress] - W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see
   DAEO-blwa [in_progress] - W2-122 Seeded rebuilds
+  DAEO-clon [in_progress] - W2-112 One reranker serves every session
   DAEO-cv58 [in_progress] - W2-60a The role, its skills and its model and effort loaded at launch; the launch record
   DAEO-drhj [in_progress] - W2-104 The skill evaluation harness
   DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
+  DAEO-jpr0 [in_progress] - W2-126 A machine-wide vector cache keyed by the text <- [DAEO-qzrq]
   DAEO-k7hz [in_progress] - W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 <- [DAEO-g0ip]
   DAEO-l78m [in_progress] - W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository
   DAEO-n0wb [in_progress] - W2-92 The knowledge graph and the code graph as routes of plain-question retrieval <- [DAEO-s9qc, DAEO-ym8a]
@@ -289,19 +351,23 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
   DAEO-u4oz [in_progress] - W2-04 gov context bounded and reproducible <- [DAEO-g0ip, DAEO-ym8a]
+  DAEO-vhad [in_progress] - W1-01b A listed merge is exempt for its own changes
   DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
   DAEO-zpdj [in_progress] - W2-105 The template's install block removed
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
+  DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS  e639b839 [w2/integrate]
-  /home/usain/gov-os-worktrees/W2-00-record   54f122fe [record/w2]
+  /home/usain/Dynamic-Agentic-Engineering-OS  a7182f6c [w2/integrate]
+  /home/usain/gov-os-worktrees/EMG-query      75f18d11 [emg/query]
+  /home/usain/gov-os-worktrees/W1-01b         76f12566 [w2/W1-01b]
+  /home/usain/gov-os-worktrees/W2-00-record   3a8ed9f9 [record/w2]
   /home/usain/gov-os-worktrees/W2-00-store-a  d88a1fff (detached HEAD)
   /home/usain/gov-os-worktrees/W2-00-store-b  6ebd7b56 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-03          92e03a72 [w2/W2-03]
-  /home/usain/gov-os-worktrees/W2-04          e0d06a04 [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-04          a0c79a6c [w2/W2-04]
   /home/usain/gov-os-worktrees/W2-05          8d2a1f54 [w2/W2-05]
   /home/usain/gov-os-worktrees/W2-07          31ddf173 [w2/W2-07]
-  /home/usain/gov-os-worktrees/W2-104         738cec98 [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-104         909d7ff0 [w2/W2-104]
   /home/usain/gov-os-worktrees/W2-105         fa653609 [w2/W2-105]
   /home/usain/gov-os-worktrees/W2-106         9525808d [w2/W2-106]
   /home/usain/gov-os-worktrees/W2-107         3861d3f3 [w2/W2-107]
@@ -309,9 +375,12 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-109         695eea48 [w2/W2-109]
   /home/usain/gov-os-worktrees/W2-11          c9f99b28 [w2/W2-11]
   /home/usain/gov-os-worktrees/W2-110         d0ecd1bc [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-112         0b9deb2d [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-112-tests   9af602dc [w2/W2-112-tests]
   /home/usain/gov-os-worktrees/W2-114         e9214850 [w2/W2-114]
-  /home/usain/gov-os-worktrees/W2-122         c2e4d0f2 [w2/W2-122]
-  /home/usain/gov-os-worktrees/W2-123         1045f565 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-122         3fc44860 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123         3de9bcf4 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-126         2a3c998f [w2/W2-126]
   /home/usain/gov-os-worktrees/W2-13          bdc4b795 [w2/W2-13]
   /home/usain/gov-os-worktrees/W2-16          05952376 [w2/W2-16]
   /home/usain/gov-os-worktrees/W2-20          1a54976c [w2/W2-20]
@@ -325,12 +394,13 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-56          23079f92 [w2/W2-56]
   /home/usain/gov-os-worktrees/W2-57          70ee48e2 [w2/W2-57]
   /home/usain/gov-os-worktrees/W2-58          09f5ebfa [w2/W2-58]
-  /home/usain/gov-os-worktrees/W2-60a         e1a3e221 [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-60a         4d798caf [w2/W2-60a]
   /home/usain/gov-os-worktrees/W2-61          6b517db9 [w2/W2-61]
   /home/usain/gov-os-worktrees/W2-61h         ac7dfa17 [w2/W2-61h]
   /home/usain/gov-os-worktrees/W2-63          ad38ed68 [w2/W2-63]
   /home/usain/gov-os-worktrees/W2-64          bb389b71 [w2/W2-64]
   /home/usain/gov-os-worktrees/W2-65          f6881547 [w2/W2-65]
+  /home/usain/gov-os-worktrees/W2-66b         2536346b [w2/W2-66b]
   /home/usain/gov-os-worktrees/W2-67          ff2cc697 [w2/W2-67]
   /home/usain/gov-os-worktrees/W2-68          05ec0f6a [w2/W2-68]
   /home/usain/gov-os-worktrees/W2-71          027d4f10 [w2/W2-71]
@@ -338,15 +408,16 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-76          e1ddcaa6 [w2/W2-76]
   /home/usain/gov-os-worktrees/W2-77          3ce51300 [w2/W2-77]
   /home/usain/gov-os-worktrees/W2-78          8e7640b9 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-81          166f459f [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-81          e78e6af7 [w2/W2-81]
   /home/usain/gov-os-worktrees/W2-84          e3096fae [w2/W2-84]
   /home/usain/gov-os-worktrees/W2-85          d113ff5e [w2/W2-85]
   /home/usain/gov-os-worktrees/W2-86          01e21d63 [w2/W2-86]
   /home/usain/gov-os-worktrees/W2-87          51a72c7f [w2/W2-87]
   /home/usain/gov-os-worktrees/W2-90          12f85350 [w2/W2-90]
-  /home/usain/gov-os-worktrees/W2-90b         d2408361 [w2/W2-90b]
-  /home/usain/gov-os-worktrees/W2-91          e7935f2d [w2/W2-91]
-  /home/usain/gov-os-worktrees/W2-92          fd03541c [w2/W2-92]
+  /home/usain/gov-os-worktrees/W2-90b         73c18fea [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91          55b47e07 [w2/W2-91]
+  /home/usain/gov-os-worktrees/W2-91-tests    a5bf211f [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92          448a835a [w2/W2-92]
   /home/usain/gov-os-worktrees/W2-95          6ce82952 [w2/W2-95]
   /home/usain/gov-os-worktrees/W2-96          220e2923 [w2/W2-96]
   /home/usain/gov-os-worktrees/W2-97          115def7e [w2/W2-97]

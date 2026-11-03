@@ -1,0 +1,67 @@
+# The tests that run only in the nightly full suite (DEC-1045 item 2, DEC-968): those whose subject is the real
+# gitleaks binary (the secret rules, the pre-index secrets filter, the secrets-indexing check, its scan's scale and
+# its verdict record), found by a static scan of tests/ on 2026-11-02 (w2/integrate d5decd4ecf74). select_tests.py
+# leaves each out of every scoped selection (leads, landings, closes) and names it in `left_out_nightly_only`; the
+# nightly runs everything, unchanged. One path (a test file) or node id (file::test) per line, then `#` and why.
+# Never list a test that does not run gitleaks; a test that runs it only on the way to another subject (a rebuild, a
+# retrieval, a hook's git environment: W1-19, W1-27, W2-05, W2-108 and the like) stays in the scoped runs.
+# One place to change: add or remove a line here.
+
+# W1-15: secret rules and the pre-index filter (DEC-285 to DEC-290)
+tests/acceptance/W1-15/test_w1_15_gitleaks_rules.py  # runs the gitleaks binary on the repository's and template's rules
+tests/acceptance/W1-15/test_w1_15_filter.py  # the secret filter on real content: each case is a gitleaks verdict
+tests/acceptance/W1-15/test_w1_15_shelter_batch.py  # the filter under sheltering configurations, through gitleaks
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py  # the filter's and the check's parallel gitleaks scan of planted files
+tests/acceptance/W1-15/test_w1_15_family_check.py  # the secrets-indexing check: gitleaks over the derived stores
+tests/acceptance/W1-15/test_w1_15_review_batch.py  # links and rule-less configurations judged by the filter and the check through gitleaks
+
+# W1-16: the token rule and gitleaks' built-in allowlist (DEC-324, DEC-325, DEC-347)
+tests/acceptance/W1-16/test_w1_16_token_rule.py  # the gov-token rule, judged by the gitleaks binary (its fixture)
+tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py  # gitleaks' built-in allowlist, by the binary
+
+# W2-50: the secrets scan's scale (DEC-853)
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py  # the real gitleaks over large stores: its time limit, pool, reuse
+
+# W2-69: the secrets check reads what the stores hold (DEC-897); every file below is local_only: runs gitleaks
+tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py  # the check's gitleaks scan after a rebuild
+tests/acceptance/W2-69/test_w2_69_last_round_fragments_around_key_blocks.py  # gitleaks' reads around key blocks
+tests/acceptance/W2-69/test_w2_69_last_round_index_filter.py  # the index filter's gitleaks verdicts
+tests/acceptance/W2-69/test_w2_69_last_round_key_blocks.py  # key blocks found by the real gitleaks
+tests/acceptance/W2-69/test_w2_69_real_token_across_read_edges.py  # a real token across gitleaks' read edges
+tests/acceptance/W2-69/test_w2_69_real_token_every_form.py  # a real token in every stored form, by gitleaks
+tests/acceptance/W2-69/test_w2_69_review_fts_stored_terms.py  # FTS terms judged by the real gitleaks
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py  # long key blocks judged by the real gitleaks
+tests/acceptance/W2-69/test_w2_69_review_raw_judgement_not_reused.py  # the check's gitleaks judgement not reused
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py  # the check's scan of a held store, gitleaks
+tests/acceptance/W2-69/test_w2_69_still_scanned_and_closed.py  # the stores still scanned by the real gitleaks
+tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py  # word-internal fragments judged by the real gitleaks
+
+# W2-71: row W2-L423's rule passes a real commit hash only (DEC-911 item 4); every file below needs_gitleaks
+tests/acceptance/W2-71/test_w2_71_exemption.py  # the exemption judged on gitleaks findings
+tests/acceptance/W2-71/test_w2_71_lazy_fetch_guard.py  # the check's gitleaks run in a full clone
+tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py  # every run through a logging stand-in to the real gitleaks
+tests/acceptance/W2-71/test_w2_71_only_that_rule_and_match.py  # gitleaks findings of the rule and of no other
+tests/acceptance/W2-71/test_w2_71_partial_clone.py  # the check's gitleaks run in a partial clone
+tests/acceptance/W2-71/test_w2_71_promisor_config.py  # the check's gitleaks run under promisor settings
+tests/acceptance/W2-71/test_w2_71_real_tokens_still_fail.py  # real tokens still findings of the real gitleaks
+tests/acceptance/W2-71/test_w2_71_verification_cannot_run.py  # the check's gitleaks run when git cannot verify
+
+# W2-107: gitleaks verdicts remembered by content hash (DEC-966 item 4); a stand-in hands each scan to the real one
+tests/acceptance/W2-107/test_w2_107_cache_contents.py  # the record after real gitleaks scans
+tests/acceptance/W2-107/test_w2_107_concurrency.py  # threads and processes judging through the real gitleaks
+tests/acceptance/W2-107/test_w2_107_default_place.py  # the record's place, scans through the real gitleaks
+tests/acceptance/W2-107/test_w2_107_engine_change.py  # a gitleaks whose bytes change rescans: the real binary
+tests/acceptance/W2-107/test_w2_107_fail_closed.py  # a broken record still scans through the real gitleaks
+tests/acceptance/W2-107/test_w2_107_full_scan.py  # the full scan through the real gitleaks
+tests/acceptance/W2-107/test_w2_107_remembered.py  # remembered verdicts: counts real gitleaks calls
+tests/acceptance/W2-107/test_w2_107_review_findings.py  # a gitleaks upgraded behind a shim: the real binary
+tests/acceptance/W2-107/test_w2_107_secrets_never_remembered.py  # a secret scanned on every call by the real gitleaks
+
+# tests/unit/secrets_check: builder tests that run the real gitleaks (skipped without it)
+tests/unit/secrets_check/test_secrets.py  # the pre-index filter and the check, real gitleaks (W1-15)
+tests/unit/secrets_check/test_scan_scale.py  # the scan's limit, pool and clean-result record, real gitleaks (W2-50)
+tests/unit/secrets_check/test_commit_exemption.py  # real git and gitleaks in a repository built from scratch (W2-71)
+tests/unit/secrets_check/test_w2_107_cache.py  # a stand-in hands each run to the real gitleaks (W2-107)
+tests/unit/secrets_check/test_w2_107_engine.py  # stand-ins hand every scan to the real gitleaks (W2-107)
+tests/unit/secrets_check/test_w2_107_record.py  # the rebuild's filter with the real gitleaks (W2-107)
+tests/unit/secrets_check/test_w2_20_pool.py::test_both_pools_take_the_width_and_their_results_do_not_depend_on_it  # the one case marked to run the real gitleaks (W2-20)

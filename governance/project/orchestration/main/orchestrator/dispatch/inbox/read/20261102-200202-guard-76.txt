@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 77
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01JG8uVL1ZkHqKc9SNN7fJG7", "time": "2026-11-02T19:54:29.508Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/debdb3f7-879f-4f53-8ef5-ba7d562eaef2/subagents/agent-ab527a8c38e4e4896.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator", "tool": "Write", "form": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/emg-w254-tests.md", "rule": "a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, 

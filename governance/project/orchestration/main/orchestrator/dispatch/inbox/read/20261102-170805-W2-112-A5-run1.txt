@@ -1,0 +1,8 @@
+log: W2-112-A5-run1.json
+W2: W2-112
+status: PACKAGES. Stopped at a safe point on the owner's order (via the CTO, 17:2x UTC). Review round 1 failed on one finding in the research document; both round-2 fixes are committed, but the second and last review has not started.
+
+task: Lead W2-112 (DAEO-clon, FULL): one shared, on-demand reranker service on the GPU, from tests to review.
+status: PACKAGES. Stopped at a safe point on the owner's order (via the CTO, 17:2x UTC). Review round 1 failed on one finding in the research document; both round-2 fixes are committed, but the second and last review has not started.
+work_completed:
+- The engineer built the shared service: one process per user on a 0600 socket, started under a lock, ending after an idle time, holding one GPU slot, and never running on the CPU. The bundle carries a `rerank` entry and `gov status` counts

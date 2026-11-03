@@ -1,0 +1,7 @@
+{
+ "memory_rule": "slots",
+ "K": 2,
+ "gpu_expected": {
+  "query": true
+ }
+}

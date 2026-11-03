@@ -1,0 +1,4803 @@
+{
+ "DAEO-yvzh": {
+  "id": "DAEO-yvzh",
+  "wbs": "W1-37",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "config",
+   "lite"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-ipqy"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/superpowers/**"
+  ],
+  "role": "engineer",
+  "title": "Superpowers three-skill vendoring",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-w616": {
+  "id": "DAEO-w616",
+  "wbs": "W1-13",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-lc4q",
+   "DAEO-topz"
+  ],
+  "paths": [
+   "src/gov/readiness/**",
+   "tests/unit/readiness/**"
+  ],
+  "role": "engineer",
+  "title": "gov readiness",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-k7hz": {
+  "id": "DAEO-k7hz",
+  "wbs": "W2-11",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "skill",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "template/governance/kernel/templates/brief-*.md",
+   "template/governance/kernel/skills/orchestration/**",
+   "template/governance/kernel/skills/audit/**",
+   ".claude/skills/orchestration/**",
+   ".claude/skills/audit/**",
+   "docs/changes/W2-11-CIT-P.md",
+   "template/governance/kernel/roles/orchestrator.md",
+   ".rulesync/subagents/orchestrator.md",
+   "template/.rulesync/subagents/orchestrator.md",
+   ".claude/agents/orchestrator.md",
+   ".rulesync/skills/orchestration/**",
+   "template/.rulesync/skills/orchestration/**",
+   ".rulesync/skills/audit/**",
+   "template/.rulesync/skills/audit/**",
+   "template/governance/kernel/skills/test-design/**",
+   ".claude/skills/test-design/**",
+   ".rulesync/skills/test-design/**",
+   "template/.rulesync/skills/test-design/**",
+   "template/governance/kernel/templates/skill.md",
+   "template/governance/kernel/skills/qa-review/**",
+   ".claude/skills/qa-review/**",
+   ".rulesync/skills/qa-review/**",
+   "template/.rulesync/skills/qa-review/**"
+  ],
+  "role": "product-spec",
+  "title": "Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2bdu": {
+  "id": "DAEO-2bdu",
+  "wbs": "W2-88",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "adoption",
+   "full",
+   "examin-minimum"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-l78m",
+   "DAEO-siiz",
+   "DAEO-tgk2",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/adopt/assess.py",
+   "src/gov/adopt/refactor_plan.py",
+   "src/gov/adopt/fabric.py",
+   "src/gov/adopt/command.py",
+   "src/gov/adopt/project.py",
+   "src/gov/adopt/stages.py",
+   "src/gov/rebuild/command.py",
+   "src/gov/store/layout.py",
+   "src/gov/store/loader.py",
+   "template/governance/kernel/skills/adopt/SKILL.md",
+   "template/.rulesync/skills/adopt/SKILL.md",
+   ".rulesync/skills/adopt/SKILL.md",
+   ".claude/skills/adopt/SKILL.md",
+   "tests/unit/adopt/test_w2_88*",
+   "tests/unit/rebuild/test_w2_88*",
+   "docs/research/W2-88-any-repository.md",
+   "docs/changes/W2-88-CIT-P.md"
+  ],
+  "role": "engineer",
+  "title": "Memory for any repository: at adoption, assess any repository however large, plan the refactoring it needs for",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-8lmb": {
+  "id": "DAEO-8lmb",
+  "wbs": "W2-90",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "test-revision",
+   "guard",
+   "lite"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W1-05/test_w1_05_live_hooks.py",
+   "tests/acceptance/W1-05/test_w1_05_role_subagents.py",
+   "tests/acceptance/W1-28/test_w1_28_launch_product_spec.py",
+   "tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py",
+   "tests/acceptance/W1-46/test_w1_46_install_spellings.py",
+   "tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py",
+   "tests/acceptance/W1-46/test_w1_46_live_sessions.py",
+   "tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py",
+   "tests/acceptance/W1-46/test_w1_46_research_installs.py",
+   "tests/acceptance/W1-46/test_w1_46_research_role.py",
+   "tests/acceptance/W1-46/test_w1_46_role_settings.py",
+   "tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py",
+   "tests/acceptance/W1-47/test_w1_47_failed_commands.py",
+   "tests/acceptance/W1-49/test_w1_49_registration.py",
+   "tests/acceptance/W1-50/test_w1_50_freeze_launcher.py",
+   "tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py",
+   "tests/acceptance/W2-59/test_w2_59_hook_lines.py",
+   "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py",
+   "tests/acceptance/W2-65/test_w2_65_hook_lines.py",
+   "tests/acceptance/W1-05/conftest.py",
+   "tests/acceptance/W1-46/conftest.py",
+   "tests/acceptance/W2-90/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "The 235 live-wiring tests judge the kernel's wiring: after ACT 1, the cases that asserted this repository runs",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-49o5": {
+  "id": "DAEO-49o5",
+  "wbs": "W2-16",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ha8z"
+  ],
+  "paths": [
+   "src/gov/lock/**",
+   "src/gov/release/**",
+   "copier.yml",
+   "template/framework.lock*",
+   "tests/unit/lock/**",
+   "tests/unit/release/**",
+   "docs/releases/**",
+   "src/gov/check/commands.py"
+  ],
+  "role": "engineer",
+  "title": "Immutable, hash-pinned releases (CAP-43.b lite)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-60rw": {
+  "id": "DAEO-60rw",
+  "wbs": "W2-30",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "audit",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-b926",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "docs/audit/wave-2/W2-30/**"
+  ],
+  "role": "independent-auditor",
+  "title": "Healthy-adoption verdict on the real repository",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0pyc": {
+  "id": "DAEO-0pyc",
+  "wbs": "W2-32",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-rd0g"
+  ],
+  "paths": [
+   "src/gov/retrieval/**",
+   "src/gov/config/models*",
+   "tests/unit/retrieval/**",
+   "tests/unit/semantic/**"
+  ],
+  "role": "engineer",
+  "title": "Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ebmh": {
+  "id": "DAEO-ebmh",
+  "wbs": "W2-75",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "close",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W2-54/conftest.py",
+   "tests/acceptance/W2-54/test_w2_54_green_here.py",
+   "tests/acceptance/W2-54/w2_54_support.py",
+   "tests/acceptance/W2-54/README.md"
+  ],
+  "role": "independent-test-designer",
+  "title": "W2-54's green-here fixture reads the close's own check result",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-fdkq": {
+  "id": "DAEO-fdkq",
+  "wbs": "W1-40",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "config",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-2lwj",
+   "DAEO-8nue",
+   "DAEO-fygv"
+  ],
+  "paths": [
+   "lefthook.yml",
+   "template/lefthook.yml.jinja",
+   ".github/workflows/**",
+   "template/.github/workflows/**",
+   "src/gov/ci/**",
+   "tests/unit/ci/**"
+  ],
+  "role": "engineer",
+  "title": "lefthook and CI workflow",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-g23i": {
+  "id": "DAEO-g23i",
+  "wbs": "W2-38",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-6n5k",
+   "DAEO-g0ip",
+   "DAEO-s694",
+   "DAEO-xxgp"
+  ],
+  "paths": [
+   "src/gov/impact/profile*",
+   "src/gov/close/select*",
+   "tests/unit/impact/**",
+   "tests/unit/close/test_select*"
+  ],
+  "role": "engineer",
+  "title": "Profile from impact; impact-selected tests at close",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-nqa2": {
+  "id": "DAEO-nqa2",
+  "wbs": "W2-90b",
+  "status": "open",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "test-revision",
+   "guard",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0mtg",
+   "DAEO-zpdj"
+  ],
+  "paths": [
+   "tests/acceptance/W1-05/test_w1_05_live_hooks.py",
+   "tests/acceptance/W1-05/conftest.py",
+   "tests/acceptance/W1-46/test_w1_46_research_installs.py",
+   "tests/acceptance/W1-46/test_w1_46_live_sessions.py",
+   "tests/acceptance/W1-46/conftest.py",
+   "tests/acceptance/W2-59/test_w2_59_hook_lines.py",
+   "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py",
+   "tests/acceptance/W2-65/test_w2_65_hook_lines.py",
+   "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+   "tests/acceptance/W1-33/w1_33_support.py",
+   "tests/acceptance/W1-47/w1_47_support.py",
+   "tests/acceptance/W1-50/test_w1_50_freeze_launcher.py",
+   "tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py",
+   "tests/acceptance/W2-54/w2_54_support.py",
+   "tests/acceptance/W2-90/w2_90_kernel_wiring.py",
+   "tests/acceptance/W2-90/README.md",
+   "tests/acceptance/W2-90b/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "W2-90's next round: the cases still tied to this repository's live wiring move to the kernel's wiring now that",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0uhh": {
+  "id": "DAEO-0uhh",
+  "wbs": "W2-64",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-zflj"
+  ],
+  "paths": [
+   "template/governance/kernel/schemas/close.schema.json",
+   "src/gov/check/schema.py",
+   "tests/unit/check/test_schema*",
+   "tests/unit/check/test_check.py",
+   "tests/unit/check/test_kernel_followup.py"
+  ],
+  "role": "engineer",
+  "title": "W2-02's widening: the record validator through check-jsonschema; docs/imported/ out of the schema check",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-av72": {
+  "id": "DAEO-av72",
+  "wbs": "W2-79",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "orchestration",
+   "tools",
+   "lite",
+   "withdrawn"
+  ],
+  "priority": 2,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W2-79/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "Acceptance tests for the orchestrator's lead brief builder",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-sg6x": {
+  "id": "DAEO-sg6x",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-e8f0"
+  ],
+  "paths": [
+   "tests/acceptance/W2-71/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-gjjf": {
+  "id": "DAEO-gjjf",
+  "wbs": "W1-42",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "integration",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0i6h",
+   "DAEO-8goq",
+   "DAEO-9i8e",
+   "DAEO-cdoi",
+   "DAEO-fdkq",
+   "DAEO-jdqr",
+   "DAEO-o4fg",
+   "DAEO-skiy",
+   "DAEO-wqd6"
+  ],
+  "paths": [
+   "docs/plan/wave-1-exit/**"
+  ],
+  "role": "orchestrator",
+  "title": "Wave 1 exit run on the dev tiers",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6icv": {
+  "id": "DAEO-6icv",
+  "wbs": "W2-101",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "skill",
+   "domain",
+   "after-act-2",
+   "standard"
+  ],
+  "priority": 3,
+  "deps": [
+   "DAEO-drhj"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/frontend/**",
+   ".claude/skills/frontend/**",
+   ".rulesync/skills/frontend/**",
+   "template/.rulesync/skills/frontend/**",
+   "template/governance/kernel/skills/ui-ux/**",
+   ".claude/skills/ui-ux/**",
+   ".rulesync/skills/ui-ux/**",
+   "template/.rulesync/skills/ui-ux/**",
+   "template/governance/kernel/skills/devops/**",
+   ".claude/skills/devops/**",
+   ".rulesync/skills/devops/**",
+   "template/.rulesync/skills/devops/**"
+  ],
+  "role": "product-spec",
+  "title": "Domain skills B: frontend, UI/UX and DevOps, each the engineer's skill for its area",
+  "body_after_act2": true,
+  "body_after_w2_11": false
+ },
+ "DAEO-kiar": {
+  "id": "DAEO-kiar",
+  "wbs": "W2-107",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "secrets",
+   "speed",
+   "full"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "src/gov/secrets/__init__.py",
+   "src/gov/secrets/cache.py",
+   "tests/unit/secrets_check/test_w2_107*"
+  ],
+  "role": "engineer",
+  "title": "Rebuild speed: gitleaks results remembered by content hash, so a rebuild scans only new or changed files; the ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-yadm": {
+  "id": "DAEO-yadm",
+  "wbs": "W2-34",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/readiness/**",
+   "src/gov/tasks/**",
+   "template/governance/kernel/templates/openspec/**",
+   "tests/unit/readiness/**",
+   "tests/unit/bridge/**"
+  ],
+  "role": "engineer",
+  "title": "gov readiness --generate",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-csj8": {
+  "id": "DAEO-csj8",
+  "wbs": "W2-28",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "audit",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-h4rh"
+  ],
+  "paths": [
+   "docs/audit/wave-2/W2-28/**"
+  ],
+  "role": "independent-auditor",
+  "title": "Independent verdict on the copy",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-rd0g": {
+  "id": "DAEO-rd0g",
+  "wbs": "W2-15a",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "research",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-h2k3",
+   "DAEO-kl5e",
+   "DAEO-r9ss",
+   "DAEO-u4oz",
+   "DAEO-ym8a",
+   "DAEO-zqvn"
+  ],
+  "paths": [
+   "docs/research/EXP-003/**",
+   "experiments/EXP-003/**"
+  ],
+  "role": "research",
+  "title": "EXP-003, pass 1: the baseline",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-rmbe": {
+  "id": "DAEO-rmbe",
+  "wbs": "W2-69",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "secrets",
+   "check",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-kl5e"
+  ],
+  "paths": [
+   "src/gov/secrets/**",
+   "src/gov/rebuild/command.py",
+   "tests/unit/secrets/**",
+   "tests/unit/secrets_check/**",
+   "tests/unit/rebuild/test_compaction*",
+   "docs/research/W2-69-secrets-scan.md"
+  ],
+  "role": "engineer",
+  "title": "The secrets check reads what the stores hold: no chance red from where a scan begins",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-1ahb": {
+  "id": "DAEO-1ahb",
+  "wbs": "W2-21",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-r30l"
+  ],
+  "paths": [
+   "src/gov/launch/**",
+   "template/governance/kernel/roles/ticket-lead.md",
+   "template/governance/kernel/settings.json",
+   "tests/unit/launch/**"
+  ],
+  "role": "engineer",
+  "title": "Stable launch: gov launch lead, the ticket-lead role, launch records",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2lwj": {
+  "id": "DAEO-2lwj",
+  "wbs": "W1-30",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-8qvp",
+   "DAEO-fygv",
+   "DAEO-rrxp",
+   "DAEO-topz",
+   "DAEO-wk2v"
+  ],
+  "paths": [
+   "src/gov/close/**",
+   "tests/unit/close/**",
+   "src/gov/rebuild/**",
+   "tests/unit/rebuild/**",
+   "tests/unit/pause/test_pause.py",
+   "template/governance/kernel/checks/product-traceability*",
+   "src/gov/check/**",
+   "tests/unit/check/**",
+   "src/gov/store/**",
+   "tests/unit/store/**",
+   "src/gov/readiness/**",
+   "tests/unit/readiness/**",
+   "src/gov/context/**",
+   "tests/unit/context/**",
+   "src/gov/telemetry/**",
+   "tests/unit/telemetry/**",
+   "src/gov/codeintel/**",
+   "tests/unit/codeintel/**",
+   "template/governance/kernel/schemas/**",
+   "template/governance/kernel/checks/**",
+   "src/gov/tasks/**",
+   "tests/unit/tasks/**",
+   "src/gov/records/**",
+   "tests/unit/records/**",
+   "src/gov/cli/checks.py",
+   "tests/unit/cli/**",
+   "src/gov/retrieval/retrieve_check.py",
+   "src/gov/guard/containment.py",
+   "tests/unit/containment/**",
+   "template/governance/kernel/settings.json",
+   "tests/unit/retrieve/test_retrieve.py",
+   ".rulesync/subagents/orchestrator.md",
+   ".rulesync/skills/orchestration/**",
+   ".rulesync/hooks.jsonc"
+  ],
+  "role": "engineer",
+  "title": "gov close",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-kmcr": {
+  "id": "DAEO-kmcr",
+  "wbs": "W2-23",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-49o5",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/adopt/**",
+   "src/gov/adapters/**",
+   "template/governance/project/path-map.yaml",
+   "tests/unit/adopt/**",
+   "tests/unit/adapters/**",
+   "fixtures/adopt/**",
+   "CLAUDE.md",
+   "AGENTS.md",
+   ".claude/settings.json"
+  ],
+  "role": "engineer",
+  "title": "Adoption safety on a real repository",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6n5k": {
+  "id": "DAEO-6n5k",
+  "wbs": "W2-37",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/impact/**",
+   "src/gov/closure/**",
+   "tests/unit/impact/**"
+  ],
+  "role": "engineer",
+  "title": "gov impact",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-m7u4": {
+  "id": "DAEO-m7u4",
+  "wbs": "W1-05",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "config",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-78bn",
+   "DAEO-8qvp",
+   "DAEO-emkd"
+  ],
+  "paths": [
+   ".claude/settings.json",
+   "governance/project/bootstrap.md",
+   "governance/project/roster.yaml",
+   ".claude/agents/**"
+  ],
+  "role": "orchestrator",
+  "title": "Dogfood switch-over",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-03dg": {
+  "id": "DAEO-03dg",
+  "wbs": "W2-80",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "tests",
+   "orchestration",
+   "close",
+   "tools",
+   "standard",
+   "withdrawn"
+  ],
+  "priority": 2,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W2-80/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "Acceptance tests for the close queue's gates (a) to (h) and its refusal path",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-9i8e": {
+  "id": "DAEO-9i8e",
+  "wbs": "W1-23",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-8nue"
+  ],
+  "paths": [
+   "src/gov/retrieval/synthesis*",
+   "tests/unit/synthesis/**"
+  ],
+  "role": "engineer",
+  "title": "Hierarchical synthesis notes",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2gc7": {
+  "id": "DAEO-2gc7",
+  "wbs": "W2-68",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "close",
+   "batch",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/close/batch.py",
+   "src/gov/close/fingerprint.py",
+   "src/gov/close/command.py",
+   "src/gov/close/repo.py",
+   "src/gov/store/**",
+   "tests/unit/close/test_batch*",
+   "tests/unit/close/test_fingerprint*",
+   "tests/unit/store/test_fingerprint*",
+   "docs/research/W2-68-batched-close.md"
+  ],
+  "role": "engineer",
+  "title": "Batched closes, reuse on the same code, and two fingerprints",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-drhj": {
+  "id": "DAEO-drhj",
+  "wbs": "W2-104",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "skills",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/skilleval/**",
+   "tests/unit/skilleval/test_w2_104*",
+   "governance/project/skill-imports.yaml"
+  ],
+  "role": "engineer",
+  "title": "The skill evaluation harness: each skill's three scenarios run on a fresh session and recorded, and every impo",
+  "body_after_act2": false,
+  "body_after_w2_11": true
+ },
+ "DAEO-9nys": {
+  "id": "DAEO-9nys",
+  "wbs": "W2-67",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "tests",
+   "hygiene",
+   "revision",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/unit/close/**",
+   "tests/unit/guard/**",
+   "tests/conftest.py"
+  ],
+  "role": "engineer",
+  "title": "Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ecac": {
+  "id": "DAEO-ecac",
+  "wbs": "W2-60b",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "launch",
+   "telemetry",
+   "keystone-3"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-cv58",
+   "DAEO-r9ss"
+  ],
+  "paths": [
+   "src/gov/launch/session_record.py",
+   "src/gov/launch/launcher.py",
+   "src/gov/telemetry/sessionlog.py",
+   "tests/unit/launch/test_session_record*",
+   "tests/unit/telemetry/test_sessionlog*",
+   "docs/changes/W2-60b-CIT-E.md",
+   "src/gov/guard/decide.py"
+  ],
+  "role": "engineer",
+  "title": "One record per session: model, effort, window, tokens, cost, minutes, turns, subagents",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-8nue": {
+  "id": "DAEO-8nue",
+  "wbs": "W1-22",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-5x4l"
+  ],
+  "paths": [
+   "src/gov/retrieval/validate*",
+   "src/gov/retrieval/canary*",
+   "template/governance/kernel/canaries/**",
+   "tests/unit/validate/**"
+  ],
+  "role": "engineer",
+  "title": "Evidence validator and zero-result canaries",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-3ef2": {
+  "id": "DAEO-3ef2",
+  "wbs": "W1-38",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "config",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0i6h",
+   "DAEO-78bn",
+   "DAEO-skiy",
+   "DAEO-xog0",
+   "DAEO-yvzh",
+   "DAEO-zsvl"
+  ],
+  "paths": [
+   "template/.rulesync/**",
+   ".rulesync/**",
+   "src/gov/adapters/**",
+   "tests/unit/adapters/**",
+   "template/governance/kernel/checks/adapter-portability*"
+  ],
+  "role": "engineer",
+  "title": "rulesync adapters and .claude ownership",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-skiy": {
+  "id": "DAEO-skiy",
+  "wbs": "W1-36",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "skill",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-5x4l",
+   "DAEO-fygv",
+   "DAEO-rrxp",
+   "DAEO-wk2v",
+   "DAEO-xog0"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/retrieval/**",
+   "template/governance/kernel/skills/audit/**",
+   "template/governance/kernel/skills/checkpoint/**",
+   "template/governance/kernel/skills/adopt/**",
+   "template/governance/kernel/checks/skill-regression-b*",
+   "template/governance/kernel/checks/audit-reproducibility*"
+  ],
+  "role": "product-spec",
+  "title": "Skills: retrieval, audit, checkpoint/resume, adopt",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-l78m": {
+  "id": "DAEO-l78m",
+  "wbs": "W2-81",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "adoption",
+   "proving-ground",
+   "tests",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W2-81/**"
+  ],
+  "role": "independent-test-designer",
+  "title": "The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-cv6c": {
+  "id": "DAEO-cv6c",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-cy5o"
+  ],
+  "paths": [
+   "src/gov/adapters/portability.py",
+   "src/gov/doctor/command.py",
+   "src/gov/close/serial.py",
+   "src/gov/close/command.py",
+   "tests/unit/close/test_serial*",
+   "tests/unit/adapters/test_portability*",
+   "docs/changes/W2-57-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2keg": {
+  "id": "DAEO-2keg",
+  "wbs": "W2-35",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-lrre",
+   "DAEO-yadm"
+  ],
+  "paths": [
+   "src/gov/readiness/ux*",
+   "template/governance/kernel/schemas/readiness*",
+   "tests/unit/readiness/**"
+  ],
+  "role": "engineer",
+  "title": "The UX readiness row: approved wireframes, visual checks",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wi46": {
+  "id": "DAEO-wi46",
+  "wbs": "W2-98",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "skill",
+   "roles",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-drhj",
+   "DAEO-k7hz"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/spec-writing/**",
+   ".claude/skills/spec-writing/**",
+   ".rulesync/skills/spec-writing/**",
+   "template/.rulesync/skills/spec-writing/**"
+  ],
+  "role": "product-spec",
+  "title": "The spec-writing skill for product-spec: problem, goals and non-goals, KPIs as observable behaviour each with ",
+  "body_after_act2": false,
+  "body_after_w2_11": true
+ },
+ "DAEO-w19l": {
+  "id": "DAEO-w19l",
+  "wbs": "W2-36",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-yadm"
+  ],
+  "paths": [
+   "src/gov/discover/**",
+   "tests/unit/discover/**"
+  ],
+  "role": "engineer",
+  "title": "gov discover",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-57hm": {
+  "id": "DAEO-57hm",
+  "wbs": "W2-95",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "check",
+   "fail-open",
+   "standard"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "src/gov/check/pathmap.py",
+   "tests/unit/check/test_w2_95*"
+  ],
+  "role": "engineer",
+  "title": "core-pathmap checks what it says: it reads the path map's mapping form, judges every tracked path against exac",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-jozo": {
+  "id": "DAEO-jozo",
+  "wbs": "W1-20",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-4yyl",
+   "DAEO-lkeb"
+  ],
+  "paths": [
+   "src/gov/closure/**",
+   "tests/unit/closure/**",
+   "src/gov/codeintel/**",
+   "tests/unit/codeintel/**"
+  ],
+  "role": "engineer",
+  "title": "gov closure",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6ox0": {
+  "id": "DAEO-6ox0",
+  "wbs": "W2-40",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "research",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-1ahb",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "docs/research/EXP-002/**",
+   "experiments/EXP-002/**"
+  ],
+  "role": "research",
+  "title": "EXP-002: the untested sandbox cases and the harness's hook limits",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wbdh": {
+  "id": "DAEO-wbdh",
+  "wbs": "W2-31",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-r9ss"
+  ],
+  "paths": [
+   "src/gov/budget/**",
+   "src/gov/close/budget*",
+   "src/gov/hooks/budget*",
+   "tests/unit/budget/**"
+  ],
+  "role": "engineer",
+  "title": "Budget gates",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-rrxp": {
+  "id": "DAEO-rrxp",
+  "wbs": "W1-25",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-drvn",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "src/gov/checkpoint/**",
+   "tests/unit/checkpoint/**",
+   "template/governance/kernel/checks/fresh-agent-reconstruction*",
+   "template/governance/kernel/schemas/checkpoint.schema.json",
+   "template/governance/kernel/templates/checkpoint.md"
+  ],
+  "role": "engineer",
+  "title": "gov checkpoint",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-m1u3": {
+  "id": "DAEO-m1u3",
+  "wbs": "W2-84",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "guard",
+   "memory"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/guard/reads.py",
+   "tests/unit/guard/test_w2_84*",
+   "docs/changes/W2-84-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "The guard refuses an evaluation set's hidden part under every tree of the repository: the main tree, every wor",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-w9l3": {
+  "id": "DAEO-w9l3",
+  "wbs": "W1-14",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-lc4q",
+   "DAEO-topz"
+  ],
+  "paths": [
+   "src/gov/tasks/bridge*",
+   "tests/unit/bridge/**"
+  ],
+  "role": "engineer",
+  "title": "Proposal-to-ticket bridge",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zoex": {
+  "id": "DAEO-zoex",
+  "wbs": "W2-108",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "standard",
+   "follow-up"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/retrieval/semantic.py",
+   "src/gov/retrieval/lexical.py",
+   "tests/unit/retrieval/test_w2_108*",
+   "docs/research/W2-108-freshness-once.md"
+  ],
+  "role": "engineer",
+  "title": "Retrieval checks the stores' freshness once per run, not on every call: the context check's 328 calls stop rep",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-tgk2": {
+  "id": "DAEO-tgk2",
+  "wbs": "W2-76",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "rebuild"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/rebuild/**",
+   "tests/unit/rebuild/test_w2_76*",
+   "tests/conftest.py"
+  ],
+  "role": "engineer",
+  "title": "gov rebuild: per-stage timings, a 30-minute watchdog that records what it waits on, and one rebuild at a time ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-n0wb": {
+  "id": "DAEO-n0wb",
+  "wbs": "W2-92",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-s9qc",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/retrieval/graph_route.py",
+   "src/gov/retrieval/code_route.py",
+   "src/gov/retrieval/retrieve.py",
+   "tests/unit/retrieval/test_w2_92*",
+   "docs/research/W2-92-memory-measure.md"
+  ],
+  "role": "engineer",
+  "title": "The knowledge graph and the code graph as routes of plain-question retrieval: ids, record titles and symbol na",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-topz": {
+  "id": "DAEO-topz",
+  "wbs": "W1-09",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-4yyl",
+   "DAEO-drvn",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "template/governance/kernel/bin/tk",
+   "src/gov/tasks/**",
+   "tests/unit/tasks/**"
+  ],
+  "role": "engineer",
+  "title": "Ticket vendoring, claims and READY rule",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-lc4q": {
+  "id": "DAEO-lc4q",
+  "wbs": "W1-12",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "schema",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "template/openspec/schemas/**",
+   "template/openspec/config.yaml"
+  ],
+  "role": "product-spec",
+  "title": "Readiness schema and proposal templates",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-gdzh": {
+  "id": "DAEO-gdzh",
+  "wbs": "W2-85",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "nightly",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W2-54/**",
+   "tests/acceptance/serial-only.txt"
+  ],
+  "role": "independent-test-designer",
+  "title": "W2-54's two time-limit cases routed to the nightly, so the leads' load no longer refuses closes",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-nn1s": {
+  "id": "DAEO-nn1s",
+  "wbs": "W2-46",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "integration",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0mab",
+   "DAEO-0mtg",
+   "DAEO-0pyc",
+   "DAEO-0rfi",
+   "DAEO-0uhh",
+   "DAEO-0z8c",
+   "DAEO-1ahb",
+   "DAEO-2azm",
+   "DAEO-2bdu",
+   "DAEO-2ds6",
+   "DAEO-2gc7",
+   "DAEO-3r1j",
+   "DAEO-49o5",
+   "DAEO-4k3l",
+   "DAEO-57hm",
+   "DAEO-5j8b",
+   "DAEO-60rw",
+   "DAEO-6b2q",
+   "DAEO-6icv",
+   "DAEO-6n5k",
+   "DAEO-6ox0",
+   "DAEO-6y0x",
+   "DAEO-7r5e",
+   "DAEO-7rr2",
+   "DAEO-8lmb",
+   "DAEO-9nys",
+   "DAEO-a3u2",
+   "DAEO-arrl",
+   "DAEO-b6hm",
+   "DAEO-b926",
+   "DAEO-btt7",
+   "DAEO-c1uz",
+   "DAEO-csj8",
+   "DAEO-cv58",
+   "DAEO-cy5o",
+   "DAEO-drhj",
+   "DAEO-dy7j",
+   "DAEO-e82f",
+   "DAEO-e8f0",
+   "DAEO-ebmh",
+   "DAEO-ecac",
+   "DAEO-egsy",
+   "DAEO-g0ip",
+   "DAEO-g87r",
+   "DAEO-gdzh",
+   "DAEO-h2k3",
+   "DAEO-h4rh",
+   "DAEO-ha8z",
+   "DAEO-hgv3",
+   "DAEO-iw1f",
+   "DAEO-jsg1",
+   "DAEO-juee",
+   "DAEO-k7hz",
+   "DAEO-kh9l",
+   "DAEO-kia7",
+   "DAEO-kiar",
+   "DAEO-kl5e",
+   "DAEO-kmcr",
+   "DAEO-l78m",
+   "DAEO-lrre",
+   "DAEO-lxzn",
+   "DAEO-m1u3",
+   "DAEO-mc6n",
+   "DAEO-n0wb",
+   "DAEO-nqa2",
+   "DAEO-ouet",
+   "DAEO-pl6k",
+   "DAEO-qty6",
+   "DAEO-r30l",
+   "DAEO-r9ss",
+   "DAEO-rd0g",
+   "DAEO-rmbe",
+   "DAEO-rpfv",
+   "DAEO-s9qc",
+   "DAEO-siiz",
+   "DAEO-swdu",
+   "DAEO-tgk2",
+   "DAEO-u4oz",
+   "DAEO-uw5h",
+   "DAEO-uzme",
+   "DAEO-wi46",
+   "DAEO-wnnz",
+   "DAEO-wq2b",
+   "DAEO-ye2a",
+   "DAEO-ym8a",
+   "DAEO-zflj",
+   "DAEO-zoex",
+   "DAEO-zpdj",
+   "DAEO-zqvn"
+  ],
+  "paths": [
+   "docs/plan/wave-2-exit/**"
+  ],
+  "role": "orchestrator",
+  "title": "Wave 2 exit run",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-4yyl": {
+  "id": "DAEO-4yyl",
+  "wbs": "W1-10",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-drvn",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "src/gov/store/**",
+   "src/gov/records/**",
+   "tests/unit/store/**"
+  ],
+  "role": "engineer",
+  "title": "Store and record graph",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-1ve2": {
+  "id": "DAEO-1ve2",
+  "wbs": "W1-18",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-drvn"
+  ],
+  "paths": [
+   "src/gov/retrieval/ollama*",
+   "src/gov/retrieval/__init__.py",
+   "tests/unit/ollama/**"
+  ],
+  "role": "engineer",
+  "title": "Ollama on-demand lifecycle and fallback",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-a3u2": {
+  "id": "DAEO-a3u2",
+  "wbs": "W2-91",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-jsg1"
+  ],
+  "paths": [
+   "governance/project/path-map.yaml",
+   "tests/unit/retrieval/test_w2_91*",
+   "docs/research/W2-91-memory-measure.md"
+  ],
+  "role": "engineer",
+  "title": "Full embeddings: the root files, the governance overlay and schemas/ embedded; the hidden half, the generated ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-rpfv": {
+  "id": "DAEO-rpfv",
+  "wbs": "W2-102",
+  "status": "open",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "skill",
+   "release",
+   "lite"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-49o5",
+   "DAEO-drhj"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/release/**",
+   ".claude/skills/release/**",
+   ".rulesync/skills/release/**",
+   "template/.rulesync/skills/release/**"
+  ],
+  "role": "product-spec",
+  "title": "The release skill for the CTO: freeze, version, changelog, provenance note and the tag request to the owner, f",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-hgv3": {
+  "id": "DAEO-hgv3",
+  "wbs": "W2-103",
+  "status": "open",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "skill",
+   "docs",
+   "lite"
+  ],
+  "priority": 3,
+  "deps": [
+   "DAEO-drhj",
+   "DAEO-k7hz"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/technical-writing/**",
+   ".claude/skills/technical-writing/**",
+   ".rulesync/skills/technical-writing/**",
+   "template/.rulesync/skills/technical-writing/**"
+  ],
+  "role": "product-spec",
+  "title": "The technical-writing skill for product-spec: Di\u00e1taxis's four kinds (tutorial, how-to, reference, explanation)",
+  "body_after_act2": false,
+  "body_after_w2_11": true
+ },
+ "DAEO-jzvg": {
+  "id": "DAEO-jzvg",
+  "wbs": "W2-19",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-7rr2",
+   "DAEO-g0ip",
+   "DAEO-r9ss"
+  ],
+  "paths": [
+   "src/gov/close/**",
+   "src/gov/config/**",
+   "template/governance/kernel/schemas/path-map.schema.json",
+   "tests/unit/close/**",
+   "fixtures/lang/**"
+  ],
+  "role": "engineer",
+  "title": "Language-agnostic test commands",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ye2a": {
+  "id": "DAEO-ye2a",
+  "wbs": "W2-72",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "guard",
+   "containment",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/guard/containment.py",
+   "src/gov/guard/containment_merge.py",
+   "tests/unit/guard/test_w2_72_*.py"
+  ],
+  "role": "engineer",
+  "title": "Containment's merge rule matches DEC-912: a merge-back file equal to git's own merge is no change",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-pl6k": {
+  "id": "DAEO-pl6k",
+  "wbs": "W2-63",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "test-revision",
+   "lite"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W1-49/test_w1_49_live_session.py",
+   "tests/acceptance/W1-49/test_w1_49_threshold.py",
+   "tests/acceptance/W1-49/w1_49_support.py",
+   "tests/acceptance/W1-49/README.md"
+  ],
+  "role": "independent-test-designer",
+  "title": "W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-dtv3": {
+  "id": "DAEO-dtv3",
+  "wbs": "W1-01",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "config",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   ".claude/settings.json",
+   "governance/project/bootstrap.md"
+  ],
+  "role": "orchestrator",
+  "title": "Interim bootstrap guardrails",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-swdu": {
+  "id": "DAEO-swdu",
+  "wbs": "W2-15b",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "research",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0pyc",
+   "DAEO-2bdu",
+   "DAEO-2ds6",
+   "DAEO-g0ip",
+   "DAEO-rd0g"
+  ],
+  "paths": [
+   "docs/research/EXP-003/**",
+   "experiments/EXP-003/**"
+  ],
+  "role": "research",
+  "title": "EXP-003, pass 2: the final measurement against 99 %",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ipqy": {
+  "id": "DAEO-ipqy",
+  "wbs": "W1-06",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "ops",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "governance/project/tool-registry.yaml",
+   "template/governance/kernel/vendor/superpowers/**"
+  ],
+  "role": "orchestrator",
+  "title": "Wave 1 tool prerequisites",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6mk8": {
+  "id": "DAEO-6mk8",
+  "wbs": "W1-31",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-2lwj",
+   "DAEO-ipqy",
+   "DAEO-zsvl"
+  ],
+  "paths": [
+   "src/gov/telemetry/**",
+   "tests/unit/telemetry/**"
+  ],
+  "role": "engineer",
+  "title": "Governance share counter",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-jsg1": {
+  "id": "DAEO-jsg1",
+  "wbs": "W2-86",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "standard",
+   "quick-win"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "governance/project/path-map.yaml",
+   "tests/unit/retrieval/test_w2_86*",
+   "docs/research/W2-86-memory-measure.md"
+  ],
+  "role": "engineer",
+  "title": "The kernel template is embedded as the path map means it: template/ except vendored code, the vendored parts a",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-7rr2": {
+  "id": "DAEO-7rr2",
+  "wbs": "W2-53",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/close/**",
+   "tests/unit/close/**"
+  ],
+  "role": "engineer",
+  "title": "The probe gate measures every later merge against git's own merge of its parents",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-juee": {
+  "id": "DAEO-juee",
+  "wbs": "W2-62",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "template/governance/kernel/hooks/sessionstart.py",
+   "template/governance/kernel/skills/checkpoint/**",
+   "tests/unit/hooks/**",
+   "docs/changes/W2-62-CIT-P.md"
+  ],
+  "role": "engineer",
+  "title": "Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-xnbx": {
+  "id": "DAEO-xnbx",
+  "wbs": "W1-50",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-8qvp"
+  ],
+  "paths": [
+   "src/gov/guard/containment*",
+   "template/governance/kernel/hooks/posttooluse*",
+   "template/governance/kernel/hooks/pretooluse*",
+   "tests/unit/containment/**",
+   "src/gov/guard/decide*",
+   "src/gov/pause/**",
+   "src/gov/launch/**",
+   "tests/unit/guard/**",
+   "tests/unit/pause/**",
+   "tests/unit/launch/**",
+   "tests/unit/install/**"
+  ],
+  "role": "engineer",
+  "title": "Containment attribution by commit trailers",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-s694": {
+  "id": "DAEO-s694",
+  "wbs": "W2-41",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-7rr2",
+   "DAEO-g0ip",
+   "DAEO-jzvg"
+  ],
+  "paths": [
+   "src/gov/close/**",
+   "src/gov/tasks/external*",
+   "tests/unit/close/**"
+  ],
+  "role": "engineer",
+  "title": "Close and escalation integrity",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-8goq": {
+  "id": "DAEO-8goq",
+  "wbs": "W1-32",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-6mk8",
+   "DAEO-9279",
+   "DAEO-w616"
+  ],
+  "paths": [
+   "src/gov/status/**",
+   "tests/unit/status/**",
+   "src/gov/launch/**",
+   "tests/unit/launch/**"
+  ],
+  "role": "engineer",
+  "title": "gov status",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2upp": {
+  "id": "DAEO-2upp",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-uzme"
+  ],
+  "paths": [
+   "tests/acceptance/W1-05/**",
+   "tests/acceptance/W1-47/**",
+   "tests/acceptance/serial-only.txt",
+   "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "tests/acceptance/W1-01/test_w1_01_history.py",
+   "tests/acceptance/W1-01/w1_01_support.py",
+   "tests/acceptance/W1-01/test_w1_01_integration_merges.py"
+  ],
+  "role": "independent-test-designer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-dy7j": {
+  "id": "DAEO-dy7j",
+  "wbs": "W2-83a",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "template",
+   "playbooks",
+   "kernel-template",
+   "standard",
+   "keystone-9"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0uhh"
+  ],
+  "paths": [
+   "template/governance/kernel/templates/playbook.md",
+   "template/governance/kernel/schemas/playbook.schema.json",
+   "src/gov/check/schema.py",
+   "template/governance/kernel/skills/adopt/**",
+   ".claude/skills/adopt/**",
+   ".rulesync/skills/adopt/**",
+   "template/.rulesync/skills/adopt/**",
+   "tests/unit/check/test_schema_playbook*",
+   "docs/changes/W2-83a-CIT-P.md",
+   "docs/changes/W2-83a-CIT-E.md"
+  ],
+  "role": "product-spec",
+  "title": "A playbook per stream: the form in the kernel template, its schema in gov check, and the adopt step",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0rfi": {
+  "id": "DAEO-0rfi",
+  "wbs": "W2-54",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/context/**",
+   "template/governance/kernel/checks/context-reproducibility.yaml",
+   "src/gov/check/schema.py",
+   "template/governance/kernel/schemas/audit-report.schema.json",
+   "tests/unit/context/**",
+   "tests/unit/check/test_schema_audit_report*",
+   "docs/changes/W2-54-CIT-E.md",
+   "src/gov/retrieval/semantic.py",
+   "src/gov/retrieval/ollama.py",
+   "tests/unit/retrieval/**",
+   "tests/unit/semantic/test_semantic.py"
+  ],
+  "role": "engineer",
+  "title": "The context packet's dropped list in a stable order; the context check's declared time limit; the audit-report",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-arrl": {
+  "id": "DAEO-arrl",
+  "wbs": "W2-55",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/decisions/**",
+   "src/gov/context/**",
+   "src/gov/retrieve/**",
+   "template/governance/kernel/schemas/decision*",
+   "tests/unit/decisions/**",
+   "docs/research/W2-55-backfill.md"
+  ],
+  "role": "engineer",
+  "title": "Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wudw": {
+  "id": "DAEO-wudw",
+  "wbs": "W2-39",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-u4oz"
+  ],
+  "paths": [
+   "src/gov/context/**",
+   "src/gov/checkpoint/**",
+   "tests/unit/context/**",
+   "tests/unit/checkpoint/**"
+  ],
+  "role": "engineer",
+  "title": "Model and provider switch reconstructs the same inputs",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-emkd": {
+  "id": "DAEO-emkd",
+  "wbs": "W1-02",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-dtv3"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "template/governance/kernel/hooks/pretooluse*",
+   "tests/unit/guard/**"
+  ],
+  "role": "engineer",
+  "title": "PreToolUse default-deny guard",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-cy5o": {
+  "id": "DAEO-cy5o",
+  "wbs": "W2-57",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "close",
+   "load",
+   "serial",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/adapters/portability.py",
+   "src/gov/doctor/command.py",
+   "src/gov/close/serial.py",
+   "src/gov/close/command.py",
+   "tests/unit/close/test_serial*",
+   "tests/unit/adapters/test_portability*",
+   "docs/changes/W2-57-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-rxln": {
+  "id": "DAEO-rxln",
+  "wbs": "W1-17",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-4yyl",
+   "DAEO-7nne"
+  ],
+  "paths": [
+   "src/gov/retrieval/lexical*",
+   "src/gov/retrieval/chunking*",
+   "src/gov/retrieval/store*",
+   "cli/govbridge/**",
+   "tests/unit/retrieval/**",
+   "template/governance/kernel/checks/index-freshness*"
+  ],
+  "role": "engineer",
+  "title": "Lexical index and shared store",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-xxgp": {
+  "id": "DAEO-xxgp",
+  "wbs": "W2-48",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-7rr2",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/testcache/**",
+   "src/gov/close/cache*",
+   "src/gov/close/command.py",
+   ".coveragerc",
+   "tests/unit/testcache/**",
+   "docs/research/W2-48-cache-choice.md"
+  ],
+  "role": "engineer",
+  "title": "Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-sdhj": {
+  "id": "DAEO-sdhj",
+  "wbs": "W2-17",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-49o5",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/update/**",
+   "src/gov/adapters/**",
+   "tests/unit/update/**"
+  ],
+  "role": "engineer",
+  "title": "gov update",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6cc2": {
+  "id": "DAEO-6cc2",
+  "wbs": "W1-45",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "template/governance/kernel/hooks/pretooluse*",
+   "template/governance/kernel/hooks/posttooluse*",
+   "tests/unit/guard/**",
+   "tests/unit/install/**"
+  ],
+  "role": "engineer",
+  "title": "Orchestrator write scope",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-xw3k": {
+  "id": "DAEO-xw3k",
+  "wbs": "W1-27",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-78bn",
+   "DAEO-8nue",
+   "DAEO-lkeb",
+   "DAEO-rxln"
+  ],
+  "paths": [
+   "src/gov/doctor/**",
+   "src/gov/rebuild/**",
+   "src/gov/config/**",
+   "tests/unit/doctor/**",
+   "template/governance/kernel/checks/recovery-rebuild*"
+  ],
+  "role": "engineer",
+  "title": "gov doctor and gov rebuild",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-32n6": {
+  "id": "DAEO-32n6",
+  "wbs": "W1-49",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "template/governance/kernel/hooks/precompact*",
+   "template/governance/kernel/hooks/sessionstart*",
+   ".claude/settings.json",
+   "tests/unit/hooks/**"
+  ],
+  "role": "engineer",
+  "title": "Light auto-resume hooks",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-v4is": {
+  "id": "DAEO-v4is",
+  "wbs": "W2-78",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "close",
+   "records",
+   "standard",
+   "parked",
+   "wave-3"
+  ],
+  "priority": 4,
+  "deps": [],
+  "paths": [
+   "src/gov/close/ratchet.py",
+   "src/gov/close/history.py",
+   "src/gov/close/gates.py",
+   "src/gov/close/traceability.py",
+   "src/gov/close/select.py",
+   "governance/project/records/**",
+   "governance/project/test-map.yaml",
+   "template/governance/kernel/schemas/**",
+   "tests/unit/close/test_w2_78*"
+  ],
+  "role": "engineer",
+  "title": "Governance edits stop widening closes: the path map's lists in record files of their own; prompts and briefs r",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2ds6": {
+  "id": "DAEO-2ds6",
+  "wbs": "W2-26",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "research",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "docs/research/EXP-003/examin/**"
+  ],
+  "role": "research",
+  "title": "EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-e8f0": {
+  "id": "DAEO-e8f0",
+  "wbs": "W2-71",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "secrets",
+   "check",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-rmbe"
+  ],
+  "paths": [
+   "src/gov/secrets/**",
+   "tests/unit/secrets_check/**"
+  ],
+  "role": "engineer",
+  "title": "The secrets check passes a real commit hash of this repository for row W2-L423's rule only",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-cdoi": {
+  "id": "DAEO-cdoi",
+  "wbs": "W1-41",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-3ef2",
+   "DAEO-5ylr",
+   "DAEO-xog0",
+   "DAEO-xw3k"
+  ],
+  "paths": [
+   "src/gov/adopt/**",
+   "tests/unit/adopt/**",
+   "src/gov/context/**",
+   "tests/unit/context/**",
+   "governance/project/external-references.yaml",
+   "tests/unit/launch/test_command_modules.py",
+   "src/gov/doctor/**",
+   "tests/unit/doctor/**",
+   "src/gov/rebuild/**",
+   "tests/unit/rebuild/**",
+   "template/governance/kernel/skills/adopt/SKILL.md"
+  ],
+  "role": "engineer",
+  "title": "gov adopt --lite and legacy importer",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-r9ss": {
+  "id": "DAEO-r9ss",
+  "wbs": "W2-07",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "close",
+   "keystone-1"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-7rr2",
+   "DAEO-g0ip",
+   "DAEO-zflj"
+  ],
+  "paths": [
+   "src/gov/close/**",
+   "src/gov/telemetry/**",
+   "tests/unit/close/**",
+   "tests/unit/telemetry/**"
+  ],
+  "role": "engineer",
+  "title": "gov close by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for eve",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-lkeb": {
+  "id": "DAEO-lkeb",
+  "wbs": "W1-16",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-7nne"
+  ],
+  "paths": [
+   "src/gov/codeintel/**",
+   "tests/unit/codeintel/**",
+   "template/.gitleaks.toml",
+   ".gitleaks.toml",
+   "src/gov/secrets/**",
+   "tests/unit/secrets/**"
+  ],
+  "role": "engineer",
+  "title": "codebase-memory wrapper",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wq2b": {
+  "id": "DAEO-wq2b",
+  "wbs": "W2-97",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "orchestration",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "governance/project/orchestration/tools/merge_queue.py",
+   "tests/unit/orchestration/test_w2_97*",
+   "governance/project/orchestration/tools/README.md"
+  ],
+  "role": "engineer",
+  "title": "The local merge queue: each candidate merge tested before w2/integrate moves, advanced only on green, ejected ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0mtg": {
+  "id": "DAEO-0mtg",
+  "wbs": "W2-106",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "template",
+   "guard",
+   "fail-open",
+   "full"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "template/governance/kernel/settings.json",
+   "template/.rulesync/hooks.jsonc",
+   "tests/unit/hooks/test_w2_106*"
+  ],
+  "role": "engineer",
+  "title": "The template's hook lines pinned: each runs the guard with the installed gov's own interpreter, ignoring PYTHO",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zpdj": {
+  "id": "DAEO-zpdj",
+  "wbs": "W2-105",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "specification",
+   "template",
+   "installs",
+   "standard"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "template/.rulesync/permissions.jsonc"
+  ],
+  "role": "product-spec",
+  "title": "The template's install block removed: an adopted product's CTO session reaches the guard's install rule and is",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-neam": {
+  "id": "DAEO-neam",
+  "wbs": "W2-45",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-7r5e",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/check/runner.py",
+   "src/gov/check/commands.py",
+   "src/gov/decisions/checker.py",
+   "tests/unit/check/**"
+  ],
+  "role": "engineer",
+  "title": "gov check runner semantics and scale",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ym8a": {
+  "id": "DAEO-ym8a",
+  "wbs": "W2-03",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-zflj"
+  ],
+  "paths": [
+   "src/gov/store/**",
+   "src/gov/records/**",
+   "src/gov/decisions/**",
+   "src/gov/check/citations.py",
+   "tests/unit/store/**",
+   "tests/unit/records/**",
+   "tests/unit/decisions/**",
+   "tests/unit/check/test_citations.py"
+  ],
+  "role": "engineer",
+  "title": "Decisions as records, each with its own hash",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0qs5": {
+  "id": "DAEO-0qs5",
+  "wbs": "W1-48",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "ops",
+   "lite"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-ipqy"
+  ],
+  "paths": [
+   "governance/project/tool-registry.yaml"
+  ],
+  "role": "orchestrator",
+  "title": "Claude Code version pin",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-h2k3": {
+  "id": "DAEO-h2k3",
+  "wbs": "W2-61h",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "audit",
+   "evaluation",
+   "held-out",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-m1u3"
+  ],
+  "paths": [
+   "fixtures/evaluation/memory-retrieval/hidden/**",
+   "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+   "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+   "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+   "fixtures/evaluation/memory-retrieval/visible/q24.yaml"
+  ],
+  "role": "independent-auditor",
+  "title": "W2-61's enlarged set: 28 new memory questions with their gold sources, 24 hidden and 4 visible, by an independ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6b2q": {
+  "id": "DAEO-6b2q",
+  "wbs": "W2-109",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "specification",
+   "contract",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "docs/contract/contract.yaml",
+   "docs/contract/CONTRACT_v4.md",
+   "docs/contract/capabilities/**",
+   "docs/contract/SOURCE_MAP.csv",
+   "docs/changes/W2-109-CIT-P.md",
+   "docs/changes/W2-109-CIT-E.md",
+   "docs/plan/tools/validate_w2.py",
+   "tests/unit/plan/test_validate_w2_forms*"
+  ],
+  "role": "product-spec",
+  "title": "Contract v4.3: DEC-841's nine items moved to Wave 3 by a CIT-P, CAP-53.b split, and contract.yaml the Contract",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ha8z": {
+  "id": "DAEO-ha8z",
+  "wbs": "W2-49",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "specification",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-egsy",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "docs/contract/contract.yaml",
+   "docs/contract/CONTRACT_v4.md",
+   "docs/changes/W2-49-CIT-P.md",
+   "docs/changes/W2-49-CIT-E.md",
+   "docs/contract/capabilities/**",
+   "docs/contract/SOURCE_MAP.csv"
+  ],
+  "role": "product-spec",
+  "title": "Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-fygv": {
+  "id": "DAEO-fygv",
+  "wbs": "W1-26",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-be7u",
+   "DAEO-topz",
+   "DAEO-w616"
+  ],
+  "paths": [
+   "src/gov/check/**",
+   "tests/unit/check/**",
+   "template/governance/kernel/checks/core-*"
+  ],
+  "role": "engineer",
+  "title": "gov check G0-G2",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-r30l": {
+  "id": "DAEO-r30l",
+  "wbs": "W2-20",
+  "status": "in_progress",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/resources/**",
+   "src/gov/check/commands.py",
+   "src/gov/launch/gate*",
+   "tests/unit/resources/**"
+  ],
+  "role": "engineer",
+  "title": "Machine-wide resource gate",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-fau3": {
+  "id": "DAEO-fau3",
+  "wbs": "W2-42",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-cuao",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "src/gov/checkpoint/**",
+   "tests/unit/guard/**",
+   "tests/unit/checkpoint/**"
+  ],
+  "role": "engineer",
+  "title": "Guard: missing role, links, late paths, atomic saves",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-pr0y": {
+  "id": "DAEO-pr0y",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-5j8b"
+  ],
+  "paths": [
+   "src/gov/guard/protected.py",
+   "src/gov/guard/heldout.py",
+   "src/gov/guard/decide.py",
+   "src/gov/guard/reads.py",
+   "src/gov/launch/**",
+   "governance/project/path-map.yaml",
+   "template/governance/kernel/schemas/path-map.schema.json",
+   "tests/unit/guard/**",
+   "tests/unit/launch/**",
+   "docs/changes/W2-58-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-b6hm": {
+  "id": "DAEO-b6hm",
+  "wbs": "W2-77",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "nightly",
+   "close"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/close/nightly.py",
+   "tests/unit/close/test_nightly_cleanup*"
+  ],
+  "role": "engineer",
+  "title": "The nightly's clean-up removes only its own clone, by its exact path (row W2-M406)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-sdxk": {
+  "id": "DAEO-sdxk",
+  "wbs": "W2-00",
+  "status": "open",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "coordination",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   ".tickets/**",
+   "governance/project/bootstrap.md",
+   "docs/plan/WAVE_2_LIST.md",
+   "docs/plan/WAVE_2_TRIAGE.md",
+   "docs/plan/WAVE_2_WBS.md",
+   "docs/DECISION_REGISTER.md",
+   ".gov-runtime/scratch/orchestrator/**",
+   "governance/project/orchestration/**",
+   "docs/assessment/**"
+  ],
+  "role": "orchestrator",
+  "title": "Wave 2 coordination: the main session's records",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-c1uz": {
+  "id": "DAEO-c1uz",
+  "wbs": "W2-66",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "close",
+   "regression",
+   "selection",
+   "keystone-2"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "src/gov/close/select.py",
+   "src/gov/close/nightly.py",
+   "src/gov/close/evidence.py",
+   "src/gov/close/command.py",
+   "governance/project/test-map.yaml",
+   "template/governance/kernel/schemas/test-map.schema.json",
+   "template/governance/project/test-map.yaml",
+   "tests/unit/close/test_select*",
+   "tests/unit/close/test_nightly*",
+   "tests/unit/close/test_evidence*",
+   "docs/research/W2-66-scoped-close.md"
+  ],
+  "role": "engineer",
+  "title": "Path-scoped regression at close: selection and evidence (the lite W2-38)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-03pw": {
+  "id": "DAEO-03pw",
+  "wbs": "W1-43",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "audit",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-gjjf"
+  ],
+  "paths": [
+   "docs/audit/wave-1/**"
+  ],
+  "role": "independent-auditor",
+  "title": "Wave 1 exit audit",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-5j8b": {
+  "id": "DAEO-5j8b",
+  "wbs": "W2-58",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/guard/protected.py",
+   "src/gov/guard/heldout.py",
+   "src/gov/guard/decide.py",
+   "src/gov/guard/reads.py",
+   "src/gov/launch/**",
+   "governance/project/path-map.yaml",
+   "template/governance/kernel/schemas/path-map.schema.json",
+   "tests/unit/guard/**",
+   "tests/unit/launch/**",
+   "docs/changes/W2-58-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "Policy 2 in the guard and the launcher: reads open, four refusals",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-7y6v": {
+  "id": "DAEO-7y6v",
+  "wbs": "W2-14",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "integration",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-kl5e",
+   "DAEO-r9ss",
+   "DAEO-u4oz",
+   "DAEO-zqvn"
+  ],
+  "paths": [
+   "docs/plan/wave-2/argus-cycle/**"
+  ],
+  "role": "orchestrator",
+  "title": "ARGUS's full cycle, a-dev green, the governance share per programme",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2azm": {
+  "id": "DAEO-2azm",
+  "wbs": "W2-74",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "settings",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W1-01/test_w1_01_settings_deny.py",
+   "tests/acceptance/W1-01/README.md",
+   "tests/acceptance/W1-47/test_w1_47_settings_rules.py",
+   "tests/acceptance/W1-47/README.md",
+   "tests/acceptance/W1-49/test_w1_49_precompact.py",
+   "tests/acceptance/W1-49/README.md",
+   "tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py",
+   "tests/acceptance/W2-69/README.md"
+  ],
+  "role": "independent-test-designer",
+  "title": "The settings regeneration's test revisions: the docs/source cases retired, W1-49's sandbox gov, W2-69's case n",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-uzme": {
+  "id": "DAEO-uzme",
+  "wbs": "W2-70",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "retirement",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W1-05/**",
+   "tests/acceptance/W1-47/**",
+   "tests/acceptance/serial-only.txt",
+   "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "tests/acceptance/W1-01/test_w1_01_history.py",
+   "tests/acceptance/W1-01/w1_01_support.py",
+   "tests/acceptance/W1-01/test_w1_01_integration_merges.py"
+  ],
+  "role": "independent-test-designer",
+  "title": "Retire the two nested reruns: W1-05's switch-over case and W1-47's builder rerun",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0z8c": {
+  "id": "DAEO-0z8c",
+  "wbs": "W2-05",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/**/*.py",
+   "src/gov/util/gitenv.py",
+   "lefthook.yml",
+   "template/lefthook.yml",
+   "template/.rulesync/hooks.jsonc",
+   "tests/unit/gitenv/**",
+   "docs/research/AR-2-git-sweep.md"
+  ],
+  "role": "engineer",
+  "title": "The git environment of every check, hook and helper; the settings re-sort",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-xm6l": {
+  "id": "DAEO-xm6l",
+  "wbs": "W2-22",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-a3m2",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/doctor/**",
+   "governance/project/tool-registry.yaml",
+   "tests/unit/doctor/**"
+  ],
+  "role": "engineer",
+  "title": "gov doctor green",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-iw1f": {
+  "id": "DAEO-iw1f",
+  "wbs": "W2-61",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "keystone-4"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/retrieval/measure.py",
+   "tests/unit/retrieval/test_measure*",
+   "fixtures/evaluation/memory-retrieval/visible/**",
+   "docs/research/W2-61-baseline.md"
+  ],
+  "role": "engineer",
+  "title": "The standing 20-question measure, split under Policy 2 (d)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-ouet": {
+  "id": "DAEO-ouet",
+  "wbs": "W2-96",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "work-order",
+   "full"
+  ],
+  "priority": 0,
+  "deps": [],
+  "paths": [
+   "src/gov/accept/**",
+   "tests/unit/accept/test_w2_96*",
+   "src/gov/check/commands.py"
+  ],
+  "role": "engineer",
+  "title": "The opaque acceptance runner: gov accept runs a ticket's acceptance tests and reports only pass or fail per KP",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-drvn": {
+  "id": "DAEO-drvn",
+  "wbs": "W1-07",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "src/gov/__init__.py",
+   "src/gov/cli/**",
+   "src/gov/config/**",
+   "pyproject.toml",
+   "tests/unit/cli/**",
+   "template/governance/kernel/checks/**"
+  ],
+  "role": "engineer",
+  "title": "gov CLI skeleton",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-h4rh": {
+  "id": "DAEO-h4rh",
+  "wbs": "W2-27",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "integration",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0mtg",
+   "DAEO-0pyc",
+   "DAEO-0z8c",
+   "DAEO-1ahb",
+   "DAEO-2bdu",
+   "DAEO-2ds6",
+   "DAEO-3r1j",
+   "DAEO-49o5",
+   "DAEO-4k3l",
+   "DAEO-57hm",
+   "DAEO-6b2q",
+   "DAEO-6icv",
+   "DAEO-6y0x",
+   "DAEO-a3u2",
+   "DAEO-cv58",
+   "DAEO-drhj",
+   "DAEO-dy7j",
+   "DAEO-ecac",
+   "DAEO-g0ip",
+   "DAEO-g87r",
+   "DAEO-h2k3",
+   "DAEO-ha8z",
+   "DAEO-hgv3",
+   "DAEO-jsg1",
+   "DAEO-k7hz",
+   "DAEO-kia7",
+   "DAEO-kiar",
+   "DAEO-kl5e",
+   "DAEO-kmcr",
+   "DAEO-l78m",
+   "DAEO-lrre",
+   "DAEO-lxzn",
+   "DAEO-n0wb",
+   "DAEO-nqa2",
+   "DAEO-ouet",
+   "DAEO-r30l",
+   "DAEO-rpfv",
+   "DAEO-siiz",
+   "DAEO-u4oz",
+   "DAEO-uw5h",
+   "DAEO-wi46",
+   "DAEO-wnnz",
+   "DAEO-wq2b",
+   "DAEO-ym8a",
+   "DAEO-zoex",
+   "DAEO-zpdj"
+  ],
+  "paths": [
+   "docs/plan/wave-2/examin-copy/**"
+  ],
+  "role": "orchestrator",
+  "title": "EXAMIN adoption on a copy",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-btt7": {
+  "id": "DAEO-btt7",
+  "wbs": "W2-25",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "audit",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0mab",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "docs/audit/wave-2/W2-25/**"
+  ],
+  "role": "independent-auditor",
+  "title": "Track A independent audit",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-8qvp": {
+  "id": "DAEO-8qvp",
+  "wbs": "W1-03",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-emkd"
+  ],
+  "paths": [
+   "src/gov/guard/containment*",
+   "template/governance/kernel/hooks/posttooluse*",
+   "template/governance/kernel/hooks/pretooluse*",
+   "tests/unit/containment/**"
+  ],
+  "role": "engineer",
+  "title": "Post-command containment check",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zsvl": {
+  "id": "DAEO-zsvl",
+  "wbs": "W1-29",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-rrxp",
+   "DAEO-topz",
+   "DAEO-wk2v"
+  ],
+  "paths": [
+   "template/governance/kernel/hooks/**",
+   "src/gov/hooks/**",
+   "tests/unit/hooks/**"
+  ],
+  "role": "engineer",
+  "title": "Session hooks",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-jip3": {
+  "id": "DAEO-jip3",
+  "wbs": "W2-47",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "audit",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-nn1s"
+  ],
+  "paths": [
+   "docs/audit/wave-2/**"
+  ],
+  "role": "independent-auditor",
+  "title": "Wave 2 exit audit, with the audit\u2192repair loop's tests",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-cv58": {
+  "id": "DAEO-cv58",
+  "wbs": "W2-60a",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "launch",
+   "roles",
+   "keystone-3"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/launch/launcher.py",
+   "src/gov/launch/role.py",
+   "src/gov/launch/record.py",
+   "tests/unit/launch/test_role*",
+   "tests/unit/launch/test_launch_record*",
+   "tests/unit/launch/test_runs.py",
+   "tests/unit/launch/test_w1_28.py",
+   "tests/unit/launch/test_w1_32.py",
+   "docs/changes/W2-60a-CIT-E.md",
+   "docs/research/W2-60-rules-probe.md"
+  ],
+  "role": "engineer",
+  "title": "The role, its skills and its model and effort loaded at launch; the launch record",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-b926": {
+  "id": "DAEO-b926",
+  "wbs": "W2-29",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "integration",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-49o5",
+   "DAEO-btt7",
+   "DAEO-csj8",
+   "DAEO-g0ip",
+   "DAEO-swdu"
+  ],
+  "paths": [
+   "docs/plan/wave-2/examin-real/**"
+  ],
+  "role": "orchestrator",
+  "title": "EXAMIN adoption on the real repository",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-u4oz": {
+  "id": "DAEO-u4oz",
+  "wbs": "W2-04",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/context/**",
+   "src/gov/retrieval/supplementary*",
+   "tests/unit/context/**"
+  ],
+  "role": "engineer",
+  "title": "gov context bounded and reproducible",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-xog0": {
+  "id": "DAEO-xog0",
+  "wbs": "W1-33",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "role-definition",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "template/governance/kernel/roles/**",
+   "governance/project/roster.yaml",
+   ".claude/agents/**"
+  ],
+  "role": "product-spec",
+  "title": "Wave 1 role definitions",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-5ylr": {
+  "id": "DAEO-5ylr",
+  "wbs": "W1-39",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-3ef2",
+   "DAEO-xw3k"
+  ],
+  "paths": [
+   "copier.yml",
+   "template/.copier-answers.yml*",
+   "template/governance/framework.lock*",
+   "src/gov/lock/**",
+   "tests/unit/lock/**",
+   "src/gov/doctor/command.py",
+   "tests/unit/doctor/**",
+   "template/governance/project/**",
+   "template/.gitignore"
+  ],
+  "role": "engineer",
+  "title": "Copier kernel template and lock",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-3r1j": {
+  "id": "DAEO-3r1j",
+  "wbs": "W2-110",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "guard",
+   "installs",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "template/governance/kernel/hooks/pretooluse.py",
+   "src/gov/guard/install.py",
+   "tests/unit/guard/test_w2_110*"
+  ],
+  "role": "engineer",
+  "title": "A product's CTO-only install rule: in a generated project the kernel's guard asks the owner only in the CTO's ",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-a3m2": {
+  "id": "DAEO-a3m2",
+  "wbs": "W2-09",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "src/gov/doctor/tools_list*",
+   "tests/unit/guard/**",
+   "tests/unit/doctor/**",
+   "docs/changes/W2-09-CIT-P.md"
+  ],
+  "role": "engineer",
+  "title": "SubagentHandback on the guard's list; the list checked against the CLI",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-6y0x": {
+  "id": "DAEO-6y0x",
+  "wbs": "W2-93",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "audit",
+   "evaluation",
+   "held-out",
+   "standard",
+   "proving-ground"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-l78m",
+   "DAEO-m1u3"
+  ],
+  "paths": [
+   "fixtures/evaluation/adoption-proving-ground/hidden/**"
+  ],
+  "role": "independent-auditor",
+  "title": "W2-81's held-out half: hidden questions and planted-problem variants per synthetic repository, by an independe",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-s1wp": {
+  "id": "DAEO-s1wp",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-c1uz"
+  ],
+  "paths": [
+   "src/gov/close/select.py",
+   "src/gov/close/nightly.py",
+   "src/gov/close/evidence.py",
+   "src/gov/close/command.py",
+   "governance/project/test-map.yaml",
+   "template/governance/kernel/schemas/test-map.schema.json",
+   "template/governance/project/test-map.yaml",
+   "tests/unit/close/test_select*",
+   "tests/unit/close/test_nightly*",
+   "tests/unit/close/test_evidence*",
+   "docs/research/W2-66-scoped-close.md"
+  ],
+  "role": "engineer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-kh9l": {
+  "id": "DAEO-kh9l",
+  "wbs": "W2-59",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/check/runner.py",
+   "src/gov/retrieval/canary.py",
+   "src/gov/retrieval/retrieve_check.py",
+   "src/gov/cli/main.py",
+   "pyproject.toml",
+   ".rulesync/hooks.jsonc",
+   "tests/unit/check/**",
+   "tests/unit/cli/**",
+   "tests/unit/retrieval/**",
+   "docs/changes/W2-59-CIT-P.md"
+  ],
+  "role": "engineer",
+  "title": "The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-uudf": {
+  "id": "DAEO-uudf",
+  "wbs": "W1-08",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "schema",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-m7u4"
+  ],
+  "paths": [
+   "template/governance/kernel/schemas/**",
+   "template/governance/kernel/templates/**",
+   "governance/project/path-map.yaml"
+  ],
+  "role": "product-spec",
+  "title": "Record schemas and templates",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-jdqr": {
+  "id": "DAEO-jdqr",
+  "wbs": "W1-46",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-0qs5",
+   "DAEO-drvn",
+   "DAEO-o4fg"
+  ],
+  "paths": [
+   "src/gov/launch/**",
+   "src/gov/cli/**",
+   "template/governance/kernel/launch/**",
+   "tests/unit/launch/**",
+   "src/gov/guard/**",
+   "template/governance/kernel/hooks/pretooluse*",
+   "template/governance/kernel/roles/research*",
+   ".claude/agents/research.md",
+   "governance/project/roster.yaml",
+   "tests/unit/guard/**",
+   "governance/project/research-allowlist.yaml"
+  ],
+  "role": "engineer",
+  "title": "Worker session launcher (gov launch)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-2d6f": {
+  "id": "DAEO-2d6f",
+  "wbs": "",
+  "status": "open",
+  "profile": "",
+  "tags": [],
+  "priority": 2,
+  "deps": [
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/store/**",
+   "src/gov/records/**",
+   "src/gov/decisions/**",
+   "src/gov/check/citations.py",
+   "tests/unit/store/**",
+   "tests/unit/records/**",
+   "tests/unit/decisions/**",
+   "tests/unit/check/test_citations.py"
+  ],
+  "role": "engineer",
+  "title": "",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wk2v": {
+  "id": "DAEO-wk2v",
+  "wbs": "W1-24",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-4yyl",
+   "DAEO-5x4l",
+   "DAEO-egm9",
+   "DAEO-topz"
+  ],
+  "paths": [
+   "src/gov/context/**",
+   "tests/unit/context/**",
+   "template/governance/kernel/checks/context-reproducibility*"
+  ],
+  "role": "engineer",
+  "title": "gov context",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-5x4l": {
+  "id": "DAEO-5x4l",
+  "wbs": "W1-21",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-jozo",
+   "DAEO-t6hf"
+  ],
+  "paths": [
+   "src/gov/retrieval/retrieve*",
+   "src/gov/retrieval/bundle*",
+   "src/gov/retrieve/**",
+   "tests/unit/retrieve/**",
+   "template/governance/kernel/checks/retrieval-regression*"
+  ],
+  "role": "engineer",
+  "title": "gov retrieve with completeness",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wnnz": {
+  "id": "DAEO-wnnz",
+  "wbs": "W2-56",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "launch",
+   "sandbox",
+   "keystone-6"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/codeintel/__init__.py",
+   "src/gov/launch/launcher.py",
+   "src/gov/launch/sandbox.py",
+   "src/gov/launch/environ.py",
+   "tests/unit/launch/**",
+   "tests/unit/codeintel/**",
+   "docs/changes/W2-56-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "gov launch usable for every worker: the code graph in the session's temp folder, the write list, no placeholde",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-kia7": {
+  "id": "DAEO-kia7",
+  "wbs": "W2-06",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0z8c",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/ci/**",
+   "src/gov/rebuild/**",
+   "src/gov/retrieval/index*",
+   "template/governance/kernel/checks/index-freshness.yaml",
+   "template/governance/kernel/checks/recovery-rebuild.yaml",
+   "template/governance/kernel/checks/secrets-indexing.yaml",
+   "lefthook.yml",
+   "template/lefthook.yml",
+   "tests/unit/ci/**",
+   "tests/unit/rebuild/**"
+  ],
+  "role": "engineer",
+  "title": "Fast pre-commit tier and commit-time re-index",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-7r5e": {
+  "id": "DAEO-7r5e",
+  "wbs": "W2-08",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "integration",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-kia7",
+   "DAEO-zflj"
+  ],
+  "paths": [
+   "docs/plan/wave-2/hooks-back-on/**"
+  ],
+  "role": "orchestrator",
+  "title": "Hooks back on: F-M4 restated, gov check green here, a report commits through the hook",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-qty6": {
+  "id": "DAEO-qty6",
+  "wbs": "W2-73",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "tests",
+   "flake",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "tests/acceptance/W1-03/test_w1_03_head_move_and_acceptance_test.py",
+   "tests/acceptance/W1-03/README.md"
+  ],
+  "role": "independent-test-designer",
+  "title": "W1-03's head-move fixture: an amend that always moves HEAD",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-s9qc": {
+  "id": "DAEO-s9qc",
+  "wbs": "W2-87",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "memory",
+   "standard",
+   "quick-win"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/retrieval/authority.py",
+   "src/gov/retrieval/retrieve.py",
+   "governance/project/path-map.yaml",
+   "tests/unit/retrieval/test_w2_87*",
+   "docs/research/W2-87-memory-measure.md"
+  ],
+  "role": "engineer",
+  "title": "Retrieval ranks by authority: for the same match, an accepted decision, the Contract, a specification or an AD",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-cuao": {
+  "id": "DAEO-cuao",
+  "wbs": "W2-10",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-a3m2",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "src/gov/hooks/**",
+   "template/governance/kernel/hooks/**",
+   "tests/unit/guard/**",
+   "tests/unit/hooks/**"
+  ],
+  "role": "engineer",
+  "title": "Guardrails explain themselves, refuse once, then record",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-u5g6": {
+  "id": "DAEO-u5g6",
+  "wbs": "W2-43",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-7r5e",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/ci/**",
+   "src/gov/secrets/**",
+   ".github/workflows/**",
+   "template/.github/workflows/**",
+   "tests/unit/ci/**",
+   "tests/unit/secrets/**"
+  ],
+  "role": "engineer",
+  "title": "CI integrity and the secret-rule floor",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-o4fg": {
+  "id": "DAEO-o4fg",
+  "wbs": "W1-47",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-6cc2"
+  ],
+  "paths": [
+   "src/gov/guard/**",
+   "template/governance/kernel/hooks/pretooluse*",
+   "template/governance/kernel/hooks/posttooluse*",
+   "template/governance/kernel/settings*",
+   ".claude/settings.json",
+   "governance/project/held-out.yaml",
+   "tests/unit/guard/**",
+   "tests/unit/install/**"
+  ],
+  "role": "engineer",
+  "title": "Guard hardening: escape hatch, failed commands, oracle path",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-lrre": {
+  "id": "DAEO-lrre",
+  "wbs": "W2-33",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "role-definition",
+   "standard",
+   "three-layers"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "template/governance/kernel/roles/**",
+   "template/governance/kernel/schemas/handoff*",
+   "template/governance/kernel/templates/handoff.md",
+   ".claude/agents/**"
+  ],
+  "role": "product-spec",
+  "title": "The three layers' roles and the typed handoff: the CTO, the Senior Engineer, the ticket lead's role file, mach",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zndm": {
+  "id": "DAEO-zndm",
+  "wbs": "W2-44",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-1ahb",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/close/traceability*",
+   "src/gov/guard/containment*",
+   "tests/unit/close/test_traceability*",
+   "tests/unit/containment/**"
+  ],
+  "role": "engineer",
+  "title": "Trailers bound to the launch identity",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-e82f": {
+  "id": "DAEO-e82f",
+  "wbs": "W2-65",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-2",
+   "guard",
+   "hooks",
+   "lite"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-kh9l"
+  ],
+  "paths": [
+   ".rulesync/hooks.jsonc",
+   "template/.rulesync/hooks.jsonc",
+   "tests/unit/hooks/**",
+   "template/governance/kernel/hooks/subagentstop.py",
+   "src/gov/hooks/subagentstop.py",
+   "template/governance/kernel/settings.json"
+  ],
+  "role": "engineer",
+  "title": "The guard's hook lines refuse a call when the guard program cannot run",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-j8gn": {
+  "id": "DAEO-j8gn",
+  "wbs": "W2-12",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/decisions/**",
+   "src/gov/approve/**",
+   "src/gov/check/authority.py",
+   "template/governance/kernel/checks/core-authority.yaml",
+   "tests/unit/decisions/**",
+   "tests/unit/approve/**",
+   "tests/unit/check/test_authority*",
+   "src/gov/close/ratchet.py",
+   "src/gov/close/state.py",
+   "tests/unit/close/test_ratchet*",
+   "tests/unit/close/test_owner_entry*"
+  ],
+  "role": "engineer",
+  "title": "Owner approval facts and gov approve",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-7nne": {
+  "id": "DAEO-7nne",
+  "wbs": "W1-15",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-drvn",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "src/gov/secrets/**",
+   "template/.gitleaks.toml",
+   ".gitleaks.toml",
+   "tests/unit/secrets/**",
+   "template/governance/kernel/checks/secrets-indexing*",
+   "src/gov/check/**",
+   "src/gov/cli/checks.py",
+   "tests/unit/check/**",
+   "tests/unit/cli/**",
+   "template/.rulesync/hooks.jsonc",
+   "src/gov/adapters/**",
+   "tests/unit/adapters/**"
+  ],
+  "role": "engineer",
+  "title": "Secret rules and pre-index filter",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-uw5h": {
+  "id": "DAEO-uw5h",
+  "wbs": "W2-100",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "skill",
+   "domain",
+   "after-act-2",
+   "standard"
+  ],
+  "priority": 3,
+  "deps": [
+   "DAEO-drhj"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/backend/**",
+   ".claude/skills/backend/**",
+   ".rulesync/skills/backend/**",
+   "template/.rulesync/skills/backend/**",
+   "template/governance/kernel/skills/api/**",
+   ".claude/skills/api/**",
+   ".rulesync/skills/api/**",
+   "template/.rulesync/skills/api/**",
+   "template/governance/kernel/skills/data/**",
+   ".claude/skills/data/**",
+   ".rulesync/skills/data/**",
+   "template/.rulesync/skills/data/**",
+   "template/governance/kernel/skills/security/**",
+   ".claude/skills/security/**",
+   ".rulesync/skills/security/**",
+   "template/.rulesync/skills/security/**"
+  ],
+  "role": "product-spec",
+  "title": "Domain skills A: backend, API, data and security, each the engineer's skill for its area (conventions, a pre-c",
+  "body_after_act2": true,
+  "body_after_w2_11": false
+ },
+ "DAEO-4k3l": {
+  "id": "DAEO-4k3l",
+  "wbs": "W2-82",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "readiness",
+   "standard",
+   "keystone-9"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/tasks/dor.py",
+   "src/gov/claim/__init__.py",
+   "src/gov/claim/command.py",
+   "src/gov/launch/launcher.py",
+   "template/governance/kernel/templates/ticket.md",
+   "template/governance/kernel/schemas/ticket.schema.json",
+   "tests/unit/tasks/test_dor*",
+   "tests/unit/claim/**",
+   "tests/unit/launch/test_w2_82*",
+   "docs/changes/W2-82-CIT-P.md",
+   "docs/changes/W2-82-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "A Definition of Ready: gov claim checks it, and gov launch refuses a lead on a ticket that is not ready",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-be7u": {
+  "id": "DAEO-be7u",
+  "wbs": "W1-11",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-4yyl",
+   "DAEO-egm9",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "src/gov/decisions/**",
+   "template/governance/kernel/schemas/madr*",
+   "tests/unit/decisions/**"
+  ],
+  "role": "engineer",
+  "title": "Decision checker and owner-approval facts",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zflj": {
+  "id": "DAEO-zflj",
+  "wbs": "W2-02",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "schema",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "template/governance/kernel/schemas/**",
+   "schemas/**",
+   "template/governance/kernel/templates/decision-record.md",
+   "src/gov/check/schema.py",
+   "tests/unit/check/test_schema*",
+   "tests/unit/check/test_check.py"
+  ],
+  "role": "product-spec",
+  "title": "Record types: decision entry, audit report, adoption verdict, close record; core-schema green here",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-egm9": {
+  "id": "DAEO-egm9",
+  "wbs": "W1-34",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "template",
+   "lite"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "template/governance/kernel/templates/decision-package*",
+   "template/governance/kernel/templates/decision-record*"
+  ],
+  "role": "product-spec",
+  "title": "Decision-package template",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-kl5e": {
+  "id": "DAEO-kl5e",
+  "wbs": "W2-50",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/guard/runs.py",
+   "src/gov/guard/decide.py",
+   "src/gov/launch/launcher.py",
+   "template/governance/kernel/checks/secrets-indexing.yaml",
+   "src/gov/secrets/__init__.py",
+   "tests/unit/guard/test_runs*",
+   "tests/unit/launch/test_runs*",
+   "src/gov/guard/protected.py",
+   "tests/unit/guard/test_protected*",
+   "tests/unit/secrets/**",
+   "docs/changes/W2-50-CIT-P.md",
+   "docs/changes/W2-50-CIT-E.md"
+  ],
+  "role": "engineer",
+  "title": "The durable scratch root: ~/gov-os-runs/<own ticket>/ in the guard and the launcher's sandbox (CIT-P)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0mab": {
+  "id": "DAEO-0mab",
+  "wbs": "W2-24",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "integration",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-0z8c",
+   "DAEO-1ahb",
+   "DAEO-2bdu",
+   "DAEO-49o5",
+   "DAEO-7r5e",
+   "DAEO-7rr2",
+   "DAEO-cy5o",
+   "DAEO-egsy",
+   "DAEO-g0ip",
+   "DAEO-ha8z",
+   "DAEO-k7hz",
+   "DAEO-kia7",
+   "DAEO-kl5e",
+   "DAEO-kmcr",
+   "DAEO-r30l",
+   "DAEO-r9ss",
+   "DAEO-rd0g",
+   "DAEO-siiz",
+   "DAEO-u4oz",
+   "DAEO-wnnz",
+   "DAEO-ym8a",
+   "DAEO-zflj",
+   "DAEO-zqvn"
+  ],
+  "paths": [
+   "docs/plan/wave-2/track-a-gate/**"
+  ],
+  "role": "orchestrator",
+  "title": "Track A gate run",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-wqd6": {
+  "id": "DAEO-wqd6",
+  "wbs": "W1-44",
+  "status": "closed",
+  "profile": "LITE",
+  "tags": [
+   "wave-1",
+   "documentation",
+   "lite"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-5x4l",
+   "DAEO-uudf"
+  ],
+  "paths": [
+   "docs/lessons/**"
+  ],
+  "role": "product-spec",
+  "title": "Phase-2 lessons as lesson records",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-t6hf": {
+  "id": "DAEO-t6hf",
+  "wbs": "W1-19",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-1ve2",
+   "DAEO-rxln"
+  ],
+  "paths": [
+   "src/gov/retrieval/semantic*",
+   "src/gov/retrieval/fusion*",
+   "src/gov/retrieval/rerank*",
+   "tests/unit/semantic/**"
+  ],
+  "role": "engineer",
+  "title": "Semantic retrieval, RRF and rerank",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-g0ip": {
+  "id": "DAEO-g0ip",
+  "wbs": "W2-01",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [],
+  "paths": [
+   "src/gov/close/**",
+   "template/governance/kernel/checks/product-traceability-trailers.yaml",
+   "tests/unit/close/**"
+  ],
+  "role": "engineer",
+  "title": "gov close and traceability: trailers base, merge form, owner-accepted history, the probe gate after a merge-ba",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-g87r": {
+  "id": "DAEO-g87r",
+  "wbs": "W2-94",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "audit",
+   "evaluation",
+   "held-out",
+   "standard",
+   "examin-minimum"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-m1u3"
+  ],
+  "paths": [
+   "fixtures/evaluation/examin/visible/**",
+   "fixtures/evaluation/examin/hidden/**"
+  ],
+  "role": "independent-auditor",
+  "title": "EXAMIN's question set: memory questions with gold sources about the owner's copy, a visible and a hidden half,",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-057v": {
+  "id": "DAEO-057v",
+  "wbs": "W2-18",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard",
+   "wave-3",
+   "deferred"
+  ],
+  "priority": 4,
+  "deps": [
+   "DAEO-49o5",
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "src/gov/install/**",
+   "src/gov/doctor/install*",
+   "template/governance/kernel/hooks/**",
+   "tests/unit/install/**"
+  ],
+  "role": "engineer",
+  "title": "Pinned install: a product repository runs a fixed release, never the development copy",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-siiz": {
+  "id": "DAEO-siiz",
+  "wbs": "W2-52",
+  "status": "in_progress",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ha8z"
+  ],
+  "paths": [
+   ".claude/skills/adopt/SKILL.md",
+   "src/gov/adopt/lite_gates.py",
+   "src/gov/adopt/stages.py",
+   "template/governance/kernel/skills/adopt/**",
+   "tests/unit/adopt/test_lite_gates*"
+  ],
+  "role": "engineer",
+  "title": "The lite A7 and A10 stage records",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-0i6h": {
+  "id": "DAEO-0i6h",
+  "wbs": "W1-35",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "skill",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-5x4l",
+   "DAEO-egm9",
+   "DAEO-fygv",
+   "DAEO-lc4q",
+   "DAEO-w616",
+   "DAEO-w9l3",
+   "DAEO-xog0"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/discovery/**",
+   "template/governance/kernel/skills/planning/**",
+   "template/governance/kernel/skills/test-design/**",
+   "template/governance/kernel/skills/change/**",
+   "template/governance/kernel/checks/skill-regression-a*",
+   "template/governance/kernel/skills/orchestration/**",
+   "template/governance/kernel/roles/orchestrator.md",
+   "template/governance/kernel/templates/**",
+   "template/governance/kernel/checks/skill-regression-orchestration*",
+   "template/.rulesync/skills/orchestration/**",
+   "template/.rulesync/subagents/orchestrator.md"
+  ],
+  "role": "product-spec",
+  "title": "Skills: discovery, planning, independent test design, change",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-9279": {
+  "id": "DAEO-9279",
+  "wbs": "W1-28",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-drvn",
+   "DAEO-emkd",
+   "DAEO-topz"
+  ],
+  "paths": [
+   "src/gov/pause/**",
+   "tests/unit/pause/**",
+   "src/gov/launch/**",
+   "tests/unit/launch/**"
+  ],
+  "role": "engineer",
+  "title": "gov pause",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-78bn": {
+  "id": "DAEO-78bn",
+  "wbs": "W1-04",
+  "status": "closed",
+  "profile": "FULL",
+  "tags": [
+   "wave-1",
+   "implementation",
+   "full"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-emkd"
+  ],
+  "paths": [
+   "src/gov/guard/install*",
+   "template/governance/kernel/hooks/pretooluse*",
+   "template/governance/kernel/schemas/tool-registry*",
+   "tests/unit/install/**"
+  ],
+  "role": "engineer",
+  "title": "Install-approval rule",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-mc6n": {
+  "id": "DAEO-mc6n",
+  "wbs": "W2-83b",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "documentation",
+   "playbooks",
+   "standard",
+   "three-layers"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-dy7j"
+  ],
+  "paths": [
+   "docs/playbooks/**"
+  ],
+  "role": "product-spec",
+  "title": "One playbook per stream (the Senior Engineer's brief), placing annex D's standing practices",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-lxzn": {
+  "id": "DAEO-lxzn",
+  "wbs": "W2-99",
+  "status": "open",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "skill",
+   "roles",
+   "standard"
+  ],
+  "priority": 2,
+  "deps": [
+   "DAEO-drhj",
+   "DAEO-k7hz"
+  ],
+  "paths": [
+   "template/governance/kernel/skills/benchmarking/**",
+   ".claude/skills/benchmarking/**",
+   ".rulesync/skills/benchmarking/**",
+   "template/.rulesync/skills/benchmarking/**"
+  ],
+  "role": "product-spec",
+  "title": "The benchmarking skill for research: a practice, tool or design of the Gov OS compared with companies' publish",
+  "body_after_act2": false,
+  "body_after_w2_11": true
+ },
+ "DAEO-egsy": {
+  "id": "DAEO-egsy",
+  "wbs": "W2-51",
+  "status": "closed",
+  "profile": "STANDARD",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "standard"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip"
+  ],
+  "paths": [
+   "docs/plan/tools/validate_w2.py",
+   "tests/unit/plan/**"
+  ],
+  "role": "engineer",
+  "title": "The Wave 2 plan validator",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ },
+ "DAEO-zqvn": {
+  "id": "DAEO-zqvn",
+  "wbs": "W2-13",
+  "status": "open",
+  "profile": "FULL",
+  "tags": [
+   "wave-2",
+   "implementation",
+   "full"
+  ],
+  "priority": 1,
+  "deps": [
+   "DAEO-g0ip",
+   "DAEO-ym8a"
+  ],
+  "paths": [
+   "src/gov/retrieve/**",
+   "src/gov/retrieval/lexical*",
+   "src/gov/retrieval/fusion*",
+   "src/gov/rebuild/lexical*",
+   "tests/unit/retrieve/**",
+   "tests/unit/retrieval/**"
+  ],
+  "role": "engineer",
+  "title": "RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5)",
+  "body_after_act2": false,
+  "body_after_w2_11": false
+ }
+}

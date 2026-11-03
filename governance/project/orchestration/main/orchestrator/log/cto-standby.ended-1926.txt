@@ -1,0 +1,1 @@
+2026-11-02 18:34:07 CTO stand-by (renewed after DEC-1039 (1b)): handover written (EMERGENCY-PLAN-2026-11-02.md top: THE OWNER'S PLAN incl. 1b; RESUME HERE; the latest checkpoint); session 07f25884 does nothing further; the dispatcher starts nothing; the fresh session ends this stand-by when it registers in log/cto-session.txt.

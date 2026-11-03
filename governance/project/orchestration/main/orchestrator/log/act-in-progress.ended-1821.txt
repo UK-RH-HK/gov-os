@@ -1,0 +1,1 @@
+2026-11-02 17:46:44 ACT-REPIN-EMERGENCY-1 (window 1 re-pin from a7182f6c) then ACT-QUERY-GPU-2 handed to the owner's operator; no CTO main-tree commit until the owner says done (DEC-1028 item 6).

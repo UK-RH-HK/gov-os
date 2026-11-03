@@ -16,7 +16,8 @@ only in the nightly. Steps, stopping at the first failure:
      (named in the record and in unowned.txt, dealt with at once by the CTO); otherwise the close is refused (a batch:
      the whole batch, since no merge is undone to find a culprit);
   5. per ticket: a FULL ticket needs a passing independent review record in docs/probes/<id>/ (no staleness check);
-     gitleaks on the merge's own change;
+     gitleaks on the merge's own change (not run when governance/project/secrets.yaml says scan: off, DEC-1045,
+     and named in the record; a value other than on or off refuses the close before the clone);
   6. per ticket: the close record governance/project/orchestration/closes/<W2>-<id>.md and `tk close <id>`; one
      commit each with Task: <id>, Implements: DEC-953, Role: orchestrator.
 Logs: .gov-runtime/scratch/orchestrator/log/close-build/<name>-<stamp>/. Exit 0 closed; 5 closed but for the culprits sent back (DEC-979 item 3); 3 tests red; 4 another step.
@@ -32,6 +33,9 @@ import sys
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from secrets_switch import OFF_LINE, REL as SWITCH_REL, SwitchError, scan_on  # noqa: E402  (DEC-1045)
 
 ROOT = Path("/home/usain/Dynamic-Agentic-Engineering-OS")
 ORCH = ROOT / ".gov-runtime/scratch/orchestrator"
@@ -235,6 +239,26 @@ def totals(xml_path):
     return t
 
 
+SCAN = True  # DEC-1045: the repository's switch, read at the start of main() (secrets_switch.py)
+
+
+def change_scan(diff, merges):
+    """gitleaks on the merges' own change, written to ``diff`` and removed: "clean" or "LEAKS"; with the switch off,
+    no gitleaks call and the switch's line (DEC-1045)."""
+    if not SCAN:
+        return OFF_LINE
+    diff.write_text("\n".join(git("diff", m + "^1", m) for m in merges))
+    gl = sh(["gitleaks", "detect", "--no-git", "--source", str(diff), "--no-banner", "--redact"])
+    diff.unlink()
+    return "clean" if gl.returncode == 0 else "LEAKS"
+
+
+def gitleaks_line(state):
+    """The close record's gitleaks line: the scan's result, or the switch named."""
+    return f"- {state}: the merge's change was not scanned" if state == OFF_LINE else \
+        f"- gitleaks on the merge's change: {state}"
+
+
 def main():
     os.environ["GOV_HEAVY_PRIORITY"] = "1"  # DEC-1011: a close takes the next free heavy-job slot before any lead's step
     ap = argparse.ArgumentParser()
@@ -278,6 +302,14 @@ def main():
         note("CLOSE REFUSED: " + why)
         sys.exit(code)
 
+    global SCAN
+    try:  # DEC-1045: read before any clone or run, so a switch that cannot be read refuses at once (fails closed)
+        SCAN = scan_on(ROOT)
+    except SwitchError as e:
+        stop(4, f"the secrets-scan switch: {e}")
+    run["gitleaks"] = "on" if SCAN else OFF_LINE
+    if not SCAN:
+        note(f"{OFF_LINE}: no merge's change is scanned ({ROOT / SWITCH_REL})")
     if sh(["bash", str(ORCH / "tools/disk_gate.sh")]).returncode:
         stop(4, "disk gate shut")
     t0 = time.time()
@@ -510,12 +542,8 @@ def main():
                 stop(4, f"{i['w2']}: FULL ticket without a passing independent review record")
         else:
             i["review"] = "not required (" + (i["profile"] or "no profile") + ")"
-        diff = log / f"change-{i['w2']}.diff"
-        diff.write_text("\n".join(git("diff", m + "^1", m) for m in i["merges"]))
-        gl = sh(["gitleaks", "detect", "--no-git", "--source", str(diff), "--no-banner", "--redact"])
-        diff.unlink()
-        i["gitleaks"] = "clean" if gl.returncode == 0 else "LEAKS"
-        if gl.returncode:
+        i["gitleaks"] = change_scan(log / f"change-{i['w2']}.diff", i["merges"])
+        if i["gitleaks"] == "LEAKS":
             stop(4, f"{i['w2']}: gitleaks found a leak in the merge's change")
     run["wall_s"] = int(time.time() - t0)
     run["verdict"] = "CLOSED (build-phase close, DEC-953)"
@@ -547,7 +575,7 @@ def main():
                  f"{', '.join(unowned) or 'none'}",
                  f"- Core changed (scoped, not full, DEC-968): {', '.join(run['core_changed']) or 'none'}; "
                  f"unplaced: {', '.join(run['unplaced']) or 'none'}",
-                 f"- Review: {i['review']}", f"- gitleaks on the merge's change: {i['gitleaks']}",
+                 f"- Review: {i['review']}", gitleaks_line(i["gitleaks"]),
                  f"- Times: rebuild {run['rebuild_s']} s, tests {run['tests_s']} s, wall {run['wall_s']} s",
                  f"- Closed: {time.strftime('%F %T %Z')}, by the orchestrator under DEC-953 items 1 and 5", ""]
         out.write_text("\n".join(lines))

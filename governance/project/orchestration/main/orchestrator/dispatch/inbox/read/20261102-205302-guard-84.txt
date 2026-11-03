@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 85
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01TDfxz6RwazGQWir3rmy8NN", "time": "2026-11-02T20:48:23.981Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/debdb3f7-879f-4f53-8ef5-ba7d562eaef2/subagents/agent-a5424a5cdf0b7a557.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/EMG-lb && grep -n \"A process's cores: its utime + stime since the last pass\" -A1 governance/project/orchestration/tools/dispatch/README.md; grep -n \"a p95 once the phas", "rule": "the call reads files whose na

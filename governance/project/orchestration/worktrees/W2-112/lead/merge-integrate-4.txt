@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge w2/integrate at a37582f6a807 (DEC-1047, DEC-1048: KPI success-7 re-baselined; DEC-1049)
+
+Task: DAEO-clon
+Implements: DEC-1048,DEC-1032
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

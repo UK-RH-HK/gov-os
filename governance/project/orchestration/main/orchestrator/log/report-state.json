@@ -12,9 +12,9 @@
   "W2-78",
   "W2-110"
  ],
- "closes_next": "running: the landing batch W2-11, W2-105, W2-81 (land.py, tests in a heavy slot since 23:27) and the close W2-05, W2-55, W2-96 (close_build.py, tests since 22:52); next: W2-90b from land.txt, then W2-92 after run 3",
- "examin": "2026-11-14 (12-17); target 11-18; gated by K9's criteria (DEC-954 Q1); memory: hit@5 11/20, full evidence 11/20 (W2-86's measure), target 95 %, floor 85 %",
- "owner_action": "P1-MORNING-2026-11-02: A the embedder's capacity; B the close refusal (W2-05/W2-55/W2-96); C W2-122's K5; D W2-123 x3; E the Stop hook; F ACT-GUARD-FIX-3 (operator) then the push test",
+ "closes_next": "none: everything stopped by the owner (DEC-1051, 23:08); the landing's approvals parked",
+ "examin": "AT RISK: the emergency and the freeze hold all ticket work; the new estimate for EXAMIN's copy comes with the refactored Wave 2 plan (DEC-1039 item 3b); target 11-18, gated by K9's criteria (DEC-954 Q1)",
+ "owner_action": "ACT ACT-SCHEDULE-STOP-2 (HOLD on) - comment out the 09:30 runs sweep; P1 P1-LIFT-1's remaining 63 rows (the owner reviewing); coming: R1's answer on gov check, the templates, the plan",
  "last_report": "2026-10-30 21:36:47",
  "chain_spec": "chain-2026-10-31f.txt",
  "chain_log": "chain-2026-10-31f.log",
@@ -26,6 +26,7 @@
   "W2-13": "waits for W2-92's landing (retrieve.py)",
   "W2-15a": "waits for W2-04 and W2-61h",
   "W2-32": "after W2-15a",
-  "W2-112": "after W2-32"
+  "W2-112": "emergency patch: lead resumed 19:30 (review round 2, the last)",
+  "W2-126": "emergency patch: engineer running (tests ready, 17 cases)"
  }
 }

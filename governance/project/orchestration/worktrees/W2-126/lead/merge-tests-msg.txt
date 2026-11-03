@@ -1,0 +1,9 @@
+W2-126 (DAEO-jpr0): merge the independent tests (w2/W2-126-tests, 17 cases, red on the base)
+
+The test designer's suite under tests/acceptance/W2-126/, merged --no-ff by the ticket lead with no conflict
+(DEC-963). The README states the interface the cases need, for the engineer.
+
+Task: DAEO-jpr0
+Implements: DEC-1032
+Role: independent-test-designer
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

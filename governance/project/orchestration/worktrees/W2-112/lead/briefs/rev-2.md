@@ -1,0 +1,108 @@
+You are a fresh reviewer (an independent auditor, read-only; brief A3). Ticket DAEO-clon (W2-112), profile FULL: "One reranker serves every session: a shared, on-demand reranker service on the GPU". It is implemented in the worktree `/home/usain/gov-os-worktrees/W2-112` on branch `w2/W2-112`, at the head `03b97eb17284` (12 digits; the lead's checkpoint record on top of the engineer's last commit 431552ce21ca), and its acceptance tests pass. **This is review round 2, the last (DEC-1010):** round 1 failed on one blocking finding (F1, below), which has been repaired. You probe the final head for behaviour the tests miss, F1's repair first. You write nothing in the repository; your probe record's content is your final message, and the lead writes it.
+
+## Standing rules (read first)
+
+- First run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-clon`) and `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-112` and `w2/W2-112`), and `git rev-parse --short=12 HEAD` (expect `03b97eb17284`). If anything differs, stop and say so.
+- **How you run:** unsandboxed, in the old launch form with your identity in `--settings` and the reading tools alone (`Bash`, `Read`, `Grep`, `Glob`), under the guard, with a tripwire comparing every tree before and after you (the CTO's reading of DEC-1034 item 1, extended to the reviewer: the service needs Unix sockets, which the launch sandbox refuses; W2-127). So no sandbox check; be exact: write nothing outside `/tmp/gov-os-lead-W2-112/rev2/`.
+- Run everything in the foreground, one command after another: your session ends with your last message, and nothing started in the background is ever read. You write nothing, so no commit of yours will exist: return when your findings are complete.
+- No `git checkout` of another commit, no `git reset`, no `git clean`, no `git stash`, no commit, merge, push, rebase or tag. Write no file of the repository. No subagents that write. Install nothing.
+- Run no glob, no search and no listing over `governance/project/`: name the files you need there one by one (DEC-508). Never read `.claude/settings.json`, in this worktree or anywhere.
+- Never read, print, search, diff or copy the held-out file under `governance/project/`, and never type its path (DEC-525); never read or name the qualification oracle; never print a secret (DEC-820 (a), (b)); never read `fixtures/evaluation/*/hidden/` (DEC-820 (d)). Never list or write in `~/gov-os-workbench`; dev-tier tests use `GOV_DEV_TIERS` by name only.
+- You read everything else, tests and code alike (DEC-820; reviewers read everything).
+- **Retrieval (DEC-836):** use `gov retrieve` for what you need to know before reading files at random: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-112/src python3 -m gov.cli.main retrieve "<question>" --json`. Never one giant query or context (DEC-860): a large question in batches (`--batch-size`, then `--continue <token>`). A code question (DEC-859) uses the code-graph tool's own traversal (`trace_path`, `search_graph`, `query_graph`), small and targeted, never a load of the whole graph. Note: a `gov retrieve` with this worktree's code may start the shared reranker service under your real `HOME`; that is ordinary use, but stop any service you started before you return (below).
+- **Read refusals (DEC-849):** the guard still refuses some reads (searches that start at the repository root, `governance/project/` or `.claude/`). Take the refusal, never another form; search named folders; count them in your return.
+- **The code under test (DEC-732), word for word:** in this worktree, **every test run and every `gov` command used for verification runs this worktree's own `src/`**: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-112/src` set **per command** (never in a session's `--settings` env). Your verification shows it with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-112/src python3 -c "import gov; print(gov.__file__)"`, quoted in your return; it must point into this worktree.
+- **The guard's command forms (DEC-941 item 4a):** no shell variable as a write target, no here-document, no backticks, no `bash -c '…'`, no long inline `python3 -c` with braces. A probe script goes in a file under `/tmp/gov-os-lead-W2-112/rev2/` (your only place to write; with no Write tool, write it with a short `printf`/`echo` to a literal path), run from there. If the guard refuses such a write for your role, take the refusal once, count it, and probe with short commands instead. Run probes with `python3 -B` (importing the worktree's test modules otherwise writes `__pycache__` into the repository; round 1's lesson).
+- **Every heavy job through the gate (owner, DEC-1038 (4)):** a probe that runs a test suite or more than one test file, or a `gov check`, goes through `PYTHONPATH=/home/usain/gov-os-worktrees/W2-112/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh <the command>`. One test, one file, one `gov retrieve`, short probe scripts: no slot. Do not re-run the whole acceptance suite or the scoped selection: the lead ran them; read the results below.
+- **Probing safely, and the GPU budget (owner, DEC-1039 (1b)):** probes that start services use a temporary `HOME` under `/tmp/gov-os-lead-W2-112/rev2/` (keep it short: a Unix socket path must stay under 107 bytes) and a private `GOV_RERANK_GPU_LOCK_DIR` there, with the suite's stand-in model (`tests/acceptance/W2-112/standin/`), never a real model. The GPU is shared with the two embedders: never touch the shared Ollama servers (ports 11434, 11435), never take or hold the real `/tmp/gov-os-rerank-gpu-*.lock` for longer than a probe needs, and put at most one extra real model on the real GPU, only if `/usr/lib/wsl/lib/nvidia-smi` shows at least 4 GB free first. Never remove `/tmp/gov-os-rerank-gpu-*.lock`. Never remove or change anything in `~/.local/share/gov-os/` (the reranker environment and the interim module: you check the ACT's precondition by reading, never by applying the ACT). Before you return, end every process you started and say so (judge processes with `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh W2-112` and `ps` filtered by your temporary folder; never `pgrep -f` on a path); if you started the real service, stop it and confirm with `nvidia-smi` that its memory is released.
+- **Row W2-L423's rule (DEC-911):** under `.gov-runtime/` commit hashes are written as 12 digits; never write the keywords of the gitleaks rule that takes a bare 40-hex string for a token (call it "row W2-L423's rule"). Your return goes into a committed probe record, where the full `probed_commit` is required: give it once, in the frontmatter line only.
+- **Scratch budget (DEC-898):** 2 GB and 100,000 files and folders under `/tmp/gov-os-lead-W2-112/rev2/`; measure it at the end (`du -s --inodes`, `du -sh`).
+- Refused twice for the same call: stop and say so; no third try (AR-6). If the guard refuses something you needed for the probe, do not work around it: say so in your return. An authentication or access error: stop and return `AUTH_REQUIRED`.
+
+## What you read
+
+- `.tickets/DAEO-clon.md`: its KPI lines (success-1 to success-7, failure-1 to failure-3, as `gov accept` names them) and its `allowed_paths`: `src/gov/retrieval/rerank.py`, `rerank_worker.py`, `rerank_service.py`, `retrieve.py`, `src/gov/status/command.py`, `tests/unit/semantic/test_rerank_process.py`, `tests/unit/orchestration/test_gov_reranker_gpu_slot.py`, `tests/unit/status/test_status.py`, `tests/unit/retrieval/test_w2_112*`, `docs/research/W2-112-shared-reranker.md`.
+- The sources: in `docs/DECISION_REGISTER.md`, DEC-979 (item 4), DEC-374, DEC-397, DEC-1031 (item 2), DEC-1032, DEC-1033, DEC-1034, DEC-1035, DEC-1036, DEC-1038 (1) and (4), DEC-1039 (1) and (1b); `docs/adr/ADR-0001-threat-model.md`; ADR-0002 §2; `governance/project/orchestration/packages/P-RERANKER-1.md`, `ACT-RERANK-GPU-SLOTS-1.md`, `ACT-RERANK-WAIT-1.md`, and `governance/project/orchestration/tools/gov_reranker_gpu_slot.py` (the interim slot module installed in the reranker environment).
+- The change: `git diff be02bb012537 HEAD -- <the allowed paths>` (the ticket's base is be02bb012537; the merges of `w2/integrate` brought other tickets' work you need not judge), and the acceptance tests `tests/acceptance/W2-112/` with their README. Since round 1 (which probed 0b9deb2dd442): the engineer's f59c9ba5560e and 431552ce21ca (the research document's §5 only), the test designer's ed0891667f46 (`test_w2_112_retirement_act.py`, merged as 428c457b4ccb), and the merge of `w2/integrate` at 3630679c (99486bc4; governance files only, none in the ticket's paths). **The product code (`src/`) is unchanged since round 1's head.**
+- Round 1's record (a draft, failed): `/home/usain/gov-os-worktrees/W2-112/.gov-runtime/scratch/lead/probes/PR-DAEO-clon-round1-DRAFT-fail.md`. Read it: its probes p1 to p15 and findings F1 to F8.
+
+## Round 1's findings and the moderator's triage (the CTO, DEC-1010)
+
+- **F1 (blocked round 1; repaired):** the research document's §5 (the ACT retiring the GPU-slot stopgap) told the operator to remove the interim module once W2-112 merged, and allowed removing the slot lock files once no process held them. Only W2-112's own worker carries the slot rule itself; the installed, pinned `gov` and the other checkouts rely on the module alone, so with it removed their rerankers loaded on the GPU beside two held slots, and with the lock files removed a third reranker loaded. The repair: the ACT's precondition is now a re-pin of the installed `gov` that carries W2-112's worker, and no tree running an older worker, each with a check the operator runs; the module stays until both hold; the ACT never removes the lock files. **Judge whether §5 as now written is safe and complete for an operator who follows it literally** (run its precondition checks read-only against the real machine; today the live pin `pin-a7182f6c` prints `0`, so the precondition should not hold).
+- **F2 to F8: placed by the moderator, not rounds.** F2: an entry criterion of W2-32 and of any ticket that changes the pin or the service (DEC-803). F3: a KPI line for W2-127 (the CTO adds it). F4 to F8: Wave 3 rows. You may confirm them (record each with its two lines, as in round 1), but a finding the moderator has placed is not a new finding; say whether anything about it changed at this head.
+- Any **new** finding is judged by the rules below.
+
+## The lead's results at this head (logs under `.gov-runtime/scratch/lead/log/` in this worktree; you may read them)
+
+- `gov accept DAEO-clon` (the lead, outside the sandbox, at 431552ce21ca): pass, all 10 lines, 54 cases (`log/accept-2.json`); the folder run directly: 54 passed (`log/acc-2.log`). The red check (round 1): on the base with the tests merged, 41 failed and 10 passed, for the README's reasons; the F1 test (`test_w2_112_retirement_act.py`) fails against round 1's head for F1's reasons (its README).
+- Full rebuild (`rebuild_slot.sh`): green, 79 s, the three stores recreated (`log/rebuild-4.log`).
+- The scoped selection (`select_tests.py`): `scoped`, core_changed `src/gov/retrieval/rerank.py` and `src/gov/retrieval/retrieve.py`, unplaced none, 42 targets.
+  - Parallel (`log/parallel.log`, `parallel.xml`): 4,767 passed, 23 failed, 6 errors, 8 skipped. (a) 6 in `tests/acceptance/W2-54/test_w2_54_cpu_embedder.py` and 4 in `tests/acceptance/W2-59/test_w2_59_hook_lines*.py`: the same 10 as round 1, identical on `w2/integrate` (the W2-54 six enforce DEC-798, superseded by DEC-1033; `w2/integrate` has since revised them, 31186ebf). (b) 19 in `tests/acceptance/W1-19/` (`test_w1_19_embedding_policy.py`, `test_w1_19_semantic_index.py`, `test_w1_19_unavailable.py`), all "No such file or directory: 'gitleaks'": the suite's helper (`w1_19_support.py`, `scratch_env`) drops every PATH folder that holds an `ollama`, and since 18:13 today `~/.local/bin` holds the CTO's `ollama` wrapper beside `~/.local/bin/gitleaks`. The same case fails on `w2/integrate`'s code (a7182f6c); with a folder holding only a `gitleaks` link first on PATH, the three files pass, 21 of 21 (`log/w119-shim.log`). Environmental, not this ticket's.
+  - Serial (`log/serial.log`, `serial.xml`): 156 passed, 3 failed, 23 errors. (a) 23 errors, `W1-46/test_w1_46_live_sessions.py` (load_sensitive: a live session ran its step from the wrong folder): the file passes alone, 36 of 36. (b) `W1-19 ... test_a_warm_query_answers_within_half_a_second_at_p95` (load_sensitive): 0.590 s in the run, passes alone (`log/rerun-3.log`). (c) `W2-57 ... designer_read ... under_100_ms_at_p95`: 114 ms in the run, passes alone (a flaky candidate). (d) `W2-54/test_w2_54_sandboxed_worker`: fails alone and fails identically on `w2/integrate`'s code (the launched worker's hook file is missing in its temporary repository), as in round 1. Round 1's other two serial reds (W1-19's default-reranker case and W1-21's every-bundle case) pass at this head.
+- `gov check` (after the rebuild): RED only mutation scope, on another ticket's file (`.tickets/DAEO-a3u2.md`); YELLOW authority/role limits (commits citing DEC-1033/DEC-1036 before their trees held them) and product traceability (OpenSpec absent); retrieval regression and context reproducibility GREEN this time.
+- The real reranker service of this tree ran during the serial phase (started by the real-model cases) and was stopped by the lead with SIGTERM at about 20:45: its socket was removed and the GPU went back from 10,424 to 5,911 MiB used. The real-GPU measure (round 1, unchanged code) is in the research document's "Measured" section.
+- **New since round 1, for your information (not a finding against this head):** the owner's DEC-1043 (2) (on `w2/integrate` at 2c28ac89, not merged here) says the service plus one private reranker in the second slot can pass the GPU budget; the CTO's tool `tools/rerank_service_slot_hold.py` now holds every slot the service does not while a service runs, and W2-112's KPI (DEC-1036 (2): at most one private beside the service) is to be revised before landing (a P2 the lead returns). Judge the code against the ticket's KPIs as they stand; you may say what the revision would need.
+
+## What you probe for
+
+Behaviour the acceptance tests miss, above all a case that could:
+
+- lose work (a search that fails, hangs, or returns another session's scores because of the service);
+- let a role write outside its scope;
+- let an implementer change the acceptance tests;
+- make the guard or a gate fail open (here: a socket another user can open; two services at once; a reranker on the CPU or more than the budget on the GPU; the GPU slot rule bypassed; the embedder pushed off the GPU).
+
+First F1's repair (§5 read as an operator would, its checks run read-only). Then, briefly, re-confirm that round 1's sound probes still hold at this head (the code is unchanged, so a short check suffices), and anything round 1 did not probe: the stale socket after a killed service; a service that hangs mid-request; the cold start racing with many searches; the idle end racing with a new request; the private fallback and the interim module both present; what an ordinary `gov retrieve` does when the service is down; `gov status`'s reranker part when the log is absent or large. Check the commits since round 1 for scope (paths) and role trailers (the engineer wrote only `docs/research/`, the designer only `tests/acceptance/W2-112/`).
+
+Run the code; do not judge it by reading alone. A finding you could not reproduce is marked as such.
+
+## Judgement rules: the w2 prompt's section 14, word for word (owner, DEC-801 to DEC-803, DEC-807 to DEC-809)
+
+Every reviewer, probe and auditor brief you write carries this section and the two bullets after it, word for word. You judge your own reviewers' findings by the same rules, and every finding in a probe record you commit keeps its two lines.
+
+- **The threat model is ADR-0001's** (`docs/adr/ADR-0001-threat-model.md`): the Gov OS guards against honest agent mistakes, plausible accidents and drift in ordinary work, not against a deliberate adversary with the owner's privileges. Machinery against an adversary the design cannot stop produces endless review loops.
+- **Every finding is judged by two questions, word for word:**
+  1. "Can an honest agent hit this in ordinary work?"
+  2. "Does it fail open or lose work?"
+- **Only a finding with "yes" to both justifies a round.** A finding that needs a deliberate construction (a link planted at a protected name, git environment variables set by hand such as `GIT_OBJECT_DIRECTORY` or alternates, replace refs, an opaque interpreter used to evade the guard) is a row for the Wave 3 hardening pass, never a new round (DEC-801). A finding marked "no" on the first question is a row automatically.
+- **Every finding in a probe or audit record carries two lines:** `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808).
+- **No extra round on its own:** when a ticket will resume anyway, its accepted fixes ride along in that resume (DEC-802).
+- **Feature-gated risks:** a risk that exists only when a feature is switched on is an entry criterion of the ticket that switches it on (DEC-803).
+- **Packages:** every package that proposes a round states the classification of its findings on one line, before the recommendation (DEC-809).
+- These rules go, word for word, into every reviewer, probe and auditor brief (A3, and every audit brief of W2-25, W2-28, W2-30 and W2-47).
+
+From brief A3 (reviewer), word for word:
+- Judge against ADR-0001's threat model (section 14): honest agent mistakes and plausible accidents in ordinary work, not deliberate adversaries. Ask of every finding, word for word: "Can an honest agent hit this in ordinary work?" and "Does it fail open or lose work?"
+- Every finding carries two lines: `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other`. A finding marked "no" is a row for the Wave 3 hardening pass, never a round; only "yes" with "fails open" or "loses work" fails the probe.
+- **How reviews converge (owner, standing, DEC-1010 item 1; in force for the CTO, every lead, reviewer and QA engineer):**
+  - **A moderator, not a circle of reviewers:** the QA engineer (or the Senior Engineer; until the three layers start, the CTO) triages every finding against the ticket's own scope and KPIs. A finding outside the scope, or one that needs an unusual construction, becomes a Wave 3 row, never a round.
+  - **A finding blocks only if it is in scope, reachable in ordinary work, and fails open or loses work.** Everything else lands as a recorded row.
+  - **At most two review rounds.** If something still blocks after that, it goes to the owner once, with options; no more routine exceptions.
+  - **READY is computed by code, not declared by an agent:** each reviewer returns a structured verdict per KPI line, a fenced `verdict` block in the probe record: `{"kpis": [{"kpi": "<line id>", "verdict": "pass|fail", "findings": [{"id": "F1", "scope": "in|out", "ordinary_work": "yes|no", "consequence": "fails open|loses work|other"}]}]}`; the close (and the merge queue's pre-check) computes READY from it: no finding that is in scope, ordinary work yes and fails open or loses work. A lead never writes a verdict over a reviewer's.
+
+## Return
+
+One message, your last, complete in itself. The twelve fields come first, each as a labelled line, then the probe record's content as the payload:
+
+1. **Frontmatter**, exactly these keys (the lead fills `reviewer_session` and `implementer_session`): `type: probe`, `task: DAEO-clon`, `reviewer_wrote_nothing: true`, `commissioned_by: orchestrator`, `judged_by: orchestrator`, `judgement: pass` or `fail` (fail only if a finding is in scope, ordinary work yes, and fails open or loses work), `probed_commit: <the full commit id of the head you probed>`.
+2. **The record:** what you probed (head, the change's files), how (each probe, run or read), what you found sound, and each finding as a described behaviour, never as code (DEC-136): what was done, what happened, what should have happened, its severity, its KPI line, `Scope: in|out`, `Ordinary work: yes|no, because …`, `Consequence: fails open|loses work|other`.
+3. **The fenced `verdict` block**, opened by three backticks and the word `verdict`, holding the JSON above with every KPI line (success-1 to success-7, failure-1 to failure-3). It is the only verdict block in your record (round 1's draft is not part of it).
+
+Also give in your return: the `gov.__file__` line, the read refusals you met (count), whether you used `gov retrieve`, the processes you ended, the GPU's free memory at your end, and your scratch figures.
+
+```
+task: <what you were asked to do, in one line>
+status: <DONE | PACKAGES | ESCALATION | ESCALATION_BLOCKED | LAUNCH_BLOCKED | AUTH_REQUIRED, and one line of why>
+work_completed: <what was done>
+files_changed: <each path, or "none">
+evidence: <commits with their trailers, logs, command outputs that show it>
+tests: <each suite run, with its counts, or "none run">
+discoveries: <what you found that was not known, or "none">
+risks: <what could go wrong with what was done, or "none">
+lessons: <what the next worker should know, or "none">
+proposed_decisions: <each package, with your recommendation and confidence, or "none">
+unresolved: <what is still open, or "none">
+recommended_next_action: <one line>
+```
+
+Refused twice for the same call: stop and say so; no third try.

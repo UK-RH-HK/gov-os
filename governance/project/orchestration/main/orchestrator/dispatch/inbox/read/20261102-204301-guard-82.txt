@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 83
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_015bzfmzLgtZwExwPSq51HjM", "time": "2026-11-02T20:39:24.134Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/debdb3f7-879f-4f53-8ef5-ba7d562eaef2/subagents/agent-a44a2fa9626a220fb.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-42a && python3 - <<'EOF' p='tests/unit/guard/test_w2_42a_parser.py'; s=open(p).read() s=s.replace(''' assert \"R/\" + A + \"/s\" in got(f\"cp /tmp/x \\\\\\\\\\\\n{A}/s 'it''s\",", "rule": "the call reads files whose names another command gives

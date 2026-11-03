@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 82
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01YPRwTMw5iWNNVKNoySKEsE", "time": "2026-11-02T20:36:24.185Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/debdb3f7-879f-4f53-8ef5-ba7d562eaef2/subagents/agent-a44a2fa9626a220fb.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "mkdir -p /tmp/gov-os-emg-w242a/t && cd /tmp/gov-os-emg-w242a/t && cat > smoke.py <<'EOF' import os, sys from gov.guard.decide import _extract_bash_write_targets as X, _UNRESOLVABLE as S d = sys.argv[1", "rule": "a command that may write the acceptance tests, which only the inde

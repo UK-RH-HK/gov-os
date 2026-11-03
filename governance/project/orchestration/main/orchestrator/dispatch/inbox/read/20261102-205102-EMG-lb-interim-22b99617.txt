@@ -1,0 +1,3 @@
+log: (interim)
+Interim: EMG-lb
+status: interim result 22b99617: EMG-lb review round 1: F1 a reaped child's CPU taken off its ancestor's delta, a job capped at the CPUs, one sample never sets a phase's peak; F2 the reranker GPU slots priced with the installed hook'

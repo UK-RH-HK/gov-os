@@ -1,0 +1,11 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261102-204101.out
+W2: (land batch)
+status: W2-123=3de9bcf44d91 not landed (still approved); W2-122=3fc448601e2d not landed (still approved)
+
+last output:
+s refresh did not bring it there; nothing advanced by this step, entries kept
+merge queue: stopped: the head without the batch cannot be judged without rebuilding a clone: the integration store /home/usain/gov-os-worktrees/W2-00-store is not at 6046339b1e27 and its refresh did not bring it there; entries kept
+queue run exit 4
+W2-123: not landed (still approved)
+W2-122: not landed (still approved)
+

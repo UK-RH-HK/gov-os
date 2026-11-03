@@ -27,7 +27,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 HOOK = os.environ.get("GUARD_FIX3_HOOK") or (
     os.path.join(HERE, "pretooluse.py") if os.path.exists(os.path.join(HERE, "pretooluse.py"))
     else ROOT + "/.claude/hooks/pretooluse.py")
-PY = open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()
+PY = os.environ.get("GOV_PIN_PY") or open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()  # DEC-1037: a pin before its switch
 GUARD4 = ROOT + "/.gov-runtime/scratch/orchestrator/tools/guard4_check.py"
 CORPUS = os.environ.get("GUARD_FIX3_CORPUS") or os.path.join(HERE, "work", "corpus.json")
 

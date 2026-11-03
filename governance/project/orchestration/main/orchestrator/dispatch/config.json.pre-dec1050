@@ -1,0 +1,10 @@
+{
+  "memory_rule": "slots",
+  "K": 2,
+  "gpu_expected": {
+    "query": true
+  },
+  "nightly_hold_from": "00:00",
+  "nightly_hold_until": "00:00",
+  "_nightly_hold_note": "DEC-1049: an empty window (no nightly while it holds); restore from config.json.pre-dec1049"
+}

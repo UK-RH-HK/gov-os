@@ -1,0 +1,10 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261102-154809.out
+W2: (land batch)
+status: W2-123=3de9bcf44d91 not landed (still approved); W2-122=3fc448601e2d not landed (still approved)
+
+last output:
+and_never_stops_it[PATH], tests/acceptance/W2-54/test_w2_54_cpu_embedder.py::test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[HOME], tests/acceptance/W2-54/test_w2_54_cpu_embedder.py::test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer; entries kept
+queue run exit 4
+W2-123: not landed (still approved)
+W2-122: not landed (still approved)
+
