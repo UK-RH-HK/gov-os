@@ -50,9 +50,25 @@ def constant_loader():
     return load
 
 
+def recording_loader(path, word):
+    """A reranker that keeps every text it is given (appended to ``path`` as JSON lines) and scores each by how often
+    it holds ``word`` (S7: what the reranker reads)."""
+    def load():
+        def score(query, texts):
+            with open(path, "a", encoding="utf-8") as out:
+                for text in texts:
+                    out.write(json.dumps(text) + "\n")
+            return [float(text.lower().count(word)) for text in texts]
+        return score
+    return load
+
+
 def reranker(spec):
     if spec is None:
         return None  # the default reranker
+    if spec.startswith("record:"):
+        _, path, word = spec.split(":", 2)
+        return recording_loader(path, word)
     if spec == "dies-process":
         return dying_process_loader()
     if spec.startswith("dies:"):
@@ -75,7 +91,8 @@ def run(call):
         return semantic.manifest(call["root"])
     if op == "retrieve":
         from gov.retrieval.retrieve import retrieve
-        return retrieve(call["root"], call["query"], reranker=reranker(call.get("reranker")))
+        options = {key: call[key] for key in ("batch_size", "bundle_budget", "continuation", "radius") if key in call}
+        return retrieve(call["root"], call["query"], reranker=reranker(call.get("reranker")), **options)
     if op == "fusion_search":
         from gov.retrieval import fusion
         from gov.retrieval.rerank import last_outcome

@@ -109,6 +109,7 @@ class OllamaStandIn:
         self.offered = dict(offered or {PIN_MODEL: PIN_DIGEST})
         self.requests = []
         self.returned = {}
+        self.text_of = {}  # each vector returned (its float32 bytes) -> the text it was made from (S7)
         self.lock = threading.Lock()
         stand_in = self
 
@@ -151,6 +152,7 @@ class OllamaStandIn:
                         with stand_in.lock:
                             stand_in.requests.append((name, texts))
                             stand_in.returned.setdefault(name, set()).update(blob(v) for v in vectors)
+                            stand_in.text_of.update((blob(v), text) for v, text in zip(vectors, texts))
                         reply = {"model": name, "embeddings": vectors}
                 else:
                     status = 404
@@ -503,6 +505,57 @@ def without_cut_record(project):
             connection.execute("INSERT INTO semantic_manifest VALUES (?, ?, ?, ?)", row)
     finally:
         connection.close()
+
+
+MODEL_FIELDS = ("embedder", "reranker")
+MODEL_COLUMNS = ("embedder_model", "embedder_revision", "reranker_model", "reranker_revision")
+
+
+def cut_entries(manifest):
+    """What the manifest records besides the two models: the embedding cut (W2-L065, S7), by its key."""
+    return {key: value for key, value in (manifest or {}).items() if key not in MODEL_FIELDS}
+
+
+def set_store_cut(project, manifest, value):
+    """Make the store record ``value`` as its cut, as a store built at that cut does: in every ``semantic_*`` table but
+    the vectors, each column named as a cut key of ``manifest`` (other than the models' columns) is set to ``value``.
+    Returns how many columns were set."""
+    keys = set(cut_entries(manifest))
+    connection = sqlite3.connect(Path(project) / STORE_REL)
+    changed = 0
+    try:
+        tables = [name for (name,) in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'semantic%'") if name != "semantic_vector"]
+        values = {str(found) for found in cut_entries(manifest).values()}
+        with connection:
+            for by_value in (False, True):  # by the key's name first; else a column that holds the cut's value
+                for table in tables:
+                    for column in [row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')]:
+                        if column in MODEL_COLUMNS:
+                            continue
+                        held = {str(found) for (found,) in connection.execute(f'SELECT "{column}" FROM "{table}"')}
+                        if (column in keys) if not by_value else (held and held <= values):
+                            connection.execute(f'UPDATE "{table}" SET "{column}" = ?', (value,))
+                            changed += 1
+                if changed:
+                    break
+    finally:
+        connection.close()
+    return changed
+
+
+def set_vectors_of(project, path, vector_bytes):
+    """Replace the vector of every chunk of ``path`` in the store with ``vector_bytes`` (a planted old vector)."""
+    connection = sqlite3.connect(Path(project) / STORE_REL)
+    try:
+        with connection:
+            ids = [chunk_id for (chunk_id,) in connection.execute(
+                "SELECT chunk_id FROM lexical_chunk WHERE path = ?", (path,))]
+            connection.executemany("UPDATE semantic_vector SET embedding = ? WHERE chunk_id = ?",
+                                   [(vector_bytes, chunk_id) for chunk_id in ids])
+    finally:
+        connection.close()
+    return ids
 
 
 def code_named(answer, word):

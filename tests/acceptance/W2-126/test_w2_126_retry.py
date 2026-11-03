@@ -129,7 +129,8 @@ class Flaky:
         if route == "/api/tags":
             return "answered", 200, json.dumps({"models": [model]}).encode()
         if route == "/api/ps":
-            return "answered", 200, json.dumps({"models": [{**model, "size_vram": 0}]}).encode()
+            # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+            return "answered", 200, json.dumps({"models": [{**model, "size_vram": model["size"]}]}).encode()
         if route != "/api/embed":
             return "answered", 404, b'{"error": "not found"}'
         given = asked.get("input", "")

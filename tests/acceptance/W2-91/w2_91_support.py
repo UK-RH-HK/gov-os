@@ -208,7 +208,8 @@ class OllamaStandIn:
                 elif route == "/api/tags":
                     reply = {"models": [model]}
                 elif route == "/api/ps":
-                    reply = {"models": [{**model, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{**model, "size_vram": model["size"]}]}
                 elif route == "/api/show":
                     reply = {"details": model["details"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS},
