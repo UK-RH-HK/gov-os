@@ -100,10 +100,12 @@ def blob(vector):
 
 class OllamaStandIn:
     """A healthy Ollama endpoint on a free loopback port. ``offer`` sets the models its list reports (name -> digest);
-    each is reported loaded on the CPU. Every ``/api/embed`` request is kept as ``(model, texts)``, and every vector
-    returned is kept per model as its float32 bytes."""
+    each is reported loaded on ``device``: the GPU by default (``size_vram`` equal to ``size``), the CPU when
+    ``device`` is ``"cpu"`` (``size_vram`` 0; S10, DEC-1065: such a vector is refused). Every ``/api/embed`` request
+    is kept as ``(model, texts)``, and every vector returned is kept per model as its float32 bytes."""
 
-    def __init__(self, offered=None):
+    def __init__(self, offered=None, device="gpu"):
+        self.device = device
         self.offered = dict(offered or {PIN_MODEL: PIN_DIGEST})
         self.requests = []
         self.returned = {}
@@ -130,7 +132,8 @@ class OllamaStandIn:
                 elif route == "/api/tags":
                     reply = {"models": models}
                 elif route == "/api/ps":
-                    reply = {"models": [{**model, "size_vram": 0} for model in models]}
+                    on_gpu = stand_in.device != "cpu"
+                    reply = {"models": [{**model, "size_vram": model["size"] if on_gpu else 0} for model in models]}
                 elif route == "/api/show":
                     name = asked.get("model") or asked.get("name")
                     reply = {"details": {"family": "stand-in"}, "capabilities": ["embedding"],
@@ -188,6 +191,32 @@ class OllamaStandIn:
     def close(self):
         self.server.shutdown()
         self.server.server_close()
+
+
+def dead_host():
+    """A loopback address nothing listens on: an embedder that cannot be reached (S10)."""
+    import socket
+    with socket.socket() as handle:
+        handle.bind(("127.0.0.1", 0))
+        return f"127.0.0.1:{handle.getsockname()[1]}"
+
+
+def cache_rows(project):
+    """The rows of every table of the two vector caches: the tree's query-vector cache (``.gov-runtime/``) and the
+    machine-wide one (``GOV_VECTOR_CACHE_DIR``, the test's own). S10: a refused vector adds none."""
+    files = [path for path in (Path(project) / ".gov-runtime").glob("*vector*.db")]
+    folder = os.environ.get("GOV_VECTOR_CACHE_DIR")
+    if folder and Path(folder).is_dir():
+        files += list(Path(folder).glob("*.db"))
+    total = 0
+    for path in files:
+        connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        try:
+            for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall():
+                total += connection.execute(f'SELECT count(*) FROM "{name}"').fetchone()[0]
+        finally:
+            connection.close()
+    return total
 
 
 def lacking():

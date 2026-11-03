@@ -1,10 +1,15 @@
 """S5: the fusion limit is honoured [W2-M103].
 
 W2-M103: "fusion.search caps at 30 hits regardless of limit"; its closing condition: "fusion.search honours limit, or
-rejects a limit above its cap." A planted project holds 50 notes that all match the question, so both routes give
-more than 30 chunks. A limit is honoured when exactly that many distinct chunks come back (as many as match, if
-fewer); it is rejected when the call refuses it with an error that names the limit or the cap. Silently returning
-fewer than asked, while more match, is neither.
+rejects a limit above its cap." A planted project holds 50 notes that all match the question, so the routes together
+give more than 30 distinct chunks to fuse (each route may cap its own list; the semantic route gives 30). "All that
+match" is what the fusion receives: the hits of a limit far above it (``ALL``). A limit is honoured when
+``min(limit, all that match)`` distinct chunks come back; it is rejected when the call refuses it with an error that
+names the limit or the cap. Silently returning fewer than that is neither.
+
+Rewrite-Reason (round 2, on the engineer's head): the round-1 case assumed all 50 notes reach the fusion, so a limit
+of 50 had to give 50; the routes give 42 distinct chunks. Each limit is now judged against what the fusion receives,
+measured in the same project; the bar (``min(limit, all)``, never 30 above it) is unchanged.
 """
 
 from __future__ import annotations
@@ -34,7 +39,21 @@ def many(tmp_path, needs_vectors, box):
     return project
 
 
-def _honoured_or_refused(data, limit):
+ALL = 10_000  # far above anything the planted project holds
+
+
+def _all_that_match(box, many):
+    """How many distinct chunks the fusion receives (the hits of a limit far above them); None when such a limit is
+    refused."""
+    data = box.call("fusion_search", root=str(many), query=QUESTION, limit=ALL)
+    if data.get("raised") is not None:
+        return None
+    count = len({hit["chunk_id"] for hit in data["result"]["hits"]})
+    assert count > 40, f"premise: the routes give the fusion more than 40 of the {MATCHING} notes' chunks ({count})"
+    return count
+
+
+def _honoured_or_refused(data, limit, everything):
     raised = data.get("raised")
     if raised is not None:
         assert any(kind in raised["types"] for kind in ("ValueError", "GovError")), \
@@ -42,18 +61,20 @@ def _honoured_or_refused(data, limit):
         assert str(limit) in raised["message"] or "30" in raised["message"] or "limit" in raised["message"], \
             f"the refusal names the limit or the cap: {raised['message']}"
         return None
+    assert everything is not None, "a limit far above the matches is refused, but this one is not: no cap is named"
     hits = data["result"]["hits"]
     ids = [hit["chunk_id"] for hit in hits]
     assert len(ids) == len(set(ids)), "each chunk once"
-    assert len(hits) == limit, f"asked for {limit} of {MATCHING} matching notes, got {len(hits)}: the limit is not " \
-                               f"honoured (W2-M103)"
+    assert len(hits) == min(limit, everything), \
+        f"asked for {limit} with {everything} matching chunks, got {len(hits)}: the limit is not honoured (W2-M103)"
     return hits
 
 
 @pytest.mark.parametrize("limit", [31, 40, 50])
 def test_a_limit_above_thirty_is_honoured_or_refused(many, box, standin, limit):
+    everything = _all_that_match(box, many)
     data = box.call("fusion_search", root=str(many), query=QUESTION, limit=limit)
-    _honoured_or_refused(data, limit)
+    _honoured_or_refused(data, limit, everything)
     s.no_traceback(data)
 
 
@@ -68,6 +89,6 @@ def test_a_honoured_limit_keeps_the_order_of_a_smaller_one(many, box, standin):
     data = box.call("fusion_search", root=str(many), query=QUESTION, limit=40, reranker="constant")
     if data.get("raised") is not None:
         pytest.skip("this build refuses a limit above its cap; the order of a honoured limit does not arise")
-    large = _honoured_or_refused(data, 40)
+    large = _honoured_or_refused(data, 40, _all_that_match(box, many))
     small = s.result(box.call("fusion_search", root=str(many), query=QUESTION, limit=5, reranker="constant"))["hits"]
     assert [hit["chunk_id"] for hit in large[:5]] == [hit["chunk_id"] for hit in small]

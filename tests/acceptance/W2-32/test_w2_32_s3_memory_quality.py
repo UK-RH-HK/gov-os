@@ -110,6 +110,60 @@ def test_the_regression_case_is_held_out_of_what_memory_embeds(project, box, sta
         f"the held-out regression case was embedded into memory: {event['regression_case']}"
 
 
+# ---- a miss on the hidden half (the CTO's ruling, round 2, P2 under DEC-1064) ----
+# A memory-quality event for a miss on the hidden half is recorded by its id only: no question text, gold answer,
+# sources or regression case in the repository. A hidden miss is one whose id is ``H`` and digits, or that says
+# ``part: hidden``. Its root cause and repair are the event's own (CAP-19.c) and stay. The texts below are planted.
+
+HIDDEN_TEXT = "Which salt marsh ledger names the heron warden?"
+HIDDEN_ANSWER = "The tidal ledger of the north marsh."
+HIDDEN_SOURCE = "docs/marsh-ledger.md"
+HIDDEN_ROOT_CAUSE = "the ledger's heading was chunked apart from its body"
+HIDDEN_REPAIR = "chunking keeps a heading with its first paragraph"
+HIDDEN_FULL = {"question": HIDDEN_TEXT, "expected": [{"path": HIDDEN_SOURCE}],
+               "regression": {"question": HIDDEN_TEXT, "gold_answer": HIDDEN_ANSWER, "sources": [{"path": HIDDEN_SOURCE}]}}
+
+
+def _hidden(marker, *carried):
+    miss = {"root_cause": HIDDEN_ROOT_CAUSE, "repair": HIDDEN_REPAIR}
+    miss.update({"id": "H07"} if marker == "id" else {"id": "q07", "part": "hidden"})
+    miss.update({key: copy.deepcopy(HIDDEN_FULL[key]) for key in carried})
+    return miss
+
+
+@pytest.mark.parametrize("marker", ["id", "part"])
+@pytest.mark.parametrize("carried", [("question",), ("expected",), ("regression",), ("question", "expected",
+                                     "regression")], ids=["question", "sources", "regression-case", "in-full"])
+def test_a_hidden_miss_is_refused_unless_it_carries_its_id_only(project, box, marker, carried):
+    """Rewrite-Reason: the CTO's ruling on S3 (round 2): a hidden miss is recorded by its id only."""
+    before = s.files_of(project)
+    data = _record(box, project, _hidden(marker, *carried))
+    raised = data.get("raised")
+    assert raised is not None, f"a hidden miss carrying its {', '.join(carried)} was recorded: {data.get('result')}"
+    assert any(kind in raised["types"] for kind in ("ValueError", "GovError")), raised
+    assert "hidden" in raised["message"].lower(), f"the refusal says the miss is hidden: {raised['message']}"
+    assert s.files_of(project) == before, "a refused event writes nothing"
+
+
+@pytest.mark.parametrize("marker", ["id", "part"])
+def test_a_hidden_miss_with_its_id_only_is_recorded_without_its_text(project, box, marker):
+    """Rewrite-Reason: the CTO's ruling on S3 (round 2): a hidden miss is recorded by its id only."""
+    miss = _hidden(marker)
+    before = s.files_of(project)
+    event = s.result(_record(box, project, miss))
+    assert event["type"] == "memory-quality" and miss["id"] in str(event), event
+    assert not event.get("regression_case"), f"no regression case is written for a hidden miss: {event}"
+    written = {rel: (Path(project) / rel).read_text(encoding="utf-8", errors="replace")
+               for rel in set(s.files_of(project)) - set(before)}
+    assert written, "the event is written"
+    for rel, text in written.items():
+        assert miss["id"] in text, f"{rel} records the hidden miss by its id"
+        for leaked in (HIDDEN_TEXT, HIDDEN_ANSWER, HIDDEN_SOURCE):
+            assert leaked not in text, f"{rel} holds the hidden miss's {leaked!r}"
+    read = [item for item in s.result(box.call("learning_events", root=str(project))) if item["id"] == event["id"]]
+    assert read and read[0]["type"] == "memory-quality", read
+
+
 def test_recorded_events_are_read_back(project, box):
     first = s.result(_record(box, project))
     other = copy.deepcopy(MISS)
