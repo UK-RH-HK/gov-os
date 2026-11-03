@@ -445,11 +445,14 @@ def test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no
     assert answer["reason"] == "stale" and answer.get("hits") == [], answer
 
 
-@pytest.mark.parametrize("failure", ("http-error", "not-json", "no-vector"))
+# Rewrite-Reason: P-W2-123-4 (W2-126's KPI 7, DEC-1042 item 4): the bounded retry also covers a transient server
+# error (HTTP 5xx). The ``http-error`` case (an HTTP 500 sent once, not retried) left this list and is the case
+# below, revised to KPI 7: tried within the same bound, failing closed after its last try.
+@pytest.mark.parametrize("failure", ("not-json", "no-vector"))
 def test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry(place, tmp_path, failure):
-    """*Red on ``retries`` only.* The first batch fails at once (an HTTP error, an answer that is not JSON, an answer
-    without a vector for each text): it is sent once, no later batch is sent, the reason is exactly ``NO_EMBEDDING``
-    as today and ``retries`` is an empty list. The base code already sends once with that reason; it reports no
+    """*Red on ``retries`` only.* The first batch fails at once (an answer that is not JSON, an answer without a
+    vector for each text): it is sent once, no later batch is sent, the reason is exactly ``NO_EMBEDDING`` as today
+    and ``retries`` is an empty list. The base code already sends once with that reason; it reports no
     ``retries``."""
     project = make_project(tmp_path / "project")
     runner = place.serve(fail=failure)
@@ -458,3 +461,27 @@ def test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry
     assert report["available"] is False and report["state"] == "FACET_UNAVAILABLE", report
     assert report["reason"] == semantic_module().NO_EMBEDDING, report
     assert report.get("retries") == [], f"`retries` is not an empty list (R3): {report}"
+
+
+def test_a_server_error_at_every_try_is_tried_within_the_bound_and_the_stage_ends_unavailable(place, tmp_path):
+    """Rewrite-Reason: P-W2-123-4. Was ``test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry
+    [http-error]`` (an HTTP 500 sent once, never retried); W2-126's KPI 7 (DEC-1042 item 4) puts a transient server
+    error under the same bounded retry. *Red on ``w2/integrate`` at the merge of W2-123.* Every chunk batch answers HTTP
+    500: the first batch is tried exactly ``TRIES`` times, after each wait in turn, then the stage stops (no later
+    batch); ``FACET_UNAVAILABLE`` with a reason that begins with ``NO_EMBEDDING`` (KPI 7 does not fix its wording);
+    ``retries`` names the request: ``TRIES`` tries, the waits, not embedded."""
+    project = make_project(tmp_path / "project")
+    runner = place.serve(fail="http-error")
+    report = semantic_module().refresh(project)
+    tries = runner.tries_of(0)
+    assert len(tries) == TRIES, f"the batch that answered HTTP 500 was not tried {TRIES} times: {tries}; {report}"
+    for index, (gap, wait) in enumerate(zip(gaps(tries), RETRY_WAITS_S), start=1):
+        assert wait - EARLY_S <= gap <= wait + LATE_S, \
+            f"try {index + 1} came {gap:.2f} s after try {index}, not after its wait ({wait} s)"
+    assert len(runner.batches) == 1, f"a later batch was sent after the last failed try: {len(runner.batches)} batches"
+    assert report["available"] is False and report["state"] == "FACET_UNAVAILABLE", report
+    assert str(report.get("reason") or "").startswith(semantic_module().NO_EMBEDDING), report
+    retries = report.get("retries")
+    assert isinstance(retries, list) and len(retries) == 1, f"`retries` does not name the request: {report}"
+    assert retries[0].get("tries") == TRIES and retries[0].get("embedded") is False \
+        and retries[0].get("waits_s") == [pytest.approx(wait, abs=0.1) for wait in RETRY_WAITS_S], report

@@ -106,6 +106,11 @@ class Box:
                 wrapper.write_text(f'#!/bin/sh\nexec "{found}" "$@"\n', encoding="utf-8")
                 wrapper.chmod(0o755)
         (self.workdir / "hook" / "sitecustomize.py").write_text(_HOOK, encoding="utf-8")
+        # Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the machine-wide vector cache of W2-126 is one folder
+        # every process on the machine shares, keyed by model, revision and text, not by the stand-in that computed
+        # a vector. Every child names a cache folder (never the user's real one, never the session's HOME); the
+        # conftest gives each case its own, in its temporary directory, so no case is served another case's vector.
+        self.vector_cache = self.default_vector_cache = self.workdir / "vector-cache"
 
     @property
     def log(self):
@@ -125,6 +130,7 @@ class Box:
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
             **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
+            VECTOR_CACHE_SETTING: str(self.vector_cache),   # DEC-1042: this case's own machine-wide cache
             **extra,
         }
         if mode:
@@ -801,6 +807,7 @@ OTHER_MODEL = "nomic-embed-text:latest"
 # Round 4 (DEC-798): the address of the CPU-only embedder that answers query embeddings (README, "Round 4", "The
 # interfaces this KPI needs"): a setting in OLLAMA_HOST's form, and its default when it is not set.
 QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"
+VECTOR_CACHE_SETTING = "GOV_VECTOR_CACHE_DIR"    # W2-126's machine-wide vector cache's folder (DEC-1042)
 QUERY_HOST_DEFAULT = "127.0.0.1:11435"
 SHARED_HOST_DEFAULT = "127.0.0.1:11434"   # OLLAMA_HOST's default (DEC-260)
 DRIFT = 0.35   # how far a text's vector moves toward the text embedded just before it (the stand-in's variation)
@@ -1002,16 +1009,21 @@ def vector_site(box):
     return site
 
 
-def embed_env(box, endpoint, cpu=None):
+def embed_env(box, endpoint, cpu=None, cache=None):
     """The scratch environment with the stand-in embedder at OLLAMA_HOST and ``sqlite_vec`` importable.
 
     Round 4 (DEC-798): the CPU embedder's address (``QUERY_HOST_SETTING``) is ``cpu`` (a stand-in or an address)
-    when given, else the same stand-in as OLLAMA_HOST; with no endpoint, both are one dead address."""
+    when given, else the same stand-in as OLLAMA_HOST; with no endpoint, both are one dead address.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): ``cache`` names another machine-wide vector cache folder
+    than the case's own, for a reference store that must be computed as on another machine (a new store and a new
+    cache), so it warms nothing the case then measures."""
     site = vector_site(box)
     shared = endpoint.host if endpoint else f"127.0.0.1:{_dead_port()}"
     query = cpu if isinstance(cpu, str) else cpu.host if cpu else shared
     return box.env(PYTHONPATH=os.pathsep.join([str(SRC), *([str(site)] if site else [])]),
-                   OLLAMA_HOST=shared, **{QUERY_HOST_SETTING: query})
+                   OLLAMA_HOST=shared, **{QUERY_HOST_SETTING: query},
+                   **({VECTOR_CACHE_SETTING: str(cache)} if cache else {}))
 
 
 def _dead_port():
@@ -1080,11 +1092,12 @@ SUBJECTS = {
 BAKERY, TIDES, ORCHARD, KILN, FORGE, APIARY = SUBJECTS
 
 
-def semantic_project(box, project, endpoint, files=None, cpu=None):
+def semantic_project(box, project, endpoint, files=None, cpu=None, cache=None):
     """A temporary project with its record store, its lexical index and its vectors, built through the stand-in
     ``endpoint``. The corpus is embedded without the variation, so two projects built alike hold the same vectors;
     the variation is on again for every question asked afterwards. ``cpu``: the CPU embedder's address during the
-    build (round 4; ``embed_env``)."""
+    build (round 4; ``embed_env``). ``cache``: another machine-wide vector cache folder than the case's own
+    (``embed_env``; Rewrite-Reason: DEC-1033)."""
     project = new_repo(project)
     adopt_embedded(project)
     for rel, text in (files or SUBJECTS).items():
@@ -1092,7 +1105,7 @@ def semantic_project(box, project, endpoint, files=None, cpu=None):
     commit_all(project)
     drift, endpoint.drift = endpoint.drift, 0.0
     try:
-        report = drive_env(box, project, embed_env(box, endpoint, cpu), ("refresh",), ("load",),
+        report = drive_env(box, project, embed_env(box, endpoint, cpu, cache), ("refresh",), ("load",),
                            timeout=CALL_TIMEOUT_S)[0]
     finally:
         endpoint.drift = drift
@@ -1146,7 +1159,8 @@ def real_env(box):
     """This machine's own environment (its Ollama), with this worktree's ``src/``; nothing may be downloaded."""
     env = {key: value for key, value in os.environ.items() if key not in ("GOV_ROLE", "GOV_TICKET")}
     env.update({"PYTHONPATH": str(SRC), "PYTHONPYCACHEPREFIX": str(box.workdir / "pycache"),
-                "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "GIT_CONFIG_NOSYSTEM": "1"})
+                "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "GIT_CONFIG_NOSYSTEM": "1",
+                VECTOR_CACHE_SETTING: str(box.vector_cache)})   # never the owner's real cache (DEC-1042 item 1)
     return env
 
 

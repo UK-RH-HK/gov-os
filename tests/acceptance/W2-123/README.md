@@ -33,7 +33,7 @@ S2 to S7 (`gov accept` names the lines by their order in the ticket file).
 
 | KPI line | Tests | Expected red reason on the base code |
 |---|---|---|
-| S1: A rebuild's embedding request that times out is retried, bounded (at most three tries, a growing wait, each try under the per-request timeout); after the last failed try the stage ends not_recreated, named; never a partial store reported as built; the tries and waits stated in the rebuild's result | `test_w2_123_retry.py::test_a_request_that_times_out_once_is_tried_again_after_the_first_wait_and_the_stage_is_built`, `::test_a_request_that_times_out_twice_is_tried_a_third_time_after_a_longer_wait_and_the_stage_is_built`, `::test_each_try_waits_no_longer_than_the_timeout_and_the_waits_between_tries_are_taken`, `::test_after_the_last_failed_try_refresh_reports_the_tries_and_the_waits_and_sends_no_later_batch`, `::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built`, `::test_with_no_request_timed_out_the_stage_is_built_and_retries_is_an_empty_list`, `::test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry` (3 cases) | the base code sends each batch request once with no retry: a timed-out batch is tried once (the five time-out cases fail on the count of tries) and the stage ends with the bare `NO_EMBEDDING`, not R3's reason; `refresh`'s report has no `retries` (the case where nothing times out, and the three not-a-time-out cases, which otherwise already pass on the base: one try, the bare `NO_EMBEDDING`) |
+| S1: A rebuild's embedding request that times out is retried, bounded (at most three tries, a growing wait, each try under the per-request timeout); after the last failed try the stage ends not_recreated, named; never a partial store reported as built; the tries and waits stated in the rebuild's result | `test_w2_123_retry.py::test_a_request_that_times_out_once_is_tried_again_after_the_first_wait_and_the_stage_is_built`, `::test_a_request_that_times_out_twice_is_tried_a_third_time_after_a_longer_wait_and_the_stage_is_built`, `::test_each_try_waits_no_longer_than_the_timeout_and_the_waits_between_tries_are_taken`, `::test_after_the_last_failed_try_refresh_reports_the_tries_and_the_waits_and_sends_no_later_batch`, `::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built`, `::test_with_no_request_timed_out_the_stage_is_built_and_retries_is_an_empty_list`, `::test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry` (2 cases: not-json, no-vector), `::test_a_server_error_at_every_try_is_tried_within_the_bound_and_the_stage_ends_unavailable` (revised from the third, http-error, under Rewrite-Reason P-W2-123-4) | the base code sends each batch request once with no retry: a timed-out batch is tried once (the five time-out cases fail on the count of tries) and the stage ends with the bare `NO_EMBEDDING`, not R3's reason; `refresh`'s report has no `retries` (the case where nothing times out, and the two not-a-time-out cases, which otherwise already pass on the base: one try, the bare `NO_EMBEDDING`); the revised server-error case: on `w2/integrate` at W2-123's merge a 500 is sent once, not tried 3 times (P-W2-123-4) |
 | S2: `ensure_available` sets parallel requests and the CPU cap from one value each (defaults from the measure), states them; an unreadable value refuses the start, named, never uncapped | `test_w2_123_start.py::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`, `::test_shared_start_without_configuration_uses_the_default_resolved_from_the_callers_cpus`, `::test_a_server_already_answering_is_used_and_the_settings_a_start_would_use_are_stated`; `test_w2_123_config_invalid.py` (all 14) | the result has no `settings` (the start cases, and the case with the server already answering); the base reads no configuration, so an unreadable value does not stop the start: the planted executable runs as `serve` (the 13 refusal cases) |
 | S3: Determinism: parallel requests return the same vector, to the stored precision; a difference refuses | `test_w2_123_determinism.py::test_equal_vectors_are_accepted_with_that_many_requests_in_flight`, `::test_a_difference_below_the_stored_precision_is_not_a_difference` | `check_determinism` does not exist (`AttributeError`) |
 | S4: Measured in `docs/changes/W2-123-evidence.md`, the setting chosen where the cap is not the limit | `test_w2_123_evidence.py::test_the_evidence_file_holds_the_sixteen_measured_cases_and_the_chosen_setting` (the only test of this line; no test measures) | the file does not exist |
@@ -112,7 +112,9 @@ daemon and its runner record what they see from inside.
 - **R1** Only a rebuild's chunk embedding (each `/api/embed` batch of up to `BATCH` texts sent to `OLLAMA_HOST` by
   `refresh(root)`, or by `search(..., refresh=True)`) is retried, and only when it timed out (accepted, no complete
   answer within `TIMEOUT_S`). Every other failure (an HTTP error, an answer that is not JSON or lacks a vector for each
-  text, nothing listening) ends the stage at once with `NO_EMBEDDING`, no retry.
+  text, nothing listening) ends the stage at once with `NO_EMBEDDING`, no retry. *Revised by W2-126's KPI 7*
+  (P-W2-123-4, DEC-1042 item 4; see "KPI 7's revision" below): an HTTP 5xx and a reset or refused connection are
+  retried within the same bound too.
 - **R2** `RETRY_WAITS_S` (default `(10.0, 30.0)`): the growing waits before the 2nd, 3rd … try; `len(RETRY_WAITS_S) + 1`
   tries; each try under `TIMEOUT_S`; both read at the time of each request. A request that answers on a later try is
   used, and the build goes on with the next batch.
@@ -138,7 +140,7 @@ daemon and its runner record what they see from inside.
   `/api/version`, `/api/tags` (the model with a digest), `/api/ps` and `/api/embed`. It numbers chunk batches by the
   order their texts are first seen (a retry is the same texts), and holds back the chosen batch's first one, two or
   three tries: it reads the request, then answers nothing for 10 s, ten times the lowered timeout. Or it fails every
-  chunk batch at once (HTTP 500, a body that is not JSON, an answer with no vector). Any other embed request (a probe's
+  chunk batch at once (HTTP 500, a body that is not JSON, an answer with no vector; the 500 is now retried, KPI 7). Any other embed request (a probe's
   fixed text) is answered at once and never held.
 - **Nothing real is touched.** `HOME` is the test's own, `GOV_QUERY_OLLAMA_HOST` a second free port with nothing on it
   (no case reaches the query embedder), `GOV_OLLAMA_BIN` a planted script that starts nothing. Nothing is sent to
@@ -154,7 +156,8 @@ daemon and its runner record what they see from inside.
 | timing | batch 0 held twice | the gap between tries k and k+1 is at least `TIMEOUT_S` + wait k (less 0.05 s) and at most that plus 1.5 s; from the first try to the end at most 2 × `TIMEOUT_S` + both waits + 3 s |
 | last failed try (`refresh`) | batch 1 held three times | 3 tries, then no later batch; `FACET_UNAVAILABLE`, R3's reason; `retries` names 3 tries, both waits, not embedded |
 | last failed try (`gov rebuild --json`) | batch 1 held three times | 3 tries, no later batch, not every chunk sent; `stores.semantic` `not_recreated` with R3's reason; then `search(refresh=False)`: `FACET_UNAVAILABLE`, `stale`, no hit (batch 0's vectors may stay) |
-| not a time-out (3 cases) | HTTP 500 / not JSON / no vector | one try, no later batch; the reason exactly `NO_EMBEDDING`; `retries == []` (passes on the base but for `retries`) |
+| not a time-out (2 cases) | not JSON / no vector | one try, no later batch; the reason exactly `NO_EMBEDDING`; `retries == []` (passes on the base but for `retries`) |
+| a server error at every try (revised, P-W2-123-4) | HTTP 500 at every chunk batch | batch 0 tried exactly 3 times, each after its wait (within 0.05 s early, 1.5 s late), no later batch; `FACET_UNAVAILABLE`, the reason beginning `NO_EMBEDDING`; `retries` one entry: 3 tries, both waits, not embedded |
 
 ### Choices the run-2 interface leaves open, and how the tests read them
 
@@ -163,3 +166,27 @@ daemon and its runner record what they see from inside.
   no case uses it.
 - The rebuild's other stages (record store, lexical, code index, compaction) are not asserted; the envelope must be
   `ok`.
+
+## KPI 7's revision (`Rewrite-Reason: P-W2-123-4`; W2-126, DAEO-jpr0; DEC-1042 item 4)
+
+W2-126's seventh success line: "The bounded retry (W2-123, DEC-1026) also covers a transient server error (HTTP 5xx)
+and a reset or refused connection, within the same bound, still failing closed after its last try; W2-123's
+acceptance case that a 500 is not retried is revised by the test designer with `Rewrite-Reason: P-W2-123-4`"
+(evidence: W2-123's rebuild of 2026-11-02 10:39-11:12 ended `not_recreated` after a transient error; the same batch
+answered 200 in 2.6 s at 11:16).
+
+- **Revised:** `test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry[http-error]` (an HTTP 500
+  sent once, never retried) left that function's parameters and is now
+  `test_a_server_error_at_every_try_is_tried_within_the_bound_and_the_stage_ends_unavailable`: every chunk batch
+  answers 500; the first is tried exactly `TRIES` times after each wait in turn, no later batch is sent, the stage
+  is `FACET_UNAVAILABLE` with a reason that begins with `NO_EMBEDDING` (R3's exact text says "timed out", which a 500
+  is not, and KPI 7 fixes no wording), and `retries` names the request: 3 tries, both waits, not embedded. The
+  file's case count is unchanged (9).
+- **Kept:** `not-json` and `no-vector` (a malformed answer is not a transient server error) and every time-out case.
+- **The rest of KPI 7** (a 5xx or a reset then an answer; a refused connection, once or at every try; a mix of a
+  time-out, a 500 and a reset sharing the one bound; an HTTP 400 still not retried) is in W2-126's own suite,
+  `tests/acceptance/W2-126/test_w2_126_retry.py`.
+- **Red and green.** On `w2/integrate` at `b120aad0f048`: the revised case fails ("the batch that answered HTTP 500
+  was not tried 3 times": one try), the other 8 pass. Against a throwaway copy of that `src/` outside the tree whose
+  `_ask` reads a 5xx, a `ConnectionError` and a refused `URLError` as a time-out: 9 passed.
+

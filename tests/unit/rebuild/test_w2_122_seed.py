@@ -52,6 +52,12 @@ def _args(*given):
     return parser.parse_args(list(given))
 
 
+def _empty_vector_cache(monkeypatch, tmp_path):
+    """The tree's rebuild gets a machine-wide vector cache of its own, empty (W2-126, P-W2-126-BT): the base's build
+    filled the test's cache, so only an empty one shows by the texts sent that nothing of the base was used."""
+    monkeypatch.setenv("GOV_VECTOR_CACHE_DIR", str(tmp_path / "empty-vector-cache"))
+
+
 def _vectors(root):
     connection = sqlite3.connect(root / STORE)
     try:
@@ -144,7 +150,9 @@ def test_the_base_is_only_read(base, tree):
 
 @pytest.mark.parametrize("field, words", [("code", "code fingerprint"), ("schema", "schema"),
                                           ("embedder", "embedder model"), (None, "no readable record")])
-def test_a_base_that_differs_is_refused_named_and_the_rebuild_runs_cold(base, tree, endpoint, field, words):
+def test_a_base_that_differs_is_refused_named_and_the_rebuild_runs_cold(base, tree, endpoint, monkeypatch, tmp_path,
+                                                                        field, words):
+    _empty_vector_cache(monkeypatch, tmp_path)
     record_path = base / seed.RECORD_REL
     record = json.loads(record_path.read_text())
     if field is None:
@@ -244,8 +252,10 @@ def test_without_embeddings_the_answer_and_the_missing_record_are_unchanged(tree
 
 
 @pytest.mark.parametrize("given", [(), ("--no-embeddings",), ("--seed", "BASE")])
-def test_a_rebuild_folder_that_is_a_file_is_said_and_the_rebuild_still_succeeds(base, tree, endpoint, capsys, given):
+def test_a_rebuild_folder_that_is_a_file_is_said_and_the_rebuild_still_succeeds(base, tree, endpoint, capsys,
+                                                                                 monkeypatch, tmp_path, given):
     """W2-76's rule: the rebuild's own folder not usable is said, never raised; the stores are built all the same."""
+    _empty_vector_cache(monkeypatch, tmp_path)
     blocker = (tree / seed.RECORD_REL).parent
     blocker.parent.mkdir(parents=True)
     blocker.write_text("not a folder\n")
