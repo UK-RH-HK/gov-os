@@ -600,9 +600,7 @@ tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_unmeasured_absen
 tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_healthy_false_when_measurement_error  # cap
 tests/acceptance/W1-27/test_w1_27_isolation_r2.py::test_doctor_isolation_is_measured_not_constant  # cap
 tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_sources_md_is_not_reported  # cap
-tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_live_document_not_sources_is_reported  # cap
 tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_old_cli_tree_is_not_reported  # cap
-tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_src_gov_cli_is_reported  # cap
 tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_inside_its_new_path_is_not_stale  # cap
 tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_standalone_is_stale_when_new_path_elsewhere  # cap
 tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_historical_excluded_nonzero_when_historical_holds_old_path  # cap
