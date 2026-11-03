@@ -9,7 +9,8 @@ public interfaces:
   child process with this worktree's ``src/`` on ``PYTHONPATH`` (DEC-732);
 - ``gov.retrieval.lexical.refresh``, ``gov.store.load`` and ``gov.codeintel.index`` to build what a retrieval reads
   (never ``gov rebuild`` of this repository, never this repository's store), and ``gov.retrieval.lexical.search``
-  with ``gov.retrieval.fusion.rrf`` for the plain fused order of the routes that exist today.
+  with ``gov.retrieval.fusion.rrf`` for the plain fused order of the routes that exist today (the lexical route's
+  ``ranked`` list since W2-13's S2).
 
 Every project is a temporary git repository built from nothing. No vector is built, so the semantic route is
 unavailable and gives no hit; no reranker is loaded. The code-graph tool is reached through a stand-in on ``PATH``
@@ -471,11 +472,12 @@ class Api:
 
     def plain_order(self, root, query):
         """``(chunk_id, path)`` of the plain fused order of the lexical route, the one route of today that answers
-        in these projects (no vector is built)."""
+        in these projects (no vector is built). The route's list for the fusion is its ``ranked`` list where it gives
+        one (W2-13's S2: the exact string's chunks first, then BM25's), else its ``hits``, as ``retrieve`` takes it."""
         root_arg = {"$path": str(root)}
         out, _ = self.run([("gov.retrieval.lexical", "search", [root_arg, query], {"refresh": False})])
         assert out[0]["error"] is None, out[0]["error"]
-        hits = out[0]["value"]["hits"]
+        hits = out[0]["value"].get("ranked", out[0]["value"]["hits"])
         fused = self.run([("gov.retrieval.fusion", "rrf", [{"lexical": hits}], {})])[0][0]["value"]
         return [(hit["chunk_id"], hit["path"]) for hit in fused]
 
