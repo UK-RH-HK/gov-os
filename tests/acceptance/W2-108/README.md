@@ -110,3 +110,20 @@ only read the store; the one file a read writes is the query-vector cache beside
 
 `gitleaks` on `PATH` (the lexical index judges every file with it) and `sqlite_vec` (the vectors). Without them,
 the planted cases are skipped with the reason. Nothing is installed or downloaded.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Within one process, the semantic store's status (which files should be embedded and whether the store holds them) and the lexical ind... | `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen`, `test_w2_108_once.py::test_lexical_freshness_is_worked_out_once` | by its words (every function of the suite kept) |
+| S2: Every answer is unchanged: for the same store and tree, each retrieval call returns the same bundle, facets and stopping reason as be... | `test_w2_108_unchanged.py::test_planted_unavailable_answers_are_unchanged`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | by its words (every function of the suite kept) |
+| S3: A change is still seen: a store rebuilt, a file changed or a head moved between two calls is seen as such (a new key, a fresh check);... | `test_w2_108_change_seen.py::test_without_a_head_every_call_checks`, `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen` | by its words (every function of the suite kept) |
+| S4: Measured: `python3 -m gov.context.context_check` on one store, before and after, at the same measured load (two loads, one of them 40... | `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen`, `test_w2_108_once.py::test_lexical_search_checks_freshness_once` | by its words (every function of the suite kept) |
+| F1: A freshness or status check repeated on every call within one process. | `test_w2_108_once.py::test_every_kind_of_call_shares_one_check`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | by its words (every function of the suite kept) |
+| F2: Any bundle, facet or stopping reason different from before for the same store and tree. | `test_w2_108_unchanged.py::test_this_repositorys_semantic_answers_are_unchanged`, `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen` | by its words (every function of the suite kept) |
+| F3: A stale answer reused after the store, a file or the head changed. | `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen`, `test_w2_108_change_seen.py::test_a_removed_store_is_seen` | by its words (every function of the suite kept) |
+| F4: W2-54's time limits raised, or its tests changed. | `test_w2_108_change_seen.py::test_a_file_changed_in_the_working_tree_is_seen`, `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen` | by its words (every function of the suite kept) |
