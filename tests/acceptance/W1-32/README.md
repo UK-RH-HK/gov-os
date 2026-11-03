@@ -229,3 +229,21 @@ A case of this suite was itself rewritten later, in the follow-up after W1-41
   with open required rows.
 
 They are given in full in the test designer's return.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: gov launch keeps the session's exit code and names the folder on stderr when its temp folder cannot be removed; SIGTERM and SIGHUP en... | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged`, `test_w1_32_status_read_only.py::test_status_writes_nothing_anywhere`, `test_w1_32_status_read_only.py::test_status_leaves_uncommitted_work_as_it_was` | README |
+| S2: gov status --json reports ready/blocked/claimed tickets, open decision packages, readiness per specification, governance share, pause... | `test_w1_32_status_parts.py::test_the_answer_has_the_six_parts`, `test_w1_32_status_parts.py::test_an_empty_project_is_answered_too`, `test_w1_32_status_parts.py::test_the_plain_form_shows_the_same_parts` | README |
+| S3: Pause state appears in gov status (moved from W1-28, DEC-364) | `test_w1_32_status_pause.py::test_the_pause_state_is_the_projects_own`, `test_w1_32_status_pause.py::test_an_empty_file_at_the_flags_path_is_no_pause` | designer, by its words |
+| S4: Read-only: git status --porcelain unchanged [CAP-27.a] | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged`, `test_w1_32_added_cases.py::test_a_placeholder_device_at_the_flags_path_is_never_a_plain_not_paused` | designer, by its words |
+| S5: The command set stays at the Wave 1 list (no command without a contract item) [CAP-28.a] | `test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones`, `test_w1_32_added_cases.py::test_a_store_without_its_records_or_edges_leaves_the_ready_and_blocked_tickets_not_read` | designer, by its words |
+| F1: status mutates the repository | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged`, `test_w1_32_status_read_only.py::test_status_writes_nothing_anywhere`, `test_w1_32_status_read_only.py::test_status_leaves_uncommitted_work_as_it_was` | README |
+| F2: An open gate is missing from the output | `test_w1_32_status_not_read.py::test_a_ticket_file_that_cannot_be_read_is_reported_and_not_left_out`, `test_w1_32_status_not_read.py::test_without_the_store_the_ready_tickets_are_not_read`, `test_w1_32_status_not_read.py::test_without_the_store_the_decision_packages_are_not_read` | README |
+
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 20 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

@@ -711,3 +711,29 @@ tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_the_feedback_of_a_bloc
 tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_stop_hooks_block_in_a_form_no_specimen_shows_is_not_measured  # cap
 rep: tests/acceptance/W1-31/test_w1_31_fourth_specimen.py  # one row per parametrised function
 rep: tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py  # one row per parametrised function
+
+# acceptance/W1-32
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_an_open_package_names_the_tickets_that_wait_on_it  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_every_specification_is_listed_with_its_verdict  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_verdict_is_the_readiness_checkers  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_governance_share_is_not_measured_and_says_why  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_doctor_summary_gives_doctors_verdict  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_doctor_summary_names_every_part_that_did_not_pass  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_an_unhealthy_doctor_is_shown_with_the_part_that_failed  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_plain_form_shows_the_same_parts  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_project_that_is_not_paused_says_so  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_says_so  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_names_who_paused_it  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_still_reports_its_other_parts  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_flag_removed_by_hand_with_its_mirror_left_is_not_reported_as_not_paused  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_leaves_uncommitted_work_as_it_was  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_writes_no_store_where_none_is  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_of_a_paused_project_changes_neither_the_flag_nor_its_mirror  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_takes_no_claim_and_releases_none  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_with_root_writes_neither_in_the_project_nor_where_it_runs  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_repeated_status_gives_the_same_answer_and_writes_nothing  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_leaves_a_dev_tier_clone_clean  # cap
+rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_record_the_load_cannot_take_is_not_hidden_behind_a_clean_list_of_packages  # one row
+rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written  # one row
+rep: tests/acceptance/W1-32/test_w1_32_launch.py  # one row per parametrised function
+rep: tests/acceptance/W1-32/test_w1_32_status_not_read.py  # one row per parametrised function
