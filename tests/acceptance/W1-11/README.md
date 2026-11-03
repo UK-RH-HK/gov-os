@@ -713,7 +713,7 @@ Hazards, as in batch 1:
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -725,4 +725,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: Any planted decision hazard is missed | `test_w1_11_hazards.py::test_every_hazard_planted_together_is_flagged`, `test_w1_11_hazards.py::test_every_active_superseded_decision_is_flagged_not_only_the_first`, `test_w1_11_approval.py::test_every_unapproved_active_decision_is_flagged` | README |
 | F2: The checker rewrites a decision file | `test_w1_11_read_only.py::test_a_check_that_finds_nothing_leaves_every_file_byte_identical`, `test_w1_11_read_only.py::test_a_check_that_finds_every_hazard_leaves_every_file_byte_identical`, `test_w1_11_read_only.py::test_decision_files_a_rewrite_would_not_reproduce_stay_byte_identical` | README |
 
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 67 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 67 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

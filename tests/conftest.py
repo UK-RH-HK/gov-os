@@ -34,21 +34,23 @@
   is made only when the test uses the cache; a test may set or unset the
   variable itself.
 
-- The opt-in suites (DEC-1061, D-4's cut; T-10): every ``tests/optin-<name>*.txt``
-  lists cases left out of a run unless the run opts in to ``<name>`` with
-  ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (several: ``lifted,breadth``
-  or the option given twice). ``lifted`` (``optin-lifted*.txt``) holds the
-  switched-off features' cases, run report-only in D-10's window; ``breadth``
-  (``optin-breadth.txt``) holds tier 2's cap and the representatives' other
-  rows (the CTO, P-1 (b)). One entry a line: a path (a folder or a test file,
-  from the repository's root) or a node id (``file::name``,
-  ``file::Class::name``, ``file::name[row]``), then ``#`` and why.
-  ``rep: <path or file::name>`` keeps, of every parametrised function under
-  it, only its first collected row in a run that does not opt in (the
-  representative); its other rows are the opt-in's. An entry that names no
-  collected case deselects nothing. The cases left out are reported as
-  deselected; nothing is skipped or deleted, and a run that opts in to every
-  suite collects every case as before.
+- The opt-in suites (DEC-1061, D-4's cut; T-10): every ``tests/optin-lifted*.txt``
+  lists cases left out of a run unless the run opts in to the list's suite
+  with ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (several:
+  ``lifted,breadth`` or the option given twice). Each ``optin-lifted*breadth*.txt``
+  is ``breadth`` (tier 2's cap and the representatives' other rows; the CTO's
+  P-1 (b)); every other ``optin-lifted*.txt`` is ``lifted`` (the switched-off
+  features' cases, run report-only in D-10's window). One entry a line: a path
+  (a folder or a test file, from the repository's root) or a node id
+  (``file::name``, ``file::Class::name``, ``file::name[row]``), then ``#`` and
+  why. ``rep: <path or file::name>`` keeps, of every parametrised function
+  under it, only its first collected row in a run that does not opt in (the
+  representative); its other rows are the opt-in's. A case an opted-in list
+  names is collected whole, whatever another list's ``rep:`` says, and a case
+  the run names by its node id on the command line is always run. An entry
+  that names no collected case deselects nothing. The cases left out are
+  reported as deselected; nothing is skipped or deleted, and a run that opts
+  in to both suites collects every case as before.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -110,7 +112,7 @@ def _drop_rebuild_lock(path: str, former: str | None) -> None:
 
 _OPTIN_ENV = "GOV_TESTS_OPTIN"
 _OPTIN_NAMES = ("lifted", "breadth")
-_OPTIN_GLOB = "optin-*.txt"
+_OPTIN_GLOB = "optin-lifted*.txt"
 _TESTS = Path(__file__).resolve().parent
 _ROOT = _TESTS.parent
 
@@ -122,9 +124,10 @@ def pytest_addoption(parser):
 
 
 def optin_name(listing: Path) -> str:
-    """The opt-in suite a list belongs to: the word after ``optin-`` in its file name (``optin-lifted-guard.txt``:
-    ``lifted``)."""
-    return listing.stem[len("optin-"):].split("-", 1)[0]
+    """The opt-in suite a list belongs to, by its file name: every ``optin-lifted*breadth*.txt`` is ``breadth``
+    (``optin-lifted-breadth.txt``, ``optin-lifted-guard-breadth.txt``), every other ``optin-lifted*.txt`` is
+    ``lifted`` (``optin-lifted.txt``, ``optin-lifted-guard.txt``)."""
+    return "breadth" if "breadth" in Path(listing).name else "lifted"
 
 
 def optin_entries(folder: Path = _TESTS, skip=()) -> list[tuple[str, str, str]]:
@@ -203,6 +206,15 @@ def pytest_collection_modifyitems(config, items):
     if not entries:
         return
     left = optin_left_out(items, entries)
+    asked = [arg.split(" ")[0] for arg in config.args if "::" in arg]
+    if left and asked:
+        # A case the run names by its node id on the command line is run: the caller asked for it by name.
+        here = Path(str(config.invocation_params.dir))
+        targets = [("case", str((here / arg.partition("::")[0]).resolve().relative_to(_ROOT)) + "::" +
+                    arg.partition("::")[2], "") for arg in asked
+                   if (here / arg.partition("::")[0]).resolve().is_relative_to(_ROOT)]
+        kept = {id(item) for item in optin_left_out(left, targets)}
+        left = [item for item in left if id(item) not in kept]
     if left and opted:
         # A case an opted-in suite's list names is collected whole, whatever another suite's ``rep:`` says.
         named = [(kind, target, name) for kind, target, name in optin_entries()

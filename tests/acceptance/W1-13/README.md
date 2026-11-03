@@ -305,7 +305,7 @@ Each is tested at its recommended option.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -319,4 +319,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: A defaulted N/A passes | `test_w1_13_na.py::test_a_silent_na_on_a_required_row_is_rejected`, `test_w1_13_na.py::test_a_record_that_defaults_every_optional_row_to_na_does_not_pass`, `test_w1_13_na.py::test_a_record_that_drops_a_row_does_not_pass` | README |
 | F3: A spine, STANDARD or FULL specification closes without an audit ticket | `test_w1_13_close.py::test_a_specification_is_not_closed_when_its_audit_ticket_cannot_be_created`, `test_w1_13_close.py::test_closing_twice_creates_one_audit_ticket`, `test_w1_13_close.py::test_closing_marks_the_record_closed_and_creates_one_audit_ticket` | README |
 
-Tier 2's cap here: 48 functions (8 KPI lines x 6); 19 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 19 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

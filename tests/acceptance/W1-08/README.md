@@ -363,7 +363,7 @@ schema.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -379,4 +379,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A schema accepts a ticket without kpis, role or allowed_paths | `test_w1_08_ticket.py::test_a_ticket_without_the_field_is_refused`, `test_w1_08_ticket.py::test_a_ticket_without_kpis_role_and_allowed_paths_is_refused`, `test_w1_08_ticket.py::test_the_ticket_template_carries_the_nine_fields` | README |
 | F2: Two schemas define the same id grammar differently | `test_w1_08_id_grammar.py::test_the_shared_definition_is_a_grammar`, `test_w1_08_id_grammar.py::test_a_lesson_id_is_the_letter_l_and_four_or_more_digits`, `test_w1_08_id_grammar.py::test_the_five_id_grammars_are_defined_in_one_file_only` | README |
 
-Tier 2's cap here: 60 functions (10 KPI lines x 6); 25 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 25 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

@@ -4,7 +4,7 @@
 # GOV_TESTS_OPTIN=lifted: one report-only run in D-10's window, its reds filed against the feature's home ticket.
 # One path (folder or file) or node id per line, then `#` and why. Moved, never deleted (DEC-953): a feature switched
 # back on takes its lines out of this list in that ticket. Part A's guard classes are in optin-lifted-guard.txt; the
-# tier-2 cap and representatives (breadth, not off features) are the opt-in suite `breadth`: optin-breadth.txt.
+# tier-2 cap and representatives (breadth, not off features) are the opt-in suite `breadth`: optin-lifted-breadth.txt.
 
 # Whole suites of lifted gates
 tests/acceptance/W2-01/  # trailers base, merge form, owner-accepted history, probe gate (Q-8, Q-11, DEC-953)

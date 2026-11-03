@@ -576,7 +576,7 @@ W2-05 has 65 cases with these 14.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -586,4 +586,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | S3: Lefthook install and uninstall leave .claude/settings.json byte-identical to the committed file, and adapter-portability stays green ... | `test_w2_05_settings.py::test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore`, `test_w2_05_settings.py::test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`, `test_w2_05_settings.py::test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore` | README |
 | F1: A planted GIT_DIR or GIT_INDEX_FILE in a hook's environment reaches no child git call. | `test_w2_05_planted.py::test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy`, `test_w2_05_planted.py::test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index`, `test_w2_05_planted.py::test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret` | README |
 
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

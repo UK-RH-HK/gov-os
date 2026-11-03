@@ -332,7 +332,7 @@ DP-1 to DP-5 are **answered** (owner, 2026-10-03). They are kept as asked, for t
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -342,4 +342,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register`, `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner` | README |
 | F2: A registry entry lacks an uninstall command | `test_w1_06_registry.py::test_every_entry_has_an_uninstall_command`, `test_w1_06_registry.py::test_no_uninstall_command_is_the_install_command`, `test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command` | README |
 
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 30 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 30 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

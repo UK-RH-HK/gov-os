@@ -243,7 +243,7 @@ change if the lead agrees; no case holds either. *Confidence:* medium.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -258,4 +258,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A mandatory input is missing from the packet | `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256`, `test_w1_24_blocked.py::test_a_missing_mandatory_input_refuses_with_blocked`, `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` | README |
 | F2: A lower-precedence record appears in the authority block | `test_w1_24_authority.py::test_the_authority_block_holds_only_the_higher_precedence_record`, `test_w1_24_authority.py::test_the_authority_block_holds_only_the_higher_precedence_record`, `test_w1_24_authority.py::test_the_lower_precedence_record_is_marked_superseded` | README |
 
-Tier 2's cap here: 54 functions (9 KPI lines x 6); 8 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 54 functions (9 KPI lines x 6); 8 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

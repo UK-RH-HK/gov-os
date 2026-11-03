@@ -149,7 +149,7 @@ None beyond the DEC-447 revision above.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -165,4 +165,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: The audit skill edits audited files | `test_w1_36_audit_skill.py::TestAuditReadOnly::test_the_skill_says_it_does_not_edit_audited_files`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_names_its_milestone`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_skill_cites_dec_088` | README |
 | F3: An owner-level finding becomes a ticket without a decision package | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_contested_findings_become_decision_packages`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_level_findings_become_decision_packages`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_agreed_fixes_become_tickets` | README |
 
-Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

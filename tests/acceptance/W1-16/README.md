@@ -704,7 +704,7 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -717,4 +717,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: An index file of this repository exists outside .gov-runtime/ after a run | `test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run`, `test_w1_16_home.py::test_the_tools_default_home_is_not_used`, `test_w1_16_home.py::test_this_repository_is_not_indexed_by_the_run` | README |
 | F3: A planted secret is found in the code graph | `test_w1_16_secret_exclusion.py::test_no_planted_secret_comes_back_from_the_code_graph`, `test_w1_16_secret_exclusion.py::test_a_file_with_a_secret_is_not_in_the_code_graph`, `test_w1_16_secret_exclusion.py::test_no_planted_secret_is_in_any_file_under_gov_runtime` | README |
 
-Tier 2's cap here: 42 functions (7 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

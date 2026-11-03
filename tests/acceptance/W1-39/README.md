@@ -304,7 +304,7 @@ The packages of the first run are decided; no case waits on one.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -315,4 +315,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: An overlay file is overwritten by copier update | `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_project_wrote`, `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_template_shipped_and_the_project_edited`, `test_w1_39_update.py::test_update_keeps_the_path_map_when_the_release_ships_a_different_one` | README |
 | F2: framework.lock lacks the template tag or commit | `test_w1_39_lock_identity.py::test_the_lock_names_the_template_tag`, `test_w1_39_lock_identity.py::test_the_lock_names_the_template_commit`, `test_w1_39_lock_identity.py::test_the_lock_of_an_untagged_template_commit_still_names_the_commit` | README |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 32 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 32 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

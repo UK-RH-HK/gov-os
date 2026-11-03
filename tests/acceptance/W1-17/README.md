@@ -172,7 +172,7 @@ Returned in full in the designer's final message. Every one is encoded in the te
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -185,4 +185,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A retrieval returns pre-edit text as current | `test_w1_17_freshness.py::test_the_text_from_before_an_edit_is_not_returned_as_current`, `test_w1_17_freshness.py::test_a_stale_index_is_reported_by_a_retrieval_that_may_not_write`, `test_w1_17_freshness.py::test_an_uncommitted_edit_to_a_tracked_file_is_re_indexed_too` | README |
 | F2: Rebuild digest differs between two runs | `test_w1_17_digest.py::test_a_rebuild_after_the_derived_state_is_deleted_gives_the_same_digest`, `test_w1_17_digest.py::test_a_build_elsewhere_gives_the_same_digest`, `test_w1_17_incremental.py::test_an_index_brought_up_to_date_equals_one_built_from_nothing` | README |
 
-Tier 2's cap here: 42 functions (7 KPI lines x 6); 11 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 11 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

@@ -207,7 +207,7 @@ expectation`.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -222,7 +222,7 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A batch-size limit is reported as completeness | `test_w1_21_paging.py::test_a_batch_size_limit_is_never_reported_as_completeness`, `test_w1_21_paging.py::test_the_gap_list_names_what_was_not_gathered`, `test_w1_21_paging.py::test_a_small_batch_size_gives_several_batches_and_everything_is_gathered` | README |
 | F2: A superseded record is cited as current | `test_w1_21_authority.py::test_the_fixture_offers_every_superseded_record_to_the_filter`, `test_w1_21_authority.py::test_current_records_are_cited`, `test_w1_21_authority.py::test_a_superseded_record_found_by_the_exact_string_is_not_cited` | README |
 
-Tier 2's cap here: 54 functions (9 KPI lines x 6); 31 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 54 functions (9 KPI lines x 6); 31 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
 
 Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061):
 memory is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32.

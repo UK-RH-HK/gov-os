@@ -630,7 +630,7 @@ Brought to DEC-491 and DEC-495 (two versions before):
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -644,4 +644,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A ticket closes without a share figure | `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes`, `test_w1_31_second_specimen.py::test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the_case_computes`, `test_w1_31_third_specimen.py::test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes` | README |
 | F2: Cache reads are counted in the share | `test_w1_31_share_counter.py::test_cache_reads_change_neither_share_nor_tokens`, `test_w1_31_share_counter.py::test_cache_reads_and_cache_creation_are_figures_of_their_own`, `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes` | README |
 
-Tier 2's cap here: 48 functions (8 KPI lines x 6); 51 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 51 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

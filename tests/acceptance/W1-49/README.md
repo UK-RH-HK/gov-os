@@ -495,7 +495,7 @@ are built from the `hooks` and `env` values only.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -511,4 +511,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F3: SessionStart injects more than the hook's size cap, or leaves out the prompt path or the RESUME HERE section | `test_w1_49_sessionstart.py::test_the_injection_carries_the_prompt_path_and_the_whole_resume_here_section`, `test_w1_49_sessionstart.py::test_a_long_checkpoint_does_not_push_the_section_out_of_the_cap`, `test_w1_49_sessionstart.py::test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut` | README |
 | F4: After a compaction the session needs the owner to restate the active tickets, the open owner decisions or the loop counts | `test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_open_owner_decisions`, `test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_active_tickets` | designer, by its words |
 
-Tier 2's cap here: 60 functions (10 KPI lines x 6); 9 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 9 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

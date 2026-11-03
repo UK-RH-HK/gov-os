@@ -354,7 +354,7 @@ was put, kept for the record:
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -366,4 +366,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: bubblewrap or socat is missing from the registry while gov launch depends on it | `test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_is_recorded_in_the_registry`, `test_w1_48_sandbox_prereqs.py::test_the_registry_records_the_prerequisites_the_contract_names_for_the_sandbox`, `test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_is_recorded_in_the_registry` | README |
 | F3: The pin is raised without a recorded owner approval | `test_w1_48_claude_code.py::test_the_pin_as_recorded_has_a_recorded_owner_approval`, `test_w1_48_claude_code.py::test_a_raised_pin_is_not_covered_by_the_approval_of_the_recorded_one`, `test_w1_48_claude_code.py::test_claude_code_is_recorded_in_the_registry` | README |
 
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 30 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 30 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

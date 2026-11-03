@@ -52,11 +52,13 @@ tests/lifted/  # a whole folder
 tests/some/test_file.py  # a whole file
 tests/a/test_a.py::test_one_row_listed[b]  # one row
 """
-LISTING_PART = """# a second list of the same suite (as part A's optin-lifted-guard.txt)
+LISTING_PART = """# a second lifted list (as part A's optin-lifted-guard.txt)
 tests/a/test_a.py::TestGroup::test_in_class  # one method
 """
 BREADTH = """# planted breadth list
 tests/a/test_a.py::test_listed  # one function past the cap
+"""
+BREADTH_PART = """# a second breadth list (as part A's optin-lifted-guard-breadth.txt)
 rep: tests/a/test_a.py  # one row per parametrised function
 """
 
@@ -74,8 +76,9 @@ def planted(tmp_path):
     (root / "tests" / "some" / "test_file.py").write_text("def test_f():\n    pass\n")
     (root / "tests" / "some" / "test_other.py").write_text("def test_o():\n    pass\n")
     (root / "tests" / "optin-lifted.txt").write_text(LISTING)
-    (root / "tests" / "optin-lifted-part.txt").write_text(LISTING_PART)
-    (root / "tests" / "optin-breadth.txt").write_text(BREADTH)
+    (root / "tests" / "optin-lifted-guard.txt").write_text(LISTING_PART)
+    (root / "tests" / "optin-lifted-breadth.txt").write_text(BREADTH)
+    (root / "tests" / "optin-lifted-guard-breadth.txt").write_text(BREADTH_PART)
     return root
 
 
@@ -135,6 +138,30 @@ def test_opting_in_to_both_collects_every_case(planted, args, extra):
 def test_another_opt_in_name_opts_in_to_nothing(planted):
     ids, _, out = collected(planted, "--optin=other", env_extra={"GOV_TESTS_OPTIN": "elsewhere"})
     assert ids == EVERY - LIFTED - BREADTH_ONLY, out
+
+
+def test_a_case_named_by_its_node_id_on_the_command_line_is_run(planted):
+    """A nested run or a caller that names a case by its node id gets it, whatever the lists say; a file or a folder
+    named on the command line does not opt in."""
+    ids, _, out = collected(planted, "tests/a/test_a.py::test_listed", "tests/a/test_a.py::test_rows",
+                            "tests/lifted/test_l.py")
+    # (the helper also names ``tests``: the default run's cases plus the two named ones; test_l stays out)
+    assert ids == (EVERY - LIFTED - BREADTH_ONLY) | {"test_listed", "test_rows[2]", "test_rows[3]"}, out
+
+
+def _root_conftest():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_root_conftest_for_optin", TESTS / "conftest.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.parametrize("name, suite", [("optin-lifted.txt", "lifted"), ("optin-lifted-guard.txt", "lifted"),
+                                         ("optin-lifted-breadth.txt", "breadth"),
+                                         ("optin-lifted-guard-breadth.txt", "breadth")])
+def test_each_list_belongs_to_its_suite_by_its_name(name, suite):
+    assert _root_conftest().optin_name(Path(name)) == suite
 
 
 def _functions(path):

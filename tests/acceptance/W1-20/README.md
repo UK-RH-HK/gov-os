@@ -379,7 +379,7 @@ the CPU-only embedder on its own port; the fixtures point it at a stand-in and c
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -389,4 +389,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: Output differs between runs on the same commit | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes`, `test_w1_20_determinism.py::test_two_clones_of_one_commit_print_the_same_bytes`, `test_w1_20_determinism.py::test_the_order_of_the_start_ids_does_not_change_the_closure` | README |
 | F2: An unresolved id is omitted from the gap list | `test_w1_20_gaps.py::test_an_edge_to_no_record_is_in_the_gap_list`, `test_w1_20_gaps.py::test_a_start_id_that_names_nothing_is_in_the_gap_list`, `test_w1_20_gaps.py::test_only_unresolved_start_ids_give_an_answer_with_gaps` | README |
 
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 14 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 14 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

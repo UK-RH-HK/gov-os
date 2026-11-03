@@ -160,7 +160,7 @@ CPU-only embedder on its own port; the fixtures point it at a stand-in and chang
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -170,4 +170,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F1: A bundle with an unresolvable citation passes | `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass`, `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass` | README |
 | F2: An empty index answers NOT_FOUND as absence | `test_w1_22_canaries.py::TestF2::test_empty_index_never_reports_not_found`, `test_w1_22_canaries.py::TestF2::test_missing_store_never_reports_not_found` | README |
 
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 1 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 1 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

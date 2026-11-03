@@ -775,7 +775,7 @@ finds the eight keys without the four. The other 43 cases pass.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -794,4 +794,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F3: A legacy rule file stays loaded after retirement | `test_w1_41_legacy.py::test_each_kind_of_legacy_rule_file_is_imported_into_rulesync`, `test_w1_41_legacy.py::test_the_imported_mcp_server_keeps_its_command`, `test_w1_41_legacy.py::test_the_two_role_sections_of_agents_md_are_both_imported` | README |
 | F4: An unknown material artefact is moved or deleted [CAP-06.c] | `test_w1_41_unknown.py::test_a2_names_the_unknown_artefact`, `test_w1_41_unknown.py::test_a_path_map_that_moves_or_deletes_the_unknown_artefact_is_refused`, `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration` | README |
 
-Tier 2's cap here: 78 functions (13 KPI lines x 6); 57 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 78 functions (13 KPI lines x 6); 57 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).

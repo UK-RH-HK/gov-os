@@ -431,7 +431,7 @@ holds the product's own list (`src/gov/check/commands.py`): it is red until the 
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
 features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
@@ -447,4 +447,4 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F3: A run error reported as pass or fail, or with its message. | `test_w2_96_at_exit_codes.py::test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal`, `test_w2_96_at_report.py::test_the_child_runs_in_the_root_with_the_trees_own_src_first` | designer, by its words |
 | F4: A write in the repository. | `test_w2_96_at_exit_codes.py::test_nothing_is_written_in_the_repository_ignored_files_included`, `test_w2_96_at_review_1.py::test_r3_folders_without_permissions_left_by_a_failing_test_are_removed` | designer, by its words |
 
-Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
