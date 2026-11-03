@@ -652,3 +652,7 @@ tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_base_folder_of_a_run_s
 rep: tests/acceptance/W1-27/test_w1_27_schema.py::test_missing_required_top_level_key_names_the_key  # one row
 rep: tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py  # one row per parametrised function
 rep: tests/acceptance/W1-27/test_w2_67_codegraph_folders.py  # one row per parametrised function
+
+# acceptance/W1-29
+rep: tests/acceptance/W1-29/test_session_hooks.py::TestSubagentStop::test_malformed_input_fails_closed  # one row
+rep: tests/acceptance/W1-29/test_session_hooks.py::TestHookCopiesIdentical::test_hook_copies_identical  # one row
