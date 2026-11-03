@@ -21,3 +21,114 @@ tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is
 tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-pem-nested]  # fold: a row beyond the representatives
 tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-key-nested]  # fold: a row beyond the representatives
 tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-config-secrets]  # fold: a row beyond the representatives
+
+# W1-02
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[cd-then-redirect]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[cp-into]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[mkdir]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[mv-out-of]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[redirect]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[rm]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[sed-in-place]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied[tee]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Write-by-the-orchestrator-whose-first-program-does-not-end]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Read-by-a-session-with-no-role-whose-first-program-does-not-end]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Bash-call-by-an-engineer-with-a-pipe-in-the-bookkeeping-before-the-decision]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Write-by-an-engineer-with-a-pipe-in-the-bookkeeping-after-the-rules-allowed-it]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Bash-call-by-the-orchestrator-whose-every-program-takes-a-few-seconds]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[fields-named-like-a-time-limit-inside-the-tool-input]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_deadline.py::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[variables-named-like-a-time-limit-set-to-zero-and-the-switches-set]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_deadline_in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_deadline_in_time.py::test_a_refusal_reached_in_time_is_never_the_deadline_s_answer  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_deadline_in_time.py::test_an_internal_failure_keeps_its_own_answer  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_deadline_in_time.py::test_the_bound_on_reading_the_input_stays_as_it_is  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_deadline_in_time.py::test_a_tiny_limit_named_stops_no_work  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_freeze.py::test_freeze_denies_the_write_each_role_could_otherwise_make  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_freeze.py::test_the_flag_freezes_by_existing_whatever_it_contains  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_freeze.py::test_freeze_denies_bash_writes  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[empty]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[truncated-json]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[json-array]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[json-string]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[no-tool-name]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2[no-tool-input]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[empty]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[truncated-json]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[json-array]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[json-string]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[no-tool-name]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding[no-tool-input]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through[frontmatter-is-not-yaml]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through[no-frontmatter]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through[empty-file]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through[not-utf-8]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through[is-a-directory]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_multiedit.py::test_a_ticket_that_names_the_acceptance_tests_gives_no_multiedit_there[orchestrator]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_multiedit.py::test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only[a-source-file]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_multiedit.py::test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only[a-ticket-file]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_multiedit.py::test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only[a-unit-test]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-02/test_w1_02_multiedit.py::test_multiedit_on_a_path_the_held_out_rule_refuses_is_refused  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_multiedit.py::test_multiedit_that_carries_a_held_out_path_in_its_text_is_refused  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_path_limit_boundary.py  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_path_limit_time.py  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_path_limit_unchanged.py  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[designer-in-designer-session-acceptance-test]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[designer-in-engineer-session-acceptance-test]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[designer-in-orchestrator-session-acceptance-test]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[engineer-in-auditor-session-source]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[engineer-in-designer-session-source]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[engineer-in-engineer-session-source]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[engineer-in-orchestrator-session-source]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows[orchestrator-in-engineer-session-own-ticket]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_gets_nothing_from_the_session_s_role  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_role_subagent_s_bash_writes_follow_its_own_role  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_subagent_that_is_not_a_role_stays_read_only  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_subagent.py::test_a_subagent_can_still_read  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_target_resolution.py::test_the_test_designer_s_targets_are_resolved_too  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_target_resolution.py::test_resolving_a_target_runs_nothing  # cap: beyond tier 2's 6 per KPI line
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[another-ticket-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[existing-test-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[existing-test-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[file-directly-under-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[file-directly-under-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[nested-data-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[new-test-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[new-test-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests[readme-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_reach_acceptance_tests_indirectly[dot-dot-from-the-allowed-directory-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_reach_acceptance_tests_indirectly[symlink-in-the-allowed-directory-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_engineer_cannot_reach_acceptance_tests_indirectly[symlink-new-file-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[another-ticket-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[existing-test-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[existing-test-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[file-directly-under-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[file-directly-under-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[nested-data-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[new-test-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[new-test-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_can_write_under_acceptance_tests[readme-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[directory-with-a-similar-name-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[docs-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[docs-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[dot-dot-out-of-acceptance-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[dot-dot-out-of-acceptance-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[file-with-a-similar-name-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[file-with-a-similar-name-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[root-file-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[root-file-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[session-settings-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[source-in-the-ticket-paths-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[source-in-the-ticket-paths-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[tests-root-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[tests-root-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[ticket-file-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[ticket-file-Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_cannot_write_anywhere_else[unit-test-in-the-ticket-paths-Edit]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_bash_write_under_acceptance_tests_is_allowed[mkdir]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_bash_write_under_acceptance_tests_is_allowed[rm]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_bash_write_elsewhere_is_denied[mv-out-of-acceptance]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_test_designer_bash_write_elsewhere_is_denied[redirect-to-source]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_auditor_cannot_write_into_another_role_s_work[tests/acceptance/W1-90/test_fixture.py]  # fold: a row beyond the representatives
+tests/acceptance/W1-02/test_w1_02_test_independence.py::test_auditor_cannot_write_into_another_role_s_work[README.md]  # fold: a row beyond the representatives
