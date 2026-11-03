@@ -95,6 +95,39 @@ Red run at the base, outside the sandbox: **30 tests, 17 failed, 13 passed**.
 | **Success 4 and failure 1.** A question naming no record or symbol gets today's bundle, item for item; budget, batches, continuation, DEC-424's records ahead as today; two runs give one bundle | `test_w2_92_unchanged.py`: `test_u1_a_question_naming_no_record_or_symbol_gets_todays_bundle` (cases: plain, batched, unknown id, unknown symbol, ticket) · `test_u2_todays_bundle_is_the_plain_fused_order_of_todays_routes` · `test_u3_two_runs_on_one_store_give_the_same_bundle` (cases: new routes, plain) · `test_u4_a_batched_answer_with_a_new_route_continues_to_its_end_within_the_budget` | u1, u2, u3 **pass at the base** (guards: they are today's bundle by construction; since the D-4b revision u1 is pinned to `w2/integrate` `23625eb2aebe`, where it passes, W2-112's `rerank` included). `ticket` is DEC-424's records ahead (`--ticket DAEO-hb92`: the lesson that constrains it first). u4: "no page holds DEC-301's evidence: []" (batch size 1, budget 400, the continuation followed to its end). |
 | **Success 5 and failure 4** (W2-61's measure re-run: both figures together; the hidden half never read or run) | none | The lead's re-measure record in `docs/research/W2-92-memory-measure.md`, not a test of this suite. |
 
+## KPI line S6 (DEC-1065 (4)), tests and red reasons on the integrated code `eb28c40866af`
+
+Added under DEC-1065 by the test designer (D-4b round, `DAEO-n0wb`), from the KPI line alone and the integrated
+code's public interfaces. The time figure (a cold `gov retrieve` on this repository's store within about 1.2 s at
+the median of ten) is the CTO's measure on the shared servers, not a test. The tests check the cause and the
+guard: in a planted project with many records (`MASS` = 240 besides the harbour's; no code index, the code-graph
+tool off `PATH`), one `retrieve` in a new process counts the planted records' files it opens (an audit hook on
+`open`) and the front matters it parses (the YAML module's load functions wrapped), both switched on around the one
+call only. `test_s6c` compares this worktree's bundles with the integrated code's (`BASE`, its `src/` taken by
+`git archive` into the session's folder), item for item, with `support.projection`. Runs inside a worker's sandbox
+(no code index is built). About 60 s.
+
+Red run on `w2/integrate` `eb28c40866af`, in the sandbox: **15 tests, 3 failed, 12 passed** (about 35 s). A check
+of the tests themselves: with the integrated record route changed to read no file (titles of records outside the
+register then empty), `test_s6a` passes (nothing else in `retrieve` opens the many records) and `test_s6c` fails on
+its two title cases (it sees the change).
+
+| KPI line | Tests | Red on the integrated code because |
+|---|---|---|
+| **Success 6.** A plain question costs about one second: the record route no longer parses every record's front matter in each process (the titles kept in the store at rebuild) | `test_w2_92_speed.py::test_s6a_a_plain_question_does_not_read_every_records_front_matter` (cases: plain, unknown id) · `test_w2_92_speed.py::test_s6a_premise_the_counter_sees_a_record_read` · `test_w2_92_speed.py::test_s6b_a_title_is_the_one_the_store_was_built_with` · `test_w2_92_speed.py::test_s6b_after_a_rebuild_the_new_title_is_the_stores` | `test_s6a` (both cases): "one plain question opened 240 of the 240 planted records' files (at most 12 allowed)": `graph_route.start_ids` reads every record's title from its file and parses its front matter in each process. `test_s6b_a_title_is_the_one_the_store_was_built_with`: the bundle is empty (`[]`): the title is read from the working tree's file, which the edit after the load changed, not from the store (the store holds titles of register entries only). **The premise and `test_s6b_after_a_rebuild_the_new_title_is_the_stores` pass** (guards: the counter counts one open and one parse for one record read; a committed title change and a rebuild move the title). |
+| **Success 6 with success 4.** Nothing else in the bundle changes; S1's record route answers as before | `test_w2_92_speed.py::test_s6c_the_record_route_answers_as_the_integrated_code_does` (cases: plain, unknown id, decision id, contract id at radius 1, ticket id, W2 id, record title, a many-records title, ticket, batched) | **Passes on the integrated code** (a guard, by construction): any change to an item, its order, or a field outside the evidence fails it. |
+
+- **S6-P1. Where the titles come from.** The KPI line allows "the titles kept in the store at rebuild, or read only
+  when a question names a record"; the CTO's brief for this round says the titles come from the store after a
+  rebuild. `test_s6b_a_title_is_the_one_the_store_was_built_with` follows the brief: a title edited in the working
+  tree after the load is not read. A reading that opens a named record's file when a question names it by title
+  fails that one test. Confidence medium.
+- **S6-P2. A W2 id in the question.** The integrated code reads every ticket's front matter (by pattern, not YAML)
+  to resolve a W2 id, since a ticket's W2 id is not in the store. That question names a record, so S6 (a plain
+  question) does not bound it; not tested.
+- **S6-P3. The pinned base.** `BASE` is the integrated code at this round. A later ticket that changes these
+  bundles (as P-6) moves `BASE` by a test designer's revision under that ticket's decision.
+
 **How the tests read "named for that route".** `support.route_entries` takes every entry of `facets` other than
 today's `lexical` and `semantic` (today's form of a route's state), and every entry of any other top-level mapping
 or list whose key holds `stopping` or `route` (a per-route stopping-reasons form), whose key or text names the
@@ -139,3 +172,4 @@ may hold ids or symbol-shaped words; see Risks in the return).
 - `conftest.py`: the session fixtures (`api`, `planted(kind)` for `full`, `nocode`, `nostore`, and `asked`, which
   asks a question once per session).
 - `test_w2_92_record_route.py`, `test_w2_92_code_route.py`, `test_w2_92_fail_closed.py`, `test_w2_92_unchanged.py`.
+- `test_w2_92_speed.py`: S6 (DEC-1065 (4)), its many-records project, its counting child process and its fixtures.
