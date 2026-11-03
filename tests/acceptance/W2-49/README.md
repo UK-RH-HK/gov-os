@@ -328,3 +328,19 @@ read through the repository's git folder):
   two CIT-P checks read, a read at a fixed commit, CSV rows, a cell's parts, the record form, the record paths.
 
 No earlier ticket's test is changed by these KPIs.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: The CIT-P names each change, its source (DEC-722) and its impact (W2-02, W2-16, W2-18, W2-27 to W2-30, exit criteria 6 and 7): CAP-44... | `test_w2_49_cit_p.py::test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks`, `test_w2_49_cit_p.py::test_cit_p_names_exit_criteria_6_and_7_in_its_impact` | designer, by its words |
+| S2: Contract v4.2 moves exactly those parts to Wave 2. CAP-02.c, A9, A11, the qualification certificate and the rest of CAP-43.b stay in ... | `test_w2_49_cit_p.py::test_cit_p_keeps_the_qualification_certificate_in_wave_3`, `test_w2_49_cit_p.py::test_cit_p_says_what_of_cap_44f_stays_for_wave_3` | designer, by its words |
+| S3: The plan validator's two-way check covers the moved parts. | `test_w2_49_validator_lines.py::test_validator_passes_both_cit_p_checks_on_this_tree`, `test_w2_49_capability_records.py::test_capability_record_covers_list_equals_contract_v4_2` | designer, by its words |
+| S4: The CIT-E record matches the CIT-P, or lists the differences. | `test_w2_49_capability_records.py::test_capability_record_covers_list_equals_contract_v4_2`, `test_w2_49_cit_e.py::test_cit_e_names_its_proposal_and_source` | designer, by its words |
+| F1: A Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator. | `test_w2_49_validator_lines.py::test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it`, `test_w2_49_validator_lines.py::test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | designer, by its words |
+
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

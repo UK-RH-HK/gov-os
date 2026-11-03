@@ -1114,3 +1114,45 @@ rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_as
 rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused  # one row
 rep: tests/acceptance/W2-16/test_w2_16_install.py  # one row per parametrised function
 rep: tests/acceptance/W2-16/test_w2_16_owner_terminal.py  # one row per parametrised function
+
+# acceptance/W2-49
+tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_44f_gate_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_rest_of_cap_43b_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_02c_signed_release_tag_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_qualification_certificate_cap_43c_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_other_covers_item_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_covers_item_is_removed  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_new_covers_items_are_only_splits_of_cap_43_and_cap_44  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_capability_is_added_removed_or_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_yaml_and_markdown_agree_on_every_covers_item_and_wave  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_new_split_id_exists_in_wave_3_naming_its_part  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_split_item_keeps_its_id_at_wave_2  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_new_covers_id_but_cap_43d_44k_44l  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_other_covers_item_of_cap_43_or_cap_44_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_covers_count_by_wave_is_w1_149_w2_20_w3_38_none_7  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_lite_cap_43b_names_none_of_the_nine_other_release_contents  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_43_wave_note_names_cap_43d_and_no_ticket  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_45a_stays_w2_with_the_release_manifest_and_hashes_as_its_wave_2_source  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_45a_names_no_signed_tag_as_a_wave_2_requirement  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_states_the_three_verdict_rules  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_says_the_auditor_accepts_no_exception  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_lets_no_one_but_the_owner_accept_an_exception  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_names_the_operational_lite_condition  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_names_its_lite_conditions_and_marks_each_of_the_ten_if_it_lists_them  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cit_e_names_w2_52_as_the_builder_of_the_lite_a7_and_a10_stage_records  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cit_p_records_the_owner_answer_naming_w2_52  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_every_capability_record_cites_contract_version_4_2  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_capability_record_cites_contract_version_4_1  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_both_contract_files_state_status_accepted_for_v4_2  # cap
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py::test_cap_45a_record_carries_contract_v4_2_item_text  # cap
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py::test_every_capability_record_states_the_contracts_status  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_rows_of_a11_and_a9_still_say_wave_3_unchanged  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_no_row_but_the_eight_differs_from_before_this_ticket  # cap
+tests/acceptance/W2-49/test_w2_49_validator_lines.py::test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks  # cap
+tests/acceptance/W2-49/test_w2_49_validator_lines.py::test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it  # cap
+rep: tests/acceptance/W2-49/test_w2_49_capability_records.py::test_record_of_split_item_follows_contract_v4_2  # one row
+rep: tests/acceptance/W2-49/test_w2_49_cit_e.py  # one row per parametrised function
+rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_names_each_impacted_ticket  # one row
+rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_presents_dec_105_three_options_with_their_cost  # one row
+rep: tests/acceptance/W2-49/test_w2_49_contract.py  # one row per parametrised function
