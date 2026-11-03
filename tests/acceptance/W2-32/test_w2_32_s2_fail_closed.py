@@ -123,10 +123,12 @@ def test_rebuild_without_embeddings_after_a_file_changed_leaves_no_stale_vector_
 # ---- W2-L065: the embedding cut ----
 
 def test_the_manifest_records_the_embedding_cut(project, box, standin):
+    """Rewrite-Reason: W2-32's S7 (DEC-1066): the cut changes from 512 to the whole chunk, so the case asks that the
+    manifest record a cut (a key besides the two models), not that it be 512."""
     box.built(project)
     built_by = s.result(box.call("manifest", root=str(project)))
-    assert built_by is not None and s.holds_value(built_by, s.EMBED_CHARS), \
-        f"the manifest does not record the {s.EMBED_CHARS}-character cut the chunks were embedded at: {built_by}"
+    assert built_by is not None and s.cut_entries(built_by), \
+        f"the manifest does not record the cut the chunks were embedded at: {built_by}"
 
 
 def test_a_store_that_records_no_cut_is_stale_and_the_next_rebuild_renews_it(project, box, standin):
@@ -137,4 +139,5 @@ def test_a_store_that_records_no_cut_is_stale_and_the_next_rebuild_renews_it(pro
     box.built(project)
     renewed = s.result(box.call("semantic_search", root=str(project), query=QUESTION))
     assert renewed["available"] is True and GOLD in s.first_paths(renewed["hits"]), renewed
-    assert s.holds_value(s.result(box.call("manifest", root=str(project))), s.EMBED_CHARS)
+    # Rewrite-Reason: W2-32's S7 (DEC-1066): the renewed manifest records its cut, whatever S7 makes it.
+    assert s.cut_entries(s.result(box.call("manifest", root=str(project))))
