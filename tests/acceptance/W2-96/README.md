@@ -426,3 +426,24 @@ this suite's run-2 designer (R13, P-W2-96-CMDLIST (a), DEC-747): `accept` is add
 README naming the list, in a commit of its own (`Rewrite-Reason: DEC-959 item 6`). W1-26's
 `test_w1_26_recorded_commands.py` reads W1-07's list, so its parametrized cases gain an `accept` variant, which
 holds the product's own list (`src/gov/check/commands.py`): it is red until the engineer adds `accept` there.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: gov accept <ticket> runs that ticket's acceptance tests (its declared acceptance_tests.path) with the tree's own src/ and reports, pe... | `test_w2_96_at_review_1.py::test_r1_a_project_whose_conftest_refuses_a_per_run_base_folder_is_run_and_reported_per_line`, `test_w2_96_at_review_1.py::test_r5_items_holding_a_double_colon_with_no_py_file_before_it_map_by_function_name`, `test_w2_96_at_review_1.py::test_r5_an_item_naming_a_test_that_matches_no_case_fails_its_line` | README |
+| S2: Nothing of the tests' content reaches its caller: no test source, no assertion text or values, no traceback, no captured output, no f... | `test_w2_96_at_review_1.py::test_r2_a_sigterm_or_sighup_to_gov_alone_stops_the_run_leaves_nothing_and_exits_128_plus_the_signal`, `test_w2_96_at_review_1.py::test_r3_folders_without_permissions_left_by_a_failing_test_are_removed`, `test_w2_96_at_review_1.py::test_r3_folders_without_permissions_held_at_a_timeout_are_removed` | README |
+| S3: A test the README does not map is reported only as counted under unmapped (pass and fail counts), never by name; a README with no map... | `test_w2_96_at_review_1.py::test_r4_a_row_whose_kpi_cell_names_no_line_the_reader_takes_refuses_the_run`, `test_w2_96_at_review_1.py::test_r4_a_tests_table_under_a_success_failure_or_kpi_heading_naming_no_line_refuses_the_run`, `test_w2_96_at_review_1.py::test_r4_the_text_form_of_accept_map_unreadable_gives_its_code_and_runs_nothing` | README |
+| S4: A collection error, a timeout or a crash is reported as error for the run with its kind only (collection, timeout, crash), never its ... | `test_w2_96_at_review_1.py::test_r7_a_tests_failed_exit_with_no_failed_case_in_the_report_is_a_crash`, `test_w2_96_at_run_errors.py::test_a_collection_error_is_an_error_of_kind_collection_with_no_message`, `test_w2_96_at_run_errors.py::test_a_timeout_is_an_error_of_kind_timeout_and_the_childs_process_group_is_killed` | README |
+| S5: The exit code is 0 when every mapped line passes, a declared code when any fails, another when the run errors; the command is a read ... | `test_w2_96_at_run_2.py::test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal`, `test_w2_96_at_exit_codes.py::test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal`, `test_w2_96_at_exit_codes.py::test_one_failing_mapped_line_fails_the_run_with_exit_code_3` | README |
+| S6: The common lead brief and the engineer's brief template name gov accept as the engineer's only way to run the acceptance tests (the b... | none: a brief line; the README's section 'The brief change has no test' says so | designer |
+| F1: Any test source, assertion text, value, traceback or captured output in the output, the JSON or a file left behind. | `test_w2_96_at_no_leak.py::test_a_failing_run_shows_no_assertion_text_value_traceback_or_captured_output`, `test_w2_96_at_report.py::test_the_text_output_gives_the_same_result_as_json` | designer, by its words |
+| F2: An unmapped test named, or a README without a map answered with raw output. | `test_w2_96_at_premises.py::test_this_readme_is_a_kpi_map_gov_accept_can_run`, `test_w2_96_at_unmapped_and_no_map.py::test_a_folder_without_a_readme_is_refused_with_accept_no_map` | designer, by its words |
+| F3: A run error reported as pass or fail, or with its message. | `test_w2_96_at_exit_codes.py::test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal`, `test_w2_96_at_report.py::test_the_child_runs_in_the_root_with_the_trees_own_src_first` | designer, by its words |
+| F4: A write in the repository. | `test_w2_96_at_exit_codes.py::test_nothing_is_written_in_the_repository_ignored_files_included`, `test_w2_96_at_review_1.py::test_r3_folders_without_permissions_left_by_a_failing_test_are_removed` | designer, by its words |
+
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

@@ -1236,3 +1236,25 @@ rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_paths_in_none_a
 rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_at_the_root_matches_only_root_files  # one row
 rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_alone_leaves_files_in_folders_unplaced  # one row
 rep: tests/acceptance/W2-95/test_w2_95_path_map_faults.py  # one row per parametrised function
+
+# acceptance/W2-96
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r14_a_churner_stops_once_its_canary_is_gone_and_its_folder_then_stays_still  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r15_a_plain_recursive_removal_takes_the_sibling_folders_away_in_a_few_seconds  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_r16_a_sigterm_to_gov_alone_while_a_nested_run_sleeps_leaves_no_process_and_nothing_later  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_r16_a_test_that_leaves_a_nested_run_going_passes_and_leaves_no_process_and_nothing_later  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_premise_r16_the_token_search_finds_a_process_of_its_own_session_and_its_child_and_not_once_gone  # cap
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_one_failing_mapped_line_fails_the_run_with_exit_code_3  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_an_unknown_ticket_is_refused_with_accept_unknown_ticket  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_premises.py  # one row per parametrised function
+rep: tests/acceptance/W2-96/test_w2_96_at_review_1.py::test_r6_no_log_file_is_written_whatever_the_projects_pytest_configuration_says  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_review_1.py::test_premise_r6_raw_pytest_writes_the_configured_log_file_holding_the_marker  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_review_3.py  # one row per parametrised function
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r10_a_chain_of_nested_folders_deeper_than_a_recursive_removal_leaves_the_result_as_the_tests_gave_it  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_errors.py::test_a_crash_is_an_error_of_kind_crash_with_no_message  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py  # one row per parametrised function
