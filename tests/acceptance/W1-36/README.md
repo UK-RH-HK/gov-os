@@ -144,3 +144,24 @@ does not silently drop this part of S2.
 ## Earlier tests revised
 
 None beyond the DEC-447 revision above.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Retrieval runs facets in disposable subagents and returns only the validated bundle [CAP-16.b, CAP-56.a] | `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_mentions_facets`, `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_says_subagents_are_disposable`, `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_cites_dec_032` | README |
+| S2: Audit produces a report naming its milestone (DEC-088) with one row per contract item and decision in scope, each classed OK/MISSING/... | `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_names_its_milestone`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_skill_cites_dec_088`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_has_rows_per_contract_item_and_decision` | README |
+| S3: Contested and owner-level findings appear in chat as decision packages; agreed fixes become tickets; each skill versioned, body <= 2.... | `test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_name_in_frontmatter`, `test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_description_in_frontmatter`, `test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_version_in_frontmatter` | README |
+| S4: No skill file grants a permission or states a rule as its own authority: a skill is a method, holds no tool permissions, and cites th... | `test_w1_36_skill_form.py::TestSkillAuthority::test_no_permission_keys_in_frontmatter`, `test_w1_36_skill_form.py::TestSkillAuthority::test_cites_at_least_one_governing_source`, `test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_name_in_frontmatter` | README |
+| S5: Registers the skill-regression family check over its four skills and the audit-reproducibility family check (an audit report's cited ... | `test_w1_36_check_declarations.py::TestSkillRegressionCheck::test_at_least_one_declaration_exists`, `test_w1_36_check_declarations.py::TestSkillRegressionCheck::test_each_has_required_fields`, `test_w1_36_check_declarations.py::TestSkillRegressionCheck::test_family_normalises_to_skill_regression` | README |
+| S6: The audit skill starts a fresh session whose only inputs are the bounded context pack from gov context and the repository, and the re... | `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_the_session_is_fresh`, `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_inputs_are_context_pack_and_repository`, `test_w1_36_audit_skill.py::TestAuditFreshSession::test_the_skill_says_report_states_pack_hash` | README |
+| S7: A wave-exit audit report has one row per LITE feature specification closed in the wave (DEC-088) [CAP-47.d] | `test_w1_36_audit_skill.py::TestAuditWaveExit::test_wave_exit_covers_every_lite_feature_spec`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_names_its_milestone`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_skill_cites_dec_088` | README |
+| F1: Intermediate retrieval batches appear in the main context | `test_w1_36_retrieval_skill.py::TestRetrievalFailure::test_the_skill_addresses_the_main_context_boundary`, `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_mentions_facets`, `test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_says_subagents_are_disposable` | README |
+| F2: The audit skill edits audited files | `test_w1_36_audit_skill.py::TestAuditReadOnly::test_the_skill_says_it_does_not_edit_audited_files`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_report_names_its_milestone`, `test_w1_36_audit_skill.py::TestAuditReport::test_the_skill_cites_dec_088` | README |
+| F3: An owner-level finding becomes a ticket without a decision package | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_contested_findings_become_decision_packages`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_level_findings_become_decision_packages`, `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_agreed_fixes_become_tickets` | README |
+
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 6 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

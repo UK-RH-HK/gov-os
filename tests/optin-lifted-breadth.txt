@@ -755,3 +755,11 @@ rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_body_wit
 rep: tests/acceptance/W1-35/test_w1_35.py::TestReferencedCommands::test_referenced_commands_are_known  # one row
 rep: tests/acceptance/W1-35/test_w1_35.py::TestCitations::test_skill_cites_at_least_one_reference  # one row
 rep: tests/acceptance/W1-35/test_w1_35_orchestration.py  # one row per parametrised function
+
+# acceptance/W1-36
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_cites_dec_032  # cap
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_says_only_the_validated_bundle_returns  # cap
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_references_cap_16  # cap
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_references_cap_56  # cap
+tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_version_in_frontmatter  # cap
+tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillTokenLimit::test_body_at_most_2500_tokens  # cap
