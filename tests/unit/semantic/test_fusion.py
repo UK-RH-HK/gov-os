@@ -53,10 +53,10 @@ def test_only_the_first_30_fused_chunks_are_scored_and_returned(passes):
     assert [hit["chunk_id"] for hit in unranked["hits"]] == NAMES[:30] and unranked["reranked"] is False
 
 
-def test_the_scorer_reads_the_path_and_the_first_500_characters_and_a_hit_keeps_its_own_text(passes):
+def test_the_scorer_reads_the_path_and_the_whole_chunk_and_a_hit_keeps_its_own_text(passes):
     seen, reranker = passes
     answer = fusion.search(Path("unused"), "a question", limit=None, reranker=reranker)
-    assert fusion.RERANK_CHARS == 500
-    assert seen[0][0] == "[path: notes/chunk-00.md]\n" + _text("chunk-00")[:500]
+    assert fusion.RERANK_CHARS >= 1200  # W2-32 S7 (DEC-1066 G1): the whole chunk, no 500-character cut
+    assert seen[0][0] == "[path: notes/chunk-00.md]\n" + _text("chunk-00")
     for hit in answer["hits"]:
         assert hit["text"] == _text(hit["chunk_id"]) and hit["path"] == f"notes/{hit['chunk_id']}.md"

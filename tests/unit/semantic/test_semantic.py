@@ -84,13 +84,13 @@ def test_only_a_file_whose_every_namespace_says_embedded_is_sent_and_found(proje
     assert {key: answer["hits"][0][key] for key in record} == record
 
 
-def test_a_chunk_is_embedded_as_its_first_512_characters(project):
+def test_a_chunk_is_embedded_whole(project):
     root, endpoint = project
-    _commit(root, {"open/long.md": "quince " * 200 + "\n"})
+    _commit(root, {"open/long.md": "quince " * 160 + "\n"})  # one line of 1,121 characters
     semantic.refresh(root)
-    assert semantic.EMBED_CHARS == 512
-    # the chunk is longer; no prefix is put before it
-    assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n", ("quince " * 200)[:512]]
+    assert semantic.EMBED_CHARS >= 1200  # W2-32 S7 (DEC-1066 G1): no 512-character cut
+    # the whole chunk; no prefix is put before it
+    assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n", "quince " * 160 + "\n"]
 
 
 def test_the_30_nearest_chunks_are_returned(project):

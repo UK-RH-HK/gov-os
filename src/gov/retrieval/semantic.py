@@ -56,7 +56,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.config import models
 from gov.config.loader import KNOWN_FILES, PROJECT_DIR, load_config
-from gov.retrieval import learning, lexical, ollama, rerank, vector_cache
+from gov.retrieval import chunking, learning, lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
 
@@ -67,7 +67,7 @@ EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
 DEVICES = ("gpu",)  # the one device a vector is used from (W2-32 S10, DEC-1065 (1)); the cache key names it
 ON_CPU = "EMBEDDER_ON_CPU"  # a vector computed on the CPU: refused, never cached or stored (W2-32 S10)
-EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
+EMBED_CHARS = chunking.READ_CHARS  # a chunk is embedded whole (W2-32 S7, DEC-1066 G1; was 512, DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
 TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
@@ -379,8 +379,8 @@ def _open(root: Path) -> sqlite3.Connection | None:
 
 
 def _build(root: Path, counts: dict, retries: list) -> str | None:
-    """Bring the lexical index up to date, then embed the chunks that have no vector, each as its first
-    ``EMBED_CHARS`` characters, those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
+    """Bring the lexical index up to date, then embed the chunks that have no vector, each whole (up to
+    ``EMBED_CHARS``, W2-32 S7), those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
     embedded, recording timed-out requests in ``retries``; why it cannot be done, or None.
 
     Under the pin of ``models.yaml`` (W2-32 S1, S2): an unpinned configuration, or an endpoint that reports another

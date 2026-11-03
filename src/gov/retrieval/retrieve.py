@@ -101,14 +101,25 @@ def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
 
 
-def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset):
+def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=()):
+    """The stateless token of the next call; ``x`` carries the parents already expanded (W2-32 S7), so a later call
+    never sends one of their spans again."""
     payload = json.dumps({"q": query, "i": sorted(ids), "t": ticket, "r": radius,
-                          "bs": batch_size, "bb": bundle_budget, "o": offset},
+                          "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded)},
                          separators=(",", ":"), sort_keys=True)
     return base64.urlsafe_b64encode(payload.encode()).decode()
 
 
-def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget):
+def _expanded_of(payload: dict) -> set[str]:
+    """The parents the earlier calls expanded (``x``); none for a token made before W2-32 S7."""
+    named = payload.get("x", [])
+    if not isinstance(named, list) or not all(isinstance(parent, str) for parent in named):
+        raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    return set(named)
+
+
+def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None):
+    """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added."""
     try:
         payload = json.loads(base64.urlsafe_b64decode(token))
     except Exception:
@@ -121,6 +132,8 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     offset = payload.get("o")
     if not isinstance(offset, int) or offset < 0:
         raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    if expanded is not None:
+        expanded |= _expanded_of(payload)
     return offset
 
 
@@ -143,9 +156,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         batch_size = DEFAULT_BATCH_SIZE
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
 
-    offset = 0
+    offset, earlier = 0, set()  # earlier: the parents the earlier calls expanded (W2-32 S7)
     if continuation is not None:
-        offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget)
+        offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget,
+                                      earlier)
 
     withhold = role_filter(root, role)
     root = Path(root)
@@ -293,7 +307,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         ranked = ahead_ranked + rest_ranked
 
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
-    evidence, expansions, expanded = [], [], set()
+    evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
     for candidate in ranked:
         rel, first, last, body = candidate["path"], candidate["start_line"], candidate["end_line"], candidate["body"]
         parent = lexical.parent(root, candidate["parent_id"])
@@ -324,7 +338,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
 
     new_offset = offset + len(gathering)
     if remaining:
-        token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset)
+        token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset,
+                                     expanded)
     else:
         token = None
 
