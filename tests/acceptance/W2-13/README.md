@@ -365,6 +365,13 @@ planted project's `vectors-only` namespace (`not indexed`, `embedded`) became `k
 `not embedded`), so that the planted project stays valid under the rule; its file is still one of the three kept out,
 by the same words. The other rows and cases are unchanged; nothing else is lowered.
 
+**Revised again (the CTO, after `gov accept` on `d4285bad`: S6 27 of 30).** The premise of
+`test_the_path_map_validator_accepts_both_values[not indexed]` planted its one namespace `embedded`, which P2 now
+refuses. For `not indexed` the one-namespace project is now `not embedded` (the only combination P2 allows); the case
+still asserts the value is accepted and kept and that the rebuild runs. `[indexed]` and the invalid-value cases
+(none of whose values is `not indexed`) keep the namespace `embedded`. Expected on the engineer's head: 28 of 30, the
+two repository cases red (D-7).
+
 ## Rewrite after implementation (DEC-1000, P-W2-13-3 (b))
 
 The CTO decided (DEC-1000, delegated) where the lexical route's ranking is read: `lexical.search` answers `hits`
