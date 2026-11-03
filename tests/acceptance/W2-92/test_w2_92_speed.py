@@ -11,8 +11,9 @@ folder, and no code index (the record route needs none; the code-graph tool is l
   parses none of their front matters (at most ``ALLOWED`` of them). The integrated code opens and parses every one
   (``graph_route.start_ids`` reads each record's title from its file, ``_parsed``).
 - ``test_s6b``: the titles come from the store after a rebuild. A record's file edited in the working tree after
-  the load (its title changed, not committed) is still found by the title the store was built with; and after the
-  change is committed and the store rebuilt, by its new title and no longer by its old one.
+  the load (its title changed, not committed; the lexical index refreshed, so it is fresh and holds the old title
+  nowhere) is still found by the title the store was built with; and after the change is committed and the store
+  rebuilt, by its new title and no longer by its old one.
 - ``test_s6c``: nothing else changes. In the many-records project, the record route answers each question as the
   integrated code ``BASE`` does (its ``src/`` taken from git into the session's folder), item for item: the plain
   question, a record named by id, ticket id, W2 id and title, and radius 1.
@@ -253,32 +254,55 @@ def _retitled(project):
     path.write_text(text.replace(support.TITLED_TITLE, NEW_TITLE), encoding="utf-8")
 
 
+def _lexical(api, root, *calls):
+    """The values of ``gov.retrieval.lexical``'s ``calls`` (``(function, args, kwargs)``) on ``root``, in one process."""
+    out, _ = api.run([("gov.retrieval.lexical", name, [{"$path": str(root)}, *args], kwargs)
+                      for name, args, kwargs in calls])
+    for record in out:
+        assert record["error"] is None, record["error"]
+    return [record["value"] for record in out]
+
+
 def test_s6b_a_title_is_the_one_the_store_was_built_with(head, tmp_path):
-    """After the load, the record's file is edited in the working tree (its title changed, not committed, not
-    rebuilt): a question naming the title the store holds still brings the record; the edit is not read."""
+    """After the load, the record's file is edited in the working tree (its title changed, not committed, the
+    store not rebuilt) and the lexical index refreshed, so the index is fresh (DEC-342 is not the cause) and holds
+    the old title nowhere. Asked by the title the store was built with, only the record route can bring the record:
+    it does, so the title is the store's and the working file's edit is not read for it.
+
+    Revised (Rewrite-Reason: s6b's premise, a stale index cites nothing, DEC-342): before, the index was left stale
+    by the edit, and a stale index cites no chunk whatever the title's source (the CTO's decision P2)."""
     root = build_many(tmp_path / "repo")
     head.build(root, store=True, code=False)
     _retitled(root)
-    bundle = head.bundle(root, _title_question(support.TITLED_TITLE))
+    _, fresh, alone = _lexical(head, root, ("refresh", [], {}), ("freshness", [], {}),
+                               ("search", [support.TITLED_TITLE], {"refresh": False}))
+    assert fresh["status"] == "fresh", f"premise: the lexical index is not fresh after its refresh: {fresh}"
+    found = [hit.get("path") for hit in alone.get("ranked", alone["hits"])]
+    assert support.TITLED_REL not in found, (
+        f"premise: the lexical route alone finds {support.TITLED_REL} for the old title, so the case cannot tell "
+        f"where the title came from: {found}")
+    bundle = head.bundle(root, support.TITLED_TITLE)
     assert support.holds_text(bundle, support.TITLED_TEXT), (
-        f"the question names {support.TITLED}'s title as the store holds it ({support.TITLED_TITLE!r}) and the "
-        f"record is not in the bundle: the title was read from the working tree's file, not the store "
+        f"the question is {support.TITLED}'s title as the store holds it ({support.TITLED_TITLE!r}); the lexical "
+        f"index is fresh and holds that title nowhere, and the record is not in the bundle: the record route took "
+        f"the title from the working tree's edited file ({NEW_TITLE!r}), not from the store "
         f"(the bundle holds {support.paths(bundle)})")
 
 
 def test_s6b_after_a_rebuild_the_new_title_is_the_stores(head, tmp_path):
-    """A title changed, committed and the store rebuilt: the new title brings the record, the old one no longer
-    does (a guard: the store's titles follow its rebuild)."""
+    """A title changed, committed and the store and lexical index rebuilt: the new title brings the record, the old
+    one no longer does (a guard: the store's titles follow its rebuild). The questions are the bare titles, so no
+    other word of the question can bring the record through the lexical route."""
     root = build_many(tmp_path / "repo")
     head.build(root, store=True, code=False)
     _retitled(root)
     support.git(root, "commit", "-q", "-am", "the protocol retitled")
     head.build(root, store=True, code=False)
-    renamed = head.bundle(root, _title_question(NEW_TITLE))
+    renamed = head.bundle(root, NEW_TITLE)
     assert support.holds_text(renamed, support.TITLED_TEXT), (
         f"after the rebuild the question naming the new title {NEW_TITLE!r} does not bring {support.TITLED}: "
         f"{support.paths(renamed)}")
-    old = head.bundle(root, _title_question(support.TITLED_TITLE))
+    old = head.bundle(root, support.TITLED_TITLE)
     assert not support.holds_text(old, support.TITLED_TEXT), (
         f"after the rebuild the old title {support.TITLED_TITLE!r} still brings {support.TITLED}: the store kept "
         f"the title of before the rebuild ({support.paths(old)})")
