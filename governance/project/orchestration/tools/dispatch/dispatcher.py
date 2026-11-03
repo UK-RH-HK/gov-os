@@ -397,12 +397,15 @@ def config():
     derived = balancer.derive_limits(known, sh)
     c["_machine"], c["_derived"] = mach, derived
     c["_overrides"] = balancer.apply_limits(c, explicit, derived)
-    # review F2: the reranker GPU slots are priced with the count the installed hook enforces, never fewer: the
-    # derived (or explicit) number is the proposal written to limits.json, which only the new hook copy reads
+    # review F2: the reranker GPU slots are priced with the count the installed hook enforces: the derived (or
+    # explicit) number is only the proposal written to limits.json, which only the new hook copy reads. Exactly that
+    # count, neither fewer (a newcomer's reranker unpriced, fails open) nor more (live 2026-11-02 23:01 and 23:04:
+    # the proposal's 3 to 5 slots left slots "free" while the hook's 2 were both held, so the running jobs' reranker
+    # peaks were added on top of memory nvidia-smi already counted: two false gpu-alert items)
     c["rerank_gpu_slots_proposed"] = c["rerank_gpu_slots"]
     c["_hook"] = hook = hook_slots(c)
     if hook["slots"] is not None:
-        c["rerank_gpu_slots"] = max(hook["slots"], int(c["rerank_gpu_slots"]))
+        c["rerank_gpu_slots"] = hook["slots"]
     else:  # no hook installed: nothing bounds the rerankers on the GPU; every newcomer's reranker is priced
         c["rerank_gpu_slots"] = 64
     return c

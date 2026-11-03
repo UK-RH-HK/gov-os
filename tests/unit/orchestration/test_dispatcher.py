@@ -2323,9 +2323,12 @@ def test_lb_a_machine_change_raises_one_item(w):
 
 def test_lb_the_forecast_refuses_a_start_that_would_put_gpu_memory_over_its_budget(wp):
     """The embedders (5.6 GiB) and a reranker service (3.5 GiB, one GPU slot) on the 16 GB card, a running lead in
-    its retrieval whose reranker has not taken the GPU yet, and 3 GPU reranker slots configured: the newcomer's
-    retrieval would bring it to 16.1 of 13.9 GiB: refused, GPU named (the free-memory check alone admits it)."""
+    its retrieval whose reranker has not taken the GPU yet, and 3 GPU reranker slots enforced (the hook copy that reads
+    limits.json, 3 there): the newcomer's retrieval would bring it to 16.1 of 13.9 GiB: refused, GPU named (the
+    free-memory check alone admits it)."""
     conf(wp, memory_rule="literal", rerank_gpu_slots=3)
+    wp.env["DISPATCH_RERANK_HOOK"] = str(plant_hook(wp.tmp, NEW_HOOK))
+    (wp.d / "limits.json").write_text(json.dumps({"rerank_gpu_slots": 3}))
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
     gpu_used(wp, 5734 + 3584)
     hold_rerank_gpu(wp, 0)
@@ -2622,3 +2625,59 @@ def test_lbr_f4_t4_events_are_not_repeated_when_the_log_becomes_unreadable(w):
     assert "- **More, " not in recs[0].read_text() and "Closed:" not in recs[0].read_text()
     tick(w, DISPATCH_NOW=NOW + 60 * 17)  # 15 minutes with no event: closed
     assert "- **Closed:** " in recs[0].read_text()
+
+
+# ---- live 2026-11-02 23:01 and 23:04: two false GPU budget alerts (EMG-lb2) -------------------------------------------
+
+def hold_locks(w, holders):
+    """The reranker GPU slot lock files held by the given pids (slot i by holders[i]), in the planted lock table."""
+    d = w.tmp / "rerank"
+    d.mkdir(exist_ok=True)
+    with open(w.tmp / "proc" / "locks", "a") as f:
+        for i, pid in enumerate(holders):
+            p = d / f"gov-os-rerank-gpu-{i}.lock"
+            p.write_text("")
+            f.write(f"{20 + i}: FLOCK  ADVISORY  WRITE {pid} 08:30:{os.stat(p).st_ino} 0 EOF\n")
+
+
+@pytest.mark.parametrize("slot1", ["worker", "hold tool"])
+def test_lb2_both_reranker_slots_held_is_no_gpu_budget_alert(w, slot1):
+    """dispatch/inbox/read/20261102-230406-gpu-alert.txt: GPU 11.5 of 15.9 GB; slot 0 held by W2-112's shared
+    rerank_service.py (pid 3361765), slot 1 by a private rerank_worker.py of the merge queue's warm clone (pid 2902931)
+    or by the CTO's rerank_service_slot_hold.py --watch (DEC-1043 item 2); running: lead W2-112 building, the landing
+    in its test run, two slot runs; the measured shares 5,800 and 1,650 MiB derive a proposal of 5 slots, and the phases'
+    peaks hold one reranker each. Priced with the proposal the pass found 3 slots free and added the running jobs'
+    reranker peaks (4.8 GB) to what nvidia-smi already counted: "GPU memory 16.3 of 13.9 GB ... 3 GPU reranker slot(s)
+    free", a false alert. Priced with the hook's 2, both held: none free, nothing added, no alert."""
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 11776, 16303, 35",
+        apps="3361765, [Not Found], [N/A]\n2902931, [Not Found], [N/A]\n")
+    rr = 1650
+    peak = lambda gpu: {"cpu": 5.9, "ram_kb": 1910344, "gpu": gpu, "util": 0, "heavy": "cpu", "samples": 40, "how": "p95"}
+    (w.d / "phase-peaks.json").write_text(json.dumps({
+        "_at": NOW + 86400, "_shares": {"embedders_gpu_mib": 5800, "reranker_gpu_mib": rr},
+        "lead.build": dict(peak(rr), cpu=1.0, heavy=None), "landing.test": peak(rr), "slot.test": peak(rr)}))
+    worker = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Qwen/Q"
+    second = ({"cmd": worker, "cwd": "/", "pid": 2902931, "ppid": 201} if slot1 == "worker" else
+              {"cmd": "python3 /x/tools/rerank_service_slot_hold.py --watch", "cwd": "/", "pid": 3518237, "ppid": 1})
+    procs = [lead_proc(w, 0, 100),
+             {"cmd": "/v/reranker-venv/bin/python /x/tools/rerank_service.py", "cwd": "/", "pid": 3361765, "ppid": 1},
+             {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1},
+             {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 201, "ppid": 200}, second]
+    for pid in (3423200, 3544196):
+        procs += [{"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+                   "pid": pid, "ppid": 1}, {"cmd": "python3 -m pytest tests", "cwd": "/", "pid": pid + 1, "ppid": pid}]
+    w.procs.write_text(json.dumps(procs))
+    hold_locks(w, [3361765, second["pid"]])
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert gpu_items(w) == [], [i.read_text() for i in gpu_items(w)]
+    line = status_line(w, "GPU rule: ")
+    assert ("GPU memory 11.5 of 13.9 GB (used 11.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker "
+            "slot(s) free): within total minus headroom") in line, line
+    assert "reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 5)" in status_line(w, "Limits: ")
+    s = status(w)
+    assert s["rerankers"]["gpu_held"] == 2 and s["rerankers"]["gpu_slots"] == 2
+    row = json.loads((w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
+    assert row["rr_held"] == 2 and row["rr_gpu"] == (2 if slot1 == "worker" else 1)
+    assert s["forecast"]["lead"]["resources"]["gpu"]["text"].endswith("the newcomer's 0.0; 0 GPU reranker slot(s) free)")

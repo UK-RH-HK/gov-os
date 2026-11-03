@@ -272,11 +272,13 @@ explicit number in `config.json` still wins (the owner's override) and the `Limi
 overrides: cpu_band [12, 16] (derived [14, 18])`). A GPU not read yet uses today's GPU figures. A machine change (CPUs,
 cores, RAM by the half GB, the GPU) is one `Machine:` inbox item with the new limits. `limits.json` (state) holds them;
 `gov_reranker_gpu_slot.py` reads its lock count from it when `GOV_RERANK_GPU_SLOTS` is unset (installing that copy is
-the owner's ACT). **The reranker GPU slots are priced with the count the installed hook enforces, never fewer**
-(review F2): the derived (or explicit) number is only the proposal written to `limits.json`; the forecast, the GPU
-check and the rerankers' RAM reserve use the larger of it and the hook's count (`hook_slots`: the installed copy that
-reads `limits.json` enforces the number there, 1 to 64, else 2; today's copy its `GOV_RERANK_GPU_SLOTS` default, 2; no
-hook installed: 64, every newcomer's reranker priced). Every held slot counts as used, a slot held by the CTO's tool
+the owner's ACT). **The reranker GPU slots are priced with exactly the count the installed hook enforces** (review
+F2; EMG-lb2): the derived (or explicit) number is only the proposal written to `limits.json`; the forecast, the GPU
+check and the rerankers' RAM reserve use the hook's count, neither fewer (a newcomer's reranker unpriced: fails open)
+nor more (2026-11-02 23:01 and 23:04: a proposal of 3 to 5 left slots "free" while the hook's 2 were both held, and
+the running jobs' reranker peaks were added on top of memory nvidia-smi already counted: two false GPU budget alerts)
+(`hook_slots`: the installed copy that reads `limits.json` enforces the number there, 1 to 64, else 2; today's copy
+its `GOV_RERANK_GPU_SLOTS` default, 2; no hook installed: 64, every newcomer's reranker priced). Every held slot counts as used, a slot held by the CTO's tool
 beside the shared service (DEC-1043 item 2) too: a newcomer is priced a reranker only while a slot is free. The
 `Limits:` line: `reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)`. The servers' CPU sets
 stay owner ACTs.
