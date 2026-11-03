@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-03 14:05: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
+## RESUME HERE — 2026-11-03 14:03: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
 
 **The plan (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its "DECIDED BY DEC-1052"
 section first; `INTENT-DEC-1052.md`; `OWNER-GLOSSARY.md`. **Read first:** the prompt's §0; `DECISIONS-IN-FORCE.md`; the
