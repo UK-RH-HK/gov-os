@@ -5937,3 +5937,5 @@
 {"t": "2026-11-03T14:01:35", "nproc": 20, "load": [0.23, 0.39, 0.51], "mem_total_kb": 24607388, "mem_available_kb": 19328600, "leads_kb": {}}
 {"t": "2026-11-03T14:02:39", "nproc": 20, "load": [0.2, 0.36, 0.49], "mem_total_kb": 24607388, "mem_available_kb": 19341420, "leads_kb": {}}
 {"t": "2026-11-03T14:03:43", "nproc": 20, "load": [0.44, 0.37, 0.48], "mem_total_kb": 24607388, "mem_available_kb": 19281132, "leads_kb": {}}
+{"t": "2026-11-03T14:04:47", "nproc": 20, "load": [1.03, 0.57, 0.54], "mem_total_kb": 24607388, "mem_available_kb": 19313404, "leads_kb": {}}
+{"t": "2026-11-03T14:05:51", "nproc": 20, "load": [0.38, 0.47, 0.51], "mem_total_kb": 24607388, "mem_available_kb": 19328600, "leads_kb": {}}

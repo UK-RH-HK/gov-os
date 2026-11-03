@@ -2,6 +2,9 @@
 
 ## RESUME HERE — 2026-11-03 14:03: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
 
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (the emergency, the reading list, what is done,
+live and next, what waits on the owner, the checks at start); this block is its detail.
+
 **The plan (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its "DECIDED BY DEC-1052"
 section first; `INTENT-DEC-1052.md`; `OWNER-GLOSSARY.md`. **Read first:** the prompt's §0; `DECISIONS-IN-FORCE.md`; the
 register's DEC-1052 and DEC-1053. **Next free id DEC-1054.** Still in force: DEC-1047, DEC-1049 (no nightly), DEC-1051
