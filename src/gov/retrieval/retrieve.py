@@ -224,6 +224,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     frontmatter_cache: dict[str, tuple[str | None, str | None]] = {}
 
     for hit in gathering:
+        if hit["chunk_id"] not in chunks:  # W2-13 R4: a hit whose chunk the lexical index does not hold is skipped
+            continue
         chunk = chunks[hit["chunk_id"]]
         record_id = record_of.get(chunk["path"])
 
