@@ -139,7 +139,25 @@ ran in a clone of `00a3daa0` with only `src/gov/store/loader.py` and `src/gov/re
   which the launch sandbox keeps read-only (`gov rebuild` answers ok with `codeintel: not_recreated, [Errno 30]
   Read-only file system: '/tmp/gov-cbm-1000/…'`); and the machine's default rebuild lock `/tmp/gov-os-rebuild.lock`
   is read-only there too. These lines passed 30 of 30 at `7f4d519b`, run outside the sandbox.
-- **The one S6 case still red:** not known from inside (the runner names no case, by design). It is red with the S6
+- **Outside the sandbox (the CTO, on `a01fc5f4`):** 44 passed, 1 failed; every line passes but S6 (14 of 15). The red:
+  `test_s6b_a_title_is_the_one_the_store_was_built_with` ("the question names SPEC-0092's title as the store holds
+  it ('Cormorant Nesting Protocol') and the record is not in the bundle ... (the bundle holds [])").
+- **Traced (2026-11-03, stand-ins only, the test not read):** with a store that has `record_titles`, nothing on the
+  question's path reads a title from the working file: `graph_route` reads the table (files only where the table is
+  missing), and neither `retrieve.py` nor `retrieve/command.py` reads a title. A planted SPEC-0092 committed as
+  'Cormorant Nesting Protocol', loaded, then retitled in the working file:
+
+  | After the change | Start ids for the store's title | Closure evidence |
+  |---|---|---|
+  | the lexical index refreshed (working file uncommitted, or committed without a store load) | `SPEC-0092` | `SPEC-0092` |
+  | the lexical index not refreshed | `SPEC-0092` | `[]`: the lexical facet is `stale`, and `retrieve` takes no chunk from a stale index (`retrieve.py:156`, DEC-342) |
+
+  So the record route matches the store's title; an empty bundle comes from the stale lexical index, not from a
+  title. Both are unit cases now (`test_a_title_changed_in_the_working_file_is_matched_as_the_store_holds_it`,
+  `test_a_working_file_changed_after_the_index_leaves_no_chunk_to_cite`); 83 unit cases pass. If the red case
+  changes the working file without refreshing the lexical index, no change to the titles turns it green; that
+  would be `retrieve.py`'s chunk rule (W2-13's file this round) or the case's setup.
+- **The one S6 case still red (as first seen in the sandbox):** not known from inside (the runner names no case, by design). It is red with the S6
   code and with the code before it, so it may be the sandbox's as the others, or a reading of S6 the change does not
   meet; `gov accept` outside the sandbox tells which.
 

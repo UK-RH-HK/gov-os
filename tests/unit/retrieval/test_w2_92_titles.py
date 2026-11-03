@@ -122,6 +122,69 @@ def test_the_titles_are_the_commits_not_the_working_trees(repo):
     assert graph_route.start_ids(repo, "harbour charts", known) == []
 
 
+SPEC = "specs/SPEC-0092.md"
+SPEC_TEXT = ("---\nid: SPEC-0092\ntype: spec\nstatus: ACTIVE\ntitle: Cormorant Nesting Protocol\n---\n# Spec\n\n"
+             "The birds nest on the east jetty.\n")
+
+
+@pytest.fixture()
+def indexed(tmp_path, monkeypatch):
+    """A repository indexed and loaded whose record's title the working file then changes; no embedder (a stand-in)."""
+    import shutil
+
+    from gov.retrieval import lexical, semantic
+
+    if shutil.which("gitleaks") is None:
+        pytest.skip("gitleaks is not on PATH")
+    _git(tmp_path, "init", "-q")
+    (tmp_path / "governance/project").mkdir(parents=True)
+    path_map = yaml.safe_load((REPO / "governance/project/path-map.yaml").read_text(encoding="utf-8"))
+    path_map["namespaces"] = {"notes": {**next(iter(path_map["namespaces"].values())), "paths": ["**"]}}
+    path_map.pop("decision_register", None)
+    (tmp_path / "governance/project/path-map.yaml").write_text(yaml.safe_dump(path_map), encoding="utf-8")
+    shutil.copy2(REPO / "template/.gitleaks.toml", tmp_path / ".gitleaks.toml")
+    (tmp_path / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
+    (tmp_path / "specs").mkdir()
+    (tmp_path / SPEC).write_text(SPEC_TEXT, encoding="utf-8")
+    (tmp_path / "note.md").write_text("# Note\n\nThe heron ledger of the pier.\n", encoding="utf-8")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "fixture")
+    lexical.refresh(tmp_path)
+    store.load(tmp_path)
+    (tmp_path / SPEC).write_text(SPEC_TEXT.replace("Cormorant Nesting Protocol", "Heron Roosting Rules"),
+                                 encoding="utf-8")
+    monkeypatch.setattr(semantic, "search", lambda *_args, **_kwargs: {"available": True, "reason": None, "hits": []})
+    monkeypatch.setattr(graph_route, "_parsed", lambda *_: pytest.fail("a record's file was parsed"))
+    return tmp_path
+
+
+def _closure_ids(root: Path, query: str) -> list[str]:
+    from gov.retrieval.retrieve import retrieve
+
+    bundle = retrieve(root, query, reranker=lambda: None)
+    return sorted({item["id"] for item in bundle["evidence"] if "closure" in item["routes"]})
+
+
+def test_a_title_changed_in_the_working_file_is_matched_as_the_store_holds_it(indexed):
+    from gov.retrieval import lexical
+
+    lexical.refresh(indexed)  # the working file's text indexed again; the record store still holds the old title
+    assert _closure_ids(indexed, "What does the Cormorant Nesting Protocol say?") == ["SPEC-0092"]
+    assert _closure_ids(indexed, "What do the Heron Roosting Rules say?") == []
+
+
+def test_a_working_file_changed_after_the_index_leaves_no_chunk_to_cite(indexed):
+    """The record route still finds the record by the store's title; the bundle has no chunk to cite for it, as the
+    lexical index is stale (DEC-342: ``retrieve`` takes no chunk from a stale index), which S6 does not change."""
+    from gov.records import queries as records
+    from gov.retrieval import lexical
+
+    query = "What does the Cormorant Nesting Protocol say?"
+    assert graph_route.start_ids(indexed, query, records.records(indexed)) == ["SPEC-0092"]
+    assert lexical.search(indexed, query, refresh=False)["reason"] == "stale"
+    assert _closure_ids(indexed, query) == []
+
+
 def test_no_store_reads_the_files(tmp_path):
     (tmp_path / "docs/contract").mkdir(parents=True)
     (tmp_path / "docs/contract/CAP-12.md").write_text("---\nid: CAP-12\ntitle: Code intelligence\n---\n",
