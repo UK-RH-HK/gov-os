@@ -73,6 +73,8 @@ namespaces:
       # DEC-990 (P-W2-97-PM-1): the CTO's committed tools, W2-97's merge queue first
       - "governance/project/orchestration/tools/**"
       - "governance/project/orchestration/sessions/**"
+      # b60ff112: the emergency patches' review records (they review no ticket), moved out of docs/probes/
+      - "governance/project/orchestration/reviews/**"
       - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
       - "governance/project/orchestration/main/orchestrator/PR-*.md"
     memory_class: governance
