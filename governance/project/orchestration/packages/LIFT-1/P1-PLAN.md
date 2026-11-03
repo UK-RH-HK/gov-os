@@ -25,10 +25,10 @@ each way. Nothing scheduled but the dispatcher (DEC-1051).
 |---|---|---|
 | D-0 clean-up | **done** (DEC-1053 `d855e41a`) | `D0-CLEANUP-LIST.md` |
 | D-1 memory branches merged as built; re-pin window 2 | **done**: seven branches and emg/w1-19-helper merged; `pin-9894b0cf` live (registry `b74d2c7f`) | `ACT-REPIN-W2.md` |
-| D-2 the CTO's tools | **in progress**: E1 (Q-1, G-1), R1-21, E3 (ACT-GUARD-FIX-4, hooks `3bc25241`), O-A1 and the LB held-slot fix **live**; **G-14 next** (stopped at a safe point: `.gov-runtime/scratch/orchestrator/drafts/g14/NEXT.md`) | `ACT-GUARD-FIX-4.md`, `reviews/` |
-| D-3 configuration and text lifts | **under way** (2026-11-03): items 11 and 12 drafted for the owner; T-6, T-7, T-10, Q-8, Q-10 moved to D-4 | `D3-WORKLIST.md` |
-| D-4 the test suite cut | not started (the deletions listed to the owner first); runs beside D-4b (DEC-1055) | — |
-| **D-4b the memory stage** (DEC-1055) | **starting**: W2-92, W2-91, W2-13, W2-61h, D-8, D-7, W2-15a/b's parts here, W2-32; measures 1 to 3; then re-pin window 3 and the integration store before D-5 | `D4B-MEMORY-STAGE.md` |
+| D-2 the CTO's tools | **done**: E1 (Q-1, G-1), R1-21, E3 (ACT-GUARD-FIX-4), O-A1 and the LB held-slot fix; G-14 live by ACT-G14 (`4edd196c`, DEC-1059) | `ACT-GUARD-FIX-4.md`, `ACT-G14.md`, `reviews/` |
+| D-3 configuration and text lifts | **done** (DEC-1057, `2e5c9cd9`); items 2-7 and 5 moved to D-4, item 9 to D-5 | `D3-WORKLIST.md` |
+| D-4 the test suite cut | **started** (2026-11-03 ~17:10): two test designers draft the list (A the guard and roles, B the rest with D-3's moved items and today's reds); the list to the owner first | `D4-LIST-A.md`, `D4-LIST-B.md` |
+| **D-4b the memory stage** (DEC-1055) | **in progress**: D-8 done (ACT-D8); W2-61h (with q03, DEC-1060), W2-91 and W2-92 merged as built after review (`15592622`, `947da7a4`, `0d33901a`); W2-13 being finished; then measure 1, D-7, measure 2, W2-32, measure 3; then re-pin window 3 and the integration store before D-5 | `D4B-MEMORY-STAGE.md` |
 | D-5, D-6 | not started (after measure 3 and the re-pin) | — |
 | D-7, D-8 | moved into D-4b (DEC-1055) | `D4B-MEMORY-STAGE.md` §5, §10 |
 | D-9 the WBS refactor | not started (the fates and K9 to the owner first) | — |
