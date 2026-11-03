@@ -871,3 +871,41 @@ tests/acceptance/W1-39/test_w1_39_update.py::test_copier_prints_the_update_proce
 tests/acceptance/W1-39/test_w1_39_update.py::test_copier_prints_the_update_procedure_after_an_update  # cap
 tests/acceptance/W1-39/test_w1_39_update.py::test_the_generated_lock_states_the_update_procedure_in_its_comment_header  # cap
 tests/acceptance/W1-39/test_w1_39_update.py::test_the_lock_keeps_its_comment_header_after_an_update  # cap
+
+# acceptance/W1-40
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_ci_reports_that_no_g3_check_is_declared_and_does_not_fail_for_it  # cap
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_a_record_of_a_failed_g3_run_that_reaches_the_remote_fails_ci  # cap
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_the_note_of_another_commit_copied_onto_the_head_commit_fails_ci  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_commit_passes_again_once_the_check_passes  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_g3_check_does_not_run_at_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_staged_secret_stops_the_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_staged_secret_that_the_builtin_allowlist_shelters_stops_the_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_sheltering_words_alone_do_not_stop_a_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_secret_staged_beside_a_clean_working_copy_is_what_counts  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_missing_tool_stops_the_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_a_push_runs_the_g3_check  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_a_failing_g3_check_stops_the_push  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_push_passes_again_once_the_g3_check_passes  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_one_push_through_the_hook_leaves_the_record_ci_asks_for  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_record_follows_the_head_commit_push_after_push  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_push_leaves_the_project_clean  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_a_push_without_a_tool_the_hook_needs_never_ends_with_ci_green  # cap
+tests/acceptance/W1-40/test_w1_40_templates.py::test_the_hook_template_renders_to_the_repositorys_hook_file  # cap
+tests/acceptance/W1-40/test_w1_40_templates.py::test_the_workflow_template_keeps_github_expressions_whole  # cap
+tests/acceptance/W1-40/test_w1_40_templates.py::test_this_repositorys_own_workflow_runs_only_when_started_by_hand  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_a_commit_is_refused_when_a_tier_the_hook_names_has_no_declared_check  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_named_tiers_when_one_of_them_has_no_declared_check  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_a_tier_name_that_is_no_tier_beside_a_declared_one  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_a_workflow_runs_on_every_push  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_job_runs_on_a_hosted_runner_without_gpu  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_step_downloads_a_model_or_asks_for_a_gpu  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_result_is_thrown_away  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_every_step_runs_a_command_or_a_pinned_action  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_checkout_brings_the_parent_commit  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_job_names_gitleaks_and_gov_check  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_a_tool_the_job_installs_is_registered_at_its_registered_version  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_hook_file_has_the_two_hooks_and_drops_no_result  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_hooks_carry_no_baseline_and_no_bypass  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_carrier_of_the_evidence_record_is_documented  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_lefthook_hook_is_installed_in_this_repository  # cap
+rep: tests/acceptance/W1-40/test_w1_40_ci_evidence.py  # one row per parametrised function

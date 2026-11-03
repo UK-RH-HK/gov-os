@@ -441,3 +441,19 @@ owner's step at the Wave 1 exit, from the main tree, after the baseline is empty
 ```
 
 From then on every push from that tree also pushes the notes ref of the evidence record to the same remote.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: pre-commit runs G1-G2; pre-push runs G3 including model-dependent tests and writes an evidence record bound to the head commit [CAP-3... | `test_w1_40_pre_commit.py::test_a_clean_commit_passes_and_runs_the_g1_and_g2_checks`, `test_w1_40_pre_commit.py::test_a_failing_hard_block_check_stops_the_commit`, `test_w1_40_pre_commit.py::test_the_commit_passes_again_once_the_check_passes` | README |
+| S2: GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier (git note o... | `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit`, `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | README |
+| S3: pre-commit also runs the second gitleaks scan, with the project's rules alone (DEC-347, DEC-369) | `test_w1_40_pre_commit.py::test_a_clean_commit_passes_and_runs_the_g1_and_g2_checks`, `test_w1_40_pre_commit.py::test_a_failing_hard_block_check_stops_the_commit`, `test_w1_40_pre_commit.py::test_the_commit_passes_again_once_the_check_passes` | README |
+| F1: CI downloads models or needs a GPU | `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit`, `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | README |
+| F2: A push with a failing G3 check leaves CI green | `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit`, `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | README |
+
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
