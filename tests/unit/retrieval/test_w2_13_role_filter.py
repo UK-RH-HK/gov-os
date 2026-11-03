@@ -187,3 +187,55 @@ def test_a_supplementary_block_whose_role_paths_cannot_be_read_is_empty_and_says
     block = context._try_supplementary(repo, "The heron ledger", [], 5000, set(), set())
     assert block["supplementary"] == [] and block["further_batch"] == []
     assert block["dropped"][0]["id"] == "supplementary" and "role_paths" in block["dropped"][0]["reason"]
+
+
+# -- gov context --role: the role given reaches the supplementary block (the CTO's red, 2026-11-03) ---------------
+
+_CTX_ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t",
+            "GIT_AUTHOR_EMAIL": "t@t.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t.invalid"}
+_CTX_CASE = "tests/acceptance/W2-99/test_quokka.py"
+_CTX_FILES = {
+    ".gitignore": ".gov-runtime/\n",
+    "governance/project/path-map.yaml": yaml.safe_dump({"decision_register": "docs/DECISION_REGISTER.md",
+                                                       "role_paths": SECTION}),
+    "docs/DECISION_REGISTER.md": "# Register\n\n### DEC-101 — The decision\n- **Status:** ACCEPTED\n\nIts text.\n",
+    ".tickets/TK-1.md": ("---\nid: TK-1\nwbs_id: W2-99\ntype: task\nstatus: open\ntitle: zebra ticket\n"
+                         "sources: [DEC-101]\nkpis:\n  success:\n  - the quokka line holds\n---\n# TK-1\n"),
+    "notes/quokka.md": "# Planted\n\nthe quokka is found here\n",
+    _CTX_CASE: "def test_quokka():\n    assert 'the quokka line holds'\n",
+}
+
+
+@pytest.fixture()
+def project(tmp_path, monkeypatch):
+    """A gov context project whose ticket W2-99 has an acceptance case and a note, both about the quokka."""
+    monkeypatch.setattr(lexical, "indexable", lambda root, paths: list(paths))  # no gitleaks needed
+    subprocess.run(["git", "-C", str(tmp_path), "init", "-q", "-b", "main"], check=True, capture_output=True,
+                   env=_CTX_ENV)
+    for rel, text in _CTX_FILES.items():
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text(text, encoding="utf-8")
+    for args in (["add", "-A"], ["commit", "-q", "-m", "fixture"]):
+        subprocess.run(["git", "-C", str(tmp_path), *args], check=True, capture_output=True,
+                       env={**_CTX_ENV, "HOME": str(tmp_path)})
+    store.load(tmp_path)
+    lexical.refresh(tmp_path)
+    monkeypatch.delenv("GOV_ROLE", raising=False)
+    monkeypatch.setenv("GOV_TICKET", "TK-1")
+    return tmp_path
+
+
+def _packet_paths(packet) -> set:
+    return {item["path"] for item in packet["supplementary"]} | {item["path"] for item in packet["further_batch"]}
+
+
+def test_gov_context_with_role_given_withholds_the_engineers_tests_and_names_it(project, monkeypatch):
+    from gov import context
+    plain = context.context(project, "TK-1")
+    assert _CTX_CASE in _packet_paths(plain) and all(e["id"] != "role_filter" for e in plain["dropped"])
+    packet = context.context(project, "TK-1", role="engineer")  # gov context ... --role engineer, GOV_ROLE unset
+    assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
+    named = [entry for entry in packet["dropped"] if entry["id"] == "role_filter"]
+    assert len(named) == 1 and "1 paths" in named[0]["reason"] and "engineer" in named[0]["reason"]
+    monkeypatch.setenv("GOV_ROLE", "engineer")  # a role given never lifts the session's
+    assert _CTX_CASE not in _packet_paths(context.context(project, "TK-1", role="orchestrator"))
