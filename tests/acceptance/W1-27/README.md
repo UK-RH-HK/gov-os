@@ -676,7 +676,8 @@ fixtures point it at a stand-in and change no expectation`.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -691,4 +692,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: doctor passes with a tool at the wrong version | `test_w1_27_doctor.py::test_doctor_does_not_pass_with_wrong_tool_version`, `test_w1_27_doctor.py::test_doctor_is_a_read_command`, `test_w1_27_doctor.py::test_doctor_envelope_is_valid_on_healthy_project` | README |
 | F2: rebuild needs anything not in git | `test_w1_27_rebuild.py::test_rebuild_needs_only_git`, `test_w1_27_rebuild.py::test_rebuild_is_an_act_command`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores` | README |
 
-Tier 2's cap here: 60 functions (10 KPI lines x 6); 80 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 80 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

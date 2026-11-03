@@ -386,7 +386,8 @@ reason.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -397,4 +398,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: A record present in git is missing from the graph | `test_w1_10_completeness.py::test_every_record_of_the_fixture_is_in_the_graph`, `test_w1_10_completeness.py::test_a_record_committed_later_is_in_the_graph_after_a_load`, `test_w1_10_completeness.py::test_a_changed_status_is_in_the_graph_after_a_load` | README |
 | F2: Graph content depends on file order or time | `test_w1_10_determinism.py::test_a_later_load_gives_the_same_digest`, `test_w1_10_determinism.py::test_a_load_into_a_new_store_gives_the_same_digest`, `test_w1_10_determinism.py::test_a_clone_elsewhere_gives_the_same_digest_and_content` | README |
 
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 39 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 39 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

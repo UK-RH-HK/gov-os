@@ -203,7 +203,8 @@ python3 -m pytest tests/acceptance/W1-35/ -v
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -226,4 +227,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F2: The test-design skill reads implementation files | `test_w1_35.py::TestFailureTestDesignReadsImpl::test_test_design_states_restriction`, `test_w1_35.py::TestFailureTestDesignReadsImpl::test_test_design_states_restriction`, `test_w1_35.py::TestTestDesignReadRestrictionProxy::test_test_design_declares_read_restriction` | README |
 | F3: A required open readiness row has no linked gap ticket after planning | `test_w1_35.py::TestFailureMissingGapTicket::test_planning_states_gap_ticket_requirement`, `test_w1_35.py::TestFailureMissingGapTicket::test_planning_states_gap_ticket_requirement` | README |
 
-Tier 2's cap here: 108 functions (18 KPI lines x 6); 10 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 108 functions (18 KPI lines x 6); 10 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

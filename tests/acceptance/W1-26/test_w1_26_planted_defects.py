@@ -448,7 +448,7 @@ def test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id(project, sandbox, i
 
 # Every planted-defect case of this file, in file order: S1 and F-1 enumerate the check families, so the full run
 # keeps one case that plants every family's defect (each in a fresh project, as its own case does) and names each
-# family whose defect passes. The cases themselves stay, built, in the opt-in suite (tests/optin-lifted-breadth.txt).
+# family whose defect passes. The cases themselves stay, built, in the opt-in suite (tests/optin-breadth.txt).
 PLANTED_FAMILIES = (
     test_planted_schema_defect_ticket_missing_kpis,
     test_planted_schema_defect_decision_missing_status,

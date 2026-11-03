@@ -122,7 +122,8 @@ The full packages are in the test designer's return for this ticket.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -131,4 +132,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: A derived ticket lacks KPIs or allowed_paths | `test_w1_14_refusals.py::test_a_task_that_lacks_kpis_allowed_paths_or_role_gives_no_ticket`, `test_w1_14_refusals.py::test_one_lacking_task_refuses_the_whole_derivation`, `test_w1_14_refusals.py::test_a_task_with_no_block_gives_no_ticket` | README |
 | F2: An implementer ticket allowed_paths covers tests/acceptance/** | `test_w1_14_acceptance_paths.py::test_an_engineer_task_whose_paths_cover_the_acceptance_tests_gives_no_ticket`, `test_w1_14_acceptance_paths.py::test_no_role_but_the_test_designer_gets_the_acceptance_tests`, `test_w1_14_acceptance_paths.py::test_the_test_designers_task_may_name_the_acceptance_tests` | README |
 
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

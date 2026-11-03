@@ -324,7 +324,8 @@ The red reason of each case is in its table row above.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -337,4 +338,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | S7: Never one giant query or context: within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and... | `test_w2_04_batches.py::test_with_room_for_all_every_matching_item_is_stacked_in_rank_order`, `test_w2_04_batches.py::test_when_room_is_left_after_one_batch_the_next_batch_is_taken`, `test_w2_04_batches.py::test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit` | README |
 | F1: DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source. | `test_w2_04_emptied.py::test_an_emptied_mandatory_file_blocks_or_is_marked_not_read_never_read`, `test_w2_04_refusal.py::test_at_the_line_it_fits_and_one_token_over_it_refuses` | designer, by its words |
 
-Tier 2's cap here: 48 functions (8 KPI lines x 6); 2 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 2 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

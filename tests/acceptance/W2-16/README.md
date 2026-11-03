@@ -483,7 +483,8 @@ its own assertion with its preconditions met. No trial file is in the tree.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -494,4 +495,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | S5: The vendored skills carry their licence and version in the release [W2-L002, W2-L014]. | `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_version`, `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_upstream_licence` | README |
 | F1: A release whose files or manifest do not match their hashes is refused by gov install, gov update and gov doctor. | `test_w2_16_immutability.py::test_a_release_never_hashes_bytes_the_commit_does_not_hold`, `test_w2_16_last_round.py::test_a_source_whose_release_records_were_removed_is_refused` | designer, by its words |
 
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 26 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 26 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

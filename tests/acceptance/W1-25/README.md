@@ -231,7 +231,8 @@ No other earlier test was changed. W1-07 after the revision: 227 passed.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -242,4 +243,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: A ticket transition leaves no checkpoint | `test_w1_25_triggers.py::test_a_ticket_in_progress_with_no_checkpoint_is_reported`, `test_w1_25_triggers.py::test_a_transition_after_the_latest_checkpoint_marks_it_stale`, `test_w1_25_triggers.py::test_a_checkpoint_at_the_transition_clears_it` | README |
 | F2: A checkpoint references an input by id without its hash | `test_w1_25_record.py::test_every_input_has_an_id_a_version_and_a_hash`, `test_w1_25_record.py::test_an_input_that_cannot_be_hashed_is_refused_and_nothing_is_written`, `test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh` | README |
 
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 12 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

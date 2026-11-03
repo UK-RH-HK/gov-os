@@ -234,7 +234,8 @@ They are given in full in the test designer's return.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -246,4 +247,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: status mutates the repository | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged`, `test_w1_32_status_read_only.py::test_status_writes_nothing_anywhere`, `test_w1_32_status_read_only.py::test_status_leaves_uncommitted_work_as_it_was` | README |
 | F2: An open gate is missing from the output | `test_w1_32_status_not_read.py::test_a_ticket_file_that_cannot_be_read_is_reported_and_not_left_out`, `test_w1_32_status_not_read.py::test_without_the_store_the_ready_tickets_are_not_read`, `test_w1_32_status_not_read.py::test_without_the_store_the_decision_packages_are_not_read` | README |
 
-Tier 2's cap here: 42 functions (7 KPI lines x 6); 20 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 20 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

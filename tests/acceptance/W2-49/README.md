@@ -333,7 +333,8 @@ No earlier ticket's test is changed by these KPIs.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -343,4 +344,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | S4: The CIT-E record matches the CIT-P, or lists the differences. | `test_w2_49_capability_records.py::test_capability_record_covers_list_equals_contract_v4_2`, `test_w2_49_cit_e.py::test_cit_e_names_its_proposal_and_source` | designer, by its words |
 | F1: A Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator. | `test_w2_49_validator_lines.py::test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it`, `test_w2_49_validator_lines.py::test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | designer, by its words |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

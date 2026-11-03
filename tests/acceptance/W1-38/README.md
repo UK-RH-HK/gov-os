@@ -878,7 +878,8 @@ P-1 and P-2 are decided: P-1 by DEC-468 (option a; its cases are `TestOpenSpecSk
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -888,4 +889,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: generate --delete removes OpenSpec or vendored skills | `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_commands`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_skills`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_vendored_skills` | README |
 | F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_agents_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_role_file` | README |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 69 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 69 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

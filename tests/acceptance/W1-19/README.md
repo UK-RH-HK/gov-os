@@ -522,7 +522,8 @@ No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewr
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -532,4 +533,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: Mean hit@5 falls below 80 | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
 | F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 11 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 11 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

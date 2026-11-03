@@ -671,7 +671,8 @@ check's own entry and finding, each shown red against a planted fault and green 
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -687,4 +688,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: A planted defect of any listed family passes | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | designer |
 | F2: The scope of a check is a hand-maintained list [CAP-58.a] | `test_w1_26_derived.py::test_adding_a_ticket_is_picked_up_by_schema_check`, `test_w1_26_derived.py::test_adding_a_decision_is_picked_up_by_graph_check`, `test_w1_26_derived.py::test_adding_a_check_declaration_is_picked_up` | README |
 
-Tier 2's cap here: 66 functions (11 KPI lines x 6); 154 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 66 functions (11 KPI lines x 6); 154 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

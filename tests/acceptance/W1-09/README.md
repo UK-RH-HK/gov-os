@@ -450,7 +450,8 @@ W1-32's status cases with a package that does not load, and any case that matche
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -463,4 +464,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: Two agents hold the same claim | `test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder`, `test_w1_09_claims.py::test_a_second_claim_on_a_held_ticket_fails_with_the_holder_named`, `test_w1_09_claims.py::test_a_failed_claim_leaves_the_first_claim_as_it_was` | README |
 | F2: A ticket without tests/acceptance/<id>/ appears as READY | `test_w1_09_ready.py::test_a_ticket_without_its_acceptance_tests_folder_is_not_ready`, `test_w1_09_ready.py::test_the_ticket_becomes_ready_when_its_acceptance_tests_folder_exists`, `test_w1_09_ready.py::test_the_acceptance_tests_of_another_ticket_do_not_count` | README |
 
-Tier 2's cap here: 48 functions (8 KPI lines x 6); 21 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 21 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

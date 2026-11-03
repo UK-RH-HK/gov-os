@@ -34,17 +34,21 @@
   is made only when the test uses the cache; a test may set or unset the
   variable itself.
 
-- The opt-in suite ``lifted`` (DEC-1061, D-4's cut; T-10): every
-  ``tests/optin-lifted*.txt`` lists cases left out of a run unless the run
-  opts in with ``--optin=lifted`` or ``GOV_TESTS_OPTIN=lifted``. One entry a
-  line: a path (a folder or a test file, from the repository's root) or a
-  node id (``file::name``, ``file::Class::name``, ``file::name[row]``), then
-  ``#`` and why. ``rep: <path or file::name>`` keeps, of every parametrised
-  function under it, only its first collected row in a run that does not opt
-  in (the representative); its other rows are the opt-in's. An entry that
-  names no collected case deselects nothing. The cases left out are reported
-  as deselected; nothing is skipped or deleted, and an opted-in run collects
-  every case as before.
+- The opt-in suites (DEC-1061, D-4's cut; T-10): every ``tests/optin-<name>*.txt``
+  lists cases left out of a run unless the run opts in to ``<name>`` with
+  ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (several: ``lifted,breadth``
+  or the option given twice). ``lifted`` (``optin-lifted*.txt``) holds the
+  switched-off features' cases, run report-only in D-10's window; ``breadth``
+  (``optin-breadth.txt``) holds tier 2's cap and the representatives' other
+  rows (the CTO, P-1 (b)). One entry a line: a path (a folder or a test file,
+  from the repository's root) or a node id (``file::name``,
+  ``file::Class::name``, ``file::name[row]``), then ``#`` and why.
+  ``rep: <path or file::name>`` keeps, of every parametrised function under
+  it, only its first collected row in a run that does not opt in (the
+  representative); its other rows are the opt-in's. An entry that names no
+  collected case deselects nothing. The cases left out are reported as
+  deselected; nothing is skipped or deleted, and a run that opts in to every
+  suite collects every case as before.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -105,22 +109,31 @@ def _drop_rebuild_lock(path: str, former: str | None) -> None:
 
 
 _OPTIN_ENV = "GOV_TESTS_OPTIN"
-_OPTIN_NAME = "lifted"
-_OPTIN_GLOB = "optin-lifted*.txt"
+_OPTIN_NAMES = ("lifted", "breadth")
+_OPTIN_GLOB = "optin-*.txt"
 _TESTS = Path(__file__).resolve().parent
 _ROOT = _TESTS.parent
 
 
 def pytest_addoption(parser):
-    parser.addoption("--optin", action="append", default=[], metavar="NAME",
-                     help=f"run the opt-in suite NAME too (only '{_OPTIN_NAME}': the cases of "
-                          f"tests/{_OPTIN_GLOB}, DEC-1061); also {_OPTIN_ENV}=NAME")
+    parser.addoption("--optin", action="append", default=[], metavar="NAME[,NAME]",
+                     help=f"run the opt-in suite(s) NAME too ({', '.join(_OPTIN_NAMES)}: the cases of "
+                          f"tests/optin-NAME*.txt, DEC-1061); also {_OPTIN_ENV}=NAME[,NAME]")
 
 
-def optin_entries(folder: Path = _TESTS) -> list[tuple[str, str, str]]:
-    """Every entry of ``folder``'s opt-in lists: ``(kind, target, list file name)``, kind ``case`` or ``rep``."""
+def optin_name(listing: Path) -> str:
+    """The opt-in suite a list belongs to: the word after ``optin-`` in its file name (``optin-lifted-guard.txt``:
+    ``lifted``)."""
+    return listing.stem[len("optin-"):].split("-", 1)[0]
+
+
+def optin_entries(folder: Path = _TESTS, skip=()) -> list[tuple[str, str, str]]:
+    """Every entry of ``folder``'s opt-in lists but those of the suites in ``skip``: ``(kind, target, list file
+    name)``, kind ``case`` or ``rep``."""
     entries = []
     for listing in sorted(folder.glob(_OPTIN_GLOB)):
+        if optin_name(listing) in skip:
+            continue
         for raw in listing.read_text(encoding="utf-8").splitlines():
             line = raw.split("#", 1)[0].strip()
             if not line:
@@ -178,19 +191,25 @@ def optin_left_out(items, entries) -> list:
     return out
 
 
-def _opted_in(config) -> bool:
-    names = set(config.getoption("optin") or [])
-    names |= {name.strip() for name in os.environ.get(_OPTIN_ENV, "").split(",")}
-    return _OPTIN_NAME in names
+def _opted_in(config) -> set[str]:
+    """The opt-in suites the run names, by option or variable, each comma-separated."""
+    given = [*(config.getoption("optin") or []), os.environ.get(_OPTIN_ENV, "")]
+    return {name.strip() for value in given for name in value.split(",") if name.strip()}
 
 
 def pytest_collection_modifyitems(config, items):
-    if _opted_in(config):
-        return
-    entries = optin_entries()
+    opted = _opted_in(config)
+    entries = optin_entries(skip=opted)
     if not entries:
         return
     left = optin_left_out(items, entries)
+    if left and opted:
+        # A case an opted-in suite's list names is collected whole, whatever another suite's ``rep:`` says.
+        named = [(kind, target, name) for kind, target, name in optin_entries()
+                 if kind == "case" and optin_name(Path(name)) in opted]
+        if named:
+            kept = {id(item) for item in optin_left_out(left, named)}
+            left = [item for item in left if id(item) not in kept]
     if left:
         gone = {id(item) for item in left}
         items[:] = [item for item in items if id(item) not in gone]

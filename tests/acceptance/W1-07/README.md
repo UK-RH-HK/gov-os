@@ -290,7 +290,8 @@ the twelve and the three) is W1-32's case, rewritten for DEC-542.
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -302,4 +303,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: A command writes outside its declared act paths | `test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths`, `test_w1_07_read_act.py::test_a_command_refused_for_invalid_configuration_writes_nothing`, `test_w1_07_check_declarations.py::test_listing_does_not_run_a_check` | README |
 | F2: Envelope fields drift from docs/interfaces/API-0002.yaml | `test_w1_07_envelope.py::test_the_envelope_has_no_field_outside_the_interface`, `test_w1_07_envelope.py::test_every_command_returns_the_envelope`, `test_w1_07_envelope.py::test_the_envelope_has_no_field_outside_the_interface` | README |
 
-Tier 2's cap here: 42 functions (7 KPI lines x 6); 6 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 6 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).

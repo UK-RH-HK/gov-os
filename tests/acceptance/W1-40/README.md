@@ -446,7 +446,8 @@ From then on every push from that tree also pushes the notes ref of the evidence
 
 Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
 a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+built in the opt-in suite `breadth` (`tests/optin-breadth.txt`), run with `--optin=breadth`; the switched-off
+features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 
 | KPI line | case(s) in the full run | placed by |
 |---|---|---|
@@ -456,4 +457,4 @@ built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only 
 | F1: CI downloads models or needs a GPU | `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit`, `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | README |
 | F2: A push with a failing G3 check leaves CI green | `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit`, `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | README |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 35 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
