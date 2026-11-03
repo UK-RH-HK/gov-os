@@ -114,6 +114,11 @@ def _highest(count):
     return ollama._cpu_list(sorted(os.sched_getaffinity(0))[-count:])
 
 
+def _lowest(count):
+    """The lowest CPUs this run may use: a configured cap inside the run's own affinity, whatever slot it runs in."""
+    return ollama._cpu_list(sorted(os.sched_getaffinity(0))[:count])
+
+
 def test_the_shared_server_starts_under_the_default_cap_and_its_child_inherits_it(stage):
     result = ollama.ensure_available(timeout_s=15, env=stage.env)
     assert result["available"] and result["started"], result
@@ -127,15 +132,16 @@ def test_the_shared_server_starts_under_the_default_cap_and_its_child_inherits_i
 @pytest.mark.parametrize("gpu", [None, "0"])
 def test_the_query_server_starts_under_its_configured_cap_with_the_gpu_left_visible(stage, gpu):
     """DEC-1033: no ``CUDA_VISIBLE_DEVICES=-1`` is added; the caller's own value, if any, reaches the daemon as it is."""
-    stage.gate({"other": 1, "embedding_servers": {"query": {"parallel": 3, "cpus": "0-1", "nice": 15},
+    two = _lowest(2)
+    stage.gate({"other": 1, "embedding_servers": {"query": {"parallel": 3, "cpus": two, "nice": 15},
                                                   "shared": {"parallel": 2}}})
     caller = {"CUDA_VISIBLE_DEVICES": gpu} if gpu is not None else {}
     result = ollama.ensure_query_available(timeout_s=15, env={**stage.env, "OLLAMA_NUM_PARALLEL": "9", **caller})
     assert result["available"] and result["started"], result
-    assert result["settings"] == {"parallel": 3, "cpus": "0-1", "nice": 15,
+    assert result["settings"] == {"parallel": 3, "cpus": two, "nice": 15,
                                   "source": str(stage.home / ollama.GATE_REL)}
     for run in stage.wait_runs(2):
-        assert (run["cpus"], run["nice"] >= 15, run["parallel"], run["gpu"]) == ("0-1", True, "3", gpu), run
+        assert (run["cpus"], run["nice"] >= 15, run["parallel"], run["gpu"]) == (two, True, "3", gpu), run
 
 
 def test_an_automatic_start_of_the_query_server_runs_under_the_default_cap_like_the_shared_one(stage):
@@ -275,13 +281,14 @@ def test_a_safe_restart_never_stops_a_port_held_by_another_process(stage):
 
 
 def test_a_safe_restart_starts_a_down_server_under_its_cap_and_records_it(stage):
-    stage.gate({"embedding_servers": {"query": {"cpus": "0", "nice": 12}}})
+    one = _lowest(1)
+    stage.gate({"embedding_servers": {"query": {"cpus": one, "nice": 12}}})
     result = ollama.safe_restart("query", env=stage.env)
     assert (result["restarted"], result["old_pid"], result["probe"]["state"]) == (True, None, "down"), result
     assert "down" in result["reason"] and result["new_pid"] == stage.wait_runs(1)[0]["pid"]
-    assert all(run["cpus"] == "0" and run["nice"] >= 12 and run["gpu"] is None for run in stage.wait_runs(2))
+    assert all(run["cpus"] == one and run["nice"] >= 12 and run["gpu"] is None for run in stage.wait_runs(2))
     record = [json.loads(line) for line in (stage.home / ollama.RESTARTS_REL).read_text().splitlines()]
-    assert len(record) == 1 and record[0]["probe_state"] == "down" and record[0]["settings"]["cpus"] == "0"
+    assert len(record) == 1 and record[0]["probe_state"] == "down" and record[0]["settings"]["cpus"] == one
 
 
 def test_a_safe_restart_stops_a_hung_serve_with_its_child_and_starts_it_capped(stage):
