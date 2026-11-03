@@ -36,6 +36,7 @@ import os
 import sqlite3
 import struct
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -54,8 +55,24 @@ EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as 
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
 TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
-RETRY_WAITS_S = (10.0, 30.0)  # the growing waits before a timed-out chunk batch's 2nd and 3rd try (DEC-1026)
-TIMED_OUT: dict = {}  # ``_ask``'s answer to a request accepted and not answered in time: empty, so read as none
+RETRY_WAITS_S = (10.0, 30.0)  # the growing waits before a failed chunk batch's 2nd and 3rd try (DEC-1026, W2-126)
+
+
+class _Transient(dict):
+    """``_ask``'s answer to a request that failed in a way a later try may not: empty, so read as none; ``kind``
+    names the failure (DEC-1026; W2-126 KPI 7, P-W2-123-4)."""
+
+    def __init__(self, kind: str):
+        super().__init__()
+        self.kind = kind
+
+
+class GaveUp(Exception):
+    """Every try of a chunk batch's request failed transiently: ``args[0]`` names each try's failure, in order."""
+
+
+TIMED_OUT = _Transient("timed out")  # a request accepted and not answered within ``TIMEOUT_S``
+REFUSED, RESET = _Transient("connection refused"), _Transient("connection reset")
 NO_VECTORS = "sqlite_vec cannot be loaded: no vector can be stored or compared"
 NO_MODEL = f"{MODEL} is not in Ollama's model list"
 NO_EMBEDDING = f"Ollama did not embed with {MODEL}"
@@ -93,7 +110,9 @@ def _report(reason: str | None, **more) -> dict:
 
 def _ask(path: str, body: dict | None = None, host: str | None = None):
     """The JSON answer to ``path`` of the Ollama endpoint at ``host`` (default: the shared one at ``OLLAMA_HOST``);
-    None when it gives none, ``TIMED_OUT`` when it accepted the request and gave no answer within ``TIMEOUT_S``."""
+    None when it gives none; a transient failure's answer (empty, read as none) when it accepted the request and gave
+    no answer within ``TIMEOUT_S`` (``TIMED_OUT``), answered with a server error (HTTP 5xx), or the connection was
+    refused or reset (``REFUSED``, ``RESET``)."""
     host = host or os.environ.get("OLLAMA_HOST") or ollama.DEFAULT_HOST
     request = urllib.request.Request((host if "://" in host else f"http://{host}").rstrip("/") + path,
                                      data=None if body is None else json.dumps(body).encode(),
@@ -103,25 +122,36 @@ def _ask(path: str, body: dict | None = None, host: str | None = None):
             return json.load(reply)
     except TimeoutError:  # the socket's own time-out once connected; a refusal comes wrapped in a URLError
         return TIMED_OUT
+    except urllib.error.HTTPError as error:  # an answer with an error status: only a server error is transient
+        return _Transient(f"HTTP {error.code}") if 500 <= error.code < 600 else None
+    except urllib.error.URLError as error:  # raised before an answer: a refusal or a reset is transient
+        failure = error.reason
+        return REFUSED if isinstance(failure, ConnectionRefusedError) else \
+            RESET if isinstance(failure, ConnectionResetError) else None
+    except ConnectionResetError:  # reset (or closed with no answer) while the answer was awaited or read
+        return RESET
     except (OSError, http.client.HTTPException, ValueError):
         return None
 
 
 def _embed(texts: list[str], host: str | None = None, retries: list | None = None) -> list[bytes] | None:
     """One float32 BLOB per text, embedded at ``host`` (default: the shared runner) with no runner option; None unless
-    the endpoint returned a vector for each. With ``retries`` (a rebuild's chunks), a try that timed out is tried again
-    after each wait of ``RETRY_WAITS_S`` in turn, a request with a timed-out try is recorded in ``retries``, and
-    ``TimeoutError`` (with the tries made) is raised when every try timed out (DEC-1026)."""
+    the endpoint returned a vector for each. With ``retries`` (a rebuild's chunks), a try that failed transiently
+    (timed out, a server error, a refused or reset connection) is tried again after each wait of ``RETRY_WAITS_S`` in
+    turn, a request with such a try is recorded in ``retries``, and ``GaveUp`` (naming each try's failure) is raised
+    when every try failed so (DEC-1026; W2-126 KPI 7). Any other failure ends at once."""
     waits: list[float] = []
-    while (answer := _ask("/api/embed", {"model": MODEL, "input": texts}, host)) is TIMED_OUT \
+    failures: list[str] = []
+    while isinstance(answer := _ask("/api/embed", {"model": MODEL, "input": texts}, host), _Transient) \
             and retries is not None and len(waits) < len(RETRY_WAITS_S):
+        failures.append(answer.kind)
         waits.append(RETRY_WAITS_S[len(waits)])
         time.sleep(waits[-1])
     vectors = (answer or {}).get("embeddings") or []
-    if retries is not None and (waits or answer is TIMED_OUT):
+    if retries is not None and (waits or isinstance(answer, _Transient)):
         retries.append({"tries": len(waits) + 1, "waits_s": waits, "embedded": len(vectors) == len(texts)})
-        if answer is TIMED_OUT:
-            raise TimeoutError(len(waits) + 1)
+        if isinstance(answer, _Transient):
+            raise GaveUp([*failures, answer.kind])
     if len(vectors) != len(texts):
         return None
     return [struct.pack(f"{len(vector)}f", *vector) for vector in vectors]
@@ -314,9 +344,8 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
                 if todo:
                     try:
                         embedded = _embed([texts[i] for i in todo], retries=retries)
-                    except TimeoutError as timed_out:  # the vectors made so far stay; the store is not reported built
-                        return (f"{NO_EMBEDDING}: the request timed out at all {timed_out.args[0]} tries (each under "
-                                f"{TIMEOUT_S:g} s; waits {', '.join(f'{w:g} s' for w in RETRY_WAITS_S)})")
+                    except GaveUp as gave_up:  # the vectors made so far stay; the store is not reported built
+                        return _gave_up(gave_up.args[0])
                     if embedded is None:
                         return NO_EMBEDDING
                     machine.put([texts[i] for i in todo], embedded)
@@ -326,6 +355,14 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
         return None
     finally:
         connection.close()
+
+
+def _gave_up(failures: list[str]) -> str:
+    """Why the stage stopped after the last try: W2-123's words when every try timed out, else each try's failure."""
+    tail = f"each under {TIMEOUT_S:g} s; waits {', '.join(f'{w:g} s' for w in RETRY_WAITS_S)}"
+    if all(failure == TIMED_OUT.kind for failure in failures):
+        return f"{NO_EMBEDDING}: the request timed out at all {len(failures)} tries ({tail})"
+    return f"{NO_EMBEDDING}: the request failed at all {len(failures)} tries ({', '.join(failures)}; {tail})"
 
 
 def _status(root: Path) -> str | None:
@@ -358,7 +395,8 @@ def _vectors(root: Path) -> str | None:
 
 def refresh(root: Path) -> dict:
     """Bring the lexical index up to date, then embed the chunks that have no vector. ``retries`` lists, in order,
-    each chunk batch request that timed out at least once: its tries, the waits taken and whether it embedded."""
+    each chunk batch request that failed transiently at least once (timed out, a server error, a refused or reset
+    connection): its tries, the waits taken and whether it embedded."""
     counts, retries = vector_cache.zero(), []
     return _report(_build(Path(root), counts, retries), retries=retries, vector_cache=counts)
 
