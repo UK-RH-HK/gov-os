@@ -256,7 +256,7 @@ Follow W2-61's §8, as W2-86's §8 adapted it, with these changes:
 
 Under DEC-1055 (2) the ticket lands as built: its embedding scope is not narrowed here. Written by the D-4b engineer (CTO session 33b3628c).
 
-**Verified on:** the merge commit `19afc18f3f19` (`git merge --no-ff w2/integrate` at `23625eb2aebe` into `w2/W2-91` at `55b47e075b3b`). The merge was clean. The ticket's `allowed_paths` follow integrate (`8562ae79`, W2-86's acceptance file no longer listed). The path map differs from integrate's only by this ticket's change (`b652fc96d2b5`). The only commit after it before the runs is `50de449610ed`: §7's code citations moved to the merged code's line numbers, with the same reads.
+**Verified on:** the merge commit `19afc18f3f19` (`git merge --no-ff w2/integrate` at `23625eb2aebe` into `w2/W2-91` at `55b47e075b3b`). The merge was clean. The ticket's `allowed_paths` follow integrate (`8562ae79`, W2-86's acceptance file no longer listed). The path map differs from integrate's only by this ticket's change (`b652fc96d2b5`). The only commit after it before the runs is `50de449610ed`: §7's code citations moved to the merged code's line numbers, with the same reads. `gov accept`'s passing run is at `e08554a9a218`, the merge of the test designer's support fix (`w2/W2-91-tests`, `3191a794`). The head is that merge plus this record's update.
 
 ### The rebuild
 
@@ -299,6 +299,7 @@ Counted read-only and judged by the merged path map, with the indexer's own matc
 | At the merge, `19afc18f3f19` and `50de449610ed` | **fail** (1 passed, 1 failed) | pass (6) | **fail** (3 passed, 1 failed) | pass (5) | pass (2) | pass (6) | **fail** (3 passed, 1 failed) | pass (5) | 17 passed, 2 failed |
 | The branch head before the merge, `55b47e075b3b`, in a clone, the same day | **fail** (1, 1) | pass (6) | **fail** (3, 1) | pass (5) | pass (2) | pass (6) | **fail** (3, 1) | pass (5) | 17 passed, 2 failed |
 | The lead's run at `160439f136b4`, 2026-11-02 09:33 | pass (2) | pass (6) | pass (4) | pass (5) | pass (2) | pass (6) | pass (4) | pass (5) | 19 passed, 0 failed |
+| **After the support fix, at `e08554a9a218`** | **pass (2)** | **pass (6)** | **pass (4)** | **pass (5)** | **pass (2)** | **pass (6)** | **pass (4)** | **pass (5)** | **19 passed, 0 failed** |
 
 - **The same two tests fail at the head before the merge,** a tree identical to the lead's passing run apart from one checkpoint file. So the merge did not cause them. Something outside the tree changed between 2026-11-02 09:33 and today.
 - **What the engineer ruled out, without reading the tests:**
@@ -309,7 +310,11 @@ Counted read-only and judged by the merged path map, with the indexer's own matc
   - this record's commits: every commit it cites still resolves;
   - the namespaces: every tracked path under the three sets is embedded, by the indexer's rule.
 - **One machine-level change in that window:** ACT-D8's `git reflog expire --expire=now --all` and `git gc --prune=now` on the shared object store, at about 15:35 today. It is not shown to be the cause.
-- **The two reds are unresolved here:** the engineer never reads `tests/acceptance/W2-91/`.
+- **The cause, found by a fresh test designer (P-W2-91-D4B-1 (a), decided by the CTO):** the reds were environmental.
+  - Since 2026-11-02 18:13 (ACT-QUERY-GPU-2), `~/.local/bin` has held an intended `ollama` wrapper beside `gitleaks`.
+  - The acceptance support's PATH filter dropped every folder holding an `ollama`, so the planted rebuild lost `gitleaks`.
+  - The ACT-D8 suspect above was not the cause.
+- **The fix:** `tests/acceptance/W2-91/w2_91_support.py` only, on `w2/W2-91-tests` at `3191a794`. The rebuild's child process keeps `gitleaks`, linked from a scratch folder, while every PATH folder holding `ollama` stays dropped. It was merged into `w2/W2-91` as `e08554a9a218`. The fourth row of the table above is the run after the fix.
 
 ### The scoped run: `select_tests.py`'s selection, through `heavy_slot.sh`
 
@@ -323,20 +328,20 @@ Counted read-only and judged by the merged path map, with the indexer's own matc
     - `W2-59/test_w2_59_hook_lines::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]`;
     - `W2-59/test_w2_59_hook_lines_worker_env`'s three `preToolUse[0]` cases: the hook line now runs `.claude/hooks/pretooluse.py`, which the test's planted project lacks.
 - **The serial phase:** 33 entries, 75 tests, 75 passed, 0 failed, in 681 s (to 16:05 UTC).
-- **The whole scoped run:** 1,140 s, of which the parallel phase is 459 s including its wait for a slot. 5,965 tests: 5,948 passed, 9 failed, 8 skipped. Apart from the two unresolved `gov accept` reds above, none of the failures is this change's.
+- **The whole scoped run:** 1,140 s, of which the parallel phase is 459 s including its wait for a slot. 5,965 tests: 5,948 passed, 9 failed, 8 skipped. None of the failures is this change's. The two W2-91 reds were the environmental cause above, since fixed. The two W1-19 cases, re-run alone again at `e08554a9a218`, pass (2 of 2).
 
 ### Per KPI line
 
 | KPI line | How it is verified | Command | Result | Commit |
 |---|---|---|---|---|
-| S1: the root files, `governance/**` and `schemas/**` have vectors; the counts recorded | the rebuilt store's count (above); the builder test `test_the_root_files_the_overlay_and_schemas_are_embedded`; `gov accept` success-1 | `rebuild_slot.sh … --seed`; the read-only count; `pytest tests/unit/retrieval/test_w2_91_full_embeddings.py`; `gov accept W2-91 --json` | the store: 26, 4,966 and 31 chunks with vectors, every file in each set; the builder test passes; **`gov accept` fails 1 of 2, also before the merge (unresolved, above)** | `19afc18f3f19` / `50de449610ed` |
+| S1: the root files, `governance/**` and `schemas/**` have vectors; the counts recorded | the rebuilt store's count (above); the builder test `test_the_root_files_the_overlay_and_schemas_are_embedded`; `gov accept` success-1 | `rebuild_slot.sh … --seed`; the read-only count; `pytest tests/unit/retrieval/test_w2_91_full_embeddings.py`; `gov accept W2-91 --json` | the store: 26, 4,966 and 31 chunks with vectors, every file in each set; the builder test passes; `gov accept` passes (2 of 2) | `19afc18f3f19`; `gov accept` at `e08554a9a218` |
 | S2: what stays out stays out; `schemas/**` has its own namespace | `gov accept` success-2; the store's count; the builder test `test_what_stays_out_stays_out` | as above | pass (6 of 6); 0 vectors in each stay-out set; passes | `50de449610ed` |
-| S3: the overlay stays restricted; the indexer reads `embedding_policy` only | the code reading in §7; the builder test `test_the_overlay_stays_restricted`; `gov accept` success-3 | `grep` over `src/`; as above | `restricted` and `denied` at the head and the base; the builder test passes; **`gov accept` fails 1 of 4, also before the merge (unresolved, above)** | `50de449610ed` |
+| S3: the overlay stays restricted; the indexer reads `embedding_policy` only | the code reading in §7; the builder test `test_the_overlay_stays_restricted`; `gov accept` success-3 | `grep` over `src/`; as above | `restricted` and `denied` at the head and the base; the builder test passes; `gov accept` passes (4 of 4) | `e08554a9a218` |
 | S4: the two values only; each tracked path in exactly one namespace; the indexer's code unchanged | `gov accept` success-4; the builder tests `test_only_the_two_values` and `test_every_tracked_path_is_in_one_namespace`; `git diff --stat 23625eb2aebe 19afc18f3f19 -- src` | as above | pass (5 of 5); both pass; the diff is empty | `50de449610ed` |
 | S5: nothing else moves | `gov accept` success-5; the builder test `test_nothing_else_moves` | as above | pass (2 of 2); passes | `50de449610ed` |
 | S6: W2-61's measure, base and head, both figures together | measure: D-4b measure 1 (the CTO runs the measures); the figures of `b652fc96d2b5` are in §4 and §5 | — | not run here | — |
 | F1: no file under `fixtures/`, `.claude/`, `.rulesync/` or `cli/` embedded | `gov accept` failure-1; the store's count | as above | pass (6 of 6); 0 vectors in each | `50de449610ed` |
-| F2: the overlay's sensitivity or export policy not changed, the overlay not exported | `gov accept` failure-2; the builder test `test_the_overlay_stays_restricted`; §7 | as above | **fails 1 of 4, also before the merge (unresolved, above)**; the builder test passes | `50de449610ed` |
+| F2: the overlay's sensitivity or export policy not changed, the overlay not exported | `gov accept` failure-2; the builder test `test_the_overlay_stays_restricted`; §7 | as above | pass (4 of 4); the builder test passes | `e08554a9a218` |
 | F3: no third value; no tracked path in no namespace or in two | `gov accept` failure-3; the builder tests as for S4 | as above | pass (5 of 5); both pass | `50de449610ed` |
 | F4: no figure without the other; the hidden half neither read nor run | measure: D-4b measure 1 | — | this record reads no hidden file, and its figures in §4 stand together | — |
 
