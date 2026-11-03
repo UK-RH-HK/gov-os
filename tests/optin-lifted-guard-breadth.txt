@@ -1880,3 +1880,92 @@ tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit
 tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[exit-2-with-refusal-source-PreToolUse]  # fold: a row beyond the representatives
 tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[exit-1-settings-PreToolUse]  # fold: a row beyond the representatives
 tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[killed-settings-PreToolUse]  # fold: a row beyond the representatives
+
+# unit/guard
+rep: tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_without_the_marker_is_unmarked  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_decide.py::TestFreezeState::test_a_marker_line_is_frozen  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[\x00\x00\x00F\x00\x00\x00R\x00\x00\x00O\x00\x00\x00Z\x00\x00\x00E\x00\x00\x00N\x00\x00\x00 \x00\x00\x00o\x00\x00\x00w\x00\x00\x00n\x00\x00\x00e\x00\x00\x00r\x00\x00\x00\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[\x00FROZEN\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[FROZEN\x00 owner\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[\xe2\x80\x8bFROZEN\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[FROZEN: owner\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[state: frozen\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[FROZEN_BY: owner\n]  # fold: a row beyond the representatives
+tests/unit/guard/test_decide.py::TestFreezeState::test_a_file_that_carries_the_word_is_frozen[not FROZEN\n]  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_decide.py::TestUnmarkedFlagRecord::test_a_call_a_later_rule_denies_is_not_recorded  # unitfold: one case per unit function
+rep: tests/unit/guard/test_heldout.py::test_escape_hatch_denied  # unitfold: one case per unit function
+rep: tests/unit/guard/test_heldout.py::test_broken_file_fails_closed  # unitfold: one case per unit function
+rep: tests/unit/guard/test_heldout_limit.py::test_a_system_that_reports_no_limit_gives_the_guard_s_own  # unitfold: one case per unit function
+rep: tests/unit/guard/test_heldout_limit.py::test_a_megabyte_of_path_like_text_is_answered_at_once  # unitfold: one case per unit function
+rep: tests/unit/guard/test_heldout_limit.py::test_no_input_makes_the_check_raise  # unitfold: one case per unit function
+rep: tests/unit/guard/test_reads.py::test_each_route_is_decided_as_policy_2_says  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_reads.py::test_the_repository_s_credential_names_are_secrets  # unitfold: one case per unit function
+rep: tests/unit/guard/test_reads.py::test_a_set_s_shape_is_checked  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_reads.py::test_a_tilde_path_is_judged_as_its_expanded_form  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_reads.py::test_no_write_rule_widens_for_a_tilde_path  # unitfold: one case per unit function
+rep: tests/unit/guard/test_reads.py::test_the_engineer_runs_its_tests_with_flags_or_under_coverage  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_reads.py::test_their_source_stays_refused  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_research_install.py::test_another_shape_gives_no_experiment_folder  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_research_install.py::test_inside_the_folder_is_the_working_directory_or_a_first_cd  # fold: a row beyond the representatives
+rep: tests/unit/guard/test_research_install.py::test_uv_run_w_with_its_value_joined_is_an_install_among_runs_own_options  # fold: a row beyond the representatives
+
+# unit/hooks
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_settings_line_equals_its_rulesync_source  # unitfold: one case per unit function
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_takes_the_pinned_form  # unitfold: one case per unit function
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_lifecycle_lines_keep_the_plain_form  # fold: a row beyond the representatives
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_runs_the_program_with_the_gov_s_interpreter_and_minus_e  # unitfold: one case per unit function
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_finds_gov_on_path_when_home_has_none  # unitfold: one case per unit function
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_the_line_keeps_its_exit_mapping  # fold: a row beyond the representatives
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_with_no_gov_the_line_refuses_and_names_it  # unitfold: one case per unit function
+rep: tests/unit/hooks/test_w2_106_template_hook_lines.py::test_a_gov_naming_no_interpreter_that_runs_refuses  # fold: a row beyond the representatives
+
+# unit/install
+rep: tests/unit/install/test_install.py::test_package_manager_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_python_m_pip_install_detected  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_uv_install_detected  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_pipe_to_shell_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_compound_install_detected  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_non_install_not_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_sudo_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_sudo_not_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_near_the_classes  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_install_across_separator  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_sudo_across_separator  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_options_before_subcommand  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_version_suffixed_names  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_added_package_managers  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_curl_download_into_path  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_curl_download_not_into_path  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_wget_download_into_path  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_wget_download_not_into_path  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_no_decision_for_ordinary_commands  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_uv_option_before_subcommand  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_uv_non_install_not_detected  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_version_suffix_python2  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_version_suffix_non_install_not_detected  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_wget_combined_option_not_into_path  # unitfold: one case per unit function
+rep: tests/unit/install/test_install.py::test_uv_forms_of_dec_174_detected  # fold: a row beyond the representatives
+rep: tests/unit/install/test_install.py::test_other_uv_commands_not_detected  # fold: a row beyond the representatives
+
+# unit/launch
+rep: tests/unit/launch/test_batch4.py::test_a_bypass_or_an_added_directory_refuses  # unitfold: one case per unit function
+rep: tests/unit/launch/test_batch4.py::test_a_harmless_mode_and_a_prompt_pass  # unitfold: one case per unit function
+rep: tests/unit/launch/test_batch4.py::test_the_matching_settings_keys_refuse_in_both_files  # unitfold: one case per unit function
+rep: tests/unit/launch/test_batch4.py::test_the_destination_of_ln_is_a_write_target  # unitfold: one case per unit function
+rep: tests/unit/launch/test_batch4.py::test_an_ln_form_the_guard_does_not_follow_is_refused  # unitfold: one case per unit function
+rep: tests/unit/launch/test_command_modules.py::test_a_faulty_module_fails_its_own_command_and_no_other  # unitfold: one case per unit function
+rep: tests/unit/launch/test_launcher.py::test_a_weaker_block_is_a_fault  # unitfold: one case per unit function
+rep: tests/unit/launch/test_launcher.py::test_the_runtime_rules_cover_every_name_but_scratch  # unitfold: one case per unit function
+rep: tests/unit/launch/test_launcher.py::test_an_allowlist_entry_is_a_host_name_or_its_subdomain_form  # unitfold: one case per unit function
+rep: tests/unit/launch/test_launcher.py::test_the_guard_is_wired_only_when_it_runs_before_every_guarded_tool  # unitfold: one case per unit function
+rep: tests/unit/launch/test_launcher.py::test_an_argument_that_takes_the_guard_or_the_settings_away_refuses  # unitfold: one case per unit function
+rep: tests/unit/launch/test_runs.py::test_a_folder_already_there_is_neither_marked_nor_added  # unitfold: one case per unit function
+rep: tests/unit/launch/test_w1_28.py::test_product_spec_is_held_to_a_ticket_of_its_own  # unitfold: one case per unit function
+rep: tests/unit/launch/test_w1_32.py::test_a_signal_ends_the_session_removes_the_folder_and_gives_130  # unitfold: one case per unit function
+rep: tests/unit/launch/test_w1_32.py::test_a_failed_removal_keeps_the_exit_code_and_names_the_folder_in_one_line  # unitfold: one case per unit function
+rep: tests/unit/launch/test_w1_32.py::test_a_failed_removal_keeps_the_exit_code_when_stderr_cannot_be_written  # unitfold: one case per unit function
+
+# unit/pause
+rep: tests/unit/pause/test_pause.py::test_an_empty_gov_role_is_refused_and_sets_nothing  # fold: a row beyond the representatives
+rep: tests/unit/pause/test_pause.py::test_a_linked_runtime_folder_is_refused_and_nothing_is_written_or_removed  # unitfold: one case per unit function
+rep: tests/unit/pause/test_pause.py::test_a_lift_that_is_not_the_owner_in_person_is_refused_and_the_flag_stays  # fold: a row beyond the representatives
