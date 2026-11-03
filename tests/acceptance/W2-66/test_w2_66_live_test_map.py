@@ -100,12 +100,14 @@ COUPLINGS = (
                                                           "tests/acceptance/W1-38", "tests/unit/telemetry")),
     ("template/governance/kernel/hooks/precompact.py", ("tests/acceptance/W1-31", "tests/acceptance/W1-37",
                                                         "tests/acceptance/W1-38", "tests/unit/telemetry")),
+    # Rewrite-Reason: DEC-1061 item 9, T-6 (D4-LIST-B §4 row 2): W1-19 and W1-21 (the real-model suites) are selected
+    # only by model-path changes, no longer by the fixture-inputs coupling (FIXTURE_INPUTS_NOT_REACHING below).
     (support.PATH_MAP_REL, tuple(f"tests/acceptance/{w}" for w in
-                                 ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                 ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     (".gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                             ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                             ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("template/.gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                                      ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                      ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("src/gov/checkpoint/record.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-31")),
     ("src/gov/decisions/checker.py", ("tests/acceptance/W1-30",)),
     ("src/gov/closure/command.py", ("tests/acceptance/W1-30",)),
@@ -338,6 +340,21 @@ def test_each_coupling_imports_cannot_see_is_declared(test_map, path, suites):
     reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
     missing = [s for s in suites if not _held(reached, s, whole=False)]
     assert not missing, f"no coupling takes a change of {path} to {missing}"
+
+
+# DEC-1061 item 9, T-6: a change of the live path map or a gitleaks configuration does not reach the real-model suites
+# (their real-model files run only on a model-path change, select_tests.py's rule, and in the nightly).
+FIXTURE_INPUTS_NOT_REACHING = ((support.PATH_MAP_REL, ".gitleaks.toml", "template/.gitleaks.toml"),
+                               ("tests/acceptance/W1-19", "tests/acceptance/W1-21"))
+
+
+@pytest.mark.parametrize("path", FIXTURE_INPUTS_NOT_REACHING[0])
+def test_a_fixture_input_change_does_not_reach_the_real_model_suites(test_map, path):
+    """T-6 (DEC-1061 item 9): the path map's and the gitleaks configurations' coupling leaves out W1-19 and W1-21."""
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    wrong = [t for t in reached for suite in FIXTURE_INPUTS_NOT_REACHING[1]
+             if t.rstrip("/") == suite or t.startswith(suite + "/")]
+    assert not wrong, f"a change of {path} still reaches the real-model suites through a coupling: {wrong}"
 
 
 # W1-27's ``test_w2_67_copies.py`` loads these conftests by file path (``conftest_of``), which no import shows.
