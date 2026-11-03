@@ -216,7 +216,7 @@ close), and the evidence block does not name it.
 | KPI line | Tests | Red on the base |
 |---|---|---|
 | S6 + F2 the evidence block | `test_w2_66_evidence.py` (8); `test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block`, `::test_the_junit_xml_holds_every_case_run_and_no_case_left_out`, `::test_a_one_module_change_is_stated_scoped_never_full`, `::test_the_head_and_the_tree_are_stated` | (a); `test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket` is green on the base (nothing is written today) |
-| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases; its five cases of Part 4 and its eight of Part 5 apart) | (d) |
+| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (73 cases since DEC-1050 (T-4), see "T-4's revision" below; its five cases of Part 4 and its eight of Part 5 apart) | (d) |
 | S12 the lead's verification unchanged | `test_w2_66_lead_verification.py` (2) | **green on the base by design**: they hold that nothing this ticket builds changes what a plain `pytest tests` reads or collects (no configuration file, conftest outside this folder or serial-only list changed against `w2/integrate`; a fixture's test map changes nothing a plain run collects) |
 
 ### Part 3 — limits, distribution, nightly, report
@@ -315,3 +315,28 @@ Each its own commit with its `Rewrite-Reason:`; no expectation lowered.
   `W1-27/w2_67_ns_launch.py`, `W1-27/w2_67_ns_probe.py`, `W1-27/w2_67_tmp_probe.py`, `W1-28/w1_28_copy_check.py`,
   `W1-47/w1_47_hook_time_limit.py`, `W1-50/w1_50_freeze_lift.py`, `W2-69/w2_69_stdlib_secrets_first.py`. None is
   below a suite folder today; the scan would read one there.
+
+## T-4's revision (`Rewrite-Reason: DEC-1050`; DEC-1050 (2) with the CTO's correction R1-22)
+
+T-4, merged into `w2/integrate`: `every_close` joins a scoped selection only when a record-only path is in the change;
+`record_reading` stays in every selection; W2-54's three green-here cases that start a whole `gov check` (they take
+its `gov_check_here` fixture) left the `record_reading` list, which now holds that file's other five cases one by one.
+
+- **Red because of T-4, revised:** `test_w2_66_live_test_map.py::test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W2-54/test_w2_54_green_here.py]`
+  required the file held whole ("the record-reading set does not hold tests/acceptance/W2-54/test_w2_54_green_here.py").
+  It is now one case per green-here case that does not start a whole `gov check` (read from the file: today the five
+  the map names), each required held, and one new case,
+  `test_w2_54_s_cases_that_start_a_whole_gov_check_are_not_in_the_record_reading_set`: the three
+  (`test_gov_check_gives_context_reproducibility_green_here`, `test_gov_check_gives_core_schema_green_here`,
+  `test_the_w1_43_audit_report_is_untouched`) take `gov_check_here` and no entry holds them. The file: 73 cases where
+  there were 68 (one replaced by five, one added). Against the map before T-4 (`83b7f85f^`): the five are held
+  (green) and the new case fails, naming the three; against the map at T-4: all green.
+- **Red for another reason, not changed (reported):**
+  `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`: the
+  record-only list (`governance/project/orchestration/**.md`, `packages/*.patch`) leaves out
+  `governance/project/orchestration/packages/ACT-GUARD-FIX-3.diff` (added `49158e13`) and
+  `governance/project/orchestration/tools/win_toast.ps1` (added `42104b11`). T-4 did not change `record_only`.
+- **Not red:** the rest of W2-66 (167 passed, 1 skipped, the two above failed, on `d7b25cf3c605`); `every_close`'s
+  three W1-07 files are still listed (`test_w1_07_s_three_contract_files_run_on_every_close`, green); when they join
+  is the selector's, which the fixture-map cases of Part 1 exercise and T-4 left green.
+

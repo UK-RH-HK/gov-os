@@ -98,7 +98,10 @@ def project(tmp_path, monkeypatch):
     counts.update(dict.fromkeys(counts, 0))
 
     def answers():
-        return (semantic.search(tmp_path, "where is the pear", refresh=False),
+        # the semantic answer without its ``vector_cache`` counts: they name what the machine-wide cache served,
+        # which changes from the first call to the next (W2-126, DEC-1042); the answer itself must not
+        searched = semantic.search(tmp_path, "where is the pear", refresh=False)
+        return ({key: value for key, value in searched.items() if key != "vector_cache"},
                 lexical.search(tmp_path, "trees", refresh=False), lexical.freshness(tmp_path),
                 semantic._status(tmp_path))
 
