@@ -992,3 +992,56 @@ its question" is gone, and the read that reaches the semantic route is `gov retr
 
 **Not revised:** `test_w2_54_green_here.py` and `test_w2_54_time_limit.py` (red only for a missing store in the
 ticket's worktree; the lead rebuilds), `test_w2_54_sandboxed_worker.py` (another ticket's).
+
+# DEC-1033: six cases revised (owner, 2026-11-02; emergency, `Rewrite-Reason: DEC-1033`)
+
+DEC-1033 item 2 (b) replaced DEC-798 (the query embedder on the CPU only): a question's vector is accepted from any
+device, and the query embedder is started with the GPU left visible (the code since `6ed6a5ae`: the query embedder
+reports the model loaded, `size` above 0 and `size_vram` 0 or above, after computing a well-formed vector, and the
+vector is used and cached under that device; `ensure_query_available` passes the caller's environment with only
+`OLLAMA_HOST` set). Item 3: a test designer revises the acceptance tests the patches turn red. Six cases of
+`test_w2_54_cpu_embedder.py` still enforced DEC-798 and were red on `w2/integrate` (the merge queue refused every
+landing on them). Revised by an independent test designer; each change carries `Rewrite-Reason: DEC-1033` in the
+file. No case is retired; the count stays 14 in the file and 103 in the suite.
+
+| old case | new case | what it now checks |
+|---|---|---|
+| `test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu]` | `test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on[gpu]` | the query embedder reports the model in GPU memory: the question is embedded there and answered with its vector (the kiln), the vector cached and served again without asking, `gov retrieve` clean with the semantic facet available, nothing to the shared runner |
+| `…[partial]` | `test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on[partial]` | the same with half the model in GPU memory |
+| `…[nothing]`, `…[other-model]` (green; renamed with their function) | `test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector[nothing, other-model]` | unchanged: no vector, unavailable with a reason, nothing cached, no fallback; once loaded, answered |
+| `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | a read with an environment that says nothing about the GPU starts the executable found as DEC-260 finds it as `serve` at the query address, told nothing about the GPU (none of `CUDA_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, `ROCR_VISIBLE_DEVICES`, `GPU_DEVICE_ORDINAL`, `OLLAMA_LLM_LIBRARY`), so it serves on the GPU; the read gets its semantic answer; never stopped; a second read starts nothing |
+| `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | two reads at once: both answered, every start told the address and nothing about the GPU, one embedder serving there on the GPU, nothing stopped |
+
+**What was removed:** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
+none, and the demand that every start hides the GPU (`gpu_hidden`). The start cases now hold the opposite, the GPU
+left visible, since DEC-1033 puts the query server on the GPU; a caller's own GPU variables are not judged (the cases
+give none). What each case guarded that still holds is kept.
+
+**Shown red and green.** On `w2/integrate` `3630679c` (this tree's `src`), the old file: 6 failed, 8 passed; the
+`gpu` and `partial` cases on "the CPU address reports 'gpu', yet the search answered (available is True …)", the four
+start cases on "the executable was started without being told to use no GPU … {'OLLAMA_HOST': …}". The revised file:
+14 passed. The revised six against a throwaway copy with `6ed6a5ae^1`'s `semantic.py` and `ollama.py` (DEC-798's
+code, outside the tree): 6 failed for the stated reasons ("… available False, reason 'the query embedder does not
+report qwen3-embedding:0.6b wholly on the CPU …'" and "the executable was told about the GPU what its caller did not
+set … {'CUDA_VISIBLE_DEVICES': '-1'}"); the two not-loaded cases passed there as here.
+
+**What else states DEC-798, listed and not revised (not red for this reason in any run the queue makes):**
+
+- In `test_w2_54_cpu_embedder.py`, the names and texts "the CPU embedder" in
+  `test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner`,
+  `test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one`,
+  `test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback` and
+  `test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers`:
+  their stand-in (the fixture `cpu`) is on the CPU and what they hold (questions to the query embedder only, chunks to
+  the shared runner, no fallback) is in force; green. The name stands for the query embedder (the module docstring).
+- `test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80` (success 6): reads the
+  figure the change record holds from DEC-798's measurement; green.
+- `test_w2_54_shared_gpu.py` (2 cases, `shared_gpu`, deselected unless `-m shared_gpu`, run by a lead on the real
+  servers only): `test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu`
+  requires the query embedder at `127.0.0.1:11435` to hold the model with `size_vram` 0, which ACT-QUERY-GPU-2 ended;
+  `test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` holds one answer
+  per text, which DEC-1033 accepted may drift on the GPU. Both would be red if run now; neither is run by the queue or
+  the closes, and this designer may not reach the real servers, so neither was revised (a decision package).
+- The round-4 sections above (the interfaces, "told to use no GPU", the KPI table, the risks) describe round 4 as
+  written under DEC-798; this section supersedes them for the six cases. The ticket's own KPI line 5
+  (`.tickets/DAEO-0rfi.md`, closed) still states the CPU-only embedder.
