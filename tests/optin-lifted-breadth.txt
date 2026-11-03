@@ -1182,3 +1182,9 @@ rep: tests/acceptance/W2-55/test_w2_55_tags.py  # one row per parametrised funct
 
 # acceptance/W2-57
 rep: tests/acceptance/W2-57/test_w2_57_rulesync_probe.py::test_a_late_answer_is_waited_for_and_the_check_compares_as_with_a_prompt_one  # one row
+
+# acceptance/W2-61
+rep: tests/acceptance/W2-61/test_w2_61_any_set.py  # one row per parametrised function
+rep: tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py::test_the_measure_refuses_the_hidden_part_to_a_measured_session  # one row
+rep: tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py::test_an_error_on_a_hidden_question_names_only_its_id  # one row
+rep: tests/acceptance/W2-61/test_w2_61_sources_matched.py  # one row per parametrised function
