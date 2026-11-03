@@ -54,7 +54,7 @@ def endpoint(tmp_path, monkeypatch):
             pass
 
         def do_GET(self):
-            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "d" * 64}]})
+            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "ac6da0dfba84" + "d" * 52}]})
 
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
@@ -157,7 +157,7 @@ def test_every_try_timed_out_keeps_w2_123_s_reason(endpoint):
 def test_a_refused_connection_is_retried_and_used_once_the_runner_listens(endpoint, monkeypatch):
     root, state = endpoint
     monkeypatch.setenv("OLLAMA_HOST", f"127.0.0.1:{_free_port()}")  # nothing listens there
-    monkeypatch.setattr(semantic, "_revision", lambda host=None: "d" * 64)
+    monkeypatch.setattr(semantic, "_revision", lambda host=None: "ac6da0dfba84" + "d" * 52)
     slept = []
 
     def sleep(seconds):  # the runner comes up during the first wait
@@ -174,7 +174,7 @@ def test_a_refused_connection_is_retried_and_used_once_the_runner_listens(endpoi
 def test_a_connection_refused_at_every_try_fails_closed_named(endpoint, monkeypatch):
     root, state = endpoint
     monkeypatch.setenv("OLLAMA_HOST", f"127.0.0.1:{_free_port()}")
-    monkeypatch.setattr(semantic, "_revision", lambda host=None: "d" * 64)
+    monkeypatch.setattr(semantic, "_revision", lambda host=None: "ac6da0dfba84" + "d" * 52)
     report = semantic.refresh(root)
     named = "connection refused, connection refused, connection refused"
     assert report["reason"] == f"{semantic.NO_EMBEDDING}: the request failed at all 3 tries ({named}; {TAIL})"

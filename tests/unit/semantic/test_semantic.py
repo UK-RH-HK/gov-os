@@ -121,6 +121,10 @@ def test_the_manifest_follows_the_model_list_and_another_embedder_builds_the_vec
     assert semantic.manifest(root)["embedder"] == {"model": semantic.MODEL, "revision": endpoint["digest"]}
     endpoint["digest"] = "5e" + "1" * 62
     del endpoint["sent"][:]
+    # W2-32 S2: an endpoint off the pin embeds nothing; S1: the new revision pinned in configuration re-embeds all
+    assert semantic.refresh(root)["error"] == "MODEL_MISMATCH" and endpoint["sent"] == []
+    (root / "governance/project/models.yaml").write_text(
+        f"embedder: {{model: {semantic.MODEL}, revision: {endpoint['digest']}}}\n")
     semantic.refresh(root)
     assert semantic.manifest(root)["embedder"]["revision"] == endpoint["digest"]
     assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n"]

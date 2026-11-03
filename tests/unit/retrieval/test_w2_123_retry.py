@@ -50,7 +50,7 @@ def endpoint(tmp_path, monkeypatch):
             pass
 
         def do_GET(self):
-            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "d" * 64}]})
+            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "ac6da0dfba84" + "d" * 52}]})
 
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
@@ -141,7 +141,7 @@ def test_a_refused_connection_is_retried_within_the_bound_then_named(endpoint, m
     """W2-126 KPI 7 (P-W2-126-BT): a refused connection is tried again, at most 3 tries, then the stage stops named."""
     root, state = endpoint
     monkeypatch.setenv("OLLAMA_HOST", f"127.0.0.1:{_free_port()}")
-    monkeypatch.setattr(semantic, "_revision", lambda host=None: "d" * 64)
+    monkeypatch.setattr(semantic, "_revision", lambda host=None: "ac6da0dfba84" + "d" * 52)
     report = semantic.refresh(root)
     named = ", ".join(["connection refused"] * 3)
     assert report["reason"] == (f"{semantic.NO_EMBEDDING}: the request failed at all 3 tries ({named}; "

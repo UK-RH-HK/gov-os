@@ -193,7 +193,11 @@ def default_reranker():
             _note("unavailable", None, f"{why}; {failed}")
             return None
         _note("private", device, why)
-        return private(query, texts)
+        try:
+            return private(query, texts)
+        except Exception:  # it died after loading: the next search starts another (W2-32 S4)
+            _started.cache_clear()
+            raise
 
     return score
 
@@ -201,17 +205,32 @@ def default_reranker():
 def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     """``candidates`` in the order of the reranker's scores, each with ``rerank_score``; equal scores keep the order
     given. One call of ``score``, with the ``text`` of every candidate. Without a reranker the candidates are returned
-    as given."""
+    as given.
+
+    A reranker that fails once loaded (W2-32 S4, W2-M104: it died, closed its pipe, answered garbage or the wrong
+    number of scores) is reported, not raised: the candidates come back in the order given, with no score, and
+    ``last_outcome`` says ``unavailable`` with the failure named. So does a loader that raises."""
     candidates = [dict(candidate) for candidate in candidates]
     _note("unavailable", None, "nothing to rerank" if not candidates else "the reranker given could not be loaded")
-    score = (reranker or default_reranker)() if candidates else None
+    try:
+        score = (reranker or default_reranker)() if candidates else None
+    except Exception as error:
+        _note("unavailable", None, f"the reranker could not be loaded ({type(error).__name__}: {error})")
+        return candidates
     if score is None:
         return candidates
     if reranker is not None:
         _note("given", None, None)
-    values = score(query, [candidate["text"] for candidate in candidates])
-    if values is None:
+    try:
+        values = score(query, [candidate["text"] for candidate in candidates])
+        if values is None:
+            if reranker is not None:
+                _note("unavailable", None, "the reranker given scored nothing: the order given is kept")
+            return candidates
+        scores = [float(value) for value in values]
+        ranked = sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])
+    except Exception as error:
+        _note("unavailable", None, f"the reranker failed after loading ({type(error).__name__}: {error}): "
+                                   f"the order given is kept")
         return candidates
-    scores = [float(value) for value in values]
-    ranked = sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])
     return [{**candidate, "rerank_score": value} for value, candidate in ranked]
