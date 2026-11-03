@@ -1188,3 +1188,6 @@ rep: tests/acceptance/W2-61/test_w2_61_any_set.py  # one row per parametrised fu
 rep: tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py::test_the_measure_refuses_the_hidden_part_to_a_measured_session  # one row
 rep: tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py::test_an_error_on_a_hidden_question_names_only_its_id  # one row
 rep: tests/acceptance/W2-61/test_w2_61_sources_matched.py  # one row per parametrised function
+
+# acceptance/W2-61h
+rep: tests/acceptance/W2-61h/test_w2_61h_visible_new.py  # one row per parametrised function
