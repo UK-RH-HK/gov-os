@@ -6,7 +6,8 @@ continuations (no span sent twice).
 
 - **The whole chunk:** a planted note is one chunk (under the chunker's 1,200 characters) whose only words of the
   question lie past character 600: the text the stand-in embedder was sent for it, and the text the recording
-  reranker was given for it, both hold those words; the semantic route finds the note first.
+  reranker was given for it, both hold those words; the semantic route finds the note nearer the question than when
+  it is embedded from its first 512 characters (the distance worked out from the question text the stand-in was sent).
 - **The cut:** the manifest records its cut (any key besides the two models, W2-L065) and it is neither 512 nor 500.
   A store that records the old cut of 512, with the note's vector made from its first 512 characters, is stale (no
   answer from it) and the next rebuild embeds the note whole.
@@ -59,10 +60,24 @@ def test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_p
     texts = _vector_texts(long_project, standin, LONG)
     assert texts and all(text and all(word in text for word in LONG_WORDS) for text in texts), \
         f"the embedder was not sent the whole chunk of {LONG}: {[text and text[-80:] for text in texts]}"
+    # Rewrite-Reason: S7's first-hit premise (the stand-in's bag of words, not the cut). The stand-in's vectors are
+    # bags of words, so the note's seven filler lines outweigh its last line and a short note sharing the question's
+    # common words can rank first at any cut. What S7 changes is that the words past the old cut reach the vector:
+    # the note's distance to the question is smaller than the distance it has when embedded from its first 512
+    # characters, worked out here from the very question text the stand-in was sent.
+    standin.clear()
     answer = s.result(box.call("semantic_search", root=str(long_project), query=LONG_QUESTION))
-    assert answer["available"] is True and s.first_paths(answer["hits"])[:1] == [LONG], \
-        f"the note whose words lie past character 600 is not the semantic route's first hit: " \
-        f"{s.first_paths(answer['hits'])}"
+    assert answer["available"] is True, answer
+    asked = [text for text in standin.texts_embedded(s.PIN_MODEL) if text.endswith(LONG_QUESTION)]
+    assert asked, "premise: the question was sent to the stand-in embedder"
+    question = s.stand_in_vector(s.PIN_MODEL, asked[-1])
+    cut = s.stand_in_vector(s.PIN_MODEL, LONG_TEXT[:OLD_CUT])
+    cut_distance = 1.0 - sum(a * b for a, b in zip(question, cut))
+    found = [hit["distance"] for hit in answer["hits"] if hit["path"] == LONG]
+    assert found, f"the note is not among the semantic route's hits: {s.first_paths(answer['hits'], 30)}"
+    assert min(found) < cut_distance - 1e-3, \
+        f"the note is no nearer the question than when embedded from its first {OLD_CUT} characters " \
+        f"({min(found):.4f}, cut at {OLD_CUT}: {cut_distance:.4f}): its words past the cut did not reach the route"
 
 
 # ---- the reranker reads the whole chunk ----

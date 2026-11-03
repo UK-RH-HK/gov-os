@@ -56,8 +56,9 @@ to the CTO so that the engineer builds to the same ones (spec gaps, DEC-136).
   are only the vectors and the four-column manifest (two models and their revisions), as every store built before
   W2-32 is, is stale.
 - **S7: the whole chunk** (G1, DEC-1066). The embedder is sent each chunk whole, and the reranker given it whole (its
-  path line may come first): a chunk whose question words lie past character 600 is embedded with them, found first
-  by the semantic route, and given to a reranker with them. The manifest's cut is neither 512 nor 500. A store that
+  path line may come first): a chunk whose question words lie past character 600 is embedded with them, found by
+  the semantic route nearer the question than when embedded from its first 512 characters (round 5: not "first",
+  which the stand-in's bag of words decides at any cut), and given to a reranker with them. The manifest's cut is neither 512 nor 500. A store that
   records the cut as 512 (each store column named as a cut key of the manifest, or else holding its value, set back
   to 512), with the chunk's vector made from its first 512 characters, is stale (no answer) and the next rebuild
   embeds the chunk whole. `retrieve(root, question, batch_size=1, radius=0)` followed through its continuations
