@@ -48,6 +48,13 @@ each way. Nothing scheduled but the dispatcher (DEC-1051).
 8. **D-10 The full suite on the refactored repository (P1-12), on the owner's word**, every red fixed; then the lift,
    the restart and the formal closes (P1-13); then EXAMIN's adoption (P1-14).
 
+9. **D-11 The basis as a standing practice, after the lift** (DEC-1052): at adoption, every new rule, gate, check,
+   mechanism or KPI line states the basis question it passes, or is not adopted; on symptoms, repeated refusals,
+   timeouts, retries, prompts to the owner and re-runs are flagged from the logs and assessed at once; weekly, a basis
+   review of everything in force with measured costs (machine time, tokens, the owner's time); the lift-or-remove list
+   to the owner first. Its home: a KPI line of the dispatcher/tools (the symptom flags) and the CTO template (the weekly
+   review), placed in D-9.
+
 The draft's estimate (§G: restart about 11-07, EXAMIN's copy about 11-14, range 11-12..11-19) is to be re-estimated after
 D-4's count, since the suite cut and the direct merges change the time to green.
 

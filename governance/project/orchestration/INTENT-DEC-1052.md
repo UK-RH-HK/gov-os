@@ -8,6 +8,14 @@ and the spec, with less drift? In order:
 4. Does it make agents deliver more with less drift, or only add records, approvals and pings?
 5. A practice enters the product only after it has proven itself in use, never the same day.
 
+**The basis is a standing practice.** It applies to everything from now on, during the refactoring and after the
+emergency is lifted. Anything in force or added later (a rule, decision, gate, check, mechanism or KPI line) that comes
+to violate the basis is assessed and lifted or removed. Three triggers: (1) at adoption, it states in one line which of
+the five questions it passes, or it is not adopted; (2) on symptoms, anything that repeatedly blocks or slows work
+(refusals, timeouts, retries, prompts to the owner, runs done again) is flagged from the logs and assessed at once;
+(3) weekly, a basis review of everything in force, with each item's measured cost (machine time, tokens, the owner's
+time). The list of what should be lifted or removed goes to the owner first.
+
 **Templates, not more text.** Every session (research and discovery, product-spec, test designer, engineer, QA and
 reviewer, lead, CTO), every ticket and every brief uses the same short templates, read whole and followed: the right
 paths, the commands (shipped as scripts), how to report. Stable rules apart from the facts filled in per task. A line

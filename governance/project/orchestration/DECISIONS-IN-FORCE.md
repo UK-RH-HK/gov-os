@@ -3,6 +3,7 @@
 Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 lifts: `LIFTED-BY-DEC953.md`. Superseded and spent decisions: `ARCHIVE-SUPERSEDED.md`.
 
 ## Working with the owner
+- DEC-1052, the basis as a standing practice: everything in force or added later is assessed against the five questions and lifted or removed if it violates them; at adoption (one line naming the question it passes, or not adopted), on symptoms (repeated blocks or slowdowns flagged from the logs), weekly (a basis review with measured costs); the list to the owner first.
 - DEC-1052 (with DEC-1047, DEC-1049 to DEC-1051): the basis (one question: does it help deliver tests and code that match the KPIs and the spec, with less drift; five tests, `INTENT-DEC-1052.md`); the rows decided; templates with READY and DONE by code; the test suite cut to about 5,000; the homes; the plan (`packages/LIFT-1/P1-PLAN.md`); everything stopped until the refactoring and the re-pins; nothing scheduled but the dispatcher; no nightly until the owner's word.
 - DEC-065: master rules MR-1 to MR-6. The owner decides (MR-6), the builder never writes its own acceptance tests (MR-3), review and audit stay independent (MR-4).
 - DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
