@@ -7,6 +7,11 @@ ranks are ordered by path, then id, then the first line a word was found on. The
 time and stacked in rank order into the room the packet leaves; the stack stops at the first chunk that does not fit,
 and the chunks of its batch from it on are named as left for a further batch. Where the room ends exactly on a stacked
 chunk, or is none at all, the next ranked chunks, one batch at most, are named instead (DEC-1025 item 2).
+
+Role separation (W2-13 S5, DEC-1065 (2)): a chunk the caller's role may not be handed (``GOV_ROLE``, ``GOV_TICKET``,
+the main tree's ``role_paths:``; ``gov.guard.role_paths``) is never ranked; where a filter applies, the block's
+``role_filter`` counts what was withheld by rule, and one entry of ``dropped`` (id ``role_filter``) says it in a line,
+so the packet names it. Role paths that cannot be read raise: the packet's block is then empty and names why.
 """
 
 from __future__ import annotations
@@ -42,9 +47,11 @@ def terms(text: str) -> list[str]:
     return sorted(words, key=lambda word: (-len(word), word))[:MAX_TERMS]
 
 
-def _ranked(root: Path, words: list[str], skip_paths: set, skip_entries: set) -> tuple[list[dict], dict | None]:
-    """Every chunk that holds a word, in rank order, without the chunks of ``skip_paths``, of a record that no longer
-    stands, or of a register entry that is in ``skip_entries`` or is not current; and W2-55's ``left_out``."""
+def _ranked(root: Path, words: list[str], skip_paths: set, skip_entries: set,
+            withhold=None) -> tuple[list[dict], dict | None]:
+    """Every chunk that holds a word, in rank order, without the chunks of ``skip_paths``, of a path the caller's
+    role may not be handed (``withhold``, which counts them), of a record that no longer stands, or of a register
+    entry that is in ``skip_entries`` or is not current; and W2-55's ``left_out``."""
     from gov import records
     from gov.decisions.register import leave_out
     from gov.retrieval import authority, lexical
@@ -77,6 +84,8 @@ def _ranked(root: Path, words: list[str], skip_paths: set, skip_entries: set) ->
     for chunk_id, (path, line) in where.items():
         if path in skip_paths:
             continue
+        if withhold is not None and not withhold.keep([{"path": path, "chunk_id": chunk_id}]):
+            continue  # W2-13 S5 (DEC-1065 (2)): withheld from the caller's role, and counted
         item = {"path": path, "chunk_id": chunk_id, "_line": line, "_score": score[chunk_id], "_standing": True}
         if path == register:
             chunk = own.get(chunk_id)
@@ -112,14 +121,19 @@ def _text(root: Path, item: dict, files: dict) -> str:
     return b"".join(lines[chunk["start_line"] - 1:chunk["end_line"]]).decode("utf-8", "replace")
 
 
-def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), skip_entries=()) -> dict:
+def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), skip_entries=(), role=None,
+          ticket=None) -> dict:
     """The supplementary block for ``room`` tokens: ``{"query", "supplementary", "dropped", "further_batch",
     "supplementary_batches", "left_out"}``, each batch the ranked items it read and its limit, in the order taken.
     ``Unavailable`` where the lexical index does not answer."""
     from gov.context import _tokens
+    from gov.guard import role_paths
 
     asked = query(title, kpis)
-    ranked, left_out = _ranked(Path(root), terms(asked), set(skip_paths), set(skip_entries))
+    # W2-13 S5: GOV_ROLE, a --role beside it (``role``: adds, never lifts) and GOV_TICKET; RolePathsError when unreadable
+    # review S5-F1: the packet's own ``ticket`` judged beside GOV_TICKET (the union: it only adds)
+    withhold = role_paths.caller(root, role, also=(ticket,) if ticket else ())
+    ranked, left_out = _ranked(Path(root), terms(asked), set(skip_paths), set(skip_entries), withhold)
     files: dict[str, tuple] = {}
     supplementary, dropped, batches = [], [], []
     taken, left_from = 0, None
@@ -150,6 +164,21 @@ def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), 
         dropped = [{"id": left["id"], "reason": "budget exceeded"} for left in further]
     else:  # no item was left unstacked
         further = []
-    return {"query": asked, "supplementary": supplementary, "dropped": dropped,
-            "further_batch": [{"id": item["id"], "path": item["path"]} for item in further],
-            "supplementary_batches": batches, "left_out": left_out}
+    block = {"query": asked, "supplementary": supplementary, "dropped": dropped,
+             "further_batch": [{"id": item["id"], "path": item["path"]} for item in further],
+             "supplementary_batches": batches, "left_out": left_out}
+    if withhold is not None:  # DEC-1065 (2): named, never silent; the packet carries it as one entry of dropped
+        block["role_filter"] = shown = withhold.summary()
+        block["dropped"] = [*dropped, {"id": ROLE_FILTER_ID, "reason": withheld_reason(shown)}]
+    return block
+
+
+ROLE_FILTER_ID = "role_filter"
+
+
+def withheld_reason(shown: dict) -> str:
+    """The filter's count and rules in one line: how many paths and chunks were withheld, by which rule."""
+    rules = "; ".join(f"{b['paths']} by role_paths.{b['role']}.reads_denied {b['rule']} ({b['glob']})"
+                      for b in shown["by"]) or "none matched"
+    return (f"withheld from {', '.join(shown['roles'])} (ticket {shown['ticket']}): {shown['withheld']['paths']} "
+            f"paths, {shown['withheld']['chunks']} chunks; {rules} (DEC-1065 (2))")

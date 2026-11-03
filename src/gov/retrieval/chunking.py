@@ -22,6 +22,10 @@ import re
 CHUNKER_VERSION = "gov-chunker/1"
 MAX_CHARS = 1200
 OVERLAP_CHARS = 120
+# What the embedder and the reranker read of a chunk (W2-32 S7, DEC-1066 G1): above every chunk the chunker makes, so
+# each is read whole. A chunk holds at most MAX_CHARS, or one longer line; this repository's longest such line is
+# 24,575 characters. A line longer than this is the one thing still cut, which bounds the models' work.
+READ_CHARS = 32768
 _HEADING = re.compile(r"#{1,6}\s")
 
 

@@ -208,7 +208,7 @@ def test_a_pinned_model_the_endpoint_does_not_list_is_named(project):
 def test_the_manifest_holds_the_cut_and_a_store_built_before_it_is_stale(project, tmp_path, monkeypatch):
     root, endpoint = project
     semantic.refresh(root)
-    assert semantic.manifest(root)["embed_chars"] == 512 == semantic.EMBED_CHARS
+    assert semantic.manifest(root)["embed_chars"] == semantic.EMBED_CHARS  # 512 before S7, the whole chunk now
     connection = sqlite3.connect(root / STORE_REL)
     connection.execute("DROP TABLE semantic_pin")  # the store as every store built before W2-32 is
     connection.commit()

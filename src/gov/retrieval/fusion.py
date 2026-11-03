@@ -2,7 +2,7 @@
 
 ``rrf`` merges the routes' ranked lists into one, each chunk once (deduplication by chunk hash: the ``chunk_id`` of
 W1-17). ``search`` asks the lexical and the semantic route, fuses them and reranks the head of the merged set once,
-as S0b2's R1 does (DEC-406): the first ``RERANK_TOP`` chunks, each scored on its path and the start of its text. A
+as S0b2's R1 does (DEC-406): the first ``RERANK_TOP`` chunks, each scored on its path and its whole text (W2-32 S7). A
 route that is unavailable gives no hit and is reported in ``facets``; nothing raises for it. The lexical route's
 list is its ``ranked`` chunks: the exact string's first, then the BM25-ranked words' (W2-13, DEC-725).
 """
@@ -12,13 +12,13 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-from gov.retrieval import lexical, semantic
+from gov.retrieval import chunking, lexical, semantic
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import STORE_REL
 
 RRF_K = 60
 RERANK_TOP = 30  # the fused chunks that are reranked and returned: the first ones, as S0b2's R1 takes them (DEC-406)
-RERANK_CHARS = 500  # the reranker reads a chunk's path and its first characters, this many (DEC-406)
+RERANK_CHARS = chunking.READ_CHARS  # the reranker reads a chunk's path and the whole chunk (W2-32 S7; was 500)
 _RECORD = "SELECT c.path, c.start_line, c.end_line, c.parent_id, f.text FROM lexical_chunk c " \
           "JOIN lexical_fts f ON f.rowid = c.id WHERE c.chunk_id = ?"
 
@@ -55,7 +55,7 @@ def search(root: Path, query: str, limit: int | None, refresh: bool = True, rera
     """Both routes, fused, and the first ``RERANK_TOP`` fused chunks reranked in one pass; ``hits`` are those
     chunks and ``limit`` cuts after the rerank.
 
-    The reranker scores ``[path: …]`` and the first ``RERANK_CHARS`` characters of each chunk; a hit keeps the
+    The reranker scores ``[path: …]`` and the whole chunk (up to ``RERANK_CHARS``, W2-32 S7); a hit keeps the
     chunk's own text. ``reranked`` is false when no reranker could be loaded, or it failed once loaded: the fused
     order is kept (DEC-374), and ``rerank`` names who scored or why none did (W2-32 S4).
 
