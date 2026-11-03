@@ -1,9 +1,12 @@
 """KPI success 4 and failure 1: a question that names no record and no symbol gets today's bundle, item for item;
 the budget, the batches, the continuation and DEC-424's records ahead are as today; two runs give one bundle.
 
-"Today's bundle" is pinned here as the base (``7ca16b19df3f``) gave it for the same planted project, through the
-same public call, and checked live against the plain fused order of the lexical route (the one route of today
-that answers in these projects): see the README."""
+"Today's bundle" is pinned here as the integrated code gives it for the same planted project, through the same
+public call, and checked live against the plain fused order of the lexical route (the one route of today that
+answers in these projects): see the README. It was recorded at the base (``7ca16b19df3f``); W2-112 (the shared
+reranker, merged into ``w2/integrate`` in D-1) then added one field, ``rerank``, to every bundle, recorded here as
+``w2/integrate`` ``23625eb2aebe`` gives it (every other field is the same there as at the base). ``rerank`` is part
+of the baseline, not a W2-92 change; any other new or changed field, ordering or content still fails."""
 
 from __future__ import annotations
 
@@ -20,29 +23,34 @@ _PAGES = [("f5431210fb79ceedf8270e11", "docs/notes/almanac-01.md", 1, 3),
           ("df0c0dd84be760c3242087b9", "docs/notes/almanac-04.md", 1, 3),
           ("8cea80a3d80d8f32e9816bb2", "docs/notes/almanac-05.md", 1, 3),
           ("54357424c79d75175ff68807", "docs/notes/almanac-06.md", 1, 3)]
+# W2-112's field (``rerank``), as w2/integrate 23625eb2aebe gives it with no reranker: candidates to score and none
+# loaded, or nothing to score
+_NOT_LOADED = {"by": "unavailable", "device": None, "reason": "the reranker given could not be loaded"}
+_NOTHING = {"by": "unavailable", "device": None, "reason": "nothing to rerank"}
 _EMPTY = {"batches": [{"size": 0}], "budget": {"bundle": {"limit": 6000, "used": 0}, "rounds": {"limit": 1, "used": 0}},
           "continued": False, "evidence": [], "expansions": [], "facets": _FACETS, "gaps": [],
           "merge": {"candidates": 0, "dropped": [], "duplicates": 0, "reranked": False},
-          "stopping_reason": "FACET_UNAVAILABLE"}
+          "rerank": _NOTHING, "stopping_reason": "FACET_UNAVAILABLE"}
 
-# The base's bundles (support.projection), recorded at 7ca16b19df3f
+# The integrated code's bundles (support.projection): recorded at the base 7ca16b19df3f, with W2-112's ``rerank``
+# recorded at w2/integrate 23625eb2aebe (the rest is the same there)
 TODAY = {
     "plain": {"batches": [{"size": 6}], "budget": {"bundle": {"limit": 6000, "used": 108},
                                                    "rounds": {"limit": 1, "used": 0}},
               "continued": False, "evidence": _PAGES, "expansions": [], "facets": _FACETS, "gaps": [],
               "merge": {"candidates": 6, "dropped": [], "duplicates": 0, "reranked": False},
-              "stopping_reason": "FACET_UNAVAILABLE"},
+              "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
     "batched": {"batches": [{"size": 2}, {"size": 2}], "budget": {"bundle": {"limit": 6000, "used": 72},
                                                                   "rounds": {"limit": 1, "used": 1}},
                 "continued": True, "evidence": _PAGES[:4], "expansions": [], "facets": _FACETS,
                 "gaps": [{"chunk_id": chunk, "path": path, "reason": "NOT_GATHERED"} for chunk, path, _, _ in _PAGES[4:]],
                 "merge": {"candidates": 4, "dropped": [], "duplicates": 0, "reranked": False},
-                "stopping_reason": "FACET_UNAVAILABLE"},
+                "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
     "batched, continued": {"batches": [{"size": 2}], "budget": {"bundle": {"limit": 6000, "used": 36},
                                                                 "rounds": {"limit": 1, "used": 0}},
                            "continued": False, "evidence": _PAGES[4:], "expansions": [], "facets": _FACETS,
                            "gaps": [], "merge": {"candidates": 2, "dropped": [], "duplicates": 0, "reranked": False},
-                           "stopping_reason": "FACET_UNAVAILABLE"},
+                           "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
     "unknown id": _EMPTY,
     "unknown symbol": _EMPTY,
     "ticket": {"batches": [{"size": 4}], "budget": {"bundle": {"limit": 6000, "used": 92},
@@ -54,7 +62,7 @@ TODAY = {
                             ("42397a5310ce4fa38331bdec", support.TICKET_REL, 9, 11)],
                "expansions": [], "facets": _FACETS, "gaps": [],
                "merge": {"candidates": 4, "dropped": [], "duplicates": 3, "reranked": False},
-               "stopping_reason": "FACET_UNAVAILABLE"},
+               "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
 }
 
 CASES = {
@@ -80,7 +88,8 @@ def _diff(found, expected):
 @pytest.mark.parametrize("case", list(CASES), ids=list(CASES))
 def test_u1_a_question_naming_no_record_or_symbol_gets_todays_bundle(asked, case):
     """Failure 1: the plain question, the same in batches, an id the store does not hold, a symbol the index does
-    not hold, and DEC-424's records ahead (a ticket's lesson first) give the base's bundle, item for item."""
+    not hold, and DEC-424's records ahead (a ticket's lesson first) give the integrated code's bundle, item for
+    item (W2-112's ``rerank`` included)."""
     question, kwargs = CASES[case]
     bundle, _ = asked("full", question, **kwargs)
     found = support.projection(bundle)
