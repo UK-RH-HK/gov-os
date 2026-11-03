@@ -1359,3 +1359,19 @@ tests/acceptance/W1-47/test_w1_47_uv_installs.py::test_the_other_uv_commands_are
 tests/acceptance/W1-47/test_w1_47_uv_installs.py::test_the_other_uv_commands_are_not_classified[uv-version-orchestrator]  # fold: a row beyond the representatives
 tests/acceptance/W1-47/test_w1_47_uv_installs.py::test_the_other_uv_commands_are_not_classified[uv-version-engineer]  # fold: a row beyond the representatives
 tests/acceptance/W1-47/test_w1_47_uv_installs.py::test_the_other_uv_commands_are_not_classified[uv-version-independent-test-designer]  # fold: a row beyond the representatives
+
+# W1-50
+rep: tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_guard_reading.py::test_what_is_not_a_marked_flag_does_not_freeze  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_guard_reading.py::test_a_marked_flag_and_what_the_guard_cannot_read_freeze  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_guard_reading.py::test_an_unmarked_presence_is_recorded  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_guard_reading.py::test_the_install_rule_reads_the_flag_as_the_guard_does  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_no_literal_rule_names_the_flag_when_nothing_is_at_its_path  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_the_patterns_still_deny_the_flag_to_the_file_tools  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_the_guard_denies_a_worker_s_write_to_the_flag_s_path  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_marker.py::test_pause_writes_the_marker_line_with_the_caller_and_the_time  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_marker.py::test_cancel_agents_writes_the_marker_line  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_marker.py::test_rollback_writes_the_marker_line_also_when_it_ends_with_an_error  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-50/test_w1_50_freeze_marker.py::test_pause_freezes_a_project_that_has_an_unmarked_file_at_the_path  # fold: a row beyond the representatives
