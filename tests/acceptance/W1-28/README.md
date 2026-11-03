@@ -41,6 +41,23 @@ python3 -m pytest tests/acceptance/W1-28 -q -p no:cacheprovider
 - **The record commit** (DEC-367) is made by the command as its own process, after the same call set the freeze
   (DEC-368). The guard judges tool calls, not the command's process; the cases assert the flag and the commit together.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 102 in the full run, 0 lifted, 52 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 | `test_w1_28_freeze.py` (10) |
+| F2 | `test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` (1) |
+| S2 | `test_w1_28_cancel.py` (9), `test_w1_28_rollback.py` (20), `test_w1_28_command.py` (3) |
+| S3 | `test_w1_28_roles.py` (15) (`test_the_orchestrator_can_pause` (1) among them, W1-50 S7's orchestrator half), `test_w1_28_repeat.py` (4) |
+| S4 | `test_w1_28_fixture_copies.py` (9) |
+| S5 | `test_w1_28_launch_temp_folder.py` (9) |
+| S6 | `test_w1_28_launch_product_spec.py` (23) |
+| Tier 2 | every function is a named case of a line, so the cap removes none; parameters are folded to representative rows |
+
 ## KPI lines and covers ids
 
 Red reason, for every row but the second: the `built` fixture stops the case with

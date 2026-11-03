@@ -420,3 +420,26 @@ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_ro
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[engineer]  # fold: a row beyond the representatives
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[product-spec]  # fold: a row beyond the representatives
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[independent-test-designer]  # fold: a row beyond the representatives
+
+# W1-28
+rep: tests/acceptance/W1-28/test_w1_28_command.py::test_help_names_each_option  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_an_unrevised_fixture_is_caught_by_running_it  # fold: a row beyond the representatives
+tests/acceptance/W1-28/test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted[product-spec]  # fold: a row beyond the representatives
+tests/acceptance/W1-28/test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted[independent-test-designer]  # fold: a row beyond the representatives
+tests/acceptance/W1-28/test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted[engineer]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_the_product_spec_settings_deny_edits_of_the_three_trees  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_the_guard_decides_by_the_identity_the_launcher_gave  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_a_product_spec_session_is_refused_on_a_ticket_of_another_role  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_no_implementing_role_is_launched_on_the_product_spec_ticket  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_the_independent_roles_are_launched_on_a_product_spec_ticket  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_a_ticket_that_is_not_in_progress_refuses_the_product_spec_launch  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_the_launcher_refuses_the_same_cli_arguments_for_product_spec  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_repository_settings_that_would_unwire_the_session_refuse_the_product_spec_launch  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_a_role_that_is_not_launched_is_still_refused  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends_with_an_error  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_launcher_is_interrupted  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_a_refused_launch_leaves_no_temp_folder  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_roles.py::test_a_worker_cannot_pause  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-28/test_w1_28_roles.py::test_a_worker_is_refused_whatever_role_it_names_with_the_role_option  # fold: a row beyond the representatives
