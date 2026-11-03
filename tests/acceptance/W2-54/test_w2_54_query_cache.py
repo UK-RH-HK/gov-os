@@ -352,11 +352,19 @@ def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_
 
 @STAND_IN
 def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedder, tmp_path):
-    """*Red.* ``gov context --json`` for one ticket, in a process of its own, after other tickets' contexts and
-    other questions: cold, warm, the cache deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the
-    cache full (bound lowered, 200 other texts): one packet and one hash, the one the ticket gets as the first
-    context in a new store built alike. Every run ends with exit code 0 and no traceback. Today the hash depends on
-    what was embedded before the ticket's question was first asked.
+    """*Red.* For one ticket, each read in a process of its own, after other questions: cold, warm, the cache
+    deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the cache full (bound lowered, 200 other
+    texts): ``gov retrieve`` of the ticket's question gives the one answer it gets as the first question in a new
+    store built alike, and ``gov context --json`` gives the one packet and hash the ticket gets as the first context
+    in a new store built alike; ``gov context`` sends the embedder nothing. Every run ends with exit code 0 and no
+    traceback.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. ``gov context`` sends nothing to an embedder
+    (W2-04's addendum, S4 and S7), so it no longer makes or reads the cache: the cache's states are made by ``gov
+    retrieve`` (the other tickets' titles in place of the other tickets' contexts), and "one question, one answer
+    whatever the cache's state" is held through ``gov retrieve``. The packet-hash part stays for ``gov context``. The
+    premise that the context held a retrieval item moves to ``gov retrieve``'s answer: the context's evidence no
+    longer comes from the semantic route. Today ``gov context`` sends the embedder its question.
 
     Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
     own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged.
@@ -366,18 +374,29 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     the case names its own machine-wide folder (``machine``); "deleted" removes the tree's files and the machine
     folder's; ".gov-runtime/ read-only" makes the machine folder read-only too; "the cache's files read-only" acts
     on the files either cache holds (the premise: at least one); "full" lowers both bounds. The packet-hash
-    assertions are unchanged."""
+    assertions are unchanged.
+
+    Merged (D-1, DEC-1052): W2-04's revision (the states made by ``gov retrieve``; its answer and the packet both
+    held; the context sends nothing) and W2-126's (both caches) together: the reads that make each state are W2-04's,
+    the caches they act on are W2-126's."""
     files = S.ticket_files()
+    question = S.QUESTION_TICKETS[TICKET]
+    others = iter([S.QUESTION_TICKETS["TK-W254-BAKERY"], S.QUESTION_TICKETS["TK-W254-ORCHARD"]] * 3)
     fresh = S.EmbedderStandIn()
     try:
         twin = S.semantic_project(box, tmp_path / "reference", fresh, files, cache=_reference_cache(tmp_path))
-        reference = S.gov(box, "context", "--json", "--root", twin, TICKET,
-                          env=S.embed_env(box, fresh, cache=_reference_cache(tmp_path)))
+        twin_env = S.embed_env(box, fresh, cache=_reference_cache(tmp_path))
+        first = S.gov(box, "retrieve", "--json", "--root", twin, question, env=twin_env)
+        assert not S.clean(first) and first.envelope().get("ok") is True, first.describe()
+        answer_reference = first.envelope()["result"]
+        reference = S.gov(box, "context", "--json", "--root", twin, TICKET, env=twin_env)
         assert not S.clean(reference), reference.describe()
         reference = reference.envelope()["result"]
     finally:
         fresh.close()
-    assert reference[S.K_SUPPLEMENTARY], "the premise: the ticket's context holds no retrieval item"
+    assert answer_reference.get("evidence") and \
+        answer_reference.get("facets", {}).get("semantic", {}).get("available") is True, \
+        f"the premise: gov retrieve's answer holds no semantic evidence: {S.canonical(answer_reference)[:600]}"
     machine = tmp_path / "case-vector-cache"   # this case's own machine-wide vector cache (GOV_VECTOR_CACHE_DIR)
     project = S.semantic_project(box, tmp_path / "p", embedder, files, cache=machine)
     env = S.embed_env(box, embedder, cache=machine)
@@ -393,38 +412,51 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
             path.unlink()
         return gone
 
-    def context(what, ticket=TICKET, env=env):
-        done = S.gov(box, "context", "--json", "--root", project, ticket, env=env)
+    def retrieve(what, text, env=env):
+        done = S.gov(box, "retrieve", "--json", "--root", project, text, env=env)
         assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
         return done.envelope()["result"]
 
+    def context(what, env=env):
+        before = len(embedder.embedded())
+        done = S.gov(box, "context", "--json", "--root", project, TICKET, env=env)
+        assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
+        assert len(embedder.embedded()) == before, \
+            f"{what}: gov context sent the embedder {embedder.embedded()[before:][:2]}"
+        return done.envelope()["result"]
+
     def same(what, **kwargs):
+        answer = retrieve(what, question, **kwargs)
+        assert S.canonical(answer) == S.canonical(answer_reference), (
+            f"{what}: one question, two answers (the first in a new store):\n"
+            f"{[item.get('path') for item in answer.get('evidence') or []]}\n"
+            f"{[item.get('path') for item in answer_reference.get('evidence') or []]}")
         packet = context(what, **kwargs)
         assert packet[S.K_HASH] == reference[S.K_HASH] and S.canonical(packet) == S.canonical(reference), (
             f"{what}: one ticket, two packets: {packet[S.K_HASH]} != {reference[S.K_HASH]} (the first in a new store)"
             f"\nsupplementary ids: {[item.get('id') for item in packet[S.K_SUPPLEMENTARY]]} / "
             f"{[item.get('id') for item in reference[S.K_SUPPLEMENTARY]]}")
 
-    context("another ticket first", ticket="TK-W254-BAKERY")
-    same("cold, after another ticket")
-    context("another ticket", ticket="TK-W254-ORCHARD")
-    same("warm, after another ticket")
-    assert delete_caches(), "the premise: the contexts left no cache (the tree's or the machine's) to delete"
+    retrieve("another question first", next(others))
+    same("cold, after another question")
+    retrieve("another question", next(others))
+    same("warm, after another question")
+    assert delete_caches(), "the premise: the reads left no cache (the tree's or the machine's) to delete"
     assert not cache_files(), f"the premise: a cache file survived its deletion: {cache_files()}"
-    context("another ticket", ticket="TK-W254-BAKERY")
-    same("the caches deleted, after another ticket")
+    retrieve("another question", next(others))
+    same("the caches deleted, after another question")
     delete_caches()
     machine.mkdir(parents=True, exist_ok=True)   # an absent folder would be made anew: it must exist to be read-only
     with S.ReadOnly(runtime, machine):
         assert S.cannot_create_in(runtime), "the premise: .gov-runtime/ still takes a new file"
         assert S.cannot_create_in(machine), "the premise: the machine-wide cache folder still takes a new file"
-        context("another ticket", ticket="TK-W254-ORCHARD")
-        same(".gov-runtime/ and the machine-wide cache folder read-only, after another ticket")
-    context("another ticket", ticket="TK-W254-BAKERY")
+        retrieve("another question", next(others))
+        same(".gov-runtime/ and the machine-wide cache folder read-only, after another question")
+    retrieve("another question", next(others))
     held = cache_files()
-    assert held, "the premise: the context left no cache file (the tree's or the machine's) to make read-only"
+    assert held, "the premise: the reads left no cache file (the tree's or the machine's) to make read-only"
     with S.ReadOnly(*held):
-        same("the caches' files read-only, after another ticket")
+        same("the caches' files read-only, after another question")
     bounded = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND), MACHINE_BOUND_SETTING: str(S.LOW_BOUND)}
     answers, done = S.drive_run(box, project, bounded, *[("search", text) for text in S.questions(BOUNDED, start=5000)])
     assert not S.clean(done), done.describe()

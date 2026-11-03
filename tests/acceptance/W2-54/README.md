@@ -40,6 +40,10 @@ Run (the project's test command, to its end):
 
 ### The retrieval stand-in
 
+*Removed by W2-04's round 2 (DEC-1005): the context no longer reaches the retrieval's entry. The orders are now
+produced from outside, and the check's stand-in sits at `gov.context.context` ("W2-04 (DEC-1005)", at the end).
+The text below is the original design.*
+
 KPI 1 lets a test control the order in which the retrieval returns its items through the retrieval's public
 entry. The suite writes a `sitecustomize.py` into a temporary folder and puts that folder first on `PYTHONPATH`
 of the processes of a run (the `gov context` process, and the check's process). It replaces
@@ -877,6 +881,122 @@ none (8 passed in 0.05 s). The four route cases fail on the old support module, 
 
 **Counts.** `test_w2_54_green_here.py`: 8 cases where there were 4; the suite: 103 where there were 99.
 
+# W2-04 (DEC-1005, 2026-11-01): the context's own lookups, its ceiling, and no embedder
+
+Ticket W2-04 (`DAEO-u4oz`, FULL), round 2, by its independent test designer. Every change carries `Rewrite-Reason:
+W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005`. Seventeen cases changed, in four files. No case is dropped, the
+count of the suite is unchanged (103), and no expectation is lowered: each case asserts at least what it did, where
+W2-04 puts it.
+
+**Why.** The run-1 build of W2-04 failed these cases for W2-04's reasons:
+
+- **P-W2-04-2 (A)** (DEC-1005, delegated by the CTO). The supplementary block is built from deterministic lexical
+  evidence only, from the context's own lookups, and `gov context` sends nothing to an embedder. The context no
+  longer reaches `gov.retrieval.retrieve.retrieve`, so the stand-in that reordered that entry's items saw nothing.
+  Each lookup is shown in the packet's new key `supplementary_batches` (`items`, `limit`).
+- **W2-04's S2.** Mandatory inputs alone over the ceiling refuse with `CONTEXT_OVER_CEILING`. TK-W254-BIG's mandatory
+  input (35,774 tokens on the base) is far past the default ceiling of 6,000.
+
+## `test_w2_54_dropped_order.py` (14 cases): the stand-in re-pointed to the packet
+
+**The stand-in that reordered the retrieval's items is gone** from `w2_54_support._HOOK`.
+
+**Orders produced from outside** (`w2_54_support.order_project`, `build_index`, `in_order`). The project
+`tied` is the context corpus with a second small ticket, `TK-W254-OTHER`, and four files of one text,
+`docs/ties/tie-{d,b,a,c}.md` (ties). For each of `reverse`, `rotate` and `shuffle` (seed 54) there is another project
+holding the same files:
+
+- **the same commit:** written in that order, committed with the fixed date and identity, so the same hash;
+- **the store's rows in that order:** the documents are set aside outside the project, and the index is refreshed; then
+  each document is put back in that order and the index refreshed again after it, so its chunks get later rowids;
+- **another hash seed** (`PYTHONHASHSEED` 1, 2, 54, against 0 for `tied`).
+
+The fixture holds its premise: the same commit; the same rows (sorted); another row order (`SELECT path FROM
+lexical_chunk ORDER BY rowid`, read from the temporary store).
+
+**Budgets from the packet's own figures** (`room_for_all`, `pressure_budget`):
+
+- *Room for all:* the default ceiling's fixed part (`tokens` less the supplementary items). Where the mandatory
+  inputs alone are over the ceiling, the refusal's `mandatory_tokens` is used instead. To it are added the ticket's
+  text and four times the text of every file of the project.
+- *Under pressure:* the packet with room for all gives the ranked items, every one read and stacked. The pressure
+  budget is the fixed part plus the first half of those items, so the first half is stacked and the rest left.
+
+**The check's two computations** run in one process, so no order outside the process can differ between them.
+`w2_54_support._HOOK` now sits at the context's public in-process entry, `gov.context.context`, which the check calls.
+Before each computation of a ticket, in turn, it puts the project into one of the states `W254_STATES` names:
+
+- a branch checked out;
+- a store built at that branch copied in.
+
+`W254_TARGET` limits the turns to one ticket. It logs each computation, and it never touches what the context
+computes. The states (fixture `states`) are:
+
+- `sorted`;
+- `reversed`: the same commit, rows in the reverse order of the documents;
+- `drop`: a branch where the first document TK-W254-SMALL stacks is removed, with its own store.
+
+The check cases use TK-W254-SMALL and TK-W254-OTHER, which fit the default ceiling. A reproduced
+`CONTEXT_OVER_CEILING` would be a `REFUSED:` line, not green evidence. Their project leaves out the big charter, which
+neither cites: its one line of about 25,000 tokens would stop the stack at the default ceiling wherever a relevance
+order ranks it.
+
+| case | before | after |
+|---|---|---|
+| `…stand_in_reaches_the_retrieval_s_public_entry_with_tied_and_same_id_items` | the stand-in saw ≥ 10 items, ≥ 5 ids, two of one id | **through the packet.** With room for all, TK-W254-BIG's `supplementary_batches` read ≥ 10 items of ≥ 5 ids. Several items come from one record (sharing its id, or its file where items are named one by one). The four tied files are read, and their stacked items have one text |
+| `…two_computations_with_the_retrieval_s_own_order_give_one_packet` | TK-W254-BIG twice (past the ceiling) | TK-W254-BIG twice **under pressure** (items stacked and left): one packet, one hash |
+| `…every_order_…_gives_the_same_packet_and_hash[reverse, rotate, shuffle]` | the stand-in returned the items reversed, rotated, shuffled | **the project's files, the store's rows and the hash seed** in that order, at the same commit, under pressure. The same `dropped` (its one order), `supplementary_batches`, `further_batch`, hash and packet |
+| `…a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order` | `ok: true`, everything dropped, one packet | **the refusal:** `ok: false`, `CONTEXT_OVER_CEILING`, a non-zero exit, details naming the ticket and limit. The same envelope and exit under every order |
+| `…nothing_is_dropped_or_added_every_item_stays_in_the_packet_once[identity, reverse]` | each returned item once in `dropped` | each item the batches read is **once in the packet**: stacked, or left for lack of room and in `dropped` (counted by id, so same-id items stay apart). The stack is the first items read. `dropped` is the same multiset under the reverse order |
+| `…a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing` | at the default ceiling, kept == the last call's items | **with room for all** (the default ceiling no longer holds all of TK-W254-SMALL's evidence): every item read is stacked once, in order. `dropped == []`, `further_batch == []`, and the last batch read fewer items than its limit |
+| `…an_empty_retrieval_result_gives_one_packet` | the stand-in returned nothing | **a project whose lookup finds nothing** (fixture `none`: tickets as `product` memory, so not indexed; the title `Quince marmalade jars` in no document; `gov retrieve` of it gives no evidence). Two seeds, one packet. Nothing supplementary, read, left or dropped |
+| `…a_store_whose_index_is_missing_gives_one_packet_under_any_order[SMALL, BIG]` | identity and reversed stand-in | the same files **written in the reverse order** (the same commit), another seed. TK-W254-BIG with room for all |
+| `…the_check_is_green_when_two_computations_see_two_orders` | the stand-in alternated the order | **the two stores in turn** (`sorted`, then `reversed`), seen in the log for both tickets. Exit 0; no `FAIL`, `REFUSED` or `ERROR` |
+| `…a_context_whose_items_differ_still_fails_the_check_naming_the_ticket` | the second call returned one item fewer | **the second computation sees the `drop` state** (one stacked document gone, its own store). The fixture shows the items differ. Not green, and names TK-W254-SMALL |
+| `…the_check_names_only_the_ticket_whose_context_differs` | the same, `W254_TARGET` TK-W254-BIG | the same, **`W254_TARGET` TK-W254-SMALL**. TK-W254-OTHER sees `sorted` only and is not named |
+
+**What can no longer be produced from outside, and what each case guards instead.**
+
+- "Two computations of the check see two orders of *the retrieval's* items" cannot be produced from outside any
+  more: the context does not ask the retrieval. Instead, between the check's two computations the stand-in at the
+  public `gov.context.context` swaps in another store at the same commit (another order of its rows), or another
+  branch with one document fewer. So "two computations saw two orders" is now two orders of *the store's* rows, and
+  "the items differ" is one document fewer.
+- A store of the context's own that it caches across the two computations is not swapped. The green case then holds
+  trivially; the two red cases still see the branch change.
+
+**Red on the base** (`d2ff95b2`, this tree's `src/` equal to `w2/integrate`'s): 11 failed, 4 passed.
+
+- TK-W254-BIG's and TK-W254-NONE's contexts are `ok: true` with 35,774 tokens over 6,000 (no
+  `CONTEXT_OVER_CEILING`): 8 cases, through `room_for_all`.
+- `--budget 30` gives `ok: true` with tokens 61.
+- No `supplementary_batches`: the fit case.
+- **Passing on the base:** the three check cases, and the index-missing case for TK-W254-SMALL. The base's
+  context is order-stable (its lexical route sorts by path), and the check compares hashes. They hold what the change
+  must keep.
+
+## The three embedder cases: their embedder steps move to `gov retrieve`
+
+`gov context` sends nothing to an embedder (W2-04's addendum, S4 and S7). The premise "a context sends the embedder
+its question" is gone, and the read that reaches the semantic route is `gov retrieve`.
+
+| case | before | after |
+|---|---|---|
+| `test_w2_54_cpu_embedder.py::test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner` | steps 3 and 4: two `gov context`, each sending the CPU embedder its question | steps 3 and 4 are **`gov retrieve` of the two tickets' titles**, held as every read is (the CPU embedder gets a text, the shared runner none); all six questions reach the CPU embedder. **Added:** the two `gov context` then send neither embedder a text |
+| `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the cache's states made by other tickets' contexts; the packet hash held in each | the states are made by **`gov retrieve` of the other tickets' titles**. In each state (cold, warm, deleted, `.gov-runtime/` read-only, the cache's files read-only, full): `gov retrieve` of the ticket's title gives the answer it gets first in a new store (the whole bundle), and `gov context` gives the reference packet and hash. **Added:** each `gov context` sends the embedder nothing. The premise "the context holds a retrieval item" moves to `gov retrieve`'s answer (evidence, semantic facet available) |
+| `test_w2_54_query_vector.py::test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary` | premise: the check's contexts reached the embedder | premise: **`gov retrieve` of each ticket's title**, asked, then again after the others, reaches the embedder after other texts, and gets one bundle every time. The check stays green over the three tickets. **Added:** its contexts send the embedder nothing |
+
+**Red on the base:** each fails on its added guarantee alone.
+
+- `gov context TK-W254-TIDES` sends the CPU embedder `…Query: Harbour`.
+- In the query-cache case, `cold, after another question: gov context sent the embedder […Query: Harbour]`. A
+  throwaway probe outside the tree ran its `gov retrieve` part through every state on the base: each answer equalled
+  the reference.
+- The check's contexts send the embedder 6 texts. The `gov retrieve` premise and the green check pass on the base.
+
+**Not revised:** `test_w2_54_green_here.py` and `test_w2_54_time_limit.py` (red only for a missing store in the
+ticket's worktree; the lead rebuilds), `test_w2_54_sandboxed_worker.py` (another ticket's).
+
 # DEC-1033: six cases revised (owner, 2026-11-02; emergency, `Rewrite-Reason: DEC-1033`)
 
 DEC-1033 item 2 (b) replaced DEC-798 (the query embedder on the CPU only): a question's vector is accepted from any
@@ -977,3 +1097,16 @@ from W2-126's ticket and README interface, without its implementation.
   `GOV_VECTOR_CACHE_MAX_BYTES`, 256 KiB). What it guards is unchanged: one ticket, one packet and one hash, the first
   context's in a new store, in every state; its row above is unchanged. Run on `w2/integrate`'s code (this
   tree's `src/`, no W2-126 code): `test_w2_54_query_cache.py` whole, 14 passed (the case 8.7 s).
+
+## W2-04 merged with W2-126's revision (D-1, DEC-1052)
+
+`test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` carries both
+revisions, which conflicted when `w2/integrate` (with W2-126) was merged into `w2/W2-04`. W2-04's: the cache's states
+are made by `gov retrieve` of the other tickets' titles; in each state `gov retrieve` of the ticket's title gives the
+reference answer and `gov context` the reference packet and hash, sending the embedder nothing; the premise is
+`gov retrieve`'s semantic evidence. W2-126's: the reference store has a cache of its own (`_reference_cache`), and the
+case its own machine-wide folder (`case-vector-cache`); "deleted" removes both caches' files, ".gov-runtime/
+read-only" makes the machine folder read-only too, "the cache's files read-only" acts on either cache's files, and
+"full" lowers both bounds. The reads that make each state are W2-04's; the caches they act on are W2-126's. No
+assertion of either side was dropped.
+
