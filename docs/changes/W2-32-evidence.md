@@ -1,0 +1,26 @@
+# W2-32 (DAEO-0pyc) evidence: S1 to S5, round 1 (D-4b, DEC-1055)
+
+The engineer's evidence per KPI line (DEC-995), built to the ticket's interface section (P-W2-32-1, `37cd5e19`).
+All runs are unit tests with stand-ins: no embedder, reranker or Ollama was started, so no real-model figure is
+claimed here (the CTO measures). The acceptance tests (`tests/acceptance/W2-32/`) were not read; `gov accept W2-32`
+is run once the CTO merges them.
+
+Commands (from the worktree; `T=$TMPDIR/w232`):
+
+- **own:** `TMPDIR=$T PYTHONPATH=src python3 -m pytest -o tmp_path_retention_policy=failed -p no:cacheprovider --optin=lifted,breadth tests/unit/retrieval/test_w2_32_pin.py tests/unit/retrieval/test_w2_32_learning.py tests/unit/retrieval/test_w2_32_rerank_fusion.py tests/unit/semantic -q`
+- **neighbours:** `TMPDIR=$T PYTHONPATH=src python3 -m pytest -o tmp_path_retention_policy=failed -p no:cacheprovider tests/unit/semantic tests/unit/retrieval tests/unit/rebuild tests/unit/retrieve tests/unit/context tests/unit/synthesis tests/unit/validate --deselect tests/unit/retrieval/test_w2_112_shared_reranker.py -q`
+
+| KPI line | how it is verified | command | result | commit |
+|---|---|---|---|---|
+| **S1** a changed embedder pin in configuration means a full re-embed [CAP-10.b] | `governance/project/models.yaml` (`embedder: {model, revision}`; absent: ADR-0002's `qwen3-embedding:0.6b` at `ac6da0dfba84`, `gov.config.models`). A rebuild under another model, revision or cut than the store's manifest drops every vector and embeds every chunk again. Cases: a new revision, and a new model (requests name it), each sends every chunk again; the same pin sends nothing. The dev-tier retrieval regression is the CTO's run (real embedder). | own | 80 passed (`test_w2_32_pin.py`: 25) | `fd72ad3a` |
+| **S2** an unpinned or mismatched model fails closed with a named error [CAP-19.a, W2-M073, W2-M191, W2-L065] | Codes first in the reason (so in `retrieve`'s `facets.semantic.reason` and `gov rebuild`'s `stores.semantic.reason`), and in `error`: `MODEL_UNPINNED` (a configured model without a 12-64 hex revision: nothing sent, store untouched); `MODEL_MISMATCH` (the endpoint's digest is not the pin's; the vectors were built under another model or revision; the query embedder reports another revision, or none); `MODEL_NOT_LISTED` (a pinned model the endpoint does not list). W2-L065: `semantic.manifest(root)["embed_chars"] == 512`; a store without `semantic_pin` (every store built before W2-32) is `stale` until a rebuild. W2-M073: `models.yaml` is read as it stands in the tree and is part of the status's fingerprint. W2-M191: vectors left by `--no-embeddings` are already reported `stale` (W2-108's check), unchanged. | own | 80 passed | `fd72ad3a` |
+| **S3** a miss is a memory-quality event with root cause, repair and a held-out regression case [CAP-19.c] | `gov.retrieval.learning.record(root, miss)` writes `fixtures/memory-quality/events/<id>.yaml` and the case, in the measure's question form, as `fixtures/memory-quality/cases/<id>.yaml` (outside `.gov-runtime/`), and returns `id`, `type: memory-quality`, `question`, `root_cause`, `repair`, `path`, `regression_case`. `events(root)` lists them. A missing or empty part of the miss or the case raises `ValueError` naming it, with nothing written. The folder is never embedded, whatever the path map says (`semantic._wanted`). | own | 80 passed (`test_w2_32_learning.py`: 19) | `fd72ad3a` |
+| **S4** a reranker that dies after loading is reported, not raised [W2-M104] | `rerank.rerank` catches a score that raises (broken pipe, empty answer, end of input) or answers wrongly (too few scores, no numbers), and a loader that raises: the order given is kept with no `rerank_score`, and `last_outcome()` is `by: unavailable` with the failure named. A dead private reranker is dropped, so the next search starts another. `fusion.search` gives `reranked: false` and `rerank`. Before: `retrieve` already caught `OSError`, `RuntimeError` and `ValueError` (partly met), `fusion.search` raised. | own | 80 passed (`test_w2_32_rerank_fusion.py`: 25 with S5) | `fd72ad3a` |
+| **S5** the fusion limit is honoured [W2-M103] | `fusion.search` gives exactly `limit` distinct hits (all there are if fewer): the reranked head of 30, then the fused order unscored; `None` gives the head; a negative, fractional, boolean or text limit raises `ValueError` naming the limit. Before: at most 30 whatever the limit, and a negative limit dropped hits from the end. DP-3 is unchanged: `retrieve` does not use `fusion.search`, and its own cut (batch size times rounds) was already honoured by paging. | own | 80 passed | `fd72ad3a` |
+
+**Neighbours:** 233 passed in semantic, retrieval and rebuild, and 112 in retrieve, context, synthesis and validate.
+One failed: `tests/unit/rebuild/test_w2_122_seed.py::test_an_endpoint_now_reporting_another_revision_refuses_the_base`.
+It is outside W2-32's paths: the endpoint's revision moves off the pin and nothing pins the new one, so the cold
+rebuild now fails closed (S2). It needs a test designer's revision (pin `"b" * 64` in that tree's `models.yaml`).
+`test_w2_112_shared_reranker.py` was left out: the sandbox refuses its socket, and it fails 18 of 26 on the unchanged
+base too.

@@ -13,7 +13,7 @@ import sqlite3
 from pathlib import Path
 
 from gov.retrieval import lexical, semantic
-from gov.retrieval.rerank import rerank
+from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import STORE_REL
 
 RRF_K = 60
@@ -56,16 +56,27 @@ def search(root: Path, query: str, limit: int | None, refresh: bool = True, rera
     chunks and ``limit`` cuts after the rerank.
 
     The reranker scores ``[path: …]`` and the first ``RERANK_CHARS`` characters of each chunk; a hit keeps the
-    chunk's own text. ``reranked`` is false when no reranker could be loaded: the fused order is kept (DEC-374).
+    chunk's own text. ``reranked`` is false when no reranker could be loaded, or it failed once loaded: the fused
+    order is kept (DEC-374), and ``rerank`` names who scored or why none did (W2-32 S4).
+
+    The limit is honoured (W2-32 S5, W2-M103): ``None`` gives the reranked head; a limit gives exactly that many
+    distinct chunks, or all there are if fewer. Past ``RERANK_TOP`` the fused chunks after the head follow it in the
+    fused order, unscored: the rerank stays one pass over the head (DEC-406). A limit that is not a whole number of 0
+    or more is refused with ``ValueError``.
     """
+    if limit is not None and (isinstance(limit, bool) or not isinstance(limit, int) or limit < 0):
+        raise ValueError(f"fusion.search: the limit must be a whole number of 0 or more, not {limit!r}")
     answers = {lexical.FACET: lexical.search(root, query, refresh),
                semantic.FACET: semantic.search(root, query, refresh)}
     fused = rrf({name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()})
-    records = {record["chunk_id"]: record for record in _records(root, fused[:RERANK_TOP])}
-    scored = [{**record, "text": f"[path: {record['path']}]\n{record['text'][:RERANK_CHARS]}"}
-              for record in records.values()]
+    wanted = RERANK_TOP if limit is None else max(RERANK_TOP, limit)
+    records = {record["chunk_id"]: record for record in _records(root, fused[:wanted])}
+    head = list(records.values())[:RERANK_TOP]
+    scored = [{**record, "text": f"[path: {record['path']}]\n{record['text'][:RERANK_CHARS]}"} for record in head]
     hits = [{**hit, "text": records[hit["chunk_id"]]["text"]} for hit in rerank(query, scored, reranker)]
-    return {"hits": hits[:limit],
+    outcome, reranked = last_outcome(), any("rerank_score" in hit for hit in hits)
+    tail = list(records.values())[RERANK_TOP:wanted] if limit is not None else []
+    return {"hits": (hits + tail)[:limit],
             "facets": {name: {key: value for key, value in answer.items() if key not in ("hits", "ranked")}
                        for name, answer in answers.items()},
-            "reranked": any("rerank_score" in hit for hit in hits)}
+            "reranked": reranked, "rerank": outcome}
