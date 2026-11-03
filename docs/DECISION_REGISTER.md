@@ -13042,3 +13042,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.437 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1053. Next free id: DEC-1054. |
+
+### DEC-1054 — G-14: the test designer's no-read list covers the ticket's own new unit-test files; shared test files stay readable
+- **Status:** ACCEPTED (owner, 2026-11-03 ~14:45, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 G-14, DEC-963, DEC-820 (c) · **Source:** the CTO's provisional recommendation (START-NEXT-SESSION §6; `.gov-runtime/scratch/orchestrator/briefs/EMG-g14-engineer.md`)
+- **Decision:** in G-14's path-map role checks, what the independent test designer may not read (`{ticket_impl}`) covers the ticket's own new unit-test files (its `allowed_paths` under `tests/`, other than `tests/acceptance/**`), as well as its code outside `tests/`; shared test files stay readable (every `conftest.py` and the shared support modules the designer needs for fixtures); the integrated copies stay readable (DEC-963). Applied in ACT-G14 unless the replay's counts show a problem (honest designer work refused, or a gap in ordinary work); if they do, it comes back to the owner before the ACT.
+- **Basis:** question 1 (role separation: the designer writes from the spec and KPIs, not from the engineer's new tests) and question 2 (a designer shaping acceptance tests to the engineer's unit tests would let drift through).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.438 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1054. Next free id: DEC-1055. |

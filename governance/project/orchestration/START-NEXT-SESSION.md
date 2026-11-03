@@ -92,8 +92,10 @@ the register and the owner's word hold over both.
 7. **D-11 the basis as a standing practice**, after the lift.
 
 ## 6. Waiting on the owner (now or coming)
-- **With G-14:** whether what the test designer may not read (`{ticket_impl}`) includes the engineer's
-  `tests/unit/**` paths; then ACT-G14.
+- **With G-14:** answered by DEC-1054 (the ticket's own new unit-test files on the designer's no-read list, shared
+  test files readable; back to the owner only if the replay shows a problem); then ACT-G14.
+- **D-4b, the memory stage** (the owner's re-plan of 2026-11-03 ~14:40): the package to the owner first; nothing
+  starts until it is approved.
 - **D-3's prompt patch** (R-9, R-11, R-12, O-6, O-11), and the class list of approved server restarts (O-6).
 - **D-4's list** of deletions and merges, and whether the lifted features' suites count in D-10's full run (T-10).
 - **D-9's list** of ticket fates and K9.
