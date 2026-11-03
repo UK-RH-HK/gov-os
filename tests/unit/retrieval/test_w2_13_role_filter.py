@@ -239,3 +239,13 @@ def test_gov_context_with_role_given_withholds_the_engineers_tests_and_names_it(
     assert len(named) == 1 and "1 paths" in named[0]["reason"] and "engineer" in named[0]["reason"]
     monkeypatch.setenv("GOV_ROLE", "engineer")  # a role given never lifts the session's
     assert _CTX_CASE not in _packet_paths(context.context(project, "TK-1", role="orchestrator"))
+
+
+def test_gov_context_command_passes_role_through_to_the_block(project):
+    from gov.context import command as context_command
+    args = argparse.Namespace(ticket="TK-1", brief=False, budget=None, dry_run=False, in_force=False, role="engineer")
+    packet = context_command.run(project, args, {})  # gov context TK-1 --role engineer, GOV_ROLE unset
+    assert _CTX_CASE not in _packet_paths(packet) and "notes/quokka.md" in _packet_paths(packet)
+    assert [entry["id"] for entry in packet["dropped"]].count("role_filter") == 1
+    assert _CTX_CASE in _packet_paths(context_command.run(project, argparse.Namespace(**{**vars(args), "role": None}),
+                                                          {}))
