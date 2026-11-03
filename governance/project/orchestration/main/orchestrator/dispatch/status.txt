@@ -1,20 +1,20 @@
-dispatcher 2026-11-03 11:46:04
+dispatcher 2026-11-03 12:09:02
 leads running (0, from the processes): none
-load 1.0/1.8/1.3; real busy cores 1.04 of 20 (the embedding server 0.0); memory available 16540 MB; gate_check (for comparison) open (OPEN leads=0 load=1.0/1.3 nproc=20 have=16936228kB need=5285964kB); disk open
-Balance: CPU 1.04/20 busy (band 14-18: below); RAM 16.2 GB available (floor 3.0 GB); GPU 7.7/15.9 GB used, 8.3 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); lead cap 0 from memory (-1.3 GB room / 2.1 GB a lead); rerankers 1 (1.6 GB RSS; 2 of 2 GPU slots held; reserve 8.9 GB: the rerankers' p95 (1433 of 30 samples, 22.0 of 24 h, since 2026-11-02 13:00))
-Forecast: lead: admits, binding GPU: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); pairing loads CPU 0.06, GPU 0.55
+load 3.9/3.1/2.0; real busy cores 1.6 of 20 (the embedding server 0.37); memory available 16486 MB; gate_check (for comparison) open (OPEN leads=0 load=3.9/2.0 nproc=20 have=16879628kB need=5285964kB); disk open
+Balance: CPU 1.6/20 busy (band 14-18: below); RAM 16.1 GB available (floor 3.0 GB); GPU 10.4/15.9 GB used, 5.6 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared BUSY 199 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); lead cap 0 from memory (-0.9 GB room / 2.1 GB a lead); rerankers 1 (1.7 GB RSS; 2 of 2 GPU slots held; reserve 8.9 GB: the rerankers' p95 (1456 of 30 samples, 22.3 of 24 h, since 2026-11-02 13:00))
+Forecast: lead: admits, binding GPU: GPU memory 10.3 of 13.9 GB (used 10.3 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 10.3 of 13.9 GB (used 10.3 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 10.3 of 13.9 GB (used 10.3 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free); pairing loads CPU 0.09, GPU 0.74
 Jobs by phase: none
-GPU rule: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free): within total minus headroom; shared GPU memory unread (powershell.exe: Exec format error)
+GPU rule: GPU memory 10.4 of 13.9 GB (used 10.4 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free): within total minus headroom; shared GPU memory unread (powershell.exe: Exec format error)
 Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
 Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 2), spill floor 1019 MiB; config.json overrides: none
-admission (by peaks, DEC-1008 item 5): memory: lead cap 0 (slots rule: -1371 MB of room / 2129 MB a lead, outside verification): 0 leads running and 0 launching
+admission (by peaks, DEC-1008 item 5): memory: lead cap 0 (slots rule: -946 MB of room / 2129 MB a lead, outside verification): 0 leads running and 0 launching
 peaks 2026-11-03 11:09:54: a lead p95 4091 MB, max 9580 MB
 heavy steps outside a slot: none
-heavy slots held: none; queue free; land: nothing to land; main tree clean on w2/integrate
+heavy slots held: none; queue free; land: nothing to land; main tree NOT clean on w2/integrate
 inbox unread: 0
 ready list: nothing waiting
 sentinel: watched
 guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
-embedding server: shared IDLE 0 tasks/min; query IDLE 0 tasks/min
-GPU: RTX 5070 Ti 7.7/15.9 GB, 1 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29; last alert 2026-11-02 23:04:06: GPU budget
+embedding server: shared BUSY 199 tasks/min; query IDLE 0 tasks/min
+GPU: RTX 5070 Ti 10.4/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29; last alert 2026-11-02 23:04:06: GPU budget
 heavy slot holders: none

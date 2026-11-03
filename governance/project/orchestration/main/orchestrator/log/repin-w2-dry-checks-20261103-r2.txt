@@ -1,0 +1,13 @@
+ok   gov imports from the pin (/home/usain/.cache/gov-os-repin3-dry/9894b0cf/venv/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint
+ok   gov accept --help and gov launch --help
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   gov retrieve: lexical and semantic available, 1.115614895 s
+ok   gov context DAEO-sdxk --json and --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   guard4_check.py: PASS
+ok   test_guard_fix_3.py: 269 passed, 1 skipped in 17.15s
+ok   hook_timing.py: exit 0 out '' seconds [0.1, 0.1, 0.1, 0.1, 0.11]
+ALL CHECKS PASS (/home/usain/.cache/gov-os-repin3-dry/9894b0cf/venv)
+exit 0

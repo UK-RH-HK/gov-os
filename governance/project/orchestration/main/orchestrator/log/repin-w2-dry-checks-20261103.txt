@@ -1,0 +1,12 @@
+ok   gov imports from the pin (/home/usain/.cache/gov-os-repin3-dry/9894b0cf/venv/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint
+ok   gov accept --help and gov launch --help
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   gov retrieve: lexical and semantic available, 2.932174948 s
+ok   gov context DAEO-sdxk --json and --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+CHECK FAILED: guard4_check.py (FAIL rule2 measured role reads hidden in another worktree: want deny, got allow | 
+FAIL rule2 measured role reads hidden in a run clone: want deny, got allow | 
+FAIL)
+exit 1

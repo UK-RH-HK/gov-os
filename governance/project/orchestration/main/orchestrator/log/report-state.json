@@ -5,7 +5,9 @@
   "W2-96",
   "W2-122",
   "W2-123",
-  "W2-112"
+  "W2-112",
+  "W2-126",
+  "W2-04"
  ],
  "built_held": [
   "W2-20",
@@ -17,7 +19,7 @@
  ],
  "closes_next": "none: the refactoring (DEC-1052); D-1 merges as built, formal closes at the lift (P1-13)",
  "examin": "AT RISK: the refactoring holds ticket work; plan estimate 11-14 (range 11-12 to 11-19), re-estimated after D-4's test count; K9 gates the start (DEC-954 Q1)",
- "owner_action": "P1 D0-CLEANUP-LIST - five yes/no lines before anything is deleted (packages/LIFT-1/D0-CLEANUP-LIST.md)",
+ "owner_action": "none now; coming: ACT-REPIN-W2 (re-pin window 2) once its dry build and checks pass",
  "last_report": "2026-10-30 21:36:47",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
@@ -30,9 +32,9 @@
   "W2-15a": "waits for W2-04 and W2-61h",
   "W2-32": "after W2-15a",
   "W2-112": "MERGED as built 9a02a474e3d5 (D-1); formal close at the lift",
-  "W2-126": "D-1: engineer resolving semantic.py with W2-123, then KPI 7; designer revising W2-123's 500 case",
+  "W2-126": "MERGED as built 0c5d7f4c935f (D-1, with KPI 7); formal close at the lift",
   "W2-122": "MERGED as built 5543a03a44c0 (D-1); formal close at the lift",
   "W2-123": "MERGED as built f704f7d3fee3 (D-1); formal close at the lift",
-  "W2-04": "D-1: designer resolving W2-54's README conflict, then merged as built (M-1)"
+  "W2-04": "MERGED as built 70965cf61311 (D-1, M-1); formal close at the lift"
  }
 }

@@ -1,1 +1,2 @@
 seed: none (none): the tree has its own store: an incremental rebuild
+rebuild: secrets scan: off by configuration (DEC-1045)

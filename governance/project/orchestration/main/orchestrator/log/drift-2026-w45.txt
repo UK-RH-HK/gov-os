@@ -1,0 +1,1 @@
+2026-11-03 12:03 slip (session bb5cd8bd): rm -rf of my own empty-ish TMPDIR /tmp/gov-os-cto-w66 chained after a commit, without the DEC-991 ping first (it ran without a prompt). Harmless scratch; rule: rm alone, pinged first.

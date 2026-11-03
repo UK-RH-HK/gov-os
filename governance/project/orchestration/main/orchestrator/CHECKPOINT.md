@@ -15,10 +15,40 @@ commit) asked of the owner in the D-0 list.
 `w2/integrate` as `c72ededc5c97`. For D-9's homes (W2-122 or W2-45): a seed base and a copy with different `scan`
 settings may index different files (untested; not on this repository); `seed.py` fingerprints the gitleaks binary
 even with the scan off (harmless).
-**11:50:** W2-126 engineer PACKAGES: merge `0ee425698978`, KPI 7 `dbdcddad8df5` (14 unit cases; W2-126 acceptance green;
+**11:43:** W2-126 engineer PACKAGES: merge `0ee425698978`, KPI 7 `dbdcddad8df5` (14 unit cases; W2-126 acceptance green;
 W2-123's 500 case red as expected, the designer's). 8 builder reds outside its paths (6 W2-122 seed: the shared cache
 makes the cold rebuild warm; 2 W2-123 retry: old rule). P-W2-126-BT decided (delegated P2, ticket line `81801789`);
 the same engineer resumed on the 8. Review F1-F8 left for the formal close.
+**11:45 (owner) DEC-1053 `d855e41a`: D-0 as recommended, DONE:** emg/w1-19-helper merged `d7b25cf3c605`; 43 worktrees +
+branches removed (scratch archived to `archive/worktree-scratch/`, self-ignored so the sync skips it; record synced
+`557e5d4e` first); `w2/W2-48` deleted; 67 run folders removed (measures' evidence kept); 879 GB free. W2-78 and the
+in-flight branches wait for D-9. W2-126 engineer DONE `6f7fd689da30` (8 builder reds fixed). W2-123's cap builder
+tests red in a narrow slot (fixed config CPUs "0-1"/"0"): fixed on the spot `043f8222` (CPUs from the run's affinity).
+One guard false refusal (nested `bash -c` quoting: "list index out of range"); worked round by a script file.
+**Waiting:** the test designer (W2-04 README; W2-123 500 case + W2-126 KPI 7 cases on `w2/W2-126-tests`; W2-66 case on
+`emg/select`). Then merge `w2/W2-126-tests` into `w2/W2-126`, acceptance W2-126 + W2-123 once, merge W2-126 and W2-04
+and emg/select into `w2/integrate`; then re-pin window 2's ACT.
+**12:03:** designer DONE (W2-04 README `fcfb9150b557`; W2-126-tests `aabbf31a7536` + `741f9eddd45c`: W2-123's 500 case rewritten, 10 KPI 7 cases; W2-66 live map `e66ca8510b42`). `w2/W2-126-tests` merged into W2-126 `15c80ebb72b7`; W2-126 +
+W2-123 acceptance and retrieval/rebuild/semantic units 369 passed 1 skipped; merged W2-126 `0c5d7f4c935f`, emg/select
+`9a5254ce8bf7`. W2-04 now conflicts with W2-126's W2-54 revision in `test_w2_54_query_cache.py`: the designer
+resumed on it (merge integrate into w2/W2-04). Test map: `packages/*.diff` record-only `530879a4` (W2-66 red's
+half); its `.ps1` half is W2-66b's (D-9 fate: P1-12 red fixes). Then: W2-04's merge, the integration store refresh,
+`pin/make_repin3_commands.sh <head>` (dry build twice), `pin/repin3_checks.sh` on the dry install, then the ACT.
+**12:05: D-1's seven merges DONE:** W2-04 merged `70965cf61311` (designer's merge `98993db4ec0e`, W2-54 query_cache
+combined, 14/14). One red owned by `w2/integrate`: W2-54 `test_no_hard_block_check_is_weakened` pins
+`secrets-indexing.yaml`, which DEC-1045 (emg/noscan) changed: the designer revises it on `emg/select`
+(Rewrite-Reason: DEC-1045), then I merge it. Window 2 tools written and tested: `pin/make_repin4_commands.sh`,
+`pin/REPIN-COMMANDS-W2.template.sh` (OLD=a7182f6c), `pin/repin4_registry.py` (tested on a throwaway copy: replaces
+window 1's entry, a second run refuses). Next: merge the designer's fix; refresh the integration store; then
+`bash pin/make_repin4_commands.sh <head>` and `pin/repin3_checks.sh` on the dry install; then ACT-REPIN-W2 to the owner
+(write `log/act-in-progress.txt` at the hand-over).
+**12:10: ACT-REPIN-W2 handed to the owner** (`packages/ACT-REPIN-W2.md`, `70a82a72`; commands
+`pin/REPIN-COMMANDS-9894b0cf.sh`; sha256 94931d3d...25c2, two builds agree; ALL CHECKS PASS on the dry install,
+`log/repin-w2-dry-checks-20261103-r2.txt`). emg/select's W2-54 fix merged `9894b0cf514a` (the pinned head); store
+refreshed there. `tools/guard4_check.py`'s two rule-2 cases repointed from W2-87 / W2-61's clone (removed by D-0) to
+W2-13's (backup `.pre-d0`). HOLD ON: `log/act-in-progress.txt` written; no main-tree commit until the owner says
+done; then `mv` it, confirm `readlink -f ~/.local/bin/gov` = pin-9894b0cf, a search, and go on with D-2 (E1 first,
+`EMG-queue`'s uncommitted work).
 
 **THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
 "DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:

@@ -45,9 +45,9 @@ CASES = [
     ("rule2 held-out named", "orchestrator", "Bash", {"command": "ls " + (held_path or "/nonexistent-held")},
      "deny" if held_path else "allow"),
     ("rule2 measured role reads hidden in another worktree", measured, "Read",
-     {"file_path": "/home/usain/gov-os-worktrees/W2-87/" + hidden_file}, "deny"),
+     {"file_path": "/home/usain/gov-os-worktrees/W2-13/" + hidden_file}, "deny"),  # DEC-1053: W2-87 removed
     ("rule2 measured role reads hidden in a run clone", measured, "Bash",
-     {"command": "cat /home/usain/gov-os-runs/W2-61/repo/" + hidden_file}, "deny"),
+     {"command": "cat /home/usain/gov-os-runs/W2-13/head/" + hidden_file}, "deny"),  # DEC-1053: W2-61/repo removed
     ("rule2 measured role reads hidden in the main tree", measured, "Read",
      {"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/" + hidden_file}, "deny"),
     ("rule5 auditor writes its probe record", "independent-auditor", "Write",
