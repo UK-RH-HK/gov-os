@@ -66,6 +66,12 @@ closed in one step (`land.py`); "landing" is that run.
 **Attribution.** Deciding whether a failing test was caused by the change being landed: re-run once with it and once
 without it (Q-1, approved), instead of the old three-and-three against a nightly clone.
 
+**The landing check (G-1).** Before a ticket lands, every commit in its range that changes an acceptance test must
+carry `Role: independent-test-designer` or `Role: owner`, or the landing refuses, naming the commits (`tools/land.py`).
+
+**The structural pass (R1-21).** A 10-second run of the cheap record checks (schema, graph, claims, path map and the
+like) after each landing and each CTO record commit; it reports a notice, never refuses (`tools/structural_pass.py`).
+
 **The dispatcher.** The program cron runs every minute: it starts leads from the CTO's ready list, lands approved
 tickets, collects returns into the inbox, and writes the machine's true status.
 

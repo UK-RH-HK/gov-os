@@ -19,6 +19,20 @@ Option A. The templates' four recommendations approved, READY and DONE computed 
 **No run uses the old way from now on:** gitleaks off; no full suite but P1-12's; scoped selection; attribution once
 each way. Nothing scheduled but the dispatcher (DEC-1051).
 
+**Status of the steps (2026-11-03 14:20, session bb5cd8bd; the fresh session starts from `governance/project/orchestration/START-NEXT-SESSION.md`):**
+
+| step | status | where |
+|---|---|---|
+| D-0 clean-up | **done** (DEC-1053 `d855e41a`) | `D0-CLEANUP-LIST.md` |
+| D-1 memory branches merged as built; re-pin window 2 | **done**: seven branches and emg/w1-19-helper merged; `pin-9894b0cf` live (registry `b74d2c7f`) | `ACT-REPIN-W2.md` |
+| D-2 the CTO's tools | **in progress**: E1 (Q-1, G-1), R1-21, E3 (ACT-GUARD-FIX-4, hooks `3bc25241`), O-A1 and the LB held-slot fix **live**; **G-14 next** (stopped at a safe point: `.gov-runtime/scratch/orchestrator/drafts/g14/NEXT.md`) | `ACT-GUARD-FIX-4.md`, `reviews/` |
+| D-3 configuration and text lifts | **next after G-14**, not started; T-6, T-7, T-10, Q-8, Q-10 moved to D-4 | `D3-WORKLIST.md` |
+| D-4 the test suite cut | not started (the deletions listed to the owner first) | — |
+| D-5 to D-8 | not started | — |
+| D-9 the WBS refactor | not started (the fates and K9 to the owner first) | — |
+| D-10 the full suite | not started (the owner's word) | — |
+| D-11 the basis as a standing practice | after the lift | — |
+
 **The order, as decided:**
 1. **D-0 Clean-up** (O-8, O-13): stale worktrees, branches, scratch, dead copies, old run folders removed; **anything
    unmerged that may hold work is listed to the owner before it is deleted** (the CTO lists, the owner says).
