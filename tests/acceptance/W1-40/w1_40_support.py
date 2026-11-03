@@ -516,12 +516,41 @@ def triggers(workflow):
     return set(on or ())
 
 
+_RENDERED = []   # the scratch folder the template's workflows are rendered into, once per process
+
+
+def template_workflow_files():
+    """The template's workflows rendered as a product gets them (Jinja, standard delimiters, no answer: the form
+    ``test_w1_40_templates.py`` renders), each at its rendered name in a scratch folder of this process."""
+    if not _RENDERED:
+        try:
+            import jinja2
+        except ImportError:
+            raise Absent("jinja2 is not importable: the template's workflows cannot be rendered") from None
+        import atexit
+        import tempfile
+        folder = Path(tempfile.mkdtemp(prefix="w1-40-template-workflows-"))
+        atexit.register(shutil.rmtree, folder, True)
+        environment = jinja2.Environment(undefined=jinja2.StrictUndefined, keep_trailing_newline=True)
+        for template in sorted(TEMPLATE_WORKFLOWS.rglob("*.jinja")) if TEMPLATE_WORKFLOWS.is_dir() else []:
+            rel = str(template.relative_to(TEMPLATE_WORKFLOWS))[:-len(".jinja")]
+            target = folder / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(environment.from_string(template.read_text(encoding="utf-8")).render(), encoding="utf-8")
+        _RENDERED.append(folder)
+    return workflow_files(_RENDERED[0])
+
+
 def push_workflows():
-    """``(path, workflow)`` for every workflow of the repository that a push starts."""
-    found = [(path, load_workflow(path)) for path in workflow_files()]
+    """``(path, workflow)`` for every workflow of the product (the template's, rendered) that a push starts.
+
+    Rewrite-Reason: DEC-1061 item 9, T-11 (D4-LIST-B §4 row 5): CI is off in this repository (its ``ci.yml`` runs only
+    on ``workflow_dispatch``), so the KPI lines are judged on the template's workflow, which is the product's CI; the
+    cases read the rendered ``template/.github/workflows/*.jinja``, no longer ``.github/workflows/``."""
+    found = [(path, load_workflow(path)) for path in template_workflow_files()]
     found = [(path, workflow) for path, workflow in found if "push" in triggers(workflow)]
     if not found:
-        raise Absent("no workflow under .github/workflows/ runs on push")
+        raise Absent("no workflow under template/.github/workflows/ runs on push")
     return found
 
 

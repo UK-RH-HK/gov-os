@@ -426,3 +426,27 @@ this suite's run-2 designer (R13, P-W2-96-CMDLIST (a), DEC-747): `accept` is add
 README naming the list, in a commit of its own (`Rewrite-Reason: DEC-959 item 6`). W1-26's
 `test_w1_26_recorded_commands.py` reads W1-07's list, so its parametrized cases gain an `accept` variant, which
 holds the product's own list (`src/gov/check/commands.py`): it is red until the engineer adds `accept` there.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 74 in the full run, 35 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov accept <ticket> runs that ticket's acceptance tests (its declared acceptance_tests.path) with the tree's own src/ and reports, per KPI line... | `test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes` (1 of 3), `test_w2_96_at_run_2.py::test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run` (1 of 2) | the ticket's words |
+| S2: Nothing of the tests' content reaches its caller: no test source, no assertion text or values, no traceback, no captured output, no fixture or ... | `test_w2_96_at_review_3.py::test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing` (1 of 2), `test_w2_96_at_no_leak.py::test_a_failing_run_shows_no_assertion_text_value_traceback_or_captured_output` | the ticket's words |
+| S3: A test the README does not map is reported only as counted under unmapped (pass and fail counts), never by name; a README with no map refuses w... | `test_w2_96_at_premises.py::test_this_readme_is_a_kpi_map_gov_accept_can_run`, `test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes` (1 of 3), `test_w2_96_at_unmapped_and_no_map.py::test_a_folder_without_a_readme_is_refused_with_accept_no_map` | the ticket's words |
+| S4: A collection error, a timeout or a crash is reported as error for the run with its kind only (collection, timeout, crash), never its message [D... | `test_w2_96_at_run_errors.py::test_a_crash_is_an_error_of_kind_crash_with_no_message` (1 of 2), `test_w2_96_at_run_errors.py::test_a_collection_error_is_an_error_of_kind_collection_with_no_message` (3 of 3) | the ticket's words |
+| S5: The exit code is 0 when every mapped line passes, a declared code when any fails, another when the run errors; the command is a read command an... | `test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes` (1 of 3), `test_w2_96_at_exit_codes.py::test_one_failing_mapped_line_fails_the_run_with_exit_code_3` (1 of 5), `test_w2_96_at_review_4.py::test_r16_a_test_that_leaves_a_nested_run_going_passes_and_leaves_no_process_and_nothing_later` | the ticket's words |
+| S6: The common lead brief and the engineer's brief template name gov accept as the engineer's only way to run the acceptance tests (the brief chang... | none: a brief line; the README's section 'The brief change has no test' says so | designer |
+| F1: Any test source, assertion text, value, traceback or captured output in the output, the JSON or a file left behind. | `test_w2_96_at_no_leak.py::test_a_failing_run_shows_no_assertion_text_value_traceback_or_captured_output` | the ticket's words |
+| F2: An unmapped test named, or a README without a map answered with raw output. | `test_w2_96_at_unmapped_and_no_map.py::test_a_folder_without_a_readme_is_refused_with_accept_no_map`, `test_w2_96_at_unmapped_and_no_map.py::test_a_readme_without_a_map_is_refused_with_accept_no_map` (1 of 5), `test_w2_96_at_premises.py::test_this_readme_is_a_kpi_map_gov_accept_can_run` | the ticket's words |
+| F3: A run error reported as pass or fail, or with its message. | `test_w2_96_at_exit_codes.py::test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal` (4 of 4), `test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes` (1 of 3), `test_w2_96_at_run_errors.py::test_a_crash_is_an_error_of_kind_crash_with_no_message` (1 of 2) | the ticket's words |
+| F4: A write in the repository. | `test_w2_96_at_exit_codes.py::test_nothing_is_written_in_the_repository_ignored_files_included` | the ticket's words |

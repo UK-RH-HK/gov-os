@@ -770,3 +770,30 @@ DEC-860), DEC-1005`. W2-04 makes the packet carry the ticket's own file whole un
 
 **Red on the base** (`d2ff95b2`): both, for W2-04's reasons. The first finds no `ticket_text` in the packet. The second
 finds the eight keys without the four. The other 43 cases pass.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 100 in the full run, 142 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: On b-dev, stages A0-A4, A5, A6 and A8 each write an evidence record: A0 clean tree and backup ref; A1 inventory; A2 classification; A3 target p... | `test_w1_41_baseline.py::test_stages_a0_to_a4_each_leave_their_own_evidence_record`, `test_w1_41_dev_tier.py::test_the_eight_stages_each_leave_an_evidence_record_on_b_dev` | designer |
+| S2: No move happens before an A5 verdict from a fresh Independent Auditor session on the path map; a failed batch rolls back to its recorded point;... | `test_w1_41_verdict.py::test_a_verdict_from_the_session_that_made_the_path_map_moves_nothing`, `test_w1_41_migration.py::test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay`, `test_w1_41_verdict.py::test_a_passing_verdict_of_the_independent_auditor_is_recorded_by_a5` | the ticket's words |
+| S3: A8: AGENTS.md role sections, .cursorrules, .windsurfrules, .cursor/rules/*.mdc and .mcp/tools.json import into .rulesync/; a raw chat database ... | `test_w1_41_legacy.py::test_each_kind_of_legacy_rule_file_is_imported_into_rulesync` (5 of 5), `test_w1_41_legacy.py::test_the_chat_database_is_marked_non_authoritative`, `test_w1_41_legacy.py::test_retired_systems_contribute_no_active_decision` | designer |
+| S4: For every artefact to be moved, the path map records its importers, references and consumers from the code graph and the record graph, and the ... | `test_w1_41_path_map.py::test_every_artefact_to_be_moved_carries_importers_references_and_consumers`, `test_w1_41_path_map.py::test_the_plan_rewrites_or_flags_every_importer_reference_and_consumer`, `test_w1_41_path_map.py::test_the_references_and_consumers_of_a_moved_record_are_read_from_the_record_graph` | the ticket's words |
+| S5: A legacy memory store is retired only after a dependency proof (no active record or rule cites it); its retirement is a CIT-E followed by an in... | `test_w1_41_legacy.py::test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (1 of 2), `test_w1_41_legacy.py::test_a_memory_store_an_active_record_cites_is_not_retired`, `test_w1_41_legacy.py::test_a_memory_store_nothing_cites_is_retired` | the ticket's words |
+| S6: Retired material leaves the active tree and stays reachable through git history or an archive ref; nothing is deleted without a recorded dispos... | `test_w1_41_legacy.py::test_retired_material_stays_reachable_as_it_was`, `test_w1_41_legacy.py::test_nothing_left_the_tree_without_a_recorded_disposition` | the ticket's words |
+| S7: A3: the path map keeps a healthy native framework or package layout unless the target structure is materially better and the migration risk is ... | `test_w1_41_path_map.py::test_a_native_package_layout_is_kept_where_nothing_else_is_proposed`, `test_w1_41_path_map.py::test_a_justification_that_states_only_one_of_the_two_grounds_is_refused` (2 of 2), `test_w1_41_path_map.py::test_a_justified_move_out_of_a_native_layout_is_recorded_with_both_grounds` | the ticket's words |
+| S8: This ticket closes under the adoption-gap exceptions; they end when this repository's adoption is complete (gov adopt --lite run on it, the gov... | none: a process line (this ticket's own close under the adoption-gap exceptions); no case named it before the cut either | designer |
+| S9: Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references: the context accept... | `test_w1_41_external_follow_up.py::test_an_id_of_a_form_outside_sources_share_is_still_accepted` (1 of 4), `test_w1_41_external_references.py::test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (1 of 2), `test_w1_41_external_references.py::test_a_listed_id_of_the_decision_registers_form_is_refused` (1 of 2) | the ticket's words |
+| F1: Any file content changes during a move batch | `test_w1_41_migration.py::test_no_other_tracked_file_changes_content_during_a_move_batch` | the ticket's words |
+| F2: A move runs without an A5 verdict [CAP-44.c] | `test_w1_41_verdict.py::test_a6_without_any_verdict_moves_nothing`, `test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing` (1 of 3) | designer |
+| F3: A legacy rule file stays loaded after retirement | `test_w1_41_legacy.py::test_no_legacy_rule_file_stays_where_an_agent_tool_loads_instructions` | designer |
+| F4: An unknown material artefact is moved or deleted [CAP-06.c] | `test_w1_41_unknown.py::test_a_path_map_that_moves_or_deletes_the_unknown_artefact_is_refused` (4 of 4), `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration`, `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_retirement_too` | the ticket's words |

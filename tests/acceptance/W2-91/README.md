@@ -100,3 +100,27 @@ embedded sets are now left out of its comparison: the tracked root files, every 
 and every tracked file under `schemas/**`. The sets are defined the same way as `newly_embedded_area` in
 `w2_91_support.py`. Every other tracked path outside `template/` is still compared with the base, in both
 directions, and the case fails if nothing is left to compare.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 15 in the full run, 4 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: After a rebuild with the embedder, the tracked root files (CLAUDE.md, README.md, AGENTS.md and the rest the root-files namespace holds), every ... | `test_w2_91_full_embeddings.py::test_root_files_governance_and_schemas_are_embedded`, `test_w2_91_full_embeddings.py::test_a_rebuild_gives_vectors_exactly_to_the_files_the_path_map_embeds` | the ticket's words |
+| S2: What stays out stays out: fixtures/** (the hidden half), .claude/** and .rulesync/** (generated copies), template/.rulesync/** and the vendored... | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded`, `test_w2_91_full_embeddings.py::test_schemas_has_a_namespace_of_its_own_and_cli_stays_out` | the ticket's words |
+| S3: The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied, and the ticket shows from the cod... | `test_w2_91_full_embeddings.py::test_the_overlay_stays_restricted_and_its_export_denied`, `test_w2_91_full_embeddings.py::test_the_indexer_verdict_ignores_sensitivity_and_export_policy` | the ticket's words |
+| S4: The path map states it in its two valid values only, every tracked path matches exactly one namespace, and the indexer's code is not changed [D... | `test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_exactly_one_namespace`, `test_w2_91_full_embeddings.py::test_every_namespace_states_one_of_the_two_values`, `test_w2_91_full_embeddings.py::test_this_ticket_changes_no_code` | the ticket's words |
+| S5: Nothing else moves: for every tracked path outside the newly embedded sets, the embedding verdict is the same at the head as at the base; the v... | `test_w2_91_full_embeddings.py::test_nothing_else_moves` | the ticket's words |
+| S6: W2-61's measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10's floor of 85 and ... | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` | the ticket's words |
+| F1: A file under fixtures/, .claude/, .rulesync/ or cli/ embedded. | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` | the ticket's words |
+| F2: The overlay's sensitivity or export policy changed, or the overlay exported. | `test_w2_91_full_embeddings.py::test_the_overlay_stays_restricted_and_its_export_denied` | the ticket's words |
+| F3: A namespace with a value other than embedded or not embedded, or a tracked path in no namespace or in two. | `test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_exactly_one_namespace`, `test_w2_91_full_embeddings.py::test_every_namespace_states_one_of_the_two_values` | the ticket's words |
+| F4: A figure of the measure reported without the other, or the hidden half read or run. | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` | the ticket's words |

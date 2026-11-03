@@ -77,3 +77,29 @@ covered by W1-21's `test_w1_21_failure_memory.py`.
 ## Expected result on today's code
 
 21 tests: 16 fail for the reasons above, 5 pass (the guards: part 1's nothing-newly-dropped, 3b, 6a and both 6b).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 17 in the full run, 4 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: For the same match, a governing source outranks a test or an assessment report: in a planted repository where an accepted register decision, a ... | `test_w2_87_authority.py::test_1_every_governing_chunk_outranks_every_test_and_report` (3 of 3) | the ticket's words |
+| S2: The order counts where it decides what is gathered: it is applied to the fused list before the first call's items are cut, so a governing chunk... | `test_w2_87_authority.py::test_2a_a_governing_chunk_just_past_the_first_call_enters_it`, `test_w2_87_authority.py::test_2b_a_lower_chunk_better_by_more_than_the_lift_keeps_its_place` | the ticket's words |
+| S3: The order is configuration, not code: the tiers, by path pattern and by the store's record type and status, and the lift are read from one bloc... | `test_w2_87_authority.py::test_4_an_unreadable_block_refuses_with_config_invalid` (1 of 4), `test_w2_87_authority.py::test_4_the_command_carries_config_invalid_in_its_json_error` | the ticket's words |
+| S4: A superseded decision never outranks its successor: a chunk of the register is ranked as the entry whose span holds it, never as the register a... | `test_w2_87_authority.py::test_5_the_superseded_entry_ranks_below_its_successor_and_gets_no_lift` (1 of 2), `test_w2_87_register.py::test_r2_a_superseded_last_entry_does_not_drop_the_other_entries`, `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept` | the ticket's words |
+| S5: Nothing else changes: the budget, the batches, the continuation token, the stopping reasons, the parent expansion and DEC-424's failure and les... | `test_w2_87_authority.py::test_6b_the_block_changes_the_order_only` (2 of 2), `test_w2_87_authority.py::test_6a_two_runs_on_one_store_give_one_bundle` | the ticket's words |
+| S6: W2-61's measure is re-run on the visible half, on one clone at the branch head with one set of stores, twice: with the base's retrieval code (t... | `test_w2_87_authority.py::test_6a_two_runs_on_one_store_give_one_bundle` | the ticket's words |
+| F1: A test or an assessment report outranks a governing source of the same match. | `test_w2_87_authority.py::test_1_every_governing_chunk_outranks_every_test_and_report` (3 of 3) | the ticket's words |
+| F2: A superseded entry outranks the entry that replaced it, or a register chunk ranked by another entry's status. | `test_w2_87_authority.py::test_5_the_superseded_entry_ranks_below_its_successor_and_gets_no_lift` (1 of 2), `test_w2_87_register.py::test_r2_a_superseded_last_entry_does_not_drop_the_other_entries` | the ticket's words |
+| F3: A path, a record type or a tier written in the code, or a missing or unreadable block read as an order. | `test_w2_87_authority.py::test_4_an_unreadable_block_refuses_with_config_invalid` (1 of 4), `test_w2_87_authority.py::test_3a_a_path_map_that_puts_tests_above_decisions_flips_the_order` | the ticket's words |
+| F4: A chunk left out of the bundle that today's code keeps, or kept that it leaves out. | `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept` | the ticket's words |
+| F5: Two runs on one store give different bundles. | `test_w2_87_authority.py::test_6a_two_runs_on_one_store_give_one_bundle` | the ticket's words |
+| F6: A figure of the measure reported without the other, or the hidden half read or run. | `test_w2_87_authority.py::test_1_every_governing_chunk_outranks_every_test_and_report` (3 of 3) | the ticket's words |

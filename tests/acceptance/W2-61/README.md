@@ -64,3 +64,28 @@ The measure's sessions run as an unmeasured role (`orchestrator`) unless a case 
 Before a run, check that neither `CLOSE-RUNNING` nor `NIGHTLY-RUNNING` is under the main tree's
 `.gov-runtime/scratch/orchestrator/`. Each case builds its own planted repository and environment under pytest's
 `tmp_path` and takes a few seconds; no case uses the network.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 99 in the full run, 26 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Lens B's 20 questions and their gold answers (docs/assessment/2026-10/B-memory-retrieval.md section 2) are the visible development half [DEC-82... | `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name`, `test_w2_61_visible_half.py::test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each` | the ticket's words |
+| S2: A hidden measurement half of 20 more questions, with their gold answers, is written by a session independent of the retrieval tickets and store... | `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name`, `test_w2_61_any_set.py::test_a_path_map_without_an_evaluation_sets_block_declares_no_set`, `test_w2_61_any_set.py::test_the_sets_root_holds_the_sets_and_the_root_answers` | the ticket's words |
+| S3: A measurement script reports, per question and in total, whether the governing source is in the first five and in the bundle, and repeatability... | `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name` | the ticket's words |
+| S4: Both figures, always together: hit@5 against CAP-10's floor of 85, and the share of questions whose stacked context holds all their needed evid... | `test_w2_61_baseline.py::test_both_figures_together_against_85_and_99`, `test_w2_61_scores.py::test_totals_against_the_floor_and_the_target`, `test_w2_61_scores.py::test_the_text_output_gives_both_figures_together_against_85_and_99` | the ticket's words |
+| S5: Stacked, never giant: each question is answered by retrieval in batches, ranked and stacked within the budget, never one giant query or context... | `test_w2_61_stacked.py::test_never_one_giant_call`, `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name`, `test_w2_61_any_set.py::test_the_sets_root_holds_the_sets_and_the_root_answers` | the ticket's words |
+| S6: The same split for EXAMIN's set, written by a session independent of the adopting team before W2-27; EXP-003's gold answers (W2-15a, W2-15b) sp... | `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name` | the ticket's words |
+| S7: The baseline: the first measure runs today on the pinned stores, both halves, and is recorded in docs/research/W2-61-baseline.md with the pinne... | `test_w2_61_any_set.py::test_the_first_set_is_measured_by_its_name_beside_it`, `test_w2_61_baseline.py::test_the_pinned_gov_s_version_and_commit` | the ticket's words |
+| F1: A measured role can read the hidden half by a route an honest agent takes in ordinary work. | `test_w2_61_visible_half.py::test_the_measure_takes_the_real_visible_half_by_its_set_s_name` | the ticket's words |
+| F2: The script prints, logs or writes a hidden question's gold answer. | `test_w2_61_hidden_never_shown.py::test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word` (5 of 5), `test_w2_61_hidden_never_shown.py::test_an_error_on_a_hidden_question_names_only_its_id` (1 of 10) | the ticket's words |
+| F3: A figure reported without the other. | `test_w2_61_any_set.py::test_a_path_map_without_an_evaluation_sets_block_declares_no_set` | the ticket's words |
+| F4: A hit counted from lens B's own report or from the evaluation files rather than from the governing source. | `test_w2_61_governing_source.py::test_quotes_ranked_first_are_no_hit_and_the_governing_source_sixth_is_no_hit_at_5`, `test_w2_61_governing_source.py::test_an_alternative_naming_the_report_never_counts_the_governing_alternative_does`, `test_w2_61_visible_half.py::test_no_source_names_the_report_the_set_declares_or_the_evaluation_files` | the ticket's words |
