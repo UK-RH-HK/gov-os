@@ -7,11 +7,17 @@ tested. On red the branch stays; the ticket that caused the red is ejected, the 
     python3 merge_queue.py enqueue --queue <dir> --ticket <W2> --task <id> --branch <branch> --commit <commit>
     python3 merge_queue.py approve --queue <dir> --ticket <W2> --by <who>
     python3 merge_queue.py run --repo <repo> --queue <dir> [--integration <branch>] [--work <dir>] [--test-cmd <cmd>]
-                               [--select-cmd <cmd>] [--prepare-cmd <cmd>] [--rounds <n>]
+                               [--select-cmd <cmd>] [--prepare-cmd <cmd>] [--rounds <n>] [--load-sensitive <file>]
                                [--integration-store <link> [--nightly-log <dir> --nightly-junit <dir>]]
 
 With --integration-store (DEC-1032 (iv)): clones without a store are seeded from it, the landed result's stores are
-promoted into it, and the head without the batch is read from that head's nightly or re-run in it, never rebuilt.
+promoted into it, and the head without the batch is read from that head's nightly or re-run in it; when that store is
+not at that head (the branch moved on, or it was not promoted), the head's throwaway tree is rebuilt once, seeded from
+it (never cold; Q-1, DEC-1050).
+
+Q-1 (DEC-1050): a red that is red alone is attributed once with the batch (its alone re-run) and once on the head
+without the batch, with the same failure type; only a case the --load-sensitive list names gets 3 rounds (--rounds,
+default 1, for every other case).
 
 Exit codes of run: 0 every approved entry landed (or none); 3 at least one ejected; 4 a step could not be done, or
 another run holds the queue's lock (entries kept, the branch unmoved by that step). See README.md beside this file.
@@ -53,6 +59,7 @@ GOVERNANCE = [  # select_tests.py's governance paths, left out of the skip's com
     ".gov-runtime/**",
 ]
 HEAD_TRIES = 3  # re-merges onto a moved head before the run stops (entries kept)
+LOAD_ROUNDS = 3  # Q-1 (DEC-1050): the rounds of a case the load-sensitive list names
 RESULT_REF = "refs/heads/merge-queue-result"  # in the clone only: how the repository fetches the tested commit
 
 
@@ -93,6 +100,27 @@ def trace_node(with_rc, without_rc, rounds=3):
             break
     return attribute(w_fail, wo_fail, done, absent), {"rounds": done, "red_with": w_fail,
                                                       "red_without": wo_fail, "without_exit": absent}
+
+
+def trace_once(with_rc, without_rc):
+    """Q-1 (DEC-1050): one red's verdict from one run each way: `with_rc` its alone re-run with the batch, `without_rc`
+    one alone run on the head without the batch. "flaky" (green with the batch), "owned" (green without it, or it
+    cannot run without it: any exit but 0 or 1) or "unowned" (red there too; the caller then compares the failure)."""
+    if with_rc == 0:
+        return "flaky"
+    return "unowned" if without_rc == 1 else "owned"
+
+
+def read_list(path):
+    """A plain list of test ids (Q-1, Q-10: the CTO's load-sensitive list, no owner commit): one per line, blank lines
+    and `#` comments left out. Raises OSError or UnicodeDecodeError when it cannot be read."""
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    return [x.strip() for x in lines if x.strip() and not x.strip().startswith("#")]
+
+
+def covers(entry, node):
+    """Whether a list entry names the case: the id itself, a file or a test function (every parameter set of it)."""
+    return node == entry or node.startswith(entry + "[") or node.startswith(entry + "::")
 
 
 def explained_without(run_once, rounds=3):
@@ -441,6 +469,8 @@ class Queue:
         self.repo = Path(a.repo).resolve()
         self.ref = f"refs/heads/{a.integration}"
         self.rounds = a.rounds
+        self.sensitive = []  # Q-1: the load-sensitive list's entries (read in run())
+        self.seen = {}  # (tree, case) -> the failure kinds of its red alone runs there (the same-failure rule)
         self.ejected, self.handled, self.n, self.with_rc = [], set(), 0, {}
         self.log = self.work = self.clone = self.alt = self.base = self._base_record = None
         # DEC-1032 (iv): the integration store (a link to the ready one of two worktrees of this repository): the seed
@@ -666,7 +696,18 @@ class Queue:
         return int(1 in (par.returncode, ser.returncode)), [junit] + ([sjunit] if ser.returncode != 5 else [])
 
     def alone(self, where, node):
-        return self.tests(where, "alone", [node])[0]
+        """One case run alone; a red run's failure kinds kept for the same-failure rule (no extra run, Q-1)."""
+        rc, junits = self.tests(where, "alone", [node])
+        if rc != 0:
+            self.seen.setdefault((str(where), node), set()).update(failure_kinds(junits))
+        return rc
+
+    def seen_kinds(self, where, node):
+        return sorted(self.seen.get((str(where), node), ()))
+
+    def rounds_for(self, node):
+        """Q-1 (DEC-1050): LOAD_ROUNDS for a case the load-sensitive list names, else --rounds (default 1)."""
+        return max(self.rounds, LOAD_ROUNDS) if any(covers(e, node) for e in self.sensitive) else self.rounds
 
     def select(self, where, e, merge):
         cmd = shlex.split(self.a.select_cmd) if self.a.select_cmd else [sys.executable, str(ORCH_TOOLS / "select_tests.py")]
@@ -752,11 +793,21 @@ class Queue:
                 if not self.prepared(self.alt):
                     raise Stop(f"the prepare command failed on {where}")
             for node in reds:
+                n = self.rounds_for(node)
+                if not self.base and self.head_known(head, node) == "passed":  # the free first step (no run)
+                    out["owned"].append(node)
+                    self.note(f"green on the head without the batch in that head's own nightly (no run): owned: {node}")
+                    continue
                 other = self.alt if self.base else self.head_tree(head)  # a throwaway tree, checked before each case
-                verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(other, node),
-                                        self.rounds)
-                if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
-                    kw, kb = self.kinds(self.clone, node), self.kinds(other, node)
+                if n == 1:  # Q-1 (DEC-1050): once each way; the run with the batch is the alone re-run above
+                    rc = self.alone(other, node)
+                    verdict = trace_once(out["with_rc"][node], rc)
+                    c = {"rounds": 1, "red_with": 1, "red_without": int(rc == 1),
+                         "without_exit": None if rc in (0, 1) else rc}
+                else:  # a load-sensitive case (Q-1): the interleaved rounds
+                    verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(other, node), n)
+                if verdict == "unowned":  # cleared only if it fails there the same way (DEC-989, Q-1)
+                    kw, kb = self.seen_kinds(self.clone, node), self.seen_kinds(other, node)
                     if not same_failure(kw, kb):
                         verdict = "owned"
                         self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
@@ -783,8 +834,8 @@ class Queue:
                               f"failure ({known}; no run): {n}")
                     return True
                 tree = self.head_tree(head)
-                return red_alone(lambda: self.alone(tree, n), self.rounds) and \
-                    same_failure(self.kinds(tree, n), self.kinds(self.clone, n))
+                return red_alone(lambda: self.alone(tree, n), self.rounds_for(n)) and \
+                    same_failure(self.seen_kinds(tree, n), self.seen_kinds(self.clone, n))
             for n in list(out["unowned"]):
                 if not on_head(n, clearing=True):
                     out["unowned"].remove(n)
@@ -841,7 +892,8 @@ class Queue:
         its state when made (HEAD, no tracked or untracked change, the same ignored files, its stores' stamps); a
         case that changed anything gets a new one. Removed when the run ends (remove_head_trees); one a killed run
         left is removed at the next run's start (sweep_head_trees). When the integration store is not at `head`: its
-        normal refresh first, and a Stop if it still is not. Without --integration-store, the earlier way: the alt
+        normal refresh first while the branch is still there; if it still is not (or the branch moved on), the tree is
+        rebuilt once, seeded from the store (Q-1: the 20:41 run stopped here). Without --integration-store, the alt
         clone checked out and rebuilt at the head (once per head while it stays there)."""
         if self.store is None:
             if self.alt and self.built.get(str(self.alt)) == head and \
@@ -865,6 +917,14 @@ class Queue:
         if r.returncode:
             raise Stop(f"the throwaway worktree of the head {head[:12]} cannot be added: {r.stderr.strip()[:200]}")
         copied = self.copy_head_stores(head, tree)
+        if copied is None:  # Q-1 (DEC-1050): one rebuild of the throwaway tree, seeded from the store, never cold
+            if not self.prepared(tree):
+                raise Stop(f"the head without the batch cannot be judged: the rebuild of its throwaway tree "
+                           f"{tree.name}, seeded from the integration store {self.store}, failed")
+            self.note(f"the head without the batch: a throwaway worktree {tree.name} at {head[:12]}, rebuilt once, "
+                      f"seeded from the integration store (not at that head; no clone rebuilt)")
+            self.head_trees[head] = (tree, snapshot(tree))
+            return tree
         index = sh([sys.executable, "-c", "import sys; from gov.codeintel import index; index(sys.argv[1])", str(tree)],
                    cwd=tree, env=self.env(tree))
         self.note(f"the head without the batch: a throwaway worktree {tree.name} at {head[:12]} with the integration "
@@ -876,8 +936,8 @@ class Queue:
     def copy_head_stores(self, head, tree):
         """The integration store's stores, built at `head`, copied into `tree` under a shared hold of the store's lock
         (a refresh or a promotion takes it whole, so the ready half cannot move while it is copied); only read there.
-        A store behind the head is refreshed first (its standby half, incrementally), then a Stop if it still is not.
-        Returns the files copied."""
+        A store behind the head is refreshed first (its standby half, incrementally) while the branch is still at that
+        head. Returns the files copied, or None when the store is not at `head` (the caller then rebuilds the tree)."""
         for attempt in (0, 1):
             ready = self.store.resolve()
             with open(self.store_lock(), "a") as hold:
@@ -892,12 +952,15 @@ class Queue:
                             copied.append(rel)
                     return copied
             if attempt == 0:
+                if self.head() != head:  # Q-1 (2026-11-02 20:41): a refresh builds the branch's head, not this one
+                    self.note(f"the integration store {ready} is at {at[:12] or 'an unreadable head'}, not at the "
+                              f"head {head[:12]}, and {self.ref} has moved on: no refresh")
+                    break
                 self.note(f"the integration store {ready} is at {at[:12] or 'an unreadable head'}, not at the head "
                           f"{head[:12]}: its normal refresh first (its standby half, incrementally; no clone rebuilt)")
                 if not self.refresh(wait=True):
                     break
-        raise Stop(f"the head without the batch cannot be judged without rebuilding a clone: the integration store "
-                   f"{self.store} is not at {head[:12]} and its refresh did not bring it there")
+        return None
 
     def remove_head_tree(self, tree):
         """One throwaway worktree of this queue's own removed (git worktree remove --force); never another path."""
@@ -1056,12 +1119,13 @@ class Queue:
             first = [self.alone(self.alt, node)]
             if first[0] not in (0, 1):
                 return "absent" if self.with_rc.get(node) == 1 else "no"
-            v = explained_without(lambda: first.pop() if first else self.alone(self.alt, node), self.rounds)
+            v = explained_without(lambda: first.pop() if first else self.alone(self.alt, node), self.rounds_for(node))
             return "absent" if v == "yes" and node.split("::")[0] in files[cur["c"]["ticket"]] else v
 
         def confirm(node, cand):
             built, failed = self.build(self.alt, head, [cand])
-            return not failed and self.prepared(self.alt) and red_alone(lambda: self.alone(self.alt, node), self.rounds)
+            return not failed and self.prepared(self.alt) and red_alone(lambda: self.alone(self.alt, node),
+                                                                        self.rounds_for(node))
 
         culprit, unexplained, skipped = assign_culprits(owned, entries, prepare, explains, confirm)
         if skipped:
@@ -1208,6 +1272,11 @@ class Queue:
             if r.returncode:
                 raise Stop(f"the baseline {self.a.base} is not a commit in {self.repo}")
             self.base = r.stdout.strip()
+        if getattr(self.a, "load_sensitive", None):
+            try:
+                self.sensitive = read_list(self.a.load_sensitive)
+            except (OSError, UnicodeDecodeError) as exc:
+                raise Stop(f"the load-sensitive list {self.a.load_sensitive} cannot be read ({exc.__class__.__name__})")
         while True:
             pending = [e for e in self.approved() if e["ticket"] not in self.handled]
             if not pending:
@@ -1276,7 +1345,9 @@ def main(argv=None):
     r.add_argument("--test-cmd")
     r.add_argument("--select-cmd")
     r.add_argument("--prepare-cmd")
-    r.add_argument("--rounds", type=int, default=3)
+    r.add_argument("--rounds", type=int, default=1, help="the rounds of each traced red (Q-1, DEC-1050: one each way)")
+    r.add_argument("--load-sensitive", help=f"a plain list of test ids (a file, a function or a case per line) whose "
+                   f"reds get {LOAD_ROUNDS} rounds (Q-1)")
     r.add_argument("--warm", help="keep the work clones here between runs, their stores kept (DEC-1001 (b))")
     r.add_argument("--base-results", help="the baseline nightly's JUnit folder (DEC-1001 (c)); with --base-run")
     r.add_argument("--base-run", help="the baseline nightly's run file, whose `red-alone <case>:` lines it reads")
