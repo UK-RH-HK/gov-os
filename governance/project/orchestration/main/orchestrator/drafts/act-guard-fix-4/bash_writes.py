@@ -27,7 +27,8 @@ unknown reader) falls back to the judgement before this fix (fail closed). Nothi
 
 ACT-GUARD-FIX-4 (DEC-1050 (8), (12)): the hook's rules 1 and 5 use only the targets this module resolves (an
 unresolvable one is let through), and the module also lists what ``rm`` deletes (``Judgement.deletes``), for the
-hook's refusal of the catastrophic deletes; the reading itself is unchanged.
+hook's refusal of the catastrophic deletes, and the folders ``mkdir`` makes (``Judgement.made``, for rule 5: a
+reviewer may make its record folder); the reading itself is unchanged.
 """
 import ast
 import os
@@ -464,8 +465,8 @@ def variants(text, expand):
                 env[name] = value
         elif not mine and len(loop) == 1 and loop[0][0] and loop[0][1] < first_use and \
                 len(loop[0][0]) <= MOST_WORDS and \
-                all(not re.search(r"[$`*?\[\]{}~]", v) for v in loop[0][0]):
-            loopvals[name] = loop[0][0]
+                all(not re.search(r"[$`*?\[\]{}~]", _tilde(v)) for v in loop[0][0]):
+            loopvals[name] = [_tilde(v) for v in loop[0][0]]
         else:
             drop.add(name)
     combos = 1
@@ -475,6 +476,15 @@ def variants(text, expand):
         drop |= set(loopvals)
         loopvals = {}
     return env, loopvals, drop
+
+
+def _tilde(word):
+    """A loop's word with its leading ``~`` or ``~/`` expanded to the home folder, as the shell does (ACT-GUARD-FIX-4:
+    ``for d in /tmp/a ~; do rm -rf $d; done`` deletes the home folder); any other ``~`` is left, and the loop is then
+    not read, as before."""
+    if word == "~" or word.startswith("~/"):
+        return os.path.expanduser("~") + word[1:]
+    return word
 
 
 def each(env, loopvals):
@@ -1127,6 +1137,9 @@ class Judgement:
         # What rm deletes (ACT-GUARD-FIX-4, DEC-1050 (8)): (the word, the path, "names" when the word expands to it,
         # "if-empty" when it is the path the word names if every variable the guard cannot resolve were empty).
         self.deletes = []
+        # The folders mkdir makes, resolved to a path (ACT-GUARD-FIX-4, rule 5: a reviewer may make its record
+        # folder itself, never delete or move it).
+        self.made = []
         self.bodies = [] if bodies is None else bodies  # every heredoc body met, nested commands' too
         self.ctx = ({}, {}, set())  # the variables of the command being walked
         self.prefix = set()  # the variables the simple command being judged sets for itself (X=1 cmd, env X=1 cmd)
@@ -1177,6 +1190,8 @@ class Judgement:
                     self.script(names, body, words, reds, subs, part, ecwd, whole, depth, staged)
                 if name == "rm":
                     self.removal(args, ecwd, env, loopvals, drop)
+                if name == "mkdir":
+                    self.making(args, ecwd, env, loopvals, drop)
                 if name in ("cd", "pushd", "popd"):
                     ecwd = self.cd(name, args, ecwd)
                 elif name in _SHELLS and any(_short(a, "c") for a in args):
@@ -1285,6 +1300,7 @@ class Judgement:
         self.shell += shell
         self.findings += sub.findings
         self.deletes += sub.deletes
+        self.made += sub.made
         self.findings.append(([(SENT, None) if t == SENT else (t, os.path.normpath(t) if os.path.isabs(t) else None)
                                for t in shell], part + "\n" + text, True))
 
@@ -1299,6 +1315,7 @@ class Judgement:
                 sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
                 self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
                 self.deletes += sub.deletes
+                self.made += sub.made
             except Unreadable:
                 self.shell.append(SENT)
 
@@ -1339,6 +1356,31 @@ class Judgement:
         self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
         self.findings += sub.findings
         self.deletes += sub.deletes
+        self.made += sub.made
+
+    def making(self, args, ecwd, env, loopvals, drop):
+        """mkdir's operands that expand to a path (ACT-GUARD-FIX-4, rule 5), into ``made``; options skipped
+        (-m takes a value)."""
+        skip = False
+        for a in args:
+            if skip:
+                skip = False
+                continue
+            if a in ("-m", "--mode", "--context"):
+                skip = a != "--context"
+                continue
+            if a.startswith("-") and len(a) > 1:
+                continue
+            for one in each(env, loopvals):
+                with environ(one, drop):
+                    exp = self.expand(a)
+                if not exp or "`" in exp:
+                    continue
+                if not os.path.isabs(exp):
+                    if ecwd is None or ecwd.startswith(UNKNOWN):
+                        continue
+                    exp = os.path.join(ecwd, exp)
+                self.made.append(os.path.normpath(exp))
 
     def removal(self, args, ecwd, env, loopvals, drop):
         """rm's operands (ACT-GUARD-FIX-4, DEC-1050 (8)), into ``deletes``: each word once for each value of the loop
@@ -1361,6 +1403,8 @@ class Judgement:
             for how, exp in dict.fromkeys(values):
                 if exp is None or exp == "":
                     continue
+                if exp.startswith("~"):
+                    exp = os.path.expanduser(exp)  # a loop's word ~ is the home folder (the shell expands it there)
                 if not os.path.isabs(exp):
                     if ecwd is None or ecwd.startswith(UNKNOWN):
                         continue

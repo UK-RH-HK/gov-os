@@ -1,0 +1,3759 @@
+bringing up nodes...
+bringing up nodes...
+
+............F...........F........F........F.............F...F....F...... [ 15%]
+.............F.F.............F.....FF....FFF..FF.....F....F........F.... [ 31%]
+F.....F...F................F.F.......F....F.F.F......F.F...FF.F..F.F..FF [ 47%]
+..F...F...FF....FF...FF...FF.F.F...F................FF...F......F..F.F.. [ 63%]
+.FFF.F.F.FFFF.FF.F..FF.F.FF.F..FFF.F.FFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 79%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFF.......... [ 95%]
+..........FFFFFF.FF                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_planted[guard4: rule5 auditor unreadable bash] ______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: rule5 auditor unreadable bash', role = 'independent-auditor'
+tool = 'Bash', tin = {'command': 'mkdir -p $D/t'}, want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: rule5 auditor unreadable bash: want allow, got deny (a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______________ test_planted[fix3 perl heredoc naming acceptance] _______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 perl heredoc naming acceptance', role = 'engineer', tool = 'Bash'
+tin = {'command': "perl <<'EOF'\nopen(F, '>tests/acceptance/W2-64/t.py');\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 perl heredoc naming acceptance: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__ test_planted[fix3 unterminated heredoc naming acceptance judged as before] __
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 unterminated heredoc naming acceptance judged as before'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c \'open("tests/acceptance/W2-64/t.py", "w")\' <<EOF\nx'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 unterminated heredoc naming acceptance judged as before: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______________________ test_planted[fix3 python -c exec] _______________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c exec', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "exec(\\"open(\'tests/acceptance/W2-64/t.py\',\'w\')\\")"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c exec: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+____________ test_planted[fix3 python heredoc rebinding by a loop] _____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc rebinding by a loop', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\np = '/tmp/x'\nfor p in ['tests/acceptance/W2-64/t.py']:\n    pass\nopen(p, 'w')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc rebinding by a loop: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________ test_planted[fix3 python heredoc write inside a function] ___________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc write inside a function', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\ndef w(p):\n    open(p, 'w').write('x')\nw('tests/acceptance/W2-64/t.py')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc write inside a function: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______________ test_planted[fix3 python heredoc global rebinding] ______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc global rebinding', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\np = '/tmp/x'\ndef f():\n    global p\n    p = 'tests/acceptance/W2-64/t.py'\nf()\nopen(p, 'w')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc global rebinding: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+___________ test_planted[fix3 node -e naming acceptance (as before)] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 node -e naming acceptance (as before)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'node -e "require(\'fs\').writeFileSync(\'tests/acceptance/W2-64/t.py\', \'x\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 node -e naming acceptance (as before): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________________ test_planted[fix3 unquoted shell heredoc] ___________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 unquoted shell heredoc', role = 'engineer', tool = 'Bash'
+tin = {'command': 'bash <<EOF\ntouch tests/acceptance/W2-64/t.py\nEOF'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 unquoted shell heredoc: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____________ test_planted[fix3 python -c io.FileIO handed a test] _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c io.FileIO handed a test', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import io; io.FileIO(\'tests/acceptance/W2-64/t.py\', \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c io.FileIO handed a test: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+___________________ test_planted[fix3 variable then source] ____________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable then source', role = 'engineer', tool = 'Bash'
+tin = {'command': 'D=/tmp; . /tmp/gov-fix3-env.sh; echo x > $D/t.py  # tests/acceptance/'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable then source: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[guard4: fix2 engineer inline python writes acceptance after a cd] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 engineer inline python writes acceptance after a cd'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'cd /tmp && python3 -c \'open("tests/acceptance/W2-64/t.py", "w")\''}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 engineer inline python writes acceptance after a cd: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________ test_planted[guard4: fix2 engineer perl -i on acceptance] ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 engineer perl -i on acceptance', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 engineer perl -i on acceptance: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_________ test_planted[fix3 assignment in a pipeline is a subshell's] __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 assignment in a pipeline is a subshell's", role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'D=/tmp | true; echo x > $D/t.py  # tests/acceptance/'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 assignment in a pipeline is a subshell's: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+____________ test_planted[fix3 variable used before its assignment] ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable used before its assignment', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'echo x > $D/t.py; D=/tmp  # tests/acceptance/'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable used before its assignment: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________ test_planted[guard4: fix2 unbalanced quotes naming acceptance] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 unbalanced quotes naming acceptance', role = 'engineer'
+tool = 'Bash', tin = {'command': 'python3 -c \'open("tests/acceptance/x" ; ls'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 unbalanced quotes naming acceptance: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________________ test_planted[fix3 variable assigned in an if] _________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable assigned in an if', role = 'engineer', tool = 'Bash'
+tin = {'command': 'if true; then D=tests/acceptance/W2-64; fi; echo x > $D/t.py'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable assigned in an if: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____________ test_planted[fix3 variable read from a here-string] ______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable read from a here-string', role = 'engineer', tool = 'Bash'
+tin = {'command': 'read D <<< tests/acceptance/W2-64; echo x > $D/t.py'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable read from a here-string: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[fix3 while read loop rm (target unresolvable, names the tests)] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 while read loop rm (target unresolvable, names the tests)'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'while read f; do rm "$f"; done <<\'EOF\'\ntests/acceptance/W2-64/t.py\nEOF'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 while read loop rm (target unresolvable, names the tests): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____ test_planted[fix3 git apply -R of a test's diff (differential #146)] _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 git apply -R of a test's diff (differential #146)"
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'P=/tmp/gov-fix3-c.patch && git diff -- tests/acceptance/W1-05/conftest.py > $P && git apply -R $P'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 git apply -R of a test's diff (differential #146): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______ test_planted[fix3 patch from stdin in a command naming the tests] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 patch from stdin in a command naming the tests', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'git diff -- tests/acceptance/W1-05/ > /tmp/gov-fix3-d.patch; patch -p1 -R < /tmp/gov-fix3-d.patch'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 patch from stdin in a command naming the tests: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______________ test_planted[fix3 python -c getattr(os, 'remove')] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 python -c getattr(os, 'remove')", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "import os; getattr(os, \'remove\')(\'tests/acceptance/W2-64/t.py\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c getattr(os, 'remove'): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____ test_planted[fix3 python -c unknown function handed a list of tests] _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c unknown function handed a list of tests'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "import mylib; ps = [\'tests/acceptance/W2-64/t.py\']; mylib.rewrite(ps)"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c unknown function handed a list of tests: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________________ test_planted[r2 F2 a python file run by runpy] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by runpy', role = 'engineer', tool = 'Bash'
+tin = {'command': 'cat > /tmp/gov-fix3-s.py <<\'EOF\'\nopen(\'tests/acceptance/f\',\'w\')\nEOF\npython3 -c "import runpy; runpy.run_path(\'/tmp/gov-fix3-s.py\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by runpy: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+____________ test_planted[r2 F2 a python file run by exec(open())] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by exec(open())', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'cat > /tmp/gov-fix3-s.py <<\'EOF\'\nopen(\'tests/acceptance/f\',\'w\')\nEOF\npython3 -c "exec(open(\'/tmp/gov-fix3-s.py\').read())"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by exec(open()): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_______________ test_planted[r2 F2 a python file run by uv run] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by uv run', role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nuv run /tmp/gov-fix3-s.py"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by uv run: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________ test_planted[r2 F2 a file with no #! line run by its name] __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a file with no #! line run by its name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nchmod +x /tmp/gov-fix3-s.py; /tmp/gov-fix3-s.py"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a file with no #! line run by its name: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_______________ test_planted[r2 F2 repro 2: cd, then bash name] ________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 repro 2: cd, then bash name', role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\ncd /tmp && bash gov-fix3-s.sh"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 repro 2: cd, then bash name: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____ test_planted[r2 F2 a python file that changes folder into the tests] _____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file that changes folder into the tests'
+role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('f','w')\nEOF\npython3 /tmp/gov-fix3-s.py"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file that changes folder into the tests: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'cp /tmp/x \\\n  tests/acceptance/f; echo "unclosed'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F3 a continued write in a command the scan cannot read (as before, on both spellings): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+____________ test_planted[r2 F2 repro 4: chmod +x, cd, then ./name] ____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 repro 4: chmod +x, cd, then ./name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nchmod +x /tmp/gov-fix3-s.sh && cd /tmp && ./gov-fix3-s.sh"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 repro 4: chmod +x, cd, then ./name: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+___________ test_planted[r2 F2 written after a cd, run by bash name] ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 written after a cd, run by bash name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cd /tmp && cat > gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nbash ./gov-fix3-s.sh"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 written after a cd, run by bash name: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_________ test_planted[fix3 python -c unknown function handed a test] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c unknown function handed a test', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import mylib; mylib.save_case(\'tests/acceptance/W2-64/t.py\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c unknown function handed a test: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________________ test_planted[r2 F4 rglob then write_text] ___________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 rglob then write_text', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport re, pathlib\nfor p in pathlib.Path('tests/acceptance').rglob('*.py'):\n    s = p.read_text()\n    p.write_text(re.sub('a', 'b', s))\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 rglob then write_text: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_______________ test_planted[r2 F4 -c: a path built by ''.join] ________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 -c: a path built by ''.join", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(\'\'.join([\'tests/\', \'acceptance/\', \'f\']), \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by ''.join: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+___________ test_planted[r2 F4 listdir then os.remove(os.path.join)] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 listdir then os.remove(os.path.join)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n    os.remove(os.path.join(root, f))\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 listdir then os.remove(os.path.join): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________________ test_planted[r2 F4 -c: a path built with chr] _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: a path built with chr', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(chr(116) + \'ests/acceptance/f\', \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built with chr: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_____________ test_planted[r2 F4 listdir then os.remove(f-string)] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 listdir then os.remove(f-string)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n    os.remove(f'{root}/{f}')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 listdir then os.remove(f-string): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________ test_planted[r2 F4 -c: glob.glob of the tests then open w] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: glob.glob of the tests then open w', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import glob; [open(p, \'w\') for p in glob.glob(\'tests/accept*/*\')]"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: glob.glob of the tests then open w: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________________ test_planted[r2 F4 os.walk then os.remove] __________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.walk then os.remove', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nfor r, d, fs in os.walk('tests/acceptance'):\n    for f in fs:\n        os.remove(os.path.join(r, f))\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.walk then os.remove: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______ test_planted[r2 F4 os.chdir into the tests then open w (heredoc)] _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into the tests then open w (heredoc)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('x', 'w')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into the tests then open w (heredoc): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_________ test_planted[r2 F4 perl -e naming the folder with no slash] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 perl -e naming the folder with no slash', role = 'engineer'
+tool = 'Bash', tin = {'command': "perl -pi -e 's/a/b/' tests/acceptance"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 perl -e naming the folder with no slash: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_________ test_planted[r2 F4 os.chdir into the tests then open w (-c)] _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into the tests then open w (-c)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import os; os.chdir(\'tests/acceptance\'); open(\'x\', \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into the tests then open w (-c): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': 'cd /tmp && rm -f gov-fix3-nothing-*.json'}, want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place: want allow, got deny (a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________ test_planted[r2 F4 os.chdir into tests then open acceptance/f] ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into tests then open acceptance/f', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import os; os.chdir(\'tests\'); open(\'acceptance/f\', \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into tests then open acceptance/f: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests'
+role = 'orchestrator', tool = 'Bash'
+tin = {'command': 'n="tests/acceptance/W1-33/t.py::x"; out=$(python3 -m pytest -q "$n" 2>&1); python3 - "$n" <<EOF\nimport sys\nprint(\'\'\'$(echo "$out" | sed "s/\'/ /g")\'\'\', sys.argv[1])\nEOF'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+______________ test_planted[r2 F4 tempfile.mkdtemp in the tests] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 tempfile.mkdtemp in the tests', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport tempfile\ntempfile.mkdtemp(dir='tests/acceptance')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 tempfile.mkdtemp in the tests: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+________________ test_planted[r2 F4 Path.glob then write_text] _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 Path.glob then write_text', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.py'):\n    p.write_text('')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 Path.glob then write_text: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________________ test_planted[r2 F4 -c: a path built by %] ___________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: a path built by %', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "p = \'tests/%s/f\' % \'acceptance\'; open(p, \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by %: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+__________________ test_planted[r2 F4 Path.glob then unlink] ___________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 Path.glob then unlink', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.pyc'):\n    p.unlink()\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 Path.glob then unlink: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_______________ test_planted[r2 F4 -c: a path built by '/'.join] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 -c: a path built by '/'.join", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(\'/\'.join([\'tests\', \'acceptance\', \'f\']), \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by '/'.join: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_planted[r2 F4 a variable the command sets for Python is not the session's] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 a variable the command sets for Python is not the session's"
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'HOME=tests/acceptance python3 -c "import os; open(os.environ[\'HOME\'] + \'/f\', \'w\')"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 a variable the command sets for Python is not the session's: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 1 (G-1): a write through a substitution is let through] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'rule 1 (G-1): a write through a substitution is let through'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'touch $(pwd)/tests/acceptance/W2-64/t.py'}, want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 1 (G-1): a write through a substitution is let through: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_planted[r2 F4 code that changes os.environ is not read from the session] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 code that changes os.environ is not read from the session'
+role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nos.environ['HOME'] = 'tests/acceptance'\nopen(os.environ['HOME'] + '/f', 'w')\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", PLANTED, ids=[c[0] for c in PLANTED])
+    def test_planted(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 code that changes os.environ is not read from the session: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert ('deny' == 'allow'
+E         
+E         - allow
+E         + deny or ('allow' == 'deny'
+E         
+E         - deny
+E         + allow))
+
+../test_guard_fix_4.py:180: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5: the subagent form (GOV_ROLE orchestrator, agent independent-auditor) into reviews/] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'rule 5: the subagent form (GOV_ROLE orchestrator, agent independent-auditor) into reviews/'
+role = 'orchestrator', tool = 'Write'
+tin = {'content': 'x', 'file_path': '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/e9.md'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: the subagent form (GOV_ROLE orchestrator, agent independent-auditor) into reviews/: want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+___________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/] ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5 (G-2): a reviewer's write through mktemp is let through] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5 (G-2): a reviewer's write through mktemp is let through"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': 'B=$(mktemp -d); mkdir $B/r && echo x > $B/r/o'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5 (G-2): a reviewer's write through mktemp is let through: want allow, got deny (a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5 (G-2): a reviewer's unmatched glob in /tmp is let through] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5 (G-2): a reviewer's unmatched glob in /tmp is let through"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': 'cd /tmp && rm -f gov-fix4-nothing-*.json'}, want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5 (G-2): a reviewer's unmatched glob in /tmp is let through: want allow, got deny (a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 1 (G-1): a Python heredoc reading a test, writing its scratch by a computed path] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'rule 1 (G-1): a Python heredoc reading a test, writing its scratch by a computed path'
+role = 'orchestrator', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport tempfile, os\nt = open('tests/acceptance/W2-64/t.py').read()\nopen(os.path.join(tempfile.gettempdir(), 'o.txt'), 'w').write(t)\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 1 (G-1): a Python heredoc reading a test, writing its scratch by a computed path: want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf $HOME] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf $HOME'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf $HOME' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5: a relative write into reviews/ from the CTO's folder] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5: a relative write into reviews/ from the CTO's folder"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': 'cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && echo x > reviews/e9.md'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: a relative write into reviews/ from the CTO's folder: want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer's Write of its record into reviews/] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5: a reviewer's Write of its record into reviews/"
+role = 'independent-auditor', tool = 'Write'
+tin = {'content': 'x', 'file_path': '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/e9-review.md'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: a reviewer's Write of its record into reviews/: want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 1: inline Python into a scratch repository's tests (row 81's form)] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 1: inline Python into a scratch repository's tests (row 81's form)"
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "import os; os.makedirs(\'/tmp/gov-fix4-repo/tests/acceptance/W1\', exist_ok=True)"'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 1: inline Python into a scratch repository's tests (row 81's form): want allow, got deny (a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer's subfolder in reviews/] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5: a reviewer's subfolder in reviews/"
+role = 'independent-auditor', tool = 'Write'
+tin = {'content': 'x', 'file_path': '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/e9/notes.md'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: a reviewer's subfolder in reviews/: want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+____ test_rules_1_and_5_judge_what_resolves[rule 5: reviews/ in a worktree] ____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'rule 5: reviews/ in a worktree', role = 'independent-auditor'
+tool = 'Write'
+tin = {'content': 'x', 'file_path': '/home/usain/gov-os-worktrees/EMG-queue/.gov-runtime/scratch/orchestrator/reviews/e9.md'}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: reviews/ in a worktree: want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -rf "$HOME"/] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf "$HOME"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$HOME"/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf .git] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf .git'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .git' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer makes reviews/ and writes its record (the E1 review's form)] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "rule 5: a reviewer makes reviews/ and writes its record (the E1 review's form)"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': "rm -rf /tmp/gov-fix4-rev; mkdir -p /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orches...> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/e9-review.md <<'EOF'\n# r\nEOF"}
+want = 'allow'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
+    def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
+        tin = dict(tin)
+        agent = tin.pop("agent", None)
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want, f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: rule 5: a reviewer makes reviews/ and writes its record (the E1 review's form): want allow, got deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E       assert 'deny' == 'allow'
+E         
+E         - allow
+E         + deny
+
+../test_guard_fix_4.py:268: AssertionError
+____________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -f .git/index] ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -f .git/index'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f .git/index' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /home] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[orchestrator-rm -rf src/gov] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf src/gov'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf src/gov' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______ test_catastrophic_rm_is_refused[orchestrator-cd / && rm -rf home] _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'cd / && rm -rf home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'cd / && rm -rf home' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /*] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /*' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ./*] ___________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ./*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ./*' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -f /home/usain/gov-os-worktrees/EMG-queue/.git] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = 'rm -f /home/usain/gov-os-worktrees/EMG-queue/.git'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f /home/usain/gov-os-worktrees/EMG-queue/.git' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -f template/governance/kernel/roles/*.md] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -f template/governance/kernel/roles/*.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f template/governance/kernel/roles/*.md' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -f ~/.bashrc] _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -f ~/.bashrc'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f ~/.bashrc' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/gov-os-worktrees/] ___
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/gov-os-worktrees/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/gov-os-worktrees/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm README.md] __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm README.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm README.md' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf tests] __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf tests'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf tests' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[orchestrator-rm -rf .] ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf .'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.claude] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/.claude'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.claude' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/gov-os-runs] ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/gov-os-runs'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/gov-os-runs' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /dev/shm] _________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /dev/shm'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /dev/shm' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf docs] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf docs'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf docs' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ./] ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ./'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ./' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-rm -f -- AGENTS.md] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -f -- AGENTS.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f -- AGENTS.md' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.ollama] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/.ollama'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.ollama' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /tmp] ___________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /tmp'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /tmp' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /dev] ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /dev'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /dev' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -rf "$(cat /tmp/gov-fix4-none)"/] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf "$(cat /tmp/gov-fix4-none)"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$(cat /tmp/gov-fix4-none)"/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/gov-os-worktrees] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /home/usain/gov-os-worktrees'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/gov-os-worktrees' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = 'cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______ test_catastrophic_rm_is_refused[orchestrator-rm -rf /etc/hostname] ______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /etc/hostname'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /etc/hostname' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[orchestrator-rm -rf /tmp/] __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /tmp/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /tmp/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___ test_catastrophic_rm_is_refused[orchestrator-rm -rf "$GOV_FIX4_UNSET"/] ____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf "$GOV_FIX4_UNSET"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$GOV_FIX4_UNSET"/' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-for d in /tmp/gov-fix4-a ~; do rm -rf $d; done] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = 'for d in /tmp/gov-fix4-a ~; do rm -rf $d; done'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'for d in /tmp/gov-fix4-a ~; do rm -rf $d; done' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[orchestrator-/bin/rm -rf /] __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = '/bin/rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: '/bin/rm -rf /' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___ test_catastrophic_rm_is_refused[orchestrator-rm -f README.md 'unclosed] ____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = "rm -f README.md 'unclosed"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "rm -f README.md 'unclosed" as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___ test_catastrophic_rm_is_refused[orchestrator-rm -rf "$GOV_FIX4_UNSET"/*] ___
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf "$GOV_FIX4_UNSET"/*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$GOV_FIX4_UNSET"/*' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______ test_catastrophic_rm_is_refused[orchestrator-rm -rf .gov-runtime] _______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf .gov-runtime'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .gov-runtime' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____ test_catastrophic_rm_is_refused[orchestrator-rm -f ~/.local/bin/gov] _____
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -f ~/.local/bin/gov'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f ~/.local/bin/gov' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-command rm -rf /] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'command rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'command rm -rf /' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-bash -c 'rm -rf ~'] _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = "bash -c 'rm -rf ~'"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "bash -c 'rm -rf ~'" as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______________ test_catastrophic_rm_is_refused[engineer-rm -rf /] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__ test_catastrophic_rm_is_refused[orchestrator-rm -rf .gov-runtime/scratch] ___
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf .gov-runtime/scratch'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .gov-runtime/scratch' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-rm -rf ${GOV_FIX4_UNSET}/home] __
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ${GOV_FIX4_UNSET}/home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ${GOV_FIX4_UNSET}/home' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-echo $(rm -rf /)] ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'echo $(rm -rf /)'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'echo $(rm -rf /)' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.config] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf ~/.config'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.config' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-timeout 5 rm -rf /] _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'timeout 5 rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'timeout 5 rm -rf /' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -rf "$HOME"/] ___________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf "$HOME"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$HOME"/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____________ test_catastrophic_rm_is_refused[engineer-rm -rf /*] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /*' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-rm -rf /usr/lib/x] ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf /usr/lib/x'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /usr/lib/x' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______________ test_catastrophic_rm_is_refused[engineer-rm -rf .] ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf .'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[orchestrator-nohup rm -rf ~ &] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'nohup rm -rf ~ &'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'nohup rm -rf ~ &' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__ test_catastrophic_rm_is_refused[orchestrator-sh -c "cd / && rm -rf home"] ___
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'sh -c "cd / && rm -rf home"'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'sh -c "cd / && rm -rf home"' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+______________ test_catastrophic_rm_is_refused[engineer-rm -rf ~] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf /home] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -f .git/index] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f .git/index'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f .git/index' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-true && \\rm -rf ~] _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'true && \\rm -rf ~'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'true && \\rm -rf ~' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____________ test_catastrophic_rm_is_refused[engineer-rm -rf ./] ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ./'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ./' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[orchestrator-cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+command = "cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh" as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[engineer-cd / && rm -rf home] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'cd / && rm -rf home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'cd / && rm -rf home' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____________ test_catastrophic_rm_is_refused[engineer-rm -rf ~/] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+command = 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+command = 'cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[orchestrator-rm -rf / "unclosed] _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator', command = 'rm -rf / "unclosed'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf / "unclosed' as orchestrator: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________ test_catastrophic_rm_is_refused[engineer-rm -rf src/gov] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf src/gov'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf src/gov' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf .git] _____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf .git'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .git' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf $HOME] ____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf $HOME'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf $HOME' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -f /home/usain/gov-os-worktrees/EMG-queue/.git] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f /home/usain/gov-os-worktrees/EMG-queue/.git'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f /home/usain/gov-os-worktrees/EMG-queue/.git' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-rm -f -- AGENTS.md] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f -- AGENTS.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f -- AGENTS.md' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/Dynamic-Agentic-Engineering-OS' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm README.md] ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm README.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm README.md' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -rf ~/.ollama] __________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/.ollama'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.ollama' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/gov-os-worktrees] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /home/usain/gov-os-worktrees'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /home/usain/gov-os-worktrees' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____ test_catastrophic_rm_is_refused[engineer-rm -rf .gov-runtime/scratch] _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf .gov-runtime/scratch'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .gov-runtime/scratch' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____________ test_catastrophic_rm_is_refused[engineer-rm -rf ./*] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ./*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ./*' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf /tmp] _____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /tmp'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /tmp' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____ test_catastrophic_rm_is_refused[engineer-rm -rf ~/gov-os-worktrees/] _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/gov-os-worktrees/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/gov-os-worktrees/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf docs] _____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf docs'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf docs' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[engineer-rm -rf /etc/hostname] ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /etc/hostname'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /etc/hostname' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -f template/governance/kernel/roles/*.md] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f template/governance/kernel/roles/*.md'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f template/governance/kernel/roles/*.md' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -f ~/.bashrc] ___________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f ~/.bashrc'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f ~/.bashrc' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf /tmp/] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /tmp/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /tmp/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf tests] ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf tests'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf tests' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[engineer-rm -rf ~/gov-os-runs] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/gov-os-runs'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/gov-os-runs' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -rf ~/.config] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/.config'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.config' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -rf ~/.claude] __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ~/.claude'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ~/.claude' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_______ test_catastrophic_rm_is_refused[engineer-rm -f ~/.local/bin/gov] _______
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -f ~/.local/bin/gov'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -f ~/.local/bin/gov' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+________ test_catastrophic_rm_is_refused[engineer-rm -rf .gov-runtime] _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf .gov-runtime'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf .gov-runtime' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____________ test_catastrophic_rm_is_refused[engineer-rm -rf /dev] _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /dev'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /dev' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-rm -rf /usr/lib/x] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /usr/lib/x'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /usr/lib/x' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-rm -rf "$(cat /tmp/gov-fix4-none)"/] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf "$(cat /tmp/gov-fix4-none)"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$(cat /tmp/gov-fix4-none)"/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-bash -c 'rm -rf ~'] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = "bash -c 'rm -rf ~'"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "bash -c 'rm -rf ~'" as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____ test_catastrophic_rm_is_refused[engineer-rm -rf "$GOV_FIX4_UNSET"/*] _____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf "$GOV_FIX4_UNSET"/*'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$GOV_FIX4_UNSET"/*' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-rm -rf /dev/shm] ___________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf /dev/shm'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf /dev/shm' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+____ test_catastrophic_rm_is_refused[engineer-sh -c "cd / && rm -rf home"] _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'sh -c "cd / && rm -rf home"'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'sh -c "cd / && rm -rf home"' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____ test_catastrophic_rm_is_refused[engineer-rm -rf "$GOV_FIX4_UNSET"/] ______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf "$GOV_FIX4_UNSET"/'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf "$GOV_FIX4_UNSET"/' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-for d in /tmp/gov-fix4-a ~; do rm -rf $d; done] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'for d in /tmp/gov-fix4-a ~; do rm -rf $d; done'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'for d in /tmp/gov-fix4-a ~; do rm -rf $d; done' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-echo $(rm -rf /)] __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'echo $(rm -rf /)'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'echo $(rm -rf /)' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___ test_catastrophic_rm_is_refused[engineer-rm -rf ${GOV_FIX4_UNSET}/home] ____
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf ${GOV_FIX4_UNSET}/home'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf ${GOV_FIX4_UNSET}/home' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________ test_catastrophic_rm_is_refused[engineer-/bin/rm -rf /] ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = '/bin/rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: '/bin/rm -rf /' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_ test_catastrophic_rm_is_refused[engineer-cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+command = "cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh" as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-timeout 5 rm -rf /] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'timeout 5 rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'timeout 5 rm -rf /' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-nohup rm -rf ~ &] __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'nohup rm -rf ~ &'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'nohup rm -rf ~ &' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-rm -rf / "unclosed] _________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'rm -rf / "unclosed'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'rm -rf / "unclosed' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_________ test_catastrophic_rm_is_refused[engineer-true && \\rm -rf ~] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'true && \\rm -rf ~'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'true && \\rm -rf ~' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+__________ test_catastrophic_rm_is_refused[engineer-command rm -rf /] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = 'command rm -rf /'
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: 'command rm -rf /' as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+_____ test_catastrophic_rm_is_refused[engineer-rm -f README.md 'unclosed] ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer', command = "rm -f README.md 'unclosed"
+
+    @pytest.mark.parametrize("command", CATASTROPHIC)
+    @pytest.mark.parametrize("role", [O, E])
+    def test_catastrophic_rm_is_refused(role, command):
+        got, why = _hook(role, "Bash", b(command), tmpdir="/tmp/gov-os-emg-e3")
+>       assert got == "deny" and "catastrophic delete" in why, f"{command!r} as {role}: {got} ({why})"
+E       AssertionError: "rm -f README.md 'unclosed" as engineer: allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:308: AssertionError
+___________________ test_todays_review_record_refusals_pass ____________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+    @pytest.mark.skipif(not os.path.exists(TODAY), reason="today's recovered calls are not here (GUARD_FIX4_TODAY)")
+    def test_todays_review_record_refusals_pass():
+        """The E1 reviewer's Bash and Write of its own record into reviews/ (2026-11-03, refused twice by today's hook;
+        the CTO transcribed the record), replayed from the transcript as they ran."""
+        rows = json.load(open(TODAY))
+        assert len(rows) == 2
+        for r in rows:
+            got, why = _hook(r["role"], r["tool"], r["input"], cwd=r["cwd"], agent=r["agent_type"])
+>           assert got == "allow", f"{r['key']}: {got} ({why})"
+E           AssertionError: toolu_01FZp28RNETABVG4JgHQhikJ: deny (a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2))
+E           assert 'deny' == 'allow'
+E             
+E             - allow
+E             + deny
+
+../test_guard_fix_4.py:405: AssertionError
+________________________ test_made_lists_mkdir_folders _________________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_made_lists_mkdir_folders():
+        code = ("import json, sys\nsys.path.insert(0, sys.argv[1])\nimport bash_writes as bw\n"
+                "from gov.guard.decide import _expand_token, _extract_bash_write_targets\n"
+                "print(json.dumps({c: bw.judge(c, '/r', _extract_bash_write_targets, _expand_token).made\n"
+                "                  for c in json.load(sys.stdin)}))\n")
+        cases = ["mkdir -p a /b", "mkdir -m 700 c", "cd /s && mkdir d", "D=/q; mkdir -p $D/e", "mkdir $(pwd)/f",
+                 "echo mkdir g", "bash -c 'mkdir /h'", "mv /i /j"]
+        p = subprocess.run([PY, "-E", "-c", code, os.path.dirname(HOOK)], input=json.dumps(cases), capture_output=True,
+                           text=True, timeout=60, env={k: v for k, v in os.environ.items() if k != "PYTHONPATH"})
+>       assert p.returncode == 0, p.stderr[-2000:]
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 5, in <module>
+E         AttributeError: 'Judgement' object has no attribute 'made'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/usain/.local/share/gov-os/pin-9894b0cf/bin/python', '-E', '-c', "import json, sys\nsys.p...call last):\n  File "<string>", line 5, in <module>\nAttributeError: \'Judgement\' object has no attribute \'made\'\n').returncode
+
+../test_guard_fix_4.py:465: AssertionError
+___________________________ test_the_reason_is_plain ___________________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_reason_is_plain():
+        got, why = _hook(O, "Bash", b("rm -rf \"$GOV_FIX4_UNSET\"/"))
+>       assert got == "deny" and "if a variable in it that the guard cannot resolve is empty" in why and ":?" in why
+E       AssertionError: assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:353: AssertionError
+____________________________ test_rm_through_a_link ____________________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-emg-e3/pytest-of-usain/pytest-4/popen-gw3/test_rm_through_a_link0')
+
+    def test_rm_through_a_link(tmp_path):
+        """A link is removed, not what it points to; a word ending in / follows it."""
+        link = tmp_path / "to-main"
+        link.symlink_to(ROOT)
+        assert _hook(O, "Bash", b(f"rm -f {link}"))[0] == "allow"
+        got, why = _hook(O, "Bash", b(f"rm -rf {link}/"))
+>       assert got == "deny" and "catastrophic delete" in why, why
+E       AssertionError: 
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:346: AssertionError
+_________________________________ test_emptied _________________________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_emptied():
+        bw = _module()
+        os.environ.pop("GOV_FIX4_UNSET", None)
+        os.environ["GOV_FIX4_SET"] = "/tmp/s"
+>       assert bw.emptied("$GOV_FIX4_UNSET/") == "/"
+               ^^^^^^^^^^
+E       AttributeError: module 'bash_writes4' has no attribute 'emptied'
+
+../test_guard_fix_4.py:421: AttributeError
+_____________________ test_rm_in_a_removed_worktree_passes _____________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_rm_in_a_removed_worktree_passes():
+        """A session whose tree git cannot read (removed): its scratch rm is not refused for that (rm history: 41 calls
+        in worktrees removed since were refused as "could not check" before the main tree fell back to the hook's)."""
+        wt = WT + "/EMG-gov-fix4-removed"
+        assert not os.path.exists(wt)
+        for command in (f"rm -rf {wt}/pytest-of-usain", "rm -f .gov-runtime/scratch/lead/x.exit"):
+            got, why = _hook(E, "Bash", b(command), cwd=wt, root=wt)
+            assert got == "allow", f"{command!r}: {got} ({why})"
+        got, why = _hook(E, "Bash", b(f"rm -f {ROOT}/README.md"), cwd=wt, root=wt)
+>       assert got == "deny" and "tracked" in why, why
+E       AssertionError: 
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow)
+
+../test_guard_fix_4.py:337: AssertionError
+_____________ test_deletes_are_listed_with_their_loops_and_folders _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_deletes_are_listed_with_their_loops_and_folders():
+        sys.path.insert(0, os.path.dirname(HOOK))
+        code = ("import json, sys\nsys.path.insert(0, sys.argv[1])\nimport bash_writes as bw\n"
+                "from gov.guard.decide import _expand_token, _extract_bash_write_targets\n"
+                "out = {}\n"
+                "for c in json.load(sys.stdin):\n"
+                "    out[c] = bw.judge(c, '/r', _extract_bash_write_targets, _expand_token).deletes\n"
+                "print(json.dumps(out))\n")
+        cases = ["rm -rf a /b", "for d in x y; do rm -r /t/$d; done", "cd /s && rm f", "rm -- -f",
+                 "cat <<'EOF' > /tmp/x\nrm -rf /\nEOF", "D=/q; rm -rf $D/z", "rm -rf $(pwd)/", "echo rm -rf /"]
+        p = subprocess.run([PY, "-E", "-c", code, os.path.dirname(HOOK)], input=json.dumps(cases), capture_output=True,
+                           text=True, timeout=60, env={k: v for k, v in os.environ.items() if k != "PYTHONPATH"})
+>       assert p.returncode == 0, p.stderr[-2000:]
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 7, in <module>
+E         AttributeError: 'Judgement' object has no attribute 'deletes'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/usain/.local/share/gov-os/pin-9894b0cf/bin/python', '-E', '-c', "import json, sys\nsys.p...l last):\n  File "<string>", line 7, in <module>\nAttributeError: \'Judgement\' object has no attribute \'deletes\'\n').returncode
+
+../test_guard_fix_4.py:444: AssertionError
+_____________________________ test_logged_refusals _____________________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    @pytest.mark.skipif(not os.path.exists(CORPUS), reason="the rebuilt corpus is not here (GUARD_FIX4_CORPUS)")
+    def test_logged_refusals():
+        rows = json.load(open(CORPUS))
+        refused = []
+        for row in rows:
+            src = rows[TWIN.get(row["i"], row["i"])]
+            role = (src.get("launch_role") if src.get("from") == "fix-3 corpus" else ROLE.get(src["i"])) or O
+            cwd = src.get("cwd") or ROOT
+            m = re.match(r"(/home/usain/gov-os-worktrees/[^/]+)", cwd)
+            tmpdir = src.get("tmpdir")
+            if tmpdir is None and src.get("from") != "fix-3 corpus":
+                t = re.search(r"/tmp/gov-launch-[a-z-]+-[a-z0-9]{8}", json.dumps(src.get("input")))
+                tmpdir = t.group(0) if t else None
+            got, _ = _hook(role, src["tool"], src["input"], cwd=cwd, root=m.group(1) if m else ROOT,
+                           agent=src.get("agent_type"), tmpdir=tmpdir)
+            if got != "allow":
+                refused.append(row["i"])
+>       assert sorted(refused) == sorted(STILL_REFUSED), refused
+E       AssertionError: [39, 46, 64, 65, 71, 72, ...]
+E       assert [39, 46, 64, 65, 71, 72, ...] == [64, 65, 73, 74, 77, 78, ...]
+E         
+E         At index 0 diff: 39 != 64
+E         Left contains 7 more items, first extra item: 80
+E         Use -v to get more diff
+
+../test_guard_fix_4.py:394: AssertionError
+=========================== short test summary info ============================
+FAILED ../test_guard_fix_4.py::test_planted[guard4: rule5 auditor unreadable bash]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 perl heredoc naming acceptance]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 unterminated heredoc naming acceptance judged as before]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python -c exec] - AssertionE...
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python heredoc rebinding by a loop]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python heredoc write inside a function]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python heredoc global rebinding]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 node -e naming acceptance (as before)]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 unquoted shell heredoc] - As...
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python -c io.FileIO handed a test]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 variable then source] - Asse...
+FAILED ../test_guard_fix_4.py::test_planted[guard4: fix2 engineer inline python writes acceptance after a cd]
+FAILED ../test_guard_fix_4.py::test_planted[guard4: fix2 engineer perl -i on acceptance]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 assignment in a pipeline is a subshell's]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 variable used before its assignment]
+FAILED ../test_guard_fix_4.py::test_planted[guard4: fix2 unbalanced quotes naming acceptance]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 variable assigned in an if]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 variable read from a here-string]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 while read loop rm (target unresolvable, names the tests)]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 git apply -R of a test's diff (differential #146)]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 patch from stdin in a command naming the tests]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python -c getattr(os, 'remove')]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python -c unknown function handed a list of tests]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 a python file run by runpy]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 a python file run by exec(open())]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 a python file run by uv run]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 a file with no #! line run by its name]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 repro 2: cd, then bash name]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 a python file that changes folder into the tests]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 repro 4: chmod +x, cd, then ./name]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F2 written after a cd, run by bash name]
+FAILED ../test_guard_fix_4.py::test_planted[fix3 python -c unknown function handed a test]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 rglob then write_text] - As...
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 -c: a path built by ''.join]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 listdir then os.remove(os.path.join)]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 -c: a path built with chr]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 listdir then os.remove(f-string)]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 -c: glob.glob of the tests then open w]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 os.walk then os.remove] - A...
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 os.chdir into the tests then open w (heredoc)]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 perl -e naming the folder with no slash]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 os.chdir into the tests then open w (-c)]
+FAILED ../test_guard_fix_4.py::test_planted[row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 os.chdir into tests then open acceptance/f]
+FAILED ../test_guard_fix_4.py::test_planted[row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 tempfile.mkdtemp in the tests]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 Path.glob then write_text]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 -c: a path built by %] - As...
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 Path.glob then unlink] - As...
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 -c: a path built by '/'.join]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 a variable the command sets for Python is not the session's]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 1 (G-1): a write through a substitution is let through]
+FAILED ../test_guard_fix_4.py::test_planted[r2 F4 code that changes os.environ is not read from the session]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: the subagent form (GOV_ROLE orchestrator, agent independent-auditor) into reviews/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5 (G-2): a reviewer's write through mktemp is let through]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5 (G-2): a reviewer's unmatched glob in /tmp is let through]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 1 (G-1): a Python heredoc reading a test, writing its scratch by a computed path]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf $HOME]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: a relative write into reviews/ from the CTO's folder]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer's Write of its record into reviews/]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 1: inline Python into a scratch repository's tests (row 81's form)]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer's subfolder in reviews/]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: reviews/ in a worktree]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf "$HOME"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf .git]
+FAILED ../test_guard_fix_4.py::test_rules_1_and_5_judge_what_resolves[rule 5: a reviewer makes reviews/ and writes its record (the E1 review's form)]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f .git/index]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf src/gov]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-cd / && rm -rf home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ./*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f /home/usain/gov-os-worktrees/EMG-queue/.git]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f template/governance/kernel/roles/*.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f ~/.bashrc]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/gov-os-worktrees/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm README.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf tests]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf .]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.claude]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/gov-os-runs]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /dev/shm]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf docs]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ./]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f -- AGENTS.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.ollama]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /tmp]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /dev]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf "$(cat /tmp/gov-fix4-none)"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /home/usain/gov-os-worktrees]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /etc/hostname]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /tmp/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf "$GOV_FIX4_UNSET"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-for d in /tmp/gov-fix4-a ~; do rm -rf $d; done]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-/bin/rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f README.md 'unclosed]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf "$GOV_FIX4_UNSET"/*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf .gov-runtime]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -f ~/.local/bin/gov]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-command rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-bash -c 'rm -rf ~']
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf .gov-runtime/scratch]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ${GOV_FIX4_UNSET}/home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-echo $(rm -rf /)]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf ~/.config]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-timeout 5 rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf "$HOME"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf /usr/lib/x]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf .]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-nohup rm -rf ~ &]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-sh -c "cd / && rm -rf home"]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f .git/index]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-true && \\rm -rf ~]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ./]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-cd / && rm -rf home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS/.git/objects]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-cd /home/usain/Dynamic-Agentic-Engineering-OS/.. && rm -rf Dynamic-Agentic-Engineering-OS]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[orchestrator-rm -rf / "unclosed]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf src/gov]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf .git]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf $HOME]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f /home/usain/gov-os-worktrees/EMG-queue/.git]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f -- AGENTS.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/Dynamic-Agentic-Engineering-OS]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm README.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/.ollama]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /home/usain/gov-os-worktrees]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf .gov-runtime/scratch]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ./*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /tmp]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/gov-os-worktrees/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf docs]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /etc/hostname]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f template/governance/kernel/roles/*.md]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f ~/.bashrc]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /tmp/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf tests]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/gov-os-runs]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/.config]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ~/.claude]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f ~/.local/bin/gov]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf .gov-runtime]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /dev]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /usr/lib/x]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf "$(cat /tmp/gov-fix4-none)"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-bash -c 'rm -rf ~']
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf "$GOV_FIX4_UNSET"/*]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf /dev/shm]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-sh -c "cd / && rm -rf home"]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf "$GOV_FIX4_UNSET"/]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-for d in /tmp/gov-fix4-a ~; do rm -rf $d; done]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-echo $(rm -rf /)]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf ${GOV_FIX4_UNSET}/home]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-/bin/rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-cat > /tmp/gov-fix4-x.sh <<'EOF'\nrm -rf ~\nEOF\nbash /tmp/gov-fix4-x.sh]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-timeout 5 rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-nohup rm -rf ~ &]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -rf / "unclosed]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-true && \\rm -rf ~]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-command rm -rf /]
+FAILED ../test_guard_fix_4.py::test_catastrophic_rm_is_refused[engineer-rm -f README.md 'unclosed]
+FAILED ../test_guard_fix_4.py::test_todays_review_record_refusals_pass - Asse...
+FAILED ../test_guard_fix_4.py::test_made_lists_mkdir_folders - AssertionError...
+FAILED ../test_guard_fix_4.py::test_the_reason_is_plain - AssertionError: ass...
+FAILED ../test_guard_fix_4.py::test_rm_through_a_link - AssertionError: 
+FAILED ../test_guard_fix_4.py::test_emptied - AttributeError: module 'bash_wr...
+FAILED ../test_guard_fix_4.py::test_rm_in_a_removed_worktree_passes - Asserti...
+FAILED ../test_guard_fix_4.py::test_deletes_are_listed_with_their_loops_and_folders
+FAILED ../test_guard_fix_4.py::test_logged_refusals - AssertionError: [39, 46...
+182 failed, 269 passed in 15.60s

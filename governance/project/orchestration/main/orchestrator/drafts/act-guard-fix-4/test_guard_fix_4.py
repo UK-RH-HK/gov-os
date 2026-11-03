@@ -8,7 +8,10 @@ Drives the hook as Claude Code runs it (event JSON on stdin, the pinned judge's 
 - writes that resolve into the acceptance tests or outside a reviewer's records: still refused;
 - the catastrophic deletes (refused, every role) and the honest ones (passed);
 - when the rebuilt corpus is here (GUARD_FIX4_CORPUS, else work/corpus4.json), every logged refusal
-  (guard-refusals.jsonl, 87 rows), replayed from its transcript's full command;
+  (guard-refusals.jsonl, 87 rows), replayed from its transcript's full command; and (GUARD_FIX4_TODAY, else
+  work/today4.json) the two rule-5 false refusals of 2026-11-03 (a reviewer's own record into the CTO's reviews/);
+- rule 5's records in the CTO's .gov-runtime/scratch/orchestrator/reviews/ (allowed; the folder deleted or moved,
+  or any other folder: refused);
 - ACT-GUARD-FIX-3's module tests, re-run on this hook's bash_writes.py (its reading is unchanged), and the module's
   new parts (what rm deletes; the emptied word).
 
@@ -35,6 +38,8 @@ CORPUS = os.environ.get("GUARD_FIX4_CORPUS") or os.path.join(HERE, "work", "corp
 HOME = os.path.realpath(os.path.expanduser("~"))
 WT = HOME + "/gov-os-worktrees"
 E, A, O, TD = "engineer", "independent-auditor", "orchestrator", "independent-test-designer"
+REV = ROOT + "/.gov-runtime/scratch/orchestrator/reviews"
+TODAY = os.environ.get("GUARD_FIX4_TODAY") or os.path.join(HERE, "work", "today4.json")
 
 
 def _fix3():
@@ -155,6 +160,12 @@ LET_THROUGH = {
     "r2 F4 -c: a path built by ''.join",
     'r2 F4 -c: a path built with chr',
     'r2 F4 -c: glob.glob of the tests then open w',
+    # rule 1: code whose write resolves outside every tree of this repository (cd /tmp, then tests/acceptance/...:
+    # /tmp/tests/acceptance/), refused by ACT-GUARD-FIX-3 because the path's words hold tests/acceptance; the shell's
+    # own write of the same path passed already (G-1: what resolves into a protected folder is judged)
+    'guard4: fix2 engineer inline python writes acceptance after a cd',
+    'r2 F2 written after a cd, run by bash name',
+    'r2 F2 repro 2: cd, then bash name',
 }
 
 PLANTED = [(c[0], c[1], c[2], c[3], "allow" if c[0] in LET_THROUGH else c[4]) for c in FIX3.ALL]
@@ -210,12 +221,50 @@ RULES = [
      b("B=$(mktemp -d); mkdir $B/r && echo x > $B/r/o"), "allow"),
     ("rule 5 (G-2): a reviewer's unmatched glob in /tmp is let through", A, "Bash",
      b("cd /tmp && rm -f gov-fix4-nothing-*.json"), "allow"),
+    # rule 5: the CTO's review records (.gov-runtime/scratch/orchestrator/reviews/), where its briefs send reviewers
+    ("rule 5: a reviewer's Write of its record into reviews/", A, "Write", {"file_path": f"{REV}/e9-review.md",
+                                                                          "content": "x"}, "allow"),
+    ("rule 5: a reviewer's subfolder in reviews/", A, "Write", {"file_path": f"{REV}/e9/notes.md", "content": "x"},
+     "allow"),
+    ("rule 5: a reviewer makes reviews/ and writes its record (the E1 review's form)", A, "Bash",
+     b(f"rm -rf /tmp/gov-fix4-rev; mkdir -p {REV}; cat > {REV}/e9-review.md <<'EOF'\n# r\nEOF"), "allow"),
+    ("rule 5: a relative write into reviews/ from the CTO's folder", A, "Bash",
+     b(f"cd {ROOT}/.gov-runtime/scratch/orchestrator && echo x > reviews/e9.md"), "allow"),
+    ("rule 5: reviews/ in a worktree", A, "Write",
+     {"file_path": f"{WT}/EMG-queue/.gov-runtime/scratch/orchestrator/reviews/e9.md", "content": "x"}, "allow"),
+    ("rule 5: a reviewer deletes reviews/", A, "Bash", b(f"rm -rf {REV}"), "deny"),
+    ("rule 5: a reviewer makes then deletes reviews/", A, "Bash", b(f"mkdir -p {REV}; rm -rf {REV}"), "deny"),
+    ("rule 5: a reviewer moves reviews/", A, "Bash", b(f"mv {REV} /tmp/gov-fix4-r"), "deny"),
+    ("rule 5: out of reviews/ by ..", A, "Write", {"file_path": f"{REV}/../briefs/x.md", "content": "x"}, "deny"),
+    ("rule 5: a folder whose name starts with reviews", A, "Write", {"file_path": f"{REV}x/a.md", "content": "x"},
+     "deny"),
+    ("rule 5: the CTO's briefs", A, "Write",
+     {"file_path": f"{ROOT}/.gov-runtime/scratch/orchestrator/briefs/x.md", "content": "x"}, "deny"),
+    ("rule 5: the CTO's log", A, "Bash", b(f"echo x >> {ROOT}/.gov-runtime/scratch/orchestrator/log/x.jsonl"),
+     "deny"),
+    ("rule 5: the CTO's folder made", A, "Bash", b(f"mkdir -p {ROOT}/.gov-runtime/scratch/orchestrator/x"), "deny"),
+    ("rule 5: unit tests", A, "Write", {"file_path": f"{ROOT}/tests/unit/x.py", "content": "x"}, "deny"),
+    ("rule 5: acceptance tests", A, "Write", {"file_path": f"{ROOT}/{T}", "content": "x"}, "deny"),
+    ("rule 5: a worktree's code", A, "Write", {"file_path": f"{WT}/EMG-queue/src/gov/x.py", "content": "x"}, "deny"),
+    ("rule 5: the subagent form (GOV_ROLE orchestrator, agent independent-auditor) into reviews/", O, "Write",
+     {"file_path": f"{REV}/e9.md", "content": "x", "agent": A}, "allow"),
+    ("rule 5: the subagent form into code", O, "Write", {"file_path": f"{ROOT}/src/gov/x.py", "content": "x",
+                                                         "agent": A}, "deny"),
+    ("rule 5: an engineer's write into reviews/ is not rule 5's", E, "Write", {"file_path": f"{REV}/x.md",
+                                                                               "content": "x"}, "allow"),
+    # rule 1: code's resolved writes into a tree of this repository, not into any folder named tests/acceptance
+    ("rule 1: inline Python into another worktree's tests", E, "Bash",
+     b(f"python3 -c \"open('{WT}/EMG-queue/{T}', 'w')\""), "deny"),
+    ("rule 1: inline Python into a scratch repository's tests (row 81's form)", E, "Bash",
+     b("python3 -c \"import os; os.makedirs('/tmp/gov-fix4-repo/tests/acceptance/W1', exist_ok=True)\""), "allow"),
 ]
 
 
 @pytest.mark.parametrize("name,role,tool,tin,want", RULES, ids=[c[0] for c in RULES])
 def test_rules_1_and_5_judge_what_resolves(name, role, tool, tin, want):
-    got, why = _hook(role, tool, tin)
+    tin = dict(tin)
+    agent = tin.pop("agent", None)
+    got, why = _hook(role, tool, tin, agent=agent)
     assert got == want, f"{name}: want {want}, got {got} ({why})"
 
 
@@ -229,7 +278,7 @@ CATASTROPHIC = [
     f"rm -rf {WT}", "rm -rf ~/gov-os-worktrees/", "rm -rf ~/gov-os-runs", "rm -rf /tmp", "rm -rf /tmp/",
     "rm -rf .gov-runtime", "rm -rf .gov-runtime/scratch",
     "rm -f ~/.bashrc", "rm -rf ~/.claude", "rm -rf ~/.ollama", "rm -rf /etc/hostname", "rm -f ~/.local/bin/gov",
-    "rm -rf ~/.config", "rm -rf /usr/lib/x",
+    "rm -rf ~/.config", "rm -rf /usr/lib/x", "rm -rf /dev/shm", "rm -rf /dev",
     "rm -rf \"$GOV_FIX4_UNSET\"/", "rm -rf \"$GOV_FIX4_UNSET\"/*", "rm -rf ${GOV_FIX4_UNSET}/home",
     "rm -rf \"$(cat /tmp/gov-fix4-none)\"/", "for d in /tmp/gov-fix4-a ~; do rm -rf $d; done",
     "bash -c 'rm -rf ~'", "echo $(rm -rf /)", "sh -c \"cd / && rm -rf home\"",
@@ -247,6 +296,8 @@ HONEST = [
     "grep -rn 'rm -rf' docs/contract | head -3", "echo 'rm -rf /'", "git rm --cached -n README.md",
     "cat > /tmp/gov-fix4-y.sh <<'EOF'\nrm -rf ~\nEOF\necho written",
     "find /tmp/gov-fix4-none -name '*.pyc' -delete", "rm -rf src/gov/__pycache__/nothing.pyc",
+    # the project's lock in /dev/shm (rm history: 3 calls of 2026-10-30/31, gov-os-W2-76-held.lock)
+    "rm -f /tmp/gov-fix4-held.lock /dev/shm/gov-fix4-held.lock",
 ]
 
 
@@ -272,6 +323,18 @@ def test_rm_in_a_worktree_of_its_own_files_passes():
         assert got == "allow", f"{command!r}: {got} ({why})"
     got, why = _hook(TD, "Bash", b("rm -f tests/acceptance/W2-none/t.py"), cwd=wt, root=wt)
     assert got == "allow", why
+
+
+def test_rm_in_a_removed_worktree_passes():
+    """A session whose tree git cannot read (removed): its scratch rm is not refused for that (rm history: 41 calls
+    in worktrees removed since were refused as "could not check" before the main tree fell back to the hook's)."""
+    wt = WT + "/EMG-gov-fix4-removed"
+    assert not os.path.exists(wt)
+    for command in (f"rm -rf {wt}/pytest-of-usain", "rm -f .gov-runtime/scratch/lead/x.exit"):
+        got, why = _hook(E, "Bash", b(command), cwd=wt, root=wt)
+        assert got == "allow", f"{command!r}: {got} ({why})"
+    got, why = _hook(E, "Bash", b(f"rm -f {ROOT}/README.md"), cwd=wt, root=wt)
+    assert got == "deny" and "tracked" in why, why
 
 
 def test_rm_through_a_link(tmp_path):
@@ -303,10 +366,12 @@ ROLE = {**{i: O for i in (61, 62, 63, 70, 71, 72)}, **{i: A for i in (64, 67, 68
 # - rule 2 (reads), as today: rows 65, 74, 77, 78, 79, 82, 83, 84, 85, 86 (a listing whose start the guard cannot
 #   place: W2-42a's patterns) and 73, 80 (the hidden half of an evaluation set, refused as designed);
 # - rule 4, as today: row 64 (an auditor's probe whose heredoc text holds "sudo touch ...": has_sudo reads text;
-#   ACT-GUARD-FIX-3 refused it first by rule 5's unresolvable write);
-# - rule 5, a resolved write: rows 75, 76 (a reviewer writing outside its records; the CTO's brief named the wrong
-#   place; labelled "as designed").
-STILL_REFUSED = [64, 65, 73, 74, 75, 76, 77, 78, 79, 80, 82, 83, 84, 85, 86]
+#   ACT-GUARD-FIX-3 refused it first by rule 5's unresolvable write).
+# Passed now, refused by today's hook: rows 39, 46, 71, 72 (unresolvable writes, G-1/G-2), 75, 76 (a reviewer's record
+# into the CTO's reviews/ folder, labelled "as designed" then; rule 5 now names that folder, the CTO's brief of
+# 2026-11-03) and 81 (inline code writing a scratch repository's tests/acceptance in /tmp: not a tree of this
+# repository).
+STILL_REFUSED = [64, 65, 73, 74, 77, 78, 79, 80, 82, 83, 84, 85, 86]
 
 
 @pytest.mark.skipif(not os.path.exists(CORPUS), reason="the rebuilt corpus is not here (GUARD_FIX4_CORPUS)")
@@ -327,6 +392,17 @@ def test_logged_refusals():
         if got != "allow":
             refused.append(row["i"])
     assert sorted(refused) == sorted(STILL_REFUSED), refused
+
+
+@pytest.mark.skipif(not os.path.exists(TODAY), reason="today's recovered calls are not here (GUARD_FIX4_TODAY)")
+def test_todays_review_record_refusals_pass():
+    """The E1 reviewer's Bash and Write of its own record into reviews/ (2026-11-03, refused twice by today's hook;
+    the CTO transcribed the record), replayed from the transcript as they ran."""
+    rows = json.load(open(TODAY))
+    assert len(rows) == 2
+    for r in rows:
+        got, why = _hook(r["role"], r["tool"], r["input"], cwd=r["cwd"], agent=r["agent_type"])
+        assert got == "allow", f"{r['key']}: {got} ({why})"
 
 
 # --- the module's new parts ---------------------------------------------------------------------------------------
@@ -375,3 +451,24 @@ def test_deletes_are_listed_with_their_loops_and_folders():
     assert got["D=/q; rm -rf $D/z"] == [("$D/z", "/q/z", "names")]
     assert got["rm -rf $(pwd)/"][0][1:] == ("/", "if-empty")
     assert got["echo rm -rf /"] == []
+
+
+def test_made_lists_mkdir_folders():
+    code = ("import json, sys\nsys.path.insert(0, sys.argv[1])\nimport bash_writes as bw\n"
+            "from gov.guard.decide import _expand_token, _extract_bash_write_targets\n"
+            "print(json.dumps({c: bw.judge(c, '/r', _extract_bash_write_targets, _expand_token).made\n"
+            "                  for c in json.load(sys.stdin)}))\n")
+    cases = ["mkdir -p a /b", "mkdir -m 700 c", "cd /s && mkdir d", "D=/q; mkdir -p $D/e", "mkdir $(pwd)/f",
+             "echo mkdir g", "bash -c 'mkdir /h'", "mv /i /j"]
+    p = subprocess.run([PY, "-E", "-c", code, os.path.dirname(HOOK)], input=json.dumps(cases), capture_output=True,
+                       text=True, timeout=60, env={k: v for k, v in os.environ.items() if k != "PYTHONPATH"})
+    assert p.returncode == 0, p.stderr[-2000:]
+    got = json.loads(p.stdout)
+    assert got["mkdir -p a /b"] == ["/r/a", "/b"]
+    assert got["mkdir -m 700 c"] == ["/r/c"]
+    assert got["cd /s && mkdir d"] == ["/s/d"]
+    assert got["D=/q; mkdir -p $D/e"] == ["/q/e"]
+    assert got["mkdir $(pwd)/f"] == []
+    assert got["echo mkdir g"] == []
+    assert got["bash -c 'mkdir /h'"] == ["/h"]
+    assert got["mv /i /j"] == []

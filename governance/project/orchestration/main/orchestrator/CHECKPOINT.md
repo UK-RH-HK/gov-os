@@ -64,6 +64,29 @@ tests 26, queue Q-1 + base 31 passed. **D-2 running, three engineers:** R1-21 (`
 `tools/land.candidate.py`), E3 (`drafts/act-guard-fix-4/`, with the reviews/ rule-5 case; then one review, then
 ACT-GUARD-FIX-4 to the owner), LB held-slot fix + O-A1 (`EMG-lb2`; then one review, then merge). G-14's path-map
 role checks after E3.
+**12:35:** R1-21 DONE: `tools/structural_pass.py` (8 families, ~9 s, a notice only) + `tools/land.candidate.py`
+(45 tests); review (Sonnet, record in its return; the CTO transcribes to `reviews/r1-21.md`) running. Promotion after
+READY: `cp -p land.py land.py.pre-r1-21 && mv land.candidate.py land.py`, then its 45 tests. Its first run found
+core-pathmap red (3 `orchestration/reviews/EMG-*` records unmapped): fixed `0e6de735`; pass all 8 ok. **After each
+record commit:** `python3 tools/structural_pass.py /home/usain/Dynamic-Agentic-Engineering-OS HEAD~1`.
+**12:37: R1-21 LIVE:** review `reviews/r1-21.md` READY (True, []; F1, F2 cosmetic rows); `tools/land.py` promoted
+(backup `land.py.pre-r1-21`); 49 passed on the live files. LB held-slot + O-A1 DONE on `emg/lb2` (`3a82896d24be`, 210
+passed): its review (Sonnet, record in its return) running; merge after READY. E3 still with its engineer.
+**12:40: LB held-slot + O-A1 LIVE:** review `reviews/emg-lb2.md` READY (True, []; F1, F2 Wave 3 rows); emg/lb2 merged
+`bad90a750fb7` (the dispatcher runs the tracked copy: live from its next pass); structural pass all 8 ok. The 12:39
+pass, just before, still showed the double count (lead cap 0, slots rule -1390 MB, 15.6 GB available).
+**12:44:** O-A1 confirmed live (12:41 pass: "memory by the Load Balancer's forecast"). The forecast now binds on the
+GPU: 6.1 used + 4.5 per running job's reranker peak + 4.5 for the newcomer > 13.9 budget, so one GPU job at a time
+beside the embedders (pre-existing pricing, not O-A1's). **For the restart after the lift:** the shared reranker
+(W2-112, merged, not started) should replace per-session reranker pricing; check the forecast then (a DEC-1052
+symptom if it blocks leads). E3 DONE (`drafts/act-guard-fix-4/`, 451 tests, ACT-GUARD-FIX-4.md; the `rm` ask is in
+`~/.claude/settings.json` lines 16-18, user level); its review (Sonnet) running; on READY: copy the ACT to
+`packages/`, commit, ping; hold while applied.
+**12:48: ACT-GUARD-FIX-4 handed to the owner** (`packages/ACT-GUARD-FIX-4.md` + `.diff`, `c4a7d7cd`): review
+`reviews/e3-guard-fix-4.md` READY (True, []); F6 answered (user `allow` holds `Bash(*)`); F1, F2, F3 Wave 3 rows.
+HOLD ON (`log/act-in-progress.txt`). After the owner's "done": `mv` the hold; confirm `guard4_check.py --settings`
+PASS from this session, an `rm` of own scratch with no prompt (in a NEW session: the user settings load at start);
+then G-14 (path-map role checks), O-A1 done, then D-3 (T-3 first).
 
 **THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
 "DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:

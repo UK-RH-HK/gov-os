@@ -8,7 +8,8 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
      in every other worktree and run clone of this repository (W2-84's fix, DEC-954 Q9b), or of the held-out
      material (every role, DEC-820 (b));
   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
-     docs/audit/ and docs/assessment/, their own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
+     docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
+     own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
      never code, tests, tickets, records, handovers or anything else (DEC-954);
   3. no reads of secrets or keys (every role, DEC-820 (a));
   4. no installs without the owner: an install asks the owner only in the CTO's own session (the orchestrator on the
@@ -16,7 +17,8 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
      refused;
   and rm is free (no ask, DEC-1050 (8)) but for the catastrophic, refused to every session: the repository's root,
   a .git, the main tree's tracked files, the folders that hold the project or its scratch, and anything outside
-  the project (the main tree, ~/gov-os-worktrees/, ~/gov-os-runs/) and its scratch (/tmp, .gov-runtime/scratch/).
+  the project (the main tree, ~/gov-os-worktrees/, ~/gov-os-runs/) and its scratch (/tmp, /dev/shm,
+  .gov-runtime/scratch/).
 It reuses the product's own checks (gov.guard.reads, heldout, install, decide), imported from the pinned judge that
 runs this file. The product's full guard (template/governance/kernel/hooks/pretooluse.py, src/gov/guard/) stays built
 and tested; it is not wired here until the Gov OS is whole. Fail closed: an error or the 20-second deadline refuses.
@@ -40,11 +42,15 @@ WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 TEST_DESIGNER = "independent-test-designer"
 REVIEWERS = ("independent-auditor", "independent-reviewer", "reviewer", "auditor")
 REVIEW_PATHS = ("docs/probes/", "docs/audit/", "docs/assessment/", ".gov-runtime/scratch/review/",
-                ".gov-runtime/scratch/audit/")
+                ".gov-runtime/scratch/audit/",
+                # the CTO's review records, where its briefs tell reviewers to write them (ACT-GUARD-FIX-4: two false
+                # refusals on 2026-11-02, rows 75-76, and two on 2026-11-03, of the E1 review's own record)
+                ".gov-runtime/scratch/orchestrator/reviews/")
 HOME = os.path.realpath(os.path.expanduser("~"))
 RUNS = os.path.expanduser("~/gov-os-runs")
 WORKTREES = os.path.realpath(os.path.expanduser("~/gov-os-worktrees"))
 SCRATCH = "/tmp"
+SHM = "/dev/shm"  # the memory-backed scratch the project's locks use (gov-os-W2-76-held.lock): scratch, like /tmp
 CTO_WBS = "W2-00"  # the coordination ticket whose orchestrator session is the CTO
 MOST_GLOB = 20000  # the paths one rm glob may name that the guard checks
 # rm in a command the scan cannot read (ACT-GUARD-FIX-4): its words up to the next ; & | ) or newline.
@@ -104,8 +110,18 @@ def bash_writes_of(command, cwd):
                                              for raw, full in _targets if raw != SENT and full])
 
 
+_ROOTS = {}
+
+
 def tree_roots(root):
-    """This tree, every worktree of its repository, and the run clones under ~/gov-os-runs (W2-84's every tree)."""
+    """This tree, every worktree of its repository, and the run clones under ~/gov-os-runs (W2-84's every tree).
+    Found once per call of the hook (ACT-GUARD-FIX-4)."""
+    if root not in _ROOTS:
+        _ROOTS[root] = _tree_roots(root)
+    return _ROOTS[root]
+
+
+def _tree_roots(root):
     roots = [os.path.realpath(root)]
 
     def worktrees(repo):
@@ -132,29 +148,46 @@ def tree_roots(root):
     return list(dict.fromkeys(roots))
 
 
-def review_may_write(path, root, cwd):
-    """Rule 5: a reviewer's or auditor's write lands only in its record paths, its own scratch, or /tmp."""
+def review_may_write(path, root, cwd, made=()):
+    """Rule 5: a reviewer's or auditor's write lands only in its record paths, its own scratch, or /tmp. A record
+    folder itself only when the command makes it (``made``: mkdir's folders, none of them deleted; ACT-GUARD-FIX-4),
+    so ``mkdir -p <records> && cat > <records>/<its record>`` passes and ``rm -rf <records>`` does not."""
     if not isinstance(path, str) or not path:
         return False
     full = os.path.realpath(os.path.join(cwd, os.path.expanduser(path)))
     for tree in tree_roots(root):  # inside any tree of this repository: only the record paths
         rel = os.path.relpath(full, tree)
         if rel == "." or not rel.startswith(".."):
-            return any(rel.startswith(p) for p in REVIEW_PATHS)
+            if any(rel.startswith(p) for p in REVIEW_PATHS):
+                return True
+            return rel in (p.rstrip("/") for p in REVIEW_PATHS) and full in made
     return full == "/tmp" or full.startswith("/tmp/")
+
+
+def bash_made(command, cwd):
+    """The folders a Bash command makes with mkdir and does not delete with rm, real paths (ACT-GUARD-FIX-4, rule 5);
+    none when the scan cannot read the command."""
+    judged = bash_judgement(command, cwd)
+    if judged is None:
+        return set()
+    gone = {os.path.realpath(p) for _w, p, how in judged.deletes if how == "names"}
+    return {os.path.realpath(p) for p in judged.made} - gone
 
 
 # -- rm: free but for the catastrophic (ACT-GUARD-FIX-4, DEC-1050 (8)) ------------------------------------------
 
 def main_tree(root):
-    """The repository's main working tree: the folder of the common .git of the tree at ``root``."""
-    try:
-        out = subprocess.run(["git", "-C", root, "rev-parse", "--path-format=absolute", "--git-common-dir"],
-                             capture_output=True, text=True, timeout=5).stdout.strip()
-    except Exception:
-        out = ""
-    if out and os.path.basename(out.rstrip("/")) == ".git":
-        return os.path.realpath(os.path.dirname(out.rstrip("/")))
+    """The repository's main working tree: the folder of the common .git of the tree at ``root``, else of the tree
+    this hook file lives in (a session whose folder git cannot read, a removed worktree: its rm is not refused for
+    that alone), else ``root``."""
+    for where in (root, os.path.dirname(os.path.abspath(__file__))):
+        try:
+            out = subprocess.run(["git", "-C", where, "rev-parse", "--path-format=absolute", "--git-common-dir"],
+                                 capture_output=True, text=True, timeout=5).stdout.strip()
+        except Exception:
+            out = ""
+        if out and os.path.basename(out.rstrip("/")) == ".git":
+            return os.path.realpath(os.path.dirname(out.rstrip("/")))
     return os.path.realpath(root)
 
 
@@ -174,7 +207,7 @@ def located(path, trailing):
 def holders(main):
     """The folders whose deletion, or the deletion of a folder above them, is catastrophic."""
     return [main, os.path.join(main, ".git"), os.path.join(main, ".gov-runtime", "scratch"), WORKTREES,
-            os.path.realpath(RUNS), SCRATCH, HOME]
+            os.path.realpath(RUNS), SCRATCH, SHM, HOME]
 
 
 def delete_refusal(path, main, strict):
@@ -189,10 +222,10 @@ def delete_refusal(path, main, strict):
         return None
     if inside(path, main):
         return None  # the main tree's tracked files: checked together, below
-    if inside(path, WORKTREES) or inside(path, os.path.realpath(RUNS)) or inside(path, SCRATCH):
+    if inside(path, WORKTREES) or inside(path, os.path.realpath(RUNS)) or inside(path, SCRATCH) or inside(path, SHM):
         return None
     return (f"{path} is outside the project (the main tree, ~/gov-os-worktrees/, ~/gov-os-runs/) and its scratch "
-            "(/tmp, .gov-runtime/scratch/)")
+            "(/tmp, /dev/shm, .gov-runtime/scratch/)")
 
 
 def tracked_in(main, paths):
@@ -292,6 +325,19 @@ def under_acceptance(path, root, cwd):
     return rel == ACCEPTANCE.rstrip("/") or rel.startswith(ACCEPTANCE)
 
 
+def in_a_trees_tests(path, root, cwd):
+    """A path in the acceptance tests of a tree of this repository (ACT-GUARD-FIX-4): this tree, its worktrees and
+    run clones (tree_roots), or any folder under ~/gov-os-worktrees/ or ~/gov-os-runs/ (the homes of the project's
+    trees, a removed one included); not a scratch folder elsewhere whose name holds tests/acceptance (row 81)."""
+    if not isinstance(path, str) or not path:
+        return False
+    full = os.path.realpath(os.path.join(cwd, os.path.expanduser(path)))
+    if any(under_acceptance(full, tree, cwd) for tree in tree_roots(root)):
+        return True
+    homes = (WORKTREES, os.path.realpath(RUNS))
+    return any(inside(full, h) for h in homes) and "/tests/acceptance/" in full + "/"
+
+
 def main():
     signal.signal(signal.SIGALRM, deadline)
     signal.alarm(20)
@@ -334,14 +380,16 @@ def main():
     # Rule 5, reviewers and auditors write only their own outcomes. A Bash write whose target the guard cannot work
     # out is let through (ACT-GUARD-FIX-4, G-2): a stray write shows in the reviewed tree's git status.
     if acting in REVIEWERS or role in REVIEWERS:
-        targets = []
+        targets, made = [], set()
         if tool in WRITE_TOOLS:
             targets = [tin.get("file_path") or tin.get("notebook_path")]
         elif command is not None:
             targets = bash_writes_of(command, cwd)[0]  # the shell's own writes: rule 5 never read code
-        if targets and not all(review_may_write(t, root, cwd) for t in targets):
+            made = bash_made(command, cwd)
+        if targets and not all(review_may_write(t, root, cwd, made) for t in targets):
             answer("deny", "a reviewer or auditor writes only its own review or audit record (docs/probes/, "
-                           "docs/audit/, docs/assessment/), its own scratch, or /tmp")
+                           "docs/audit/, docs/assessment/, .gov-runtime/scratch/orchestrator/reviews/), its own "
+                           "scratch, or /tmp")
 
     # Rule 1, acceptance tests: written only by the independent test designer. A Bash write whose target the guard
     # cannot work out is let through (ACT-GUARD-FIX-4, G-1): the landing refuses a commit touching the tests
@@ -352,9 +400,11 @@ def main():
             targets = [tin.get("file_path") or tin.get("notebook_path")]
         elif command is not None:
             targets, code = bash_writes_of(command, cwd)
-        # Code's resolved writes into any tree's acceptance tests refuse too, as since ACT-GUARD-FIX-3.
+        # Code's resolved writes into any tree's acceptance tests refuse too, as since ACT-GUARD-FIX-3; a tree of this
+        # repository (tree_roots), not any folder whose name holds tests/acceptance (ACT-GUARD-FIX-4: row 81, a
+        # scratch repository in /tmp).
         if any(under_acceptance(t, root, cwd) for t in targets + code) or \
-                any("/tests/acceptance/" in os.path.normpath(t) + "/" for t in code):
+                any(in_a_trees_tests(t, root, cwd) for t in code):
             answer("deny", "only the independent test designer writes the acceptance tests (MR-3)")
 
     # Rule 4, installs.

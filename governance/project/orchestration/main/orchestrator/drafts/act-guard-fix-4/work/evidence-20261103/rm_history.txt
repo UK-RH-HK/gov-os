@@ -1,0 +1,2 @@
+804 transcripts, 562 distinct Bash calls with an rm word; 452 with rm operands read, 2 unreadable (crude scan), 0 crashed; refused 1; slowest 0.02 s; total 1 s
+  REFUSED: 'F=$HOME/.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov-reranker-cpu.pth; WANT=\'import os; os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # Gov O' | cwd /home/usain/gov-os-operator | /home/usain/.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov-reranker-cpu.pth is outside the project (the main tree, ~/gov

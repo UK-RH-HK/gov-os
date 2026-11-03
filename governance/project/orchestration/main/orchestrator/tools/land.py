@@ -15,7 +15,10 @@ batch, no baseline clone, 3 rounds only for the cases tools/load_sensitive.txt n
 baseline, is no longer used: given, it is named and left out), and for every
 ticket the run landed: its close record (governance/project/orchestration/closes/<W2>-<id>.md, citing the queue's
 record), `tk close <id>` and one commit (Task: <id>, Implements: DEC-953, DEC-989, DEC-1050, Role: orchestrator). No ticket
-sits merged but not closed. --check: step 1 only.
+sits merged but not closed. Then, when the run landed a ticket, R1-21 (DEC-1052): tools/structural_pass.py on the new
+head (base: the head before the run), its lines in this landing's log, and one inbox item
+(dispatch/inbox/<YYYYmmdd-HHMMSS>-structural-notice.txt) when a family is not ok or the pass could not run: a notice
+to the CTO, never a refusal; it changes no exit code. --check: step 1 only.
 Exit: the queue's (0 all landed and closed; 3 some ejected; 4 the run stopped), 2 a pre-check refused, 6 a ticket
 landed but its close step failed (fix at once).
 """
@@ -49,6 +52,9 @@ TEST_ROLES = ("independent-test-designer", "owner")  # G-1 (DEC-1050 (12)): who 
 G1_COUNT = {}  # commit -> how many of its range's commits change tests/acceptance/ (the close record's line)
 BASE_WHY = ("the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's "
             "cases (Q-1, DEC-1050)")
+STRUCTURAL = ORCH / "tools/structural_pass.py"  # R1-21 (DEC-1052): the structural pass after a landing, a notice only
+STRUCTURAL_BOUND = 150  # s: the whole pass (each check is bounded at 50 s inside it; measured 8.5 s on 11-03)
+INBOX = ORCH / "dispatch/inbox"  # the dispatcher's inbox: the same item form (log:, a kind line, status:)
 
 
 def sh(cmd, **kw):
@@ -204,6 +210,51 @@ def strays(queue, names):
     return sorted(p.stem for p in (Path(queue) / "approved").glob("*.json") if p.stem not in set(names))
 
 
+def inbox_item(name, body):
+    """One item in the dispatcher's inbox, as the dispatcher writes them: <YYYYmmdd-HHMMSS>-<name>.txt, never
+    overwritten (-2, -3, ... for a name used twice in one second)."""
+    INBOX.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    item, n = INBOX / f"{stamp}-{name}.txt", 1
+    while True:
+        try:
+            with open(item, "x") as f:
+                f.write(body)
+            return item
+        except FileExistsError:
+            n += 1
+            item = INBOX / f"{stamp}-{name}-{n}.txt"
+
+
+def structural_notice(base, landed):
+    """R1-21 (DEC-1052): the structural pass on the new head, its lines in this landing's log (standard output), and
+    one inbox item when a family is not ok or the pass could not run. A notice only: never raises, refuses nothing."""
+    try:
+        r = sh([sys.executable, str(STRUCTURAL), str(ROOT), base], timeout=STRUCTURAL_BOUND)
+        rc, out = r.returncode, (r.stdout or "").strip() or (r.stderr or "").strip()[-300:]
+    except Exception as e:  # a notice step: whatever goes wrong is named, and the landing's outcome stands
+        rc, out = None, (f"the pass did not end within {STRUCTURAL_BOUND} s" if type(e).__name__ == "TimeoutExpired"
+                         else f"the pass could not start: {type(e).__name__}: {e}")
+    for line in out.splitlines():
+        print(f"structural pass: {line}", flush=True)
+    last = (out.splitlines() or ["no output"])[-1]
+    if rc == 0 and "NOTICE" not in out:
+        return None
+    try:
+        log = os.readlink("/proc/self/fd/1")  # the dispatcher's land-dispatch-<stamp>.out, when it started us
+    except OSError:
+        log = "land.py's output"
+    status = last if rc == 0 else f"the structural pass could not run (exit {rc}): {last}"
+    try:
+        item = inbox_item("structural-notice", f"log: {log}\nStructural: after the landing of {', '.join(landed)} "
+                          f"(base {base[:12]})\nstatus: {status[:300]}\n\n{out}\n")
+        print(f"structural pass: notice -> inbox/{item.name}", flush=True)
+        return item
+    except OSError as e:
+        print(f"structural pass: the inbox item could not be written: {e}", flush=True)
+        return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("tickets", nargs="+")
@@ -256,11 +307,12 @@ def main():
             if r.returncode:
                 sys.exit(f"{i['w2']}: merge_queue {cmd[0]} failed: {r.stderr.strip()[:300]}")
     started = time.strftime("%F %T")
-    extra = ["--warm", str(WARM), "--integration-store", str(STORE), "--nightly-log", str(NIGHTLY),
+    before = git("rev-parse", INTEGRATION)  # R1-21: the structural pass's base (its portability is for the change)
+    extra =["--warm", str(WARM), "--integration-store", str(STORE), "--nightly-log", str(NIGHTLY),
              "--nightly-junit", str(JUNIT), "--rounds", "1", "--load-sensitive", str(LOAD_SENSITIVE)]
     run = subprocess.run([sys.executable, str(MQ), "run", "--repo", str(ROOT), "--queue", str(QUEUE), *extra])
     print(f"queue run exit {run.returncode}", flush=True)
-    failed_close = False
+    failed_close, landed_now = False, []
     for i in items:
         lf = QUEUE / "landed" / f"{i['w2']}.json"
         if not lf.is_file():
@@ -272,6 +324,7 @@ def main():
         if landed.get("landed_at", "") < started or landed["commit"] != i["commit"]:  # both "%Y-%m-%d %H:%M:%S"
             print(f"{i['w2']}: its landed entry is not this run's; not closed here", flush=True)
             continue
+        landed_now.append(i["w2"])
         rec = json.loads(Path(landed["record"]).read_text())
         out = ROOT / "governance/project/orchestration/closes" / f"{i['w2']}-{i['tid']}.md"
         out.write_text(close_record(i["w2"], i["tid"], i["profile"], landed, rec, i["review"], BASE_WHY, i["g1"]))
@@ -291,6 +344,8 @@ def main():
         (QUEUE / "closed").mkdir(exist_ok=True)
         lf.rename(QUEUE / "closed" / lf.name)
         print(f"CLOSED {i['w2']}: {git('log', '--oneline', '-1')}", flush=True)
+    if landed_now:  # R1-21 (DEC-1052): the new head (its close commits included), a notice only
+        structural_notice(before, landed_now)
     sys.exit(6 if failed_close else run.returncode)
 
 

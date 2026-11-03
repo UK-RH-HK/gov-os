@@ -1,0 +1,55 @@
+ok   rule1 engineer Write acceptance: want deny, got deny
+ok   rule1 engineer bash redirect acceptance: want deny, got deny
+ok   rule1 orchestrator Edit acceptance: want deny, got deny
+ok   rule1 test designer Write acceptance: want allow, got allow
+ok   rule2 measured role reads hidden: want deny, got deny
+ok   rule2 held-out named: want deny, got deny
+ok   rule2 measured role reads hidden in another worktree: want deny, got deny
+ok   rule2 measured role reads hidden in a run clone: want deny, got deny
+ok   rule2 measured role reads hidden in the main tree: want deny, got deny
+ok   rule5 auditor writes its probe record: want allow, got allow
+ok   rule5 auditor writes its audit report: want allow, got allow
+ok   rule5 auditor bash writes its record: want allow, got allow
+ok   rule5 auditor writes /tmp: want allow, got allow
+ok   rule5 auditor edits code: want deny, got deny
+ok   rule5 auditor writes a test: want deny, got deny
+ok   rule5 auditor edits a ticket: want deny, got deny
+ok   rule5 auditor edits the register: want deny, got deny
+ok   rule5 auditor edits a lead handover: want deny, got deny
+ok   rule5 auditor bash writes code: want deny, got deny
+FAIL rule5 auditor unreadable bash: want deny, got allow | 
+ok   rule5 auditor reads code: want allow, got allow
+ok   rule3 read .env: want deny, got deny
+ok   rule3 cat ssh key: want deny, got deny
+ok   rule4 engineer pip install: want deny, got deny
+ok   rule4 CTO (orchestrator on W2-00) pip install: want ask, got ask
+ok   rule4 lead (orchestrator on W2-87) pip install: want deny, got deny
+ok   rule4 lead (orchestrator on W2-64) npm install: want deny, got deny
+ok   rule4 CTO's engineer subagent pip install: want deny, got deny
+ok   rule4 sudo: want deny, got deny
+ok   lifted heredoc to tmp: want allow, got allow
+ok   lifted engineer writes src: want allow, got allow
+ok   lifted var write target: want allow, got allow
+ok   lifted backticks: want allow, got allow
+ok   lifted inline python braces: want allow, got allow
+ok   lifted rm: want allow, got allow
+ok   lifted engineer reads acceptance: want allow, got allow
+ok   lifted CronCreate: want allow, got allow
+ok   lifted general-purpose subagent write: want allow, got allow
+ok   dec958 engineer runs its acceptance tests: want allow, got allow
+ok   dec958 lead lists acceptance folders: want allow, got allow
+ok   dec958 lead greps acceptance through a pipe: want allow, got allow
+ok   dec958 lead greps a conftest with an alternation: want allow, got allow
+ok   dec958 CTO builds a brief naming the acceptance path: want allow, got allow
+ok   dec958 auditor runs git log: want allow, got allow
+ok   dec958 auditor runs the tests: want allow, got allow
+ok   dec958 engineer inline python writes acceptance: want deny, got deny
+ok   fix2 lead import check then lists acceptance: want allow, got allow
+ok   fix2 lead import check then greps acceptance: want allow, got allow
+FAIL fix2 engineer inline python writes acceptance after a cd: want deny, got allow | 
+FAIL fix2 engineer perl -i on acceptance: want deny, got allow | 
+FAIL fix2 unbalanced quotes naming acceptance: want deny, got allow | 
+ok   dec958 engineer tee into acceptance: want deny, got deny
+ok   dec958 engineer sed -i acceptance: want deny, got deny
+ok   dec958 engineer cp into acceptance: want deny, got deny
+FAIL

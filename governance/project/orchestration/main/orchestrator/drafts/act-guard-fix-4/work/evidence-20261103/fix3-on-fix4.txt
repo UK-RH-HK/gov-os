@@ -1,0 +1,1416 @@
+bringing up nodes...
+bringing up nodes...
+
+.....................................F.......FF....FFF..........F..F.... [ 26%]
+.....F........FF...................F..F....F..F....F...F.....F...F....F. [ 53%]
+.F...F..........F....F.......F..F.......FF.....FF..F.........FFFFF.FF.FF [ 80%]
+FFFFFFF..FF..FF.................s........FF...........                   [100%]
+=================================== FAILURES ===================================
+_ test_case[guard4: fix2 engineer inline python writes acceptance after a cd] __
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 engineer inline python writes acceptance after a cd'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'cd /tmp && python3 -c \'open("tests/acceptance/W2-64/t.py", "w")\''}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 engineer inline python writes acceptance after a cd: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_______________ test_case[guard4: rule5 auditor unreadable bash] _______________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: rule5 auditor unreadable bash', role = 'independent-auditor'
+tool = 'Bash', tin = {'command': 'mkdir -p $D/t'}, want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: rule5 auditor unreadable bash: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________ test_case[guard4: fix2 engineer perl -i on acceptance] ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 engineer perl -i on acceptance', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 engineer perl -i on acceptance: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______________ test_case[fix3 python heredoc rebinding by a loop] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc rebinding by a loop', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\np = '/tmp/x'\nfor p in ['tests/acceptance/W2-64/t.py']:\n    pass\nopen(p, 'w')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc rebinding by a loop: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________ test_case[fix3 python heredoc write inside a function] ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc write inside a function', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\ndef w(p):\n    open(p, 'w').write('x')\nw('tests/acceptance/W2-64/t.py')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc write inside a function: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________ test_case[guard4: fix2 unbalanced quotes naming acceptance] __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'guard4: fix2 unbalanced quotes naming acceptance', role = 'engineer'
+tool = 'Bash', tin = {'command': 'python3 -c \'open("tests/acceptance/x" ; ls'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: guard4: fix2 unbalanced quotes naming acceptance: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_______________ test_case[fix3 python heredoc global rebinding] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python heredoc global rebinding', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\np = '/tmp/x'\ndef f():\n    global p\n    p = 'tests/acceptance/W2-64/t.py'\nf()\nopen(p, 'w')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python heredoc global rebinding: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___ test_case[fix3 unterminated heredoc naming acceptance judged as before] ____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 unterminated heredoc naming acceptance judged as before'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c \'open("tests/acceptance/W2-64/t.py", "w")\' <<EOF\nx'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 unterminated heredoc naming acceptance judged as before: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________________________ test_case[fix3 python -c exec] ________________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c exec', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "exec(\\"open(\'tests/acceptance/W2-64/t.py\',\'w\')\\")"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c exec: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________________ test_case[fix3 unquoted shell heredoc] ____________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 unquoted shell heredoc', role = 'engineer', tool = 'Bash'
+tin = {'command': 'bash <<EOF\ntouch tests/acceptance/W2-64/t.py\nEOF'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 unquoted shell heredoc: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________ test_case[fix3 node -e naming acceptance (as before)] _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 node -e naming acceptance (as before)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'node -e "require(\'fs\').writeFileSync(\'tests/acceptance/W2-64/t.py\', \'x\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 node -e naming acceptance (as before): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_____________ test_case[fix3 variable used before its assignment] ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable used before its assignment', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'echo x > $D/t.py; D=/tmp  # tests/acceptance/'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable used before its assignment: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________________ test_case[fix3 perl heredoc naming acceptance] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 perl heredoc naming acceptance', role = 'engineer', tool = 'Bash'
+tin = {'command': "perl <<'EOF'\nopen(F, '>tests/acceptance/W2-64/t.py');\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 perl heredoc naming acceptance: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__________________ test_case[fix3 variable assigned in an if] __________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable assigned in an if', role = 'engineer', tool = 'Bash'
+tin = {'command': 'if true; then D=tests/acceptance/W2-64; fi; echo x > $D/t.py'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable assigned in an if: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________ test_case[fix3 patch from stdin in a command naming the tests] ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 patch from stdin in a command naming the tests', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'git diff -- tests/acceptance/W1-05/ > /tmp/gov-fix3-d.patch; patch -p1 -R < /tmp/gov-fix3-d.patch'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 patch from stdin in a command naming the tests: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_______________ test_case[fix3 variable read from a here-string] _______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable read from a here-string', role = 'engineer', tool = 'Bash'
+tin = {'command': 'read D <<< tests/acceptance/W2-64; echo x > $D/t.py'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable read from a here-string: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_______________ test_case[fix3 python -c getattr(os, 'remove')] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 python -c getattr(os, 'remove')", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "import os; getattr(os, \'remove\')(\'tests/acceptance/W2-64/t.py\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c getattr(os, 'remove'): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______ test_case[fix3 python -c unknown function handed a list of tests] _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c unknown function handed a list of tests'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "import mylib; ps = [\'tests/acceptance/W2-64/t.py\']; mylib.rewrite(ps)"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c unknown function handed a list of tests: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_____________________ test_case[fix3 variable then source] _____________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 variable then source', role = 'engineer', tool = 'Bash'
+tin = {'command': 'D=/tmp; . /tmp/gov-fix3-env.sh; echo x > $D/t.py  # tests/acceptance/'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 variable then source: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________ test_case[fix3 python -c unknown function handed a test] ___________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c unknown function handed a test', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import mylib; mylib.save_case(\'tests/acceptance/W2-64/t.py\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c unknown function handed a test: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________ test_case[fix3 assignment in a pipeline is a subshell's] ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 assignment in a pipeline is a subshell's", role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'D=/tmp | true; echo x > $D/t.py  # tests/acceptance/'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 assignment in a pipeline is a subshell's: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______________ test_case[fix3 python -c io.FileIO handed a test] _______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 python -c io.FileIO handed a test', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import io; io.FileIO(\'tests/acceptance/W2-64/t.py\', \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 python -c io.FileIO handed a test: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________________ test_case[r2 F2 repro 2: cd, then bash name] _________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 repro 2: cd, then bash name', role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\ncd /tmp && bash gov-fix3-s.sh"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 repro 2: cd, then bash name: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__ test_case[fix3 while read loop rm (target unresolvable, names the tests)] ___
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'fix3 while read loop rm (target unresolvable, names the tests)'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'while read f; do rm "$f"; done <<\'EOF\'\ntests/acceptance/W2-64/t.py\nEOF'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 while read loop rm (target unresolvable, names the tests): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_____________ test_case[r2 F2 repro 4: chmod +x, cd, then ./name] ______________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 repro 4: chmod +x, cd, then ./name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nchmod +x /tmp/gov-fix3-s.sh && cd /tmp && ./gov-fix3-s.sh"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 repro 4: chmod +x, cd, then ./name: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______ test_case[fix3 git apply -R of a test's diff (differential #146)] _______
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "fix3 git apply -R of a test's diff (differential #146)"
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'P=/tmp/gov-fix3-c.patch && git diff -- tests/acceptance/W1-05/conftest.py > $P && git apply -R $P'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: fix3 git apply -R of a test's diff (differential #146): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________ test_case[r2 F2 written after a cd, run by bash name] _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 written after a cd, run by bash name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cd /tmp && cat > gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nbash ./gov-fix3-s.sh"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 written after a cd, run by bash name: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________________ test_case[r2 F2 a python file run by runpy] __________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by runpy', role = 'engineer', tool = 'Bash'
+tin = {'command': 'cat > /tmp/gov-fix3-s.py <<\'EOF\'\nopen(\'tests/acceptance/f\',\'w\')\nEOF\npython3 -c "import runpy; runpy.run_path(\'/tmp/gov-fix3-s.py\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by runpy: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______ test_case[r2 F2 a python file that changes folder into the tests] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file that changes folder into the tests'
+role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('f','w')\nEOF\npython3 /tmp/gov-fix3-s.py"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file that changes folder into the tests: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______________ test_case[r2 F2 a python file run by exec(open())] ______________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by exec(open())', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'cat > /tmp/gov-fix3-s.py <<\'EOF\'\nopen(\'tests/acceptance/f\',\'w\')\nEOF\npython3 -c "exec(open(\'/tmp/gov-fix3-s.py\').read())"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by exec(open()): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_ test_case[r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)'
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'cp /tmp/x \\\n  tests/acceptance/f; echo "unclosed'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F3 a continued write in a command the scan cannot read (as before, on both spellings): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________________ test_case[r2 F2 a python file run by uv run] _________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a python file run by uv run', role = 'engineer', tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nuv run /tmp/gov-fix3-s.py"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a python file run by uv run: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__________________ test_case[r2 F4 Path.glob then write_text] __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 Path.glob then write_text', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.py'):\n    p.write_text('')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 Path.glob then write_text: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________ test_case[r2 F4 os.chdir into the tests then open w (heredoc)] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into the tests then open w (heredoc)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('x', 'w')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into the tests then open w (heredoc): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________ test_case[r2 F4 listdir then os.remove(os.path.join)] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 listdir then os.remove(os.path.join)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n    os.remove(os.path.join(root, f))\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 listdir then os.remove(os.path.join): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________________ test_case[r2 F4 tempfile.mkdtemp in the tests] ________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 tempfile.mkdtemp in the tests', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport tempfile\ntempfile.mkdtemp(dir='tests/acceptance')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 tempfile.mkdtemp in the tests: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________ test_case[r2 F2 a file with no #! line run by its name] ____________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F2 a file with no #! line run by its name', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nchmod +x /tmp/gov-fix3-s.py; /tmp/gov-fix3-s.py"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F2 a file with no #! line run by its name: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________________ test_case[r2 F4 Path.glob then unlink] ____________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 Path.glob then unlink', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.pyc'):\n    p.unlink()\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 Path.glob then unlink: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__________ test_case[r2 F4 os.chdir into the tests then open w (-c)] ___________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into the tests then open w (-c)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import os; os.chdir(\'tests/acceptance\'); open(\'x\', \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into the tests then open w (-c): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+______________ test_case[r2 F4 listdir then os.remove(f-string)] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 listdir then os.remove(f-string)', role = 'engineer'
+tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n    os.remove(f'{root}/{f}')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 listdir then os.remove(f-string): want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________________ test_case[r2 F4 -c: a path built by %] ____________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: a path built by %', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "p = \'tests/%s/f\' % \'acceptance\'; open(p, \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by %: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________________ test_case[r2 F4 -c: a path built by ''.join] _________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 -c: a path built by ''.join", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(\'\'.join([\'tests/\', \'acceptance/\', \'f\']), \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by ''.join: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+____________________ test_case[r2 F4 rglob then write_text] ____________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 rglob then write_text', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport re, pathlib\nfor p in pathlib.Path('tests/acceptance').rglob('*.py'):\n    s = p.read_text()\n    p.write_text(re.sub('a', 'b', s))\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 rglob then write_text: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7ed0a5f2cb70>('deny')
+E        +    where <built-in method startswith of str object at 0x7ed0a5f2cb70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________ test_case[r2 F4 perl -e naming the folder with no slash] ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 perl -e naming the folder with no slash', role = 'engineer'
+tool = 'Bash', tin = {'command': "perl -pi -e 's/a/b/' tests/acceptance"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 perl -e naming the folder with no slash: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_________ test_case[r2 F4 os.chdir into tests then open acceptance/f] __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.chdir into tests then open acceptance/f', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import os; os.chdir(\'tests\'); open(\'acceptance/f\', \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.chdir into tests then open acceptance/f: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________________ test_case[r2 F4 os.walk then os.remove] ____________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 os.walk then os.remove', role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nfor r, d, fs in os.walk('tests/acceptance'):\n    for f in fs:\n        os.remove(os.path.join(r, f))\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 os.walk then os.remove: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e4cd77d0d20>('deny')
+E        +    where <built-in method startswith of str object at 0x7e4cd77d0d20> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+________________ test_case[r2 F4 -c: a path built by '/'.join] _________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 -c: a path built by '/'.join", role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(\'/\'.join([\'tests\', \'acceptance\', \'f\']), \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built by '/'.join: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_ test_case[r2 F4 a variable the command sets for Python is not the session's] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "r2 F4 a variable the command sets for Python is not the session's"
+role = 'engineer', tool = 'Bash'
+tin = {'command': 'HOME=tests/acceptance python3 -c "import os; open(os.environ[\'HOME\'] + \'/f\', \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 a variable the command sets for Python is not the session's: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__________________ test_case[r2 F4 -c: a path built with chr] __________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: a path built with chr', role = 'engineer', tool = 'Bash'
+tin = {'command': 'python3 -c "open(chr(116) + \'ests/acceptance/f\', \'w\')"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: a path built with chr: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+___________ test_case[r2 F4 -c: glob.glob of the tests then open w] ____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 -c: glob.glob of the tests then open w', role = 'engineer'
+tool = 'Bash'
+tin = {'command': 'python3 -c "import glob; [open(p, \'w\') for p in glob.glob(\'tests/accept*/*\')]"'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 -c: glob.glob of the tests then open w: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7f484a000ae0>('deny')
+E        +    where <built-in method startswith of str object at 0x7f484a000ae0> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+__ test_case[r2 F4 code that changes os.environ is not read from the session] __
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'r2 F4 code that changes os.environ is not read from the session'
+role = 'engineer', tool = 'Bash'
+tin = {'command': "python3 - <<'EOF'\nimport os\nos.environ['HOME'] = 'tests/acceptance'\nopen(os.environ['HOME'] + '/f', 'w')\nEOF"}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: r2 F4 code that changes os.environ is not read from the session: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x750620d5ce70>('deny')
+E        +    where <built-in method startswith of str object at 0x750620d5ce70> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_ test_case[row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests'
+role = 'orchestrator', tool = 'Bash'
+tin = {'command': 'n="tests/acceptance/W1-33/t.py::x"; out=$(python3 -m pytest -q "$n" 2>&1); python3 - "$n" <<EOF\nimport sys\nprint(\'\'\'$(echo "$out" | sed "s/\'/ /g")\'\'\', sys.argv[1])\nEOF'}
+want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x76e35febcc90>('deny')
+E        +    where <built-in method startswith of str object at 0x76e35febcc90> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+_ test_case[row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+name = "row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place"
+role = 'independent-auditor', tool = 'Bash'
+tin = {'command': 'cd /tmp && rm -f gov-fix3-nothing-*.json'}, want = 'deny'
+
+    @pytest.mark.parametrize("name,role,tool,tin,want", ALL, ids=[c[0] for c in ALL])
+    def test_case(name, role, tool, tin, want):
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        got, why = _hook(role, tool, tin, agent=agent)
+>       assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
+E       AssertionError: row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place: want deny, got allow ()
+E       assert ('allow' == 'deny'
+E         
+E         - deny
+E         + allow or ('deny' == 'deny'
+E         
+E           deny and False))
+E        +  where False = <built-in method startswith of str object at 0x7e12a9d38d80>('deny')
+E        +    where <built-in method startswith of str object at 0x7e12a9d38d80> = 'allow'.startswith
+
+../../../tools/test_guard_fix_3.py:517: AssertionError
+=========================== short test summary info ============================
+FAILED ../../../tools/test_guard_fix_3.py::test_case[guard4: fix2 engineer inline python writes acceptance after a cd]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[guard4: rule5 auditor unreadable bash]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[guard4: fix2 engineer perl -i on acceptance]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python heredoc rebinding by a loop]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python heredoc write inside a function]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[guard4: fix2 unbalanced quotes naming acceptance]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python heredoc global rebinding]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 unterminated heredoc naming acceptance judged as before]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python -c exec] - A...
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 unquoted shell heredoc]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 node -e naming acceptance (as before)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 variable used before its assignment]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 perl heredoc naming acceptance]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 variable assigned in an if]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 patch from stdin in a command naming the tests]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 variable read from a here-string]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python -c getattr(os, 'remove')]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python -c unknown function handed a list of tests]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 variable then source]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python -c unknown function handed a test]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 assignment in a pipeline is a subshell's]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 python -c io.FileIO handed a test]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 repro 2: cd, then bash name]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 while read loop rm (target unresolvable, names the tests)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 repro 4: chmod +x, cd, then ./name]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[fix3 git apply -R of a test's diff (differential #146)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 written after a cd, run by bash name]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 a python file run by runpy]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 a python file that changes folder into the tests]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 a python file run by exec(open())]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 a python file run by uv run]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 Path.glob then write_text]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 os.chdir into the tests then open w (heredoc)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 listdir then os.remove(os.path.join)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 tempfile.mkdtemp in the tests]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F2 a file with no #! line run by its name]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 Path.glob then unlink]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 os.chdir into the tests then open w (-c)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 listdir then os.remove(f-string)]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 -c: a path built by %]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 -c: a path built by ''.join]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 rglob then write_text]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 perl -e naming the folder with no slash]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 os.chdir into tests then open acceptance/f]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 os.walk then os.remove]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 -c: a path built by '/'.join]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 a variable the command sets for Python is not the session's]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 -c: a path built with chr]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 -c: glob.glob of the tests then open w]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[r2 F4 code that changes os.environ is not read from the session]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[row 46 (left refused): an unquoted Python heredoc the shell rewrites, in a command naming the tests]
+FAILED ../../../tools/test_guard_fix_3.py::test_case[row 39 (left refused): an auditor's rm of an unmatched glob, which the product's parser cannot place]
+53 failed, 216 passed, 1 skipped in 4.62s

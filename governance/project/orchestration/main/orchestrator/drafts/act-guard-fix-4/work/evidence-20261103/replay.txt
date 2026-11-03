@@ -1,0 +1,29 @@
+87 logged refusals replayed (rule, today's hook, fix-4):
+   ('rule 1', 'allow', 'allow') 55
+   ('rule 1', 'deny', 'allow') 4
+   ('rule 1', 'deny', 'deny') 2
+   ('rule 2', 'allow', 'allow') 1
+   ('rule 2', 'deny', 'deny') 11
+   ('rule 3', 'allow', 'allow') 1
+   ('rule 5', 'allow', 'allow') 10
+   ('rule 5', 'deny', 'allow') 3
+  rule 1: logged 61, refused today 6, refused by fix-4 2
+  rule 5: logged 13, refused today 3, refused by fix-4 0
+  rule 2: logged 12, refused today 11, refused by fix-4 11
+  rule 3: logged 1, refused today 0, refused by fix-4 0
+refused by fix-4:
+   row 64 rule 1 independent-auditor | sudo is refused to every session (DEC-953 item 2) | the round-1 reviewer's probe script written by heredoc into its own temp folder; the body names a test path as
+   row 65 rule 1 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | the guard-fix round-2 engineer's command in the CTO's scratch drafts (no acceptance write); ACT-GUARD-FIX-3's 
+   row 73 rule 2 engineer | the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC | W2-112's engineer: a find over every worktree to depth 6 can reach the hidden half of an evaluation set; refus
+   row 74 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | python3 heredoc editing heavy_slot.candidate.sh by literal path (CTO gitleaks engineer); the heredoc pattern o
+   row 77 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | W2-126 engineer's wait loop: grep on one literal task-output path inside for i in $(seq ...); the guard took t
+   row 78 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | LB engineer: python3 heredoc editing a file of its own worktree by literal path; heredoc pattern (P1-GUARD-PAR
+   row 79 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | gitleaks engineer: cat >> heredoc appending the brief's Fix note to the incident record; heredoc pattern (P1-G
+   row 80 rule 2 engineer | the call reads the hidden part of an evaluation set that measures this session, which is refused to it (DEC-820 (d), DEC | re-labelled by the CTO on the W2-42a engineer's word: its compound command also ran ls on the hidden folder by
+   row 82 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | W2-42a engineer: python3 heredoc editing its own unit test (heredoc pattern)
+   row 83 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | W2-42a engineer: a quoted 'for ...' argument to its debug script read as a run-time listing
+   row 84 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | LB engineer: grep -n on its own README by literal path; an apostrophe inside a double-quoted pattern misread a
+   row 85 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | W2-42a engineer: for i in $(seq 1 57) wait loop grepping one literal file (the seq pattern, fixed by W2-42a)
+   row 86 rule 2 engineer | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a | W2-42a engineer: cat >> heredoc appending to its own evidence file (the heredoc pattern W2-42a fixes); worked 
+passed by fix-4, refused today: [39, 46, 71, 72, 75, 76, 81]
+refused by fix-4, passed today: []
