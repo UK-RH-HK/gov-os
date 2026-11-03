@@ -374,3 +374,18 @@ No expectation, assertion, pass line or threshold changes. In the designer's san
 `gov.codeintel` cannot create `/tmp/gov-cbm-1000/…` (read-only file system). The code case above is one of them; the
 lead runs it. Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from
 the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model [CAP-57.a] | `test_w1_20_records.py::test_a_chain_is_followed_to_the_depth_and_no_further`, `test_w1_20_records.py::test_every_one_of_the_eight_typed_edges_is_followed`, `test_w1_20_records.py::test_a_cycle_ends_and_is_complete` | README |
+| S2: Byte-identical output on repeated runs; DEPTH_LIMIT_REACHED lists the gaps [CAP-57.a] | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes`, `test_w1_20_determinism.py::test_the_compared_output_is_a_closure_and_not_an_empty_answer`, `test_w1_20_gaps.py::test_every_id_beyond_the_depth_is_a_gap` | README |
+| F1: Output differs between runs on the same commit | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes`, `test_w1_20_determinism.py::test_two_clones_of_one_commit_print_the_same_bytes`, `test_w1_20_determinism.py::test_the_order_of_the_start_ids_does_not_change_the_closure` | README |
+| F2: An unresolved id is omitted from the gap list | `test_w1_20_gaps.py::test_an_edge_to_no_record_is_in_the_gap_list`, `test_w1_20_gaps.py::test_a_start_id_that_names_nothing_is_in_the_gap_list`, `test_w1_20_gaps.py::test_only_unresolved_start_ids_give_an_answer_with_gaps` | README |
+
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 14 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

@@ -328,3 +328,20 @@ tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_limit_cuts_the_list_aft
 tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so  # cap
 tests/acceptance/W1-19/test_w1_19_unavailable.py::test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises  # cap
 tests/acceptance/W1-19/test_w1_19_unavailable.py::test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises  # cap
+
+# acceptance/W1-20
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_a_closure_does_not_build_the_store  # cap
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_an_uncommitted_edit_of_a_record_is_not_in_the_closure  # cap
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_the_result_names_the_files_that_differ_from_head  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_every_id_beyond_the_depth_is_a_gap  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_a_gap_beyond_the_depth_says_so  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_an_id_already_in_the_closure_is_no_gap  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_only_unresolved_start_ids_give_an_answer_with_gaps  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_an_unresolved_id_is_told_from_one_beyond_the_depth  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_a_depth_cut_together_with_an_unresolved_id_stops_on_the_depth  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_a_cycle_ends_and_is_complete  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_several_start_ids_give_the_closure_of_all_of_them  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_the_result_names_the_depth_it_ran_at  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_a_record_that_names_the_start_record_is_in_its_closure  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_the_depth_scales_with_the_impact_radius  # cap
+rep: tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py  # one row per parametrised function
