@@ -82,3 +82,17 @@ R8) and the lead's design note, before the implementation. No implementation was
   by its path; it must keep doing so).
 - `test_the_fixture_the_other_worktree_holds_the_entry_name_tree_and_the_clone_another` (the fixture's premise: the
   clone gets another entry name than `tree`) and `test_a_failed_clean_up_does_not_change_the_verdict`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: After its run, gov.close.nightly removes only its own clone, by its exact path (git worktree remove --force <that path>), and never r... | `test_w2_77_own_clone_only.py::test_the_night_runs_no_git_worktree_prune`, `test_w2_77_own_clone_only.py::test_the_night_removes_its_clone_by_its_exact_path_with_git_worktree_remove_force`, `test_w2_77_own_clone_only.py::test_the_clone_is_gone_afterwards_its_folder_its_registration_and_its_entry` | README |
+| S2: A second worktree of the project whose folder is hidden or unreadable while the nightly runs (unmounted, permission-denied, moved and... | `test_w2_77_hidden_worktree.py::test_a_worktree_hidden_while_the_night_runs_keeps_its_registration_its_admin_folder_and_its_staged_index`, `test_w2_77_batch.py::test_the_batch_keeps_a_hidden_worktree_s_registration_admin_folder_and_staged_index`, `test_w2_77_hidden_worktree.py::test_a_worktree_hidden_while_the_night_runs_keeps_its_registration_its_admin_folder_and_its_staged_index` | README |
+| S3: If the removal of its own clone fails, the nightly removes only that clone's own administrative entry (by its exact name under the co... | `test_w2_77_failed_removal.py::test_the_fixture_the_other_worktree_holds_the_entry_name_tree_and_the_clone_another`, `test_w2_77_failed_removal.py::test_another_worktree_s_entry_is_never_touched_the_one_also_called_tree_keeps_its_registration_and_index`, `test_w2_77_failed_removal.py::test_a_stale_registration_is_still_registered_after_a_failed_removal` | README |
+| S4: Everything else the nightly does is unchanged: its selection, its runs, its record and its verdict [DEC-915, DEC-890] | `test_w2_77_unchanged.py::test_a_green_night_s_envelope_exit_code_and_verdict_are_as_today`, `test_w2_77_unchanged.py::test_a_green_night_s_record_has_exactly_today_s_keys_and_no_cleanup_key`, `test_w2_77_unchanged.py::test_a_green_night_selects_and_runs_the_full_suite` | README |
+| F1: Any repo-wide prune left in the nightly; another worktree's registration or index lost; a clone's failed removal hidden. | `test_w2_77_failure_line.py::test_no_prune_no_other_worktree_lost_and_the_failed_removal_not_hidden`, `test_w2_77_batch.py::test_the_batch_keeps_a_hidden_worktree_s_registration_admin_folder_and_staged_index` | by its words (every function of the suite kept) |
