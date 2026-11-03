@@ -89,6 +89,10 @@ def run(call):
             ranked = rerank(call["query"], call["candidates"], reranker(call.get("reranker")))
             answers.append({"ranked": ranked, "outcome": last_outcome()})
         return answers
+    if op == "ensure":
+        from gov.retrieval import ollama
+        return {"shared": ollama.ensure_available(timeout_s=call.get("timeout_s", 3.0)),
+                "query": ollama.ensure_query_available(timeout_s=call.get("timeout_s", 3.0))}
     if op == "learning_record":
         from gov.retrieval import learning
         return learning.record(call["root"], call["miss"])

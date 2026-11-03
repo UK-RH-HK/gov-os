@@ -117,6 +117,11 @@ def test_the_manifest_records_the_model_ids_and_their_revisions(api, indexed):
 @INDEX
 def test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant(api, repo):
     # DEC-374. This endpoint's model list reports a digest that is not the pin; no other answer carries a digest.
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): a revision that no pin names fails closed, so this clone pins the
+    # endpoint's digest in its models.yaml (W2-32's interface; untracked, so its corpus is unchanged). The manifest
+    # must still record the digest observed, never ADR-0002's constant pin.
+    (repo / "governance/project/models.yaml").write_text(
+        f"embedder:\n  model: {support.EMBED_MODEL}\n  revision: {support.OTHER_DIGEST}\n", encoding="utf-8")
     endpoint = support.OllamaStandIn(digest=support.OTHER_DIGEST)
     try:
         env = api.scratch_env(ollama_host=endpoint.host)
