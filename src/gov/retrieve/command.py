@@ -14,6 +14,11 @@ offered in its place. The line is drawn at "every": when one named id exists, th
 (the closure names the missing ones as gaps beside the answer); when one is no id (an ``--id`` that is a symbol name,
 for the code index), or a ``--continue`` is given, it is retrieved as before too. When the lexical index cannot
 answer, or the record graph cannot be read, nothing is decided here and the request is retrieved as before.
+
+Role separation (W2-13 S5, DEC-1065 (2)): every route's hits are filtered by the caller's ``role_paths``
+(``GOV_ROLE``, a ``--role`` beside it, ``GOV_TICKET``; ``gov.guard.role_paths``), and the bundle's ``role_filter``
+counts what was withheld, by rule; no section, no filter, no ``role_filter``. ``ROLE_PATHS_UNREADABLE``: the section
+or the session's ticket cannot be read, so nothing is handed out.
 """
 
 from __future__ import annotations
@@ -84,16 +89,21 @@ def run(root: Path, args, config: dict) -> dict:
 
     from gov.cli.errors import GovError
     from gov.decisions.register import leave_out
-    from gov.retrieval.retrieve import retrieve
+    from gov.retrieval.retrieve import retrieve, role_filter
 
+    role = getattr(args, "role", None)  # W2-13 S5: a --role given adds its filter beside GOV_ROLE's (DEC-1065 (2))
     if args.continuation is None:
         nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
         if nowhere is not None:
-            return _stated_gap(Path(root), args.query, *nowhere, args)
+            bundle = _stated_gap(Path(root), args.query, *nowhere, args)
+            withhold = role_filter(root, role)
+            if withhold is not None:  # nothing is offered, so nothing is withheld; the filter is named all the same
+                bundle["role_filter"] = withhold.summary()
+            return bundle
     try:
         bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
                           batch_size=args.batch_size, bundle_budget=args.bundle_budget,
-                          continuation=args.continuation)
+                          continuation=args.continuation, role=role)
     except sqlite3.DatabaseError as error:  # no bundle was made: the store itself cannot be read (W2-M071)
         raise GovError("STORE_UNREADABLE", f"the store at {root} cannot be read: {error}",
                        {"root": str(root), "error": str(error)}) from None

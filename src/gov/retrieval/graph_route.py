@@ -5,16 +5,24 @@ ticket, and record titles, so that the record closure joins the fusion without `
 titles the record store holds become start ids: a question that names no record gives none, and today's bundle. A
 title is a register entry's in the store, or the ``title`` of the frontmatter that declares the record; it is found
 whole, by word, in any case. Everything is sorted. It only reads.
+
+The frontmatter titles come from the store's ``record_titles``, parsed once at the load (S6, DEC-1065 (4)); only a
+store built before that table is read file by file, with the C loader where PyYAML has it.
 """
 
 from __future__ import annotations
 
 import os
 import re
+import sqlite3
 from pathlib import Path
 
 import yaml
 
+from gov.cli.errors import GovError
+from gov.store.loader import TITLES_TABLE, connect
+
+_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # the C parser: about 9x faster on ~840 frontmatters
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*")
 W2_ID = re.compile(r"W2-[0-9]+[a-z]?")
 TASK = "task"
@@ -52,16 +60,35 @@ def _parsed(root: Path, path: str):
     key = (os.path.abspath(root / path), stat.st_size, stat.st_mtime_ns)
     if key not in _FRONTS:
         try:
-            _FRONTS[key] = yaml.safe_load(_front(root, path))
+            _FRONTS[key] = yaml.load(_front(root, path), Loader=_LOADER)
         except yaml.YAMLError:
             _FRONTS[key] = None
     return _FRONTS[key]
 
 
-def _title(root: Path, record: dict) -> str:
-    """The record's title: a register entry's from the store, any other record's from its file's frontmatter."""
+def _titles(root: Path) -> dict[tuple[str, str], str] | None:
+    """``(path, id) -> title`` of the store's records of files; None where the store has no such table (built before
+    S6) or cannot be read, so the titles are read from the files as before."""
+    try:
+        connection = connect(root)
+    except GovError:
+        return None
+    try:
+        return {(path, rid): title for path, rid, title in connection.execute(
+            f"SELECT path, id, title FROM {TITLES_TABLE}")}
+    except sqlite3.Error:
+        return None
+    finally:
+        connection.close()
+
+
+def _title(root: Path, record: dict, titles: dict | None = None) -> str:
+    """The record's title: a register entry's from the store, any other record's from its frontmatter, as the store
+    keeps it in ``titles`` or, with none, as its file holds it."""
     if record.get("title"):
         return record["title"]
+    if titles is not None:
+        return titles.get((record["path"], record["id"]), "")
     front = _parsed(root, record["path"])
     if not isinstance(front, dict) or front.get("id") != record["id"] or not isinstance(front.get("title"), str):
         return ""
@@ -86,8 +113,9 @@ def start_ids(root: Path, query: str, known: list[dict]) -> list[str]:
         tickets = _wbs_ids(Path(root), known)
         found |= {tickets[token] for token in w2 if token in tickets}
     words = " ".join(query.split()).casefold()
+    titles = _titles(Path(root)) if known else None
     for record in known:
-        title = " ".join(_title(Path(root), record).split()).casefold()
+        title = " ".join(_title(Path(root), record, titles).split()).casefold()
         if title and title in words and re.search(rf"(?<!\w){re.escape(title)}(?!\w)", words):
             found.add(record["id"])
     return sorted(found)
