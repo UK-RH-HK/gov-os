@@ -317,8 +317,20 @@ def rebuild(project, host):
     workdir = project.parent / f"{project.name}-run"
     for name in ("home", "tmp", "pycache"):
         (workdir / name).mkdir(parents=True, exist_ok=True)
-    path = os.pathsep.join(folder for folder in os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)
-                           if folder and not (Path(folder) / "ollama").exists())
+    # No real ollama reachable: every PATH folder holding one is dropped. The tools the rebuild needs are resolved on
+    # the full PATH first and linked from a scratch folder, so a dropped folder (~/.local/bin, which holds the ollama
+    # wrapper beside gitleaks) takes no tool away with it; the dropped folder itself is never put back.
+    full = os.environ.get("PATH", "/usr/bin:/bin")
+    tools = workdir / "tools"
+    tools.mkdir(parents=True, exist_ok=True)
+    for name in ("gitleaks",):
+        found = shutil.which(name, path=full)
+        link = tools / name
+        if found and not link.is_symlink():
+            link.symlink_to(Path(found).resolve())
+    path = os.pathsep.join([str(tools), *(folder for folder in full.split(os.pathsep)
+                                          if folder and not (Path(folder) / "ollama").exists())])
+    assert not (tools / "ollama").exists(), "the scratch tools folder must hold no ollama"
     env = {"PATH": path, "HOME": str(workdir / "home"), "TMPDIR": str(workdir / "tmp"), "LC_ALL": "C.UTF-8",
            "GIT_CONFIG_NOSYSTEM": "1", "PYTHONPATH": os.pathsep.join([str(GOV_SRC), str(_site(workdir))]),
            "PYTHONPYCACHEPREFIX": str(workdir / "pycache"), "OLLAMA_HOST": host, "GOV_QUERY_OLLAMA_HOST": host,
