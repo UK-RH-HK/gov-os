@@ -103,3 +103,7 @@ These keep their other items. The exact marks are in the orchestrator's superses
 - DEC-946
 - DEC-951
 - DEC-952
+
+
+## Added by DEC-1045 (owner, 2026-11-02): gitleaks scanning
+Lifted on this repository the same way, by configuration (`governance/project/secrets.yaml`, `scan: off`): the rebuild's memory-indexing scan and the secrets-indexing check (W1-15, DEC-285 to DEC-290), `gov ci staged-secrets`, the landing's and the close's scans (`land.py`, `close_build.py`), the record branch's sync scan, the nightly's scan and the CTO's staged-content scans (DEC-893). The feature stays built and on by default in every other repository; its tests run only in the nightly full suite. A full scan weekly only on the owner's approval.

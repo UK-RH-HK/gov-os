@@ -35,6 +35,7 @@ import math
 import os
 import sqlite3
 import struct
+import time
 import urllib.request
 from pathlib import Path
 
@@ -52,7 +53,9 @@ DEVICES = ("cpu", "gpu")  # the devices a question's vector is used from (DEC-10
 EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
-TIMEOUT_S = 120.0  # the first request loads the model
+TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
+RETRY_WAITS_S = (10.0, 30.0)  # the growing waits before a timed-out chunk batch's 2nd and 3rd try (DEC-1026)
+TIMED_OUT: dict = {}  # ``_ask``'s answer to a request accepted and not answered in time: empty, so read as none
 NO_VECTORS = "sqlite_vec cannot be loaded: no vector can be stored or compared"
 NO_MODEL = f"{MODEL} is not in Ollama's model list"
 NO_EMBEDDING = f"Ollama did not embed with {MODEL}"
@@ -90,7 +93,7 @@ def _report(reason: str | None, **more) -> dict:
 
 def _ask(path: str, body: dict | None = None, host: str | None = None):
     """The JSON answer to ``path`` of the Ollama endpoint at ``host`` (default: the shared one at ``OLLAMA_HOST``);
-    None when it gives none."""
+    None when it gives none, ``TIMED_OUT`` when it accepted the request and gave no answer within ``TIMEOUT_S``."""
     host = host or os.environ.get("OLLAMA_HOST") or ollama.DEFAULT_HOST
     request = urllib.request.Request((host if "://" in host else f"http://{host}").rstrip("/") + path,
                                      data=None if body is None else json.dumps(body).encode(),
@@ -98,14 +101,27 @@ def _ask(path: str, body: dict | None = None, host: str | None = None):
     try:
         with _OPENER.open(request, timeout=TIMEOUT_S) as reply:
             return json.load(reply)
+    except TimeoutError:  # the socket's own time-out once connected; a refusal comes wrapped in a URLError
+        return TIMED_OUT
     except (OSError, http.client.HTTPException, ValueError):
         return None
 
 
-def _embed(texts: list[str], host: str | None = None) -> list[bytes] | None:
+def _embed(texts: list[str], host: str | None = None, retries: list | None = None) -> list[bytes] | None:
     """One float32 BLOB per text, embedded at ``host`` (default: the shared runner) with no runner option; None unless
-    the endpoint returned a vector for each."""
-    vectors = (_ask("/api/embed", {"model": MODEL, "input": texts}, host) or {}).get("embeddings") or []
+    the endpoint returned a vector for each. With ``retries`` (a rebuild's chunks), a try that timed out is tried again
+    after each wait of ``RETRY_WAITS_S`` in turn, a request with a timed-out try is recorded in ``retries``, and
+    ``TimeoutError`` (with the tries made) is raised when every try timed out (DEC-1026)."""
+    waits: list[float] = []
+    while (answer := _ask("/api/embed", {"model": MODEL, "input": texts}, host)) is TIMED_OUT \
+            and retries is not None and len(waits) < len(RETRY_WAITS_S):
+        waits.append(RETRY_WAITS_S[len(waits)])
+        time.sleep(waits[-1])
+    vectors = (answer or {}).get("embeddings") or []
+    if retries is not None and (waits or answer is TIMED_OUT):
+        retries.append({"tries": len(waits) + 1, "waits_s": waits, "embedded": len(vectors) == len(texts)})
+        if answer is TIMED_OUT:
+            raise TimeoutError(len(waits) + 1)
     if len(vectors) != len(texts):
         return None
     return [struct.pack(f"{len(vector)}f", *vector) for vector in vectors]
@@ -265,10 +281,10 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
-def _build(root: Path, counts: dict) -> str | None:
+def _build(root: Path, counts: dict, retries: list) -> str | None:
     """Bring the lexical index up to date, then embed the chunks that have no vector, each as its first
-    ``EMBED_CHARS`` characters, those the machine-wide cache holds taken from it (counted in ``counts``); why it
-    cannot be done, or None."""
+    ``EMBED_CHARS`` characters, those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
+    embedded, recording timed-out requests in ``retries``; why it cannot be done, or None."""
     lexical.refresh(root)
     connection = sqlite3.connect(root / STORE_REL)
     try:
@@ -296,7 +312,11 @@ def _build(root: Path, counts: dict) -> str | None:
                 vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
                 todo = [i for i, vector in enumerate(vectors) if vector is None]
                 if todo:
-                    embedded = _embed([texts[i] for i in todo])
+                    try:
+                        embedded = _embed([texts[i] for i in todo], retries=retries)
+                    except TimeoutError as timed_out:  # the vectors made so far stay; the store is not reported built
+                        return (f"{NO_EMBEDDING}: the request timed out at all {timed_out.args[0]} tries (each under "
+                                f"{TIMEOUT_S:g} s; waits {', '.join(f'{w:g} s' for w in RETRY_WAITS_S)})")
                     if embedded is None:
                         return NO_EMBEDDING
                     machine.put([texts[i] for i in todo], embedded)
@@ -337,9 +357,10 @@ def _vectors(root: Path) -> str | None:
 
 
 def refresh(root: Path) -> dict:
-    """Bring the lexical index up to date, then embed the chunks that have no vector."""
-    counts = vector_cache.zero()
-    return _report(_build(Path(root), counts), vector_cache=counts)
+    """Bring the lexical index up to date, then embed the chunks that have no vector. ``retries`` lists, in order,
+    each chunk batch request that timed out at least once: its tries, the waits taken and whether it embedded."""
+    counts, retries = vector_cache.zero(), []
+    return _report(_build(Path(root), counts, retries), retries=retries, vector_cache=counts)
 
 
 def search(root: Path, query: str, refresh: bool = True) -> dict:
@@ -351,7 +372,7 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
     beside the store once the vectors can be answered from (DEC-782, DEC-1033).
     """
     root, counts = Path(root), vector_cache.zero()
-    reason = (_build(root, counts) if refresh else None) or _status(root)
+    reason = (_build(root, counts, []) if refresh else None) or _status(root)
     if reason:
         return _report(reason, hits=[], vector_cache=counts)
     connection = _open(root)
