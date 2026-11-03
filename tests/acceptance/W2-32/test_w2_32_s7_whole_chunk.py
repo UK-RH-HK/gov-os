@@ -133,21 +133,39 @@ def test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_th
 
 # ---- parent expansion across continuations ----
 
+def _named(value, skip=("evidence", "expansions")):
+    """Every span record (a mapping with ``path``, ``start_line`` and ``end_line``) the bundle names outside its
+    evidence and its expansions, but for a gap of what was not gathered: what the bundle names as left out."""
+    if isinstance(value, dict):
+        found = [value] if {"path", "start_line", "end_line"} <= set(value) and value.get("reason") != "NOT_GATHERED" \
+            else []
+        return found + [record for key, item in value.items() if key not in skip for record in _named(item, ())]
+    if isinstance(value, list):
+        return [record for item in value for record in _named(item, ())]
+    return []
+
+
 def test_across_continuations_no_span_is_sent_twice(long_project, box, standin):
     box.built(long_project)
-    bundles, token = [], None
+    bundles, named, token = [], [], None
     for _ in range(12):
         call = {"root": str(long_project), "query": ALMANAC_QUESTION, "batch_size": 1, "radius": 0}
         if token:
             call["continuation"] = token
         bundle = s.result(box.call("retrieve", **call))
         bundles.append(bundle["evidence"])
+        named.append(_named(bundle))
         token = bundle.get("continuation")
         if not token:
             break
     assert len(bundles) >= 2, "premise: the question takes more than one bundle"
-    assert sum(item["path"] == ALMANAC for items in bundles[1:] for item in items), \
-        "premise: a later bundle holds another chunk of the almanac's section"
+    # Rewrite-Reason: S7's continuation premise (a left-out span is named, not sent). A later bundle either holds
+    # another chunk of the almanac's section, or names one as left out: inside a parent an earlier bundle sent.
+    first = [(item["start_line"], item["end_line"]) for item in bundles[0] if item["path"] == ALMANAC]
+    left_out = [record for records in named[1:] for record in records if record["path"] == ALMANAC
+                and any(start <= record["start_line"] and record["end_line"] <= end for start, end in first)]
+    assert sum(item["path"] == ALMANAC for items in bundles[1:] for item in items) or left_out, \
+        "premise: a later bundle holds another chunk of the almanac's section, or names one as left out"
     sent_hashes, sent_spans = set(), []
     for number, items in enumerate(bundles, 1):
         for item in items:

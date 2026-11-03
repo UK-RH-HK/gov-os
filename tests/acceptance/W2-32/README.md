@@ -62,7 +62,10 @@ to the CTO so that the engineer builds to the same ones (spec gaps, DEC-136).
   records the cut as 512 (each store column named as a cut key of the manifest, or else holding its value, set back
   to 512), with the chunk's vector made from its first 512 characters, is stale (no answer) and the next rebuild
   embeds the chunk whole. `retrieve(root, question, batch_size=1, radius=0)` followed through its continuations
-  sends no item whose sha256 an earlier bundle sent, and none within a span an earlier bundle sent.
+  sends no item whose sha256 an earlier bundle sent, and none within a span an earlier bundle sent. Its premise
+  (round 6): a later bundle either holds another chunk of the expanded section, or names one as left out (a span
+  record, with `path`, `start_line` and `end_line`, anywhere in the bundle but its evidence, its expansions and its
+  not-gathered gaps, inside the section an earlier bundle sent).
 - **S3: the memory-quality event.** `gov.retrieval.learning`:
   - `record(root, miss) -> dict`. `miss` holds `question`, `expected` (the sources the answer needed:
     `[{"path": …}]`), `observed` (the paths retrieval gave first), `root_cause`, `repair`, and `regression`: a case
