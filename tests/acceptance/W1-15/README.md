@@ -338,3 +338,18 @@ Deselect with `-m "not local_only"` (103 cases remain).
 - The check's `tier` and `severity` values, beyond being valid.
 - `.gov-runtime/scratch/`: whether it counts as a derived store.
 - That this repository's own tree stays clean under the new rules (package DP-6).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected | moved to `lifted` (the feature is off here): `test_w1_15_gitleaks_rules`, `test_the_configuration_extends_the_gitleaks_defaults` | README (lifted) |
+| S2: Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store [CAP-03.a, CAP-03.e] | moved to `lifted` (the feature is off here): `test_w1_15_filter`, `test_a_file_without_a_secret_is_indexable` | README (lifted) |
+| S3: Indexers skip every namespace the path map classes as customer/runtime product data: a planted product-data file is absent from every... | `test_w1_15_product_data.py::test_a_file_in_a_product_namespace_is_not_indexable`, `test_w1_15_product_data.py::test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance`, `test_w1_15_product_data.py::test_a_namespace_the_map_turns_into_product_data_is_skipped` | README |
+| S4: Registers the secrets-indexing family check: no planted secret or canary in any derived store [CAP-38.b] | moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_the_check_is_registered_in_the_kernel_template` | README (lifted) |
+| F1: Any planted secret appears in a derived store, packet or bundle | moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_w1_15_filter` | README (lifted) |
+| F2: The filter relies on a hard-coded path list | `test_w1_15_product_data.py::test_a_file_in_a_product_namespace_is_not_indexable`, `test_w1_15_product_data.py::test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance`, `test_w1_15_product_data.py::test_a_namespace_the_map_turns_into_product_data_is_skipped` | README |
