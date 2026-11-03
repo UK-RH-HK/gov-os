@@ -478,3 +478,20 @@ its own assertion with its preconditions met. No trial file is in the tree.
 - **Rebuilding the same version from the same commit:** no source decides between refusal and a no-op. No case.
 - **The wheel's bytes:** a wheel build is not byte-reproducible; the case holds the hash's presence and its
   agreement with a wheel the record holds.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: gov release <version> builds a release from a clean w2/integrate commit [CAP-43.b lite]. Its manifest holds: the semantic version and... | `test_w2_16_release.py::test_a_release_writes_its_record_under_docs_releases_and_changes_nothing_else`, `test_w2_16_release.py::test_the_manifest_holds_the_semantic_version`, `test_w2_16_release.py::test_the_manifest_holds_the_full_commit_the_release_was_built_from` | README |
+| S2: The owner tags the release commit (agents never tag); the tag is not signed (CAP-02.c stays in Wave 3, DEC-722). | `test_w2_16_release.py::test_building_a_release_creates_no_tag`, `test_w2_16_release.py::test_building_a_release_signs_nothing`, `test_w2_16_install.py::test_a_release_installed_from_an_unsigned_lightweight_tag_is_accepted` | README |
+| S3: A release is immutable: building the same version from another commit, or changing a file after release, is refused [CAP-43]. | `test_w2_16_release.py::test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was` | README |
+| S4: Framework.lock records the release version and manifest hash, at copy as well as at update. A missing lock fails, and a project canno... | `test_w2_16_install.py::test_a_project_copied_from_a_release_tag_records_the_release_version_in_its_lock`, `test_w2_16_install.py::test_a_project_copied_from_a_release_tag_records_the_manifest_hash_in_its_lock`, `test_w2_16_install.py::test_a_project_updated_to_a_later_release_records_that_release_in_its_lock` | README |
+| S5: The vendored skills carry their licence and version in the release [W2-L002, W2-L014]. | `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_version`, `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_upstream_licence` | README |
+| F1: A release whose files or manifest do not match their hashes is refused by gov install, gov update and gov doctor. | `test_w2_16_immutability.py::test_a_release_never_hashes_bytes_the_commit_does_not_hold`, `test_w2_16_last_round.py::test_a_source_whose_release_records_were_removed_is_refused` | designer, by its words |
+
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 26 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

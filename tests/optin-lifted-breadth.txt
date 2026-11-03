@@ -1079,3 +1079,38 @@ rep: tests/acceptance/W2-123/test_w2_123_retry.py  # one row per parametrised fu
 
 # acceptance/W2-126
 rep: tests/acceptance/W2-126/test_w2_126_writers.py  # one row per parametrised function
+
+# acceptance/W2-16
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_lock_from_a_source_with_no_release_record_is_refused_where_the_lock_records_a_release  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_lock_from_the_installed_release_s_own_source_never_makes_an_edited_kernel_pass  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_a_lock_whose_release_entries_were_deleted_fails  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_gov_release_runs_for_the_orchestrator_and_the_owner  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_the_suite_runs_gov_and_copier_with_gov_role_unset  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_a_chain_that_does_not_reach_process_1_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_gov_role_set_to_any_value_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_gov_ticket_set_to_any_value_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_without_a_terminal_on_both_sides_the_build_refuses  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_anything_but_the_shown_code_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_code_comes_from_the_system_s_random_source  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_command_refuses_with_standard_input_from_dev_null  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_command_refuses_on_a_terminal_under_this_suite_s_ancestry  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_full_commit_the_release_was_built_from  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_lists_every_shipped_file_with_its_sha256  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_second_release_lists_the_shipped_file_that_changed_with_its_new_hash  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_wheel_hash  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_cli_version  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_schema_versions  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_release_notes  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_s_own_hash_is_in_the_record_and_a_reader_finds_it_equal  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_from_a_tree_with_uncommitted_or_untracked_changes  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_from_a_commit_that_is_not_on_w2_integrate  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_with_a_version_that_is_not_a_semantic_version  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_without_a_version  # cap
+rep: tests/acceptance/W2-16/test_w2_16_doctor.py  # one row per parametrised function
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_from_an_older_integration_commit_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_after_its_record_was_removed_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_as_an_existing_owner_tag_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_install.py  # one row per parametrised function
+rep: tests/acceptance/W2-16/test_w2_16_owner_terminal.py  # one row per parametrised function
