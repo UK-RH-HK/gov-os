@@ -106,8 +106,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
   pinned model the endpoint does not list. The code is looked for anywhere in the answer's text: in `gov rebuild`'s
   `result.stores.semantic` (its `reason`, or a field of its own), in `semantic.search`'s answer, and in the reason of
   `retrieve`'s `facets.semantic` (which has only `available` and `reason`, so the code goes in the reason).
-- **W2-L065: the cut.** `semantic.manifest(root)` holds the embedding cut, `512`, as one of its values (the key is
-  not judged). A store whose `semantic_*` tables are only the vectors and the four-column manifest (two models and
+- **W2-L065: the cut.** `semantic.manifest(root)` holds the embedding cut the chunks were embedded at (since S7, G1:
+  at or above the chunk's size; no fixed 512; the key is not judged). A store whose `semantic_*` tables are only the vectors and the four-column manifest (two models and
   their revisions), as every store built before W2-32 is, is stale.
 - **S3: the memory-quality event.** `gov.retrieval.learning`:
   - `record(root, miss) -> dict`. `miss` holds `question`, `expected` (the sources the answer needed:
@@ -132,3 +132,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
 **DEC-1065 (1) placed here (CTO, 2026-11-03):** S10 added; every CPU-embedder start goes through `ollama.py`'s `ensure_available` (the search, the refresh in rebuild and close, the seed, the sandbox), all in this ticket's paths.
 
 **DEC-1066 (owner, 2026-11-03):** S6-S8 re-worded to the chosen gaps, in the round order G1 (S7), G3 (S8, the fusion: W2-32's KPIs changed to cover it), G2 (S6).
+
+**S7 and the interface (CTO, 2026-11-03, P2):** the cut is no longer 512 (S7, G1: the models read the whole chunk); the interface's W2-L065 clause now reads "the manifest records the cut the chunks were embedded at"; S2's two cut cases are revised to it by the test designer.
