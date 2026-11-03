@@ -67,3 +67,24 @@ covered by W1-21's `test_w1_21_failure_memory.py`.
 ## Expected result on today's code
 
 21 tests: 16 fail for the reasons above, 5 pass (the guards: part 1's nothing-newly-dropped, 3b, 6a and both 6b).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: For the same match, a governing source outranks a test or an assessment report: in a planted repository where an accepted register de... | `test_w2_87_authority.py::test_1_every_governing_chunk_outranks_every_test_and_report` | README |
+| S2: The order counts where it decides what is gathered: it is applied to the fused list before the first call's items are cut, so a gover... | `test_w2_87_authority.py::test_2a_a_governing_chunk_just_past_the_first_call_enters_it`, `test_w2_87_authority.py::test_2b_a_lower_chunk_better_by_more_than_the_lift_keeps_its_place`, `test_w2_87_authority.py::test_2c_the_rerank_does_not_undo_the_order_and_its_lift_is_bounded` | README |
+| S3: The order is configuration, not code: the tiers, by path pattern and by the store's record type and status, and the lift are read fro... | `test_w2_87_authority.py::test_3a_a_path_map_that_puts_tests_above_decisions_flips_the_order`, `test_w2_87_authority.py::test_3b_without_the_block_the_order_is_the_plain_fused_one`, `test_w2_87_authority.py::test_4_an_unreadable_block_refuses_with_config_invalid` | README |
+| S4: A superseded decision never outranks its successor: a chunk of the register is ranked as the entry whose span holds it, never as the ... | `test_w2_87_register.py::test_r1_the_closure_route_takes_an_older_entry_by_its_own_id`, `test_w2_87_register.py::test_r2_a_superseded_last_entry_does_not_drop_the_other_entries`, `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept` | README |
+| S5: Nothing else changes: the budget, the batches, the continuation token, the stopping reasons, the parent expansion and DEC-424's failu... | `test_w2_87_authority.py::test_6a_two_runs_on_one_store_give_one_bundle`, `test_w2_87_authority.py::test_6b_the_block_changes_the_order_only` | README |
+| S6: W2-61's measure is re-run on the visible half, on one clone at the branch head with one set of stores, twice: with the base's retriev... | `test_w2_87_register.py::test_r2_a_superseded_last_entry_does_not_drop_the_other_entries`, `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept` | by its words (every function of the suite kept) |
+| F1: A test or an assessment report outranks a governing source of the same match. | `test_w2_87_authority.py::test_1_every_governing_chunk_outranks_every_test_and_report`, `test_w2_87_authority.py::test_2c_the_rerank_does_not_undo_the_order_and_its_lift_is_bounded` | by its words (every function of the suite kept) |
+| F2: A superseded entry outranks the entry that replaced it, or a register chunk ranked by another entry's status. | `test_w2_87_register.py::test_r2_a_superseded_last_entry_does_not_drop_the_other_entries`, `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept` | by its words (every function of the suite kept) |
+| F3: A path, a record type or a tier written in the code, or a missing or unreadable block read as an order. | `test_w2_87_authority.py::test_3a_a_path_map_that_puts_tests_above_decisions_flips_the_order`, `test_w2_87_authority.py::test_3b_without_the_block_the_order_is_the_plain_fused_one` | by its words (every function of the suite kept) |
+| F4: A chunk left out of the bundle that today's code keeps, or kept that it leaves out. | `test_w2_87_register.py::test_r2_a_superseded_entry_that_is_kept_today_stays_kept`, `test_w2_87_authority.py::test_2b_a_lower_chunk_better_by_more_than_the_lift_keeps_its_place` | by its words (every function of the suite kept) |
+| F5: Two runs on one store give different bundles. | `test_w2_87_authority.py::test_6a_two_runs_on_one_store_give_one_bundle` | by its words (every function of the suite kept) |
+| F6: A figure of the measure reported without the other, or the hidden half read or run. | `test_w2_87_authority.py::test_2c_the_rerank_does_not_undo_the_order_and_its_lift_is_bounded`, `test_w2_87_authority.py::test_3b_without_the_block_the_order_is_the_plain_fused_one` | by its words (every function of the suite kept) |

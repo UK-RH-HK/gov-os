@@ -1223,3 +1223,7 @@ rep: tests/acceptance/W2-76/test_w2_76_machine_lock.py  # one row per parametris
 
 # acceptance/W2-77
 rep: tests/acceptance/W2-77/test_w2_77_unchanged.py  # one row per parametrised function
+
+# acceptance/W2-87
+rep: tests/acceptance/W2-87/test_w2_87_authority.py::test_4_an_unreadable_block_refuses_with_config_invalid  # one row
+rep: tests/acceptance/W2-87/test_w2_87_authority.py::test_5_the_superseded_entry_ranks_below_its_successor_and_gets_no_lift  # one row
