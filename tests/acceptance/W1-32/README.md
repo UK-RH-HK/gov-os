@@ -229,3 +229,24 @@ A case of this suite was itself rewritten later, in the follow-up after W1-41
   with open required rows.
 
 They are given in full in the test designer's return.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 52 in the full run, 29 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov launch keeps the session's exit code and names the folder on stderr when its temp folder cannot be removed; SIGTERM and SIGHUP end the sess... | `test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written` (1 of 3), `test_w1_32_launch.py::test_the_signal_ends_the_session` (2 of 2), `test_w1_32_launch.py::test_the_signal_removes_the_temp_folder` (2 of 2), `test_w1_32_launch.py::test_the_exit_code_after_the_signal_is_130` (3 of 3) | designer |
+| S2: gov status --json reports ready/blocked/claimed tickets, open decision packages, readiness per specification, governance share, pause state and... | `test_w1_32_added_cases.py::test_a_store_without_its_records_or_edges_leaves_the_ready_and_blocked_tickets_not_read` (2 of 2), `test_w1_32_status_read_only.py::test_status_of_a_paused_project_changes_neither_the_flag_nor_its_mirror`, `test_w1_32_status_read_only.py::test_status_takes_no_claim_and_releases_none` | the ticket's words |
+| S3: Pause state appears in gov status (moved from W1-28, DEC-364) | `test_w1_32_status_pause.py::test_the_pause_state_is_the_projects_own`, `test_w1_32_status_pause.py::test_a_paused_project_names_who_paused_it` (1 of 2), `test_w1_32_status_pause.py::test_an_empty_file_at_the_flags_path_is_no_pause` | the ticket's words |
+| S4: Read-only: git status --porcelain unchanged [CAP-27.a] | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged` (2 of 2) | the ticket's words |
+| S5: The command set stays at the Wave 1 list (no command without a contract item) [CAP-28.a] | `test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones` | the ticket's words |
+| F1: status mutates the repository | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged` (2 of 2), `test_w1_32_status_read_only.py::test_status_writes_nothing_anywhere` (2 of 2) | designer |
+| F2: An open gate is missing from the output | `test_w1_32_status_not_read.py::test_every_open_package_is_listed_however_many`, `test_w1_32_status_not_read.py::test_an_open_specification_shows_every_open_row_linked_or_not` | the ticket's words |

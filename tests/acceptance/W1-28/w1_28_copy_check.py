@@ -61,8 +61,11 @@ _UNWRAPPED = {"str", "Path", "fspath", "realpath", "abspath", "resolve"}
 _COPY_CALLS = {"copy2", "copyfile", "copytree", "symlink_to", "hardlink_to", "write_bytes"}
 _MODULE_COPY_CALLS = {("shutil", "copy"), ("shutil", "move"), ("os", "link"), ("os", "symlink")}
 _LISTERS = {"walk", "rglob", "glob", "iterdir", "scandir", "listdir"}
-_ARGV_ROUTES = {"clone", "archive", "worktree", "checkout-index", "bundle"}
-_SHELL_ROUTE = re.compile(r"\b(cp\s+-\w*[rRa]\w*|rsync|git\s+(?:archive|clone|worktree)|tar\s+-?\w*c\w*)\b")
+_ARGV_ROUTES = {"clone", "archive", "checkout-index", "bundle"}
+# ``git worktree`` is a route only as ``worktree add`` (it makes a checkout); ``worktree list``, ``prune`` and the
+# like read or tidy git's records and copy nothing (W2-61h's ``worktrees()``, a listing of paths; D-4's cut).
+_WORKTREE_ROUTE = ("worktree", "add")
+_SHELL_ROUTE = re.compile(r"\b(cp\s+-\w*[rRa]\w*|rsync|git\s+(?:archive|clone|worktree\s+add)|tar\s+-?\w*c\w*)\b")
 # The calls whose arguments are a command, read whole for a shell route (DEC-982).
 _COMMAND_CALLS = {"run", "call", "check_call", "check_output", "Popen", "getoutput", "getstatusoutput",
                   "system", "popen", "create_subprocess_exec", "create_subprocess_shell"}
@@ -192,12 +195,14 @@ def _names_a_route(call, messages):
     ``worktree``, ...) in its argument list or a shell route in an argv list of it; in a ``subprocess``,
     ``os.system`` or copy call, also a shell route in any string it is given."""
     words, sequences = _argv(call)
-    if any(word in _ARGV_ROUTES for word in words) or any(_SHELL_ROUTE.search(text) for text in sequences):
+    if any(word in _ARGV_ROUTES for word in words) or set(_WORKTREE_ROUTE) <= set(words) \
+            or any(_SHELL_ROUTE.search(text) for text in sequences):
         return True
     callee, owner = _callee(call), _owner(call)
     if callee in _COMMAND_CALLS or callee in _COPY_CALLS or (owner, callee) in _MODULE_COPY_CALLS:
         texts = [text for argument in _arguments(call) for text in _strings(argument, messages)]
-        return any(text in _ARGV_ROUTES or _SHELL_ROUTE.search(text) for text in texts)
+        return any(text in _ARGV_ROUTES or _SHELL_ROUTE.search(text) for text in texts) \
+            or set(_WORKTREE_ROUTE) <= set(texts)
     return False
 
 

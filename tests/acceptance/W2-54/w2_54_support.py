@@ -1662,8 +1662,21 @@ class Daemons:
     def env(self, base, place=None):
         env = dict(base)
         env.pop("GOV_OLLAMA_BIN", None)
-        folders = [str(self.bin)] + [folder for folder in base.get("PATH", "/usr/bin:/bin").split(os.pathsep)
-                                     if folder and not (Path(folder) / "ollama").exists()]
+        # Rewrite-Reason: DEC-1061 (D-4's red fix R-1, latent copy): the folders holding ``ollama`` stay dropped, but
+        # the tools a read's refresh may need (``gitleaks``) are resolved on the full PATH first and linked from a
+        # scratch ``tools`` folder, so a dropped folder (~/.local/bin, the ollama wrapper beside gitleaks) takes no
+        # tool away; the dropped folder is never put back (W2-91's form).
+        full = base.get("PATH", "/usr/bin:/bin")
+        tools = self.root / "tools"
+        tools.mkdir(parents=True, exist_ok=True)
+        for name in ("gitleaks",):
+            found = shutil.which(name, path=full)
+            link = tools / name
+            if found and not link.is_symlink():
+                link.symlink_to(Path(found).resolve())
+        assert not (tools / "ollama").exists(), "the scratch tools folder must hold no ollama"
+        folders = [str(self.bin), str(tools)] + [folder for folder in full.split(os.pathsep)
+                                                 if folder and not (Path(folder) / "ollama").exists()]
         env.update({"PATH": os.pathsep.join(folders), "HOME": str(self.home)})
         if place is not None:
             path = self.install(place)

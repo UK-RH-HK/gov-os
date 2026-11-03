@@ -19,6 +19,29 @@ written, and no hook is run against it.
 After the switch-over, nine cases time the hook. The case that ran the acceptance suites of W1-02, W1-03 and W1-04 in
 a child process is retired (see [Retired](#retired)).
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 30 in the full run, 51 in `breadth`, 17 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The Gov OS repository runs W1-02, W1-03 and W1-04 as live hooks for every later ticket | `test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool` (2 of 14), `test_w1_05_live_hooks.py::test_a_hook_runs_after_every_bash_call` (2 of 2), `test_w1_05_live_hooks.py::test_hooks_are_not_switched_off`, `test_w1_05_live_hooks.py::test_ordinary_reads_stay_open` | part A's row, by its words; partly lifted (part A's row): `test_a_hook_runs_before_every_tool` (2), `test_a_hook_runs_after_every_bash_call` (2), `test_hooks_are_not_switched_... |
+| S2: The interim operator diff check is retired and recorded as such | `test_w1_05_switch_over_record.py::test_the_operator_diff_check_is_recorded_as_retired` | part A's row, by its words |
+| S3: A minimal subagent definition for the orchestrator role exists under .claude/agents/, with the subagent type name orchestrator (DEC-119) [CAP-2... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S4: A minimal subagent definition for the engineer role exists under .claude/agents/, with the subagent type name engineer (DEC-119) [CAP-22.a] | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S5: A minimal subagent definition for the product-spec role exists under .claude/agents/, with the subagent type name product-spec (DEC-119) [CAP-2... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S6: A minimal subagent definition for the independent-test-designer role exists under .claude/agents/, with the subagent type name independent-test... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| S7: A minimal subagent definition for the independent-auditor role exists under .claude/agents/, with the subagent type name independent-auditor (D... | `test_w1_05_role_subagents.py::test_a_subagent_definition_exists_for_the_role` (5 of 5), `test_w1_05_role_subagents.py::test_the_live_guard_takes_the_definition_s_type_name_as_the_role` (5 of 5) | part A's row, by its words |
+| F1: A later ticket runs without the guard active | `test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool` (2 of 14), `test_w1_05_live_hooks.py::test_a_hook_runs_after_every_bash_call` (2 of 2), `test_w1_05_live_hooks.py::test_hooks_are_not_switched_off`, `test_w1_05_live_hooks.py::test_ordinary_reads_stay_open` | part A's row, by its words; partly lifted (part A's row): `test_a_hook_runs_before_every_tool` (2), `test_a_hook_runs_after_every_bash_call` (2), `test_hooks_are_not_switched_... |
+| F2: The switch-over happens before W1-02..04 acceptance tests pass | `test_w1_05_live_hooks.py::test_the_test_designer_writes_only_acceptance_tests` | the ticket's words |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `2b4b91f`, with the tests of this revision: 22 failed, 77 errors, 0 passed (99 cases, 27

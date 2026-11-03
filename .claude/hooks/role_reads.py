@@ -16,7 +16,8 @@ A glob is in the path map's language (``*`` within a folder, ``**`` across folde
                        tests/acceptance/<WBS>/**, and each file in another ticket's tests/acceptance/<X>/ that a
                        test designer's commit made for it touched (linked_tests: the commit's Task: trailer names the
                        ticket, or the commit is on the first-parent line of w2/<WBS>-tests since it left
-                       w2/integrate);
+                       w2/integrate); for a coordination ticket (class: coordination, W2-00) its own folder only
+                       (ACT-G14b);
                        other tickets' tests stay readable;
   {ticket_impl}        the engineer's new work (the owner's (c3), 2026-11-03): each of the ticket's allowed_paths but
                        tests/acceptance/ (its code, docs and new unit tests), less the shared test files (any conftest.py,
@@ -858,8 +859,36 @@ def judges(sec, roles, root, ticket_id, trees, main=None):
         if isinstance(front, dict) and isinstance(front.get("id"), str):
             names = set(names) | {front["id"]}
         out.append(Judge(role, expand(globs, wbs, allowed if isinstance(allowed, list) else [], root, main=main,
-                                      names=names), trees))
+                                      names=names, links=_links_unless_coordination(root, ticket_id, front)),
+                         trees))
     return out
+
+
+def coordination(front):
+    """A coordination ticket (front matter ``class: coordination``, as W2-00): it has no acceptance tests of its own,
+    and the work committed under it (the CTO's, the refactoring's) revises other tickets' tests for them."""
+    return isinstance(front, dict) and str(front.get("class") or "").strip() == "coordination"
+
+
+def _links_unless_coordination(root, ticket_id, front):
+    """{ticket_tests}'s link source for the session's ticket: none for a coordination ticket (its own folder only;
+    ACT-G14b, after D-4's cut tied 109 acceptance files to W2-00 through Task: DAEO-sdxk), linked_tests otherwise.
+    The ticket's class is read only when the links are first wanted (an engineer's read of another ticket's
+    acceptance folder); a ticket that cannot be read gives None (only the own folder, and the refusal says so)."""
+    seen = []
+
+    def links(main, names, wbs):
+        if not seen:
+            try:
+                seen.append(front if front else ticket_front(root, ticket_id))
+            except Exception:
+                seen.append(None)
+        if seen[0] is None:
+            return None
+        if coordination(seen[0]):
+            return set()
+        return linked_tests(main, names, wbs)
+    return links
 
 
 def refusal(main, root, tool, tin, cwd, roles, ticket_id, trees, expand_token):

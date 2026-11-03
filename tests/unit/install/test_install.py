@@ -522,12 +522,8 @@ def test_frozen_repo_denies_install_for_orchestrator(tmp_path):
     assert _decision(proc) == "deny"
 
 
-def test_unfrozen_repo_asks_install_for_orchestrator(tmp_path):
-    """Without freeze, orchestrator gets ask (control for frozen test)."""
-    project = _make_project(tmp_path)
-    proc = _run_hook(project, "pip install requests",
-                     role="orchestrator", ticket="T-01", tmp_path=tmp_path)
-    assert _decision(proc) == "ask"
+# The unfrozen control (orchestrator gets ask) is test_orchestrator_install_gets_ask above: its byte-identical twin
+# here is deleted (D-4, row D2, DEC-1040 (1)).
 
 
 # ===================================================================
