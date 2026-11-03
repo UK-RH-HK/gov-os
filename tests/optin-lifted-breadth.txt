@@ -972,3 +972,38 @@ rep: tests/acceptance/W1-41/test_w1_41_baseline.py  # one row per parametrised f
 rep: tests/acceptance/W1-41/test_w1_41_embedding_policy.py  # one row per parametrised function
 rep: tests/acceptance/W1-41/test_w1_41_external_follow_up.py  # one row per parametrised function
 rep: tests/acceptance/W1-41/test_w1_41_external_references.py  # one row per parametrised function
+
+# acceptance/W1-48
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_version_below_the_minimum_fails_even_when_the_registry_records_it  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_failure_names_what_is_below_the_minimum  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_cli_and_an_active_extension_at_or_above_the_minimum_are_no_hard_failure  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_difference_at_or_above_the_minimum_is_reported_as_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_record_written_with_a_leading_v_is_the_same_version  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_failure_and_drift_are_told_apart_in_one_look  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_newer_binary_with_another_digest_is_drift_by_its_version_alone  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_recorded_digest_is_compared_without_case  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_cli_at_the_recorded_version_with_another_digest_is_a_hard_failure  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_extensions_binary_at_the_recorded_version_with_another_digest_is_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_both_binaries_at_the_recorded_version_with_another_digest_are_one_failure_and_one_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_clis_digest_fails_whatever_the_extension_is  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_active_extension_is_the_row_of_extensions_json  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_extension_id_is_compared_without_case  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_an_index_without_a_claude_code_row_gives_no_active_extension  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_folder_of_a_row_is_its_location  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_folder_of_a_row_without_a_location_is_its_relative_location_under_the_extensions_folder  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_every_node_22_command_of_the_registry_carries_the_path_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_sees_the_node_22_commands_the_registry_has  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_refuses_a_node_22_command_without_the_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_accepts_a_node_22_command_with_the_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_leaves_other_commands_alone  # cap
+tests/acceptance/W1-48/test_w1_48_registry.py::test_an_entry_of_this_ticket_states_every_fact_the_schema_requires  # cap
+tests/acceptance/W1-48/test_w1_48_registry.py::test_the_registry_as_read_is_the_committed_one  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_dec_141_is_an_owner_decision_that_names_the_prerequisite_and_its_version  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_install_command_of_a_sandbox_prerequisite_is_the_owners  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_uninstall_command_of_a_sandbox_prerequisite_is_the_owners  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_sha256_digest  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_calendar_date  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_sandbox_prerequisite_on_this_machine_is_the_recorded_version  # cap
+rep: tests/acceptance/W1-48/test_w1_48_claude_code.py  # one row per parametrised function
+rep: tests/acceptance/W1-48/test_w1_48_cli_path.py  # one row per parametrised function
+rep: tests/acceptance/W1-48/test_w1_48_drift.py  # one row per parametrised function
