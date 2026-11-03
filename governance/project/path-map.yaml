@@ -4,6 +4,7 @@
 state_class: AUTHORITATIVE
 
 namespaces:
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the root files are embedded.
   root-files:
     paths: ["*"]
     memory_class: governance
@@ -11,7 +12,7 @@ namespaces:
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: allowed
-    embedding_policy: not embedded
+    embedding_policy: embedded
     provenance: written by hand under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
   agent-settings:
@@ -57,6 +58,8 @@ namespaces:
   # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
   # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
   # packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the overlay is embedded. Its sensitivity and export policy
+  # stay as they are: the indexer reads embedding_policy only.
   project-overlay:
     paths:
       - "governance/*"
@@ -73,6 +76,8 @@ namespaces:
       # DEC-990 (P-W2-97-PM-1): the CTO's committed tools, W2-97's merge queue first
       - "governance/project/orchestration/tools/**"
       - "governance/project/orchestration/sessions/**"
+      # b60ff112: the emergency patches' review records (they review no ticket), moved out of docs/probes/
+      - "governance/project/orchestration/reviews/**"
       - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
       - "governance/project/orchestration/main/orchestrator/PR-*.md"
     memory_class: governance
@@ -80,21 +85,62 @@ namespaces:
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: denied
-    embedding_policy: not embedded
+    embedding_policy: embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
   # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
   # the branch record/w2, outside this tree; no namespace here holds it.
+  # DEC-952 item 1, DEC-388: the kernel's own files are embedded; vendored code and the generated adapter copies
+  # are in the two namespaces below it. `skills/*/*` holds each kernel skill and vendored.yaml, never a file in a
+  # folder below superpowers/.
   kernel-template:
-    paths: ["template/**"]
+    paths:
+      - "template/*"
+      - "template/.github/**"
+      - "template/openspec/**"
+      - "template/governance/project/**"
+      - "template/governance/kernel/*"
+      - "template/governance/kernel/canaries/**"
+      - "template/governance/kernel/checks/**"
+      - "template/governance/kernel/hooks/**"
+      - "template/governance/kernel/launch/**"
+      - "template/governance/kernel/roles/**"
+      - "template/governance/kernel/schemas/**"
+      - "template/governance/kernel/skills/*/*"
+      - "template/governance/kernel/templates/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: allowed; copied into adopting products
-    embedding_policy: embedded, except vendored code
+    embedding_policy: embedded
     provenance: written under a ticket; vendored parts are pinned in the tool registry
     deletion_rebuild: authoritative; restored from git only
+  # DEC-952 item 1, DEC-388: vendored code, unchanged upstream copies, is not embedded.
+  kernel-vendored:
+    paths:
+      - "template/governance/kernel/vendor/**"
+      - "template/governance/kernel/skills/superpowers/*/**"
+      - "template/governance/kernel/bin/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: allowed; copied into adopting products
+    embedding_policy: not embedded
+    provenance: vendored upstream code, pinned in the tool registry (superpowers v6.4.2, its kernel copies recorded in skills/superpowers/vendored.yaml; tk)
+    deletion_rebuild: restored from git; re-vendored by the tool registry's install command
+  # DEC-952 item 1, DEC-388: the generated adapter copies are not embedded, as the root's .rulesync/** and .claude/**.
+  kernel-adapter-copies:
+    paths: ["template/.rulesync/**"]
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: allowed; copied into adopting products
+    embedding_policy: not embedded
+    provenance: generated copies of the kernel's skills, roles and commands for the agent adapters (rulesync)
+    deletion_rebuild: rebuilt from the kernel's own files; restored from git
   gov-source:
     paths: ["src/**"]
     memory_class: governance
@@ -125,14 +171,26 @@ namespaces:
     embedding_policy: not embedded
     provenance: synthetic product repositories, written under a ticket; stand-ins for product data, kept out of governance memory
     deletion_rebuild: authoritative; restored from git only
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the old carried cli/ stays out; schemas/ has the namespace
+  # below it and is embedded.
   carried-code:
-    paths: ["cli/**", "schemas/**"]
+    paths: ["cli/**"]
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: until the tickets that reuse it have ported it into src/gov/; then removed
     export_policy: allowed
     embedding_policy: not embedded
+    provenance: carried from the earlier implementation (ADR-0002 §5); not authoritative for the Gov OS
+    deletion_rebuild: removed after porting; restored from git only
+  carried-schemas:
+    paths: ["schemas/**"]
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: until the tickets that reuse it have ported it into src/gov/; then removed
+    export_policy: allowed
+    embedding_policy: embedded
     provenance: carried from the earlier implementation (ADR-0002 §5); not authoritative for the Gov OS
     deletion_rebuild: removed after porting; restored from git only
 
@@ -379,6 +437,8 @@ accepted_history:
 acceptance_exemptions:
   - commit: "c9a08678644485a7528bc875164e110881b63d93"
     decision: DEC-900
+  - commit: "0568d91baf566b4d8f3ccb448e51af41cbb46d03"
+    decision: DEC-1031
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
@@ -496,6 +556,22 @@ evaluation_sets:
     hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
     measures:
       roles: [engineer, research]
+# Role separation (DEC-1052 G-14): the globs each role does not read, judged by the guard's role_reads.py from the
+# main tree's copy of this file by simple path checks (a target the guard cannot resolve, a search from a folder
+# above and a listing of names are let through). Only this block is parsed. A plain glob applies in every tree.
+# {ticket_tests} is the session ticket's acceptance tests (the owner, 2026-11-03): its own tests/acceptance/<WBS>/**
+# and each file in another ticket's folder that a test designer's commit made for it touched (the commit's Task:
+# trailer names the ticket, or the commit is on w2/<WBS>-tests's own first-parent line); other tickets' tests stay
+# readable. {ticket_impl} is the engineer's new work (the owner's (c3), 2026-11-03): the ticket's allowed_paths but
+# tests/acceptance/, less the shared test files (any conftest.py, __init__.py, *support*.py, *helper*.py), in the
+# engineer's tree ~/gov-os-worktrees/<WBS> and on its branch w2/<WBS>; in a designer's session in that tree only the
+# files its branch changes, and in the designer's <WBS>-tests tree the files the engineer's commits carried in; the
+# rest is the integrated code, which the test designer reads (DEC-963). No section, no check.
+role_paths:
+  engineer:
+    reads_denied: ["{ticket_tests}"]
+  independent-test-designer:
+    reads_denied: ["{ticket_impl}"]
 # The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
 # a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
 retrieval_authority:

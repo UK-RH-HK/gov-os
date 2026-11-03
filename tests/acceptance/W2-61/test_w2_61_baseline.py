@@ -11,7 +11,8 @@ Structural checks only, never the values of the figures beyond their presence. T
 - the stores' fingerprint (as the rebuild records it, or the sha256 of each store file, so named);
 - both figures together, hit@5 against 85 and full evidence against 99 %;
 - a per-question table of the visible half: hit@5, in the bundle, full evidence, the repeat run, the run after the
-  rebuild; one row per visible question;
+  rebuild; one row per question of lens B's 20 that the baseline measured (``q01.yaml`` to ``q20.yaml``), until
+  W2-15a's 48-question record [DEC-954 (Q9a), DEC-1009];
 - lens B's figures (13 of 20, 17 of 20) beside;
 - a labelled place (a heading) for the hidden half's scores, which W2-61h's run fills.
 
@@ -83,9 +84,14 @@ def test_both_figures_together_against_85_and_99(text):
         "full evidence is not set against 99")
 
 
-def _visible_ids():
-    files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
-    assert files, "the visible half does not exist"
+LENS_B_NAMES = tuple(f"q{n:02d}.yaml" for n in range(1, 21))   # lens B's 20, by file name [DEC-1009]
+
+
+def _lens_b_ids():
+    """The ids of lens B's 20 files, ``q01.yaml`` to ``q20.yaml`` (each file's ``id``, else its name's stem)."""
+    files = [s.REAL_VISIBLE / name for name in LENS_B_NAMES]
+    missing = [path.name for path in files if not path.is_file()]
+    assert not missing, f"lens B's question files missing from the visible half: {missing}"
     ids = []
     for path in files:
         data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -94,13 +100,16 @@ def _visible_ids():
 
 
 def test_a_per_question_table_of_the_visible_half(text):
+    """The table stays bound to the 20 questions the baseline measured: a row for each of lens B's 20
+    (``q01.yaml`` to ``q20.yaml``, by their ids), not for every visible file, until W2-15a's 48-question record
+    [DEC-954 (Q9a), DEC-1009]."""
     assert text is not None, MISSING
     rows = [line for line in text.splitlines() if line.lstrip().startswith("|")]
     headers = [line for line in rows if s.HIT_LABEL.search(line) and s.FULL_LABEL.search(line)
                and "bundle" in line.lower() and "repeat" in line.lower() and "rebuild" in line.lower()]
     assert headers, ("no table header gives hit@5, in the bundle, full evidence, the repeat run and the run after "
                      "the rebuild")
-    missing = [qid for qid in _visible_ids() if not any(re.search(rf"\b{re.escape(qid)}\b", row) for row in rows)]
+    missing = [qid for qid in _lens_b_ids() if not any(re.search(rf"\b{re.escape(qid)}\b", row) for row in rows)]
     assert not missing, f"the table has no row for: {missing}"
 
 

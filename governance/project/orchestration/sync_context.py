@@ -26,6 +26,10 @@ themselves (a ``.gitignore`` of their own), a suite's raw output under a log fol
 tree copy that no namespace of the path map holds is left out and named. Then it runs gitleaks over the record, with
 the repository's ``.gitleaks.toml``, redacted; a file gitleaks flags is removed again and named, never committed.
 ``--check`` copies nothing and only lists what it would copy.
+
+DEC-1045: both gitleaks scans (the record's and the staged set's) follow the repository's switch,
+``governance/project/secrets.yaml`` (``scan: on|off``; absent file or key: on). Off: no gitleaks call, each skip named
+on stderr. Any other value, or a file that does not parse: exit 2 before anything is copied (fails closed).
 """
 import json
 import os
@@ -112,8 +116,41 @@ def namespaced():
     return lambda rel: any(matches(rel, p) for p in patterns)
 
 
+SWITCH = "governance/project/secrets.yaml"  # DEC-1045: the repository's secrets-scan switch, shared with the product
+OFF_LINE = "gitleaks: off by configuration (DEC-1045)"
+SCAN = True  # read from the switch at the start of main()
+
+
+def scan_on(root: Path) -> bool:
+    """The switch ``scan: on|off`` of ``root``'s secrets.yaml: absent file, empty file or absent key: on; ``on`` or
+    ``off`` (YAML's true/false, or the quoted words); anything else, or a file that does not parse, raises ValueError
+    (fails closed, never "off")."""
+    path = Path(root) / SWITCH
+    if not path.exists():
+        return True
+    import yaml
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, yaml.YAMLError) as e:
+        raise ValueError(f"{path}: cannot be read as YAML ({type(e).__name__})") from e
+    if data is None:
+        return True
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: not a mapping (one key, scan: on|off)")
+    value = data.get("scan", True)
+    if value is True or value == "on":
+        return True
+    if value is False or value == "off":
+        return False
+    raise ValueError(f"{path}: scan is {value!r}; only on or off (DEC-1045)")
+
+
 def scan(folder: Path) -> list[Path]:
-    """Run gitleaks over ``folder``; remove and name every file it flags. Raises when gitleaks cannot scan."""
+    """Run gitleaks over ``folder``; remove and name every file it flags. Raises when gitleaks cannot scan. With the
+    switch off (DEC-1045), no gitleaks call: named on stderr, nothing flagged."""
+    if not SCAN:
+        print(f"   {OFF_LINE}: the scan of {folder} is skipped", file=sys.stderr)
+        return []
     with tempfile.TemporaryDirectory() as tmp:
         report = Path(tmp) / "report.json"
         done = subprocess.run(["gitleaks", "dir", str(folder), "--config", str(ROOT / ".gitleaks.toml"), "--redact",
@@ -136,9 +173,10 @@ def commit(subject: str) -> int:
     if subprocess.run(git + ["diff", "--cached", "--quiet"]).returncode == 0:
         print("record/w2: nothing to commit")
         return 0
-    leaks = subprocess.run(["gitleaks", "git", "--staged", "--redact", "--no-banner", "--log-level", "error",
-                            "--config", str(ROOT / ".gitleaks.toml"), str(RECORD)])
-    if leaks.returncode != 0:
+    if not SCAN:
+        print(f"record/w2: {OFF_LINE}: the staged set's scan is skipped", file=sys.stderr)
+    elif subprocess.run(["gitleaks", "git", "--staged", "--redact", "--no-banner", "--log-level", "error",
+                         "--config", str(ROOT / ".gitleaks.toml"), str(RECORD)]).returncode != 0:
         print("record/w2: gitleaks flagged the staged set; nothing committed", file=sys.stderr)
         return 3
     subprocess.run(git + ["commit", "-q", "-m", subject, *TRAILERS], check=True)
@@ -151,6 +189,12 @@ def main():
     args = sys.argv[1:]
     check, to_main = "--check" in args, "--main" in args
     subject = args[args.index("--commit") + 1] if "--commit" in args else None
+    global SCAN
+    try:
+        SCAN = scan_on(ROOT)
+    except ValueError as e:  # fails closed: nothing copied, nothing committed
+        print(f"the secrets-scan switch cannot be read: {e}; nothing copied", file=sys.stderr)
+        return 2
     if not (RECORD / ".git").exists():
         print(f"the record worktree {RECORD} is missing: nothing copied", file=sys.stderr)
         return 2
@@ -177,7 +221,8 @@ def main():
         d.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(s, d)
     flagged = scan(DEST) + (scan(MAIN_DEST / "main") if main_pairs else [])
-    print(f"{len(pairs) + len(main_pairs)} copied; {len(flagged)} flagged by gitleaks and removed again")
+    print(f"{len(pairs) + len(main_pairs)} copied; " + (f"{len(flagged)} flagged by gitleaks and removed again" if SCAN
+                                                        else f"not scanned: {OFF_LINE}"))
     return commit(subject) if subject else 0
 
 
