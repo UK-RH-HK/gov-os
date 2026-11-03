@@ -877,8 +877,6 @@ tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_a_record_of_a_failed_
 tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_the_note_of_another_commit_copied_onto_the_head_commit_fails_ci  # cap
 tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_commit_passes_again_once_the_check_passes  # cap
 tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_g3_check_does_not_run_at_commit  # cap
-tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_staged_secret_stops_the_commit  # cap
-tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_staged_secret_that_the_builtin_allowlist_shelters_stops_the_commit  # cap
 tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_sheltering_words_alone_do_not_stop_a_commit  # cap
 tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_secret_staged_beside_a_clean_working_copy_is_what_counts  # cap
 tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_missing_tool_stops_the_commit  # cap
