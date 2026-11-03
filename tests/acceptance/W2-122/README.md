@@ -82,3 +82,17 @@ retired from this suite. The ticket's other lines keep their numbers (K1 to K4, 
   base folder. Returned to the lead as a package; no case guesses it.
 - **A rebuild whose semantic store was not recreated** (the former KPI 5): moved to W2-124 (DEC-1027 C); its
   tests are W2-124's.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: `gov rebuild --seed <store folder>` copies a warm base's stores (the lexical, semantic and code-graph stores and the secrets cache's ... | `test_w2_122_configured_base.py::test_a_project_with_no_configured_base_rebuilds_cold_named`, `test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` | by its words (every function of the suite kept) |
+| S2: A seed whose code fingerprint, embedder model or schema differs from the tree's is refused, named, and the rebuild runs cold (fail cl... | `test_w2_122_fail_closed.py::test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed`, `test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` | by its words (every function of the suite kept) |
+| S3: Measured, in docs/changes/W2-122-evidence.md: a new worktree's first rebuild seeded from the integration store against a cold one, al... | `test_w2_122_configured_base.py::test_a_project_with_no_configured_base_rebuilds_cold_named`, `test_w2_122_fail_closed.py::test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed` | by its words (every function of the suite kept) |
+| S4: A product feature for every adopted repository: the warm base is the project's configured integration store (W2-116's, a path in the ... | `test_w2_122_configured_base.py::test_a_project_with_no_configured_base_rebuilds_cold_named`, `test_w2_122_configured_base.py::test_a_configured_path_that_holds_no_base_rebuilds_cold_named` | by its words (every function of the suite kept) |
+| F1: A seeded store that differs from a cold rebuild's; a seed from another embedder or schema used [DEC-1014] | `test_w2_122_seeded_equals_cold.py::test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry`, `test_w2_122_seeded_equals_cold.py::test_a_link_to_the_base_is_followed`, `test_w2_122_configured_base.py::test_seed_without_a_folder_reads_the_configured_base` | README |
