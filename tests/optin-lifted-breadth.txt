@@ -88,7 +88,8 @@ rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_scope_outside_the_three
 rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_severity_outside_the_four_is_refused  # one row
 rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_whose_paths_are_not_a_list_of_patterns_is_refused  # one row
 rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_that_declares_nothing_is_refused  # one row
-rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither  # one row
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither[governance,product]  # fold (round 2: a row past the line's named classes)
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither[None]  # fold (round 2: a row past the line's named classes)
 
 # acceptance/W1-09
 tests/acceptance/W1-09/test_w1_09_ready.py::test_a_ticket_that_names_no_folder_needs_the_folder_of_its_own_id  # cap
@@ -184,7 +185,6 @@ tests/acceptance/W1-11/test_w1_11_gates.py::test_a_citing_record_without_a_cit_i
 tests/acceptance/W1-11/test_w1_11_gates.py::test_a_gate_without_a_cit_does_not_authorise  # cap
 tests/acceptance/W1-11/test_w1_11_gates.py::test_two_missing_cits_are_not_the_same_cit  # cap
 tests/acceptance/W1-11/test_w1_11_gates.py::test_a_record_without_approval_is_not_checked  # cap
-rep: tests/acceptance/W1-11/test_w1_11_gates.py::test_a_ticket_that_waits_on_a_declined_revoked_or_stale_package_fails  # one row (round 2: the function is a KPI line's case)
 tests/acceptance/W1-11/test_w1_11_gates.py::test_a_ticket_that_waits_on_an_open_or_answered_package_is_not_failed_by_the_checker  # cap
 tests/acceptance/W1-11/test_w1_11_gates.py::test_a_closed_ticket_named_by_a_dead_package_is_not_failed  # cap
 tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_naming_another_repository_does_not_hide_the_findings_of_the_root  # cap
@@ -278,7 +278,6 @@ tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_first_call_that_builds_no_in
 tests/acceptance/W1-16/test_w1_16_ui_off.py::test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on  # cap
 tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on  # cap
 tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_setting_left_in_the_home_is_turned_off_by_the_next_call  # cap
-rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_callers_and_impact_hit_at_five_is_at_least_sixty_percent  # one row
 rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_callers_and_impact_are_answered_in_every_language  # one row
 rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_a_renamed_symbol_is_answered_under_its_new_name_only  # one row
 rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_definitions_name_every_file_that_defines_the_symbol  # one row
@@ -696,7 +695,8 @@ tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_repeated_status_give
 tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_leaves_a_dev_tier_clone_clean  # cap
 rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_record_the_load_cannot_take_is_not_hidden_behind_a_clean_list_of_packages  # one row
 rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written  # one row
-rep: tests/acceptance/W1-32/test_w1_32_launch.py  # one row per parametrised function
+rep: tests/acceptance/W1-32/test_w1_32_launch.py::test_a_failed_removal_keeps_the_sessions_exit_code  # one row per parametrised function
+rep: tests/acceptance/W1-32/test_w1_32_launch.py::test_a_failed_removal_writes_one_line_to_stderr_that_names_the_folder  # one row per parametrised function
 rep: tests/acceptance/W1-32/test_w1_32_status_not_read.py  # one row per parametrised function
 
 # acceptance/W1-35
@@ -888,7 +888,6 @@ tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_split_a_merge_or_an_extrac
 tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off  # cap
 tests/acceptance/W1-41/test_w1_41_path_map.py::test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off  # cap
 tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off  # cap
-rep: tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_justification_that_states_only_one_of_the_two_grounds_is_refused  # one row (round 2: the function is a KPI line's case)
 tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_plan_has_the_proposed_batches_each_with_its_own_rollback_point  # cap
 tests/acceptance/W1-41/test_w1_41_unknown.py::test_the_unknown_artefact_becomes_a_decision_package_for_the_customer  # cap
 tests/acceptance/W1-41/test_w1_41_unknown.py::test_a_project_without_unknown_artefacts_raises_no_package_about_one  # cap
@@ -929,8 +928,6 @@ tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_leaves_other_
 tests/acceptance/W1-48/test_w1_48_registry.py::test_an_entry_of_this_ticket_states_every_fact_the_schema_requires  # cap
 tests/acceptance/W1-48/test_w1_48_registry.py::test_the_registry_as_read_is_the_committed_one  # cap
 tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_dec_141_is_an_owner_decision_that_names_the_prerequisite_and_its_version  # cap
-rep: tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_install_command_of_a_sandbox_prerequisite_is_the_owners  # one row (round 2: the function is a KPI line's case)
-rep: tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_uninstall_command_of_a_sandbox_prerequisite_is_the_owners  # one row (round 2: the function is a KPI line's case)
 tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_sha256_digest  # cap
 tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_calendar_date  # cap
 tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_sandbox_prerequisite_on_this_machine_is_the_recorded_version  # cap
@@ -1099,7 +1096,6 @@ rep: tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_nothing_is_dropped
 rep: tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_a_store_whose_index_is_missing_gives_one_packet_under_any_order  # one row
 rep: tests/acceptance/W2-54/test_w2_54_query_cache.py  # one row per parametrised function
 rep: tests/acceptance/W2-54/test_w2_54_query_vector.py  # one row per parametrised function
-rep: tests/acceptance/W2-54/test_w2_54_time_limit.py  # one row per parametrised function
 
 # acceptance/W2-55
 rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding  # one row
@@ -1141,7 +1137,8 @@ rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_each_coupling_impo
 rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_a_fixture_input_change_does_not_reach_the_real_model_suites  # one row
 rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it  # one row
 rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared  # one row
-rep: tests/acceptance/W2-66/test_w2_66_retention.py  # one row per parametrised function
+rep: tests/acceptance/W2-66/test_w2_66_retention.py::test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays  # one row per parametrised function
+tests/acceptance/W2-66/test_w2_66_retention.py::test_every_test_run_of_the_close_is_given_the_retention_option[serial-afterwards]  # fold (round 2: a row past the line's named classes)
 rep: tests/acceptance/W2-66/test_w2_66_scoped_selection.py  # one row per parametrised function
 
 # acceptance/W2-76

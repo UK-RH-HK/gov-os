@@ -718,13 +718,13 @@ the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--
 switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
 (`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 45 in the full run, 97 in `breadth`, 0 in `lifted`.
+Cases: 47 in the full run, 95 in `breadth`, 0 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
 | S1: Flags ACTIVE-while-superseded, duplicate or overlapping ids across directories, and supersession cycles on the b-dev fixtures (HZ-B-03, HZ-B-04... | `test_w1_11_b_dev.py::test_the_overlapping_ids_of_the_two_decision_directories_are_flagged`, `test_w1_11_b_dev.py::test_adr_003_is_flagged_as_active_while_superseded_once_dec_003_names_it`, `test_w1_11_b_dev.py::test_a_supersession_cycle_between_the_two_directories_is_flagged` | the ticket's words |
 | S2: A change that sets a decision ACTIVE without an owner approval fact from git fails [CAP-01.b, CAP-21.a] | `test_w1_11_no_id_and_replace_refs.py::test_a_replace_ref_that_gives_an_agent_commit_the_owner_role_is_no_approval`, `test_w1_11_object_store.py::test_a_missing_object_does_not_make_a_later_owner_commit_the_approval`, `test_w1_11_approval.py::test_an_agent_that_sets_an_approved_decision_active_again_fails` | the ticket's words |
 | S3: Files stay byte-identical | `test_w1_11_b_dev.py::test_the_tier_is_byte_identical_after_the_check` | the ticket's words |
-| S4: A declined, revoked or stale gate, or a gate answered for another CIT, does not authorise execution: the checker fails a ticket or change that ... | `test_w1_11_gates.py::test_a_declined_revoked_or_stale_gate_does_not_authorise` (6 of 6), `test_w1_11_gates.py::test_a_ticket_that_waits_on_a_declined_revoked_or_stale_package_fails` (1 of 3), `test_w1_11_citing_files.py::test_a_citing_file_without_an_id_is_authorised_by_an_answered_gate_of_its_cit` | the ticket's words |
+| S4: A declined, revoked or stale gate, or a gate answered for another CIT, does not authorise execution: the checker fails a ticket or change that ... | `test_w1_11_gates.py::test_a_declined_revoked_or_stale_gate_does_not_authorise` (6 of 6), `test_w1_11_gates.py::test_a_ticket_that_waits_on_a_declined_revoked_or_stale_package_fails` (3 of 3), `test_w1_11_citing_files.py::test_a_citing_file_without_an_id_is_authorised_by_an_answered_gate_of_its_cit` | the ticket's words |
 | F1: Any planted decision hazard is missed | `test_w1_11_hazards.py::test_every_hazard_planted_together_is_flagged`, `test_w1_11_approval.py::test_every_unapproved_active_decision_is_flagged`, `test_w1_11_hazards.py::test_every_active_superseded_decision_is_flagged_not_only_the_first` | the ticket's words |
 | F2: The checker rewrites a decision file | `test_w1_11_b_dev.py::test_the_tier_is_byte_identical_after_the_check` | the ticket's words |

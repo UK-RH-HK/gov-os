@@ -239,11 +239,11 @@ the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--
 switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
 (`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 48 in the full run, 33 in `breadth`, 0 in `lifted`.
+Cases: 52 in the full run, 29 in `breadth`, 0 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov launch keeps the session's exit code and names the folder on stderr when its temp folder cannot be removed; SIGTERM and SIGHUP end the sess... | `test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written` (1 of 3), `test_w1_32_launch.py::test_the_signal_ends_the_session` (1 of 2), `test_w1_32_launch.py::test_the_signal_removes_the_temp_folder` (1 of 2), `test_w1_32_launch.py::test_the_exit_code_after_the_signal_is_130` (1 of 3) | designer |
+| S1: gov launch keeps the session's exit code and names the folder on stderr when its temp folder cannot be removed; SIGTERM and SIGHUP end the sess... | `test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written` (1 of 3), `test_w1_32_launch.py::test_the_signal_ends_the_session` (2 of 2), `test_w1_32_launch.py::test_the_signal_removes_the_temp_folder` (2 of 2), `test_w1_32_launch.py::test_the_exit_code_after_the_signal_is_130` (3 of 3) | designer |
 | S2: gov status --json reports ready/blocked/claimed tickets, open decision packages, readiness per specification, governance share, pause state and... | `test_w1_32_added_cases.py::test_a_store_without_its_records_or_edges_leaves_the_ready_and_blocked_tickets_not_read` (2 of 2), `test_w1_32_status_read_only.py::test_status_of_a_paused_project_changes_neither_the_flag_nor_its_mirror`, `test_w1_32_status_read_only.py::test_status_takes_no_claim_and_releases_none` | the ticket's words |
 | S3: Pause state appears in gov status (moved from W1-28, DEC-364) | `test_w1_32_status_pause.py::test_the_pause_state_is_the_projects_own`, `test_w1_32_status_pause.py::test_a_paused_project_names_who_paused_it` (1 of 2), `test_w1_32_status_pause.py::test_an_empty_file_at_the_flags_path_is_no_pause` | the ticket's words |
 | S4: Read-only: git status --porcelain unchanged [CAP-27.a] | `test_w1_32_status_read_only.py::test_git_status_porcelain_is_unchanged` (2 of 2) | the ticket's words |
