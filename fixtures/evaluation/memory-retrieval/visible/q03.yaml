@@ -1,22 +1,32 @@
-# Lens B's Q03 (Table 2): "DEC-798; semantic.py 10–25; ollama.py 1–30". My reading: the three state the same
-# reason (the GPU gives a text a vector that depends on the prompt before it; the CPU does not), so they are
-# alternatives of one entry. ollama.py states the CPU-only embedder that embeds the questions, not the reason itself;
-# kept because lens B names it. semantic.py's lines are 12–17 and ollama.py's 8–11 at the commit.
+# Q03, rewritten by the owner's decision of 2026-11-03 (in the chat): lens B's Q03 asked for DEC-798's CPU-only rule,
+# which DEC-1033 replaced on 2026-11-02 (commit 75f18d1118c7), so it rewarded a replaced decision. Lens B's original
+# and its past scores are kept in ../retired/ (q03-lens-b.yaml, README.md); the measure never reads that folder.
+# The three sources state the same rule, so they are alternatives of one entry, as the original's were: the
+# register's DEC-1033 entry (the rule and why), semantic.py's docstring lines on the question's vector (the rule, its
+# reason, the chunks on the shared runner; query_vector and _device carry it out) and ollama.py's on the two daemons
+# (the query daemon started with the GPU visible; ensure_query_available carries it out). Category kept: the answer
+# is a decision.
 id: Q03
 category: decision
-commit: 23079f92a6fa
-question: Why are query embeddings computed on a CPU-only embedder?
+commit: acfea6d9d4ef
+question: Where are query embeddings computed now, on which device, and why?
 gold_answer: >-
-  Because on the shared GPU runner one text's vector varies with the prompt computed just before it (50 of 216 reads
-  differed), while on the CPU it never did; DEC-798 has a CPU-only embedder of gov's own, on its own port, answer the
-  query embeddings, and the shared GPU runner keeps building the index.
+  By gov's own query embedder, the Ollama daemon at GOV_QUERY_OLLAMA_HOST (127.0.0.1:11435 by default), which embeds
+  the questions and nothing else; the shared runner at OLLAMA_HOST still builds the index. Since DEC-1033 (2026-11-02,
+  replacing DEC-798's CPU-only rule) that daemon is started with the GPU visible (no CUDA_VISIBLE_DEVICES=-1), and a
+  question's vector is used from whichever device computed it, CPU or GPU, provided the embedder reports the model
+  loaded after computing it and the vectors are well-formed; the query-vector cache keys by that device. Why: the
+  CPU-only rule dropped a question's vector unless the query server was wholly on the CPU (the W2-123 lead's finding,
+  so ACT-QUERY-GPU-1 was not applied) and the machine had no room for the fixes; the owner accepted the GPU's drift
+  (a vector that can depend on the prompt computed just before it, DEC-773) on the evidence that it changed no answer
+  of the standing memory measure.
 sources:
   - - path: docs/DECISION_REGISTER.md
-      heading: "### DEC-798 — Query embeddings on a CPU-only embedder of their own; DEC-261 amended (P-W2-40 (b))"
-      lines: [8731, 8739]
+      heading: "### DEC-1033 — EMERGENCY: everything stopped but the fixes; four emergency patches in parallel; DEC-798 replaced (standing until the owner lifts it)"
+      lines: [12838, 12845]
     - path: src/gov/retrieval/semantic.py
-      heading: "- On the GPU the embedder gives a text a vector that depends on the prompt the runner computed just before it, by"
-      lines: [12, 17]
+      heading: "- A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare"
+      lines: [12, 18]
     - path: src/gov/retrieval/ollama.py
-      heading: "Two daemons are started so (DEC-261 as DEC-798 amends it): the shared one at"
-      lines: [8, 11]
+      heading: "Two daemons are started so (DEC-261 as DEC-798 amends it and DEC-1033 replaces its"
+      lines: [8, 12]
