@@ -141,3 +141,17 @@ tests red. No edge case is added beyond the two behaviours (DEC-221; DEC-303: "O
 - Anything under `template/governance/kernel/templates/openspec/` (DP-3, DEC-304).
 - Any key of `template/openspec/config.yaml` other than `schema` (`context`, `rules`).
 - That a change to the YAML or the taxonomy carries a linked CIT-E record (DP-5).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a] | `test_w1_12_rows_and_states.py::test_schema_is_where_openspec_looks_for_it`, `test_w1_12_rows_and_states.py::test_fork_keeps_the_base_workflow_and_adds_the_readiness_record`, `test_w1_12_rows_and_states.py::test_every_row_is_carried_by_its_id_in_order` | README |
+| S2: Proposal templates pass openspec validate --strict on first use | `test_w1_12_templates.py::test_every_artifact_has_its_template_in_the_schema_folder`, `test_w1_12_templates.py::test_the_project_resolves_the_schema_and_its_templates`, `test_w1_12_templates.py::test_a_fresh_change_from_the_templates_passes_validate_strict` | README |
+| S3: The schema carries the capability-type table for STANDARD rows; a change to the taxonomy or to readiness-dimensions.yaml is accepted ... | `test_w1_12_capability_types.py::test_the_table_has_the_capability_types_of_the_yaml`, `test_w1_12_capability_types.py::test_each_capability_type_marks_the_rows_of_the_yaml`, `test_w1_12_capability_types.py::test_the_table_marks_only_rows_the_schema_carries` | README |
+| F1: A row name or state differs from readiness-dimensions.yaml | `test_w1_12_rows_and_states.py::test_every_row_name_is_the_name_in_the_yaml`, `test_w1_12_rows_and_states.py::test_the_five_states_are_carried_exactly`, `test_w1_12_rows_and_states.py::test_every_row_is_carried_by_its_id_in_order` | README |
+| F2: A template fails validate --strict | `test_w1_12_templates.py::test_first_use_of_the_unforked_templates_fails_validate_strict`, `test_w1_12_templates.py::test_a_template_that_breaks_the_delta_format_fails_validate_strict` | README |
