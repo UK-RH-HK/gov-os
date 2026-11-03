@@ -1065,3 +1065,9 @@ tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_one_helper_is_there_and_the
 rep: tests/acceptance/W2-05/test_w2_05_declared_check.py  # one row per parametrised function
 rep: tests/acceptance/W2-05/test_w2_05_hooks_source.py  # one row per parametrised function
 rep: tests/acceptance/W2-05/test_w2_05_planted.py::test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it  # one row
+
+# acceptance/W2-112
+rep: tests/acceptance/W2-112/test_w2_112_bundle.py  # one row per parametrised function
+rep: tests/acceptance/W2-112/test_w2_112_fallback.py  # one row per parametrised function
+rep: tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder  # one row
+rep: tests/acceptance/W2-112/test_w2_112_slots.py  # one row per parametrised function
