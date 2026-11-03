@@ -380,8 +380,9 @@ in `~/.cache/huggingface/hub`. `sentence_transformers`, `torch` and `transformer
   and `sentence_transformers` are not in `sys.modules` after the three modules are imported or after a fusion;
   and reranking nothing loads nothing. Since DEC-397 a fourth: with the default reranker the calling process holds
   none of the three after the rerank either, because the model is loaded in the reranker's own process.
-- **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own hits; the case compares
-  the chunk ids of `fusion.search` with it, one after the other.
+- **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own list (its `ranked` list
+  where it gives one, since W2-13's S2; else its `hits`); the case compares the chunk ids of `fusion.search` with
+  it, one after the other.
 - **hit@5**: the section above. The pass line is 80 (DEC-414); the measured mean is always shown, against 80 and
   against 85 (the fourth batch, at the head of this file).
 - **Warm p95** (DEC-373): per tier, one process builds the index, asks three warm-up questions that are not
@@ -517,3 +518,20 @@ failed with `No such file or directory: 'gitleaks'` on every tree. Only the fixt
 - Nothing on the machine changes (`~/.local/bin` is only read).
 
 No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: DEC-1046`.
+
+## The fused order's reference (DEC-1055, D-4b, for W2-13's S2, 2026-11-03)
+
+W2-13 gives the lexical route a `ranked` list beside its `hits` (the exact string's chunks first, then BM25's for the
+question's words), and `fusion.search` fuses `ranked` (S2: the fusion receives a ranked lexical list). Two cases built
+their reference order from `hits`, which is no longer what the fusion takes:
+`test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so` and
+`test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises`.
+
+- Their reference: **before**, `fusion.rrf` of the lexical route's `hits`; **after**, of its `ranked` list where the
+  answer holds one, else its `hits` (so the case reads the same on a tree before W2-13).
+- What they guard is unchanged: with no reranker the fusion's own order is kept, item for item, `reranked` is false,
+  nothing raises (DEC-374), the hub is asked nothing (DEC-397). A `fusion.search` that reorders the list without a
+  reranker still fails them.
+
+No other expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: W2-13's S2 (the
+fusion receives the lexical route's ranked list); DEC-1055`.
