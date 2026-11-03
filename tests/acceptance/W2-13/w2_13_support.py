@@ -840,7 +840,8 @@ class OllamaStandIn:
                 elif route == "/api/tags":
                     reply = {"models": [model]}
                 elif route == "/api/ps":
-                    reply = {"models": [{**model, "size": 639150000, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{**model, "size": 639150000, "size_vram": 639150000}]}
                 elif route == "/api/embed":
                     given = asked.get("input", "")
                     texts = [given] if isinstance(given, str) else list(given)

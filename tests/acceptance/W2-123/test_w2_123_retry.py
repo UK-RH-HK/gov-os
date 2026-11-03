@@ -120,7 +120,8 @@ class Runner:
         if route == "/api/tags":
             return 200, {"models": [model]}
         if route == "/api/ps":
-            return 200, {"models": [{**model, "size_vram": 0}]}
+            # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+            return 200, {"models": [{**model, "size_vram": model["size"]}]}
         if route != "/api/embed":
             return 404, {"error": "not found"}
         given = asked.get("input", "")

@@ -75,6 +75,8 @@ def endpoint(monkeypatch):
     def ask(path, body=None, host=None):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": state["digest"]}]}
+        if path == "/api/ps":  # Rewrite-Reason: W2-32's S10 (DEC-1065): the model loaded on the GPU, the one device
+            return {"models": [{"name": semantic.MODEL, "model": semantic.MODEL, "size": 1, "size_vram": 1}]}
         if state["fails"] or (state["fails_after"] is not None and len(state["sent"]) >= state["fails_after"]):
             return None
         state["sent"] += body["input"]
