@@ -18,7 +18,10 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
   and rm is free (no ask, DEC-1050 (8)) but for the catastrophic, refused to every session: the repository's root,
   a .git, the main tree's tracked files, the folders that hold the project or its scratch, and anything outside
   the project (the main tree, ~/gov-os-worktrees/, ~/gov-os-runs/) and its scratch (/tmp, /dev/shm,
-  .gov-runtime/scratch/).
+  .gov-runtime/scratch/);
+  and role separation from the path map (DEC-1052 G-14, role_reads.py): what the main tree's path-map.yaml
+  role_paths: denies a role to read (the engineer the acceptance tests, the test designer the engineer's new code),
+  by simple path checks; no section, no check.
 It reuses the product's own checks (gov.guard.reads, heldout, install, decide), imported from the pinned judge that
 runs this file. The product's full guard (template/governance/kernel/hooks/pretooluse.py, src/gov/guard/) stays built
 and tested; it is not wired here until the Gov OS is whole. Fail closed: an error or the 20-second deadline refuses.
@@ -370,6 +373,17 @@ def main():
     why = reads._Judge(root, parts).tool(tool, seen, cwd)
     if why:
         answer("deny", why)
+
+    # G-14 (DEC-1052), role separation: what the main tree's path map's role_paths: denies the session's role and
+    # the acting role to read, by simple path checks (role_reads.py beside this file). No section, no check.
+    if tool in ("Read", "NotebookRead", "Grep", "Bash"):
+        import role_reads
+        from gov.guard.decide import _expand_token
+        why = role_reads.refusal(main_tree(root), os.path.realpath(root), tool, seen, cwd,
+                                 [r for r in dict.fromkeys((role, acting)) if r], ticket,
+                                 lambda: tree_roots(root), _expand_token)
+        if why:
+            answer("deny", why)
 
     # rm, every role: free but for the catastrophic (ACT-GUARD-FIX-4, DEC-1050 (8)).
     if command is not None:
