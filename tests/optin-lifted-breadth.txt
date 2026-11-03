@@ -1197,3 +1197,9 @@ rep: tests/acceptance/W2-62/test_w2_62_prompt_in_force.py::test_with_no_setting_
 rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_a_section_of_50000_characters_is_named_by_its_lines_never_cut  # one row
 rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_no_section_still_says_so  # one row
 rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_unreadable_input_exits_0  # one row
+
+# acceptance/W2-64
+rep: tests/acceptance/W2-64/test_w2_64_close_schema.py::test_this_repository_s_close_records_validate  # one row
+rep: tests/acceptance/W2-64/test_w2_64_imported.py  # one row per parametrised function
+rep: tests/acceptance/W2-64/test_w2_64_tool_red.py  # one row per parametrised function
+rep: tests/acceptance/W2-64/test_w2_64_what_stays.py  # one row per parametrised function
