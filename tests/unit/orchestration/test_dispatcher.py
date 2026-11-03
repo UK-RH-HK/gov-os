@@ -24,6 +24,17 @@ def git(d, *a):
                           capture_output=True, text=True, check=True).stdout.strip()
 
 
+OLD_HOOK = 'import os\n    slots = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2"))\n'  # the installed copy today
+NEW_HOOK = 'def _slots():\n    pass  # reads limits.json\n'
+
+
+def plant_hook(tmp, text):
+    p = tmp / "hook" / "gov_reranker_gpu_slot.py"
+    p.parent.mkdir(exist_ok=True)
+    p.write_text(text)
+    return p
+
+
 def ticket(tid, status):
     return f"---\nid: {tid}\nstatus: {status}\nwbs_id: W2-X\n---\n# {tid}\n"
 
@@ -84,6 +95,10 @@ def w(tmp_path, healthy_embed):
                DISPATCH_GPU_LOG_QUERY=str(tmp_path / "serve-11435.log"),
                # DEC-1032, all planted: no ss (unless a test plants one), the rerankers' GPU lock files in the folder
                DISPATCH_SS=str(tmp_path / "ss"), DISPATCH_RERANK_GLOB=str(tmp_path / "rerank" / "gov-os-rerank-gpu-*.lock"),
+               # DEC-1039 (1b), planted: no shared-GPU-memory reader (unless a test plants one)
+               DISPATCH_GPU_SHARED_CMD=str(tmp_path / "shared-counter"),
+               # review F2, planted: the installed reranker hook, today's copy (2 locks); a test may plant another
+               DISPATCH_RERANK_HOOK=str(plant_hook(tmp_path, OLD_HOOK)),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -1563,7 +1578,8 @@ def test_gpu_an_unreadable_nvidia_smi_is_a_status_line_not_a_failure(w, how):
 
 def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
     (w.d / "ready.txt").write_text("")  # no lead starts: the inbox holds only the GPU's items
-    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 14400, 16303, 99")
+    # 13,000 MiB: within the budget (16,303 - 2,048); above it is a gpu-alert of its own (DEC-1039 (1b))
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 13000, 16303, 99")
     glog(w, "shared", LOADED + "an old " + CUDA)  # history before the first pass: not alerted
     tick(w)
     assert gpu_items(w) == []
@@ -1574,7 +1590,7 @@ def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
     body = items[0].read_text().splitlines()
     assert body[0] == "log: serve-11434.log" and body[1] == "GPU: CUDA error (shared)" and body[2].startswith("status: ")
     text = items[0].read_text()
-    assert "shared: CUDA error: unknown error" in text and "14.1/15.9 GB, 99 %" in text and "W2:" not in text
+    assert "shared: CUDA error: unknown error" in text and "12.7/15.9 GB, 99 %" in text and "W2:" not in text
     assert "holders:" in text and "layers: shared 29/29" in text
     assert (w.d / "inbox-stale.txt").read_text().startswith("gpu: the GPU CUDA error (shared) since ")
     tick(w, DISPATCH_NOW=NOW + 120)  # no new line: not again
@@ -2201,3 +2217,408 @@ def test_round2_g1_the_test_request_clears_failing_and_a_runner_task_error_count
         assert server["hits"] == 0 and emb_shared(w)["state"] == "FAILING"
     ptick(w, server, NOW + 360)  # pass 7, five after the refused one: one test request, it answers: cleared
     assert server["hits"] == 1 and emb_shared(w)["state"] == "IDLE" and server_stale(w) == []
+
+
+# ---- DEC-1039 (1b): the Gov Load Balancer; DEC-1037 (4): limits from the machine; DEC-1038 (4): targets -------------
+
+def shared_counter(w, shared_mib, dedicated_mib=6000):
+    """A stand-in for the Windows counters (powershell.exe Get-Counter): two adapters, the card and a virtual one."""
+    exe = w.tmp / "shared-counter"
+    (w.tmp / "shared.txt").write_text(
+        f"\\\\h\\gpu adapter memory(luid_0x00000000_0x00011f5c_phys_0)\\dedicated usage {dedicated_mib * 2 ** 20}\n"
+        "\\\\h\\gpu adapter memory(luid_0x00000000_0x00013318_phys_0)\\dedicated usage 0\n"
+        f"\\\\h\\gpu adapter memory(luid_0x00000000_0x00011f5c_phys_0)\\shared usage {shared_mib * 2 ** 20}\n"
+        "\\\\h\\gpu adapter memory(luid_0x00000000_0x00013318_phys_0)\\shared usage 8192\n")
+    exe.write_text(f"#!{sys.executable}\nimport sys\nsys.stdout.write(open({str(w.tmp / 'shared.txt')!r}).read())\n")
+    exe.chmod(0o755)
+
+
+def lead_proc(w, i, pid, age_s=3600, rss_kb=300_000):
+    (w.wt / f"L{i}").mkdir(exist_ok=True)
+    return {"cmd": LEAD.format(f"T-L{i}"), "cwd": str(w.wt / f"L{i}"), "pid": pid, "ppid": 1, "age_s": age_s,
+            "rss_kb": rss_kb}
+
+
+def jobs_by_name(w):
+    return {j["name"]: j for j in status(w)["jobs"]}
+
+
+def status_line(w, start):
+    return next(l for l in (w.d / "status.txt").read_text().splitlines() if l.startswith(start))
+
+
+def test_lb_a_jobs_phase_is_detected_from_its_processes(w):
+    (w.d / "ready.txt").write_text("")
+    (w.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "BUSY"}}}))
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    review = '/home/u/.local/bin/claude -p --settings {"env":{"GOV_ROLE":"independent-auditor","GOV_TICKET":"T-L4"}}'
+    procs = [lead_proc(w, 0, 100), {"cmd": rr, "cwd": "/", "pid": 101, "ppid": 100, "rss_kb": 2_000_000},
+             lead_proc(w, 1, 110), {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 111, "ppid": 110},
+             lead_proc(w, 2, 120, age_s=60), lead_proc(w, 3, 130),
+             lead_proc(w, 4, 140), {"cmd": review, "cwd": "/", "pid": 141, "ppid": 140},
+             {"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 200, "ppid": 1},
+             {"cmd": "bash /x/tools/rebuild_slot.sh /tree", "cwd": "/", "pid": 201, "ppid": 200},
+             {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json",
+              "cwd": "/", "pid": 202, "ppid": 201},
+             {"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 203, "ppid": 202},
+             # waiting for a slot (the live dry pass, 20:05): a wrapper with no flock yet is no running job
+             {"cmd": "bash /x/tools/heavy_slot.sh python3 -m pytest tests", "cwd": "/", "pid": 450, "ppid": 1},
+             {"cmd": "bash /x/tools/rebuild_slot.sh /tree2", "cwd": "/", "pid": 460, "ppid": 1},
+             {"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 300, "ppid": 1, "age_s": 100,
+              "cpu_ticks": 2 * 100 * os.sysconf("SC_CLK_TCK")},  # no earlier sample: its lifetime's 2 cores
+             {"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests", "cwd": "/",
+              "pid": 400, "ppid": 1}, {"cmd": "python3 -m pytest tests", "cwd": "/", "pid": 401, "ppid": 400},
+             {"cmd": "/usr/bin/python3 /x/tools/close_build.py W2-C", "cwd": "/", "pid": 500, "ppid": 1}]
+    w.procs.write_text(json.dumps(procs))
+    tick(w)
+    j = jobs_by_name(w)
+    assert {n: (v["kind"], v["phase"]) for n, v in j.items()} == {
+        "L0": ("lead", "retrieval"), "L1": ("lead", "test"), "L2": ("lead", "start"), "L3": ("lead", "build"),
+        "L4": ("lead", "review"), "land": ("landing", "rebuild.embedding"), "pid 300": ("rebuild", "rebuild.embedding"),
+        "pid 400": ("slot", "test"), "W2-C": ("close", "other")}
+    assert j["L0"]["rss_kb"] == 2_300_000 and j["pid 300"]["cpu"] == 2.0
+    assert "pid 450" not in j and "pid 460" not in j  # waiting for a slot: no job
+    assert "Jobs by phase: lead L0 retrieval (" in (w.d / "status.txt").read_text()
+    (w.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "IDLE"}}}))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert jobs_by_name(w)["pid 300"]["phase"] == "rebuild.lexical"
+
+
+def test_lb_todays_numbers_are_unchanged_on_this_machines_figures(wp):
+    (wp.tmp / "meminfo").write_text(f"MemTotal:       24607384 kB\nMemAvailable: {16 * GB} kB\n")
+    smi(wp)
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    line = status_line(wp, "Limits: ")
+    assert ("from 20 CPUs" in line and "23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 "
+            "workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced "
+            "(the installed hook's own default: 2; proposed 2), spill floor 1019 MiB; config.json overrides: none") \
+        in line, line
+    lim = json.loads((wp.d / "limits.json").read_text())
+    assert lim["rerank_gpu_slots"] == 2 and lim["limits"]["cpu_band"] == [14, 18]
+    assert "(band 14-18: " in status_line(wp, "Balance: ")
+
+
+def test_lb_an_explicit_number_in_config_wins_and_the_status_says_so(wp):
+    conf(wp, memory_rule="literal", cpu_band=[12, 16], rerank_gpu_slots=3)
+    smi(wp)
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    line = status_line(wp, "Limits: ")
+    assert "config.json overrides: cpu_band [12, 16] (derived [14, 18]), rerank_gpu_slots 3 (derived 2)" in line
+    assert "(band 12-16: " in status_line(wp, "Balance: ")
+
+
+def test_lb_a_machine_change_raises_one_item(w):
+    (w.d / "ready.txt").write_text("")
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert not items_with(w, "Machine:")
+    tick(w, DISPATCH_NOW=NOW + 120, DISPATCH_NPROC=32)
+    items = items_with(w, "Machine:")
+    assert len(items) == 1 and "cpus 20 -> 32" in items[0] and "band 22-29" in items[0]
+    tick(w, DISPATCH_NOW=NOW + 180, DISPATCH_NPROC=32)
+    assert len(items_with(w, "Machine:")) == 1
+
+
+def test_lb_the_forecast_refuses_a_start_that_would_put_gpu_memory_over_its_budget(wp):
+    """The embedders (5.6 GiB) and a reranker service (3.5 GiB, one GPU slot) on the 16 GB card, a running lead in
+    its retrieval whose reranker has not taken the GPU yet, and 3 GPU reranker slots configured: the newcomer's
+    retrieval would bring it to 16.1 of 13.9 GiB: refused, GPU named (the free-memory check alone admits it)."""
+    conf(wp, memory_rule="literal", rerank_gpu_slots=3)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5734 + 3584)
+    hold_rerank_gpu(wp, 0)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    wp.procs.write_text(json.dumps([lead_proc(wp, 0, 100), {"cmd": rr, "cwd": "/", "pid": 101, "ppid": 100}]))
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (GPU binding): GPU memory 16.1 of 13.9 GB")
+    assert all(r.startswith("not admitted: forecast refuses (GPU binding)") for r in s["ready_waits"].values())
+    assert calls(wp) == [] and "lead: REFUSES, binding GPU: GPU memory 16.1 of 13.9 GB" in status_line(wp, "Forecast: ")
+
+
+def test_lb_the_forecast_names_the_binding_resource_when_it_admits(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5734 + 3584)
+    hold_rerank_gpu(wp, 0)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "forecast admits (binding GPU: GPU memory 12.6 of 13.9 GB" in s["admit_reason"]
+    assert calls(wp)[0].startswith("launch W2-A")
+
+
+def test_lb_pairing_chooses_a_gpu_heavy_start_beside_two_running_test_slots(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    (wp.d / "ready.txt").write_text("W2-A T-A A.md W2-A-A5-run1.json first=test\nW2-B T-B B.md W2-B-A5-run1.json\n")
+    hz = os.sysconf("SC_CLK_TCK")
+    procs = []
+    for n, pid in enumerate((400, 410)):
+        procs += [{"cmd": f"flock -n -o -E 213 /tmp/gov-os-heavy-slot-{n + 1}.lock python3 -m pytest tests", "cwd": "/",
+                   "pid": pid, "ppid": 1}, {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": pid + 1,
+                                            "ppid": pid, "cpu_ticks": int(5.9 * 60 * hz)}]
+    wp.procs.write_text(json.dumps(procs))
+    (wp.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": {"401": 0, "411": 0, "400": 0, "410": 0}}))
+    cpu_prev(wp, busy=1000, total=10000)
+    (wp.tmp / "procstat").write_text(PROCSTAT.format(busy=2200, idle=9800, iowait=0))  # 12 busy cores
+    tick(wp, minute=False)
+    s = status(wp)
+    assert s["pair_load"]["cpu"] > s["pair_load"]["gpu"], s["pair_load"]
+    assert calls(wp) == ["launch W2-B T-B B.md W2-B-A5-run1.json"], (calls(wp), s["ready_waits"])
+    assert s["ready_waits"]["W2-A T-A"].startswith("paired: W2-B goes first (its heavy resource gpu is the idler")
+
+
+def test_lb_pairing_chooses_a_cpu_heavy_start_while_the_gpu_embeds(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    (wp.d / "ready.txt").write_text("W2-B T-B B.md W2-B-A5-run1.json\nW2-A T-A A.md W2-A-A5-run1.json first=test\n")
+    (wp.d / "embed-health.json").write_text(json.dumps({"servers": {"shared": {"state": "BUSY"}}}))
+    wp.procs.write_text(json.dumps([{"cmd": "python3 -m gov.cli.main rebuild --json", "cwd": "/", "pid": 300,
+                                     "ppid": 1}]))
+    tick(wp)
+    assert calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"], status(wp)["ready_waits"]
+    assert jobs_by_name(wp)["pid 300"]["phase"] == "rebuild.embedding"
+
+
+def test_lb_a_malformed_first_phase_is_refused(w):
+    (w.d / "ready.txt").write_text("W2-A T-A A.md W2-A-A5-run1.json first=lunch\n")
+    tick(w)
+    assert calls(w) == [] and status(w)["ready_waits"]["W2-A T-A"].startswith("malformed line")
+
+
+def test_lb_the_spill_check_raises_one_item_per_incident(w):
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 6000, 16303, 5")
+    shared_counter(w, 600)
+    tick(w)
+    assert gpu_items(w) == [] and "shared GPU memory 600 MiB (floor 1019 MiB): no spill" in status_line(w, "GPU rule: ")
+    shared_counter(w, 1500)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: GPU spill" in items[0].read_text() and "1500 MiB of shared GPU memory" in \
+        items[0].read_text()
+    assert "SPILL" in status_line(w, "GPU rule: ")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(gpu_items(w)) == 1  # the same incident
+    shared_counter(w, 600)
+    tick(w, DISPATCH_NOW=NOW + 180)
+    shared_counter(w, 1500)
+    tick(w, DISPATCH_NOW=NOW + 240)
+    assert len(gpu_items(w)) == 2  # a new spill, a new item
+
+
+def test_lb_an_unreadable_shared_counter_is_said_and_is_no_failure(w):
+    smi(w)
+    tick(w)
+    assert "shared GPU memory unread (shared-counter: No such file" in status_line(w, "GPU rule: ")
+    assert not (w.d / "status.txt").read_text().startswith("TICK FAILED")
+
+
+def test_lb_the_gpu_budget_is_checked_each_pass(w):
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 14400, 16303, 5")
+    shared_counter(w, 600)
+    tick(w)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: GPU budget" in items[0].read_text()
+    assert "ABOVE total minus headroom" in status_line(w, "GPU rule: ")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1
+
+
+def test_lb_each_pass_appends_one_balance_row_and_a_dry_pass_none(w):
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    rows = (w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()
+    assert len(rows) == 2
+    r = json.loads(rows[-1])
+    assert {"busy_cores", "mem_available_mb", "gpu", "jobs", "targets", "forecast", "embedders"} <= set(r)
+    tick(w, "--dry", DISPATCH_NOW=NOW + 120)
+    assert len((w.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()) == 2
+
+
+def test_lb_a_16_minute_breach_opens_one_incident_and_15_minutes_held_close_it(wp):
+    (wp.d / "ready.txt").write_text("")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {2 * GB} kB\n")  # under the 3 GB floor: T2 breached
+    for m in range(15):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert not items_with(wp, "Incident: T2")
+    tick(wp, DISPATCH_NOW=NOW + 60 * 16)
+    items = items_with(wp, "Incident: T2")
+    recs = sorted((wp.orch / "log" / "incidents").glob("*-T2.md"))
+    assert len(items) == 1 and len(recs) == 1
+    text = recs[0].read_text()
+    for part in ("— T2: memory available above the floor", "- **Readings:** busy cores", "grouped by tree and session",
+                 "- **Cause:** \n- **Fix:** \n"):
+        assert part in text, part
+    for m in range(17, 21):  # still breached: no second
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert len(items_with(wp, "Incident: T2")) == 1 and status(wp)["incidents_open"] == ["T2"]
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    for m in range(21, 36):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert "Closed:" not in recs[0].read_text()
+    tick(wp, DISPATCH_NOW=NOW + 60 * 36)
+    assert "- **Closed:** " in recs[0].read_text() and "T2" not in status(wp)["incidents_open"]
+
+
+def test_lb_t4_a_timed_out_embedding_opens_an_incident_at_once(w):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    tick(w)
+    slow = '[GIN] 2026/11/02 - 12:45:47 | 200 |  2m5.1s |       127.0.0.1 | POST     "/api/embed"\n'
+    glog(w, "shared", gin(200) + gin(499) + slow + gin(503))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = items_with(w, "Incident: T4")
+    recs = sorted((w.orch / "log" / "incidents").glob("*-T4.md"))
+    assert len(items) == 1 and len(recs) == 1 and "3 timed-out embedding(s)" in items[0]
+    text = recs[0].read_text()
+    assert "| 499 |" in text and "2m5.1s" in text and "| 503 |" in text and "| 200 |  1.0s" not in text
+    glog(w, "shared", gin(499))
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(items_with(w, "Incident: T4")) == 1 and "- **More, " in recs[0].read_text()
+
+
+def test_lb_t5_a_cold_rebuild_in_the_seed_log_opens_an_incident(w):
+    (w.d / "ready.txt").write_text("")
+    seed = w.orch / "log" / "seed.jsonl"
+    seed.write_text(json.dumps({"kind": "rebuild", "tree": "/old", "seed": {"status": "refused"}}) + "\n")
+    tick(w)  # the first read starts at the end: no old event
+    assert not items_with(w, "Incident: T5")
+    with open(seed, "a") as f:
+        f.write(json.dumps({"kind": "rebuild", "tree": "/t", "who": "W2-X", "seed": {"status": "seeded"},
+                            "timing": {"semantic_s": 20}}) + "\n")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert not items_with(w, "Incident: T5")
+    with open(seed, "a") as f:
+        f.write(json.dumps({"kind": "rebuild", "tree": "/t", "who": "W2-X", "seed": {"status": "refused"},
+                            "timing": {"semantic_s": 3000}}) + "\n")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(items_with(w, "Incident: T5")) == 1
+
+
+def test_lb_a_heavy_step_outside_a_slot_becomes_an_incident_after_15_minutes(wp):
+    (wp.d / "ready.txt").write_text("")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    wp.procs.write_text(json.dumps([{"cmd": "python3 -m pytest tests", "cwd": str(wp.wt / "W2-A"), "pid": 700,
+                                     "ppid": 1, "age_s": 400}]))
+    for m in range(16):
+        tick(wp, DISPATCH_NOW=NOW + 60 * m)
+    assert not items_with(wp, "Incident: outside-slot")
+    tick(wp, DISPATCH_NOW=NOW + 60 * 16)
+    items = items_with(wp, "Incident: outside-slot")
+    assert len(items) == 1 and "pid 700" in items[0] and "W2-A" in items[0]
+
+
+# ---- review round 1 of emg/lb: F1 (CPU of reaped children), F2 (reranker slots priced as enforced), F4 (T4) --------
+
+def slot_run(hz, pytest_ticks):
+    return [{"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests", "cwd": "/", "pid": 10,
+             "ppid": 1}, {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 11, "ppid": 10,
+                          "cpu_ticks_all": pytest_ticks}]
+
+
+def test_lbr_f1_a_reaped_childs_lifetime_is_not_counted_again(w):
+    """The reviewer's case: a slot run's 6 workers ran 1 core each for 6 minutes and were reaped this interval (one of
+    them had reaped its own child, 100 s seen, 160 s in all): the job counts their last minute, 7 cores, not their
+    lifetimes again (37 cores before the fix)."""
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, (6 * 360 + 160) * hz)))  # the workers' lifetimes now in its cutime
+    old = {"10": 0, "11": 0, "20": 100 * hz, **{str(p): 300 * hz for p in range(12, 18)}}
+    pp = {"10": 1, "11": 10, "20": 12, **{str(p): 11 for p in range(12, 18)}}
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": old, "ppid": pp}))
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 7.0
+
+
+def test_lbr_f1_a_job_is_capped_at_the_machines_cpus(w):
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, 50 * 60 * hz)))  # 50 cores' worth in a minute (an earlier record's
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": {"10": 0, "11": 0}}))  # form: no ppid)
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 20.0
+
+
+def phase_shares(w, emb, rr):
+    """A phase-peaks.json not due for refresh, with these measured GPU shares."""
+    (w.d / "phase-peaks.json").write_text(json.dumps({"_at": NOW + 86400, "_shares": {"embedders_gpu_mib": emb,
+                                                                                       "reranker_gpu_mib": rr}}))
+
+
+def test_lbr_f2_the_reranker_slots_are_priced_with_the_installed_hooks_count(wp):
+    """The reviewer's case: the shares measured at 5,800 and 4,655 MiB derive 1 reranker GPU slot, while today's
+    installed hook hands out 2. Priced with 1 (1 held, none free) the newcomer's reranker cost nothing and the forecast
+    admitted (10.2 of 13.9 GB); priced with the hook's 2 it is refused: 14.8 of 13.9 GB."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 10455)
+    hold_rerank_gpu(wp, 0)  # pid 4000, a private reranker
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    wp.procs.write_text(json.dumps([{"cmd": rr, "cwd": "/", "pid": 4000, "ppid": 1}]))
+    phase_shares(wp, 5800, 4655)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (GPU binding): GPU memory 14.8 of 13.9 GB")
+    assert "1 GPU reranker slot(s) free" in s["admit_reason"] and calls(wp) == []
+    assert "reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)" in status_line(wp, "Limits: ")
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1  # the proposal, for the new copy
+    # once the owner installs the copy that reads limits.json, it enforces the 1 written there: priced with 1
+    tick(wp, DISPATCH_NOW=NOW + 120, DISPATCH_RERANK_HOOK=str(plant_hook(wp.tmp, NEW_HOOK)))
+    assert "reranker GPU slots 1 priced (the installed hook reads limits.json: 1; proposed 1)" in \
+        status_line(wp, "Limits: ")
+    # no hook at all: nothing bounds the rerankers, every newcomer's reranker is priced
+    tick(wp, DISPATCH_NOW=NOW + 180, DISPATCH_RERANK_HOOK=str(wp.tmp / "none" / "gov_reranker_gpu_slot.py"))
+    assert "reranker GPU slots 64 priced (no hook installed; proposed 1)" in status_line(wp, "Limits: ")
+
+
+def test_lbr_f2_a_derived_count_is_never_0_with_a_gpu(wp):
+    smi(wp)
+    phase_shares(wp, 15000, 3584)  # a spurious embedders' share: (16303 - 15000 - 2048) // 3584 < 0
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1
+
+
+def test_lbr_f2_slots_held_beside_the_shared_service_count_as_used(wp):
+    """DEC-1043 item 2: while the shared reranker service runs, the CTO's tool holds every other slot. Held is used:
+    no slot is free, the newcomer's reranker cannot take the GPU and is priced at nothing; and the tool's slot holds no
+    GPU memory, so it is not a reranker on the GPU in the balance row (the shares' measure)."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5800 + 3584)
+    hold_rerank_gpu(wp, 0, 1)  # pids 4000 and 4001
+    wp.procs.write_text(json.dumps([
+        {"cmd": "/v/reranker-venv/bin/python /x/tools/rerank_service.py", "cwd": "/", "pid": 4000, "ppid": 1},
+        {"cmd": "python3 /x/tools/rerank_service_slot_hold.py", "cwd": "/", "pid": 4001, "ppid": 1}]))
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "the newcomer's 0.0; 0 GPU reranker slot(s) free" in s["admit_reason"], s["admit_reason"]
+    row = json.loads((wp.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
+    assert row["rr_held"] == 2 and row["rr_gpu"] == 1
+
+
+def test_lbr_f4_t4_events_are_not_repeated_when_the_log_becomes_unreadable(w):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", gin(499))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    recs = sorted((w.orch / "log" / "incidents").glob("*-T4.md"))
+    assert len(recs) == 1
+    (w.tmp / "serve-11434.log").unlink()  # moved away: the last read's events must not count again
+    for m in range(2, 17):
+        tick(w, DISPATCH_NOW=NOW + 60 * m)
+    assert "- **More, " not in recs[0].read_text() and "Closed:" not in recs[0].read_text()
+    tick(w, DISPATCH_NOW=NOW + 60 * 17)  # 15 minutes with no event: closed
+    assert "- **Closed:** " in recs[0].read_text()
