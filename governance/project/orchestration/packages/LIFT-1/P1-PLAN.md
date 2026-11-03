@@ -45,6 +45,9 @@ each way. Nothing scheduled but the dispatcher (DEC-1051).
    READY/DONE in W2-11, W2-33, W2-60a/b and TPL-1..8; path-map roles in the roles tickets and the guard's re-scoped
    ticket; what memory embeds in the memory tickets), or a new ticket where none fits; every affected ticket points
    to `INTENT-DEC-1052.md`; **the tests run per ticket, before and after the refactoring**, shown.
+   **The ticket fates and K9 (EXAMIN's entry criteria) come to the owner first, as a list, before they are applied**
+   (DEC-1039 (3b)): each ticket's fate (keep, re-scope, merge, close formally, retire, Wave 3) with its KPI lines' fate
+   (met with evidence, or moved to the ticket that absorbs it), and the amended K9 with W2-27's re-derived dependencies.
 8. **D-10 The full suite on the refactored repository (P1-12), on the owner's word**, every red fixed; then the lift,
    the restart and the formal closes (P1-13); then EXAMIN's adoption (P1-14).
 
