@@ -410,3 +410,160 @@ tests/acceptance/W1-25/test_w1_25_watch.py::test_the_watchdog_only_reads  # cap
 tests/acceptance/W1-25/test_w1_25_watch.py::test_without_json_the_exit_code_and_one_message_carry_the_verdict  # cap
 tests/acceptance/W1-25/test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh  # cap
 rep: tests/acceptance/W1-25/test_w1_25_record.py  # one row per parametrised function
+
+# acceptance/W1-26
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_reported_in_json  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_in_text_output  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_declaration_in_check_list  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_name_normalisation_retrieval_regression  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_name_normalisation_mixed_case_and_punctuation  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_only_red_check_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_only_unmeasured_check_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_in_new_directory_discovered_by_schema_check  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_in_nested_path_discovered_by_graph_check  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_with_unknown_type_not_silently_skipped  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_new_command_module_discovered_by_commands_check  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_new_pathmap_namespace_picked_up  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_check_declaration_for_unregistered_family_runs  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_readiness_check_all_return_value_not_ignored  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_readiness_check_all_exception_caught  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_not_green_json  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_reason  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_not_green_text  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_present_for_every_family  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_zero_for_uncovered_families  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_positive_for_covered_families  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_family_green_requires_at_least_one_check  # cap
+tests/acceptance/W1-26/test_w1_26_derived.py::test_removing_a_defective_record_clears_the_finding  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_required_missing_row_with_valid_gap_ticket_passes  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_gap_ticket_naming_closed_ticket_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_gap_ticket_naming_nonexistent_ticket_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_complete_specification_no_gap_finding  # cap
+tests/acceptance/W1-26/test_w1_26_green_base.py::test_the_base_project_is_green_before_any_defect  # cap
+tests/acceptance/W1-26/test_w1_26_green_base.py::test_the_checks_left_out_of_the_base_are_the_only_red_checks_of_the_full_base  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_project_lists_its_declarations  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_project_is_answered_as_the_same_kernel_in_the_template_layout  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_the_declared_command_of_an_installed_check_is_started_and_its_result_reported  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_kernel_declaration_whose_command_names_template_paths_measures_the_installed_kernel  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_in_an_installed_project_a_record_that_breaks_its_schema_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_in_an_installed_project_records_that_keep_their_schemas_give_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_gov_check_in_an_installed_project_is_red_on_a_record_that_breaks_its_schema  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_kernel_without_a_record_s_schema_is_never_silent_about_it  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_project_with_neither_layout_answers_as_today  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_alike_every_check_runs_once_as_with_the_template_alone  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_this_repository_s_own_list_holds_each_declaration_of_its_template_once  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_declaration_in_one_layout_only_is_run  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_one_check_id_declared_differently_in_the_two_layouts_is_refused  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_record_is_held_to_the_schemas_of_both  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_declaration_that_is_not_valid_is_refused_under_the_installed_layout_as_under_the_template  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_declaration_that_is_not_valid_in_the_installed_one_is_refused  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_folder_exists_no_reports_says_not_applicable  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_folder_does_not_exist_says_not_applicable  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_not_applicable_exit_code_is_2  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_not_applicable_exit_code_distinct_from_findings_and_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_no_args_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_file_does_not_exist_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_outside_git_repo_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorFolderWithReports::test_folder_valid_report  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorFolderWithReports::test_folder_broken_report  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_check_is_yellow  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_family_is_yellow  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_reason_in_json  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerNotOptedIn::test_not_opted_in_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_findings_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_unmeasured_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_crash_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_other_exit_code_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_marker_with_exit_0_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestLifecycle::test_lifecycle  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestNeverGreen::test_not_applicable_never_green_json  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestNeverGreen::test_not_applicable_never_green_text  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_reported_by_name  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_no_exception  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_present_and_passing  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_present_and_failing_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_provenance_commit_is_head  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_two_runs_same_commit_same_provenance  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_provenance_changes_with_a_new_commit  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_gov_check_runs_readiness  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_readiness_invalid_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_complete_specification_no_readiness_finding  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_no_specifications_no_readiness_finding  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_with_every_module_present_the_check_has_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_a_skill_may_name_a_recorded_gov_command  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_gov_lock_in_a_skill_stays_an_unknown_command  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_the_module_command_of_lock_in_a_skill_is_not_flagged  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_absent_family_reported_by_name  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_core_check_declared  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_already_declared_check_is_listed  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_declared_checks_are_run  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_a_new_check_added_to_the_folder_is_picked_up  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_misspelled_family_name_not_silently_dropped  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_the_check_measures_and_is_green_on_well_formed_skills  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_a_planted_defect_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_an_absent_skill_is_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_the_check_is_green_on_well_formed_skills  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_a_planted_defect_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_an_absent_skill_is_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_with_both_layouts_well_formed_the_check_is_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_with_both_layouts_a_defect_in_either_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_a_project_with_neither_layout_the_check_is_unmeasured_and_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_a_skills_folder_without_the_check_s_skills_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestValidSkillFile::test_valid_skill_file_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestValidSkillFile::test_valid_skill_folder_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingFrontmatter::test_no_frontmatter_delimiters  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingFrontmatter::test_unclosed_frontmatter  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingVersion::test_no_version_field  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingVersion::test_empty_version_field  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDescriptionTooLong::test_description_over_60_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDescriptionTooLong::test_description_at_60_tokens_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestBodyTooLong::test_body_over_2500_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestBodyTooLong::test_body_at_2500_tokens_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnknownGovCommand::test_unknown_gov_command_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnknownGovCommand::test_multiple_unknown_commands  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestKnownGovCommand::test_known_gov_command_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNoArguments::test_no_args_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestEmptyFolder::test_empty_folder_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestEmptyFolder::test_folder_with_non_frontmatter_md  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnreadableFile::test_nonexistent_path_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnreadableFile::test_nonexistent_folder_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDeepFolderSearch::test_deep_folder_all_valid  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDeepFolderSearch::test_deep_folder_one_broken  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNoFrontmatterIsFinding::test_skill_with_no_frontmatter_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_misspelt_command_with_args  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_valid_command_with_args_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_fenced_code_block_misspelt_command  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_bare_gov_command_still_works  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_version_integer_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_name_integer_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_description_list_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_name_empty_string_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_description_empty_string_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestTokenCountFormula::test_body_10001_chars_is_2501_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnmeasuredEdgeCases::test_valid_folder_plus_missing_path  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnmeasuredEdgeCases::test_binary_file_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_taxonomy_field_changed_without_cite_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_no_change_to_dimensions_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_ticket_missing_kpis  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_decision_missing_status  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_dangling_depends_on  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_duplicate_id  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_id_outside_grammar  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_active_while_superseded  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_mutation_defect_implementer_covers_acceptance  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_mutation_defect_implementer_covers_acceptance_subpath  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_pathmap_defect_file_matches_no_namespace  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_pathmap_defect_file_matches_two_namespaces  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_ticket_dag_cycle  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_ticket_missing_required_field  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_commands_defect_reserved_command_no_module  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_commands_check_green_when_every_reserved_command_has_a_module  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_missing_type  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_type_null  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_type_non_string  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_decision_checker_exception_not_swallowed  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id  # folded into test_a_planted_defect_of_every_family_is_found
+rep: tests/acceptance/W1-26/test_w1_26_audit_validator.py  # one row per parametrised function
