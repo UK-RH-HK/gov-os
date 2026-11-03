@@ -1,5 +1,5 @@
 {
- "computed": "2026-11-03 00:31:04",
+ "computed": "2026-11-03 11:09:54",
  "days": 7,
  "kinds": {
   "other": {
@@ -7,14 +7,14 @@
    "cpu_max": 7206.96,
    "rss_kb_p95": 4828276,
    "rss_kb_max": 7480440,
-   "samples": 3262
+   "samples": 3269
   },
   "embedding": {
    "cpu_p95": 7.98,
    "cpu_max": 16.2,
    "rss_kb_p95": 2823912,
    "rss_kb_max": 8676476,
-   "samples": 3262
+   "samples": 3269
   },
   "rebuild": {
    "cpu_p95": 12.15,
@@ -35,7 +35,7 @@
    "cpu_max": 543.86,
    "rss_kb_p95": 2657424,
    "rss_kb_max": 4055288,
-   "samples": 2839
+   "samples": 2846
   },
   "reranker": {
    "cpu_p95": 6.07,

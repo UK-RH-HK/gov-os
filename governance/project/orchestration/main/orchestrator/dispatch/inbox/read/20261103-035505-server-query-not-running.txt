@@ -1,0 +1,3 @@
+log: serve-11435.log
+Server: the query embedding server
+status: NOT RUNNING since 2026-11-03 03:55:05: nothing listens on port 11435 (3 passes); starts are not held (the shared server decides)

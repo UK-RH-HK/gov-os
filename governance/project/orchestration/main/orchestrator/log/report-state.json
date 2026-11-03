@@ -2,7 +2,10 @@
  "merged_not_closed": [
   "W2-05",
   "W2-55",
-  "W2-96"
+  "W2-96",
+  "W2-122",
+  "W2-123",
+  "W2-112"
  ],
  "built_held": [
   "W2-20",
@@ -12,11 +15,11 @@
   "W2-78",
   "W2-110"
  ],
- "closes_next": "none: everything stopped by the owner (DEC-1051, 23:08); the landing's approvals parked",
- "examin": "AT RISK: the emergency and the freeze hold all ticket work; the new estimate for EXAMIN's copy comes with the refactored Wave 2 plan (DEC-1039 item 3b); target 11-18, gated by K9's criteria (DEC-954 Q1)",
- "owner_action": "ACT ACT-SCHEDULE-STOP-2 (HOLD on) - comment out the 09:30 runs sweep; P1 P1-LIFT-1's remaining 63 rows (the owner reviewing); coming: R1's answer on gov check, the templates, the plan",
+ "closes_next": "none: the refactoring (DEC-1052); D-1 merges as built, formal closes at the lift (P1-13)",
+ "examin": "AT RISK: the refactoring holds ticket work; plan estimate 11-14 (range 11-12 to 11-19), re-estimated after D-4's test count; K9 gates the start (DEC-954 Q1)",
+ "owner_action": "P1 D0-CLEANUP-LIST - five yes/no lines before anything is deleted (packages/LIFT-1/D0-CLEANUP-LIST.md)",
  "last_report": "2026-10-30 21:36:47",
- "chain_spec": "chain-2026-10-31f.txt",
+ "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
  "parked": [],
  "memory_notes": {
@@ -26,7 +29,10 @@
   "W2-13": "waits for W2-92's landing (retrieve.py)",
   "W2-15a": "waits for W2-04 and W2-61h",
   "W2-32": "after W2-15a",
-  "W2-112": "emergency patch: lead resumed 19:30 (review round 2, the last)",
-  "W2-126": "emergency patch: engineer running (tests ready, 17 cases)"
+  "W2-112": "MERGED as built 9a02a474e3d5 (D-1); formal close at the lift",
+  "W2-126": "D-1: engineer resolving semantic.py with W2-123, then KPI 7; designer revising W2-123's 500 case",
+  "W2-122": "MERGED as built 5543a03a44c0 (D-1); formal close at the lift",
+  "W2-123": "MERGED as built f704f7d3fee3 (D-1); formal close at the lift",
+  "W2-04": "D-1: designer resolving W2-54's README conflict, then merged as built (M-1)"
  }
 }

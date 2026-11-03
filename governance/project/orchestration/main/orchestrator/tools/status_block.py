@@ -51,7 +51,7 @@ try:
         m = re.search(r" starting (W2-\S+) ", line)
         if m:
             started.add(m.group(1))
-    queued = [l.split()[0] for l in open(O + "/log/" + st["chain_spec"]) if l.strip() and l.split()[0] not in started]
+    queued = [l.split()[0] for l in open(O + "/log/" + st["chain_spec"]) if l.strip() and not l.lstrip().startswith("#") and l.split()[0] not in started]
 except OSError:
     queued = []
 gate = subprocess.run(["python3", O + "/tools/gate_check.py"], capture_output=True, text=True).stdout.strip()

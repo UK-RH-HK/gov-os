@@ -2,6 +2,24 @@
 
 ## RESUME HERE — 2026-11-03 00:00: handover from session `debdb3f7` before the owner's restart of WSL and the machine
 
+**Resumed 2026-11-03 11:28 by session `bb5cd8bd`** (registered; stand-by ended; waiter armed; 3 night items filed:
+restart marks, all clear; test push "not sent", terminal active). **D-0:** list `packages/LIFT-1/D0-CLEANUP-LIST.md`
+(`ad3d1529`) with the owner, nothing deleted until the answers. **D-1:** merged as built W2-122 `5543a03a44c0`, W2-123
+`f704f7d3fee3`, W2-112 `9a02a474e3d5`, emg/select `b120aad0f048`. Conflicts: W2-04 (W2-54 README, vs integrate: test
+designer), emg/noscan (rebuild/command.py vs W2-122: engineer), W2-126 (semantic.py vs W2-123: engineer + KPI 7; the
+designer revises W2-123's 500 case and W2-126's KPI 7 cases on `w2/W2-126-tests`, and W2-66's live test-map case on
+`emg/select`). Three in-session workers running. Then: merge `w2/W2-126-tests` into `w2/W2-126`, `gov accept`, merge
+W2-126, W2-04, emg/noscan, emg/select into `w2/integrate`; then re-pin window 2's ACT. `emg/w1-19-helper` (1 test
+commit) asked of the owner in the D-0 list.
+**11:39:** emg/noscan DONE (merge `b8957843aba8`; unit 177 + 250/1 skip, W2-122 acceptance 22/22), merged into
+`w2/integrate` as `c72ededc5c97`. For D-9's homes (W2-122 or W2-45): a seed base and a copy with different `scan`
+settings may index different files (untested; not on this repository); `seed.py` fingerprints the gitleaks binary
+even with the scan off (harmless).
+**11:50:** W2-126 engineer PACKAGES: merge `0ee425698978`, KPI 7 `dbdcddad8df5` (14 unit cases; W2-126 acceptance green;
+W2-123's 500 case red as expected, the designer's). 8 builder reds outside its paths (6 W2-122 seed: the shared cache
+makes the cold rebuild warm; 2 W2-123 retry: old rule). P-W2-126-BT decided (delegated P2, ticket line `81801789`);
+the same engineer resumed on the 8. Review F1-F8 left for the formal close.
+
 **THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
 "DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:
 `governance/project/orchestration/INTENT-DEC-1052.md` (one question, five tests; templates; READY and DONE by code;

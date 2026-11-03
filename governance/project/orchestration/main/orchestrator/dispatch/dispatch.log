@@ -287,3 +287,9 @@
 2026-11-02 23:05:06 gpu rule: within its budget again (GPU memory 12.4 of 13.9 GB (used 10.0 + running jobs' peaks 2.4 + the newcomer's 0.0; 1 GPU reranker slot(s) free))
 2026-11-02 23:09:04 started but never ran: W2-112 W2-112-A5-r3-land.json
 2026-11-02 23:09:04 land finished: {'W2-123=3de9bcf44d91': 'no outcome in the output (refused or stopped)', 'W2-122=3fc448601e2d': 'no outcome in the output (refused or stopped)', 'W2-126=2785b2e47432': 'no outcome in the output (refused or stopped)'}
+2026-11-03 03:55:05 embedding server shared: NOT RUNNING since 2026-11-03 03:55:05 (nothing listens on port 11434 (3 passes))
+2026-11-03 03:55:05 embedding server query: NOT RUNNING since 2026-11-03 03:55:05 (nothing listens on port 11435 (3 passes))
+2026-11-03 11:18:03 gpu watch: the shared log was truncated or rotated (offset 450399815, size 19291): from 0
+2026-11-03 11:18:03 embedding server shared: BUSY again after NOT RUNNING since 2026-11-03 03:55:05
+2026-11-03 11:18:03 embedding server query: BUSY again after NOT RUNNING since 2026-11-03 03:55:05
+2026-11-03 11:18:03 gpu watch: the shared log was truncated or rotated (offset 450399815, size 19291): from 0

@@ -1,0 +1,3 @@
+log: serve-11434.log
+Server: the embedding server
+status: NOT RUNNING since 2026-11-03 03:55:05: nothing listens on port 11434 (3 passes); starts are held; rebuilds and heavy steps that need it wait
