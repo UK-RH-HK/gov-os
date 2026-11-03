@@ -23,6 +23,8 @@ from gov.retrieval import lexical, semantic  # noqa: E402
 from gov.retrieval import retrieve as retrieve_module  # noqa: E402
 from gov.retrieve import command  # noqa: E402
 
+REAL_SEMANTIC_SEARCH = semantic.search
+
 pytestmark = pytest.mark.skipif(shutil.which("gitleaks") is None, reason="gitleaks is not on PATH")
 MISSING = "-".join(("DEC", "9999"))
 
@@ -96,9 +98,12 @@ def test_an_id_that_exists_or_a_symbol_name_is_retrieved_as_before(root, ids):
     assert bundle["evidence"] and MISSING in {gap.get("id") for gap in bundle["gaps"]}
 
 
-def test_a_store_that_is_no_database_is_a_governance_error_not_a_traceback(root, capsys):
+def test_a_store_that_is_no_database_is_a_governance_error_not_a_traceback(root, capsys, monkeypatch):
     from gov.cli.main import main
 
+    # The real semantic route: it reads the store before it asks any endpoint, so it meets the same bad file. Since
+    # W2-92 the record graph's fault is that route's alone, and the double would answer from a store that is none.
+    monkeypatch.setattr(semantic, "search", REAL_SEMANTIC_SEARCH)
     (root / ".gov-runtime/store.db").write_bytes(b"this is no database" * 100)
     code = main(["retrieve", "--json", "--root", str(root), "pilot tide harbour"])
     out, err = capsys.readouterr()
