@@ -395,3 +395,18 @@ tests/acceptance/W1-24/test_w1_24_supplementary.py::test_supplementary_context_i
 tests/acceptance/W1-24/test_w1_24_supplementary.py::test_supplementary_is_dropped_before_mandatory_and_the_drop_is_named  # cap
 tests/acceptance/W1-24/test_w1_24_supplementary.py::test_the_packet_indicates_supplementary_is_unavailable_when_the_index_is_down  # cap
 rep: tests/acceptance/W1-24/test_w1_24_standing_sources.py  # one row per parametrised function
+
+# acceptance/W1-25
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_a_trigger_outside_the_list_is_refused  # cap
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_a_checkpoint_at_the_transition_clears_it  # cap
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_another_tickets_checkpoint_does_not_cover_the_transition  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_new_checkpoint_is_fresh_under_the_default_policy  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_within_every_threshold_is_fresh  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_an_old_checkpoint_is_stale_by_age  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_is_stale_by_the_commits_since  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_is_stale_by_context_utilisation  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_every_violated_threshold_is_reported  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_the_watchdog_only_reads  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_without_json_the_exit_code_and_one_message_carry_the_verdict  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh  # cap
+rep: tests/acceptance/W1-25/test_w1_25_record.py  # one row per parametrised function

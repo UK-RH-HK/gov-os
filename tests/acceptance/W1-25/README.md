@@ -226,3 +226,20 @@ No other earlier test was changed. W1-07 after the revision: 227 passed.
   commit that carries the checkpoint or at the head when it was written.
 - A read (`--watch`, `--resume`, the family check) may write under `.gov-runtime/`; the snapshot leaves it out, as
   W1-07's does.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop [CAP-13.b, CAP-37.a, CAP-37.b] | `test_w1_25_triggers.py::test_each_mandatory_trigger_writes_a_checkpoint_that_records_it`, `test_w1_25_command.py::test_checkpoint_no_longer_returns_not_implemented`, `test_w1_25_command.py::test_checkpoint_without_arguments_writes_nothing` | README |
+| S2: A fresh session resumes the ticket at the recorded next step from the checkpoint alone [CAP-20.a, CAP-37.f] | `test_w1_25_resume.py::test_resume_states_the_ticket_its_inputs_and_the_next_step`, `test_w1_25_resume.py::test_resume_reads_the_latest_checkpoint_of_the_ticket`, `test_w1_25_resume.py::test_the_brief_as_text_names_the_ticket_each_input_and_the_next_step` | README |
+| S3: gov checkpoint --watch marks the latest checkpoint stale by policy (age, commits since, context utilisation) without relying on harne... | `test_w1_25_command.py::test_help_names_watch`, `test_w1_25_command.py::test_watch_is_accepted_as_an_argument`, `test_w1_25_watch.py::test_a_new_checkpoint_is_fresh_under_the_default_policy` | README |
+| S4: Registers the fresh-agent-reconstruction family check: a session with only the latest checkpoint and the SessionStart output states t... | `test_w1_25_check_declaration.py::test_the_declaration_is_a_file_of_the_kernel_checks`, `test_w1_25_check_declaration.py::test_gov_check_list_names_the_family_check`, `test_w1_25_resume.py::test_resume_states_the_ticket_its_inputs_and_the_next_step` | README |
+| F1: A ticket transition leaves no checkpoint | `test_w1_25_triggers.py::test_a_ticket_in_progress_with_no_checkpoint_is_reported`, `test_w1_25_triggers.py::test_a_transition_after_the_latest_checkpoint_marks_it_stale`, `test_w1_25_triggers.py::test_a_checkpoint_at_the_transition_clears_it` | README |
+| F2: A checkpoint references an input by id without its hash | `test_w1_25_record.py::test_every_input_has_an_id_a_version_and_a_hash`, `test_w1_25_record.py::test_an_input_that_cannot_be_hashed_is_refused_and_nothing_is_written`, `test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh` | README |
+
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 12 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
