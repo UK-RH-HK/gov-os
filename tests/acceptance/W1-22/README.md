@@ -155,3 +155,18 @@ DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-o
 No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 25 passed (as
 before). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the
 CPU-only embedder on its own port; the fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: The validator rejects a bundle without a stopping reason, with an unresolvable citation, a stale hash or a quoted span absent from it... | `test_w1_22_validator.py::TestValidatorAccepts::test_validator_accepts_a_valid_bundle`, `test_w1_22_validator.py::TestValidatorAccepts::test_validator_accepts_each_fixed_stopping_reason`, `test_w1_22_validator.py::TestValidatorAccepts::test_validator_accepts_empty_evidence_with_valid_reason` | README |
+| S2: Each index has canaries run after reindex and in doctor; a canary miss sets FACET_UNAVAILABLE [CAP-17.c, CAP-55.a] | `test_w1_22_canaries.py::TestDeclarations::test_canary_declarations_exist_for_each_index`, `test_w1_22_canaries.py::TestCanaryRunner::test_runner_returns_per_index_results`, `test_w1_22_canaries.py::TestCanaryRunner::test_lexical_canary_hits_after_reindex` | README |
+| F1: A bundle with an unresolvable citation passes | `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass`, `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass` | README |
+| F2: An empty index answers NOT_FOUND as absence | `test_w1_22_canaries.py::TestF2::test_empty_index_never_reports_not_found`, `test_w1_22_canaries.py::TestF2::test_missing_store_never_reports_not_found` | README |
+
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 1 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

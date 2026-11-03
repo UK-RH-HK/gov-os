@@ -381,3 +381,6 @@ tests/acceptance/W1-21/test_w1_21_paging.py::test_the_spend_budget_is_separate_f
 rep: tests/acceptance/W1-21/test_w1_21_authority.py  # one row per parametrised function
 rep: tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py  # one row per parametrised function
 rep: tests/acceptance/W1-21/test_w1_21_command.py  # one row per parametrised function
+
+# acceptance/W1-22
+tests/acceptance/W1-22/test_w1_22_validator.py::TestValidatorRejects::test_validator_reports_multiple_errors  # cap
