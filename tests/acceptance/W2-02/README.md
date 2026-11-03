@@ -203,3 +203,17 @@ Notes on these cases:
 W2-67's test designer (round 1, batch 2) revised `test_w2_02_unmeasured.py::test_a_type_whose_schema_file_is_absent_is_reported_unmeasured_and_not_green`
 so that it fails when the finding does not name the type whose schema file is absent (I4 F7): red under a planted
 fault, green on the head, with a `Rewrite-Reason:` trailer. The plant and the evidence: `README-W2-67.md`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: The kernel schemas define these types [AR-1, AR-3, W2-M316, W2-M317, AR-9]: a decision entry: one register entry, with id, status, ow... | `test_w2_02_record_types.py::test_an_audit_report_in_dec_441_form_passes_core_schema`, `test_w2_02_record_types.py::test_one_kernel_schema_states_the_three_verdicts_of_cap_44_h`, `test_w2_02_record_types.py::test_each_of_the_three_verdicts_is_a_well_formed_verdict` | README |
+| S2: Core-schema reads docs/audit/wave-1/W1-43-wave-1-exit-audit.md and the exit report as valid, and is green on this repository [F-M13, ... | `test_w2_02_green_here.py::test_core_schema_reads_the_w1_43_exit_audit_report_as_valid_here`, `test_w2_02_green_here.py::test_core_schema_reads_the_w1_43_report_as_valid_in_a_project_of_its_own`, `test_w2_02_green_here.py::test_core_schema_reads_the_wave_1_exit_report_as_valid_here` | README |
+| S3: A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177]. | `test_w2_02_unmeasured.py::test_a_type_whose_schema_file_is_absent_is_reported_unmeasured_and_not_green`, `test_w2_02_unmeasured.py::test_a_project_with_no_schema_file_at_all_is_not_green`, `test_w2_02_unmeasured.py::test_a_type_whose_schema_file_is_present_is_not_reported_unmeasured` | README |
+| S4: The wbs_id grammar accepts an id with one lower-case letter suffix (W2-15a) and still refuses any other form (W2-15, W2-15ab, W2-15A,... | `test_w2_02_wbs_grammar.py::test_the_wbs_id_grammar_accepts_one_lower_case_letter_suffix`, `test_w2_02_wbs_grammar.py::test_the_wbs_id_grammar_still_refuses_every_other_form`, `test_w2_02_wbs_grammar.py::test_the_ticket_schema_takes_its_wbs_id_grammar_from_the_one_definition` | README |
+| F1: An audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still SCHEMA_INVALID_TYPE. | `test_w2_02_failure.py::test_an_audit_report_missing_a_field_of_dec_441_is_refused_on_that_field`, `test_w2_02_failure.py::test_a_record_whose_type_is_missing_or_no_text_is_still_schema_invalid_type` | by its words (every function of the suite kept) |

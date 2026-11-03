@@ -1030,3 +1030,7 @@ rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_missing_checkpoin
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_in_a_worktree_the_leads_section_is_injected  # one row
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_checkpoint_that_cannot_be_read_does_not_fail_the_hook  # one row
 rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_worker_session_is_not_given_the_leads_checkpoint  # one row
+
+# acceptance/W2-02
+rep: tests/acceptance/W2-02/test_w2_02_record_types.py  # one row per parametrised function
+rep: tests/acceptance/W2-02/test_w2_02_verdict_conditions.py  # one row per parametrised function
