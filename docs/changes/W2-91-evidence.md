@@ -189,13 +189,13 @@ From the lead's count over the two clones' stores, each opened read-only, judged
 ### The restricted overlay (KPI 3)
 
 - **The overlay's other fields are unchanged.** `project-overlay` keeps `sensitivity: restricted` and `export_policy: denied` at the head, as the head map's figures in the lead's count show, and the same as at the base.
-- **The indexer reads `embedding_policy` only.** `_wanted` in `src/gov/retrieval/semantic.py` (lines 207 to 221; the read is at line 215) embeds a file's chunks when every namespace the file matches says `embedded`. Two other places read the field, and neither reads `sensitivity` or `export_policy`:
-  - `src/gov/rebuild/command.py:32`, for the warning given when no namespace is embedded;
+- **The indexer reads `embedding_policy` only.** The line numbers are those of the code at the D-4b merge `19afc18f3f19` (§9); `w2/integrate`'s changes to `src/` moved them, and the reads are the same. `_wanted` in `src/gov/retrieval/semantic.py` (lines 285 to 299; the read is at line 293) embeds a file's chunks when every namespace the file matches says `embedded`. Two other places read the field, and neither reads `sensitivity` or `export_policy`:
+  - `src/gov/rebuild/command.py:36`, for the warning given when no namespace is embedded;
   - `src/gov/adopt/stages.py:240` to `248`, which checks that the value is one of the two.
 - **Nothing in `src/` reads the values of `sensitivity` or `export_policy`.** The two names appear only:
   - as required field names in `src/gov/config/path_map_schema.py:14-15`;
   - as text fields in `template/governance/kernel/schemas/path-map.schema.json:164, 178, 181`;
-  - as literal values in a sample namespace that `src/gov/retrieval/retrieve_check.py:141, 144` writes.
+  - as literal values in a sample namespace that `src/gov/retrieval/retrieve_check.py:145, 148` writes.
 - **So embedding the overlay changes no export or sharing rule.**
 - **No export path exists today.** No code exports a namespace, so the KPI line's "planted export case" cannot show an export refusal. The lead has returned this to the orchestrator as a package; this record does not decide it.
 
