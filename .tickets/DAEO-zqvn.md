@@ -23,6 +23,7 @@ allowed_paths:
 - src/gov/retrieval/supplementary.py
 - src/gov/context/__init__.py
 - src/gov/context/command.py
+- src/gov/rebuild/command.py
 - src/gov/guard/role_paths.py
 - tests/unit/guard/test_role_paths*
 - src/gov/retrieve/**
@@ -96,3 +97,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **S5 (CTO, 2026-11-03, P2):** `src/gov/context/command.py` added too: its `context(...)` call must pass the parsed `--role` (the one line the engineer named).
 
 **DEC-1066 (3) placed here (CTO, 2026-11-03):** S6 added (W2-13 owns the keyword index): `lexical.py` takes every tracked file today (no exclusion list); the path map gains `lexical_policy`.
+
+**S6 (CTO, 2026-11-03, P2):** `src/gov/rebuild/command.py` added: the rebuild's report names the files the keyword index kept out (one line, as S5's command.py). S6's two repository cases turn green with D-7's path-map marking (the CTO's), right after W2-13 merges.
