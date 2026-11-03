@@ -17,6 +17,8 @@ commit gives the same store wherever and whenever it is loaded.
   A heading alone, one inside an HTML comment, an id outside the ``decision_id`` grammar, a status word not in
   capitals and an id under two headings make no record (W2-L221, W2-M145, W2-M106). A named register that
   ``HEAD`` does not hold as a file of text refuses the load (DEC-579: one that is not in the commit too).
+- A record of a file whose frontmatter ``title`` is a string keeps it in ``record_titles`` (W2-92 S6), outside the
+  digest.
 - ``Task:`` and ``Implements:`` trailers are read from the final trailer block;
   a commit made before 2026-10-03 is read from the whole message (DEC-182).
 """
@@ -64,6 +66,14 @@ _TABLES = {
     REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL, span TEXT NOT NULL,"
                     " content_hash TEXT NOT NULL",
 }
+# W2-92 S6 (DEC-1065 (4)): the frontmatter ``title`` of each record of a file, parsed once at the load, so the record
+# route of a plain question reads the titles here instead of parsing every record's file in each process. A table of
+# its own (a column of ``records`` would clash with ``register_entries.title`` in the joined query), kept out of the
+# digest like the fingerprints row, so the digest of a commit is unchanged; it is part of the schema version
+# (``rebuild/seed.py``), so a warm base built without it is refused.
+TITLES_TABLE = "record_titles"
+_TABLES[TITLES_TABLE] = "path TEXT, id TEXT, title TEXT NOT NULL, PRIMARY KEY (path, id)"
+_DIGESTED = tuple(table for table in _TABLES if table != TITLES_TABLE)  # register_entries stays the last of them
 # W2-68: the one row of the load that built the store (its head, the head's two fingerprints, the kind of load),
 # kept out of the graph's tables and out of the digest, so the recovery-rebuild check (CAP-38.b) is unchanged.
 FINGERPRINTS_TABLE = "fingerprints"
@@ -263,7 +273,8 @@ def _ids(value) -> list[str]:
 
 
 def _read_records(root: Path):
-    records, edges, invalid = [], set(), []
+    """The records, edges, entries that are no records, register headings and frontmatter titles of ``HEAD``."""
+    records, edges, invalid, titles = [], set(), [], []
     tree = _tree(root)
     register = _register(root, tree)
     for path, text in _markdown(root, tree):
@@ -279,6 +290,8 @@ def _read_records(root: Path):
             invalid.append({"path": path, "reason": f"required key missing or not a string: {', '.join(missing)}"})
             continue
         records.append((path, front["id"], front["type"], front["status"]))
+        if isinstance(front.get("title"), str):
+            titles.append((path, front["id"], front["title"]))
         for edge_type in EDGE_TYPES:
             edges.update((edge_type, front["id"], target) for target in _ids(front.get(edge_type.lower())))
         edges.update(("SUPERSEDES", successor, front["id"]) for successor in _ids(front.get("superseded_by")))
@@ -289,7 +302,7 @@ def _read_records(root: Path):
         records += entries
         edges |= supersedes
         invalid += no_records
-    return records, edges, invalid, headings
+    return records, edges, invalid, headings, titles
 
 
 def _read_commits(root: Path):
@@ -306,7 +319,7 @@ def _read_commits(root: Path):
 
 def _digest(connection: sqlite3.Connection) -> str:
     """sha256 of the store's logical content: every row of every table of the graph, in sorted order."""
-    content = [[table, sorted(connection.execute(f"SELECT * FROM {table}").fetchall())] for table in _TABLES]
+    content = [[table, sorted(connection.execute(f"SELECT * FROM {table}").fetchall())] for table in _DIGESTED]
     if not content[-1][1]:  # no register entry: the digest is the one of a store without that table
         del content[-1]
     return hashlib.sha256(json.dumps(content).encode("utf-8")).hexdigest()
@@ -327,10 +340,10 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
     from gov.close.fingerprint import of_commit
 
     head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
-    records, edges, invalid, headings = _read_records(root)
+    records, edges, invalid, headings, titles = _read_records(root)
     commits, trailers, paths = _read_commits(root)
     prints = of_commit(root, head)
-    rows = dict(zip(_TABLES, (records, edges, commits, trailers, paths, headings)))
+    rows = dict(zip(_TABLES, (records, edges, commits, trailers, paths, headings, titles)))
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
     try:
