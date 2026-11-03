@@ -18,7 +18,8 @@ depends_on:
 - DAEO-g0ip
 - DAEO-ym8a
 allowed_paths:
-- src/gov/context/supplementary.py
+- src/gov/retrieval/supplementary.py
+- src/gov/context/__init__.py
 - src/gov/guard/role_paths.py
 - tests/unit/guard/test_role_paths*
 - src/gov/retrieve/**
@@ -83,3 +84,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **Delegated (CTO, 2026-11-03, P2; DEC-1057 R-8):** P-W2-13-R3 (a): the bundle budget bounds parent expansion only, as W1-21's approved spec DEC-419 DP-3 says (a cut of the gathered children was tried and reverted, `ea486253`/`80cdd7ff`); whether the budget should bound the whole bundle (DEC-860) is W2-32's S5, with its own tests. The 13 cases of W2-92, W2-87, W1-21 and W1-19 that W2-13's S2 and DP-3 changed were re-pinned by a test designer (`d71df8f8`). Merged as built in D-4b (`8550788b`).
 
 **DEC-1065 (2) placed here (CTO, 2026-11-03):** S5 added (W2-13 owns `gov retrieve`); the filter at `retrieve.py`'s chunk list, the matcher in a product module the hook can later reuse.
+
+**P-W2-13-TD-5 (a) (CTO, 2026-11-03, P2):** the supplementary block is built in `src/gov/retrieval/supplementary.py` (not `src/gov/context/`): that file replaces the wrong path in S5's allowed paths.
+
+**S5 (CTO, 2026-11-03, P2):** `src/gov/context/__init__.py` added to the paths: `gov context --role` must reach the supplementary block's filter (S5 names `GOV_ROLE` or `--role`); the one red case of S5 outside the sandbox is the `--role` variant.
