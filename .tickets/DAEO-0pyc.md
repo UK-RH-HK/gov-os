@@ -1,6 +1,6 @@
 ---
 id: DAEO-0pyc
-status: open
+status: in_progress
 deps: [DAEO-g0ip, DAEO-rd0g]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -83,3 +83,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
   - the hit@5 85 row on the dev queryset [W2-M341].
   Each gets one round plus its probe; its effect is measured by W2-15b. What remains is a named residual.
 - **Failure:** an improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted.
+
+**Claimed (CTO, 2026-11-03 ~21:20, D-4b, DEC-1055; the owner's order of 21:10):** W2-32's test designer and engineer run as `gov launch` workers under this ticket's own id (no lead: the CTO acts as its lead from its session), so the guard's G-14 enforces their separation (DEC-1056, DEC-1063). Its dependency on W2-15a is W2-15a's baseline record, D-4b measure 1 (DEC-1055 (6)). S1-S5, S9, F1 now; S6-S8 after the owner approves the gaps.
