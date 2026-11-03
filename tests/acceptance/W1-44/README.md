@@ -34,3 +34,17 @@ No case fails on a behaviour assertion before the lesson files exist; none passe
   and `jsonschema`, both installed.
 * The retrieve case uses `OllamaStandIn` and the stand-in reranker from `w1_21_support`: no model runs, no
   Ollama, no network beyond a loopback port.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: docs/lessons/ holds scoped, schema-valid lesson records for L-0074 (enumerated universal negatives fail silently), the anti-stall rul... | `test_w1_44_lessons.py::test_lessons_exist_and_are_schema_valid` | README |
+| S2: gov retrieve returns each lesson for a ticket in its scope | `test_w1_44_lessons.py::test_retrieve_returns_lessons_for_ticket_in_scope` | README |
+| S3: The anti-snowball lesson states the one-disposition rule that gov close applies [CAP-59.c] | `test_w1_44_lessons.py::test_anti_snowball_lesson_states_one_disposition_rule` | README |
+| F1: A lesson lacks a scope, a severity or a source reference (DEC-168) | `test_w1_44_lessons.py::test_every_lesson_has_scope_severity_and_source` | README |
+| F2: A lesson restates policy as authority (lessons cannot become policy, Contract v3 W2) [CAP-41.b] | `test_w1_44_lessons.py::test_no_lesson_restates_policy_as_authority` | README |
