@@ -58,7 +58,9 @@ grep -q 'EST=14400;' "$HERE/nightly.sh" || fail "N9: the no-history estimate is 
 # ---- nightly.sh: the rebuild scans in full (DEC-966 item 4, W2-107); the suites do not get the setting ---------------
 rb=$(grep -n 'gov.cli.main rebuild' "$HERE/nightly.sh")
 [ "$(echo "$rb" | grep -c .)" -eq 1 ] || fail "N10: not exactly one rebuild line in nightly.sh"
-echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN=1 ' || fail "N10: the rebuild line does not set GOV_SECRETS_FULL_SCAN=1"
+echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN="$FULL_SCAN" ' || fail "N10: the rebuild line does not take the full scan from the switch (DEC-1045)"
+grep -q "import secrets_switch as s; print(1 if s.scan_on('\$CLONE') else 0)" "$HERE/nightly.sh" || fail "N10: FULL_SCAN is not read from the clone's DEC-1045 switch"
+grep -q 'the secrets switch cannot be read (DEC-1045)" >> "$OUT/run.txt"; exit 2' "$HERE/nightly.sh" || fail "N10: an unreadable switch does not stop the night"
 grep -v 'gov.cli.main rebuild' "$HERE/nightly.sh" | grep -v '^ *#' | grep -q 'GOV_SECRETS_FULL_SCAN' && fail "N11: GOV_SECRETS_FULL_SCAN set outside the rebuild line"
 
 # ---- nightly.sh: the nightly takes all the heavy-job slots while its suites run (DEC-984) ------------------------

@@ -29,10 +29,16 @@ if {loads}:
 CANDIDATES = [{"chunk_id": "short", "text": "ab"}, {"chunk_id": "long", "text": "abcdef"}]
 
 
+def _no_service(*_args):
+    raise ConnectionError("the shared service is not under test here")
+
+
 @pytest.fixture
 def home(tmp_path, monkeypatch):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("HF_HUB_OFFLINE", "0")
+    # W2-112: every search asks the shared service first; these cases are the private reranker's, its fallback.
+    monkeypatch.setattr(rerank, "_ask", _no_service)
     rerank._started.cache_clear()
     yield tmp_path
     rerank._started.cache_clear()

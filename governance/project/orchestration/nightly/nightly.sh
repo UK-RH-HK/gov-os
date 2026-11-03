@@ -115,7 +115,13 @@ SEED=${NIGHTLY_SEED:-$ORCH/tools/seed_store.py}
 if [ -f "$SEED" ]; then
   echo "$(python3 "$SEED" seed "$CLONE" --vectors-only --who nightly 2>&1 | tail -1)" >> "$OUT/run.txt"
 fi
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
+# DEC-1045 (owner, 2026-11-02): gitleaks scanning lifted on this repository by its switch
+# (governance/project/secrets.yaml, scan: off): the full scan only when the clone's switch says on; a switch that
+# cannot be read stops the night (fails closed), never "off".
+FULL_SCAN=$(python3 -c "import sys; sys.path.insert(0, '$ORCH/tools'); import secrets_switch as s; print(1 if s.scan_on('$CLONE') else 0)") \
+  || { echo "the secrets switch cannot be read (DEC-1045)" >> "$OUT/run.txt"; exit 2; }
+[ "$FULL_SCAN" = 1 ] || echo "secrets full scan: off by configuration (DEC-1045)" >> "$OUT/run.txt"
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN="$FULL_SCAN" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")

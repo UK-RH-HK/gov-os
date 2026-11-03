@@ -37,6 +37,10 @@ sys.stdin.read()
 FAKE_TORCH = """import os
 if os.environ.get("MARKS"):
     open(os.path.join(os.environ["MARKS"], "torch-%d" % os.getpid()), "w").close()
+class cuda:  # a GPU is there (W2-112: the real worker ends named without one); its free memory cannot be read,
+    @staticmethod  # so the shared service, which needs that reading, does not start here and the worker is used
+    def is_available():
+        return True
 """
 # The real rerank_worker.py imports this; it scores a text by its length.
 FAKE_SENTENCE_TRANSFORMERS = """import os
