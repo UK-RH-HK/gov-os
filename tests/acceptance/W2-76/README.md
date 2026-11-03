@@ -150,15 +150,20 @@ namespace, so they are always shown.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 16 in the full run, 6 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov rebuild's output and record give the time of each stage (the lexical, semantic and code-index stores, the secrets filter where it... | `test_w2_76_timings.py::test_every_stage_timed_in_output_and_record`, `test_w2_76_timings.py::test_lock_part_of_a_rebuild_on_a_free_lock`, `test_w2_76_timings.py::test_a_stage_that_did_not_run_still_has_its_time` | README |
-| S2: A rebuild that passes 30 minutes (a value the project may set) writes, and keeps updating while it runs, a record of the stages done ... | `test_w2_76_watchdog.py::test_a_slow_rebuild_records_what_it_waits_on_and_goes_on`, `test_w2_76_watchdog.py::test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds`, `test_w2_76_watchdog.py::test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it` | README |
-| S3: One store rebuild at a time on the machine: every gov rebuild, in every session on this machine (the main tree, a worktree, a clone, ... | `test_w2_76_machine_lock.py::test_two_rebuilds_at_once_run_one_after_the_other`, `test_w2_76_machine_lock.py::test_a_waiting_rebuild_says_before_it_waits_what_it_waits_for`, `test_w2_76_machine_lock.py::test_a_rebuild_under_its_callers_hold_runs_at_once` | README |
-| S4: Fail closed: a lock it cannot create or take is never ignored; the rebuild waits, or refuses with the reason, and never runs beside a... | `test_w2_76_fail_closed.py::test_a_lock_whose_folder_is_missing_refuses_and_builds_nothing`, `test_w2_76_fail_closed.py::test_a_lock_in_an_unwritable_folder_refuses_and_builds_nothing`, `test_w2_76_fail_closed.py::test_a_refused_rebuild_leaves_the_existing_stores_unchanged` | README |
-| S5: Everything a rebuild builds is unchanged: the same stores, the same digest on the same tree [DEC-889] | `test_w2_76_unchanged.py::test_two_full_rebuilds_of_the_same_tree_give_the_same_digest`, `test_w2_76_unchanged.py::test_two_full_rebuilds_of_the_same_tree_give_the_same_digest` | README |
-| F1: Two rebuilds running at once on the machine; a rebuild stopped by the watchdog; a slow rebuild with no record; a stage's time missing. | `test_w2_76_timings.py::test_lock_part_of_a_rebuild_on_a_free_lock`, `test_w2_76_watchdog.py::test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds` | by its words (every function of the suite kept) |
+| S1: gov rebuild's output and record give the time of each stage (the lexical, semantic and code-index stores, the secrets filter where it runs, the... | `test_w2_76_timings.py::test_a_stage_that_did_not_run_still_has_its_time`, `test_w2_76_timings.py::test_every_stage_timed_in_output_and_record` (2 of 2) | the ticket's words |
+| S2: A rebuild that passes 30 minutes (a value the project may set) writes, and keeps updating while it runs, a record of the stages done with their... | `test_w2_76_watchdog.py::test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it`, `test_w2_76_watchdog.py::test_a_slow_rebuild_records_what_it_waits_on_and_goes_on` | the ticket's words |
+| S3: One store rebuild at a time on the machine: every gov rebuild, in every session on this machine (the main tree, a worktree, a clone, sandboxed ... | `test_w2_76_machine_lock.py::test_a_waiting_rebuild_says_before_it_waits_what_it_waits_for`, `test_w2_76_machine_lock.py::test_two_rebuilds_at_once_run_one_after_the_other`, `test_w2_76_machine_lock.py::test_a_rebuild_under_its_callers_hold_runs_at_once` (1 of 2) | the ticket's words |
+| S4: Fail closed: a lock it cannot create or take is never ignored; the rebuild waits, or refuses with the reason, and never runs beside another una... | `test_w2_76_fail_closed.py::test_a_lock_whose_folder_is_missing_refuses_and_builds_nothing`, `test_w2_76_fail_closed.py::test_a_lock_in_an_unwritable_folder_refuses_and_builds_nothing`, `test_w2_76_fail_closed.py::test_a_refused_rebuild_leaves_the_existing_stores_unchanged` | the ticket's words |
+| S5: Everything a rebuild builds is unchanged: the same stores, the same digest on the same tree [DEC-889] | `test_w2_76_unchanged.py::test_two_full_rebuilds_of_the_same_tree_give_the_same_digest`, `test_w2_76_fail_closed.py::test_a_refused_rebuild_leaves_the_existing_stores_unchanged` | the ticket's words |
+| F1: Two rebuilds running at once on the machine; a rebuild stopped by the watchdog; a slow rebuild with no record; a stage's time missing. | `test_w2_76_machine_lock.py::test_two_rebuilds_at_once_run_one_after_the_other`, `test_w2_76_watchdog.py::test_a_slow_rebuild_records_what_it_waits_on_and_goes_on`, `test_w2_76_watchdog.py::test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it` | the ticket's words |

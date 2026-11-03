@@ -120,16 +120,18 @@ The full packages are in the test designer's return for this ticket.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 46 in the full run, 17 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: Tickets derived from an OpenSpec change tasks.md carry kpis, role, allowed_paths, profile and a back-reference to the change [CAP-31.a] | `test_w1_14_derive.py::test_a_derived_ticket_carries_the_task_contract_of_its_task`, `test_w1_14_derive.py::test_every_task_of_the_change_becomes_one_ticket`, `test_w1_14_derive.py::test_a_derived_ticket_carries_the_task_contract_of_its_task` | README |
-| S2: Derived tickets pass the ticket schema and the DAG is acyclic | `test_w1_14_schema_and_dag.py::test_derived_tickets_pass_the_ticket_schema`, `test_w1_14_schema_and_dag.py::test_a_derived_ticket_is_an_open_ticket`, `test_w1_14_schema_and_dag.py::test_task_dependencies_become_ticket_dependencies` | README |
-| F1: A derived ticket lacks KPIs or allowed_paths | `test_w1_14_refusals.py::test_a_task_that_lacks_kpis_allowed_paths_or_role_gives_no_ticket`, `test_w1_14_refusals.py::test_one_lacking_task_refuses_the_whole_derivation`, `test_w1_14_refusals.py::test_a_task_with_no_block_gives_no_ticket` | README |
-| F2: An implementer ticket allowed_paths covers tests/acceptance/** | `test_w1_14_acceptance_paths.py::test_an_engineer_task_whose_paths_cover_the_acceptance_tests_gives_no_ticket`, `test_w1_14_acceptance_paths.py::test_no_role_but_the_test_designer_gets_the_acceptance_tests`, `test_w1_14_acceptance_paths.py::test_the_test_designers_task_may_name_the_acceptance_tests` | README |
-
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: Tickets derived from an OpenSpec change tasks.md carry kpis, role, allowed_paths, profile and a back-reference to the change [CAP-31.a] | `test_w1_14_derive.py::test_a_derived_ticket_carries_the_task_contract_of_its_task` | the ticket's words |
+| S2: Derived tickets pass the ticket schema and the DAG is acyclic | `test_w1_14_schema_and_dag.py::test_derived_tickets_pass_the_ticket_schema` | the ticket's words |
+| F1: A derived ticket lacks KPIs or allowed_paths | `test_w1_14_refusals.py::test_a_task_that_lacks_kpis_allowed_paths_or_role_gives_no_ticket` (11 of 11) | the ticket's words |
+| F2: An implementer ticket allowed_paths covers tests/acceptance/** | `test_w1_14_acceptance_paths.py::test_an_engineer_task_whose_paths_cover_the_acceptance_tests_gives_no_ticket` (11 of 11) | the ticket's words |

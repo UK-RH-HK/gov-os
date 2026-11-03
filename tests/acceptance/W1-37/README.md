@@ -101,13 +101,18 @@ test stops in the `copy` fixture with the same reason:
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 4 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: test-driven-development, systematic-debugging and verification-before-completion copied from v6.4.2, namespaced, with source hash rec... | `test_w1_37_skills.py::test_the_three_skills_are_copied_from_v6_4_2_into_the_namespace_with_the_source_hash_recorded` | README |
-| S2: Token sizes measured and within the I-09 figures; no plugin, no SessionStart hook, no subagent-driven-development | `test_w1_37_skills.py::test_the_token_sizes_are_measured_and_within_the_figures_and_no_plugin_hook_or_excluded_skill_is_there` | README |
-| F1: Any other Superpowers skill or hook is present | `test_w1_37_skills.py::test_no_other_superpowers_skill_or_hook_is_present` | README |
-| F2: A vendored file differs from its recorded hash | `test_w1_37_skills.py::test_no_vendored_file_differs_from_its_recorded_hash` | README |
+| S1: test-driven-development, systematic-debugging and verification-before-completion copied from v6.4.2, namespaced, with source hash recorded | `test_w1_37_skills.py::test_the_three_skills_are_copied_from_v6_4_2_into_the_namespace_with_the_source_hash_recorded` | the ticket's words |
+| S2: Token sizes measured and within the I-09 figures; no plugin, no SessionStart hook, no subagent-driven-development | `test_w1_37_skills.py::test_the_token_sizes_are_measured_and_within_the_figures_and_no_plugin_hook_or_excluded_skill_is_there` | the ticket's words |
+| F1: Any other Superpowers skill or hook is present | `test_w1_37_skills.py::test_no_other_superpowers_skill_or_hook_is_present` | the ticket's words |
+| F2: A vendored file differs from its recorded hash | `test_w1_37_skills.py::test_no_vendored_file_differs_from_its_recorded_hash` | the ticket's words |

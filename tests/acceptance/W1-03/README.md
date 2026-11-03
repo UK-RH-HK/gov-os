@@ -35,15 +35,24 @@ hook. Nothing in the repository is written. The run takes about 95 seconds.
 Sixteen cases need a program that a machine may lack (`perl` four cases; `ruby`, `node`, `curl`, `base64` three
 each); a case is skipped where its program is missing. All five are present on the owner's machine.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 0 in the full run, 364 lifted, 0 breadth (opt-in), 0 deleted.
+Cases: 0 in the full run, 0 in `breadth`, 364 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 to S3, F1, F2 | **lifted only** (G-5: post-command containment off, built; tag `containment`) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: After every Bash call and at gov close, git status --porcelain is compared with allowed_paths; a change outside them is reported to the agent a... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: post-command containment off, built; tag `containment`) | lifted |
+| S2: Changes under tests/acceptance/** by a non-test-designer role are restored from HEAD and the breach is recorded | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: post-command containment off, built; tag `containment`) | lifted |
+| S3: All nine Bash write forms from S0b2 I-06 are caught | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: post-command containment off, built; tag `containment`) | lifted |
+| F1: Any out-of-scope change survives without a finding | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: post-command containment off, built; tag `containment`) | lifted |
+| F2: A legitimate in-scope change is reverted | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: post-command containment off, built; tag `containment`) | lifted |
 
 ## KPI → tests → red reason today
 

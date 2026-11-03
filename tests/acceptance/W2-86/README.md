@@ -53,19 +53,24 @@ so it cannot pass with an empty set.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 3 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: After a rebuild with the embedder, the kernel's own files under template/ have vectors: every role file (template/governance/kernel/r... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | by its words (every function of the suite kept) |
-| S2: Vendored code has no vector: template/governance/kernel/vendor/**, the kernel's copies of the vendored skills (template/governance/ke... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | by its words (every function of the suite kept) |
-| S3: The path map states it in its two valid values only: kernel-template says embedded, each new namespace says not embedded, and no name... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | by its words (every function of the suite kept) |
-| S4: Nothing else moves: for every tracked path outside template/ the indexer's embedding verdict is the same at the head as at the ticket... | `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base`, `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | by its words (every function of the suite kept) |
-| S5: W2-61's measure is re-run after the change on the visible half, on a clone at the branch head with stores built by the pinned gov, an... | none: the measure's research record line (docs/research/W2-86-memory-measure.md); no case of the suite's 3 (all kept) names it | designer |
-| F1: A vendored file, or a generated adapter copy, embedded. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | by its words (every function of the suite kept) |
-| F2: A file outside template/ gains or loses its embedding. | `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base`, `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | by its words (every function of the suite kept) |
-| F3: A namespace states a value other than embedded or not embedded, or a tracked path under template/ falls in no namespace or in two. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | by its words (every function of the suite kept) |
-| F4: The indexer changed to honour a free-text exception (DEC-694's two values stay). | `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | by its words (every function of the suite kept) |
-| F5: A figure of the measure reported without the other, or the hidden half read or run. | none: the measure's research record line; no case of the suite's 3 (all kept) names it | designer |
+| S1: After a rebuild with the embedder, the kernel's own files under template/ have vectors: every role file (template/governance/kernel/roles/*.md)... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S2: Vendored code has no vector: template/governance/kernel/vendor/**, the kernel's copies of the vendored skills (template/governance/kernel/skill... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S3: The path map states it in its two valid values only: kernel-template says embedded, each new namespace says not embedded, and no namespace stat... | `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values`, `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| S4: Nothing else moves: for every tracked path outside template/ the indexer's embedding verdict is the same at the head as at the ticket's base; b... | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | the ticket's words |
+| S5: W2-61's measure is re-run after the change on the visible half, on a clone at the branch head with stores built by the pinned gov, and on a clo... | none: the measure's research record line (docs/research/W2-86-memory-measure.md) | designer |
+| F1: A vendored file, or a generated adapter copy, embedded. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated` | the ticket's words |
+| F2: A file outside template/ gains or loses its embedding. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base` | the ticket's words |
+| F3: A namespace states a value other than embedded or not embedded, or a tracked path under template/ falls in no namespace or in two. | `test_w2_86_kernel_template_embedding.py::test_template_in_one_namespace_each_and_embedded_except_vendored_and_generated`, `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | the ticket's words |
+| F4: The indexer changed to honour a free-text exception (DEC-694's two values stay). | `test_w2_86_kernel_template_embedding.py::test_every_namespace_states_one_of_the_two_values` | the ticket's words |
+| F5: A figure of the measure reported without the other, or the hidden half read or run. | none: the measure's research record line | designer |

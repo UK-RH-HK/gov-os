@@ -2350,19 +2350,24 @@ expectation`.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 7 in the full run, 0 in `breadth`, 530 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes... | `test_w1_30_close.py::test_close_returns_api_0002_envelope`, `test_w1_30_close.py::test_close_succeeds_on_green_standard_ticket`, `test_w1_30_close.py::test_close_runs_acceptance_tests` | README |
-| S2: Holds the iteration count of every review→repair, test→fix and verification loop on the ticket; after three consecutive non-convergin... | moved to `lifted` (the feature is off here): `test_first_failure_records_iteration`, `test_iteration_count_persists_across_failures` | README (lifted) |
-| S3: Registers the product-traceability family check: the commits of every closed ticket carry Implements: and Task: trailers that resolve... | moved to `lifted` (the feature is off here): `test_product_traceability_check_in_family`, `test_check_red_when_closed_ticket_lacks_implements_trailer` | README (lifted) |
-| S4: A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash: gov close re-runs th... | moved to `lifted` (the feature is off here): `test_w1_30_governance_checks`, `test_w1_30_stale` | README (lifted) |
-| S5: The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements i... | `test_w1_30_receipt.py::test_close_record_has_packet_hash`, `test_w1_30_receipt.py::test_close_record_has_tests_and_deviations` | README |
-| S6: A finding raised at close is classed into exactly one disposition (repair, reuse, delete, narrow, defer or owner) with whole-system c... | moved to `lifted` (the feature is off here): `test_no_disposition_records_unclassed`, `test_no_disposition_output_names_findings_awaiting_class` | README (lifted) |
-| S7: A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer, commiss... | moved to `lifted` (the feature is off here): `test_full_ticket_requires_probe_record`, `test_full_ticket_closes_with_valid_probe` | README (lifted) |
-| F1: A ticket closes with a failing acceptance test | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | README |
-| F2: A fourth consecutive non-converging iteration starts without an owner decision | moved to `lifted` (the feature is off here): `test_fourth_non_converging_blocked_without_owner` | README (lifted) |
-| F3: The iteration count or budget appears in any output seen by the looping session [CAP-59.b] | moved to `lifted` (the feature is off here): `test_iteration_count_not_in_output`, `test_budget_not_in_output` | README (lifted) |
+| S1: Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpo... | `test_w1_30_close.py::test_close_runs_acceptance_tests`, `test_w1_30_close.py::test_regression_failure_blocks_close`, `test_w1_30_close.py::test_close_succeeds_on_green_standard_ticket` | the ticket's words |
+| S2: Holds the iteration count of every review→repair, test→fix and verification loop on the ticket; after three consecutive non-converging iteratio... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_first_failure_records_iteration`, `test_iteration_count_persists_across_failures` \| README (lif... | lifted |
+| S3: Registers the product-traceability family check: the commits of every closed ticket carry Implements: and Task: trailers that resolve [CAP-38.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_product_traceability_check_in_family`, `test_check_red_when_closed_ticket_lacks_implements_trail... | lifted |
+| S4: A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash: gov close re-runs the checks o... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_30_governance_checks`, `test_w1_30_stale` \| README (lifted) | lifted |
+| S5: The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented... | `test_w1_30_receipt.py::test_close_record_has_packet_hash`, `test_w1_30_receipt.py::test_close_record_has_tests_and_deviations` | the ticket's words |
+| S6: A finding raised at close is classed into exactly one disposition (repair, reuse, delete, narrow, defer or owner) with whole-system context fro... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_no_disposition_records_unclassed`, `test_no_disposition_output_names_findings_awaiting_class` \|... | lifted |
+| S7: A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer, commissioned and ... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_full_ticket_requires_probe_record`, `test_full_ticket_closes_with_valid_probe` \| README (lifted) | lifted |
+| F1: A ticket closes with a failing acceptance test | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | the ticket's words |
+| F2: A fourth consecutive non-converging iteration starts without an owner decision | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_fourth_non_converging_blocked_without_owner` \| README (lifted) | lifted |
+| F3: The iteration count or budget appears in any output seen by the looping session [CAP-59.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_iteration_count_not_in_output`, `test_budget_not_in_output` \| README (lifted) | lifted |

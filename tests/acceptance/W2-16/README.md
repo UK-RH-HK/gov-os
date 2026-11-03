@@ -481,18 +481,20 @@ its own assertion with its preconditions met. No trial file is in the tree.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 49 in the full run, 93 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov release <version> builds a release from a clean w2/integrate commit [CAP-43.b lite]. Its manifest holds: the semantic version and... | `test_w2_16_release.py::test_a_release_writes_its_record_under_docs_releases_and_changes_nothing_else`, `test_w2_16_release.py::test_the_manifest_holds_the_semantic_version`, `test_w2_16_release.py::test_the_manifest_holds_the_full_commit_the_release_was_built_from` | README |
-| S2: The owner tags the release commit (agents never tag); the tag is not signed (CAP-02.c stays in Wave 3, DEC-722). | `test_w2_16_release.py::test_building_a_release_creates_no_tag`, `test_w2_16_release.py::test_building_a_release_signs_nothing`, `test_w2_16_install.py::test_a_release_installed_from_an_unsigned_lightweight_tag_is_accepted` | README |
-| S3: A release is immutable: building the same version from another commit, or changing a file after release, is refused [CAP-43]. | `test_w2_16_release.py::test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was` | README |
-| S4: Framework.lock records the release version and manifest hash, at copy as well as at update. A missing lock fails, and a project canno... | `test_w2_16_install.py::test_a_project_copied_from_a_release_tag_records_the_release_version_in_its_lock`, `test_w2_16_install.py::test_a_project_copied_from_a_release_tag_records_the_manifest_hash_in_its_lock`, `test_w2_16_install.py::test_a_project_updated_to_a_later_release_records_that_release_in_its_lock` | README |
-| S5: The vendored skills carry their licence and version in the release [W2-L002, W2-L014]. | `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_version`, `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_upstream_licence` | README |
-| F1: A release whose files or manifest do not match their hashes is refused by gov install, gov update and gov doctor. | `test_w2_16_immutability.py::test_a_release_never_hashes_bytes_the_commit_does_not_hold`, `test_w2_16_last_round.py::test_a_source_whose_release_records_were_removed_is_refused` | designer, by its words |
-
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 26 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: gov release <version> builds a release from a clean w2/integrate commit [CAP-43.b lite]. Its manifest holds: the semantic version and the commi... | `test_w2_16_immutability.py::test_a_release_never_hashes_bytes_the_commit_does_not_hold` (2 of 2), `test_w2_16_immutability.py::test_the_same_version_from_an_older_integration_commit_is_refused` (1 of 2), `test_w2_16_release.py::test_the_manifest_holds_the_full_commit_the_release_was_built_from` (1 of 2) | the ticket's words |
+| S2: The owner tags the release commit (agents never tag); the tag is not signed (CAP-02.c stays in Wave 3, DEC-722). | `test_w2_16_immutability.py::test_the_same_version_as_an_existing_owner_tag_is_refused` (1 of 2), `test_w2_16_last_round.py::test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner` (1 of 18), `test_w2_16_owner_terminal.py::test_the_owner_in_person_builds_the_release` (1 of 2) | the ticket's words |
+| S3: A release is immutable: building the same version from another commit, or changing a file after release, is refused [CAP-43]. | `test_w2_16_immutability.py::test_the_same_version_from_an_older_integration_commit_is_refused` (1 of 2), `test_w2_16_immutability.py::test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused` (1 of 2), `test_w2_16_release.py::test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was` (2 of 2) | the ticket's words |
+| S4: Framework.lock records the release version and manifest hash, at copy as well as at update. A missing lock fails, and a project cannot silence ... | `test_w2_16_last_round.py::test_a_lock_whose_release_entries_were_deleted_fails` (1 of 2), `test_w2_16_install.py::test_a_project_copied_from_a_release_tag_records_the_manifest_hash_in_its_lock`, `test_w2_16_install.py::test_a_project_updated_to_a_later_release_records_that_release_in_its_lock` | the ticket's words |
+| S5: The vendored skills carry their licence and version in the release [W2-L002, W2-L014]. | `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_version` (2 of 2), `test_w2_16_release.py::test_the_release_holds_the_vendored_skills_upstream_licence` (2 of 2) | the ticket's words |
+| F1: A release whose files or manifest do not match their hashes is refused by gov install, gov update and gov doctor. | `test_w2_16_install.py::test_copier_update_refuses_a_release_that_does_not_match_its_hashes` (1 of 2), `test_w2_16_install.py::test_copier_copy_refuses_a_release_that_does_not_match_its_hashes` (1 of 5), `test_w2_16_last_round.py::test_a_source_whose_release_records_were_removed_is_refused` (3 of 3) | the ticket's words |

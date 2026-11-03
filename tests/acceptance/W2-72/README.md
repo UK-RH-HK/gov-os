@@ -72,15 +72,27 @@ Every history is checked by `assert_shape` from git's own answers before anythin
 - which paths `git merge-tree --write-tree --name-only` reports as conflicted;
 - whether the merge commit holds exactly the entry (mode and blob) of git's own merge for the path.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 0 in the full run, 73 lifted, 0 breadth (opt-in), 0 deleted.
+Cases: 0 in the full run, 0 in `breadth`, 73 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 to S5, F1 to F3 | **lifted only** (G-5) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Under tests/acceptance/, a path both parents of a merge commit changed against their merge base is not the merge commit's own change when the m... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| S2: Any file that differs from git's own merge is still caught as before: a hand edit of a clean merge, a conflict resolution in the file, a file g... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| S3: Nothing else changes: ticket files keep DEC-421's and DEC-572's rule, every other path keeps read_merge's rule, and the approval check's readin... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| S4: The two merge-backs judge clean: judge_commits returns no finding for 03f470a5 and for 4ef3293a (W2-66's and W2-65's), read in this repository'... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| S5: W1-50's merge cases that read a clean merge of a both-changed acceptance file as the merge's own are revised by the test designer with Rewrite-... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| F1: A file that differs from git's own merge passes, in the live check or at the close. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| F2: A merge-back file equal to git's own merge is restored, refused or flagged. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| F3: A ticket file's rule, or any other path's, changes. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
 
 ## KPI lines and their tests
 

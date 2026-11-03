@@ -12,20 +12,25 @@ python3 -m pytest tests/acceptance/W1-01 -q
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. The tests read
 `.claude/settings.json`, `governance/project/bootstrap.md`, `.tickets/` and git history; they write nothing.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 50 in the full run, 0 lifted, 12 breadth (opt-in), 28 deleted.
+Cases: 54 in the full run, 12 in `breadth`, 0 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 | `test_write_to_secret_file_is_denied` (4) (one row per class: `.env*`, `*.pem`, `*.key`, `config/secrets*`, on Edit and Write), `test_a_denied_attempt_is_recorded_for_each_path_class` (5); the acceptance-test half as the guard enforces it: `test_engineer_cannot_write_under_acceptance_tests` (3) (W1-02), `test_only_the_test_designer_may_write_the_acceptance_tests` (5) (W1-33), and the live hook's rule 1 (`test_rule_1_only_the_test_designer_writes_the_acceptance_tests` (6), tests/unit/hooks) |
-| S2 | `test_w1_01_bootstrap_record.py` (9), `test_implementer_commits_stay_inside_allowed_paths` (1) |
-| S3 | `test_interim_install_rule_is_recorded` (1), `test_install_rule_lists_every_agent_session_settings_file` (1), `test_a_denied_install_attempt_is_recorded` (1); in force: `test_an_install_by_any_other_role_is_denied` (5) and `test_sudo_is_denied_to_every_role` (5) (W1-04) |
-| F1 | `test_only_the_test_designer_commits_to_acceptance_tests` (1) (reads the path map's `acceptance_exemptions`, frozen by Q-10), `test_w1_01_integration_merges.py` (26) |
-| F2 | retired (DEC-925 item 1) |
-| F3 | spent: the interim rule's cases are deleted (row D1, DEC-1040 (1)); installs stay refused by W1-04's cases |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Implementer sessions deny Edit/Write on tests/acceptance/** and on .env*, *.pem, *.key, config/secrets* (verified by one denied attempt each) | `test_w1_01_bootstrap_record.py::test_a_denied_attempt_is_recorded_for_each_path_class` (5 of 5), `test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied` (4 of 16) | part A's row, by its words |
+| S2: The operator diff procedure (git diff --name-only vs allowed_paths at each ticket close) is written and used from the first implementation ticket | `test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths`, `test_w1_01_bootstrap_record.py::test_operator_diff_procedure_is_written` | part A's row, by its words |
+| S3: Interim install rule recorded and in force until W1-05: install commands are denied in every session settings file; no tool is installed before... | `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded`, `test_w1_01_bootstrap_record.py::test_install_rule_lists_every_agent_session_settings_file`, `test_w1_01_bootstrap_record.py::test_a_denied_install_attempt_is_recorded` | part A's row, by its words |
+| F1: Any implementer commit touching tests/acceptance/** before W1-05 lands | `test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests`, `test_w1_01_integration_merges.py::test_a_merge_that_changes_an_acceptance_test_itself_fails`, `test_w1_01_integration_merges.py::test_a_merge_that_adds_an_acceptance_test_itself_fails` | part A's row, by its words |
+| F2: An existing docs/source deny rule is lost | `test_w1_01_bootstrap_record.py::test_a_denied_attempt_is_recorded_for_each_path_class` (5 of 5), `test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied` (4 of 16), `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded` | the ticket's words |
+| F3: Any install runs before W1-05 | `test_w1_01_bootstrap_record.py::test_interim_install_rule_is_recorded` | the ticket's words |
 
 ## KPI → tests → red reason today
 

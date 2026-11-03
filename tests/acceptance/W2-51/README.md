@@ -180,15 +180,20 @@ No earlier test was rewritten.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 39 in the full run, 8 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: It reads the Wave 2 plan (the WBS ticket table, the Wave 2 tickets in .tickets/ by wbs_id or external-ref when it has none, a letter ... | `test_w2_51_plan_reading.py::test_a_wave_2_ticket_missing_from_the_wbs_table_fails_naming_it`, `test_w2_51_plan_reading.py::test_a_ticket_with_only_external_ref_is_read_as_a_wave_2_ticket` | by its words (every function of the suite kept) |
-| S2: The two-way check of exit criterion 7: every Contract item in Wave 2, and every lite item of Contract v4.2, is delivered by a Wave 2 ... | `test_w2_51_plan_reading.py::test_a_malformed_id_is_not_taken_as_a_wave_2_ticket`, `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_line_fails_naming_it` | by its words (every function of the suite kept) |
-| S3: A Contract item moved to Wave 2 with no CIT-P line, or a CIT-P line with no change, fails it (W2-49's failure KPI) [DEC-741]. | `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_line_fails_naming_it`, `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_file_at_all_fails_naming_it` | by its words (every function of the suite kept) |
-| S4: The list's and the triage's counts agree with their rows. | `test_w2_51_counts.py::test_the_list_and_the_triage_counts_agree_with_their_rows`, `test_w2_51_counts.py::test_a_list_severity_heading_that_disagrees_with_its_rows_fails_naming_it` | by its words (every function of the suite kept) |
-| F1: It never reads ~/gov-os-workbench or docs/source/ by default; a check that would need them is reported as not run, by name [DEC-744]. | `test_w2_51_outside_inputs.py::test_checks_that_would_need_the_workbench_or_docs_source_are_reported_not_run_by_name`, `test_w2_51_outside_inputs.py::test_decoy_workbench_and_docs_source_change_nothing_in_the_output` | by its words (every function of the suite kept) |
-| F2: An input it cannot read is a named failure, never a pass. | `test_w2_51_unreadable_inputs.py::test_an_input_it_cannot_read_is_a_named_failure_never_a_pass`, `test_w2_51_outside_inputs.py::test_decoy_workbench_and_docs_source_change_nothing_in_the_output` | by its words (every function of the suite kept) |
+| S1: It reads the Wave 2 plan (the WBS ticket table, the Wave 2 tickets in .tickets/ by wbs_id or external-ref when it has none, a letter suffix suc... | `test_w2_51_plan_reading.py::test_a_wave_2_ticket_missing_from_the_wbs_table_fails_naming_it` (2 of 2), `test_w2_51_plan_reading.py::test_a_ticket_with_only_external_ref_is_read_as_a_wave_2_ticket` | the ticket's words |
+| S2: The two-way check of exit criterion 7: every Contract item in Wave 2, and every lite item of Contract v4.2, is delivered by a Wave 2 ticket and... | `test_w2_51_exit_criterion_7.py::test_a_lite_item_of_contract_4_2_no_wave_2_ticket_delivers_fails_naming_it`, `test_w2_51_exit_criterion_7.py::test_a_lite_item_of_contract_4_2_no_acceptance_test_cites_fails_naming_it` | the ticket's words |
+| S3: A Contract item moved to Wave 2 with no CIT-P line, or a CIT-P line with no change, fails it (W2-49's failure KPI) [DEC-741]. | `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_line_fails_naming_it`, `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_file_at_all_fails_naming_it`, `test_w2_51_cit_p.py::test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it` (1 of 3) | the ticket's words |
+| S4: The list's and the triage's counts agree with their rows. | `test_w2_51_counts.py::test_the_list_and_the_triage_counts_agree_with_their_rows` | the ticket's words |
+| F1: It never reads ~/gov-os-workbench or docs/source/ by default; a check that would need them is reported as not run, by name [DEC-744]. | `test_w2_51_outside_inputs.py::test_checks_that_would_need_the_workbench_or_docs_source_are_reported_not_run_by_name` | the ticket's words |
+| F2: An input it cannot read is a named failure, never a pass. | `test_w2_51_unreadable_inputs.py::test_an_input_it_cannot_read_is_a_named_failure_never_a_pass` (8 of 8) | the ticket's words |

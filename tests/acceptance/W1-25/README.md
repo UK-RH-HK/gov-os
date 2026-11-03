@@ -229,18 +229,20 @@ No other earlier test was changed. W1-07 after the revision: 227 passed.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 39 in the full run, 13 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop [CAP-13.b, CAP-37.a, CAP-37.b] | `test_w1_25_triggers.py::test_each_mandatory_trigger_writes_a_checkpoint_that_records_it`, `test_w1_25_command.py::test_checkpoint_no_longer_returns_not_implemented`, `test_w1_25_command.py::test_checkpoint_without_arguments_writes_nothing` | README |
-| S2: A fresh session resumes the ticket at the recorded next step from the checkpoint alone [CAP-20.a, CAP-37.f] | `test_w1_25_resume.py::test_resume_states_the_ticket_its_inputs_and_the_next_step`, `test_w1_25_resume.py::test_resume_reads_the_latest_checkpoint_of_the_ticket`, `test_w1_25_resume.py::test_the_brief_as_text_names_the_ticket_each_input_and_the_next_step` | README |
-| S3: gov checkpoint --watch marks the latest checkpoint stale by policy (age, commits since, context utilisation) without relying on harne... | `test_w1_25_command.py::test_help_names_watch`, `test_w1_25_command.py::test_watch_is_accepted_as_an_argument`, `test_w1_25_watch.py::test_a_new_checkpoint_is_fresh_under_the_default_policy` | README |
-| S4: Registers the fresh-agent-reconstruction family check: a session with only the latest checkpoint and the SessionStart output states t... | `test_w1_25_check_declaration.py::test_the_declaration_is_a_file_of_the_kernel_checks`, `test_w1_25_check_declaration.py::test_gov_check_list_names_the_family_check`, `test_w1_25_resume.py::test_resume_states_the_ticket_its_inputs_and_the_next_step` | README |
-| F1: A ticket transition leaves no checkpoint | `test_w1_25_triggers.py::test_a_ticket_in_progress_with_no_checkpoint_is_reported`, `test_w1_25_triggers.py::test_a_transition_after_the_latest_checkpoint_marks_it_stale`, `test_w1_25_triggers.py::test_a_checkpoint_at_the_transition_clears_it` | README |
-| F2: A checkpoint references an input by id without its hash | `test_w1_25_record.py::test_every_input_has_an_id_a_version_and_a_hash`, `test_w1_25_record.py::test_an_input_that_cannot_be_hashed_is_refused_and_nothing_is_written`, `test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh` | README |
-
-Tier 2's cap here: 36 functions (6 KPI lines x 6); 12 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop [CAP-13.b, CAP-37.a, CAP-37.b] | `test_w1_25_record.py::test_the_checkpoint_conforms_to_the_kernel_schema`, `test_w1_25_triggers.py::test_each_mandatory_trigger_writes_a_checkpoint_that_records_it` (3 of 3) | the ticket's words |
+| S2: A fresh session resumes the ticket at the recorded next step from the checkpoint alone [CAP-20.a, CAP-37.f] | `test_w1_25_record.py::test_the_checkpoint_records_the_ticket_the_trigger_and_the_next_step`, `test_w1_25_live_session.py::test_the_session_states_the_recorded_next_step`, `test_w1_25_record.py::test_a_checkpoint_without_its_ticket_trigger_or_next_step_is_refused` (1 of 3) | the ticket's words |
+| S3: gov checkpoint --watch marks the latest checkpoint stale by policy (age, commits since, context utilisation) without relying on harness hooks; ... | `test_w1_25_command.py::test_help_names_watch`, `test_w1_25_command.py::test_watch_is_accepted_as_an_argument` | the ticket's words |
+| S4: Registers the fresh-agent-reconstruction family check: a session with only the latest checkpoint and the SessionStart output states the ticket,... | `test_w1_25_resume.py::test_resume_states_the_ticket_its_inputs_and_the_next_step`, `test_w1_25_resume.py::test_the_family_check_fails_when_the_latest_checkpoint_has_no_next_step`, `test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh` | the ticket's words |
+| F1: A ticket transition leaves no checkpoint | `test_w1_25_triggers.py::test_a_ticket_in_progress_with_no_checkpoint_is_reported`, `test_w1_25_triggers.py::test_a_transition_after_the_latest_checkpoint_marks_it_stale` | the ticket's words |
+| F2: A checkpoint references an input by id without its hash | `test_w1_25_watch.py::test_a_latest_checkpoint_with_an_input_without_its_hash_is_not_fresh`, `test_w1_25_record.py::test_every_input_has_an_id_a_version_and_a_hash` | the ticket's words |

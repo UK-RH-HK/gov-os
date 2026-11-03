@@ -113,17 +113,22 @@ the planted cases are skipped with the reason. Nothing is installed or downloade
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 27 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: Within one process, the semantic store's status (which files should be embedded and whether the store holds them) and the lexical ind... | `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen`, `test_w2_108_once.py::test_lexical_freshness_is_worked_out_once` | by its words (every function of the suite kept) |
-| S2: Every answer is unchanged: for the same store and tree, each retrieval call returns the same bundle, facets and stopping reason as be... | `test_w2_108_unchanged.py::test_planted_unavailable_answers_are_unchanged`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | by its words (every function of the suite kept) |
-| S3: A change is still seen: a store rebuilt, a file changed or a head moved between two calls is seen as such (a new key, a fresh check);... | `test_w2_108_change_seen.py::test_without_a_head_every_call_checks`, `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen` | by its words (every function of the suite kept) |
-| S4: Measured: `python3 -m gov.context.context_check` on one store, before and after, at the same measured load (two loads, one of them 40... | `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen`, `test_w2_108_once.py::test_lexical_search_checks_freshness_once` | by its words (every function of the suite kept) |
-| F1: A freshness or status check repeated on every call within one process. | `test_w2_108_once.py::test_every_kind_of_call_shares_one_check`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | by its words (every function of the suite kept) |
-| F2: Any bundle, facet or stopping reason different from before for the same store and tree. | `test_w2_108_unchanged.py::test_this_repositorys_semantic_answers_are_unchanged`, `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen` | by its words (every function of the suite kept) |
-| F3: A stale answer reused after the store, a file or the head changed. | `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen`, `test_w2_108_change_seen.py::test_a_removed_store_is_seen` | by its words (every function of the suite kept) |
-| F4: W2-54's time limits raised, or its tests changed. | `test_w2_108_change_seen.py::test_a_file_changed_in_the_working_tree_is_seen`, `test_w2_108_change_seen.py::test_a_second_edit_of_an_edited_file_is_seen` | by its words (every function of the suite kept) |
+| S1: Within one process, the semantic store's status (which files should be embedded and whether the store holds them) and the lexical index's fresh... | `test_w2_108_once.py::test_lexical_freshness_is_worked_out_once`, `test_w2_108_once.py::test_semantic_status_is_worked_out_once`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | the ticket's words |
+| S2: Every answer is unchanged: for the same store and tree, each retrieval call returns the same bundle, facets and stopping reason as before, item... | `test_w2_108_unchanged.py::test_this_repositorys_answers_are_unchanged`, `test_w2_108_unchanged.py::test_this_repositorys_semantic_answers_are_unchanged`, `test_w2_108_unchanged.py::test_planted_answers_are_unchanged` | the ticket's words |
+| S3: A change is still seen: a store rebuilt, a file changed or a head moved between two calls is seen as such (a new key, a fresh check); a process... | `test_w2_108_change_seen.py::test_a_store_rebuilt_in_the_same_process_is_seen`, `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen` (2 of 2), `test_w2_108_change_seen.py::test_a_moved_head_is_checked_afresh` | the ticket's words |
+| S4: Measured: `python3 -m gov.context.context_check` on one store, before and after, at the same measured load (two loads, one of them 40 or more),... | `test_w2_108_scope.py::test_the_research_record_names_the_measure` | the ticket's words |
+| F1: A freshness or status check repeated on every call within one process. | `test_w2_108_once.py::test_lexical_search_checks_freshness_once`, `test_w2_108_once.py::test_every_kind_of_call_shares_one_check`, `test_w2_108_once.py::test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once` | the ticket's words |
+| F2: Any bundle, facet or stopping reason different from before for the same store and tree. | `test_w2_108_unchanged.py::test_this_repositorys_answers_are_unchanged`, `test_w2_108_unchanged.py::test_this_repositorys_semantic_answers_are_unchanged`, `test_w2_108_unchanged.py::test_planted_answers_are_unchanged` | the ticket's words |
+| F3: A stale answer reused after the store, a file or the head changed. | `test_w2_108_change_seen.py::test_a_file_changed_in_the_working_tree_is_seen` (2 of 2), `test_w2_108_change_seen.py::test_a_committed_change_is_seen`, `test_w2_108_change_seen.py::test_a_store_rebuilt_by_another_process_is_seen` (2 of 2) | the ticket's words |
+| F4: W2-54's time limits raised, or its tests changed. | `test_w2_108_scope.py::test_the_context_checks_limit_is_not_raised`, `test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket` | the ticket's words |

@@ -302,17 +302,19 @@ The packages of the first run are decided; no case waits on one.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 39 in the full run, 32 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov d... | `test_w1_39_copy.py::test_copy_installs_the_kernel_exactly_as_the_template_holds_it`, `test_w1_39_copy.py::test_copy_installs_the_hooks_and_keeps_them_executable`, `test_w1_39_copy.py::test_copy_installs_the_rulesync_sources` | README |
-| S2: Editing one kernel file makes doctor report DRIFT naming it; the update procedure is documented [CAP-02.a] | `test_w1_39_drift.py::test_a_one_byte_edit_of_a_kernel_file_is_drift_naming_it`, `test_w1_39_drift.py::test_drift_names_the_edited_file_and_no_other`, `test_w1_39_drift.py::test_the_edit_taken_back_is_a_match_again` | README |
-| S3: The Gov OS repository keeps kernel template, CLI, tests, fixtures, lessons, plan and docs in separate trees (ADR-0002 §5); a product ... | `test_w1_39_layout.py::test_this_repository_is_a_copier_template_whose_subdirectory_is_the_kernel_template_tree`, `test_w1_39_layout.py::test_the_template_tree_holds_nothing_but_what_a_product_receives`, `test_w1_39_layout.py::test_a_created_project_holds_none_of_the_gov_os_repositorys_own_trees` | README |
-| F1: An overlay file is overwritten by copier update | `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_project_wrote`, `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_template_shipped_and_the_project_edited`, `test_w1_39_update.py::test_update_keeps_the_path_map_when_the_release_ships_a_different_one` | README |
-| F2: framework.lock lacks the template tag or commit | `test_w1_39_lock_identity.py::test_the_lock_names_the_template_tag`, `test_w1_39_lock_identity.py::test_the_lock_names_the_template_commit`, `test_w1_39_lock_identity.py::test_the_lock_of_an_untagged_template_commit_still_names_the_commit` | README |
-
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 32 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov doctor pass... | `test_w1_39_layout.py::test_governance_of_a_created_project_is_the_kernel_the_overlay_and_the_lock`, `test_w1_39_copy.py::test_the_path_map_of_a_fresh_project_is_one_doctors_path_map_part_accepts`, `test_w1_39_copy.py::test_copy_writes_the_lock_where_the_product_layout_places_it` | the ticket's words |
+| S2: Editing one kernel file makes doctor report DRIFT naming it; the update procedure is documented [CAP-02.a] | `test_w1_39_update.py::test_after_an_update_doctor_reports_a_match`, `test_w1_39_drift.py::test_a_one_byte_edit_of_a_kernel_file_is_drift_naming_it` (2 of 2), `test_w1_39_drift.py::test_a_kernel_file_the_manifest_does_not_list_is_drift_naming_it` | the ticket's words |
+| S3: The Gov OS repository keeps kernel template, CLI, tests, fixtures, lessons, plan and docs in separate trees (ADR-0002 §5); a product repository... | `test_w1_39_layout.py::test_a_created_project_holds_none_of_the_gov_os_repositorys_own_trees` | the ticket's words |
+| F1: An overlay file is overwritten by copier update | `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_project_wrote` (2 of 2), `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_template_shipped_and_the_project_edited` (2 of 2), `test_w1_39_update.py::test_copier_prints_the_update_procedure_after_a_copy` | the ticket's words |
+| F2: framework.lock lacks the template tag or commit | `test_w1_39_lock_identity.py::test_the_lock_names_the_template_commit`, `test_w1_39_lock_identity.py::test_the_lock_of_an_untagged_template_commit_still_names_the_commit`, `test_w1_39_lock_identity.py::test_the_lock_names_the_template_tag` | the ticket's words |

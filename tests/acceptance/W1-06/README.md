@@ -330,16 +330,18 @@ DP-1 to DP-5 are **answered** (owner, 2026-10-03). They are kept as asked, for t
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 45 in the full run, 51 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: ccusage installed and pinned through a DEC-083 decision package and recorded in the registry | `test_w1_06_ccusage.py::test_ccusage_is_recorded_in_the_registry`, `test_w1_06_ccusage.py::test_ccusage_is_pinned_to_one_exact_version`, `test_w1_06_ccusage.py::test_the_recorded_install_command_installs_the_pinned_version` | README |
-| S2: The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with... | `test_w1_06_pins.py::test_a_dec_074_pin_is_recorded_at_its_pinned_version`, `test_w1_06_pins.py::test_a_dec_074_pin_is_recorded_with_the_sha256_of_the_stack_table`, `test_w1_06_pins.py::test_pyyaml_is_recorded_at_6_0_1` | README |
-| F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register`, `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner` | README |
-| F2: A registry entry lacks an uninstall command | `test_w1_06_registry.py::test_every_entry_has_an_uninstall_command`, `test_w1_06_registry.py::test_no_uninstall_command_is_the_install_command`, `test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command` | README |
-
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 30 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: ccusage installed and pinned through a DEC-083 decision package and recorded in the registry | `test_w1_06_install_approvals.py::test_the_approval_of_an_install_of_this_ticket_is_made_under_dec_083` (1 of 2), `test_w1_06_ccusage.py::test_ccusage_is_recorded_in_the_registry`, `test_w1_06_ccusage.py::test_the_recorded_install_command_installs_the_pinned_version` | the ticket's words |
+| S2: The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with sha256 [C... | `test_w1_06_pins.py::test_superpowers_is_recorded_with_a_sha256_digest`, `test_w1_06_digests.py::test_a_single_file_tool_is_recorded_with_the_sha256_of_its_binary` (1 of 7), `test_w1_06_install_approvals.py::test_the_superpowers_install_command_fetches_the_approved_source` | the ticket's words |
+| F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner`, `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register` | the ticket's words |
+| F2: A registry entry lacks an uninstall command | `test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command`, `test_w1_06_registry.py::test_every_entry_has_an_uninstall_command` | the ticket's words |

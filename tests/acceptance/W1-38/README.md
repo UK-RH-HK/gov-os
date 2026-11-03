@@ -876,17 +876,19 @@ P-1 and P-2 are decided: P-1 by DEC-468 (option a; its cases are `TestOpenSpecSk
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 42 in the full run, 159 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec comma... | `test_w1_38_rulesync.py::TestRoleFieldAgreement::test_role_fields_match_kernel`, `test_w1_38_rulesync.py::TestRoleFieldAgreement::test_role_fields_match_kernel`, `test_w1_38_rulesync.py::TestSkillGeneration::test_skill_body_matches_source` | README |
-| S2: Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI | `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestGenerateCheck::test_check_clean_after_generate` | README |
-| S3: Registers the adapter/model-portability family check: generated adapters match their source for Claude Code and AGENTS.md [CAP-38.b] | `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family`, `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project`, `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_red_after_a_hand_edit` | README |
-| F1: generate --delete removes OpenSpec or vendored skills | `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_commands`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_skills`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_vendored_skills` | README |
-| F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_agents_md`, `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_role_file` | README |
-
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 69 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec commands and ve... | `test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_claude_md_is_the_root_rule`, `test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_agents_md_token_limit`, `test_w1_38_rulesync.py::TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships` (1 of 6) | designer |
+| S2: Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI | `test_w1_38_rulesync.py::TestHookStubs::test_hook_stubs_exist`, `test_w1_38_rulesync.py::TestGenerateCheck::test_check_clean_after_generate` | the ticket's words |
+| S3: Registers the adapter/model-portability family check: generated adapters match their source for Claude Code and AGENTS.md [CAP-38.b] | `test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family`, `test_w1_38_rulesync.py::TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read`, `test_w1_38_rulesync.py::TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md` | the ticket's words |
+| F1: generate --delete removes OpenSpec or vendored skills | `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_openspec_skills`, `test_w1_38_rulesync.py::TestDeleteProtection::test_delete_preserves_vendored_skills`, `test_w1_38_rulesync.py::TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships` (1 of 6) | the ticket's words |
+| F2: A generated file is hand-edited | `test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_claude_md` | the ticket's words |

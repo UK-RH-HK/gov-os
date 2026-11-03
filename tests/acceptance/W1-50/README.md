@@ -255,21 +255,39 @@ invocation"), raises findings for the reverts of the ticket's acceptance-test co
 package DP-12. DEC-390 decides it, "as built until the owner says otherwise": the commits are judged like any other
 commit, and where they are findings, the findings are records.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 30 in the full run, 614 lifted, 45 breadth (opt-in), 0 deleted.
+Cases: 30 in the full run, 41 in `breadth`, 614 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 | `test_w1_50_freeze_marker.py` (7), `test_w1_50_freeze_guard_reading.py` (10) |
-| S2 | `test_w1_50_freeze_launcher.py` (8) |
-| S12 | `test_w1_50_freeze_fixture_settings.py` (5) |
-| S4, S5, S6, S9 | **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) |
-| S7 | **lifted only** for the owner's terminal; the orchestrator's half stays by W1-28's `test_the_orchestrator_can_pause` (1) |
-| S11 (the ticket lead's write scope) | **lifted only** (G-4) |
-| S3, S8, S10, S13 to S17, F1 to F3 | **lifted only** (G-5: commit attribution and the flag's restore are containment's) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A freeze flag set by gov pause carries a marker line; the guard treats an empty file, or one without the marker, at the flag's path as no freez... | `test_w1_50_freeze_marker.py::test_the_flag_pause_writes_is_the_freeze_the_guard_reads`, `test_w1_50_freeze_guard_reading.py::test_a_marked_flag_and_what_the_guard_cannot_read_freeze` (1 of 13) | part A's row, by its words |
+| S2: gov launch does not deny the freeze flag's path when the flag does not exist at launch, so a launched session leaves no placeholder there (DEC-... | `test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path` | part A's row, by its words |
+| S3: The containment check compares the freeze flag around every Bash call; a flag removed or emptied during the call is a finding and is restored w... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S4: gov pause --off refuses when any ancestor process is a Claude Code session, wherever it was started, the operator console included; the same ho... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) | lifted |
+| S5: gov pause --off requires an interactive terminal (stdin and stdout are TTYs) and a one-time random code LIFT-<4 digits> typed back; a wrong cod... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) | lifted |
+| S6: The guard refuses, for every role, any agent Bash command whose text contains the lift form of gov pause (the --off option), including a comman... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) | lifted |
+| S7: Setting a freeze stays open to the owner, from a terminal or the operator console, and to the orchestrator (DEC-409) | none: the line's feature is lifted (`--optin=lifted`): **lifted only** for the owner's terminal; the orchestrator's half stays by W1-28's `test_the_orchestrator_can_pause` (1) | lifted |
+| S8: A ticket file that more than one parent of a merge changed against the merge base is the merge commit's own change, whichever side's content it... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S9: gov pause writes the freeze to .gov-runtime/freeze and to a mirror outside the repository, under ~/.local/state/gov-os/, keyed by the repositor... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) | lifted |
+| S10: A flag in the repository that is removed or emptied while the mirror remains is a finding, and the flag is restored with its marker line; lift... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S11: A ticket lead runs under its own role, which may write only its checkpoint, its scratch and merge-backs judged by the three-way rule; a lead's... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4) | lifted |
+| S12: Every test fixture that copies the whole tree strips the held-out deny line from the copied settings file (DEC-399) | `test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules` (1 of 2) | part A's row, by its words |
+| S13: A forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each commit's paths against the allowed p... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S14: A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S15: A worker's commit made during another actor's call is judged by its own trailers (DEC-255) [CAP-58.h] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S16: A commit with no Role or Task trailer is judged against the caller, as today (DEC-255) [CAP-58.h] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| S17: A commit carrying a Role: owner trailer that is made during any agent session's call is a finding (DEC-360) [CAP-58.h] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| F1: An integration merge whose commits each stay inside the allowed paths of their own Role and Task trailers raises a finding | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| F2: A commit that changes a path outside the allowed paths of its own Role and Task trailers raises no finding, whoever the caller is | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
+| F3: A commit with no Role or Task trailer is judged by anything other than the caller | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: commit attribution and the flag's restore are containment's) | lifted |
 
 ## KPI and decision → tests → red reason
 

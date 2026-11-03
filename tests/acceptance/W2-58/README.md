@@ -45,24 +45,28 @@ Every project is a git repository built from scratch (`w2_58_support.make_projec
 Read-only cases of one module share one project (module-scoped fixtures `open_world`, `branch_world`, `eval_world`);
 cases that break a file build their own.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 102 in the full run, 153 lifted, 553 breadth (opt-in), 0 deleted.
+Cases: 102 in the full run, 553 in `breadth`, 153 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 (the engineer refused its ticket's acceptance tests) | `test_the_engineer_is_refused_its_tickets_acceptance_tests` (2), `test_the_engineer_still_runs_its_tests_and_reads_the_rest` (2), `test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (1), `test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests` (1), `test_an_engineer_whose_ticket_is_given_by_its_wbs_id_is_refused_ts_tests` (1) |
-| S2 | `test_w2_58_launched_sessions.py` (6) |
-| S3 (the test designer refused the branch's changes) | `test_w2_58_test_designer.py` (12), `test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (1) |
-| S4 (the hidden half) | `test_w2_58_evaluation_sets.py` (10), `test_a_session_measured_by_a_ticket_given_by_its_wbs_id_is_refused_the_hidden_part` (1) |
-| S5 (reads open) | `test_w2_58_reads_open.py` (6) |
-| S6 | `test_w2_58_auditor.py` (4) |
-| S7 | `test_w2_58_tilde_and_test_runs.py` (17) |
-| S8 | `test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage` (2) |
-| F1 | `test_w2_58_still_refused.py` (21), `test_a_credential_file_is_refused` (3), `test_every_role_is_refused_each_credential_file_by_the_read_tool` (1), `test_w2_58_fails_closed.py` (6); the run-time listing forms, the protected files' write side and the hook-listing helper are **lifted only** (a command form, G-1/G-2/B2-3; the write side is `protected.py`, G-4) |
-| (c), the counterpart reads (DEC-1061 (6)) | 27 cases kept while G-14 holds, named first so tier 2's cap takes none: `test_w2_58_engineer.py` (8), `test_w2_58_test_designer.py` (12), and the review's `test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (1), `test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (1), `test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests` (1), `test_an_untyped_or_explore_subagent_of_the_ticket_lead_reads_ts_tests` (1), `test_the_engineer_on_another_ticket_reads_ts_tests` (1), `test_gov_launch_accepts_a_ticket_named_by_its_wbs_id_and_its_session_is_refused_ts_tests` (1); rewritten if D-9 adopts `role_paths` as the product's (the live hook's G-14 cases are in tests/unit/hooks/test_live_hook.py) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A session of role engineer on ticket T is refused reads of tests/acceptance/<T's W2 id>/** by the guard, on every tool read and the read side o... | `test_w2_58_engineer.py::test_the_engineer_is_refused_its_tickets_acceptance_tests` (2 of 27), `test_w2_58_engineer.py::test_the_engineer_still_runs_its_tests_and_reads_the_rest` (2 of 16), `test_w2_58_review.py::test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (1 of 10), `test_w2_58_review.py::test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests` | part A's row, by its words |
+| S2: The launcher adds no OS-level Read deny rule for (c) or (d), because running a test means reading it; the held-out material's Read rules (b) st... | `test_w2_58_launched_sessions.py::test_the_held_out_rules_stay_in_every_launched_role_s_settings` (1 of 5), `test_w2_58_launched_sessions.py::test_the_launch_denies_no_tracked_file_of_the_project_by_a_read_rule` (1 of 2) | part A's row, by its words |
+| S3: A session of role independent-test-designer on T is refused reads of the files T's branch changes against its base, other than its own tests, a... | `test_w2_58_review.py::test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (1 of 2), `test_w2_58_test_designer.py::test_the_test_designer_is_refused_the_files_the_branch_changes` (2 of 14), `test_w2_58_test_designer.py::test_the_test_designer_reads_the_base_its_tests_its_ticket_and_unchanged_code` (2 of 18) | part A's row, by its words |
+| S4: An evaluation set declared in the path map with a visible and a hidden part, a session measured by it is refused reads of the hidden part, and ... | `test_w2_58_review.py::test_a_session_measured_by_a_ticket_given_by_its_wbs_id_is_refused_the_hidden_part` (1 of 2), `test_w2_58_evaluation_sets.py::test_a_session_the_set_does_not_measure_reads_the_hidden_part` (1 of 5), `test_w2_58_evaluation_sets.py::test_a_measured_session_is_refused_the_hidden_part` (1 of 36) | part A's row, by its words |
+| S5: The listing and search refusals over governance/ and .claude/ (DEC-508) are gone: a search that starts at the repository root or governance/pro... | `test_w2_58_reads_open.py::test_the_held_out_list_and_the_settings_file_are_readable` (2 of 48), `test_w2_58_reads_open.py::test_searches_and_listings_of_governance_and_claude_are_open` (2 of 72) | part A's row, by its words |
+| S6: Reviewers and auditors read everything, tests and code alike [DEC-820]. | `test_w2_58_auditor.py::test_the_auditor_on_t_reads_its_tests_and_its_code` (2 of 13), `test_w2_58_auditor.py::test_secrets_and_held_out_material_still_refuse_the_auditor` | part A's row, by its words |
+| S7: A path with a leading ~ is judged as its expanded form in every path the guard judges, on Read, Grep, Glob, Edit, Write and Bash: each of (a) t... | `test_w2_58_tilde_and_test_runs.py::test_read_judges_a_tilde_path_as_its_absolute_path` (2 of 13), `test_w2_58_tilde_and_test_runs.py::test_grep_judges_a_tilde_path_as_its_absolute_path` (2 of 9) | part A's row, by its words |
+| S8: An engineer runs its own ticket's tests with python3 -B -m pytest, python3 -m coverage run -m pytest and coverage run -m pytest, as with plain ... | `test_w2_58_tilde_and_test_runs.py::test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage` (2 of 3) | part A's row, by its words |
+| F1: Each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error sti... | `test_w2_58_review.py::test_a_credential_file_is_refused` (3 of 24), `test_w2_58_review.py::test_every_role_is_refused_each_credential_file_by_the_read_tool` (1 of 6), `test_w2_58_still_refused.py::test_a_dot_env_file_is_refused_by_every_route_to_every_role` (3 of 48), `test_w2_58_still_refused.py::test_every_secret_name_is_refused` (3 of 32), `test_w2_58_fails_closed.py::test_a_malformed_evaluation_block_refuses_the_launch`, `test_w2_58_fails_closed.py::test_a_malformed_evaluation_block_refuses_the_calls_of_the_sessions_it_could_concern` (2 of 2) | part A's row, by its words; partly lifted (part A's row): `test_w2_58_still_refused.py` (21), `test_a_credential_file_is_refused` (3), `test_every_role_is_refused_each_credent... |
 
 ## KPI lines, their tests, and the red reason
 

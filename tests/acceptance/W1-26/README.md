@@ -669,23 +669,25 @@ check's own entry and finding, each shown red against a planted fault and green 
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 75 in the full run, 212 in `breadth`, 132 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acycli... | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | designer |
-| S2: Every policy key maps to a check or is declared informational (D-0003); each family is reported RED/YELLOW/GREEN [CAP-39.d] | `test_w1_26_command.py::test_gov_check_json_returns_the_api_0002_envelope`, `test_w1_26_command.py::test_gov_check_list_still_works`, `test_w1_26_command.py::test_exit_0_when_all_checks_green` | README |
-| S3: Fails a specification with a required open readiness row that has no linked gap ticket (DEC-089) [CAP-30.b] | `test_w1_26_gap_tickets.py::test_required_missing_row_no_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_unlinked_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_valid_gap_ticket_passes` | README |
-| S4: Fails a change to the capability taxonomy or to readiness-dimensions.yaml that has no linked CIT-E record (DEC-309) [CAP-30.e] | `test_w1_26_taxonomy.py::test_dimensions_changed_without_cite_is_red`, `test_w1_26_taxonomy.py::test_dimensions_changed_with_cite_passes`, `test_w1_26_taxonomy.py::test_taxonomy_field_changed_without_cite_is_red` | README |
-| S5: Each check declares hard-block or warning, and every result records its provenance (commit, check version, inputs hash) [CAP-39.d] | `test_w1_26_command.py::test_each_check_result_declares_severity`, `test_w1_26_provenance.py::test_each_check_result_has_provenance`, `test_w1_26_provenance.py::test_provenance_commit_is_head` | README |
-| S6: Fails a skill file whose content changed without a version change and a linked decision [CAP-24.c] | moved to `lifted` (the feature is off here): `test_w1_26_skill` | README (lifted) |
-| S7: The check registry names all 17 governance test families of Contract v3 O2 (schema/invariants, graph integrity, index freshness, retr... | `test_w1_26_registry.py::test_all_17_families_named_in_result`, `test_w1_26_registry.py::test_exactly_17_families`, `test_w1_26_registry.py::test_absent_family_reported_by_name` | README |
-| S8: Fails a record that changes authority class without a decision: a research or lesson record cited as a decision or policy, or a super... | `test_w1_26_authority.py::test_research_cited_as_decision_is_red`, `test_w1_26_authority.py::test_research_cited_as_policy_is_red`, `test_w1_26_authority.py::test_lesson_cited_as_policy_is_red` | README |
-| S9: Flags a commit that cites a decision id missing from the decision register at that commit: a decision is recorded before the change i... | moved to `lifted` (the feature is off here): `test_w1_26_decision_citations`, `test_w1_26_decision_register_and_base` | README (lifted) |
-| F1: A planted defect of any listed family passes | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | designer |
-| F2: The scope of a check is a hand-maintained list [CAP-58.a] | `test_w1_26_derived.py::test_adding_a_ticket_is_picked_up_by_schema_check`, `test_w1_26_derived.py::test_adding_a_decision_is_picked_up_by_graph_check`, `test_w1_26_derived.py::test_adding_a_check_declaration_is_picked_up` | README |
-
-Tier 2's cap here: 66 functions (11 KPI lines x 6); 154 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acyclicity and f... | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | designer |
+| S2: Every policy key maps to a check or is declared informational (D-0003); each family is reported RED/YELLOW/GREEN [CAP-39.d] | `test_w1_26_dec436.py::test_family_only_red_check_not_green`, `test_w1_26_installed_kernel.py::test_the_declared_command_of_an_installed_check_is_started_and_its_result_reported` (1 of 2), `test_w1_26_dec438.py::test_family_green_requires_at_least_one_check` | the ticket's words |
+| S3: Fails a specification with a required open readiness row that has no linked gap ticket (DEC-089) [CAP-30.b] | `test_w1_26_gap_tickets.py::test_required_missing_row_no_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_unlinked_gap_ticket_is_red`, `test_w1_26_gap_tickets.py::test_required_missing_row_with_valid_gap_ticket_passes` | the ticket's words |
+| S4: Fails a change to the capability taxonomy or to readiness-dimensions.yaml that has no linked CIT-E record (DEC-309) [CAP-30.e] | `test_w1_26_taxonomy.py::test_dimensions_changed_without_cite_is_red`, `test_w1_26_taxonomy.py::test_dimensions_changed_with_cite_passes` | the ticket's words |
+| S5: Each check declares hard-block or warning, and every result records its provenance (commit, check version, inputs hash) [CAP-39.d] | `test_w1_26_command.py::test_each_check_result_declares_severity`, `test_w1_26_provenance.py::test_each_check_result_has_provenance` | the ticket's words |
+| S6: Fails a skill file whose content changed without a version change and a linked decision [CAP-24.c] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_26_skill` \| README (lifted) | lifted |
+| S7: The check registry names all 17 governance test families of Contract v3 O2 (schema/invariants, graph integrity, index freshness, retrieval regr... | `test_w1_26_dec436.py::test_family_only_unmeasured_check_not_green`, `test_w1_26_planted_defects.py::test_commands_check_green_when_every_reserved_command_has_a_module`, `test_w1_26_dec438.py::test_no_check_family_reason` | the ticket's words |
+| S8: Fails a record that changes authority class without a decision: a research or lesson record cited as a decision or policy, or a superseded reco... | `test_w1_26_authority.py::test_superseded_record_satisfying_current_requirement_is_red` | the ticket's words |
+| S9: Flags a commit that cites a decision id missing from the decision register at that commit: a decision is recorded before the change it authoris... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_26_decision_citations`, `test_w1_26_decision_register_and_base` \| README (lifted) | lifted |
+| F1: A planted defect of any listed family passes | `test_w1_26_planted_defects.py::test_a_planted_defect_of_every_family_is_found` | the ticket's words |
+| F2: The scope of a check is a hand-maintained list [CAP-58.a] | `test_w1_26_command.py::test_gov_check_list_still_works`, `test_w1_26_dec436.py::test_unknown_family_declaration_in_check_list`, `test_w1_26_dec436.py::test_record_in_new_directory_discovered_by_schema_check` | the ticket's words |

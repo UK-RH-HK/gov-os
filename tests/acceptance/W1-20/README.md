@@ -377,16 +377,18 @@ the CPU-only embedder on its own port; the fixtures point it at a stand-in and c
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 35 in the full run, 16 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model [CAP-57.a] | `test_w1_20_records.py::test_a_chain_is_followed_to_the_depth_and_no_further`, `test_w1_20_records.py::test_every_one_of_the_eight_typed_edges_is_followed`, `test_w1_20_records.py::test_a_cycle_ends_and_is_complete` | README |
-| S2: Byte-identical output on repeated runs; DEPTH_LIMIT_REACHED lists the gaps [CAP-57.a] | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes`, `test_w1_20_determinism.py::test_the_compared_output_is_a_closure_and_not_an_empty_answer`, `test_w1_20_gaps.py::test_every_id_beyond_the_depth_is_a_gap` | README |
-| F1: Output differs between runs on the same commit | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes`, `test_w1_20_determinism.py::test_two_clones_of_one_commit_print_the_same_bytes`, `test_w1_20_determinism.py::test_the_order_of_the_start_ids_does_not_change_the_closure` | README |
-| F2: An unresolved id is omitted from the gap list | `test_w1_20_gaps.py::test_an_edge_to_no_record_is_in_the_gap_list`, `test_w1_20_gaps.py::test_a_start_id_that_names_nothing_is_in_the_gap_list`, `test_w1_20_gaps.py::test_only_unresolved_start_ids_give_an_answer_with_gaps` | README |
-
-Tier 2's cap here: 24 functions (4 KPI lines x 6); 14 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model [CAP-57.a] | `test_w1_20_code.py::test_a_symbol_is_resolved_and_its_callers_are_followed_to_the_depth`, `test_w1_20_records.py::test_the_depth_scales_with_the_impact_radius` (1 of 4), `test_w1_20_code.py::test_records_and_symbols_are_resolved_in_one_closure` | the ticket's words |
+| S2: Byte-identical output on repeated runs; DEPTH_LIMIT_REACHED lists the gaps [CAP-57.a] | `test_w1_20_determinism.py::test_repeated_runs_print_the_same_bytes` (6 of 6), `test_w1_20_determinism.py::test_the_compared_output_is_a_closure_and_not_an_empty_answer`, `test_w1_20_gaps.py::test_every_id_beyond_the_depth_is_a_gap` | the ticket's words |
+| F1: Output differs between runs on the same commit | `test_w1_20_code.py::test_repeated_runs_and_a_rebuilt_index_print_the_same_bytes` | the ticket's words |
+| F2: An unresolved id is omitted from the gap list | `test_w1_20_code.py::test_an_id_that_is_no_record_and_no_symbol_is_an_unresolved_gap`, `test_w1_20_gaps.py::test_an_edge_to_no_record_is_in_the_gap_list`, `test_w1_20_gaps.py::test_a_start_id_that_names_nothing_is_in_the_gap_list` | the ticket's words |

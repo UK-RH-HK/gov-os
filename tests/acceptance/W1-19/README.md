@@ -520,21 +520,23 @@ No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewr
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 31 in the full run, 10 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_unavailable.py::test_there_is_no_manifest_before_there_is_an_index`, `test_w1_19_semantic_index.py::test_a_question_no_line_holds_reaches_its_chunk_by_its_vector`, `test_w1_19_semantic_index.py::test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent` | README |
-| S2: Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1... | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` | README |
-| S3: Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py::test_the_manifest_records_the_model_ids_and_their_revisions`, `test_w1_19_semantic_index.py::test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant`, `test_w1_19_semantic_index.py::test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama` | README |
-| F1: Mean hit@5 falls below 80 | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
-| F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
+| S1: sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | the ticket's words |
+| S2: Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1-42) and a... | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95` | the ticket's words |
+| S3: Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py::test_the_manifest_records_the_model_ids_and_their_revisions` | the ticket's words |
+| F1: Mean hit@5 falls below 80 | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80` | the ticket's words |
+| F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | the ticket's words |
 
-Tier 2's cap here: 30 functions (5 KPI lines x 6); 11 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
-
-Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061):
-memory is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32.
-It is applied after D-4b's measure 3; until then the hit@5 rows above judge against 80.
+Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061): memory
+is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32. It is applied
+after D-4b's measure 3; until then the hit@5 rows above judge against 80.

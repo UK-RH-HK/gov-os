@@ -55,19 +55,25 @@ location leads to (three folders above the installed `gov/retrieval/` module: th
 checkout, `<venv>/lib/python3.X` for the install), decoys are planted: canary declarations with a query of their
 own in both kernel layouts, and a path map and gitleaks configurations that cannot be read.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 39 in the full run, 4 lifted, 3 breadth (opt-in), 0 deleted.
+Cases: 39 in the full run, 3 in `breadth`, 4 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1, F1 (the pinned judge's declared checks) | `test_w2_59_judge_checks.py` (6) |
-| S2 (the hook lines) | `test_w2_59_hook_lines.py` (15), `test_w2_59_hook_lines_worker_env.py` (8), every line but the Stop hook's; the Stop line's rows are **lifted only** (R-7). The planted projects hold `.claude/hooks` (D-4's red fix R-2) and the refused write is rule 1's |
-| S3 | `test_w2_59_project_root.py` (3) |
-| S4, F1 (the wheel ships the baseline) | `test_w2_59_baseline.py` (4) |
-| S5 | `test_w2_59_version.py` (3) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The runner runs every declared check with the pinned interpreter and package; only the code under test comes from the tree [DEC-822 item 3]. | `test_w2_59_judge_checks.py::test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath` (1 of 2) | part A's row, by its words |
+| S2: The hook command lines call the pin's environment [DEC-822 step 2], after the independent test designer has checked W1-38's hook-source tests a... | none: the line's feature is lifted (`--optin=lifted`): `test_w2_59_hook_lines.py` (15), `test_w2_59_hook_lines_worker_env.py` (8), every line but the Stop hook's; the Stop line's rows are **lifted only*... | lifted |
+| S3: Every module that finds the repository from its own install path finds it from the project root instead (today src/gov/retrieval/canary.py:10 a... | `test_w2_59_project_root.py::test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files` (1 of 2), `test_w2_59_project_root.py::test_doctor_reads_the_canary_declarations_of_the_project_under_check` (1 of 2) | part A's row, by its words |
+| S4: retrieve_baseline.yaml is shipped as package data, proven from an installed wheel [DEC-835]. | `test_w2_59_baseline.py::test_the_wheel_ships_the_baseline_in_the_retrieval_package` | part A's row, by its words |
+| S5: gov --version names the version and the commit. | `test_w2_59_version.py::test_the_installed_pin_names_its_version_and_never_a_wrong_commit` | part A's row, by its words |
+| F1: A check edited in the tree does not change the verdict of the pinned judge; a wheel without the data file fails the build or its test; a module... | `test_w2_59_judge_checks.py::test_a_check_edited_in_the_tree_does_not_change_the_pinned_judge_s_verdict`, `test_w2_59_baseline.py::test_the_installed_check_reads_its_thresholds_from_the_installed_package` | part A's row, by its words |
 
 ## KPI lines, cases and red reasons
 

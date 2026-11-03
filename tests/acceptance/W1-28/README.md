@@ -41,22 +41,27 @@ python3 -m pytest tests/acceptance/W1-28 -q -p no:cacheprovider
 - **The record commit** (DEC-367) is made by the command as its own process, after the same call set the freeze
   (DEC-368). The guard judges tool calls, not the command's process; the cases assert the flag and the commit together.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 102 in the full run, 0 lifted, 52 breadth (opt-in), 0 deleted.
+Cases: 103 in the full run, 52 in `breadth`, 0 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1, F1 | `test_w1_28_freeze.py` (10) |
-| F2 | `test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` (1) |
-| S2 | `test_w1_28_cancel.py` (9), `test_w1_28_rollback.py` (20), `test_w1_28_command.py` (3) |
-| S3 | `test_w1_28_roles.py` (15) (`test_the_orchestrator_can_pause` (1) among them, W1-50 S7's orchestrator half), `test_w1_28_repeat.py` (4) |
-| S4 | `test_w1_28_fixture_copies.py` (9) |
-| S5 | `test_w1_28_launch_temp_folder.py` (9) |
-| S6 | `test_w1_28_launch_product_spec.py` (23) |
-| Tier 2 | every function is a named case of a line, so the cap removes none; parameters are folded to representative rows |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov pause sets the freeze flag and the next write by any role is denied; gov pause --off clears it [CAP-05.a] | `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5), `test_w1_28_freeze.py::test_pause_sets_the_flag_in_the_runtime_directory` | part A's row, by its words |
+| S2: gov pause --cancel-agents releases every claim and records the cancelled sessions; gov pause --rollback <ticket> reverts the ticket's commits w... | `test_w1_28_cancel.py::test_the_cancel_is_recorded_by_one_commit_per_released_ticket`, `test_w1_28_cancel.py::test_each_cancelled_session_is_recorded_in_its_ticket`, `test_w1_28_rollback.py::test_rollback_reverts_the_commits_of_the_ticket_and_no_other`, `test_w1_28_rollback.py::test_rollback_makes_one_revert_commit_per_commit_newest_first`, `test_w1_28_command.py::test_rollback_without_a_ticket_is_a_usage_error`, `test_w1_28_command.py::test_gov_pause_is_no_longer_answered_as_not_implemented` | part A's row, by its words |
+| S3: Pause, cancel and rollback run only on the owner's or the orchestrator's invocation and give the same result on repeat; cancel and rollback eac... | `test_w1_28_roles.py::test_the_orchestrator_can_pause`, `test_w1_28_roles.py::test_the_orchestrator_cannot_lift_a_pause`, `test_w1_28_repeat.py::test_pause_on_a_paused_project_succeeds_and_stays_paused` | part A's row, by its words |
+| S4: Every test fixture that copies the repository leaves governance/project/held-out.yaml out, so it is never copied into a temporary project (DEC-... | `test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out` (1 of 12) | part A's row, by its words |
+| S5: gov launch removes its per-session temp folder when the session ends (DEC-386) | `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends` (1 of 5), `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends_with_an_error` (1 of 2) | part A's row, by its words |
+| S6: gov launch starts a product-spec worker sandboxed, with an empty network allowlist (DEC-386) | `test_w1_28_launch_product_spec.py::test_the_product_spec_session_has_an_empty_network_allowlist`, `test_w1_28_launch_product_spec.py::test_the_launcher_starts_one_product_spec_session` | part A's row, by its words |
+| F1: A write succeeds while paused | `test_w1_28_freeze.py::test_a_bash_write_is_denied_while_paused` (2 of 2), `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5) | part A's row, by its words |
+| F2: The flag lives outside the repository runtime directory | `test_w1_28_freeze.py::test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` | part A's row, by its words |
 
 ## KPI lines and covers ids
 

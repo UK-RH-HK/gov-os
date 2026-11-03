@@ -144,14 +144,19 @@ tests red. No edge case is added beyond the two behaviours (DEC-221; DEC-303: "O
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 21 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a] | `test_w1_12_rows_and_states.py::test_schema_is_where_openspec_looks_for_it`, `test_w1_12_rows_and_states.py::test_fork_keeps_the_base_workflow_and_adds_the_readiness_record`, `test_w1_12_rows_and_states.py::test_every_row_is_carried_by_its_id_in_order` | README |
-| S2: Proposal templates pass openspec validate --strict on first use | `test_w1_12_templates.py::test_every_artifact_has_its_template_in_the_schema_folder`, `test_w1_12_templates.py::test_the_project_resolves_the_schema_and_its_templates`, `test_w1_12_templates.py::test_a_fresh_change_from_the_templates_passes_validate_strict` | README |
-| S3: The schema carries the capability-type table for STANDARD rows; a change to the taxonomy or to readiness-dimensions.yaml is accepted ... | `test_w1_12_capability_types.py::test_the_table_has_the_capability_types_of_the_yaml`, `test_w1_12_capability_types.py::test_each_capability_type_marks_the_rows_of_the_yaml`, `test_w1_12_capability_types.py::test_the_table_marks_only_rows_the_schema_carries` | README |
-| F1: A row name or state differs from readiness-dimensions.yaml | `test_w1_12_rows_and_states.py::test_every_row_name_is_the_name_in_the_yaml`, `test_w1_12_rows_and_states.py::test_the_five_states_are_carried_exactly`, `test_w1_12_rows_and_states.py::test_every_row_is_carried_by_its_id_in_order` | README |
-| F2: A template fails validate --strict | `test_w1_12_templates.py::test_first_use_of_the_unforked_templates_fails_validate_strict`, `test_w1_12_templates.py::test_a_template_that_breaks_the_delta_format_fails_validate_strict` | README |
+| S1: The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a] | `test_w1_12_rows_and_states.py::test_the_five_states_are_carried_exactly`, `test_w1_12_templates.py::test_openspec_accepts_the_forked_schema`, `test_w1_12_rows_and_states.py::test_schema_is_where_openspec_looks_for_it` | the ticket's words |
+| S2: Proposal templates pass openspec validate --strict on first use | `test_w1_12_templates.py::test_a_fresh_change_from_the_templates_passes_validate_strict`, `test_w1_12_templates.py::test_every_artifact_has_its_template_in_the_schema_folder`, `test_w1_12_templates.py::test_the_project_resolves_the_schema_and_its_templates` | the ticket's words |
+| S3: The schema carries the capability-type table for STANDARD rows; a change to the taxonomy or to readiness-dimensions.yaml is accepted only with ... | `test_w1_12_capability_types.py::test_each_capability_type_marks_the_rows_of_the_yaml`, `test_w1_12_capability_types.py::test_the_table_marks_only_rows_the_schema_carries`, `test_w1_12_capability_types.py::test_the_table_has_the_capability_types_of_the_yaml` | the ticket's words |
+| F1: A row name or state differs from readiness-dimensions.yaml | `test_w1_12_rows_and_states.py::test_every_row_name_is_the_name_in_the_yaml`, `test_w1_12_rows_and_states.py::test_every_row_is_carried_by_its_id_in_order`, `test_w1_12_rows_and_states.py::test_the_five_states_are_carried_exactly` | the ticket's words |
+| F2: A template fails validate --strict | `test_w1_12_templates.py::test_first_use_of_the_unforked_templates_fails_validate_strict`, `test_w1_12_templates.py::test_a_template_that_breaks_the_delta_format_fails_validate_strict` | the ticket's words |

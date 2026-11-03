@@ -18,23 +18,26 @@ python3 -m pytest tests/acceptance/W1-02 -q
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. Each test builds a small git project
 in a temporary directory, copies the hook into it and runs the hook as a process. Nothing in the repository is written.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 71 in the full run, 3282 lifted, 302 breadth (opt-in), 0 deleted.
+Cases: 71 in the full run, 302 in `breadth`, 3282 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S1 (writes only inside allowed_paths plus scratch) | **lifted only** (G-4: write scope is the full guard's; `allow_list`, `bash_writes`, `scratch`, `target_resolution`). Still touched in the full run by `test_a_role_subagent_writes_what_its_own_role_allows` (2) |
-| S2 (the engineer refused the acceptance tests; the test designer only there) | `test_w1_02_test_independence.py` (29), `test_engineer_bash_write_under_acceptance_tests_is_denied` (4), `test_a_ticket_that_names_the_acceptance_tests_gives_no_multiedit_there` (2), `test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only` (2) |
-| S3a (the freeze flag denies every write) | `test_w1_02_freeze.py` (7); "no agent role lifts it" is **lifted only** (G-6) |
-| S3b (frontmatter read directly) | **lifted only** (G-4: `allowed_paths` serve write scope only) |
-| S3c (p95 < 100 ms) | `test_decision_p95_is_under_100_ms` (1) |
-| S4, F3 (no or an unknown role is read-only) | **lifted only** (G-4: `role_less_session`, `unknown_role`); the part the five rules keep, a role-less write into the tests refused: `test_no_ticket_role_can_write_under_acceptance_tests` (3) |
-| F1 (any write outside allowed_paths allowed) | **lifted only** (G-4) |
-| F2 (a crash or timeout lets the call through) | `test_w1_02_guard_failure.py` (9), `test_w1_02_deadline.py` (6), `test_w1_02_deadline_in_time.py` (6); CAP-39.a: `test_guard_hook_ships_in_the_kernel_template` (1), `test_guard_decides_before_the_tool_runs` (1) |
-| Tier 2 | the cap (42 functions for 7 lines) falls on the held-out path-limit functions (DEC-574) and the deadline variants beyond the named ones; rule 2 stays covered by W1-47's oracle cases, W1-46's held-out cases and the live hook's |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Edit/Write/Bash writes are allowed only inside the active ticket allowed_paths plus the kernel scratch set, per role [CAP-39.a, CAP-58.a] | `test_w1_02_subagent.py::test_a_role_subagent_writes_what_its_own_role_allows` (2 of 10) | part A's row, by its words; partly lifted (part A's row): **lifted only** (G-4: write scope is the full guard's; `allow_list`, `bash_writes`, `scratch`, `target_resolution`). ... |
+| S2: The engineer role is denied every write under tests/acceptance/**; the independent-test-designer role is allowed only there [CAP-38.c] | `test_w1_02_bash_writes.py::test_engineer_bash_write_under_acceptance_tests_is_denied` (4 of 12), `test_w1_02_multiedit.py::test_a_ticket_that_names_the_acceptance_tests_gives_no_multiedit_there` (2 of 3), `test_w1_02_multiedit.py::test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only` (2 of 5), `test_w1_02_test_independence.py::test_test_designer_bash_write_under_acceptance_tests_is_allowed` (3 of 5), `test_w1_02_test_independence.py::test_engineer_cannot_write_under_acceptance_tests` (3 of 12) | part A's row, by its words |
+| S3: The freeze flag (gov pause) denies every write; the guard reads ticket frontmatter directly; decision in < 100 ms p95 | `test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms` (1 of 5), `test_w1_02_freeze.py::test_freeze_denies_the_write_each_role_could_otherwise_make` (1 of 5), `test_w1_02_freeze.py::test_freeze_denies_bash_writes` (1 of 6) | part A's row, by its words; partly lifted (part A's row): `test_w1_02_freeze.py` (7); "no agent role lifts it" is **lifted only** (G-6) **lifted only** (G-4: `allowed_paths` s... |
+| S4: A session with no declared role, or an unknown role, is read-only: every write is denied [CAP-58.c] | `test_w1_02_test_independence.py::test_no_ticket_role_can_write_under_acceptance_tests` (3 of 3) | part A's row, by its words; partly lifted (part A's row): **lifted only** (G-4: `role_less_session`, `unknown_role`); the part the five rules keep, a role-less write into the ... |
+| F1: Any write outside allowed_paths is allowed | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4) | lifted |
+| F2: Guard crash or timeout lets the call through without a recorded finding | `test_w1_02_guard_hook.py::test_guard_hook_ships_in_the_kernel_template`, `test_w1_02_guard_hook.py::test_guard_decides_before_the_tool_runs`, `test_w1_02_guard_failure.py::test_a_ticket_file_the_guard_cannot_use_never_lets_a_write_through` (2 of 7), `test_w1_02_guard_failure.py::test_unusable_input_leaves_one_finding` (2 of 8), `test_w1_02_deadline.py::test_the_deadline_s_refusal_carries_nothing_of_the_call`, `test_w1_02_deadline.py::test_nothing_the_hook_started_is_left_running_after_its_answer`, `test_w1_02_deadline_in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed` (1 of 2) | part A's row, by its words |
+| F3: A session with no or an unknown role can write anywhere | `test_w1_02_test_independence.py::test_no_ticket_role_can_write_under_acceptance_tests` (3 of 3) | part A's row, by its words; partly lifted (part A's row): **lifted only** (G-4: `role_less_session`, `unknown_role`); the part the five rules keep, a role-less write into the ... |
 
 ## KPI → tests → red reason today
 

@@ -1,7 +1,7 @@
 # Breadth, part A (DEC-1061 (1), tier 2; D4-LIST-A §1): the parameter rows beyond each function's representatives,
 # the functions beyond tier 2's cap of 6 per KPI line (each line's named cases kept first, F2), and the unit families
-# folded to one case per function. Read by tests/conftest.py with the other tests/optin-lifted*.txt: left out unless a
-# run opts in (--optin=lifted or GOV_TESTS_OPTIN=lifted). Nothing is deleted: every row stays built and runs in the
+# folded to one case per function. Read by tests/conftest.py as the opt-in suite `breadth` (every
+# tests/optin-lifted*breadth*.txt): left out unless a run opts in (--optin=breadth or GOV_TESTS_OPTIN=breadth). Nothing is deleted: every row stays built and runs in the
 # opt-in. `rep: file::name` keeps a parametrised function's first collected row and leaves out the rest. Each row
 # kept was chosen to keep every class its KPI line names (one per secret-file class in W1-01, per install class in
 # W1-04, per tool kind and per uv form in W1-47; elsewhere rows spread over the parameter table).

@@ -341,15 +341,20 @@ Deselect with `-m "not local_only"` (103 cases remain).
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 18 in the full run, 15 in `breadth`, 91 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected | moved to `lifted` (the feature is off here): `test_w1_15_gitleaks_rules`, `test_the_configuration_extends_the_gitleaks_defaults` | README (lifted) |
-| S2: Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store [CAP-03.a, CAP-03.e] | moved to `lifted` (the feature is off here): `test_w1_15_filter`, `test_a_file_without_a_secret_is_indexable` | README (lifted) |
-| S3: Indexers skip every namespace the path map classes as customer/runtime product data: a planted product-data file is absent from every... | `test_w1_15_product_data.py::test_a_file_in_a_product_namespace_is_not_indexable`, `test_w1_15_product_data.py::test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance`, `test_w1_15_product_data.py::test_a_namespace_the_map_turns_into_product_data_is_skipped` | README |
-| S4: Registers the secrets-indexing family check: no planted secret or canary in any derived store [CAP-38.b] | moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_the_check_is_registered_in_the_kernel_template` | README (lifted) |
-| F1: Any planted secret appears in a derived store, packet or bundle | moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_w1_15_filter` | README (lifted) |
-| F2: The filter relies on a hard-coded path list | `test_w1_15_product_data.py::test_a_file_in_a_product_namespace_is_not_indexable`, `test_w1_15_product_data.py::test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance`, `test_w1_15_product_data.py::test_a_namespace_the_map_turns_into_product_data_is_skipped` | README |
+| S1: .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_15_gitleaks_rules`, `test_the_configuration_extends_the_gitleaks_defaults` \| README (lifted) | lifted |
+| S2: Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store [CAP-03.a, CAP-03.e] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_15_filter`, `test_a_file_without_a_secret_is_indexable` \| README (lifted) | lifted |
+| S3: Indexers skip every namespace the path map classes as customer/runtime product data: a planted product-data file is absent from every governanc... | `test_w1_15_product_data.py::test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance`, `test_w1_15_product_data.py::test_a_namespace_the_map_turns_into_product_data_is_skipped`, `test_w1_15_product_data.py::test_a_namespace_the_map_does_not_class_as_governance_is_not_let_through` (1 of 2) | the ticket's words |
+| S4: Registers the secrets-indexing family check: no planted secret or canary in any derived store [CAP-38.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_the_check_is_registered_in_the_kernel_template` \| README (lifted) | lifted |
+| F1: Any planted secret appears in a derived store, packet or bundle | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_15_family_check`, `test_w1_15_filter` \| README (lifted) | lifted |
+| F2: The filter relies on a hard-coded path list | `test_w1_15_product_data.py::test_the_patterns_are_read_as_the_path_map_writes_them` | the ticket's words |

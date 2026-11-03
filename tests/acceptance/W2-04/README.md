@@ -322,20 +322,22 @@ The red reason of each case is in its table row above.
 
 ## KPI map after D-4's cut (DEC-1061)
 
-Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
-a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
-built in the opt-in suite `breadth` (`tests/optin-lifted*breadth*.txt`), run with `--optin=breadth`; the switched-off
-features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-| KPI line | case(s) in the full run | placed by |
+Cases: 74 in the full run, 16 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov context <ticket> holds the packet ceiling (≈ 6k tokens, Contract envelope) and never drops the ticket's own text [AR-1, CAP-15.d]. | `test_w2_04_ceiling.py::test_the_packet_carries_the_tickets_own_text_whole_and_verbatim`, `test_w2_04_ceiling.py::test_tokens_count_the_tickets_text_and_every_mandatory_input`, `test_w2_04_ceiling.py::test_a_large_ticket_whose_total_fits_is_served_whole` | README |
-| S2: When the mandatory inputs alone exceed the ceiling, it refuses with a named error and a non-zero exit; it never reports ok: true over... | `test_w2_04_refusal.py::test_mandatory_inputs_over_the_default_ceiling_refuse_by_name`, `test_w2_04_refusal.py::test_mandatory_inputs_over_a_given_budget_refuse_by_name`, `test_w2_04_refusal.py::test_the_function_refuses_with_the_named_error` | README |
-| S3: Each decision in the packet is named by its own hash (from W2-03) [AR-1]. | `test_w2_04_decision_hash.py::test_a_decision_is_named_by_its_entrys_own_hash_not_the_registers`, `test_w2_04_decision_hash.py::test_a_decisions_token_cost_is_its_span_so_one_short_decision_of_a_large_register_fits`, `test_w2_04_decision_hash.py::test_editing_another_entry_leaves_the_decisions_hash_unchanged` | README |
-| S4: Two builds of one ticket's context, on stores rebuilt from one commit, give the same packet hash with or without a live semantic inde... | `test_w2_04_reproducible.py::test_two_builds_in_one_process_give_one_hash`, `test_w2_04_reproducible.py::test_two_builds_in_two_processes_give_one_hash`, `test_w2_04_reproducible.py::test_two_stores_rebuilt_from_one_commit_give_one_hash` | README |
-| S5: An unreadable mandatory record blocks the context or is marked not read; it is never shown as read with an empty hash [W2-H034, W2-M2... | `test_w2_04_unreadable.py::test_a_mandatory_file_that_cannot_be_read_blocks_or_is_marked_not_read`, `test_w2_04_unreadable.py::test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read`, `test_w2_04_unreadable.py::test_a_source_that_no_longer_stands_blocks_naming_its_status` | README |
-| S6: The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126]. | `test_w2_04_query.py::test_the_packet_carries_the_query_built_from_the_kpi_lines_and_the_title`, `test_w2_04_query.py::test_a_document_matching_only_the_kpi_lines_reaches_the_supplementary_block` | README |
-| S7: Never one giant query or context: within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and... | `test_w2_04_batches.py::test_with_room_for_all_every_matching_item_is_stacked_in_rank_order`, `test_w2_04_batches.py::test_when_room_is_left_after_one_batch_the_next_batch_is_taken`, `test_w2_04_batches.py::test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit` | README |
-| F1: DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source. | `test_w2_04_emptied.py::test_an_emptied_mandatory_file_blocks_or_is_marked_not_read_never_read`, `test_w2_04_refusal.py::test_at_the_line_it_fits_and_one_token_over_it_refuses` | designer, by its words |
-
-Tier 2's cap here: 48 functions (8 KPI lines x 6); 2 functions moved to the opt-in suite `breadth` (listed in `tests/optin-lifted*breadth*.txt`).
+| S1: gov context <ticket> holds the packet ceiling (≈ 6k tokens, Contract envelope) and never drops the ticket's own text [AR-1, CAP-15.d]. | `test_w2_04_ceiling.py::test_a_dependency_ticket_is_counted_by_its_front_matter_so_a_large_body_still_fits` | the ticket's words |
+| S2: When the mandatory inputs alone exceed the ceiling, it refuses with a named error and a non-zero exit; it never reports ok: true over its budge... | `test_w2_04_refusal.py::test_mandatory_inputs_over_the_default_ceiling_refuse_by_name`, `test_w2_04_context_check.py::test_when_every_ticket_refuses_over_the_ceiling_the_check_is_unmeasured_never_green` | the ticket's words |
+| S3: Each decision in the packet is named by its own hash (from W2-03) [AR-1]. | `test_w2_04_ceiling.py::test_a_dependency_ticket_is_counted_by_its_front_matter_so_a_large_body_still_fits`, `test_w2_04_decision_hash.py::test_a_decision_is_named_by_its_entrys_own_hash_not_the_registers`, `test_w2_04_decision_hash.py::test_editing_another_entry_leaves_the_decisions_hash_unchanged` | the ticket's words |
+| S4: Two builds of one ticket's context, on stores rebuilt from one commit, give the same packet hash with or without a live semantic index. Ties in... | `test_w2_04_reproducible.py::test_two_stores_rebuilt_from_one_commit_give_one_hash`, `test_w2_04_reproducible.py::test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them`, `test_w2_04_reproducible.py::test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers` | the ticket's words |
+| S5: An unreadable mandatory record blocks the context or is marked not read; it is never shown as read with an empty hash [W2-H034, W2-M215]. | `test_w2_04_emptied.py::test_an_emptied_mandatory_file_blocks_or_is_marked_not_read_never_read` (24 of 24) | the ticket's words |
+| S6: The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126]. | `test_w2_04_query.py::test_the_packet_carries_the_query_built_from_the_kpi_lines_and_the_title` | the ticket's words |
+| S7: Never one giant query or context: within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked i... | `test_w2_04_batches.py::test_when_the_room_ends_exactly_further_batch_names_what_is_left` (1 of 3) | the ticket's words |
+| F1: DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source. | `test_w2_04_refusal.py::test_daeo_03pw_shape_fits_or_refuses` | the ticket's words |

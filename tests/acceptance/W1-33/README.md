@@ -23,16 +23,26 @@ the definitions describe. No session is started, no network is used, nothing is 
 write there (DEC-312, DEC-315), so the definitions may be placed later than the role files and the roster. Report
 this file's result apart from the other three.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 110 in the full run, 3 lifted, 0 breadth (opt-in), 0 deleted.
+Cases: 110 in the full run, 0 in `breadth`, 3 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| every line | keeps its cases but three, lifted (G-4): `the_orchestrator_may_write_anywhere_else_in_the_repository` (W1-45's wide scope; S4's statement of it stays covered by `test_the_orchestrator_definition_states_its_write_scope` (1)), `the_auditor_writes_only_the_report_path_of_its_own_ticket` (per-ticket write scope; rule 5 stays covered by `test_auditor_cannot_write_into_another_role_s_work` (3) and the live hook's `test_rule_5_reviewers_write_only_their_records` (5)) and the orchestrator row of `an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role` (the five rules ask only in the CTO's session, DEC-957; its other rows stay, with the live hook's `test_rule_4_installs_and_sudo` (5)) |
-| D-4's red fix R-2 | the planted project copies `.claude/hooks`, which turns `test_w1_33_guard_and_launcher.py` (13) green (red on w2/integrate: the copied settings named a hook the project lacked) |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tool... | `test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests` (5 of 5), `test_w1_33_kernel_role_files.py::test_no_other_pattern_includes_the_acceptance_tests` (4 of 4), `test_w1_33_kernel_role_files.py::test_the_auditor_is_read_only_except_its_ticket_s_report_path` | the ticket's words |
+| S2: Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner ... | `test_w1_33_kernel_role_files.py::test_the_research_exception_is_stated_by_the_research_role_file_alone`, `test_w1_33_kernel_role_files.py::test_the_orchestrator_may_install_only_after_owner_approval`, `test_w1_33_kernel_role_files.py::test_the_test_designer_pattern_includes_the_acceptance_tests` | the ticket's words |
+| S3: Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_RE... | `test_w1_33_kernel_role_files.py::test_the_role_maps_the_classes_as_the_contract_says` (5 of 5) | the ticket's words |
+| S4: The generated definitions replace the minimal definitions W1-05 placed under .claude/agents/ (DEC-119, DEC-154); the orchestrator definition st... | `test_w1_33_agent_definitions.py::test_the_orchestrator_definition_states_its_write_scope`, `test_w1_33_kernel_role_files.py::test_the_orchestrator_role_file_states_its_write_scope` | the ticket's words |
+| S5: The generated definitions leave the minimal research role of W1-46 in place where it exists; W1-33 does not redefine it (DEC-163) | `test_w1_33_agent_definitions.py::test_there_is_one_definition_per_role_and_the_research_one`, `test_w1_33_agent_definitions.py::test_the_research_definition_is_the_generated_one`, `test_w1_33_agent_definitions.py::test_the_definition_is_no_longer_the_minimal_one` (5 of 5) | the ticket's words |
+| F1: A role lacks any required field | `test_w1_33_agent_definitions.py::test_a_definition_without_one_required_field_is_found` (5 of 5) | the ticket's words |
+| F2: An implementer role pattern covers tests/acceptance/** | `test_w1_33_kernel_role_files.py::test_an_implementer_pattern_that_covers_the_acceptance_tests_is_found` (4 of 4) | the ticket's words |
 
 ## KPI lines and their tests
 

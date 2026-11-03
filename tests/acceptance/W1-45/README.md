@@ -3,18 +3,30 @@
 Covers id: **CAP-58.e** (orchestrator write scope).
 Ticket: DAEO-6cc2.  Sources: DEC-150, DEC-156, DEC-171, DEC-112, DEC-106, MR-3.
 
-## The full run after D-4's cut (DEC-1061)
+## KPI map after D-4's cut (DEC-1061)
 
-D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 4 in the full run, 96 lifted, 5 breadth (opt-in), 0 deleted.
+Cases: 4 in the full run, 5 in `breadth`, 96 in `lifted`.
 
-| KPI line | in the full run |
-|---|---|
-| S2, F1 (the orchestrator refused the acceptance tests) | `test_orchestrator_cannot_write_under_acceptance_tests` (2), `test_orchestrator_bash_write_under_acceptance_tests_is_denied` (1), `test_orchestrator_subagent_acceptance_denied_in_orchestrator_session` (1) |
-| S1, S5, S7, F2, F3 and the DEC-176/DEC-178 rows | **lifted only** (G-4: the wide scope is write scope) |
-| S3, S4 and the DEC-177 row | **lifted only** (G-5: containment and its records) |
-| S6, F4 | process lines; no case |
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: With GOV_ROLE=orchestrator, an Edit, Write or Bash write to any path inside the repository other than tests/acceptance/** is allowed by the gua... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4: the wide scope is write scope) | lifted |
+| S2: With GOV_ROLE=orchestrator, a write to tests/acceptance/** is refused by the guard and caught by the containment check: only the Independent Te... | `test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests` (2 of 5), `test_w1_45_orchestrator_scope.py::test_orchestrator_bash_write_under_acceptance_tests_is_denied` (1 of 3), `test_w1_45_subagent_scope.py::test_orchestrator_subagent_acceptance_denied_in_orchestrator_session` | part A's row, by its words |
+| S3: A commit made by the orchestrator that carries an engineer's verified work passes the guard unless it touches tests/acceptance/** [CAP-58.e] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: containment and its records) | lifted |
+| S4: The containment check still records the files the orchestrator changed after each command; a change outside the active ticket's allowed_paths i... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5: containment and its records) | lifted |
+| S5: Every other role keeps the allowed_paths rule unchanged (DEC-112): the acceptance tests of W1-02 and W1-03 still pass unchanged for every role ... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4: the wide scope is write scope) | lifted |
+| S6: The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule (the orchestrator held to its active ticket's allowed_paths) are ... | `test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests` (2 of 5), `test_w1_45_orchestrator_scope.py::test_orchestrator_bash_write_under_acceptance_tests_is_denied` (1 of 3) | the ticket's words |
+| S7: The orchestrator can write its checkpoint under .gov-runtime/scratch/orchestrator/ (DEC-150) | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4: the wide scope is write scope) | lifted |
+| F1: The orchestrator writes or commits a change under tests/acceptance/** | `test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests` (2 of 5), `test_w1_45_orchestrator_scope.py::test_orchestrator_bash_write_under_acceptance_tests_is_denied` (1 of 3), `test_w1_45_subagent_scope.py::test_orchestrator_subagent_acceptance_denied_in_orchestrator_session` | part A's row, by its words |
+| F2: Any role other than the orchestrator gains a write outside its ticket's allowed_paths | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4: the wide scope is write scope) | lifted |
+| F3: A session with no role or an unknown role gains a write | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4: the wide scope is write scope) | lifted |
+| F4: An acceptance test of W1-02 or W1-03 is revised by anyone other than the Independent Test Designer, or a test that does not concern the orchest... | `test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests` (2 of 5), `test_w1_45_orchestrator_scope.py::test_orchestrator_bash_write_under_acceptance_tests_is_denied` (1 of 3) | the ticket's words |
 
 ## KPI-to-test mapping
 
