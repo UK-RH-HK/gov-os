@@ -231,3 +231,27 @@ tests/acceptance/W1-11/test_w1_11_unreadable.py::test_an_ordinary_file_is_not_un
 rep: tests/acceptance/W1-11/test_w1_11_approval.py  # one row per parametrised function
 rep: tests/acceptance/W1-11/test_w1_11_approval_fail_closed.py  # one row per parametrised function
 rep: tests/acceptance/W1-11/test_w1_11_approval_history.py  # one row per parametrised function
+
+# acceptance/W1-13
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_spine_is_judged_and_reported_at_full  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_each_open_row_carries_its_number_key_and_state  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_required_row_in_a_state_that_does_not_satisfy_is_open  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_row_that_is_not_applicable_with_its_reason_is_satisfied  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_standard_specification_holds_only_the_rows_of_its_declared_types  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_the_open_cells_of_a_tickets_specification_are_named  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_ticket_whose_specification_is_complete_passes  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_specification_with_no_profile_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_capability_type_outside_the_taxonomy_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_schema.py::test_a_weakened_schema_does_not_let_a_specification_pass  # cap
+tests/acceptance/W1-13/test_w1_13_schema.py::test_a_weakened_schema_does_not_let_a_specification_be_closed  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_with_no_frontmatter_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_that_is_not_of_type_specification_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_with_no_id_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_whose_frontmatter_is_not_yaml_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_change_with_a_readiness_record_and_no_proposal_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_one_unreadable_change_beside_a_complete_specification_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_project_with_no_change_passes  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_the_archive_folder_is_not_a_change  # cap
+rep: tests/acceptance/W1-13/test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed  # one row
+rep: tests/acceptance/W1-13/test_w1_13_gate.py  # one row per parametrised function
+rep: tests/acceptance/W1-13/test_w1_13_na.py::test_a_silent_na_on_a_row_the_profile_does_not_require_is_rejected  # one row
