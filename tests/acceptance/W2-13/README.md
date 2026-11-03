@@ -5,9 +5,11 @@ its card (`docs/plan/WAVE_2_WBS.md`, W2-13), its list rows and its sources (DEC-
 engineer and without reading the implementation (DEC-462, DEC-963). Other decisions used: DEC-260, DEC-342, DEC-343,
 DEC-396, DEC-414, DEC-372, DEC-732, DEC-911, DEC-956 item 2; AR-9; CAP-11.
 
-**56 cases from 32 test functions in seven files**, with a support module (`w2_13_support.py`) and a conftest.
-Seven of S1's and S2's cases were rewritten after implementation to read the lexical route's ranking from `ranked`
-(DEC-1000, P-W2-13-3 (b)): see "Rewrite after implementation".
+**68 cases from 39 test functions in eight files**, with two support modules (`w2_13_support.py`,
+`w2_13_roles_support.py`) and a conftest. Seven of S1's and S2's cases were rewritten after implementation to read the
+lexical route's ranking from `ranked` (DEC-1000, P-W2-13-3 (b)): see "Rewrite after implementation". S5 (search
+respects role separation, DEC-1065 (2)) was added in the DEC-1065 round by a fresh test designer, from the KPI line
+and the guard's matcher, without reading W2-13's implementation of it: see "S5: search respects role separation".
 
 ## How the tests reach the code under test
 
@@ -77,6 +79,7 @@ The test files are all `test_w2_13_<name>.py`.
 | S2 | The fusion receives a ranked lexical list beside the semantic one; lexical, semantic and the reranker each contribute [DEC-725] | `test_w2_13_fusion.py::test_lexical_semantic_and_the_reranker_each_contribute`, `test_w2_13_fusion.py::test_the_lexical_route_hands_the_fusion_its_ranking_best_first`, `test_w2_13_fusion.py::test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question` |
 | S3 | Lexical search returns "unavailable" instead of raising [W2-M071]; retrieval latency within the retrieve budget on the dev tiers | `test_w2_13_unavailable.py::test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises`, `test_w2_13_unavailable.py::test_a_default_search_that_may_refresh_never_raises_on_an_unreadable_store`, `test_w2_13_unavailable.py::test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback`, `test_w2_13_unavailable.py::test_no_question_makes_a_search_raise`, `test_w2_13_unavailable.py::test_gov_retrieve_answers_any_question_without_a_traceback`, `test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget`, `test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget` |
 | S4 | A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap (RETR-X-02) [AR-9, W2-M296, DEC-900] | `test_w2_13_stated_gap.py::test_premise_no_file_of_the_fixture_holds_the_missing_id`, `test_w2_13_stated_gap.py::test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap`, `test_w2_13_stated_gap.py::test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap`, `test_w2_13_stated_gap.py::test_a_question_naming_an_id_that_exists_is_answered_with_no_gap_for_it`, `test_w2_13_stated_gap.py::test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap` |
+| S5 | Search respects role separation: `gov retrieve`'s results (every route) and `gov context`'s supplementary block filtered by the caller's role_paths (GOV_ROLE or --role, and GOV_TICKET; the guard's path checks); an engineer never its own ticket's acceptance tests, a test designer never the ticket's new code; what is filtered named (how many, by which rule); no role_paths section, no filter [DEC-1065, DEC-1056, DEC-1063] | `test_w2_13_role_separation.py::test_engineer_retrieve_returns_none_of_its_own_tickets_acceptance_tests`, `test_w2_13_role_separation.py::test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests`, `test_w2_13_role_separation.py::test_engineer_retrieve_holds_back_its_tickets_cases_revised_in_another_folder`, `test_w2_13_role_separation.py::test_coordination_ticket_holds_back_its_own_folder_only`, `test_w2_13_role_separation.py::test_designer_retrieve_returns_none_of_the_tickets_new_code`, `test_w2_13_role_separation.py::test_designer_retrieve_keeps_the_shared_test_files`, `test_w2_13_role_separation.py::test_no_role_paths_section_means_no_filter` |
 | F1 | RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason) | `test_w2_13_bundle_unchanged.py::test_the_bundle_keeps_its_form`, `test_w2_13_bundle_unchanged.py::test_a_child_hit_is_still_cited_as_its_parent_and_named_as_an_expansion`, `test_w2_13_bundle_unchanged.py::test_retr_a_04_cites_both_files_with_three_named_expansions_and_its_stopping_reason` |
 | F2 | The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed | `test_w2_13_secrets.py::test_no_row_or_term_of_the_store_holds_the_canary`, `test_w2_13_secrets.py::test_no_lexical_search_for_the_canary_or_its_words_finds_its_file`, `test_w2_13_secrets.py::test_gov_retrieve_cites_nothing_from_the_file_that_holds_the_canary`, `test_w2_13_secrets.py::test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more` |
 
@@ -185,6 +188,88 @@ spans of today; `test_every_line_that_holds_an_exact_string_is_found_with_its_fi
 lexical table, the form before this change, stale: the base answers each as unavailable or rebuilds) and every
 question case (the base quotes the question as a phrase); the lexical latency case on the dev tiers; S4's premise
 and the existing-id cases; F1's two fixture cases; F2's four cases (the filter holds today).
+
+## S5: search respects role separation (DEC-1065 (2))
+
+Written in the DEC-1065 round (D-4b, launched by the CTO, no lead) from the S5 line, DEC-1065, DEC-1056, DEC-1063
+and the guard's matcher `.claude/hooks/role_reads.py` (DEC-1052 G-14), which the KPI names as the checks to share.
+**12 cases from 7 functions** in `test_w2_13_role_separation.py`; the projects, the calls and the checks are in
+`w2_13_roles_support.py` (its docstring states the guard's checks as the cases take them).
+
+**The projects.** Each is planted from nothing and indexed by `gov rebuild --no-embeddings`: the record store and the
+lexical index, no embedder asked. The child's environment is the W2-13 scratch one (an empty `HOME` but for what a
+case plants there, a `PATH` of git, gitleaks and python3, both Ollama hosts at a dead port, no reranker), so no model
+starts: the semantic route reports itself unavailable (DEC-1065 (1)) and the keyword route answers. Every planted
+file holds the words of the questions, `barnacle lighthouse gauge`, and the exact id `QZ-7731`, and its own marker
+word that no other file holds. The path map's `role_paths` block is this project's own (`engineer: ["{ticket_tests}"]`,
+`independent-test-designer: ["{ticket_impl}"]`).
+
+- **A** (a plain repository, outside any engineer's tree): `.tickets/` with `DAEO-s5own` (W9-01, implementation),
+  `DAEO-s5other` (W9-02) and `DAEO-s5coord` (W9-00, `class: coordination`), the record `DEC-0101` they cite; the
+  acceptance tests of W9-01 (two files), W9-02 and W9-00; one file in W9-02's folder revised for W9-01 and one for
+  W9-00, each by a commit with `Task:` the ticket and `Role: independent-test-designer` (the guard's linked tests);
+  integrated code and a unit test (`src/harbour/`, `src/quay/`, `tests/unit/harbour/`).
+- **B** (the engineer's tree as the guard places it: `~/gov-os-worktrees/W9-01`, `~` the case's own planted
+  `HOME`): `w2/integrate` holds the integrated code, the ticket's paths included; the branch `w2/W9-01`, checked out,
+  adds the ticket's new work under its `allowed_paths` (`src/harbour/calibrate.py`, its unit test, its evidence
+  document), a new shared test file (`harbour_support.py`) and a new file outside the ticket's paths.
+- **C**: A with no `role_paths` section.
+
+**How the line is read.** The caller's role comes as `GOV_ROLE` or as `--role` (both forms, parametrized `env` and
+`flag`); the ticket as `GOV_TICKET`, its file's name. "Returns none" is: no evidence item, expansion or `NOT_GATHERED`
+gap of `gov retrieve` (no supplementary item, further-batch item or batch item of `gov context`) from a held-back
+path, and the held-back files' marker words nowhere in the result. A held-back path may be named in the filter's
+record: naming it returns nothing. "Named (how many, by which rule)" is held by `filter_records`: somewhere in the
+result, outside the cited items and the fields that carry the project's own words, a mapping that names the rule
+(`role_paths`, `reads_denied`, the entry such as `{ticket_tests}`, or the glob it expands to, such as
+`tests/acceptance/W9-01`) beside a positive count, or a mapping from such a rule to a positive count, or a non-empty
+list of entries that each name it. The field names and the form are the engineer's. "Still come back" is: another
+ticket's tests, the integrated code and unit tests (and, for the designer, the integrated code under the same paths,
+the shared test file and the branch's work outside the ticket's paths) are cited. Each case first makes the same call
+with no role and checks that the files to be held back do come back then (a premise), so a red is never a project
+that does not hold them.
+
+| Case | What it holds |
+|---|---|
+| `test_engineer_retrieve_returns_none_of_its_own_tickets_acceptance_tests[env\|flag-plain words\|an exact identifier]` | project A, the engineer of W9-01: none of `tests/acceptance/W9-01/**` through the ranked words or the exact route; named; W9-02's tests and the integrated code still cited |
+| `test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests[env\|flag]` | the same for `gov context DAEO-s5own`'s supplementary block |
+| `test_engineer_retrieve_holds_back_its_tickets_cases_revised_in_another_folder` | `{ticket_tests}`'s linked tests: the file revised for W9-01 in W9-02's folder is held back; W9-02's own file is not |
+| `test_coordination_ticket_holds_back_its_own_folder_only` | for the coordination ticket, its own folder only: W9-00's tests held back, the file revised for it in W9-02's folder cited |
+| `test_designer_retrieve_returns_none_of_the_tickets_new_code[env\|flag]` | project B, the test designer of W9-01: none of the branch's new files under the ticket's paths (code, unit test, document); named; the integrated code under the same paths and the branch's file outside them still cited |
+| `test_designer_retrieve_keeps_the_shared_test_files` | the guard's (c3): the new `*support*.py` under the ticket's paths stays readable |
+| `test_no_role_paths_section_means_no_filter` | projects A and C, the same engineer's call: held back with the section; cited, and no filter named, without it |
+
+**Expected red on today's integrated code** (`w2/integrate` at `eb28c40866af`, merged into this branch as
+`295a20f7ec7f`; run by the designer in the launch sandbox, `PYTHONPATH=<tests worktree>/src`, through the heavy slot):
+
+    12 run: 12 failed (15 s)
+
+Every case is red on its first role assertion, after its premise held: no product code reads `role_paths` today and
+`--role` is parsed and never used. The engineer's cases: "the engineer of W9-01 got its own acceptance tests:
+['tests/acceptance/W9-01/README.md', 'tests/acceptance/W9-01/test_w9_01_gauge.py']" (`gov context`: "the engineer's
+supplementary block holds its own acceptance tests: [the same two]"); the linked case: "got a case revised for its
+ticket in another folder: ['tests/acceptance/W9-02/test_w9_02_revised_for_w9_01.py']"; the coordination case: "got its
+own folder's tests: ['tests/acceptance/W9-00/test_w9_00_gauge.py']"; the designer's cases: "the test designer got the
+ticket's new work: ['docs/changes/W9-01-evidence.md', 'src/harbour/calibrate.py',
+'tests/unit/harbour/test_calibrate.py']" and "the designer's filter is not in force"; the no-section case: "with the
+section, the engineer's own tests came back". Their other assertions (still cited, nothing named without the section)
+pass today and guard against a filter that holds back too much. The checks were tried on today's results and on the
+same results with the held-back items removed and a filter record added: `filter_records` finds nothing in today's
+results (a first draft counted the context packet's `ticket_text`, which names the ticket's acceptance folder; content
+fields are now passed over) and finds the record in the filtered ones, and every other assertion then passes.
+
+**Not covered here:** the test designer's own tests tree (`~/gov-os-worktrees/<WBS>-tests`, where the guard names the
+files the engineer's commits carried in) and the linked tests found on `w2/<WBS>-tests`'s first-parent line; the
+closure and code routes by name (the filter sits at the chunk list, which every route's hits pass through; project
+A has no code index, and its acceptance files are no records).
+
+**P-W2-13-TD-5 (allowed paths for S5).** `gov context`'s supplementary block is built in
+`src/gov/retrieval/supplementary.py` and called from `src/gov/context/__init__.py`; neither is in the ticket's
+`allowed_paths`, which name `src/gov/context/supplementary.py` (no such file today). Options: (a) add
+`src/gov/retrieval/supplementary.py` (where the block's chunks are listed) to the paths; (b) the engineer creates
+`src/gov/context/supplementary.py` and `src/gov/context/__init__.py` calls it, which needs `__init__.py` in the paths
+too; (c) leave `gov context` to another ticket and re-scope the two `gov context` cases. Recommendation (a);
+confidence medium-high. No case depends on which file changes.
 
 ## Rewrite after implementation (DEC-1000, P-W2-13-3 (b))
 
