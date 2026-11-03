@@ -172,3 +172,20 @@ refused with a reason; F4-F6 below; F7 an unreadable glob fails closed.
 ## 7. Recommendation
 Apply, **confidence high on the measurements and the review, medium-high on the new code on the guard's path**
 (about 250 lines in the hook and 120 in the module; pinned by 451 tests and the 562-call history).
+
+## 8. Applied (2026-11-03), with one correction to §3
+- **The stop:** the owner's operator stopped at §3's test step: "1 failed, 461 passed", not the ACT's "451 passed".
+  The cause was the ACT's order, not the hook: §3 copies the new `guard4_check.py` into `tools/` before the test, and
+  the new copy renames four planted cases (now let through under G-1/G-2, expecting `allow`) and adds 11 (54 to 65),
+  while `test_guard_fix_4.py`'s `test_let_through_names_are_planted_cases` still named the four by their old names.
+  The 451 had been measured with the old copy in place.
+- **The fix (the CTO, the test only):** the check accepts either copy (each of the four by its old name expecting
+  `deny`, or by its new name expecting `allow`); the hook and `guard4_check.py` unchanged. Re-run on the files in
+  place: **462 passed**. Test sha256 `0b37aa565dc3`; the finishing steps:
+  `.gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/FINISH-20261103.md`.
+- **Applied:** every line of the finishing steps matched; 462 passed; the hooks committed `3bc25241` (the two files,
+  `Role: owner`); the three `rm` lines removed from `~/.claude/settings.json` (backup
+  `~/.claude/settings.json.pre-act-guard-fix-4`), the four `owner-ping` asks kept. The CTO confirmed
+  `guard4_check.py --settings` PASS from its own session afterwards.
+- **For the undo (§4):** the expected test count after an undo is the old copy's; `undo` restores the settings backup
+  above (review F5: only right after the apply).
