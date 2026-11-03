@@ -24,6 +24,7 @@ import yaml
 from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
+from gov.guard import role_paths
 from gov.retrieval import authority, code_route, graph_route, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
@@ -123,9 +124,21 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     return offset
 
 
+def role_filter(root, role=None):
+    """W2-13 S5 (DEC-1065 (2)): what the caller (``GOV_ROLE``, ``role`` beside it, ``GOV_TICKET``) may not be handed,
+    by the main tree's ``role_paths:``; None for no filter. One that cannot be worked out stops the search."""
+    try:
+        return role_paths.caller(root, role)
+    except role_paths.RolePathsError as error:
+        raise GovError("ROLE_PATHS_UNREADABLE", f"what the caller's role may be handed cannot be worked out: {error}",
+                       {"root": str(root)}) from None
+
+
 def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bundle_budget=None, continuation=None,
-             reranker=None) -> dict:
-    """The evidence bundle for ``query``; ``ticket`` and ``ids`` are closed over to the depth of ``radius``."""
+             reranker=None, role=None) -> dict:
+    """The evidence bundle for ``query``; ``ticket`` and ``ids`` are closed over to the depth of ``radius``. Every
+    route's hits are filtered by the caller's role paths (``role_filter``; ``role`` is a ``--role`` given), and what
+    is withheld is counted in the bundle's ``role_filter``."""
     if batch_size is None:
         batch_size = DEFAULT_BATCH_SIZE
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
@@ -134,6 +147,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     if continuation is not None:
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget)
 
+    withhold = role_filter(root, role)
     root = Path(root)
     unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
     try:
@@ -175,6 +189,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
         routes[code_route.FACET], facets[code_route.FACET] = coded
+    if withhold is not None:  # W2-13 S5: every route's hits, before the fusion, so a withheld one takes no rank
+        routes = {name: withhold.keep(hits) for name, hits in routes.items()}
 
     fused = rrf(routes)
     fused = order.fused(fused, chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
@@ -321,4 +337,6 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
               "continuation": token}
+    if withhold is not None:
+        bundle["role_filter"] = withhold.summary()  # DEC-1065 (2): what was withheld, how many and by which rule
     return bundle
