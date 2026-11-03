@@ -1230,3 +1230,9 @@ rep: tests/acceptance/W2-87/test_w2_87_authority.py::test_5_the_superseded_entry
 
 # acceptance/W2-91
 rep: tests/acceptance/W2-91/test_w2_91_full_embeddings.py  # one row per parametrised function
+
+# acceptance/W2-95
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_paths_in_none_and_in_two_are_named  # one row
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_at_the_root_matches_only_root_files  # one row
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_alone_leaves_files_in_folders_unplaced  # one row
+rep: tests/acceptance/W2-95/test_w2_95_path_map_faults.py  # one row per parametrised function

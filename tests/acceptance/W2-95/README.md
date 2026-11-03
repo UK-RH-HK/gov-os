@@ -91,3 +91,20 @@ against a correct implementation, and `missing_path_map_is_never_green_in_gov_ch
 failure form for a refusal. All four now read both forms, and no expectation changed. On
 `w2/integrate` the counts and reasons above are unchanged: core-pathmap is never red there
 through `gov check`, so only the success form is seen.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: core-pathmap reads the namespaces in the form the path map's schema states (a mapping of name to its entry), and the list form too; f... | `test_w2_95_adopted_and_gov_check.py::test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none`, `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green` | by its words (every function of the suite kept) |
+| S2: A path map that is missing where the project declares one, cannot be read, cannot be parsed, or has namespaces of neither form is a f... | `test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_is_never_green_in_gov_check`, `test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_under_governance_project_is_a_finding` | by its words (every function of the suite kept) |
+| S3: It validates a refactored path map of an adopted repository the same way: a planted repository with a path map written for it, green ... | `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green`, `test_w2_95_namespaces.py::test_w2_95_every_path_in_exactly_one_namespace_is_green` | by its words (every function of the suite kept) |
+| S4: This repository's own result is measured and recorded: the check run on w2/integrate's head, every path it names listed in the ticket... | `test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_is_never_green_in_gov_check`, `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green` | by its words (every function of the suite kept) |
+| S5: Nothing else in gov check changes: the other checks' results on this repository are the same before and after [DEC-381] | `test_w2_95_adopted_and_gov_check.py::test_w2_95_other_checks_results_do_not_change_with_core_pathmap`, `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green` | by its words (every function of the suite kept) |
+| F1: A tracked path in no namespace or in two, reported green. | `test_w2_95_namespaces.py::test_w2_95_every_path_in_exactly_one_namespace_is_green`, `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green` | by its words (every function of the suite kept) |
+| F2: An unreadable or unparsable path map, or one of an unknown form, reported green. | `test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_refactored_path_map_is_green`, `test_w2_95_adopted_and_gov_check.py::test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none` | by its words (every function of the suite kept) |
+| F3: Another check's result changed. | `test_w2_95_adopted_and_gov_check.py::test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none`, `test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_is_never_green_in_gov_check` | by its words (every function of the suite kept) |
