@@ -100,3 +100,22 @@ embedded sets are now left out of its comparison: the tracked root files, every 
 and every tracked file under `schemas/**`. The sets are defined the same way as `newly_embedded_area` in
 `w2_91_support.py`. Every other tracked path outside `template/` is still compared with the base, in both
 directions, and the case fails if nothing is left to compare.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: After a rebuild with the embedder, the tracked root files (CLAUDE.md, README.md, AGENTS.md and the rest the root-files namespace hold... | `test_w2_91_full_embeddings.py::test_root_files_governance_and_schemas_are_embedded`, `test_w2_91_full_embeddings.py::test_a_rebuild_gives_vectors_exactly_to_the_files_the_path_map_embeds` | README |
+| S2: What stays out stays out: fixtures/** (the hidden half), .claude/** and .rulesync/** (generated copies), template/.rulesync/** and th... | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded`, `test_w2_91_full_embeddings.py::test_schemas_has_a_namespace_of_its_own_and_cli_stays_out`, `test_w2_91_full_embeddings.py::test_failure_1_an_embedded_file_that_stays_out_is_refused` | README |
+| S3: The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied, and the ticket shows fr... | `test_w2_91_full_embeddings.py::test_the_overlay_stays_restricted_and_its_export_denied`, `test_w2_91_full_embeddings.py::test_the_indexer_verdict_ignores_sensitivity_and_export_policy`, `test_w2_91_full_embeddings.py::test_failure_2_the_overlay_unrestricted_is_refused` | README |
+| S4: The path map states it in its two valid values only, every tracked path matches exactly one namespace, and the indexer's code is not ... | `test_w2_91_full_embeddings.py::test_every_namespace_states_one_of_the_two_values`, `test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_exactly_one_namespace`, `test_w2_91_full_embeddings.py::test_this_ticket_changes_no_code` | README |
+| S5: Nothing else moves: for every tracked path outside the newly embedded sets, the embedding verdict is the same at the head as at the b... | `test_w2_91_full_embeddings.py::test_nothing_else_moves`, `test_w2_91_full_embeddings.py::test_success_5_a_verdict_moved_elsewhere_is_refused` | README |
+| S6: W2-61's measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10's floor ... | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded`, `test_w2_91_full_embeddings.py::test_this_ticket_changes_no_code` | by its words (every function of the suite kept) |
+| F1: A file under fixtures/, .claude/, .rulesync/ or cli/ embedded. | `test_w2_91_full_embeddings.py::test_schemas_has_a_namespace_of_its_own_and_cli_stays_out`, `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` | by its words (every function of the suite kept) |
+| F2: The overlay's sensitivity or export policy changed, or the overlay exported. | `test_w2_91_full_embeddings.py::test_the_indexer_verdict_ignores_sensitivity_and_export_policy`, `test_w2_91_full_embeddings.py::test_the_overlay_stays_restricted_and_its_export_denied` | by its words (every function of the suite kept) |
+| F3: A namespace with a value other than embedded or not embedded, or a tracked path in no namespace or in two. | `test_w2_91_full_embeddings.py::test_root_files_governance_and_schemas_are_embedded`, `test_w2_91_full_embeddings.py::test_schemas_has_a_namespace_of_its_own_and_cli_stays_out` | by its words (every function of the suite kept) |
+| F4: A figure of the measure reported without the other, or the hidden half read or run. | `test_w2_91_full_embeddings.py::test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` | by its words (every function of the suite kept) |
