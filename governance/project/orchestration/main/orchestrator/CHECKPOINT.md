@@ -8,6 +8,8 @@
 path-map roles; what memory holds). **After the restart: `governance/project/orchestration/MORNING-RESTART-2026-11-03.md`**
 (what to start again, in order, and what must not start).
 
+**The owner's terms:** `governance/project/orchestration/OWNER-GLOSSARY.md` (two lines each). The old emergency plan file is history (marked SUPERSEDED at its top).
+
 **Read first:** the prompt's §0 (DEC-1047, DEC-1049, DEC-1051, DEC-1052 hold over everything below);
 `governance/project/orchestration/DECISIONS-IN-FORCE.md`; the register's last entries DEC-1040 to DEC-1052; this block.
 Next free id DEC-1053.

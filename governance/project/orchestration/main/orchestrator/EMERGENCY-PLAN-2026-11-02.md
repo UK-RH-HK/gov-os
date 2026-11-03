@@ -1,10 +1,13 @@
-**SUPERSEDED as the working plan by DEC-1052: read RESUME HERE in CHECKPOINT.md and `packages/LIFT-1/P1-PLAN.md` (its DEC-1052 section) first; this file is the emergency's history.**
+# READ THIS FIRST — THIS FILE IS HISTORY. The working plan is DEC-1052's:
+# `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section "DECIDED BY DEC-1052" (D-0 to D-11),
+# with RESUME HERE in `.gov-runtime/scratch/orchestrator/CHECKPOINT.md` and the owner's intent in
+# `governance/project/orchestration/INTENT-DEC-1052.md`. Every plan and step list below is SUPERSEDED: do not follow it.
 
 # EMERGENCY PLAN — DEC-1033 (in force since 2026-11-02 13:01), the one file a fresh or compacted session carries on from
 
 ## 23:08 (owner, DEC-1051): EVERYTHING STOPPED — where each piece stopped: `log/emergency-stops-20261102.md` (last section). Resume after the refactoring and the re-pins. The dispatcher stays on, nothing to start or land.
 
-## DEC-1047 (owner, ~21:40): THE EMERGENCY RAISED ONE LEVEL — this holds over the plan below
+## DEC-1047 (owner, ~21:40): THE EMERGENCY RAISED ONE LEVEL (history; superseded as the plan by DEC-1052)
 - Stopped at safe points: everything but the memory infrastructure. W2-42a's engineer and the W1-19 helper designer
   told to stop and return PARTIAL. Continuing: W2-126 (its two W2-54 cases running, task bgv7xk5tu; then the landing),
   the W2-123 + W2-122 landing (in flight since 20:41), the DEC-1045 product switch engineer (`EMG-noscan`), the Load
@@ -52,7 +55,7 @@
   `drafts/INVESTIGATION-1/<part>.md`. Then ONE combiner -> one list without duplicates -> the owner first; nothing
   lifted before the owner decides. DEC-1010 stays. Recorded DEC-1047 `1e02facd` (register + prompt §0).
 
-## THE OWNER'S PLAN (DEC-1039, 2026-11-02 ~18:20) — the fresh session works from this, in order, all in emergency mode
+## SUPERSEDED BY DEC-1052 — DO NOT FOLLOW: the owner's plan of DEC-1039 (2026-11-02 ~18:20), kept as history
 1. **No infrastructure fix waits for the ticket path.** Each one now, as an emergency patch, out of the ordinary,
    with the reds' rules (an acceptance test that must change is revised by a test designer; a review where needed;
    every heavy run through the gate): the shared reranker on the GPU (W2-112: resume from
