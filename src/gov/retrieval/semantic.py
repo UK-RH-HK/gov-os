@@ -21,6 +21,9 @@ DEC-381).
   it and the sha256 of the exact text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. Round 3's entries, keyed
   without the device, are never read and are dropped at the next write. The cache only saves a request: a cache that
   cannot be read, written or created is skipped, and deleting it changes no answer.
+- Before a chunk or a question is embedded, the machine-wide cache (``vector_cache``, W2-126, DEC-1032) is looked up
+  under the model, the revision and the sha256 of the exact text sent; a hit is used and nothing is sent, a miss is
+  embedded and stored. ``refresh`` and ``search`` name the run's ``vector_cache`` counts (hits, misses, skipped).
 """
 
 from __future__ import annotations
@@ -32,11 +35,13 @@ import math
 import os
 import sqlite3
 import struct
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
 from gov.config.loader import KNOWN_FILES, PROJECT_DIR, load_config
-from gov.retrieval import lexical, ollama, rerank
+from gov.retrieval import lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
 
@@ -49,7 +54,25 @@ DEVICES = ("cpu", "gpu")  # the devices a question's vector is used from (DEC-10
 EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
-TIMEOUT_S = 120.0  # the first request loads the model
+TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
+RETRY_WAITS_S = (10.0, 30.0)  # the growing waits before a failed chunk batch's 2nd and 3rd try (DEC-1026, W2-126)
+
+
+class _Transient(dict):
+    """``_ask``'s answer to a request that failed in a way a later try may not: empty, so read as none; ``kind``
+    names the failure (DEC-1026; W2-126 KPI 7, P-W2-123-4)."""
+
+    def __init__(self, kind: str):
+        super().__init__()
+        self.kind = kind
+
+
+class GaveUp(Exception):
+    """Every try of a chunk batch's request failed transiently: ``args[0]`` names each try's failure, in order."""
+
+
+TIMED_OUT = _Transient("timed out")  # a request accepted and not answered within ``TIMEOUT_S``
+REFUSED, RESET = _Transient("connection refused"), _Transient("connection reset")
 NO_VECTORS = "sqlite_vec cannot be loaded: no vector can be stored or compared"
 NO_MODEL = f"{MODEL} is not in Ollama's model list"
 NO_EMBEDDING = f"Ollama did not embed with {MODEL}"
@@ -87,7 +110,9 @@ def _report(reason: str | None, **more) -> dict:
 
 def _ask(path: str, body: dict | None = None, host: str | None = None):
     """The JSON answer to ``path`` of the Ollama endpoint at ``host`` (default: the shared one at ``OLLAMA_HOST``);
-    None when it gives none."""
+    None when it gives none; a transient failure's answer (empty, read as none) when it accepted the request and gave
+    no answer within ``TIMEOUT_S`` (``TIMED_OUT``), answered with a server error (HTTP 5xx), or the connection was
+    refused or reset (``REFUSED``, ``RESET``)."""
     host = host or os.environ.get("OLLAMA_HOST") or ollama.DEFAULT_HOST
     request = urllib.request.Request((host if "://" in host else f"http://{host}").rstrip("/") + path,
                                      data=None if body is None else json.dumps(body).encode(),
@@ -95,14 +120,38 @@ def _ask(path: str, body: dict | None = None, host: str | None = None):
     try:
         with _OPENER.open(request, timeout=TIMEOUT_S) as reply:
             return json.load(reply)
+    except TimeoutError:  # the socket's own time-out once connected; a refusal comes wrapped in a URLError
+        return TIMED_OUT
+    except urllib.error.HTTPError as error:  # an answer with an error status: only a server error is transient
+        return _Transient(f"HTTP {error.code}") if 500 <= error.code < 600 else None
+    except urllib.error.URLError as error:  # raised before an answer: a refusal or a reset is transient
+        failure = error.reason
+        return REFUSED if isinstance(failure, ConnectionRefusedError) else \
+            RESET if isinstance(failure, ConnectionResetError) else None
+    except ConnectionResetError:  # reset (or closed with no answer) while the answer was awaited or read
+        return RESET
     except (OSError, http.client.HTTPException, ValueError):
         return None
 
 
-def _embed(texts: list[str], host: str | None = None) -> list[bytes] | None:
+def _embed(texts: list[str], host: str | None = None, retries: list | None = None) -> list[bytes] | None:
     """One float32 BLOB per text, embedded at ``host`` (default: the shared runner) with no runner option; None unless
-    the endpoint returned a vector for each."""
-    vectors = (_ask("/api/embed", {"model": MODEL, "input": texts}, host) or {}).get("embeddings") or []
+    the endpoint returned a vector for each. With ``retries`` (a rebuild's chunks), a try that failed transiently
+    (timed out, a server error, a refused or reset connection) is tried again after each wait of ``RETRY_WAITS_S`` in
+    turn, a request with such a try is recorded in ``retries``, and ``GaveUp`` (naming each try's failure) is raised
+    when every try failed so (DEC-1026; W2-126 KPI 7). Any other failure ends at once."""
+    waits: list[float] = []
+    failures: list[str] = []
+    while isinstance(answer := _ask("/api/embed", {"model": MODEL, "input": texts}, host), _Transient) \
+            and retries is not None and len(waits) < len(RETRY_WAITS_S):
+        failures.append(answer.kind)
+        waits.append(RETRY_WAITS_S[len(waits)])
+        time.sleep(waits[-1])
+    vectors = (answer or {}).get("embeddings") or []
+    if retries is not None and (waits or isinstance(answer, _Transient)):
+        retries.append({"tries": len(waits) + 1, "waits_s": waits, "embedded": len(vectors) == len(texts)})
+        if isinstance(answer, _Transient):
+            raise GaveUp([*failures, answer.kind])
     if len(vectors) != len(texts):
         return None
     return [struct.pack(f"{len(vector)}f", *vector) for vector in vectors]
@@ -183,20 +232,25 @@ def _cache(path: Path, key: tuple, vector: bytes) -> None:
         return
 
 
-def query_vector(root: Path, query: str) -> tuple[bytes | None, str | None]:
+def query_vector(root: Path, query: str, counts: dict | None = None) -> tuple[bytes | None, str | None]:
     """The vector a search compares with for ``query``, and why there is none: the one cached under its key for
     either device, else the one the query embedder gives the question, sent right after the bare instruction in one
     request, if the vectors are well-formed and that embedder then reports the model loaded, on any device (DEC-1033;
     cached then, under that device). When the embedder gives no vector, malformed vectors or does not report the model
     loaded, there is no vector and nothing is cached. Without a revision in the model list there is no key and nothing
-    is cached."""
+    is cached. The machine-wide cache is looked up first, and given the vector whenever the tree's cache is."""
     host = ollama.query_host()
     text, revision, path = INSTRUCTION + query, _revision(host), Path(root) / QUERY_VECTORS_REL
     digest = hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
     keys = {device: (MODEL, revision, device, digest) for device in DEVICES} if revision else {}
+    machine = vector_cache.Cache(MODEL, revision, counts)
+    cached = machine.get([text])[0]
+    if cached:
+        return cached, None
     for key in keys.values():
         cached = _cached(path, key)
         if cached:
+            machine.put([text], [cached])
             return cached, None
     try:
         vectors = _embed([INSTRUCTION, text], host)
@@ -211,6 +265,7 @@ def query_vector(root: Path, query: str) -> tuple[bytes | None, str | None]:
         return None, NOT_LOADED
     if device in keys:
         _cache(path, keys[device], vectors[1])
+        machine.put([text], [vectors[1]])
     return vectors[1], None
 
 
@@ -256,9 +311,10 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
-def _build(root: Path) -> str | None:
+def _build(root: Path, counts: dict, retries: list) -> str | None:
     """Bring the lexical index up to date, then embed the chunks that have no vector, each as its first
-    ``EMBED_CHARS`` characters; why it cannot be done, or None."""
+    ``EMBED_CHARS`` characters, those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
+    embedded, recording timed-out requests in ``retries``; why it cannot be done, or None."""
     lexical.refresh(root)
     connection = sqlite3.connect(root / STORE_REL)
     try:
@@ -279,16 +335,34 @@ def _build(root: Path) -> str | None:
             connection.executemany("DELETE FROM semantic_vector WHERE chunk_id = ?",
                                    [(chunk_id,) for chunk_id in have - set(wanted)])
             missing = [chunk_id for chunk_id in wanted if chunk_id not in have]
+            machine = vector_cache.Cache(MODEL, revision, counts)
             for start in range(0, len(missing), BATCH):
                 batch = missing[start:start + BATCH]
-                vectors = _embed([connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS]
-                                  for chunk_id in batch])
-                if vectors is None:
-                    return NO_EMBEDDING
+                texts = [connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS] for chunk_id in batch]
+                vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
+                todo = [i for i, vector in enumerate(vectors) if vector is None]
+                if todo:
+                    try:
+                        embedded = _embed([texts[i] for i in todo], retries=retries)
+                    except GaveUp as gave_up:  # the vectors made so far stay; the store is not reported built
+                        return _gave_up(gave_up.args[0])
+                    if embedded is None:
+                        return NO_EMBEDDING
+                    machine.put([texts[i] for i in todo], embedded)
+                    for i, vector in zip(todo, embedded):
+                        vectors[i] = vector
                 connection.executemany("INSERT INTO semantic_vector VALUES (?, ?)", zip(batch, vectors))
         return None
     finally:
         connection.close()
+
+
+def _gave_up(failures: list[str]) -> str:
+    """Why the stage stopped after the last try: W2-123's words when every try timed out, else each try's failure."""
+    tail = f"each under {TIMEOUT_S:g} s; waits {', '.join(f'{w:g} s' for w in RETRY_WAITS_S)}"
+    if all(failure == TIMED_OUT.kind for failure in failures):
+        return f"{NO_EMBEDDING}: the request timed out at all {len(failures)} tries ({tail})"
+    return f"{NO_EMBEDDING}: the request failed at all {len(failures)} tries ({', '.join(failures)}; {tail})"
 
 
 def _status(root: Path) -> str | None:
@@ -320,8 +394,11 @@ def _vectors(root: Path) -> str | None:
 
 
 def refresh(root: Path) -> dict:
-    """Bring the lexical index up to date, then embed the chunks that have no vector."""
-    return _report(_build(Path(root)))
+    """Bring the lexical index up to date, then embed the chunks that have no vector. ``retries`` lists, in order,
+    each chunk batch request that failed transiently at least once (timed out, a server error, a refused or reset
+    connection): its tries, the waits taken and whether it embedded."""
+    counts, retries = vector_cache.zero(), []
+    return _report(_build(Path(root), counts, retries), retries=retries, vector_cache=counts)
 
 
 def search(root: Path, query: str, refresh: bool = True) -> dict:
@@ -332,18 +409,19 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
     question is embedded by the query embedder alone (started if needed, on any device) and its vector is cached
     beside the store once the vectors can be answered from (DEC-782, DEC-1033).
     """
-    root = Path(root)
-    reason = (_build(root) if refresh else None) or _status(root)
+    root, counts = Path(root), vector_cache.zero()
+    reason = (_build(root, counts, []) if refresh else None) or _status(root)
     if reason:
-        return _report(reason, hits=[])
+        return _report(reason, hits=[], vector_cache=counts)
     connection = _open(root)
     try:
         reason = _ready(connection, ollama.ensure_query_available)
-        vector, reason = (None, reason) if reason else query_vector(root, query)
+        vector, reason = (None, reason) if reason else query_vector(root, query, counts)
         if vector is None:
-            return _report(reason, hits=[])
+            return _report(reason, hits=[], vector_cache=counts)
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
-        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))])
+        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))],
+                       vector_cache=counts)
     finally:
         connection.close()
 

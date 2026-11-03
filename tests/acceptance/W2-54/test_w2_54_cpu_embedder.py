@@ -103,26 +103,37 @@ def _no_option_and_on_gpu(shared):
 
 # ---- 1. query embeddings go to the CPU embedder, and only those ---------------------------------------------------
 
+# Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: ``gov context`` sends nothing to an embedder
+# (P-W2-04-2 (A)), so the two questions its steps asked are asked through ``gov retrieve``: the tickets' titles.
+TITLE_TIDES, TITLE_BAKERY = S.QUESTION_TICKETS["TK-W254-TIDES"], S.QUESTION_TICKETS["TK-W254-BAKERY"]
+
+
 @STAND_IN
 def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner(
         box, shared, cpu, tmp_path):
-    """*Red.* With the shared runner at OLLAMA_HOST and the CPU embedder at its address: two ``gov retrieve``, two
-    ``gov context``, a semantic search and a retrieval through the public entry each send the CPU embedder at least
-    one text to embed (the question) and send the shared runner none; the search's answer is the CPU embedder's
-    vector (the kiln, where the shared runner's would be the forge). No request to the shared runner names a runner
-    option, and its model stays on the GPU. Today every question goes to OLLAMA_HOST, with ``num_gpu: 0``.
+    """*Red.* With the shared runner at OLLAMA_HOST and the CPU embedder at its address: four ``gov retrieve``, a
+    semantic search and a retrieval through the public entry each send the CPU embedder at least one text to embed
+    (the question) and send the shared runner none; the search's answer is the CPU embedder's vector (the kiln,
+    where the shared runner's would be the forge). Two ``gov context`` send neither embedder anything. No request to
+    the shared runner names a runner option, and its model stays on the GPU. Today every question goes to
+    OLLAMA_HOST, with ``num_gpu: 0``.
 
     Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-2 (a): the search and the retrieval
     (steps 5 and 6) ask texts no earlier step asked (they asked QUESTION and OTHER again, whose vectors the cache
-    rightly serves with no request), so each step has a text the CPU embedder has not embedded yet."""
+    rightly serves with no request), so each step has a text the CPU embedder has not embedded yet.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005: steps 3 and 4 were two ``gov context``, whose
+    question went to the embedder; ``gov context`` now sends none (W2-04's addendum, S4 and S7), so they are two
+    ``gov retrieve`` of the two tickets' titles (the read that reaches the semantic route), held as every read is.
+    The two ``gov context`` stay, and add a guarantee: they send neither embedder a text."""
     project = S.semantic_project(box, tmp_path / "p", shared, S.ticket_files(), cpu=cpu)
     assert shared.embed_requests() and not cpu.embedded(), \
         f"the premise: the index was built through the shared runner only (CPU embedder sent {cpu.embedded()[:2]})"
     env = S.embed_env(box, shared, cpu)
     steps = [("gov", "retrieve", "--json", "--root", project, QUESTION),
              ("gov", "retrieve", "--json", "--root", project, OTHER),
-             ("gov", "context", "--json", "--root", project, "TK-W254-TIDES"),
-             ("gov", "context", "--json", "--root", project, "TK-W254-BAKERY"),
+             ("gov", "retrieve", "--json", "--root", project, TITLE_TIDES),
+             ("gov", "retrieve", "--json", "--root", project, TITLE_BAKERY),
              ("search", AGAIN_KILN), ("retrieve", AGAIN_OTHER)]
     answer = None
     for step in steps:
@@ -138,8 +149,15 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
         sent = [text[-60:] for request in shared.embed_requests()[to_shared:] for text in request["texts"]]
         assert not sent, f"`{what}` sent the shared runner texts to embed: {sent}"
         assert len(cpu.embed_requests()) > to_cpu, f"`{what}` sent the CPU embedder nothing to embed"
-    assert all(cpu.asked_for(text) >= 1 for text in (QUESTION, OTHER, AGAIN_KILN, AGAIN_OTHER)), \
-        "the questions never reached the CPU embedder"
+    assert all(cpu.asked_for(text) >= 1 for text in (QUESTION, OTHER, TITLE_TIDES, TITLE_BAKERY, AGAIN_KILN,
+                                                     AGAIN_OTHER)), "the questions never reached the CPU embedder"
+    for ticket_id in ("TK-W254-TIDES", "TK-W254-BAKERY"):
+        to_shared, to_cpu = len(shared.embed_requests()), len(cpu.embed_requests())
+        done = S.gov(box, "context", "--json", "--root", project, ticket_id, env=env)
+        assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
+        sent = [text[-60:] for stand_in, before in ((shared, to_shared), (cpu, to_cpu))
+                for request in stand_in.embed_requests()[before:] for text in request["texts"]]
+        assert not sent, f"`gov context {ticket_id}` sent an embedder texts to embed: {sent}"
     assert answer.get("available") is True and _nearest(answer) == [S.KILN], (
         f"the search's answer is not the CPU embedder's vector (the kiln): {S.hits_of(answer)[:2]}")
     assert not _chunks_in(cpu.embedded()), f"the CPU embedder was sent chunks: {_chunks_in(cpu.embedded())}"
@@ -290,12 +308,19 @@ def test_a_vector_cached_under_round_3_s_key_is_never_served(box, shared, cpu, t
     (the forge's), under round 3's key (model, revision, sha256 of the exact text sent; both the text round 3 sent and
     the text sent now), in round 3's layout. The read asks the CPU embedder and answers with its vector, the kiln:
     the answer a new store built alike gives, hit for hit and distance for distance; asked again after another text,
-    the same. The shared runner is asked nothing. Today round 3's entry is served (the forge)."""
+    the same. The shared runner is asked nothing. Today round 3's entry is served (the forge).
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the new store built alike (the twin) is built and asked with
+    a machine-wide vector cache of its own (as on another machine). Sharing the case's cache, W2-126 would serve the
+    project the twin's vector, so the CPU embedder would rightly not be asked and the case would read the outcome
+    the cache is for as a failure. The assertions are unchanged."""
     twin_shared = S.EmbedderStandIn(device="gpu", targets={QUESTION: S.SUBJECTS[S.FORGE]})
     twin_cpu = S.EmbedderStandIn(device="cpu", targets={QUESTION: S.SUBJECTS[S.KILN]})
+    twin_cache = tmp_path / "twin-vector-cache"
     try:
-        twin = S.semantic_project(box, tmp_path / "twin", twin_shared, cpu=twin_cpu)
-        answers, done = S.drive_run(box, twin, S.embed_env(box, twin_shared, twin_cpu), ("search", QUESTION))
+        twin = S.semantic_project(box, tmp_path / "twin", twin_shared, cpu=twin_cpu, cache=twin_cache)
+        answers, done = S.drive_run(box, twin, S.embed_env(box, twin_shared, twin_cpu, cache=twin_cache),
+                                    ("search", QUESTION))
         assert not S.clean(done), done.describe()
         reference, sent = answers[0], S.sent_for([twin_shared, twin_cpu], QUESTION)
     finally:
