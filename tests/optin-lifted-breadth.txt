@@ -255,3 +255,19 @@ tests/acceptance/W1-13/test_w1_13_unreadable.py::test_the_archive_folder_is_not_
 rep: tests/acceptance/W1-13/test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed  # one row
 rep: tests/acceptance/W1-13/test_w1_13_gate.py  # one row per parametrised function
 rep: tests/acceptance/W1-13/test_w1_13_na.py::test_a_silent_na_on_a_row_the_profile_does_not_require_is_rejected  # one row
+
+# acceptance/W1-14
+tests/acceptance/W1-14/test_w1_14_refusals.py::test_a_change_without_a_specification_record_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_second_run_creates_no_duplicate_ticket  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_second_run_does_not_reopen_work_and_derives_only_the_new_task  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_refused_second_run_leaves_the_first_runs_tickets_alone  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_task_dependencies_become_ticket_dependencies  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_task_may_depend_on_a_ticket_that_already_exists  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_cycle_between_tasks_is_refused_and_no_ticket_is_written  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_cycle_through_tickets_that_already_exist_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_dependency_that_names_nothing_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_task_number_written_as_a_yaml_number_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_derived_tickets_move_through_the_ready_rule  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_derived_tickets_are_held_when_their_specification_is_reopened  # cap
+rep: tests/acceptance/W1-14/test_w1_14_refusals.py::test_no_ticket_is_derived_without_a_profile_or_a_class  # one row
+rep: tests/acceptance/W1-14/test_w1_14_refusals.py::test_a_specification_that_is_not_closed_gives_no_ticket  # one row
