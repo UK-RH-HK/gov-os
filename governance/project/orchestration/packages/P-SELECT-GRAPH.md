@@ -1,6 +1,6 @@
 # P-SELECT-GRAPH: should the scoped selection also use W2-92's code graph? (for D-9; short form)
 
-By the CTO (session 33b3628c), 2026-11-03, at the owner's request. A proposal for D-9's WBS refactor; nothing changes
+By the CTO (session 33b3628c), 2026-11-03, at the owner's request. **DECIDED (DEC-1062): (a), the trial in D-9; its result to the owner before anything is built.** Nothing changes
 now.
 
 **The question.** Today `select_tests.py` (the product's `gov.close.select.plan`) selects by the test map: a changed
