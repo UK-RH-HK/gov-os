@@ -5,7 +5,7 @@ Source: `git worktree list`, `git rev-list --count w2/integrate..<branch>` (comm
 `git status --porcelain [--ignored]` in each worktree, `tk ls`, `du`. 75 worktrees (27 GB), 77 local branches,
 64 run folders under `~/gov-os-runs/` (about 19 GB). Disk: 854 GB free.
 
-**What I ask you:** say yes to each line marked **ASK**, or change it. Everything else follows the plan.
+**Decided: DEC-1053 (owner, 2026-11-03), every ASK line as recommended.**
 
 ## 1. Unmerged work: KEPT (nothing deleted)
 
