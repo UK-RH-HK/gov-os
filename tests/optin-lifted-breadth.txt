@@ -837,3 +837,37 @@ tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAPr
 rep: tests/acceptance/W1-38/test_w1_38_heldout_step.py  # one row per parametrised function
 rep: tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py  # one row per parametrised function
 rep: tests/acceptance/W1-38/test_w1_38_hooks_command_line.py  # one row per parametrised function
+
+# acceptance/W1-39
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_the_manifest_does_not_list_is_drift_naming_it  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_hidden_from_git_by_an_ignore_rule_is_still_drift_naming_it  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_file_in_a_bytecode_folder_inside_the_kernel_is_not_drift  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_folder_that_cannot_be_listed_is_not_passed_over  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_without_any_installed_kernel_file_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_file_the_project_adds_outside_the_kernel_is_not_drift  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_an_installed_project_whose_lock_was_deleted_fails_the_lock_part  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_doctor_without_json_exits_non_zero_and_names_the_lock_when_it_was_deleted  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_deleting_the_lock_does_not_silence_an_edited_kernel_file  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_without_manifest_entries_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_that_is_not_readable_as_a_map_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_created_project_has_the_time_limit_on_every_guard_hook_entry  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_that_had_settings_of_its_own_gets_the_time_limit_on_the_guard_s_entries  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_copy_leaves_a_project_s_own_settings_as_they_were  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_of_an_earlier_release_gets_the_time_limit_by_an_update  # cap
+tests/acceptance/W1-39/test_w1_39_layout.py::test_a_created_project_holds_none_of_the_gov_os_repositorys_own_trees  # cap
+tests/acceptance/W1-39/test_w1_39_layout.py::test_a_created_project_holds_only_the_product_layout  # cap
+tests/acceptance/W1-39/test_w1_39_layout.py::test_governance_of_a_created_project_is_the_kernel_the_overlay_and_the_lock  # cap
+tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_the_lock_of_an_untagged_template_commit_still_names_the_commit  # cap
+tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_the_lock_refers_to_the_answers_file  # cap
+tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_doctor_fails_when_the_locks_tag_or_commit_disagrees_with_the_install  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_keeps_the_path_map_when_the_release_ships_a_different_one  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_leaves_every_file_the_project_added_as_it_was  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_brings_the_kernel_of_the_second_release  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_after_an_update_the_lock_names_the_second_release_and_its_files  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_after_an_update_doctor_reports_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_copier_prints_the_update_procedure_after_a_copy  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_copier_prints_the_update_procedure_after_an_update  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_the_generated_lock_states_the_update_procedure_in_its_comment_header  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_the_lock_keeps_its_comment_header_after_an_update  # cap

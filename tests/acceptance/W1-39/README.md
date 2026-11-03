@@ -299,3 +299,19 @@ The packages of the first run are decided; no case waits on one.
 - **G-14 and S0a-G-15:** their text is not in the readable tree. No case is derived from them.
 - **`lefthook.yml` and the CI workflow** (ADR-0002 §5's template list): W1-40.
 - **Signed tags** (`git tag -v`): CAP-02.c, Wave 3.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov d... | `test_w1_39_copy.py::test_copy_installs_the_kernel_exactly_as_the_template_holds_it`, `test_w1_39_copy.py::test_copy_installs_the_hooks_and_keeps_them_executable`, `test_w1_39_copy.py::test_copy_installs_the_rulesync_sources` | README |
+| S2: Editing one kernel file makes doctor report DRIFT naming it; the update procedure is documented [CAP-02.a] | `test_w1_39_drift.py::test_a_one_byte_edit_of_a_kernel_file_is_drift_naming_it`, `test_w1_39_drift.py::test_drift_names_the_edited_file_and_no_other`, `test_w1_39_drift.py::test_the_edit_taken_back_is_a_match_again` | README |
+| S3: The Gov OS repository keeps kernel template, CLI, tests, fixtures, lessons, plan and docs in separate trees (ADR-0002 §5); a product ... | `test_w1_39_layout.py::test_this_repository_is_a_copier_template_whose_subdirectory_is_the_kernel_template_tree`, `test_w1_39_layout.py::test_the_template_tree_holds_nothing_but_what_a_product_receives`, `test_w1_39_layout.py::test_a_created_project_holds_none_of_the_gov_os_repositorys_own_trees` | README |
+| F1: An overlay file is overwritten by copier update | `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_project_wrote`, `test_w1_39_update.py::test_update_keeps_an_overlay_file_the_template_shipped_and_the_project_edited`, `test_w1_39_update.py::test_update_keeps_the_path_map_when_the_release_ships_a_different_one` | README |
+| F2: framework.lock lacks the template tag or commit | `test_w1_39_lock_identity.py::test_the_lock_names_the_template_tag`, `test_w1_39_lock_identity.py::test_the_lock_names_the_template_commit`, `test_w1_39_lock_identity.py::test_the_lock_of_an_untagged_template_commit_still_names_the_commit` | README |
+
+Tier 2's cap here: 30 functions (5 KPI lines x 6); 32 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
