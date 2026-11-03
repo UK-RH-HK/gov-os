@@ -737,3 +737,21 @@ rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_record_the_load_ca
 rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written  # one row
 rep: tests/acceptance/W1-32/test_w1_32_launch.py  # one row per parametrised function
 rep: tests/acceptance/W1-32/test_w1_32_status_not_read.py  # one row per parametrised function
+
+# acceptance/W1-35
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_the_route_names_the_parts_the_answer_is_given_from  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_a_part_marked_not_read_is_said_not_to_be_read  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_the_answer_is_never_given_from_recall  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_declaration_has_the_form_of_the_existing_one  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_declared_command_runs_the_generic_validator_over_the_new_skill  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_delivered_skill_passes_the_generic_validator  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_delivered_skill_with_a_body_over_the_bound_does_not_pass  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_gov_check_runs_the_check_under_the_skill_regression_family  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRulesyncSources::test_the_skills_rulesync_source_is_the_kernel_skill  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRulesyncSources::test_the_orchestrator_roles_rulesync_source_carries_the_role_files_body  # cap
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_version_is_present_and_nonempty  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_description_within_60_tokens  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_body_within_2500_tokens  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestReferencedCommands::test_referenced_commands_are_known  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestCitations::test_skill_cites_at_least_one_reference  # one row
+rep: tests/acceptance/W1-35/test_w1_35_orchestration.py  # one row per parametrised function
