@@ -58,6 +58,14 @@ The measure's sessions run as an unmeasured role (`orchestrator`) unless a case 
   `in_bundle`, `full_evidence`, `first_gold_rank`, and a name of the measure's own for the stacked items' digest).
 - **A commit** is given as at least 12 hex digits and must be a prefix of the HEAD it names.
 - **The text output** names the comparison's differences on a line holding the question's id and the word "differ".
+- **Q11's entry 1, re-anchored** (the CTO's decision, 2026-11-03, P2): W2-13's `44993791` (2026-11-01) changed
+  `search`'s calling line in `src/gov/retrieval/fusion.py`, so the old heading
+  (`fused = rrf({name: answer["hits"] …})`) was found nowhere and the measure fell back to `lines: [62, 62]`, which
+  is no longer the call. **D-4b measure 1 (its three records of 2026-11-03 in `~/gov-os-runs/D4B/m1/records/`, tree
+  at `156a5feb677b`, which holds `44993791`) judged Q11 against that stale anchor**, as did W2-13's head runs at
+  `bd329ce3b402`. The anchor is now today's
+  line (`answer.get("ranked", answer["hits"])`, line 63) with the source's own `commit: f1a01dfe2f38`; the question,
+  the gold answer and the question's commit are kept (the answer's line numbers are as of that commit).
 
 ## Running
 
