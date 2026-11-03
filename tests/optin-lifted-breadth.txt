@@ -889,7 +889,6 @@ tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_push_leaves_the_project_
 tests/acceptance/W1-40/test_w1_40_pre_push.py::test_a_push_without_a_tool_the_hook_needs_never_ends_with_ci_green  # cap
 tests/acceptance/W1-40/test_w1_40_templates.py::test_the_hook_template_renders_to_the_repositorys_hook_file  # cap
 tests/acceptance/W1-40/test_w1_40_templates.py::test_the_workflow_template_keeps_github_expressions_whole  # cap
-tests/acceptance/W1-40/test_w1_40_templates.py::test_this_repositorys_own_workflow_runs_only_when_started_by_hand  # cap
 tests/acceptance/W1-40/test_w1_40_tiers.py::test_a_commit_is_refused_when_a_tier_the_hook_names_has_no_declared_check  # cap
 tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_named_tiers_when_one_of_them_has_no_declared_check  # cap
 tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_a_tier_name_that_is_no_tier_beside_a_declared_one  # cap
