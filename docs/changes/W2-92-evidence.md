@@ -28,6 +28,7 @@ worktree. Unit = `pytest tests/unit/retrieval/test_w2_92_routes.py tests/unit/re
 | F2 a whole-graph query or one over the row cap | `gov accept` line failure-2; unit small-page cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F3 a missing index reported ok or failing the whole answer | `gov accept` line failure-3; unit missing-index cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F4 a figure without the other, or the hidden half read or run | the measure record (§4 gives both figures together; §8: the hidden half neither read nor run) | measure: D-4b measure 1 | earlier record as cited; re-measured: D-4b measure 1 | `d72c96fc029c` (record); D-4b measure 1 |
+| S6 a plain question costs about one second (DEC-1065 (4)) | the record route reads the titles the store keeps (`record_titles`), parses no record file; same start ids as before; the route timed cold with stand-ins (below); the cold `gov retrieve` median of ten: the CTO's, on the shared servers | unit `tests/unit/retrieval/test_w2_92_titles.py` (18 cases) with the W2-92 and store unit files (81 cases, `--optin=lifted,breadth`); the timing scripts (below); `gov accept` after the test designer's S6 tests merge | unit 81 passed; the record route 2.97 s → 0.0045 s median of ten; 1,968 records' titles equal both ways; `gov retrieve` median: CTO | `62013a81` |
 
 `gov accept` totals at `ebba014ac355`: 25 passed, 5 failed, 0 skipped; 5 of 7 lines pass (2026-11-03 15:39-15:41
 UTC). At the pre-merge head `448a835a9dca`, run the same day in a clone: 30 passed, 7 of 7 lines. **At `7f4d519b`
@@ -73,3 +74,43 @@ UTC).**
   - `tests/acceptance/W2-59/test_w2_59_hook_lines.py` (1 case) and `test_w2_59_hook_lines_worker_env.py` (3 cases),
     `preToolUse[0]`: the planted project has no `.claude/hooks/pretooluse.py` (W2-59's hook-line cases, red at the
     ticket's base already in the lead's run 1).
+
+## S6: the titles kept in the store (DEC-1065 (4); the DEC-1065 round, 2026-11-03)
+
+**Merged first:** `w2/integrate` at `eb28c40866af` into the branch by `1e29f3cc` (a fast-forward case, no conflict;
+built with `git merge-tree` and `git commit-tree`, as the launch sandbox keeps `tests/acceptance/**`, `.tickets/**`
+and `.claude/hooks/**` read-only for the engineer, so `git merge` could not check them out; the commit's tree is
+`w2/integrate`'s). **The change:** `62013a81`.
+
+- **Where the time went:** `graph_route.start_ids` parsed every record file's frontmatter with PyYAML's pure-Python
+  loader in each process, for its `title`, while the store had parsed the same frontmatter at the load and dropped
+  the title.
+- **What changes:** `store/loader.py` keeps each file record's string `title` in a new table `record_titles (path, id,
+  title)`; `graph_route` reads it in one query. The table is outside the store's digest (as the fingerprints row is),
+  so a commit's digest is unchanged, and outside `records` (a `title` column there would clash with
+  `register_entries.title` in `records/queries.py`'s join). Where a store has no such table (built before this
+  change), the route reads the files as before, with `yaml.CSafeLoader` where PyYAML has it. `retrieve.py` is not
+  touched (W2-13's this round), nor `semantic.py`, `rerank.py`, `fusion.py`, `ollama.py` (W2-32's).
+- **One change of source:** the titles are now `HEAD`'s at the load (the store's), not the working tree's at the
+  question. The ids the route matches were already the store's, so titles and ids now come from one commit.
+- **The rebuild it needs:** a full `gov rebuild`. `gov rebuild --records` refuses with `STORE_CODE_CHANGED`, as
+  `loader.py` is part of the code fingerprint. **Old seeds are refused:** `rebuild/seed.py`'s `schema_version()`
+  hashes `loader._TABLES`, which now holds `record_titles`, and the code fingerprint differs as well, so a warm base
+  built without the table is refused, named, and the rebuild runs cold. Until the rebuild, the route answers from the
+  files with the C loader.
+- **Timed with stand-ins only** (no `gov retrieve`, no embedder, reranker or model): a clone of `1e29f3cc` +
+  `62013a81` in the sandbox's TMPDIR (its acceptance tests not checked out), its record graph loaded with
+  `store.load` alone (4.8 s; digest `9a7c281ee14d…`, 0 invalid); ten cold processes per mode, one plain question,
+  1,968 records:
+
+  | Mode | `start_ids` median of ten |
+  |---|---|
+  | before: the files, pure-Python loader | 2.97 s |
+  | a store without the table: the files, C loader | 0.479 s |
+  | the store's `record_titles` | 0.0045 s |
+
+  The same start ids in all three modes on five questions (plain, ids and W2 ids, a title, none); all 1,968 records'
+  titles equal from the store and from the files, with either loader (844 records have one). A question naming W2
+  ids still reads the tickets' files for their W2 id (by a regex, no YAML): 0.008 s, left as it is.
+- **Not measured here:** the cold `gov retrieve` median of ten against the target of about 1.2 s: the CTO's, on the
+  shared servers, after the full rebuild.
