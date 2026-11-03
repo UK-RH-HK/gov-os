@@ -1,5 +1,56 @@
 # P1-PLAN — the refactoring plan, drafted (DEC-1050 THE PLAN; DEC-1039 steps 2, 3, 3b, 4)
 
+## DECIDED BY DEC-1052 (owner, 2026-11-02 late evening) — this section overrides the draft below where they differ
+
+**The basis:** `governance/project/orchestration/INTENT-DEC-1052.md` (one question, five tests; templates; READY and DONE by
+code; path-map roles; what memory holds). Every affected ticket points to it.
+
+**The rows' status (§B is to be updated to this):** approved: T-2, T-3 (first), T-6..T-11, T-13; Q-2..Q-14; G-4..G-9, G-13;
+M-2, M-3, M-5, M-6; R-6, R-7, R-9, R-10, R-12, R-13; O-5, O-8, O-9, O-11, O-12, O-13; K-1..K-4; W-1..W-10; with DEC-1050's
+T-1, T-4, T-5, Q-1, T-12/O-10 (wider), G-10/G-11 (the harvest stopped), O-7 (wider), R-8/R-11, G-1/G-2, E-1 (keep the
+repository). Replaced by the templates (no cuts): R-1..R-5, O-1, O-2, O-4. Refused: O-3 (a fresh CTO session daily; long
+contexts kept), G-12 (review effort as is). Re-decided: O-6 (ACTs only for machine changes, and only where they help;
+the repository's own servers restarted from committed configs approved by class; no ACTs for records), G-3 (the hidden
+half moves outside every worktree; no guard rule), G-14 (role separation from the path map, simple path checks),
+M-1 (W2-04 accepted as built), M-4 (embed the WBS, specs and KPIs, tickets, code, decisions; not tests or close,
+checkpoint and probe records; W2-61's measure before and after). E1 and R1-21 approved (E1 before the guard ACT).
+Option A. The templates' four recommendations approved, READY and DONE computed by code from the filled templates.
+
+**No run uses the old way from now on:** gitleaks off; no full suite but P1-12's; scoped selection; attribution once
+each way. Nothing scheduled but the dispatcher (DEC-1051).
+
+**The order, as decided:**
+1. **D-0 Clean-up** (O-8, O-13): stale worktrees, branches, scratch, dead copies, old run folders removed; **anything
+   unmerged that may hold work is listed to the owner before it is deleted** (the CTO lists, the owner says).
+2. **D-1 The memory branches merged directly into `w2/integrate`, accepted as built, no queue run:** W2-122
+   (3fc448601e2d), W2-123 (3de9bcf44d91), W2-126 (2785b2e47432; an engineer resolves its conflict with W2-123 in
+   `semantic.py`, then KPI 7), W2-112 (d5216599e6fd), W2-04 (its last head). With them the built emergency branches:
+   `emg/noscan` (the DEC-1045 product switch), `emg/select` (T-4, 194e3289). **Re-pin window 2** carries them, with its
+   checks (`pin/make_repin3_commands.sh`, `pin/repin3_checks.sh`, the ACT); the full suite on the refactored repository
+   (P1-12) verifies them.
+3. **D-2 The CTO's tools:** E1 (Q-1 attribution once each way; G-1 the landing check on who wrote any acceptance test),
+   then R1-21 (the structural pass in `land.py`), then E3's guard ACT (rules 1 and 5 by path, `rm` free but the
+   catastrophic), then G-14's path-map role checks in its place. O-A1 and the Load Balancer's held-slot fix (EMG-lb2).
+4. **D-3 Configuration and text lifts** of every approved row (T-3 first, then T-2 ...), as the draft's P1-2.
+5. **D-4 The test suite cut, before the full suite:** from about 19,000 cases to about 5,000 or fewer, every kept KPI
+   line covered by at least one test; the guard's ~9,000 first (keep what the five rules need; lifted rules' cases and the
+   roles x tools x input-forms breadth go or become representative cases); tests of features built but off leave the
+   full suite (per group: delete, or an opt-in suite outside the full run, proposed). Test designers, one independent
+   reviewer; **the deletions and merges listed to the owner first**; the count and the full suite's expected time,
+   before and after. With P1-INVENTORY-1's approved rows (P1-5).
+6. **D-5 The templates** (TPL-1..TPL-8, scripts first), READY and DONE by code; **D-6 the code tidy-up** (P1-6);
+   **D-7 memory's embedding scope (M-4)** with W2-61's measure before and after; **D-8 G-3** (the hidden half outside
+   every worktree).
+7. **D-9 The WBS refactor (P1-8), with the homes:** every decision as KPI lines in its home ticket (templates and
+   READY/DONE in W2-11, W2-33, W2-60a/b and TPL-1..8; path-map roles in the roles tickets and the guard's re-scoped
+   ticket; what memory embeds in the memory tickets), or a new ticket where none fits; every affected ticket points
+   to `INTENT-DEC-1052.md`; **the tests run per ticket, before and after the refactoring**, shown.
+8. **D-10 The full suite on the refactored repository (P1-12), on the owner's word**, every red fixed; then the lift,
+   the restart and the formal closes (P1-13); then EXAMIN's adoption (P1-14).
+
+The draft's estimate (§G: restart about 11-07, EXAMIN's copy about 11-14, range 11-12..11-19) is to be re-estimated after
+D-4's count, since the suite cut and the direct merges change the time to green.
+
 By the P1 planner, read-only, 2026-11-02 ~23:00. Sources: DEC-1039, DEC-1040, DEC-1047 to DEC-1050 (register, last
 entries); `packages/INVESTIGATION-1-COMBINED.md` (the list, §3 rows, §5 fates, §6 order) and its part reports;
 `packages/P1-LIFT-1.md` (with O-A1); `packages/P1-INVENTORY-1.md` and `INVENTORY-TESTS-CODE-1.md` (§5, §6a, §6b);
