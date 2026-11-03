@@ -35,6 +35,7 @@ each piece stopped and how it resumes: `log/emergency-stops-20261102.md` (its 23
    the tests run per ticket, before and after.
 6. D-10 the full suite on the refactored repository, on the owner's word only; then the lift, the restart of tickets,
    the formal closes, EXAMIN's adoption.
+7. D-11 the basis as a standing practice, after the lift (at adoption, on symptoms, weekly; the list to the owner first).
 **No run uses the old way:** gitleaks off; no full suite but D-10's; scoped selection; attribution once each way.
 
 **Open with the owner:** nothing blocking; the CTO lists D-0's unmerged work to the owner first. P-LB-PRODUCT-1 is
