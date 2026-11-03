@@ -86,3 +86,16 @@ All tests need only `git` and `python3`. No machine dependencies (no gitleaks, n
 ## Packages
 
 None.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: When evidence exceeds the packet budget, notes are derived under .gov-runtime/, cite source ids and hashes, and disclose unresolved e... | `test_w1_23_synthesis.py::TestDerive::test_notes_written_under_gov_runtime`, `test_w1_23_synthesis.py::TestDerive::test_notes_cite_source_ids`, `test_w1_23_synthesis.py::TestDerive::test_notes_cite_source_sha256` | README |
+| S2: A note is invalidated when any cited source hash changes; notes are rebuildable [CAP-15.f] | `test_w1_23_synthesis.py::TestInvalidation::test_note_invalidated_when_source_hash_changes`, `test_w1_23_synthesis.py::TestInvalidation::test_notes_rebuildable_same_bytes` | README |
+| F1: A note survives a change to a cited source | `test_w1_23_synthesis.py::TestF1::test_changed_source_invalidates_note`, `test_w1_23_synthesis.py::TestF1::test_changed_source_invalidates_note` | README |
+| F2: A note cites a span not in its source | `test_w1_23_synthesis.py::TestF2::test_all_citations_reference_valid_spans`, `test_w1_23_synthesis.py::TestF2::test_all_citations_reference_valid_spans` | README |
