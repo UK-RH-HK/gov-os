@@ -1007,3 +1007,26 @@ tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_sandbox_prerequis
 rep: tests/acceptance/W1-48/test_w1_48_claude_code.py  # one row per parametrised function
 rep: tests/acceptance/W1-48/test_w1_48_cli_path.py  # one row per parametrised function
 rep: tests/acceptance/W1-48/test_w1_48_drift.py  # one row per parametrised function
+
+# acceptance/W1-49
+tests/acceptance/W1-49/test_w1_49_threshold.py::test_the_pinned_cli_has_an_auto_compact_window  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_session_text_between_a_begin_marker_near_the_top_and_an_end_marker_at_the_end_is_kept  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_marker_lines_that_are_not_exact_do_not_make_a_block_of_the_text_between_them  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_line_the_session_wrote_inside_the_block_is_not_deleted  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_session_text_between_marker_lines_at_the_end_of_the_section_is_injected  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_marker_line_in_what_tk_prints_does_not_break_the_block  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_checkpoint_saved_while_the_hook_gathers_its_state_keeps_the_new_text  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_file_beside_the_checkpoint_is_neither_changed_nor_removed  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_link_beside_the_checkpoint_is_not_written_through_and_does_not_become_the_checkpoint  # cap
+rep: tests/acceptance/W1-49/test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_loop_counts  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_the_state_block_is_appended_and_the_written_part_is_unchanged_and_first  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_missing_checkpoint_is_said_so_and_none_is_created  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_without_tk_the_block_says_so_and_holds_the_rest  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_workers_compaction_is_not_blocked_and_appends_nothing  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_guard_hooks_stay_registered  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_guard_hooks_stay_registered_in_the_kernel_s_wiring  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_missing_checkpoint_does_not_fail_the_hook  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_in_a_worktree_the_leads_section_is_injected  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_checkpoint_that_cannot_be_read_does_not_fail_the_hook  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_worker_session_is_not_given_the_leads_checkpoint  # one row

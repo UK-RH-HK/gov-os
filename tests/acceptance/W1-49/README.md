@@ -490,3 +490,24 @@ stand-in is first on the hook's `PATH` and prints invented tickets in progress (
 away use a `PATH` without it or a stand-in that fails. The worktree list is that of the temporary repository. No file
 of this suite reads the held-out list or carries one of its values, and the temporary settings of the real session
 are built from the `hooks` and `env` values only.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: A PreCompact hook ensures the orchestrator's checkpoint is current, and in a worktree the lead's (DEC-248) [CAP-37.g] | `test_w1_49_registration.py::test_the_hook_file_exists_in_the_kernel_template`, `test_w1_49_registration.py::test_the_precompact_hook_is_registered_for_both_triggers`, `test_w1_49_registration.py::test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume` | README |
+| S2: A SessionStart hook on compact, clear and resume injects, within the hook's size cap, the prompt path and the checkpoint's RESUME HER... | `test_w1_49_registration.py::test_the_hook_file_exists_in_the_kernel_template`, `test_w1_49_registration.py::test_the_precompact_hook_is_registered_for_both_triggers`, `test_w1_49_registration.py::test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume` | README |
+| S3: The auto-compact threshold is set to about 300k tokens (30 % of the window) if Claude Code allows it to be configured; an acceptance ... | `test_w1_49_threshold.py::test_a_session_on_this_machine_is_given_no_compaction_threshold`, `test_w1_49_live_session.py::test_the_session_reports_its_models_own_window`, `test_w1_49_threshold.py::test_the_project_settings_set_no_auto_compact_window_of_their_own` | README |
+| S4: After a forced compaction (/compact), the session's next action shows it knows the active tickets, the open owner decisions and the l... | `test_w1_49_live_session.py::test_the_forced_compaction_over_an_old_checkpoint_is_not_blocked`, `test_w1_49_live_session.py::test_the_forced_compaction_left_the_state_block_in_the_checkpoint`, `test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_active_tickets` | README |
+| S5: The PreCompact hook never blocks a compaction: it appends a generated state block to the checkpoint (the git head, the tickets in pro... | `test_w1_49_precompact.py::test_no_compaction_is_blocked`, `test_w1_49_precompact.py::test_a_hook_that_cannot_read_its_input_does_not_block_the_compaction`, `test_w1_49_precompact.py::test_the_state_block_is_appended_and_the_written_part_is_unchanged_and_first` | README |
+| S6: The SessionStart injection is role-specific: in the main tree it points to the orchestrator prompt and the orchestrator's checkpoint;... | `test_w1_49_sessionstart.py::test_the_injection_carries_the_prompt_path_and_the_whole_resume_here_section`, `test_w1_49_sessionstart.py::test_a_long_checkpoint_does_not_push_the_section_out_of_the_cap`, `test_w1_49_sessionstart.py::test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut` | README |
+| F1: A compaction is blocked by the PreCompact hook | `test_w1_49_registration.py::test_the_precompact_hook_is_registered_for_both_triggers`, `test_w1_49_live_session.py::test_the_forced_compaction_over_an_old_checkpoint_is_not_blocked` | designer, by its words |
+| F2: The checkpoint's written part is older than the generated state block, and the SessionStart injection does not say so | `test_w1_49_live_session.py::test_the_forced_compaction_left_the_state_block_in_the_checkpoint`, `test_w1_49_precompact.py::test_the_state_block_does_not_invent_the_pending_owner_decisions` | designer, by its words |
+| F3: SessionStart injects more than the hook's size cap, or leaves out the prompt path or the RESUME HERE section | `test_w1_49_sessionstart.py::test_the_injection_carries_the_prompt_path_and_the_whole_resume_here_section`, `test_w1_49_sessionstart.py::test_a_long_checkpoint_does_not_push_the_section_out_of_the_cap`, `test_w1_49_sessionstart.py::test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut` | README |
+| F4: After a compaction the session needs the owner to restate the active tickets, the open owner decisions or the loop counts | `test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_open_owner_decisions`, `test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_active_tickets` | designer, by its words |
+
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 9 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
