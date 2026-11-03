@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/retrieval/supplementary.py
 - src/gov/context/__init__.py
+- src/gov/context/command.py
 - src/gov/guard/role_paths.py
 - tests/unit/guard/test_role_paths*
 - src/gov/retrieve/**
@@ -88,3 +89,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **P-W2-13-TD-5 (a) (CTO, 2026-11-03, P2):** the supplementary block is built in `src/gov/retrieval/supplementary.py` (not `src/gov/context/`): that file replaces the wrong path in S5's allowed paths.
 
 **S5 (CTO, 2026-11-03, P2):** `src/gov/context/__init__.py` added to the paths: `gov context --role` must reach the supplementary block's filter (S5 names `GOV_ROLE` or `--role`); the one red case of S5 outside the sandbox is the `--role` variant.
+
+**S5 (CTO, 2026-11-03, P2):** `src/gov/context/command.py` added too: its `context(...)` call must pass the parsed `--role` (the one line the engineer named).
