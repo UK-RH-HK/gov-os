@@ -340,9 +340,19 @@ def test_two_projects_never_share_a_vector_for_another_revision_or_another_text(
     asked = QUESTION if differs == "revision" else RESPELLED
     two = (S.EmbedderStandIn(digest=S.OTHER_DIGEST, targets={QUESTION: S.SUBJECTS[S.FORGE]}) if differs == "revision"
            else S.EmbedderStandIn(targets={RESPELLED: S.SUBJECTS[S.FORGE]}))
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): a store and an endpoint whose revisions no pin names fail closed before
+    # the question is sent, so under ``revision`` each project pins its embedder's revision in its models.yaml (W2-32's
+    # interface) and the second is built by its own embedder, at the other revision. The question is still asked of
+    # it, so a machine-wide cache that ignored the revision would still serve it the kiln's vector.
+    pinned = {}
+    if differs == "revision":
+        pinned = {stand_in: {**S.SUBJECTS, "governance/project/models.yaml":
+                             f"embedder:\n  model: {S.EMBED_MODEL}\n  revision: {stand_in.digest}\n"}
+                  for stand_in in (one, two)}
     try:
-        first = S.semantic_project(box, tmp_path / "one", one)
-        second = S.semantic_project(box, tmp_path / "two", one)   # built alike, at the pinned revision
+        first = S.semantic_project(box, tmp_path / "one", one, files=pinned.get(one))
+        second = S.semantic_project(box, tmp_path / "two", two if differs == "revision" else one,  # built alike
+                                    files=pinned.get(two))
         in_first = S.ask(box, first, one, QUESTION)
         in_second = S.ask(box, second, two, asked)
         models = {request.get("model") for stand_in in (one, two) for request in stand_in.embed_requests()}
