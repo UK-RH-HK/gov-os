@@ -40,7 +40,8 @@ def _free_port() -> int:
 @pytest.fixture()
 def endpoint(tmp_path, monkeypatch):
     """The stand-in runner: ``plan`` is what each successive ``/api/embed`` request gets ("ok", "hang" past the
-    timeout, or "error" 500; "ok" once the plan is used up); ``seen`` counts the embed requests it accepted."""
+    timeout, or an HTTP status such as "400"; "ok" once the plan is used up); ``seen`` counts the embed requests it
+    accepted."""
     state = {"plan": [], "seen": 0}
     stop = threading.Event()
 
@@ -58,8 +59,8 @@ def endpoint(tmp_path, monkeypatch):
             if step == "hang":
                 stop.wait(TIMEOUT * 4)
                 return
-            if step == "error":
-                return self._answer(500, {"error": "no"})
+            if step.isdigit():
+                return self._answer(int(step), {"error": "no"})
             self._answer(200, {"embeddings": [[float("pear" in text), 1.0] for text in body["input"]]})
 
         def _answer(self, code, payload):
@@ -128,19 +129,24 @@ def test_after_the_last_timed_out_try_the_stage_stops_named_and_the_part_built_i
     assert (answer["state"], answer["reason"], answer["hits"]) == ("FACET_UNAVAILABLE", "stale", [])
 
 
-def test_a_failure_that_is_not_a_time_out_ends_at_once_with_no_embedding(endpoint):
+def test_a_4xx_ends_at_once_with_no_embedding(endpoint):
+    """A client error is not transient: no retry (W2-126 KPI 7 retries a 5xx, P-W2-126-BT)."""
     root, state = endpoint
-    state["plan"] = ["error"]
+    state["plan"] = ["400"]
     report = semantic.refresh(root)
     assert (report["reason"], report["retries"], state["seen"]) == (semantic.NO_EMBEDDING, [], 1)
 
 
-def test_a_refused_connection_is_not_a_time_out(endpoint, monkeypatch):
+def test_a_refused_connection_is_retried_within_the_bound_then_named(endpoint, monkeypatch):
+    """W2-126 KPI 7 (P-W2-126-BT): a refused connection is tried again, at most 3 tries, then the stage stops named."""
     root, state = endpoint
     monkeypatch.setenv("OLLAMA_HOST", f"127.0.0.1:{_free_port()}")
     monkeypatch.setattr(semantic, "_revision", lambda host=None: "d" * 64)
     report = semantic.refresh(root)
-    assert (report["reason"], report["retries"]) == (semantic.NO_EMBEDDING, [])
+    named = ", ".join(["connection refused"] * 3)
+    assert report["reason"] == (f"{semantic.NO_EMBEDDING}: the request failed at all 3 tries ({named}; "
+                                "each under 0.3 s; waits 0.05 s, 0.1 s)")
+    assert report["retries"] == [{"tries": 3, "waits_s": [0.05, 0.1], "embedded": False}]
 
 
 def test_nothing_timed_out_gives_an_empty_list_and_the_question_s_embedding_is_not_retried(endpoint):
