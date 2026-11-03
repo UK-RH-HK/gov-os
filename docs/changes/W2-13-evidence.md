@@ -10,8 +10,10 @@ filter's judges). The one change W2-13 waited for is `3c0320080829`: `retrieve()
 
 **Verified on:** the merge commit `b91e78b17cdb`, with the one line at `3c0320080829` (the worktree's store rebuilt
 there with `--seed` under the D-4b lock, 2026-11-03: all three stores recreated, 57 s; seed: none, no warm base
-configured) and the two builder tests fixed for the merge at `06e5ae70a4a7` (no code change; `gov accept`'s last
-run, alone: 56 of 56, 6 of 6 lines).
+configured) and the two builder tests fixed for the merge at `06e5ae70a4a7` (no code change; `gov accept` alone:
+56 of 56, 6 of 6 lines). After the review: `3d1d1b34` (R4, a fused hit whose chunk the lexical index does not
+hold is skipped), `ea486253` (R3's budget cut) and its revert `80cdd7ff` (DEC-419 DP-3, below); `gov accept` alone
+on `80cdd7ff`: 56 of 56, 6 of 6 lines (load near 12); unit `tests/unit/retrieval` and `tests/unit/retrieve`: 300 passed, 1 skipped.
 
 This record holds scores only: ids, counts and figures. It quotes no question's text and no gold answer. The
 acceptance tests were run (pass or fail), never read.
@@ -78,11 +80,41 @@ tmp_path_retention_policy=failed -p no:cacheprovider` through `heavy_slot.sh`, a
 
 - **Three reds were the merge's,** in two builder tests: fixed at `06e5ae70a4a7` (above); both files then pass,
   51 of 51.
-- **The other 29 failed and 20 errors are not W2-13's.** The 18 acceptance files that hold them were run again
-  alone (`-n auto`), with the same tests, three times: with the head's code (`3c0320080829`), with the merge's code
-  without the one line (`b91e78b17cdb`, `git archive`) and with integrate's own code (`5522a603dead`, `git
-  archive`). Each run: 26 failed, 20 errors, 131 passed, 2 skipped, the same 46 cases each time. So neither the line
-  nor the branch's code causes any of them. Three cases red under load passed alone (W1-19's warm-query p95, W2-108's
-  two "this repository's answers are unchanged" cases). The 46, by file: W2-108 (20 errors: `gitleaks` not found
-  inside the cases), W2-92 `test_w2_92_unchanged.py` and `test_w2_92_fail_closed.py` (7), W2-59 (4), W1-19 (5),
-  W2-55 (3), W2-87 (2), W1-21 (2), W1-06 (1), W1-28 (1), W2-54 (1).
+- **The other 29 failed and 20 errors: 13 are W2-13's (corrected after the review, R2).** A first control re-ran
+  their 18 files with `PYTHONPATH` swapped to `git archive` copies of the base's code and found the same 46. That
+  control was invalid for W2-92, W2-87, W1-21, W1-19 and W1-28: their support modules start their children with
+  their own tree's `src` (DEC-732), so all three runs ran the head's code there. The S2 hit@5 base figure above is
+  not affected: `lexical_hit5.py` imports `gov` in its own process, with no child.
+- **The control, redone against a real checkout:** the five suites (`tests/acceptance/W2-92`, `W2-87`, `W1-21`,
+  `W1-19`, `W1-28`, `-n auto`, through `heavy_slot.sh`), run one after the other, in the worktree with its own
+  `src`, and in a `git clone` of `w2/integrate` at `7524fa04` (its `src/` and these suites the same as at
+  `5522a603dead`) with that clone's `src`:
+
+  | tree | result | reds |
+  |---|---|---|
+  | `w2/integrate` `7524fa04` | 4 failed, 369 passed | integrate's own: W1-19 `embedding_policy`, `semantic_index`, the reranker-process case; W1-28's whole-tree copy case |
+  | W2-13 head `80cdd7ff` | 17 failed, 356 passed | the same 4, plus the 13 below |
+
+- **The 13 are W2-13's, by design:** S2 changes the lexical list the fusion takes. 11 pin the old lexical
+  behaviour, and the test designer re-pins them next (MR-3):
+  - W2-92 `test_w2_92_unchanged.py`: `test_u1_a_question_naming_no_record_or_symbol_gets_todays_bundle` `[plain]`,
+    `[batched]`, `[unknown id]`, `[ticket]`; `test_u2_todays_bundle_is_the_plain_fused_order_of_todays_routes`.
+  - W2-92 `test_w2_92_fail_closed.py`: `test_f4_a_question_naming_no_symbol_does_not_report_the_code_route_ok_or_fail`.
+  - W2-87 `test_w2_87_authority.py`: `test_2b_a_lower_chunk_better_by_more_than_the_lift_keeps_its_place`,
+    `test_3b_without_the_block_the_order_is_the_plain_fused_one`.
+  - W1-21 `test_w1_21_family_check.py`: `test_the_check_is_red_when_the_dev_tiers_fail_the_baselines` (its
+    premise, dev tiers below the 80 baseline, no longer holds: the ranked route lifts them over it).
+  - W1-19 `test_w1_19_unavailable.py`: `test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so`,
+    `test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises` (their
+    reference order is built from `hits`, not `ranked`).
+
+  The other 2 are the budget gap (review R3): W2-92
+  `test_u4_a_batched_answer_with_a_new_route_continues_to_its_end_within_the_budget` and W1-21 `test_w1_21_expansion.py`
+  `test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded`. They are **not fixed on this head.** A cut of
+  the gathered chunks to the budget (`ea486253`) made both pass, but it turned 11 W1-21 cases red
+  (`test_w1_21_paging.py`: 8; `test_w1_21_merge.py`: 3). Those cases hold DEC-419 DP-3, W1-21's approved spec: "the
+  bundle budget ... bounds parent expansion only; a child hit is never dropped for it". The cut was reverted
+  (`80cdd7ff`), and the choice went to the CTO as a decision package (DEC-105).
+- **Not re-run against a real checkout:** W2-108's 20 errors (its support takes `PYTHONPATH`, so the first control
+  is valid for it: integrate's own), W2-55's 3 (red on clean `w2/integrate` in the review's run: integrate's own),
+  W2-59's 4, W1-06's 1 and W2-54's 1 (attribution unverified).
