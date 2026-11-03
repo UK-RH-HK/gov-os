@@ -6,8 +6,8 @@ Ported from ``cli/govbridge/lexical/fts.py`` (the FTS5 table, its tokenizer and 
 - The corpus is ``git ls-files`` passed through ``gov.secrets.indexable``; there is no include list. A file is
   read as it stands in the working tree (DEC-344), and only after the filter has let it through.
 - The index is incremental by blob hash: ``lexical_file`` holds the blob of every tracked file that was judged,
-  indexed or not, and a refresh judges and chunks only the paths whose blob differs. When the path map or the
-  gitleaks rules change, every tracked file is judged again.
+  indexed or not, and a refresh judges and chunks only the paths whose blob differs. When the path map, the
+  gitleaks rules or the scan's switch (``secrets.yaml``, DEC-1045) change, every tracked file is judged again.
 - ``search(..., refresh=False)``, ``freshness``, ``digest``, ``chunks`` and ``parent`` open the store read-only
   and never write (DEC-322). A missing, empty or stale index makes the facet unavailable (DEC-342).
 
@@ -25,7 +25,7 @@ import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.config.loader import PROJECT_DIR
+from gov.config.loader import PROJECT_DIR, SECRETS_FILE
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
@@ -35,7 +35,7 @@ FACET = "lexical"
 # Carried: porter unicode61, with '_' a token character so a snake_case identifier stays one token.
 TOKENIZE = "porter unicode61 tokenchars '_'"
 # What the filter's verdict on a file depends on besides the file: when one changes, every file is judged again.
-JUDGES = (f"{PROJECT_DIR}/path-map.yaml", CONFIG_REL)
+JUDGES = (f"{PROJECT_DIR}/path-map.yaml", CONFIG_REL, f"{PROJECT_DIR}/{SECRETS_FILE}")  # the scan's switch, DEC-1045
 FIELD_SEP, ROW_SEP = "\x1f", "\x1e"
 
 SCHEMA = f"""

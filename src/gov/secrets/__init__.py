@@ -44,10 +44,13 @@ import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from gov.config.loader import load_config
+from gov.config.loader import load_config, secrets_scan_on
 from gov.guard.runs import root as runs_root
 from gov.secrets import cache
 
+# The switch (DEC-1045): ``scan: off`` in ``governance/project/secrets.yaml`` gives no content to gitleaks; every place
+# it acts says so with this line. Absent, it is on, and every behaviour below is as before.
+SCAN_OFF = "secrets scan: off by configuration (DEC-1045)"
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
 RECORD_REL = f"{RUNTIME_REL}/secrets-clean.json"  # the clean results, by digest (DEC-853)
@@ -77,7 +80,12 @@ _SQLITE = b"SQLite format 3\0"
 _BUSY_S = 10.0  # how long a store's lock held by another process is waited out before the store is judged by its bytes
 _FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
-__all__ = ["indexable", "path_holds_secret", "scan_counts", "stores_with_secrets"]
+__all__ = ["SCAN_OFF", "indexable", "path_holds_secret", "scan_counts", "scan_on", "stores_with_secrets"]
+
+
+def scan_on(root: Path) -> bool:
+    """Whether the secrets scan is on at ``root`` (DEC-1045); CONFIG_INVALID when its switch cannot be read."""
+    return secrets_scan_on(Path(root))
 
 _KINDS = ("content", "path")  # what the filter judges: a file's content, a path's names
 _counts = {kind: {"scanned": 0, "remembered": 0} for kind in _KINDS}
@@ -295,6 +303,25 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list 
     return bool(hashes) and _commits(root, hashes) != hashes
 
 
+def _workers() -> int:
+    """How many texts the scan judges at once, each a gitleaks (W2-20, DEC-1038, DEC-1039).
+
+    The CPUs this process may use (its CPU set, ``os.sched_getaffinity``), never the machine's count, so a scan inside
+    a heavy-job slot confined to its share of the CPUs runs at most that share at once; ``os.cpu_count()`` where the
+    CPU set cannot be read. No more than the slot's thread budget when one is exported (``GOV_HEAVY_THREAD_BUDGET``,
+    digits only): each of the slot's workers then runs its own share (incident 2026-11-02 16:20: about 120 gitleaks at
+    once from one slot's 6 workers, each pool as wide as the machine).
+    """
+    try:
+        cpus = len(os.sched_getaffinity(0))
+    except (AttributeError, OSError):  # no affinity call on this platform, or it cannot be read
+        cpus = os.cpu_count() or 1
+    budget = os.environ.get("GOV_HEAVY_THREAD_BUDGET", "")
+    if budget.isascii() and budget.isdigit() and int(budget) >= 1:
+        cpus = min(cpus, int(budget))
+    return max(1, cpus)
+
+
 def _matches(rel: str, pattern: str) -> bool:
     """``*`` stays inside one folder, ``**`` crosses folders (the language of the path map)."""
     parts = [re.escape(part).replace(r"\*", "[^/]*") for part in pattern.split("**")]
@@ -311,7 +338,8 @@ def _governance(namespaces: dict, rel: str) -> bool:
 def indexable(root: Path, paths: list[str]) -> list[str]:
     """The sub-list of ``paths`` an indexer may read, in the order asked (DEC-285)."""
     root = Path(root).resolve()
-    rules = _rules(root)
+    scanning = scan_on(root)  # off (DEC-1045): the namespace filter alone, no content given to gitleaks
+    rules = _rules(root) if scanning else ()
     namespaces = load_config(root)["path-map.yaml"]["namespaces"]
 
     def allowed(rel: str) -> bool:
@@ -323,15 +351,18 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
             return False
         if not (_governance(namespaces, rel) and _governance(namespaces, target)):
             return False
-        return not _holds_secret(rules, content, root, "content")
+        return not (scanning and _holds_secret(rules, content, root, "content"))
 
-    with ThreadPoolExecutor() as pool:
+    with ThreadPoolExecutor(max_workers=_workers()) as pool:  # results in the order asked, whatever the width
         verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
     return [rel for rel, verdict in zip(dict.fromkeys(paths), verdicts) if verdict]
 
 
 def path_holds_secret(root: Path, path: str) -> bool:
-    """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is."""
+    """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is.
+    False, with no scan, where the scan is off by configuration (DEC-1045)."""
+    if not scan_on(root):
+        return False
     return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root, "path")
 
 
@@ -550,8 +581,12 @@ def _record(root: Path, scanner: str, clean: set[str]) -> None:
 
 
 def stores_with_secrets(root: Path) -> list[str]:
-    """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290)."""
+    """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290).
+    Empty, with no scan and no record written, where the scan is off by configuration (DEC-1045): the check that
+    calls it (``python3 -m gov.secrets``) names that state itself."""
     root = Path(root)
+    if not scan_on(root):
+        return []
     rules = _rules(root)
     if not os.path.lexists(root / RUNTIME_REL):
         return []
@@ -592,11 +627,11 @@ def stores_with_secrets(root: Path) -> list[str]:
                 clean.add(digest)
             return False
 
-    # Every file is read and judged, the largest first, as many at a time as there are processors, so a large
-    # store is neither started last nor slowed by more runs than the machine runs at once. The first file that
-    # cannot be decided raises, and then nothing is recorded.
+    # Every file is read and judged, the largest first, as many at a time as the process has CPUs (its CPU set and
+    # thread budget, _workers), so a large store is neither started last nor slowed by more runs than the CPUs run at
+    # once. The first file that cannot be decided raises, and then nothing is recorded.
     by_size = sorted(files, key=lambda path: -path.stat().st_size)
-    with ThreadPoolExecutor(max_workers=os.cpu_count() or 1) as pool:
+    with ThreadPoolExecutor(max_workers=_workers()) as pool:
         verdicts = dict(zip(by_size, pool.map(judge, by_size)))
     for path, digest in sorted(reused.items()):  # the label names the store and the digest, never content
         print(f"secrets-indexing: clean result reused, not scanned again: {path.relative_to(root).as_posix()} "

@@ -55,6 +55,7 @@ record_only:
   - "docs/plan/wave-1-exit/evidence/**.json"
   - "governance/project/orchestration/**.md"
   - "governance/project/orchestration/packages/*.patch"
+  - "governance/project/orchestration/packages/*.diff"
 
 # DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
 # every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
@@ -66,7 +67,13 @@ record_reading:
   - "tests/acceptance/W1-27/test_w1_27_path_compliance.py"
   - "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py"
   - "tests/acceptance/W1-07/test_w1_07_envelope.py"
-  - "tests/acceptance/W2-54/test_w2_54_green_here.py"
+  # W2-54's green-here cases without the three that start a whole gov check (its gov_check_here fixture): those run
+  # only in the full suite (DEC-1050, T-4)
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_suite_runs_this_worktree_s_code"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_in_a_close_the_fixture_reads_the_check_result_and_starts_no_gov_check"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_a_check_result_that_is_missing_or_broken_is_never_read_as_green"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_a_red_or_missing_check_in_the_close_s_result_still_fails_the_cases"
   - "tests/acceptance/W1-33/test_w1_33_agent_definitions.py"
   - "tests/acceptance/W1-49/test_w1_49_threshold.py"
   # area 1 (I1 §4.1): today's ticket files
@@ -92,7 +99,8 @@ record_reading:
   - "tests/acceptance/W1-27/test_w1_27_doctor_r7.py"
   - "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py"
 
-# P-IS-1 (a): W1-07's three contract files run every command; they run on every close.
+# P-IS-1 (a): W1-07's three contract files run every command; since DEC-1050 (T-4), on a close whose change holds a
+# record-only path (and in the full suite).
 every_close:
   - "tests/acceptance/W1-07/test_w1_07_envelope.py"
   - "tests/acceptance/W1-07/test_w1_07_read_act.py"

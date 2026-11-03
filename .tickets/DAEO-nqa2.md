@@ -39,7 +39,7 @@ kpis:
   - 'Every case that does not need W2-105 or W2-110 is fixed now; any case found to need them is named in the return with its reason and moves to W2-90c (the owner split W2-90b so it does not wait for W2-105 or ACT 2, DEC-999) [DEC-999]'
   - 'The 14 parametrized ids ACT 1 removed without a red (W2-59''s 10 post-tool ids, W2-65''s 4) and W2-59''s empty-parameter skip are back, on the template''s post-tool lines [DEC-965 item 4]'
   - 'W1-33''s four guard-and-launcher cases and W1-05''s two setup errors (their fixture repositories lack the five-rule hook file since ACT 1) judge the kernel''s wiring and pass; W2-54''s sandboxed-worker case''s cause is confirmed and, if it is the same, fixed the same way [DEC-970, DEC-953 item 2]'
-  - 'The stand-in homes of the harnesses (W1-47''s installed environment, W1-46''s live sessions, W1-50''s freeze launcher) use the editable install''s gov, so with the hook lines pinned they judge the worktree''s code, not the installed copy [DEC-970, W2-106''s P2]'
+  - 'The stand-in home of W1-47''s installed environment uses the editable install''s gov, so with the hook lines pinned it judges the worktree''s code, not the installed copy; the same for W1-46''s live sessions and W1-50''s freeze launcher moved to W2-90c unchanged, pending the owner''s P-W2-90b-1 (they need the caller''s HOME for credentials) [DEC-970, W2-106''s P2, DEC-1016]'
   - 'Nothing is lowered: no case deleted, skipped, xfailed or weakened; every revised file''s commit carries Rewrite-Reason: DEC-953 item 2; a README under the ticket''s folder maps every case [DEC-906, MR-3]'
   failure:
   - 'A revised case still reads this repository''s live settings, or is red with W2-106 merged (a case needing W2-105 or W2-110 is W2-90c''s, named).'

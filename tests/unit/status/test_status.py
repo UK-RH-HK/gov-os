@@ -24,7 +24,8 @@ from gov.guard.decide import FREEZE_FLAG  # noqa: E402
 from gov.status import command  # noqa: E402
 
 ARGS = argparse.Namespace(json=True)
-PARTS = ("tickets", "decision_packages", "readiness", "governance_share", "pause", "doctor")
+PARTS = ("tickets", "decision_packages", "readiness", "governance_share", "pause", "doctor",
+         "reranker")  # W2-112: the shared reranker's fallbacks and refusals
 TICKET = "---\nid: {id}\ntype: task\nstatus: {status}\ndeps: []\nwbs_id: W9-01\n---\n# A ticket\n"
 
 

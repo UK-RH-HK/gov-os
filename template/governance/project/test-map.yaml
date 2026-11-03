@@ -24,7 +24,7 @@ record_only:
 # The tests that read a record-only path, directly or by scanning the tree: run on every close.
 record_reading: []
 
-# Targets run on every close, whatever changed.
+# Targets run on a close whose change holds a record-only path (and in the full run).
 every_close: []
 
 # What imports and coverage cannot see: {paths: [patterns], suites: [targets], why: <text>}.
