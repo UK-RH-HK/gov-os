@@ -34,6 +34,7 @@ kpis:
   - 'At most the three gaps that W2-15a named, from these: chunking: span size, overlap and parent expansion, with a re-embed'
   - 'At most the three gaps that W2-15a named, from these: the hit@5 85 row on the dev queryset [W2-M341]: Each gets one round plus its probe; its effect is measured by W2-15b. What remains is a named residual.'
   - 'If memory is below 85 % after two improvement rounds, the orchestrator escalates to the owner with the reasons; at the third the owner decides: a discovery and research ticket benchmarking market tools in a separate worktree, accepting the level reached, or another course. At 85 % or above but under the owner''s target of 95 %, with room for improvement found, memory is not closed: an escalation to the owner [DEC-954 Q9e, DEC-957]'
+  - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'
   failure:
   - An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted.
 profile: STANDARD
@@ -127,3 +128,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
 - **S5: honoured or refused.** `fusion.search` with a limit returns exactly that many distinct hits (all that match,
   if fewer), or refuses a limit above its cap with a `ValueError` or a `GovError` naming the limit or the cap.
 
+
+**DEC-1065 (1) placed here (CTO, 2026-11-03):** S10 added; every CPU-embedder start goes through `ollama.py`'s `ensure_available` (the search, the refresh in rebuild and close, the seed, the sandbox), all in this ticket's paths.
