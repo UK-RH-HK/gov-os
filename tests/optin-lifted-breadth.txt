@@ -909,3 +909,66 @@ tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_hooks_carry_no_base
 tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_carrier_of_the_evidence_record_is_documented  # cap
 tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_lefthook_hook_is_installed_in_this_repository  # cap
 rep: tests/acceptance/W1-40/test_w1_40_ci_evidence.py  # one row per parametrised function
+
+# acceptance/W1-41
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_no_legacy_rule_file_stays_where_an_agent_tool_loads_instructions  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_adapter_generation_is_run_or_named  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_parsed_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_read_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_chat_database_is_marked_non_authoritative  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_chat_database_is_retired_after_its_knowledge_is_in_records  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_chat_database_with_nothing_extracted_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_an_extraction_from_another_content_of_the_database_does_not_count  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_chat_database_that_cannot_be_read_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_memory_store_an_active_record_cites_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_memory_store_a_rule_cites_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_kept_rule_file_cites_the_store_however_it_writes_the_path  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_longer_path_or_id_that_only_contains_the_stores_is_no_citation  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_still_stands_keeps_the_store  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_no_longer_stands_does_not_keep_the_store  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_retirement_of_the_memory_store_is_a_cit_e  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_index_is_refreshed_after_the_retirement  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_retired_systems_contribute_no_active_decision  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_what_the_path_map_keeps_is_untouched_by_the_retirement  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_file_deleted_from_the_active_tree_stays_reachable_too  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_the_rollback_points_are_the_ones_the_plan_recorded  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_the_index_refresh_follows_the_moves  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_a_backup_ref_that_no_longer_resolves_stops_the_migration  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_a_tree_that_is_dirty_at_a6_is_not_migrated  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_every_artefact_has_exactly_one_of_the_eight_actions  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_each_of_the_eight_actions_is_recorded_as_proposed  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_an_action_outside_the_eight_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_an_artefact_given_two_actions_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_path_the_inventory_does_not_hold_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_without_a_target_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_onto_an_artefact_that_stays_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_proposal_that_cannot_be_read_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_references_and_consumers_of_a_moved_record_are_read_from_the_record_graph  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_plan_rewrites_or_flags_every_importer_reference_and_consumer  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_justification_that_states_only_one_of_the_two_grounds_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_justified_move_out_of_a_native_layout_is_recorded_with_both_grounds  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_plan_has_the_proposed_batches_each_with_its_own_rollback_point  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_the_unknown_artefact_becomes_a_decision_package_for_the_customer  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_a_project_without_unknown_artefacts_raises_no_package_about_one  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_an_unknown_artefact_blocks_retirement_too  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_not_committed_by_the_independent_auditor_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_written_and_not_committed_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_from_the_session_that_made_the_path_map_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_about_a_path_map_that_changed_afterwards_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_path_map_that_changes_after_a5_passed_is_not_executed  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_that_cannot_be_read_moves_nothing  # cap
+rep: tests/acceptance/W1-41/test_w1_41_baseline.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_embedding_policy.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_external_follow_up.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_external_references.py  # one row per parametrised function
