@@ -1,6 +1,6 @@
 # D4B-GAPS: the gaps for W2-32, from measure 1 and the five modes (P1, for the owner; W2-15a's KPI: at most three, chosen with the owner)
 
-By the CTO (session 33b3628c), 2026-11-04 ~00:30. Sources: D-4b measure 1 (`~/gov-os-runs/D4B/m1/`); W2-15a's evidence
+By the CTO (session 33b3628c), 2026-11-03 ~22:40. Sources: D-4b measure 1 (`~/gov-os-runs/D4B/m1/`); W2-15a's evidence
 record (`docs/research/EXP-003/w2-15a-baseline.md` on `w2/W2-15a`, `fd637510`, by the research agent); DEC-1065 (3).
 Estimates are the research agent's, marked (est.).
 
