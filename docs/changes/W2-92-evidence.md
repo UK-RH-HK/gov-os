@@ -28,7 +28,7 @@ worktree. Unit = `pytest tests/unit/retrieval/test_w2_92_routes.py tests/unit/re
 | F2 a whole-graph query or one over the row cap | `gov accept` line failure-2; unit small-page cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F3 a missing index reported ok or failing the whole answer | `gov accept` line failure-3; unit missing-index cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F4 a figure without the other, or the hidden half read or run | the measure record (§4 gives both figures together; §8: the hidden half neither read nor run) | measure: D-4b measure 1 | earlier record as cited; re-measured: D-4b measure 1 | `d72c96fc029c` (record); D-4b measure 1 |
-| S6 a plain question costs about one second (DEC-1065 (4)) | the record route reads the titles the store keeps (`record_titles`), parses no record file; same start ids as before; the route timed cold with stand-ins (below); the cold `gov retrieve` median of ten: the CTO's, on the shared servers | unit `tests/unit/retrieval/test_w2_92_titles.py` (18 cases) with the W2-92 and store unit files (81 cases, `--optin=lifted,breadth`); the timing scripts (below); `gov accept` after the test designer's S6 tests merge | unit 81 passed; the record route 2.97 s → 0.0045 s median of ten; 1,968 records' titles equal both ways; `gov retrieve` median: CTO | `62013a81` |
+| S6 a plain question costs about one second (DEC-1065 (4)) | the record route reads the titles the store keeps (`record_titles`), parses no record file; same start ids as before; the route timed cold with stand-ins (below); the cold `gov retrieve` median of ten: the CTO's, on the shared servers | unit `tests/unit/retrieval/test_w2_92_titles.py` (18 cases) with the W2-92 and store unit files (81 cases, `--optin=lifted,breadth`); the timing scripts (below); `gov accept` after the test designer's S6 tests merge | unit 81 passed; the record route 2.97 s → 0.0045 s median of ten; 1,968 records' titles equal both ways; `gov accept` in the launch sandbox at `00a3daa0`: 14 of 15, 1 failed (pre-S6 code: 12 of 15); `gov retrieve` median: CTO | `62013a81`; `00a3daa0` |
 
 `gov accept` totals at `ebba014ac355`: 25 passed, 5 failed, 0 skipped; 5 of 7 lines pass (2026-11-03 15:39-15:41
 UTC). At the pre-merge head `448a835a9dca`, run the same day in a clone: 30 passed, 7 of 7 lines. **At `7f4d519b`
@@ -114,3 +114,32 @@ and `.claude/hooks/**` read-only for the engineer, so `git merge` could not chec
   ids still reads the tickets' files for their W2 id (by a regex, no YAML): 0.008 s, left as it is.
 - **Not measured here:** the cold `gov retrieve` median of ten against the target of about 1.2 s: the CTO's, on the
   shared servers, after the full rebuild.
+
+### `gov accept W2-92` at `00a3daa0` (S6's tests merged), in the engineer's launch sandbox, 2026-11-03
+
+Run as `PYTHONPATH=<tree>/src bash heavy_slot.sh python3 -m gov.cli.main accept W2-92 --json` (pass or fail per
+line only; the engineer never reads `tests/acceptance/W2-92/`). To tell the sandbox from the change, the same command
+ran in a clone of `00a3daa0` with only `src/gov/store/loader.py` and `src/gov/retrieval/graph_route.py` put back to
+`1e29f3cc`'s (the code before S6): the same tests, the same sandbox.
+
+| KPI line | S6 code (`00a3daa0`) passed / failed | Code before S6, same sandbox | Reading |
+|---|---|---|---|
+| success-1 | 0 / 9 | 0 / 9 | the sandbox (same at both) |
+| success-2 | 1 / 6 | 1 / 6 | the sandbox (same at both) |
+| success-3 | 3 / 3 | 3 / 3 | the sandbox (same at both) |
+| success-4 | 0 / 9 | 0 / 9 | the sandbox (same at both) |
+| success-6 | **14 / 1** | 12 / 3 | S6 fixes 2 of the 3 the designer showed red on `w2/integrate`; 1 still fails |
+| failure-1 | 0 / 9 | 0 / 9 | the sandbox (same at both) |
+| failure-2 | 1 / 5 | 1 / 5 | the sandbox (same at both) |
+| failure-3 | 3 / 3 | 3 / 3 | the sandbox (same at both) |
+| totals | 18 / 27 | 16 / 29 | |
+
+- **What in the sandbox fails them (found with a planted repository of the engineer's own, no test read):** the code
+  index cannot be built there: `codeintel`'s runtime folder is fixed at `/tmp/gov-cbm-<uid>/` (`codeintel.DAEMON_BASE`),
+  which the launch sandbox keeps read-only (`gov rebuild` answers ok with `codeintel: not_recreated, [Errno 30]
+  Read-only file system: '/tmp/gov-cbm-1000/…'`); and the machine's default rebuild lock `/tmp/gov-os-rebuild.lock`
+  is read-only there too. These lines passed 30 of 30 at `7f4d519b`, run outside the sandbox.
+- **The one S6 case still red:** not known from inside (the runner names no case, by design). It is red with the S6
+  code and with the code before it, so it may be the sandbox's as the others, or a reading of S6 the change does not
+  meet; `gov accept` outside the sandbox tells which.
+
