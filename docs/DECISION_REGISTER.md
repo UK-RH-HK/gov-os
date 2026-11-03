@@ -13123,3 +13123,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.446 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1062. Next free id: DEC-1063. |
+
+### DEC-1063 — ACT-G14b applied: a coordination ticket's own tests are its own folder only
+- **Status:** ACCEPTED (owner, 2026-11-03 ~21:10, in the chat; applied by the owner's operator, commit `e02d55e40424`, `Role: owner`; recorded by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1056, DEC-1058 (an (a) ACT), DEC-1057 (rehearsed), DEC-1059 · **Source:** `.gov-runtime/scratch/orchestrator/drafts/g14/ACT-G14b.md`; the delta review in `reviews/g14.md` (READY)
+- **Decision and record:** after D-4's cut merged (`6008a41f`), its 101 test-designer commits under `Task: DAEO-sdxk` tied 109 acceptance files to W2-00 by G-14's link source (i), so engineers under W2-00 were refused other tickets' tests (against DEC-1056) and `guard4_check` reported FAIL. In `.claude/hooks/role_reads.py`, a ticket whose front matter says `class: coordination` (today only W2-00) has as its own tests only its own folder; link sources (i) and (ii) apply to every other ticket as before. The operator's run matched the rehearsal: the guard check FAIL before, PASS after; `test_live_hook.py` 63 passed; `test_guard_fix_4.py` 467 passed; `test_g14.py` 151 passed, 1 skipped. Row (G14b-F1): a designer and an engineer paired under W2-00 are not separated by the guard; such pairs run under their own ticket's id.
+- **Basis:** question 1 (role separation where the conflict is, not on a coordination ticket's records) and question 4 (no refusal of honest regression reads).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.447 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1063. Next free id: DEC-1064. |
