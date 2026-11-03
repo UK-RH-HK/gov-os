@@ -755,3 +755,18 @@ code graph's daemon folder `/tmp/gov-cbm-1000` being read-only there ("Where the
 in `path_map`, 1 in `unknown`, all 19 of `verdict`. `migration` was also run with the edit undone: the same 7 failed.
 Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only
 embedder on its own port; the fixtures point it at a stand-in and change no expectation`.
+
+## Rewrite (W2-04, DEC-1005, 2026-11-01)
+
+W2-04 (`DAEO-u4oz`, FULL), round 2, by its independent test designer. `Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d,
+DEC-860), DEC-1005`. W2-04 makes the packet carry the ticket's own file whole under `ticket_text` and count it in
+`tokens` (its S1), and adds four keys (its addendum, "The packet's keys"). Two cases of
+`test_w1_41_external_references.py` change; no other case, expectation or count does (45 cases).
+
+| case | before | after |
+|---|---|---|
+| `test_an_external_reference_adds_nothing_to_the_packets_tokens` | TK-H9-EXT and its twin TK-H9-REC (the same records, no external id) count the same `tokens` and have the same `budget` | TK-H9-EXT's file is longer than TK-H9-REC's by its external source's line, and W2-04 counts each ticket's own text. So the twin is now **TK-H9-PAD**: TK-H9-REC's records, its file padded at its end to TK-H9-EXT's length (an id of the same length). The packets count the same `tokens` and have the same `budget`, exactly, however the count is rounded. Both packets carry their ticket's text whole (the twin's as long). They read the same records. This is the equivalent the brief allows of "the tokens less the ticket text's tokens": it holds the same equality without a choice of rounding (W2-04's S1 does not fix whether the texts are rounded one by one or summed) |
+| `test_a_project_without_the_file_gives_the_packet_it_gave_before` | the eight keys of W1-24's packet and no other | those eight and **W2-04's four** (`ticket_text`, `supplementary_query`, `further_batch`, `supplementary_batches`), and no other. The CTO's text said "the three new keys": it was written before `supplementary_batches` was added in the same decision, so the four are taken. The mandatory ids are compared as before |
+
+**Red on the base** (`d2ff95b2`): both, for W2-04's reasons. The first finds no `ticket_text` in the packet. The second
+finds the eight keys without the four. The other 43 cases pass.

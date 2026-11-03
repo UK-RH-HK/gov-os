@@ -26,7 +26,7 @@ from gov import records
 from gov.cli.errors import GovError
 from gov.retrieval import authority, code_route, graph_route, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
-from gov.retrieval.rerank import rerank
+from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
 
 CLOSURE = "closure"
@@ -262,9 +262,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                            "_batch": batch_assignments[hit["chunk_id"]]})
 
     try:
-        ranked = rerank(query, candidates, reranker)
-    except (OSError, RuntimeError, ValueError):
+        ranked, reranked_by = rerank(query, candidates, reranker), last_outcome()
+    except (OSError, RuntimeError, ValueError) as error:
         ranked = candidates
+        reranked_by = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
     ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
 
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
@@ -313,6 +314,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "merge": {"candidates": len(gathering), "duplicates": sum(map(len, routes.values())) - len(fused),
                         "dropped": [dropped[rel] for rel in sorted(dropped)],
                         "reranked": any("rerank_score" in candidate for candidate in ranked)},
+              "rerank": reranked_by,  # W2-112: who scored (service, private) and on which device, or unavailable
               "expansions": expansions, "gaps": gaps, "facets": facets,
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},

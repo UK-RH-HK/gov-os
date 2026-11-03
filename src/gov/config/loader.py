@@ -28,18 +28,30 @@ from gov.config.path_map_schema import (
 )
 
 PROJECT_DIR = "governance/project"
-KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA}
+# The secrets scan's switch (DEC-1045, as DEC-953 switched the other lifted gates): one key ``scan``, ``on`` or ``off``.
+# The file absent, or the key absent, is on; any other value is CONFIG_INVALID, never off.
+SECRETS_FILE = "secrets.yaml"
+SECRETS_SCHEMA = {"scan": {"required": False, "type": str}}
+SCAN_VALUES = ("on", "off")
+KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA}
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
 
-def read_yaml(path: Path, code: str, rel: str):
+def read_yaml(path: Path, code: str, rel: str, plain: bool = False):
+    """The YAML document at ``path``. ``plain``: every scalar as the string written (so ``off`` is not a boolean)."""
     try:
         import yaml
     except ImportError:
         raise GovError(code, f"{rel}: cannot be read, PyYAML is not available", {"file": rel, "key": None}) from None
     try:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            if not plain:
+                raise
+            raise GovError(code, f"{rel}: cannot be read: {exc.strerror or exc}", {"file": rel, "key": None}) from None
+        return yaml.load(text, Loader=yaml.BaseLoader) if plain else yaml.safe_load(text)
     except (yaml.YAMLError, UnicodeDecodeError) as exc:
         reason = " ".join(str(exc).split())
         raise GovError(code, f"{rel}: not valid YAML: {reason}", {"file": rel, "key": None}) from None
@@ -188,6 +200,12 @@ def validate(document, schema: dict, rel: str) -> None:
                     raise _invalid(rel, f"{key}.{name}", f"must be a {_TYPE_NAMES[rule['values']]}")
     if rel.endswith("path-map.yaml"):
         _validate_path_map(document, rel)
+    if rel.endswith(SECRETS_FILE):
+        for key in document:
+            if key not in schema:
+                raise _invalid(rel, str(key), "unknown key (the only key is 'scan')")
+        if "scan" in document and document["scan"] not in SCAN_VALUES:
+            raise _invalid(rel, "scan", f"must be one of {SCAN_VALUES}")
 
 
 def _validate_namespace_minimal(ns_name, ns_value, rel):
@@ -219,14 +237,31 @@ def _validate_path_map(document, rel):
             _validate_systems(document["systems"], rel)
 
 
+def _load(root: Path, name: str, schema: dict):
+    """The known file ``name`` validated, or None when it is absent."""
+    rel = f"{PROJECT_DIR}/{name}"
+    path = Path(root) / rel
+    if not path.is_file():
+        return None
+    secrets = name == SECRETS_FILE
+    document = read_yaml(path, "CONFIG_INVALID", rel, plain=secrets)
+    if secrets and document is None:  # a file of comments alone holds no key: on
+        document = {}
+    validate(document, schema, rel)
+    return document
+
+
 def load_config(root: Path) -> dict:
     loaded = {}
     for name, schema in KNOWN_FILES.items():
-        rel = f"{PROJECT_DIR}/{name}"
-        path = Path(root) / rel
-        if not path.is_file():
-            continue
-        document = read_yaml(path, "CONFIG_INVALID", rel)
-        validate(document, schema, rel)
-        loaded[name] = document
+        document = _load(root, name, schema)
+        if document is not None:
+            loaded[name] = document
     return loaded
+
+
+def secrets_scan_on(root: Path) -> bool:
+    """Whether the secrets scan is on at ``root`` (DEC-1045): reads ``secrets.yaml`` alone. Absent file or key: on.
+    A file that cannot be read or holds another value raises CONFIG_INVALID: the switch fails closed, never off."""
+    document = _load(root, SECRETS_FILE, SECRETS_SCHEMA) or {}
+    return document.get("scan", "on") == "on"

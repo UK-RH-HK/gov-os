@@ -79,6 +79,23 @@ def _fresh_log(request):
     yield
 
 
+@pytest.fixture(autouse=True)
+def _own_vector_cache(request):
+    """Each case its own machine-wide vector cache folder, in its temporary directory (Rewrite-Reason: DEC-1033,
+    item 3; DEC-1042 item 2): W2-126's cache is shared by every process on the machine and keyed by model, revision
+    and text, so cases whose stand-ins send one text to different places must never share one. Fixtures of a wider
+    scope keep the session's folder (``Box.default_vector_cache``), never the user's own."""
+    if "box" not in request.fixturenames:
+        yield
+        return
+    box = request.getfixturevalue("box")
+    box.vector_cache = request.getfixturevalue("tmp_path") / "vector-cache"
+    try:
+        yield
+    finally:
+        box.vector_cache = box.default_vector_cache
+
+
 @pytest.fixture()
 def embedder():
     """Round 2: the stand-in embedder, healthy, on its own loopback port (README, "The stand-in embedder")."""

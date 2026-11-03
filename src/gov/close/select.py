@@ -2,8 +2,9 @@
 
 A close runs what its change can reach: the ticket's own suite, ``tests/unit``, the acceptance suite of every
 ticket whose ``allowed_paths`` match a changed path, a suite holding a changed file or importing a changed helper,
-each declared coupling's suites, ``every_close`` and ``record_reading``. The change is every path changed since the
-base, the newest commit a green record names that is ``HEAD`` or an ancestor of it.
+each declared coupling's suites, ``record_reading``, and ``every_close`` when a ``record_only`` path is in the
+change (DEC-1050, T-4). The change is every path changed since the base, the newest commit a green record names
+that is ``HEAD`` or an ancestor of it.
 
 Anything unknown or unreadable widens to the full regression, never less: a changed path under the shared core
 (``SHARED_CORE``), one nothing places (``UNPLACED``), a test map that is missing or invalid
@@ -405,8 +406,11 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None =
         if hit:
             for suite in c["suites"]:
                 select(suite, {"reason": "COUPLING", "paths": hit, "coupling": c["why"]})
-    for target in test_map.get("every_close") or []:
-        select(target, {"reason": "EVERY_CLOSE"})
+    # DEC-1050 (T-4): every_close joins the selection only when a record-only path is in the change (a code change
+    # alone leaves it to the full suite); record_reading, without W2-54's whole gov check (the map), joins every one
+    if any(_any(p, test_map.get("record_only")) for p in paths):
+        for target in test_map.get("every_close") or []:
+            select(target, {"reason": "EVERY_CLOSE"})
     for target in test_map.get("record_reading") or []:
         select(target, {"reason": "RECORD_READING"})
 
