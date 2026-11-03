@@ -625,3 +625,22 @@ Brought to DEC-491 and DEC-495 (two versions before):
 | `test_no_session_of_the_ticket_gives_no_figure`, `test_named_session_without_a_log_gives_no_figure`, `test_absent_log_folder_gives_no_figure`, `test_empty_log_folder_gives_no_figure`, `test_ccusage_that_cannot_be_read_gives_no_figure` | unchanged text; the shared `assert_no_figure` now asks for the three share figures and cache creation to say `"not measured"` | DEC-495 |
 | every case that writes logs | unchanged text; the logs are now written in the specimen's form (two lines a message, a `cost-state` line) | DEC-495 |
 | every case | unchanged text; the fixture project now has the designer's commit before the engineer's | DEC-491 |
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: gov counts governance tokens per ticket (instruction files, SessionStart packet, hook output, gov output, governance MCP definitions,... | `test_w1_31_share_counter.py::test_joins_ccusage_input_and_output_of_the_tickets_sessions`, `test_w1_31_share_counter.py::test_names_each_of_the_seven_sources_of_governance_tokens`, `test_w1_31_measured_and_estimated.py::test_sessionstart_packet_is_what_the_sessionstart_hooks_added` | README |
+| S2: The close record carries the share and the locally observable Contract v3 P1 fields (session, model, role, ticket, skill/tool version... | `test_w1_31_third_specimen.py::test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes`, `test_w1_31_third_specimen.py::test_the_cost_of_a_model_without_a_price_is_not_measured`, `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes` | README |
+| S3: The close record also carries agent, provider, latency and files read, taken from the harness session log [CAP-40.a] | `test_w1_31_share_counter.py::test_record_names_agent_provider_latency_and_files_read`, `test_w1_31_measured_and_estimated.py::test_provider_and_files_read_have_no_source_in_the_specimen`, `test_w1_31_second_specimen.py::test_latency_is_the_api_duration_of_each_sessions_last_totals_line` | README |
+| S4: The share is reported per profile (LITE, STANDARD, FULL), so the budget is judged against the ceremony applied [CAP-53.c] | `test_w1_31_share_counter.py::test_record_names_the_tickets_profile_beside_the_share`, `test_w1_31_measured_and_estimated.py::test_a_ticket_without_a_profile_is_not_measured_for_the_profile` | README |
+| S5: The close record carries the three Wave 1 learning metrics: KPI disputes raised by the test designer, acceptance tests rewritten afte... | `test_w1_31_share_counter.py::test_record_carries_the_three_learning_metrics`, `test_w1_31_measured_and_estimated.py::test_rewrites_are_the_designers_commits_after_the_first_engineer_commit`, `test_w1_31_measured_and_estimated.py::test_commits_that_cannot_be_read_are_not_measured` | README |
+| S6: For a launched worker session the close record reports the sandbox's added system-prompt tokens (about 3,250 input tokens per session... | `test_w1_31_share_counter.py::test_sandbox_tokens_are_a_line_apart_and_never_assumed` | README |
+| F1: A ticket closes without a share figure | `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes`, `test_w1_31_second_specimen.py::test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the_case_computes`, `test_w1_31_third_specimen.py::test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes` | README |
+| F2: Cache reads are counted in the share | `test_w1_31_share_counter.py::test_cache_reads_change_neither_share_nor_tokens`, `test_w1_31_share_counter.py::test_cache_reads_and_cache_creation_are_figures_of_their_own`, `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes` | README |
+
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 51 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

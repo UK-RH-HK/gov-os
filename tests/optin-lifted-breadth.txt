@@ -656,3 +656,58 @@ rep: tests/acceptance/W1-27/test_w2_67_codegraph_folders.py  # one row per param
 # acceptance/W1-29
 rep: tests/acceptance/W1-29/test_session_hooks.py::TestSubagentStop::test_malformed_input_fails_closed  # one row
 rep: tests/acceptance/W1-29/test_session_hooks.py::TestHookCopiesIdentical::test_hook_copies_identical  # one row
+
+# acceptance/W1-31
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_commits_that_cannot_be_read_are_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_kpi_disputes_are_read_from_the_orchestrators_record  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_kpi_disputes_are_not_measured_without_a_readable_record  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_an_empty_checkpoint_folder_counts_zero_and_an_absent_one_is_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_the_close_record_is_not_measured_before_the_close  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_the_model_is_reported_from_the_logs_and_from_the_commits  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_hook_run_without_added_context_counts_zero  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_sessionstart_packet_is_counted_each_time_it_is_given  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_added_context_of_any_other_event_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_text_of_a_blocking_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_text_of_a_failing_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_blocked_gov_command_is_counted_once_as_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_gov_result_marked_as_an_error_is_counted  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_gov_beside_other_commands_is_counted_whole_and_the_record_says_so  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_subagents_lines_and_tokens_belong_to_the_named_session  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_subagents_file_that_ccusage_reads_otherwise_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_subagent_of_a_session_that_was_not_named_is_never_counted  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_latency_is_the_api_duration_of_each_sessions_last_totals_line  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_session_without_a_totals_line_has_no_latency  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_agent_is_the_harness_and_its_version  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_precompact_gap_is_named_and_is_no_entry_of_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_the_counter_is_a_command_of_gov  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_counts_the_tickets_checkpoint_records  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_automatic_checkpoints_are_checkpoint_records  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_counts_the_tickets_close_record  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_record_names_every_p1_field_and_invents_none  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_sessions_carry_what_ccusage_measured_for_each  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_cost_is_ccusages  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_record_is_plain_data_a_close_record_can_carry  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_the_counter_writes_nothing  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_no_session_of_the_ticket_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_named_session_without_a_log_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_absent_log_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_empty_log_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_absent_ccusage_refuses  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_ccusage_that_cannot_be_read_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_sessionstart_hooks_plain_output_is_the_packet_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_failing_sessionstart_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_plain_output_of_a_hook_of_any_other_event_counts_zero  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_added_context_after_a_failed_tool_call_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_gov_called_by_a_path_is_gov_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_gov_result_by_a_path_marked_as_an_error_is_counted  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_gov_through_another_runner_is_not_measured_by_name  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_shortened_result_is_counted_as_logged_and_tool_results_is_passed_over  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_any_other_content_of_a_sessions_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_call_a_hook_denies_by_its_answer_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_call_a_permission_rule_denies_counts_nothing  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_denial_in_a_form_no_specimen_shows_is_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_the_feedback_of_a_blocking_stop_hook_is_hook_output_counted_once  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_the_feedback_of_a_blocking_subagentstop_hook_is_counted_once_with_the_session  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_stop_hooks_block_in_a_form_no_specimen_shows_is_not_measured  # cap
+rep: tests/acceptance/W1-31/test_w1_31_fourth_specimen.py  # one row per parametrised function
+rep: tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py  # one row per parametrised function
