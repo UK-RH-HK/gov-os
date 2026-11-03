@@ -9,8 +9,9 @@ reading it. Behaviour through public interfaces only (DEC-462), in proportion to
     PYTHONPATH=<this worktree>/src python3 -m pytest tests/acceptance/W2-126 -q -p no:cacheprovider \
         -o tmp_path_retention_policy=failed -rs
 
-17 cases (one of them `local_only`); about 40 s without the `local_only` case, about 2 minutes with it (measured on
-the base).
+27 cases (one of them `local_only`): 17 for success lines 1 to 6, 10 for success line 7 (`test_w2_126_retry.py`);
+about 40 s for the first 17 without the `local_only` case (about 2 minutes with it), and about 20 s more for the
+retry file (measured on the base).
 Each needs `gitleaks` on `PATH` and an importable `sqlite_vec` (the lexical index and the vectors need them); a case
 is skipped, named, where either is missing.
 
@@ -91,9 +92,15 @@ backticks, a parameterised case once per parameter (`name[id]`); notes on a case
 | S5 | `test_w2_126_dev_tiers.py::test_a_later_check_embeds_nothing` | a planted GOV_DEV_TIERS folder: two small tiers, four questions; "a later check embedded 60 texts cold" |
 | S5 | `test_w2_126_dev_tiers.py::test_a_later_check_on_this_machines_dev_tiers_embeds_nothing` | marked local_only: this machine's dev tiers by GOV_DEV_TIERS's name, skipped where absent; "a later check embedded … texts cold" |
 | S6 | `test_w2_126_evidence.py::test_the_evidence_file_states_the_named_figures` | light: the file exists and names the figures, never their values; "docs/changes/W2-126-evidence.md does not exist" |
+| S7 | `test_w2_126_retry.py::test_a_transient_failure_then_an_answer_is_tried_again_and_the_stage_is_built[500]`, `test_w2_126_retry.py::test_a_transient_failure_then_an_answer_is_tried_again_and_the_stage_is_built[503]`, `test_w2_126_retry.py::test_a_transient_failure_then_an_answer_is_tried_again_and_the_stage_is_built[reset]` | batch 0 fails once, then answered: 2 tries after the first wait, built, `retries` one entry of 2 tries, embedded; "after a 500 (503, reset), the batch was not tried again exactly once": `['500'] == ['500', 'answered']` |
+| S7 | `test_w2_126_retry.py::test_a_refused_connection_then_an_answer_is_tried_again_and_the_stage_is_built` | nothing listens for 1 s after batch 0's answer, the waits lowered to 2 s and 3 s: batch 1 reaches the stand-in after the first wait, built, `retries` 2 tries, embedded; "batch 1 did not reach the stand-in once after its refused try: []" (`retries` `[]`) |
+| S7 | `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[500]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[503]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[reset]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[mixed]` | batch 1 fails at every try (`mixed`: a time-out, a 500, a reset: one bound): exactly 3 tries after their waits, no later batch, within the bound, `FACET_UNAVAILABLE` with a reason beginning `NO_EMBEDDING`, `retries` 3 tries not embedded, a search without refresh `stale`, no hit; "the batch that kept failing was not tried exactly 3 times" (one try; `mixed`: the time-out retried, then the 500 ended it, `['held', '500']`) |
+| S7 | `test_w2_126_retry.py::test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_within_the_bound` | nothing listens again after batch 0: the stage waits both waits, ends within the bound, `FACET_UNAVAILABLE`, `retries` 3 tries not embedded; "the stage ended 0.01 s after nothing listened: it did not wait 1.0 s to try again" |
+| S7 | `test_w2_126_retry.py::test_a_client_error_is_not_retried_and_the_stage_ends_at_once` | an edge, green on the base (a guard): an HTTP 400 is not a transient server error, sent once, exactly `NO_EMBEDDING`, `retries` `[]` |
 
-Success line 7 (the bounded retry's cover of a transient server error, W2-123's case revised under
-`Rewrite-Reason: P-W2-123-4`) is not in this map: DEC-1042 item 4 does it after W2-123 lands.
+Success line 7 (DEC-1042 item 4, after W2-123 landed; `Rewrite-Reason: P-W2-123-4`): see "Success line 7: the
+bounded retry" below. W2-123's case that an HTTP 500 is not retried is revised in
+`tests/acceptance/W2-123/test_w2_123_retry.py` (its README, "Run 2", says how).
 
 Failure lines: **F1** (a vector for a different text, model or revision): the changed-text, concurrent-writers and
 revision cases. **F2** (a store built with the cache differs): the all-cached rebuild, the cached-vector case and
@@ -123,3 +130,42 @@ because of the cache): the concurrent-writers, held-request and unusable-cache c
   cache. The `local_only` case uses this machine's tiers only by `GOV_DEV_TIERS`'s name (default
   `~/gov-os-workbench/synthetic`) and checks only that a named file exists there; the check itself clones them into
   the test's temporary folder.
+
+## Success line 7: the bounded retry (`test_w2_126_retry.py`; DEC-1042 item 4, P-W2-123-4)
+
+Written after W2-123 landed on `w2/integrate`, from KPI 7 and W2-123's run-2 interface (R1 to R3, its README), by a
+fresh independent test designer, without reading W2-126's implementation. The integrated code (W2-123's retry) was
+read for the names it exposes; the cases use only those: `semantic.refresh`, `search(..., refresh=False)`,
+`TIMEOUT_S`, `RETRY_WAITS_S`, `NO_EMBEDDING` and the report's `retries`.
+
+- **The bound** is W2-123's: `len(RETRY_WAITS_S) + 1` tries of one chunk batch request, the waits of `RETRY_WAITS_S`
+  before the later tries, each try under `TIMEOUT_S`. KPI 7 adds no other bound, so a time-out, a 5xx and a reset met
+  by one request share it (the `mixed` case: three tries in all).
+- **How they run.** One child per case (the suite's `Box` environment: its own HOME and cache folder), with
+  `TIMEOUT_S` 1.0 and `RETRY_WAITS_S` (0.25, 0.75) set in the child before `refresh` (the refused-then-answered case:
+  (2.0, 3.0)). The project is 80 one-section chunks (two notes of 40, each holding `w2126retryNNN`), three batch
+  requests at `BATCH` 32. The stand-in (`Flaky`, in the test file) numbers chunk batches by their texts and fails a
+  chosen batch's first tries: HTTP 500, 503 or 400 at once; a reset (the request read, the socket closed with RST);
+  held (no answer for 10 s); or refused (after batch 0's answer the serving loop is stopped and the listening socket
+  closed before the answer is sent, so the next connection is refused; opened again on the same port after 1 s, or
+  never).
+- **Readings of KPI 7, stated (not guessed past):** "covers" means the request is tried again after the next wait,
+  as a time-out is; "failing closed" means W2-123's R3 end: no later batch, `FACET_UNAVAILABLE`, a search without
+  refresh `stale` with no hit. The reason after the last failed try must begin with `NO_EMBEDDING`; its wording is
+  not fixed (R3's exact text says "timed out", which a 5xx is not). `retries` states every chunk batch request tried
+  more than once (R3 listed the timed-out ones; the KPI's "tries and waits stated in the rebuild's result" now covers
+  every retried request): `tries` and `embedded` are asserted, `waits_s` within 0.1 s where the waits are lowered,
+  and an entry may carry more keys. A 4xx, a body that is not JSON and one without a vector stay R1's "ends at once"
+  (not transient); the 400 case guards it here, W2-123's `not-json` and `no-vector` cases there.
+- **A refused try cannot be seen by the stand-in** (nothing listens). The refused cases read it from the time taken
+  (the waits were waited) and from `retries`. The refused-then-answered case relies on the client sending batch 1
+  less than 1 s after batch 0's answer, and the listener being back 1 s before the 2 s wait ends.
+
+**Red on the base** (`w2/integrate` at `b120aad0f048`, this tree's `src/` equal to it): 9 failed, 1 passed (the 400
+guard), in 14 s. Each 5xx and reset case: the batch sent once (`['500'] == ['500', 'answered']`, `['reset'] ==
+['reset', 'reset', 'reset']`); `mixed`: the time-out retried, the 500 then ended the stage (`['held', '500']`); the
+refused-then-answered case: batch 1 never reached the stand-in (`retries` `[]`); the refused-at-every-try case: the
+stage ended 0.01 s after the refusal, no wait. **Shown green** against a throwaway copy of that `src/` outside the
+tree whose `_ask` reads an HTTP 5xx, a `ConnectionError` and a refused `URLError` as a time-out (a probe, not W2-126's
+code): 10 passed, four runs, about 22 s each.
+
