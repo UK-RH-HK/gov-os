@@ -1,0 +1,41 @@
+# The opt-in suite `lifted`, part B's breadth (DEC-1061, tier 2; D4-LIST-B §2-§3): cases kept built and run
+# report-only with the opt-in (--optin=lifted or GOV_TESTS_OPTIN=lifted), left out of the full run. Two kinds:
+#   <file>::<function>   a function past tier 2's cap of 6 per KPI line (each line's own case was kept first)
+#   rep: <file or function>   only the first row of each parametrised function runs in the full run; a KPI line's
+#                             own case keeps every row (each class a KPI line names stays)
+# Each suite's README holds its KPI map after the cut (every kept line names the case that covers it).
+# Written by the cut's designer (part B); regenerate rather than edit by hand. Never delete these cases (DEC-953).
+
+# acceptance/W1-06
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_an_install_of_this_ticket_is_not_dated_before_its_approval  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_install_command_is_the_approved_one  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_uninstall_command_uses_the_same_npm  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_superpowers_install_command_fetches_the_approved_source  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_a_stack_pin_cites_dec_074  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_pyyaml_cites_dec_191  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool  # cap
+tests/acceptance/W1-06/test_w1_06_pins.py::test_superpowers_is_recorded_at_v6_4_2  # cap
+tests/acceptance/W1-06/test_w1_06_pins.py::test_superpowers_is_recorded_with_a_sha256_digest  # cap
+tests/acceptance/W1-06/test_w1_06_pins.py::test_pyyaml_is_recorded_at_6_0_1  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_is_committed  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_is_valid_against_the_committed_schema  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_records_at_least_one_tool  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_entry_states_all_seven_facts  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_each_tool_is_recorded_once  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_sha256_is_a_sha256_digest  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_date_is_a_calendar_date  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_vendor_folder_is_committed  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_a_skill_folder_is_there_with_its_skill_md  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_a_skill_md_declares_the_skill_of_its_folder  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_upstream_licence_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_other_skill_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_plugin_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_hook_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_nothing_but_the_three_skills_and_the_licence_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_excluded_parts_are_nowhere_in_the_repository  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_scratch_clone_is_deleted  # cap
+tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_digest_rule_gives_the_value_worked_out_by_hand  # cap
+tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_superpowers_sha256_is_the_digest_of_the_committed_vendor_folder  # cap
+rep: tests/acceptance/W1-06/test_w1_06_digests.py  # one row per parametrised function
+rep: tests/acceptance/W1-06/test_w1_06_install_approvals.py  # one row per parametrised function

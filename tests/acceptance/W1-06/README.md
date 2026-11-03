@@ -327,3 +327,18 @@ DP-1 to DP-5 are **answered** (owner, 2026-10-03). They are kept as asked, for t
 - **Recommendation.** (a). I would then add: the decision cited by the ccusage entry names `ccusage` and the pinned
   version; every other entry's approving decision names the tool.
 - **Confidence.** High that (b) is too weak for failure 1; medium between (a) and (c).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: ccusage installed and pinned through a DEC-083 decision package and recorded in the registry | `test_w1_06_ccusage.py::test_ccusage_is_recorded_in_the_registry`, `test_w1_06_ccusage.py::test_ccusage_is_pinned_to_one_exact_version`, `test_w1_06_ccusage.py::test_the_recorded_install_command_installs_the_pinned_version` | README |
+| S2: The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with... | `test_w1_06_pins.py::test_a_dec_074_pin_is_recorded_at_its_pinned_version`, `test_w1_06_pins.py::test_a_dec_074_pin_is_recorded_with_the_sha256_of_the_stack_table`, `test_w1_06_pins.py::test_pyyaml_is_recorded_at_6_0_1` | README |
+| F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register`, `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner` | README |
+| F2: A registry entry lacks an uninstall command | `test_w1_06_registry.py::test_every_entry_has_an_uninstall_command`, `test_w1_06_registry.py::test_no_uninstall_command_is_the_install_command`, `test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command` | README |
+
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 30 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
