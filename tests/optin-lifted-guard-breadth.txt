@@ -1,0 +1,23 @@
+# Breadth, part A (DEC-1061 (1), tier 2; D4-LIST-A §1): the parameter rows beyond each function's representatives,
+# the functions beyond tier 2's cap of 6 per KPI line (each line's named cases kept first, F2), and the unit families
+# folded to one case per function. Read by tests/conftest.py with the other tests/optin-lifted*.txt: left out unless a
+# run opts in (--optin=lifted or GOV_TESTS_OPTIN=lifted). Nothing is deleted: every row stays built and runs in the
+# opt-in. `rep: file::name` keeps a parametrised function's first collected row and leaves out the rest. Each row
+# kept was chosen to keep every class its KPI line names (one per secret-file class in W1-01, per install class in
+# W1-04, per tool kind and per uv form in W1-47; elsewhere rows spread over the parameter table).
+# Tags: fold (a row beyond the representatives), cap (a function beyond tier 2's cap), unitfold (a unit family's
+# function folded to one case).
+
+# W1-01
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-dotenv]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-dotenv-suffix]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-dotenv-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-pem-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-key]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Edit-key-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-dotenv-suffix]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-dotenv-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-pem]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-pem-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-key-nested]  # fold: a row beyond the representatives
+tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_write_to_secret_file_is_denied[Write-config-secrets]  # fold: a row beyond the representatives

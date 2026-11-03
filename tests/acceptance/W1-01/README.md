@@ -12,6 +12,21 @@ python3 -m pytest tests/acceptance/W1-01 -q
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. The tests read
 `.claude/settings.json`, `governance/project/bootstrap.md`, `.tickets/` and git history; they write nothing.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 50 in the full run, 0 lifted, 12 breadth (opt-in), 28 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 | `test_write_to_secret_file_is_denied` (4) (one row per class: `.env*`, `*.pem`, `*.key`, `config/secrets*`, on Edit and Write), `test_a_denied_attempt_is_recorded_for_each_path_class` (5); the acceptance-test half as the guard enforces it: `test_engineer_cannot_write_under_acceptance_tests` (3) (W1-02), `test_only_the_test_designer_may_write_the_acceptance_tests` (5) (W1-33), and the live hook's rule 1 (`test_rule_1_only_the_test_designer_writes_the_acceptance_tests` (6), tests/unit/hooks) |
+| S2 | `test_w1_01_bootstrap_record.py` (9), `test_implementer_commits_stay_inside_allowed_paths` (1) |
+| S3 | `test_interim_install_rule_is_recorded` (1), `test_install_rule_lists_every_agent_session_settings_file` (1), `test_a_denied_install_attempt_is_recorded` (1); in force: `test_an_install_by_any_other_role_is_denied` (5) and `test_sudo_is_denied_to_every_role` (5) (W1-04) |
+| F1 | `test_only_the_test_designer_commits_to_acceptance_tests` (1) (reads the path map's `acceptance_exemptions`, frozen by Q-10), `test_w1_01_integration_merges.py` (26) |
+| F2 | retired (DEC-925 item 1) |
+| F3 | spent: the interim rule's cases are deleted (row D1, DEC-1040 (1)); installs stay refused by W1-04's cases |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `b4d7ede`: 49 failed, 10 errors, 0 passed (59 cases, 16 test functions).
