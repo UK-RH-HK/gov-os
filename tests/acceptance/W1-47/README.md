@@ -45,6 +45,22 @@ No file here carries a held-out path, and no test opens, lists or stats anything
 - **The owner's commit of the file is the confirmation of the value** (DEC-218). No test can tell whether a
   configured path is the oracle's.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 108 in the full run, 87 lifted, 785 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 (the `dangerouslyDisableSandbox` escape hatch, CAP-62) | **lifted only** (tag `cap-62`, DEC-1061 (7)) |
+| S2 (containment after a failed command) | **lifted only** (G-5) |
+| S3, F3, F4, F7 | `test_w1_47_oracle_rule.py` (7) |
+| S4, F2 (any tool naming the oracle path denied) | `test_a_call_that_names_the_oracle_path_is_denied` (6) (one row per tool kind: Read, Grep, Glob, Bash, a write tool, an MCP tool), `test_w1_47_oracle_guard.py` (26), `test_w1_47_oracle_naming.py` (19), `test_w1_47_oracle_config.py` (10), `test_the_template_s_guard_hides_a_held_out_path` (1) |
+| S5, F5 | `test_w1_47_settings_rules.py` (10) |
+| S6, F6 (the uv forms) | `test_w1_47_uv_installs.py` (23) (per function one row each of `uv add`, `uv sync`, `uv run --with`, `uvx` where it has them) |
+| S7 (no wide scope without a session role) | **lifted only** (G-4) |
+
 ## KPI lines, tests and red reasons
 
 "Red reason" is what the test says before implementation. "Green already" means the case passes today; the reason is

@@ -388,6 +388,41 @@ def test_a_merge_that_resolves_a_conflict_in_the_file_stays_red(repo, resolution
     assert any(line.startswith(merge[:12]) for line in _offenders(repo))
 
 
+# --------------------------------------------------------------------------
+# DEC-1031 item 3: a merge listed by its full id is exempt for its own changes
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("listing", ["full-id", "abbreviated", "unlisted"])
+def test_a_listed_merge_is_exempt_for_its_own_conflict_resolution_only_by_its_full_id(repo, listing):
+    """A test designer's resolution of a conflict in the file, committed by the lead under ``Role: orchestrator``
+    (``0568d91baf56``'s form): listed by its full id, its own change is no offence; listed by abbreviated ids, or
+    not listed, it stays red."""
+    _designers_edit_one_file(repo, ticket_line=0, integrate_line=0)
+    merge = _merge_resolving(repo, "ticket", {SHARED_TEST_FILE: _shared({0: "integrate and ticket"})})
+    _premise_equal_to_neither_parent(repo, merge)
+    _path_map(repo, {"full-id": _listing(merge), "abbreviated": _listing(merge[:7], merge[:12], merge[:39]),
+                     "unlisted": _listing()}[listing])
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    if listing == "full-id":
+        assert offences == [], f"the merge {merge[:12]}, listed by its full id, is refused for its own change: {offences}"
+        assert _offenders(repo) == [], "a merge listed by its full id is taken for an offender"
+    else:
+        assert any(SHARED_TEST_FILE in line for line in offences), (listing, offences)
+        assert any(line.startswith(merge[:12]) for line in _offenders(repo))
+
+
+def test_a_listed_merge_still_answers_for_an_unlisted_commit_it_brings(repo):
+    """The listing exempts the merge's own change, not the commits it brings without the role."""
+    bad = _designers_edit_one_file(repo, unlisted=True)
+    merge = _merge(repo, "ticket", own_change={SHARED_TEST_FILE: _shared({0: "integrate", 4: "by hand", 8: "ticket"})})
+    _path_map(repo, _listing(merge))
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    assert len(offences) == 1 and bad[:12] in offences[0] and SHARED_TEST_FILE not in offences[0], (
+        f"the listed merge {merge[:12]} brings the unlisted {bad[:12]}; that commit alone must be its offence: "
+        f"{offences}"
+    )
+
+
 def test_a_clean_merge_that_brings_an_unlisted_commit_without_the_role_stays_red(repo):
     """The merged test is git's own merge, so the file passes; the commit without the role still does not."""
     bad = _designers_edit_one_file(repo, unlisted=True)

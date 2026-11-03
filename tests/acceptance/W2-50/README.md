@@ -89,6 +89,19 @@ write a 16 MiB store and take about 15 to 50 s each; see `README-W2-67.md`.
   normalised or resolved) or says why (`gov-os-runs`, `gov-os-workbench`, `gov-os-worktrees`, `ticket`, `outside`,
   `role`). The guard's wording is not prescribed.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 24 in the full run, 570 lifted, 19 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, S2 (the launcher's half), S3 | `test_w2_50_launcher.py` (10), the launcher functions of `test_w2_50_review_findings.py` (4), `test_the_first_launch_makes_the_root_with_the_own_folder_and_nothing_else` (1), `test_a_launch_into_an_existing_root_makes_only_the_own_folder_and_leaves_the_rest_alone` (1) |
+| S1, S2 (the guard's half), F1 to F6 | **lifted only** (G-4: the durable root's scope is write scope); rule 1's two cases stay: `test_a_copy_into_a_repository_folder_that_lands_on_a_link_to_the_acceptance_test_is_refused` (1), `test_the_acceptance_test_named_directly_is_refused` (1) |
+| S4 | `test_w2_50_never_indexed.py` (5) |
+| S5, S6, F7 (the secrets scan on large stores) | **lifted only** (DEC-1045: gitleaks off here; listed in part B's `tests/optin-lifted.txt`) |
+
 ## KPI lines, tests and red reasons
 
 Files: `own` = `test_w2_50_guard_own_folder.py`, `ref` = `test_w2_50_guard_refusals.py`, `launch` =

@@ -65,6 +65,20 @@ The three guard lines, in both template files (6 lines; ids `settings-<Event>` a
 The four lifecycle lines (sessionStart, stop, preCompact, subagentStop) keep DEC-608's plain form by DEC-917, which
 W1-38 holds them to; they are not tested here (the lead's scope note, P3).
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 26 in the full run, 58 lifted, 4 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 | `test_w2_106_form.py` (5) (the PreToolUse line in the settings and in the rulesync source) |
+| S2, F2 | `test_w2_106_fail_closed.py` (8) |
+| S3, F3 | `test_w2_106_generated_project.py` (3) |
+| S4, F4 | `test_the_settings_and_the_rulesync_source_hold_the_same_guard_line` (1), `test_the_generated_settings_hold_the_template_s_guard_line` (1) |
+| the post-tool (containment) lines' rows | **lifted only** (G-5 takes them out of the template's defaults) |
+
 ## KPI lines, cases and red reasons
 
 ### KPI success 1 and its failure line: the pinned form (`test_w2_106_form.py`, `test_w2_106_interpreter.py`)

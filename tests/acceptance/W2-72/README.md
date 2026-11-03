@@ -72,6 +72,16 @@ Every history is checked by `assert_shape` from git's own answers before anythin
 - which paths `git merge-tree --write-tree --name-only` reports as conflicted;
 - whether the merge commit holds exactly the entry (mode and blob) of git's own merge for the path.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 0 in the full run, 73 lifted, 0 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 to S5, F1 to F3 | **lifted only** (G-5) |
+
 ## KPI lines and their tests
 
 The first batch: 53 tests, of which 14 were red before the implementation and 39 passed. Review 1's batch adds

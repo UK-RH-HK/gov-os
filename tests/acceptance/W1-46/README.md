@@ -47,6 +47,31 @@ leaves out the `Read` rules with an absolute path. Every project gets a `held-ou
 stand-in directory it made (DEC-218), as in W1-47. One static test reads the committed list at run time through
 W1-47's `load_configured`, to check that no file of the ticket repeats a value; a value is never shown.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 129 in the full run, 123 lifted, 241 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1, F2, F8 (the sandbox strict; no excludedCommands) | `test_w1_46_sandbox_settings.py` (11), `test_w1_46_launch_refusals.py` (8) |
+| S2 | `test_w1_46_role_settings.py` (8), `test_the_role_and_the_ticket_reach_the_session_and_its_hooks` (1) |
+| S3 | `test_engineer_test_designer_and_auditor_get_an_empty_allowlist` (1), `test_w1_46_research_allowlist.py` (11), `test_the_research_allowlist_refuses_a_domain_that_is_not_on_it` (1) |
+| S4 | `test_w1_46_research_fence.py` (7) (the launcher's deny list), `test_a_research_bash_write_to_a_sibling_directory_fails` (1); the guard's own research refusals are **lifted only** (G-4) |
+| S5 | `test_the_research_role_has_a_role_file` (1), `test_the_role_file_states_the_six_parts_the_kpi_names` (1), `test_the_roster_has_an_entry_for_the_research_role` (1) |
+| S6, F6 | `test_w1_46_research_installs.py` (16); the full guard's allowance of a research install inside its folder is **lifted only** (G-4: the five-rule hook refuses every install but the CTO's) |
+| S7 | `test_the_launcher_sets_a_temp_directory_of_the_sessions_own` (1), `test_each_session_uses_a_temp_directory_of_its_own` (1) |
+| S8 | `test_an_opaque_bash_write_outside_the_repository_fails` (1), `test_a_file_tool_write_outside_the_repository_is_refused` (1) |
+| S9 | `test_w1_46_held_out.py` (9), `test_the_held_out_directory_looks_empty_from_the_sessions_bash` (1) |
+| S10 | `test_the_built_settings_deny_edits_under_gov_runtime` (1), `test_each_name_under_gov_runtime_at_launch_has_a_literal_edit_deny_rule` (1), `test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable` (1); the guard's `.gov-runtime` refusals are **lifted only** (G-4) |
+| S11 | `test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails` (1) (the launcher's sandbox), `test_w1_46_protected_trees.py` (6); the guard's file-tool refusal of the tickets and `.claude` is **lifted only** (G-4; the acceptance tests stay refused by rule 1) |
+| F3, F4, F7 | `test_w1_46_research_installs.py` (16), `test_a_research_install_outside_the_repository_fails_at_the_write_fence` (1) |
+| F5 | `test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported` (1) (the guard half **lifted only**) |
+| F9 | `test_no_file_of_this_ticket_names_a_held_out_path` (1) |
+| The DEC-311/DEC-334 guard forms | **lifted only** (G-4: `ln`, hard links, `mv -t`, `install`, options after the destination), but for the three into `tests/acceptance` (rule 1): `test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets` (2) (its acceptance-test rows; the ticket rows lifted), `test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_there` (1), `test_the_guard_refuses_cp_with_the_acceptance_tests_as_the_target_directory_option` (1) |
+| D-4's red fix R-2 | the planted project copies `.claude/hooks` (`PROJECT_PATHSPECS`); ten guard cases that passed only while the missing hook refused every call are **lifted only** (G-4) |
+
 ## KPI lines, tests and red reasons
 
 Red reason **L**: `gov launch` is not a command yet (`gov launch --help` ends with exit code 2); the `launcher`

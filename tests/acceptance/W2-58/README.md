@@ -45,6 +45,25 @@ Every project is a git repository built from scratch (`w2_58_support.make_projec
 Read-only cases of one module share one project (module-scoped fixtures `open_world`, `branch_world`, `eval_world`);
 cases that break a file build their own.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 102 in the full run, 153 lifted, 553 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 (the engineer refused its ticket's acceptance tests) | `test_the_engineer_is_refused_its_tickets_acceptance_tests` (2), `test_the_engineer_still_runs_its_tests_and_reads_the_rest` (2), `test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (1), `test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests` (1), `test_an_engineer_whose_ticket_is_given_by_its_wbs_id_is_refused_ts_tests` (1) |
+| S2 | `test_w2_58_launched_sessions.py` (6) |
+| S3 (the test designer refused the branch's changes) | `test_w2_58_test_designer.py` (12), `test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (1) |
+| S4 (the hidden half) | `test_w2_58_evaluation_sets.py` (10), `test_a_session_measured_by_a_ticket_given_by_its_wbs_id_is_refused_the_hidden_part` (1) |
+| S5 (reads open) | `test_w2_58_reads_open.py` (6) |
+| S6 | `test_w2_58_auditor.py` (4) |
+| S7 | `test_w2_58_tilde_and_test_runs.py` (17) |
+| S8 | `test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage` (2) |
+| F1 | `test_w2_58_still_refused.py` (21), `test_a_credential_file_is_refused` (3), `test_every_role_is_refused_each_credential_file_by_the_read_tool` (1), `test_w2_58_fails_closed.py` (6); the run-time listing forms, the protected files' write side and the hook-listing helper are **lifted only** (a command form, G-1/G-2/B2-3; the write side is `protected.py`, G-4) |
+| (c), the counterpart reads (DEC-1061 (6)) | 27 cases kept while G-14 holds, named first so tier 2's cap takes none: `test_w2_58_engineer.py` (8), `test_w2_58_test_designer.py` (12), and the review's `test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (1), `test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (1), `test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests` (1), `test_an_untyped_or_explore_subagent_of_the_ticket_lead_reads_ts_tests` (1), `test_the_engineer_on_another_ticket_reads_ts_tests` (1), `test_gov_launch_accepts_a_ticket_named_by_its_wbs_id_and_its_session_is_refused_ts_tests` (1); rewritten if D-9 adopts `role_paths` as the product's (the live hook's G-14 cases are in tests/unit/hooks/test_live_hook.py) |
+
 ## KPI lines, their tests, and the red reason
 
 Red reason today, in one line: the guard still refuses what Policy 2 opened (DEC-508, DEC-525, DEC-557: any read,

@@ -255,6 +255,22 @@ invocation"), raises findings for the reverts of the ticket's acceptance-test co
 package DP-12. DEC-390 decides it, "as built until the owner says otherwise": the commits are judged like any other
 commit, and where they are findings, the findings are records.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 30 in the full run, 614 lifted, 45 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 | `test_w1_50_freeze_marker.py` (7), `test_w1_50_freeze_guard_reading.py` (10) |
+| S2 | `test_w1_50_freeze_launcher.py` (8) |
+| S12 | `test_w1_50_freeze_fixture_settings.py` (5) |
+| S4, S5, S6, S9 | **lifted only** (G-6: the lift refusal, the terminal code, the ancestry and the mirror) |
+| S7 | **lifted only** for the owner's terminal; the orchestrator's half stays by W1-28's `test_the_orchestrator_can_pause` (1) |
+| S11 (the ticket lead's write scope) | **lifted only** (G-4) |
+| S3, S8, S10, S13 to S17, F1 to F3 | **lifted only** (G-5: commit attribution and the flag's restore are containment's) |
+
 ## KPI and decision → tests → red reason
 
 This section and the next describe the first three batches, written before implementation: 113 test cases in 53

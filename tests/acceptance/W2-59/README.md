@@ -55,6 +55,20 @@ location leads to (three folders above the installed `gov/retrieval/` module: th
 checkout, `<venv>/lib/python3.X` for the install), decoys are planted: canary declarations with a query of their
 own in both kernel layouts, and a path map and gitleaks configurations that cannot be read.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 39 in the full run, 4 lifted, 3 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 (the pinned judge's declared checks) | `test_w2_59_judge_checks.py` (6) |
+| S2 (the hook lines) | `test_w2_59_hook_lines.py` (15), `test_w2_59_hook_lines_worker_env.py` (8), every line but the Stop hook's; the Stop line's rows are **lifted only** (R-7). The planted projects hold `.claude/hooks` (D-4's red fix R-2) and the refused write is rule 1's |
+| S3 | `test_w2_59_project_root.py` (3) |
+| S4, F1 (the wheel ships the baseline) | `test_w2_59_baseline.py` (4) |
+| S5 | `test_w2_59_version.py` (3) |
+
 ## KPI lines, cases and red reasons
 
 ### KPI success 1 and its failure line: the judge's checks (`test_w2_59_judge_checks.py`, 7 cases)

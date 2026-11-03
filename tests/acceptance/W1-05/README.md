@@ -19,6 +19,19 @@ written, and no hook is run against it.
 After the switch-over, nine cases time the hook. The case that ran the acceptance suites of W1-02, W1-03 and W1-04 in
 a child process is retired (see [Retired](#retired)).
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 30 in the full run, 17 lifted, 51 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 (the live hooks) | `test_a_hook_runs_before_every_tool` (2), `test_a_hook_runs_after_every_bash_call` (2), `test_hooks_are_not_switched_off` (1), `test_the_hooks_stay_wired_in_every_later_commit` (1), `test_an_install_by_any_other_role_is_denied` (5), `test_sudo_is_denied_to_every_role` (5), `test_ordinary_reads_stay_open` (1), `test_a_call_waits_under_100_ms_p95_for_the_hook` (1); its containment cases are **lifted only** (G-5), its role-less and ticket-path cases **lifted only** (G-4) |
+| S2 | `test_the_operator_diff_check_is_recorded_as_retired` (1) |
+| S3 to S7 (the role subagents) | `test_w1_05_role_subagents.py` (11) |
+| F2 | spent (a one-time order at W1-05's close; its case was retired by W2-70) |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `2b4b91f`, with the tests of this revision: 22 failed, 77 errors, 0 passed (99 cases, 27

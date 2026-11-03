@@ -41,6 +41,23 @@ python3 -m pytest tests/acceptance/W1-28 -q -p no:cacheprovider
 - **The record commit** (DEC-367) is made by the command as its own process, after the same call set the freeze
   (DEC-368). The guard judges tool calls, not the command's process; the cases assert the flag and the commit together.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 102 in the full run, 0 lifted, 52 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 | `test_w1_28_freeze.py` (10) |
+| F2 | `test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` (1) |
+| S2 | `test_w1_28_cancel.py` (9), `test_w1_28_rollback.py` (20), `test_w1_28_command.py` (3) |
+| S3 | `test_w1_28_roles.py` (15) (`test_the_orchestrator_can_pause` (1) among them, W1-50 S7's orchestrator half), `test_w1_28_repeat.py` (4) |
+| S4 | `test_w1_28_fixture_copies.py` (9) |
+| S5 | `test_w1_28_launch_temp_folder.py` (9) |
+| S6 | `test_w1_28_launch_product_spec.py` (23) |
+| Tier 2 | every function is a named case of a line, so the cap removes none; parameters are folded to representative rows |
+
 ## KPI lines and covers ids
 
 Red reason, for every row but the second: the `built` fixture stops the case with
@@ -275,9 +292,9 @@ its text is never a route.
   all its arguments; the message of an `assert` statement; the value of a `reason=` or `msg=` keyword of any call.
   These nodes are left out of the whole function's reading (copies, listings and routes alike).
 - **A route is still found only at a call that holds the bare root among its arguments** (as before), and only in:
-  - its **argument list**: an argv word (`clone`, `archive`, `worktree`, `checkout-index`, `bundle`) as one of the
+  - its **argument list**: an argv word (`clone`, `archive`, `checkout-index`, `bundle`, or `worktree` with `add`) as one of the
     strings it is given, directly or as an item of a list, a tuple, a `+` or a `*` given there; or a shell route
-    (`cp -r`, `rsync`, `git archive|clone|worktree`, `tar -c`) in such a list or tuple read as one text, its items
+    (`cp -r`, `rsync`, `git archive|clone|worktree add`, `tar -c`) in such a list or tuple read as one text, its items
     joined by spaces;
   - a **`subprocess`, `os.system` or copy call** (callee `run`, `call`, `check_call`, `check_output`, `Popen`,
     `getoutput`, `getstatusoutput`, `system`, `popen`, `create_subprocess_exec`, `create_subprocess_shell`, or a
@@ -305,6 +322,7 @@ argv list, still counts.
 |---|---|
 | Success 1: message text is not read; routes only in argument lists and `subprocess`, `os.system` and copy calls | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` (W2-108's old skip; a `pytest.fail` and two `assert` messages naming the root with `git clone`, `cp -r`, `rsync`, `git worktree`) |
 | Success 2: every true whole-tree copy still found, nothing lowered | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` (`cp -r`, `copytree`, `git worktree add`, `git clone` of the root, and a skip message followed by a clone) · `test_cp_r_and_tar_c_given_as_separate_argv_items_are_reported` · the cases before it in this file and W1-50's, unchanged |
+| Success 2 (D-4's cut, DEC-1061): `git worktree` is a route only as `worktree add` (it makes a checkout); `worktree list` (W2-61h's `worktrees()`, 15592622) copies nothing | `test_git_worktree_is_a_copy_only_as_worktree_add` (W2-61h's helper and a shell `worktree list` not reported; `worktree add` as argv and as a shell string reported) |
 | Success 3: this section, with `Rewrite-Reason: DEC-982` | this README |
 | Failure 1: a real whole-tree copy no longer reported | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` · `test_a_whole_tree_copy_without_a_root_parameter_is_caught_by_reading` · `test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` |
 | Failure 2: a message that names the root reported as a copy | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` |

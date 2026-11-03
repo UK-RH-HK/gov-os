@@ -55,7 +55,7 @@ def _worker(src):
 @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
 def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
         event, index, entry, inherits, pin_markers, tmp_path):
-    """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+    """An engineer's write into the acceptance tests, which the pin's guard refuses, is refused (exit 2 or a deny
     decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
     box = support.make_box(tmp_path / "box", pin_markers)
     project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
