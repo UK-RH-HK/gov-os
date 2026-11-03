@@ -1258,3 +1258,72 @@ rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r10_a_chain_of_nested_f
 rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes  # one row
 rep: tests/acceptance/W2-96/test_w2_96_at_run_errors.py::test_a_crash_is_an_error_of_kind_crash_with_no_message  # one row
 rep: tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py  # one row per parametrised function
+
+# unit/accept
+rep: tests/unit/accept/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/adapters
+rep: tests/unit/adapters/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/adopt
+rep: tests/unit/adopt/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/bridge
+rep: tests/unit/bridge/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/check
+rep: tests/unit/check/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/ci
+rep: tests/unit/ci/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/cli
+rep: tests/unit/cli/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/close
+rep: tests/unit/close/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/closure
+rep: tests/unit/closure/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/context
+rep: tests/unit/context/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/decisions
+rep: tests/unit/decisions/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/doctor
+rep: tests/unit/doctor/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/gitenv
+rep: tests/unit/gitenv/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/hooks
+rep: tests/unit/hooks/test_w29_hooks.py  # one row per parametrised function
+
+# unit/lock
+rep: tests/unit/lock/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/orchestration
+rep: tests/unit/orchestration/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/rebuild
+rep: tests/unit/rebuild/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/release
+rep: tests/unit/release/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/retrieval
+rep: tests/unit/retrieval/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/secrets_check
+rep: tests/unit/secrets_check/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/status
+rep: tests/unit/status/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/store
+rep: tests/unit/store/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/telemetry
+rep: tests/unit/telemetry/  # one row per parametrised function (no KPI line, DEC-136)
