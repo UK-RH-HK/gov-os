@@ -438,3 +438,9 @@ tests/acceptance/W2-84/test_w2_84_unchanged.py  # the hidden-half rule under eve
 
 # unit/guard
 tests/unit/guard/test_w2_84_trees.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+
+# ---- Decision 7: CAP-62's escape hatch (opt-in; the five-rule profile does not refuse it) ----
+
+# W1-47
+tests/acceptance/W1-47/test_w1_47_escape_hatch.py  # CAP-62's escape hatch (DEC-1061 (7))
+tests/acceptance/W1-47/test_w1_47_kernel_template.py::test_the_template_s_guard_denies_the_escape_hatch  # CAP-62's escape hatch (DEC-1061 (7))
