@@ -1,0 +1,5 @@
+Run exactly these three shell commands with the Bash tool, one at a time, and print each one's output line. Do nothing else: no other commands, no files, no explanations. After the third, reply with the three output lines only.
+
+1. cd /home/usain/gov-os-worktrees/W2-00-store && gov retrieve "How does a session resume after compaction?" --json | python3 -c "import sys,json; d=json.load(sys.stdin); r=d.get('result',d); print(json.dumps({'q':'q15','rerank':r.get('rerank'),'reranked':(r.get('merge') or {}).get('reranked')}))"
+2. cd /home/usain/gov-os-worktrees/W2-00-store && gov retrieve "Who calls indexable?" --json | python3 -c "import sys,json; d=json.load(sys.stdin); r=d.get('result',d); print(json.dumps({'q':'q16','rerank':r.get('rerank'),'reranked':(r.get('merge') or {}).get('reranked')}))"
+3. cd /home/usain/gov-os-worktrees/W2-00-store && gov retrieve "Which tickets depend on W2-03?" --json | python3 -c "import sys,json; d=json.load(sys.stdin); r=d.get('result',d); print(json.dumps({'q':'q18','rerank':r.get('rerank'),'reranked':(r.get('merge') or {}).get('reranked')}))"

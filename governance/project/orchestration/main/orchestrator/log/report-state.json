@@ -19,7 +19,7 @@
  ],
  "closes_next": "none: the refactoring (DEC-1052); D-1 merges as built, formal closes at the lift (P1-13)",
  "examin": "AT RISK: the refactoring holds ticket work; plan estimate 11-14 (range 11-12 to 11-19), re-estimated after D-4's test count; K9 gates the start (DEC-954 Q1)",
- "owner_action": "none; coming: ACT-GUARD-FIX-4 (E3) after its review",
+ "owner_action": "ACT ACT-GUARD-FIX-4 - the guard's rules 1 and 5 by path, rm free but the catastrophic, reviews/ records (packages/ACT-GUARD-FIX-4.md); HOLD on CTO commits",
  "last_report": "2026-10-30 21:36:47",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",

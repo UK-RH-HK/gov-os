@@ -1,0 +1,1 @@
+2026-11-03 12:49 ACT-GUARD-FIX-4 handed to the owner's operator (packages/ACT-GUARD-FIX-4.md, c4a7d7cd): no CTO main-tree commit until the owner says done (DEC-1028 item 6).

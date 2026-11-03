@@ -180,10 +180,30 @@ def test_planted(name, role, tool, tin, want):
     assert got == want or (want == "deny" and got.startswith("deny")), f"{name}: want {want}, got {got} ({why})"
 
 
+# The four guard4 cases the new tools/guard4_check.py (copied in by the ACT) renames, with "allow" already expected:
+# with the old copy in tools/ they are let through here by their old names; with the new one, by its own expectation.
+GUARD4_RENAMED = {
+    'guard4: rule5 auditor unreadable bash': 'guard4: rule5 auditor unreadable bash (G-2: let through)',
+    'guard4: fix2 engineer perl -i on acceptance':
+        'guard4: fix2 engineer perl -i on acceptance (G-1: perl is not read; the landing check)',
+    'guard4: fix2 unbalanced quotes naming acceptance':
+        'guard4: fix2 unbalanced quotes naming acceptance (G-1: unreadable, let through)',
+    'guard4: fix2 engineer inline python writes acceptance after a cd':
+        'guard4: fix2 engineer inline python writes /tmp/tests/acceptance after a cd (G-1: outside every tree)',
+}
+
+
 def test_let_through_names_are_planted_cases():
-    names = {c[0] for c in FIX3.ALL}
-    assert set(LET_THROUGH) <= names, sorted(set(LET_THROUGH) - names)
-    assert all(c[4] == "deny" for c in FIX3.ALL if c[0] in LET_THROUGH)
+    """Every let-through name is a planted case still expecting deny (so this file flips it), except the four guard4
+    cases the new guard4_check.py renames: each is either there by its old name expecting deny (the old copy in tools/),
+    or absent with its new name there expecting allow (the new copy, after the ACT's copy step)."""
+    cases = {c[0]: c[4] for c in FIX3.ALL}
+    for old, new in GUARD4_RENAMED.items():
+        assert (cases.get(old) == "deny" and new not in cases) or (old not in cases and cases.get(new) == "allow"), \
+            (old, cases.get(old), new, cases.get(new))
+    rest = set(LET_THROUGH) - set(GUARD4_RENAMED)
+    assert rest <= set(cases), sorted(rest - set(cases))
+    assert all(cases[n] == "deny" for n in rest)
 
 
 T = "tests/acceptance/W2-64/t.py"

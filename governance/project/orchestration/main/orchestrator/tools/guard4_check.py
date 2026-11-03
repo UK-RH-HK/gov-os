@@ -1,6 +1,9 @@
 """DEC-953 item 2: the four-rule hook's two-minute check. Runs .claude/hooks/pretooluse.py under the pinned judge's
 interpreter with event JSON, as the registered hook line does, and checks each kept rule refuses and each lifted form
-passes. Prints one line per case and a last line PASS or FAIL. Usage: python3 guard4_check.py [hook path]"""
+passes. Prints one line per case and a last line PASS or FAIL. Usage: python3 guard4_check.py [hook path]
+ACT-GUARD-FIX-4 (DEC-1050 (8), (12)): four cases re-baselined to allow (a write whose target the guard cannot work
+out, or that resolves outside every tree, is let through: G-1, G-2); added: a reviewer's record into the CTO's
+reviews/ (allowed), and rm: the catastrophic refused, an honest one passed."""
 import json
 import os
 import subprocess
@@ -69,7 +72,25 @@ CASES = [
     ("rule5 auditor edits a lead handover", "independent-auditor", "Write",
      {"file_path": ROOT + "/.gov-runtime/scratch/lead/CHECKPOINT.md", "content": "x"}, "deny"),
     ("rule5 auditor bash writes code", "independent-auditor", "Bash", {"command": "echo x > src/gov/x.py"}, "deny"),
-    ("rule5 auditor unreadable bash", "independent-auditor", "Bash", {"command": "mkdir -p $D/t"}, "deny"),
+    ("rule5 auditor unreadable bash (G-2: let through)", "independent-auditor", "Bash",
+     {"command": "mkdir -p $D/t"}, "allow"),
+    ("rule5 auditor writes its record in the CTO's reviews/", "independent-auditor", "Write",
+     {"file_path": ROOT + "/.gov-runtime/scratch/orchestrator/reviews/guard4-check.md", "content": "x"}, "allow"),
+    ("rule5 auditor makes reviews/ and writes its record by bash", "independent-auditor", "Bash",
+     {"command": "mkdir -p .gov-runtime/scratch/orchestrator/reviews && cat > "
+                 ".gov-runtime/scratch/orchestrator/reviews/guard4-check.md <<'EOF'\nx\nEOF"}, "allow"),
+    ("rule5 auditor deletes reviews/", "independent-auditor", "Bash",
+     {"command": "rm -rf .gov-runtime/scratch/orchestrator/reviews"}, "deny"),
+    ("rule5 auditor writes the CTO's briefs", "independent-auditor", "Write",
+     {"file_path": ROOT + "/.gov-runtime/scratch/orchestrator/briefs/x.md", "content": "x"}, "deny"),
+    ("rm catastrophic: the home folder", "orchestrator", "Bash", {"command": "rm -rf ~"}, "deny"),
+    ("rm catastrophic: the repository's root", "engineer", "Bash", {"command": "rm -rf " + ROOT}, "deny"),
+    ("rm catastrophic: the .git", "engineer", "Bash", {"command": "rm -rf .git"}, "deny"),
+    ("rm catastrophic: a tracked file of the main tree", "orchestrator", "Bash", {"command": "rm README.md"}, "deny"),
+    ("rm catastrophic: an empty variable", "engineer", "Bash", {"command": "rm -rf \"$GOV_GUARD4_UNSET\"/"}, "deny"),
+    ("rm catastrophic: outside the project", "engineer", "Bash", {"command": "rm -f ~/.bashrc"}, "deny"),
+    ("rm free: the project's scratch", "engineer", "Bash",
+     {"command": "rm -rf .gov-runtime/scratch/orchestrator/drafts/guard4-check-none"}, "allow"),
     ("rule5 auditor reads code", "independent-auditor", "Read", {"file_path": ROOT + "/src/gov/close/command.py"},
      "allow"),
     ("rule3 read .env", "engineer", "Read", {"file_path": ROOT + "/.env"}, "deny"),
@@ -114,12 +135,12 @@ CASES = [
      {"command": "PYTHONPATH=src python3 -c \"import gov; print(gov.__file__)\"; ls tests/acceptance/W2-05/"}, "allow"),
     ("fix2 lead import check then greps acceptance", "orchestrator@DAEO-57hm", "Bash",
      {"command": "python3 -c 'import gov' && grep -rn x tests/acceptance/W2-95/ | head"}, "allow"),
-    ("fix2 engineer inline python writes acceptance after a cd", "engineer", "Bash",
-     {"command": "cd /tmp && python3 -c 'open(\"tests/acceptance/W2-64/t.py\", \"w\")'"}, "deny"),
-    ("fix2 engineer perl -i on acceptance", "engineer", "Bash",
-     {"command": "perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py"}, "deny"),
-    ("fix2 unbalanced quotes naming acceptance", "engineer", "Bash",
-     {"command": "python3 -c 'open(\"tests/acceptance/x\" ; ls"}, "deny"),
+    ("fix2 engineer inline python writes /tmp/tests/acceptance after a cd (G-1: outside every tree)", "engineer",
+     "Bash", {"command": "cd /tmp && python3 -c 'open(\"tests/acceptance/W2-64/t.py\", \"w\")'"}, "allow"),
+    ("fix2 engineer perl -i on acceptance (G-1: perl is not read; the landing check)", "engineer", "Bash",
+     {"command": "perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py"}, "allow"),
+    ("fix2 unbalanced quotes naming acceptance (G-1: unreadable, let through)", "engineer", "Bash",
+     {"command": "python3 -c 'open(\"tests/acceptance/x\" ; ls"}, "allow"),
     ("dec958 engineer tee into acceptance", "engineer", "Bash",
      {"command": "echo x | tee tests/acceptance/W2-64/t.py"}, "deny"),
     ("dec958 engineer sed -i acceptance", "engineer", "Bash",

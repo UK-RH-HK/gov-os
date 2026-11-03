@@ -1,20 +1,20 @@
 {
- "computed": "2026-11-03 12:10:05",
+ "computed": "2026-11-03 13:10:05",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 10.87,
+   "cpu_p95": 10.54,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 4965512,
-   "rss_kb_max": 8534000,
-   "samples": 3318
+   "rss_kb_p95": 5338532,
+   "rss_kb_max": 10563972,
+   "samples": 3375
   },
   "embedding": {
    "cpu_p95": 7.98,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2756192,
+   "rss_kb_p95": 2721248,
    "rss_kb_max": 8676476,
-   "samples": 3318
+   "samples": 3375
   },
   "rebuild": {
    "cpu_p95": 12.15,
@@ -28,14 +28,14 @@
    "cpu_max": 294.7,
    "rss_kb_p95": 4056876,
    "rss_kb_max": 6778004,
-   "samples": 2641
+   "samples": 2649
   },
   "claude": {
-   "cpu_p95": 3.57,
+   "cpu_p95": 3.39,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2611032,
+   "rss_kb_p95": 2581420,
    "rss_kb_max": 4055288,
-   "samples": 2895
+   "samples": 2952
   },
   "reranker": {
    "cpu_p95": 6.07,
@@ -160,7 +160,7 @@
  "test_run_per_slot": {
   "rss_kb_p95": 717290.6666666666,
   "rss_kb_max": 1464452.0,
-  "samples": 2641
+  "samples": 2649
  },
  "slot_run_kb": 1873832
 }

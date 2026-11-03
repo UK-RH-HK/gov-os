@@ -1,0 +1,13 @@
+== searches
+alone: n=5 p50=1.141 p95=1.261 max=1.284 min=1.132 mean=1.173 outcomes={('service', 'cuda:0', None, True, 0): 5}
+load10: n=10 p50=2.119 p95=2.677 max=2.723 min=1.46 mean=2.124 outcomes={('service', 'cuda:0', None, True, 0): 10}
+load20: n=20 p50=4.13 p95=5.33 max=5.464 min=3.025 mean=4.177 outcomes={('service', 'cuda:0', None, True, 0): 20}
+agents10: n=20 p50=3.383 p95=4.729 max=4.815 min=1.941 mean=3.374 outcomes={('service', 'cuda:0', None, True, 0): 20}
+== samples 472 from 1793713611.851 to 1793713735.566 span_s 123.7
+sample gap p50 0.25 max 2.273
+gpu MiB min 8764 p50 9694.0 max 9816 at 1793713646.554 missing 0
+samples where slot0 != [service] or slot1 != [watcher]: 0
+all holders seen: {'gov-os-rerank-gpu-0.lock': [356621], 'gov-os-rerank-gpu-1.lock': [8416]}
+service RSS KiB min 1744860 max 1755952 GiB max 1.675
+reranker processes seen: {'service': [356621]}
+samples without the service pid: 0

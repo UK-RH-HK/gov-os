@@ -1,6 +1,67 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-03 00:00: handover from session `debdb3f7` before the owner's restart of WSL and the machine
+## RESUME HERE — 2026-11-03 14:05: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
+
+**The plan (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its "DECIDED BY DEC-1052"
+section first; `INTENT-DEC-1052.md`; `OWNER-GLOSSARY.md`. **Read first:** the prompt's §0; `DECISIONS-IN-FORCE.md`; the
+register's DEC-1052 and DEC-1053. **Next free id DEC-1054.** Still in force: DEC-1047, DEC-1049 (no nightly), DEC-1051
+(everything stopped but the refactoring), DEC-1045 (no gitleaks).
+
+**Done today (D-0 to D-2):**
+- **D-0** (DEC-1053 `d855e41a`, the list `packages/LIFT-1/D0-CLEANUP-LIST.md`): 43 worktrees + branches with nothing
+  unmerged removed (their scratch archived to `archive/worktree-scratch/`, self-ignored; the record synced first);
+  `w2/W2-48` deleted; 67 run folders removed (the measures' evidence kept). 32 worktrees left; 878 GB free.
+  `w2/W2-78` and the in-flight tickets' branches wait for D-9's fates.
+- **D-1:** merged as built into `w2/integrate`: W2-122 `5543a03a44c0`, W2-123 `f704f7d3fee3`, W2-112 `9a02a474e3d5`,
+  emg/select `b120aad0f048` (+ `9a5254ce8bf7`, `9894b0cf514a`), emg/noscan `c72ededc5c97`, emg/w1-19-helper
+  `d7b25cf3c605`, W2-126 `0c5d7f4c935f` (conflict + KPI 7 + 8 builder tests; P-W2-126-BT delegated, ticket line
+  `81801789`), W2-04 `70965cf61311`. **Re-pin window 2 LIVE:** `pin-9894b0cf` (ACT-REPIN-W2, registry `b74d2c7f`);
+  pin-a7182f6c kept for the rollback; the integration store at 9894b0cf.
+- **D-2 live:** E1 (Q-1 + G-1: `emg/queue` `2d968b5089c5`, `tools/land.py` promoted, backup `land.py.pre-dec1050`);
+  R1-21 (`tools/structural_pass.py`, in `land.py`, backup `land.py.pre-r1-21`); the LB held-slot fix + O-A1
+  (`emg/lb2` `bad90a750fb7`: the forecast admits); **ACT-GUARD-FIX-4 applied** (hooks `3bc25241`, `Role: owner`; the
+  three `rm` asks removed from `~/.claude/settings.json`, backup `.pre-act-guard-fix-4`; the test's fix and the finish
+  in the ACT's §8, `a698ebfe`). Reviews (READY by `tools/verdict.py`): `reviews/e1-q1-g1.md`, `r1-21.md`,
+  `emg-lb2.md`, `e3-guard-fix-4.md`.
+- **Reds fixed on the spot (DEC-968):** W2-123's cap tests use the run's CPUs `043f8222`; the test map's
+  `packages/*.diff` record-only `530879a4`; the path map's `orchestration/reviews/**` `0e6de735`; W2-54's hard-block
+  case accepts DEC-1045's change only (`9894b0cf`). Known red left: W2-66's record-only case on `win_toast.ps1`
+  (W2-66b's, D-9). `tools/guard4_check.py`'s two rule-2 cases repointed to W2-13's trees (D-0 removed W2-87's).
+
+**Running now:** the shared reranker (W2-112) pid 356621 since 13:45:09, cuda:0, idle end 43,200 s (the owner: keep it
+running for the refactoring's searches; trial `drafts/W2-112-trial/REPORT.md`); the slot watcher pid 8416; the
+dispatcher (cron; ready list empty, nothing to land); the samplers. No lead, no landing, no test run.
+
+**Stopped at the owner's order, to resume in the fresh session:**
+1. **G-14** (path-map role reads): its engineer stopped at a safe point; scratch only, nothing committed or live:
+   `drafts/g14/NEXT.md` (the design and steps 1-5; nothing built, no replay yet). Then one review, then the owner's ACT.
+   **For the owner with it:** whether `{ticket_impl}` (what the test designer may not read) covers the engineer's
+   `tests/unit/**` paths too (the engineer's recommendation: decide; the brief's "outside tests/" leaves them open);
+   `permitted_roles` not read (every namespace lists all six roles); W2-58's shell guessing in the pinned
+   `reads.py` not reused (its 26.2 h cost), only its glob matcher and ticket reader.
+2. **D-3:** NOT started. `packages/LIFT-1/D3-WORKLIST.md` (items 2-4 and 6-7 moved to D-4). Then D-4 onward.
+
+**Check at the start of the fresh session (beyond §1):**
+- `readlink -f ~/.local/bin/gov` = pin-9894b0cf; `python3 tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS` = PASS.
+- **The first live test of ACT-GUARD-FIX-4's settings:** a new session loads `~/.claude/settings.json` at start, so
+  an `rm` of your own scratch should now run with no prompt, and a catastrophic one be refused by the hook with a
+  reason. A reviewer may write its record in `reviews/` itself now (until today the CTO transcribed).
+- The shared reranker alive (`tail -2 ~/.cache/gov-os/rerank.log`; READY, no END) and the GPU memory (9,714 MiB at
+  14:02; about 900 MiB stayed after the trial: re-read it; if it keeps growing, find the holder).
+- After every record commit: `python3 tools/structural_pass.py /home/usain/Dynamic-Agentic-Engineering-OS HEAD~1`.
+
+**Open, for later (not blocking):** the sandboxed worker searches unranked (`~/.cache/gov-os` read-only in the
+sandbox; W2-127's); the sandbox's `ollama.com:443` denials on each search (to trace); the forecast prices 4.5 GB a
+job's reranker, so one GPU job at a time beside the embedders (revisit at the restart, with the shared reranker);
+`close_build.py`'s attribution (Q-1's other half, or retired); the queue's unused `--base` path and
+`land.candidate.applied-2112.py` (O-8); Wave 3 rows to add to `docs/plan/WAVE_3_PARKING.md`: E1 F2/F3, R1-21 F1/F2,
+LB F1/F2, E3 F1/F2/F3.
+
+**Standing practice:** deleting your own scratch is not a slip (the owner, DEC-1050 (8)); times only from `date`;
+checkpoints only by `tools/cto_checkpoint.sh`; no main-tree commit while `log/act-in-progress.txt` exists.
+
+
+## (history, superseded by the RESUME HERE above) — 2026-11-03 00:00: handover from session `debdb3f7` before the owner's restart of WSL and the machine
 
 **Resumed 2026-11-03 11:28 by session `bb5cd8bd`** (registered; stand-by ended; waiter armed; 3 night items filed:
 restart marks, all clear; test push "not sent", terminal active). **D-0:** list `packages/LIFT-1/D0-CLEANUP-LIST.md`
@@ -87,6 +148,19 @@ symptom if it blocks leads). E3 DONE (`drafts/act-guard-fix-4/`, 451 tests, ACT-
 HOLD ON (`log/act-in-progress.txt`). After the owner's "done": `mv` the hold; confirm `guard4_check.py --settings`
 PASS from this session, an `rm` of own scratch with no prompt (in a NEW session: the user settings load at start);
 then G-14 (path-map role checks), O-A1 done, then D-3 (T-3 first).
+**13:45 (owner): ACT-GUARD-FIX-4 NOT done:** stopped at §3's test (1 failed 461 passed): the ACT copied the new
+guard4_check.py before the test, whose LET_THROUGH still named four renamed cases. Hook files in place in the main
+tree, UNCOMMITTED; settings untouched; HOLD STAYS. Fixed the test (accepts either copy; `.pre-names` kept;
+sha256 0b37aa565dc3): 462 passed on the files in place. Finish steps for the operator:
+`drafts/act-guard-fix-4/FINISH-20261103.md` (pinged). After "done": add FINISH's note to `packages/ACT-GUARD-FIX-4.md`
+and commit it. **W2-112 (owner): the shared reranker started** 13:45:09 (pid 356621, cuda:0, idle 43,200 s; the
+watcher holds slot 1); the trial (research agent, `drafts/W2-112-trial/REPORT.md`): alone, 10 and 20 at once, three
+agent sessions incl. a sandboxed worker (P-W2-112-T2). If it holds: keep it running.
+**13:52: W2-112 trial DONE** (`drafts/W2-112-trial/REPORT.md`): holds for ordinary sessions (61/61 by the service on
+cuda:0, slot held in 472/472 samples, GPU peak 9.8 of 13.9 GB, 20 at once p50 4.1 s); KEPT RUNNING (pid 356621, idle
+12 h). Sandboxed worker (gov launch engineer DAEO-clon): unranked, named (`~/.cache/gov-os` read-only in the sandbox;
+the private fallback's slot check fails), never GPU/CPU: W2-127's. To do: re-read GPU memory about 14:50 (900 MiB
+stayed); trace the sandbox's `ollama.com:443` denials.
 
 **THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
 "DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:
