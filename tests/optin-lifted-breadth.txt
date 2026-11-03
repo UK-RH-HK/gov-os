@@ -567,3 +567,88 @@ tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect
 tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_decision_checker_exception_not_swallowed  # folded into test_a_planted_defect_of_every_family_is_found
 tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id  # folded into test_a_planted_defect_of_every_family_is_found
 rep: tests/acceptance/W1-26/test_w1_26_audit_validator.py  # one row per parametrised function
+
+# acceptance/W1-27
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_registered_location_passes  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_registered_location_wrong_version_fails  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_empty_registered_location_fails  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_without_registered_location_found_on_path  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_doctor_does_not_modify_path  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_stale_path_in_historical_record_is_not_reported  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_stale_path_section_counts_excluded_historical  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_found_under_another_entrys_prefix  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_absent_from_all_prefixes_found_on_path  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_own_prefix_wins_over_other_entrys_prefix  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_no_version_no_hash_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_no_version_hash_match_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_version_raises_no_hash_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_version_mismatch_fails_despite_hash_match  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_wrong_content_sha256_match_false  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_wrong_content_has_reason  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_right_content_passes  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_absent_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_python_package_wrong_version_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_python_package_right_version_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_distribution_package_sha256_match_not_true  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_home_tool_wrong_sha256_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_index_freshness_error_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_canary_error_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_isolation_broken_git_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_unmeasured_absence_prevents_adopted_healthy  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_healthy_false_when_measurement_error  # cap
+tests/acceptance/W1-27/test_w1_27_isolation_r2.py::test_doctor_isolation_is_measured_not_constant  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_sources_md_is_not_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_live_document_not_sources_is_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_old_cli_tree_is_not_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_src_gov_cli_is_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_inside_its_new_path_is_not_stale  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_standalone_is_stale_when_new_path_elsewhere  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_historical_excluded_nonzero_when_historical_holds_old_path  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_recreates_lexical_index  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_does_not_silently_drop_lexical_tables  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_result_names_unreconstructed_stores  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_lexical_index_is_fresh  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_lexical_search_finds_tracked_text  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_result_names_derived_stores_with_measured_status  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_does_not_hold_lexical_schema_copy  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_secret_file_not_in_lexical_index  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_lexical_digest_matches_owner_refresh  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_stores_hold_no_secret  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_codeintel_reason_is_measured  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_codeintel_is_recreated_when_tool_answers  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_returns_envelope  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_lexical_not_built  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_no_traceback  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_record_store_outcome  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_idempotent_digest  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_writes_only_act_paths  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_gives_error_envelope  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_no_traceback  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_not_complete  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_writes_only_act_paths  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_rebuild_without_the_argument_asks_the_endpoint_as_today  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_asks_the_endpoint_nothing_and_starts_no_program  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_starts_no_program_when_the_endpoint_is_down  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_builds_everything_else_a_rebuild_builds  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_two_rebuilds_in_the_mode_give_the_same_digest  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_retrieval_on_a_store_whose_vectors_could_not_be_built_says_so  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_retrieval_on_a_store_rebuilt_without_embeddings_says_so  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_not_unconditionally_exit_zero  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_exits_nonzero_on_tampered_store  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_check_reports_unmeasured_when_no_store  # cap
+tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py::test_status_accepts_minimal_path_map_with_only_namespaces  # cap
+tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py::test_doctor_does_not_crash_on_minimal_path_map  # cap
+tests/acceptance/W1-27/test_w2_67_copies.py::test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs  # cap
+tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py::test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace  # cap
+tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py::test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_the_pytest_configuration_passes_no_basetemp_and_keeps_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_run_after_older_runs_leaves_at_most_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_run_after_killed_runs_leaves_at_most_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_base_folder_of_a_run_still_going_is_kept  # cap
+rep: tests/acceptance/W1-27/test_w1_27_schema.py::test_missing_required_top_level_key_names_the_key  # one row
+rep: tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py  # one row per parametrised function
+rep: tests/acceptance/W1-27/test_w2_67_codegraph_folders.py  # one row per parametrised function

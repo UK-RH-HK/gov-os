@@ -671,3 +671,24 @@ addresses, as they did for `OLLAMA_HOST`. No expectation, assertion, pass line o
 sandbox, after the change: `test_w1_27_rebuild_r8_no_embeddings.py` 9 passed. Commit trailer: `Rewrite-Reason:
 DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own port; the
 fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: doctor reports pinned vs found tool versions, hooks wired, path map with zero unclassified paths, index freshness, canaries, framewor... | `test_w1_27_doctor.py::test_doctor_is_a_read_command`, `test_w1_27_doctor.py::test_doctor_envelope_is_valid_on_healthy_project`, `test_w1_27_doctor.py::test_doctor_report_mentions_tool_versions` | README |
+| S2: rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works [CAP-07.a, CAP... | `test_w1_27_rebuild.py::test_rebuild_is_an_act_command`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores`, `test_w1_27_rebuild.py::test_two_rebuilds_give_the_same_digest` | README |
+| S3: Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is re... | `test_w1_27_path_compliance.py::test_full_coverage_is_healthy`, `test_w1_27_path_compliance.py::test_unclassified_path_is_reported`, `test_w1_27_path_compliance.py::test_moved_path_reference_is_reported` | README |
+| S4: Registers the recovery/rebuild family check: derived state deleted and rebuilt gives the same digest [CAP-38.b] | `test_w1_27_recovery_check.py::test_recovery_rebuild_check_declaration_exists`, `test_w1_27_recovery_check.py::test_recovery_rebuild_check_has_correct_family`, `test_w1_27_recovery_check.py::test_recovery_rebuild_check_has_id` | README |
+| S5: doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoptio... | `test_w1_27_adoption.py::test_doctor_report_mentions_adoption_level`, `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level`, `test_w1_27_adoption.py::test_completed_stages_raise_adoption_level` | README |
+| S6: doctor reports Claude Code drift (DEC-210, DEC-214); the CLI at ~/.local/bin/claude and the active VS Code extension differing from e... | `test_w1_27_drift.py::test_cli_newer_than_registry_is_drift`, `test_w1_27_drift.py::test_cli_and_extension_different_versions_is_drift`, `test_w1_27_drift.py::test_extension_bundled_binary_different_sha256_is_drift` | README |
+| S7: doctor reports a missing governance/project/held-out.yaml in this repository, because the guard treats a missing file as no held-out ... | `test_w1_27_held_out.py::test_missing_held_out_yaml_is_reported`, `test_w1_27_held_out.py::test_present_held_out_yaml_is_not_reported`, `test_w1_27_held_out.py::test_missing_held_out_yaml_is_reported` | README |
+| S8: gov validates governance/project/path-map.yaml against the kernel's path-map schema of W1-08, which replaces the minimal schema of W1... | `test_w1_27_schema.py::test_valid_w1_08_path_map_loads`, `test_w1_27_schema.py::test_valid_w1_08_path_map_is_not_reported_as_invalid`, `test_w1_27_schema.py::test_valid_w1_08_path_map_with_code_intelligence_loads` | README |
+| F1: doctor passes with a tool at the wrong version | `test_w1_27_doctor.py::test_doctor_does_not_pass_with_wrong_tool_version`, `test_w1_27_doctor.py::test_doctor_is_a_read_command`, `test_w1_27_doctor.py::test_doctor_envelope_is_valid_on_healthy_project` | README |
+| F2: rebuild needs anything not in git | `test_w1_27_rebuild.py::test_rebuild_needs_only_git`, `test_w1_27_rebuild.py::test_rebuild_is_an_act_command`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores` | README |
+
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 80 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
