@@ -1869,3 +1869,14 @@ tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py::test_edit_judges_a_til
 tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py::test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage[python3-B]  # fold: a row beyond the representatives
 tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py::test_a_test_run_joined_with_a_read_of_the_source_is_refused[plain-then-cat]  # fold: a row beyond the representatives
 tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py::test_a_test_run_joined_with_a_read_of_the_source_is_refused[python3-B-then-cat]  # fold: a row beyond the representatives
+
+# W2-59
+rep: tests/acceptance/W2-59/test_w2_59_judge_checks.py::test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath  # fold: a row beyond the representatives
+rep: tests/acceptance/W2-59/test_w2_59_project_root.py::test_doctor_reads_the_canary_declarations_of_the_project_under_check  # fold: a row beyond the representatives
+rep: tests/acceptance/W2-59/test_w2_59_project_root.py::test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files  # fold: a row beyond the representatives
+
+# W2-106
+tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[exit-0-with-output-source-PreToolUse]  # fold: a row beyond the representatives
+tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[exit-2-with-refusal-source-PreToolUse]  # fold: a row beyond the representatives
+tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[exit-1-settings-PreToolUse]  # fold: a row beyond the representatives
+tests/acceptance/W2-106/test_w2_106_interpreter.py::test_the_line_keeps_its_exit_codes[killed-settings-PreToolUse]  # fold: a row beyond the representatives
