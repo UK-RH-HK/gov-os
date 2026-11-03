@@ -79,3 +79,10 @@ W2-61h's other work is on `w2/W2-61h-d8`. The transcript (2.3) moves back with
   guard's hidden-half rule (G-3: no guard rule needed).
 - Residual, named: a session could still open `~/gov-os-eval/` by its exact path; G-3 accepts that (no ordinary
   search reaches it: it is in no tree, no store, no commit).
+
+## 6. Applied (the owner, 2026-11-03 ~15:35)
+§1's checks passed. §2.1 and §2.2 by the owner's operator; §2.3 by the owner (the transcript moved to
+`~/gov-os-eval/transcripts/`, mode 700, since a deny rule keeps sessions out of `~/.claude/projects/`); §2.4 by the
+operator (reflog expiry and gc, rc 0). §3: `c5c10072` gone; 0 hidden files under the worktrees, `~/gov-os-runs` and
+`/tmp`; 24 files in `~/gov-os-eval`'s hidden folder; the `W2-61h-d8` worktree listed; the main tree clean at `2ae4e094`.
+The CTO's hold ended at 15:36.
