@@ -61,7 +61,7 @@ def project(tmp_path, monkeypatch):
         if path == "/api/tags":
             return {"models": [{"name": name, "digest": digest} for name, digest in listed.items()]}
         if path == "/api/ps":
-            return {"models": [{"name": name, "size": 1, "size_vram": 0} for name in listed]}
+            return {"models": [{"name": name, "size": 1, "size_vram": 1} for name in listed]}
         endpoint["asked_for"].append(body["model"])
         endpoint["sent"] += body["input"]
         return {"embeddings": [[float("pear" in text), float("plum" in text)] for text in body["input"]]}

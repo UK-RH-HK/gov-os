@@ -54,7 +54,8 @@ def endpoint(tmp_path, monkeypatch):
             pass
 
         def do_GET(self):
-            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "ac6da0dfba84" + "d" * 52}]})
+            self._answer(200, {"models": [{"name": semantic.MODEL, "digest": "ac6da0dfba84" + "d" * 52,
+                                           "size": 1, "size_vram": 1}]})  # tags and ps: on the GPU (S10)
 
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
