@@ -22,6 +22,7 @@ allowed_paths:
 - src/gov/retrieval/lexical*
 - src/gov/retrieval/fusion*
 - src/gov/rebuild/lexical*
+- src/gov/retrieval/retrieve.py
 - tests/unit/retrieve/**
 - tests/unit/retrieval/**
 kpis:
@@ -72,3 +73,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 - **KPIs, failure:**
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.
+
+**Delegated (CTO, 2026-11-03, P2 under DEC-957; DEC-1057 R-8: a line here, not a register entry):** `src/gov/retrieval/retrieve.py` added to the allowed paths, so that S2's fusion takes the ranked lexical list W2-92's merged `retrieve()` now carries (one line, `answer.get("ranked", answer["hits"])`); D-4b (DEC-1055) finishes W2-13 on top of W2-92.
