@@ -292,9 +292,9 @@ its text is never a route.
   all its arguments; the message of an `assert` statement; the value of a `reason=` or `msg=` keyword of any call.
   These nodes are left out of the whole function's reading (copies, listings and routes alike).
 - **A route is still found only at a call that holds the bare root among its arguments** (as before), and only in:
-  - its **argument list**: an argv word (`clone`, `archive`, `worktree`, `checkout-index`, `bundle`) as one of the
+  - its **argument list**: an argv word (`clone`, `archive`, `checkout-index`, `bundle`, or `worktree` with `add`) as one of the
     strings it is given, directly or as an item of a list, a tuple, a `+` or a `*` given there; or a shell route
-    (`cp -r`, `rsync`, `git archive|clone|worktree`, `tar -c`) in such a list or tuple read as one text, its items
+    (`cp -r`, `rsync`, `git archive|clone|worktree add`, `tar -c`) in such a list or tuple read as one text, its items
     joined by spaces;
   - a **`subprocess`, `os.system` or copy call** (callee `run`, `call`, `check_call`, `check_output`, `Popen`,
     `getoutput`, `getstatusoutput`, `system`, `popen`, `create_subprocess_exec`, `create_subprocess_shell`, or a
@@ -322,6 +322,7 @@ argv list, still counts.
 |---|---|
 | Success 1: message text is not read; routes only in argument lists and `subprocess`, `os.system` and copy calls | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` (W2-108's old skip; a `pytest.fail` and two `assert` messages naming the root with `git clone`, `cp -r`, `rsync`, `git worktree`) |
 | Success 2: every true whole-tree copy still found, nothing lowered | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` (`cp -r`, `copytree`, `git worktree add`, `git clone` of the root, and a skip message followed by a clone) · `test_cp_r_and_tar_c_given_as_separate_argv_items_are_reported` · the cases before it in this file and W1-50's, unchanged |
+| Success 2 (D-4's cut, DEC-1061): `git worktree` is a route only as `worktree add` (it makes a checkout); `worktree list` (W2-61h's `worktrees()`, 15592622) copies nothing | `test_git_worktree_is_a_copy_only_as_worktree_add` (W2-61h's helper and a shell `worktree list` not reported; `worktree add` as argv and as a shell string reported) |
 | Success 3: this section, with `Rewrite-Reason: DEC-982` | this README |
 | Failure 1: a real whole-tree copy no longer reported | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` · `test_a_whole_tree_copy_without_a_root_parameter_is_caught_by_reading` · `test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` |
 | Failure 2: a message that names the root reported as a copy | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` |
