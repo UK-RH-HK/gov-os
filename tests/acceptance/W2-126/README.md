@@ -169,3 +169,21 @@ stage ended 0.01 s after the refusal, no wait. **Shown green** against a throwaw
 tree whose `_ask` reads an HTTP 5xx, a `ConnectionError` and a refused `URLError` as a time-out (a probe, not W2-126's
 code): 10 passed, four runs, about 22 s each.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Before it embeds a chunk or a question, the semantic stage and `query_vector` look up a machine-wide cache keyed by the model, its re... | `test_w2_126_hits.py::test_a_second_tree_and_a_clone_send_nothing`, `test_w2_126_hits.py::test_a_changed_text_is_a_miss`, `test_w2_126_hits.py::test_a_question_from_two_trees_is_embedded_once` | README |
+| S2: The same vector for the same text: a cached vector is byte-for-byte what the embedder returned when it was stored; a rebuild of a tre... | `test_w2_126_same_vector.py::test_a_cached_vector_is_the_one_the_embedder_returned`, `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache`, `test_w2_126_same_vector.py::test_a_cached_vector_is_the_one_the_embedder_returned` | README |
+| S3: Safe under many writers: concurrent rebuilds and searches read and write it at once without a corrupt entry, a lost write that is lat... | `test_w2_126_writers.py::test_concurrent_rebuilds_and_searches_serve_only_right_vectors`, `test_w2_126_writers.py::test_no_lock_is_held_across_an_embedding_request`, `test_w2_126_writers.py::test_an_unusable_cache_is_skipped_and_named` | README |
+| S4: Bounded: a configured size limit (default from the measured corpus: about 2 corpora) with least-recently-used eviction; a model or re... | `test_w2_126_bound.py::test_least_recently_used_entries_go_first`, `test_w2_126_bound.py::test_a_revision_change_is_a_new_key_space`, `test_w2_126_bound.py::test_least_recently_used_entries_go_first` | README |
+| S5: The retrieval check's dev tiers (a-dev, b-dev) and their 52 questions are embedded once on the machine and hit the cache in every lat... | `test_w2_126_dev_tiers.py::test_a_later_check_embeds_nothing`, `test_w2_126_dev_tiers.py::test_a_later_check_on_this_machines_dev_tiers_embeds_nothing`, `test_w2_126_dev_tiers.py::test_a_later_check_embeds_nothing` | README |
+| S6: Measured, in docs/changes/W2-126-evidence.md: the texts sent to the embedder per day before and after (target: under one corpus, abou... | `test_w2_126_evidence.py::test_the_evidence_file_states_the_named_figures`, `test_w2_126_evidence.py::test_the_evidence_file_states_the_named_figures` | README |
+| S7: The bounded retry (W2-123, DEC-1026) also covers a transient server error (HTTP 5xx) and a reset or refused connection, within the sa... | `test_w2_126_retry.py::test_a_transient_failure_then_an_answer_is_tried_again_and_the_stage_is_built`, `test_w2_126_retry.py::test_a_refused_connection_then_an_answer_is_tried_again_and_the_stage_is_built`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound` | README |
+| F1: A vector served for a different text, model or revision. | `test_w2_126_bound.py::test_a_revision_change_is_a_new_key_space`, `test_w2_126_hits.py::test_a_changed_text_is_a_miss` | by its words (every function of the suite kept) |
+| F2: A store built with the cache that differs from one built without it. | `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound` | by its words (every function of the suite kept) |
+| F3: A rebuild or search that fails because of the cache. | `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound`, `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache` | by its words (every function of the suite kept) |
