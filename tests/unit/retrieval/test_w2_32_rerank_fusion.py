@@ -103,24 +103,33 @@ def _score(query, texts):
     return [float(text.splitlines()[0].split("chunk-")[1][:2]) for text in texts]
 
 
-@pytest.mark.parametrize("limit", [0, 1, 5, 30, 31, 40, 45])
-def test_a_limit_gives_exactly_that_many_distinct_hits(routes, limit):
+@pytest.mark.parametrize("limit", [0, 1, 5, 29, 30])
+def test_a_limit_up_to_the_cap_gives_exactly_that_many_distinct_hits(routes, limit):
     answer = fusion.search(Path("unused"), "q", limit=limit, reranker=lambda: _score)
     ids = [hit["chunk_id"] for hit in answer["hits"]]
     assert len(ids) == limit == len(set(ids))
     head = sorted((hit["chunk_id"] for hit in routes[:fusion.RERANK_TOP]), reverse=True)
-    assert ids[:fusion.RERANK_TOP] == head[:limit]  # the reranked head first, best first
-    assert ids[fusion.RERANK_TOP:] == [hit["chunk_id"] for hit in routes[fusion.RERANK_TOP:limit]]  # then fused order
+    assert ids == head[:limit]  # the reranked head, best first
     assert answer["reranked"] is True  # the head was reranked, whatever the limit cuts after it
 
 
-def test_a_limit_above_what_there_is_gives_all_there_is(routes):
-    answer = fusion.search(Path("unused"), "q", limit=1000, reranker=lambda: _score)
-    assert sorted(hit["chunk_id"] for hit in answer["hits"]) == sorted(NAMES)
+def test_a_limit_above_what_there_is_gives_all_there_is(monkeypatch, routes):
+    few = [{"chunk_id": n, "path": f"notes/{n}.md", "start_line": 1, "end_line": 2, "parent_id": "p"}
+           for n in NAMES[:7]]
+    monkeypatch.setattr(fusion.lexical, "search", lambda root, query, refresh: {"available": True, "hits": few})
+    monkeypatch.setattr(fusion.semantic, "search", lambda root, query, refresh: {"available": False, "hits": []})
+    answer = fusion.search(Path("unused"), "q", limit=20, reranker=lambda: _score)
+    assert sorted(hit["chunk_id"] for hit in answer["hits"]) == NAMES[:7]
 
 
 def test_no_limit_gives_the_reranked_head(routes):
     assert len(fusion.search(Path("unused"), "q", limit=None, reranker=lambda: _score)["hits"]) == fusion.RERANK_TOP
+
+
+@pytest.mark.parametrize("limit", [31, 50, 1000])
+def test_a_limit_above_the_cap_is_refused_naming_the_limit_and_the_cap(routes, limit):
+    with pytest.raises(ValueError, match=f"limit {limit} is above its cap of {fusion.RERANK_TOP}"):
+        fusion.search(Path("unused"), "q", limit=limit, reranker=lambda: _score)
 
 
 @pytest.mark.parametrize("limit", [-1, 2.5, "5", True])
