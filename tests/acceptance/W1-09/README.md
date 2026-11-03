@@ -446,3 +446,21 @@ The ten cases were read again against DEC-579 by a fresh Independent Test Design
 W1-32's status cases with a package that does not load, and any case that matches the reasons of
 `blocked` against a closed list of codes, were not run against the built rule by the designer.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: tk v0.3.2 is vendored with sha256 408f2c11... verified by gov doctor | `test_w1_09_vendoring.py::test_the_ticket_script_is_vendored_into_the_kernel_template`, `test_w1_09_vendoring.py::test_the_vendored_script_has_the_pinned_sha256`, `test_w1_09_vendoring.py::test_the_vendored_script_matches_the_tool_registry` | README |
+| S2: A second claim on a held ticket fails with the holder named (O_EXCL lock in .tickets/.claims/) [CAP-23.a] | `test_w1_09_claims.py::test_a_claim_on_a_free_ticket_names_the_ticket_and_its_holder`, `test_w1_09_claims.py::test_a_claim_is_a_lock_file_in_the_claims_folder`, `test_w1_09_claims.py::test_the_holder_of_a_ticket_is_reported` | README |
+| S3: The ready queue excludes tickets that are claimed, whose acceptance tests directory is missing, or whose specification is not closed ... | `test_w1_09_ready.py::test_tickets_with_nothing_in_their_way_are_all_ready`, `test_w1_09_ready.py::test_a_ticket_is_not_ready_before_its_dependencies_are_closed`, `test_w1_09_ready.py::test_closing_a_dependency_makes_the_next_ticket_ready` | README |
+| S4: A ticket whose mandatory input is absent or superseded is not READY [CAP-31.d] | `test_w1_09_inputs.py::test_a_ticket_whose_mandatory_inputs_are_all_present_is_ready`, `test_w1_09_inputs.py::test_a_ticket_whose_mandatory_input_is_absent_is_not_ready`, `test_w1_09_inputs.py::test_one_absent_input_among_several_is_enough` | README |
+| S5: A ticket waiting on an open decision package is blocked, and tickets that do not depend on it stay READY [CAP-34.e] | `test_w1_09_decisions.py::test_a_ticket_waiting_on_an_open_decision_package_is_blocked`, `test_w1_09_decisions.py::test_tickets_that_do_not_depend_on_the_package_stay_ready`, `test_w1_09_decisions.py::test_the_ticket_is_ready_again_when_the_package_is_answered` | README |
+| S6: A ticket created through gov.tasks.create carries state_class AUTHORITATIVE, added after the vendored tk create, whose script keeps i... | `test_w1_09_create.py::test_a_created_ticket_carries_state_class`, `test_w1_09_create.py::test_a_created_ticket_is_the_ticket_the_script_writes` | designer, by its words |
+| F1: Two agents hold the same claim | `test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder`, `test_w1_09_claims.py::test_a_second_claim_on_a_held_ticket_fails_with_the_holder_named`, `test_w1_09_claims.py::test_a_failed_claim_leaves_the_first_claim_as_it_was` | README |
+| F2: A ticket without tests/acceptance/<id>/ appears as READY | `test_w1_09_ready.py::test_a_ticket_without_its_acceptance_tests_folder_is_not_ready`, `test_w1_09_ready.py::test_the_ticket_becomes_ready_when_its_acceptance_tests_folder_exists`, `test_w1_09_ready.py::test_the_acceptance_tests_of_another_ticket_do_not_count` | README |
+
+Tier 2's cap here: 48 functions (8 KPI lines x 6); 21 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

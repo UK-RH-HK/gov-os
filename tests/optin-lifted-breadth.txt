@@ -93,3 +93,27 @@ rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_severity_outside_the_fo
 rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_whose_paths_are_not_a_list_of_patterns_is_refused  # one row
 rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_that_declares_nothing_is_refused  # one row
 rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither  # one row
+
+# acceptance/W1-09
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_ticket_that_names_no_folder_needs_the_folder_of_its_own_id  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_ticket_whose_specification_is_closed_is_ready  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_ticket_whose_specification_is_not_closed_is_not_ready  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_the_ticket_becomes_ready_when_its_specification_closes  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_specification_that_is_no_record_is_not_closed  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_every_reason_that_holds_a_ticket_is_reported  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_every_open_ticket_is_either_ready_or_blocked  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_reading_the_queue_changes_nothing_in_the_project  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_named_folder_below_the_projects_acceptance_tests_counts  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_the_store_could_not_load_blocks_the_ticket_it_names  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_whose_frontmatter_cannot_be_read_holds_every_ticket  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_the_ticket_is_ready_again_when_the_package_loads_and_is_closed  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_that_loads_and_is_open_gives_the_reason_of_today  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_that_loads_and_is_closed_does_not_block  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_file_the_store_could_not_load_that_constrains_nothing_blocks_nothing  # cap
+tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_matches_the_tool_registry  # cap
+tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_is_executable  # cap
+tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_works_without_the_installed_one  # cap
+rep: tests/acceptance/W1-09/test_w1_09_claims.py  # one row per parametrised function
