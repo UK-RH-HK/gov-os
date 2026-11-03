@@ -1,0 +1,169 @@
+# The opt-in suite `lifted`, part B (DEC-1061; D4-LIST-B Appendix A; T-10): the cases of features built but off in this
+# repository (the strict close, gitleaks, the probe gate, trailers and accepted history, the ratchet, the batch close,
+# the lifted `gov check` families). tests/conftest.py leaves every entry out of a run unless it says --optin=lifted or
+# GOV_TESTS_OPTIN=lifted: one report-only run in D-10's window, its reds filed against the feature's home ticket.
+# One path (folder or file) or node id per line, then `#` and why. Moved, never deleted (DEC-953): a feature switched
+# back on takes its lines out of this list in that ticket. Part A's guard classes are in optin-lifted-guard.txt; the
+# tier-2 cap and representatives (breadth, not off features) are in optin-lifted-breadth.txt.
+
+# Whole suites of lifted gates
+tests/acceptance/W2-01/  # trailers base, merge form, owner-accepted history, probe gate (Q-8, Q-11, DEC-953)
+tests/acceptance/W2-07/  # close by class, commit gates, repair tickets: the strict close (DEC-953, Q-7, Q-8)
+tests/acceptance/W2-53/  # the probe gate's merge measure and the ratchet (Q-10, Q-11)
+tests/acceptance/W2-68/  # batched closes and reuse (T-10, Q-2)
+tests/acceptance/W2-69/  # the secrets check over stores, the real gitleaks (DEC-1045; was nightly_only.txt)
+tests/acceptance/W2-71/  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt)
+tests/acceptance/W2-107/  # gitleaks verdicts by content hash (DEC-1045; was nightly_only.txt)
+
+# W1-15: secret rules and the pre-index filter through gitleaks (DEC-1045; was nightly_only.txt)
+tests/acceptance/W1-15/test_w1_15_gitleaks_rules.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+tests/acceptance/W1-15/test_w1_15_filter.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+tests/acceptance/W1-15/test_w1_15_shelter_batch.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+tests/acceptance/W1-15/test_w1_15_family_check.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+tests/acceptance/W1-15/test_w1_15_review_batch.py  # runs the real gitleaks (S1, S2, S4, F1, F2 lifted here)
+
+# W1-16: the token rule and gitleaks' built-in allowlist (DEC-1045; was nightly_only.txt)
+tests/acceptance/W1-16/test_w1_16_token_rule.py  # the gov-token rule judged by the gitleaks binary (S4, F1)
+tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py  # gitleaks' built-in allowlist, by the binary
+
+# W2-50: the secrets scan's scale (DEC-1045; was nightly_only.txt; the suite is part A's, listed here once with the move)
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py  # the real gitleaks over large stores
+
+# W1-26: the lifted gov check families (T-3, Q-11, DEC-1052)
+tests/acceptance/W1-26/test_w1_26_policy.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+tests/acceptance/W1-26/test_w1_26_skill.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+tests/acceptance/W1-26/test_w1_26_decision_citations.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+tests/acceptance/W1-26/test_w1_26_probe_records.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+
+# W1-30: the strict close's gates (DEC-953, Q-2..Q-11); the 7 core cases of close and receipt stay in the full run
+tests/acceptance/W1-30/test_w1_30_check_blocks.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_commit_models.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_containment_places.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_context_failures.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_disposition.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_governance_checks.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_iteration.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_probe.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_probe_commits.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r10_git.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r10_interpreter.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r10_probe_records.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r10_skips.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r11_declared_here.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_governance_share.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_long_findings.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_command_success.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_enforces.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_own_sources.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_record_types.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r16_human_gate.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_commits.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_escalation.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_last_step.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_probe_record.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_test_runs.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r8_tree.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r9_every_finding.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_regression_scope.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_repair_ticket.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_stale.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_test_runner.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_time_limit.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_traceability.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_watchdog.py  # a lifted gate of the strict close (home: W2-115, D-9)
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_sets_ticket_status  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_regression_tests_when_present  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_implements_trailer  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_requires_task_trailer  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_runs_containment_check  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_writes_checkpoint_on_success  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_has_kernel_skill_versions  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_vendor_skill_without_version  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_empty_skill_versions_when_none  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_containment_blocks_close_for_out_of_scope_commit  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_task_trailer_exact_match_not_substring  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_closed_through_ticket_tool_interface  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_exists_before_ticket_status_changes  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_checkpoint_exists_before_ticket_status_changes  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_regression_includes_other_acceptance_folders  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_collection_error_refuses_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_lists_test_counts  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_exceeded_refuses_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_commits_from_head_only  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_git_failure_is_error_not_empty_list  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_time_limit_is_configurable  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_acceptance_tests  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_containment_refuses_ticket_changing_docs_outside_paths  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_containment_clean_within_paths  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_ticket_tool_close_is_what_tk_produces  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_fails_when_ticket_tool_absent  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_unwritable_ticket_stays_open  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_input_ids_and_hashes  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_outputs  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_requirements_implemented  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_has_decisions_applied  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_record_packet_hash_matches_context  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_close_refuses_when_context_cannot_be_built  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_no_fallback_hash_when_context_fails  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_outputs_lists_files_from_ticket_commits  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_deviations_says_not_measured_when_unverified  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_input_hash_is_of_file_content  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_unmeasurable_inputs_listed_with_reason  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_ticket_file_is_always_an_input  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_unresolvable_source_refuses_the_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_sources_resolve_through_defined_lookup  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_context_failure_non_cycle_refuses_close  # a lifted gate of the strict close
+tests/acceptance/W1-30/test_w1_30_receipt.py::test_tests_produced_lists_ticket_own_tests  # a lifted gate of the strict close
+
+# unit/close: the strict close's builders (DEC-953, Q-2..Q-11); select, serial, nightly, evidence, runs and tool kept
+tests/unit/close/test_batch_refresh.py  # a lifted gate of the strict close
+tests/unit/close/test_batch_reuse.py  # a lifted gate of the strict close
+tests/unit/close/test_collection_gate.py  # a lifted gate of the strict close
+tests/unit/close/test_context.py  # a lifted gate of the strict close
+tests/unit/close/test_decision_records.py  # a lifted gate of the strict close
+tests/unit/close/test_every_finding.py  # a lifted gate of the strict close
+tests/unit/close/test_fingerprint.py  # a lifted gate of the strict close
+tests/unit/close/test_follow_up.py  # a lifted gate of the strict close
+tests/unit/close/test_gates.py  # a lifted gate of the strict close
+tests/unit/close/test_governance_checks.py  # a lifted gate of the strict close
+tests/unit/close/test_history.py  # a lifted gate of the strict close
+tests/unit/close/test_measured.py  # a lifted gate of the strict close
+tests/unit/close/test_ratchet.py  # a lifted gate of the strict close
+tests/unit/close/test_refuse.py  # a lifted gate of the strict close
+tests/unit/close/test_repair_ticket.py  # a lifted gate of the strict close
+tests/unit/close/test_repo.py  # a lifted gate of the strict close
+tests/unit/close/test_state.py  # a lifted gate of the strict close
+tests/unit/close/test_traceability.py  # a lifted gate of the strict close
+tests/unit/close/test_w2_07_decision_records.py  # a lifted gate of the strict close
+
+# unit/secrets_check: the scan's builders (DEC-1045; the gitleaks ones were nightly_only.txt); the off switch kept
+tests/unit/secrets_check/test_commit_exemption.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_scan_scale.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_secrets.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_stored_forms.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_token_rule.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_w2_107_cache.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_w2_107_engine.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_w2_107_record.py  # the secrets scan, off here (DEC-1045)
+tests/unit/secrets_check/test_w2_20_pool.py  # the secrets scan, off here (DEC-1045)
