@@ -13132,3 +13132,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.447 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1063. Next free id: DEC-1064. |
+
+### DEC-1064 — W2-32 under its own ticket id: S1 to S5 now on its branch, merged only after measure 2; no private embedder in the sandbox
+- **Status:** ACCEPTED (owner, 2026-11-03 ~21:30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1055 (6), (7), DEC-1031, DEC-1063, DEC-1051
+- **Decision:** (1) W2-32's test designer and engineer run as `gov launch` workers under W2-32's own ticket id (DAEO-0pyc, claimed `9c468dbd`), no lead (the CTO acts as its lead), so the guard enforces their separation. Its engineer builds S1 to S5 now on `w2/W2-32`; **W2-32 merges into `w2/integrate` only after D-4b's measure 2**, so D-7's effect is measured cleanly; S6 to S8 are built only on the gaps the owner approves. (2) **No private embedder in the launch sandbox:** inside it `gov` would start a private Ollama on the CPU (DEC-261), loading the CPU beside the memory measures and breaking DEC-1031 (the embedders on the GPU); so sandboxed workers run no `gov retrieve` (grep and the Read tool instead) and no test that starts a real embedder, reranker or model, until W2-127 makes the shared servers reachable from the sandbox; the scoped set that reaches real-model suites runs in the CTO's session, outside the sandbox, between measures. The CTO checks that no private `ollama` or `llama-server` process runs while a measure runs.
+- **Basis:** question 1 (role separation by the guard, not by a brief) and question 2 (the measures not skewed by CPU load; the embedders where DEC-1031 puts them).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.448 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1064. Next free id: DEC-1065. |
