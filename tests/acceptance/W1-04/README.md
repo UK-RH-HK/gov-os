@@ -18,6 +18,20 @@ Standard library and `pytest` only. No network, no dev tiers, no `local_only` te
 run.** Each is text in the hook's input; the test reads the guard's decision. Nothing is installed and nothing in the
 repository is written. The run takes about 90 seconds.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 69 in the full run, 0 lifted, 267 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1, F1 (installs ask the orchestrator, refused to others) | `test_w1_04_install_rule.py` (19) (per function one package manager, one `curl|sh`, one download into PATH), `test_w1_04_probe_findings.py` (17) |
+| S2 (Auto mode) | `test_w1_04_auto_mode.py` (6) |
+| S3 (the registry schema) | `test_w1_04_registry_schema.py` (12) |
+| F2 (sudo) | `test_w1_04_sudo.py` (10), `test_sudo_in_a_later_part_of_the_command_is_denied_to_every_role` (2) |
+| F3 (matching only escalates) | `test_w1_04_only_escalates.py` (5), `test_the_hook_never_gives_an_explicit_allow` (1) |
+
 ## KPI → tests → red reason today
 
 Run on `w1/integrate` at `5e14561`, after implementation: **329 passed, 7 failed** (336 cases, 35 test functions).
