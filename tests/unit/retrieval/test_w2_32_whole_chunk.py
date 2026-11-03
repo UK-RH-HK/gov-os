@@ -158,12 +158,22 @@ def _calls(root, reranker=lambda: None):
 @needs_gitleaks
 def test_a_parent_expanded_in_one_call_is_not_sent_again_by_a_later_one(repository):
     bundles = _calls(repository)
-    calls_of_long = [n for n, b in enumerate(bundles) for item in b["evidence"] if item["path"] == "long.md"]
+    calls_of_long = [n for n, b in enumerate(bundles) for item in [*b["evidence"], *b["repeats"]]
+                     if item["path"] == "long.md"]
     assert len(set(calls_of_long)) == 2, f"the two children are not in two calls: {calls_of_long}"
     sent = [(item["path"], item["start_line"], item["end_line"]) for b in bundles for item in b["evidence"]]
     assert len(sent) == len(set(sent)), f"a span came back in a later call: {sent}"
     expanded = [entry["parent_id"] for b in bundles for entry in b["expansions"]]
     assert len(expanded) == len(set(expanded)) == 1  # the one parent, expanded once across the calls
+    # a span inside one an earlier call sent is a repeat too: it is not sent, and is named
+    for n, bundle in enumerate(bundles):
+        earlier = [(i["path"], i["start_line"], i["end_line"]) for b in bundles[:n] for i in b["evidence"]]
+        for item in bundle["evidence"]:
+            assert not any(path == item["path"] and first <= item["start_line"] and item["end_line"] <= last
+                           for path, first, last in earlier), f"call {n + 1} sends {item['path']}:" \
+                f"{item['start_line']}-{item['end_line']}, within a span sent earlier"
+    repeats = [item for b in bundles for item in b["repeats"]]
+    assert [item["path"] for item in repeats] == ["long.md"] and repeats[0]["parent_id"] == expanded[0]
 
 
 @needs_gitleaks

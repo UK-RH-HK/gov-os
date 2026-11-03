@@ -306,6 +306,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         rest_ranked = [c for c in ranked if c["path"] not in ahead_paths]
         ranked = ahead_ranked + rest_ranked
 
+    # W2-32 S7: a chunk whose parent an earlier call expanded lies inside a span already sent: it is not sent again,
+    # and is named in ``repeats`` (within one call a parent's other children are still sent, DP-3)
+    repeats = [{key: candidate[key] for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")}
+               for candidate in ranked if candidate["parent_id"] in earlier]
+    ranked = [candidate for candidate in ranked if candidate["parent_id"] not in earlier]
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
     evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
     for candidate in ranked:
@@ -348,7 +353,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                         "dropped": [dropped[rel] for rel in sorted(dropped)],
                         "reranked": any("rerank_score" in candidate for candidate in ranked)},
               "rerank": reranked_by,  # W2-112: who scored (service, private) and on which device, or unavailable
-              "expansions": expansions, "gaps": gaps, "facets": facets,
+              "expansions": expansions, "repeats": repeats, "gaps": gaps, "facets": facets,
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
               "continuation": token}
