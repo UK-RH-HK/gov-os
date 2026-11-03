@@ -13033,3 +13033,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 |---|---|---|
 | 0.435 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1052. Next free id: DEC-1053. |
 | 0.436 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1052 gains the basis as a standing practice. Next free id: DEC-1053. |
+
+### DEC-1053 — D-0's clean-up list decided: what is merged, what is deleted, what waits for D-9
+- **Status:** ACCEPTED (owner, 2026-11-03 ~11:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 (D-0, O-8, O-13) · **Source:** `governance/project/orchestration/packages/LIFT-1/D0-CLEANUP-LIST.md` (`ad3d1529`)
+- **Decision:** every ASK line as recommended. (1) `emg/w1-19-helper` (`a0d1d3a0`, the W1-19 test helper, DEC-1046 item 3) is merged into `w2/integrate` in D-1, then its branch and worktree deleted. (2) `w2/W2-48` (the cache withdrawn by DEC-880) is deleted. (3) W2-67's stray planted file `tests/acceptance/W1-27/w2_67_td4_plant.py` (untracked, in the W2-67 worktree) is deleted. (4) The 42 worktrees and branches with nothing unmerged are removed, after each worktree's ignored `.gov-runtime/scratch/` is archived to `.gov-runtime/scratch/orchestrator/archive/worktree-scratch/<name>/`. (5) The run folders as listed: the 56 near-empty folders; the base and head clones of W2-55, W2-86, W2-87 and W2-61's `repo/`, keeping `measure/`, `records/`, `register/` and `logs/` (the measures' evidence); in `W2-00/`, `close/`, `precheck-w254-20261030-2146/`, `w103-before-w272/` and `tooltrials/`. (6) `w2/W2-78` and the in-flight tickets' branches with unmerged work wait for D-9's fates.
+- **Basis:** question 4 (less to search and keep; nothing that holds work is lost) and question 2 (no work lost: unmerged work listed first).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.437 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1053. Next free id: DEC-1054. |

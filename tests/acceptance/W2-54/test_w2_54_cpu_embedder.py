@@ -308,12 +308,19 @@ def test_a_vector_cached_under_round_3_s_key_is_never_served(box, shared, cpu, t
     (the forge's), under round 3's key (model, revision, sha256 of the exact text sent; both the text round 3 sent and
     the text sent now), in round 3's layout. The read asks the CPU embedder and answers with its vector, the kiln:
     the answer a new store built alike gives, hit for hit and distance for distance; asked again after another text,
-    the same. The shared runner is asked nothing. Today round 3's entry is served (the forge)."""
+    the same. The shared runner is asked nothing. Today round 3's entry is served (the forge).
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the new store built alike (the twin) is built and asked with
+    a machine-wide vector cache of its own (as on another machine). Sharing the case's cache, W2-126 would serve the
+    project the twin's vector, so the CPU embedder would rightly not be asked and the case would read the outcome
+    the cache is for as a failure. The assertions are unchanged."""
     twin_shared = S.EmbedderStandIn(device="gpu", targets={QUESTION: S.SUBJECTS[S.FORGE]})
     twin_cpu = S.EmbedderStandIn(device="cpu", targets={QUESTION: S.SUBJECTS[S.KILN]})
+    twin_cache = tmp_path / "twin-vector-cache"
     try:
-        twin = S.semantic_project(box, tmp_path / "twin", twin_shared, cpu=twin_cpu)
-        answers, done = S.drive_run(box, twin, S.embed_env(box, twin_shared, twin_cpu), ("search", QUESTION))
+        twin = S.semantic_project(box, tmp_path / "twin", twin_shared, cpu=twin_cpu, cache=twin_cache)
+        answers, done = S.drive_run(box, twin, S.embed_env(box, twin_shared, twin_cpu, cache=twin_cache),
+                                    ("search", QUESTION))
         assert not S.clean(done), done.describe()
         reference, sent = answers[0], S.sent_for([twin_shared, twin_cpu], QUESTION)
     finally:

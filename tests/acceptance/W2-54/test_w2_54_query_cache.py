@@ -49,12 +49,32 @@ def _ask(box, project, env, question, what):
     return answers[0]
 
 
+def _reference_cache(tmp_path):
+    """A machine-wide vector cache folder for a reference store only (Rewrite-Reason: DEC-1033, item 3; DEC-1042
+    item 2): a reference is computed as in a new store on another machine, so it warms nothing in the case's own
+    cache (W2-126 shares one cache by model, revision and text) and every cache state the case sets stays what it
+    names."""
+    return tmp_path / "reference-vector-cache"
+
+
+# W2-126's bound on the machine-wide vector cache (its README, "Interface the cases need", 2; Rewrite-Reason: DEC-1033)
+MACHINE_BOUND_SETTING = "GOV_VECTOR_CACHE_MAX_BYTES"
+
+
+def _machine_files(folder):
+    """Every file the machine-wide vector cache folder ``folder`` holds (none when it is absent; Rewrite-Reason:
+    DEC-1033, item 3; DEC-1042): what a case deletes or makes read-only beside the tree's own cache files."""
+    folder = S.Path(folder)
+    return sorted(path for path in folder.rglob("*") if path.is_file()) if folder.is_dir() else []
+
+
 def _first_answer(box, tmp_path, question, files=None, name="reference"):
-    """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike."""
+    """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike (with a
+    cache of its own: ``_reference_cache``)."""
     fresh = S.EmbedderStandIn()
     try:
-        project = S.semantic_project(box, tmp_path / name, fresh, files)
-        return _ask(box, project, S.embed_env(box, fresh), question, "the reference")
+        project = S.semantic_project(box, tmp_path / name, fresh, files, cache=_reference_cache(tmp_path))
+        return _ask(box, project, S.embed_env(box, fresh, cache=_reference_cache(tmp_path)), question, "the reference")
     finally:
         fresh.close()
 
@@ -167,14 +187,19 @@ def test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_an
     (each in its own order) and 4 of its own: 40 distinct texts. None errors; every answer is the one the text gets
     as the first text in a new store; afterwards, asking every text again in one process gives the same answers and
     sends **none** of them to the embedder (no entry was lost or torn); and ``.gov-runtime/`` holds the store and at
-    most one other file (no lock or temporary file left behind). Today the answers depend on the interleaving."""
+    most one other file (no lock or temporary file left behind). Today the answers depend on the interleaving.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so the case's cache is still cold when the six processes start; the assertions are
+    unchanged."""
     shared = S.questions(SHARED)
     own = [S.questions(OWN, start=100 + OWN * n) for n in range(PROCESSES)]
     texts = shared + [text for group in own for text in group]
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh)
-        references = {text: _ask(box, twin, S.embed_env(box, fresh), text, "the reference") for text in texts}
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, cache=_reference_cache(tmp_path))
+        reference_env = S.embed_env(box, fresh, cache=_reference_cache(tmp_path))
+        references = {text: _ask(box, twin, reference_env, text, "the reference") for text in texts}
     finally:
         fresh.close()
     project = S.semantic_project(box, tmp_path / "p", embedder)
@@ -227,13 +252,18 @@ def test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_sa
     least 819,200 bytes of vectors, so the bound is reached). After every process the files beside the store hold
     at most 256 KiB; every read ends cleanly with an answer; and the first and last ten texts, asked again at the
     bound, get the answers they got in a new store without a bound. Today the setting changes nothing: the cache
-    grows past the bound."""
+    grows past the bound.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so the case's reads at the bound are not served from the reference's; the
+    assertions are unchanged."""
     assert BOUNDED * S.VECTOR_BYTES > 3 * S.LOW_BOUND
     texts = S.questions(BOUNDED, start=1000)
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh)
-        answers, done = S.drive_run(box, twin, S.embed_env(box, fresh), *[("search", text) for text in texts])
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, cache=_reference_cache(tmp_path))
+        answers, done = S.drive_run(box, twin, S.embed_env(box, fresh, cache=_reference_cache(tmp_path)),
+                                    *[("search", text) for text in texts])
         assert not S.clean(done), done.describe()
         references = dict(zip(texts, answers))
     finally:
@@ -334,14 +364,28 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     retrieve`` (the other tickets' titles in place of the other tickets' contexts), and "one question, one answer
     whatever the cache's state" is held through ``gov retrieve``. The packet-hash part stays for ``gov context``. The
     premise that the context held a retrieval item moves to ``gov retrieve``'s answer: the context's evidence no
-    longer comes from the semantic route. Today ``gov context`` sends the embedder its question."""
+    longer comes from the semantic route. Today ``gov context`` sends the embedder its question.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042, P-W2-126-QC (a)): W2-126's machine-wide vector cache answers a
+    question it already holds without writing the tree's own cache file, so every state now holds for both caches:
+    the case names its own machine-wide folder (``machine``); "deleted" removes the tree's files and the machine
+    folder's; ".gov-runtime/ read-only" makes the machine folder read-only too; "the cache's files read-only" acts
+    on the files either cache holds (the premise: at least one); "full" lowers both bounds. The packet-hash
+    assertions are unchanged.
+
+    Merged (D-1, DEC-1052): W2-04's revision (the states made by ``gov retrieve``; its answer and the packet both
+    held; the context sends nothing) and W2-126's (both caches) together: the reads that make each state are W2-04's,
+    the caches they act on are W2-126's."""
     files = S.ticket_files()
     question = S.QUESTION_TICKETS[TICKET]
     others = iter([S.QUESTION_TICKETS["TK-W254-BAKERY"], S.QUESTION_TICKETS["TK-W254-ORCHARD"]] * 3)
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh, files)
-        twin_env = S.embed_env(box, fresh)
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, files, cache=_reference_cache(tmp_path))
+        twin_env = S.embed_env(box, fresh, cache=_reference_cache(tmp_path))
         first = S.gov(box, "retrieve", "--json", "--root", twin, question, env=twin_env)
         assert not S.clean(first) and first.envelope().get("ok") is True, first.describe()
         answer_reference = first.envelope()["result"]
@@ -353,9 +397,20 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     assert answer_reference.get("evidence") and \
         answer_reference.get("facets", {}).get("semantic", {}).get("available") is True, \
         f"the premise: gov retrieve's answer holds no semantic evidence: {S.canonical(answer_reference)[:600]}"
-    project = S.semantic_project(box, tmp_path / "p", embedder, files)
-    env = S.embed_env(box, embedder)
+    machine = tmp_path / "case-vector-cache"   # this case's own machine-wide vector cache (GOV_VECTOR_CACHE_DIR)
+    project = S.semantic_project(box, tmp_path / "p", embedder, files, cache=machine)
+    env = S.embed_env(box, embedder, cache=machine)
     runtime = project / S.RUNTIME_REL
+
+    def cache_files():
+        """Every file either cache holds: the tree's (beside the store, under .gov-runtime/) and the machine's."""
+        return [project / rel for rel in S.runtime_others(project)] + _machine_files(machine)
+
+    def delete_caches():
+        gone = cache_files()
+        for path in gone:
+            path.unlink()
+        return gone
 
     def retrieve(what, text, env=env):
         done = S.gov(box, "retrieve", "--json", "--root", project, text, env=env)
@@ -386,19 +441,23 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     same("cold, after another question")
     retrieve("another question", next(others))
     same("warm, after another question")
-    assert S.delete_cache(project), "the premise: the reads left no cache to delete"
+    assert delete_caches(), "the premise: the reads left no cache (the tree's or the machine's) to delete"
+    assert not cache_files(), f"the premise: a cache file survived its deletion: {cache_files()}"
     retrieve("another question", next(others))
-    same("the cache deleted, after another question")
-    S.delete_cache(project)
-    with S.ReadOnly(runtime):
+    same("the caches deleted, after another question")
+    delete_caches()
+    machine.mkdir(parents=True, exist_ok=True)   # an absent folder would be made anew: it must exist to be read-only
+    with S.ReadOnly(runtime, machine):
         assert S.cannot_create_in(runtime), "the premise: .gov-runtime/ still takes a new file"
+        assert S.cannot_create_in(machine), "the premise: the machine-wide cache folder still takes a new file"
         retrieve("another question", next(others))
-        same(".gov-runtime/ read-only, after another question")
+        same(".gov-runtime/ and the machine-wide cache folder read-only, after another question")
     retrieve("another question", next(others))
-    assert S.runtime_others(project), "the premise: the reads left no cache file to make read-only"
-    with S.ReadOnly(*[project / rel for rel in S.runtime_others(project)]):
-        same("the cache's files read-only, after another question")
-    bounded = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+    held = cache_files()
+    assert held, "the premise: the reads left no cache file (the tree's or the machine's) to make read-only"
+    with S.ReadOnly(*held):
+        same("the caches' files read-only, after another question")
+    bounded = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND), MACHINE_BOUND_SETTING: str(S.LOW_BOUND)}
     answers, done = S.drive_run(box, project, bounded, *[("search", text) for text in S.questions(BOUNDED, start=5000)])
     assert not S.clean(done), done.describe()
     same("the cache full, after 200 other texts", env=bounded)

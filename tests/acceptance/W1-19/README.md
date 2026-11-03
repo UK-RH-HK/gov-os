@@ -502,3 +502,18 @@ No expectation, assertion, pass line or threshold changes. In the designer's san
 without `test_w1_19_real_models.py` (as before; that file needs the real models and was not run). Commit trailer:
 `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own
 port; the fixtures point it at a stand-in and change no expectation`.
+
+## Fixture (DEC-1046 item 3, DEC-1039 item 3, 2026-11-02)
+
+Since 2026-11-02 18:13 this machine's `~/.local/bin` holds an `ollama` wrapper beside `gitleaks`. `Api.scratch_env`
+dropped every `PATH` folder that held an `ollama`, so it also hid gitleaks, and the cases that run the secret filter
+failed with `No such file or directory: 'gitleaks'` on every tree. Only the fixture changes:
+
+- `Api.scratch_env`'s `PATH`: **before**, this machine's `PATH` less every folder that holds an `ollama`; **after**,
+  this machine's `PATH` with each such folder replaced, in its place, by a scratch folder (under the case's work
+  folder, `path/<n>`) of links to each of that folder's entries but `ollama` (`Api._path_without_ollama`, built once
+  per `Api`). `ollama` stays hidden, and the helper asserts `shutil.which("ollama", path=...)` is None for the
+  `PATH` it hands out; every other program of the folder (gitleaks among them) stays on `PATH`, where it was.
+- Nothing on the machine changes (`~/.local/bin` is only read).
+
+No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: DEC-1046`.

@@ -27,6 +27,12 @@
   folder (``tempfile.gettempdir()``); a worker replaces the controller's. At
   the end the file is removed and the variable's former state restored
   (DEC-956 item 2).
+- The machine-wide vector cache (W2-126) is shared by every process that
+  embeds, so each test gets a ``GOV_VECTOR_CACHE_DIR`` of its own, under the
+  run's base folder and named by the test's id (DEC-1042): no test is served
+  another's stand-in vectors, and none writes the user's own cache. The folder
+  is made only when the test uses the cache; a test may set or unset the
+  variable itself.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -34,6 +40,7 @@ The conftest sets no base folder and changes no retention count or policy.
 from __future__ import annotations
 
 import fcntl
+import hashlib
 import os
 import re
 import stat
@@ -48,6 +55,7 @@ _ALLOW = "GOV_ALLOW_BASETEMP"
 _HELD = ".lock-held"
 _NUMBERED = re.compile(r"pytest-(\d+)")
 _REBUILD_LOCK = "GOV_REBUILD_LOCK"
+_VECTOR_CACHE = "GOV_VECTOR_CACHE_DIR"
 _refused = False
 _held = None
 _rebuild_lock = None  # this process's own lock file and the variable's former value
@@ -55,6 +63,13 @@ _rebuild_lock = None  # this process's own lock file and the variable's former v
 
 def _is_worker(config) -> bool:
     return hasattr(config, "workerinput")
+
+
+@pytest.fixture(autouse=True)
+def _own_vector_cache(request, tmp_path_factory, monkeypatch):
+    """Each test's own machine-wide vector cache folder (W2-126, DEC-1042); made only when used."""
+    name = hashlib.sha256(request.node.nodeid.encode()).hexdigest()[:16]
+    monkeypatch.setenv(_VECTOR_CACHE, str(tmp_path_factory.getbasetemp() / "vector-cache" / name))
 
 
 def _own_rebuild_lock() -> tuple[str, str | None]:

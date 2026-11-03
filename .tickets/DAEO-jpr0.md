@@ -27,6 +27,8 @@ allowed_paths:
 - tests/unit/retrieval/test_semantic_cpu_embedder.py
 - tests/unit/retrieval/test_w2_108_freshness_once.py
 - tests/unit/semantic/test_semantic.py
+- tests/unit/retrieval/test_w2_123_retry.py
+- tests/unit/rebuild/test_w2_122_seed.py
 kpis:
   success:
   - 'Before it embeds a chunk or a question, the semantic stage and `query_vector` look up a machine-wide cache keyed by the model, its revision and the sha256 of the exact text sent; a hit uses the stored vector and sends nothing to the embedder; a miss embeds and stores the vector; the cache sits in the user''s own folder (one file, mode 0600), shared by every tree and clone on the machine [DEC-1032, P1-LOAD-BALANCE-1 b.1]'
@@ -62,3 +64,9 @@ only on the model, its revision and the text sent, not on the `gov` code, so one
 machine, makes every text embedded once. It also makes the retrieval check's dev tiers and questions free after their
 first use, and makes vectors reproducible across rebuilds (P-W2-123-2). The test designer starts at once from these
 KPIs; the engineer starts when W2-123 (which holds `semantic.py` for the bounded retry, DEC-1026) has landed.
+
+**Delegated (P2, the CTO, 2026-11-03, P-W2-126-BT; R-8: recorded here, not in the register):** the allowed paths gain
+`tests/unit/retrieval/test_w2_123_retry.py` and `tests/unit/rebuild/test_w2_122_seed.py`, builder tests (MR-3 holds) that
+assert behaviour this ticket's KPIs reverse, on DEC-1042 (2)'s reasoning: W2-123's two cases become "a 4xx ends at
+once" and "a refused connection is retried within the bound, then named" (KPI 7); W2-122's seed cases give the cold
+rebuild its own empty `GOV_VECTOR_CACHE_DIR`, so they still prove nothing of the base store was used.
