@@ -693,3 +693,8 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: rebuild needs anything not in git | `test_w1_27_rebuild.py::test_rebuild_needs_only_git`, `test_w1_27_rebuild.py::test_rebuild_is_an_act_command`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores` | README |
 
 Tier 2's cap here: 60 functions (10 KPI lines x 6); 80 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+
+Inventory row M5 (DEC-1040 (1), applied at the cut): `test_w1_27_path_compliance_r2.py`'s
+`test_stale_path_in_live_document_not_sources_is_reported` and `test_stale_path_in_src_gov_cli_is_reported` are folded
+into `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` (one doctor run, the three planted paths);
+the rows above that name them read as that case.
