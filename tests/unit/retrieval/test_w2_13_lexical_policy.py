@@ -137,6 +137,34 @@ def test_an_invalid_policy_is_refused_and_search_does_not_raise(project):
     assert lexical.search(root, "walrusword") == lexical._unavailable("unreadable")
 
 
+def _rebuild(root: Path, monkeypatch) -> dict:
+    """``gov rebuild --no-embeddings`` with the real lexical stage; stand-ins for the record store and the code index."""
+    import argparse
+
+    from gov.rebuild.command import add_arguments, run
+
+    monkeypatch.setattr("gov.store.load", lambda root: {"digest": "d"})
+    monkeypatch.setattr("gov.codeintel.index", lambda root: None)
+    parser = argparse.ArgumentParser()
+    add_arguments(parser)
+    return run(root, parser.parse_args(["--no-embeddings"]), load_config(root))
+
+
+def test_the_rebuild_names_each_file_kept_out(project, monkeypatch):
+    root, _ = project
+    lexical_store = _rebuild(root, monkeypatch)["stores"]["lexical"]
+    assert lexical_store == {"status": "recreated",
+                             "kept_out": {"evaluation": ["fixtures/evaluation/visible/q01.yaml"],
+                                          "report": ["docs/assessment/2026-10/B-memory-retrieval.md"]}}
+    assert _rebuild(root, monkeypatch)["stores"]["lexical"] == lexical_store, "a fresh index named nothing"
+
+
+def test_the_rebuild_report_is_unchanged_where_nothing_is_kept_out(project, monkeypatch):
+    root, _ = project
+    _commit(root, {PATH_MAP: _path_map(None, "indexed")})
+    assert _rebuild(root, monkeypatch)["stores"]["lexical"] == {"status": "recreated"}
+
+
 NAMESPACE = ("    memory_class: governance\n    sensitivity: internal\n    permitted_roles: [engineer]\n"
              "    retention: r\n    export_policy: e\n    embedding_policy: n\n    provenance: p\n    deletion_rebuild: d\n")
 
