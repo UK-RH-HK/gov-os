@@ -203,3 +203,40 @@ def test_the_validators_refuse_any_other_value(tmp_path, policy):
     findings = check(root)
     assert [finding["code"] for finding in findings] == ["PATH_MAP_INVALID"]
     assert "lexical_policy" in findings[0]["message"]
+
+
+@pytest.mark.parametrize("policy, embedding, refused", [
+    ("not indexed", "embedded", True),
+    ("not indexed", "not embedded", False),
+    ("indexed", "embedded", False),
+    (None, "embedded", False),
+])
+def test_not_indexed_cannot_be_embedded(tmp_path, policy, embedding, refused):
+    """The CTO's P2: the vectors are built from the keyword index's chunks, so the combination is refused, named."""
+    root = tmp_path / "r"
+    subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True, env=_ENV)
+    _commit(root, {PATH_MAP: _full(policy).replace("embedding_policy: n\n", f"embedding_policy: {embedding}\n"),
+                   "README.md": "x\n"})
+    if not refused:
+        assert load_config(root)["path-map.yaml"]["namespaces"]["all"]["embedding_policy"] == embedding
+        assert check(root) == []
+        return
+    with pytest.raises(GovError) as raised:
+        load_config(root)
+    assert raised.value.code == "CONFIG_INVALID"
+    assert raised.value.details["key"] == "namespaces.all.lexical_policy"
+    assert "not indexed cannot be embedded" in raised.value.message
+    findings = check(root)
+    assert [finding["code"] for finding in findings] == ["PATH_MAP_INVALID"]
+    assert "'all'" in findings[0]["message"] and "not indexed cannot be embedded" in findings[0]["message"]
+
+
+def test_the_keyword_index_refuses_the_combination_too(project):
+    """The minimal form of the path map is refused as the W1-08 form is; the index is not built on it."""
+    root, _ = project
+    _commit(root, {PATH_MAP: _path_map("not indexed").replace(
+        "lexical_policy: not indexed\n", "lexical_policy: not indexed\n    embedding_policy: embedded\n", 1)})
+    with pytest.raises(GovError) as raised:
+        lexical.refresh(root)
+    assert raised.value.code == "CONFIG_INVALID" and "namespaces.evaluation.lexical_policy" in raised.value.message
+    assert lexical.search(root, "walrusword") == lexical._unavailable("unreadable")

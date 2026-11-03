@@ -39,6 +39,9 @@ KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA}
 LEXICAL_POLICY = "lexical_policy"
 INDEXED, NOT_INDEXED = "indexed", "not indexed"
 LEXICAL_POLICIES = (INDEXED, NOT_INDEXED)
+# ``not indexed`` with ``embedding_policy: embedded`` is refused (the CTO, P2): the vectors are built from the keyword
+# index's chunks, so such a namespace would get no vectors while claiming them. The value semantic retrieval embeds.
+EMBEDDED = "embedded"
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
@@ -104,11 +107,24 @@ def _validate_namespace(ns_name, ns_value, rel):
     validate_lexical_policy(ns_name, ns_value, rel)
 
 
+def lexical_policy_fault(ns_value: dict) -> str | None:
+    """Why the namespace's ``lexical_policy`` is refused, or None: a value other than ``LEXICAL_POLICIES`` (absent is
+    ``indexed``), or ``not indexed`` with ``embedding_policy: embedded``."""
+    if LEXICAL_POLICY not in ns_value:
+        return None
+    if ns_value[LEXICAL_POLICY] not in LEXICAL_POLICIES:
+        return f"must be one of {LEXICAL_POLICIES} (absent: {INDEXED})"
+    if ns_value[LEXICAL_POLICY] == NOT_INDEXED and ns_value.get("embedding_policy") == EMBEDDED:
+        return (f"{NOT_INDEXED} cannot be embedded: the vectors are built from the keyword index's chunks "
+                f"(embedding_policy is {EMBEDDED})")
+    return None
+
+
 def validate_lexical_policy(ns_name, ns_value, rel):
-    """CONFIG_INVALID unless the namespace's ``lexical_policy`` is absent or one of ``LEXICAL_POLICIES``."""
-    if LEXICAL_POLICY in ns_value and ns_value[LEXICAL_POLICY] not in LEXICAL_POLICIES:
-        raise _invalid(rel, f"namespaces.{ns_name}.{LEXICAL_POLICY}",
-                       f"must be one of {LEXICAL_POLICIES} (absent: {INDEXED})")
+    """CONFIG_INVALID, naming the namespace, when ``lexical_policy_fault`` refuses its ``lexical_policy``."""
+    fault = lexical_policy_fault(ns_value)
+    if fault:
+        raise _invalid(rel, f"namespaces.{ns_name}.{LEXICAL_POLICY}", fault)
 
 
 def _validate_capabilities(caps, rel):
