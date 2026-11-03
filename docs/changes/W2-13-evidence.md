@@ -30,6 +30,7 @@ worktree. Unit = `tests/unit/retrieval/test_w2_13_ranked.py`, `test_w2_13_id_boo
 | S2 the fusion receives the ranked lexical list; the dev queryset's lexical-only hit@5 recorded | `gov accept` line success-2 (the `gov retrieve` case that waited for W2-92 now passes); the hit@5 below; the fusion's contribution: measure: D-4b measure 1 | `gov accept`; `lexical_hit5.py` (below); measure: D-4b measure 1 | pass, 3 of 3; hit@5 87.0 at the head (45 of 52), 0.0 at the base (0 of 52); the fusion's contribution: D-4b measure 1 | `06e5ae70a4a7` (`gov accept`); `3c0320080829` (hit@5) |
 | S3 "unavailable" instead of raising; latency within the retrieve budget on the dev tiers | `gov accept` line success-3; the latency file alone; unit `test_w2_13_rerank_work.py` | `gov accept`; `pytest tests/acceptance/W2-13/test_w2_13_latency.py` through `heavy_slot.sh` | pass, 25 of 25 alone (load 1.6 at its start); under load (the scoped run beside it, load near 20): 24 of 25, the one red the load-sensitive latency case; the latency file alone: 2 of 2 (load 1.1 at its start; 261 s, the real-model case's call 14.2 s after a 189 s setup, the lexical case 57.7 s) | `06e5ae70a4a7` (`gov accept`); `3c0320080829` (latency alone) |
 | S4 an id that exists nowhere: the stated gap | `gov accept` line success-4; unit `tests/unit/retrieve/test_w2_13_stated_gap.py` | `gov accept`; unit | pass, 8 of 8; unit pass (one case's double fixed for the merge, below) | `06e5ae70a4a7` |
+| S5 search respects role separation (DEC-1065 (2)): every route of `gov retrieve` and `gov context`'s supplementary block filtered by the caller's role_paths; what is withheld named by count and rule; no section, no filter | `gov accept` line success-5 (the designer's tests at `5828714c`, merged by the CTO; not yet run); unit `tests/unit/guard/test_role_paths.py`, `tests/unit/retrieval/test_w2_13_role_filter.py` (S5 below) | `gov accept`, after the CTO's merge; unit: `PYTHONPATH=<tree>/src bash heavy_slot.sh python3 -m pytest tests/unit/guard/test_role_paths.py tests/unit/retrieval/test_w2_13_role_filter.py tests/unit/context tests/unit/retrieve` | unit pass: 25 of 25 for S5; with `tests/unit/context` and `tests/unit/retrieve`, 115 passed; `gov accept`: waits for the merge | `5b42e9810996` |
 | F1 RETR-A-04's bundle unchanged | `gov accept` line failure-1 | `gov accept` | pass, 3 of 3 | `06e5ae70a4a7` |
 | F2 the secrets filter on the FTS5 table: a planted canary never indexed | `gov accept` line failure-2, after DEC-1045's change to `lexical.py` on integrate (merged without conflict) | `gov accept` | pass, 4 of 4 (both runs) | `06e5ae70a4a7` |
 
@@ -44,6 +45,25 @@ The two builder tests changed for the merge (`06e5ae70a4a7`), each the smallest 
 - `tests/unit/retrieval/test_w2_92_routes.py`, the missing or unreadable record store case: the evidence's routes
   are now `["lexical", "code"]`, not `["code"]`: the ranked lexical route holds the question's word beside the code
   route's span (S2, the change this ticket makes).
+
+## S5: search respects role separation (DEC-1065 (2); the round of 2026-11-03, `5b42e9810996`)
+
+- **The matcher:** `src/gov/guard/role_paths.py`, the hook's path checks (`.claude/hooks/role_reads.py`: `section`,
+  the placeholders `{ticket_tests}` with linked tests and `{ticket_impl}` with the (c3) shared files, `expand`,
+  `Judge`, `judges`) as a product module; the hook's reading of shell commands is not in it, and the hook is
+  unchanged (it may reuse the module later). The caller: `GOV_ROLE`, a `--role` beside it (it adds a filter, never
+  lifts the session's), `GOV_TICKET`; the section from the main tree's path map, the ticket from the searched tree.
+- **Where it applies:** in `retrieve()`, on every route's hits (lexical, semantic, closure, code) just before the
+  fusion, rather than on the chunk list alone: the lexical and semantic lists are not built from that list, so a
+  withheld hit would otherwise still take a rank and show its path in `gaps`. In `gov context`, in
+  `supplementary._ranked`, before a chunk is ranked.
+- **Named, never silent:** the bundle's `role_filter` (roles, ticket, rule, `withheld` paths and chunks, `by` rule
+  and glob), also on the stated-gap bundle; the supplementary block's `role_filter` and one `dropped` entry with id
+  `role_filter`, which the packet already carries, so `src/gov/context/__init__.py` (not in the ticket's paths) is
+  unchanged. No section, no role the section names, or no rule the ticket fills: no filter and no `role_filter`,
+  so today's bundles are unchanged.
+- **Fails closed:** a section or ticket that cannot be read stops `gov retrieve` with `ROLE_PATHS_UNREADABLE`; the
+  supplementary block is then empty and its `dropped` says why.
 
 ## S2: the dev queryset's lexical-only hit@5
 
