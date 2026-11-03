@@ -35,6 +35,16 @@ hook. Nothing in the repository is written. The run takes about 95 seconds.
 Sixteen cases need a program that a machine may lack (`perl` four cases; `ruby`, `node`, `curl`, `base64` three
 each); a case is skipped where its program is missing. All five are present on the owner's machine.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 0 in the full run, 364 lifted, 0 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 to S3, F1, F2 | **lifted only** (G-5: post-command containment off, built; tag `containment`) |
+
 ## KPI → tests → red reason today
 
 Red run on `w1/integrate` at `aa649af`, before implementation: **240 errors, 0 passed** (240 cases, 66 test

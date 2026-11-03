@@ -73,6 +73,16 @@ path), `sleep` (sleeps 12 seconds on `worktree`, past the guard's 5-second git t
 so that only a guard that times out refuses), `record` (writes every call's arguments to a log of the test's own, then
 passes it on).
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 0 in the full run, 329 lifted, 0 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| S1 to S6, F1 to F5 | **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in the full run by W2-58's S4 cases and the live hook's rule 2 |
+
 ## The KPI lines and their tests
 
 ### Success

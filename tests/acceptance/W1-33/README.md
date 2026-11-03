@@ -23,6 +23,17 @@ the definitions describe. No session is started, no network is used, nothing is 
 write there (DEC-312, DEC-315), so the definitions may be placed later than the role files and the roster. Report
 this file's result apart from the other three.
 
+## The full run after D-4's cut (DEC-1061)
+
+D-4's cut (DEC-1061, tier 2): the cases below run in the full suite. The lifted features' cases are in `tests/optin-lifted-guard.txt` and the parameter rows beyond each function's representatives (and any function beyond tier 2's cap of 6 per line, each line's named cases kept first) in `tests/optin-lifted-guard-breadth.txt`; a run leaves both out unless it says `--optin=lifted` (or `GOV_TESTS_OPTIN=lifted`). Nothing is deleted but the rows the list deletes. Each KPI line names the case(s) that cover it in the full run, with the number of cases kept (all of a file's, or a function's representative rows), or says it is lifted and by which decision.
+
+Cases: 110 in the full run, 3 lifted, 0 breadth (opt-in), 0 deleted.
+
+| KPI line | in the full run |
+|---|---|
+| every line | keeps its cases but three, lifted (G-4): `the_orchestrator_may_write_anywhere_else_in_the_repository` (W1-45's wide scope; S4's statement of it stays covered by `test_the_orchestrator_definition_states_its_write_scope` (1)), `the_auditor_writes_only_the_report_path_of_its_own_ticket` (per-ticket write scope; rule 5 stays covered by `test_auditor_cannot_write_into_another_role_s_work` (3) and the live hook's `test_rule_5_reviewers_write_only_their_records` (5)) and the orchestrator row of `an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role` (the five rules ask only in the CTO's session, DEC-957; its other rows stay, with the live hook's `test_rule_4_installs_and_sudo` (5)) |
+| D-4's red fix R-2 | the planted project copies `.claude/hooks`, which turns `test_w1_33_guard_and_launcher.py` (13) green (red on w2/integrate: the copied settings named a hook the project lacked) |
+
 ## KPI lines and their tests
 
 | KPI line | Tests |

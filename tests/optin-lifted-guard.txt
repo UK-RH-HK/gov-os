@@ -80,6 +80,8 @@ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_engineer_writes_only_i
 
 # W1-33
 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository  # the full guard (G-4/G-6; DEC-1061 (3a))
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket  # the full guard (G-4/G-6; DEC-1061 (3a))
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]  # the full guard (G-4/G-6; DEC-1061 (3a))
 
 # W1-45
 tests/acceptance/W1-45/test_w1_45_gov_runtime.py  # the full guard (G-4/G-6; DEC-1061 (3a))
