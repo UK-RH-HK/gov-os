@@ -384,3 +384,14 @@ rep: tests/acceptance/W1-21/test_w1_21_command.py  # one row per parametrised fu
 
 # acceptance/W1-22
 tests/acceptance/W1-22/test_w1_22_validator.py::TestValidatorRejects::test_validator_reports_multiple_errors  # cap
+
+# acceptance/W1-24
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_mandatory_record_that_is_read_has_the_hash_of_its_file  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_lookup_that_fails_on_a_file_it_cannot_read_says_so_and_not_that_the_index_is_unavailable  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_lookup_that_fails_on_a_damaged_index_says_that_the_index_is_unavailable  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_the_two_failures_give_two_packets  # cap
+tests/acceptance/W1-24/test_w1_24_supplementary.py::test_supplementary_context_is_non_empty_with_a_built_index  # cap
+tests/acceptance/W1-24/test_w1_24_supplementary.py::test_supplementary_is_dropped_before_mandatory_and_the_drop_is_named  # cap
+tests/acceptance/W1-24/test_w1_24_supplementary.py::test_the_packet_indicates_supplementary_is_unavailable_when_the_index_is_down  # cap
+rep: tests/acceptance/W1-24/test_w1_24_standing_sources.py  # one row per parametrised function
