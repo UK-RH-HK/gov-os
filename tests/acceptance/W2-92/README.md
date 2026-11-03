@@ -50,9 +50,23 @@ Two forms, both valid once the implementation lands:
    `rerank` is pinned as that code gives it with no reranker (`by: unavailable`, reason `the reranker given could
    not be loaded`, or `nothing to rerank` for an empty bundle). So `rerank` is part of the baseline, not a W2-92
    change, and any other added or changed field, order or content still fails `test_u1`.
+   **Revised under DEC-1055 (D-4b) for W2-13's S2** (the fusion receives the lexical route's ranked list, BM25):
+   the pins are W2-13's head `d6cba69e`, recorded by the test designer through the same call. The plain question
+   (and "unknown id", whose id is in no planted line and names no record, so it adds nothing) gives the six pages
+   that hold the phrase, then the three chunks BM25 finds for its words (`README.md`, the register's head, the
+   lantern note); the batched pages and their continuation follow that order; the ticket's lesson and ticket chunks
+   come in BM25 order, the lesson still first (DEC-424). Every other field is as before, and any other change
+   still fails `test_u1`.
 2. **Live** (`test_u2`): the plain question's evidence is the plain fused order of the lexical route, the only route
    of today that answers in these projects (`gov.retrieval.lexical.search` then `gov.retrieval.fusion.rrf`, as W2-87
-   does), and the pinned answer is that order.
+   does), and the pinned answer is that order. Since W2-13's S2 the route's list for the fusion is its `ranked`
+   list (else its `hits`), as `retrieve` takes it (`Api.plain_order`). `test_f4` holds the no-code-index answer to
+   the same order (before: its length, the six pages).
+3. **The budget** (`test_u4`, revised under DEC-1055 for the CTO's decision P-W2-13-R3 (a)): DEC-419 DP-3, W1-21's
+   approved spec, has the bundle budget bound parent expansion only, never dropping a child hit. Each page carries
+   the budget asked for, and a page that names an expansion is within it; a page whose gathered chunks alone pass
+   the budget (W2-13's longer lexical list does, at 400) is not cut and expands nothing. Before, each page's whole
+   bundle had to be within 400. Whether the budget should bound the whole bundle is W2-32's S5, with its own tests.
 
 Facts of the base, observed through the public interface and used by the tests:
 
@@ -80,6 +94,39 @@ Red run at the base, outside the sandbox: **30 tests, 17 failed, 13 passed**.
 | **Success 3 and failure 3.** A missing or unreadable code index or record store is named in the bundle for that route, never silently ok, never a failure of the whole answer | `test_w2_92_fail_closed.py`: `test_f1_a_code_index_that_cannot_answer_is_named_and_the_rest_is_returned` (cases: never indexed, tool cannot read it, tool not on PATH) · `test_f2_the_command_answers_ok_when_the_code_index_is_missing` · `test_f3_a_missing_record_store_is_named_and_the_code_routes_evidence_is_returned` · `test_f4_a_question_naming_no_symbol_does_not_report_the_code_route_ok_or_fail` | f1, f2: "the bundle names no state of that route" (only `lexical` and `semantic` are in `facets`). f1's evidence check is today's lexical evidence for `w92_leaf`, the planted files whose text holds the word: `app/leaf.py` and `app/middle.py` (the base answers exactly these; `app/top.py` only calls `w92_mid`; DEC-1006, P-W2-92-2), so at the base f1 fails on its facet check only. f3: the whole answer fails with `STORE_MISSING` ("no record graph in the store ..."). **f4 passes at the base** (a guard). |
 | **Success 4 and failure 1.** A question naming no record or symbol gets today's bundle, item for item; budget, batches, continuation, DEC-424's records ahead as today; two runs give one bundle | `test_w2_92_unchanged.py`: `test_u1_a_question_naming_no_record_or_symbol_gets_todays_bundle` (cases: plain, batched, unknown id, unknown symbol, ticket) · `test_u2_todays_bundle_is_the_plain_fused_order_of_todays_routes` · `test_u3_two_runs_on_one_store_give_the_same_bundle` (cases: new routes, plain) · `test_u4_a_batched_answer_with_a_new_route_continues_to_its_end_within_the_budget` | u1, u2, u3 **pass at the base** (guards: they are today's bundle by construction; since the D-4b revision u1 is pinned to `w2/integrate` `23625eb2aebe`, where it passes, W2-112's `rerank` included). `ticket` is DEC-424's records ahead (`--ticket DAEO-hb92`: the lesson that constrains it first). u4: "no page holds DEC-301's evidence: []" (batch size 1, budget 400, the continuation followed to its end). |
 | **Success 5 and failure 4** (W2-61's measure re-run: both figures together; the hidden half never read or run) | none | The lead's re-measure record in `docs/research/W2-92-memory-measure.md`, not a test of this suite. |
+
+## KPI line S6 (DEC-1065 (4)), tests and red reasons on the integrated code `eb28c40866af`
+
+Added under DEC-1065 by the test designer (D-4b round, `DAEO-n0wb`), from the KPI line alone and the integrated
+code's public interfaces. The time figure (a cold `gov retrieve` on this repository's store within about 1.2 s at
+the median of ten) is the CTO's measure on the shared servers, not a test. The tests check the cause and the
+guard: in a planted project with many records (`MASS` = 240 besides the harbour's; no code index, the code-graph
+tool off `PATH`), one `retrieve` in a new process counts the planted records' files it opens (an audit hook on
+`open`) and the front matters it parses (the YAML module's load functions wrapped), both switched on around the one
+call only. `test_s6c` compares this worktree's bundles with the integrated code's (`BASE`, its `src/` taken by
+`git archive` into the session's folder), item for item, with `support.projection`. Runs inside a worker's sandbox
+(no code index is built). About 60 s.
+
+Red run on `w2/integrate` `eb28c40866af`, in the sandbox: **15 tests, 3 failed, 12 passed** (about 35 s). A check
+of the tests themselves: with the integrated record route changed to read no file (titles of records outside the
+register then empty), `test_s6a` passes (nothing else in `retrieve` opens the many records) and `test_s6c` fails on
+its two title cases (it sees the change).
+
+| KPI line | Tests | Red on the integrated code because |
+|---|---|---|
+| **Success 6.** A plain question costs about one second: the record route no longer parses every record's front matter in each process (the titles kept in the store at rebuild) | `test_w2_92_speed.py::test_s6a_a_plain_question_does_not_read_every_records_front_matter` (cases: plain, unknown id) · `test_w2_92_speed.py::test_s6a_premise_the_counter_sees_a_record_read` · `test_w2_92_speed.py::test_s6b_a_title_is_the_one_the_store_was_built_with` · `test_w2_92_speed.py::test_s6b_after_a_rebuild_the_new_title_is_the_stores` | `test_s6a` (both cases): "one plain question opened 240 of the 240 planted records' files (at most 12 allowed)": `graph_route.start_ids` reads every record's title from its file and parses its front matter in each process. `test_s6b_a_title_is_the_one_the_store_was_built_with`: the bundle is empty (`[]`): the title is read from the working tree's file, which the edit after the load changed, not from the store (the store holds titles of register entries only). **The premise and `test_s6b_after_a_rebuild_the_new_title_is_the_stores` pass** (guards: the counter counts one open and one parse for one record read; a committed title change and a rebuild move the title). |
+| **Success 6 with success 4.** Nothing else in the bundle changes; S1's record route answers as before | `test_w2_92_speed.py::test_s6c_the_record_route_answers_as_the_integrated_code_does` (cases: plain, unknown id, decision id, contract id at radius 1, ticket id, W2 id, record title, a many-records title, ticket, batched) | **Passes on the integrated code** (a guard, by construction): any change to an item, its order, or a field outside the evidence fails it. |
+
+- **S6-P1. Where the titles come from.** The KPI line allows "the titles kept in the store at rebuild, or read only
+  when a question names a record"; the CTO's brief for this round says the titles come from the store after a
+  rebuild. `test_s6b_a_title_is_the_one_the_store_was_built_with` follows the brief: a title edited in the working
+  tree after the load is not read. A reading that opens a named record's file when a question names it by title
+  fails that one test. Confidence medium.
+- **S6-P2. A W2 id in the question.** The integrated code reads every ticket's front matter (by pattern, not YAML)
+  to resolve a W2 id, since a ticket's W2 id is not in the store. That question names a record, so S6 (a plain
+  question) does not bound it; not tested.
+- **S6-P3. The pinned base.** `BASE` is the integrated code at this round. A later ticket that changes these
+  bundles (as P-6) moves `BASE` by a test designer's revision under that ticket's decision.
 
 **How the tests read "named for that route".** `support.route_entries` takes every entry of `facets` other than
 today's `lexical` and `semantic` (today's form of a route's state), and every entry of any other top-level mapping
@@ -125,3 +172,4 @@ may hold ids or symbol-shaped words; see Risks in the return).
 - `conftest.py`: the session fixtures (`api`, `planted(kind)` for `full`, `nocode`, `nostore`, and `asked`, which
   asks a question once per session).
 - `test_w2_92_record_route.py`, `test_w2_92_code_route.py`, `test_w2_92_fail_closed.py`, `test_w2_92_unchanged.py`.
+- `test_w2_92_speed.py`: S6 (DEC-1065 (4)), its many-records project, its counting child process and its fixtures.
