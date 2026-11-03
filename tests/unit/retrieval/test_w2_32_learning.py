@@ -78,6 +78,41 @@ def test_a_case_without_a_part_names_it_and_writes_nothing(tmp_path, part):
     assert _files(tmp_path) == []
 
 
+@pytest.mark.parametrize("miss", [{"id": "H07"}, {"id": "H12", "part": "hidden"}, {"id": "q3", "part": "hidden"}])
+def test_a_hidden_miss_is_recorded_by_its_id_only(tmp_path, miss):
+    """The CTO's ruling under S3: nothing of a hidden question is written into the repository, and no case."""
+    event = learning.record(tmp_path, dict(miss))
+    assert event["type"] == "memory-quality" and event["question_id"] == miss["id"] and event["part"] == "hidden"
+    assert event["question"] is None and event["regression_case"] is None
+    assert _files(tmp_path) == [tmp_path / event["path"]]
+    stored = yaml.safe_load((tmp_path / event["path"]).read_text())
+    assert stored == event and not {"expected", "observed", "gold_answer", "sources", "regression"} & set(stored)
+    assert [e["id"] for e in learning.events(tmp_path)] == [event["id"]]
+
+
+@pytest.mark.parametrize("extra", ["question", "expected", "observed", "root_cause", "repair", "regression",
+                                   "gold_answer", "sources"])
+@pytest.mark.parametrize("marker", [{"id": "H07"}, {"id": "q3", "part": "hidden"}])
+def test_a_hidden_miss_carrying_more_than_its_id_is_refused_and_nothing_is_written(tmp_path, extra, marker):
+    miss = {**copy.deepcopy(MISS), **marker}
+    miss.setdefault(extra, MISS["regression"].get(extra, "x"))
+    miss = {key: value for key, value in miss.items() if key in (extra, *marker)}
+    with pytest.raises(ValueError, match=extra):
+        learning.record(tmp_path, miss)
+    assert _files(tmp_path) == []
+
+
+def test_a_hidden_miss_without_an_id_is_refused(tmp_path):
+    with pytest.raises(ValueError, match="no id"):
+        learning.record(tmp_path, {"part": "hidden"})
+    assert _files(tmp_path) == []
+
+
+def test_a_visible_miss_keeps_its_question_id(tmp_path):
+    event = learning.record(tmp_path, {**copy.deepcopy(MISS), "id": "q07", "part": "visible"})
+    assert (event["question_id"], event["part"]) == ("q07", "visible") and event["regression_case"]
+
+
 @pytest.mark.parametrize("change", [{"expected": [{"heading": "x"}]}, {"observed": "docs/a.md"},
                                     {"regression": {**MISS["regression"], "sources": [{"lines": [1, 2]}]}},
                                     {"root_cause": 7}])

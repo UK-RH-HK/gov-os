@@ -120,7 +120,7 @@ def _lowest(count):
 
 
 def test_the_shared_server_starts_under_the_default_cap_and_its_child_inherits_it(stage):
-    result = ollama.ensure_available(timeout_s=15, env=stage.env)
+    result = ollama.ensure_available(start=True, timeout_s=15, env=stage.env)
     assert result["available"] and result["started"], result
     assert result["settings"] == {"parallel": 1, "cpus": _highest(8), "nice": 10, "source": "default"}
     runs = {run["who"]: run for run in stage.wait_runs(2)}
@@ -136,7 +136,7 @@ def test_the_query_server_starts_under_its_configured_cap_with_the_gpu_left_visi
     stage.gate({"other": 1, "embedding_servers": {"query": {"parallel": 3, "cpus": two, "nice": 15},
                                                   "shared": {"parallel": 2}}})
     caller = {"CUDA_VISIBLE_DEVICES": gpu} if gpu is not None else {}
-    result = ollama.ensure_query_available(timeout_s=15, env={**stage.env, "OLLAMA_NUM_PARALLEL": "9", **caller})
+    result = ollama.ensure_query_available(start=True, timeout_s=15, env={**stage.env, "OLLAMA_NUM_PARALLEL": "9", **caller})
     assert result["available"] and result["started"], result
     assert result["settings"] == {"parallel": 3, "cpus": two, "nice": 15,
                                   "source": str(stage.home / ollama.GATE_REL)}
@@ -148,7 +148,7 @@ def test_an_automatic_start_of_the_query_server_runs_under_the_default_cap_like_
     """Nothing listens at the query address and no gate file exists: the code's own start gives the started process
     and its child the default CPU list and niceness, the same as the shared server's, and leaves the GPU visible."""
     assert not (stage.home / ollama.GATE_REL).exists()
-    result = ollama.ensure_query_available(timeout_s=15, env=stage.env)
+    result = ollama.ensure_query_available(start=True, timeout_s=15, env=stage.env)
     assert result["available"] and result["started"], result
     assert result["settings"] == {"parallel": 1, "cpus": _highest(8), "nice": 10, "source": "default"}
     runs = {run["who"]: run for run in stage.wait_runs(2)}
@@ -176,7 +176,7 @@ def test_an_unreadable_value_refuses_the_start_and_names_the_key(stage, capsys, 
         (stage.home / ollama.GATE_REL).write_text("{", encoding="utf-8")
     else:
         stage.gate(section)
-    result = ollama.ensure_available(timeout_s=1, env=stage.env)
+    result = ollama.ensure_available(start=True, timeout_s=1, env=stage.env)
     assert (result["available"], result["started"], result["state"], result["settings"]) == \
         (False, False, "CONFIG_INVALID", None)
     assert key in result["warning"] and ollama.GATE_REL in result["warning"]
@@ -195,7 +195,7 @@ def test_no_executable_found_gives_the_result_of_w1_18_without_settings(stage, c
         env["GOV_OLLAMA_BIN"] = str(stage.home / "missing")
     else:
         del env["GOV_OLLAMA_BIN"]
-    result = start(timeout_s=1, env=env)
+    result = start(start=True, timeout_s=1, env=env)  # the explicit start (W2-32 S10)
     assert result == {"available": False, "started": False, "facet": "semantic", "state": "FACET_UNAVAILABLE",
                       "warning": ollama.WARNING}
     assert capsys.readouterr().err.count(ollama.WARNING) == 1
@@ -203,14 +203,14 @@ def test_no_executable_found_gives_the_result_of_w1_18_without_settings(stage, c
 
 def test_an_executable_that_cannot_start_still_states_its_settings(stage):
     stage.program.chmod(0o644)  # there, but not executable: a start attempted, not one without an executable
-    result = ollama.ensure_available(timeout_s=1, env=stage.env)
+    result = ollama.ensure_available(start=True, timeout_s=1, env=stage.env)
     assert (result["available"], result["started"], result["state"]) == (False, False, "FACET_UNAVAILABLE")
     assert result["settings"] == {"parallel": 1, "cpus": _highest(8), "nice": 10, "source": "default"}
 
 
 def test_an_unreadable_value_comes_before_a_missing_executable(stage):
     stage.gate({"embedding_servers": {"shared": {"nice": -1}}})
-    result = ollama.ensure_available(timeout_s=1, env={**stage.env, "GOV_OLLAMA_BIN": str(stage.home / "missing")})
+    result = ollama.ensure_available(start=True, timeout_s=1, env={**stage.env, "GOV_OLLAMA_BIN": str(stage.home / "missing")})
     assert (result["state"], result["settings"]) == ("CONFIG_INVALID", None)
 
 
@@ -293,7 +293,7 @@ def test_a_safe_restart_starts_a_down_server_under_its_cap_and_records_it(stage)
 
 def test_a_safe_restart_stops_a_hung_serve_with_its_child_and_starts_it_capped(stage):
     stage.gate({"embedding_servers": {"shared": {"probe_slow_s": 0.2, "probe_hung_s": 0.5, "parallel": 2}}})
-    first = ollama.ensure_available(timeout_s=15, env={**stage.env, "STANDIN_MODE": "novector"})
+    first = ollama.ensure_available(start=True, timeout_s=15, env={**stage.env, "STANDIN_MODE": "novector"})
     assert first["started"], first
     old = {run["who"]: run["pid"] for run in stage.wait_runs(2)}
     result = ollama.safe_restart("shared", env=stage.env)

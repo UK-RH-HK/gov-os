@@ -15,12 +15,19 @@ written. Otherwise the case is written as a file of its own under ``CASES_REL`` 
 both YAML in the project and outside ``.gov-runtime/``, so they are kept with the tree. The folder is never embedded
 (``gov.retrieval.semantic`` leaves it out whatever the path map says), as tests and probe records stay out of memory
 (DEC-1052): the case is held out. ``events(root)`` lists every event recorded, oldest first.
+
+A miss may name its question's ``id`` (the measure's id) and its ``part``. **A miss on the hidden half** (an id of
+``H`` followed by digits, or ``part: hidden``) is recorded by the question's id only (the CTO's ruling under S3; the
+hidden half lives outside every tree, DEC-1055 (4), G-3): its event holds the id and nothing of the question, its
+gold answer or its sources, and no case is written. Such a miss that carries anything but ``id`` and ``part`` raises
+``ValueError`` naming what it carries, and nothing is written.
 """
 
 from __future__ import annotations
 
 import hashlib
 import os
+import re
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,6 +40,14 @@ TYPE = "memory-quality"
 REQUIRED = ("question", "expected", "root_cause", "repair", "regression")
 CASE_REQUIRED = ("question", "gold_answer", "sources")
 FIELDS = ("id", "type", "question", "root_cause", "repair", "path", "regression_case")
+HIDDEN, HIDDEN_ID = "hidden", re.compile(r"H\d+")
+HIDDEN_KEYS = ("id", "part")  # all a hidden miss may carry
+
+
+def hidden(miss) -> bool:
+    """Whether ``miss`` is one of the hidden half's: its id is ``H`` and digits, or its part is ``hidden``."""
+    return isinstance(miss, dict) and (miss.get("part") == HIDDEN or (
+        isinstance(miss.get("id"), str) and HIDDEN_ID.fullmatch(miss["id"].strip()) is not None))
 
 
 def _empty(value) -> bool:
@@ -111,16 +126,46 @@ def _write(path: Path, document: dict) -> None:
         raise
 
 
+def _hidden_id(miss: dict) -> str:
+    """The hidden question's id; raises ``ValueError`` naming what else the miss carries, or that it has no id."""
+    carried = sorted(str(key) for key, value in miss.items() if key not in HIDDEN_KEYS and not _empty(value))
+    if carried:
+        raise ValueError(f"a miss on the hidden half is recorded by its question's id only: it carries "
+                         f"{', '.join(carried)} (nothing is written)")
+    qid = miss.get("id")
+    if not isinstance(qid, str) or not qid.strip():
+        raise ValueError("a miss on the hidden half has no id: it is recorded by its question's id only")
+    return qid.strip()
+
+
+def _record_hidden(root: Path, miss: dict) -> dict:
+    """The hidden half's event: the question's id, and nothing of its text, answer or sources; no case."""
+    qid, now = _hidden_id(miss), datetime.now(timezone.utc)
+    event_id = _new_id(root, f"{HIDDEN}/{qid}", now)
+    event_rel = f"{EVENTS_REL}/{event_id}.yaml"
+    event = {"id": event_id, "type": TYPE, "question": None, "question_id": qid, "part": HIDDEN,
+             "root_cause": None, "repair": None, "path": event_rel, "regression_case": None,
+             "recorded_at": now.strftime("%Y-%m-%dT%H:%M:%SZ")}
+    _write(root / event_rel, event)
+    return event
+
+
 def record(root, miss) -> dict:
     """Record ``miss`` as a memory-quality event with its held-out regression case; the event, as ``events`` gives
-    it. Raises ``ValueError`` naming a missing part, and then writes nothing."""
+    it. Raises ``ValueError`` naming a missing part, and then writes nothing. A miss on the hidden half is recorded
+    by its question's id only (see the module)."""
     root = Path(root)
+    if hidden(miss):
+        return _record_hidden(root, miss)
     parts = _checked(miss)
     now = datetime.now(timezone.utc)
     event_id = _new_id(root, parts["question"], now)
     case_rel, event_rel = f"{CASES_REL}/{event_id}.yaml", f"{EVENTS_REL}/{event_id}.yaml"
+    qid = miss.get("id")
     event = {"id": event_id, "type": TYPE, "question": parts["question"], "root_cause": parts["root_cause"],
              "repair": parts["repair"], "path": event_rel, "regression_case": case_rel,
+             **({"question_id": str(qid)} if not _empty(qid) else {}),
+             **({"part": str(miss["part"])} if not _empty(miss.get("part")) else {}),
              "expected": parts["expected"], "observed": parts["observed"],
              "recorded_at": now.strftime("%Y-%m-%dT%H:%M:%SZ")}
     _write(root / case_rel, {"id": event_id, **parts["regression"]})

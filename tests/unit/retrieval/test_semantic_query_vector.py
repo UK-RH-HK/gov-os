@@ -33,10 +33,10 @@ def vector(own: str, before: str | None) -> bytes:
 @pytest.fixture()
 def embedder(tmp_path, monkeypatch):
     """A project with a runtime folder, and an embedder whose vector for a text depends on the text embedded just
-    before it, as the real one's does; ``state["revision"]`` is what the model list reports, ``state["on_cpu"]``
-    whether the embedder reports the model on the CPU."""
+    before it, as the real one's does; ``state["revision"]`` is what the model list reports, ``state["loaded"]``
+    whether the embedder reports the model loaded (on the GPU: W2-32 S10 refuses the CPU)."""
     (tmp_path / ".gov-runtime").mkdir()
-    state = {"revision": DIGEST, "calls": [], "hosts": [], "fail": False, "previous": None, "on_cpu": True}
+    state = {"revision": DIGEST, "calls": [], "hosts": [], "fail": False, "previous": None, "loaded": True}
 
     def embed(texts, host=None):
         state["calls"].append(texts)
@@ -52,7 +52,7 @@ def embedder(tmp_path, monkeypatch):
     monkeypatch.setenv(ollama.QUERY_HOST_SETTING, QUERY_HOST)
     monkeypatch.setattr(semantic, "_embed", embed)
     monkeypatch.setattr(semantic, "_revision", lambda host=None: state["revision"])
-    monkeypatch.setattr(semantic, "_device", lambda host: "cpu" if state["on_cpu"] else None)
+    monkeypatch.setattr(semantic, "_device", lambda host: "gpu" if state["loaded"] else None)
     return tmp_path, state
 
 
@@ -156,7 +156,7 @@ def test_the_key_names_the_device_and_a_hash_of_the_text_and_the_text_is_kept_no
     vec(root, "who fires the bowls")
     with sqlite3.connect(cache(root)) as connection:
         rows = connection.execute("SELECT model, revision, device, text_sha256 FROM device_query_vector").fetchall()
-    assert rows == [(semantic.MODEL, DIGEST, "cpu", hashlib.sha256((I + "who fires the bowls").encode()).hexdigest())]
+    assert rows == [(semantic.MODEL, DIGEST, "gpu", hashlib.sha256((I + "who fires the bowls").encode()).hexdigest())]
     assert b"fires" not in cache(root).read_bytes()
 
 

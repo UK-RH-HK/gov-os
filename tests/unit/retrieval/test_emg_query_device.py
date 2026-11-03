@@ -62,8 +62,17 @@ def _cached_devices(root):
         return [device for (device,) in connection.execute("SELECT device FROM device_query_vector")]
 
 
-@pytest.mark.parametrize("vram, device", [(SIZE, "gpu"), (SIZE // 2, "gpu"), (0, "cpu")])
-def test_a_question_s_vector_is_used_whatever_device_the_model_is_reported_on(server, vram, device):
+def test_a_question_s_vector_computed_on_the_cpu_is_refused_named_and_not_cached(server):
+    """W2-32 S10 (DEC-1065 (1)): no CPU fallback, so a CPU vector is refused, never cached."""
+    root, state = server
+    state["ps"] = _ps(vram=0)
+    vector, reason = semantic.query_vector(root, "q")
+    assert vector is None and reason.startswith(semantic.ON_CPU)
+    assert not (root / semantic.QUERY_VECTORS_REL).exists()
+
+
+@pytest.mark.parametrize("vram, device", [(SIZE, "gpu"), (SIZE // 2, "gpu")])
+def test_a_question_s_vector_is_used_when_the_model_is_reported_on_the_gpu(server, vram, device):
     root, state = server
     state["ps"] = _ps(vram=vram)
     assert semantic.query_vector(root, "q") == (_expected(), None)
@@ -130,7 +139,7 @@ def test_the_query_server_is_started_without_hiding_the_gpu(monkeypatch, caller)
     seen = []
     monkeypatch.setattr(ollama, "ensure_available", lambda **kwargs: seen.append(kwargs) or {"available": True})
     env = {"OLLAMA_HOST": "127.0.0.1:11434", "GOV_QUERY_OLLAMA_HOST": "127.0.0.1:7", "PATH": "/bin", **caller}
-    assert ollama.ensure_query_available(timeout_s=3, env=env) == {"available": True}
-    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7"}}]
+    assert ollama.ensure_query_available(start=True, timeout_s=3, env=env) == {"available": True}  # explicit only
+    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7"}, "start": True}]
     assert seen[0]["env"].get("CUDA_VISIBLE_DEVICES") == caller.get("CUDA_VISIBLE_DEVICES")
     assert not hasattr(ollama, "NO_GPU")

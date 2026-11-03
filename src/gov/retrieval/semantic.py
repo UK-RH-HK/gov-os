@@ -10,12 +10,16 @@ DEC-381).
 - ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write it (DEC-322). Missing, empty
   or stale vectors, an absent ``sqlite_vec`` and an absent Ollama make the facet unavailable; none raises.
 - A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare
-  instruction, and the second vector is its vector. It is used whatever device computed it (DEC-1033, replacing
-  DEC-798's CPU-only rule): on the GPU the vector can depend on the prompt computed just before it (DEC-773), and
-  the owner accepted that drift on the evidence that it changed no answer of the standing memory measure. The vector
-  is used only when that embedder reports the model loaded after computing it and the two vectors are well-formed
-  (one length above 0, every number finite); otherwise the facet is unavailable and the question goes nowhere else.
-  The chunks go to the shared runner at ``OLLAMA_HOST``, with no runner option.
+  instruction, and the second vector is its vector. It is used only when computed on the GPU (W2-32 S10, DEC-1065
+  (1), replacing DEC-1033's "any device"): on the GPU the vector can depend on the prompt computed just before it
+  (DEC-773), and the owner accepted that drift on the evidence that it changed no answer of the standing memory
+  measure. The vector is used only when that embedder reports the model loaded on the GPU after computing it and the
+  two vectors are well-formed (one length above 0, every number finite); a vector computed on the CPU is
+  ``EMBEDDER_ON_CPU``, never cached; otherwise the facet is unavailable and the question goes nowhere else.
+  The chunks go to the shared runner at ``OLLAMA_HOST``, with no runner option; a batch the runner reports
+  computing on the CPU (or on no device it names) is ``EMBEDDER_ON_CPU``: nothing of it is stored or cached, and the
+  stage is not reported built. No embedder is ever started here (``ollama.ensure_*`` check health only): one that
+  does not answer is ``EMBEDDER_UNAVAILABLE``.
 - That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in
   it, keyed by the model, the revision the model list reports at the time of the search, the device that computed
   it and the sha256 of the exact text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. Round 3's entries, keyed
@@ -61,7 +65,8 @@ MODEL = models.DEFAULT_MODEL  # the embedder when no models.yaml pins one (W2-32
 EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-381)
 # A question is embedded with the model's retrieval instruction; a chunk is embedded without one.
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
-DEVICES = ("cpu", "gpu")  # the devices a question's vector is used from (DEC-1033); the cache key names which one
+DEVICES = ("gpu",)  # the one device a vector is used from (W2-32 S10, DEC-1065 (1)); the cache key names it
+ON_CPU = "EMBEDDER_ON_CPU"  # a vector computed on the CPU: refused, never cached or stored (W2-32 S10)
 EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
@@ -89,6 +94,10 @@ NO_MODEL = f"{models.NOT_LISTED}: {MODEL} is not in Ollama's model list"
 NO_EMBEDDING = f"Ollama did not embed with {MODEL}"
 NOT_LOADED = f"the query embedder does not report {MODEL} loaded: its vector is not used"
 MALFORMED = f"the query embedder's vectors from {MODEL} are malformed: the question's vector is not used"
+QUERY_ON_CPU = f"{ON_CPU}: the query embedder computed the question's vector with {MODEL} on the CPU: it is not used "\
+               f"or cached (no CPU fallback, DEC-1065)"
+BUILD_ON_CPU = f"{ON_CPU}: the shared embedder computed the chunks' vectors with {MODEL} on the CPU: none is stored "\
+               f"or cached, and the stage is not reported built (no CPU fallback, DEC-1065)"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS semantic_vector (chunk_id TEXT PRIMARY KEY, embedding BLOB NOT NULL);
@@ -318,6 +327,8 @@ def query_vector(root: Path, query: str, counts: dict | None = None,
     device = _device(host)  # read after the computation: a fresh embedder lists nothing until a request loads it
     if device is None:
         return None, _say(NOT_LOADED)
+    if device not in DEVICES:  # W2-32 S10: a CPU vector is refused, never cached
+        return None, Refused(ON_CPU, _say(QUERY_ON_CPU))
     if device in keys:
         _cache(path, keys[device], vectors[1])
         machine.put([text], [vectors[1]])
@@ -415,6 +426,10 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
                         return _gave_up(gave_up.args[0])
                     if embedded is None:
                         return _say(NO_EMBEDDING)
+                    device = _device(None)  # W2-32 S10: read after the request, which loads the model
+                    if device not in DEVICES:  # on the CPU, or not reported: nothing of this batch is kept
+                        return Refused(ON_CPU, f"{_say(BUILD_ON_CPU)} (the shared embedder reports "
+                                               f"{device or 'no device'} for it)")
                     machine.put([texts[i] for i in todo], embedded)
                     for i, vector in zip(todo, embedded):
                         vectors[i] = vector
