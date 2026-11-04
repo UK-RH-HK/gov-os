@@ -10,7 +10,7 @@ The work was done by two sessions, both blind to every result:
 The files:
 - the rubric: `docs/research/memory-measure-audit/RUBRIC.md`, items R1-R10, with pass tests and reason codes;
 - the visible half: `docs/research/memory-measure-audit/VISIBLE.md`;
-- the hidden half: `docs/audit/memory-measure-hidden.md`, in ids, items and general reasons only. h02 and h24 are
+- the hidden half: `docs/research/memory-measure-audit/HIDDEN.md`, in ids, items and general reasons only. h02 and h24 are
   held back while your operator corrects them, as DEC-1068 (c) ruled.
 
 ## The answers to your three questions
