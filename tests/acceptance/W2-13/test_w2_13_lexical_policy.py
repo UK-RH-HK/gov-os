@@ -276,8 +276,8 @@ def test_the_vectors_keep_their_embedding_policy(box, ollama, planted_vectors, c
 # the repository: D-7 marks the evaluation set's own documents
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("prefix", [s6.LENS_B_REPORT, s6.EVALUATION_FIXTURES],
-                         ids=["lens B's report", "the evaluation fixtures"])
+@pytest.mark.parametrize("prefix", [s6.LENS_B_REPORT, s6.EVALUATION_FIXTURES, s6.W2_15A_RAW],
+                         ids=["lens B's report", "the evaluation fixtures", "W2-15a's raw measure output"])
 def test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed(prefix):
     """This repository's own path map (the run's root): each tracked file lies in exactly one namespace, and that
     namespace says ``lexical_policy: not indexed`` (DEC-1066 (3), D-7)."""
@@ -293,3 +293,22 @@ def test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed(pref
             wrong[path] = f"namespace {names[0]!r} says lexical_policy: {namespaces[names[0]].get(s6.FIELD)!r}"
     assert not wrong, f"{len(wrong)} of {len(files)} files under {prefix} are not marked not indexed: " \
                       f"{dict(list(wrong.items())[:5])}"
+
+
+def test_the_repository_keeps_nothing_else_out_of_the_keyword_index():
+    """The converse (the D-7 review's F2; DEC-1052 M-4: tests and the close, checkpoint and probe records stay in
+    keyword search). This repository's path map says ``lexical_policy: not indexed`` on ``evaluation-sources`` and
+    ``evaluation-fixtures`` only. Every tracked file that a namespace keeps out lies under the decided patterns: lens B's
+    report, W2-15a's raw measure output and the evaluation fixtures (DEC-1066 (3))."""
+    namespaces = s6.repository_namespaces()
+    marked = {name for name, entry in namespaces.items()
+              if isinstance(entry, dict) and entry.get(s6.FIELD) == s6.NOT_INDEXED}
+    assert marked == s6.NOT_INDEXED_NAMESPACES, \
+        f"the namespaces that say lexical_policy: not indexed are {sorted(marked)}, not " \
+        f"{sorted(s6.NOT_INDEXED_NAMESPACES)}: extra {sorted(marked - s6.NOT_INDEXED_NAMESPACES)}"
+    files = s6.tracked(".")
+    kept = [path for path in files
+            if any(namespaces[name].get(s6.FIELD) == s6.NOT_INDEXED for name in s6.holders(namespaces, path))]
+    assert kept, "premise: the path map keeps no tracked file out of the keyword index"
+    extra = [path for path in kept if not any(s6.matches(path, pattern) for pattern in s6.KEPT_OUT_BY_DECISION)]
+    assert not extra, f"{len(extra)} tracked files kept out of the keyword index that no decision names: {extra[:5]}"
