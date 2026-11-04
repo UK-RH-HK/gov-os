@@ -51,6 +51,18 @@ retired from this suite. The ticket's other lines keep their numbers (K1 to K4, 
   `PATH`; no code-graph tool on `PATH` (as in W2-76: the code index reports itself not recreated and no daemon
   starts); `GOV_OLLAMA_BIN` naming no program; `GOV_SECRETS_CACHE` empty. Cases skip where `gitleaks`, `git` or
   `sqlite_vec` is missing.
+- **Every rebuild gets a new, empty machine-wide vector cache (W2-126, DEC-1032).** Each `gov rebuild` the
+  support starts is given `GOV_VECTOR_CACHE_DIR` set to a fresh folder under the case's `tmp_path`
+  (`<box>/vector-cache/run-*`, `run_environment` in the support); `XDG_CACHE_HOME` is the case's empty home's
+  `.cache`. No case reads or writes the machine's cache (`~/.cache/gov-os/vector-cache`), with the real `HOME` or an
+  empty one. *Why one cache per rebuild and not one per case:* W2-126's cache is keyed by model, revision and text.
+  With one cache per case, the cold rebuild after the base's build is served the base's vectors and sends the
+  endpoint no text at all. That is W2-126's design and no fault: a cold rebuild may reuse cached vectors. This
+  suite's premise, though, is "cold" in both senses, with no store and no cache. A cold rebuild (and a rebuild after
+  a refused seed) embeds every file at the endpoint, so when a seeded rebuild does not send a kept note's text, that
+  is the seed's work and not the cache's. The isolation states that premise exactly; whether the cache serves a
+  rebuild is for W2-126's tests. (Rewritten 2026-11-04, DEC-968, D-4b: from W2-126's merge `0c5d7f4c` on, the cache
+  each case shared made the cold rebuilds of 11 cases look seeded.)
 
 ## KPI lines and their tests
 

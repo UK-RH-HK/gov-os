@@ -5,6 +5,9 @@ Ported from ``cli/govbridge/lexical/fts.py`` (the FTS5 table, its tokenizer and 
 
 - The corpus is ``git ls-files`` passed through ``gov.secrets.indexable``; there is no include list. A file is
   read as it stands in the working tree (DEC-344), and only after the filter has let it through.
+- A file whose namespace says ``lexical_policy: not indexed`` is kept out before the filter, unread (W2-13 S6,
+  DEC-1066 (3)); a link, also when what it points to is so placed. Absent, the field is ``indexed``, as before. Such a
+  file is recorded with ``indexed`` = ``KEPT_OUT``, and ``refresh`` names each one under its namespace (``kept_out``).
 - The index is incremental by blob hash: ``lexical_file`` holds the blob of every tracked file that was judged,
   indexed or not, and a refresh judges and chunks only the paths whose blob differs. When the path map, the
   gitleaks rules or the scan's switch (``secrets.yaml``, DEC-1045) change, every tracked file is judged again.
@@ -51,7 +54,8 @@ import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.config.loader import PROJECT_DIR, SECRETS_FILE
+from gov.config.loader import (LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, SECRETS_FILE, read_yaml,
+                               validate_lexical_policy)
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
@@ -63,6 +67,7 @@ TOKENIZE = "porter unicode61 tokenchars '_'"
 # What the filter's verdict on a file depends on besides the file: when one changes, every file is judged again.
 JUDGES = (f"{PROJECT_DIR}/path-map.yaml", CONFIG_REL, f"{PROJECT_DIR}/{SECRETS_FILE}")  # the scan's switch, DEC-1045
 FIELD_SEP, ROW_SEP = "\x1f", "\x1e"
+KEPT_OUT = 2  # ``lexical_file.indexed`` of a file the path map's lexical_policy keeps out (0: the filter refused it)
 COLUMNS = ("text", "ident", "title")
 WEIGHTS = (1.0, 10.0, 4.0)  # bm25's weight of each of COLUMNS: body, id, title
 TOP_K = 30  # the chunks the words add to the ranked list, as many as the semantic route returns
@@ -124,6 +129,45 @@ def _tracked(root: Path) -> dict[str, str]:
         return {}
     hashes = _git(root, "hash-object", "--stdin-paths", stdin=os.fsencode("\n".join(files) + "\n")).decode().split()
     return dict(zip(files, hashes, strict=True))
+
+
+def _pattern(pattern: str) -> re.Pattern:
+    """A path map pattern: ``*`` stays inside one folder, ``**`` crosses folders."""
+    return re.compile(".*".join(re.escape(part).replace(r"\*", "[^/]*") for part in pattern.split("**")))
+
+
+def kept_out(root: Path, paths) -> dict[str, str]:
+    """``path -> namespace`` for each of ``paths`` that a namespace saying ``lexical_policy: not indexed`` matches, or,
+    for a link, whose target inside ``root`` it matches (DEC-1066 (3)). Reads the path map; reads no file.
+
+    Only the namespaces' ``lexical_policy`` is validated here (any other value: CONFIG_INVALID); the rest of the path
+    map is validated by the secrets filter, which loads it whole for every file it judges."""
+    map_rel = f"{PROJECT_DIR}/path-map.yaml"
+    place = Path(root) / map_rel
+    document = read_yaml(place, "CONFIG_INVALID", map_rel) if place.is_file() else None
+    namespaces = document.get("namespaces") if isinstance(document, dict) else None
+    if not isinstance(namespaces, dict):
+        return {}
+    rules = []
+    for name, entry in namespaces.items():
+        if isinstance(entry, dict):
+            validate_lexical_policy(name, entry, map_rel)
+            if entry.get(LEXICAL_POLICY) == NOT_INDEXED and isinstance(entry.get("paths"), list):
+                rules += [(name, _pattern(pattern)) for pattern in entry["paths"] if isinstance(pattern, str)]
+    if not rules:
+        return {}
+    top, kept = Path(root).resolve(), {}
+    for rel in paths:
+        names = [rel]
+        if os.path.islink(Path(root) / rel):
+            try:
+                names.append((Path(root) / rel).resolve(strict=True).relative_to(top).as_posix())
+            except (OSError, ValueError, RuntimeError):
+                pass  # no target, a loop or a place outside the root: the filter refuses it anyway
+        name = next((name for name, pattern in rules for each in names if pattern.fullmatch(each)), None)
+        if name is not None:
+            kept[rel] = name
+    return kept
 
 
 def ids_in(text: str) -> list[str]:
@@ -199,8 +243,15 @@ def _drop(connection: sqlite3.Connection, rel: str) -> None:
         connection.execute(f"DELETE FROM {table} WHERE path = ?", (rel,))
 
 
-def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
-    """Bring the index up to date; the open store and the paths chunked in this call."""
+def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
+    """Bring the index up to date; the open store, the paths chunked in this call and the tracked paths the path map
+    keeps out (``kept_out``'s answer).
+
+    The policy is worked out over every tracked path on each refresh, and a path whose stored verdict disagrees with
+    it is judged again whatever its blob (review S6-F1): a store judged by code without S6, against a map that already
+    says ``not indexed``, holds such files at ``indexed = 1``, and the map's blob it recorded is the current one. A
+    stored ``KEPT_OUT`` the map no longer keeps out is judged again too; a file the filter refused (``indexed = 0``)
+    and the map does not keep out agrees, and is not."""
     current = _tracked(root)
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL)
@@ -211,14 +262,18 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
         connection.executescript(SCHEMA)
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
-        asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]]
-        allowed = set(indexable(root, asked)) if asked else set()
+        policy = kept_out(root, list(current)) if current else {}
+        asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]
+                 or (rel in policy) != (stored[rel][1] == KEPT_OUT)]
+        kept = {rel: policy[rel] for rel in asked if rel in policy}  # before the filter: neither scanned nor read
+        judged = [rel for rel in asked if rel not in kept]
+        allowed = set(indexable(root, judged)) if judged else set()
         indexed = []
         with connection:
             for rel in stored.keys() - current.keys():
                 _drop(connection, rel)
             for rel in asked:
-                state = (current[rel], int(rel in allowed))
+                state = (current[rel], KEPT_OUT if rel in kept else int(rel in allowed))
                 if stored.get(rel) == state:
                     continue  # judged again and nothing changed: the chunks stand
                 _drop(connection, rel)
@@ -235,7 +290,7 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
                     connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
                                        (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
-        return connection, indexed
+        return connection, indexed, policy
     except BaseException:
         connection.close()
         raise
@@ -246,10 +301,14 @@ def _empty(connection: sqlite3.Connection) -> bool:
 
 
 def refresh(root: Path) -> dict:
-    """Bring the index up to date with the tracked files; its digest and the paths chunked in this call."""
-    connection, indexed = _update(Path(root))
+    """Bring the index up to date with the tracked files; its digest, the paths chunked in this call and every file
+    the path map keeps out (``kept_out``: namespace -> its paths, sorted; empty when none is)."""
+    connection, indexed, policy = _update(Path(root))
     try:
-        return {"digest": _digest(connection), "indexed": indexed}
+        named: dict[str, list[str]] = {}
+        for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = ? ORDER BY path", (KEPT_OUT,)):
+            named.setdefault(policy[rel], []).append(rel)  # every KEPT_OUT row agrees with the policy after _update
+        return {"digest": _digest(connection), "indexed": indexed, "kept_out": dict(sorted(named.items()))}
     finally:
         connection.close()
 

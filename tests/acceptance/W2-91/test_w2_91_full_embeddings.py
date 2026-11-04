@@ -33,8 +33,14 @@ def _code_under_test():
 # --------------------------------------------------------------------------
 
 def not_yet_embedded(namespaces, paths):
-    """Success 1: the root files, governance/** and schemas/** files the path map does not embed."""
-    return sorted(rel for rel in paths if s.newly_embedded_area(rel) and not s.embedded(namespaces, rel))
+    """Success 1 in D-7's scope: the root files, governance/** (less the overlay's record folders) and schemas/**
+    files the path map does not embed."""
+    return sorted(rel for rel in paths if s.embedded_after_d7(rel) and not s.embedded(namespaces, rel))
+
+
+def records_embedded(namespaces, paths):
+    """D-7 (DEC-1055 (3)): the overlay's record folders that the path map embeds."""
+    return sorted(rel for rel in paths if s.matches_any(rel, s.OVERLAY_RECORDS) and s.embedded(namespaces, rel))
 
 
 def embedded_that_stays_out(namespaces, paths):
@@ -87,16 +93,21 @@ def moved(before, after, paths):
 # --------------------------------------------------------------------------
 
 def test_root_files_governance_and_schemas_are_embedded():
-    """Success 1 (the path map's verdict for this repository's tracked files)."""
+    """Success 1 (the path map's verdict for this repository's tracked files), in D-7's scope (DEC-1055 (2), (3)):
+    the overlay's record folders are left out of success 1 and must be not embedded."""
     paths, namespaces = s.tracked(), s.namespaces_at(None)
     root = [rel for rel in paths if "/" not in rel]
-    sets = {"root files": root, "governance/": [rel for rel in paths if rel.startswith("governance/")],
-            "schemas/": [rel for rel in paths if rel.startswith("schemas/")]}
+    sets = {"root files": root,
+            "governance/": [rel for rel in paths if rel.startswith("governance/") and s.embedded_after_d7(rel)],
+            "schemas/": [rel for rel in paths if rel.startswith("schemas/")],
+            "the overlay's records": [rel for rel in paths if s.matches_any(rel, s.OVERLAY_RECORDS)]}
     assert [name for name, found in sets.items() if not found] == [], "an empty set: the case would pass vacuously"
     assert {"CLAUDE.md", "README.md", "AGENTS.md"} <= set(root)
     missing = not_yet_embedded(namespaces, paths)
     counts = {name: sum(1 for rel in found if rel in missing) for name, found in sets.items()}
     assert missing == [], f"{len(missing)} files not embedded ({counts}), e.g. {missing[:5]}"
+    records = records_embedded(namespaces, paths)
+    assert records == [], f"{len(records)} files of the overlay's record folders embedded, e.g. {records[:5]}"
 
 
 def test_schemas_has_a_namespace_of_its_own_and_cli_stays_out():
@@ -175,7 +186,9 @@ def _holding(namespaces, rel):
     return names[0]
 
 
-@pytest.mark.parametrize("rel", ["fixtures/planted/sample.md", ".claude/skills/planted/SKILL.md",
+# fixtures/evaluation/: since D-7 the path map names fixtures/ by its sub-folders; a plant in an unnamed one is in no
+# namespace (the path-map check's fault, not this one), so the plant sits in the evaluation set's own folder.
+@pytest.mark.parametrize("rel", ["fixtures/evaluation/planted/sample.md", ".claude/skills/planted/SKILL.md",
                                  ".rulesync/planted.md", "cli/carried.py"])
 def test_failure_1_an_embedded_file_that_stays_out_is_refused(rel):
     namespaces = s.namespaces_at(None)
@@ -229,15 +242,21 @@ def _json(rel):
 IN = ["CLAUDE.md", "README.md", "AGENTS.md", "copier.yml", "governance/adoption/planted.md",
       "governance/project/planted-notes.md", "governance/project/briefs/planted.md",
       "governance/project/prompts/planted.md", "governance/project/orchestration/packages/planted.md",
-      "governance/project/orchestration/sessions/planted.md",
+      "governance/project/orchestration/tools/planted.md",
       "governance/project/orchestration/main/orchestrator/CHECKPOINT.md", "schemas/planted.schema.json"]
-OUT = ["cli/carried.py", "fixtures/planted/sample.md", ".claude/skills/planted/SKILL.md", ".rulesync/planted.md",
+# fixtures/: since D-7 the path map names its sub-folders, so the plants sit in two of them (evaluation-fixtures,
+# DEC-1066 (3), and fixtures); an unnamed fixtures/ folder would be in no namespace.
+OUT = ["cli/carried.py", "fixtures/evaluation/planted/sample.md", "fixtures/brownfield/planted/sample.md",
+       ".claude/skills/planted/SKILL.md", ".rulesync/planted.md",
        "template/.rulesync/planted.md", "template/governance/kernel/vendor/planted.py",
        "template/governance/kernel/bin/planted.md", "template/governance/kernel/skills/superpowers/planted/SKILL.md"]
+# D-7 (DEC-1055 (3)): an overlay record folder is not embedded; the session plant moved here from IN.
+RECORD = "governance/project/orchestration/sessions/planted.md"
 CONTROLS = ["docs/planted.md", "src/planted.py", ".github/workflows/planted.md",
-            "template/governance/kernel/roles/planted.md"]
-# fixtures/** is product memory: the lexical index never reads it (DEC-820 (d)), so it has no chunk to embed either.
-NEVER_INDEXED = {"fixtures/planted/sample.md"}
+            "template/governance/kernel/roles/planted.md", RECORD]
+# fixtures/** is product memory: the lexical index never reads it (DEC-820 (d)), so it has no chunk to embed either;
+# fixtures/evaluation/** is also kept out of the keyword index by its namespace (DEC-1066 (3)).
+NEVER_INDEXED = {"fixtures/evaluation/planted/sample.md", "fixtures/brownfield/planted/sample.md"}
 
 
 def _text(rel):
@@ -276,6 +295,7 @@ def test_a_rebuild_gives_vectors_exactly_to_the_files_the_path_map_embeds(tmp_pa
         "the vectors are not exactly the files the path map embeds"
     assert {"docs/planted.md", "src/planted.py", "template/governance/kernel/roles/planted.md"} <= vectors
     assert ".github/workflows/planted.md" not in vectors
+    assert RECORD in chunked and RECORD not in vectors, "an overlay record has a vector, or no chunk"
 
 
 def test_the_indexer_verdict_ignores_sensitivity_and_export_policy(tmp_path, stand_in):

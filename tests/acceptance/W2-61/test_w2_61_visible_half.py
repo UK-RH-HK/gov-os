@@ -13,6 +13,9 @@ Table 2's Command column, with its ``--ticket``, ``--id`` and ``--radius`` as ``
 Table 2's Q03 is matched by the retired original, kept unchanged in ``fixtures/evaluation/memory-retrieval/retired/
 q03-lens-b.yaml`` outside the visible half, and the rewritten question states DEC-1033's rule and repeats no Table 2
 query.
+``q09.yaml`` is re-labelled blind (the owner's DEC-1066 (4), 2026-11-03): its question and gold answer are lens B's,
+its sources now the Contract's statements of the packet's ceiling with the ticket's KPI lines as one alternative;
+Table 2's Q09 is matched by the retired original, kept unchanged in ``retired/q09-lens-b.yaml``.
 Every source exists at this worktree's HEAD, every heading it gives is a line of that file there, and no source
 names lens B's report or ``fixtures/evaluation/**`` (failure KPI 4).
 
@@ -38,6 +41,11 @@ LENS_B_NAMES = tuple(f"q{n:02d}.yaml" for n in range(1, 21))   # lens B's 20, by
 REWRITTEN = "q03.yaml"
 RETIRED = s.REAL_VISIBLE.parent / "retired" / "q03-lens-b.yaml"
 RETIRED_FROM = "8d09eb40"   # the commit that wrote lens B's Q03 into the visible half
+# The owner's Q09 re-label (DEC-1066 (4)): q09.yaml's sources re-set blind, lens B's label retired unchanged; 8d09eb40
+# wrote it too.
+RELABELLED = "q09.yaml"
+RETIRED_Q09 = s.REAL_VISIBLE.parent / "retired" / "q09-lens-b.yaml"
+RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09}
 
 
 def _files():
@@ -60,10 +68,11 @@ def _extra_files():
 
 
 def _table_2_files():
-    """The files that hold Table 2's 20 commands: lens B's 20, with the retired original in the rewritten q03's
-    place (the owner's q03 decision of 2026-11-03)."""
-    assert RETIRED.is_file(), f"{RETIRED.relative_to(s.REPO_ROOT)} (lens B's original Q03) is not on record"
-    return [RETIRED if path.name == REWRITTEN else path for path in _lens_b_files()]
+    """The files that hold Table 2's 20 commands: lens B's 20, with the retired originals in the rewritten q03's and
+    the re-labelled q09's places (the owner's q03 decision of 2026-11-03; DEC-1066 (4))."""
+    for retired in RETIRED_ORIGINALS.values():
+        assert retired.is_file(), f"{retired.relative_to(s.REPO_ROOT)} (lens B's original) is not on record"
+    return [RETIRED_ORIGINALS.get(path.name, path) for path in _lens_b_files()]
 
 
 def _command(path):
@@ -132,7 +141,8 @@ def test_every_visible_question_has_the_required_fields(key):
 
 def test_each_question_is_table_2_s_command_with_its_options():
     """Lens B's 20 files, ``q01.yaml`` to ``q20.yaml``, are exactly Table 2's 20 commands with their options, at
-    full strength, with the retired original in the rewritten ``q03.yaml``'s place; a visible file beyond them, and
+    full strength, with the retired originals in the rewritten ``q03.yaml``'s and the re-labelled ``q09.yaml``'s
+    places (``q09.yaml`` keeps lens B's question, which its own case checks); a visible file beyond them, and
     the rewritten ``q03.yaml``, is not required to be a Table 2 command, and none repeats a Table 2 query (failure
     KPI: no question copied from lens B's 20). Failure messages name files and Table 2 rows by id only, never a
     question's text [DEC-954 (Q9a), DEC-1009, DEC-820 (d); the owner's q03 decision of 2026-11-03]."""
@@ -192,6 +202,59 @@ def test_q03_is_rewritten_to_dec_1033_and_the_original_is_kept_unchanged():
             faults.append(f"{source['path']}: its span does not hold DEC-1033")
         if str(heading or "").startswith("### DEC-798 "):
             faults.append(f"{source['path']}: DEC-798's entry, the replaced decision")
+    assert not faults, "\n".join(faults)
+
+
+def _span_at_head(source):
+    """A source's lines at HEAD by the measure's rule (a heading found governs: a ``#`` heading to the next of its
+    level or higher, any other as many lines as ``lines`` state; not found, ``lines``), or None when no file."""
+    text = _at_head(source["path"])
+    if text is None:
+        return None
+    lines = text.splitlines()
+    heading, stated = source.get("heading"), source.get("lines")
+    at = next((i for i, line in enumerate(lines) if heading is not None and line.rstrip() == str(heading).rstrip()),
+              None)
+    if at is not None and str(heading).startswith("#"):
+        level = len(str(heading)) - len(str(heading).lstrip("#"))
+        end = next((j for j in range(at + 1, len(lines)) if lines[j].startswith("#")
+                    and len(lines[j]) - len(lines[j].lstrip("#")) <= level), len(lines))
+        return lines[at:end]
+    if at is not None:
+        return lines[at:at + (stated[1] - stated[0] + 1 if stated else 1)]
+    return lines[stated[0] - 1:stated[1]] if stated else lines
+
+
+def test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged():
+    """The owner's Q09 re-label (DEC-1066 (4), 2026-11-03): lens B's Q09 is kept, byte for byte as W2-61 wrote it,
+    in ``retired/`` outside the visible half; the visible ``q09.yaml`` keeps its id, question, gold answer and
+    ticket; its sources are one entry of alternatives that names the Contract (``docs/contract/``) and keeps the
+    ticket's KPI lines, and each alternative's span (the measure's rule) states the packet's ceiling of ~6k tokens
+    at HEAD."""
+    rel = (s.REAL_VISIBLE / RELABELLED).relative_to(s.REPO_ROOT).as_posix()
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{RETIRED_FROM}:{rel}"], capture_output=True,
+                          timeout=s.TIMEOUT_S)
+    assert done.returncode == 0, f"lens B's Q09 is not found at {RETIRED_FROM}"
+    assert RETIRED_Q09.is_file() and RETIRED_Q09.read_bytes() == done.stdout, (
+        f"{RETIRED_Q09.relative_to(s.REPO_ROOT)} is not lens B's Q09 as {RETIRED_FROM} wrote it")
+    assert RETIRED_Q09.parent != s.REAL_VISIBLE
+    data, original = _load(s.REAL_VISIBLE / RELABELLED), _load(RETIRED_Q09)
+    for key in ("id", "question", "gold_answer", "ticket"):
+        assert data.get(key) == original.get(key), f"the re-labelled q09 does not keep lens B's {key}"
+    sources = data.get("sources")
+    assert isinstance(sources, list) and len(sources) == 1 and isinstance(sources[0], list), (
+        "q09's sources are not one entry of alternatives")
+    alternatives = _entries(data)
+    paths = [source["path"] for source in alternatives]
+    assert any(path.startswith("docs/contract/") for path in paths), "no source of q09 is the Contract"
+    assert any(source in alternatives for source in _entries(original)), "q09 no longer keeps the ticket's KPI lines"
+    faults = []
+    for source in alternatives:
+        span = _span_at_head(source)
+        if span is None:
+            faults.append(f"{source['path']} is not a file at HEAD")
+        elif "6k tokens" not in "\n".join(span):
+            faults.append(f"{source['path']} ({source.get('heading')!r}): its span does not state ~6k tokens")
     assert not faults, "\n".join(faults)
 
 

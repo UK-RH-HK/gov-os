@@ -45,14 +45,75 @@ namespaces:
     embedding_policy: embedded
     provenance: written by tk and the orchestrator; git history
     deletion_rebuild: authoritative; restored from git only
+  # DEC-1052 M-4, DEC-1055 (3) (D-7): docs split so the records and the measure's own document sit apart
   docs:
-    paths: ["docs/**"]
+    paths:
+      - "docs/*"
+      - "docs/adoption/**"
+      - "docs/adr/**"
+      - "docs/audit/**"
+      - "docs/changes/**"
+      - "docs/charter/**"
+      - "docs/contract/**"
+      - "docs/imported/**"
+      - "docs/interfaces/**"
+      - "docs/lessons/**"
+      - "docs/plan/**"
+      - "docs/releases/**"
+      - "docs/research/*"
+      - "docs/research/EXP-003/*"
+      - "docs/research/EXP-003/examin/**"
+      - "docs/research/EXP-003/w2-15a/*"
+      - "docs/research/EXP-003/w2-15a/diag/**"
+      - "docs/spec/**"
+      - "docs/assessment/2026-10/A-purpose-roadmap.md"
+      - "docs/assessment/2026-10/C-decisions-to-spec.md"
+      - "docs/assessment/2026-10/D-tool-staging.md"
+      - "docs/assessment/2026-10/E-roles-context.md"
+      - "docs/assessment/2026-10/F-models-context.md"
+      - "docs/assessment/2026-10/G-tools-glue.md"
+      - "docs/assessment/2026-10/H-test-strategy.md"
+      - "docs/assessment/2026-10/I-SYNTHESIS.md"
+      - "docs/assessment/2026-10/I1-guard-launcher-sandbox.md"
+      - "docs/assessment/2026-10/I2-close-checks-ratchet.md"
+      - "docs/assessment/2026-10/I3-retrieval-context-resume.md"
+      - "docs/assessment/2026-10/I4-records-plan-rest.md"
+      - "docs/assessment/2026-10/SYNTHESIS.md"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history; superseded records stay
     export_policy: allowed
     embedding_policy: embedded
+    provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
+    deletion_rebuild: authoritative; restored from git only
+  # M-4: close, checkpoint and probe records stay in keyword search only
+  doc-records:
+    paths:
+      - "docs/close/**"
+      - "docs/checkpoints/**"
+      - "docs/probes/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history; superseded records stay
+    export_policy: allowed
+    embedding_policy: not embedded
+    provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
+    deletion_rebuild: authoritative; restored from git only
+  # DEC-1066 (3), G4: lens B's report and W2-15a's raw measure output quote the measure's questions or name their
+  # gold positions and hold the hidden half's ranks: out of both indexes (the D-7 review's F5)
+  evaluation-sources:
+    paths:
+      - "docs/assessment/2026-10/B-memory-retrieval.md"
+      - "docs/research/EXP-003/w2-15a/raw/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history; superseded records stay
+    export_policy: allowed
+    embedding_policy: not embedded
+    lexical_policy: not indexed
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
   # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
@@ -70,14 +131,10 @@ namespaces:
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
       # DEC-953 items 1 and 5: the build-phase close records
-      - "governance/project/orchestration/closes/**"
       # DEC-934: the nightly's committed, reviewed scripts and their tests
-      - "governance/project/orchestration/nightly/**"
       # DEC-990 (P-W2-97-PM-1): the CTO's committed tools, W2-97's merge queue first
       - "governance/project/orchestration/tools/**"
-      - "governance/project/orchestration/sessions/**"
       # b60ff112: the emergency patches' review records (they review no ticket), moved out of docs/probes/
-      - "governance/project/orchestration/reviews/**"
       - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
       - "governance/project/orchestration/main/orchestrator/PR-*.md"
     memory_class: governance
@@ -86,6 +143,21 @@ namespaces:
     retention: kept in git history
     export_policy: denied
     embedding_policy: embedded
+    provenance: the project overlay, written by the orchestrator or under a ticket; git history
+    deletion_rebuild: authoritative; restored from git only
+  # M-4: the orchestration's close, nightly, session and review records stay in keyword search only
+  orchestration-records:
+    paths:
+      - "governance/project/orchestration/closes/**"
+      - "governance/project/orchestration/nightly/**"
+      - "governance/project/orchestration/sessions/**"
+      - "governance/project/orchestration/reviews/**"
+    memory_class: governance
+    sensitivity: restricted
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: denied
+    embedding_policy: not embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
   # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
@@ -151,24 +223,44 @@ namespaces:
     embedding_policy: embedded
     provenance: written by the engineer under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
+  # M-4: tests stay in keyword search only; tickets link to their tests
   tests:
-    paths: ["tests/**"]
+    paths:
+      - "tests/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: allowed
-    embedding_policy: embedded
+    embedding_policy: not embedded
     provenance: tests/acceptance by the independent test designer only (MR-3); tests/unit by the engineer
     deletion_rebuild: authoritative; restored from git only
   fixtures:
-    paths: ["fixtures/**"]
+    paths:
+      - "fixtures/README.md"
+      - "fixtures/brownfield/**"
+      - "fixtures/greenfield/**"
+      - "fixtures/migration/**"
     memory_class: product
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: denied
     embedding_policy: not embedded
+    provenance: synthetic product repositories, written under a ticket; stand-ins for product data, kept out of governance memory
+    deletion_rebuild: authoritative; restored from git only
+  # DEC-1066 (3), G4: the measure's questions and W2-32's memory-quality events: out of both indexes
+  evaluation-fixtures:
+    paths:
+      - "fixtures/evaluation/**"
+      - "fixtures/memory-quality/**"
+    memory_class: product
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: denied
+    embedding_policy: not embedded
+    lexical_policy: not indexed
     provenance: synthetic product repositories, written under a ticket; stand-ins for product data, kept out of governance memory
     deletion_rebuild: authoritative; restored from git only
   # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the old carried cli/ stays out; schemas/ has the namespace
