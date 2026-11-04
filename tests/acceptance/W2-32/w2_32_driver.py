@@ -63,9 +63,29 @@ def recording_loader(path, word):
     return load
 
 
+def hashed_score(text):
+    """A score of its own for every text (DEC-1067 (f)'s order check): no two texts tie."""
+    import hashlib
+    return int(hashlib.sha256(text.encode("utf-8")).hexdigest()[:12], 16) / float(16 ** 12)
+
+
+def calls_loader(path):
+    """A reranker that keeps each request it is given (one JSON line per call: its texts) and scores each text by
+    ``hashed_score``."""
+    def load():
+        def score(query, texts):
+            with open(path, "a", encoding="utf-8") as out:
+                out.write(json.dumps(list(texts)) + "\n")
+            return [hashed_score(text) for text in texts]
+        return score
+    return load
+
+
 def reranker(spec):
     if spec is None:
         return None  # the default reranker
+    if spec.startswith("calls:"):
+        return calls_loader(spec.split(":", 1)[1])
     if spec.startswith("record:"):
         _, path, word = spec.split(":", 2)
         return recording_loader(path, word)
