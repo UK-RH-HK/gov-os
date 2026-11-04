@@ -1,0 +1,12 @@
+category: failure-memory
+commit: cc9c94d42a54
+question: "What did the Phase 2 rule against review-repair snowballs require before code changed for a finding?"
+gold_answer: >-
+  The finding went through whole-system retrieval or a context pack, then a fresh architecture or root-cause synthesis
+  that classified the response as exactly one of six dispositions: REPAIR EXISTING MECHANISM, REUSE EXISTING
+  PRIMITIVE, DELETE MECHANISM, NARROW REQUIREMENT, DEFER TO LATER LIFECYCLE or OWNER DECISION; only after one
+  disposition was chosen could Phase 2's product code change (L-0077, the anti-snowball rule).
+sources:
+  - path: docs/lessons/L-0077.md
+    heading: "The owner's anti-snowball rule required that before any implementation change, a finding go through a mandatory sequence:"
+    lines: [14, 29]

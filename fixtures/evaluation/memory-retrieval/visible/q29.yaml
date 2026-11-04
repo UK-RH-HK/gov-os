@@ -1,0 +1,13 @@
+category: ticket
+commit: cc9c94d42a54
+question: "What does W2-77 require of the nightly when it cannot remove its own clone?"
+gold_answer: >-
+  W2-77 (DAEO-b6hm): the nightly then removes only that clone's own administrative entry, by its exact name under the
+  common git directory, or reports the failure in its record; it never touches another worktree's entry.
+sources:
+  - - path: .tickets/DAEO-b6hm.md
+      heading: "  - 'If the removal of its own clone fails, the nightly removes only that clone''s own administrative entry (by its exact name under the common git directory), or reports the failure in its record; it never touches another worktree''s entry [DEC-939 item 5, DEC-866]'"
+      lines: [25, 25]
+    - path: src/gov/close/nightly.py
+      heading: "def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:"
+      lines: [301, 302]

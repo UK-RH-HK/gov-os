@@ -1,0 +1,14 @@
+category: kernel-template
+commit: cc9c94d42a54
+question: "When the orchestrator's review finds a case my acceptance tests miss, how does it reach me and what do I do with it?"
+gold_answer: >-
+  As a described behaviour, never as code (DEC-136): the test designer decides from the specification whether it
+  becomes an acceptance test, and reports a finding that reveals a specification gap to the orchestrator, so the
+  specification can be amended.
+sources:
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-136 — Probe findings feed the independent suite"
+      lines: [1238, 1247]
+    - path: template/governance/kernel/skills/test-design/SKILL.md
+      heading: "## Handling probe findings"
+      lines: [28, 35]

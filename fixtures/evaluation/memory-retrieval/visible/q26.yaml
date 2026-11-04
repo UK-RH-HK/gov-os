@@ -1,0 +1,11 @@
+category: plan
+commit: cc9c94d42a54
+question: "What has to hold for Wave 2's exit criterion on the hooks?"
+gold_answer: >-
+  Exit criterion 2 (WAVE_2_WBS.md §5), the hooks back on with fast pre-commit checks: the owner has reinstalled
+  lefthook; a commit made straight after staging, with no hand rebuild, passes the pre-commit hook in under 60 s;
+  index-freshness and recovery-rebuild run at pre-push or in CI; and DEC-709 is retired.
+sources:
+  - path: docs/plan/WAVE_2_WBS.md
+    heading: "2. **The hooks are back on, with fast pre-commit checks.**"
+    lines: [1850, 1854]

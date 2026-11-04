@@ -1,0 +1,21 @@
+category: ticket
+commit: cc9c94d42a54
+question: "Which ticket made a rebuild remember gitleaks' clean verdicts, and where is that record kept?"
+gold_answer: >-
+  W2-107 (DAEO-kiar), "Rebuild speed: gitleaks results remembered by content hash, so a rebuild scans only new or
+  changed files". The record is one machine-wide cache outside every repository, ~/.cache/gov-os/secrets-scan.sqlite,
+  shared by worktrees, close clones and the nightly, keyed by the sha256 of the bytes scanned, the kind and the
+  engine's fingerprint.
+sources:
+  - - path: .tickets/DAEO-kiar.md
+      heading: "wbs_id: W2-107"
+      lines: [12, 13]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "| W2-107 | A | **New (DEC-966).** Rebuild speed: gitleaks verdicts remembered by content hash; the nightly scans in full; a gitleaks or rule change forgets them (`DAEO-kiar`) | implementation | engineer | FULL | none | 180 | DEC-966 item 4, DEC-939 |"
+      lines: [179, 179]
+  - - path: src/gov/secrets/cache.py
+      heading: "The pre-index filter judges a file's content and a path's names. A verdict of no finding at all, by every rule set,"
+      lines: [3, 7]
+    - path: .tickets/DAEO-kiar.md
+      heading: "  - 'A rebuild scans with gitleaks only content it has not judged clean before: each scan''s verdict is remembered in one machine-wide cache (`~/.cache/gov-os/secrets-scan.sqlite`, outside every repository, shared by worktrees, close clones and the nightly), keyed by the sha256 of the bytes scanned, the kind (a file''s content, or a path''s names for `path_holds_secret`) and the engine''s fingerprint (gitleaks'' version string, the sha256 of every rule set in force, the cache format''s version); a second rebuild of an unchanged tree scans nothing again [DEC-966 item 4, DEC-939]'"
+      lines: [25, 25]

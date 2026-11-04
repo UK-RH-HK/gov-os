@@ -1,0 +1,13 @@
+category: code-paraphrase
+commit: cc9c94d42a54
+question: "Can a Gov OS release version be built again from a different commit?"
+gold_answer: >-
+  No. A release is immutable (CAP-43): gov release never builds again a version the repository already knows, from a
+  record in the tree, any ref's history or a tag, build metadata aside.
+sources:
+  - - path: src/gov/release/__init__.py
+      heading: "\"\"\"Immutable, hash-pinned releases of the Gov OS (W2-16, CAP-43.b lite, DEC-722)."
+      lines: [1, 9]
+    - path: .tickets/DAEO-49o5.md
+      heading: "  - 'A release is immutable: building the same version from another commit, or changing a file after release, is refused [CAP-43].'"
+      lines: [34, 34]
