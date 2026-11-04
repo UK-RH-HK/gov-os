@@ -5,14 +5,18 @@
 # not keep out), so its old heading was found nowhere and lines 115 were no longer the call. The fact is unchanged:
 # the lexical index calls indexable before it chunks a file, now at lexical.py line 270. The question, the gold
 # answer and the question's commit are kept; the answer's line numbers are as of that commit.
+# Re-worded by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-DETAIL), checked blind at cc9c94d42a54 by a session
+# independent of the retrieval work: the gold answer's line numbers (115, 185; the calls are at 270 and 188 there)
+# are dropped: the sources' headings locate the calls. The two callers are complete (no third in src/ or template/). The
+# label before is in ../retired/q10-pre-dec1069.yaml.
 id: Q10
 category: callers
 commit: 23079f92a6fa
 ids: [indexable]
 question: Who calls indexable?
 gold_answer: >-
-  Two indexers: the lexical index (src/gov/retrieval/lexical.py, line 115) and the code index
-  (src/gov/codeintel/__init__.py, line 185), each before it chunks a file.
+  Two indexers: the lexical index (src/gov/retrieval/lexical.py) and the code index (src/gov/codeintel/__init__.py),
+  each before it chunks a file.
 sources:
   - path: src/gov/retrieval/lexical.py
     heading: "        allowed = set(indexable(root, judged)) if judged else set()"

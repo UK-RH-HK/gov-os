@@ -110,3 +110,51 @@ does not read, so nothing here is scored or retrieved.
   fallback and the two daemons (lines 3-17). Figures for Q03 before 2026-11-04 are the old label's and are not
   comparable with the new one's.
 - **Past results:** not read, as for Q16.
+
+## The labels retired 2026-11-04 under DEC-1069 (`<id>-pre-dec1069.yaml`)
+
+These come from the owner's DEC-1069 (1) to (3) (2026-11-04, in the chat; recorded in the register by the
+orchestrator), which apply the fixes of the visible half's audit (`docs/research/memory-measure-audit/VISIBLE.md` §4
+and §5). The independent test designer, a session independent of the retrieval work, checked each one blind against
+the repository at cc9c94d42a54 and read no result. Each file here is the label as it stood at cc9c94d42a54, byte for
+byte. Its replacement is `visible/<id>.yaml`, whose header comment gives the detail. Figures for a re-labelled
+question before 2026-11-04 are the old label's.
+
+- **q02-pre-dec1069.yaml** (lens B's Q02, W2-61's 8d09eb40): its gold answer named the cache file
+  `.gov-runtime/query-vectors.db`. At cc9c94d42a54 the file is `.gov-runtime/query-vector-cache.db`
+  (`QUERY_VECTORS_REL`). Only the file name was re-worded.
+- **q03-pre-dec1069.yaml** (q03's DEC-1065 label, a9ef6f82): it had one entry of four alternatives, and no single
+  one held all three asked facts (DEC-1065's entry names no host; W2-32's S10 line gives neither where nor why). It
+  is split into two entries, as DEC-1069 (3) confirms: where (`ollama.py` 3-17 or `semantic.py` 12-18), and the
+  device and why (DEC-1065's entry or `semantic.py` 12-18). S10's line is left out. The question and the gold
+  answer are kept.
+- **q04-pre-dec1069.yaml** (lens B's Q04, 8d09eb40): it cited DEC-004 (PROPOSED, not the governing source),
+  `CAP-15.g.md` (it states only the ~2.5k summary) and `retrieve.py`'s `BUNDLE_BUDGET` (the retrieval bundle's
+  budget, another limit), and was categorised `decision`. It is re-labelled to the Contract: CAP-15 in
+  `contract.yaml` added, the Contract's envelope (`token_budget`, and its line in `CONTRACT_v4.md`) added, the three
+  dropped, and category `contract`. The question is kept, beside Q09 (DEC-1069 (2), option (a)).
+- **q07-pre-dec1069.yaml** (lens B's Q07, 8d09eb40): its gold answer gave 27 tickets, DAEO-g0ip to DAEO-7rr2, but
+  DAEO-0mab's `depends_on` holds 23, DAEO-g0ip to DAEO-2bdu: d7d41d6e (DEC-954) took nine out and put five in. Its
+  ticket span (17-44) also ran into `allowed_paths`. The gold answer is now the 23, and the span is 17-40.
+  Volatile (DEC-1069 (6)).
+- **q09-pre-dec1069.yaml** (Q09's DEC-1066 (4) label, f1a01dfe): categorised `ticket`, while the Contract governs
+  the answer. Its category is now `contract`; nothing else changed.
+- **q10-pre-dec1069.yaml** (lens B's Q10, re-anchored at ba08ca77): its gold answer gave lines 115 and 185, while
+  the calls are at 270 and 188. The line numbers are dropped.
+- **q11-pre-dec1069.yaml** (lens B's Q11, re-anchored at 320b98f3): its gold answer gave lines 62 and 135 (the calls
+  are at 80 and 283) and left out the code route that `retrieve` fuses when the question names a symbol (W2-92). The
+  line numbers are dropped and the code route is named.
+- **q12-pre-dec1069.yaml** (lens B's Q12, re-anchored at bc1219c1): its gold answer gave three cases, but W2-32's S7
+  added two more for the same token (a malformed list of expanded parents or of spans sent alone, through
+  `_expanded_of` and `_alone_of`). They are added. The source is kept.
+- **q13-pre-dec1069.yaml** (lens B's Q13, 8d09eb40): entry 1's span ended before the deciding check (`if used +
+  cost <= limit:`), and entry 2's `retrieve` alternative ended before the line that takes the limit. They are
+  re-anchored to 411-431 and 214-221, the headings kept.
+- **q14-pre-dec1069.yaml** (lens B's Q14, 8d09eb40): its gold answer gave nine dependents, while 13 tickets list
+  DAEO-ym8a in `depends_on` (DAEO-2bdu, DAEO-arrl, DAEO-n0wb and DAEO-s9qc added). The four had no entry, and "depend
+  on" was ambiguous (DAEO-2d6f names W2-03 only in tk's `deps`). It now has 13 entries, and the gold answer states
+  `depends_on` and names DAEO-2d6f as outside it. Volatile (DEC-1069 (6)).
+- **q17-pre-dec1069.yaml** (lens B's Q17, 8d09eb40): the path map's `namespaces:` span (6-135) covered half the
+  block, which runs 6-288. It is re-anchored to 6-288.
+- **q23-pre-dec1069.yaml** (W2-61h's q23): its gold answer gave line 26, while `MAP_REL` is at line 27 (its value
+  unchanged). The line number is dropped.
