@@ -139,6 +139,11 @@ Each revised case is green on `emg/d7`. In a clone of `emg/d7`, each of these pl
   rebuild;
 - `evaluation-fixtures` removed: the rebuild and failure 1's first row (the plant in no namespace).
 
+The D-7 review's F5 (`e44d6732`) moves `docs/research/EXP-003/w2-15a/raw/**` into `evaluation-sources`. These tests
+do not name that folder, and need not. It is outside every set W2-91 judges: the root files, `governance/`,
+`schemas/`, and what stays out. The rebuild's `docs/planted.md` control lies in `docs/*`, which is still embedded.
+W2-86 case 3 holds the folder in its cut.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
