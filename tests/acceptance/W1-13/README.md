@@ -300,3 +300,25 @@ Each is tested at its recommended option.
 - That the store is fresh: the tests load it before every call (W1-09 residual "stale store").
 - Whether a PRESENT row with no evidence is "open" or "invalid": the test only requires that it does not pass.
 - Running `openspec apply` or `archive` (DP-1).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 76 in the full run, 34 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Reports every row open for the profile (FULL for spines) and rejects N/A_WITH_REASON with an empty reason [CAP-30.a, CAP-53.a] | `test_w1_13_report.py::test_a_spine_is_judged_and_reported_at_full`, `test_w1_13_na.py::test_a_silent_na_on_a_row_the_profile_does_not_require_is_rejected` (1 of 2), `test_w1_13_report.py::test_a_fresh_record_has_every_row_its_profile_requires_open` (5 of 5) | the ticket's words |
+| S2: Blocks OpenSpec apply/archive and ticket READY while required rows are open | `test_w1_13_gate.py::test_a_ticket_stays_out_of_ready_while_its_specification_has_a_required_row_open` | the ticket's words |
+| S3: Output is identical on repeated runs | `test_w1_13_determinism.py::test_the_bare_command_is_the_same_on_repeated_runs` | the ticket's words |
+| S4: Lists every required open row with its linked gap ticket id, or UNLINKED (DEC-089) [CAP-30.b] | `test_w1_13_gap_tickets.py::test_a_required_open_row_with_no_gap_ticket_is_unlinked` (3 of 3), `test_w1_13_gap_tickets.py::test_a_required_open_row_is_listed_with_its_gap_ticket`, `test_w1_13_gap_tickets.py::test_every_required_open_row_is_listed_linked_or_not` | the ticket's words |
+| S5: Closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor naming the milestone (DEC-088) ... | `test_w1_13_close.py::test_closing_a_lite_feature_specification_creates_no_audit_ticket`, `test_w1_13_close.py::test_closing_marks_the_record_closed_and_creates_one_audit_ticket` (3 of 3), `test_w1_13_close.py::test_the_audit_ticket_is_for_an_independent_auditor_and_names_the_milestone` (3 of 3) | the ticket's words |
+| F1: A spec with a required MISSING row is reported closed | `test_w1_13_report.py::test_a_record_marked_closed_by_hand_with_a_required_row_missing_is_not_reported_closed`, `test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed` (1 of 3), `test_w1_13_report.py::test_one_required_missing_row_is_enough` (3 of 3) | the ticket's words |
+| F2: A defaulted N/A passes | `test_w1_13_na.py::test_a_record_that_defaults_every_optional_row_to_na_does_not_pass` | the ticket's words |
+| F3: A spine, STANDARD or FULL specification closes without an audit ticket | `test_w1_13_close.py::test_a_specification_is_not_closed_when_its_audit_ticket_cannot_be_created`, `test_w1_13_close.py::test_closing_marks_the_record_closed_and_creates_one_audit_ticket` (3 of 3), `test_w1_13_close.py::test_closing_a_lite_feature_specification_creates_no_audit_ticket` | the ticket's words |

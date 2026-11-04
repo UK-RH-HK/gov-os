@@ -27,6 +27,30 @@
   folder (``tempfile.gettempdir()``); a worker replaces the controller's. At
   the end the file is removed and the variable's former state restored
   (DEC-956 item 2).
+- The machine-wide vector cache (W2-126) is shared by every process that
+  embeds, so each test gets a ``GOV_VECTOR_CACHE_DIR`` of its own, under the
+  run's base folder and named by the test's id (DEC-1042): no test is served
+  another's stand-in vectors, and none writes the user's own cache. The folder
+  is made only when the test uses the cache; a test may set or unset the
+  variable itself.
+
+- The opt-in suites (DEC-1061, D-4's cut; T-10): every ``tests/optin-lifted*.txt``
+  lists cases left out of a run unless the run opts in to the list's suite
+  with ``--optin=<name>`` or ``GOV_TESTS_OPTIN=<name>`` (several:
+  ``lifted,breadth`` or the option given twice). Each ``optin-lifted*breadth*.txt``
+  is ``breadth`` (tier 2's cap and the representatives' other rows; the CTO's
+  P-1 (b)); every other ``optin-lifted*.txt`` is ``lifted`` (the switched-off
+  features' cases, run report-only in D-10's window). One entry a line: a path
+  (a folder or a test file, from the repository's root) or a node id
+  (``file::name``, ``file::Class::name``, ``file::name[row]``), then ``#`` and
+  why. ``rep: <path or file::name>`` keeps, of every parametrised function
+  under it, only its first collected row in a run that does not opt in (the
+  representative); its other rows are the opt-in's. A case an opted-in list
+  names is collected whole, whatever another list's ``rep:`` says, and a case
+  the run names by its node id on the command line is always run. An entry
+  that names no collected case deselects nothing. The cases left out are
+  reported as deselected; nothing is skipped or deleted, and a run that opts
+  in to both suites collects every case as before.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -34,6 +58,7 @@ The conftest sets no base folder and changes no retention count or policy.
 from __future__ import annotations
 
 import fcntl
+import hashlib
 import os
 import re
 import stat
@@ -48,6 +73,7 @@ _ALLOW = "GOV_ALLOW_BASETEMP"
 _HELD = ".lock-held"
 _NUMBERED = re.compile(r"pytest-(\d+)")
 _REBUILD_LOCK = "GOV_REBUILD_LOCK"
+_VECTOR_CACHE = "GOV_VECTOR_CACHE_DIR"
 _refused = False
 _held = None
 _rebuild_lock = None  # this process's own lock file and the variable's former value
@@ -55,6 +81,13 @@ _rebuild_lock = None  # this process's own lock file and the variable's former v
 
 def _is_worker(config) -> bool:
     return hasattr(config, "workerinput")
+
+
+@pytest.fixture(autouse=True)
+def _own_vector_cache(request, tmp_path_factory, monkeypatch):
+    """Each test's own machine-wide vector cache folder (W2-126, DEC-1042); made only when used."""
+    name = hashlib.sha256(request.node.nodeid.encode()).hexdigest()[:16]
+    monkeypatch.setenv(_VECTOR_CACHE, str(tmp_path_factory.getbasetemp() / "vector-cache" / name))
 
 
 def _own_rebuild_lock() -> tuple[str, str | None]:
@@ -75,6 +108,124 @@ def _drop_rebuild_lock(path: str, former: str | None) -> None:
         os.unlink(path)
     except FileNotFoundError:
         pass
+
+
+_OPTIN_ENV = "GOV_TESTS_OPTIN"
+_OPTIN_NAMES = ("lifted", "breadth")
+_OPTIN_GLOB = "optin-lifted*.txt"
+_TESTS = Path(__file__).resolve().parent
+_ROOT = _TESTS.parent
+
+
+def pytest_addoption(parser):
+    parser.addoption("--optin", action="append", default=[], metavar="NAME[,NAME]",
+                     help=f"run the opt-in suite(s) NAME too ({', '.join(_OPTIN_NAMES)}: the cases of "
+                          f"tests/optin-NAME*.txt, DEC-1061); also {_OPTIN_ENV}=NAME[,NAME]")
+
+
+def optin_name(listing: Path) -> str:
+    """The opt-in suite a list belongs to, by its file name: every ``optin-lifted*breadth*.txt`` is ``breadth``
+    (``optin-lifted-breadth.txt``, ``optin-lifted-guard-breadth.txt``), every other ``optin-lifted*.txt`` is
+    ``lifted`` (``optin-lifted.txt``, ``optin-lifted-guard.txt``)."""
+    return "breadth" if "breadth" in Path(listing).name else "lifted"
+
+
+def optin_entries(folder: Path = _TESTS, skip=()) -> list[tuple[str, str, str]]:
+    """Every entry of ``folder``'s opt-in lists but those of the suites in ``skip``: ``(kind, target, list file
+    name)``, kind ``case`` or ``rep``."""
+    entries = []
+    for listing in sorted(folder.glob(_OPTIN_GLOB)):
+        if optin_name(listing) in skip:
+            continue
+        for raw in listing.read_text(encoding="utf-8").splitlines():
+            line = raw.split("#", 1)[0].strip()
+            if not line:
+                continue
+            kind = "case"
+            if line.startswith("rep:"):
+                kind, line = "rep", line[len("rep:"):].strip()
+            if line:
+                entries.append((kind, line, listing.name))
+    return entries
+
+
+def _target(entry: str, root: Path = _ROOT) -> tuple[Path, str]:
+    """An entry's path (absolute) and its node part after the first ``::`` (empty for a path)."""
+    path, _, rest = entry.partition("::")
+    return (root / path.rstrip("/")).resolve(), rest
+
+
+class _Targets:
+    """A set of entries' targets, looked up per item: whole paths (folders or files) and node parts per file."""
+
+    def __init__(self, targets):
+        self.paths, self.parts = set(), {}
+        for path, rest in targets:
+            if rest:
+                self.parts.setdefault(path, []).append(rest)
+            else:
+                self.paths.add(path)
+
+    def names(self, here: Path, part: str) -> bool:
+        if here in self.paths or not self.paths.isdisjoint(here.parents):
+            return True
+        return any(part == rest or part.startswith(rest + "[") or part.startswith(rest + "::")
+                   for rest in self.parts.get(here, ()))
+
+
+def optin_left_out(items, entries) -> list:
+    """The items a run that does not opt in leaves out, in collection order."""
+    cases = _Targets(_target(target) for kind, target, _ in entries if kind == "case")
+    reps = _Targets(_target(target) for kind, target, _ in entries if kind == "rep")
+    resolved, seen, out = {}, set(), []
+    for item in items:
+        key = str(item.path)
+        here = resolved.get(key) or resolved.setdefault(key, Path(key).resolve())
+        part = item.nodeid.partition("::")[2]
+        if cases.names(here, part):
+            out.append(item)
+            continue
+        if getattr(item, "callspec", None) is not None and reps.names(here, part):
+            function = (key, part.partition("[")[0])
+            if function in seen:
+                out.append(item)
+            else:
+                seen.add(function)
+    return out
+
+
+def _opted_in(config) -> set[str]:
+    """The opt-in suites the run names, by option or variable, each comma-separated."""
+    given = [*(config.getoption("optin") or []), os.environ.get(_OPTIN_ENV, "")]
+    return {name.strip() for value in given for name in value.split(",") if name.strip()}
+
+
+def pytest_collection_modifyitems(config, items):
+    opted = _opted_in(config)
+    entries = optin_entries(skip=opted)
+    if not entries:
+        return
+    left = optin_left_out(items, entries)
+    asked = [arg.split(" ")[0] for arg in config.args if "::" in arg]
+    if left and asked:
+        # A case the run names by its node id on the command line is run: the caller asked for it by name.
+        here = Path(str(config.invocation_params.dir))
+        targets = [("case", str((here / arg.partition("::")[0]).resolve().relative_to(_ROOT)) + "::" +
+                    arg.partition("::")[2], "") for arg in asked
+                   if (here / arg.partition("::")[0]).resolve().is_relative_to(_ROOT)]
+        kept = {id(item) for item in optin_left_out(left, targets)}
+        left = [item for item in left if id(item) not in kept]
+    if left and opted:
+        # A case an opted-in suite's list names is collected whole, whatever another suite's ``rep:`` says.
+        named = [(kind, target, name) for kind, target, name in optin_entries()
+                 if kind == "case" and optin_name(Path(name)) in opted]
+        if named:
+            kept = {id(item) for item in optin_left_out(left, named)}
+            left = [item for item in left if id(item) not in kept]
+    if left:
+        gone = {id(item) for item in left}
+        items[:] = [item for item in items if id(item) not in gone]
+        config.hook.pytest_deselected(items=left)
 
 
 def pytest_configure(config):

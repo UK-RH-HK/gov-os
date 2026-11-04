@@ -87,7 +87,7 @@ New or changed for Wave 2:
 10. **List rows.** A list row's state is re-checked against the code when its ticket picks it up (DEC-718). A row a ticket closes is marked closed in `docs/plan/WAVE_2_LIST.md` with its commit.
 11. **Owner decisions (DEC-724, changed by DEC-861 and DEC-862).**
     - The orchestrator records the owner's decisions and commits them itself, as soon as they are written, with `Role: orchestrator`, `Task: decision-record` and `Decided-by: owner (chat, <date>)`; nothing stays staged. The owner's push is the acceptance.
-    - ~~Until W2-12 lands, ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts stay the owner's own `Role: owner` commits (DEC-862 (a)).~~ **Lifted by DEC-953:** the ratchet lists and escalation lifts no longer gate anything here (`LIFTED-BY-DEC953.md` B). W2-12 is Wave 3.
+    - ~~Until W2-12 lands, ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts stay the owner's own `Role: owner` commits (DEC-862 (a)).~~ **Lifted by DEC-953:** the ratchet lists and escalation lifts no longer gate anything here (`DECISIONS-IN-FORCE.md`, its "Lifted" section). W2-12 is Wave 3.
     - Once W2-12 lands, the owner approves with `gov approve` in a plain terminal, and the close counts a decision-record commit once it is in the owner's pushed ref (DEC-862 (b)).
     - Delegated decisions are the orchestrator's, with `Role: orchestrator`.
 12. **The coordination ticket W2-00 (DEC-729)** carries the main session's own records (section 2, W2-00).
@@ -1569,7 +1569,7 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
   - a partial output.
 
 #### W2-80 Acceptance tests for the close queue's gates (a) to (h) and its refusal path (STANDARD, independent-test-designer; DEC-941; DEC-929 item 3; P-TOOLS-REVIEW-1 §4 (a) item 2)
-- **Withdrawn (DEC-953 item 10, DEC-954), unbuilt.** The queue's gates (a) to (h) are lifted (`LIFTED-BY-DEC953.md` A). The text below is history.
+- **Withdrawn (DEC-953 item 10, DEC-954), unbuilt.** The queue's gates (a) to (h) are lifted (`DECISIONS-IN-FORCE.md`, its "Lifted" section). The text below is history.
 - **Why:** the queue decides whether a close starts and what reaches the commit. Its faults T8, S1, S2 and T9 cost closes this fortnight. Only the refusal path is tested, by a cut-out line range. Ticket file `DAEO-03dg`.
 - **Starts** once the orchestrator has committed the queue and its gate tools under `governance/project/orchestration/tools/` (not this ticket's). **Closes** after the orchestrator's change to the queue turns its red cases green: the settable interface, gate (d)'s fail-closed read, the wording of a stop after the close, and the self-check.
 - **Allowed paths:** `tests/acceptance/W2-80/**`.

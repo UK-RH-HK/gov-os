@@ -33,18 +33,29 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
      `/tmp/gov-os-rerank-gpu-*.lock` held than slots: its reranker would take it), else 0 (`GPU memory: N MiB free <
      M MiB (...)`). A GPU not read recently (no nvidia-smi, an old read) is not judged and says so: an absent reading
      is not a shortage, and the GPU watch alerts on its own;
-   - **the lead cap from memory (replacing slots × `K`, which is no longer used):** `lead_cap = floor(room / a lead's
-     p95)`, room = free memory + the leads' current trees − the floor − the slot runs − the services' headroom (the
-     same parts as the memory rule below); running and launching leads + the newcomer ≤ the cap (`memory: lead cap
-     N (...)`);
-   - **memory** (`memory_rule: slots`, the default): free memory + the leads' current trees ≥ the floor + each running
-     or launching lead at the larger of the lead p95 outside verification and its own outside maximum + the newcomer
-     likewise + the slot runs + the shared services' headroom (the embedding server and the code-graph daemon at their
-     p95 above what they hold; the rerankers outside every lead tree at their kind's p95 above what they hold, while a
-     queue or close runs or such a reranker exists) (`memory: available + leads' ...`); `memory_rule: literal` counts
-     each lead at its all-sample p95 instead. **The rerankers are counted:** one inside a lead's tree is in that
-     lead's current memory and its peak; one outside is in the headroom; the reason names how many there are and
-     their RSS now. **The reservation for the rerankers outside the leads (review of v4.6, F4; DEC-1033: at most
+   - **memory, by the Load Balancer's forecast** (`memory_rule: forecast`, the default; DEC-1052 O-A1): the forecast
+     below ("The Gov Load Balancer") is the memory admission: free memory − each running job's current-phase peak
+     above what it holds now − the newcomer's worst phase ≥ the floor (`forecast refuses (RAM binding): ...`). It is
+     applied whatever `forecast_admission` says (off, memory would go unjudged), and a forecast that did not judge
+     RAM refuses. **The floor stays:** `gate-config.json`'s `floor_kb`, which `tools/oom_watch.sh` (the out-of-memory
+     trip-wire, DEC-961) raises; no floor, or no `MemAvailable`, refuses (fail closed). There is no lead cap: the
+     forecast admits each start on its own (`Balance: ... no lead cap (memory by the forecast: DEC-1052 O-A1)`), and
+     the status's admission line says what admits (`admission (memory by the Load Balancer's forecast, the slots rule
+     lifted: DEC-1052 O-A1): memory by the Load Balancer's forecast above the floor 3072 MB ...; forecast admits
+     (binding ...)`). **The slots rule is lifted:** it reserved each heavy slot's peak on top of the memory the running
+     slot jobs already held, a double count (2026-11-02 22:17: W2-112's lead refused with `-2580 MB of room` while
+     15.9 GB was free and the forecast admitted it, `log/incidents/2026-11-02-2217-T1.md`). A `config.json` that still
+     says `memory_rule: slots` is read as `forecast`, and the reason says so;
+   - **memory, the literal rule** (`memory_rule: literal`, an explicit option, DEC-1008 item 5 as written): the lead
+     cap from memory, `lead_cap = floor(room / a lead's all-sample p95)`, room = free memory + the leads' current
+     trees − the floor − the services' headroom; running and launching leads + the newcomer ≤ the cap (`memory: lead
+     cap N (...)`); and free memory + the leads' current trees ≥ the floor + each running or launching lead at the
+     larger of the lead p95 and its own maximum + the newcomer likewise + the shared services' headroom (the embedding
+     server and the code-graph daemon at their p95 above what they hold; the rerankers outside every lead tree at
+     their kind's p95 above what they hold, while a queue or close runs or such a reranker exists) (`memory:
+     available + leads' ...`); the forecast applies after it as for every rule. **The rerankers are counted:** one
+     inside a lead's tree is in that lead's current memory and its peak; one outside is in the headroom; the reason
+     names how many there are and their RSS now. **The reservation for the rerankers outside the leads (review of v4.6, F4; DEC-1033: at most
      `rerank_gpu_slots` (2) rerankers, on the GPU, the rest end)** is at most that number × one reranker's measured
      peak (the largest RSS of any reranker process in the dispatcher's own samples, one a reranker a pass, in
      `reranker-peak.json`, since `reranker_era_from` "2026-11-02 13:00"), and never above the rerankers' p95; until
@@ -53,11 +64,11 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
      shows it (`reserve 4.4 GB: 2 x the 2240 MB peak (n samples since ...)`);
    - **the slot runs by device:** the heavy slots reckoned with follow where the shared embedder runs, from its latest
      load line (4f): all layers on the GPU, `slots_gpu` (3); none or only part, `slots_cpu` (2); no load seen yet,
-     `heavy_slots.conf`'s number; never fewer than the slots held now. `heavy_slots.conf` itself (which
-     `heavy_slot.sh` reads) is not changed: the target is the dispatcher's, in its status and admission only;
+     `heavy_slots.conf`'s number. `heavy_slots.conf` itself (which `heavy_slot.sh` reads) is not changed: the target
+     is the dispatcher's, in its status only (DEC-1052 O-A1: no memory rule reserves slot runs any more);
    - never while a heavy step has run outside a slot for over 5 minutes (a finding);
-   - with `peaks.json` missing, over 7 days old, or under 120 minutes of history outside verification: `gate_check`'s
-     verdict (fail closed to the old rule). The status shows `gate_check`'s verdict either way, for comparison.
+   - with `peaks.json` missing or over 7 days old: `gate_check`'s verdict (fail closed to the old rule), the forecast
+     after it. The status shows `gate_check`'s verdict either way, for comparison.
    It launches with `launch_now.sh` (here): the owner's launch form copied verbatim from
    `tools/launch_when_gate_opens.sh`, without its wait on `gate_check` (admission is the dispatcher's), keeping the
    disk gate.
@@ -161,7 +172,7 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
    (DEC-1032)**: the real busy CPU against its band (`cpu_band`, 14-18 of 20: below, within, above), memory available
    and the floor, the GPU used/total and free with the headroom, the embedders' layers and nvidia-smi's holders by
    kind, the embedders' states with their tasks a minute, the heavy slots by device, the lead cap from memory (its
-   room and a lead's p95), the rerankers (how many, their RSS, the GPU slots held by their lock files); its record is
+   room and a lead's p95; under the forecast, `no lead cap`), the rerankers (how many, their RSS, the GPU slots held by their lock files); its record is
    `balance` in `status.json`.
 6. **Escalation:** `inbox-stale.txt`, one line per cause, each written once per stall: `sentinel: ...` (first) while
    the sentinel is expected (`sentinel-expected` in the state folder) and its watch has written nothing parseable to
@@ -173,8 +184,8 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
    sentinel pushes it, keyed on its first 150 characters, so the short lines come first.
 
 `peaks.json` (state folder) is refreshed at most hourly from `log/capacity/kinds.jsonl` and `log/lead-mem.jsonl`
-(7 days). `config.json` (state folder) holds `cpu_margin`, `memory_rule`, `min_outside_samples` and the rest; every
-key has its default in the code (`K` is kept for the record but no longer used).
+(7 days). `config.json` (state folder) holds `cpu_margin`, `memory_rule` and the rest; every key has
+its default in the code (`K` and `min_outside_samples`, the lifted slots rule's, are no longer used).
 
 ## The Gov Load Balancer (owner, DEC-1039 (1b); DEC-1037 (4), DEC-1038 (4))
 The arithmetic is `balancer.py` beside the dispatcher (pure functions, tested alone in `tests/unit/orchestration/
@@ -242,7 +253,8 @@ the newcomer's ≥ the floor; **GPU memory** used + each job's peak above what i
 `gpu_headroom_mib`, the rerankers' part at most the free GPU reranker slots' share. A lead's own admission covers the
 phases it enters with no other gate (start, retrieval, building, review; and its entry's `first=<phase>` when given):
 its test runs and rebuilds are admitted when they take their slot. The forecast applies after the rules of step 3
-(`forecast_admission`, default true; false: shown, not applied), and the admission line names **the binding resource**
+(`forecast_admission`, default true; false: shown, not applied, under the literal memory rule only: under the default
+forecast rule it is the memory admission, DEC-1052 O-A1), and the admission line names **the binding resource**
 either way (`forecast admits (binding GPU: GPU memory 12.6 of 13.9 GB ...)`, `forecast refuses (GPU binding): ...`).
 The `Forecast:` line gives the verdict for a lead, a slot grant and a rebuild; `forecast.json` (state) holds them for
 `heavy_slot.sh` and `rebuild_slot.sh` to consult (a proposal: neither reads it yet, and `heavy_slot.sh` is another
@@ -272,11 +284,13 @@ explicit number in `config.json` still wins (the owner's override) and the `Limi
 overrides: cpu_band [12, 16] (derived [14, 18])`). A GPU not read yet uses today's GPU figures. A machine change (CPUs,
 cores, RAM by the half GB, the GPU) is one `Machine:` inbox item with the new limits. `limits.json` (state) holds them;
 `gov_reranker_gpu_slot.py` reads its lock count from it when `GOV_RERANK_GPU_SLOTS` is unset (installing that copy is
-the owner's ACT). **The reranker GPU slots are priced with the count the installed hook enforces, never fewer**
-(review F2): the derived (or explicit) number is only the proposal written to `limits.json`; the forecast, the GPU
-check and the rerankers' RAM reserve use the larger of it and the hook's count (`hook_slots`: the installed copy that
-reads `limits.json` enforces the number there, 1 to 64, else 2; today's copy its `GOV_RERANK_GPU_SLOTS` default, 2; no
-hook installed: 64, every newcomer's reranker priced). Every held slot counts as used, a slot held by the CTO's tool
+the owner's ACT). **The reranker GPU slots are priced with exactly the count the installed hook enforces** (review
+F2; EMG-lb2): the derived (or explicit) number is only the proposal written to `limits.json`; the forecast, the GPU
+check and the rerankers' RAM reserve use the hook's count, neither fewer (a newcomer's reranker unpriced: fails open)
+nor more (2026-11-02 23:01 and 23:04: a proposal of 3 to 5 left slots "free" while the hook's 2 were both held, and
+the running jobs' reranker peaks were added on top of memory nvidia-smi already counted: two false GPU budget alerts)
+(`hook_slots`: the installed copy that reads `limits.json` enforces the number there, 1 to 64, else 2; today's copy
+its `GOV_RERANK_GPU_SLOTS` default, 2; no hook installed: 64, every newcomer's reranker priced). Every held slot counts as used, a slot held by the CTO's tool
 beside the shared service (DEC-1043 item 2) too: a newcomer is priced a reranker only while a slot is free. The
 `Limits:` line: `reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)`. The servers' CPU sets
 stay owner ACTs.

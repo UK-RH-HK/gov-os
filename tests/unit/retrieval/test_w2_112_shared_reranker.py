@@ -379,11 +379,24 @@ def test_a_service_that_does_not_answer_in_time_is_left(home, monkeypatch):
 
 
 def test_a_request_over_the_cap_is_refused_and_the_search_falls_back(home):
+    # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (16, DEC-1067 (f)), so the service's own cap is
+    # reached only by a request made past rerank.rerank: the default reranker's scorer, asked directly. The guard
+    # stays: the service refuses the over-cap request, and the scorer falls back to the private reranker, named.
     texts = ["x"] * (rerank_service.MAX_TEXTS + 1)
-    ranked, outcome = ask("q", texts)
+    values = rerank.default_reranker()("q", texts)
+    outcome = rerank.last_outcome()
     assert outcome["by"] == "private" and "refused the request" in outcome["reason"]
-    assert len(ranked) == len(texts) and all("rerank_score" in entry for entry in ranked)
+    assert values is not None and len(values) == len(texts)
     assert len(_pids(home, SERVICE)) == 1  # the service stays up for the next search
+
+
+def test_a_search_s_requests_never_reach_the_service_s_cap(home):
+    # DEC-1067 (f): a pool larger than the service's cap goes in requests of at most 16, each under the cap
+    assert rerank.MAX_REQUEST_TEXTS == 16 < rerank_service.MAX_TEXTS
+    texts = ["x" * (number % 7 + 1) for number in range(rerank_service.MAX_TEXTS + 1)]
+    ranked, outcome = ask("q", texts)
+    assert outcome["by"] == "service" and outcome["reason"] is None and not fallbacks(home)
+    assert len(ranked) == len(texts) and all("rerank_score" in entry for entry in ranked)
 
 
 def test_a_service_that_cannot_start_leaves_the_search_to_the_private_reranker(home, monkeypatch):

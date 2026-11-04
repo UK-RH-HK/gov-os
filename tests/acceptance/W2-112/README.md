@@ -229,3 +229,27 @@ alone.
   environment's interpreter is seen *under the calling process*. With a shared service already up, none is
   started under the caller; and it runs with the machine's real `HOME`, so it would use or start the real shared
   service. To be revised afterwards by a test designer (DEC-1033 item 3), not in this ticket.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 48 in the full run, 7 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: One reranker process serves every session on the machine: the same pinned model, revision and environment as today (ADR-0002 §2, DEC-397), list... | `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_gpu.py::test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu` | the ticket's words |
+| S2: Many sessions at once: 20 concurrent searches are answered by that one process, each with its own scores for its own texts, in arrival order, w... | `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_concurrency.py::test_requests_are_answered_in_arrival_order`, `test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search` | the ticket's words |
+| S3: The same answers: for the same inputs on the same device, the order and the scores match a private reranker's (within float rounding; ties keep... | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_candidates_the_service_scores_alike_keep_the_order_given`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
+| S4: If the service is down (it cannot start, does not answer within about 2 s, or answers with an error), the search falls back to a private rerank... | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker`, `test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error` | the ticket's words |
+| S5: Measured, in docs/research/W2-112-shared-reranker.md: memory with 10 concurrent searches before and after (today up to 9 rerankers, 9.4 GiB at ... | `test_w2_112_record.py::test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times` | the ticket's words |
+| S6: The service runs its one model on the GPU, within the GPU budget (DEC-1032: the embedder first, about 3.5 GB; the shared reranker second, about... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
+| S7: When it lands, the stopgap that caps private rerankers on the GPU (the `gov-reranker-gpu-slot.pth` in the reranker environment, ACT-RERANK-GPU-... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
+| F1: A search that fails, hangs, or returns another session's scores because of the service. | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
+| F2: Two services started at once, or a socket another user can open. | `test_w2_112_service.py::test_two_searches_starting_together_start_one_service`, `test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
+| F3: Answers that differ from a private reranker's on the same inputs and device. | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |

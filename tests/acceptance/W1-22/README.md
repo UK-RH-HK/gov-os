@@ -155,3 +155,21 @@ DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-o
 No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 25 passed (as
 before). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the
 CPU-only embedder on its own port; the fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 24 in the full run, 1 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The validator rejects a bundle without a stopping reason, with an unresolvable citation, a stale hash or a quoted span absent from its source [... | `test_w1_22_validator.py::TestValidatorRejects::test_validator_rejects_bundle_without_stopping_reason`, `test_w1_22_validator.py::TestValidatorRejects::test_validator_rejects_bundle_with_invalid_stopping_reason` | the ticket's words |
+| S2: Each index has canaries run after reindex and in doctor; a canary miss sets FACET_UNAVAILABLE [CAP-17.c, CAP-55.a] | `test_w1_22_canaries.py::TestCanaryMiss::test_empty_project_canaries_fail_as_facet_unavailable`, `test_w1_22_canaries.py::TestCanaryMiss::test_deleted_store_canaries_fail_as_facet_unavailable` | the ticket's words |
+| F1: A bundle with an unresolvable citation passes | `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass` | the ticket's words |
+| F2: An empty index answers NOT_FOUND as absence | `test_w1_22_canaries.py::TestF2::test_empty_index_never_reports_not_found` | the ticket's words |

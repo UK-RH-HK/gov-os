@@ -35,7 +35,7 @@ def test_the_query_embedder_is_started_at_its_own_address_with_the_gpu_left_as_t
     env = {"OLLAMA_HOST": "127.0.0.1:11434", "GOV_QUERY_OLLAMA_HOST": "127.0.0.1:7", "PATH": "/bin",
            "CUDA_VISIBLE_DEVICES": "0"}
     assert ollama.ensure_query_available(timeout_s=3, env=env) == {"available": True}
-    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7"}}]
+    assert seen == [{"timeout_s": 3, "env": {**env, "OLLAMA_HOST": "127.0.0.1:7"}, "start": False}]  # W2-32 S10
     assert env["OLLAMA_HOST"] == "127.0.0.1:11434"  # the caller's environment is not changed
 
 
@@ -68,7 +68,7 @@ def test_the_device_is_the_one_the_listing_reports_for_the_model_loaded(monkeypa
 @pytest.fixture()
 def recorded(tmp_path, monkeypatch):
     (tmp_path / ".gov-runtime").mkdir()
-    state = {"order": [], "device": "cpu"}
+    state = {"order": [], "device": "gpu"}
 
     def embed(texts, host=None):
         state["order"].append(("embed", host))
@@ -91,7 +91,11 @@ def test_the_device_is_read_after_the_vector_is_computed_and_a_model_not_listed_
     assert semantic.query_vector(root, "q") == (None, semantic.NOT_LOADED)
     assert state["order"] == [("embed", "h:1"), ("ps", "h:1")]
     assert not (root / semantic.QUERY_VECTORS_REL).exists()
-    state["device"] = "cpu"
+    state["device"] = "cpu"  # W2-32 S10: a CPU vector is refused, never cached
+    vector, reason = semantic.query_vector(root, "q")
+    assert vector is None and reason.startswith(semantic.ON_CPU)
+    assert not (root / semantic.QUERY_VECTORS_REL).exists()
+    state["device"] = "gpu"
     assert semantic.query_vector(root, "q")[0] == struct.pack("2f", len(I + "q"), 1.0)
     assert (root / semantic.QUERY_VECTORS_REL).exists()
 

@@ -216,7 +216,7 @@ close), and the evidence block does not name it.
 | KPI line | Tests | Red on the base |
 |---|---|---|
 | S6 + F2 the evidence block | `test_w2_66_evidence.py` (8); `test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block`, `::test_the_junit_xml_holds_every_case_run_and_no_case_left_out`, `::test_a_one_module_change_is_stated_scoped_never_full`, `::test_the_head_and_the_tree_are_stated` | (a); `test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket` is green on the base (nothing is written today) |
-| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases; its five cases of Part 4 and its eight of Part 5 apart) | (d) |
+| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (73 cases since DEC-1050 (T-4), see "T-4's revision" below; its five cases of Part 4 and its eight of Part 5 apart) | (d) |
 | S12 the lead's verification unchanged | `test_w2_66_lead_verification.py` (2) | **green on the base by design**: they hold that nothing this ticket builds changes what a plain `pytest tests` reads or collects (no configuration file, conftest outside this folder or serial-only list changed against `w2/integrate`; a fixture's test map changes nothing a plain run collects) |
 
 ### Part 3 — limits, distribution, nightly, report
@@ -315,3 +315,61 @@ Each its own commit with its `Rewrite-Reason:`; no expectation lowered.
   `W1-27/w2_67_ns_launch.py`, `W1-27/w2_67_ns_probe.py`, `W1-27/w2_67_tmp_probe.py`, `W1-28/w1_28_copy_check.py`,
   `W1-47/w1_47_hook_time_limit.py`, `W1-50/w1_50_freeze_lift.py`, `W2-69/w2_69_stdlib_secrets_first.py`. None is
   below a suite folder today; the scan would read one there.
+
+## T-4's revision (`Rewrite-Reason: DEC-1050`; DEC-1050 (2) with the CTO's correction R1-22)
+
+T-4, merged into `w2/integrate`: `every_close` joins a scoped selection only when a record-only path is in the change;
+`record_reading` stays in every selection; W2-54's three green-here cases that start a whole `gov check` (they take
+its `gov_check_here` fixture) left the `record_reading` list, which now holds that file's other five cases one by one.
+
+- **Red because of T-4, revised:** `test_w2_66_live_test_map.py::test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W2-54/test_w2_54_green_here.py]`
+  required the file held whole ("the record-reading set does not hold tests/acceptance/W2-54/test_w2_54_green_here.py").
+  It is now one case per green-here case that does not start a whole `gov check` (read from the file: today the five
+  the map names), each required held, and one new case,
+  `test_w2_54_s_cases_that_start_a_whole_gov_check_are_not_in_the_record_reading_set`: the three
+  (`test_gov_check_gives_context_reproducibility_green_here`, `test_gov_check_gives_core_schema_green_here`,
+  `test_the_w1_43_audit_report_is_untouched`) take `gov_check_here` and no entry holds them. The file: 73 cases where
+  there were 68 (one replaced by five, one added). Against the map before T-4 (`83b7f85f^`): the five are held
+  (green) and the new case fails, naming the three; against the map at T-4: all green.
+- **Red for another reason, not changed (reported):**
+  `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`: the
+  record-only list (`governance/project/orchestration/**.md`, `packages/*.patch`) leaves out
+  `governance/project/orchestration/packages/ACT-GUARD-FIX-3.diff` (added `49158e13`) and
+  `governance/project/orchestration/tools/win_toast.ps1` (added `42104b11`). T-4 did not change `record_only`.
+- **Not red:** the rest of W2-66 (167 passed, 1 skipped, the two above failed, on `d7b25cf3c605`); `every_close`'s
+  three W1-07 files are still listed (`test_w1_07_s_three_contract_files_run_on_every_close`, green); when they join
+  is the selector's, which the fixture-map cases of Part 1 exercise and T-4 left green.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 108 in the full run, 70 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A close runs the ticket's own acceptance suite, tests/unit, and the acceptance suites of every ticket (Wave 1 and Wave 2) whose allowed_paths o... | `test_w2_66_followed_couplings.py::test_a_changed_helper_selects_every_suite_that_imports_it_directly_or_through_another_helper`, `test_w2_66_full_widening.py::test_a_passed_full_close_is_the_base_of_the_next_scoped_close` | the ticket's words |
+| S2: Any change under the shared core runs the full regression. The shared core is one list in the test map: src/gov/close, src/gov/guard, src/gov/c... | `test_w2_66_unresolved_targets.py::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression`, `test_w2_66_unresolved_targets.py::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression` (2 of 2), `test_w2_66_unresolved_targets.py::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression` | the ticket's words |
+| S3: The couplings imports and coverage cannot see are declared in the test map and followed: text reads (W1-42 reads src/gov/cli/main.py and kernel... | `test_w2_66_followed_couplings.py::test_a_declared_coupling_selects_its_suites_and_names_why`, `test_w2_66_live_test_map.py::test_a_fixture_input_change_does_not_reach_the_real_model_suites` (1 of 3), `test_w2_66_unresolved_targets.py::test_a_red_the_renamed_coupled_file_catches_refuses_the_close` | the ticket's words |
+| S4: The serial-only tests are scoped by the same selection: a scoped close runs the serial cases of the suites it selected, one at a time, and the ... | `test_w2_66_scoped_selection.py::test_the_record_reading_set_runs_on_a_scoped_close_and_is_named`, `test_w2_66_scoped_selection.py::test_the_serial_cases_of_the_selected_suites_run_alone_and_only_those`, `test_w2_66_scoped_selection.py::test_the_record_says_which_serial_cases_ran` | the ticket's words |
+| S5: A declared record-reading set runs on every head, whatever was selected: every test that reads a declared record-only path, directly or by scan... | `test_w2_66_followed_couplings.py::test_the_record_reading_set_reads_the_pre_close_gate_s_own_check_result` | the ticket's words |
+| S6: The close record's evidence block states the scope (scoped, full), the base commit, the head, the tree, every suite and case run, every suite l... | `test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block`, `test_w2_66_scoped_selection.py::test_the_junit_xml_holds_every_case_run_and_no_case_left_out`, `test_w2_66_scoped_selection.py::test_a_one_module_change_is_stated_scoped_never_full` | the ticket's words |
+| S7: gov close --full runs the full regression and the record says so; W2-24 and W2-46 use it [DEC-880 item 2 (d)] | `test_w2_66_full_widening.py::test_full_runs_the_full_regression_and_the_record_says_so`, `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` | the ticket's words |
+| S8: Every test has a per-test time limit (pytest-timeout with the signal method, an owner install package at this ticket's start), set above the sl... | `test_w2_66_live_test_map.py::test_the_per_test_limit_is_above_the_slowest_test_measured`, `test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit` (2 of 2), `test_w2_66_limits.py::test_without_pytest_timeout_the_close_does_not_pass_silently` | the ticket's words |
+| S9: The close's pytest runs (its parallel run and its serial-only cases) pass -o tmp_path_retention_policy=failed, so a passing test's temp folder ... | `test_w2_66_retention.py::test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays` (1 of 2), `test_w2_66_retention.py::test_every_test_run_of_the_close_is_given_the_retention_option` (2 of 3), `test_w2_66_retention.py::test_the_nightly_run_s_test_runs_are_given_the_retention_option` | the ticket's words |
+| S10: The parallel run's distribution mode is one setting; it stays the default (no worksteal) until the nested reruns are gone and worksteal is re-... | `test_w2_66_live_test_map.py::test_the_distribution_mode_stays_the_default_and_is_not_worksteal`, `test_w2_66_limits.py::test_the_distribution_mode_is_one_setting_and_the_runs_follow_it` | the ticket's words |
+| S11: One command runs the nightly full uncached regression on w2/integrate's head in the close's form, with JUnit XML: every failing test is re-run... | `test_w2_66_nightly.py::test_a_red_that_fails_alone_is_a_p1_package_with_git_bisect_over_the_commits_since_the_last_green_night`, `test_w2_66_nightly.py::test_a_red_a_scoped_close_since_the_last_green_night_left_out_is_a_p1_package_with_the_map_corrected`, `test_w2_66_unresolved_targets.py::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression` | the ticket's words |
+| S12: Measured and reported in docs/research/W2-66-scoped-close.md, on a quiet machine: the time of a typical scoped close (one module outside the s... | `test_w2_66_research.py::test_the_report_states_the_catch_rate_on_lens_h_s_planted_faults_with_the_three_widest_modules`, `test_w2_66_research.py::test_the_report_states_a_typical_scoped_close_s_time_against_the_full_close` | the ticket's words |
+| S13: The lead's full verification before every return is unchanged [DEC-880 item 2 (b)] | `test_w2_66_moved_files.py::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression`, `test_w2_66_moved_files.py::test_a_file_moved_into_the_shared_core_runs_the_full_regression`, `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` | the ticket's words |
+| S14: The valid case this ticket turns red is revised by its test designer with a Rewrite-Reason: W1-30's test_regression_includes_other_acceptance_... | `test_w2_66_unresolved_targets.py::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression`, `test_w2_66_unresolved_targets.py::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression` (2 of 2), `test_w2_66_unresolved_targets.py::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression` | the ticket's words |
+| S15: A selected test-map target (record-reading, every-close or coupling) that cannot be resolved at the head (its file or test function renamed or... | `test_w2_66_unresolved_targets.py::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression` (2 of 2), `test_w2_66_unresolved_targets.py::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression`, `test_w2_66_unresolved_targets.py::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression` | the ticket's words |
+| S16: W1-28's held-out copy check is coupled to every file under tests/acceptance/ that its scan reads, so a change to any of them runs it [DEC-912 ... | `test_w2_66_live_test_map.py::test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check` (7 of 7), `test_w2_66_live_test_map.py::test_every_python_source_w1_28_s_scan_reads_selects_its_check` | the ticket's words |
+| F1: A change under the shared core, a change no mapping places, or a missing or unreadable test map runs anything less than the full regression. | `test_w2_66_full_widening.py::test_a_change_under_the_shared_core_runs_the_full_regression`, `test_w2_66_full_widening.py::test_a_shared_core_change_in_the_ticket_s_own_commit_runs_the_full_regression`, `test_w2_66_full_widening.py::test_a_changed_file_no_mapping_places_runs_the_full_regression` | the ticket's words |
+| F2: A scoped close whose record says full; a skip, a left-out suite or a failure the record does not name; a record without its JUnit XML or failur... | `test_w2_66_evidence.py::test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip`, `test_w2_66_evidence.py::test_a_full_close_names_every_suite_it_ran_and_its_junit_xml_holds_every_case`, `test_w2_66_scoped_selection.py::test_the_junit_xml_holds_every_case_run_and_no_case_left_out` | the ticket's words |
+| F3: A record-reading test outside the set on a head with record-only commits; a record-only path list that hides a code path. | `test_w2_66_live_test_map.py::test_the_record_only_list_hides_no_code_path`, `test_w2_66_followed_couplings.py::test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_scoped_close`, `test_w2_66_unresolved_targets.py::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close` | the ticket's words |
+| F4: A per-test limit that lets a hung test hold the close; worksteal switched on before the nested reruns are gone. | `test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit` (2 of 2), `test_w2_66_limits.py::test_without_pytest_timeout_the_close_does_not_pass_silently`, `test_w2_66_live_test_map.py::test_the_per_test_limit_is_above_the_slowest_test_measured` | the ticket's words |

@@ -118,16 +118,42 @@ def test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet(
 @STAND_IN
 def test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary(
         box, embedder, tmp_path):
-    """*Red.* The context-reproducibility check, run as its declaration says, over a project with three tickets,
-    the stand-in behind every context: green. Today it prints ``FAIL: <ticket>: <hash> != <hash>``."""
+    """*Red.* The embedder whose vectors vary is behind every process. Each ticket's title, asked through ``gov
+    retrieve`` in a process of its own, then again after the others, reaches the embedder after other texts and gets
+    one bundle every time. The context-reproducibility check, run as its declaration says over the three tickets,
+    is green, and its contexts send the embedder nothing.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. The check's contexts no longer reach the
+    embedder (W2-04's addendum: ``gov context`` sends nothing to an embedder), so the premise "the check's contexts
+    reached the embedder" moves to ``gov retrieve``, the read that does, and is held as round 2 holds a read: one
+    question, one bundle, whatever was asked before. The check stays green over several tickets. Today the check's
+    contexts send the embedder their questions."""
     project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
+    env = S.embed_env(box, embedder)
+    titles = list(S.QUESTION_TICKETS.values())
+    bundles = collections.defaultdict(list)
+    before = len(embedder.embedded())
+    for title in titles + titles[::-1]:
+        done = S.gov(box, "retrieve", "--json", "--root", project, title, env=env)
+        assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
+        bundles[title].append(done.envelope()["result"])
+    sent = embedder.embedded()[before:]
+    assert all(embedder.asked_for(title) >= 1 for title in titles) and \
+        any(a != b for a, b in zip(sent, sent[1:])), \
+        f"the premise: the questions did not reach the embedder one after another: {[text[-40:] for text in sent]}"
+    for title, found in bundles.items():
+        assert found[0].get("evidence") and found[0]["facets"].get("semantic", {}).get("available") is True, \
+            f"the premise: gov retrieve {title!r} gave no semantic answer: {found[0].get('facets')}"
+        assert len({S.canonical(bundle) for bundle in found}) == 1, \
+            f"one question, two bundles in one store: {title!r}"
     before = len(embedder.embedded())
     done = S.run(["sh", "-c", S.yaml.safe_load(
         (S.REPO_ROOT / S.CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))["command"]],
-        cwd=project, env=S.embed_env(box, embedder), timeout=S.CHECK_TIMEOUT_S)
-    assert len(embedder.embedded()) > before, "the premise: the check's contexts never reached the embedder"
+        cwd=project, env=env, timeout=S.CHECK_TIMEOUT_S)
     assert done.returncode == 0 and "FAIL" not in done.stdout, \
         f"two computations of a ticket's context in one store give two hashes\n{done.describe()}"
+    assert len(embedder.embedded()) == before, \
+        f"the check's contexts sent the embedder {len(embedder.embedded()) - before} texts"
 
 
 # ---- 3. a stored vector is never taken for another key ------------------------------------------------------------
@@ -203,7 +229,11 @@ def test_a_stored_vector_is_not_used_under_another_revision_and_is_used_again_wh
 def test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it(box, embedder, tmp_path):
     """In a new store, a question asked for the first time is sent to the embedder and answered with the vector
     it returns: the embedder sends it to the orchard, which its own words do not lead to, and the orchard is
-    nearest. Two projects built alike, asked alike, give that first answer hit for hit. Passes today."""
+    nearest. Two projects built alike, asked alike, give that first answer hit for hit. Passes today.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the twin is built and asked with a machine-wide vector cache
+    of its own (as on another machine), so its first answer is computed by its embedder, not served from the first
+    project's; the assertions are unchanged."""
     embedder.targets = {QUESTION: S.SUBJECTS[S.ORCHARD]}
     project = S.semantic_project(box, tmp_path / "p", embedder)
     answer = S.ask(box, project, embedder, QUESTION)
@@ -212,9 +242,11 @@ def test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_return
     assert [hit[1] for hit in S.hits_of(answer)][:1] == [S.ORCHARD], \
         f"the first answer is not the embedder's vector for the question: {S.hits_of(answer)[:3]}"
     twin_embedder = S.EmbedderStandIn(targets={QUESTION: S.SUBJECTS[S.ORCHARD]})
+    twin_cache = tmp_path / "twin-vector-cache"
     try:
-        twin = S.semantic_project(box, tmp_path / "twin", twin_embedder)
-        twin_answer = S.ask(box, twin, twin_embedder, QUESTION)
+        twin = S.semantic_project(box, tmp_path / "twin", twin_embedder, cache=twin_cache)
+        twin_answer = S.drive_env(box, twin, S.embed_env(box, twin_embedder, cache=twin_cache), ("search", QUESTION),
+                                  timeout=S.CALL_TIMEOUT_S)[0]
     finally:
         twin_embedder.close()
     assert S.hits_of(twin_answer) == S.hits_of(answer), \
@@ -245,13 +277,24 @@ def test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses(
         f"after a failed embedding ({failure}) the answer is not the healthy embedder's: {healthy}"
 
 
-# ---- 6. one project's stored vectors are never another's -----------------------------------------------------------
+# ---- 6. two projects on one machine: one vector for one text, model and revision; nothing else shared ------------
 
 @STAND_IN
-def test_two_projects_do_not_share_query_vectors(box, tmp_path):
-    """Two projects, each with its own store, the same model and revision. In the first the embedder sends the
-    question to the kiln; in the second it sends it to the forge. Each gets its own embedder's answer; the second's
-    search changes no file of the first project's runtime folder and none under HOME. Passes today."""
+def test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache(
+        box, tmp_path):
+    """*Red until W2-126.* Two projects, each with its own store, on one machine (one machine-wide vector cache, the
+    case's own folder), the same model and revision. The first project's embedder sends the question to the kiln; the
+    second project's would send it to the forge. The second project's search sends the embedder nothing for the
+    question and answers with the first project's vector: the kiln, hit for hit and distance for distance. The
+    second's search changes no file of the first project's runtime folder and none under HOME.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 items 2 and 3, W2-126's machine-wide cache, DEC-1032). Before:
+    ``test_two_projects_do_not_share_query_vectors`` required the second project to ask its own embedder and get the
+    forge ("it used another's vector" was the failure); W2-126 makes one text, model and revision one vector on the
+    machine, so that is now the outcome required. Kept: the first project's runtime folder and HOME untouched. What
+    the cache must still keep apart (another revision, another text) is
+    ``test_two_projects_never_share_a_vector_for_another_revision_or_another_text``. Today the second project asks
+    its embedder and gets the forge."""
     one = S.EmbedderStandIn(targets={QUESTION: S.SUBJECTS[S.KILN]})
     two = S.EmbedderStandIn(targets={QUESTION: S.SUBJECTS[S.FORGE]})
     try:
@@ -263,13 +306,70 @@ def test_two_projects_do_not_share_query_vectors(box, tmp_path):
         assert S.runtime_digest(first) == runtime, \
             "a search in the second project changed the first project's runtime folder"
         assert S.home_files(box) == home, f"a search wrote under HOME: {sorted(set(S.home_files(box)) - set(home))}"
-        assert two.asked_for(QUESTION) >= 1, "the second project never asked its embedder: it used another's vector"
+        sent = two.asked_for(QUESTION)
+    finally:
+        one.close()
+        two.close()
+    assert one.asked_for(QUESTION) >= 1, "the premise: the first project never sent the question to its embedder"
+    assert [hit[1] for hit in S.hits_of(in_first)][:1] == [S.KILN], f"the premise: {S.hits_of(in_first)[:3]}"
+    assert sent == 0, (f"the second project sent the embedder the question {sent} time(s): a text this machine had "
+                       f"embedded under the same model and revision was not served from the machine-wide cache")
+    assert S.hits_of(in_second) == S.hits_of(in_first), (
+        "one text, one model and revision, two vectors on one machine\n"
+        f"first project:  {S.hits_of(in_first)[:3]}\nsecond project: {S.hits_of(in_second)[:3]}")
+
+
+# The question in another spelling (one letter's case): another text, so another key (KPI success 2's "exact text").
+RESPELLED = "Who fires the glazed bowls"
+
+
+@STAND_IN
+@pytest.mark.parametrize("differs", ("revision", "text"))
+def test_two_projects_never_share_a_vector_for_another_revision_or_another_text(box, tmp_path, differs):
+    """Two projects on one machine (one machine-wide vector cache, the case's own folder), built alike. In the first
+    the embedder, at the pinned revision, sends the question to the kiln. In the second, the embedder differs in one
+    part of the key (``differs``): ``revision``, its model list reports another digest and that build sends the
+    question to the forge; ``text``, the second project asks the question in another spelling, which its embedder
+    sends to the forge. The second project's text is sent to its own embedder, and its answer is the forge's (under
+    another revision the facet may instead be unavailable with no hit), never the kiln's. Every request names the
+    pinned model (the key's model part: no public interface selects another model). Passes today.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): what ``test_two_projects_do_not_share_query_vectors``
+    checked that the machine-wide cache must still keep apart between projects."""
+    one = S.EmbedderStandIn(targets={QUESTION: S.SUBJECTS[S.KILN]})
+    asked = QUESTION if differs == "revision" else RESPELLED
+    two = (S.EmbedderStandIn(digest=S.OTHER_DIGEST, targets={QUESTION: S.SUBJECTS[S.FORGE]}) if differs == "revision"
+           else S.EmbedderStandIn(targets={RESPELLED: S.SUBJECTS[S.FORGE]}))
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): a store and an endpoint whose revisions no pin names fail closed before
+    # the question is sent, so under ``revision`` each project pins its embedder's revision in its models.yaml (W2-32's
+    # interface) and the second is built by its own embedder, at the other revision. The question is still asked of
+    # it, so a machine-wide cache that ignored the revision would still serve it the kiln's vector.
+    pinned = {}
+    if differs == "revision":
+        pinned = {stand_in: {**S.SUBJECTS, "governance/project/models.yaml":
+                             f"embedder:\n  model: {S.EMBED_MODEL}\n  revision: {stand_in.digest}\n"}
+                  for stand_in in (one, two)}
+    try:
+        first = S.semantic_project(box, tmp_path / "one", one, files=pinned.get(one))
+        second = S.semantic_project(box, tmp_path / "two", two if differs == "revision" else one,  # built alike
+                                    files=pinned.get(two))
+        in_first = S.ask(box, first, one, QUESTION)
+        in_second = S.ask(box, second, two, asked)
+        models = {request.get("model") for stand_in in (one, two) for request in stand_in.embed_requests()}
     finally:
         one.close()
         two.close()
     assert [hit[1] for hit in S.hits_of(in_first)][:1] == [S.KILN], f"the premise: {S.hits_of(in_first)[:3]}"
-    assert [hit[1] for hit in S.hits_of(in_second)][:1] == [S.FORGE], \
-        f"the second project got the first project's vector: {S.hits_of(in_second)[:3]}"
+    assert two.asked_for(asked) >= 1, (
+        f"{differs}: the second project never sent {asked!r} to its embedder: it was served a vector stored under "
+        f"another {'revision of the model' if differs == 'revision' else 'text'}")
+    if differs == "revision" and not in_second.get("available"):
+        assert in_second.get("hits") == [], f"an unavailable facet gave hits: {in_second}"
+    else:
+        assert [hit[1] for hit in S.hits_of(in_second)][:1] == [S.FORGE], (
+            f"{differs}: the second project got the vector stored for another "
+            f"{'revision' if differs == 'revision' else 'text'} (nearest {S.hits_of(in_second)[:2]})")
+    assert models == {S.EMBED_MODEL}, f"vectors were asked of another model than the pinned one: {models}"
 
 
 # ---- the real embedder (this machine's Ollama) ----------------------------------------------------------------------

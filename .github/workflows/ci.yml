@@ -25,7 +25,9 @@
 
 name: ci
 
-on: push
+# CI off here, started only by hand (DEC-1052 T-11, DEC-1061 item 9): no push trigger; the template's workflow is the product's.
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read

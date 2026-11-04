@@ -117,3 +117,27 @@ it stands runs a `full` selection); the other 18 cases are green.
   (bounded attempts, then exit 4: the bound is not fixed); a ticket whose test the ticket edited (DEC-979's weak
   proof, `close_build.py`'s "absent" path); the test map's `record_only` places in the skip rule (the planted
   repository has no test map); the ref move when the branch is not checked out; the default (production) commands.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 19 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A ticket enters the queue only with its Senior Engineer's approval (until the three layers start, the CTO's); the queue makes the --no-ff merge... | `test_w2_97_entry.py::test_green_advances_to_the_very_merge_commit_tested`, `test_w2_97_entry.py::test_only_an_approved_ticket_enters`, `test_w2_97_entry.py::test_a_second_run_while_one_holds_the_lock_exits_4` | the ticket's words |
+| S2: On red, w2/integrate does not move: the ticket is ejected back to its Senior Engineer (or the CTO) with the failing tests' names and the run's ... | `test_w2_97_red.py::test_a_red_that_passes_alone_is_a_flaky_candidate`, `test_w2_97_red.py::test_red_ejects_the_ticket_and_the_head_stays`, `test_w2_97_red.py::test_a_failing_test_the_ticket_added_is_the_ticket_s` | the ticket's words |
+| S3: Tests run no more than this: the queue runs the scoped set once per batch on the merged result, and skips the run when the merged code is ident... | `test_w2_97_batch.py::test_a_batch_gives_one_merged_result_and_one_run_on_the_union`, `test_w2_97_once.py::test_code_identical_to_the_lead_s_is_skipped_with_its_reason`, `test_w2_97_entry.py::test_green_advances_to_the_very_merge_commit_tested` | the ticket's words |
+| S4: A batch of queued tickets on one head gives one merged result and one run; a red batch is bisected by ticket, the good ones advance and the cau... | `test_w2_97_batch.py::test_a_batch_gives_one_merged_result_and_one_run_on_the_union`, `test_w2_97_batch.py::test_a_red_no_single_ticket_explains_ejects_the_whole_batch`, `test_w2_97_batch.py::test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested` | the ticket's words |
+| S5: Each advance writes the record the close cites (the head, the tickets, the selection, the counts, the time); close_build cites it instead of ru... | `test_w2_97_record.py::test_each_advance_writes_the_record_the_close_cites` | the ticket's words |
+| S6: When the head moves while a candidate is under test, the candidate is re-merged and re-tested, never advanced onto a head it was not tested on ... | `test_w2_97_entry.py::test_green_advances_to_the_very_merge_commit_tested`, `test_w2_97_moved.py::test_a_head_moved_under_test_is_re_merged_and_re_tested` | the ticket's words |
+| F1: w2/integrate advanced to a commit that was not the one tested, or after a red. | `test_w2_97_entry.py::test_green_advances_to_the_very_merge_commit_tested`, `test_w2_97_batch.py::test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested` | the ticket's words |
+| F2: A second run on code identical to the lead's tested code, or a skip without its recorded reason. | `test_w2_97_once.py::test_code_identical_to_the_lead_s_is_skipped_with_its_reason` | the ticket's words |
+| F3: A red batch that advances its causing ticket. | `test_w2_97_batch.py::test_a_red_no_single_ticket_explains_ejects_the_whole_batch`, `test_w2_97_batch.py::test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested`, `test_w2_97_batch.py::test_a_ticket_bringing_another_ticket_s_commits_fails_the_batch_closed` | the ticket's words |
+| F4: A close that re-runs tests the queue already ran on the same code. | `test_w2_97_record.py::test_each_advance_writes_the_record_the_close_cites` | the ticket's words |

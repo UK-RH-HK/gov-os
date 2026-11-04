@@ -380,8 +380,9 @@ in `~/.cache/huggingface/hub`. `sentence_transformers`, `torch` and `transformer
   and `sentence_transformers` are not in `sys.modules` after the three modules are imported or after a fusion;
   and reranking nothing loads nothing. Since DEC-397 a fourth: with the default reranker the calling process holds
   none of the three after the rerank either, because the model is loaded in the reranker's own process.
-- **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own hits; the case compares
-  the chunk ids of `fusion.search` with it, one after the other.
+- **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own list (its `ranked` list
+  where it gives one, since W2-13's S2; else its `hits`); the case compares the chunk ids of `fusion.search` with
+  it, one after the other.
 - **hit@5**: the section above. The pass line is 80 (DEC-414); the measured mean is always shown, against 80 and
   against 85 (the fourth batch, at the head of this file).
 - **Warm p95** (DEC-373): per tier, one process builds the index, asks three warm-up questions that are not
@@ -502,3 +503,67 @@ No expectation, assertion, pass line or threshold changes. In the designer's san
 without `test_w1_19_real_models.py` (as before; that file needs the real models and was not run). Commit trailer:
 `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own
 port; the fixtures point it at a stand-in and change no expectation`.
+
+## Fixture (DEC-1046 item 3, DEC-1039 item 3, 2026-11-02)
+
+Since 2026-11-02 18:13 this machine's `~/.local/bin` holds an `ollama` wrapper beside `gitleaks`. `Api.scratch_env`
+dropped every `PATH` folder that held an `ollama`, so it also hid gitleaks, and the cases that run the secret filter
+failed with `No such file or directory: 'gitleaks'` on every tree. Only the fixture changes:
+
+- `Api.scratch_env`'s `PATH`: **before**, this machine's `PATH` less every folder that holds an `ollama`; **after**,
+  this machine's `PATH` with each such folder replaced, in its place, by a scratch folder (under the case's work
+  folder, `path/<n>`) of links to each of that folder's entries but `ollama` (`Api._path_without_ollama`, built once
+  per `Api`). `ollama` stays hidden, and the helper asserts `shutil.which("ollama", path=...)` is None for the
+  `PATH` it hands out; every other program of the folder (gitleaks among them) stays on `PATH`, where it was.
+- Nothing on the machine changes (`~/.local/bin` is only read).
+
+No expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: DEC-1046`.
+
+## The fused order's reference (DEC-1055, D-4b, for W2-13's S2, 2026-11-03)
+
+W2-13 gives the lexical route a `ranked` list beside its `hits` (the exact string's chunks first, then BM25's for the
+question's words), and `fusion.search` fuses `ranked` (S2: the fusion receives a ranked lexical list). Two cases built
+their reference order from `hits`, which is no longer what the fusion takes:
+`test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so` and
+`test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises`.
+
+- Their reference: **before**, `fusion.rrf` of the lexical route's `hits`; **after**, of its `ranked` list where the
+  answer holds one, else its `hits` (so the case reads the same on a tree before W2-13).
+- What they guard is unchanged: with no reranker the fusion's own order is kept, item for item, `reranked` is false,
+  nothing raises (DEC-374), the hub is asked nothing (DEC-397). A `fusion.search` that reorders the list without a
+  reranker still fails them.
+
+No other expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: W2-13's S2 (the
+fusion receives the lexical route's ranked list); DEC-1055`.
+
+## The rerank in requests of at most 16 (DEC-1067 (f), W2-32's S7, 2026-11-04; `Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16)`)
+
+`test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` read the KPI's
+"one rerank" as one reranker call. The owner's DEC-1067 (f) caps each request at 16 texts, a larger pool sent in
+batches of at most 16 with the scores combined in order. Revised by W2-32's independent test designer; the name
+stands. It now asks: one reranker load; every request at most 16 texts; the requests together score the merged set
+once (each candidate once, as many texts as hits); no more requests than the cap needs, every one but the last carrying exactly 16 (the round-2 review's R2-F3: so two passes of their own, one per route, do not pass); the first result still the
+reranker's highest. Nothing else in the case changes.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 31 in the full run, 10 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | the ticket's words |
+| S2: Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1-42) and a... | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`, `test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95` | the ticket's words |
+| S3: Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py::test_the_manifest_records_the_model_ids_and_their_revisions` | the ticket's words |
+| F1: Mean hit@5 falls below 80 | `test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80` | the ticket's words |
+| F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | the ticket's words |
+
+Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061): memory
+is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32. It is applied
+after D-4b's measure 3; until then the hit@5 rows above judge against 80.

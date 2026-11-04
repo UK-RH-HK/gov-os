@@ -49,13 +49,41 @@ def test_the_check_is_green_when_the_dev_tiers_meet_the_baselines(box, family_ch
     assert run.returncode == 0, f"the baselines are met and the check is not green\n{run.describe()}"
 
 
+def _planted_failing_tiers(folder):
+    """Dev tiers that fail the baselines whatever the retrieval: the dev tiers themselves (linked, never changed)
+    and a copy of their dev query set whose every ``must_cite`` path is one that no tier holds, so no query can be a
+    hit and the mean hit@5 is 0; None when this machine has no dev tiers. The failure is planted, so it does not
+    rest on the stand-in vectors scoring under the pass line (they did, 73.2, before W2-13's ranked lexical route;
+    with it they score 80.5; DEC-1055)."""
+    import yaml
+
+    if not support.QUERY_SET.is_file() or not all((support.DEV_TIERS / tier / ".git").exists()
+                                                  for tier in ("a-dev", "b-dev")):
+        return None
+    folder.mkdir(parents=True)
+    for tier in ("a-dev", "b-dev"):
+        (folder / tier).symlink_to(support.DEV_TIERS / tier, target_is_directory=True)
+    document = yaml.safe_load(support.QUERY_SET.read_text(encoding="utf-8"))
+    for entry in document["queries"]:
+        gold = entry.get("gold") or {}
+        gold["must_cite"] = [f"planted-nowhere/{path}" for path in gold.get("must_cite") or []] or ["planted-nowhere"]
+        entry["gold"] = gold
+    (folder / support.QUERY_SET.name).write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    return folder
+
+
 @pytest.mark.needs("gitleaks", "sqlite_vec")
-def test_the_check_is_red_when_the_dev_tiers_fail_the_baselines(box, family_check, repo, ollama):
+def test_the_check_is_red_when_the_dev_tiers_fail_the_baselines(box, family_check, repo, ollama, tmp_path):
     """DEC-425: hit@5 < 80 or forbidden > 2. A project with dev tiers that fail the baselines reports red
-    (exit != 0)."""
+    (exit != 0). The tiers are made to fail: their query set's gold names paths no tier holds, so hit@5 is 0; the
+    check measures them (it does not stop "unmeasured") and is red."""
+    tiers = _planted_failing_tiers(tmp_path / "planted-tiers")
+    if tiers is None:
+        pytest.skip(f"no dev tiers and dev query set at {support.DEV_TIERS} (GOV_DEV_TIERS)")
     box.build(repo, ollama.host)
-    env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(support.DEV_TIERS))
+    env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(tiers))
     run = support.run_check(family_check, repo, env)
+    assert "unmeasured" not in run.output.lower(), f"the planted tiers were not measured\n{run.describe()}"
     assert run.returncode != 0, f"the baselines are not met and the check is green\n{run.describe()}"
 
 

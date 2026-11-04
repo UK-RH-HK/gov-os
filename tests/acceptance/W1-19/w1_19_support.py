@@ -271,8 +271,38 @@ class Api:
         self.driver = self.workdir / "driver.py"
         self.driver.write_text(_DRIVER, encoding="utf-8")
         self.dead_host = f"127.0.0.1:{free_port()}"
+        self._path = None
 
     # ---- environments
+
+    def _path_without_ollama(self):
+        """This machine's ``PATH`` with ``ollama`` hidden and every other program kept (DEC-1046).
+
+        A folder that holds an ``ollama`` is replaced, in its place, by a scratch folder of links to each of its other
+        entries. Dropping the whole folder also hid what stands beside ``ollama``: ``~/.local/bin`` holds an ``ollama``
+        wrapper beside ``gitleaks``, and the secret-filter cases lost gitleaks. Built once per ``Api``."""
+        if self._path is None:
+            stand_ins, folders = {}, []
+            for folder in os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep):
+                if not folder:
+                    continue
+                if not os.path.lexists(os.path.join(folder, "ollama")):
+                    folders.append(folder)
+                    continue
+                if folder not in stand_ins:
+                    stand_in = self.workdir / "path" / str(len(stand_ins))
+                    stand_in.mkdir(parents=True, exist_ok=True)
+                    with os.scandir(folder) as entries:
+                        for entry in entries:
+                            link = stand_in / entry.name
+                            if entry.name != "ollama" and not link.is_symlink():
+                                link.symlink_to(entry.path)
+                    stand_ins[folder] = str(stand_in)
+                folders.append(stand_ins[folder])
+            path = os.pathsep.join(folders)
+            assert shutil.which("ollama", path=path) is None, f"ollama is still on the scratch PATH: {path}"
+            self._path = path
+        return self._path
 
     def _link_sqlite_vec(self):
         """A folder that holds a link to the ``sqlite_vec`` this machine's Python imports, and nothing else; None
@@ -292,11 +322,10 @@ class Api:
         """Built from scratch: an empty HOME, no ``ollama`` on PATH, and an endpoint that is dead unless given.
 
         ``PYTHONPATH`` is this worktree's ``src`` and, when this machine has ``sqlite_vec``, the folder that links
-        that one package: the empty HOME has no user site folder to find it in."""
-        path = os.pathsep.join(folder for folder in os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)
-                               if folder and not (Path(folder) / "ollama").exists())
+        that one package: the empty HOME has no user site folder to find it in. ``PATH`` hides ``ollama`` alone; every
+        other program of this machine's ``PATH`` stays (``_path_without_ollama``, DEC-1046)."""
         return {
-            "PATH": path,
+            "PATH": self._path_without_ollama(),
             "HOME": str(self.workdir / "home"),
             "TMPDIR": str(self.workdir / "tmp"),
             "LC_ALL": "C.UTF-8",
@@ -825,7 +854,8 @@ class OllamaStandIn:
                     reply = {"models": [model]}
                 elif route == "/api/ps":
                     # W2-54, DEC-798: as the CPU-only embedder must, the model loaded wholly on the CPU.
-                    reply = {"models": [{**model, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{**model, "size_vram": model["size"]}]}
                 elif route == "/api/show":
                     reply = {"details": model["details"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS},

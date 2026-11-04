@@ -1,0 +1,15 @@
+category: callers
+commit: f46b96537d74
+question: "Which functions call set_fault?"
+gold_answer: >-
+  Three: check_sets (src/gov/guard/reads.py, line 465) and _hidden (reads.py, line 483), each raising PolicyError
+  on a fault, and measure in src/gov/retrieval/measure.py (line 247), which refuses a set that is not declared well
+  formed in the path map's evaluation_sets.
+sources:
+  - path: src/gov/guard/reads.py
+    lines: [465, 465]
+  - path: src/gov/guard/reads.py
+    lines: [483, 483]
+  - path: src/gov/retrieval/measure.py
+    heading: "        if not isinstance(entry, dict) or set_fault(entry):"
+    lines: [247, 247]

@@ -1,0 +1,18 @@
+category: code-paraphrase
+commit: f46b96537d74
+question: "By default, how long may a store rebuild run before it counts as slow, and how often is its record rewritten after that?"
+gold_answer: >-
+  1800 seconds by default (slow_after_s, which the tree's governance/project/rebuild.yaml may set); past it the
+  watchdog flags the rebuild slow and writes its record at once, then at least every 30 seconds
+  (src/gov/rebuild/watch.py: SLOW_AFTER_S = 1800, EVERY_S = 30.0).
+sources:
+  - - path: src/gov/rebuild/watch.py
+      lines: [3, 4]
+    - path: src/gov/rebuild/watch.py
+      heading: "SLOW_AFTER_S = 1800"
+      lines: [41, 41]
+  - - path: src/gov/rebuild/watch.py
+      lines: [16, 17]
+    - path: src/gov/rebuild/watch.py
+      heading: "EVERY_S = 30.0  # the longest gap between two writes of a slow rebuild's record"
+      lines: [46, 46]

@@ -55,6 +55,8 @@ record_only:
   - "docs/plan/wave-1-exit/evidence/**.json"
   - "governance/project/orchestration/**.md"
   - "governance/project/orchestration/packages/*.patch"
+  - "governance/project/orchestration/packages/*.diff"
+  - "governance/project/orchestration/tools/win_toast.ps1"
 
 # DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
 # every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
@@ -66,7 +68,13 @@ record_reading:
   - "tests/acceptance/W1-27/test_w1_27_path_compliance.py"
   - "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py"
   - "tests/acceptance/W1-07/test_w1_07_envelope.py"
-  - "tests/acceptance/W2-54/test_w2_54_green_here.py"
+  # W2-54's green-here cases without the three that start a whole gov check (its gov_check_here fixture): those run
+  # only in the full suite (DEC-1050, T-4)
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_suite_runs_this_worktree_s_code"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_in_a_close_the_fixture_reads_the_check_result_and_starts_no_gov_check"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_a_check_result_that_is_missing_or_broken_is_never_read_as_green"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py::test_a_red_or_missing_check_in_the_close_s_result_still_fails_the_cases"
   - "tests/acceptance/W1-33/test_w1_33_agent_definitions.py"
   - "tests/acceptance/W1-49/test_w1_49_threshold.py"
   # area 1 (I1 §4.1): today's ticket files
@@ -92,7 +100,8 @@ record_reading:
   - "tests/acceptance/W1-27/test_w1_27_doctor_r7.py"
   - "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py"
 
-# P-IS-1 (a): W1-07's three contract files run every command; they run on every close.
+# P-IS-1 (a): W1-07's three contract files run every command; since DEC-1050 (T-4), on a close whose change holds a
+# record-only path (and in the full suite).
 every_close:
   - "tests/acceptance/W1-07/test_w1_07_envelope.py"
   - "tests/acceptance/W1-07/test_w1_07_read_act.py"
@@ -118,9 +127,16 @@ couplings:
     suites: ["tests/acceptance/W1-31/", "tests/acceptance/W1-37/", "tests/acceptance/W1-38/", "tests/unit/telemetry"]
     why: "the session-start and PreCompact hooks are also run by these suites (I3 §4.1 item 5)"
   - paths: ["governance/project/path-map.yaml", ".gitleaks.toml", "template/.gitleaks.toml"]
-    suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-19/", "tests/acceptance/W1-20/",
-             "tests/acceptance/W1-21/", "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
-    why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6)"
+    suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-20/",
+             "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
+    why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6); W1-19 and W1-21 left out by DEC-1061 item 9 (T-6)"
+  # DEC-1061 item 9 (DEC-1052 T-6): the real-model suites are selected by a model-path change only: the embedder (its
+  # model pin, the Ollama client, the vector cache), the reranker (its pin, service and worker) and the dev tier's baseline
+  - paths: ["src/gov/retrieval/semantic.py", "src/gov/retrieval/ollama.py", "src/gov/retrieval/vector_cache.py",
+            "src/gov/retrieval/rerank.py", "src/gov/retrieval/rerank_service.py", "src/gov/retrieval/rerank_worker.py",
+            "src/gov/retrieval/retrieve_baseline.yaml"]
+    suites: ["tests/acceptance/W1-19/", "tests/acceptance/W1-21/"]
+    why: "model paths: the embedding and reranker code and configuration W1-19 and W1-21 run against the real models (DEC-1061 item 9, T-6)"
   - paths: ["**.service", "**.socket", "**.timer"]
     suites: ["tests/acceptance/W1-18/"]
     why: "fixture input: W1-18 lists the working tree's service, socket and timer units (I3 §4.1 item 6)"

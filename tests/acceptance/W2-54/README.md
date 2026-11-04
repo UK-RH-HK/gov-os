@@ -40,6 +40,10 @@ Run (the project's test command, to its end):
 
 ### The retrieval stand-in
 
+*Removed by W2-04's round 2 (DEC-1005): the context no longer reaches the retrieval's entry. The orders are now
+produced from outside, and the check's stand-in sits at `gov.context.context` ("W2-04 (DEC-1005)", at the end).
+The text below is the original design.*
+
 KPI 1 lets a test control the order in which the retrieval returns its items through the retrieval's public
 entry. The suite writes a `sitecustomize.py` into a temporary folder and puts that folder first on `PYTHONPATH`
 of the processes of a run (the `gov context` process, and the check's process). It replaces
@@ -89,7 +93,7 @@ and the support reads the check's output in each form it prints: a list of findi
 | **S4** `audit-report` exactly W2-02's; nothing of W2-02's other types; core-schema green here, W1-43 untouched | `test_w2_54_audit_report.py`: `test_the_schema_file_is_w2_02_s_byte_for_byte`, `test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[2]`, `test_a_record_of_type_audit_report_owes_no_shared_frontmatter[2]`, `test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[3]`, `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`; `test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here` (in a close, gate (b)'s `gov check`: "W2-75") | **red** |
 | S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD, 4ce16df2]`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict × HEAD, 4ce16df2]` (read through git since run 5: "Run 5 (DEC-874)", at the end), `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` (in a close, after gate (b)'s `gov check`: "W2-75") | pass |
 | **F1** a context whose items or hash differ still fails the check, naming the ticket | `test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_the_check_names_only_the_ticket_whose_context_differs` | pass |
-| **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass |
+| **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass; since DEC-1045 the weakening case accepts that decision's three lines appended to secrets-indexing.yaml and nothing else (Rewrite-Reason DEC-1045, below) |
 | **F3** outside `docs/audit/` with no `type` still fails; an audit report lacking `milestone`, `commit` or `pack_sha256` fails naming the field | `test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/notes, docs/audit-archive, docs/reports/audit]` (pass); `test_an_audit_report_lacking_a_required_field_fails_naming_it[folder, stated × milestone, commit, pack_sha256]` (**red**) | mixed |
 
 ## Red reasons (as seen at `b644d28a`)
@@ -273,7 +277,8 @@ this worktree's `src/` on `PYTHONPATH`, DEC-732), `OLLAMA_HOST` naming the stand
 | 3: a text that differs in any character | `test_a_text_that_differs_in_any_character_gets_its_own_answer[case, spacing, trailing-newline, unicode-normal-form]` | pass | — |
 | **4. the first answer is unchanged** | `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it` | pass | — |
 | **5. nothing is left behind by a failed or partial call** | `test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses[fail, short]` | pass | — |
-| **6. one project's vectors are never another's** | `test_two_projects_do_not_share_query_vectors` | pass | — |
+| **6. two projects on one machine** (rewritten under DEC-1033 for W2-126's machine-wide cache: "The rewrite for W2-126" at the end): one text, model and revision, one vector | `test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache` | **red until W2-126** | "the second project sent the embedder the question 1 time(s)" |
+| 6: another revision or another text is never shared | `test_two_projects_never_share_a_vector_for_another_revision_or_another_text[revision, text]` | pass | — |
 | 1 with **the real embedder** | `test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before` | **red** (here) | answer 2 differs from the first: kiln at 0.36549 then 0.36438, orchard at 0.72068 then 0.72273 (the real variation) |
 
 **Count:** 15 cases (11 functions); 7 red today, 8 pass today.
@@ -297,9 +302,12 @@ under a store that gets the key wrong.
 - **A failed or partial call** (HTTP 500; one vector fewer than asked): unavailable, no hit, as today; the next
   search with a healthy embedder **asks the embedder again** and gets its vector. A store that kept anything from
   the failed call (an empty or partial vector, a marker) would not ask again or would answer from it.
-- **Two projects**: the same model, revision and question, two stores, two embedders that answer differently: each
-  project gets its own embedder's answer; the second project's search changes no file of the first project's
-  runtime folder and writes nothing under `HOME` (a vector kept for every project, under `HOME`, would show there).
+- **Two projects** (rewritten under DEC-1033, item 3, for W2-126; "The rewrite for W2-126" at the end): the same
+  model, revision and question, two stores, two embedders that would answer differently: the second project is
+  served the first's vector from the machine-wide cache and sends its embedder nothing for the question; its search
+  changes no file of the first project's runtime folder and writes nothing under `HOME` (the cache sits in the
+  case's own `GOV_VECTOR_CACHE_DIR`). Another revision or another spelling of the question is never served the
+  first project's vector: its own embedder is asked and its answer is the forge's.
 
 ## The real embedder
 
@@ -873,6 +881,122 @@ none (8 passed in 0.05 s). The four route cases fail on the old support module, 
 
 **Counts.** `test_w2_54_green_here.py`: 8 cases where there were 4; the suite: 103 where there were 99.
 
+# W2-04 (DEC-1005, 2026-11-01): the context's own lookups, its ceiling, and no embedder
+
+Ticket W2-04 (`DAEO-u4oz`, FULL), round 2, by its independent test designer. Every change carries `Rewrite-Reason:
+W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005`. Seventeen cases changed, in four files. No case is dropped, the
+count of the suite is unchanged (103), and no expectation is lowered: each case asserts at least what it did, where
+W2-04 puts it.
+
+**Why.** The run-1 build of W2-04 failed these cases for W2-04's reasons:
+
+- **P-W2-04-2 (A)** (DEC-1005, delegated by the CTO). The supplementary block is built from deterministic lexical
+  evidence only, from the context's own lookups, and `gov context` sends nothing to an embedder. The context no
+  longer reaches `gov.retrieval.retrieve.retrieve`, so the stand-in that reordered that entry's items saw nothing.
+  Each lookup is shown in the packet's new key `supplementary_batches` (`items`, `limit`).
+- **W2-04's S2.** Mandatory inputs alone over the ceiling refuse with `CONTEXT_OVER_CEILING`. TK-W254-BIG's mandatory
+  input (35,774 tokens on the base) is far past the default ceiling of 6,000.
+
+## `test_w2_54_dropped_order.py` (14 cases): the stand-in re-pointed to the packet
+
+**The stand-in that reordered the retrieval's items is gone** from `w2_54_support._HOOK`.
+
+**Orders produced from outside** (`w2_54_support.order_project`, `build_index`, `in_order`). The project
+`tied` is the context corpus with a second small ticket, `TK-W254-OTHER`, and four files of one text,
+`docs/ties/tie-{d,b,a,c}.md` (ties). For each of `reverse`, `rotate` and `shuffle` (seed 54) there is another project
+holding the same files:
+
+- **the same commit:** written in that order, committed with the fixed date and identity, so the same hash;
+- **the store's rows in that order:** the documents are set aside outside the project, and the index is refreshed; then
+  each document is put back in that order and the index refreshed again after it, so its chunks get later rowids;
+- **another hash seed** (`PYTHONHASHSEED` 1, 2, 54, against 0 for `tied`).
+
+The fixture holds its premise: the same commit; the same rows (sorted); another row order (`SELECT path FROM
+lexical_chunk ORDER BY rowid`, read from the temporary store).
+
+**Budgets from the packet's own figures** (`room_for_all`, `pressure_budget`):
+
+- *Room for all:* the default ceiling's fixed part (`tokens` less the supplementary items). Where the mandatory
+  inputs alone are over the ceiling, the refusal's `mandatory_tokens` is used instead. To it are added the ticket's
+  text and four times the text of every file of the project.
+- *Under pressure:* the packet with room for all gives the ranked items, every one read and stacked. The pressure
+  budget is the fixed part plus the first half of those items, so the first half is stacked and the rest left.
+
+**The check's two computations** run in one process, so no order outside the process can differ between them.
+`w2_54_support._HOOK` now sits at the context's public in-process entry, `gov.context.context`, which the check calls.
+Before each computation of a ticket, in turn, it puts the project into one of the states `W254_STATES` names:
+
+- a branch checked out;
+- a store built at that branch copied in.
+
+`W254_TARGET` limits the turns to one ticket. It logs each computation, and it never touches what the context
+computes. The states (fixture `states`) are:
+
+- `sorted`;
+- `reversed`: the same commit, rows in the reverse order of the documents;
+- `drop`: a branch where the first document TK-W254-SMALL stacks is removed, with its own store.
+
+The check cases use TK-W254-SMALL and TK-W254-OTHER, which fit the default ceiling. A reproduced
+`CONTEXT_OVER_CEILING` would be a `REFUSED:` line, not green evidence. Their project leaves out the big charter, which
+neither cites: its one line of about 25,000 tokens would stop the stack at the default ceiling wherever a relevance
+order ranks it.
+
+| case | before | after |
+|---|---|---|
+| `…stand_in_reaches_the_retrieval_s_public_entry_with_tied_and_same_id_items` | the stand-in saw ≥ 10 items, ≥ 5 ids, two of one id | **through the packet.** With room for all, TK-W254-BIG's `supplementary_batches` read ≥ 10 items of ≥ 5 ids. Several items come from one record (sharing its id, or its file where items are named one by one). The four tied files are read, and their stacked items have one text |
+| `…two_computations_with_the_retrieval_s_own_order_give_one_packet` | TK-W254-BIG twice (past the ceiling) | TK-W254-BIG twice **under pressure** (items stacked and left): one packet, one hash |
+| `…every_order_…_gives_the_same_packet_and_hash[reverse, rotate, shuffle]` | the stand-in returned the items reversed, rotated, shuffled | **the project's files, the store's rows and the hash seed** in that order, at the same commit, under pressure. The same `dropped` (its one order), `supplementary_batches`, `further_batch`, hash and packet |
+| `…a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order` | `ok: true`, everything dropped, one packet | **the refusal:** `ok: false`, `CONTEXT_OVER_CEILING`, a non-zero exit, details naming the ticket and limit. The same envelope and exit under every order |
+| `…nothing_is_dropped_or_added_every_item_stays_in_the_packet_once[identity, reverse]` | each returned item once in `dropped` | each item the batches read is **once in the packet**: stacked, or left for lack of room and in `dropped` (counted by id, so same-id items stay apart). The stack is the first items read. `dropped` is the same multiset under the reverse order |
+| `…a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing` | at the default ceiling, kept == the last call's items | **with room for all** (the default ceiling no longer holds all of TK-W254-SMALL's evidence): every item read is stacked once, in order. `dropped == []`, `further_batch == []`, and the last batch read fewer items than its limit |
+| `…an_empty_retrieval_result_gives_one_packet` | the stand-in returned nothing | **a project whose lookup finds nothing** (fixture `none`: tickets as `product` memory, so not indexed; the title `Quince marmalade jars` in no document; `gov retrieve` of it gives no evidence). Two seeds, one packet. Nothing supplementary, read, left or dropped |
+| `…a_store_whose_index_is_missing_gives_one_packet_under_any_order[SMALL, BIG]` | identity and reversed stand-in | the same files **written in the reverse order** (the same commit), another seed. TK-W254-BIG with room for all |
+| `…the_check_is_green_when_two_computations_see_two_orders` | the stand-in alternated the order | **the two stores in turn** (`sorted`, then `reversed`), seen in the log for both tickets. Exit 0; no `FAIL`, `REFUSED` or `ERROR` |
+| `…a_context_whose_items_differ_still_fails_the_check_naming_the_ticket` | the second call returned one item fewer | **the second computation sees the `drop` state** (one stacked document gone, its own store). The fixture shows the items differ. Not green, and names TK-W254-SMALL |
+| `…the_check_names_only_the_ticket_whose_context_differs` | the same, `W254_TARGET` TK-W254-BIG | the same, **`W254_TARGET` TK-W254-SMALL**. TK-W254-OTHER sees `sorted` only and is not named |
+
+**What can no longer be produced from outside, and what each case guards instead.**
+
+- "Two computations of the check see two orders of *the retrieval's* items" cannot be produced from outside any
+  more: the context does not ask the retrieval. Instead, between the check's two computations the stand-in at the
+  public `gov.context.context` swaps in another store at the same commit (another order of its rows), or another
+  branch with one document fewer. So "two computations saw two orders" is now two orders of *the store's* rows, and
+  "the items differ" is one document fewer.
+- A store of the context's own that it caches across the two computations is not swapped. The green case then holds
+  trivially; the two red cases still see the branch change.
+
+**Red on the base** (`d2ff95b2`, this tree's `src/` equal to `w2/integrate`'s): 11 failed, 4 passed.
+
+- TK-W254-BIG's and TK-W254-NONE's contexts are `ok: true` with 35,774 tokens over 6,000 (no
+  `CONTEXT_OVER_CEILING`): 8 cases, through `room_for_all`.
+- `--budget 30` gives `ok: true` with tokens 61.
+- No `supplementary_batches`: the fit case.
+- **Passing on the base:** the three check cases, and the index-missing case for TK-W254-SMALL. The base's
+  context is order-stable (its lexical route sorts by path), and the check compares hashes. They hold what the change
+  must keep.
+
+## The three embedder cases: their embedder steps move to `gov retrieve`
+
+`gov context` sends nothing to an embedder (W2-04's addendum, S4 and S7). The premise "a context sends the embedder
+its question" is gone, and the read that reaches the semantic route is `gov retrieve`.
+
+| case | before | after |
+|---|---|---|
+| `test_w2_54_cpu_embedder.py::test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner` | steps 3 and 4: two `gov context`, each sending the CPU embedder its question | steps 3 and 4 are **`gov retrieve` of the two tickets' titles**, held as every read is (the CPU embedder gets a text, the shared runner none); all six questions reach the CPU embedder. **Added:** the two `gov context` then send neither embedder a text |
+| `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the cache's states made by other tickets' contexts; the packet hash held in each | the states are made by **`gov retrieve` of the other tickets' titles**. In each state (cold, warm, deleted, `.gov-runtime/` read-only, the cache's files read-only, full): `gov retrieve` of the ticket's title gives the answer it gets first in a new store (the whole bundle), and `gov context` gives the reference packet and hash. **Added:** each `gov context` sends the embedder nothing. The premise "the context holds a retrieval item" moves to `gov retrieve`'s answer (evidence, semantic facet available) |
+| `test_w2_54_query_vector.py::test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary` | premise: the check's contexts reached the embedder | premise: **`gov retrieve` of each ticket's title**, asked, then again after the others, reaches the embedder after other texts, and gets one bundle every time. The check stays green over the three tickets. **Added:** its contexts send the embedder nothing |
+
+**Red on the base:** each fails on its added guarantee alone.
+
+- `gov context TK-W254-TIDES` sends the CPU embedder `…Query: Harbour`.
+- In the query-cache case, `cold, after another question: gov context sent the embedder […Query: Harbour]`. A
+  throwaway probe outside the tree ran its `gov retrieve` part through every state on the base: each answer equalled
+  the reference.
+- The check's contexts send the embedder 6 texts. The `gov retrieve` premise and the green check pass on the base.
+
+**Not revised:** `test_w2_54_green_here.py` and `test_w2_54_time_limit.py` (red only for a missing store in the
+ticket's worktree; the lead rebuilds), `test_w2_54_sandboxed_worker.py` (another ticket's).
+
 # DEC-1033: six cases revised (owner, 2026-11-02; emergency, `Rewrite-Reason: DEC-1033`)
 
 DEC-1033 item 2 (b) replaced DEC-798 (the query embedder on the CPU only): a question's vector is accepted from any
@@ -892,7 +1016,21 @@ file. No case is retired; the count stays 14 in the file and 103 in the suite.
 | `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | a read with an environment that says nothing about the GPU starts the executable found as DEC-260 finds it as `serve` at the query address, told nothing about the GPU (none of `CUDA_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, `ROCR_VISIBLE_DEVICES`, `GPU_DEVICE_ORDINAL`, `OLLAMA_LLM_LIBRARY`), so it serves on the GPU; the read gets its semantic answer; never stopped; a second read starts nothing |
 | `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | two reads at once: both answered, every start told the address and nothing about the GPU, one embedder serving there on the GPU, nothing stopped |
 
-**What was removed:** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
+**DEC-1065 (1) (owner, 2026-11-03; W2-32's S10; the review of W2-32, F-8):** no CPU fallback anywhere, `ensure_*` a
+health check only, and only an explicit restart starts a server. Revised by W2-32's independent test designer; each
+change carries `Rewrite-Reason: DEC-1065 (1)` in the file. The count stays 14 in the file.
+
+| old case | new case | what it now checks |
+|---|---|---|
+| the `cpu` fixture (the query embedder's stand-in, on the CPU) | the same fixture, on the GPU | the 9 cases that use it keep what they guard: the questions to the query embedder only, the chunks to the shared runner, round 3's key never served, a model not reported loaded gives no vector |
+| `test_a_vector_cached_under_round_3_s_key_is_never_served`'s twin query embedder, on the CPU | the same, on the GPU | the reference answer is the twin's again (a CPU vector is refused) |
+| `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_with_nothing_at_the_query_address_starts_nothing_and_answers_by_keywords[GOV_OLLAMA_BIN, PATH, HOME]` | with nothing at the query address and the stand-in `ollama` where DEC-260 looks: two reads run no executable, name the semantic part `EMBEDDER_UNAVAILABLE`, answer by keywords, send nothing to the shared runner |
+| `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_with_nothing_at_the_query_address_start_nothing_and_both_answer_by_keywords` | two reads at once: both clean, both named `EMBEDDER_UNAVAILABLE` and answered by keywords, no executable run, nothing to the shared runner |
+
+**What was removed (DEC-1065 (1)):** the start by a read and the "never stopped" of what it started (nothing is
+started), and the use of a vector the query embedder computed on the CPU.
+
+**What was removed (DEC-1033):** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
 none, and the demand that every start hides the GPU (`gpu_hidden`). The start cases now hold the opposite, the GPU
 left visible, since DEC-1033 puts the query server on the GPU; a caller's own GPU variables are not judged (the cases
 give none). What each case guarded that still holds is kept.
@@ -925,3 +1063,110 @@ set … {'CUDA_VISIBLE_DEVICES': '-1'}"); the two not-loaded cases passed there 
 - The round-4 sections above (the interfaces, "told to use no GPU", the KPI table, the risks) describe round 4 as
   written under DEC-798; this section supersedes them for the six cases. The ticket's own KPI line 5
   (`.tickets/DAEO-0rfi.md`, closed) still states the CPU-only embedder.
+
+## The rewrite for W2-126 (`Rewrite-Reason: DEC-1033`; DEC-1042 items 2 and 3, 2026-11-02)
+
+W2-126 (`DAEO-jpr0`, DEC-1032) adds one vector cache shared by every process on the machine, keyed by the model, the
+revision `/api/tags` reports and the sha256 of the exact text, in the folder `GOV_VECTOR_CACHE_DIR` names (default
+in the user's own folder). One text, model and revision is then one vector on the machine, in every project. Written
+from W2-126's ticket and README interface, without its implementation.
+
+- **Each case its own cache folder.** `Box.env` names `GOV_VECTOR_CACHE_DIR` in every child; the autouse fixture
+  `_own_vector_cache` (conftest) points it at `<tmp_path>/vector-cache` for each case, and fixtures of wider scope
+  keep `<box>/vector-cache`. `real_env` names it too, so the real-embedder case never writes the owner's cache. Without
+  this every case would share the session's `HOME` cache, and the cases whose stand-ins send one question to
+  different places (kiln, forge, orchard) would be served one another's vectors.
+- **Replaced:** `test_two_projects_do_not_share_query_vectors` (it read "the second project never asked its embedder"
+  as the failure) becomes
+  `test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`: the
+  second project sends the embedder nothing for the question and answers with the first project's vector, hit for
+  hit and distance for distance; the first project's runtime folder and `HOME` stay untouched. Red on `w2/integrate`
+  (`d72e8dbe`), the stated reason: "the second project sent the embedder the question 1 time(s)". Green once W2-126
+  is in.
+- **New, from the old case's other half:**
+  `test_two_projects_never_share_a_vector_for_another_revision_or_another_text[revision, text]`: another digest, or
+  the question with one letter's case changed, is sent to the second project's own embedder and answered with its
+  vector (the forge; under another revision, or unavailable with no hit), never the first project's; every request
+  names the pinned model. Passes on `w2/integrate`, and must stay green with the cache. `test_w2_54_query_vector.py`
+  now holds 17 cases (12 functions). The suite, as merged with W2-04's revisions on `w2/integrate` (`70965cf61311`):
+  105 cases, 103 selected and the 2 `shared_gpu` cases deselected.
+- **Reference stores get a cache of their own** (`cache=` on `semantic_project` and `embed_env`): the twin of
+  `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it`, the twin of
+  `test_a_vector_cached_under_round_3_s_key_is_never_served` (sharing the case's cache, W2-126 would rightly serve
+  the project the twin's vector, and the case's "the CPU embedder was never asked the question" would fail for it),
+  and the references of `test_w2_54_query_cache.py` (`_first_answer`, the cold-cache concurrency case, the bound
+  case, the packet-hash case), so a reference warms nothing the case then measures and "cold" stays cold. No
+  assertion of these cases changed.
+- **Run on `w2/integrate` (`d72e8dbe`, no W2-126 code):** `test_w2_54_query_vector.py` without the real-embedder case
+  (it reaches this machine's Ollama): 13 passed, the replaced case red as stated; the keep-apart pair, the round-3
+  case and the changed query-cache cases: 12 passed; `test_w2_54_query_cache.py`, `test_w2_54_cpu_embedder.py` and
+  `test_w2_54_dropped_order.py` whole, with the per-case cache folder: 43 passed.
+- **The packet-hash case's states hold for both caches** (P-W2-126-QC (a), `Rewrite-Reason: DEC-1033`; DEC-1042):
+  `test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` read "the context left no cache file to make
+  read-only" from the tree's own file alone, and W2-126 answers a question its machine-wide cache already holds
+  without writing that file. The case now names its own machine-wide folder (`<tmp_path>/case-vector-cache`, on the
+  build and every context); "deleted" removes the tree's cache files and the machine folder's (the premise: at least
+  one existed, and none survives); ".gov-runtime/ read-only" makes the machine folder (made if absent) read-only as
+  well, each checked to refuse a new file; "the cache's files read-only" acts on the files either cache holds (the
+  premise: at least one); "full" lowers both bounds (`GOV_QUERY_VECTOR_CACHE_MAX_BYTES` and
+  `GOV_VECTOR_CACHE_MAX_BYTES`, 256 KiB). What it guards is unchanged: one ticket, one packet and one hash, the first
+  context's in a new store, in every state; its row above is unchanged. Run on `w2/integrate`'s code (this
+  tree's `src/`, no W2-126 code): `test_w2_54_query_cache.py` whole, 14 passed (the case 8.7 s).
+
+## W2-04 merged with W2-126's revision (D-1, DEC-1052)
+
+`test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` carries both
+revisions, which conflicted when `w2/integrate` (with W2-126) was merged into `w2/W2-04`. W2-04's: the cache's states
+are made by `gov retrieve` of the other tickets' titles; in each state `gov retrieve` of the ticket's title gives the
+reference answer and `gov context` the reference packet and hash, sending the embedder nothing; the premise is
+`gov retrieve`'s semantic evidence. W2-126's: the reference store has a cache of its own (`_reference_cache`), and the
+case its own machine-wide folder (`case-vector-cache`); "deleted" removes both caches' files, ".gov-runtime/
+read-only" makes the machine folder read-only too, "the cache's files read-only" acts on either cache's files, and
+"full" lowers both bounds. The reads that make each state are W2-04's; the caches they act on are W2-126's. No
+assertion of either side was dropped.
+
+## DEC-1045: the secrets-indexing declaration's decided change (`Rewrite-Reason: DEC-1045`, 2026-11-03)
+
+DEC-1045 (owner, 2026-11-02) switched the secrets scan off on this repository by configuration, the feature kept
+built and on by default elsewhere. Its commit `ddcec657c278` appended three lines to
+`template/governance/kernel/checks/secrets-indexing.yaml` (two comment lines and `allows-not-applicable: "true"`), so
+that with `scan: off` the check answers not applicable, YELLOW, naming the switch.
+`test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened` (DEC-768 item 4: every declaration byte for byte as
+at the base `b644d28a`, but the context check's line) failed on it ("secrets-indexing.yaml is changed").
+
+- **Revised:** the case names that change in `DECIDED_CHANGES` (the file, the decision, its exact three lines). That
+  declaration must be its base bytes, or those bytes followed by exactly those lines; every other declaration stays
+  byte for byte as at the base, and none is added or removed. Its intent is kept: no hard-block check is weakened
+  beyond what an owner's decision named.
+- **Shown:** on `70965cf61311` the case passes. A throwaway probe outside the tree (the file's bytes replaced in the
+  reading process only) shows it still fails for the secrets-indexing check downgraded to advisory, for another line
+  appended to it, and for core-schema given the same `allows-not-applicable` line; it passes for the declaration
+  back at its base bytes.
+- **Counts:** unchanged, 10 cases in the file, 105 in the suite (103 selected).
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 87 in the full run, 16 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order ... | `test_w2_54_dropped_order.py::test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash` (3 of 3), `test_w2_54_dropped_order.py::test_two_computations_with_the_retrieval_s_own_order_give_one_packet`, `test_w2_54_dropped_order.py::test_the_check_is_green_when_two_computations_see_two_orders` | the ticket's words |
+| S2: The same text always gets the same query vector, whatever was embedded before it: query vectors are stored, keyed by the model, the model's rev... | `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_query_vector.py::test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`, `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2) | the ticket's words |
+| S3: The query-vector cache is the one file a read command writes: a derived file under .gov-runtime/, keyed by model, model revision and a hash of ... | `test_w2_54_query_vector.py::test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`, `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the ticket's words |
+| S4: Where the cache cannot be written (a sandboxed worker, whose .gov-runtime is read-only), the same text still gets the same vector; a test shows... | `test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written` | the ticket's words |
+| S5: On the shared GPU Ollama, the same text read many times, after different texts and by two sessions at once, gets one vector: query embeddings c... | `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2) | the ticket's words |
+| S6: W1-21's hit@5 on the real models, with the query embedder's vectors (any device, DEC-1033) against the GPU-built index, is at or above its pass... | `test_w2_54_cpu_embedder.py::test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80`, `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2), `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2) | the ticket's words |
+| S7: W1-46's live cases launch their sessions with no CLAUDE* variable in the environment [owner, 2026-10-18, P-W2-34 (a)]. | `test_w2_54_cpu_embedder.py::test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner`, `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the ticket's words |
+| S8: The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the ... | `test_w2_54_time_limit.py::test_the_change_record_states_the_limit_and_its_measurement`, `test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit` | the ticket's words |
+| S9: `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768]. | `test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here`, `test_w2_54_time_limit.py::test_the_two_checks_of_this_ticket_stay_hard_block` (2 of 2) | designer |
+| S10: The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`): its schema file byte for byte as W2-02's; in `src/gov/check/sc... | `test_w2_54_audit_report.py::test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report` (2 of 2), `test_w2_54_audit_report.py::test_a_record_of_type_audit_report_owes_no_shared_frontmatter` (1 of 2), `test_w2_54_audit_report.py::test_core_schema_is_green_on_this_repository_with_w1_43_untouched` | the ticket's words |
+| F1: A context whose items or hash differ between two computations still fails the check, naming the ticket. | `test_w2_54_dropped_order.py::test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_w2_54_dropped_order.py::test_the_check_names_only_the_ticket_whose_context_differs` | the ticket's words |
+| F2: A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4]. | `test_w2_54_time_limit.py::test_a_check_past_its_declared_limit_is_red`, `test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened`, `test_w2_54_time_limit.py::test_the_two_checks_of_this_ticket_stay_hard_block` (2 of 2) | designer |
+| F3: A record outside `docs/audit/` that states no `type` still fails core-schema; an audit report that lacks `milestone`, `commit` or `pack_sha256`... | `test_w2_54_audit_report.py::test_a_record_outside_the_audit_folder_that_states_no_type_still_fails` (3 of 3), `test_w2_54_audit_report.py::test_an_audit_report_lacking_a_required_field_fails_naming_it` (6 of 6) | the ticket's words |

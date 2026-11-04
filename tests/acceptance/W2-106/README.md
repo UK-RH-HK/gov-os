@@ -65,6 +65,28 @@ The three guard lines, in both template files (6 lines; ids `settings-<Event>` a
 The four lifecycle lines (sessionStart, stop, preCompact, subagentStop) keep DEC-608's plain form by DEC-917, which
 W1-38 holds them to; they are not tested here (the lead's scope note, P3).
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 26 in the full run, 4 in `breadth`, 58 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Each of the template's hook lines (pre-tool and the two post-tool lines, in `template/governance/kernel/settings.json` and their rulesync sourc... | `test_w2_106_form.py::test_the_line_takes_this_repository_s_pinned_form` (2 of 6) | part A's row, by its words |
+| S2: Fail closed: with no gov found, or a first line that names no interpreter that runs, the line refuses (exit 2) with a message naming what is mi... | `test_w2_106_fail_closed.py::test_a_home_gov_whose_interpreter_is_missing_is_refused` (2 of 6) | part A's row, by its words |
+| S3: A session's PYTHONPATH cannot change which guard code runs: in a generated project, a planted PYTHONPATH pointing at an edited copy of gov that... | `test_w2_106_generated_project.py::test_a_planted_pythonpath_to_an_edited_gov_does_not_let_a_refused_write_through` | part A's row, by its words |
+| S4: A generated project's hook lines equal the template's source after `rulesync generate` (the two sources stay in step), and the template's own s... | `test_w2_106_form.py::test_the_settings_and_the_rulesync_source_hold_the_same_guard_line` (1 of 3), `test_w2_106_generated_project.py::test_the_generated_settings_hold_the_template_s_guard_line` (1 of 3) | part A's row, by its words |
+| F1: A template hook line that runs a bare `python3`, or one without `-E`. | `test_w2_106_form.py::test_the_line_runs_no_bare_python3_and_passes_minus_e_to_its_interpreter` (2 of 6) | part A's row, by its words |
+| F2: A missing or broken gov lets the hook pass, or falls back to another interpreter. | `test_w2_106_fail_closed.py::test_a_broken_home_gov_does_not_fall_back_to_the_gov_on_path` (2 of 6) | part A's row, by its words |
+| F3: An edited gov on PYTHONPATH lets a refused write through. | `test_w2_106_generated_project.py::test_a_planted_pythonpath_to_an_edited_gov_does_not_let_a_refused_write_through` | part A's row, by its words |
+| F4: The settings and the rulesync source out of step, or W1-38 or W1-39 red. | `test_w2_106_form.py::test_the_settings_and_the_rulesync_source_hold_the_same_guard_line` (1 of 3), `test_w2_106_generated_project.py::test_the_generated_settings_hold_the_template_s_guard_line` (1 of 3) | part A's row, by its words |
+
 ## KPI lines, cases and red reasons
 
 ### KPI success 1 and its failure line: the pinned form (`test_w2_106_form.py`, `test_w2_106_interpreter.py`)

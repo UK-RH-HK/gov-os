@@ -4,7 +4,7 @@ Draft of 2026-10-30, for DEC-953 item 7. History is not rewritten: the full regi
 
 How the sorting works:
 - `DECISIONS-IN-FORCE.md` lists the decisions that still guide work.
-- `LIFTED-BY-DEC953.md` lists what DEC-953 lifts.
+- `DECISIONS-IN-FORCE.md`, its "Lifted" section, lists what DEC-953 lifts (it replaced `LIFTED-BY-DEC953.md`, DEC-1052 R-9).
 - This file lists the rest. Each line gives what superseded it, or why it is spent.
 - **Product record** means a decision about how the product behaves, or about the plan. It is still the authority for that behaviour, but it is not a working rule for sessions.
 
@@ -69,7 +69,7 @@ How the sorting works:
 - DEC-947: SUPERSEDED by DEC-953 item 1 (LIFTED §D).
 
 ## B. Wave 2 entries (DEC-720 to DEC-951) that are spent or product record
-"Feature lifted" means that the feature the entry served is lifted by DEC-953 (see `LIFTED-BY-DEC953.md`).
+"Feature lifted" means that the feature the entry served is lifted by DEC-953 (see the "Lifted" section of `DECISIONS-IN-FORCE.md`).
 
 - DEC-721: the adoption-readiness block, W2-01 first. Spent.
 - DEC-722: Contract v4.2 brings two Wave 3 items in. Product record.

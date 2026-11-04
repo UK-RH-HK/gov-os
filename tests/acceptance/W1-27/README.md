@@ -671,3 +671,32 @@ addresses, as they did for `OLLAMA_HOST`. No expectation, assertion, pass line o
 sandbox, after the change: `test_w1_27_rebuild_r8_no_embeddings.py` 9 passed. Commit trailer: `Rewrite-Reason:
 DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own port; the
 fixtures point it at a stand-in and change no expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 66 in the full run, 113 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: doctor reports pinned vs found tool versions, hooks wired, path map with zero unclassified paths, index freshness, canaries, framework.lock MAT... | `test_w1_27_doctor.py::test_doctor_report_mentions_path_map_coverage`, `test_w1_27_adoption.py::test_doctor_report_mentions_adoption_level`, `test_w1_27_doctor.py::test_doctor_report_mentions_tool_versions` | the ticket's words |
+| S2: rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works [CAP-07.a, CAP-20.a, CAP... | `test_w1_27_rebuild.py::test_fresh_clone_doctor_rebuild`, `test_w1_27_rebuild.py::test_rebuild_recreates_derived_stores`, `test_w1_27_rebuild.py::test_two_rebuilds_give_the_same_digest` | the ticket's words |
+| S3: Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is reported [CA... | `test_w1_27_doctor_r5.py::test_stale_path_in_historical_record_is_not_reported` (1 of 4), `test_w1_27_path_compliance.py::test_moved_path_reference_is_reported`, `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` | the ticket's words |
+| S4: Registers the recovery/rebuild family check: derived state deleted and rebuilt gives the same digest [CAP-38.b] | `test_w1_27_recovery_check.py::test_derived_state_deleted_and_rebuilt_gives_same_digest` | the ticket's words |
+| S5: doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoption stage ra... | `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level`, `test_w1_27_adoption.py::test_completed_stages_raise_adoption_level` | the ticket's words |
+| S6: doctor reports Claude Code drift (DEC-210, DEC-214); the CLI at ~/.local/bin/claude and the active VS Code extension differing from each other,... | `test_w1_27_drift.py::test_cli_and_extension_different_versions_is_drift`, `test_w1_27_drift.py::test_extension_bundled_binary_different_sha256_is_drift` | the ticket's words |
+| S7: doctor reports a missing governance/project/held-out.yaml in this repository, because the guard treats a missing file as no held-out rule (DEC-... | `test_w1_27_held_out.py::test_missing_held_out_yaml_is_reported`, `test_w1_27_held_out.py::test_present_held_out_yaml_is_not_reported` | the ticket's words |
+| S8: gov validates governance/project/path-map.yaml against the kernel's path-map schema of W1-08, which replaces the minimal schema of W1-07 in src... | `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level`, `test_w1_27_schema.py::test_valid_w1_08_path_map_loads`, `test_w1_27_schema_compat_r2.py::test_status_accepts_minimal_path_map_with_only_namespaces` | the ticket's words |
+| F1: doctor passes with a tool at the wrong version | `test_w1_27_doctor_r7.py::test_home_tool_wrong_sha256_not_ok` (1 of 4) | the ticket's words |
+| F2: rebuild needs anything not in git | `test_w1_27_rebuild.py::test_rebuild_needs_only_git` | the ticket's words |
+
+Inventory row M5 (DEC-1040 (1), applied at the cut): `test_w1_27_path_compliance_r2.py`'s
+`test_stale_path_in_live_document_not_sources_is_reported` and `test_stale_path_in_src_gov_cli_is_reported`
+are folded into `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` (one doctor run, the
+three planted paths); the older tables above that name them read as that case.

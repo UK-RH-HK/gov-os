@@ -269,7 +269,8 @@ class OllamaStandIn:
                 elif route == "/api/tags":
                     reply = {"models": [model]}
                 elif route == "/api/ps":
-                    reply = {"models": [{**model, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{**model, "size_vram": model["size"]}]}
                 elif route == "/api/show":
                     reply = {"details": model["details"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS},
@@ -482,9 +483,23 @@ class Driver:
         return self.workdir / "site"
 
     def env(self, host=None, **extra):
-        """Built from scratch: an empty HOME, no ``ollama`` on PATH, the embedder at ``host`` (else a dead port)."""
-        path = os.pathsep.join(folder for folder in os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)
-                               if folder and not (Path(folder) / "ollama").exists())
+        """Built from scratch: an empty HOME, no ``ollama`` on PATH, the embedder at ``host`` (else a dead port).
+
+        Rewrite-Reason: DEC-1061 (D-4's red fix R-1): every PATH folder holding ``ollama`` is still dropped, but the
+        tools the store build needs (``gitleaks``) are resolved on the full PATH first and linked from a scratch
+        ``tools`` folder placed first, so a dropped folder (``~/.local/bin``, which holds the ollama wrapper beside
+        gitleaks) takes no tool away with it; the dropped folder itself is never put back (W2-91's form)."""
+        full = os.environ.get("PATH", "/usr/bin:/bin")
+        tools = self.workdir / "tools"
+        tools.mkdir(parents=True, exist_ok=True)
+        for name in ("gitleaks",):
+            found = shutil.which(name, path=full)
+            link = tools / name
+            if found and not link.is_symlink():
+                link.symlink_to(Path(found).resolve())
+        path = os.pathsep.join([str(tools), *(folder for folder in full.split(os.pathsep)
+                                              if folder and not (Path(folder) / "ollama").exists())])
+        assert not (tools / "ollama").exists(), "the scratch tools folder must hold no ollama"
         return {
             "PATH": path,
             "HOME": str(self.workdir / "home"),
@@ -590,6 +605,19 @@ def describe_effects(calls):
 
 def facet(answer):
     return answer["available"], answer["state"], answer["reason"]
+
+
+def answer_of(value):
+    """``value`` without W2-126's ``vector_cache`` counters (hits and misses of the machine-wide vector cache).
+
+    Rewrite-Reason: DEC-1061 (D-4's red fix R-1, shown once gitleaks was linked): W2-126 added to each semantic answer
+    the counts of its vector cache, which a later call in the same case's cache folder hits where a fresh one missed.
+    The counts say how the vector was found, not what was answered; every other field is still compared whole."""
+    if isinstance(value, dict):
+        return {key: answer_of(item) for key, item in value.items() if key != "vector_cache"}
+    if isinstance(value, list):
+        return [answer_of(item) for item in value]
+    return value
 
 
 # --------------------------------------------------------------------------

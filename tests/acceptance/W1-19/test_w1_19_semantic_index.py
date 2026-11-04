@@ -19,6 +19,7 @@ import pytest
 import w1_19_support as support
 
 ROOT = support.path_arg
+RERANK_CAP = 16  # DEC-1067 (f): no reranker request carries more than 16 texts
 INDEX = pytest.mark.needs("gitleaks", "sqlite_vec")
 
 
@@ -117,6 +118,11 @@ def test_the_manifest_records_the_model_ids_and_their_revisions(api, indexed):
 @INDEX
 def test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant(api, repo):
     # DEC-374. This endpoint's model list reports a digest that is not the pin; no other answer carries a digest.
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): a revision that no pin names fails closed, so this clone pins the
+    # endpoint's digest in its models.yaml (W2-32's interface; untracked, so its corpus is unchanged). The manifest
+    # must still record the digest observed, never ADR-0002's constant pin.
+    (repo / "governance/project/models.yaml").write_text(
+        f"embedder:\n  model: {support.EMBED_MODEL}\n  revision: {support.OTHER_DIGEST}\n", encoding="utf-8")
     endpoint = support.OllamaStandIn(digest=support.OTHER_DIGEST)
     try:
         env = api.scratch_env(ollama_host=endpoint.host)
@@ -184,9 +190,21 @@ def test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass(api, index
             if {support.LEXICAL_FACET, support.SEMANTIC_FACET} <= set(entry["routes"])]
     assert both, "no chunk is named by both routes: the lists were joined, not fused by chunk"
     assert answer["reranked"] is True
-    assert outcome.loads == 1 and len(outcome.passes) == 1, \
-        f"{outcome.loads} loads and {len(outcome.passes)} passes of the reranker for one retrieval; the KPI says one"
-    assert len(outcome.passes[0]["texts"]) == len(answer["hits"]), "the one pass was not over the merged set"
+    # Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16): the one rerank over the merged set is now sent
+    # in requests of at most 16 texts, its scores combined in order. What the case guards stands: one reranker load
+    # for one retrieval, and the requests together score the merged set once, each candidate once, in as few
+    # requests as the cap allows; the first result is still the reranker's highest.
+    assert outcome.loads == 1, f"{outcome.loads} loads of the reranker for one retrieval; the KPI says one"
+    sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
+    texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
+    assert sizes and max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts: {sizes}"
+    assert len(sizes) == -(-len(texts) // RERANK_CAP), f"more rerank requests than the cap needs: {sizes}"
+    # The round-2 review's R2-F3: the merged set is cut into requests of 16, every one but the last full (two
+    # rerank passes of their own, one per route, would also pass a count of requests).
+    assert all(size == RERANK_CAP for size in sizes[:-1]) and sizes[-1] <= RERANK_CAP, \
+        f"the rerank requests are not the merged set cut into requests of {RERANK_CAP}: {sizes}"
+    assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
+    assert len(texts) == len(answer["hits"]), "the rerank was not over the merged set"
     assert found[0] == support.ZETA, f"the first result is not the one the reranker scored highest: {found}"
 
 

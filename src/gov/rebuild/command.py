@@ -4,6 +4,10 @@ Two rebuilds from the same commit give the same digest. Needs only git.
 
 ``--no-embeddings`` (DEC-530) builds everything but the semantic vectors; a full rebuild is the default.
 
+``--seed [FOLDER]`` (W2-122) seeds the stores from a warm base before the stages, so only what differs from it is
+built again (``gov.rebuild.seed``); every full rebuild whose semantic store is recreated leaves the record that makes
+its tree such a base, and no other rebuild does (DEC-1027 C).
+
 Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
 ``gov.rebuild.watch``).
 """
@@ -68,10 +72,16 @@ def _compact(root: Path, rels) -> dict:
 
 
 def add_arguments(parser) -> None:
+    from gov.rebuild.seed import CONFIGURED
+
     parser.add_argument(NO_EMBEDDINGS, action="store_true",
                         help="rebuild everything but the semantic vectors: the embedding endpoint is not asked "
                              "(for closes and checks that need only the record store and the lexical and code "
                              "indexes); without it the rebuild is full")
+    parser.add_argument("--seed", nargs="?", const=CONFIGURED, default=None, metavar="FOLDER",
+                        help="first copy the stores of the warm base at FOLDER (default: integration_store in "
+                             "governance/project/rebuild.yaml), where its record matches this build's code, embedder "
+                             "and schema; then rebuild only what differs from it")
 
 
 def run(root: Path, args, config: dict) -> dict:
@@ -96,13 +106,27 @@ def run(root: Path, args, config: dict) -> dict:
 
 
 def _build(root: Path, args, config: dict, watch) -> dict:
+    import sys
+
     from gov.cli.errors import GovError
+    from gov.rebuild import seed
     from gov.retrieval import lexical
     from gov.retrieval.lexical import refresh as lexical_refresh
-    from gov.secrets import scan_counts
+    from gov.secrets import SCAN_OFF, scan_counts, scan_on
     from gov.store import load as store_load
 
     has_path_map = "path-map.yaml" in config
+    embeddings = not getattr(args, "no_embeddings", False)
+
+    # The tree is no warm base while it is rebuilt: its record is written again only once its stores are complete.
+    # A record that cannot be removed is said and the rebuild goes on (W2-76: its own records never fail it).
+    forgotten = seed.forget(root)
+    if forgotten:
+        print(f"rebuild: {forgotten}", file=sys.stderr, flush=True)
+    seeded = None
+    if getattr(args, "seed", None) is not None:
+        with watch.stage("seed"):
+            seeded = seed.seed(root, args.seed, embeddings)
 
     with watch.stage("record"):
         try:
@@ -123,8 +147,11 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     if has_path_map:
         with watch.stage("lexical"), watch.filtered(lexical, "indexable"):
             try:
-                lexical_refresh(root)
-                stores["lexical"] = {"status": "recreated"}
+                # Every file the path map's lexical_policy keeps out, by namespace (W2-13 S6, DEC-1066 (3)); where none
+                # is, the report is as before.
+                built = lexical_refresh(root)
+                kept = built.get("kept_out") if isinstance(built, dict) else None
+                stores["lexical"] = {"status": "recreated"} | ({"kept_out": kept} if kept else {})
             except GovError:
                 raise
             except Exception as exc:
@@ -140,7 +167,7 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             "reason": "no path map: nothing is classified as indexable",
         }
 
-    if getattr(args, "no_embeddings", False):
+    if not embeddings:
         # Not asked for (DEC-530): the embedding endpoint is not asked and its program is not started.
         watch.skip("semantic")
         stores["semantic"] = {
@@ -161,6 +188,9 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                         "status": "not_recreated",
                         "reason": sem.get("reason", "unknown"),
                     }
+                cut = sem.get("cut")  # W2-32 S7 (DEC-1067): the chunks the embedder's limit cut, named, never silent
+                if isinstance(cut, dict) and cut.get("count"):
+                    stores["semantic"]["cut"] = cut
             except Exception as exc:
                 stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
     note = none_embedded(config)
@@ -203,10 +233,29 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                                                     for path in tool_home.rglob("*") if path.is_file())
                                    if tool_home.is_dir() else ())
 
-    return {
+    # Complete only where the semantic store was recreated: the tree is then a warm base for the embedder its semantic
+    # store records. Otherwise (not asked for, or not recreated) the record removed at the start stays removed, so the
+    # tree is refused as a base and no seed copies its partial semantic store (fail closed, DEC-1027 C).
+    if stores["semantic"]["status"] == "recreated":
+        import sqlite3
+
+        from gov.retrieval.semantic import manifest
+
+        try:
+            built_by = manifest(root)
+            if built_by is not None:
+                seed.remember(root, built_by["embedder"])
+        except (OSError, sqlite3.Error) as exc:  # the stores stand; the tree is only no warm base
+            print(f"rebuild: {seed.RECORD_REL} not written, so this tree is no warm base: {exc}", file=sys.stderr)
+
+    built = {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
         "secrets_counts": secrets_counts,
-    }
+    } | ({} if seeded is None else {"seed": seeded})
+    if not scan_on(root):  # DEC-1045: the filter gave nothing to gitleaks, and the report says so
+        secrets_counts["scan"] = built["secrets_scan"] = SCAN_OFF
+        print(f"rebuild: {SCAN_OFF}", file=sys.stderr)
+    return built

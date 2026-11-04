@@ -1,112 +1,119 @@
-# Decisions in force (after DEC-952 and DEC-953)
+# Decisions in force
 
-Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 lifts: `LIFTED-BY-DEC953.md`. Superseded and spent decisions: `ARCHIVE-SUPERSEDED.md`.
+The one list of what holds (DEC-1052 R-9), 2026-11-03. Where the prompt, a brief or RESUME HERE differs, it holds; a
+rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
+stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
-## Working with the owner
-- DEC-065: master rules MR-1 to MR-6. The owner decides (MR-6), the builder never writes its own acceptance tests (MR-3), review and audit stay independent (MR-4).
-- DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
-- DEC-949 (the owner's reminder of 2026-11-01: every OWNER_ACTION item, not only the day's urgent ones), DEC-850, DEC-855, DEC-972: P1s and owner-only decisions are sent as they arise, 07:30 to midnight: a package file, then the line logged (`tools/ping_log.sh`, no ask) and sent by `PushNotification` (it does not stop the CTO); a daytime P1 needed that day that shows "not sent" falls back to the blocking `owner-ping`. None from 02:00 to 07:30 (the morning package, DEC-973). Only the orchestrator asks the owner.
-- DEC-818: a P1 package stands alone, in six parts.
-- DEC-1012: a rule broken twice becomes a mechanism within a day (hand-run chains and the return watcher retired for the dispatcher).
-- DEC-1010: reviews converge (a moderator triages by scope; a finding blocks only if in scope, ordinary work, and failing open or losing work; at most two rounds, then the owner once; READY computed by code from structured verdicts); W2-81 lands, W2-93 proves its own exam; W2-117 before EXAMIN's copy; the dispatcher versioned; checks and the embedding server in slots, real CPU judged.
-- DEC-1007: the dispatcher keeps the machine full and the work moving (ready list, inbox, batched landing, true status in `dispatch/`); until it is on, the CTO does its job by hand; the lead count from the processes.
-- DEC-999 to DEC-1004: up to capacity (aim 10 leads); claims committed before a lead starts; batched landings; the queue's waits cut (records-only moves, warm clones, nightly results as baseline, rebuilds in the heavy slots, per-tree locks); every CTO practice mapped into the product the same day (SMART-WORK-2).
-- DEC-994, DEC-998: quiet-hours hook in; push for waiting prompts on; the dead-man's switch is a Claude-only sentinel session; each CTO session confirms Remote Control, sends a test push and registers in `log/cto-session.txt` at its start.
-- DEC-995, DEC-996: a role is its reads and writes, a skill never widens them; mixed tickets are split before they start (the 13 approved splits filed at each parent's claim); measurement records are the implementer's evidence; the test designer writes `fixtures/evaluation/**`; one folder per research ticket; the launcher keeps one role per ticket. DEC-997 (delegated): W2-81's batch 6 and second review.
-- DEC-991: the CTO knows its allow list and checks each command; one that could need approval is never chained to other work; by day it pings first, then runs; in the quiet hours (02:00 to 07:30) it never runs it, queues it (`log/approval-queue.jsonl`) for the 09:00 package. Safety net ACT-QUIET-DENY-1, Gov OS placement P1-ORCH-APPROVALS-1, last net ACT-DEADMAN-1.
-- DEC-990 to DEC-993 (delegated): the tools folder in the path map; W2-11's packages (the CTO writes the `.claude/` copies with the owner's daytime approval); W2-81's round 2 for F1.
-- DEC-989: baseline = the last nightly with a verdict (its reds known) until a green nightly after ACT 1; then the last green one. Once the queue lands, merge and close are one step on the queue's green run; nothing sits merged but not closed.
-- DEC-988: test before merge (W2-97's queue for every merge); one merge per ticket (rounds stay on the branch); attribution against the last green nightly's head, never undone merges; a dead-man's switch on the CTO's session (an ACT). P-W2-110-4 (a); P-W2-55-HOOK (b) then (a); the backfill after a product-spec pass and the owner's sample.
-- DEC-984: the nightly takes all three heavy-job slots while its suites run (until its latest start at most); released before its light steps.
-- DEC-983: SMART-WORK-1 decided (W2-115 smart close after W2-55, W2-116, W2-119 before EXAMIN's copy; W2-117, W2-118 after; ten tickets' KPIs). The heavy-job slots in force from 2026-10-31 23:50 (3 x 6 workers, tools/heavy_slots.conf); the leads' load wait removed.
-- DEC-982: W2-112 (shared reranker), W2-113 (CTO named at adoption), W2-114 (W1-28's copy check) filed. The smart way of working goes into the product through tickets (SMART-WORK-1), not only the CTO's tools.
-- DEC-979: CAPACITY-1 decided: a heavy-job limit (slots for test runs and rebuilds, load near 20) replaces the leads' load wait once it runs; the load in every status block; P-LATENCY-1 (a) (a ticket after W2-90b); the CTO's tools in the lighter lane (own tests; a review only if fail-open or work-losing; logged daily; no WBS ticket); no query-embedding batching yet; W2-90b approved; no bigger machine until the re-measure. Batch closes send back only the culprit. The order: speed-ups first (W2-107, the batch of seven, W2-108, the limit, W2-97), then memory's chain with the roles in parallel, then ACT 2 and the three layers; W2-81, W2-88, W2-96 alongside.
-- DEC-975: W2-107 first: no new lead until it is closed; merged on DONE, reviewed on its final head, closed alone at once. CAPACITY-1 re-measured after it. The query embedder stays on the CPU (DEC-798) until W2-15b's GPU-against-CPU KPI is decided by the owner.
-- DEC-974: a new ticket in the WBS (follow-up, split, a red's ticket) is a P1 to the owner with the CTO's recommendation before it is filed; never delegated. Leads name a needed ticket in their return.
-- DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
-- DEC-945: no paid notifier and no app install.
-- DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
-- DEC-954: the plan is approved, with amendments. The order ahead (RESUME HERE): ACT 1, the five-rule guard; then the 10 built tickets and the streams; the roles spec first (W2-60b, W2-11, W2-33 and W2-83 wait for its approval); memory for this repository and any adopted repository; the roles; ACT 2, one re-pin; the three layers in new sessions.
-- DEC-957: the work order (product-spec, then KPIs to the test designer, the engineer to the spec never to the tests, the QA engineer alone reads both); installs ask only in the CTO's session; the escalation rubric P3/P2/P1/emergency (prompt §0); the domain skill packs in Wave 2; memory's target 95 % (floor 85 %), all seven gaps before ready; a roles research session.
-- DEC-955: ACT 1 first: a close refused before ACT 1 waits for it; right after ACT 1 is committed, a handover and a fresh session under the five-rule guard.
-- DEC-954 Q1: EXAMIN's copy starts only when K9's entry criteria are met, never because a date arrived. Dates are weekly estimates.
-- DEC-954 Q13: the master orchestrator is the CTO; each sub-orchestrator is a Senior Engineer for its stream, with a coordination ticket each, and the CTO's watchers track their state.
-- DEC-946 items 6 and 8: nothing else starts (new ideas go to `WAVE_3_PARKING.md`), and lead launches are staggered by 1 to 2 minutes.
-- DEC-953 item 8, DEC-954 Q8: three-layer orchestration starts after ACT 2, once memory, the roles and its foundations have landed.
+## The emergency, until the owner lifts it
+- DEC-1047, DEC-1051 (with DEC-1032, DEC-1033): everything stopped until the refactoring and the re-pins; nothing
+  scheduled but the dispatcher (ready list empty, approvals parked); each item resumes from
+  `log/emergency-stops-20261102.md`. DEC-1010 stays.
+- DEC-1049: no nightly and no full suite until the owner's word (D-10); the nightly's crontab lines stay commented.
+- DEC-1052, DEC-1055: the plan (`packages/LIFT-1/P1-PLAN.md`): G-14, D-3, D-4 beside D-4b (memory, as refactoring
+  work, no leads; D-4 two heavy slots, D-4b one and the rebuild lock), the final memory measure, re-pin window 3 and
+  the integration store, D-5 to D-9, D-10, the lift. No run the old way.
+- DEC-1052, the basis (standing): one question, five tests (`INTENT-DEC-1052.md`); applied at adoption, on symptoms
+  and weekly with measured costs; the lift-or-remove list to the owner first; a practice enters the product once proven.
+- DEC-1052: templates per session kind, ticket and brief, READY and DONE computed from their required fields by code;
+  the suite cut to about 5,000 before D-10, every kept KPI line covered, the list to the owner first; memory embeds
+  no `tests/**`, close, checkpoint or probe records, nor orchestration closes, reviews, sessions or nightly (M-4,
+  DEC-1055 (3)); the hidden half lives in `~/gov-os-eval/`, outside every worktree (G-3, DEC-1055 (4)).
+- DEC-1052 G-14, DEC-1054, DEC-1056, DEC-1059 (live since ACT-G14, `4edd196c`): role separation by path checks; the test designer never reads the ticket's new
+  code or new unit-test files; the engineer never reads its own ticket's acceptance tests, wherever they sit; shared
+  test files, other tickets' tests and the integrated code stay readable (DEC-963).
+- DEC-1065 (standing): no CPU fallback for embeddings anywhere (the shared GPU embedders unreachable: the semantic part
+  unavailable, named, keywords answer; never a private embedder on the CPU, as the reranker's ACT-RERANK-WAIT-1);
+  search respects role separation (`gov retrieve` filtered by the caller's `role_paths`, before W2-127 and the restart).
+  DEC-1064: sandboxed workers run no `gov retrieve` and no real-model test until then.
+- DEC-1067 (standing for D-4b): the memory measure's hidden half never chooses a method (adopted only if it wins on
+  the visible half alone; the hidden half reported separately; hidden ranks never in the index or on integrate);
+  labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; no measure or
+  rebuild beside one; the GPU back in budget between); no install until the owner decides the bigger models.
+- DEC-1060: lens B's q03 rewritten to DEC-1033's rule; a measure question never rewards a replaced decision.
+- DEC-1053: D-0 done; `w2/W2-78` and the in-flight branches with unmerged work wait for D-9.
+- DEC-1050: this repository kept; no full `gov check` in leads' runs (T-1); attribution once each way (Q-1); the
+  landing refuses an acceptance-test change but the designer's or owner's (G-1); guard rules 1 and 5 judge only
+  targets that resolve (G-2); review effort as it is (G-12).
+- DEC-1045: no gitleaks scan here (`secrets.yaml` `scan: off`); a weekly full scan only on the owner's approval.
+- DEC-1040 (3), DEC-849: a false refusal is worked round at once by an equivalent form and named; a true one is taken.
 
-## Closes and testing
-- DEC-953 item 1: a ticket closes on the audit's 10 practices (AUDIT-GOV-FEATURES-1 §5), nothing more. No Gov OS feature gates this repo, and nothing is deleted from the product.
-- DEC-953 item 5: close W2-71, W2-77, W2-57, W2-03 and W2-26 now, then each ticket as its practices pass.
-- DEC-953 item 6: the proof of `gov close` happens on the proving ground (W2-81) and EXAMIN's copy, not by re-closing this repo's tickets.
-- DEC-906 item 1, DEC-462, DEC-959 item 7: a fresh independent test designer writes the acceptance tests from behaviour and sources, in parallel with the engineer, both from the spec; the engineer runs them once they are ready. Only the designer commits under `tests/acceptance/`.
-- DEC-959: the local merge queue (Senior Engineers approve, the CTO's tool tests the candidate merge, advances only on green); tests run once per level (lead scoped once; QA re-runs nothing; the queue once per batch, skipped on identical code; full only in the nightly, DEC-968); the QA engineer per stream (core one by one, others in batches of about five); the opaque acceptance runner now; one skill template with three scenarios; domain skills after ACT 2; everything before EXAMIN.
-- DEC-953 item 4, DEC-952: one selection tool at every level:
-  - workers run their own unit tests;
-  - a lead runs its acceptance tests plus the affected set (never full, core changes included, DEC-968);
-  - the close runs the same set on the merged commit in a clean worktree;
-  - the nightly runs everything, once a day, and nowhere else (DEC-968).
-  Governance files never widen a selection.
-- DEC-962 (changing DEC-905, DEC-906 item 3, DEC-954): no shared test lock and no closes-first; every full run (a close's, the nightly's, a lead's through `verify_lock.sh`) asks the gate for room for its own peak; `tmp_path_retention_policy=failed` stays. One store rebuild at a time stays until W2-76's lock is measured. One writing worker per worktree (DEC-963): the test designer works in parallel in its own tests worktree, retrieving only from the integration branch's store (`~/gov-os-worktrees/W2-00-store`, refreshed at most twice a day or on request, DEC-966); the engineer merges its tests and runs them once.
-- DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
-- DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
-- DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.
-- DEC-221, DEC-951 item 5: tests are proportional to the profile.
-- DEC-096: a loop that has not converged after three iterations goes to the owner as a package. The count is never disclosed.
-- DEC-944 items 2 and 3: readiness is checked by hand at claim until W2-82. Playbooks per stream.
+## The owner
+- R-11, R-8 (DEC-1050 (9)): a ping only when work waits on the owner (a blocking P1, an ACT a step waits on,
+  LAUNCH_BLOCKED, ESCALATION, AUTH_REQUIRED) or an emergency; the rest in two digests a day (09:00, 18:00), one page
+  each. Six parts only for a blocking P1, else question, options, recommendation; P1 only by DEC-957's rubric (§7). A
+  delegated choice is a line in its ticket's file or close record, not a register entry.
+- DEC-972, DEC-1021, DEC-973: a ping is `tools/ping_log.sh`, `PushNotification`, `--result`; a blocking P1 "not sent"
+  by day falls back to `owner-ping`. Quiet hours 02:00 to 07:30; an emergency pings at once at any hour (owner, D-3 answer 3); the morning package at 09:00.
+- DEC-991, corrected by DEC-1050 (8): `owner-ping` and `.claude/` paths ask; `rm` is free but the catastrophic (the
+  hook refuses it); `sudo`, `git push` denied. A call that may ask is never chained; by day ping first; 02:00 to
+  07:30 never run it: queue it (`log/approval-queue.jsonl`) for 09:00.
+- DEC-957: the work order (the test designer from the spec, never the code; the engineer to the spec, never the tests;
+  QA reads both, changes neither); installs only through the CTO's session.
+- DEC-974: a new WBS ticket is a P1 before it is filed; leads name one, never file it.
+- DEC-954 Q1: EXAMIN's copy on K9's entry criteria, never a date. DEC-952 (6): a fresh CTO session each morning; no handover by context size (O-3 refused).
 
-## The guard
-- DEC-953 item 2, DEC-954 (narrowing DEC-820): five rules only, switched on by ACT 1:
-  - an implementer never writes acceptance tests;
-  - independent reviewers and auditors write only their own review and audit records;
-  - no reads of the hidden half of an evaluation set (from any worktree), or of the held-out material;
-  - no reads of secrets, and secrets are never printed;
-  - no installs without the owner.
-- DEC-083, DEC-040: the owner approves and makes every install, and it is recorded in the tool registry.
-- DEC-849: a refusal is taken, never routed round, and it is recorded.
-- DEC-958: every false refusal by the five-rule hook is recorded (time, form, rule, cost), counted in the daily document, and worked round only by an equivalent form. Three of one pattern, five in a week, or one that stops a lead or a close brings the owner a P1 package with a hook fix.
-- DEC-723: agents never write in, list or search `~/gov-os-workbench`. Writing work runs on clones under `~/gov-os-runs/<ticket>/`.
+## Machine and ACTs
+- O-6, scoping DEC-1038 (1): an ACT only for a machine change, where it helps: installs, services, crontab,
+  `.wslconfig`, `~/.local/bin` (the pinned gov), `~/.config`, `~/.ollama`, `~/.local/share`, environment files,
+  `.claude/` settings and hooks; exact commands, check and undo (DEC-925 (2)). No ACT for records. Until D-10, a
+  settings change runs its own scoped tests on a clone, not the full suite (owner, D-3 answer 5). **Every ACT is
+  rehearsed end to end, exactly as the operator will run it, in a scratch copy (its own clone) before it is handed
+  over; its stated counts are the rehearsal's (owner, standing, 2026-11-03).**
+- P-ACT-SPLIT (owner, 2026-11-03): (a) the operator's ACTs: the guard, its hooks, `.claude/` settings and generated
+  files, the pinned gov, the sentinel, what the CTO's session runs on; (b) the CTO's ACTs on the owner's ping reply
+  (crontab, the servers' settings, the CTO's watchers, `~/.config/gov-os*`, `~/.cache/gov-os`), only with a rehearsed
+  rollback, the approval recorded verbatim in the ACT and `log/act-approvals.jsonl`, the report in the next digest.
+  Never the CTO's: `sudo`, `git push`, installs, irreversible deletion, secrets, its own permissions, quiet hours.
+- DEC-1028 (6), scoped by O-6: while an ACT is applied, no commit touches its paths (`log/act-in-progress.txt`).
+- DEC-1038 (2)-(4): the CTO's checkpoint to scratch (`tools/cto_checkpoint.sh`); `.wslconfig` unchanged until the RAM
+  upgrade; the standing targets (a breach over 15 min an incident); every heavy job through `tools/heavy_slot.sh`.
+- DEC-1039 (1b), (6), DEC-1037 (4), (5), O-A1, O-10: admission by the Load Balancer's forecast (`gate_check.py`
+  lifted); limits from the machine; `tools/tree_busy.sh`, never `pgrep -f`; a stop parks the queue's approvals.
+- DEC-1030, DEC-1015: the dispatcher watches the GPU and server logs (a crash or 0-layer load: inbox and push); a
+  rebuild without its semantic store has failed.
+- DEC-1031, DEC-1043 (2), DEC-1048: the embedder stays on the GPU; no private reranker beside the shared one
+  (`tools/rerank_service_slot_hold.py --watch`); the interim GPU-slot module is the machine-wide guard.
+- O-5 (DEC-994, DEC-998 scoped): one stall net, the dispatcher's stale line and the sentinel's push, and the
+  quiet-hours hook; at session start Remote Control, one test push, `log/cto-session.txt`; `log/cto-standby.txt`
+  kept while the sentinel reads it (owner, D-3 answer 7).
 
-## The nightly
-- DEC-953 item 3, DEC-934: a plain full run on the integration head from 02:00, by cron, on committed code. No `gov close` and no gates at night. A missed night goes in the morning package.
-- DEC-953 item 3, DEC-938 item 1: a red is investigated at once (re-run alone, traced to its change and cause):
-  - a small, clear fix is made on the spot and reported;
-  - otherwise it goes to the owner as a P1 with a recommendation.
-  A red holds nothing.
-- DEC-946 item 9: the nightly is frozen. No new features unless it breaks.
+## Tickets, tests, reviews
+- DEC-953 (1, 2, 6), DEC-954: nothing gates this repository until the Gov OS is whole; closes on the audit's 10
+  practices; nothing deleted from the product; the guard's five rules; `gov close` proved on W2-81 and EXAMIN's copy.
+- DEC-1010, DEC-916: moderator triage; a finding blocks only in scope, in ordinary work and failing open or losing
+  work; two rounds, then the owner once; READY by `tools/verdict.py`.
+- DEC-968: scoped runs only (`tools/select_tests.py`); a close refused only by its own failure; no accepted reds.
+- DEC-959, DEC-988, DEC-989: every merge through the queue (`tools/land.py`), one per ticket; merge and close one step;
+  except the refactoring's merges as built (D-1, D-4b: one review, READY by code, the CTO merges; DEC-1052, DEC-1055).
+- DEC-995, DEC-996: a role is its reads and writes; a skill never widens it; mixed tickets split first.
+- DEC-1007, DEC-1012 (1), DEC-999: leads start only from `dispatch/ready.txt`, returns land in its inbox, one batch
+  from `land.txt`, `status.txt` the truth; claims committed before a lead starts.
+- DEC-979 (2): the CTO's tools: their own tests; a review only where a change could fail open or lose work.
 
-## Memory and briefs
-- DEC-953 item 6a, DEC-952: memory first: W2-86, W2-87, the register-as-one-record defect, then W2-55, W2-04, W2-05, W2-06, W2-13 and W2-15a. W2-61 measures after each fix. Memory is never cut.
-- DEC-836, DEC-943 item 2: once memory measurably helps, the orchestrator uses it at every resume and before every decision, and the leads use it through their briefs.
-- DEC-953 item 6b: W2-60a, W2-60b and W2-11 (roles, skills, briefs) run in parallel with memory.
-- DEC-860, DEC-859: never one giant query or context: retrieval is batched, ranked and stacked. The code graph is traversed in pages.
-- DEC-838, DEC-839: every session uses its model's full window, on claude-opus-5-5, with its effort set per launch.
-- DEC-236, DEC-371, DEC-731, DEC-732: a lead runs one ticket in its worktree, never merges into `w2/integrate`, and never edits tickets or the register.
-  - It launches workers with `gov launch` in a background run.
-  - Tests use the worktree's own `src/`.
-- DEC-793, DEC-943: every return carries the twelve fields and `brief_gaps`. Gaps are fixed the same week.
-- DEC-420: an authentication error stops all launches with `AUTH_REQUIRED`.
+## Rules about rules
+- O-11, DEC-1012: a rule broken twice becomes a mechanism only if it passes DEC-1010's test; a slipped ceremony is
+  assessed under the basis instead.
+- O-11, DEC-1003, DEC-982: a practice from the CTO's tools enters a product ticket after a week in use and the basis,
+  proposed weekly as one batch.
 
 ## Records and commits
-- DEC-851, DEC-866: each owner rule is written where sessions read it. A superseding decision marks the old entry at once and sweeps whatever cites it.
-- DEC-861: the orchestrator commits the owner's decisions (`Decided-by: owner`) and never pushes. The owner's push is the acceptance.
-- DEC-463: the record comes before the change it authorises.
-- DEC-819, DEC-887: context is committed, with the raw record on `record/w2`. Secrets, held-out material and derived stores are never committed.
-- DEC-1045 (changing DEC-953 §5 practices 6 and 10, DEC-893, DEC-966 item 4): no gitleaks scan on this repository (rebuilds, landings, closes, the nightly, record commits), switched off by `governance/project/secrets.yaml`; the real-gitleaks tests run only in the nightly; a weekly full scan only on the owner's approval. A seconds-long check (YAML, schema, placeholders) runs before record commits.
-- DEC-720, DEC-848: `w2/integrate` is never rewritten, and merges use `--no-ff`. The owner pushes daily.
-- DEC-182: commits keep their `Task:`, `Implements:` and `Role:` trailers. Nothing refuses on them.
-- DEC-952, DEC-792: RESUME HERE (under 8,000 characters) names this list first. The handover each morning goes to a fresh session.
+- DEC-861, R-10: the CTO commits the owner's decisions (`Task: decision-record`, `Role: orchestrator`, `Decided-by`),
+  one commit per batch (hourly or at handover); `record/w2` synced hourly and at session end; `--main` lifted.
+- R-12: `Task:` and `Role:` on every commit; `Implements:` optional; a decision and its ticket files in one commit.
+- R-6: no committed `gov checkpoint` record per round; the prose checkpoint, PreCompact and SessionStart stay.
+- R1-21: `tools/structural_pass.py` after each landing and record commit, a notice only.
 
-## Machine and disk
-- DEC-898, DEC-902: no launch or full run below 100 GiB or 10M inodes free. Each session has a scratch budget. A sweep runs weekly.
-- DEC-942 items 1 and 3: there is no fixed number of leads. A lead launches while the load is below nproc, and a running lead is never stopped.
-- DEC-961 (with DEC-947's floor and trip-wire): the machine is shared by capacity alone. The gate counts the memory floor, each running lead at what it uses (at least its working size) and the newcomer; nothing is set aside for a full run that has not started. A full run (a close's, the nightly's, a lead's) checks the gate itself and waits for room. No hold for a waiting close and no night window: closes, scoped runs and leads run side by side as capacity and paths allow. The nightly starts at 02:00, takes no lock and holds nothing.
-- DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
+## Lifted (was `LIFTED-BY-DEC953.md`, `69a0e5d89f04`; kept built and tested in the product unless "ended")
+- DEC-953: `gov close` and its gates here, escalations, repair tickets, the work-without-a-task gate, containment and
+  trailers as refusals, the ratchet lists and their owner commits, probe staleness, the re-pin ladder, the memory
+  arithmetic as a gate, the guard beyond its five rules. Ended: the pre-close gate (a) to (h), `record_checks.sh`,
+  close windows, holds and cut-offs, the 90-minute rule, the red-nightly hold, the nightly's booking window.
+- DEC-1045: gitleaks here. DEC-1050: the guard harvest, `refusal_watch.sh`. DEC-1052: record ACTs (O-6); round
+  records (R-6); the two-commit rule (R-12); a ping per owner item (R-11); heartbeat checks, the
+  Stop-hook waiter check, the scratch `deadman.py` (O-5); §0's copies and RULES-IN-FORCE (R-9); `gate_check.py` (O-10).
 
-## Reporting
-- DEC-948, DEC-878, DEC-952, DEC-974: every report ends with the five-line block (the load shown, DEC-979), plus the memory-chain line (never left out) and the leads' interim results.
-- DEC-938, DEC-951 B: one P1-MORNING file and one ping at 07:30. No long foreground work runs from 07:15 to 07:35.
-- DEC-941 item 4.3, DEC-930 item 2: one daily document, and the weekly numbers (with ticket growth and drift).
-- DEC-953: three milestone reports, each pinged. Between them, the block plus at most five lines.
-- DEC-966: the template's install block removed and its hook lines pinned (two tickets, before EXAMIN's copy); rebuild speed a priority (gitleaks results by content hash, a full scan nightly).
-- DEC-968: a close is refused only by a failure its own change caused (each red alone re-run with the batch's merges reverted); a failure it did not cause is named in the close record and dealt with at once (fixed on the spot, or a P1); no accepted-reds list.
-- DEC-973: the nightly at 04:00 (to about 07:00); its check at 08:00 (re-checks 08:30, 09:00); the CTO's investigation and the designers' store refresh right after the nightly ends; the morning package with any ACTs at 09:00; the fresh-session handover after it; quiet hours 02:00 to 07:30.
+## Approved restarts by class (owner, O-6)
+Approved (owner, D-3 answer 4, 2026-11-03): the five classes in `governance/project/orchestration/RESTART-CLASSES.md`
+(the shared embedder :11434, the query server :11435, the shared reranker service, the CTO's samplers and slot
+watcher, the sentinel). Each is restarted by the CTO from its committed config, with its check, without an ACT; any
+other restart is an ACT.

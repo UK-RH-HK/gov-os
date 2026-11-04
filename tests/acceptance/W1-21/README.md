@@ -202,3 +202,67 @@ in eleven files, run file by file; the five real-models and `local_only` cases w
 the sandbox reaches no shared Ollama). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
 query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
 expectation`.
+
+## Two cases re-pinned for W2-13 (DEC-1055, D-4b, 2026-11-03)
+
+W2-13 (DAEO-zqvn) gives the fusion the lexical route's ranked list (BM25, S2). Two cases of this suite read
+something that change moved; the test designer re-pins them, keeping what each guards.
+
+- `test_w1_21_family_check.py::test_the_check_is_red_when_the_dev_tiers_fail_the_baselines`. **Before:** the dev
+  tiers as they are, with the stand-in vectors, on the premise that they score under the pass line (hit@5 73.2).
+  With W2-13's ranked route they score 80.5, so the check was green and the case red. **After:** the failure is
+  planted, not left to the retrieval's quality: the case links the dev tiers (never changed) beside a copy of their
+  dev query set whose every `must_cite` path is one no tier holds, so no query can be a hit and hit@5 is 0. The
+  check must measure them (no "unmeasured" in its output) and be red. A check that is green whatever it measures,
+  or that does not compare hit@5 with its baseline, still fails the case. Without dev tiers on the machine the case
+  skips with the reason (as `test_w1_21_dev_tier.py` does); before, it passed there on "unmeasured", which proved
+  nothing about the baselines.
+- `test_w1_21_expansion.py::test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded`. **Before:** the
+  whole bundle within the budget (`0 < used <= 1500`). DP-3 (DEC-419, this suite's approved spec) says the bundle
+  budget bounds parent expansion only and a child hit is never dropped for it; with W2-13's longer lexical list the
+  gathered children alone pass 1,500 (2,007), which DP-3 allows. **After** (the CTO's decision P-W2-13-R3 (a)): the
+  child is cited as it was found, no expansion of it is named, the budget is the one asked for and something was
+  counted, and a bundle that names an expansion is within the budget. No claim on the gathered children. Whether the
+  budget should bound the whole bundle is W2-32's S5, later, with its own tests.
+
+The stand-in figure "hit@5 73.2" in the sections above is the figure before W2-13. No other expectation, pass line
+or threshold changes. Commit trailers: `Rewrite-Reason: W2-13's S2 (the fusion receives the lexical route's ranked
+list); DEC-419 DP-3 for the budget case (P-W2-13-R3 (a))`.
+
+## The rerank in requests of at most 16 (DEC-1067 (f), W2-32's S7, 2026-11-04; `Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16)`)
+
+Three cases of `test_w1_21_merge.py` read "one rerank over the merged set" as one reranker call:
+`test_several_batches_are_reranked_in_one_pass_over_the_merged_set`, `test_a_continued_bundle_is_reranked_once_too`
+and `test_a_rerank_over_more_than_thirty_candidates`. The owner's DEC-1067 (f) caps each request at 16 texts, a
+larger pool sent in batches of at most 16 with the scores combined in order. Revised by W2-32's independent test
+designer; the names stand. One helper (`one_rerank`) now asks of each: every request at most 16 texts; the requests
+together score the set once (each candidate once); no more requests than the cap needs, every one but the last carrying exactly 16 (the round-2 review's R2-F3: so two passes of their own, one per route, do not pass). One load, the texts scored
+(at least the cited chunks; more than 30 in the wide case) and the first result being the reranker's highest are
+kept as they were.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 83 in the full run, 44 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Paging with continuation; facets; dedup by chunk hash; authority/current filter drops superseded and must-not-cite records; one rerank over the... | `test_w1_21_authority.py::test_a_must_not_cite_record_is_not_cited`, `test_w1_21_authority.py::test_the_bundle_names_what_the_filter_dropped_and_why`, `test_w1_21_authority.py::test_a_rejected_record_is_not_cited` | the ticket's words |
+| S2: Every bundle cites by id and sha256 and carries one stopping reason from the fixed list [CAP-55.a] | `test_w1_21_bundle.py::test_every_bundle_cites_by_id_and_sha256_and_carries_one_stopping_reason` (9 of 9) | the ticket's words |
+| S3: RETR-A-04 and RETR-X-02 dev runs produce multi-batch bundles [CAP-16.b] | `test_w1_21_dev_tier.py::test_retr_a_04_gives_a_bundle_of_several_batches` | the ticket's words |
+| S4: A child hit is expanded to its parent span only within the bundle budget, and the bundle names each expansion (DEC-091) [CAP-18.b] | `test_w1_21_expansion.py::test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded`, `test_w1_21_expansion.py::test_a_child_hit_is_expanded_to_its_parent_and_the_expansion_is_named` (2 of 2) | the ticket's words |
+| S5: Registers the retrieval-regression family check: the dev query set meets its recorded hit@5 and forbidden-citation baselines [CAP-38.b] | `test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_forbidden_citation_baseline`, `test_w1_21_family_check.py::test_the_check_is_green_when_the_dev_tiers_meet_the_baselines` | the ticket's words |
+| S6: Retrieval spend has its own radius-scaled budget (follow-up rounds by profile), separate from the packet ceiling; reaching it ends with BUDGET_... | `test_w1_21_paging.py::test_reaching_the_spend_budget_ends_with_the_reason_and_the_gap_list` (1 of 3), `test_w1_21_paging.py::test_the_follow_up_rounds_scale_with_the_radius` (5 of 5), `test_w1_21_paging.py::test_the_spend_budget_is_separate_from_the_bundle_budget` (1 of 2) | the ticket's words |
+| S7: For a ticket whose scope matches a committed failure or lesson record, the bundle returns that record ahead of implementation evidence [CAP-14.a] | `test_w1_21_failure_memory.py::test_failure_and_lesson_records_come_ahead_of_implementation_evidence` | the ticket's words |
+| F1: A batch-size limit is reported as completeness | `test_w1_21_paging.py::test_a_batch_size_limit_is_never_reported_as_completeness` (3 of 3) | the ticket's words |
+| F2: A superseded record is cited as current | `test_w1_21_authority.py::test_without_a_record_graph_no_superseded_record_is_cited_as_current`, `test_w1_21_dev_tier.py::test_no_file_whose_frontmatter_says_superseded_is_cited_on_a_dev_tier` (1 of 2), `test_w1_21_authority.py::test_a_superseded_record_reached_through_the_closure_is_not_cited` | the ticket's words |
+
+Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061): memory
+is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32. It is applied
+after D-4b's measure 3; until then the hit@5 rows above judge against 80.
