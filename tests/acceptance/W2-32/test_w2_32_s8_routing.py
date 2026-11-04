@@ -20,6 +20,7 @@ bundle's ``routing`` record of what it moved, which the engineer states.
 from __future__ import annotations
 
 import json
+import struct
 from pathlib import Path
 
 import pytest
@@ -28,7 +29,7 @@ import w2_32_routing as r
 import w2_32_support as s
 
 CAP = 16
-CODE_AHEAD = {(path, r.rank_of(r.CODE_TEXT[path])) for path in r.CODE[:2]}
+ROUTE_ORDER_AHEAD = {(path, r.rank_of(r.CODE_TEXT[path])) for path in r.CODE[:2]}  # the fallback: no vectors
 RECORD_AHEAD = {(r.RECORD_REL, rank) for rank in sorted(r.RECORD_RANKS, reverse=True)[:2]}
 
 
@@ -37,6 +38,35 @@ def routed(tmp_path, needs_vectors, box):
     project = r.plant(tmp_path / "routed")
     box.built(project)
     return project
+
+
+@pytest.fixture
+def unvectored(tmp_path, needs_vectors, box):
+    project = r.plant(tmp_path / "unvectored", code_vectors=False)
+    box.built(project)
+    return project
+
+
+def _code_ahead(project, standin, question):
+    """S8's measured form: the code route's first 2 hits by their stored vectors' cosine to the question (the
+    question's vector the one the stand-in made from the text it was sent; ties in the route's order).
+
+    Rewrite-Reason: S8's measured form (cosine order of the code route): the cases read "the code route's first 2
+    hits" as the route's own order."""
+    sent = [text for text in standin.texts_embedded(s.PIN_MODEL) if text.endswith(question)]
+    assert sent, "premise: the question was sent to the stand-in embedder"
+    asked = s.stand_in_vector(s.PIN_MODEL, sent[-1])
+    stored = {path: vector for path, vector in s.vectors(project).values() if path in r.CODE}
+    assert set(stored) == set(r.CODE), f"premise: every code hit has a stored vector: {sorted(stored)}"
+
+    def cosine(vector):
+        values = struct.unpack(f"{len(vector) // 4}f", vector)
+        return sum(a * b for a, b in zip(asked, values))
+
+    ranked = sorted(r.CODE, key=lambda path: (-cosine(stored[path]), r.CODE.index(path)))
+    ahead = {(path, r.rank_of(r.CODE_TEXT[path])) for path in ranked[:2]}
+    assert ahead != ROUTE_ORDER_AHEAD, "premise: the cosine order's first 2 are not the route's own first 2"
+    return ahead
 
 
 def _ask(box, project, question):
@@ -50,9 +80,14 @@ def _ask(box, project, question):
         return None, raised, []
     requests = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()] if log.exists() else []
     pool = [text for request in requests for text in request]
-    first_lines = [text.split("\n", 1) for text in pool]
-    keyed = [(head[len("[path: "):-1], r.rank_of(text)) for (head, *_), text in zip(first_lines, pool)]
-    order = [key for _, key in sorted(enumerate(keyed), key=lambda pair: (-pair[1][1], pair[0]))]
+    # Each chunk once, at its first place (a chunk the code scores again in a later request is the same chunk).
+    unique, seen = [], set()
+    for text in pool:
+        head, _, body = text.partition("\n")
+        if (head, body) not in seen:
+            seen.add((head, body))
+            unique.append((head[len("[path: "):-1], r.rank_of(text)))
+    order = [key for _, key in sorted(enumerate(unique), key=lambda pair: (-pair[1][1], pair[0]))]
     return data["result"], requests, order
 
 
@@ -61,9 +96,16 @@ def _evidence(bundle):
 
 
 def _reranker_order(evidence, order):
-    """The evidence's chunks in the reranker's order."""
-    present = set(evidence)
-    return [key for key in order if key in present]
+    """The evidence's chunks in the reranker's order (as many of a key as the evidence holds)."""
+    left = {}
+    for key in evidence:
+        left[key] = left.get(key, 0) + 1
+    picked = []
+    for key in order:
+        if left.get(key):
+            left[key] -= 1
+            picked.append(key)
+    return picked
 
 
 def _moved_named(bundle, routed):
@@ -71,8 +113,11 @@ def _moved_named(bundle, routed):
     record = bundle.get("routing")
     assert record, f"the bundle carries no routing record of what it moved: {sorted(bundle)}"
     text = json.dumps(record)
-    missing = sorted({path for path, _ in routed if path not in text})
-    assert not missing, f"the routing record does not name what it moved ({missing}): {record}"
+    moved = [item for item in bundle["evidence"] if r.key_of(item["path"], item["text"]) in routed]
+    missing = sorted(r.key_of(item["path"], item["text"]) for item in moved
+                     if item["chunk_id"] not in text and item["path"] not in text)
+    assert moved and not missing, f"the routing record does not name what it moved ({missing}, by chunk id or " \
+                                  f"path): {record}"
 
 
 def _ahead(evidence, order, routed):
@@ -83,7 +128,10 @@ def _ahead(evidence, order, routed):
     head, rest = evidence[:len(routed)], evidence[len(routed):]
     assert set(head) == routed, f"the routed chunks are not put ahead after the rerank: the first {len(routed)} are " \
                                 f"{head}, not {sorted(routed)}"
-    assert rest == [key for key in _reranker_order(evidence, order) if key not in routed], \
+    expected = list(_reranker_order(evidence, order))
+    for key in head:
+        expected.remove(key)
+    assert rest == expected, \
         "after the routed chunks, the rest is not in the reranker's order"
 
 
@@ -121,8 +169,23 @@ def test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rer
     r.set_routing(routed, symbol=r.ON)
     bundle, _, order = _ask(box, routed, r.SYMBOL_QUESTION)
     assert bundle["facets"].get("code", {}).get("available") is True, f"premise: the code route answers: {bundle['facets']}"
-    _ahead(_evidence(bundle), order, CODE_AHEAD)
-    _moved_named(bundle, CODE_AHEAD)
+    ahead = _code_ahead(routed, standin, r.SYMBOL_QUESTION)
+    _ahead(_evidence(bundle), order, ahead)
+    _moved_named(bundle, ahead)
+
+
+def test_route_by_symbol_without_stored_vectors_falls_back_to_the_routes_own_order(unvectored, box, standin):
+    """S8's measured form: a code hit with no stored vector is ranked in the code route's own order (here no code
+    file is embedded), so its first 2 hits are the route's first 2.
+
+    Rewrite-Reason: S8's measured form (cosine order of the code route): the fallback, a case of its own."""
+    r.set_routing(unvectored, symbol=r.ON)
+    stored = {path for path, _ in s.vectors(unvectored).values()}
+    assert not stored & set(r.CODE), f"premise: no code hit has a stored vector: {sorted(stored & set(r.CODE))}"
+    bundle, _, order = _ask(box, unvectored, r.SYMBOL_QUESTION)
+    assert bundle["facets"].get("code", {}).get("available") is True, f"premise: the code route answers: {bundle['facets']}"
+    _ahead(_evidence(bundle), order, ROUTE_ORDER_AHEAD)
+    _moved_named(bundle, ROUTE_ORDER_AHEAD)
 
 
 @pytest.mark.parametrize("asked", ["plain", "record"])
@@ -157,8 +220,9 @@ def test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_ord
 def test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead(routed, box, standin):
     r.set_routing(routed, symbol=r.ON, record=r.ON)
     bundle, _, order = _ask(box, routed, r.BOTH_QUESTION)
-    _ahead(_evidence(bundle), order, CODE_AHEAD | RECORD_AHEAD)
-    _moved_named(bundle, CODE_AHEAD | RECORD_AHEAD)
+    ahead = _code_ahead(routed, standin, r.BOTH_QUESTION) | RECORD_AHEAD
+    _ahead(_evidence(bundle), order, ahead)
+    _moved_named(bundle, ahead)
 
 
 def test_the_16_text_cap_holds_with_routing_on(routed, box, standin):
