@@ -1,13 +1,40 @@
-# Lens B's Q16 (Table 2): "DEC-798 item 4: 4 GiB plus 2.4 GB". The W2-20 card's "at least 4 GiB" (DEC-742's base
-# value) is the incomplete naive answer, not gold.
+# Q16, re-labelled blind by the owner's DEC-1067 (c) (2026-11-04), by a session independent of the retrieval work: the
+# label decided from the question, the gold answer and the repository at the commit, never from a retrieval run or a
+# measure record. Lens B's label is kept unchanged in ../retired/ (q16-pre-dec1067.yaml, README.md), which the measure
+# never reads.
+# Why: its one source was DEC-798 item 4 (MemAvailable of at least 4 GiB plus 2.4 GB), and DEC-798 is SUPERSEDED by
+# DEC-1033. Its fixed gate figures had already been replaced by DEC-942 item 2's measured gate, and the CPU embedder
+# whose 2.4 GB it counted no longer exists in that form. A superseded decision is never the gold. The old question
+# ("before a heavy run") is not answerable as asked today: a heavy job (a test run, a rebuild) takes one of the
+# heavy-job slots (DEC-979 D1, DEC-1038 (4)), and the memory rule DEC-798 item 4 set figures for is the launch gate's
+# (DEC-942 lists it as the launch gate's "fixed gate figures"). So the question names that gate's admission of a new
+# lead, as q03 named DEC-1033's rule.
+# Two pieces: the rule is DEC-961 item 1 (the governing source; it replaced DEC-947's reserved verification peak and
+# DEC-960), restated for the product's gate by W2-20's KPI line, so the two are alternatives of one entry; the floor's
+# figure is DEC-947 item 5, which DEC-961 keeps ("the floor and the out-of-memory trip-wire stay as they are").
+# Left out: DEC-942 and DEC-947's items 1-2 and "How it is applied" (they reserve the verification peak, changed by
+# DEC-961), DEC-960 (superseded), the w2 prompt's resource-gate line (a working copy; it still gives the 6,710,886 kB
+# floor DEC-947 item 5 replaced) and the CTO's dispatcher README (a tool's document: its Load Balancer forecast, row
+# O-A1, has no register entry). DEC-953 and DEC-1050 (5) lift the gate on this repository's own development (as a
+# gate, `gate_check.py`); the rule stays the owner's and the product's (W2-20).
 id: Q16
 category: decision
-commit: 23079f92a6fa
-question: How much free memory must the resource gate see before a heavy run?
+commit: 03df21248e36
+question: How much free memory must the resource gate see before it launches a new lead?
 gold_answer: >-
-  MemAvailable of at least 4 GiB plus 2.4 GB while the CPU embedder is not loaded: DEC-798 item 4 counts the CPU
-  embedder's 2.4 GB as standing memory on top of DEC-742's 4 GiB.
+  No fixed figure any more: DEC-798's MemAvailable of 4 GiB plus 2.4 GB is superseded (DEC-942 replaced its fixed
+  figures with a measured gate; DEC-1033 replaced DEC-798). The gate opens on memory while MemAvailable plus what the
+  running leads already hold is at least the floor (3 GiB, DEC-947 item 5; put back to 6.4 GiB at once if available
+  memory falls below 2 GiB or an out-of-memory kill appears) plus each running lead at what it uses (at least its
+  measured working size) plus a working size for the new one; nothing is set aside for a full test run that has not
+  started (DEC-961 item 1: a full run checks the gate for its own measured peak when it starts).
 sources:
+  - - path: docs/DECISION_REGISTER.md
+      heading: "  1. **No memory is set aside for a full test run** (the 7.4 GiB verification peak). The gate counts the floor, each running lead at what it uses (at least its working size) and the newcomer. A full run (a close's, the nightly's, a lead's) gets its place like anything else: it checks the gate before it starts (`gate_check.py --full-run`, room for its own measured peak) and waits until there is room. The floor and the out-of-memory trip-wire stay as they are."
+      lines: [12039, 12039]
+    - path: .tickets/DAEO-r30l.md
+      heading: "  - 'The gate opens on memory while MemAvailable plus the running sessions'' live memory is at least the floor plus a working size for each running session and for the new one; nothing is reserved for a run that has not started [DEC-961, DEC-983, DEC-982]'"
+      lines: [36, 36]
   - path: docs/DECISION_REGISTER.md
-    heading: "  4. **The resource gate counts the CPU embedder's 2.4 GB as standing memory.** Until the gate's code does (row W2-M374), the orchestrator's gate by hand asks MemAvailable of at least 4 GiB plus 2.4 GB while the CPU embedder is not loaded."
-    lines: [8737, 8737]
+    heading: "  5. **The floor goes from 6.4 GiB to 3 GiB** (the owner's amendment the same day, not at the weekly re-measure): the verification run's peak is now reserved separately, and seven leads ran without memory trouble. If available memory ever falls below 2 GiB, or the kernel journal shows any out-of-memory kill, the floor goes back to 6.4 GiB at once and the next package reports it. The load gate stays as it is."
+    lines: [11726, 11726]

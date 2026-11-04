@@ -22,6 +22,7 @@ allowed_paths:
 - src/gov/retrieval/**
 - src/gov/config/models*
 - src/gov/rebuild/command.py
+- src/gov/config/loader.py
 - tests/unit/retrieval/**
 - tests/unit/semantic/**
 kpis:
@@ -139,3 +140,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
 **DEC-1067 (owner, 2026-11-04 ~01:30):** S8 re-worded to routing by question type (D4B-RESEARCH item 2), each half kept only if it holds; a method is adopted only if it wins on the visible half alone; reranker requests capped at 16 texts (a note within S7, DEC-1067 (f)).
 
 **P-W2-32-8 (CTO, 2026-11-04 ~02:05, delegated):** `src/gov/rebuild/command.py` in W2-32's paths, for one line: `gov rebuild`'s result names the chunks the embedder's limit cut (S7's note, DEC-1067 (f)); the engineer's P2.
+
+**DEC-1067 order (5), index-time method 1 (CTO, 2026-11-04 ~02:45):** *Contextual headers:* each chunk is embedded with a deterministic header of its file path and the headings above it (title, section), the keyword chunk and the evidence text unchanged; behind a setting that defaults to off (`governance/project/rebuild.yaml`: `embed_headers: true|false`), so measure 3 is unaffected; switching it changes the manifest's embedding recipe, so the next rebuild re-embeds; measured at measure 4 and kept only if it wins on the visible half alone (DEC-1067 (b)). Built on `w2/W2-32-index` beside the review of `w2/W2-32`.
