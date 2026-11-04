@@ -26,6 +26,14 @@ section 6.
   `docs/audit/memory-measure-*`, `docs/research/EXP-003/`, and `.gov-runtime/` (the CTO's drafts and logs);
 - the decision register's DEC-1066 to DEC-1070 for anything beyond the rubric's rules (they name misses).
 
+**How it searches:**
+- A file-name denial does not stop a recursive search started above a denied folder.
+- So every `grep -r`, `find` or similar search names its folders (for example `src/`, `docs/contract/`,
+  `docs/plan/`, `.tickets/`, `template/`), or excludes the denied ones. For the latter:
+  `--exclude-dir=fixtures --exclude-dir=.gov-runtime --exclude-dir=EXP-003 --exclude-dir=memory-measure-audit`, with
+  `docs/audit/` and `tests/acceptance/W2-61*` left out.
+- It is never run from `~` or from `~/gov-os-eval`.
+
 **Never runs:**
 - `gov retrieve`, `gov context`, `gov.retrieval.measure`, or any model;
 - any command that writes to the repository or to git.
@@ -85,140 +93,14 @@ xcheck: <n> as written, <n> minor fix, <n> major fix, <n> drop; after fixes: unr
 The CTO then measures `memory-verdict` only at the decision point DEC-1070 (8) names: the 0.6B's new record.
 
 ## 7. The session's folder (for the owner's operator)
-The settings were checked against the Claude Code documentation (permissions, sandboxing, settings). Points the
-documentation leaves open are marked, and the probes in step 4 settle them on this machine before any work starts.
-
-### Step 1: the folder
-```
-mkdir -p ~/mset-xcheck/.claude && chmod 700 ~/mset-xcheck
-touch ~/gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md
-```
-The sandbox's tools (bubblewrap 0.9.0, socat) are already installed. Nothing needs installing.
-
-### Step 2: `~/mset-xcheck/.claude/settings.json`
-```json
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "permissions": {
-    "defaultMode": "dontAsk",
-    "disableBypassPermissionsMode": "disable",
-    "additionalDirectories": [
-      "/home/usain/Dynamic-Agentic-Engineering-OS",
-      "/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict"
-    ],
-    "allow": [
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/**)",
-      "Read(//home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/**)",
-      "Edit(//home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md)"
-    ],
-    "deny": [
-      "Read(//home/usain/gov-os-eval/fixtures/evaluation/memory-retrieval/**)",
-      "Read(//home/usain/gov-os-eval/runs/**)",
-      "Read(//home/usain/gov-os-runs/**)",
-      "Read(//home/usain/gov-os-worktrees/**)",
-      "Read(//home/usain/.claude/projects/**)",
-      "Read(//tmp/claude-1000/**)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/**)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/assessment/2026-10/B-memory-retrieval.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/research/EXP-003/**)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/VISIBLE.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/HIDDEN.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/NEW-VISIBLE.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/RETIRED-RESULTS.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/audit/memory-measure-new-visible.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/docs/audit/memory-measure-new-hidden.md)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/**)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/tests/acceptance/W2-61/**)",
-      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/tests/acceptance/W2-61h/**)",
-      "Edit(//home/usain/Dynamic-Agentic-Engineering-OS/**)",
-      "Edit(//home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/**)",
-      "Edit(//home/usain/gov-os-eval/fixtures/evaluation/memory-retrieval/**)",
-      "Edit(//home/usain/.claude/**)",
-      "Edit(//home/usain/.local/**)",
-      "Bash(gov *)",
-      "Bash(*gov.retrieval.measure*)",
-      "Bash(git add *)", "Bash(git commit *)", "Bash(git push *)", "Bash(git checkout *)",
-      "Bash(git switch *)", "Bash(git restore *)", "Bash(git reset *)", "Bash(git clean *)",
-      "Bash(git rm *)", "Bash(git mv *)", "Bash(git merge *)", "Bash(git rebase *)",
-      "Bash(git pull *)", "Bash(git fetch *)", "Bash(git stash *)", "Bash(git tag *)",
-      "Bash(git branch *)", "Bash(git cherry-pick *)", "Bash(git revert *)", "Bash(git apply *)",
-      "Bash(git am *)", "Bash(git config *)", "Bash(git worktree *)", "Bash(git bisect *)",
-      "WebFetch",
-      "WebSearch"
-    ]
-  },
-  "sandbox": {
-    "enabled": true,
-    "failIfUnavailable": true,
-    "autoAllowBashIfSandboxed": true,
-    "allowUnsandboxedCommands": false,
-    "filesystem": {
-      "allowWrite": ["/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md"],
-      "denyRead": [
-        "/home/usain/gov-os-eval/fixtures/evaluation/memory-retrieval",
-        "/home/usain/gov-os-eval/runs",
-        "/home/usain/gov-os-runs",
-        "/home/usain/gov-os-worktrees",
-        "/home/usain/.claude/projects",
-        "/tmp/claude-1000",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/assessment/2026-10/B-memory-retrieval.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/research/EXP-003",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/VISIBLE.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/HIDDEN.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/NEW-VISIBLE.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/research/memory-measure-audit/RETIRED-RESULTS.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/audit/memory-measure-new-visible.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/docs/audit/memory-measure-new-hidden.md",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/tests/acceptance/W2-61",
-        "/home/usain/Dynamic-Agentic-Engineering-OS/tests/acceptance/W2-61h"
-      ]
-    },
-    "network": { "allowedDomains": [] }
-  }
-}
-```
-**How the settings work:**
-- **Two layers.** The permission rules govern Claude's own file and web tools. The sandbox governs every shell
-  command and anything it runs (Python included) at the operating-system level. Each denied path is therefore in
-  both lists. In the permission rules, `//` marks an absolute path; in the sandbox, a plain `/` does.
-- **Shell commands** run without prompts only inside the sandbox, which may write only `XCHECK.md`. A command cannot
-  leave the sandbox (`allowUnsandboxedCommands: false`), and it has no network.
-- **Writes:** `Edit` rules also cover the Write tool. The repository, the 60 questions and the tuning sets are denied
-  for writing; `XCHECK.md` is the one allowed file.
-- **Not covered by path rules:** the decision register is one file, so DEC-1066 to DEC-1070 cannot be denied by path.
-  The brief's section 2 governs it.
-
-### Step 3: start the session from the folder, with only this folder's settings
-```
-cd ~/mset-xcheck && claude --setting-sources project
-```
-- **Why `--setting-sources project`:** the owner's user-level `~/.claude/settings.json` allows `Bash(*)`, `Read(*)`,
-  `Edit(*)`, `Write(*)`, `WebFetch(*)` and `WebSearch(*)`. Those allow rules would otherwise merge in.
-  - Deny rules still win over them, and the Edit denies above are a backstop.
-  - But the flag keeps the session to this folder's file alone.
-  - If this build has no such flag, the session still holds by the denies. Probe 4f then matters most.
-- **Accept the folder's trust prompt.** Until it is accepted, the project settings do not apply.
-
-### Step 4: the checks before any work (each must give the result shown)
-Run inside the session, before pasting the brief:
-- **a.** `/status`: the setting sources list the project settings only.
-- **b.** `/permissions`: the rules above appear, with no `Bash(*)`, `Read(*)` or `Edit(*)`.
-- **c.** `/sandbox`: the sandbox is enabled.
-- **d.** Ask the session to read `~/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/` with its Read tool, and
-  with `ls`, `cat` and `grep -r` from the shell: **all refused**. Do it again for the repository's
-  `fixtures/evaluation/memory-retrieval/visible/` and for `~/.claude/projects/`: **all refused**.
-- **e.** `python3 -c "print(open('/home/usain/gov-os-eval/fixtures/evaluation/memory-retrieval/README.md').read()[:1])"`,
-  or any file in that folder: **refused**.
-- **f.** Write a line to `XCHECK.md`: **succeeds**. Create a file in the repository with the Write tool and with the
-  shell: **both refused**.
-- **g.** `gov retrieve "x"`, `git commit --allow-empty -m x`, and one web fetch: **all refused**.
-- **h.** Read `~/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/m01.yaml` and
-  `docs/research/memory-measure-audit/RUBRIC.md`: **both succeed**.
-
-If any check gives another result, stop and tell the owner which one. Then empty `XCHECK.md` again (`: > XCHECK.md`)
-and paste:
+- **A copy of the writer's settings:**
+  - the same read denials;
+  - the same two directories (the repository, and `~/gov-os-eval/fixtures/evaluation/memory-verdict/`);
+  - model opus;
+  - `acceptEdits`.
+- **The one change:** write access only to `~/gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md`. Nothing
+  else is written, the 60 included.
+- **Start it** from that folder as the writer's was. Then paste:
 
 > Read `/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/packages/ACT-MSET-2.md` and follow
 > it exactly. Write your report only to `~/gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md`. Tell me only
