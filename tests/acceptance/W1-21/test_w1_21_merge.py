@@ -10,6 +10,24 @@ import pytest
 
 import w1_21_support as support
 
+# Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16): the one rerank over the merged set is sent in
+# requests of at most 16 texts, its scores combined in order. "One pass" is read as one rerank of the merged set as a
+# whole: the requests each carry at most 16 texts, together score the set once (each candidate once), and are no more
+# than the cap needs; one load, and the order is still the reranker's.
+RERANK_CAP = 16
+
+
+def one_rerank(outcome):
+    """The texts the one rerank scored across its requests; fails unless they are one rerank of the merged set."""
+    sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
+    texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
+    assert sizes, "the reranker was given nothing to score"
+    assert max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts (DEC-1067 (f)): {sizes}"
+    assert len(sizes) == -(-len(texts) // RERANK_CAP), \
+        f"{len(sizes)} rerank requests for {len(texts)} texts: more than the cap of {RERANK_CAP} needs ({sizes})"
+    assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
+    return texts
+
 pytestmark = pytest.mark.needs("gitleaks", "sqlite_vec")
 
 
@@ -66,11 +84,9 @@ def test_several_batches_are_reranked_in_one_pass_over_the_merged_set(api, proje
     evidence = bundle[support.K_EVIDENCE]
     assert len(bundle[support.K_BATCHES]) > 1 and bundle[support.K_CONTINUATION] is None
     assert outcome.loads == 1, f"the reranker was loaded {outcome.loads} times"
-    assert len(outcome.passes) == 1, f"{len(outcome.passes)} rerank passes for one bundle of several batches"
-    texts = outcome.passes[0]["texts"]
+    texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank in requests of at most 16
     assert len(texts) >= len(evidence) > 3, \
-        f"the one pass scored {len(texts)} texts and the bundle cites {len(evidence)} chunks"
-    assert len(set(texts)) == len(texts), "a candidate was scored twice: the pass was not over the deduplicated set"
+        f"the one rerank scored {len(texts)} texts and the bundle cites {len(evidence)} chunks"
     assert evidence[0][support.E_PATH] == support.FAVOURED_PAGE, \
         f"the reranker scored {support.FAVOURED_PAGE} highest and the bundle starts with {evidence[0][support.E_PATH]}"
     assert bundle[support.K_MERGE].get(support.M_RERANKED) is True
@@ -80,7 +96,7 @@ def test_a_continued_bundle_is_reranked_once_too(api, project, ollama):
     _, first = reranked(api, project, ollama, batch_size=2, radius=support.RADIUS_LITE)
     outcome, _ = reranked(api, project, ollama, batch_size=2, radius=support.RADIUS_LITE,
                           continuation=first[support.K_CONTINUATION])
-    assert len(outcome.passes) == 1, f"{len(outcome.passes)} rerank passes for one continued bundle"
+    one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank, in requests of at most 16, for a continued bundle
 
 
 def test_without_a_reranker_the_bundle_says_nothing_was_reranked(api, project, ollama):
@@ -127,6 +143,6 @@ def test_a_rerank_over_more_than_thirty_candidates(api, ollama, tmp_path):
     assert merge.get(support.M_RERANKED) is True, f"the bundle was not reranked: {merge!r}"
     assert type(merge.get(support.M_CANDIDATES)) is int and merge[support.M_CANDIDATES] > 30, \
         f"the merged candidate set is at most 30: {merge.get(support.M_CANDIDATES)!r}"
-    assert len(outcome.passes) == 1, f"the reranker made {len(outcome.passes)} passes, not one"
-    assert len(outcome.passes[0]["texts"]) > 30, \
-        f"the one rerank pass scored {len(outcome.passes[0]['texts'])} texts, not more than 30"
+    texts = one_rerank(outcome)  # Rewrite-Reason: DEC-1067 (f): one rerank, in requests of at most 16
+    assert outcome.loads == 1, f"the reranker was loaded {outcome.loads} times for one bundle"
+    assert len(texts) > 30, f"the one rerank scored {len(texts)} texts, not more than 30"

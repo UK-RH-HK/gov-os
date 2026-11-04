@@ -59,12 +59,20 @@ def corpus():
 class Flaky:
     """An Ollama endpoint on a loopback port. ``plan[n]``: the outcomes of chunk batch ``n``'s first tries, each
     ``"500"``/``"503"``/``"400"`` (that HTTP status at once), ``"reset"``, ``"held"``, ``"not-json"`` or
-    ``"no-vector"``; later tries are answered. ``down_after``: once batch ``down_after`` is answered, the listening
-    socket is closed before the answer is sent, so the next connection is refused; it is opened again on the same
-    port after ``down_s`` seconds (never, when ``down_s`` is None)."""
+    ``"no-vector"``; later tries are answered. ``down_after``: once batch ``down_after`` is answered and then the
+    device read that follows it (``/api/ps``) is answered, the listening socket is closed before that answer is
+    sent, so the next connection (the next batch's first try) is refused; it is opened again on the same port after
+    ``down_s`` seconds (never, when ``down_s`` is None). ``ps``: ``"answer"`` (the model on the GPU) or ``"reset"``
+    (every ``/api/ps`` connection reset: the device can never be read). ``ps_reads`` counts the ``/api/ps`` requests.
 
-    def __init__(self, plan=None, down_after=None, down_s=None):
-        self.plan, self.down_after, self.down_s = dict(plan or {}), down_after, down_s
+    Rewrite-Reason: DEC-1065 (1) (the device is read, never assumed): after each batch the device is read from
+    ``/api/ps`` and an unreadable read is retried as the request is (W2-32's S10, F-2). The listener used to close
+    right after batch ``down_after``'s answer, so the refusal fell on that device read, not on the next batch as the
+    cases mean; it now closes once the device read after the batch is answered too."""
+
+    def __init__(self, plan=None, down_after=None, down_s=None, ps="answer"):
+        self.plan, self.down_after, self.down_s, self.ps = dict(plan or {}), down_after, down_s, ps
+        self.armed, self.ps_reads = False, 0
         self.lock, self.release = threading.Lock(), threading.Event()
         self.batches, self.tries = [], []   # each batch's texts; every chunk batch try {"batch", "try", "at", "outcome"}
         self.down_at = None
@@ -129,7 +137,14 @@ class Flaky:
         if route == "/api/tags":
             return "answered", 200, json.dumps({"models": [model]}).encode()
         if route == "/api/ps":
-            return "answered", 200, json.dumps({"models": [{**model, "size_vram": 0}]}).encode()
+            # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+            with self.lock:
+                self.ps_reads += 1
+                going = self.armed and self.down_at is None
+            if self.ps == "reset":
+                return "reset", 0, b""
+            payload = json.dumps({"models": [{**model, "size_vram": model["size"]}]}).encode()
+            return ("go-down" if going else "answered"), 200, payload
         if route != "/api/embed":
             return "answered", 404, b'{"error": "not found"}'
         given = asked.get("input", "")
@@ -154,7 +169,7 @@ class Flaky:
         if outcome == "no-vector":
             return outcome, 200, b'{"embeddings": []}'
         if outcome == "answered" and batch == self.down_after and self.down_at is None:
-            return "go-down", 200, answer
+            self.armed = True  # down once the device read that follows this answer is answered (DEC-1065 (1))
         return outcome, 200, answer
 
     def go_down(self):
@@ -291,7 +306,9 @@ def test_a_refused_connection_then_an_answer_is_tried_again_and_the_stage_is_bui
     box, flaky, project = place(down_after=0, down_s=DOWN_S)
     out, _ = run(box, project, waits=REFUSED_WAITS_S)
     report = out["refresh"]
-    assert flaky.down_at is not None, "the case's set-up: batch 0 was never answered"
+    assert flaky.down_at is not None, ("the case's set-up: the stand-in never went down (it goes down once batch 0 "
+                                       f"and the device read after it are answered): {flaky.tries_of(0)}, "
+                                       f"{flaky.ps_reads} device reads (DEC-1065 (1))")
     assert flaky.outcomes_of(1) == ["answered"], \
         f"batch 1 did not reach the stand-in once after its refused try: {flaky.tries_of(1)}; report {report}"
     late = flaky.tries_of(1)[0]["at"] - flaky.down_at
@@ -348,7 +365,9 @@ def test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_withi
     box, flaky, project = place(down_after=0, down_s=None)
     out, ended = run(box, project)
     report = out["refresh"]
-    assert flaky.down_at is not None, "the case's set-up: batch 0 was never answered"
+    assert flaky.down_at is not None, ("the case's set-up: the stand-in never went down (it goes down once batch 0 "
+                                       f"and the device read after it are answered): {flaky.tries_of(0)}, "
+                                       f"{flaky.ps_reads} device reads (DEC-1065 (1))")
     took = ended - flaky.down_at
     assert took >= sum(RETRY_WAITS_S) - EARLY_S, \
         f"the stage ended {took:.2f} s after nothing listened: it did not wait {sum(RETRY_WAITS_S)} s to try again"
@@ -359,6 +378,47 @@ def test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_withi
     assert str(report.get("reason") or "").startswith(out["no_embedding"]), report
     entries = retried(report)
     assert entries and entries[-1].get("tries") == TRIES and entries[-1].get("embedded") is False, report
+
+
+def _cache_rows(box):
+    """The rows of every table of the machine-wide cache's files (the case's own folder)."""
+    import sqlite3
+    total = 0
+    for path in sorted(box.cache_dir.glob("*.db")) if box.cache_dir.is_dir() else []:
+        connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        try:
+            for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall():
+                total += connection.execute(f'SELECT count(*) FROM "{name}"').fetchone()[0]
+        finally:
+            connection.close()
+    return total
+
+
+def _stored(project):
+    import sqlite3
+    try:
+        return S.store_vectors(project)
+    except sqlite3.Error:  # no vector table: nothing stored
+        return {}
+
+
+def test_a_device_read_that_never_answers_fails_closed_and_stores_nothing(place):
+    """DEC-1065 (1) (the device is read, never assumed; W2-32's S10, F-2): every ``/api/ps`` connection is reset, so
+    the device of batch 0's vectors can never be read. The read is tried again (more than once); then the stage fails
+    closed, named ``EMBEDDER_DEVICE_UNREAD``: no later batch is sent, no vector is stored in the store or the
+    machine-wide cache, and the stage is not reported built.
+
+    Rewrite-Reason: DEC-1065 (1) (the device is read, never assumed): a row added for the read the rule adds."""
+    box, flaky, project = place(ps="reset")
+    out, _ = run(box, project)
+    report = out["refresh"]
+    assert flaky.outcomes_of(0) == ["answered"], f"the case's set-up: batch 0 was not answered once: {flaky.tries}"
+    assert flaky.ps_reads >= 2, f"the device read was not tried again ({flaky.ps_reads} read)"
+    assert report["available"] is False and report["state"] == "FACET_UNAVAILABLE", report
+    assert "EMBEDDER_DEVICE_UNREAD" in json.dumps(report), f"the refusal is not named EMBEDDER_DEVICE_UNREAD: {report}"
+    assert len(flaky.batches) == 1, f"a later batch was sent after the device could not be read: {len(flaky.batches)}"
+    assert _stored(project) == {}, f"vectors of an unread device were stored: {len(_stored(project))}"
+    assert _cache_rows(box) == 0, "vectors of an unread device were cached"
 
 
 # --------------------------------------------------------------------------

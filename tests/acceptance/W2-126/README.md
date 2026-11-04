@@ -96,6 +96,7 @@ backticks, a parameterised case once per parameter (`name[id]`); notes on a case
 | S7 | `test_w2_126_retry.py::test_a_refused_connection_then_an_answer_is_tried_again_and_the_stage_is_built` | nothing listens for 1 s after batch 0's answer, the waits lowered to 2 s and 3 s: batch 1 reaches the stand-in after the first wait, built, `retries` 2 tries, embedded; "batch 1 did not reach the stand-in once after its refused try: []" (`retries` `[]`) |
 | S7 | `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[500]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[503]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[reset]`, `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound[mixed]` | batch 1 fails at every try (`mixed`: a time-out, a 500, a reset: one bound): exactly 3 tries after their waits, no later batch, within the bound, `FACET_UNAVAILABLE` with a reason beginning `NO_EMBEDDING`, `retries` 3 tries not embedded, a search without refresh `stale`, no hit; "the batch that kept failing was not tried exactly 3 times" (one try; `mixed`: the time-out retried, then the 500 ended it, `['held', '500']`) |
 | S7 | `test_w2_126_retry.py::test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_within_the_bound` | nothing listens again after batch 0: the stage waits both waits, ends within the bound, `FACET_UNAVAILABLE`, `retries` 3 tries not embedded; "the stage ended 0.01 s after nothing listened: it did not wait 1.0 s to try again" |
+| S7 | `test_w2_126_retry.py::test_a_device_read_that_never_answers_fails_closed_and_stores_nothing` | DEC-1065 (1) (W2-32's S10, F-2): every `/api/ps` connection reset, so the device of batch 0's vectors is never read: the read tried again, then `EMBEDDER_DEVICE_UNREAD`, no later batch, nothing stored or cached; red where no device is read (before W2-32) |
 | S7 | `test_w2_126_retry.py::test_a_client_error_is_not_retried_and_the_stage_ends_at_once` | an edge, green on the base (a guard): an HTTP 400 is not a transient server error, sent once, exactly `NO_EMBEDDING`, `retries` `[]` |
 
 Success line 7 (DEC-1042 item 4, after W2-123 landed; `Rewrite-Reason: P-W2-123-4`): see "Success line 7: the
@@ -169,6 +170,23 @@ stage ended 0.01 s after the refusal, no wait. **Shown green** against a throwaw
 tree whose `_ask` reads an HTTP 5xx, a `ConnectionError` and a refused `URLError` as a time-out (a probe, not W2-126's
 code): 10 passed, four runs, about 22 s each.
 
+## DEC-1065 (1): the device is read, never assumed (`Rewrite-Reason: DEC-1065 (1) (the device is read, never assumed)`)
+
+W2-32's S10 (and the review's F-2): after each rebuild batch the device is read from `/api/ps`; an unreadable read
+is retried as the request is, and after the last try the stage fails closed (`EMBEDDER_DEVICE_UNREAD`), never
+assuming the GPU. Revised by W2-32's independent test designer:
+
+- **The stand-in (`Flaky`)** goes down once batch 0 is answered **and the device read after it is answered** (it went
+  down right after batch 0's answer, so the refusal fell on the device read, not on batch 1 as the two refused cases
+  mean). What they guard is unchanged: a refused batch is tried again after its wait and the stage is built
+  (`retries`: one request of 2 tries); a batch refused at every try fails closed after both waits, within the bound,
+  with `NO_EMBEDDING`.
+- **A row added:** `test_a_device_read_that_never_answers_fails_closed_and_stores_nothing` (every `/api/ps`
+  connection reset: the read is tried again, then `EMBEDDER_DEVICE_UNREAD`, no later batch, no vector stored in the
+  store or the machine-wide cache).
+- On code that reads no device after a batch (before W2-32) the stand-in never goes down, so the two refused cases
+  and the new row are red there; on W2-32 (`26ad7ca2`) the file's 11 cases pass.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
@@ -188,7 +206,7 @@ Cases: 25 in the full run, 2 in `breadth`, 0 in `lifted`.
 | S4: Bounded: a configured size limit (default from the measured corpus: about 2 corpora) with least-recently-used eviction; a model or revision cha... | `test_w2_126_bound.py::test_a_revision_change_is_a_new_key_space` | the ticket's words |
 | S5: The retrieval check's dev tiers (a-dev, b-dev) and their 52 questions are embedded once on the machine and hit the cache in every later `gov ch... | `test_w2_126_dev_tiers.py::test_a_later_check_on_this_machines_dev_tiers_embeds_nothing` | the ticket's words |
 | S6: Measured, in docs/changes/W2-126-evidence.md: the texts sent to the embedder per day before and after (target: under one corpus, about 54,000, ... | `test_w2_126_same_vector.py::test_a_cached_vector_is_the_one_the_embedder_returned`, `test_w2_126_hits.py::test_a_second_tree_and_a_clone_send_nothing`, `test_w2_126_hits.py::test_a_changed_text_is_a_miss` | the ticket's words |
-| S7: The bounded retry (W2-123, DEC-1026) also covers a transient server error (HTTP 5xx) and a reset or refused connection, within the same bound, ... | `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound` (4 of 4), `test_w2_126_retry.py::test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_within_the_bound` | the ticket's words |
+| S7: The bounded retry (W2-123, DEC-1026) also covers a transient server error (HTTP 5xx) and a reset or refused connection, within the same bound, ... | `test_w2_126_retry.py::test_a_transient_failure_at_every_try_fails_closed_after_the_last_try_within_the_bound` (4 of 4), `test_w2_126_retry.py::test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_within_the_bound`, `test_w2_126_retry.py::test_a_device_read_that_never_answers_fails_closed_and_stores_nothing` | the ticket's words |
 | F1: A vector served for a different text, model or revision. | `test_w2_126_writers.py::test_concurrent_rebuilds_and_searches_serve_only_right_vectors` | the ticket's words |
 | F2: A store built with the cache that differs from one built without it. | `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache` | the ticket's words |
 | F3: A rebuild or search that fails because of the cache. | `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache`, `test_w2_126_writers.py::test_concurrent_rebuilds_and_searches_serve_only_right_vectors` | the ticket's words |

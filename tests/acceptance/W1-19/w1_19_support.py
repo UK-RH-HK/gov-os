@@ -854,7 +854,8 @@ class OllamaStandIn:
                     reply = {"models": [model]}
                 elif route == "/api/ps":
                     # W2-54, DEC-798: as the CPU-only embedder must, the model loaded wholly on the CPU.
-                    reply = {"models": [{**model, "size_vram": 0}]}
+                    # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+                    reply = {"models": [{**model, "size_vram": model["size"]}]}
                 elif route == "/api/show":
                     reply = {"details": model["details"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS},

@@ -536,6 +536,15 @@ their reference order from `hits`, which is no longer what the fusion takes:
 No other expectation, assertion, pass line or threshold changes. Commit trailer: `Rewrite-Reason: W2-13's S2 (the
 fusion receives the lexical route's ranked list); DEC-1055`.
 
+## The rerank in requests of at most 16 (DEC-1067 (f), W2-32's S7, 2026-11-04; `Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16)`)
+
+`test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` read the KPI's
+"one rerank" as one reranker call. The owner's DEC-1067 (f) caps each request at 16 texts, a larger pool sent in
+batches of at most 16 with the scores combined in order. Revised by W2-32's independent test designer; the name
+stands. It now asks: one reranker load; every request at most 16 texts; the requests together score the merged set
+once (each candidate once, as many texts as hits); no more requests than the cap needs; the first result still the
+reranker's highest. Nothing else in the case changes.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

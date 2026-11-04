@@ -103,7 +103,9 @@ def test_an_all_cached_store_equals_one_built_without_the_cache(tmp_path, endpoi
 def test_a_revision_change_is_a_new_key_space(tmp_path, endpoint):
     semantic.refresh(_repo(tmp_path / "a"))
     endpoint["digest"], endpoint["sent"] = OTHER, []
-    assert semantic.refresh(_repo(tmp_path / "b"))["vector_cache"]["hits"] == 0 and len(endpoint["sent"]) == 40
+    b = _repo(tmp_path / "b")  # W2-32: the new revision is pinned in configuration, or nothing is embedded
+    (b / "governance/project/models.yaml").write_text(f"embedder: {{model: {semantic.MODEL}, revision: {OTHER}}}\n")
+    assert semantic.refresh(b)["vector_cache"]["hits"] == 0 and len(endpoint["sent"]) == 40
 
 
 def test_a_question_is_embedded_once_across_trees_and_named_in_the_search(tmp_path, endpoint):

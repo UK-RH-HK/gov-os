@@ -229,6 +229,17 @@ The stand-in figure "hit@5 73.2" in the sections above is the figure before W2-1
 or threshold changes. Commit trailers: `Rewrite-Reason: W2-13's S2 (the fusion receives the lexical route's ranked
 list); DEC-419 DP-3 for the budget case (P-W2-13-R3 (a))`.
 
+## The rerank in requests of at most 16 (DEC-1067 (f), W2-32's S7, 2026-11-04; `Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16)`)
+
+Three cases of `test_w1_21_merge.py` read "one rerank over the merged set" as one reranker call:
+`test_several_batches_are_reranked_in_one_pass_over_the_merged_set`, `test_a_continued_bundle_is_reranked_once_too`
+and `test_a_rerank_over_more_than_thirty_candidates`. The owner's DEC-1067 (f) caps each request at 16 texts, a
+larger pool sent in batches of at most 16 with the scores combined in order. Revised by W2-32's independent test
+designer; the names stand. One helper (`one_rerank`) now asks of each: every request at most 16 texts; the requests
+together score the set once (each candidate once); no more requests than the cap needs. One load, the texts scored
+(at least the cited chunks; more than 30 in the wide case) and the first result being the reranker's highest are
+kept as they were.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

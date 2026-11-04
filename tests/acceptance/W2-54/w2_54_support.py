@@ -1054,7 +1054,9 @@ class EmbedderStandIn:
     Every request is recorded: ``embedded()`` lists the texts sent to be embedded, in order.
     """
 
-    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT, device="cpu", bind=None, size=CPU_SIZE, log=None):
+    # Rewrite-Reason: W2-32's S10 (DEC-1065): the GPU is the only device, so a stand-in loads the model on the GPU
+    # unless a case names the CPU (it was "cpu" by default).
+    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT, device="gpu", bind=None, size=CPU_SIZE, log=None):
         self.digest, self.targets, self.drift, self.mode = digest, dict(targets or {}), drift, "healthy"
         self.requests, self.previous = [], None
         self.device, self.size, self.log, self.ps, self.loaded = device, size, log, None, None

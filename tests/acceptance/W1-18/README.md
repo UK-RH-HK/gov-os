@@ -42,8 +42,8 @@ Red run on `w1/W1-18` at `71651e81` plus this batch: **15 errors, 0 passed, 0 fa
 
 | KPI line | Test file | Test functions | Red reason today |
 |---|---|---|---|
-| **Success 1a.** gov starts `ollama serve` on demand and relies on the 5-min idle unload (DEC-260, DEC-261) | `test_w1_18_on_demand_start.py` | `test_a_healthy_endpoint_is_used_and_nothing_is_started` · `test_with_the_endpoint_down_ollama_serve_is_started_on_demand[3]` · `test_starting_sets_up_no_unit_and_no_keep_alive_override` · `test_the_started_daemon_is_left_running_and_used_again` | The module does not exist |
-| **Success 1b.** No always-on unit | `test_w1_18_no_always_on_unit.py` · `test_w1_18_on_demand_start.py` | `test_the_repository_ships_no_always_on_unit_for_ollama` · `test_starting_sets_up_no_unit_and_no_keep_alive_override` | The module does not exist |
+| **Success 1a.** gov starts `ollama serve` on demand and relies on the 5-min idle unload (DEC-260, DEC-261) | `test_w1_18_on_demand_start.py` | `test_a_healthy_endpoint_is_used_and_nothing_is_started` · `test_with_the_endpoint_down_nothing_is_started_and_the_embedder_is_named_unavailable[3]` · `test_an_unavailable_endpoint_sets_up_no_unit_and_no_keep_alive_override` · `test_a_running_endpoint_is_used_again_and_never_stopped` · `test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_starts_nothing` | The module does not exist |
+| **Success 1b.** No always-on unit | `test_w1_18_no_always_on_unit.py` · `test_w1_18_on_demand_start.py` | `test_the_repository_ships_no_always_on_unit_for_ollama` · `test_an_unavailable_endpoint_sets_up_no_unit_and_no_keep_alive_override` | The module does not exist |
 | **Success 2.** When Ollama is unavailable retrieval degrades to FTS-only with a warning and the facet state recorded (DEC-257) | `test_w1_18_fallback.py` | `test_without_an_executable_the_result_is_fts_only_with_the_facet_state` · `test_a_daemon_that_never_becomes_healthy_gives_the_same_degraded_result` · `test_degrading_writes_no_file` | The module does not exist |
 | **Failure 1.** A query hangs > 30 s waiting for Ollama (DEC-260) | `test_w1_18_deadline.py` | `test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline` · `test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call` · `test_the_default_deadline_is_20_seconds` · every call in the suite (killed and failed after 30 s) | The module does not exist |
 | **Failure 2.** Semantic results are silently omitted without a warning (DEC-257) | `test_w1_18_fallback.py` | `test_a_degraded_result_is_never_silent[2]` · the two Success 2 result tests | The module does not exist |
@@ -56,14 +56,16 @@ Red run on `w1/W1-18` at `71651e81` plus this batch: **15 errors, 0 passed, 0 fa
 - **The result** is the mapping the function returns. Every call checks it has `available`, `started`, `facet`,
   `state` and `warning`, and that the child ended with exit code 0 (the function never raises for an unavailable
   daemon).
-- **Started on demand.** The stand-in executable's record shows one `serve` run when the endpoint was down, and none
-  when it was already healthy. The executable is found in each of the three places of DEC-260 (one case each); the
-  order between them is not tested.
+- **Never started (DEC-1065 (1), which replaces the on-demand start; `Rewrite-Reason` in W2-32's round 4).** With the
+  endpoint down and the stand-in executable in each of the three places of DEC-260 (one case each), the executable's
+  record shows no run at all, and the result is unavailable, `started` false, named `EMBEDDER_UNAVAILABLE`. A planted
+  project rebuilt and asked with the server down: the semantic store is refused, named `EMBEDDER_UNAVAILABLE`, the
+  keyword index is built, the retrieval cites the planted note by keywords, and the executable is never run. With
+  the endpoint already healthy, nothing is run either.
 - **No unit, no keep-alive override.** No stand-in unit command was called, nothing was written under `HOME`, the
-  daemon's environment has no variable whose name contains `KEEP_ALIVE`, no argument contains `keep`, and no request
-  to the endpoint carries `keep_alive`.
-- **Never stopped.** After the child has ended, the test itself asks the endpoint and gets 200. A second call is
-  available with `started` false, still one `serve` run, and no `stop` argument.
+  executable was never run, and no request to the endpoint carries `keep_alive`.
+- **Never stopped.** With a healthy server, two calls are each available with `started` false, nothing is run (no
+  `stop`), and after them the test itself asks the endpoint and gets 200.
 - **Degraded.** `available` is false, `facet` is `semantic`, `state` is `FACET_UNAVAILABLE`, and `warning` is a
   non-empty string that names Ollama and says FTS-only. The exact warning text appears once in the child's standard
   error. `HOME`, the working directory and `TMPDIR` hold the same files before and after.
@@ -143,7 +145,7 @@ Cases: 15 in the full run, 0 in `breadth`, 0 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
-| S1: gov starts ollama serve on demand and relies on the 5-min idle unload; no always-on unit | `test_w1_18_on_demand_start.py::test_with_the_endpoint_down_ollama_serve_is_started_on_demand` (3 of 3), `test_w1_18_on_demand_start.py::test_starting_sets_up_no_unit_and_no_keep_alive_override` | the ticket's words |
+| S1: gov starts ollama serve on demand and relies on the 5-min idle unload; no always-on unit | `test_w1_18_on_demand_start.py::test_with_the_endpoint_down_nothing_is_started_and_the_embedder_is_named_unavailable` (3 of 3), `test_w1_18_on_demand_start.py::test_an_unavailable_endpoint_sets_up_no_unit_and_no_keep_alive_override`, `test_w1_18_on_demand_start.py::test_with_the_server_not_answering_a_retrieval_answers_by_keywords_and_starts_nothing` | the ticket's words |
 | S2: When Ollama is unavailable retrieval degrades to FTS-only with a warning and the facet state recorded | `test_w1_18_fallback.py::test_without_an_executable_the_result_is_fts_only_with_the_facet_state`, `test_w1_18_fallback.py::test_a_daemon_that_never_becomes_healthy_gives_the_same_degraded_result`, `test_w1_18_fallback.py::test_degrading_writes_no_file` | the ticket's words |
 | F1: A query hangs > 30 s waiting for Ollama | `test_w1_18_deadline.py::test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline`, `test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call`, `test_w1_18_deadline.py::test_the_default_deadline_is_20_seconds` | the ticket's words |
 | F2: Semantic results are silently omitted without a warning | `test_w1_18_fallback.py::test_a_degraded_result_is_never_silent` (2 of 2) | the ticket's words |

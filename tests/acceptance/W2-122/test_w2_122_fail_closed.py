@@ -106,6 +106,11 @@ def test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed(bo
     other = support.OllamaStandIn(revision=support.OTHER_REVISION, salt="the other embedder ")
     try:
         base = support.make_base(box)
+        # Rewrite-Reason: W2-32's S2 (DEC-1064): a revision that no pin names fails closed, so the base pins the other
+        # endpoint's revision in its models.yaml (W2-32's interface), untracked so the tree's clone keeps the default
+        # pin; the base is still built by the other embedder, and the tree must still refuse it.
+        support.write(base / "governance/project/models.yaml",
+                      f"embedder:\n  model: {other.model}\n  revision: {other.digest}\n")
         support.built(base, support.environment(box, other.host))
     finally:
         other.close()
