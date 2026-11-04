@@ -25,7 +25,7 @@ from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
 from gov.guard import role_paths
-from gov.retrieval import authority, code_route, graph_route, lexical, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, routing, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
@@ -179,6 +179,15 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     if alone is not None:
         alone |= _alone_of(payload)
     return offset
+
+
+def _by_cosine(root: Path, query: str, chunk_ids: list[str]) -> list[str]:
+    """``chunk_ids`` ranked by their stored vectors' cosine to the question's, those with no vector last and ties in
+    the order given; as given when no vector can be compared (W2-32 S8)."""
+    distance = semantic.distances(root, query, chunk_ids)
+    if not distance:
+        return list(chunk_ids)
+    return sorted(chunk_ids, key=lambda chunk_id: distance.get(chunk_id, float("inf")))
 
 
 def role_filter(root, role=None):
@@ -345,6 +354,32 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         reranked_by = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
     ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
 
+    # W2-32 S8 (DEC-1067 (a)): routing by question type, each half behind its own setting (off: today's order)
+    route_settings, routed = routing.settings(root), {}
+    if route_settings["named_first"] and start and routes.get(CLOSURE):
+        named_ids = set(start)
+        own = [chunk for chunk in routes[CLOSURE]
+               if (record_of.get(chunk["path"]) if chunk["path"] != register
+                   else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in named_ids]
+        on_page = {candidate["chunk_id"] for candidate in ranked}
+        if any(chunk["chunk_id"] in on_page for chunk in own):  # none on the page: nothing to move, nothing asked
+            texts = []
+            for chunk in own:  # as the page's candidates are given to the reranker
+                body = span(chunk["path"], chunk["start_line"], chunk["end_line"]).decode("utf-8", "replace")
+                texts.append({**chunk, "text": f"[path: {chunk['path']}]\n{body[:RERANK_CHARS]}"})
+            try:
+                scored = rerank(query, texts, reranker)  # the named record's chunks, by the reranker's score
+            except (OSError, RuntimeError, ValueError):
+                scored = []
+            if any("rerank_score" in chunk for chunk in scored):
+                best = [chunk["chunk_id"] for chunk in scored]
+            else:  # no reranker: by the stored vectors' cosine, else the closure's own order
+                best = _by_cosine(root, query, [chunk["chunk_id"] for chunk in own])
+            ranked, routed[routing.NAMED] = routing.ahead(ranked, routing.firsts(best, route_settings["named_first"]))
+    if route_settings["code_first"] and coded is not None and routes.get(code_route.FACET):
+        best = _by_cosine(root, query, [hit["chunk_id"] for hit in routes[code_route.FACET]])
+        ranked, routed[routing.CODE] = routing.ahead(ranked, routing.firsts(best, route_settings["code_first"]))
+
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
     if ahead_paths:
         ahead_ranked = [c for c in ranked if c["path"] in ahead_paths]
@@ -424,6 +459,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
               "continuation": token}
+    if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
+        bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
+                                if route_settings[key]}, **routed}
     if withhold is not None:
         bundle["role_filter"] = withhold.summary()  # DEC-1065 (2): what was withheld, how many and by which rule
     return bundle

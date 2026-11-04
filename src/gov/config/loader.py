@@ -33,7 +33,12 @@ PROJECT_DIR = "governance/project"
 SECRETS_FILE = "secrets.yaml"
 SECRETS_SCHEMA = {"scan": {"required": False, "type": str}}
 SCAN_VALUES = ("on", "off")
-KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA}
+# Routing by question type (W2-32 S8, DEC-1067 (a)): ``routing.code_first`` and ``routing.named_first``, each a whole
+# number of 0 or more (absent or 0: off, today's order). Any other key or value is CONFIG_INVALID.
+RETRIEVAL_FILE = "retrieval.yaml"
+RETRIEVAL_SCHEMA = {"routing": {"required": False, "type": dict}}
+ROUTING_KEYS = ("code_first", "named_first")
+KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA, RETRIEVAL_FILE: RETRIEVAL_SCHEMA}
 # A namespace's keyword-index policy (DEC-1066 (3)): optional, one of two values; absent is indexed. Any other value is
 # CONFIG_INVALID in either form of the path map, so a misspelt exclusion never leaves its files in the index.
 LEXICAL_POLICY = "lexical_policy"
@@ -229,12 +234,25 @@ def validate(document, schema: dict, rel: str) -> None:
                     raise _invalid(rel, f"{key}.{name}", f"must be a {_TYPE_NAMES[rule['values']]}")
     if rel.endswith("path-map.yaml"):
         _validate_path_map(document, rel)
+    if rel.endswith(RETRIEVAL_FILE):
+        _validate_retrieval(document, rel)
     if rel.endswith(SECRETS_FILE):
         for key in document:
             if key not in schema:
                 raise _invalid(rel, str(key), "unknown key (the only key is 'scan')")
         if "scan" in document and document["scan"] not in SCAN_VALUES:
             raise _invalid(rel, "scan", f"must be one of {SCAN_VALUES}")
+
+
+def _validate_retrieval(document, rel):
+    for key in document:
+        if key not in RETRIEVAL_SCHEMA:
+            raise _invalid(rel, str(key), "unknown key (the only key is 'routing')")
+    for key, value in (document.get("routing") or {}).items():
+        if key not in ROUTING_KEYS:
+            raise _invalid(rel, f"routing.{key}", f"unknown key (the keys are {', '.join(ROUTING_KEYS)})")
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise _invalid(rel, f"routing.{key}", "must be a whole number of 0 or more (0: off)")
 
 
 def _validate_namespace_minimal(ns_name, ns_value, rel):
@@ -275,7 +293,7 @@ def _load(root: Path, name: str, schema: dict):
         return None
     secrets = name == SECRETS_FILE
     document = read_yaml(path, "CONFIG_INVALID", rel, plain=secrets)
-    if secrets and document is None:  # a file of comments alone holds no key: on
+    if (secrets or name == RETRIEVAL_FILE) and document is None:  # a file of comments alone holds no key
         document = {}
     validate(document, schema, rel)
     return document
