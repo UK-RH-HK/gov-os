@@ -32,9 +32,15 @@
 - **Links:**
   - The record graph holds the edges the records state in their own fields: 743 `DEPENDS_ON`, 9 `CONSTRAINS`,
     3 `SUPERSEDES` and 2 `IMPLEMENTS` here.
-  - **The lesson:** the register states 103 supersessions or amendments and 9,111 citations in its text, which the
-    graph does not hold. Census every kind of link the repository states before building (D4B-STRUCTURE step 7,
-    DEC-1072 (1)).
+  - **The census** (`docs/research/D4B-link-census.md`) counted every link the repository states:
+    - 37,815 distinct pairs across 65 kinds, of which the graph held 895 (2.4 %);
+    - of about 9,000 pairs that involve a decision, 6 were edges;
+    - no ticket reached the decisions it cites;
+    - commit trailers were neither indexed nor edges.
+  - **The drift:** 215 decisions read as current although the register or the archive says they were changed. 87 of
+    them carry no hint in their own entry.
+  - **The lesson:** census the stated links first. Build each kind as typed edges (ticket → decision; supersedes and
+    amends kept apart, so a partial supersession never hides its target; `Under:`). Measure drift as well as hit@5.
 - **Retrieval:**
   - three phrasings (no model);
   - keyword and meaning routes, 30 each;
@@ -112,7 +118,8 @@ The figures are hit@5. The 48-question set ran from m1 to m5 (24 visible + 24 hi
 | v5 + v6, three runs | v56 | 36/40 | 29/40 | yes | MRR 0.6925 visible, 0.4912 hidden |
 | M1, a file-level index | m6-M1 | 36/40 | 30/40 | to judge on all 80 | MRR 0.7015 visible, 0.4835 hidden |
 | M2, code chunks cut on definitions | m6-M2 | 36/40 | 29/40 | to judge | no change (embedded code changed by 50 chunks) |
-| M3-M5 | running | | | | |
+| M3, dependents beyond one hop | m6-M3 | 37/40 | 29/40 | no (DEC-1071) | the 80 rise, the gap widens (92.5 against 74.4) |
+| M4-M5 | running | | | | |
 
 Night one's survey (63 variants on all 48) and night two's (32 on the visible half) also found:
 - **Losers:** pool quotas, a global pool, an embedder instruction, a reranker instruction, authority ×2.
