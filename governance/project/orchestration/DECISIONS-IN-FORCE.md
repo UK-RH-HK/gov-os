@@ -144,3 +144,9 @@ Approved (owner, D-3 answer 4, 2026-11-03): the five classes in `governance/proj
 (the shared embedder :11434, the query server :11435, the shared reranker service, the CTO's samplers and slot
 watcher, the sentinel). Each is restarted by the CTO from its committed config, with its check, without an ACT; any
 other restart is an ACT.
+- DEC-1071 (2026-11-04, standing for the measure): **structural fixes only**, never per question, from one structural
+  review (chunking, embedding, ranking, the graph). **The rule:** a structural fix is judged on **all 80 together**
+  (hit@5, then MRR), the hidden half in counts only. It is adopted if the 80 do not fall and the halves' gap does not
+  widen. **The proof is consistency:** the halves agree within 3 points; then memory-verdict (60) is measured once as
+  the confirmation (if it disagrees, to the owner first). **Then** all three rerankers on the three sets. The
+  nonexistent-id question passes on `UNRESOLVED_IDS` naming its id, scored apart from hit@5. Basis: questions 1 and 2.

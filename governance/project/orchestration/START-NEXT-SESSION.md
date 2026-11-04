@@ -29,7 +29,7 @@ the register and the owner's word hold over both.
    table (D-4b's row holds the measures m1 to m6, re-pin window 3 and the trial).
 5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068, DEC-1069 and today's standing practice:
    the stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, a stop only by named pids).
-6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1070 (**next free id DEC-1071**).
+6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1071 (**next free id DEC-1072**).
 7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md` (today: m6, the trial's rule and state,
    the methods' rule, rows) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips, the slips); the packages
    `packages/LIFT-1/D4B-NIGHT.md`, `D4B-RESEARCH.md`, `D4B-AUDIT.md`; the measure's audit
