@@ -38,7 +38,9 @@ TICKETS = {
     "T-1": _ticket("T-1"),  # the start record: its own chunks come first in today's closure route
     "T-2": _ticket("T-2", "deps: [T-1]\ndepends_on:\n- T-1\n"),  # a list item under the key
     "T-3": _ticket("T-3", "depends_on: [T-9, T-1]\n"),  # an inline list
-    "T-4": _ticket("T-4", "depends_on:\n- T-2\n"),  # depends on T-2, not on T-1
+    "T-4": _ticket("T-4", "depends_on:\n- T-2\n"),  # depends on T-2, not on T-1: hop 2 from T-1
+    "T-5": _ticket("T-5", "depends_on:\n- T-4\n"),  # hop 3: the last within DEPTH
+    "T-6": _ticket("T-6", "depends_on:\n- T-5\n"),  # hop 4: beyond DEPTH
     "T-9": _ticket("T-9"),
     "T-10": _ticket("T-10", "depends_on:\n- T-9\n"),  # names T-1 nowhere: T-10 is no T-1
 }
@@ -139,14 +141,40 @@ def test_off_the_rebuild_s_index_is_today_s(project):
 
 def test_on_each_depends_on_edge_is_kept_with_its_stating_line(project):
     _settings(project, "closure_reverse_depends_on: true\n")
-    assert reverse_edges.refresh(project) == {"status": "recreated", "edges": 5, "stated": 5}
+    assert reverse_edges.refresh(project) == {"status": "recreated", "edges": 7, "stated": 7}
     rows, recipe = _table(project)
     assert rows == [("T-1", "T-2", ".tickets/T-2.md", 8), ("T-1", "T-3", ".tickets/T-3.md", 6),
-                    ("T-2", "T-4", ".tickets/T-4.md", 7), ("T-9", "T-10", ".tickets/T-10.md", 7),
+                    ("T-2", "T-4", ".tickets/T-4.md", 7), ("T-4", "T-5", ".tickets/T-5.md", 7),
+                    ("T-5", "T-6", ".tickets/T-6.md", 7), ("T-9", "T-10", ".tickets/T-10.md", 7),
                     ("T-9", "T-3", ".tickets/T-3.md", 6)]
     assert recipe == {"closure_reverse_depends_on": "true"}
     _settings(project, None)  # switched off: the next rebuild drops it
     assert reverse_edges.refresh(project) is None and _table(project) == (None, {})
+
+
+# --- the walk: beyond one hop, bounded --------------------------------------------------------------------------------
+
+def test_the_walk_reaches_the_dependents_hop_by_hop_up_to_its_depth(project):
+    _settings(project, "closure_reverse_depends_on: true\n")
+    reverse_edges.refresh(project)
+    walked = reverse_edges.walk(project, ["T-1"])
+    assert reverse_edges.DEPTH == 3 and reverse_edges.CAP == 50
+    assert walked.dependents == {"T-2": 1, "T-3": 1, "T-4": 2, "T-5": 3}  # T-6 is hop 4, beyond the depth
+    assert [source for source, _, _ in walked.stating] == ["T-2", "T-3", "T-4", "T-5"] and walked.capped == 0
+    assert reverse_edges.walk(project, ["T-9"]).dependents == {"T-10": 1, "T-3": 1}  # T-3's other dependency
+
+
+def test_the_cap_bounds_the_dependents_beyond_one_hop_and_counts_what_it_left_out(project, monkeypatch):
+    _settings(project, "closure_reverse_depends_on: true\n")
+    reverse_edges.refresh(project)
+    monkeypatch.setattr(reverse_edges, "CAP", 1)
+    walked = reverse_edges.walk(project, ["T-1"])
+    assert walked.dependents == {"T-2": 1, "T-3": 1, "T-4": 2} and walked.capped == 1  # hop 1 whole, then 1 more
+
+
+def test_the_walk_is_stale_without_an_index_built_under_the_setting(project):
+    _settings(project, "closure_reverse_depends_on: true\n")
+    assert reverse_edges.walk(project, ["T-1"]) is None
 
 
 def _closure_route(root: Path, monkeypatch) -> tuple[list[str], dict]:
@@ -158,27 +186,44 @@ def _closure_route(root: Path, monkeypatch) -> tuple[list[str], dict]:
     return [f"{chunks[h['chunk_id']]['path']}:{h['start_line']}" for h in seen[retrieving.CLOSURE]], bundle
 
 
+def _records(route: list[str]) -> set[str]:
+    return {item.split(":")[0].removeprefix(".tickets/").removesuffix(".md") for item in route}
+
+
 @needs_gitleaks
-def test_off_the_closure_route_is_today_s(project, monkeypatch):
+def test_off_the_closure_is_today_s_one_hop(project, monkeypatch):
     route, bundle = _closure_route(project, monkeypatch)
-    assert route[0].startswith(".tickets/T-1.md")  # the start record's own chunks first, the dependents' after
+    assert _records(route) == {"T-1", "T-2", "T-3"}  # the named record and its direct dependents alone
+    assert route[0].startswith(".tickets/T-1.md")
     assert reverse_edges.FACET_KEY not in bundle["facets"][retrieving.CLOSURE]
 
 
 @needs_gitleaks
-def test_on_the_dependents_stating_chunks_come_first_in_the_closure_route(project, monkeypatch):
+def test_on_a_question_naming_a_record_reaches_its_dependents_beyond_one_hop(project, monkeypatch):
     off, _ = _closure_route(project, monkeypatch)
     _settings(project, "closure_reverse_depends_on: true\n")
     reverse_edges.refresh(project)
     on, bundle = _closure_route(project, monkeypatch)
-    assert on[:2] == [".tickets/T-2.md:1", ".tickets/T-3.md:1"]  # the chunks holding lines 8 and 6, by the dependent
-    assert sorted(on) == sorted(off)  # the same chunks, the stating ones moved ahead
+    assert _records(on) == {"T-1", "T-2", "T-3", "T-4", "T-5"}  # T-4 depends on T-2, T-5 on T-4; T-6 past the depth
+    assert on[:4] == [".tickets/T-2.md:1", ".tickets/T-3.md:1", ".tickets/T-4.md:1", ".tickets/T-5.md:1"]
+    assert set(off) < set(on)  # today's chunks all kept, the new records' added
     assert reverse_edges.FACET_KEY not in bundle["facets"][retrieving.CLOSURE]
-    assert not any(path.startswith((".tickets/T-4.md", ".tickets/T-10.md")) for path in on[:2])
+    evidence = {item["path"] for item in bundle["evidence"]} | {gap.get("path") for gap in bundle["gaps"]}
+    assert ".tickets/T-5.md" in evidence  # reached by the bundle, gathered or named
 
 
 @needs_gitleaks
-def test_switched_on_without_a_rebuild_the_route_is_today_s_and_named_stale(project, monkeypatch):
+def test_a_capped_walk_is_named_in_the_closure_facet(project, monkeypatch):
+    _settings(project, "closure_reverse_depends_on: true\n")
+    reverse_edges.refresh(project)
+    monkeypatch.setattr(reverse_edges, "CAP", 1)
+    on, bundle = _closure_route(project, monkeypatch)
+    assert _records(on) == {"T-1", "T-2", "T-3", "T-4"}
+    assert bundle["facets"][retrieving.CLOSURE][reverse_edges.FACET_KEY] == f"{reverse_edges.CAPPED}: 1"
+
+
+@needs_gitleaks
+def test_switched_on_without_a_rebuild_the_closure_is_today_s_and_named_stale(project, monkeypatch):
     off, _ = _closure_route(project, monkeypatch)
     _settings(project, "closure_reverse_depends_on: true\n")
     on, bundle = _closure_route(project, monkeypatch)
@@ -199,6 +244,6 @@ def test_gov_rebuild_builds_the_index_only_with_the_setting_on(project, tmp_path
     assert _table(project) == (None, {})
     _settings(project, "closure_reverse_depends_on: true\n")
     on = rebuild()
-    assert on["result"]["stores"][reverse_edges.RECIPE_KEY] == {"status": "recreated", "edges": 5, "stated": 5}
-    assert len(_table(project)[0]) == 5
+    assert on["result"]["stores"][reverse_edges.RECIPE_KEY] == {"status": "recreated", "edges": 7, "stated": 7}
+    assert len(_table(project)[0]) == 7
     assert on["result"]["digest"] == off["result"]["digest"]  # the record store's digest is unchanged

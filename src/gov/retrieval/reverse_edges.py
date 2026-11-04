@@ -1,22 +1,27 @@
 """DEC-1068 M3: the reverse ``depends_on`` edge in the closure, behind ``closure_reverse_depends_on`` in
 ``governance/project/rebuild.yaml`` (absent: off, today's index and answers).
 
-The record store already holds each ``DEPENDS_ON`` edge, and ``gov.closure`` follows every edge both ways, so a
-question naming a record already reaches the records that depend on it; but the closure route hands over every chunk
-of every record it reaches, unranked, so the line where a dependent names the record is lost among them (W2-15a's
-Q14, "Which tickets depend on W2-03?": DAEO-ym8a's closure at depth 1 holds 16 records).
+The meaning (the CTO's ruling P-W2-32-10): a question naming a record reaches the records that depend on it **beyond
+one hop** (C depends on B, which depends on the named A). ``gov.closure`` already follows every edge both ways, so a
+plain question (depth 1, R0 or R1) reaches A's direct dependents today, and no further; off stays exactly that.
 
+- **The bound:** ``DEPTH`` = 3 ``DEPENDS_ON`` hops back from each start record (hop 1 is today's), and at most
+  ``CAP`` = 50 dependents added beyond hop 1, the nearest hop first and then by id. On this repository's store
+  (720 edges, 213 records with dependents) a record reaches 11.8 dependents within 3 hops on average and one reaches
+  289, so the cap cuts only such roots, and says so in the closure facet (``reverse_depends_on``: ``capped``). A
+  larger radius's own closure (R2: 3 hops, R3: 8, both ways) still reaches what it reaches today.
 - **The index** (``refresh``, at ``gov rebuild`` after the record store): for each ``DEPENDS_ON`` edge, the line of
   the source record's file that states it: the first line of its front matter's ``depends_on`` value that names the
   target as a whole id (an inline list's own line, or a list item under the key). It is kept in
   ``closure_reverse_edge (target, source, path, line)`` with the store's recipe row
-  ``index_recipe.closure_reverse_depends_on = true``. An edge whose line cannot be found has no row. Off, the table
-  and the row are dropped, so the store is today's.
-- **The closure route** (``first``, ``retrieve``): for each start record (the question's ``--ticket``, ``--id``s and
-  the records the record route finds, in that order), the chunk holding each line that states a record depends on
-  it, by the dependent's id, comes first; the closure route's other chunks follow as today. A dependent not reached
-  is reached now. With the setting on and no index built under it, the route is today's and the closure facet says
-  ``reverse_depends_on: stale`` until a rebuild.
+  ``index_recipe.closure_reverse_depends_on = true``. An edge whose line cannot be found has no row (its dependent is
+  still reached). Off, the table and the row are dropped, so the store is today's.
+- **The closure** (``walk``, ``retrieve``): the dependents reached join the closure, so all their chunks join the
+  closure route, and the chunk holding each stating line on the way comes first (hop by hop, then by the dependent's
+  id; a dependent of two records on the way has both its lines, in the order of the records); the route's other
+  chunks follow in today's order. With the setting on
+  and no index built under it, the closure is today's and the facet says ``reverse_depends_on: stale`` until a
+  rebuild.
 """
 
 from __future__ import annotations
@@ -32,7 +37,10 @@ EDGE = "DEPENDS_ON"
 KEY = "depends_on"  # the front-matter key whose edges the store makes DEPENDS_ON
 RECIPE_KEY = CLOSURE_REVERSE_DEPENDS_ON
 STALE = "stale"
+CAPPED = "capped"
 FACET_KEY = "reverse_depends_on"
+DEPTH = 3  # DEPENDS_ON hops back from a start record (hop 1 is today's closure at depth 1)
+CAP = 50  # dependents added beyond hop 1, at most
 _SCHEMA = "CREATE TABLE closure_reverse_edge (target TEXT NOT NULL, source TEXT NOT NULL, path TEXT NOT NULL, " \
           "line INTEGER NOT NULL, PRIMARY KEY (target, source))"
 _RECIPE = "CREATE TABLE IF NOT EXISTS index_recipe (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
@@ -124,9 +132,35 @@ def _drop(root: Path) -> None:
         return
 
 
-def _rows(root: Path, starts: list[str]) -> list[tuple] | None:
-    """The index's rows for ``starts`` (target, source, path, line), the starts in order and each one's dependents by
-    id; None when the store holds no index built under the setting."""
+class Walk:
+    """What the walk back along ``DEPENDS_ON`` from the start records found: ``dependents`` (id -> hop, at most
+    ``DEPTH``; hop 1 always whole, beyond it at most ``CAP``), ``stating`` (the (source, path, line) of each edge
+    walked whose line is known, hop by hop) and ``capped`` (dependents left out by ``CAP``)."""
+
+    def __init__(self, dependents: dict[str, int], stating: list[tuple[str, str, int]], capped: int):
+        self.dependents, self.stating, self.capped = dependents, stating, capped
+
+    def first(self, chunks: dict[str, dict]) -> list[dict]:
+        """The closure route's first chunks, each once, in order: the chunk holding each stating line (the first of
+        its file, by its first line, whose lines hold it), from ``chunks`` (the keyword index's, ``chunk_id -> record``)."""
+        by_path: dict[str, list[dict]] = {}
+        for chunk in chunks.values():
+            by_path.setdefault(chunk["path"], []).append(chunk)
+        ordered, seen = [], set()
+        for _, path, line in self.stating:
+            holding = sorted((c for c in by_path.get(path, []) if c["start_line"] <= line <= c["end_line"]),
+                             key=lambda c: (c["start_line"], c["end_line"]))
+            if holding and holding[0]["chunk_id"] not in seen:
+                seen.add(holding[0]["chunk_id"])
+                ordered.append(holding[0])
+        return ordered
+
+
+def walk(root: Path, starts: list[str]) -> Walk | None:
+    """The bounded walk back along ``DEPENDS_ON`` from ``starts`` (in the order given): hop by hop up to ``DEPTH``,
+    each hop's new dependents by id, the start records and those already found never again; beyond hop 1 at most
+    ``CAP`` dependents in all, the rest counted in ``capped``. Reads the store only; None when it holds no index built
+    under the setting (``STALE``)."""
     path = Path(root) / STORE_REL
     if not path.is_file():
         return None
@@ -135,33 +169,36 @@ def _rows(root: Path, starts: list[str]) -> list[tuple] | None:
         built = connection.execute("SELECT value FROM index_recipe WHERE key = ?", (RECIPE_KEY,)).fetchone()
         if not built or built[0] != "true":
             return None
-        rows = []
-        for target in dict.fromkeys(starts):
-            rows += connection.execute("SELECT target, source, path, line FROM closure_reverse_edge WHERE target = ? "
-                                       "ORDER BY source", (target,)).fetchall()
-        return rows
+        back: dict[str, list[str]] = {}
+        for source, target in connection.execute("SELECT source, target FROM edges WHERE type = ? "
+                                                 "ORDER BY target, source", (EDGE,)):
+            back.setdefault(target, []).append(source)
+        lines = {(target, source): (path, line) for target, source, path, line in
+                 connection.execute("SELECT target, source, path, line FROM closure_reverse_edge")}
     except sqlite3.Error:
         return None
     finally:
         connection.close()
-
-
-def first(root: Path, starts: list[str], chunks: dict[str, dict]) -> tuple[list[dict], set[str]] | None:
-    """The closure route's first chunks (each chunk once, in order) and the dependents they belong to; None when the
-    index is not built under the setting (``STALE``). ``chunks`` are the keyword index's (``chunk_id -> record``): the
-    chunk holding a stating line is the first of its file, by its first line, whose lines hold it."""
-    rows = _rows(root, starts)
-    if rows is None:
-        return None
-    by_path: dict[str, list[dict]] = {}
-    for chunk in chunks.values():
-        by_path.setdefault(chunk["path"], []).append(chunk)
-    ordered, sources, seen = [], set(), set()
-    for _, source, path, line in rows:
-        holding = sorted((c for c in by_path.get(path, []) if c["start_line"] <= line <= c["end_line"]),
-                         key=lambda c: (c["start_line"], c["end_line"]))
-        if holding and holding[0]["chunk_id"] not in seen:
-            seen.add(holding[0]["chunk_id"])
-            ordered.append(holding[0])
-            sources.add(source)
-    return ordered, sources
+    front, found, stating, added, capped = list(dict.fromkeys(starts)), {}, [], 0, 0
+    known = set(front)
+    for hop in range(1, DEPTH + 1):
+        new: list[tuple[str, str]] = []  # (dependent, the record it depends on) of this hop, by dependent
+        for target in front:
+            new += [(source, target) for source in back.get(target, []) if source not in known]
+        reached: list[str] = []
+        for source, target in sorted(new, key=lambda pair: pair[0]):
+            if source not in known:
+                if hop > 1 and added >= CAP:
+                    capped += 1
+                    known.add(source)
+                    continue
+                known.add(source)
+                found[source] = hop
+                reached.append(source)
+                added += hop > 1
+            if found.get(source) == hop and (target, source) in lines:
+                stating.append((source, *lines[(target, source)]))
+        front = reached
+        if not front:
+            break
+    return Walk(found, stating, capped)

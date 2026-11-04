@@ -266,21 +266,26 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     elif start:
         closed = closures.closure(root, start, depth)
         reached = {item["id"] for item in closed["closure"]}
+        walked, note = None, None
+        if reverse_edges.on(root):  # DEC-1068 M3 (P-W2-32-10): the start records' dependents beyond one hop
+            walked = reverse_edges.walk(root, start)
+            if walked is None:
+                note = reverse_edges.STALE  # today's closure until a rebuild
+            else:
+                reached |= set(walked.dependents)
+                note = f"{reverse_edges.CAPPED}: {walked.capped}" if walked.capped else None
         routes[CLOSURE] = [chunk for chunk in chunks.values()
                            if (record_of.get(chunk["path"]) if chunk["path"] != register
                                else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in reached]
+        if walked is not None:  # the chunks stating each dependency walked, first
+            ahead = walked.first(chunks)
+            named = {chunk["chunk_id"] for chunk in ahead}
+            routes[CLOSURE] = ahead + [chunk for chunk in routes[CLOSURE] if chunk["chunk_id"] not in named]
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
+        if note:
+            facets[CLOSURE][reverse_edges.FACET_KEY] = note
         closure_gaps += closed["gaps"]
-        if reverse_edges.on(root):  # DEC-1068 M3: the lines stating that a record depends on a start record, first
-            stating = reverse_edges.first(root, start, chunks)
-            if stating is None:
-                facets[CLOSURE][reverse_edges.FACET_KEY] = reverse_edges.STALE  # today's route until a rebuild
-            else:
-                ahead, dependents = stating
-                reached |= dependents
-                named = {chunk["chunk_id"] for chunk in ahead}
-                routes[CLOSURE] = ahead + [chunk for chunk in routes[CLOSURE] if chunk["chunk_id"] not in named]
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
         routes[code_route.FACET], facets[code_route.FACET] = coded
