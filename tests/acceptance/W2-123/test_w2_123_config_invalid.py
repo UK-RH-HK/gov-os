@@ -1,5 +1,10 @@
 """KPIs 1 and 4, and the failure line "a server started uncapped": an unreadable value refuses the start, named, and
-is never an uncapped start (S1)."""
+is never an uncapped start (S1).
+
+Rewrite-Reason: DEC-1065 (1): only the explicit restart (``safe_restart``) starts a server, so "refuses the start" is
+judged there (not restarted, no settings, the reason naming the file and the key, the executable never run); the
+health check (``ensure_*``) still reports the unreadable value as before (``CONFIG_INVALID``, settings None, the
+warning naming the file and the key, written once to standard error)."""
 
 from __future__ import annotations
 
@@ -51,30 +56,43 @@ def test_an_unreadable_value_refuses_the_start_and_names_it(stage, text, key):
     executable never runs."""
     stage.configure(raw=text)
 
+    restart = stage.call("safe_restart", "shared").result
+    assert stage.serves() == [], f"the server was started with an unreadable configuration: {stage.serves()}"
+    assert restart["restarted"] is False and restart["settings"] is None, restart
+    assert _names(restart.get("reason") or "", key), f"the refusal does not name the file and {key}: {restart}"
+
     call = stage.call("ensure_available", timeout_s=support.START_TIMEOUT_S)
 
     result = call.result
     assert stage.serves() == [], f"the server was started with an unreadable configuration: {stage.serves()}"
     support.assert_keys(result, support.RESULT_KEYS, "ensure_available's result")
     assert result["available"] is False and result["started"] is False, result
-    assert result["state"] == support.CONFIG_INVALID, result
     assert result["settings"] is None, result
+    # Rewrite-Reason: DEC-1065 (1): with nothing listening, the health check names the embedder unavailable (it
+    # starts nothing, so CONFIG_INVALID is the start's: judged on safe_restart above); its warning is still written
+    # once to standard error, never silent.
     warning = result["warning"] or ""
-    assert _names(warning, key), f"the warning does not name the file and {key}: {warning!r}"
-    assert call.stderr.count(warning) == 1, f"the warning is not written once to standard error:\n{call.stderr}"
+    assert warning.strip() and call.stderr.count(warning) == 1, \
+        f"the warning is not written once to standard error ({warning!r}):\n{call.stderr}"
 
 
 def test_an_unreadable_query_entry_refuses_the_query_start(stage):
     """KPI 6: the query server's entry is read and checked the same way."""
     stage.configure({"query": support.probe_section(nice=25)})
 
+    restart = stage.call("safe_restart", "query").result
+    assert stage.serves() == [], f"the query server was started with an unreadable value: {stage.serves()}"
+    assert restart["restarted"] is False and restart["settings"] is None, restart
+    assert f"{support.SECTION}.query.nice" in (restart.get("reason") or ""), restart
+
     call = stage.call("ensure_query_available", timeout_s=support.START_TIMEOUT_S)
 
     result = call.result
     assert stage.serves() == [], f"the query server was started with an unreadable value: {stage.serves()}"
-    assert result.get("state") == support.CONFIG_INVALID and result["available"] is False, result
-    assert result.get("settings") is None, result
-    assert f"{support.SECTION}.query.nice" in (result["warning"] or ""), result
+    # Rewrite-Reason: DEC-1065 (1): CONFIG_INVALID and the key are the start's (judged on safe_restart above); the
+    # health check starts nothing and states no settings.
+    assert result["available"] is False and not result.get("started"), result
+    assert "settings" in result and result["settings"] is None, result
 
 
 def test_an_unreadable_value_with_the_server_already_answering_uses_it_and_still_names_the_value(stage):

@@ -67,6 +67,24 @@ Every other assertion of those tests is unchanged (the configured entry, `OLLAMA
 (`Stage.environment`), so "none" means the caller's environment has no `CUDA_VISIBLE_DEVICES` at all; the planted
 daemon and its runner record what they see from inside.
 
+## Revision for DEC-1065 (1): a start only by the explicit restart (`Rewrite-Reason: DEC-1065 (1)`)
+
+DEC-1065 (1) (owner, 2026-11-03; W2-32's S10; the review of W2-32, F-8): `ensure_available` and
+`ensure_query_available` check health only and start nothing; only the explicit restart, `safe_restart(server)`,
+starts a server, and W2-123's cap still applies to it. Revised by W2-32's independent test designer; the names are
+unchanged, so the maps below stand.
+
+- `test_w2_123_start.py`: the three start cases (4 rows) call `safe_restart("shared")` or `safe_restart("query")`. Its
+  result names the server, `restarted` true, the new process and the `settings` its start used; every assertion on
+  the cap, the parallel requests, the settings, their file and the caller's GPU variables is unchanged.
+  `test_a_server_already_answering_is_used_and_the_settings_a_start_would_use_are_stated` still calls
+  `ensure_available` (a health check) and still asks for the settings a start would use.
+- `test_w2_123_config_invalid.py`: "refuses the start" is judged on `safe_restart`: not restarted, `settings` None, its
+  reason naming the file and the key, the executable never run. The health check then reports unavailable, started
+  false, `settings` None, its warning written once to standard error. `CONFIG_INVALID` and the key are the start's
+  (the health check starts nothing). `test_an_unreadable_value_with_the_server_already_answering_uses_it_and_still_names_the_value`
+  is unchanged.
+
 ## How the suite runs the code under test (DEC-732)
 
 - **Whatever `gov` the pytest process imports.** `probe` and `check_determinism` are called in the pytest process

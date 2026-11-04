@@ -128,13 +128,16 @@ TEXT_FIELDS = ("question", "expected", "observed", "root_cause", "repair", "regr
 
 
 def _hidden(marker, *carried):
-    """A hidden miss: its id (``H07``), or an id with ``part: hidden``; and the parts ``carried``, nothing else."""
-    miss = {"id": "H07"} if marker == "id" else {"id": "q07", "part": "hidden"}
+    """A hidden miss: its id (``H07``, or ``h07`` as the measure writes it), or an id with ``part: hidden``; and the
+    parts ``carried``, nothing else."""
+    # Rewrite-Reason: the review's F-1: the measure's hidden ids are ``h`` and digits, lower case (``h07``), so a miss
+    # with such an id and no ``part`` is hidden too, and is recorded by its id only.
+    miss = {"id": {"id": "H07", "lower-id": "h07"}[marker]} if marker != "part" else {"id": "q07", "part": "hidden"}
     miss.update({key: copy.deepcopy(HIDDEN_FULL[key]) for key in carried})
     return miss
 
 
-@pytest.mark.parametrize("marker", ["id", "part"])
+@pytest.mark.parametrize("marker", ["id", "lower-id", "part"])
 @pytest.mark.parametrize("carried", [("question",), ("expected",), ("regression",), ("root_cause",), ("repair",),
                                      tuple(HIDDEN_FULL)],
                          ids=["question", "sources", "regression-case", "root-cause", "repair", "in-full"])
@@ -149,7 +152,7 @@ def test_a_hidden_miss_is_refused_unless_it_carries_its_id_only(project, box, ma
     assert s.files_of(project) == before, "a refused event writes nothing"
 
 
-@pytest.mark.parametrize("marker", ["id", "part"])
+@pytest.mark.parametrize("marker", ["id", "lower-id", "part"])
 def test_a_hidden_miss_with_its_id_only_is_recorded_without_its_text(project, box, marker):
     """Rewrite-Reason: P-W2-32-5 (a hidden miss by its id only): the miss carries its id (or ``part: hidden``) and
     nothing else, and the event holds no text: no question, sources, root cause, repair or regression case."""
