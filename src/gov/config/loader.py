@@ -295,6 +295,8 @@ def _load(root: Path, name: str, schema: dict):
     document = read_yaml(path, "CONFIG_INVALID", rel, plain=secrets)
     if (secrets or name == RETRIEVAL_FILE) and document is None:  # a file of comments alone holds no key
         document = {}
+    if name == RETRIEVAL_FILE and isinstance(document, dict) and document.get("routing", {}) is None:
+        document = {**document, "routing": {}}  # a ``routing:`` block with its keys commented out: off (S8-F4)
     validate(document, schema, rel)
     return document
 

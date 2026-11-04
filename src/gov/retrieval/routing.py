@@ -7,13 +7,15 @@ Each half has its own setting in ``governance/project/retrieval.yaml`` (``gov.co
       code_first: 2    # a question naming a symbol: the code route's first 2 hits ahead
       named_first: 2   # a question naming a record: that record's 2 best chunks ahead
 
-Absent or 0, a half is off and the page is in today's order, nothing more asked (DEC-1067: each half kept only if
-it holds at its measure, on the visible half alone). The measured form is the research harness's (``rx.py``,
+The settings are read before any search work, so an invalid file is refused first; a ``routing:`` block with no
+keys is off (review S8-F4). Absent or 0, a half is off and the page is in today's order, nothing more asked
+(DEC-1067: each half kept only if it holds at its measure, on the visible half alone). The measured form is the research harness's (``rx.py``,
 variants r01 and s01):
 
 - **code:** the code route's hits (the question names a symbol the code graph holds), ranked by their stored
-  vectors' cosine to the question's (``semantic.distances``; with no vector to compare, the route's own order); its
-  first ``code_first``, those on the page, go first.
+  vectors' cosine to the question's (``semantic.distances``; with no vector to compare, the route's own order)
+  before they enter the fusion, as r01's ``code: sem`` (review S8-F1); its first ``code_first``, those on the page,
+  go first after the rerank.
 - **named:** the closure's chunks of the records the question names (its ``--ticket``, its ``--id``s and the record
   route's start ids) that are on the page, ranked by the scores the page's rerank gave them (no request of its own,
   P-W2-32-9: the rerank stays one of the merged set in full requests of 16); the first ``named_first`` go first.

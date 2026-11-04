@@ -126,7 +126,8 @@ def test_a_question_naming_a_symbol_has_the_code_route_s_first_2_ahead_by_cosine
     bundle = _ask(root, code_first=2)
     expected = [code[-1]["chunk_id"], code[-2]["chunk_id"]]
     assert _order(bundle)[:2] == expected and bundle["routing"] == {"code": expected}
-    assert _order(bundle)[2:] == [cid for cid in base if cid not in expected]  # the rest in the rerank's order
+    # the rest: the same chunks (S8-F1 ranks the code route before the fusion, so ties may fall otherwise)
+    assert sorted(_order(bundle)[2:]) == sorted(cid for cid in base if cid not in expected)
 
 
 def test_with_no_vector_the_code_route_keeps_its_own_order(project):
@@ -234,3 +235,58 @@ def test_routing_on_keeps_one_rerank_of_the_merged_set_in_full_requests_of_16(pr
     assert pool > 16
     assert on_sizes == off_sizes == [16] * (pool // 16) + ([pool % 16] if pool % 16 else [])
     assert on["routing"]["named"] and on["routing"]["code"]
+
+
+
+# --- the review's S8-F1 and S8-F4 ------------------------------------------------------------------------------------
+
+def _fused_code(monkeypatch):
+    """The code route's order as the fusion receives it, per call."""
+    seen = []
+    real = retrieve_module.rrf
+
+    def rrf(routes, *args, **kwargs):
+        seen.append([hit["chunk_id"] for hit in routes.get("code", [])])
+        return real(routes, *args, **kwargs)
+    monkeypatch.setattr(retrieve_module, "rrf", rrf)
+    return seen
+
+
+def test_with_the_symbol_half_on_the_code_route_enters_the_fusion_by_cosine(project, monkeypatch):
+    root, code, record, state = project
+    state.update(symbol=True, distance={c["chunk_id"]: n for n, c in enumerate(reversed(code))})
+    seen = _fused_code(monkeypatch)
+    _ask(root, code_first=1)
+    assert seen == [[c["chunk_id"] for c in reversed(code)]]  # r01's ``code: sem``: before the fusion
+
+
+def test_with_the_symbol_half_off_the_code_route_enters_in_its_own_order_and_no_distance_is_asked(project,
+                                                                                                    monkeypatch):
+    root, code, record, state = project
+    asked = []
+    state.update(symbol=True)
+    monkeypatch.setattr(semantic, "distances", lambda root_, query, ids: asked.append(ids))
+    seen = _fused_code(monkeypatch)
+    _ask(root)
+    _ask(root, named_first=2)
+    assert seen == [[c["chunk_id"] for c in code]] * 2 and asked == []
+
+
+@pytest.mark.parametrize("text", ["routing:\n", "routing:\n  # code_first: 2\n  # named_first: 2\n",
+                                  "routing: {}\n", "# nothing\n"])
+def test_a_routing_block_with_no_keys_is_off(tmp_path, text):
+    (tmp_path / "governance/project").mkdir(parents=True)
+    (tmp_path / "governance/project/retrieval.yaml").write_text(text, encoding="utf-8")
+    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0}
+
+
+def test_an_invalid_setting_is_refused_before_any_search_work(project, monkeypatch):
+    root, code, record, state = project
+    asked = []
+    monkeypatch.setattr(lexical, "search", lambda *args, **kwargs: asked.append("lexical"))
+    monkeypatch.setattr(semantic, "search", lambda *args, **kwargs: asked.append("semantic"))
+    (root / "governance/project/retrieval.yaml").write_text("routing: {code_first: two}\n", encoding="utf-8")
+    with pytest.raises(GovError) as raised:
+        retrieve(root, PHRASE, batch_size=30, bundle_budget=0, reranker=lambda: _score)
+    assert raised.value.code == "CONFIG_INVALID" and raised.value.details["key"] == "routing.code_first"
+    assert asked == []  # no route asked, no reranker, no GPU work

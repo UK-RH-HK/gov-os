@@ -216,6 +216,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
+    # W2-32 S8: the routing settings read first, so an invalid file is refused before any search work (S8-F4)
+    route_settings, routed = routing.settings(root), {}
     root = Path(root)
     unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
     try:
@@ -257,6 +259,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
         routes[code_route.FACET], facets[code_route.FACET] = coded
+        if route_settings["code_first"] and routes[code_route.FACET]:  # S8-F1: as r01, ranked before the fusion
+            by_id = {hit["chunk_id"]: hit for hit in routes[code_route.FACET]}
+            ordered = _by_cosine(root, query, list(by_id))
+            routes[code_route.FACET] = [by_id[chunk_id] for chunk_id in ordered]
     if withhold is not None:  # W2-13 S5: every route's hits, before the fusion, so a withheld one takes no rank
         routes = {name: withhold.keep(hits) for name, hits in routes.items()}
 
@@ -355,7 +361,6 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
 
     # W2-32 S8 (DEC-1067 (a)): routing by question type, each half behind its own setting (off: today's order)
-    route_settings, routed = routing.settings(root), {}
     if route_settings["named_first"] and start and routes.get(CLOSURE):
         named_ids = set(start)
         own = [chunk for chunk in routes[CLOSURE]
@@ -373,7 +378,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 best = _by_cosine(root, query, [candidate["chunk_id"] for _, candidate in mine])
             ranked, routed[routing.NAMED] = routing.ahead(ranked, routing.firsts(best, route_settings["named_first"]))
     if route_settings["code_first"] and coded is not None and routes.get(code_route.FACET):
-        best = _by_cosine(root, query, [hit["chunk_id"] for hit in routes[code_route.FACET]])
+        best = [hit["chunk_id"] for hit in routes[code_route.FACET]]  # already by cosine, before the fusion
         ranked, routed[routing.CODE] = routing.ahead(ranked, routing.firsts(best, route_settings["code_first"]))
 
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
