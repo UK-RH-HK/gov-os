@@ -90,8 +90,11 @@ def _newly_embedded_by_dec_957(rel: str) -> bool:
 # towards not embedded. Written here as the decisions word them, not read from the path map, so a path map that takes
 # anything more out (a namespace silently not embedded, a folder slipped into a records namespace) stays red. The
 # overlay's four record folders sit under governance/, which DEC-957's sets already leave out of this comparison.
+# W2-15a's raw measure output quotes the visible questions, names gold positions and holds the hidden half's ranks:
+# G4 keeps it out of both indexes, as lens B (DEC-1066 (3); the D-7 review's F5).
 D7_NOT_EMBEDDED = ("tests/**", "docs/close/**", "docs/checkpoints/**", "docs/probes/**",
-                   "docs/assessment/2026-10/B-memory-retrieval.md", "fixtures/evaluation/**",
+                   "docs/assessment/2026-10/B-memory-retrieval.md", "docs/research/EXP-003/w2-15a/raw/**",
+                   "fixtures/evaluation/**",
                    "governance/project/orchestration/closes/**", "governance/project/orchestration/nightly/**",
                    "governance/project/orchestration/sessions/**", "governance/project/orchestration/reviews/**")
 

@@ -71,6 +71,12 @@ Each of these was planted in a clone of `emg/d7` and turned the case red:
 - `gov-source` not embedded: 145 files moved;
 - `tests` embedded again: 1,322 files of the cut still embedded.
 
+**Added with the D-7 review's F5** (the CTO's `e44d6732`, under DEC-1066 (3)): W2-15a's raw measure output,
+`docs/research/EXP-003/w2-15a/raw/**` (19 tracked files), is in `evaluation-sources`, which is not embedded and not
+indexed, as lens B's report is. The cut names it, in the same direction only. Without it the case was red on
+`e44d6732`. A plant that moves another `docs/research/` folder out, here `docs/research/EXP-003/examin/**` put into
+`evaluation-sources`, stays red.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

@@ -89,6 +89,15 @@ EVALUATION_FILE = BY_PATH["evaluation/lens-report.md"]  # not indexed, not embed
 # The repository's own evaluation documents (DEC-1066 (3)): what D-7 marks ``not indexed``.
 LENS_B_REPORT = "docs/assessment/2026-10/B-memory-retrieval.md"
 EVALUATION_FIXTURES = "fixtures/evaluation/"
+# W2-15a's raw measure output: G4's, as lens B (DEC-1066 (3); the D-7 review's F5, applied by the CTO in e44d6732).
+W2_15A_RAW = "docs/research/EXP-003/w2-15a/raw/"
+
+# The converse (the D-7 review's F2; DEC-1052 M-4: tests and the close, checkpoint and probe records stay in keyword
+# search): only these namespaces say ``not indexed``, and every tracked file they keep out lies under these patterns.
+# Written as the decisions word them, not read from the path map. fixtures/memory-quality/** is in evaluation-fixtures
+# by the CTO's map and holds no tracked file (the review's F3, open).
+NOT_INDEXED_NAMESPACES = {"evaluation-sources", "evaluation-fixtures"}
+KEPT_OUT_BY_DECISION = (LENS_B_REPORT, W2_15A_RAW + "**", EVALUATION_FIXTURES + "**", "fixtures/memory-quality/**")
 
 
 # --------------------------------------------------------------------------
