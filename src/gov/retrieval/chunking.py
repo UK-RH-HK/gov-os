@@ -94,6 +94,49 @@ def parents(path: str, text: str) -> list[tuple[str, int, int, list[tuple[int, i
     return [("module", 1, count, runs)] + [("function", start, end, [(start, end)]) for start, end in functions]
 
 
+_DEF = re.compile(r"\s*(?:async\s+)?def\s+(\w+)")
+
+
+def _heading(line: str) -> tuple[int, str] | None:
+    """A Markdown heading line's level and text (its marks and a closing run of ``#`` taken off), or None."""
+    if not _HEADING.match(line):
+        return None
+    marks = len(line) - len(line.lstrip("#"))
+    return marks, re.sub(r"\s+#+\s*$", "", line[marks:]).strip()
+
+
+def headers(path: str, firsts: list[tuple[str, str, int, str]]) -> dict[str, str]:
+    """The contextual header of each parent of the file at ``path`` (DEC-1067 order (5), index-time method 1), from
+    ``(parent_id, kind, start_line, first line)`` of its parents, the first line read from the parent's first chunk.
+
+    - Markdown: ``[path: <path>]`` and ``[section: <title> > <heading> > ...]``, the headings that contain the section,
+      outermost first, by their levels, the section's own last; a part before the first heading has none.
+    - Python: ``[path: <path>]`` and, for a function the chunker made a parent of, ``[function: <name>]``. The chunker
+      knows no class, so a method is named as its function; the module's own lines have the path alone.
+    - Anything else, and a parent not given: the path alone. Each line ends in a newline, so the header is followed
+      by the chunk's text as it stands."""
+    trail: list[tuple[int, str]] = []
+    named: dict[str, str] = {}
+    for parent_id, kind, _, line in sorted(firsts, key=lambda row: row[2]):
+        extra = ""
+        if kind == "section":
+            found = _heading(line)
+            if found:
+                while trail and trail[-1][0] >= found[0]:
+                    trail.pop()
+                trail.append(found)
+            extra = f"[section: {' > '.join(text for _, text in trail)}]\n" if trail else ""
+        elif kind == "function" and (match := _DEF.match(line)):
+            extra = f"[function: {match.group(1)}]\n"
+        named[parent_id] = header(path) + extra
+    return named
+
+
+def header(path: str) -> str:
+    """The header's first line, all a parent without headings gets."""
+    return f"[path: {path}]\n"
+
+
 def chunk_file(path: str, blob: str, text: str):
     """``(parent rows, chunk rows)`` of one file.
 

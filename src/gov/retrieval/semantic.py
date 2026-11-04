@@ -37,6 +37,11 @@ DEC-381).
   (``MODEL_NOT_LISTED``) make the facet unavailable, the code first in ``reason`` and named in ``error``: nothing is
   embedded or compared (fail closed). Vectors built under another pin are ``MODEL_MISMATCH``, and a store that
   records no cut, or another one (built before W2-32, W2-L065), is ``stale``; both until a rebuild.
+- With ``embed_headers: true`` in ``rebuild.yaml`` (absent: false; DEC-1067 order (5), index-time method 1), each
+  chunk is embedded after its contextual header, its path and the headings above it (``chunking.headers``), the
+  whole cut to ``EMBED_CHARS``; the keyword chunk, the evidence text and the reranker's input are unchanged. The
+  store records the recipe (``HEADERS_KEY``), so switching the setting makes the store ``stale`` and the next build
+  a full re-embed, as another cut does.
 """
 
 from __future__ import annotations
@@ -57,7 +62,7 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.config import models
-from gov.config.loader import KNOWN_FILES, PROJECT_DIR, load_config
+from gov.config.loader import KNOWN_FILES, PROJECT_DIR, embed_headers, load_config
 from gov.retrieval import chunking, learning, lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
@@ -118,6 +123,10 @@ CREATE TABLE IF NOT EXISTS semantic_manifest (embedder_model TEXT NOT NULL, embe
 CREATE TABLE IF NOT EXISTS semantic_pin (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
 CUT_KEY = "embed_chars"  # the row of ``semantic_pin`` that records the cut the vectors were made with (W2-L065)
+# The row of ``semantic_pin`` that records the embedding recipe: ``true`` when each chunk was embedded after its
+# contextual header (``chunking.headers``; DEC-1067 order (5), ``embed_headers`` in ``rebuild.yaml``), ``false``
+# without. A store that records none was built without (every store before it), so it stays fresh with the setting off.
+HEADERS_KEY = "embed_headers"
 _MODEL = contextvars.ContextVar("semantic_model", default=None)  # the pinned model for this refresh or search
 
 
@@ -152,10 +161,67 @@ def _pin(root: Path) -> tuple[models.Pin | None, Refused | None]:
 
 def _mismatch(reason: str) -> Refused:
     return Refused(models.MISMATCH, f"{models.MISMATCH}: {reason}")
+
+
+def _recipe(root: Path) -> tuple[bool | None, Refused | None]:
+    """Whether the chunks are embedded with their headers at ``root`` (``rebuild.yaml``'s ``embed_headers``), or why
+    the setting cannot be read (``CONFIG_INVALID``, naming the key)."""
+    try:
+        return embed_headers(root), None
+    except GovError as error:
+        return None, Refused(error.code, error.message)
+
+
+def _recorded_headers(connection: sqlite3.Connection) -> bool | None:
+    """The recipe the store's vectors were made with (``HEADERS_KEY``): absent is without headers; None when the
+    store cannot say, or records a value of neither kind."""
+    try:
+        row = connection.execute("SELECT value FROM semantic_pin WHERE key = ?", (HEADERS_KEY,)).fetchone()
+    except sqlite3.Error:
+        return None
+    return False if row is None else {"true": True, "false": False}.get(row[0])
+
+
+class _Texts:
+    """The text each chunk is embedded as: its text, or with headers its parent's header (``chunking.headers``)
+    followed by its text; either cut to ``EMBED_CHARS``, so the header counts toward the limit and is kept while the
+    text is cut (DEC-1067 order (5)). Off, the text is the chunk's alone, byte for byte as before the setting."""
+
+    _PARENTS = "SELECT p.parent_id, p.kind, p.start_line, f.text FROM lexical_parent p JOIN lexical_chunk c " \
+               "ON c.parent_id = p.parent_id AND c.start_line = p.start_line JOIN lexical_fts f ON f.rowid = c.id " \
+               "WHERE p.path = ? AND c.path = ?"  # the chunk's path bound too: planned through lexical_chunk_by_path,
+    # not a scan of the whole keyword table per file (review F2; the same rows, as a chunk lies in its parent's file)
+    _CHUNK = "SELECT c.path, c.parent_id, f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id " \
+             "WHERE c.chunk_id = ?"
+
+    def __init__(self, connection: sqlite3.Connection, headers: bool):
+        self.connection, self.headers, self._by_path = connection, headers, {}
+
+    def header(self, path: str, parent_id: str) -> str:
+        if not self.headers:
+            return ""
+        if path not in self._by_path:
+            firsts = [(parent, kind, start, (text.splitlines() or [""])[0])
+                      for parent, kind, start, text in self.connection.execute(self._PARENTS, (path, path))]
+            self._by_path = {path: chunking.headers(path, firsts)}  # one file at a time: chunks come in path order
+        return self._by_path[path].get(parent_id) or chunking.header(path)
+
+    def __call__(self, chunk_id: str) -> str:
+        path, parent_id, text = self.connection.execute(self._CHUNK, (chunk_id,)).fetchone()
+        return (self.header(path, parent_id) + text)[:EMBED_CHARS]
+
+    def over_limit(self, wanted: list[str]) -> list[str]:
+        """The paths of the embedded chunks longer than ``EMBED_LIMIT_CHARS`` with their headers, once each, in order."""
+        keep = set(wanted)
+        if not self.headers:
+            return _over_limit(self.connection, wanted)
+        rows = self.connection.execute("SELECT c.chunk_id, c.path, c.parent_id, length(f.text) FROM lexical_chunk c "
+                                       "JOIN lexical_fts f ON f.rowid = c.id ORDER BY c.path, c.start_line").fetchall()
+        return list(dict.fromkeys(path for chunk_id, path, parent_id, size in rows if chunk_id in keep
+                                  and size + len(self.header(path, parent_id)) > EMBED_LIMIT_CHARS))
 _NEAREST = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, " \
            "vec_distance_cosine(v.embedding, ?) AS distance FROM semantic_vector v " \
            "JOIN lexical_chunk c ON c.chunk_id = v.chunk_id ORDER BY distance, c.chunk_id LIMIT ?"
-_TEXT = "SELECT f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id WHERE c.chunk_id = ?"
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
 QUERY_VECTORS_REL = ".gov-runtime/query-vector-cache.db"  # a file of its own: store.db is not written by a search
 CACHE_BOUND_SETTING = "GOV_QUERY_VECTOR_CACHE_MAX_BYTES"
@@ -408,8 +474,9 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
     revision or cut are all dropped first, so every chunk is embedded again (a full re-embed)."""
     lexical.refresh(root)
     pin, refused = _pin(root)
-    if refused:
-        return refused  # nothing was sent to be embedded, the store's vectors left as they are
+    headers, unread = _recipe(root)
+    if refused or unread:
+        return refused or unread  # nothing was sent to be embedded, the store's vectors left as they are
     connection = sqlite3.connect(root / STORE_REL)
     try:
         reason = _ready(connection)
@@ -421,20 +488,24 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
                              f"{pin.revision}: nothing is embedded")
         connection.executescript(SCHEMA)
         wanted = _wanted(root, connection)
+        text_of = _Texts(connection, headers)
         if cut is not None:  # the chunks above the embedder's limit, named (DEC-1067; review F-4)
-            over = _over_limit(connection, wanted)
+            over = text_of.over_limit(wanted)
             cut.update(limit=EMBED_LIMIT_CHARS, count=len(over), paths=over)
             if over:
                 print(f"semantic: {len(over)} file(s) hold a chunk over {EMBED_LIMIT_CHARS} characters, embedded "
                       f"from its first {EMBED_LIMIT_CHARS}: {', '.join(over)}", file=sys.stderr, flush=True)
         with connection:
             built_by = connection.execute("SELECT embedder_model, embedder_revision FROM semantic_manifest").fetchone()
-            if built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS:
-                connection.execute("DELETE FROM semantic_vector")  # another pin: a full re-embed
+            if built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS \
+                    or _recorded_headers(connection) is not headers:
+                connection.execute("DELETE FROM semantic_vector")  # another pin, cut or recipe: a full re-embed
             connection.execute("DELETE FROM semantic_manifest")
             connection.execute("INSERT INTO semantic_manifest VALUES (?, ?, ?, ?)",
                                (pin.model, revision, rerank.MODEL, rerank.REVISION))
             connection.execute("INSERT OR REPLACE INTO semantic_pin VALUES (?, ?)", (CUT_KEY, str(EMBED_CHARS)))
+            connection.execute("INSERT OR REPLACE INTO semantic_pin VALUES (?, ?)",
+                               (HEADERS_KEY, "true" if headers else "false"))
             have = {chunk_id for (chunk_id,) in connection.execute("SELECT chunk_id FROM semantic_vector")}
             connection.executemany("DELETE FROM semantic_vector WHERE chunk_id = ?",
                                    [(chunk_id,) for chunk_id in have - set(wanted)])
@@ -442,7 +513,7 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
             machine = vector_cache.Cache(pin.model, revision, counts)
             for start in range(0, len(missing), BATCH):
                 batch = missing[start:start + BATCH]
-                texts = [connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS] for chunk_id in batch]
+                texts = [text_of(chunk_id) for chunk_id in batch]
                 vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
                 todo = [i for i, vector in enumerate(vectors) if vector is None]
                 if todo:
@@ -516,8 +587,8 @@ def _status(root: Path) -> str | None:
     tree, status, _ = lexical._checked(root)  # the store's and the tree's key, taken with the lexical answer
     if status != "fresh":
         return status
-    config = lexical._stamps(Path(root) / PROJECT_DIR / name  # what ``_wanted`` and ``_pin`` read
-                             for name in [*KNOWN_FILES, models.MODELS_FILE])
+    config = lexical._stamps(Path(root) / PROJECT_DIR / name  # what ``_wanted``, ``_pin`` and ``_recipe`` read
+                             for name in [*KNOWN_FILES, models.MODELS_FILE])  # rebuild.yaml among the known
     key, place = None if tree is None or config is None else (tree, config), Path(root).resolve()
     if key is None or _STATUS.get(place, (None,))[0] != key:
         _STATUS[place] = (key, _vectors(root))
@@ -526,10 +597,13 @@ def _status(root: Path) -> str | None:
 
 def _vectors(root: Path) -> str | None:
     """The status of the vectors, worked out from the store, the path map and the pin as they stand: a pin that
-    cannot be had, or vectors built under another model or revision, refuse them by name; another cut is stale."""
+    cannot be had, or vectors built under another model or revision, refuse them by name; another cut, or another
+    recipe than ``rebuild.yaml``'s ``embed_headers`` (DEC-1067 order (5)), is stale. A setting that cannot be read is
+    refused by name (``CONFIG_INVALID``)."""
     pin, refused = _pin(root)
-    if refused:
-        return refused
+    headers, unread = _recipe(root)
+    if refused or unread:
+        return refused or unread
     connection = _open(root)
     if connection is None:
         return "missing"
@@ -543,6 +617,8 @@ def _vectors(root: Path) -> str | None:
                              f"pins {pin.model} at {pin.revision}: they are not compared until a rebuild embeds "
                              f"them all again")
         if _cut(connection) != EMBED_CHARS:  # W2-L065: built before the cut was recorded, or under another cut
+            return "stale"
+        if _recorded_headers(connection) is not headers:  # the setting switched since the vectors were made
             return "stale"
         return "stale" if have != set(_wanted(root, connection)) else None if have else "empty"
     finally:
@@ -646,14 +722,16 @@ def distances(root: Path, query: str, chunk_ids: list[str]) -> dict[str, float] 
 def manifest(root: Path) -> dict | None:
     """The models the vectors were built with and the reranker's pin, each with its revision; None when there is no
     vector index. Read from the store alone: writes nothing and asks Ollama nothing (DEC-374). ``embed_chars`` is the
-    cut the vectors were made with (W2-L065), None for a store built before it was recorded."""
+    cut the vectors were made with (W2-L065), None for a store built before it was recorded. ``embed_headers`` is the
+    recipe: whether each chunk was embedded after its contextual header (DEC-1067 order (5)); false for a store built
+    before it was recorded."""
     connection = _open(root)
     if connection is None:
         return None
     try:
         row = connection.execute("SELECT * FROM semantic_manifest").fetchone()
-        cut = _cut(connection)
+        cut, headers = _cut(connection), _recorded_headers(connection)
     finally:
         connection.close()
     return row and {"embedder": {"model": row[0], "revision": row[1]},
-                    "reranker": {"model": row[2], "revision": row[3]}, CUT_KEY: cut}
+                    "reranker": {"model": row[2], "revision": row[3]}, CUT_KEY: cut, HEADERS_KEY: headers}
