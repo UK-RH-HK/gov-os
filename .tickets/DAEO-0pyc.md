@@ -22,6 +22,7 @@ allowed_paths:
 - src/gov/retrieval/**
 - src/gov/config/models*
 - src/gov/rebuild/command.py
+- src/gov/config/loader.py
 - tests/unit/retrieval/**
 - tests/unit/semantic/**
 kpis:
