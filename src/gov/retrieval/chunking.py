@@ -94,6 +94,34 @@ def parents(path: str, text: str) -> list[tuple[str, int, int, list[tuple[int, i
     return [("module", 1, count, runs)] + [("function", start, end, [(start, end)]) for start, end in functions]
 
 
+def definitions(text: str) -> list[int]:
+    """The ``def`` or ``class`` line of each top-level function and class of the Python source ``text``, and of each
+    method of a top-level class, in order (DEC-1068's M2); none when it does not parse."""
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        return []
+    kinds = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    starts = {node.lineno for node in tree.body if isinstance(node, kinds)}
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef):
+            starts |= {item.lineno for item in node.body if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    return sorted(starts)
+
+
+def cut_at(runs: list[tuple[int, int]], starts: list[int]) -> list[tuple[int, int]]:
+    """``runs`` cut before each line of ``starts`` inside one, so no run holds the start of two definitions."""
+    out = []
+    for first, last in runs:
+        at = first
+        for start in starts:
+            if at < start <= last:
+                out.append((at, start - 1))
+                at = start
+        out.append((at, last))
+    return out
+
+
 _DEF = re.compile(r"\s*(?:async\s+)?def\s+(\w+)")
 
 
@@ -137,15 +165,22 @@ def header(path: str) -> str:
     return f"[path: {path}]\n"
 
 
-def chunk_file(path: str, blob: str, text: str):
+def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None):
     """``(parent rows, chunk rows)`` of one file.
 
     A parent row is ``(parent_id, path, kind, start_line, end_line)``; a chunk row is
     ``(chunk_id, path, start_line, end_line, parent_id, text)``.
+
+    ``recipe`` holds DEC-1068's index-time methods that are on (absent or all off: today's chunks, byte for byte).
+    ``chunk_code_by_definition`` (M2): a Python file's runs are also cut at each top-level def/class and method
+    (``definitions``), so no chunk holds the start of two definitions; the parents are kept as they are.
     """
+    recipe = recipe or {}
     lines = text.splitlines(keepends=True)
+    starts = definitions(text) if recipe.get("chunk_code_by_definition") and path.endswith(".py") else []
     parent_rows, chunk_rows = [], []
     for kind, start, end, runs in parents(path, text):
+        runs = cut_at(runs, starts) if starts else runs
         parent_id = make_id("parent", path, blob, kind, start, end)
         parent_rows.append((parent_id, path, kind, start, end))
         for run_start, run_end in runs:

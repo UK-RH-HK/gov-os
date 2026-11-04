@@ -54,8 +54,8 @@ import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.config.loader import (LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, SECRETS_FILE, read_yaml,
-                               validate_lexical_policy)
+from gov.config.loader import (CODE_BY_DEFINITION, INDEX_FLAGS, LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, REBUILD_FILE,
+                               SECRETS_FILE, index_recipe, read_yaml, validate_lexical_policy)
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
@@ -105,6 +105,11 @@ _DIGESTED = (
     "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.text FROM lexical_chunk c "
     "JOIN lexical_fts f ON f.rowid = c.id ORDER BY c.chunk_id",
 )
+# DEC-1068's index-time methods that are on, as the index was built with them (W2-32): a row a method, none when all
+# are off, and then no table at all, so an index with every method off is today's. Any difference from
+# ``rebuild.yaml``'s makes the index stale; a refresh re-chunks the files the switched methods change (``_affected``).
+RECIPE = "lexical_recipe"
+_RECIPE_SCHEMA = f"CREATE TABLE IF NOT EXISTS {RECIPE} (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
 RACY_NS = 10_000_000  # a file changed this recently (a coarse clock's tick) may not yet tell a later write apart
 _FRESHNESS: dict = {}  # resolved root -> (key, answer): the freshness worked out last in this process (W2-108)
 _LISTED: dict = {}  # resolved root -> ((head, index stamp), ``ls-files -z``): the tracked paths listed last (W2-108)
@@ -226,9 +231,34 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
+def _recipe_now(root: Path) -> dict[str, str]:
+    """The methods ``rebuild.yaml`` switches on (``index_recipe``), as the store records them."""
+    return {key: "true" for key, on in index_recipe(root).items() if on}
+
+
+def _recipe_of(connection: sqlite3.Connection) -> dict[str, str]:
+    """The methods the index was built with: none for an index without the table (every one off, or before them)."""
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE name = ?", (RECIPE,)).fetchone() is None:
+        return {}
+    return dict(connection.execute(f"SELECT key, value FROM {RECIPE}"))
+
+
+def _affected(keys, paths) -> set[str]:
+    """The paths whose chunks or index terms a switch of ``keys`` changes."""
+    out: set[str] = set()
+    for key in keys:
+        if key == CODE_BY_DEFINITION:
+            out |= {rel for rel in paths if rel.endswith(".py")}
+    return out
+
+
 def _digest(connection: sqlite3.Connection) -> str:
-    """sha256 of the index's logical content: its files, parents and chunks with their text, in sorted order."""
+    """sha256 of the index's logical content: its files, parents and chunks with their text, in sorted order, and
+    the methods it was built with when one is on (none on: today's digest)."""
     digest = hashlib.sha256()
+    recipe = sorted(_recipe_of(connection).items())
+    if recipe:
+        digest.update(FIELD_SEP.join(f"{key}={value}" for key, value in recipe).encode() + ROW_SEP.encode())
     for query in _DIGESTED:
         for row in connection.execute(query):
             digest.update(FIELD_SEP.join(str(value) for value in row).encode("utf-8", "replace"))
@@ -260,11 +290,14 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                 and not _current(connection):
             connection.executescript(_OLD)  # an index of the code before W2-13: built again from nothing
         connection.executescript(SCHEMA)
+        recipe, built = _recipe_now(root), _recipe_of(connection)
+        switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
+        rechunk = _affected(switched, [rel for rel, (_, indexed) in stored.items() if indexed == 1])
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
         policy = kept_out(root, list(current)) if current else {}
         asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]
-                 or (rel in policy) != (stored[rel][1] == KEPT_OUT)]
+                 or (rel in policy) != (stored[rel][1] == KEPT_OUT) or rel in rechunk]
         kept = {rel: policy[rel] for rel in asked if rel in policy}  # before the filter: neither scanned nor read
         judged = [rel for rel in asked if rel not in kept]
         allowed = set(indexable(root, judged)) if judged else set()
@@ -274,14 +307,14 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                 _drop(connection, rel)
             for rel in asked:
                 state = (current[rel], KEPT_OUT if rel in kept else int(rel in allowed))
-                if stored.get(rel) == state:
+                if stored.get(rel) == state and rel not in rechunk:
                     continue  # judged again and nothing changed: the chunks stand
                 _drop(connection, rel)
                 connection.execute("INSERT INTO lexical_file VALUES (?, ?, ?)", (rel, *state))
                 if rel not in allowed:
                     continue
                 text = (root / rel).read_bytes().decode("utf-8", "replace")  # only after the filter let it through
-                parent_rows, chunk_rows = chunk_file(rel, current[rel], text)
+                parent_rows, chunk_rows = chunk_file(rel, current[rel], text, recipe)
                 fields = _fields(rel, text, parent_rows)
                 connection.executemany("INSERT INTO lexical_parent VALUES (?, ?, ?, ?, ?)", parent_rows)
                 for *record, chunk in chunk_rows:
@@ -290,6 +323,12 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                     connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
                                        (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
+            if recipe:  # the methods it is built with now
+                connection.execute(_RECIPE_SCHEMA)
+                connection.execute(f"DELETE FROM {RECIPE}")
+                connection.executemany(f"INSERT INTO {RECIPE} VALUES (?, ?)", sorted(recipe.items()))
+            else:  # every method off: no table, today's index
+                connection.execute(f"DROP TABLE IF EXISTS {RECIPE}")
         return connection, indexed, policy
     except BaseException:
         connection.close()
@@ -365,7 +404,8 @@ def _checked(root: Path) -> tuple[tuple | None, str, list[str]]:
     root = Path(root)
     place = root.resolve()
     store, tree = _store_stamp(root), _tree(root, place)
-    key = None if store is None or tree is None else (store, tree)
+    settings = _stamps([root / PROJECT_DIR / REBUILD_FILE])  # the index-time methods' file, tracked or not
+    key = None if store is None or tree is None or settings is None else (store, tree, settings)
     if key is None or _FRESHNESS.get(place, (None,))[0] != key:
         _FRESHNESS[place] = (key, _freshness(root))
     status, stale = _FRESHNESS[place][1]
@@ -391,6 +431,11 @@ def _freshness(root: Path) -> tuple[str, list[str]]:
         stored = dict(connection.execute("SELECT path, blob FROM lexical_file"))
         current = _tracked(Path(root))
         stale = sorted(rel for rel in stored.keys() | current.keys() if stored.get(rel) != current.get(rel))
+        recipe, built = _recipe_now(Path(root)), _recipe_of(connection)
+        if recipe != built:  # DEC-1068: built with other index-time methods than rebuild.yaml's
+            indexed = [rel for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = 1")]
+            switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
+            return "stale", sorted(set(stale) | _affected(switched, indexed))
         return "stale" if stale else "empty" if _empty(connection) else "fresh", stale
     finally:
         connection.close()
