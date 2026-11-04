@@ -57,7 +57,18 @@ def test_a_health_check_starts_nothing_and_names_the_embedder_unavailable(no_sta
 def test_an_answering_embedder_is_available_and_nothing_is_started(no_start, monkeypatch, check):
     started, env = no_start
     monkeypatch.setattr(ollama, "_healthy", lambda url, deadline: True)
-    assert check(timeout_s=0.2, env=env)["available"] is True and started == []
+    result = check(timeout_s=0.2, env=env)
+    assert result["available"] is True and started == []
+    server = "query" if check is ollama.ensure_query_available else "shared"
+    expected = ollama._config(server, {**env, "OLLAMA_HOST": ollama.query_host(env)} if server == "query" else env)[0]
+    assert result["settings"] == expected and expected  # the settings a start would use (review F-3)
+
+
+def test_a_health_check_that_fails_states_the_settings_when_an_executable_is_found(no_start):
+    _, env = no_start
+    assert ollama.ensure_available(timeout_s=0.2, env=env)["settings"] == ollama._config("shared", env)[0]
+    without = {**env, "GOV_OLLAMA_BIN": env["GOV_OLLAMA_BIN"] + "-missing", "PATH": "/nowhere"}
+    assert "settings" not in ollama.ensure_available(timeout_s=0.2, env=without)  # W1-18's result
 
 
 @pytest.mark.parametrize("server", ["shared", "query"])
@@ -81,7 +92,8 @@ def _distance(left, right):
 @pytest.fixture()
 def project(tmp_path, monkeypatch):
     """A repository; the endpoint's stand-in reports the model on the device ``endpoint[host]`` names."""
-    endpoint = {"sent": [], "shared": "gpu", "query": "gpu"}
+    endpoint = {"sent": [], "shared": "gpu", "query": "gpu", "ps": []}  # ps: the next listings, "none" or "missing"
+    monkeypatch.setattr(semantic, "RETRY_WAITS_S", (0.0, 0.0))
     monkeypatch.setenv(ollama.QUERY_HOST_SETTING, "query:1")
     monkeypatch.setenv("GOV_VECTOR_CACHE_DIR", str(tmp_path / "machine-cache"))
 
@@ -90,6 +102,11 @@ def project(tmp_path, monkeypatch):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": PINNED}]}
         if path == "/api/ps":
+            step = endpoint["ps"].pop(0) if endpoint["ps"] and host != "query:1" else None
+            if step == "none":
+                return None  # the listing cannot be read (the server down for a moment)
+            if step == "missing":
+                return {"models": []}
             return {"models": [{"name": semantic.MODEL, "size": 4, "size_vram": 4 if device == "gpu" else 0}]}
         endpoint["sent"] += body["input"]
         return {"embeddings": [[float("pear" in text), float("plum" in text)] for text in body["input"]]}
@@ -116,6 +133,22 @@ def _stored(root):
         return connection.execute("SELECT count(*) FROM semantic_vector").fetchone()[0]
     finally:
         connection.close()
+
+
+@pytest.mark.parametrize("unread", [["none"], ["missing", "none"]])
+def test_a_device_that_cannot_be_read_for_a_moment_is_read_again_and_the_stage_is_built(project, unread):
+    root, endpoint = project
+    endpoint["ps"] = list(unread)
+    assert semantic.refresh(root)["available"] is True and _stored(root) == 2  # review F-2: a transient
+
+
+def test_a_device_that_cannot_be_read_at_any_try_fails_closed_named(project):
+    root, endpoint = project
+    endpoint["ps"] = ["none", "missing", "none"]  # every try: never assumed the GPU
+    report = semantic.refresh(root)
+    assert (report["available"], report["error"]) == (False, "EMBEDDER_DEVICE_UNREAD") and _stored(root) == 0
+    assert "CPU" not in report["reason"].split(":")[0]
+    assert vector_cache.Cache(semantic.MODEL, PINNED).get(["pear trees\n", "plum trees\n"]) == [None, None]
 
 
 def test_a_rebuild_on_the_cpu_stores_and_caches_nothing_and_is_named(project):

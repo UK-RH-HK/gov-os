@@ -199,6 +199,10 @@ def test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass(api, index
     texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
     assert sizes and max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts: {sizes}"
     assert len(sizes) == -(-len(texts) // RERANK_CAP), f"more rerank requests than the cap needs: {sizes}"
+    # The round-2 review's R2-F3: the merged set is cut into requests of 16, every one but the last full (two
+    # rerank passes of their own, one per route, would also pass a count of requests).
+    assert all(size == RERANK_CAP for size in sizes[:-1]) and sizes[-1] <= RERANK_CAP, \
+        f"the rerank requests are not the merged set cut into requests of {RERANK_CAP}: {sizes}"
     assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
     assert len(texts) == len(answer["hits"]), "the rerank was not over the merged set"
     assert found[0] == support.ZETA, f"the first result is not the one the reranker scored highest: {found}"

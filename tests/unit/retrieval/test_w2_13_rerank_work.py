@@ -1,8 +1,8 @@
 """Builder tests for the fused path's work once the lexical route gives its ranked list (W2-13; DEC-725, KPI success 3).
 
 Regression evidence only (DEC-136). The ranked route adds up to ``lexical.TOP_K`` chunks to the fusion, never to the
-reranker's work: one rerank call, at most ``RERANK_TOP`` candidates, each its path and at most ``RERANK_CHARS`` of
-its text (DEC-406), as before W2-13; and a question costs the lexical route two FTS5 queries at most, the exact
+reranker's work: one rerank (in requests of at most 16 texts, DEC-1067), at most ``RERANK_TOP`` candidates, each its
+path and at most ``RERANK_CHARS`` of its text (DEC-406), as before W2-13; and a question costs the lexical route two FTS5 queries at most, the exact
 phrase and the words. No wall-clock assertion: the work is counted.
 """
 from __future__ import annotations
@@ -61,9 +61,11 @@ def test_the_ranked_route_adds_no_rerank_work(root, monkeypatch):
     lexical_answer = lexical.search(root, "lantern keeper tide", refresh=False)
     assert len([entry for entry in lexical_answer["ranked"] if not entry["exact"]]) == lexical.TOP_K
     answer = fusion.search(root, "lantern keeper tide", limit=None, refresh=False, reranker=lambda: score)
-    assert len(calls) == 1 and len(calls[0]) == fusion.RERANK_TOP == len(answer["hits"])
+    # one rerank of at most RERANK_TOP, in requests of at most 16 texts (DEC-1067 (f))
+    assert all(len(texts) <= 16 for texts in calls)
+    assert sum(map(len, calls)) == fusion.RERANK_TOP == len(answer["hits"])
     assert set(answer["facets"]) == {"lexical", "semantic"} and any("lexical" in hit["routes"] for hit in answer["hits"])
-    for text in calls[0]:
+    for text in [text for texts in calls for text in texts]:
         head, _, body = text.partition("\n")
         assert head.startswith("[path: docs/") and len(body) <= fusion.RERANK_CHARS
 

@@ -44,7 +44,8 @@ def passes(monkeypatch):
 def test_only_the_first_30_fused_chunks_are_scored_and_returned(passes):
     seen, reranker = passes
     answer = fusion.search(Path("unused"), "a question", limit=None, reranker=reranker)
-    assert fusion.RERANK_TOP == 30 and len(seen) == 1 and len(seen[0]) == 30
+    # one rerank of the first 30, in requests of at most 16 texts (DEC-1067 (f))
+    assert fusion.RERANK_TOP == 30 and [len(texts) for texts in seen] == [16, 14]
     assert [hit["chunk_id"] for hit in answer["hits"]] == NAMES[29::-1]  # the reranker's order, of the first 30
     assert answer["reranked"] is True
     assert [hit["chunk_id"] for hit in fusion.search(Path("unused"), "a question", limit=2, reranker=reranker)["hits"]] \

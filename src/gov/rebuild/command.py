@@ -188,6 +188,9 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                         "status": "not_recreated",
                         "reason": sem.get("reason", "unknown"),
                     }
+                cut = sem.get("cut")  # W2-32 S7 (DEC-1067): the chunks the embedder's limit cut, named, never silent
+                if isinstance(cut, dict) and cut.get("count"):
+                    stores["semantic"]["cut"] = cut
             except Exception as exc:
                 stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
     note = none_embedded(config)

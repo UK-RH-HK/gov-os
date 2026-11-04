@@ -78,7 +78,8 @@ def test_a_case_without_a_part_names_it_and_writes_nothing(tmp_path, part):
     assert _files(tmp_path) == []
 
 
-@pytest.mark.parametrize("miss", [{"id": "H07"}, {"id": "H12", "part": "hidden"}, {"id": "q3", "part": "hidden"}])
+@pytest.mark.parametrize("miss", [{"id": "H07"}, {"id": "h07"}, {"id": "H12", "part": "hidden"},
+                                  {"id": "q3", "part": "hidden"}])  # h07: the measure's own form (review F-1)
 def test_a_hidden_miss_is_recorded_by_its_id_only(tmp_path, miss):
     """The CTO's ruling under S3: nothing of a hidden question is written into the repository, and no case."""
     event = learning.record(tmp_path, dict(miss))
@@ -92,7 +93,7 @@ def test_a_hidden_miss_is_recorded_by_its_id_only(tmp_path, miss):
 
 @pytest.mark.parametrize("extra", ["question", "expected", "observed", "root_cause", "repair", "regression",
                                    "gold_answer", "sources"])
-@pytest.mark.parametrize("marker", [{"id": "H07"}, {"id": "q3", "part": "hidden"}])
+@pytest.mark.parametrize("marker", [{"id": "H07"}, {"id": "h07"}, {"id": "q3", "part": "hidden"}])
 def test_a_hidden_miss_carrying_more_than_its_id_is_refused_and_nothing_is_written(tmp_path, extra, marker):
     miss = {**copy.deepcopy(MISS), **marker}
     miss.setdefault(extra, MISS["regression"].get(extra, "x"))

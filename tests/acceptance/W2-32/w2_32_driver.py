@@ -81,9 +81,46 @@ def calls_loader(path):
     return load
 
 
+def rank_score(text):
+    """The S8 stand-in's score of a text: its ``rankNN`` (0 without one), plus half a hash fraction of the text, so
+    no two texts tie and the ranks still decide (each fraction is under 1). Rewrite-Reason: the padded bound groups
+    requests by length (ties in the pool's order): with no ties, the unbatched order is the scores' alone."""
+    import re
+    found = [int(n) for n in re.findall(r"\brank(\d{2})\b", text)]
+    return float(max(found) if found else 0) + 0.5 * hashed_score(text)
+
+
+def ranks_loader(path):
+    """A reranker that keeps each request (one JSON line per call) and scores each text by ``rank_score`` (S8)."""
+    def load():
+        def score(query, texts):
+            with open(path, "a", encoding="utf-8") as out:
+                out.write(json.dumps(list(texts)) + "\n")
+            return [rank_score(text) for text in texts]
+        return score
+    return load
+
+
+def code_route_stand_in(spec):
+    """Replace the code route (the real code-graph tool cannot run in the launch sandbox): a question naming
+    ``spec["symbol"]`` gets the chunks of ``spec["paths"]``, in that order, as the route's hits; any other none."""
+    from gov.retrieval import code_route
+
+    def route(root, query, chunks, *args, **kwargs):
+        if spec["symbol"] not in query:
+            return None
+        hits = [chunk for path in spec["paths"] for chunk in sorted(
+            (c for c in chunks.values() if c["path"] == path), key=lambda c: c["start_line"])]
+        return hits, {"available": True, "reason": None}
+
+    code_route.route = route
+
+
 def reranker(spec):
     if spec is None:
         return None  # the default reranker
+    if spec.startswith("ranks:"):
+        return ranks_loader(spec.split(":", 1)[1])
     if spec.startswith("calls:"):
         return calls_loader(spec.split(":", 1)[1])
     if spec.startswith("record:"):
@@ -109,6 +146,8 @@ def run(call):
     if op == "manifest":
         from gov.retrieval import semantic
         return semantic.manifest(call["root"])
+    if call.get("code_route"):
+        code_route_stand_in(call["code_route"])
     if op == "retrieve":
         from gov.retrieval.retrieve import retrieve
         options = {key: call[key] for key in ("batch_size", "bundle_budget", "continuation", "radius") if key in call}
@@ -147,7 +186,8 @@ def main():
         out["result"] = run(call)
     except BaseException as error:  # reported, so a case can say what was raised
         out["raised"] = {"type": type(error).__name__, "types": [kind.__name__ for kind in type(error).__mro__],
-                         "message": str(error), "traceback": traceback.format_exc()}
+                         "message": str(error), "code": getattr(error, "code", None),
+                         "traceback": traceback.format_exc()}
     print(json.dumps(out, default=str))
 
 

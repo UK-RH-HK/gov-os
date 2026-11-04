@@ -1,32 +1,44 @@
-# Q03, rewritten by the owner's decision of 2026-11-03 (in the chat): lens B's Q03 asked for DEC-798's CPU-only rule,
-# which DEC-1033 replaced on 2026-11-02 (commit 75f18d1118c7), so it rewarded a replaced decision. Lens B's original
-# and its past scores are kept in ../retired/ (q03-lens-b.yaml, README.md); the measure never reads that folder.
-# The three sources state the same rule, so they are alternatives of one entry, as the original's were: the
-# register's DEC-1033 entry (the rule and why), semantic.py's docstring lines on the question's vector (the rule, its
-# reason, the chunks on the shared runner; query_vector and _device carry it out) and ollama.py's on the two daemons
-# (the query daemon started with the GPU visible; ensure_query_available carries it out). Category kept: the answer
-# is a decision.
+# Q03, re-labelled blind by the owner's DEC-1067 (c) form (2026-11-04; the CTO's order after W2-32's review, F-9), by
+# a session independent of the retrieval work: the label decided from the question, the gold answer and the
+# repository at the commit, never from a retrieval run or a measure record. The DEC-1033 label (68252f5c) is kept
+# unchanged in ../retired/ (q03-pre-dec1067.yaml, README.md), as lens B's original is (q03-lens-b.yaml); the measure
+# never reads that folder.
+# Why: the gold answer said a question's vector is used from whichever device computed it, CPU or GPU (DEC-1033 (2)
+# (b), "accepted from any device"). DEC-1065 (1) (2026-11-03, no CPU fallback for embeddings, anywhere), carried out
+# by W2-32 S10 and merged at b32e8504, makes the GPU the only device: a vector computed on the CPU is refused, never
+# cached or stored, and gov never starts an embedder for a search. So the answer was wrong today, and DEC-1033's
+# entry, which states "any device", is no longer gold. The question is kept: it is answerable as asked.
+# One entry of alternatives, the governing source first: DEC-1065's entry (the rule and why), W2-32's S10 KPI line
+# (the rule as the ticket states it), semantic.py's docstring lines on the question's vector (where, the GPU only,
+# the CPU's vector refused, the drift accepted and why) and ollama.py's on the two daemons (no CPU fallback, the
+# query daemon at its own host, the GPU the only device). Category kept: the answer is a decision.
 id: Q03
 category: decision
-commit: acfea6d9d4ef
+commit: b32e8504b8d3
 question: Where are query embeddings computed now, on which device, and why?
 gold_answer: >-
   By gov's own query embedder, the Ollama daemon at GOV_QUERY_OLLAMA_HOST (127.0.0.1:11435 by default), which embeds
-  the questions and nothing else; the shared runner at OLLAMA_HOST still builds the index. Since DEC-1033 (2026-11-02,
-  replacing DEC-798's CPU-only rule) that daemon is started with the GPU visible (no CUDA_VISIBLE_DEVICES=-1), and a
-  question's vector is used from whichever device computed it, CPU or GPU, provided the embedder reports the model
-  loaded after computing it and the vectors are well-formed; the query-vector cache keys by that device. Why: the
-  CPU-only rule dropped a question's vector unless the query server was wholly on the CPU (the W2-123 lead's finding,
-  so ACT-QUERY-GPU-1 was not applied) and the machine had no room for the fixes; the owner accepted the GPU's drift
-  (a vector that can depend on the prompt computed just before it, DEC-773) on the evidence that it changed no answer
-  of the standing memory measure.
+  the questions and nothing else; the shared runner at OLLAMA_HOST builds the index. On the GPU only: since DEC-1065
+  (1) (2026-11-03, no CPU fallback for embeddings, anywhere; W2-32 S10), which replaced DEC-1033's "any device", a
+  question's vector is used only when the embedder reports the model loaded on the GPU after computing it and the
+  vectors are well-formed; a vector computed on the CPU is refused (EMBEDDER_ON_CPU), never cached or stored, and the
+  query-vector cache keys by the device. gov never starts an embedder for a search: when the shared GPU embedders
+  cannot be reached (the launch sandbox included) the semantic part is reported unavailable (EMBEDDER_UNAVAILABLE)
+  and the search answers by keywords; only an explicit restart of the shared servers starts the query daemon, with
+  the GPU visible. Why: DEC-1033 (2026-11-02) had replaced DEC-798's CPU-only rule, which dropped a question's
+  vector unless the query server was wholly on the CPU, and the owner accepted the GPU's drift (a vector can depend
+  on the prompt computed just before it, DEC-773) on the evidence that it changed no answer of the standing memory
+  measure; DEC-1065 then ruled the CPU out, because a private CPU embedder skews the measures and loads the machine.
 sources:
   - - path: docs/DECISION_REGISTER.md
-      heading: "### DEC-1033 — EMERGENCY: everything stopped but the fixes; four emergency patches in parallel; DEC-798 replaced (standing until the owner lifts it)"
-      lines: [12838, 12845]
+      heading: "### DEC-1065 — No CPU fallback for embeddings; search respects role separation; the fusion as a gap if a single route beats it; the search's speed near the pin's (standing for 1 and 2)"
+      lines: [13145, 13148]
+    - path: .tickets/DAEO-0pyc.md
+      heading: "  - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'"
+      lines: [39, 39]
     - path: src/gov/retrieval/semantic.py
       heading: "- A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare"
       lines: [12, 18]
     - path: src/gov/retrieval/ollama.py
-      heading: "Two daemons are started so (DEC-261 as DEC-798 amends it and DEC-1033 replaces its"
-      lines: [8, 12]
+      heading: "**No CPU fallback (W2-32 S10, DEC-1065 (1), DEC-1031):** ``ensure_available`` and ``ensure_query_available``"
+      lines: [3, 17]
