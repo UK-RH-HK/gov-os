@@ -137,6 +137,75 @@ def test_an_invalid_policy_is_refused_and_search_does_not_raise(project):
     assert lexical.search(root, "walrusword") == lexical._unavailable("unreadable")
 
 
+EVAL, REPORT = "fixtures/evaluation/visible/q01.yaml", "docs/assessment/2026-10/B-memory-retrieval.md"
+
+
+def _rows(root: Path) -> dict:
+    connection = sqlite3.connect(root / ".gov-runtime/store.db")
+    try:
+        return {rel: indexed for rel, indexed in connection.execute("SELECT path, indexed FROM lexical_file")}
+    finally:
+        connection.close()
+
+
+def _judged_without_s6(root: Path, monkeypatch) -> None:
+    """The store as code without S6 leaves it: every file of the fixture's tree, whose map already says ``not
+    indexed``, judged with no policy, so the map's blob recorded is the current one (review S6-F1, probe 2)."""
+    real = lexical.kept_out
+    monkeypatch.setattr(lexical, "kept_out", lambda root, paths: {})
+    lexical.refresh(root)
+    monkeypatch.setattr(lexical, "kept_out", real)
+
+
+def test_a_store_judged_without_s6_is_put_right_by_one_refresh(project, monkeypatch):
+    """S6-F1: a stored ``(blob, 1)`` row with chunks under a ``not indexed`` namespace, the map's blob current."""
+    root, asked = project
+    _judged_without_s6(root, monkeypatch)
+    assert _rows(root)[EVAL] == 1 and _rows(root)[REPORT] == 1 and REPORT in _paths(root)
+    assert lexical.freshness(root)["status"] == "fresh", "the planted store is not the pre-S6 state"
+    calls = len(asked)
+    result = lexical.refresh(root)
+    assert asked[calls:] == [], "a file kept out was given to the filter, or an agreeing file was judged again"
+    assert result["indexed"] == []
+    assert result["kept_out"] == {"evaluation": [EVAL], "report": [REPORT]}
+    assert _rows(root)[EVAL] == _rows(root)[REPORT] == lexical.KEPT_OUT and REPORT not in _paths(root)
+    assert lexical.search(root, "quokkaword")["ranked"] == []
+    assert lexical.refresh(root)["kept_out"] == result["kept_out"] and len(asked) == calls, "it was judged again"
+
+
+def test_a_stored_kept_out_the_map_now_indexes_is_indexed_again(project, monkeypatch):
+    """The reverse: rows stored ``KEPT_OUT`` while the recorded map (current) no longer keeps them out."""
+    root, _ = project
+    lexical.refresh(root)  # the policy map: both kept out
+    real = lexical.kept_out
+    monkeypatch.setattr(lexical, "kept_out", lambda root, paths: {rel: "stale" for rel in paths
+                                                                  if rel in (EVAL, REPORT)})
+    _commit(root, {PATH_MAP: _path_map(None, "indexed")})
+    lexical.refresh(root)  # judged against the new map, with stale verdicts
+    assert _rows(root)[EVAL] == _rows(root)[REPORT] == lexical.KEPT_OUT
+    monkeypatch.setattr(lexical, "kept_out", real)
+    result = lexical.refresh(root)
+    assert sorted(result["indexed"]) == sorted([EVAL, REPORT]) and result["kept_out"] == {}
+    assert lexical.search(root, "quokkaword")["hits"][0]["path"] == REPORT
+
+
+def test_a_file_kept_out_for_another_reason_is_not_reindexed_by_the_rule(project, monkeypatch):
+    """A file the secrets filter refuses (a secret, a product memory class) and the map does not keep out agrees with
+    the policy: it is not asked again and stays out; one the map also keeps out becomes ``KEPT_OUT``, never indexed."""
+    root, asked = project
+    refused = {"docs/guide.md", EVAL}
+    monkeypatch.setattr(lexical, "indexable", lambda root, paths: asked.append(sorted(paths)) or
+                        [rel for rel in paths if rel not in refused])
+    _judged_without_s6(root, monkeypatch)
+    assert _rows(root)["docs/guide.md"] == 0 and _rows(root)[EVAL] == 0
+    calls = len(asked)
+    result = lexical.refresh(root)
+    assert asked[calls:] == [], "a file the filter refused, or one kept out, was given to the filter again"
+    assert _rows(root)["docs/guide.md"] == 0 and "docs/guide.md" not in _paths(root)
+    assert _rows(root)[EVAL] == lexical.KEPT_OUT and result["kept_out"]["evaluation"] == [EVAL]
+    assert result["indexed"] == []
+
+
 def _rebuild(root: Path, monkeypatch) -> dict:
     """``gov rebuild --no-embeddings`` with the real lexical stage; stand-ins for the record store and the code index."""
     import argparse

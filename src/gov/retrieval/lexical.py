@@ -243,8 +243,15 @@ def _drop(connection: sqlite3.Connection, rel: str) -> None:
         connection.execute(f"DELETE FROM {table} WHERE path = ?", (rel,))
 
 
-def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
-    """Bring the index up to date; the open store and the paths chunked in this call."""
+def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
+    """Bring the index up to date; the open store, the paths chunked in this call and the tracked paths the path map
+    keeps out (``kept_out``'s answer).
+
+    The policy is worked out over every tracked path on each refresh, and a path whose stored verdict disagrees with
+    it is judged again whatever its blob (review S6-F1): a store judged by code without S6, against a map that already
+    says ``not indexed``, holds such files at ``indexed = 1``, and the map's blob it recorded is the current one. A
+    stored ``KEPT_OUT`` the map no longer keeps out is judged again too; a file the filter refused (``indexed = 0``)
+    and the map does not keep out agrees, and is not."""
     current = _tracked(root)
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL)
@@ -255,8 +262,10 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
         connection.executescript(SCHEMA)
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
-        asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]]
-        kept = kept_out(root, asked) if asked else {}  # before the filter: a file kept out is neither scanned nor read
+        policy = kept_out(root, list(current)) if current else {}
+        asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]
+                 or (rel in policy) != (stored[rel][1] == KEPT_OUT)]
+        kept = {rel: policy[rel] for rel in asked if rel in policy}  # before the filter: neither scanned nor read
         judged = [rel for rel in asked if rel not in kept]
         allowed = set(indexable(root, judged)) if judged else set()
         indexed = []
@@ -281,7 +290,7 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
                     connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
                                        (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
-        return connection, indexed
+        return connection, indexed, policy
     except BaseException:
         connection.close()
         raise
@@ -294,13 +303,11 @@ def _empty(connection: sqlite3.Connection) -> bool:
 def refresh(root: Path) -> dict:
     """Bring the index up to date with the tracked files; its digest, the paths chunked in this call and every file
     the path map keeps out (``kept_out``: namespace -> its paths, sorted; empty when none is)."""
-    connection, indexed = _update(Path(root))
+    connection, indexed, policy = _update(Path(root))
     try:
-        held = [rel for (rel,) in connection.execute(
-            "SELECT path FROM lexical_file WHERE indexed = ? ORDER BY path", (KEPT_OUT,))]
         named: dict[str, list[str]] = {}
-        for rel, name in kept_out(root, held).items() if held else ():
-            named.setdefault(name, []).append(rel)
+        for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = ? ORDER BY path", (KEPT_OUT,)):
+            named.setdefault(policy[rel], []).append(rel)  # every KEPT_OUT row agrees with the policy after _update
         return {"digest": _digest(connection), "indexed": indexed, "kept_out": dict(sorted(named.items()))}
     finally:
         connection.close()
