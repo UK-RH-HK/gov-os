@@ -62,7 +62,7 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.config import models
-from gov.config.loader import KNOWN_FILES, PROJECT_DIR, REBUILD_FILE, embed_headers, load_config
+from gov.config.loader import KNOWN_FILES, PROJECT_DIR, embed_headers, load_config
 from gov.retrieval import chunking, learning, lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
@@ -587,7 +587,7 @@ def _status(root: Path) -> str | None:
     if status != "fresh":
         return status
     config = lexical._stamps(Path(root) / PROJECT_DIR / name  # what ``_wanted``, ``_pin`` and ``_recipe`` read
-                             for name in [*KNOWN_FILES, models.MODELS_FILE, REBUILD_FILE])
+                             for name in [*KNOWN_FILES, models.MODELS_FILE])  # rebuild.yaml among the known
     key, place = None if tree is None or config is None else (tree, config), Path(root).resolve()
     if key is None or _STATUS.get(place, (None,))[0] != key:
         _STATUS[place] = (key, _vectors(root))

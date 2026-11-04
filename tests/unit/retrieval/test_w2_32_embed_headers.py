@@ -141,6 +141,41 @@ def test_a_settings_file_that_is_not_a_map_is_refused(tmp_path):
     assert raised.value.code == "CONFIG_INVALID"
 
 
+@pytest.mark.parametrize("value", ["yes", "1", "'true'", "word", "null"])
+def test_the_config_loader_refuses_an_invalid_value_naming_the_key(tmp_path, value):
+    """The CTO's red on ``ff347bcd``: refused by the loader itself, as every other configuration key is (DEC-185)."""
+    _settings(tmp_path, f"slow_after_s: 60\nembed_headers: {value}\n")
+    with pytest.raises(GovError) as raised:
+        loader.load_config(tmp_path)
+    assert raised.value.code == "CONFIG_INVALID" and "embed_headers" in raised.value.message
+    assert raised.value.details == {"file": "governance/project/rebuild.yaml", "key": "embed_headers"}
+
+
+@pytest.mark.parametrize("text", ["embed_headers: true\nslow_after_s: 60\n", "embed_headers: false\n", "lock: /x\n",
+                                  "", "slow_after_s: [2\n", "- embed_headers\n"])
+def test_the_config_loader_leaves_the_file_s_other_faults_to_the_rebuild(tmp_path, text):
+    """Not YAML, not a map, or the rebuild's own keys: ``gov.rebuild.watch`` refuses those with REBUILD_FAILED (W2-76)."""
+    _settings(tmp_path, text)
+    loader.load_config(tmp_path)  # nothing raised
+
+
+@pytest.mark.parametrize("value", ["yes", "1", "'true'"])
+def test_gov_rebuild_fails_with_config_invalid_before_any_stage(tmp_path, monkeypatch, capsys, value):
+    import json
+
+    from gov.cli import main as cli
+    from gov.rebuild import watch
+    _settings(tmp_path, f"embed_headers: {value}\n")
+    sent = []
+    monkeypatch.setattr(semantic, "_ask", lambda *args, **kwargs: sent.append(args))
+    monkeypatch.setattr(watch, "settings", lambda root: pytest.fail("a stage's settings were read"))
+    code = cli.main(["rebuild", "--json", "--root", str(tmp_path)])
+    envelope = json.loads(capsys.readouterr().out.strip().splitlines()[-1])
+    assert code != 0 and envelope["ok"] is False and envelope["error"]["code"] == "CONFIG_INVALID"
+    assert envelope["error"]["details"]["key"] == "embed_headers"
+    assert sent == [] and not (tmp_path / STORE_REL).exists() and not (tmp_path / ".gov-runtime").exists()
+
+
 def test_this_repository_does_not_switch_it_on():
     assert loader.embed_headers(REPO) is False
 

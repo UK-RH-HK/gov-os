@@ -47,6 +47,7 @@ EMBEDDED = "embedded"
 REBUILD_FILE = "rebuild.yaml"
 EMBED_HEADERS = "embed_headers"
 EMBED_HEADERS_VALUES = ("true", "false")
+KNOWN_FILES[REBUILD_FILE] = {}  # loaded for ``embed_headers`` alone (``_rebuild_settings``); its schema is the rebuild's
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
@@ -278,6 +279,8 @@ def _load(root: Path, name: str, schema: dict):
     path = Path(root) / rel
     if not path.is_file():
         return None
+    if name == REBUILD_FILE:
+        return _rebuild_settings(path, rel)
     secrets = name == SECRETS_FILE
     document = read_yaml(path, "CONFIG_INVALID", rel, plain=secrets)
     if secrets and document is None:  # a file of comments alone holds no key: on
@@ -295,11 +298,39 @@ def load_config(root: Path) -> dict:
     return loaded
 
 
+def _check_embed_headers(written: dict, value: dict, rel: str) -> bool:
+    """``embed_headers`` of the settings as written (every scalar a string) and as read: false when absent, else
+    ``true`` or ``false`` exactly; any other value is CONFIG_INVALID naming the key."""
+    if EMBED_HEADERS not in written:
+        return False
+    if written[EMBED_HEADERS] not in EMBED_HEADERS_VALUES or not isinstance(value.get(EMBED_HEADERS), bool):
+        raise _invalid(rel, EMBED_HEADERS, f"must be true or false (absent: false), not {written[EMBED_HEADERS]!r}")
+    return value[EMBED_HEADERS]
+
+
+def _rebuild_settings(path: Path, rel: str) -> dict | None:
+    """``rebuild.yaml`` as ``load_config`` holds it, its ``embed_headers`` checked: an invalid value is CONFIG_INVALID
+    naming the key, so every command that loads the configuration (``gov rebuild`` among them) is refused before it
+    does anything (DEC-185). The file's other keys and faults (not YAML, not a map, ``slow_after_s``, ``lock``,
+    ``integration_store``) are the rebuild's own (``gov.rebuild.watch``, ``seed``: REBUILD_FAILED), so a file this
+    cannot read is held as none here."""
+    try:
+        written = read_yaml(path, "CONFIG_INVALID", rel, plain=True)
+        value = read_yaml(path, "CONFIG_INVALID", rel)
+    except GovError:
+        return None
+    if not isinstance(written, dict) or not isinstance(value, dict):
+        return None
+    _check_embed_headers(written, value, rel)
+    return value
+
+
 def embed_headers(root: Path) -> bool:
     """Whether each chunk is embedded with its contextual header (DEC-1067 order (5), index-time method 1): the key
     ``embed_headers`` of ``rebuild.yaml``, written ``true`` or ``false``. The file, the key or a file of comments
     alone absent: false. Any other value (``yes``, ``on``, ``True``, a quoted ``"true"``, none) is CONFIG_INVALID
-    naming the key, never read as either; a file that is not a map is CONFIG_INVALID too. Reads no other key."""
+    naming the key, never read as either (``load_config`` refuses it the same way); a file that is not a map is
+    CONFIG_INVALID here too. Reads no other key."""
     rel = f"{PROJECT_DIR}/{REBUILD_FILE}"
     path = Path(root) / rel
     if not path.is_file():
@@ -309,12 +340,7 @@ def embed_headers(root: Path) -> bool:
         return False
     if not isinstance(written, dict):
         raise _invalid(rel, None, "the top level must be a map")
-    if EMBED_HEADERS not in written:
-        return False
-    value = (read_yaml(path, "CONFIG_INVALID", rel) or {}).get(EMBED_HEADERS)
-    if written[EMBED_HEADERS] not in EMBED_HEADERS_VALUES or not isinstance(value, bool):
-        raise _invalid(rel, EMBED_HEADERS, f"must be true or false (absent: false), not {written[EMBED_HEADERS]!r}")
-    return value
+    return _check_embed_headers(written, read_yaml(path, "CONFIG_INVALID", rel) or {}, rel)
 
 
 def secrets_scan_on(root: Path) -> bool:
