@@ -285,3 +285,75 @@ def test_m4_on_plain_words_find_a_snake_case_or_camel_case_identifier_and_the_ex
     assert lexical.search(root, "rerank service", refresh=False)["ranked"][0]["path"] == "src/ops.py"
     assert lexical.search(root, "harbour watch", refresh=False)["ranked"][0]["path"] == "src/ops.py"
     assert lexical.search(root, "open_rerank_service", refresh=False)["hits"] == off_exact  # the exact route as before
+
+
+# --- M5 re-scoped (P-W2-32-11): fenced blocks are no headings; a long entry split at its own boundaries -----------
+
+FENCED = ("### DEC-010 — A decision with an example\n"
+          "- **Decision:** the example below shows a file of headings.\n"
+          "```markdown\n# Not a heading\n## Nor this\n### DEC-999 — nor this\n```\n"
+          "- **Basis:** the example stays inside its entry.\n")
+LONG = "### DEC-011 — A long decision\n" + "".join(
+    f"- Item {n}: " + "the harbour's tide almanac and its keepers, " * 8 + "\n" for n in range(40))
+HUGE_ITEM = "### DEC-012 — One item above the limit\n- One item:\n" + "".join(
+    f"  continued line {n} of the one long item, about the tide almanac's keepers.\n" for n in range(160))
+REG2 = "# Register\n\n" + FENCED + LONG + HUGE_ITEM + "## Versions\n\nA table row.\n"
+
+
+def _m5(text=REG2):
+    return chunking.chunk_file("docs/REG.md", "b", text, {"chunk_register_by_entry": True}, register="docs/REG.md")
+
+
+def test_m5_a_fenced_block_inside_an_entry_is_no_heading_and_the_entry_is_one_chunk():
+    lines = REG2.splitlines()
+    a = lines.index(FENCED.splitlines()[0]) + 1
+    b = a + len(FENCED.splitlines()) - 1
+    parents, chunks = _m5()
+    assert (a, b) in [(f, l) for _, _, f, l, _, _ in chunks]  # the whole entry, its fenced example inside
+    assert ("section", a, b) in [(kind, f, l) for _, _, kind, f, l in parents]
+    today = [(f, l) for _, _, f, l, _, _ in chunking.chunk_file("docs/REG.md", "b", REG2)[1]]
+    assert (a, b) not in today  # today the fenced "#" lines cut it
+
+
+def test_m5_a_long_entry_is_split_at_its_own_items_each_part_within_the_limit():
+    lines = REG2.splitlines(keepends=True)
+    a = [l.rstrip("\n") for l in lines].index(LONG.splitlines()[0]) + 1
+    b = a + len(LONG.splitlines()) - 1
+    assert len("".join(lines[a - 1:b])) > chunking.REGISTER_ENTRY_CHARS
+    parts = [(f, l) for _, _, f, l, _, _ in _m5()[1] if a <= f <= b]
+    assert len(parts) > 1 and parts[0][0] == a and parts[-1][1] == b
+    assert all(f2 == l1 + 1 for (_, l1), (f2, _) in zip(parts, parts[1:]))  # no overlap, no gap
+    assert all(lines[f - 1].startswith("- ") for f, _ in parts[1:])  # each later part begins at an item
+    assert all(len("".join(lines[f - 1:l])) <= chunking.REGISTER_ENTRY_CHARS for f, l in parts)
+
+
+def test_m5_one_item_above_the_limit_is_cut_by_lines_and_no_part_crosses_two_entries():
+    lines = REG2.splitlines(keepends=True)
+    outside = chunking._unfenced([l.rstrip("\n") for l in lines])  # a fenced "#" line is no heading
+    heads = [n for n, l in enumerate(lines, 1) if outside[n - 1] and (l.startswith("### DEC-") or l.startswith("## "))]
+    a = [l.rstrip("\n") for l in lines].index(HUGE_ITEM.splitlines()[0]) + 1
+    b = a + len(HUGE_ITEM.splitlines()) - 1
+    parts = [(f, l) for _, _, f, l, _, _ in _m5()[1] if a <= f <= b]
+    assert len(parts) > 1 and all(len("".join(lines[f - 1:l])) <= chunking.REGISTER_ENTRY_CHARS for f, l in parts)
+    for _, _, f, l, _, _ in _m5()[1]:
+        assert len([h for h in heads if f < h <= l]) == 0  # never across a heading of the register
+
+
+def test_m5_off_or_another_file_is_today_s():
+    assert chunking.chunk_file("docs/REG.md", "b", REG2) == \
+        chunking.chunk_file("docs/REG.md", "b", REG2, {"chunk_register_by_entry": False}, register="docs/REG.md")
+    assert chunking.chunk_file("docs/other.md", "b", REG2, {"chunk_register_by_entry": True}, register="docs/REG.md") \
+        == chunking.chunk_file("docs/other.md", "b", REG2)
+
+
+def test_m5_switched_the_next_build_follows_the_new_form(register):
+    root = register
+    (root / "docs/REG.md").write_text(REG2, encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "register two")
+    lexical.refresh(root)
+    _settings(root, chunk_register_by_entry=True)
+    assert lexical.freshness(root) == {"status": "stale", "stale": ["docs/REG.md"]}
+    lexical.refresh(root)
+    expected = [(f, l) for _, _, f, l, _, _ in _m5()[1]]
+    assert _spans(root, "docs/REG.md") == sorted(expected)

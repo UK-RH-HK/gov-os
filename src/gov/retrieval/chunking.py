@@ -31,6 +31,69 @@ READ_CHARS = 32768
 # ``semantic.EMBED_LIMIT_CHARS``, so an entry is embedded whole); a longer entry is split within it at this size.
 REGISTER_ENTRY_CHARS = 10_000
 _ENTRY = re.compile(r"### DEC-")
+_FENCE = re.compile(r"\s*(```|~~~)")
+_TOP_HEADING = re.compile(r"#{1,3}\s")  # a register section: an entry ends at the next heading of level 1 to 3
+_INNER = re.compile(r"(?:[-*+]|\d+[.)])\s|#{4,6}\s")  # an entry's own boundaries: a top-level item, a sub-heading
+
+
+def _unfenced(lines: list[str]) -> list[bool]:
+    """For each line, whether it stands outside a fenced block (``` or ~~~): a ``#`` line inside one is no heading."""
+    out, fence = [], None
+    for line in lines:
+        mark = _FENCE.match(line)
+        if fence is None:
+            out.append(not mark)
+            if mark:
+                fence = mark.group(1)
+        else:
+            out.append(False)
+            if mark and mark.group(1) == fence:
+                fence = None
+    return out
+
+
+def register_sections(text: str) -> list[tuple[str, int, int, list[tuple[int, int]]]]:
+    """The decision register's parents under M5: its sections at the headings of level 1 to 3 outside fenced blocks,
+    so an entry runs from its ``### DEC-`` line to the next such heading and a fenced ``#`` line does not cut it."""
+    lines = text.splitlines()
+    if not lines:
+        return []
+    outside = _unfenced(lines)
+    starts = sorted({1} | {n for n, line in enumerate(lines, 1) if outside[n - 1] and _TOP_HEADING.match(line)})
+    ends = [s - 1 for s in starts[1:]] + [len(lines)]
+    return [("section", start, end, [(start, end)]) for start, end in zip(starts, ends)]
+
+
+def entry_parts(lines: list[str], first: int, last: int) -> list[tuple[int, int]]:
+    """An entry's lines ``first`` to ``last`` (1-based) as its chunks: the whole entry when it holds at most
+    ``REGISTER_ENTRY_CHARS`` characters; else parts cut at its own boundaries (a top-level list item, a sub-heading,
+    outside fenced blocks), packed in order, each at most the limit, no overlap; a piece still above the limit is cut
+    by lines at that size."""
+    body = lines[first - 1:last]
+    if sum(map(len, body)) <= REGISTER_ENTRY_CHARS:
+        return [(first, last)]
+    outside = _unfenced(body)
+    cuts = [first] + [first + i for i, line in enumerate(body) if i and outside[i] and _INNER.match(line)]
+    pieces = [(a, b - 1) for a, b in zip(cuts, cuts[1:] + [last + 1])]
+    parts, start, size = [], None, 0
+    for a, b in pieces:
+        chars = sum(len(line) for line in lines[a - 1:b])
+        if chars > REGISTER_ENTRY_CHARS:  # one piece above the limit: by lines, at the limit
+            if start is not None:
+                parts.append((start, a - 1))
+                start, size = None, 0
+            parts += [(a + f - 1, a + l - 1) for f, l, _ in
+                      chunk_text("".join(lines[a - 1:b]), max_chars=REGISTER_ENTRY_CHARS, overlap_chars=0)]
+            continue
+        if start is not None and size + chars > REGISTER_ENTRY_CHARS:
+            parts.append((start, a - 1))
+            start, size = None, 0
+        if start is None:
+            start = a
+        size += chars
+    if start is not None:
+        parts.append((start, last))
+    return parts
 _HEADING = re.compile(r"#{1,6}\s")
 
 
@@ -178,23 +241,28 @@ def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None, regi
     ``recipe`` holds DEC-1068's index-time methods that are on (absent or all off: today's chunks, byte for byte).
     ``chunk_code_by_definition`` (M2): a Python file's runs are also cut at each top-level def/class and method
     (``definitions``), so no chunk holds the start of two definitions; the parents are kept as they are.
-    ``chunk_register_by_entry`` (M5): in the decision register (``register``, the path map's ``decision_register``),
-    each ``### DEC-`` entry's section is one chunk up to ``REGISTER_ENTRY_CHARS``, a longer one split within it at
-    that size; the register's other sections and every other file as before; the parents kept.
+    ``chunk_register_by_entry`` (M5, P-W2-32-11): in the decision register (``register``, the path map's
+    ``decision_register``), the parents are ``register_sections`` (headings outside fenced blocks), and each
+    ``### DEC-`` entry is one chunk up to ``REGISTER_ENTRY_CHARS``, a longer one split at its own boundaries
+    (``entry_parts``), never across two entries; the register's other sections are chunked as before; every other
+    file as before.
     """
     recipe = recipe or {}
     lines = text.splitlines(keepends=True)
     starts = definitions(text) if recipe.get("chunk_code_by_definition") and path.endswith(".py") else []
     by_entry = bool(recipe.get("chunk_register_by_entry")) and register is not None and path == register
     parent_rows, chunk_rows = [], []
-    for kind, start, end, runs in parents(path, text):
+    for kind, start, end, runs in (register_sections(text) if by_entry else parents(path, text)):
         runs = cut_at(runs, starts) if starts else runs
-        entry = by_entry and kind == "section" and bool(_ENTRY.match(lines[start - 1]))
-        size = REGISTER_ENTRY_CHARS if entry else MAX_CHARS
         parent_id = make_id("parent", path, blob, kind, start, end)
         parent_rows.append((parent_id, path, kind, start, end))
+        if by_entry and _ENTRY.match(lines[start - 1]):  # an entry: one chunk, or its parts at its own boundaries
+            for first, last in entry_parts(lines, start, end):
+                chunk = "".join(lines[first - 1:last])
+                chunk_rows.append((make_id("chunk", path, blob, first, last), path, first, last, parent_id, chunk))
+            continue
         for run_start, run_end in runs:
-            for first, last, chunk in chunk_text("".join(lines[run_start - 1:run_end]), max_chars=size):
+            for first, last, chunk in chunk_text("".join(lines[run_start - 1:run_end])):
                 first, last = first + run_start - 1, last + run_start - 1
                 chunk_rows.append((make_id("chunk", path, blob, first, last), path, first, last, parent_id, chunk))
     return parent_rows, chunk_rows
