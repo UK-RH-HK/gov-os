@@ -1,9 +1,12 @@
 # A rubric for a good memory-measure question (DEC-1068, the audit of the 48 questions, step 1)
 
-- **Status:** DRAFT for the owner. Nothing in the set changes until the owner decides (DEC-1068 (3)).
-- **Written by:** a session independent of the retrieval work, 2026-11-04, at `w2/integrate` `8284fb408bd4`.
+- **Status:** version 2, under DEC-1069: R5's thresholds as the owner decided them (item 5), W2-61h's category quotas
+  amended to fit (item 5), R1.3's test-harness rule (item 7) and the new item R11 (item 6). Version 1 was the
+  DEC-1068 draft (`26b7edb7`).
+- **Written by:** a session independent of the retrieval work, 2026-11-04, at `w2/integrate` `8284fb408bd4`
+  (version 1) and `cc9c94d42a54` (version 2).
 - **Drawn from:** W2-61's KPIs and failure lines (`.tickets/DAEO-iw1f.md`), W2-61h's KPIs and failure lines
-  (`.tickets/DAEO-h2k3.md`), DEC-1009, DEC-1060, DEC-1067 (c), DEC-1068 (the audit), the path map
+  (`.tickets/DAEO-h2k3.md`), DEC-1009, DEC-1060, DEC-1067 (c), DEC-1068 (the audit), DEC-1069 (version 2), the path map
   (`governance/project/path-map.yaml`, D-7's M-4 split), the measure's question form and matching rule
   (`src/gov/retrieval/measure.py`, docstring), the context packet's precedence (`src/gov/context/__init__.py`,
   `PRECEDENCE`), the path map's `retrieval_authority` tiers, the kernel skills, the role files and the briefs.
@@ -44,13 +47,19 @@ KPI 3 and failure line 4 (the governing source, never lens B's report), W2-61h K
    replaces. Read the entry's status line and search the register for later entries that name it.
 3. Every alternative is the governing source, a faithful restatement of it (a generated Contract record, a ticket
    KPI line or brief line restating it) or, for a code fact, the code. None is in the `reports` tier
-   (`tests/**`, `docs/assessment/**`, `docs/audit/**`, `docs/probes/**`).
+   (`tests/**`, `docs/assessment/**`, `docs/audit/**`, `docs/probes/**`). **Test-harness code is never the
+   governing source for a code fact** (DEC-1069 (7)), except for a question about the test harness itself (for
+   example "what does the shared acceptance fixture build?"). Test-harness code is the code that exists to run
+   tests: everything under `tests/**` (test files, `conftest.py`, helpers, fixture builders) and the fixtures under
+   `fixtures/**`. The product's own code that runs tests for a user (for example `gov close`'s selection or its
+   pytest plugin under `src/`) is product code, not test harness.
 4. Every factual claim of `gold_answer` holds at the head: names, values, counts, lists, file names. A line number or
    a count in the gold answer is a claim unless the answer itself says "as of <commit>"; a comment above the YAML
    does not count.
 5. A supersession question names the superseded record as the naive answer, never as gold.
 
-**Codes:** `R1-SUPERSEDED`, `R1-NOT-GOVERNING` (a PROPOSED entry or a report as gold), `R1-WRONG` (the substance is
+**Codes:** `R1-SUPERSEDED`, `R1-NOT-GOVERNING` (a PROPOSED entry, a report, or test-harness code for a code fact,
+as gold), `R1-WRONG` (the substance is
 false today: major), `R1-INCOMPLETE` (the head adds a case the answer omits), `R1-DETAIL` (a stale line number, file
 name or similar detail: minor).
 
@@ -124,19 +133,49 @@ discovery skill (`gov retrieve` before an experiment or a decision package), the
 *Source:* DEC-1068 (the audit, item (1)); W2-61h KPI 3 (the 28 new questions' category quotas, DEC-954 Q9c);
 the retrieval skill (failure and lesson records come ahead: CAP-14).
 
-**Pass test** (thresholds proposed by this draft; the owner may set others):
+**Pass test.** The thresholds in items 2 and 3 are the owner's (DEC-1069 (5)); items 4 to 6 restate W2-61h's KPI 3
+as DEC-1069 amends it.
 1. Give each question its **governing domain**: the domain of the governing source of its main entry: code
    (`src/**`, the kernel hooks), decisions (the register), tickets (`.tickets/**`), the plan (`docs/plan/**`), the
-   Contract and Charter (`docs/contract/**`, `docs/charter/**`). Count also the kernel template (roles, skills,
-   hooks) and failure or lesson memory (`docs/lessons/**`, failure records) as cross-cutting tags.
-2. On each half and on the 48: each of the five domains governs at least 10 % of the questions (3 of 24, 5 of 48);
-   the kernel template is in at least 2 per half; failure or lesson memory in at least 1 per half.
-3. No one subsystem (for example retrieval and the context packet, the guard, the close, checkpoints, rebuild) is the
-   subject of more than 25 % of a half.
+   Contract and Charter (`docs/contract/**`, `docs/charter/**`). A question governed elsewhere (a lesson under
+   `docs/lessons/**`, a role file or a skill) counts in none of the five; it counts in the tags. The tags, which cut
+   across the domains, are the kernel template (roles, skills, hooks) and failure or lesson memory
+   (`docs/lessons/**`, failure records).
+2. **Each governing domain at least 10 % of each half** (4 of a 40-question half; 3 of the old 24) and of the whole
+   set.
+3. **No subsystem above 25 % of a half** (at most 10 of 40): retrieval and the context packet, the guard, the close
+   and the nightly, checkpoints and resume, rebuild and the secrets scan, launch and the sandbox, releases and
+   install. Count a question for the subsystem its asked fact is about, not for where its source sits.
 4. At least 2 per half are supersession questions whose naive answer is superseded (W2-61h KPI 3).
-5. For the 28 new questions, W2-61h KPI 3's category quotas hold, read from each question's `category`.
+5. At least 2 per half are on the kernel's roles or skills, and at least 3 per half on failure or lesson memory,
+   each citing a lesson or failure record (the CTO's brief under DEC-1069 for the visible 40; the same for the
+   hidden 40).
+6. **The category quotas for a 40-question half in W2-61h's form** (DEC-1069 (5): W2-61h KPI 3's quotas amended to
+   fit items 2 to 5). Each question has one `category`; the counts below sum to 40.
 
-**Codes:** `R5-DOMAIN-THIN` (name the domain), `R5-TOPIC-HEAVY` (name the subsystem), `R5-QUOTA`.
+   | Category | `category` value | At least |
+   |---|---|---|
+   | Decisions and supersession (at least 2 with a superseded naive answer) | `decision` | 6 |
+   | The Contract and the Charter | `contract` | 4 |
+   | The plan | `plan` | 4 |
+   | Tickets and the path map | `ticket` | 4 |
+   | Exact strings and identifiers, with file and line | `exact-string` | 4 |
+   | Callers, callees and definitions | `callers` | 4 |
+   | Code facts by paraphrase | `code-paraphrase` | 3 |
+   | The kernel template (at least 2 of them roles or skills) | `kernel-template` | 3 |
+   | Multi-file, stacked (each needing two or more files) | `multi-file` | 3 |
+   | Failure and lesson memory | `failure-memory` | 3 |
+   | History | `history` | 1 |
+   | An id that exists nowhere (scored under R3 item 5) | `nonexistent-id` | 1 |
+
+   The quotas apply in full to a half written wholly in this form (the hidden half: W2-61h's 24 plus the 16 new
+   ones, the new ones filling what the 24 lack). The visible half also holds lens B's 20 in lens B's own categories
+   (`decision`, `ticket`, `ownership`, `callers`, `code location`, `policy`). There, items 2 to 5 decide, and the
+   category counts are reported under this table's names, with each lens B question put under the category its
+   asked fact fits.
+
+**Codes:** `R5-DOMAIN-THIN` (name the domain), `R5-TOPIC-HEAVY` (name the subsystem), `R5-TAG-THIN` (name the tag),
+`R5-QUOTA` (name the category).
 
 ### R6 Every gold source holds its answer at the head (added: W2-61h KPI 4, its failure line 3; the measure's rule)
 
@@ -149,6 +188,8 @@ read it.
    which would count a hit on text that does not hold the answer.
 4. Advisory, not a fail: a lines-only anchor where a unique line exists to anchor on (it breaks silently on the next
    edit above it); a non-unique heading line that resolves to its first occurrence.
+5. A re-anchor the measure script makes by itself writes a reason line (DEC-1069 (6)). Judge the re-anchored span
+   by items 1 to 3, as for a hand-made one.
 
 **Codes:** `R6-NOT-FOUND`, `R6-NO-ANSWER` (the span holds none of it), `R6-SPAN-MISSES`, `R6-SPAN-OVERRUNS`,
 `R6-LINES-ONLY` (advisory).
@@ -188,18 +229,48 @@ marked FAIL.
 
 **Pass test:**
 1. The `category` matches the governing domain or W2-61h's category list (the stratified draw and R5 read it).
-2. The file has `question`, `gold_answer`, `sources`, `commit`, and an `id` in the set's form.
+2. The file has `question`, `gold_answer`, `sources` and `commit`, and an `id` or a file name that gives one (the
+   measure's default is the file name without `.yaml`).
 3. Every label change since the set was fixed names the decision or order under which it was made, says why, was
    decided blind (from the question, the gold answer and the repository, never a run), and keeps the old label in
    `retired/`. A re-anchor (same fact, new span) needs the reason and the git history only.
 
 **Codes:** `R10-CATEGORY`, `R10-FORM`, `R10-RECORD`.
 
+### R11 Stable under ordinary work (added: DEC-1069 (6))
+
+*Source:* DEC-1069 (6): no question whose answer changes with ordinary work unless its gold is computed from the
+repository at the measured head. Ordinary work means filing, claiming, closing or re-scoping tickets, adding
+decisions, list rows, lessons or parking entries, and editing code without changing what the asked fact is about.
+
+**Pass test:**
+1. Ask: would the gold answer or the set of gold sources change if ordinary work went on for a week, with no new
+   decision about the asked fact? Questions that fail:
+   - counts or lists that grow: the dependents of a ticket, the tickets of a track, the entries of a list, the rows
+     of a ticket, the callers of a function in a part of the code that is still being built;
+   - states that move: a ticket's `status`, an open ticket's `depends_on` or `allowed_paths`, "the latest" or
+     "the current" anything, a figure of a running measure;
+   - "now" or "today", unless the answer is a rule that holds until a decision changes it (a supersession question
+     passes: its answer changes only by a decision, and R1 catches that change).
+2. Line numbers do not fail R11: R6 judges anchors, and the gold answer carries no line numbers (R1 item 4).
+3. **A question that fails item 1 passes only when it is marked as computed.** The proposed form, not yet read by
+   the measure (it ignores unknown fields): `computed: true` and a `compute:` map naming the repository query the
+   gold comes from, for example `{kind: ticket-field-contains, field: depends_on, value: DAEO-ym8a}`. Its
+   `sources` and its count are then produced from the measured root at the measure's start, written to the run's
+   record with a reason line, and never kept by hand. The `gold_answer` states the rule ("every ticket whose
+   `depends_on` lists W2-03"), not the members. Until the measure computes such questions, a marked question is
+   reported apart and not scored, and an unmarked one fails R11.
+4. A closed ticket's front matter, a decision entry, a lesson, the plan's rules and the code's settled behaviour pass:
+   they change only by a decision or a ticket that is about them.
+
+**Codes:** `R11-GROWS` (a count or a list), `R11-MOVES` (a state), `R11-UNMARKED` (it would pass if marked as
+computed).
+
 ## 3. Applying it to the hidden half (W2-61h's role, DEC-1068 (2))
 
 1. Read-only, in the sets root (`~/gov-os-eval/.../hidden/`), by W2-61h's role only, under the hidden-half rule:
    no question, gold answer or source path is written, quoted or returned.
-2. Apply R1 to R10 exactly as above, at the head of `w2/integrate`, with the path map there.
+2. Apply R1 to R11 exactly as above, at the head of `w2/integrate`, with the path map there.
 3. **Report per question:** its id, each item PASS or FAIL, the reason code, and a reason in general terms (for
    example "R6-SPAN-MISSES: the anchor's span ends before the deciding line"; never the line, the file or the fact).
 4. **Report for the half:** R2's two counts (any keyword-only, all keyword-only) and, for those, the keyword-only
@@ -211,6 +282,8 @@ marked FAIL.
 
 ## 4. What this rubric does not decide
 
-- It sets no threshold the owner has not approved: R5's numbers are proposals.
+- It sets no threshold the owner has not approved. R5's domain and subsystem thresholds are the owner's (DEC-1069
+  (5)); its category table is DEC-1069 (5)'s amendment of W2-61h's quotas, stated here for a 40-question half; R11's
+  `computed` form is a proposal until the measure reads it.
 - It never judges a question by its score. A question retrieval misses is not wrong for that; a question it hits is
   not right for that.
