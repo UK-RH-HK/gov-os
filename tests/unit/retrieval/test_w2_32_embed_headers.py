@@ -294,6 +294,27 @@ def test_switching_the_setting_marks_the_store_stale_and_the_next_build_re_embed
     assert semantic.search(root, "kiln", refresh=False)["available"] is True
 
 
+def test_the_parents_query_bound_to_the_file_gives_the_same_rows_through_the_path_index(project):
+    """Review F2: ``_PARENTS`` binds the chunk's path too, so SQLite plans it through ``lexical_chunk_by_path`` and
+    not as a scan of the whole keyword table per file; a chunk lies in its parent's file, so the rows are the same."""
+    root, _ = project
+    semantic.refresh(root)
+    unbound = semantic._Texts._PARENTS.replace(" AND c.path = ?", "")
+    assert unbound != semantic._Texts._PARENTS
+    connection = sqlite3.connect(root / STORE_REL)
+    try:
+        paths = [path for (path,) in connection.execute("SELECT DISTINCT path FROM lexical_parent ORDER BY path")]
+        assert {"open/notes.md", "open/tool.py", "open/plain.txt"} <= set(paths)
+        for path in paths:
+            bound = sorted(connection.execute(semantic._Texts._PARENTS, (path, path)))
+            assert bound == sorted(connection.execute(unbound, (path,))) and bound
+        plan = " ".join(str(row) for row in connection.execute(
+            "EXPLAIN QUERY PLAN " + semantic._Texts._PARENTS, ("open/notes.md", "open/notes.md")))
+        assert "lexical_chunk_by_path" in plan, plan
+    finally:
+        connection.close()
+
+
 def test_a_store_built_before_the_recipe_was_recorded_is_fresh_with_the_setting_off(project):
     root, endpoint = project
     semantic.refresh(root)

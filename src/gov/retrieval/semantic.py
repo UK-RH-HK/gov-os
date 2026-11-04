@@ -189,7 +189,8 @@ class _Texts:
 
     _PARENTS = "SELECT p.parent_id, p.kind, p.start_line, f.text FROM lexical_parent p JOIN lexical_chunk c " \
                "ON c.parent_id = p.parent_id AND c.start_line = p.start_line JOIN lexical_fts f ON f.rowid = c.id " \
-               "WHERE p.path = ?"
+               "WHERE p.path = ? AND c.path = ?"  # the chunk's path bound too: planned through lexical_chunk_by_path,
+    # not a scan of the whole keyword table per file (review F2; the same rows, as a chunk lies in its parent's file)
     _CHUNK = "SELECT c.path, c.parent_id, f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id " \
              "WHERE c.chunk_id = ?"
 
@@ -201,7 +202,7 @@ class _Texts:
             return ""
         if path not in self._by_path:
             firsts = [(parent, kind, start, (text.splitlines() or [""])[0])
-                      for parent, kind, start, text in self.connection.execute(self._PARENTS, (path,))]
+                      for parent, kind, start, text in self.connection.execute(self._PARENTS, (path, path))]
             self._by_path = {path: chunking.headers(path, firsts)}  # one file at a time: chunks come in path order
         return self._by_path[path].get(parent_id) or chunking.header(path)
 
