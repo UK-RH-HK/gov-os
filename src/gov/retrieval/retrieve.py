@@ -101,11 +101,12 @@ def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
 
 
-def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=()):
-    """The stateless token of the next call; ``x`` carries the parents already expanded (W2-32 S7), so a later call
-    never sends one of their spans again."""
+def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=(), alone=()):
+    """The stateless token of the next call; ``x`` carries the parents already expanded and ``c`` the spans already
+    sent as a child on its own (``[path, first, last]``), so a later call sends neither again (W2-32 S7, DEC-1067)."""
     payload = json.dumps({"q": query, "i": sorted(ids), "t": ticket, "r": radius,
-                          "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded)},
+                          "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded),
+                          "c": sorted([list(item) for item in alone])},
                          separators=(",", ":"), sort_keys=True)
     return base64.urlsafe_b64encode(payload.encode()).decode()
 
@@ -118,8 +119,31 @@ def _expanded_of(payload: dict) -> set[str]:
     return set(named)
 
 
-def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None):
-    """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added."""
+def _alone_of(payload: dict) -> set[tuple[str, int, int]]:
+    """The spans the earlier calls sent as a child on its own (``c``); none for a token made before DEC-1067."""
+    named = payload.get("c", [])
+    if not isinstance(named, list) or not all(
+            isinstance(item, list) and len(item) == 3 and isinstance(item[0], str)
+            and all(isinstance(n, int) and not isinstance(n, bool) for n in item[1:]) for item in named):
+        raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    return {(path, first, last) for path, first, last in named}
+
+
+def _without(first: int, last: int, sent: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """The runs of lines ``first`` to ``last`` that none of the ``sent`` spans holds, in order."""
+    runs, at = [], first
+    for start, end in sorted(sent):
+        if start > at:
+            runs.append((at, min(start - 1, last)))
+        at = max(at, end + 1)
+    if at <= last:
+        runs.append((at, last))
+    return [(a, b) for a, b in runs if a <= b]
+
+
+def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None):
+    """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added, and
+    with ``alone`` (a set), the spans they sent as a child on its own."""
     try:
         payload = json.loads(base64.urlsafe_b64decode(token))
     except Exception:
@@ -134,6 +158,8 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
         raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
     if expanded is not None:
         expanded |= _expanded_of(payload)
+    if alone is not None:
+        alone |= _alone_of(payload)
     return offset
 
 
@@ -156,10 +182,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         batch_size = DEFAULT_BATCH_SIZE
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
 
-    offset, earlier = 0, set()  # earlier: the parents the earlier calls expanded (W2-32 S7)
+    offset, earlier, alone = 0, set(), set()  # the parents the earlier calls expanded, the children they sent alone
     if continuation is not None:
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget,
-                                      earlier)
+                                      earlier, alone)
+    sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
     root = Path(root)
@@ -313,21 +340,36 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     ranked = [candidate for candidate in ranked if candidate["parent_id"] not in earlier]
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
     evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
+
+    def item(candidate, rel, first, last, body):
+        return {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
+                "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
+                "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
+
     for candidate in ranked:
         rel, first, last, body = candidate["path"], candidate["start_line"], candidate["end_line"], candidate["body"]
         parent = lexical.parent(root, candidate["parent_id"])
         if parent and (parent["start_line"], parent["end_line"]) != (first, last) and parent["parent_id"] not in expanded:
-            wider = span(rel, parent["start_line"], parent["end_line"])
-            cost = _tokens(wider.decode("utf-8", "replace")) - _tokens(body.decode("utf-8", "replace"))
+            top, bottom = parent["start_line"], parent["end_line"]
+            # DEC-1067 (review F-5): the lines an earlier call sent as a child on its own are left out of the parent
+            held = sorted((a, b) for path, a, b in alone if path == rel and top <= a and b <= bottom)
+            runs = _without(top, bottom, held)
+            pieces = [(a, b, span(rel, a, b)) for a, b in runs]
+            cost = sum(_tokens(piece.decode("utf-8", "replace")) for *_, piece in pieces) \
+                - _tokens(body.decode("utf-8", "replace"))
             if used + cost <= limit:
-                used, first, last, body = used + cost, parent["start_line"], parent["end_line"], wider
+                used = used + cost
                 expanded.add(parent["parent_id"])
                 expansions.append({"chunk_id": candidate["chunk_id"], "parent_id": parent["parent_id"], "path": rel,
-                                   "start_line": first, "end_line": last})
-        evidence.append({"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
-                         "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
-                         "chunk_id": candidate["chunk_id"], "routes": candidate["routes"],
-                         "batch": candidate["_batch"]})
+                                   "start_line": top, "end_line": bottom,
+                                   **({"left_out": [list(span_) for span_ in held]} if held else {})})
+                if not pieces:  # the whole parent was sent before, child by child: nothing of it again
+                    repeats.append({key: candidate[key]
+                                    for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")})
+                evidence.extend(item(candidate, rel, a, b, piece) for a, b, piece in pieces)
+                continue
+        sent_alone.add((rel, first, last))
+        evidence.append(item(candidate, rel, first, last, body))
 
     reasons = {gap["reason"] for gap in gaps}
     if not all(facet["available"] for facet in facets.values()):
@@ -344,7 +386,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     new_offset = offset + len(gathering)
     if remaining:
         token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset,
-                                     expanded)
+                                     expanded, sent_alone)
     else:
         token = None
 

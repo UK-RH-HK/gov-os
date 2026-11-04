@@ -49,6 +49,7 @@ import math
 import os
 import sqlite3
 import struct
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -69,7 +70,13 @@ INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages th
 DEVICES = ("gpu",)  # the one device a vector is used from (W2-32 S10, DEC-1065 (1)); the cache key names it
 ON_CPU = "EMBEDDER_ON_CPU"  # a vector computed on the CPU: refused, never cached or stored (W2-32 S10)
 DEVICE_UNREAD = "EMBEDDER_DEVICE_UNREAD"  # the device a batch was computed on could not be read: refused (S10)
-EMBED_CHARS = chunking.READ_CHARS  # a chunk is embedded whole (W2-32 S7, DEC-1066 G1; was 512, DEC-406)
+# A chunk is embedded whole up to this many characters (W2-32 S7, DEC-1066 G1, DEC-1067; was 512, DEC-406). The
+# shared embedder's context is 4,096 tokens and cuts a longer input silently (the CTO's measure, 2026-11-04: 3.7 to
+# 3.8 characters a token on the register, 24,000 characters read as 4,095 tokens). 10,000 characters is about 2,650
+# tokens there, and still fits text as dense as 2.5 characters a token. A chunk above it is embedded from its first
+# part and named in the refresh's ``cut`` and on standard error, never silently.
+EMBED_LIMIT_CHARS = 10_000
+EMBED_CHARS = EMBED_LIMIT_CHARS  # the cut the manifest records (W2-L065)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
 TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
@@ -383,7 +390,15 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
-def _build(root: Path, counts: dict, retries: list) -> str | None:
+def _over_limit(connection: sqlite3.Connection, wanted: list[str]) -> list[str]:
+    """The paths of the embedded chunks longer than ``EMBED_LIMIT_CHARS``, once each, in order."""
+    over = connection.execute(f"SELECT c.chunk_id, c.path FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
+                              f"WHERE length(f.text) > {EMBED_LIMIT_CHARS} ORDER BY c.path, c.start_line").fetchall()
+    keep = set(wanted)
+    return list(dict.fromkeys(path for chunk_id, path in over if chunk_id in keep))
+
+
+def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> str | None:
     """Bring the lexical index up to date, then embed the chunks that have no vector, each whole (up to
     ``EMBED_CHARS``, W2-32 S7), those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
     embedded, recording timed-out requests in ``retries``; why it cannot be done, or None.
@@ -406,6 +421,12 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
                              f"{pin.revision}: nothing is embedded")
         connection.executescript(SCHEMA)
         wanted = _wanted(root, connection)
+        if cut is not None:  # the chunks above the embedder's limit, named (DEC-1067; review F-4)
+            over = _over_limit(connection, wanted)
+            cut.update(limit=EMBED_LIMIT_CHARS, count=len(over), paths=over)
+            if over:
+                print(f"semantic: {len(over)} file(s) hold a chunk over {EMBED_LIMIT_CHARS} characters, embedded "
+                      f"from its first {EMBED_LIMIT_CHARS}: {', '.join(over)}", file=sys.stderr, flush=True)
         with connection:
             built_by = connection.execute("SELECT embedder_model, embedder_revision FROM semantic_manifest").fetchone()
             if built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS:
@@ -547,8 +568,9 @@ def refresh(root: Path) -> dict:
     each chunk batch request that failed transiently at least once (timed out, a server error, a refused or reset
     connection): its tries, the waits taken and whether it embedded. Under another pin than the store's, every
     chunk is embedded again; an unpinned or mismatched pin embeds nothing (``error`` names which)."""
-    counts, retries = vector_cache.zero(), []
-    return _report(_build(Path(root), counts, retries), retries=retries, vector_cache=counts)
+    counts, retries, cut = vector_cache.zero(), [], {}
+    return _report(_build(Path(root), counts, retries, cut), retries=retries, vector_cache=counts,
+                   cut=cut or {"limit": EMBED_LIMIT_CHARS, "count": 0, "paths": []})
 
 
 @_pinned
