@@ -1,13 +1,16 @@
 """The planted project and the readers of DEC-1068's index-time methods M2, M5 and M4 (``test_w2_32_dec1068_*``).
 
 The settings are in ``governance/project/rebuild.yaml``, absent = off: ``chunk_code_by_definition`` (M2),
-``chunk_register_by_entry`` (M5), ``lexical_split_identifiers`` (M4). The file is kept out of git (``.gitignore``)
-and read as it stands in the working tree, so writing it changes no tracked file: a store made stale by it is stale
-by the setting alone. The governance files are kept out of the keyword index, so the keyword answers hold the planted
-files alone and do not move with this repository's path map.
+``chunk_register_by_entry`` (M5), ``lexical_split_identifiers`` (M4). The file is tracked, as this repository's is
+(since ``dc8a2829``): each setting is written and committed, so the store sees the file's blob change (P-W2-32-11).
+The governance files are kept out of the keyword index, so the keyword answers hold the planted files alone and do not
+move with this repository's path map.
+
+Rewrite-Reason: P-W2-32-11 (M5 re-scoped): each entry one chunk up to ``EMBED_LIMIT_CHARS``, a longer one split at its
+own bullet or section boundaries; the settings file committed, not kept out of git.
 
 ``TODAY`` (``w2_32_dec1068_today.json``) is today's index of the planted files and today's keyword answers, recorded
-on integrate's head ``bfd60400`` (``python3 w2_32_index_methods.py --record``): what "off" must give exactly.
+on integrate's head ``bd87a8b2`` (``python3 w2_32_index_methods.py --record``): what "off" must give exactly.
 """
 
 from __future__ import annotations
@@ -114,8 +117,11 @@ WORDS = ("lantern", "ledger rules", "copper tokens")  # plain words: the same an
 # ---- M5: a register (the path map's ``decision_register``) ---------------------------------------------------
 
 REGISTER_REL = "docs/DECISION_REGISTER.md"
-_RULES = "".join(f"- Ledger rule {i:03d}: the clerk enters the berth, the hull and the hour of mooring in ink.\n"
-                 for i in range(400))
+_RULES = "".join(f"- Ledger rule {i:03d}: the clerk enters the berth, the hull and the hour of mooring in ink,\n"
+                 f"  and the warden countersigns the page before the bell of rule {i:03d} is rung.\n"
+                 f"  A copy goes to the harbour office.\n" for i in range(170))
+_BOOK = "".join(f"- Berth {i:03d}: the mooring book names the vessel, her master and the tide she came in on.\n"
+                for i in range(96))
 REGISTER_TEXT = (
     "# Planted decision register\n"
     "\n"
@@ -140,14 +146,22 @@ REGISTER_TEXT = (
     "\n"
     "- **Basis:** silver marks were refused by the board.\n"
     "\n"
-    "### DEC-903 — The ledger rules\n"
+    "### DEC-903 — The mooring book\n"
     "- **Status:** ACCEPTED\n"
-    "- **Decision:** the ledger rules, one per line:\n"
-    + _RULES +
+    "- **Decision:** the mooring book, one berth per line:\n"
+    + _BOOK +
+    "\n"
+    "### DEC-904 — The ledger rules\n"
+    "- **Status:** ACCEPTED\n"
+    "- **Decision:** the ledger rules of the first book:\n"
+    + _RULES[:len(_RULES) // 2] +
+    "\n"
+    "The ledger rules of the second book:\n"
+    + _RULES[len(_RULES) // 2:] +
     "\n"
     "## 2. Later decisions\n"
     "\n"
-    "### DEC-904 — The night watch\n"
+    "### DEC-905 — The night watch\n"
     "- **Status:** PROPOSED\n"
     "- **Decision:** two wardens walk the quay at night, as the lamp hours of DEC-901 allow.\n"
     "\n"
@@ -156,7 +170,10 @@ REGISTER_TEXT = (
     "| Version | Date | Change |\n"
     "|---|---|---|\n"
     "| 0.1 | 2026-11-04 | planted |\n")
-SHORT_ENTRIES, LONG_ENTRY = ("DEC-901", "DEC-902", "DEC-904"), "DEC-903"  # DEC-903: about 34,000 characters
+LIMIT_CHARS = 10_000  # the embedder's limit, ``semantic.EMBED_LIMIT_CHARS`` (P-W2-32-11)
+# One chunk each: a short entry, one holding a fenced block with '#' lines, one of about 9,000 characters (under the
+# limit, nine chunks today). Split within it: one of about 34,000 characters, its bullets three lines each.
+WHOLE_ENTRIES, LONG_ENTRY = ("DEC-901", "DEC-902", "DEC-903", "DEC-905"), "DEC-904"
 
 FILES = {**s.NOTES, CODE_REL: CODE_TEXT, REGISTER_REL: REGISTER_TEXT, **IDENT_FILES}
 PYTHON = (CODE_REL, CAMEL_REL)
@@ -174,19 +191,19 @@ def plant(project):
     document["namespaces"]["project"]["lexical_policy"] = "not indexed"
     document["decision_register"] = REGISTER_REL
     s.write(project, s.PATH_MAP_REL, yaml.safe_dump(document, sort_keys=False))
-    s.write(project, ".gitignore", f".gov-runtime/\n{SETTINGS_REL}\n")
     s.commit(project, "the code, the register named, the governance files out of the keyword index")
     return project
 
 
 def settle(project, text):
-    """Write ``rebuild.yaml`` as ``text`` (``None``: no file); it stays out of git."""
+    """Write ``rebuild.yaml`` as ``text`` (``None``: no file) and commit it: the file is tracked (P-W2-32-11)."""
     path = Path(project) / SETTINGS_REL
     if text is None:
         if path.exists():
             path.unlink()
     else:
         s.write(project, SETTINGS_REL, text)
+    s.commit(project, "the rebuild settings")
 
 
 def setting(key, value, control=True):
@@ -326,31 +343,59 @@ def entries():
     return found
 
 
+_BULLET = re.compile(r" {0,3}(?:[-*+]|\d+[.)])\s")
+
+
+def chars(rel, start, end):
+    """The characters of lines ``start`` to ``end`` of ``rel``, their line ends counted."""
+    return len("".join(FILES[rel].splitlines(keepends=True)[start - 1:end]))
+
+
+def _boundary(lines, head, number):
+    """Whether line ``number`` of an entry headed at ``head`` begins one of its own parts: the heading, a bullet of
+    its own (not an indented continuation), or a line after a blank line (a section of it)."""
+    text = lines[number - 1]
+    return number == head or bool(_BULLET.match(text)) or (bool(text.strip()) and not lines[number - 2].strip())
+
+
 def m5_problems(chunks):
-    """What breaks M5 in the index: each entry's chunks lie inside it (no chunk spans two entries, or an entry and
-    what is not it), all name one parent that is the entry's span, cover it, and are one for a short entry and more
-    than one for the long one."""
+    """What breaks M5 (P-W2-32-11) in the index: each entry's chunks lie inside it (no chunk spans two entries, or an
+    entry and what is not it) and inside the parent each names, and cover it; an entry within ``LIMIT_CHARS`` is one
+    chunk holding it whole; the longer one is more than one, each at most ``LIMIT_CHARS``, each beginning at one of
+    the entry's own bullet or section boundaries and ending just before one (or at the entry's end)."""
     problems = []
+    lines = _lines(REGISTER_REL)
     mine = [chunk for chunk in chunks if chunk[0] == REGISTER_REL]
     for entry, (head, last, region) in entries().items():
-        touching = [chunk for chunk in mine if chunk[1] <= region and chunk[2] >= head]
+        touching = sorted((chunk for chunk in mine if chunk[1] <= region and chunk[2] >= head), key=lambda c: c[1])
+        spans_of = [c[1:3] for c in touching]
         outside = [chunk[1:3] for chunk in touching if chunk[1] < head or chunk[2] > region]
         if outside:
             problems.append(f"{entry} (lines {head}-{last}): chunks {outside[:4]} reach past the entry")
-        named = {tuple(chunk[3:6]) for chunk in touching}
-        if len(named) != 1:
-            problems.append(f"{entry}: its chunks name {len(named)} parents {sorted(named, key=str)[:4]}, not one")
-        elif not (next(iter(named))[1] == head and last <= next(iter(named))[2] <= region):
-            problems.append(f"{entry}: the parent its chunks name {next(iter(named))} is not the entry's span "
-                            f"({head}-{last})")
+        for chunk in touching:
+            if chunk[3] is None or not (chunk[4] <= chunk[1] and chunk[2] <= chunk[5]):
+                problems.append(f"{entry}: chunk {chunk[1:3]} is not inside the parent it names {chunk[3:6]}")
         missing = _covered(REGISTER_REL, touching, head, last)
         if missing:
             problems.append(f"{entry}: lines {missing[:8]} are in no chunk of it")
-        if entry in SHORT_ENTRIES and len(touching) != 1:
-            problems.append(f"{entry} (a short entry, lines {head}-{last}) is {len(touching)} chunks "
-                            f"{[c[1:3] for c in touching]}, not one")
-        if entry == LONG_ENTRY and len(touching) < 2:
-            problems.append(f"{entry} (about 34,000 characters) is not split within it: {len(touching)} chunk")
+        if entry in WHOLE_ENTRIES:
+            if len(touching) != 1 or touching[0][1] != head or touching[0][2] < last:
+                problems.append(f"{entry} (lines {head}-{last}, {chars(REGISTER_REL, head, last)} characters, within "
+                                f"{LIMIT_CHARS}) is not one chunk holding it whole: {spans_of[:10]}")
+            continue
+        if len(touching) < 2:
+            problems.append(f"{entry} ({chars(REGISTER_REL, head, last)} characters) is not split within it: "
+                            f"{spans_of}")
+        for _, start, end, *_ in touching:
+            first = next((n for n in range(start, end + 1) if lines[n - 1].strip()), start)
+            if not _boundary(lines, head, first):
+                problems.append(f"{entry}: the part {start}-{end} begins inside a bullet: {lines[first - 1]!r}")
+            after = end + 1
+            if after <= last and lines[after - 1].strip() and not _boundary(lines, head, after):
+                problems.append(f"{entry}: the part {start}-{end} ends inside a bullet, before {lines[after - 1]!r}")
+            if chars(REGISTER_REL, start, end) > LIMIT_CHARS:
+                problems.append(f"{entry}: the part {start}-{end} holds {chars(REGISTER_REL, start, end)} characters, "
+                                f"above {LIMIT_CHARS}")
     return problems
 
 

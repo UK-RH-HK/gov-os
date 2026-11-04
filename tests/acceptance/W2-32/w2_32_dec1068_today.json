@@ -188,8 +188,8 @@
    "section",
    1,
    4,
-   "0472331a3a38220f6c4fa05c",
-   "57836e6241e5b49642594ed8"
+   "c6732a8a8c91a7a7f2d1ecee",
+   "6331275c166b4d117a8515e0"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -198,8 +198,8 @@
    "section",
    5,
    6,
-   "c0c8727e41a6609206973419",
-   "546fae52834376a943cd8335"
+   "967b20a606796d89ad2e4280",
+   "a73f0307eaa10a2a93b91d6e"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -208,8 +208,8 @@
    "section",
    7,
    10,
-   "58f9deb71a9edd61601051df",
-   "21d2fea4cc6c8cf20ce0af5b"
+   "c2e32fdabbebc48dfb4f1b08",
+   "fa527aaf35766377b83a8946"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -218,8 +218,8 @@
    "section",
    11,
    15,
-   "93321f2d378879c54e7d3559",
-   "c3d00216294642384f19734b"
+   "0d076dbc55ac34f3de9b0bd9",
+   "ca3c7ebc3094797cd69cd6f8"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -228,8 +228,8 @@
    "section",
    16,
    17,
-   "da39d86a4b455c573a1cf292",
-   "b1bade7bbc570d9e75479ab9"
+   "ba1ee9ce32b0d4b563548bd8",
+   "7c0bc6548ff543a521d2fa45"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -238,8 +238,8 @@
    "section",
    18,
    23,
-   "14c735322bd90f8a718231f0",
-   "d642df8c9e267b13c9a506b8"
+   "06019852cd760e71dd974e6f",
+   "f10419e3b9d3e7ac8fdf4f88"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -247,9 +247,9 @@
    38,
    "section",
    24,
-   427,
-   "dd4bcf36105ec970760efea4",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "22aad1dc52acfe0e262b3c7c",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -257,9 +257,9 @@
    49,
    "section",
    24,
-   427,
-   "62c5642ae77aeade4d1e28e7",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "d3ffb36a0338e490419b6138",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -267,9 +267,9 @@
    60,
    "section",
    24,
-   427,
-   "7dea026f43cdd2ae58c7c767",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "cbc49c3856779218cc3351a2",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -277,9 +277,9 @@
    71,
    "section",
    24,
-   427,
-   "2d1a52239cd26450b5337bc0",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "31ccaddbd581b19bd6c4cd2a",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -287,9 +287,9 @@
    82,
    "section",
    24,
-   427,
-   "86f88d01a46956452fdcf028",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "23f4f63d5b111a39a29e9d20",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -297,9 +297,9 @@
    93,
    "section",
    24,
-   427,
-   "6cbd7fa07d32fb37492f8796",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "ec6da6ea60ef1a7277d320c1",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -307,9 +307,9 @@
    104,
    "section",
    24,
-   427,
-   "752082edc8f67435a5d347c2",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "652e98ad439e90af91eb6f55",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
@@ -317,329 +317,389 @@
    115,
    "section",
    24,
-   427,
-   "bcd9f1e9c51ba81aa970959e",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "fff2db5f4951c01393d15ab1",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
    114,
-   126,
+   123,
    "section",
    24,
-   427,
-   "762635fc7db013e04fb0beff",
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "851ed882c1085288c1d16c65",
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   125,
-   137,
+   124,
+   142,
    "section",
-   24,
-   427,
-   "b8a9feb9f6cdd793f8ca0dc1",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "cca9a53ac582465ea0c3691f",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   136,
-   148,
+   141,
+   157,
    "section",
-   24,
-   427,
-   "7a9482f3ba2ae3dd852419ff",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "3b2e98e53eeb6f18e7eb2efd",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   147,
-   159,
+   156,
+   172,
    "section",
-   24,
-   427,
-   "bf3e85af5716c5d6d9b6c6f5",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "cd0dc596f57dd2da43fa21db",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   158,
-   170,
+   171,
+   187,
    "section",
-   24,
-   427,
-   "bf24e6e47629b12c847c6d73",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "cef73a144260825ac45d95e0",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   169,
-   181,
-   "section",
-   24,
-   427,
-   "6d3790779812a29356f0f0db",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   180,
-   192,
-   "section",
-   24,
-   427,
-   "3f6ddc46eee984070f036514",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   191,
-   203,
-   "section",
-   24,
-   427,
-   "6c94e27595c7c10070dccaf1",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
+   186,
    202,
-   214,
    "section",
-   24,
-   427,
-   "557791398b3f6ec44aa2459d",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "586dc8112b91a9146c8ac0d7",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   213,
-   225,
+   201,
+   217,
    "section",
-   24,
-   427,
-   "f13a65cf14a0d78065beff89",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "85540b7260793ab1a9faf2e1",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   224,
-   236,
+   216,
+   232,
    "section",
-   24,
-   427,
-   "bcd19c81d836ece04e6b8e2f",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "e4174acb97c5522ee6c8aa8e",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   235,
+   231,
    247,
    "section",
-   24,
-   427,
-   "803e4c1380e5d87742975e3c",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "a3603351256b5f1645fa9b2d",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
    246,
-   258,
+   262,
    "section",
-   24,
-   427,
-   "695b2ca8ba775efb3ee2062e",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "687f9fb1e3b9ed119e0849b3",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   257,
-   269,
+   261,
+   277,
    "section",
-   24,
-   427,
-   "5b9bf3d17035e151c19024f4",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "7aee1e139930207cca6085fa",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   268,
-   280,
+   276,
+   292,
    "section",
-   24,
-   427,
-   "6095d3054c7f9dfd595fc53a",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "83668a49f6a74b2b1e572302",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   279,
    291,
+   307,
    "section",
-   24,
-   427,
-   "9dfa491701193956fb5683b4",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "e876ecef91015e6c29551604",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   290,
-   302,
+   306,
+   322,
    "section",
-   24,
-   427,
-   "7a6c7de07874ecbac378a244",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "6c895650b9ea3da29eca52ce",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   301,
-   313,
+   321,
+   337,
    "section",
-   24,
-   427,
-   "9411cac4cfb69984100cb9fb",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "356815501db89e05a1e1b7c4",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   312,
-   324,
+   336,
+   352,
    "section",
-   24,
-   427,
-   "3520aca16b992f9b337a1888",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "a978a2484a91268af9a31602",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   323,
-   335,
-   "section",
-   24,
-   427,
-   "8fcf29d70c2cc7c145876f4a",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   334,
-   346,
-   "section",
-   24,
-   427,
-   "2ab30d797f36809809d41a3b",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   345,
-   357,
-   "section",
-   24,
-   427,
-   "759797baa992b3271237b578",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   356,
-   368,
-   "section",
-   24,
-   427,
-   "920c361c31b1797891117033",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
+   351,
    367,
-   379,
    "section",
-   24,
-   427,
-   "266fc821125ed9c27b5acc53",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "d2b4ef58c013c0e296685293",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   378,
-   390,
+   366,
+   384,
    "section",
-   24,
-   427,
-   "88c44eed56a19ab472c67999",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "6f94129c2e72ae2e8ae5f443",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   389,
-   401,
+   383,
+   399,
    "section",
-   24,
-   427,
-   "1de47d3f3f9510e960fe8ff1",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "c87b3281a1fb438b3bf0e029",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   400,
-   412,
+   398,
+   414,
    "section",
-   24,
-   427,
-   "58c57018d3a67f6a3a093cfd",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "3be645e2c01f21be47725ea1",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   411,
-   423,
+   413,
+   429,
    "section",
-   24,
-   427,
-   "f00789db56363427f8d3f26a",
-   "1def3bd4aa35c984f00f9255"
-  ],
-  [
-   "docs/DECISION_REGISTER.md",
-   422,
-   427,
-   "section",
-   24,
-   427,
-   "62ce4fd54a11077113834c67",
-   "1def3bd4aa35c984f00f9255"
+   124,
+   639,
+   "d55b224942b4da954e6d2f62",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
    428,
-   429,
+   444,
    "section",
-   428,
-   429,
-   "1d0c8856c94c647a821e027f",
-   "7cca4fcc577f7e2334948744"
+   124,
+   639,
+   "f2319b3a8fccef5d32408c53",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   430,
-   433,
+   443,
+   459,
    "section",
-   430,
-   433,
-   "64b522742dc139468ea80042",
-   "1d8a1a605b6fcbbb888a62a1"
+   124,
+   639,
+   "8382179e6b2a9da80184dc0c",
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
-   434,
-   438,
+   458,
+   474,
    "section",
-   434,
-   438,
-   "338a325ac2c20e73b410dcad",
-   "fbc25ab15308d94e2b6d81fd"
+   124,
+   639,
+   "8a6be7706319d48f00094204",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   473,
+   489,
+   "section",
+   124,
+   639,
+   "0b4dab74e2732c9bd241e829",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   488,
+   504,
+   "section",
+   124,
+   639,
+   "6efcfb17b0fa0274d1d14377",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   503,
+   519,
+   "section",
+   124,
+   639,
+   "d9daa8377dd2c389ac26d5ee",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   518,
+   534,
+   "section",
+   124,
+   639,
+   "2915f0d0a272b214671591a4",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   533,
+   549,
+   "section",
+   124,
+   639,
+   "65a182d7417e7cd9cefc9b6a",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   548,
+   564,
+   "section",
+   124,
+   639,
+   "1deea5adf2693f5ee3e24e97",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   563,
+   579,
+   "section",
+   124,
+   639,
+   "b4085ee4e83b9410612ffe6b",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   578,
+   594,
+   "section",
+   124,
+   639,
+   "00df8ea6c7d994e68a92fc3b",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   593,
+   609,
+   "section",
+   124,
+   639,
+   "8bb50a2300f108c0495382f1",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   608,
+   624,
+   "section",
+   124,
+   639,
+   "22b320e18b24ac44fff9f850",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   623,
+   639,
+   "section",
+   124,
+   639,
+   "131f7a7118955894a00936d2",
+   "6ec774fb61add7d0b606c016"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   640,
+   641,
+   "section",
+   640,
+   641,
+   "0d0eaffed48a83b73010e70c",
+   "a9fa337a820028e16de4770f"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   642,
+   645,
+   "section",
+   642,
+   645,
+   "97c0e2184d6dc4bea5b8ec15",
+   "1402981603c26e09ea797b62"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   646,
+   650,
+   "section",
+   646,
+   650,
+   "1c2a6e7e9282c1eb49f81c0d",
+   "577ff1fae1525c4f33c0b1ed"
   ],
   [
    "docs/bakery.md",
@@ -815,70 +875,77 @@
    "section",
    1,
    4,
-   "57836e6241e5b49642594ed8"
+   "6331275c166b4d117a8515e0"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    5,
    6,
-   "546fae52834376a943cd8335"
+   "a73f0307eaa10a2a93b91d6e"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    7,
    10,
-   "21d2fea4cc6c8cf20ce0af5b"
+   "fa527aaf35766377b83a8946"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    11,
    15,
-   "c3d00216294642384f19734b"
+   "ca3c7ebc3094797cd69cd6f8"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    16,
    17,
-   "b1bade7bbc570d9e75479ab9"
+   "7c0bc6548ff543a521d2fa45"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    18,
    23,
-   "d642df8c9e267b13c9a506b8"
+   "f10419e3b9d3e7ac8fdf4f88"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
    24,
-   427,
-   "1def3bd4aa35c984f00f9255"
+   123,
+   "92755be515f7676c935336e1"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
-   428,
-   429,
-   "7cca4fcc577f7e2334948744"
+   124,
+   639,
+   "6ec774fb61add7d0b606c016"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
-   430,
-   433,
-   "1d8a1a605b6fcbbb888a62a1"
+   640,
+   641,
+   "a9fa337a820028e16de4770f"
   ],
   [
    "docs/DECISION_REGISTER.md",
    "section",
-   434,
-   438,
-   "fbc25ab15308d94e2b6d81fd"
+   642,
+   645,
+   "1402981603c26e09ea797b62"
+  ],
+  [
+   "docs/DECISION_REGISTER.md",
+   "section",
+   646,
+   650,
+   "577ff1fae1525c4f33c0b1ed"
   ],
   [
    "docs/bakery.md",
@@ -1054,200 +1121,217 @@
    "hits": [
     [
      "docs/DECISION_REGISTER.md",
-     24,
-     "### DEC-903 — The ledger rules"
+     124,
+     "### DEC-904 — The ledger rules"
     ],
     [
      "docs/DECISION_REGISTER.md",
-     26,
-     "- **Decision:** the ledger rules, one per line:"
+     126,
+     "- **Decision:** the ledger rules of the first book:"
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     383,
+     "The ledger rules of the second book:"
     ]
    ],
    "ranked": [
     [
      "docs/DECISION_REGISTER.md",
-     24,
-     38,
+     124,
+     142,
      true
     ],
     [
      "docs/DECISION_REGISTER.md",
-     422,
-     427,
+     383,
+     399,
+     true
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     366,
+     384,
+     true
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     141,
+     157,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     37,
-     49,
+     156,
+     172,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     48,
-     60,
+     171,
+     187,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     59,
-     71,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     70,
-     82,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     81,
-     93,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     92,
-     104,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     103,
-     115,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     114,
-     126,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     125,
-     137,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     136,
-     148,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     147,
-     159,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     158,
-     170,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     169,
-     181,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     180,
-     192,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
-     191,
-     203,
-     false
-    ],
-    [
-     "docs/DECISION_REGISTER.md",
+     186,
      202,
-     214,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     213,
-     225,
+     201,
+     217,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     224,
-     236,
+     216,
+     232,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     235,
+     231,
      247,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
      246,
-     258,
+     262,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     257,
-     269,
+     261,
+     277,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     268,
-     280,
+     276,
+     292,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     279,
      291,
+     307,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     290,
-     302,
+     306,
+     322,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     301,
-     313,
+     321,
+     337,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     312,
-     324,
+     336,
+     352,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     323,
-     335,
+     351,
+     367,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     334,
-     346,
+     398,
+     414,
      false
     ],
     [
      "docs/DECISION_REGISTER.md",
-     345,
-     357,
+     413,
+     429,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     428,
+     444,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     443,
+     459,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     458,
+     474,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     473,
+     489,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     488,
+     504,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     503,
+     519,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     518,
+     534,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     533,
+     549,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     548,
+     564,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     563,
+     579,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     578,
+     594,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     593,
+     609,
+     false
+    ],
+    [
+     "docs/DECISION_REGISTER.md",
+     608,
+     624,
      false
     ]
    ]

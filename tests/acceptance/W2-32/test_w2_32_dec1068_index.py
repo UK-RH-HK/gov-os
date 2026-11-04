@@ -6,19 +6,23 @@ it, ``CONFIG_INVALID`` naming the key.
   top-level ``def``/``class`` and each method (the lines before it in its chunk blank or comments alone), no chunk
   runs on into one, every line is in a chunk, today's parents are kept and each chunk lies inside the parent it names;
   the other files' chunks are as today.
-- **M5, one span per register entry** (``chunk_register_by_entry``): the register's (the path map's
-  ``decision_register``) chunks are one per ``### DEC-`` entry, the entry as the store reads it (to the next heading
-  outside a fenced block); a long entry is split within it; no chunk spans two entries; the chunks of an entry name
-  one parent, the entry's span; the other files' chunks are as today.
+- **M5, one chunk per register entry** (``chunk_register_by_entry``; re-scoped by P-W2-32-11): in the register (the
+  path map's ``decision_register``) each ``### DEC-`` entry, as the store reads it (to the next heading outside a
+  fenced block, so a fenced ``#`` line is no heading), is one chunk holding it whole up to the embedder's limit
+  (``EMBED_LIMIT_CHARS``, 10,000 characters); a longer entry is split within it at its own bullet or section
+  boundaries, each part at most 10,000; no chunk spans two entries; the other files' chunks are as today.
 - **M4, identifier tokenisation in the keyword index** (``lexical_split_identifiers``): a keyword search for a part
   of an identifier (``seed`` of ``rebuild_slot_seed``; ``Seeded`` and ``Rebuild`` of ``SeededRebuild``; ``trimmer`` of
   ``gov.lantern.wick_trimmer``) or of a path's segment (``ballast`` of ``tools/heavy_ballast.sh``) finds the chunk
   and the line; the whole identifier still finds what it finds today; no chunk changes.
 - **Off:** no file, a file without the keys, or the three ``false``: today's chunks (spans and ids) and today's
   keyword answers exactly (``w2_32_dec1068_today.json``, recorded on integrate's head).
-- **Switched:** turning a setting on, or off again, makes the store stale (the keyword route, and for M2 and M5 the
-  vectors, answer unavailable without a rebuild); a refresh of the keyword index and the next rebuild build what the
-  setting says; off again gives today's chunks back.
+- **Switched:** the settings file is tracked, so each switch is a commit. Turning a setting on, or off again, makes
+  the store stale (the keyword route, and for M2 and M5 the vectors, answer unavailable without a rebuild); a refresh
+  of the keyword index builds what the setting says, and for M2 and M5 leaves the vectors stale until the rebuild;
+  the rebuild builds what it says; off again gives today's chunks back.
+
+Rewrite-Reason: P-W2-32-11 (M5 re-scoped).
 - **Invalid:** ``yes``, ``1``, a quoted ``"true"`` or a word refuses the rebuild with ``CONFIG_INVALID`` naming the key,
   and nothing is embedded.
 """
@@ -93,12 +97,31 @@ def test_m2_on_changes_no_other_files_chunks(planted, box, standin):
 
 # ---- M5 ------------------------------------------------------------------------------------------------------------
 
-def test_m5_on_the_registers_chunks_are_one_span_per_entry(planted, box, standin):
-    assert m.m5_problems(m.today()["chunks"]), "premise: today's chunks of the register break M5 (DEC-902's fenced " \
-                                               "'#' lines cut it)"
+def _of(entry, problems):
+    return [problem for problem in problems if problem.startswith(entry)]
+
+
+WHOLE = {"short": "DEC-901", "fenced": "DEC-902", "9000-characters": "DEC-903", "after-a-section": "DEC-905"}
+
+
+@pytest.mark.parametrize("kind", list(WHOLE), ids=list(WHOLE))
+def test_m5_on_an_entry_within_the_limit_is_one_chunk_holding_it_whole(planted, box, standin, kind):
+    entry = WHOLE[kind]
+    head, last, _ = m.entries()[entry]
+    assert m.chars(m.REGISTER_REL, head, last) <= m.LIMIT_CHARS - 1000, f"premise: {entry} is within the limit"
     got = _built(box, planted, m.setting(m.M5, "true"))
-    problems = m.m5_problems(got["chunks"])
+    problems = _of(entry, m.m5_problems(got["chunks"]))
     assert not problems, f"with {m.M5} on:\n" + "\n".join(problems)
+
+
+def test_m5_on_an_entry_above_the_limit_is_split_within_it_at_its_own_bullets(planted, box, standin):
+    head, last, _ = m.entries()[m.LONG_ENTRY]
+    assert m.chars(m.REGISTER_REL, head, last) > 3 * m.LIMIT_CHARS, f"premise: {m.LONG_ENTRY} is above the limit"
+    assert _of(m.LONG_ENTRY, m.m5_problems(m.today()["chunks"])), \
+        f"premise: today {m.LONG_ENTRY} is cut inside its bullets"
+    got = _built(box, planted, m.setting(m.M5, "true"))
+    problems = _of(m.LONG_ENTRY, m.m5_problems(got["chunks"]))
+    assert not problems, f"with {m.M5} on:\n" + "\n".join(problems[:12])
 
 
 def test_m5_on_changes_no_other_files_chunks(planted, box, standin):
@@ -169,21 +192,26 @@ def _stale(box, project, key, said):
 
 @pytest.mark.parametrize("key", m.KEYS)
 def test_switching_a_setting_makes_the_store_stale_and_the_next_build_follows_it(planted, box, standin, key):
-    first = _built(box, planted, None)
-    m.settle(planted, m.CONTROL)
-    keyword = m.search(box, planted, "lantern")
-    vectors = s.result(box.call("semantic_search", root=str(planted), query=QUESTION))
-    assert keyword["available"] and vectors["available"], \
-        f"premise: writing the settings file without the key leaves the store fresh: {keyword}, " \
-        f"{json.dumps(vectors)[:400]}"
+    """The settings file is tracked (P-W2-32-11): each switch is committed, so its blob change alone makes the store
+    stale; what tells the setting was read is the refresh and the rebuild after it, which must build what it says
+    (and, for M2 and M5, a keyword refresh leaves the vectors stale: they were made from the other chunks)."""
+    first = _built(box, planted, m.CONTROL)
     m.settle(planted, m.setting(key, "true"))
     _stale(box, planted, key, f"switching {key} on")
     refreshed = _problems(key, box, planted, refresh=True)
     assert not refreshed, f"after switching {key} on, a refresh of the keyword index did not build what it says:\n" \
-                          + "\n".join(refreshed)
+                          + "\n".join(refreshed[:12])
+    if key in (m.M2, m.M5):
+        vectors = s.result(box.call("semantic_search", root=str(planted), query=QUESTION))
+        assert vectors["available"] is False and vectors["hits"] == [], \
+            f"after switching {key} on and refreshing the keyword index, the vectors made from the old chunks were " \
+            f"searched: {json.dumps(vectors)[:600]}"
     box.built(planted)
     rebuilt = _problems(key, box, planted)
-    assert not rebuilt, f"after switching {key} on, the rebuild did not build what it says:\n" + "\n".join(rebuilt)
+    assert not rebuilt, f"after switching {key} on, the rebuild did not build what it says:\n" + "\n".join(rebuilt[:12])
+    vectors = s.result(box.call("semantic_search", root=str(planted), query=QUESTION))
+    assert vectors["available"], f"after the rebuild with {key} on, the vectors are unavailable: " \
+                                 f"{json.dumps(vectors)[:600]}"
     m.settle(planted, m.setting(key, "false"))
     _stale(box, planted, key, f"switching {key} off again")
     box.built(planted)
