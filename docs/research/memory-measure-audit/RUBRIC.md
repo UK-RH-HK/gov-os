@@ -46,7 +46,11 @@ KPI 3 and failure line 4 (the governing source, never lens B's report), W2-61h K
    a gold source, not even as an alternative; neither is a part of an entry that a later entry's "Changed by" line
    replaces. Read the entry's status line and search the register for later entries that name it.
 3. Every alternative is the governing source, a faithful restatement of it (a generated Contract record, a ticket
-   KPI line or brief line restating it) or, for a code fact, the code. None is in the `reports` tier
+   KPI line or brief line restating it) or, for a code fact, the code. **A generated Contract record**
+   (`docs/contract/capabilities/*.md`, `docs/contract/master-rules/*.md`) **counts only when its own front matter
+   says `status: ACCEPTED`**: one that says PROPOSED (for example `master-rules/MR-3.md` and `MR-6.md` today) is left
+   out, whatever the status of the Contract text it copies; cite `contract.yaml` or `CONTRACT_v4.md` instead. None
+   is in the `reports` tier
    (`tests/**`, `docs/assessment/**`, `docs/audit/**`, `docs/probes/**`). **Test-harness code is never the
    governing source for a code fact** (DEC-1069 (7)), except for a question about the test harness itself (for
    example "what does the shared acceptance fixture build?"). Test-harness code is the code that exists to run
