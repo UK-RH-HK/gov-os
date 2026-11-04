@@ -1,5 +1,10 @@
 # Lens B's Q10 (Table 2): "lexical.py:115; codeintel/__init__.py:185": two callers, each its own entry; each source
 # is the calling line.
+# Entry 1 re-anchored (the CTO's decision, 2026-11-04, the D-4b measure 2 pre-check), decided from the code: W2-13's
+# S6 (261d6415) changed the lexical index's calling line (it now passes the files the path map's lexical_policy does
+# not keep out), so its old heading was found nowhere and lines 115 were no longer the call. The fact is unchanged:
+# the lexical index calls indexable before it chunks a file, now at lexical.py line 270. The question, the gold
+# answer and the question's commit are kept; the answer's line numbers are as of that commit.
 id: Q10
 category: callers
 commit: 23079f92a6fa
@@ -10,8 +15,9 @@ gold_answer: >-
   (src/gov/codeintel/__init__.py, line 185), each before it chunks a file.
 sources:
   - path: src/gov/retrieval/lexical.py
-    heading: "        allowed = set(indexable(root, asked)) if asked else set()"
-    lines: [115, 115]
+    heading: "        allowed = set(indexable(root, judged)) if judged else set()"
+    lines: [270, 270]
+    commit: 27a804119e073b9c63cbadbbb91184d32ca28cc1
   - path: src/gov/codeintel/__init__.py
     heading: '    allowed = indexable(root, [rel for rel in listed.split("\0") if rel])'
     lines: [185, 185]
