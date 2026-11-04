@@ -680,6 +680,44 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
         connection.close()
 
 
+@_pinned
+def distances(root: Path, query: str, chunk_ids: list[str]) -> dict[str, float] | None:
+    """Each chunk's cosine distance from its stored vector to the question's (W2-32 S8: the code route ranked); a
+    chunk with no vector is left out. None when no vector can be compared (vectors missing, stale or of another pin,
+    or no question vector), so the caller keeps its own order. Reads only, and the question's vector is the one a
+    search uses (cached, from the GPU, never an embedder started)."""
+    root = Path(root)
+    if not chunk_ids or _status(root):
+        return None
+    connection = _open(root)
+    if connection is None:
+        return None
+    try:
+        built_at = _built_at(connection)
+        if built_at is None or not ollama.ensure_query_available()["available"]:
+            return None
+        vector, _ = query_vector(root, query, None, expect=built_at)
+        if vector is None:
+            return None
+        question = struct.unpack(f"{len(vector) // 4}f", vector)
+        q_norm = math.sqrt(sum(x * x for x in question)) or 1.0
+        found: dict[str, float] = {}
+        ids = list(dict.fromkeys(chunk_ids))
+        for start in range(0, len(ids), 500):
+            part = ids[start:start + 500]
+            rows = connection.execute(f"SELECT chunk_id, embedding FROM semantic_vector "
+                                      f"WHERE chunk_id IN ({','.join('?' * len(part))})", part)
+            for chunk_id, blob in rows:
+                stored = struct.unpack(f"{len(blob) // 4}f", blob)
+                if len(stored) != len(question):
+                    continue
+                norm = math.sqrt(sum(x * x for x in stored)) or 1.0
+                found[chunk_id] = 1.0 - sum(a * b for a, b in zip(question, stored)) / (q_norm * norm)
+        return found
+    finally:
+        connection.close()
+
+
 def manifest(root: Path) -> dict | None:
     """The models the vectors were built with and the reranker's pin, each with its revision; None when there is no
     vector index. Read from the store alone: writes nothing and asks Ollama nothing (DEC-374). ``embed_chars`` is the

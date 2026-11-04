@@ -160,3 +160,77 @@ def test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_n
     report = json.dumps(envelope.get("result") or {})
     assert LONG in report, f"the rebuild's report does not name the chunk embedded from its first part: {store}"
     assert "docs/harbour.md" not in report, "premise: the report names the cut chunk, not every file"
+
+
+# ---- no span twice with nested parents: a Python module and its functions (the round-2 review, R2-F1) -------------
+
+# A module whose parent (the whole file) holds its function parents. Each function and each run of module lines is
+# one chunk of its own (under the chunker's 1,200 characters), so no two chunks overlap: a line sent twice is sent
+# twice by expansion. Every line of it answers the question.
+TIDE_PIERS = ("north", "south", "east", "west", "cedar")
+CODE = "docs/tides.py"
+
+
+def _function(pier):
+    body = "".join(f"    # the tide almanac lists the {pier} pier tide at hour {hour:02d}\n" for hour in range(6))
+    return f"def {pier}_pier_tides():\n    \"\"\"The tide almanac for the {pier} pier.\"\"\"\n{body}    return \"{pier}\"\n"
+
+
+CODE_TEXT = ('"""The tide almanac: each pier\'s tides, as the almanac lists them."""\n\n'
+             'ALMANAC_PIERS = ("north", "south", "east", "west", "cedar")  # the tide almanac\'s piers\n'
+             'TIDE_UNIT = "metres"  # the almanac lists each pier tide in metres\n\n\n'
+             + "\n\n".join(_function(pier) for pier in TIDE_PIERS))
+CODE_QUESTION = "What does the tide almanac list for each pier tide?"
+
+
+@pytest.fixture
+def module(tmp_path, needs_vectors, box):
+    project = s.plant(tmp_path / "module", {**s.NOTES, CODE: CODE_TEXT})
+    box.built(project)
+    return project
+
+
+# Rewrite-Reason: R2-F1 deferred to D-9: a known failure, marked strict so it turns red the moment the behaviour is
+# fixed and the mark is not removed.
+@pytest.mark.xfail(strict=True, reason="R2-F1 deferred to D-9 (the CTO, 2026-11-04; DEC-802); park/W2-32-R2-F1")
+def test_nested_parents_send_no_line_twice_and_name_every_span_left_out(module, box, standin):
+    """The round-2 review's R2-F1 (DEC-1067; the owner's order: parent expansion sends no span twice, and every span
+    left out is named as a span record). A paged retrieval (one item a batch, followed through its continuations):
+    across all calls, and within one call, no line of the module is sent twice in the evidence; in each call every
+    gathered chunk is either sent or named as a span record outside the evidence and the expansions; and a named
+    span lies within lines already sent."""
+    bundles, token = [], None
+    for _ in range(14):
+        call = {"root": str(module), "query": CODE_QUESTION, "batch_size": 1, "radius": 0}
+        if token:
+            call["continuation"] = token
+        bundle = s.result(box.call("retrieve", **call))
+        bundles.append(bundle)
+        token = bundle.get("continuation")
+        if not token:
+            break
+    reached = sum(1 for bundle in bundles for item in bundle["evidence"] + _named(bundle) if item["path"] == CODE)
+    assert reached >= 3, f"premise: the retrieval reaches the module's functions more than once ({reached})"
+    assert any(e["path"] == CODE for bundle in bundles for e in bundle["expansions"]) or any(
+        item["path"] == CODE and item["end_line"] - item["start_line"] > 12 for bundle in bundles
+        for item in bundle["evidence"]), "premise: a parent of the module (the module or a function) is expanded"
+    sent: dict[str, set[int]] = {}
+    for number, bundle in enumerate(bundles, 1):
+        named = _named(bundle)
+        for record in named:
+            lines = set(range(record["start_line"], record["end_line"] + 1))
+            assert lines <= sent.get(record["path"], set()) | {
+                line for item in bundle["evidence"] if item["path"] == record["path"]
+                for line in range(item["start_line"], item["end_line"] + 1)}, \
+                f"call {number} names {record['path']}:{record['start_line']}-{record['end_line']} as left out, " \
+                "but those lines were never sent"
+        for item in bundle["evidence"]:
+            lines = set(range(item["start_line"], item["end_line"] + 1))
+            twice = sorted(lines & sent.get(item["path"], set()))
+            assert not twice, f"call {number} sends {item['path']}:{item['start_line']}-{item['end_line']}: lines " \
+                              f"{twice[0]}-{twice[-1]} were already sent (unnamed, sent twice)"
+            sent.setdefault(item["path"], set()).update(lines)
+        gathered = bundle["merge"]["candidates"]
+        assert gathered == len(bundle["evidence"]) + len(named), \
+            f"call {number} gathered {gathered} chunks, sent {len(bundle['evidence'])} and named {len(named)} as " \
+            "left out: a chunk left out is not named"

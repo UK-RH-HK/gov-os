@@ -22,9 +22,10 @@ import re
 CHUNKER_VERSION = "gov-chunker/1"
 MAX_CHARS = 1200
 OVERLAP_CHARS = 120
-# What the reranker reads of a chunk (W2-32 S7, DEC-1066 G1, DEC-1067): above every chunk the chunker makes, so each
-# is read whole. A chunk holds at most MAX_CHARS, or one longer line; this repository's longest such line is 24,575
-# characters. The embedder reads less, ``semantic.EMBED_LIMIT_CHARS``, its server's context being 4,096 tokens.
+# Above every chunk the chunker makes (W2-32 S7): a chunk holds at most MAX_CHARS, or one longer line; this
+# repository's longest such line is 24,575 characters. The models read less: the embedder up to
+# ``semantic.EMBED_LIMIT_CHARS`` (its server's 4,096-token context), the reranker up to ``fusion.RERANK_LIMIT_CHARS``
+# (one request's size bound, ``rerank.MAX_REQUEST_CHARS``, DEC-1067 (f)).
 READ_CHARS = 32768
 _HEADING = re.compile(r"#{1,6}\s")
 

@@ -26,6 +26,10 @@ def one_rerank(outcome):
     assert len(sizes) == -(-len(texts) // RERANK_CAP), \
         f"{len(sizes)} rerank requests for {len(texts)} texts: more than the cap of {RERANK_CAP} needs ({sizes})"
     assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
+    # The round-2 review's R2-F3: the merged set is cut into requests of 16, every one but the last full (two
+    # rerank passes of their own, one per route, would also pass a count of requests).
+    assert all(size == RERANK_CAP for size in sizes[:-1]) and sizes[-1] <= RERANK_CAP, \
+        f"the rerank requests are not the merged set cut into requests of {RERANK_CAP}: {sizes}"
     return texts
 
 pytestmark = pytest.mark.needs("gitleaks", "sqlite_vec")

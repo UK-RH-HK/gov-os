@@ -236,7 +236,7 @@ Three cases of `test_w1_21_merge.py` read "one rerank over the merged set" as on
 and `test_a_rerank_over_more_than_thirty_candidates`. The owner's DEC-1067 (f) caps each request at 16 texts, a
 larger pool sent in batches of at most 16 with the scores combined in order. Revised by W2-32's independent test
 designer; the names stand. One helper (`one_rerank`) now asks of each: every request at most 16 texts; the requests
-together score the set once (each candidate once); no more requests than the cap needs. One load, the texts scored
+together score the set once (each candidate once); no more requests than the cap needs, every one but the last carrying exactly 16 (the round-2 review's R2-F3: so two passes of their own, one per route, do not pass). One load, the texts scored
 (at least the cited chunks; more than 30 in the wide case) and the first result being the reranker's highest are
 kept as they were.
 

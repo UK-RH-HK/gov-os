@@ -25,7 +25,7 @@ from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
 from gov.guard import role_paths
-from gov.retrieval import authority, code_route, graph_route, lexical, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, routing, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
@@ -181,6 +181,26 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     return offset
 
 
+def _phrased(search, root: Path, asked: list[str], key: str, cut: int | None = None) -> dict:
+    """One route's answer for the question (one phrasing: today's answer, unchanged), or for several phrasings: the
+    question's answer with ``key`` the phrasings' lists fused (``routing.fused``), cut to ``cut``; when any phrasing's
+    answer is unavailable, the question's alone, as the research harness does (W2-32 S8's note, DEC-1067 order (4))."""
+    answers = [search(root, phrasing, refresh=False) for phrasing in asked]
+    if len(answers) == 1 or not all(answer.get("available", True) for answer in answers):
+        return answers[0]
+    merged = routing.fused([answer.get(key, answer["hits"]) for answer in answers])
+    return {**answers[0], key: merged[:cut] if cut is not None else merged}
+
+
+def _by_cosine(root: Path, query: str, chunk_ids: list[str]) -> list[str]:
+    """``chunk_ids`` ranked by their stored vectors' cosine to the question's, those with no vector last and ties in
+    the order given; as given when no vector can be compared (W2-32 S8)."""
+    distance = semantic.distances(root, query, chunk_ids)
+    if not distance:
+        return list(chunk_ids)
+    return sorted(chunk_ids, key=lambda chunk_id: distance.get(chunk_id, float("inf")))
+
+
 def role_filter(root, role=None):
     """W2-13 S5 (DEC-1065 (2)): what the caller (``GOV_ROLE``, ``role`` beside it, ``GOV_TICKET``) may not be handed,
     by the main tree's ``role_paths:``; None for no filter. One that cannot be worked out stops the search."""
@@ -207,6 +227,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
+    # W2-32 S8: the routing settings read first, so an invalid file is refused before any search work (S8-F4)
+    route_settings, routed = routing.settings(root), {}
     root = Path(root)
     unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
     try:
@@ -225,8 +247,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
     order = (authority.order(root, known, edges, entry_of) if unread is None  # DEC-952 item 1: retrieval_authority
              else authority.Order(None, known, edges, entry_of))  # no record graph: no authority order (DEC-1006)
-    answers = {lexical.FACET: lexical.search(root, query, refresh=False),
-               semantic.FACET: semantic.search(root, query, refresh=False)}
+    asked = [query]
+    if route_settings["phrasings"]:  # DEC-1067 order (4): three deterministic phrasings, searched and fused
+        asked = routing.phrasings(query, graph_route.start_ids(root, query, known))
+    answers = {lexical.FACET: _phrased(lexical.search, root, asked, "ranked"),
+               semantic.FACET: _phrased(semantic.search, root, asked, "hits", cut=semantic.TOP_K)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
@@ -248,6 +273,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
         routes[code_route.FACET], facets[code_route.FACET] = coded
+        if route_settings["code_first"] and routes[code_route.FACET]:  # S8-F1: as r01, ranked before the fusion
+            by_id = {hit["chunk_id"]: hit for hit in routes[code_route.FACET]}
+            ordered = _by_cosine(root, query, list(by_id))
+            routes[code_route.FACET] = [by_id[chunk_id] for chunk_id in ordered]
     if withhold is not None:  # W2-13 S5: every route's hits, before the fusion, so a withheld one takes no rank
         routes = {name: withhold.keep(hits) for name, hits in routes.items()}
 
@@ -345,6 +374,27 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         reranked_by = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
     ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
 
+    # W2-32 S8 (DEC-1067 (a)): routing by question type, each half behind its own setting (off: today's order)
+    if route_settings["named_first"] and start and routes.get(CLOSURE):
+        named_ids = set(start)
+        own = [chunk for chunk in routes[CLOSURE]
+               if (record_of.get(chunk["path"]) if chunk["path"] != register
+                   else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in named_ids]
+        # P-W2-32-9: the scores the pool's rerank already gave (the chunks put ahead are on the page, so scored);
+        # no request of its own, so the rerank stays one of the merged set in full requests of 16
+        own_ids = {chunk["chunk_id"] for chunk in own}
+        mine = [(position, candidate) for position, candidate in enumerate(ranked) if candidate["chunk_id"] in own_ids]
+        if mine:
+            if all("rerank_score" in candidate for _, candidate in mine):
+                best = [candidate["chunk_id"] for _, candidate in
+                        sorted(mine, key=lambda pair: (-pair[1]["rerank_score"], pair[0]))]
+            else:  # no reranker scored the page: by the stored vectors' cosine, else the page's order
+                best = _by_cosine(root, query, [candidate["chunk_id"] for _, candidate in mine])
+            ranked, routed[routing.NAMED] = routing.ahead(ranked, routing.firsts(best, route_settings["named_first"]))
+    if route_settings["code_first"] and coded is not None and routes.get(code_route.FACET):
+        best = [hit["chunk_id"] for hit in routes[code_route.FACET]]  # already by cosine, before the fusion
+        ranked, routed[routing.CODE] = routing.ahead(ranked, routing.firsts(best, route_settings["code_first"]))
+
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
     if ahead_paths:
         ahead_ranked = [c for c in ranked if c["path"] in ahead_paths]
@@ -424,6 +474,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "budget": {"bundle": {"limit": limit, "used": used},
                          "rounds": {"limit": rounds_limit, "used": rounds_used}},
               "continuation": token}
+    if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
+        bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
+                                if route_settings[key]}, **routed,
+                             **({"phrasings": asked} if route_settings["phrasings"] else {})}
     if withhold is not None:
         bundle["role_filter"] = withhold.summary()  # DEC-1065 (2): what was withheld, how many and by which rule
     return bundle
