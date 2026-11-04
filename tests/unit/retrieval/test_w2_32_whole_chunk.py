@@ -35,8 +35,10 @@ def _git(root, *args):
 
 
 def test_each_model_reads_the_whole_chunk_up_to_its_own_named_limit():
-    # the reranker: above every chunk (this repository's longest one-line chunk is 24,575 characters)
-    assert fusion.RERANK_CHARS == fusion.RERANK_LIMIT_CHARS == chunking.READ_CHARS > 24575
+    # the reranker: up to one request's size bound (DEC-1067 (f)), above the chunker's MAX_CHARS
+    from gov.retrieval import rerank
+    assert fusion.RERANK_CHARS == fusion.RERANK_LIMIT_CHARS == rerank.MAX_REQUEST_CHARS == 24_000
+    assert chunking.READ_CHARS > 24575 > fusion.RERANK_LIMIT_CHARS > chunking.MAX_CHARS
     # the embedder: within its server's 4,096-token context with margin (DEC-1067; review F-4)
     assert semantic.EMBED_CHARS == semantic.EMBED_LIMIT_CHARS == 10_000 >= chunking.MAX_CHARS
 
@@ -403,3 +405,82 @@ def test_the_first_direction_s_spans_are_span_records_of_the_same_form(repositor
     from gov.retrieval.retrieve import IN_EARLIER_PARENT
     first = [r for b in _calls(repository) for r in b["repeats"]]
     assert first and all(r["reason"] == IN_EARLIER_PARENT and frozenset(r) == RECORD for r in first)
+
+
+
+# --- DEC-1067 (f): the size bound on every request, beside the count -------------------------------------------------
+
+def _recorder(log):
+    def score(query, texts):
+        log.append((len(texts), sum(len(query) + len(text) for text in texts)))
+        return [float(len(text)) for text in texts]  # longer is better: the unbatched order is known
+    return score
+
+
+@pytest.mark.parametrize("lengths", [[100] * 40, [9_000] * 5, [5_000, 20_000, 3_000, 23_000, 1_000],
+                                     [23_990, 23_990], [40_000], [1] * 3])
+def test_no_request_is_above_16_texts_or_24000_characters_and_the_order_is_the_unbatched_one(lengths):
+    from gov.retrieval import rerank
+    query, log = "who fires the bowls", []
+    given = [{"chunk_id": str(n), "text": "x" * length} for n, length in enumerate(lengths)]
+    ranked = rerank.rerank(query, given, lambda: _recorder(log))
+    assert all(texts <= 16 and chars <= rerank.MAX_REQUEST_CHARS for texts, chars in log)
+    assert sum(texts for texts, _ in log) == len(lengths)
+    room = rerank.MAX_REQUEST_CHARS - len(query)
+    expected = sorted(range(len(lengths)), key=lambda n: -min(lengths[n], room))  # one request, as if unbatched
+    assert [c["chunk_id"] for c in ranked] == [str(n) for n in expected]
+
+
+def test_a_pool_is_split_into_the_fewest_requests_meeting_both_bounds():
+    from gov.retrieval import rerank
+    query = "q" * 10
+    pairs = lambda lengths: [(last - first, sum(len(query) + n for n in lengths[first:last]))  # noqa: E731
+                             for first, last, _ in rerank.requests(query, ["x" * n for n in lengths])]
+    assert pairs([100] * 40) == [(16, 1760), (16, 1760), (8, 880)]  # the count binds
+    assert pairs([9_000] * 5) == [(2, 18020), (2, 18020), (1, 9010)]  # the size binds
+    assert pairs([5_000, 20_000, 3_000]) == [(1, 5010), (2, 23020)]
+    assert pairs([]) == []
+
+
+def test_one_chunk_above_the_budget_is_read_up_to_it():
+    from gov.retrieval import rerank
+    query = "who fires the bowls"
+    [(first, last, texts)] = rerank.requests(query, ["y" * 40_000])
+    assert (first, last) == (0, 1) and len(query) + len(texts[0]) == rerank.MAX_REQUEST_CHARS
+
+
+def test_the_shared_service_and_a_private_reranker_are_each_asked_within_both_bounds(tmp_path, monkeypatch):
+    import functools
+    from gov.retrieval import rerank
+    interpreter = tmp_path / rerank.PYTHON_REL
+    interpreter.parent.mkdir(parents=True)
+    interpreter.write_text("")
+    monkeypatch.setenv("HOME", str(tmp_path))
+    service, private = [], []
+
+    def ask(interpreter, query, texts):
+        service.append(sum(len(query) + len(text) for text in texts))
+        if len(service) > 1:
+            raise TimeoutError("timed out")  # the second request falls back to the private reranker
+        return [1.0] * len(texts), "cuda:0"
+
+    @functools.lru_cache(maxsize=None)
+    def started(interpreter):
+        return (lambda query, texts: private.append(sum(len(query) + len(t) for t in texts)) or [2.0] * len(texts)), \
+            "cuda:0", None
+
+    monkeypatch.setattr(rerank, "_ask", ask)
+    monkeypatch.setattr(rerank, "_started", started)
+    rerank.rerank("q", [{"chunk_id": str(n), "text": "z" * 9_000} for n in range(6)])
+    assert service and private and all(chars <= rerank.MAX_REQUEST_CHARS for chars in service + private)
+
+
+def test_the_fusion_reads_a_chunk_up_to_the_budget(monkeypatch):
+    hits = [{"chunk_id": "a", "path": "open/huge.md", "start_line": 1, "end_line": 1, "parent_id": "p"}]
+    seen = []
+    monkeypatch.setattr(fusion.lexical, "search", lambda root, query, refresh: {"available": True, "hits": hits})
+    monkeypatch.setattr(fusion.semantic, "search", lambda root, query, refresh: {"available": False, "hits": []})
+    monkeypatch.setattr(fusion, "_records", lambda root, fused: [{**hit, "text": "w" * 30_000} for hit in fused])
+    fusion.search(Path("unused"), "q", limit=None,
+                  reranker=lambda: lambda query, texts: seen.extend(texts) or [1.0] * len(texts))
+    assert len(seen) == 1 and len("q") + len(seen[0]) <= 24_000
