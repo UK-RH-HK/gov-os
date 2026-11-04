@@ -55,7 +55,8 @@ VALUES = {EMBEDDED, NOT_EMBEDDED}  # DEC-388 DP-8, DEC-694: the closed list
 # W2-86's kernel-vendored parts (DEC-952 item 1, DEC-388): vendored code stays out.
 VENDORED = ("template/governance/kernel/vendor/**", "template/governance/kernel/skills/superpowers/*/**",
             "template/governance/kernel/bin/**")
-# DEC-957 / MEMORY-SPEC-MAP gap 1: what stays out by necessity.
+# DEC-957 / MEMORY-SPEC-MAP gap 1: what stays out by necessity. Since D-7 the path map names fixtures/ by its
+# sub-folders (fixtures/evaluation/** in evaluation-fixtures, DEC-1066 (3)); every one of them still stays out.
 HIDDEN = ("fixtures/**",)
 GENERATED = (".claude/**", ".rulesync/**", "template/.rulesync/**")
 CARRIED = ("cli/**",)
@@ -109,6 +110,18 @@ def embedded_set(namespaces, paths):
 def newly_embedded_area(rel):
     """The sets DEC-957 embeds: the root files, ``governance/**`` and ``schemas/**``."""
     return "/" not in rel or rel.startswith(("governance/", "schemas/"))
+
+
+# D-7 narrows DEC-957's sets (DEC-1052 M-4, DEC-1055 (2) and (3)): the overlay's close, nightly, session and review
+# records stay in keyword search only. Written as the decision words them, not read from the path map.
+OVERLAY_RECORDS = ("governance/project/orchestration/closes/**", "governance/project/orchestration/nightly/**",
+                   "governance/project/orchestration/sessions/**", "governance/project/orchestration/reviews/**")
+
+
+def embedded_after_d7(rel):
+    """DEC-957's sets as D-7 leaves them: ``newly_embedded_area`` less the overlay's record folders. ``moved`` keeps
+    ``newly_embedded_area``: this ticket's own steps are judged by the scope they were made under."""
+    return newly_embedded_area(rel) and not matches_any(rel, OVERLAY_RECORDS)
 
 
 # --------------------------------------------------------------------------

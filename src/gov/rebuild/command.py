@@ -147,8 +147,11 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     if has_path_map:
         with watch.stage("lexical"), watch.filtered(lexical, "indexable"):
             try:
-                lexical_refresh(root)
-                stores["lexical"] = {"status": "recreated"}
+                # Every file the path map's lexical_policy keeps out, by namespace (W2-13 S6, DEC-1066 (3)); where none
+                # is, the report is as before.
+                built = lexical_refresh(root)
+                kept = built.get("kept_out") if isinstance(built, dict) else None
+                stores["lexical"] = {"status": "recreated"} | ({"kept_out": kept} if kept else {})
             except GovError:
                 raise
             except Exception as exc:

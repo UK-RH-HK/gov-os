@@ -21,6 +21,7 @@ allowed_paths:
 - docs/changes/W2-32-evidence.md
 - src/gov/retrieval/**
 - src/gov/config/models*
+- src/gov/rebuild/command.py
 - tests/unit/retrieval/**
 - tests/unit/semantic/**
 kpis:
@@ -32,7 +33,7 @@ kpis:
   - The fusion limit is honoured [W2-M103].
   - 'S6 (G2, round 3; DEC-1066) Ranked-lexical tuning for code questions: code ranked above tests and assessments for a question about code, call sites preferred for an --id question; one round plus its probe, measured by D-4b (a rebuild and the measure); F1 reverts a round that lowers a baseline figure beyond its noise band'
   - 'S7 (G1, round 1; DEC-1066) The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk''s size; the manifest''s cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice); one round, measured by D-4b'
-  - 'S8 (G3, round 2; DEC-1066, DEC-1065 (3)) The fusion keeps each route''s top hits: no route''s first hits are outscored by an unranked set (the closure route ranked or down-weighted), each route''s first hits keep a place in the first batch, and the semantic route''s hits survive the fusion and the rerank; one round, measured by D-4b'
+  - 'S8 (G3, round 2; DEC-1067 (a), replacing DEC-1066 (2)''s wording) Routing by question type: a question that names a symbol puts the code route''s first 2 hits ahead after the rerank; a question that names a record puts that record''s 2 best chunks ahead; each half kept only if it holds at its measure (F1''s revert rule), judged on the visible half alone (DEC-1067 (b)); measured by D-4b'
   - 'If memory is below 85 % after two improvement rounds, the orchestrator escalates to the owner with the reasons; at the third the owner decides: a discovery and research ticket benchmarking market tools in a separate worktree, accepting the level reached, or another course. At 85 % or above but under the owner''s target of 95 %, with room for improvement found, memory is not closed: an escalation to the owner [DEC-954 Q9e, DEC-957]'
   - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'
   failure:
@@ -134,3 +135,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
 **DEC-1066 (owner, 2026-11-03):** S6-S8 re-worded to the chosen gaps, in the round order G1 (S7), G3 (S8, the fusion: W2-32's KPIs changed to cover it), G2 (S6).
 
 **S7 and the interface (CTO, 2026-11-03, P2):** the cut is no longer 512 (S7, G1: the models read the whole chunk); the interface's W2-L065 clause now reads "the manifest records the cut the chunks were embedded at"; S2's two cut cases are revised to it by the test designer.
+
+**DEC-1067 (owner, 2026-11-04 ~01:30):** S8 re-worded to routing by question type (D4B-RESEARCH item 2), each half kept only if it holds; a method is adopted only if it wins on the visible half alone; reranker requests capped at 16 texts (a note within S7, DEC-1067 (f)).
+
+**P-W2-32-8 (CTO, 2026-11-04 ~02:05, delegated):** `src/gov/rebuild/command.py` in W2-32's paths, for one line: `gov rebuild`'s result names the chunks the embedder's limit cut (S7's note, DEC-1067 (f)); the engineer's P2.

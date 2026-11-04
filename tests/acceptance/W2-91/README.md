@@ -101,6 +101,49 @@ and every tracked file under `schemas/**`. The sets are defined the same way as 
 `w2_91_support.py`. Every other tracked path outside `template/` is still compared with the base, in both
 directions, and the case fails if nothing is left to compare.
 
+## Revised to D-7's scope (DEC-1052 M-4, DEC-1055 (2) and (3), DEC-1066 (3))
+
+DEC-1055 (2) says W2-91 lands as built and D-7 then narrows it. D-7's path map (`9c080788`) makes three changes
+these tests notice:
+- the overlay's record folders, `governance/project/orchestration/{closes,nightly,sessions,reviews}/**`, move to a
+  namespace of their own, `orchestration-records`, which is not embedded;
+- `tests/**` is not embedded;
+- `fixtures/` is named by its sub-folders, and `fixtures/evaluation/**` gets its own namespace,
+  `evaluation-fixtures`, which is not embedded and not indexed.
+
+Three cases turned red and were revised. The other cases are unchanged.
+
+- **`test_root_files_governance_and_schemas_are_embedded`.** Success 1 now judges DEC-957's sets less the
+  overlay's record folders. That is `embedded_after_d7` in `w2_91_support.py`, with the folders written there as
+  `OVERLAY_RECORDS`, as the decision words them. The case also requires every tracked file in those folders to be
+  not embedded, and the folders to hold at least one tracked file.
+- **`test_a_rebuild_gives_vectors_exactly_to_the_files_the_path_map_embeds`.**
+  - The overlay plant under `sessions/` moved from the in-files to the controls. The case requires it to have a
+    chunk and no vector.
+  - An embedded overlay plant takes its place in the in-files: `governance/project/orchestration/tools/planted.md`.
+  - The `fixtures/` plant sat in a sub-folder the path map no longer names, so it was in no namespace. There are
+    now two plants, `fixtures/evaluation/planted/sample.md` and `fixtures/brownfield/planted/sample.md`. Both must
+    stay without a vector.
+- **`test_failure_1_an_embedded_file_that_stays_out_is_refused`.** The first row's plant moved to
+  `fixtures/evaluation/planted/sample.md` for the same reason. It still shows that a `fixtures/` file embedded is
+  refused.
+
+`newly_embedded_area` is left unchanged. `test_nothing_else_moves` judges this ticket's own steps by the scope they
+were made under, and W2-86 case 3 shares the definition.
+
+Each revised case is green on `emg/d7`. In a clone of `emg/d7`, each of these plants turned it red:
+- `project-overlay` not embedded: success 1 (209 files) and the rebuild;
+- `orchestration-records` embedded: success 1 (40 record files embedded) and the rebuild (the session plant has a
+  vector);
+- `governance/project/orchestration/tools/**` moved into `orchestration-records`: success 1 (14 files) and the
+  rebuild;
+- `evaluation-fixtures` removed: the rebuild and failure 1's first row (the plant in no namespace).
+
+The D-7 review's F5 (`e44d6732`) moves `docs/research/EXP-003/w2-15a/raw/**` into `evaluation-sources`. These tests
+do not name that folder, and need not. It is outside every set W2-91 judges: the root files, `governance/`,
+`schemas/`, and what stays out. The rebuild's `docs/planted.md` control lies in `docs/*`, which is still embedded.
+W2-86 case 3 holds the folder in its cut.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
