@@ -20,7 +20,8 @@ with that worktree's ``PYTHONPATH``, the cases exercise the ticket's code.
 What the environment of every child holds: an empty ``HOME``; the real ``gitleaks`` linked into a tools folder first
 on ``PATH``; no code-graph tool (left off ``PATH``, as W2-76 does: the code index reports itself not recreated and no
 daemon starts); no ``ollama`` program (``GOV_OLLAMA_BIN`` names a path that does not exist); no secrets cache
-(``GOV_SECRETS_CACHE`` empty); a ``rebuild.yaml`` whose lock is a temporary path (no case takes the machine's lock).
+(``GOV_SECRETS_CACHE`` empty); a ``rebuild.yaml`` whose lock is a temporary path (no case takes the machine's lock);
+a machine-wide vector cache (W2-126, ``GOV_VECTOR_CACHE_DIR``) new and empty for each rebuild (``run_environment``).
 """
 
 from __future__ import annotations
@@ -36,6 +37,7 @@ import site
 import sqlite3
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from dataclasses import dataclass
@@ -217,6 +219,7 @@ def environment(box, host):
         "HOME": str(box.home),
         "TMPDIR": str(box.tmpdir),
         "XDG_CACHE_HOME": str(box.home / ".cache"),
+        "GOV_VECTOR_CACHE_DIR": str(box.base / "vector-cache"),   # the root; each rebuild a folder of its own in it
         "LANG": "C.UTF-8",
         "LC_ALL": "C.UTF-8",
         "TZ": "UTC",
@@ -375,13 +378,25 @@ class Run:
                 f"stdout:\n{self.stdout[-tail:]}\nstderr:\n{self.stderr[-tail:]}")
 
 
+def run_environment(env):
+    """The environment of one rebuild: ``env`` with a machine-wide vector cache of its own, new and empty
+    (``GOV_VECTOR_CACHE_DIR``, W2-126, DEC-1032). The cache is keyed by model, revision and text, so two rebuilds
+    that shared one would serve the second the first's vectors: a cold rebuild would send the endpoint none of the
+    kept notes' text and look seeded. A cold rebuild here is cold in the cache too; a seeded one is measured by its
+    seed alone. No rebuild of a case reads or writes the machine's cache (``~/.cache/gov-os/vector-cache``)."""
+    root = Path(env["GOV_VECTOR_CACHE_DIR"])
+    root.mkdir(parents=True, exist_ok=True)
+    return {**env, "GOV_VECTOR_CACHE_DIR": tempfile.mkdtemp(prefix="run-", dir=root)}
+
+
 def rebuild(project, env, *extra, timeout=COMMAND_TIMEOUT_S):
-    """``gov rebuild --json <extra>`` in ``project``, run as ``sys.executable -m gov.cli.main`` (DEC-732)."""
+    """``gov rebuild --json <extra>`` in ``project``, run as ``sys.executable -m gov.cli.main`` (DEC-732), with a
+    vector cache of its own (``run_environment``)."""
     argv = (sys.executable, "-m", "gov.cli.main", "rebuild", "--json", *extra)
     began = time.monotonic()
     try:
-        done = subprocess.run(argv, cwd=str(project), env=env, stdin=subprocess.DEVNULL, capture_output=True,
-                              text=True, timeout=timeout)
+        done = subprocess.run(argv, cwd=str(project), env=run_environment(env), stdin=subprocess.DEVNULL,
+                              capture_output=True, text=True, timeout=timeout)
         code, out, err = done.returncode, done.stdout, done.stderr
     except subprocess.TimeoutExpired as exc:
         code = None
