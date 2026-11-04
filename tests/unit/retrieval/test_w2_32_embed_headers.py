@@ -183,6 +183,13 @@ def test_this_repository_s_setting_reads_as_written():
     assert loader.embed_headers(REPO) is ("embed_headers: true" in written)
 
 
+def test_this_repository_s_setting_is_read_as_its_file_states_it():
+    """Off until measure 4 adopted it (DEC-1067 (b)); the CTO switched it on in ``dc8a2829``."""
+    import yaml
+    written = yaml.safe_load((REPO / "governance/project/rebuild.yaml").read_text(encoding="utf-8")) or {}
+    assert loader.embed_headers(REPO) is written.get("embed_headers", False)
+
+
 # --- the embedder's input --------------------------------------------------------------------------------------------
 
 def _git(root, *args):
