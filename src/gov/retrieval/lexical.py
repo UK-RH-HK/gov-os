@@ -55,7 +55,7 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.config.loader import (CODE_BY_DEFINITION, INDEX_FLAGS, LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, REBUILD_FILE,
-                               SECRETS_FILE, index_recipe, read_yaml, validate_lexical_policy)
+                               REGISTER_BY_ENTRY, SECRETS_FILE, index_recipe, read_yaml, validate_lexical_policy)
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
@@ -243,12 +243,24 @@ def _recipe_of(connection: sqlite3.Connection) -> dict[str, str]:
     return dict(connection.execute(f"SELECT key, value FROM {RECIPE}"))
 
 
-def _affected(keys, paths) -> set[str]:
+def _register(root: Path) -> str | None:
+    """The decision register the path map names (``decision_register``), read without the record store."""
+    try:
+        named = read_yaml(Path(root) / PROJECT_DIR / "path-map.yaml", "CONFIG_INVALID", f"{PROJECT_DIR}/path-map.yaml")
+    except (GovError, OSError):
+        return None
+    value = named.get("decision_register") if isinstance(named, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def _affected(keys, paths, register: str | None = None) -> set[str]:
     """The paths whose chunks or index terms a switch of ``keys`` changes."""
     out: set[str] = set()
     for key in keys:
         if key == CODE_BY_DEFINITION:
             out |= {rel for rel in paths if rel.endswith(".py")}
+        elif key == REGISTER_BY_ENTRY and register is not None:
+            out |= {rel for rel in paths if rel == register}
     return out
 
 
@@ -293,7 +305,8 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
         recipe, built = _recipe_now(root), _recipe_of(connection)
         switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
-        rechunk = _affected(switched, [rel for rel, (_, indexed) in stored.items() if indexed == 1])
+        register = _register(root)
+        rechunk = _affected(switched, [rel for rel, (_, indexed) in stored.items() if indexed == 1], register)
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
         policy = kept_out(root, list(current)) if current else {}
         asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]
@@ -314,7 +327,7 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                 if rel not in allowed:
                     continue
                 text = (root / rel).read_bytes().decode("utf-8", "replace")  # only after the filter let it through
-                parent_rows, chunk_rows = chunk_file(rel, current[rel], text, recipe)
+                parent_rows, chunk_rows = chunk_file(rel, current[rel], text, recipe, register)
                 fields = _fields(rel, text, parent_rows)
                 connection.executemany("INSERT INTO lexical_parent VALUES (?, ?, ?, ?, ?)", parent_rows)
                 for *record, chunk in chunk_rows:
@@ -435,7 +448,7 @@ def _freshness(root: Path) -> tuple[str, list[str]]:
         if recipe != built:  # DEC-1068: built with other index-time methods than rebuild.yaml's
             indexed = [rel for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = 1")]
             switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
-            return "stale", sorted(set(stale) | _affected(switched, indexed))
+            return "stale", sorted(set(stale) | _affected(switched, indexed, _register(Path(root))))
         return "stale" if stale else "empty" if _empty(connection) else "fresh", stale
     finally:
         connection.close()

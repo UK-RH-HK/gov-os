@@ -58,7 +58,8 @@ KNOWN_FILES[REBUILD_FILE] = {}  # loaded for ``embed_headers`` alone (``_rebuild
 # DEC-1068's index-time methods of the keyword index (W2-32, notes within S7), each ``true`` or ``false``, absent
 # false: the store records them (``gov.retrieval.lexical``'s recipe), so switching one makes the index stale.
 CODE_BY_DEFINITION = "chunk_code_by_definition"  # M2: a Python chunk boundary at each top-level def/class and method
-INDEX_FLAGS = (CODE_BY_DEFINITION,)
+REGISTER_BY_ENTRY = "chunk_register_by_entry"  # M5: the decision register's entries one span each (long ones split)
+INDEX_FLAGS = (CODE_BY_DEFINITION, REGISTER_BY_ENTRY)
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 

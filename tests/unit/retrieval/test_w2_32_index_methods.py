@@ -148,3 +148,86 @@ def test_m2_on_a_question_naming_a_class_finds_the_chunk_that_begins_at_its_clas
     line = CODE.splitlines().index("class TideTable7:") + 1
     ranked = lexical.search(root, "TideTable7", refresh=False)["ranked"]
     assert ranked[0]["path"] == "src/almanac.py" and ranked[0]["start_line"] == line
+
+
+# --- M5: one span per register entry -----------------------------------------------------------------------------
+
+def _entry(number, lines):
+    return f"### DEC-{number:03d} — Decision {number}\n" + "".join(
+        f"- Line {n} of decision {number}, about the harbour's tide almanac and its keepers.\n" for n in range(lines))
+
+
+REGISTER = ("# The register\n\n## Section one\n\nIntroductory text of the section.\n\n"
+            + _entry(1, 5) + _entry(2, 40) + _entry(3, 160) + "## Section two\n\n"
+            + "".join(f"Row {n} of a long table outside any entry, kept as before.\n" for n in range(60))
+            + _entry(4, 2))
+
+
+@pytest.fixture()
+def register(project):
+    root = project
+    (root / "governance/project/path-map.yaml").write_text(
+        "namespaces:\n  all: {paths: ['**'], embedding_policy: embedded}\ndecision_register: docs/REG.md\n",
+        encoding="utf-8")
+    (root / "docs").mkdir()
+    (root / "docs/REG.md").write_text(REGISTER, encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "register")
+    return root
+
+
+def _entry_spans(text):
+    lines = text.splitlines()
+    heads = [n for n, line in enumerate(lines, 1) if line.startswith("#")]
+    return {lines[a - 1]: (a, b) for a, b in zip(heads, [h - 1 for h in heads[1:]] + [len(lines)])
+            if lines[a - 1].startswith("### DEC-")}
+
+
+def test_m5_off_is_today_s_and_on_each_entry_is_one_span_up_to_the_limit():
+    today = chunking.chunk_file("docs/REG.md", "b", REGISTER)
+    assert chunking.chunk_file("docs/REG.md", "b", REGISTER, {"chunk_register_by_entry": True}) == today  # no register
+    parents, chunks = chunking.chunk_file("docs/REG.md", "b", REGISTER, {"chunk_register_by_entry": True},
+                                          register="docs/REG.md")
+    assert parents == today[0]  # the parents kept
+    spans = [(first, last) for _, _, first, last, _, _ in chunks]
+    entries = _entry_spans(REGISTER)
+    sizes = {head: len("".join(REGISTER.splitlines(keepends=True)[a - 1:b])) for head, (a, b) in entries.items()}
+    assert sizes["### DEC-002 — Decision 2"] > chunking.MAX_CHARS and sizes["### DEC-003 — Decision 3"] > 10_000
+    for head, (a, b) in entries.items():
+        inside = [(f, l) for f, l in spans if a <= f and l <= b]
+        if sizes[head] <= chunking.REGISTER_ENTRY_CHARS:
+            assert inside == [(a, b)], head  # one span: the whole entry
+        else:
+            assert len(inside) > 1 and all(len("".join(REGISTER.splitlines(keepends=True)[f - 1:l])) <= 10_000
+                                           for f, l in inside)  # split within it, at the limit
+    today_spans = [(first, last) for _, _, first, last, _, _ in today[1]]
+    section = [(f, l) for f, l in today_spans if REGISTER.splitlines()[f - 1].startswith("Row")
+               or REGISTER.splitlines()[f - 1].startswith("## Section two")]
+    assert section and all(span in spans for span in section)  # outside the entries: as before
+    from gov.retrieval import semantic
+    assert chunking.REGISTER_ENTRY_CHARS == 10_000 == semantic.EMBED_LIMIT_CHARS  # an entry is embedded whole
+
+
+def test_switching_m5_marks_only_the_register_stale_and_off_restores_today_s(register):
+    root = register
+    lexical.refresh(root)
+    today, code = lexical.digest(root), _spans(root, "src/almanac.py")
+    _settings(root, chunk_register_by_entry=True)
+    assert lexical.freshness(root) == {"status": "stale", "stale": ["docs/REG.md"]}
+    assert lexical.refresh(root)["indexed"] == ["docs/REG.md"]
+    entries = _entry_spans(REGISTER)
+    assert entries["### DEC-002 — Decision 2"] in _spans(root, "docs/REG.md")
+    assert _spans(root, "src/almanac.py") == code
+    _settings(root, chunk_register_by_entry=True, chunk_code_by_definition=True)  # both: only the code is added
+    assert lexical.freshness(root) == {"status": "stale", "stale": ["src/almanac.py"]}
+    _settings(root)
+    lexical.refresh(root)
+    assert lexical.digest(root) == today and "lexical_recipe" not in _tables(root)
+
+
+def test_m5_on_a_question_about_an_entry_s_last_line_finds_the_whole_entry(register):
+    root = register
+    _settings(root, chunk_register_by_entry=True)
+    lexical.refresh(root)
+    ranked = lexical.search(root, "Line 39 of decision 2", refresh=False)["ranked"]
+    assert (ranked[0]["start_line"], ranked[0]["end_line"]) == _entry_spans(REGISTER)["### DEC-002 — Decision 2"]

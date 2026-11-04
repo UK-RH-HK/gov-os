@@ -27,6 +27,10 @@ OVERLAP_CHARS = 120
 # ``semantic.EMBED_LIMIT_CHARS`` (its server's 4,096-token context), the reranker up to ``fusion.RERANK_LIMIT_CHARS``
 # (one request's size bound, ``rerank.MAX_REQUEST_CHARS``, DEC-1067 (f)).
 READ_CHARS = 32768
+# DEC-1068's M5: a decision register entry is one chunk up to this many characters (the embedder's read,
+# ``semantic.EMBED_LIMIT_CHARS``, so an entry is embedded whole); a longer entry is split within it at this size.
+REGISTER_ENTRY_CHARS = 10_000
+_ENTRY = re.compile(r"### DEC-")
 _HEADING = re.compile(r"#{1,6}\s")
 
 
@@ -165,7 +169,7 @@ def header(path: str) -> str:
     return f"[path: {path}]\n"
 
 
-def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None):
+def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None, register: str | None = None):
     """``(parent rows, chunk rows)`` of one file.
 
     A parent row is ``(parent_id, path, kind, start_line, end_line)``; a chunk row is
@@ -174,17 +178,23 @@ def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None):
     ``recipe`` holds DEC-1068's index-time methods that are on (absent or all off: today's chunks, byte for byte).
     ``chunk_code_by_definition`` (M2): a Python file's runs are also cut at each top-level def/class and method
     (``definitions``), so no chunk holds the start of two definitions; the parents are kept as they are.
+    ``chunk_register_by_entry`` (M5): in the decision register (``register``, the path map's ``decision_register``),
+    each ``### DEC-`` entry's section is one chunk up to ``REGISTER_ENTRY_CHARS``, a longer one split within it at
+    that size; the register's other sections and every other file as before; the parents kept.
     """
     recipe = recipe or {}
     lines = text.splitlines(keepends=True)
     starts = definitions(text) if recipe.get("chunk_code_by_definition") and path.endswith(".py") else []
+    by_entry = bool(recipe.get("chunk_register_by_entry")) and register is not None and path == register
     parent_rows, chunk_rows = [], []
     for kind, start, end, runs in parents(path, text):
         runs = cut_at(runs, starts) if starts else runs
+        entry = by_entry and kind == "section" and bool(_ENTRY.match(lines[start - 1]))
+        size = REGISTER_ENTRY_CHARS if entry else MAX_CHARS
         parent_id = make_id("parent", path, blob, kind, start, end)
         parent_rows.append((parent_id, path, kind, start, end))
         for run_start, run_end in runs:
-            for first, last, chunk in chunk_text("".join(lines[run_start - 1:run_end])):
+            for first, last, chunk in chunk_text("".join(lines[run_start - 1:run_end]), max_chars=size):
                 first, last = first + run_start - 1, last + run_start - 1
                 chunk_rows.append((make_id("chunk", path, blob, first, last), path, first, last, parent_id, chunk))
     return parent_rows, chunk_rows
