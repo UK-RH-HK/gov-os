@@ -17,8 +17,8 @@ both YAML in the project and outside ``.gov-runtime/``, so they are kept with th
 (DEC-1052): the case is held out. ``events(root)`` lists every event recorded, oldest first.
 
 A miss may name its question's ``id`` (the measure's id) and its ``part``. **A miss on the hidden half** (an id of
-``H`` followed by digits, or ``part: hidden``) is recorded by the question's id only (the CTO's ruling under S3; the
-hidden half lives outside every tree, DEC-1055 (4), G-3): its event holds the id and nothing of the question, its
+``H`` or ``h`` followed by digits, or ``part: hidden``) is recorded by the question's id only (the CTO's ruling
+under S3; the hidden half lives outside every tree, DEC-1055 (4), G-3): its event holds the id and nothing of the question, its
 gold answer or its sources, and no case is written. Such a miss that carries anything but ``id`` and ``part`` raises
 ``ValueError`` naming what it carries, and nothing is written.
 """
@@ -40,12 +40,12 @@ TYPE = "memory-quality"
 REQUIRED = ("question", "expected", "root_cause", "repair", "regression")
 CASE_REQUIRED = ("question", "gold_answer", "sources")
 FIELDS = ("id", "type", "question", "root_cause", "repair", "path", "regression_case")
-HIDDEN, HIDDEN_ID = "hidden", re.compile(r"H\d+")
+HIDDEN, HIDDEN_ID = "hidden", re.compile(r"[Hh]\d+")  # the measure's hidden ids are h and digits (review F-1)
 HIDDEN_KEYS = ("id", "part")  # all a hidden miss may carry
 
 
 def hidden(miss) -> bool:
-    """Whether ``miss`` is one of the hidden half's: its id is ``H`` and digits, or its part is ``hidden``."""
+    """Whether ``miss`` is one of the hidden half's: its id is ``H`` or ``h`` and digits, or its part is ``hidden``."""
     return isinstance(miss, dict) and (miss.get("part") == HIDDEN or (
         isinstance(miss.get("id"), str) and HIDDEN_ID.fullmatch(miss["id"].strip()) is not None))
 
