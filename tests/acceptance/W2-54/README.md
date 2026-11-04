@@ -1016,7 +1016,21 @@ file. No case is retired; the count stays 14 in the file and 103 in the suite.
 | `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | a read with an environment that says nothing about the GPU starts the executable found as DEC-260 finds it as `serve` at the query address, told nothing about the GPU (none of `CUDA_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, `ROCR_VISIBLE_DEVICES`, `GPU_DEVICE_ORDINAL`, `OLLAMA_LLM_LIBRARY`), so it serves on the GPU; the read gets its semantic answer; never stopped; a second read starts nothing |
 | `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | two reads at once: both answered, every start told the address and nothing about the GPU, one embedder serving there on the GPU, nothing stopped |
 
-**What was removed:** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
+**DEC-1065 (1) (owner, 2026-11-03; W2-32's S10; the review of W2-32, F-8):** no CPU fallback anywhere, `ensure_*` a
+health check only, and only an explicit restart starts a server. Revised by W2-32's independent test designer; each
+change carries `Rewrite-Reason: DEC-1065 (1)` in the file. The count stays 14 in the file.
+
+| old case | new case | what it now checks |
+|---|---|---|
+| the `cpu` fixture (the query embedder's stand-in, on the CPU) | the same fixture, on the GPU | the 9 cases that use it keep what they guard: the questions to the query embedder only, the chunks to the shared runner, round 3's key never served, a model not reported loaded gives no vector |
+| `test_a_vector_cached_under_round_3_s_key_is_never_served`'s twin query embedder, on the CPU | the same, on the GPU | the reference answer is the twin's again (a CPU vector is refused) |
+| `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_with_nothing_at_the_query_address_starts_nothing_and_answers_by_keywords[GOV_OLLAMA_BIN, PATH, HOME]` | with nothing at the query address and the stand-in `ollama` where DEC-260 looks: two reads run no executable, name the semantic part `EMBEDDER_UNAVAILABLE`, answer by keywords, send nothing to the shared runner |
+| `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_with_nothing_at_the_query_address_start_nothing_and_both_answer_by_keywords` | two reads at once: both clean, both named `EMBEDDER_UNAVAILABLE` and answered by keywords, no executable run, nothing to the shared runner |
+
+**What was removed (DEC-1065 (1)):** the start by a read and the "never stopped" of what it started (nothing is
+started), and the use of a vector the query embedder computed on the CPU.
+
+**What was removed (DEC-1033):** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
 none, and the demand that every start hides the GPU (`gpu_hidden`). The start cases now hold the opposite, the GPU
 left visible, since DEC-1033 puts the query server on the GPU; a caller's own GPU variables are not judged (the cases
 give none). What each case guarded that still holds is kept.
