@@ -75,3 +75,48 @@ README line in the sets root, which the script did not write: a row, fixed by wr
 
 Every run from today keeps its per-question ranks (DEC-1068 (4)). Approved label changes can be re-scored on those runs
 without running again; last night's runs predate this.
+
+## Proposal: a larger set (the owner's request, 2026-11-04 ~12:50)
+**Why.**
+- The visible half has 3 misses left. One question is about 4 points of 24 (2 of 48), too coarse to choose methods
+  by.
+- Both halves fail R5: the plan, the tickets, and failure and lesson memory are thin or absent, and retrieval itself
+  is the subject of 10 of the visible 24.
+
+**Proposed shape: about 40 per half, 80 in all, about 2.5 points a question per half.**
+- **Keep the 48**, after the label fixes you approve. That keeps tonight's m1 to m5 comparable on the old 48 as a
+  subset.
+- **Add about 16 new per half**, chosen to fill R5's gaps:
+  - per half, at least 4 governed by **the plan**, 4 by **tickets**, 4 by **the Contract**;
+  - at least 3 on **failure and lesson memory**, citing a lesson or failure record;
+  - at least 2 on **the kernel's skills or roles**;
+  - the rest spread across decisions and code;
+  - no subsystem above 25 % of the half (retrieval at most 10 of 40).
+- Each new question passes R1-R10 when written: a governing source that is correct today, sources in what memory
+  searches by meaning (or marked as a keyword question), unambiguous, the kind of question agents ask, each fact once.
+
+**Who writes them.**
+- **Visible:** a session independent of the retrieval work (the rubric's author is the natural one), blind to every
+  result.
+- **Hidden:** W2-61h's role. Its writes to the sets root are refused by the guard (DEC-953 item 2), so one of:
+  - (a) an operator ACT letting that role write one folder (`~/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/`)
+    for this task only;
+  - (b) your operator writes the hidden 16, from the rubric, as for h02 and h24.
+  The role cannot draft them in its own scratch, because that is inside the repository (DEC-1052 G-3).
+- **Cross-check:** each half's new questions are judged against the rubric by the other writer's role before the
+  measure (ids and items only for the hidden half).
+
+**Then m6:**
+- the product as live (pin `8284fb408bd4`'s code: G1, x5, headers), with today's 0.6B reranker, on the 80;
+- three runs, every search's ranked output kept;
+- the new baseline for the methods' measures (`DAY.md`'s rule, re-based on m6) and for the reranker trial.
+- **Cost:** about 1,100 s a run (670 s for 48), about an hour for three.
+
+**What it needs from you:**
+1. **The visible half's size beyond lens B's 20 + 4** (DEC-1009 fixes the visible set at "lens B's 20 exactly" + W2-61h's
+   4): an amendment, recorded as yours.
+2. **R5's threshold**, and W2-61h's category quotas, which cannot meet it (the hidden auditor's point 2).
+3. **The hidden writer:** (a) or (b) above.
+4. **The audit's label decisions (a)-(f) above**, applied before m6, so m6 is measured on corrected labels.
+
+**Time:** about 2 h for the writing (both halves in parallel), then the cross-check (30 min), then m6 (1 h).
