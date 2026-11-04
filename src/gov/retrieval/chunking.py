@@ -64,13 +64,12 @@ def register_sections(text: str) -> list[tuple[str, int, int, list[tuple[int, in
     return [("section", start, end, [(start, end)]) for start, end in zip(starts, ends)]
 
 
-def entry_parts(lines: list[str], first: int, last: int) -> list[tuple[int, int]]:
-    """An entry's lines ``first`` to ``last`` (1-based) as its chunks: the whole entry when it holds at most
-    ``REGISTER_ENTRY_CHARS`` characters; else parts cut at its own boundaries (a top-level list item, a sub-heading,
-    outside fenced blocks), packed in order, each at most the limit, no overlap; a piece still above the limit is cut
-    by lines at that size."""
+def entry_parts(lines: list[str], first: int, last: int, limit: int = REGISTER_ENTRY_CHARS) -> list[tuple[int, int]]:
+    """An entry's lines ``first`` to ``last`` (1-based) as its chunks: the whole entry when it holds at most ``limit``
+    characters; else parts cut at its own boundaries (a top-level list item, a sub-heading, outside fenced blocks),
+    packed in order, each at most ``limit``, no overlap; a piece still above it is cut by lines at that size."""
     body = lines[first - 1:last]
-    if sum(map(len, body)) <= REGISTER_ENTRY_CHARS:
+    if sum(map(len, body)) <= limit:
         return [(first, last)]
     outside = _unfenced(body)
     cuts = [first] + [first + i for i, line in enumerate(body) if i and outside[i] and _INNER.match(line)]
@@ -78,14 +77,14 @@ def entry_parts(lines: list[str], first: int, last: int) -> list[tuple[int, int]
     parts, start, size = [], None, 0
     for a, b in pieces:
         chars = sum(len(line) for line in lines[a - 1:b])
-        if chars > REGISTER_ENTRY_CHARS:  # one piece above the limit: by lines, at the limit
+        if chars > limit:  # one piece above the limit: by lines, at the limit
             if start is not None:
                 parts.append((start, a - 1))
                 start, size = None, 0
             parts += [(a + f - 1, a + l - 1) for f, l, _ in
-                      chunk_text("".join(lines[a - 1:b]), max_chars=REGISTER_ENTRY_CHARS, overlap_chars=0)]
+                      chunk_text("".join(lines[a - 1:b]), max_chars=limit, overlap_chars=0)]
             continue
-        if start is not None and size + chars > REGISTER_ENTRY_CHARS:
+        if start is not None and size + chars > limit:
             parts.append((start, a - 1))
             start, size = None, 0
         if start is None:
@@ -243,21 +242,28 @@ def chunk_file(path: str, blob: str, text: str, recipe: dict | None = None, regi
     (``definitions``), so no chunk holds the start of two definitions; the parents are kept as they are.
     ``chunk_register_by_entry`` (M5, P-W2-32-11): in the decision register (``register``, the path map's
     ``decision_register``), the parents are ``register_sections`` (headings outside fenced blocks), and each
-    ``### DEC-`` entry is one chunk up to ``REGISTER_ENTRY_CHARS``, a longer one split at its own boundaries
-    (``entry_parts``), never across two entries; the register's other sections are chunked as before; every other
-    file as before.
+    ``### DEC-`` entry is one chunk when it and its contextual header (``headers``, as the embedder adds it) hold at
+    most ``REGISTER_ENTRY_CHARS``, else split at its own boundaries (``entry_parts``) into parts that each fit with the
+    header (review S7-F1), never across two entries; the same chunks whether ``embed_headers`` is on or off; the
+    register's other sections are chunked as before; every other file as before.
     """
     recipe = recipe or {}
     lines = text.splitlines(keepends=True)
     starts = definitions(text) if recipe.get("chunk_code_by_definition") and path.endswith(".py") else []
     by_entry = bool(recipe.get("chunk_register_by_entry")) and register is not None and path == register
     parent_rows, chunk_rows = [], []
-    for kind, start, end, runs in (register_sections(text) if by_entry else parents(path, text)):
+    sections = register_sections(text) if by_entry else parents(path, text)
+    room = {}
+    if by_entry:  # review S7-F1: an entry and its contextual header fit the embedder's read together
+        ids = [make_id("parent", path, blob, kind, start, end) for kind, start, end, _ in sections]
+        named = headers(path, [(pid, kind, start, lines[start - 1]) for pid, (kind, start, _, _) in zip(ids, sections)])
+        room = {pid: REGISTER_ENTRY_CHARS - len(named.get(pid, header(path))) for pid in ids}
+    for kind, start, end, runs in sections:
         runs = cut_at(runs, starts) if starts else runs
         parent_id = make_id("parent", path, blob, kind, start, end)
         parent_rows.append((parent_id, path, kind, start, end))
         if by_entry and _ENTRY.match(lines[start - 1]):  # an entry: one chunk, or its parts at its own boundaries
-            for first, last in entry_parts(lines, start, end):
+            for first, last in entry_parts(lines, start, end, room[parent_id]):
                 chunk = "".join(lines[first - 1:last])
                 chunk_rows.append((make_id("chunk", path, blob, first, last), path, first, last, parent_id, chunk))
             continue

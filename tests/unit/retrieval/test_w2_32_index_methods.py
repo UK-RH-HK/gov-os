@@ -357,3 +357,51 @@ def test_m5_switched_the_next_build_follows_the_new_form(register):
     lexical.refresh(root)
     expected = [(f, l) for _, _, f, l, _, _ in _m5()[1]]
     assert _spans(root, "docs/REG.md") == sorted(expected)
+
+
+# --- review S7-F1: an entry and its contextual header fit the embedder's read together ----------------------------
+
+TITLE = "### DEC-020 — " + "A decision with a long title about the harbour's tide almanac and its keepers " * 6 + "\n"
+NEAR = TITLE + "".join(f"- Item {n}: the keepers read the almanac at dawn and at dusk, and log it.\n"
+                       for n in range(125))  # under 10,000 characters alone, over it with its header
+REG3 = "# Register\n\n## Decisions of the harbour\n\n" + NEAR + _entry(21, 3)
+
+
+def _with_headers(text, path="docs/REG.md"):
+    parents, chunks = chunking.chunk_file(path, "b", text, {"chunk_register_by_entry": True}, register=path)
+    lines = text.splitlines()
+    named = chunking.headers(path, [(pid, kind, s, lines[s - 1]) for pid, _, kind, s, _ in parents])
+    return [(f, l, len(named[pid]) + len(chunk)) for _, _, f, l, pid, chunk in chunks]
+
+
+def test_s7_f1_no_register_chunk_with_its_header_passes_the_embedder_s_limit():
+    entry = len(NEAR)
+    header = len(chunking.headers("docs/REG.md", [("p", "section", 1, "# Register"),
+                                                  ("q", "section", 3, "## Decisions of the harbour"),
+                                                  ("r", "section", 5, TITLE.rstrip("\n"))])["r"])
+    assert entry <= chunking.REGISTER_ENTRY_CHARS < entry + header  # the case S7-F1 found: cut once the header is on
+    sized = _with_headers(REG3)
+    assert all(size <= chunking.REGISTER_ENTRY_CHARS for _, _, size in sized)
+    a = REG3.splitlines().index(TITLE.rstrip("\n")) + 1
+    parts = [(f, l) for f, l, _ in sized if a <= f <= a + len(NEAR.splitlines()) - 1]
+    assert len(parts) == 2 and parts[0][0] == a and parts[1][1] == a + len(NEAR.splitlines()) - 1  # split at an item
+    assert REG3.splitlines()[parts[1][0] - 1].startswith("- Item")
+
+
+def test_s7_f1_a_short_entry_is_still_one_chunk_and_the_chunks_do_not_depend_on_embed_headers():
+    sized = _with_headers(REG3)
+    lines = REG3.splitlines()
+    b = lines.index(_entry(21, 3).splitlines()[0]) + 1
+    assert (b, len(lines)) in [(f, l) for f, l, _ in sized]  # the short entry: one chunk, whole
+    on = chunking.chunk_file("docs/REG.md", "b", REG3, {"chunk_register_by_entry": True, "embed_headers": True},
+                             register="docs/REG.md")
+    assert on == chunking.chunk_file("docs/REG.md", "b", REG3, {"chunk_register_by_entry": True},
+                                     register="docs/REG.md")  # the keyword index's chunks, headers on or off
+
+
+def test_s7_f1_this_repository_s_register_fits_with_its_headers():
+    path = REPO / "docs/DECISION_REGISTER.md"
+    if not path.is_file():
+        pytest.skip("no register in this tree")
+    sized = _with_headers(path.read_text(encoding="utf-8"), "docs/DECISION_REGISTER.md")
+    assert sized and max(size for _, _, size in sized) <= chunking.REGISTER_ENTRY_CHARS
