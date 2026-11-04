@@ -9,7 +9,7 @@ integrated code at `9c468dbd` was read for today's interfaces (DEC-963).
 **Round 1:** S1 to S5, S9 and F1. **Round 2:** S3's hidden miss (the CTO's ruling), S10 (DEC-1065), S5's premise,
 the map in the runner's form, and the stand-in reporting the GPU (below, "Round 2's rewrites"). Round 3: the hidden
 miss made strict (P-W2-32-5). Round 4: S7, the owner's first gap (G1, DEC-1066); S8 (G3) and S6 (G2) come in later
-rounds; round 10 adds DEC-1067 order (5)'s contextual headers. **167 cases from 77 test functions in thirteen files**, with a support module, a driver, the S9/F1 rule module
+rounds; round 10 adds DEC-1067 order (5)'s contextual headers, round 19 DEC-1068's M1 and M3. **185 cases from 85 test functions in fifteen files**, with a support module, a driver, the S9/F1 rule module
 and a conftest. They run in under a minute on the engineer's head.
 
 ## How the tests reach the code under test
@@ -134,8 +134,8 @@ Each item names its file and its test function in full, as `gov accept` matches 
 | S9 | Below 85 % after two improvement rounds: escalated to the owner, who decides at the third; at 85 % or above but under 95 % with room, not closed: escalated [DEC-954 Q9e, DEC-957] | `test_w2_32_record.py::test_the_baseline_record_holds_both_figures_against_their_bars`; `test_w2_32_record.py::test_s9_escalates_below_85_after_two_rounds_and_under_95_with_room` (6 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | F1 | An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted | `test_w2_32_record.py::test_the_baseline_was_run_more_than_once_on_one_commit_so_it_has_a_noise_band`; `test_w2_32_record.py::test_f1_reverts_a_round_below_the_baselines_noise_band` (5 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | S10 | No CPU fallback for embeddings: the GPU embedders unreachable, the semantic part named unavailable and a keyword answer; no private embedder started; a vector computed on the CPU refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1] | `test_w2_32_s10_no_cpu_fallback.py::test_ensure_available_with_the_embedders_unreachable_checks_health_only`; `test_w2_32_s10_no_cpu_fallback.py::test_a_search_with_the_embedders_unreachable_reports_the_semantic_part_unavailable_with_a_named_code`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_embedders_unreachable_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing`; `test_w2_32_s10_no_cpu_fallback.py::test_a_question_vector_computed_on_the_cpu_is_refused_and_nothing_cached`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_query_embedder_on_the_cpu_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed` |
-| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named`; `test_w2_32_s7_dec1067.py::test_nested_parents_send_no_line_twice_and_name_every_span_left_out` (a Python module and its functions, the round-2 review's R2-F1; a known failure, xfail strict: R2-F1 deferred to D-9 by the CTO, 2026-11-04, DEC-802, work parked at tag park/W2-32-R2-F1; it turns red when the behaviour is fixed and the mark is not removed); `test_w2_32_s7_size_bound.py::test_a_pool_of_long_chunks_goes_in_the_fewest_requests_within_16_texts_and_24000_characters` (2 cases: the fusion, retrieve; the review's S7-F4); `test_w2_32_s7_size_bound.py::test_a_chunk_above_the_budget_is_read_up_to_it` (2 cases); `test_w2_32_s7_headers.py::test_with_the_setting_on_each_chunk_is_embedded_after_a_header_of_its_path_and_the_headings_above_it` (DEC-1067 order (5): a title and nested sections); `test_w2_32_s7_headers.py::test_a_file_with_no_headings_is_embedded_after_a_header_of_its_path_alone`; `test_w2_32_s7_headers.py::test_the_header_is_deterministic`; `test_w2_32_s7_headers.py::test_a_headed_chunk_stays_within_the_embedders_limit`; `test_w2_32_s7_headers.py::test_the_keyword_chunk_and_the_evidence_are_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_the_rerankers_input_is_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_with_the_setting_absent_or_false_the_embedder_receives_the_chunk_as_today` (3 cases: no file, no key, false); `test_w2_32_s7_headers.py::test_an_invalid_setting_is_refused_with_config_invalid_naming_the_key` (4 cases: yes, 1, a quoted "true", a word); `test_w2_32_s7_headers.py::test_switching_the_setting_makes_the_store_stale_and_the_next_rebuild_re_embeds_every_chunk` |
-| S8 | Routing by question type: a question that names a symbol puts the code route's first 2 hits ahead after the rerank; a question that names a record puts that record's 2 best chunks ahead; each half kept only if it holds at its measure (each half behind its own setting, both off by default) [DEC-1067 (a)] | `test_w2_32_s8_routing.py::test_with_both_halves_off_the_order_is_the_rerankers` (12 cases: no setting, both 0 or an empty block, four questions); `test_w2_32_s8_routing.py::test_off_by_setting_gives_the_same_bundle_as_no_setting`; `test_w2_32_s8_routing.py::test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rerank` (S8's measured form: the code route's hits by stored-vector cosine to the question); `test_w2_32_s8_routing.py::test_route_by_symbol_without_stored_vectors_falls_back_to_the_routes_own_order`; `test_w2_32_s8_routing.py::test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_route_by_record_puts_the_records_two_best_chunks_ahead_after_the_rerank`; `test_w2_32_s8_routing.py::test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead`; `test_w2_32_s8_routing.py::test_the_16_text_cap_holds_with_routing_on`; `test_w2_32_s8_routing.py::test_an_invalid_setting_is_config_invalid_naming_the_key` (6 cases: a negative number, a word, a list, each key); the phrasings (DEC-1067 order (4), a note within S8): `test_w2_32_s8_phrasings.py::test_the_content_word_phrasing_brings_a_chunk_only_it_reaches` (on, off); `test_w2_32_s8_phrasings.py::test_the_id_appended_phrasing_reaches_a_chunk_naming_the_resolved_record` (on, off); `test_w2_32_s8_phrasings.py::test_the_merged_pool_is_reranked_once_within_16_texts_and_24000_characters` (2 cases); `test_w2_32_s8_phrasings.py::test_off_is_todays_bundle_byte_for_byte` (2 cases); `test_w2_32_s8_phrasings.py::test_an_invalid_phrasings_value_is_config_invalid_naming_the_key` (3 cases) |
+| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066]; DEC-1068's index-time methods M1, M2, M5, M4, each behind a setting off by default [DEC-1068] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named`; `test_w2_32_s7_dec1067.py::test_nested_parents_send_no_line_twice_and_name_every_span_left_out` (a Python module and its functions, the round-2 review's R2-F1; a known failure, xfail strict: R2-F1 deferred to D-9 by the CTO, 2026-11-04, DEC-802, work parked at tag park/W2-32-R2-F1; it turns red when the behaviour is fixed and the mark is not removed); `test_w2_32_s7_size_bound.py::test_a_pool_of_long_chunks_goes_in_the_fewest_requests_within_16_texts_and_24000_characters` (2 cases: the fusion, retrieve; the review's S7-F4); `test_w2_32_s7_size_bound.py::test_a_chunk_above_the_budget_is_read_up_to_it` (2 cases); `test_w2_32_s7_headers.py::test_with_the_setting_on_each_chunk_is_embedded_after_a_header_of_its_path_and_the_headings_above_it` (DEC-1067 order (5): a title and nested sections); `test_w2_32_s7_headers.py::test_a_file_with_no_headings_is_embedded_after_a_header_of_its_path_alone`; `test_w2_32_s7_headers.py::test_the_header_is_deterministic`; `test_w2_32_s7_headers.py::test_a_headed_chunk_stays_within_the_embedders_limit`; `test_w2_32_s7_headers.py::test_the_keyword_chunk_and_the_evidence_are_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_the_rerankers_input_is_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_with_the_setting_absent_or_false_the_embedder_receives_the_chunk_as_today` (3 cases: no file, no key, false); `test_w2_32_s7_headers.py::test_an_invalid_setting_is_refused_with_config_invalid_naming_the_key` (4 cases: yes, 1, a quoted "true", a word); `test_w2_32_s7_headers.py::test_switching_the_setting_makes_the_store_stale_and_the_next_rebuild_re_embeds_every_chunk`; `test_w2_32_dec1068_index.py::test_with_the_settings_off_the_chunks_are_todays` (3 cases: no file, no key, the three false); `test_w2_32_dec1068_index.py::test_with_the_settings_off_the_keyword_answers_are_todays` (3 cases: no file, no key, the three false); `test_w2_32_dec1068_index.py::test_m2_on_python_chunks_begin_at_each_definition_with_the_parents_kept`; `test_w2_32_dec1068_index.py::test_m2_on_changes_no_other_files_chunks`; `test_w2_32_dec1068_index.py::test_m5_on_an_entry_within_the_limit_is_one_chunk_holding_it_whole` (4 cases: short, fenced, 9000 characters, after a section); `test_w2_32_dec1068_index.py::test_m5_on_an_entry_above_the_limit_is_split_within_it_at_its_own_bullets`; `test_w2_32_dec1068_index.py::test_m5_on_changes_no_other_files_chunks`; `test_w2_32_dec1068_index.py::test_m4_on_a_part_of_an_identifier_or_a_path_finds_its_chunk` (5 cases: seed, Seeded, Rebuild, trimmer, ballast); `test_w2_32_dec1068_index.py::test_m4_on_the_whole_identifier_still_matches` (4 cases); `test_w2_32_dec1068_index.py::test_m4_on_changes_no_chunk`; `test_w2_32_dec1068_index.py::test_switching_a_setting_makes_the_store_stale_and_the_next_build_follows_it` (3 cases: one per setting); `test_w2_32_dec1068_index.py::test_an_invalid_value_is_refused_with_config_invalid_naming_the_key` (12 cases: each setting with yes, 1, a quoted "true", a word); the file-level index (DEC-1068 M1, a note within S7): `test_w2_32_s7_file_index.py::test_with_the_file_level_index_on_a_question_spread_over_a_files_headings_reaches_its_best_chunk`; `test_w2_32_s7_file_index.py::test_with_the_file_level_index_absent_or_false_the_answers_are_todays` (2 cases: no key, false); `test_w2_32_s7_file_index.py::test_switching_the_file_level_index_makes_the_store_stale`; `test_w2_32_s7_file_index.py::test_an_invalid_file_level_index_is_config_invalid_naming_the_key` (4 cases) |
+| S8 | Routing by question type: a question that names a symbol puts the code route's first 2 hits ahead after the rerank; a question that names a record puts that record's 2 best chunks ahead; each half kept only if it holds at its measure (each half behind its own setting, both off by default) [DEC-1067 (a)] | `test_w2_32_s8_routing.py::test_with_both_halves_off_the_order_is_the_rerankers` (12 cases: no setting, both 0 or an empty block, four questions); `test_w2_32_s8_routing.py::test_off_by_setting_gives_the_same_bundle_as_no_setting`; `test_w2_32_s8_routing.py::test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rerank` (S8's measured form: the code route's hits by stored-vector cosine to the question); `test_w2_32_s8_routing.py::test_route_by_symbol_without_stored_vectors_falls_back_to_the_routes_own_order`; `test_w2_32_s8_routing.py::test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_route_by_record_puts_the_records_two_best_chunks_ahead_after_the_rerank`; `test_w2_32_s8_routing.py::test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead`; `test_w2_32_s8_routing.py::test_the_16_text_cap_holds_with_routing_on`; `test_w2_32_s8_routing.py::test_an_invalid_setting_is_config_invalid_naming_the_key` (6 cases: a negative number, a word, a list, each key); the phrasings (DEC-1067 order (4), a note within S8): `test_w2_32_s8_phrasings.py::test_the_content_word_phrasing_brings_a_chunk_only_it_reaches` (on, off); `test_w2_32_s8_phrasings.py::test_the_id_appended_phrasing_reaches_a_chunk_naming_the_resolved_record` (on, off); `test_w2_32_s8_phrasings.py::test_the_merged_pool_is_reranked_once_within_16_texts_and_24000_characters` (2 cases); `test_w2_32_s8_phrasings.py::test_off_is_todays_bundle_byte_for_byte` (2 cases); `test_w2_32_s8_phrasings.py::test_an_invalid_phrasings_value_is_config_invalid_naming_the_key` (3 cases); the reverse depends_on edge (DEC-1068 M3, a note within S8; re-scoped by P-W2-32-10 to dependents beyond one hop): `test_w2_32_s8_reverse_depends.py::test_with_the_reverse_edge_on_a_question_naming_a_record_reaches_its_dependents_beyond_one_hop`; `test_w2_32_s8_reverse_depends.py::test_with_the_reverse_edge_off_the_closure_reaches_one_hop_as_today` (2 cases: absent, false); `test_w2_32_s8_reverse_depends.py::test_a_question_naming_a_record_reaches_the_records_that_depend_on_it` (3 cases: absent, false, true; a guard: today's closure reaches the direct dependents already); `test_w2_32_s8_reverse_depends.py::test_an_invalid_closure_reverse_depends_on_is_config_invalid_naming_the_key` (4 cases) |
 
 ## What the record judges instead of a test
 
@@ -167,6 +167,113 @@ Each item names its file and its test function in full, as `gov accept` matches 
   hidden-shaped miss.
 - **Other tickets' cases that W2-32's S2 makes fail closed** are revised to pin their stand-in's digest in their
   planted project's `models.yaml` (each with its own `Rewrite-Reason`; the return lists them).
+
+## The two method branches joined (`w2/W2-32-index-tests` into `w2/W2-32-tests`, the CTO)
+
+Both branches' rows are kept whole in the map: S7 holds this branch's M2, M5 and M4 items and the other branch's M1
+items (36 items), S8 the phrasings' and routing items and the other branch's M3 items (19 items); 98 items in all,
+every one of the folder's 97 test functions among them (`test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome`
+under both S9 and F1, as before). Each branch's round sections follow under its own heading.
+
+- **On this tree (`src` at integrate's `d30e9514`):** 35 failed, 187 passed, 1 skipped (S5's order case), 1 xfailed
+  (R2-F1). The 35 are the methods' cases whose code is not here: M2, M5 and M4 (24: `test_w2_32_dec1068_index.py`)
+  and M1 and M3 (11: `test_w2_32_s7_file_index.py` 6, `test_w2_32_s8_reverse_depends.py` 5). No other case fails.
+
+## Round 20, this branch (P-W2-32-11: M5 re-scoped; the settings file tracked; `Rewrite-Reason: P-W2-32-11 (M5 re-scoped)`)
+
+- **M5 re-scoped:** each `### DEC-` entry (as the store reads it: to the next heading outside a fenced block) is one
+  chunk holding it whole, up to `EMBED_LIMIT_CHARS` (10,000 characters); a longer entry is split within it at its own
+  bullet or section boundaries (a bullet of its own, not an indented continuation line; or a line after a blank line),
+  each part at most 10,000; no chunk spans two entries; each chunk inside the parent it names. The planted register:
+  DEC-901 short, DEC-902 with a fenced block of `#` lines, DEC-903 of 8,556 characters (nine chunks today), DEC-904 of
+  34,314 characters whose bullets are three lines each and which holds a paragraph break, DEC-905 after a `##`
+  section. The cases: one per entry within the limit (4), and one for the long entry (replacing round 19's single M5
+  case). The one-parent-per-entry requirement of round 19 is dropped (not in the re-scoped note).
+- **The settings file is tracked** (since `dc8a2829`): each setting is written and committed, no longer kept out of git.
+  A switch now makes the store stale by its blob change alone, so the switch case is told apart by what follows: a
+  refresh of the keyword index builds what the setting says, and for M2 and M5 leaves the vectors stale until the
+  rebuild; after the rebuild the vectors answer; off again gives today's chunks. The "settings file without the key
+  leaves the store fresh" premise is gone (a committed edit makes it stale).
+- **Today's answers re-recorded** on integrate's head `bd87a8b2` (the register changed): `w2_32_dec1068_today.json`.
+- **On integrate's head `bd87a8b2` (a scratch tree):** 24 red, 15 green. Red: M2 (1), M5's fenced and 9,000-character
+  entries and the long entry (3), M4's parts (5), the switches (3, each at the refresh step), the invalid values (12).
+  Green, as guards: off (6), M5's short and after-a-section entries, the other files unchanged under M2 and M5, M4's
+  whole identifiers (4) and its unchanged chunks.
+
+## Round 19, this branch (DEC-1068's index-time methods M2, M5, M4; notes within S7)
+
+`test_w2_32_dec1068_index.py`, with the planted project and the readers in `w2_32_index_methods.py`. The settings are
+`chunk_code_by_definition` (M2), `chunk_register_by_entry` (M5) and `lexical_split_identifiers` (M4) in
+`governance/project/rebuild.yaml`, absent = off, `true` or `false` alone. The file is kept out of git and read as it
+stands in the working tree, so writing it changes no tracked file; the governance files are kept out of the keyword
+index, so the keyword answers hold the planted files alone. The driver gains `lexical_search` (`lexical.search`).
+
+- **Off is today's, exactly:** `w2_32_dec1068_today.json` is today's index of the planted files (chunk spans, parents,
+  chunk and parent ids) and today's keyword answers (hits and the ranked list) for twelve queries, recorded on
+  integrate's head `bfd60400` by `python3 w2_32_index_methods.py --record`. No file, a file without the keys, and the
+  three `false` must each give it exactly; the ids too, so an upgrade with the settings off makes no store stale.
+- **M2:** each top-level `def`/`class` and each method begins a chunk (the lines before it in that chunk blank or
+  comments alone); no chunk runs on into one; every line is in a chunk; today's parents (the module, the outermost
+  functions) are kept and each chunk lies inside the parent it names. Nested functions are not boundaries. Red today:
+  `class TideTable` lies in a module chunk that begins at `WATCH = "night"`, and `class SeededRebuild` in one that
+  begins at the docstring.
+- **M5:** the register is the path map's `decision_register`; an entry runs from its `### DEC-` heading to the next
+  heading outside a fenced block, the store's rule (`register_entries`). Each entry's chunks lie inside it, name one
+  parent that is the entry's span, and cover it; a short entry is one chunk; an entry of about 34,000 characters is
+  more than one. Red today on one point only: DEC-902 holds a fenced YAML block with `#` comment lines, which today's
+  chunker takes for headings, so the entry is three sections. **Today's chunker already keeps entries apart wherever
+  they hold no such line: on this repository's register, 0 of its 2,554 chunks span two entries.**
+- **M4:** a part of an identifier (`seed` of `rebuild_slot_seed`; `Seeded` and `Rebuild` of `SeededRebuild`;
+  `trimmer` of `gov.lantern.wick_trimmer`) or of a path's segment (`ballast` of `tools/heavy_ballast.sh`) finds the
+  chunk in the ranked list and the line as a hit, its text the file's line. Today the tokenizer already separates at
+  `/`, `.` and `-`; only parts within `_` or a capital inside a word are found nowhere. The whole identifier hits
+  exactly what it hits today; no chunk changes.
+- **Switched:** with the settings file holding only another key, the store is fresh (the premise). Turning a setting
+  on makes the keyword route answer unavailable, and for M2 and M5 the vectors too; a refresh of the keyword index,
+  and then the rebuild, build what the setting says; off again is stale again, and the rebuild gives today's chunks.
+- **Invalid:** `yes`, `1`, a quoted `"true"` or a word refuses the rebuild with `CONFIG_INVALID` naming the key, and
+  nothing is embedded.
+- **On integrate's head `bfd60400` (a scratch tree):** 22 red, 13 green. Red: M2's definitions, M5's entries, M4's 5
+  parts, the 3 switches, the 12 invalid values. Green, as guards: off (6), the other files unchanged under M2 and M5,
+  M4's whole identifiers (4) and its unchanged chunks.
+
+## Round 20, `w2/W2-32-index-tests` (M3 re-scoped: `Rewrite-Reason: P-W2-32-10 (M3 re-scoped to dependents beyond one hop)`)
+
+The CTO's ruling P-W2-32-10 (option (b) of round 19's return): M3 is what today's closure lacks. For a record the
+question names, `closure_reverse_depends_on: true` also reaches its dependents beyond one hop: `DAEO-sail`
+(`depends_on: [DAEO-buoy]`), two hops from the named `DAEO-quay`, is an evidence item whose `routes` name `closure`.
+**Off** (absent, `false`): today's one hop, `DAEO-buoy` by the closure and `DAEO-sail` not. Round 19's guard (the
+direct dependent reached, setting absent, false or true) and the invalid-value case stay. 3 cases added (10 in the
+file). **On integrate `71fedd02`** (a scratch tree): 5 red (the two-hop case: `DAEO-sail` not reached by the closure,
+its premise holding; the four invalid values: accepted, the key ignored), 5 green (the two off cases and the three
+guards).
+
+## Round 19, `w2/W2-32-index-tests` (DEC-1068: M1, the file-level index; M3, the reverse `depends_on` edge)
+
+From the ticket's note "DEC-1068, the five index-time methods" (the CTO, 2026-11-04 ~09:30), M1 within S7 and M3 within
+S8; the planted projects and the settings in `w2_32_methods.py`. Both settings files are kept out of the index (a
+namespace with `lexical_policy: not indexed`) and written uncommitted, so a setting alone changes an answer.
+
+- **M1** (`test_w2_32_s7_file_index.py`, 8 cases): `file_level_index: true|false` in `governance/project/rebuild.yaml`,
+  absent is off. `docs/mate-notes.md`, small, holds the question's three word pairs one per heading (title, two
+  sections), no question word in its path; 42 notes, each dense in one pair, out-rank its chunks in both routes. From
+  the stand-in's vectors (premises in the case): its file vector (path, headings, opening) is the nearest file, and its
+  best chunk by stored vector is its `Pennant hoists` section. **On:** that chunk is in `retrieve`'s evidence (radius
+  0); off it is not. **Off** (no key, `false`): the bundle and the semantic answer are those with no file, byte for
+  byte. **Switched** (both ways): a search that may not refresh answers unavailable until the next rebuild.
+  **Invalid** (`yes`, `1`, `"true"`, a word): `gov rebuild` refuses with `CONFIG_INVALID` naming the key, nothing sent
+  to the embedder.
+- **M3** (`test_w2_32_s8_reverse_depends.py`, 7 cases): `closure_reverse_depends_on` (in `rebuild.yaml`;
+  `w2_32_methods.M3_SETTINGS_REL` names the file, to align if the engineer makes it query-time). **Today's closure
+  already reaches the direct dependents**: it follows the store's typed edges both ways, `DEPENDS_ON` among them, so on
+  integrate `bfd60400` "Which tickets depend on DAEO-quay?" reaches `DAEO-buoy` (`depends_on: [DAEO-quay]`) by the
+  closure at radius 0, 1 and 2, while `DAEO-sail` (two hops) is not reached. The reaching case is therefore a guard
+  (absent, false, true: the direct dependent reached by the closure). "Off does not reach it" is not written: it would
+  change today's answers; it is the CTO's decision (the return). **Invalid:** `CONFIG_INVALID` naming the key, from
+  `gov rebuild` or, read at query time, from `retrieve`.
+- **On integrate `bfd60400`** (a scratch tree): 10 red, 5 green. Red: M1 on (the best chunk not in the evidence), M1
+  switched (the store answered from), the eight invalid values (accepted: the keys are ignored today). Green: M1 off
+  (2, guards) and the M3 reaching guard (3).
 
 ## Round 18 (the padded request bound; `Rewrite-Reason: the padded bound groups requests by length (ties in the pool's order)`)
 

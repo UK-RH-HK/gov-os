@@ -141,6 +141,20 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             )
 
     stores: dict = {}
+    # DEC-1068 M3: the line stating each depends_on edge, from the record store just built; only with the setting on
+    # is it a stage and a part of the result, so a rebuild with it off is today's (its table dropped if there is one).
+    import sqlite3
+
+    from gov.retrieval import reverse_edges
+
+    if reverse_edges.on(root):
+        with watch.stage(reverse_edges.RECIPE_KEY):
+            try:
+                stores[reverse_edges.RECIPE_KEY] = reverse_edges.refresh(root)
+            except (OSError, ValueError, LookupError, sqlite3.Error) as exc:
+                stores[reverse_edges.RECIPE_KEY] = {"status": "not_recreated", "reason": str(exc)}
+    else:
+        reverse_edges.refresh(root)
     # The secrets filter's counts around the stages that run it, all in this process (W2-107, DEC-970 P-W2-107-3).
     counted = scan_counts()
 
