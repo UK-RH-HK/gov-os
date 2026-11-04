@@ -1,12 +1,21 @@
 category: kernel-template
 commit: cc9c94d42a54
-question: "When the orchestrator's review finds a case my acceptance tests miss, how does it reach me and what do I do with it?"
+question: "A reviewer found a behaviour that no acceptance test covers. How is it handed to the test designer, and what do I decide about it?"
 gold_answer: >-
-  As a described behaviour, never as code (DEC-136): the test designer decides from the specification whether it
-  becomes an acceptance test, and reports a finding that reveals a specification gap to the orchestrator, so the
-  specification can be amended.
+  It goes to the next test design batch as a described behaviour, never as code (CAP-38.e, DEC-136): the test designer
+  decides from the specification whether it becomes an acceptance test, and reports a finding that reveals a
+  specification gap.
 sources:
-  - - path: docs/DECISION_REGISTER.md
+  - - path: docs/contract/CONTRACT_v4.md
+      heading: "  - `CAP-38.e` [W1] A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and reports a specification gap — DEC-136 · delivered by W1-35"
+      lines: [605, 605]
+    - path: docs/contract/contract.yaml
+      heading: "  - id: CAP-38.e"
+      lines: [2292, 2295]
+    - path: docs/contract/capabilities/CAP-38.e.md
+      heading: "# CAP-38.e: A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and reports a specification gap"
+      lines: [11, 16]
+    - path: docs/DECISION_REGISTER.md
       heading: "### DEC-136 — Probe findings feed the independent suite"
       lines: [1238, 1247]
     - path: template/governance/kernel/skills/test-design/SKILL.md

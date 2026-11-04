@@ -10,4 +10,4 @@ sources:
       lines: [25, 25]
     - path: src/gov/close/nightly.py
       heading: "def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:"
-      lines: [301, 302]
+      lines: [301, 315]

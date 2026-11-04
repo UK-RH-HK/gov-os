@@ -8,6 +8,9 @@ sources:
   - - path: src/gov/release/__init__.py
       heading: "\"\"\"Immutable, hash-pinned releases of the Gov OS (W2-16, CAP-43.b lite, DEC-722)."
       lines: [1, 9]
+    - path: src/gov/release/__init__.py
+      heading: "    known = _known(repo, version)"
+      lines: [174, 176]
     - path: .tickets/DAEO-49o5.md
       heading: "  - 'A release is immutable: building the same version from another commit, or changing a file after release, is refused [CAP-43].'"
       lines: [34, 34]

@@ -5,7 +5,14 @@
   (worktree `emg-new-visible`), in q21 to q24's form, each with `commit: cc9c94d42a54` and every source anchored on
   its own line at that head (a heading taken from the file, checked to be the first line equal to itself).
 - **Judged by:** `RUBRIC.md` version 2 (R1 to R11).
-- **Checked:** `repin_gold.py` on the 40 prints `unresolved: 0` (105 line-cited, 101 heading-anchored, 0 re-pinned).
+- **Revised after the independent cross-check** (`docs/audit/memory-measure-new-visible.md`: 15 of 16 passed as
+  written):
+  - q36 re-worded so that it does not repeat its gold's phrasing (R4), with the Contract's CAP-38.e (its three
+    records) added first as the governing source (R1.1: it outranks DEC-136), so it now counts under the Contract;
+  - q29's code alternative now spans the whole `_remove_clone` (lines 301 to 315);
+  - q40 gains the release builder's check as a third alternative (lines 174 to 176);
+  - q34's gold answer now notes that the rule is still in force as CAP-59.c, which is added as its second entry.
+- **Checked:** `repin_gold.py` on the 40 prints `unresolved: 0` (111 line-cited, 107 heading-anchored, 0 re-pinned).
   Every span was also resolved with the measure's own rule and read, and every path placed with the path map at
   the head: all in embedded namespaces (`docs`, `tickets`, `gov-source`, `kernel-template`).
 - **Not touched:** `tests/` (W2-61's visible-half cases follow, by a test designer).
@@ -23,13 +30,13 @@
 | q31 | What an owner question holds; how many at once | Contract and Charter (MR-6) | `contract` | owner decisions | 2 (1, 3) |
 | q32 | Why the Phase 1 write guard let new paths through | lessons (L-0074) | `failure-memory` | the guard | 1 |
 | q33 | What a wait loop must have | lessons (L-0075) | `failure-memory` | scripts and tools | 1 |
-| q34 | What the anti-snowball rule required before code changed | lessons (L-0077) | `failure-memory` | reviews | 1 |
+| q34 | What the anti-snowball rule required before code changed | lessons (L-0077; still in force as CAP-59.c) | `failure-memory` | reviews | 2 (1, 2) |
 | q35 | Does an independent auditor fix what it finds? | kernel role (`independent-auditor.md`) | `kernel-template` | reviews and audit | 1 |
-| q36 | How a probe finding reaches the test designer | decisions (DEC-136; the test-design skill) | `kernel-template` | test design | 1 (2) |
+| q36 | How an uncovered behaviour reaches the test designer | Contract (CAP-38.e's three records; DEC-136, the test-design skill) | `kernel-template` | test design | 1 (5) |
 | q37 | A contradicted closed specification: what goes to the owner | Contract (CAP-33.e; DEC-105, the change skill) | `contract` | owner decisions | 1 (4) |
 | q38 | Where the Task, Implements and Role trailers go | decisions (DEC-182) | `decision` | commits | 1 |
 | q39 | Routing a serial-only entry to the nightly | code (`src/gov/close/serial.py`) | `code-paraphrase` | the close | 1 |
-| q40 | Can a release version be built again? | code (`src/gov/release/__init__.py`; W2-16's KPI) | `code-paraphrase` | releases | 1 (2) |
+| q40 | Can a release version be built again? | code (`src/gov/release/__init__.py`'s docstring and its check; W2-16's KPI) | `code-paraphrase` | releases | 1 (3) |
 
 ## 2. The rubric check, per question
 
@@ -54,8 +61,9 @@ Each of the 16 passes R1 to R11. The judgement behind each item:
   - Lead after a review: q34.
 - **R6:** every span holds its answer and stops at it. `#` headings span their section; other headings span the
   stated lines.
-- **R7:** each alternative holds its entry's whole piece. q27, q30 and q31 have two entries because their answers
-  need two pieces in two places. Each fits the stack budget.
+- **R7:** each alternative holds its entry's whole piece. q27, q30, q31 and q34 have two entries because their
+  answers need two pieces in two places (q34: the lesson, and the Contract's CAP-59.c as the rule still in force).
+  Each fits the stack budget.
 - **R8:** no source is an evaluation document.
 - **R9:** each fact is asked once, among the 16 and against the 24. The nearest pairs are distinct facts:
   - q32 (the guard's lesson) and Q19 (MR-3);
@@ -74,10 +82,10 @@ The existing 24 are counted as `VISIBLE.md` placed them, Q04 under the Contract 
 
 | Governing domain | Existing 24 | New 16 | Of 40 | Share | At least 10 % (4) |
 |---|---|---|---|---|---|
-| Decisions | 8 (Q01, Q02, Q03, Q05, Q15, Q16, Q18, Q21) | 2 (q36, q38) | 10 | 25 % | yes |
+| Decisions | 8 (Q01, Q02, Q03, Q05, Q15, Q16, Q18, Q21) | 1 (q38) | 9 | 22.5 % | yes |
 | Code | 8 (Q10, Q11, Q12, Q13, Q17, Q22, Q23, Q24) | 2 (q39, q40) | 10 | 25 % | yes |
 | Tickets | 4 (Q06, Q07, Q08, Q14) | 2 (q29, q30) | 6 | 15 % | yes (4 without Q07 and Q14) |
-| The Contract and the Charter | 4 (Q04, Q09, Q19, Q20) | 2 (q31, q37) | 6 | 15 % | yes |
+| The Contract and the Charter | 4 (Q04, Q09, Q19, Q20) | 3 (q31, q36, q37) | 7 | 17.5 % | yes |
 | The plan | 0 | 4 (q25, q26, q27, q28) | 4 | 10 % | yes |
 | Lessons (no domain of the five) | 0 | 3 (q32, q33, q34) | 3 | 7.5 % | n/a |
 | A kernel role (no domain of the five) | 0 | 1 (q35) | 1 | 2.5 % | n/a |

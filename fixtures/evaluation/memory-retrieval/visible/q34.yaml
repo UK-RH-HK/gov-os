@@ -5,8 +5,15 @@ gold_answer: >-
   The finding went through whole-system retrieval or a context pack, then a fresh architecture or root-cause synthesis
   that classified the response as exactly one of six dispositions: REPAIR EXISTING MECHANISM, REUSE EXISTING
   PRIMITIVE, DELETE MECHANISM, NARROW REQUIREMENT, DEFER TO LATER LIFECYCLE or OWNER DECISION; only after one
-  disposition was chosen could Phase 2's product code change (L-0077, the anti-snowball rule).
+  disposition was chosen could Phase 2's product code change (L-0077, the anti-snowball rule). The rule is still in
+  force as the Contract's CAP-59.c: a finding goes through whole-system context to one disposition before code.
 sources:
   - path: docs/lessons/L-0077.md
     heading: "The owner's anti-snowball rule required that before any implementation change, a finding go through a mandatory sequence:"
     lines: [14, 29]
+  - - path: docs/contract/CONTRACT_v4.md
+      heading: "  - `CAP-59.c` [W1] Anti-snowball: finding → whole-system context → one disposition before code — OWNER-AMENDMENT-P2-0010 §7 · delivered by W1-30, W1-44"
+      lines: [916, 916]
+    - path: docs/contract/contract.yaml
+      heading: "  - id: CAP-59.c"
+      lines: [3382, 3383]
