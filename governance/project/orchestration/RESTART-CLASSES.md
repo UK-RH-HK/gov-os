@@ -76,7 +76,10 @@ and is run again).
 - **Commands:**
   ```bash
   T=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh
-  for P in $(bash $T --cmd rerank_service.py | awk '/^BUSY/{print $2}'); do kill -TERM $P; done; sleep 3
+  for P in $(bash $T --cmd rerank_service.py | awk '/^BUSY/{print $2}'); do kill -TERM $P; done
+  # the force-stop (DEC-1068 (f)): a service still alive 30 s after SIGTERM (e.g. stuck in a CUDA call) gets SIGKILL
+  for i in $(seq 1 15); do bash $T --cmd rerank_service.py | grep -q '^BUSY' || break; sleep 2; done
+  for P in $(bash $T --cmd rerank_service.py | awk '/^BUSY/{print $2}'); do kill -KILL $P; done; sleep 3
   cd /home/usain/gov-os-worktrees/W2-00-store && GOV_RERANK_IDLE_S=43200 ~/.local/bin/gov retrieve "what decides a close" --json > /dev/null
   ```
   (`GOV_RERANK_IDLE_S=43200` keeps it for 12 hours with no search, as the owner kept it on 2026-11-03. The service
