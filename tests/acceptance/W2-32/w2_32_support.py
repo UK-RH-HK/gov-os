@@ -512,29 +512,48 @@ MODEL_COLUMNS = ("embedder_model", "embedder_revision", "reranker_model", "reran
 
 
 def cut_entries(manifest):
-    """What the manifest records besides the two models: the embedding cut (W2-L065, S7), by its key."""
-    return {key: value for key, value in (manifest or {}).items() if key not in MODEL_FIELDS}
+    """The embedding cut the manifest records (W2-L065, S7), by its key: an entry besides the two models whose value is
+    a number of characters. The manifest's other recipe entries (``embed_headers``, DEC-1067 order (5): true or false)
+    are not the cut.
+    Rewrite-Reason: the store's pin gained embed_headers (every entry besides the models was taken as the cut)."""
+    return {key: value for key, value in (manifest or {}).items()
+            if key not in MODEL_FIELDS and isinstance(value, (int, float)) and not isinstance(value, bool)}
 
 
 def set_store_cut(project, manifest, value):
-    """Make the store record ``value`` as its cut, as a store built at that cut does: in every ``semantic_*`` table but
-    the vectors, each column named as a cut key of ``manifest`` (other than the models' columns) is set to ``value``.
-    Returns how many columns were set."""
-    keys = set(cut_entries(manifest))
+    """Make the store record ``value`` as its cut, as a store built at that cut does, and touch nothing else it records
+    (``embed_headers`` and any other recipe entry keep their values). In every ``semantic_*`` table but the vectors,
+    the first of these forms that the store has: a column named as a cut key of ``manifest``; a row of a key and value
+    table whose key is a cut key, its value column set where it holds the cut; else a column holding only the cut's
+    value. The models' columns are never touched. Returns how many columns or rows were set.
+    Rewrite-Reason: the store's pin gained embed_headers (its key and value rows: only the cut's row is set)."""
+    cut = cut_entries(manifest)
+    keys, values = set(cut), {str(found) for found in cut.values()}
     connection = sqlite3.connect(Path(project) / STORE_REL)
     changed = 0
     try:
         tables = [name for (name,) in connection.execute(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'semantic%'") if name != "semantic_vector"]
-        values = {str(found) for found in cut_entries(manifest).values()}
+        columns_of = {table: [row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')
+                              if row[1] not in MODEL_COLUMNS] for table in tables}
         with connection:
-            for by_value in (False, True):  # by the key's name first; else a column that holds the cut's value
+            for form in ("named column", "key row", "value column"):
                 for table in tables:
-                    for column in [row[1] for row in connection.execute(f'PRAGMA table_info("{table}")')]:
-                        if column in MODEL_COLUMNS:
-                            continue
+                    columns = columns_of[table]
+                    for column in columns:
                         held = {str(found) for (found,) in connection.execute(f'SELECT "{column}" FROM "{table}"')}
-                        if (column in keys) if not by_value else (held and held <= values):
+                        if form == "named column" and column in keys:
+                            connection.execute(f'UPDATE "{table}" SET "{column}" = ?', (value,))
+                            changed += 1
+                        elif form == "key row" and held & keys:
+                            for other in columns:
+                                if other == column:
+                                    continue
+                                for key in held & keys:
+                                    changed += connection.execute(
+                                        f'UPDATE "{table}" SET "{other}" = ? WHERE "{column}" = ? AND '
+                                        f'CAST("{other}" AS TEXT) = ?', (value, key, str(cut[key]))).rowcount
+                        elif form == "value column" and held and held <= values:
                             connection.execute(f'UPDATE "{table}" SET "{column}" = ?', (value,))
                             changed += 1
                 if changed:

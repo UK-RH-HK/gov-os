@@ -52,15 +52,17 @@ to the CTO so that the engineer builds to the same ones (spec gaps, DEC-136).
   `result.stores.semantic` (its `reason`, or a field of its own), in `semantic.search`'s answer, and in the reason of
   `retrieve`'s `facets.semantic` (which has only `available` and `reason`, so the code goes in the reason).
 - **W2-L065: the cut.** `semantic.manifest(root)` records the embedding cut under a key of its own besides
-  `embedder` and `reranker` (the key and, since S7, the value are not judged here). A store whose `semantic_*` tables
+  `embedder` and `reranker`, its value a number of characters (the key and, since S7, the value are not judged here;
+  the manifest's other recipe entries, such as `embed_headers`, true or false, are not the cut). A store whose `semantic_*` tables
   are only the vectors and the four-column manifest (two models and their revisions), as every store built before
   W2-32 is, is stale.
 - **S7: the whole chunk** (G1, DEC-1066). The embedder is sent each chunk whole, and the reranker given it whole (its
   path line may come first): a chunk whose question words lie past character 600 is embedded with them, found by
   the semantic route nearer the question than when embedded from its first 512 characters (round 5: not "first",
   which the stand-in's bag of words decides at any cut), and given to a reranker with them. The manifest's cut is neither 512 nor 500. A store that
-  records the cut as 512 (each store column named as a cut key of the manifest, or else holding its value, set back
-  to 512), with the chunk's vector made from its first 512 characters, is stale (no answer) and the next rebuild
+  records the cut as 512 (a store column named as a cut key of the manifest, or a key and value row of that key, or
+  else a column holding only the cut's value, set back to 512; every other recipe entry left as it was;
+  `Rewrite-Reason: the store's pin gained embed_headers`), with the chunk's vector made from its first 512 characters, is stale (no answer) and the next rebuild
   embeds the chunk whole. `retrieve(root, question, batch_size=1, radius=0)` followed through its continuations
   sends no item whose sha256 an earlier bundle sent, and none within a span an earlier bundle sent. Its premise
   (round 6): a later bundle either holds another chunk of the expanded section, or names one as left out (a span
