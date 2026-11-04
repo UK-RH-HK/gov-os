@@ -185,10 +185,10 @@ def test_an_invalid_setting_is_config_invalid_naming_the_key(tmp_path, text, key
 
 
 def test_no_file_or_an_empty_one_is_off(tmp_path):
-    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0}
+    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0, "phrasings": False}
     (tmp_path / "governance/project").mkdir(parents=True)
     (tmp_path / "governance/project/retrieval.yaml").write_text("# nothing yet\n", encoding="utf-8")
-    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0}
+    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0, "phrasings": False}
 
 
 def test_a_route_s_first_are_cut_before_the_page_is_looked_at():
@@ -277,7 +277,7 @@ def test_with_the_symbol_half_off_the_code_route_enters_in_its_own_order_and_no_
 def test_a_routing_block_with_no_keys_is_off(tmp_path, text):
     (tmp_path / "governance/project").mkdir(parents=True)
     (tmp_path / "governance/project/retrieval.yaml").write_text(text, encoding="utf-8")
-    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0}
+    assert routing.settings(tmp_path) == {"code_first": 0, "named_first": 0, "phrasings": False}
 
 
 def test_an_invalid_setting_is_refused_before_any_search_work(project, monkeypatch):
@@ -290,3 +290,111 @@ def test_an_invalid_setting_is_refused_before_any_search_work(project, monkeypat
         retrieve(root, PHRASE, batch_size=30, bundle_budget=0, reranker=lambda: _score)
     assert raised.value.code == "CONFIG_INVALID" and raised.value.details["key"] == "routing.code_first"
     assert asked == []  # no route asked, no reranker, no GPU work
+
+
+
+# --- the phrasings (DEC-1067 order (4), measure 3's x5) ------------------------------------------------------------
+
+def test_the_three_phrasings_are_deterministic():
+    q = "Which ticket owns the heron ledger in W2-32?"
+    assert routing.phrasings(q, ["DAEO-0pyc"]) == [q, "ticket owns heron ledger W2-32", q + " DAEO-0pyc"]
+    assert routing.phrasings(q, ["W2-32"]) == [q, "ticket owns heron ledger W2-32"]  # an id it holds: not again
+    assert routing.phrasings("heron ledger", []) == ["heron ledger"]  # all three alike: once
+    assert routing.phrasings("what is the", []) == ["what is the"]  # no content word: no empty phrasing
+
+
+def test_a_route_s_lists_are_fused_as_the_harness_fuses_them():
+    a, b, c = ({"chunk_id": x} for x in "abc")
+    # c: 1/63 + 1/62 + 1/61; a and b tie at 1/61 + 1/62, so the order first met: a, then b
+    assert [h["chunk_id"] for h in routing.fused([[a, b, c], [b, c], [c, a, a]])] == ["c", "a", "b"]
+    assert [h["chunk_id"] for h in routing.fused([[a, b], [b, c]])] == ["b", "a", "c"]
+    assert routing.fused([[a, a, b]])[0] is a  # each chunk once a list, at its best rank, kept as first seen
+
+
+def _searches(monkeypatch, state):
+    """Each route's questions, and stand-in answers that differ per phrasing."""
+    asked = {"lexical": [], "semantic": []}
+    real = lexical.search
+
+    def lex(root, query, refresh=True):
+        asked["lexical"].append(query)
+        answer = real(root, query if query.strip() else PHRASE, refresh)
+        if query != PHRASE:  # another phrasing: the same chunks in reverse
+            answer = {**answer, "ranked": list(reversed(answer["ranked"]))}
+        return answer
+
+    def sem(root, query, refresh=True):
+        asked["semantic"].append(query)
+        return {"available": state.get("semantic", False), "reason": None, "hits": []}
+
+    monkeypatch.setattr(lexical, "search", lex)
+    monkeypatch.setattr(semantic, "search", sem)
+    return asked
+
+
+def test_phrasings_off_is_today_s_bundle_byte_for_byte_and_one_question(project, monkeypatch):
+    root, code, record, state = project
+    asked = _searches(monkeypatch, state)
+    before = json.dumps(_ask(root), sort_keys=True)
+    assert json.dumps(_ask(root, phrasings=False), sort_keys=True) == before
+    assert asked["lexical"] == [PHRASE] * 2 and asked["semantic"] == [PHRASE] * 2
+
+
+def test_phrasings_on_ask_each_route_the_three_and_fuse_its_lists(project, monkeypatch):
+    root, code, record, state = project
+    state.update(record=True, semantic=True)
+    asked = _searches(monkeypatch, state)
+    seen = []
+    real = retrieve_module.rrf
+    monkeypatch.setattr(retrieve_module, "rrf", lambda routes, *a, **k: seen.append(routes) or real(routes, *a, **k))
+    bundle = _ask(root, phrasings=True)
+    expected = routing.phrasings(PHRASE, [RECORD])
+    assert len(expected) == 2 and asked["lexical"] == expected and asked["semantic"] == expected
+    lists = [lexical_ranked(root, p) for p in expected]
+    assert [h["chunk_id"] for h in seen[0]["lexical"]] == [h["chunk_id"] for h in routing.fused(lists)]
+    assert bundle["routing"] == {"phrasings": expected}
+
+
+def test_a_phrasing_a_route_cannot_answer_leaves_it_the_question_s_answer(project, monkeypatch):
+    root, code, record, state = project
+    state.update(record=True)  # the semantic route is unavailable for every phrasing
+    _searches(monkeypatch, state)
+    seen = []
+    real = retrieve_module.rrf
+    monkeypatch.setattr(retrieve_module, "rrf", lambda routes, *a, **k: seen.append(routes) or real(routes, *a, **k))
+    _ask(root, phrasings=True)
+    assert seen[0]["semantic"] == []  # the question's own answer: no hit, not a fusion of nothing
+
+
+def test_phrasings_on_rerank_the_merged_pool_once_within_the_bounds(project, monkeypatch):
+    root, code, record, state = project
+    state.update(record=True, symbol=True, distance={c["chunk_id"]: n for n, c in enumerate(code)})
+    _searches(monkeypatch, state)
+    sizes = []
+
+    def recording():
+        def score(query, texts):
+            sizes.append((len(texts), sum(len(query) + len(t) for t in texts)))
+            return _score(query, texts)
+        return score
+
+    (root / "governance/project/retrieval.yaml").write_text(
+        yaml.safe_dump({"routing": {"phrasings": True, "code_first": 2, "named_first": 2}}))
+    bundle = retrieve(root, PHRASE, batch_size=30, bundle_budget=0, reranker=recording)
+    assert sum(n for n, _ in sizes) == len(bundle["evidence"])  # each candidate scored once: one rerank
+    assert all(n <= 16 and chars <= 24_000 for n, chars in sizes)
+    assert bundle["routing"]["code"] and bundle["routing"]["named"]  # S8's halves after the phrasings
+
+
+@pytest.mark.parametrize("text", ["routing: {phrasings: yes please}\n", "routing: {phrasings: 1}\n"])
+def test_an_invalid_phrasings_value_is_config_invalid_naming_it(tmp_path, text):
+    (tmp_path / "governance/project").mkdir(parents=True)
+    (tmp_path / "governance/project/retrieval.yaml").write_text(text, encoding="utf-8")
+    with pytest.raises(GovError) as raised:
+        routing.settings(tmp_path)
+    assert raised.value.code == "CONFIG_INVALID" and raised.value.details["key"] == "routing.phrasings"
+
+
+def lexical_ranked(root, phrasing):
+    answer = lexical.search(root, phrasing, refresh=False)
+    return answer["ranked"]

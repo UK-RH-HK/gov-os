@@ -181,6 +181,17 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
     return offset
 
 
+def _phrased(search, root: Path, asked: list[str], key: str, cut: int | None = None) -> dict:
+    """One route's answer for the question (one phrasing: today's answer, unchanged), or for several phrasings: the
+    question's answer with ``key`` the phrasings' lists fused (``routing.fused``), cut to ``cut``; when any phrasing's
+    answer is unavailable, the question's alone, as the research harness does (W2-32 S8's note, DEC-1067 order (4))."""
+    answers = [search(root, phrasing, refresh=False) for phrasing in asked]
+    if len(answers) == 1 or not all(answer.get("available", True) for answer in answers):
+        return answers[0]
+    merged = routing.fused([answer.get(key, answer["hits"]) for answer in answers])
+    return {**answers[0], key: merged[:cut] if cut is not None else merged}
+
+
 def _by_cosine(root: Path, query: str, chunk_ids: list[str]) -> list[str]:
     """``chunk_ids`` ranked by their stored vectors' cosine to the question's, those with no vector last and ties in
     the order given; as given when no vector can be compared (W2-32 S8)."""
@@ -236,8 +247,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
     order = (authority.order(root, known, edges, entry_of) if unread is None  # DEC-952 item 1: retrieval_authority
              else authority.Order(None, known, edges, entry_of))  # no record graph: no authority order (DEC-1006)
-    answers = {lexical.FACET: lexical.search(root, query, refresh=False),
-               semantic.FACET: semantic.search(root, query, refresh=False)}
+    asked = [query]
+    if route_settings["phrasings"]:  # DEC-1067 order (4): three deterministic phrasings, searched and fused
+        asked = routing.phrasings(query, graph_route.start_ids(root, query, known))
+    answers = {lexical.FACET: _phrased(lexical.search, root, asked, "ranked"),
+               semantic.FACET: _phrased(semantic.search, root, asked, "hits", cut=semantic.TOP_K)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
@@ -462,7 +476,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
               "continuation": token}
     if any(route_settings.values()):  # W2-32 S8: what the routing moved ahead, per half that is on
         bundle["routing"] = {**{half: [] for half, key in ((routing.CODE, "code_first"), (routing.NAMED, "named_first"))
-                                if route_settings[key]}, **routed}
+                                if route_settings[key]}, **routed,
+                             **({"phrasings": asked} if route_settings["phrasings"] else {})}
     if withhold is not None:
         bundle["role_filter"] = withhold.summary()  # DEC-1065 (2): what was withheld, how many and by which rule
     return bundle

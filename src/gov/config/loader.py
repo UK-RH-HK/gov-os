@@ -34,10 +34,12 @@ SECRETS_FILE = "secrets.yaml"
 SECRETS_SCHEMA = {"scan": {"required": False, "type": str}}
 SCAN_VALUES = ("on", "off")
 # Routing by question type (W2-32 S8, DEC-1067 (a)): ``routing.code_first`` and ``routing.named_first``, each a whole
-# number of 0 or more (absent or 0: off, today's order). Any other key or value is CONFIG_INVALID.
+# number of 0 or more (absent or 0: off, today's order); ``routing.phrasings``, true or false (absent: false; DEC-1067
+# order (4), measure 3). Any other key or value is CONFIG_INVALID.
 RETRIEVAL_FILE = "retrieval.yaml"
 RETRIEVAL_SCHEMA = {"routing": {"required": False, "type": dict}}
-ROUTING_KEYS = ("code_first", "named_first")
+ROUTING_KEYS = ("code_first", "named_first", "phrasings")
+ROUTING_FLAGS = ("phrasings",)  # the keys that are true or false; the others are counts
 KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA, RETRIEVAL_FILE: RETRIEVAL_SCHEMA}
 # A namespace's keyword-index policy (DEC-1066 (3)): optional, one of two values; absent is indexed. Any other value is
 # CONFIG_INVALID in either form of the path map, so a misspelt exclusion never leaves its files in the index.
@@ -251,7 +253,10 @@ def _validate_retrieval(document, rel):
     for key, value in (document.get("routing") or {}).items():
         if key not in ROUTING_KEYS:
             raise _invalid(rel, f"routing.{key}", f"unknown key (the keys are {', '.join(ROUTING_KEYS)})")
-        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        if key in ROUTING_FLAGS:
+            if not isinstance(value, bool):
+                raise _invalid(rel, f"routing.{key}", "must be true or false")
+        elif isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise _invalid(rel, f"routing.{key}", "must be a whole number of 0 or more (0: off)")
 
 
