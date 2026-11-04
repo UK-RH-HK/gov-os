@@ -1,9 +1,15 @@
 # Lens B's Q13 (Table 2): "retrieve.py 218–230, 33, 107–113; DEC-419". My reading: two pieces. (1) Where it is
 # enforced: the expansion loop, retrieve.py 218–230. (2) What the budget is and bounds: retrieve.py 33 (the constant),
 # 107–113 (the limit taken) or DEC-419 (DP-3: the budget bounds parent expansion), alternatives of one entry.
+# Re-anchored by the owner's DEC-1069 (1) (2026-11-04; the audit's R6-SPAN-MISSES), checked blind at the commit by a
+# session independent of the retrieval work. Entry 1's heading is found at line 411, but at 13 lines its span (411
+# to 423) ended before the deciding check (`if used + cost <= limit:`, line 431), so it is now 411 to 431. Entry 2's
+# retrieve alternative spanned 214 to 220 and ended before the line that takes the limit (221), so it is now 214 to
+# 221. BUNDLE_BUDGET's heading is now at line 36. The question, the gold answer and every heading are kept. The
+# label before is in ../retired/q13-pre-dec1069.yaml.
 id: Q13
 category: code location
-commit: 23079f92a6fa
+commit: cc9c94d42a54
 question: Where is the bundle budget enforced?
 gold_answer: >-
   In retrieve (src/gov/retrieval/retrieve.py): a candidate is expanded to its parent only when the bundle's tokens plus
@@ -12,13 +18,13 @@ gold_answer: >-
 sources:
   - path: src/gov/retrieval/retrieve.py
     heading: '    used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)'
-    lines: [218, 230]
+    lines: [411, 431]
   - - path: src/gov/retrieval/retrieve.py
       heading: "BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)"
-      lines: [33, 33]
+      lines: [36, 36]
     - path: src/gov/retrieval/retrieve.py
       heading: "def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bundle_budget=None, continuation=None,"
-      lines: [107, 113]
+      lines: [214, 221]
     - path: docs/DECISION_REGISTER.md
       heading: "### DEC-419 — W1-21: the command's path, the public interface, the bundle budget, the order of stopping reasons, facets as routes, one rerank over the merged set"
       lines: [4501, 4527]

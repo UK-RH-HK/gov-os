@@ -8,13 +8,20 @@
 # by W2-32 S10 and merged at b32e8504, makes the GPU the only device: a vector computed on the CPU is refused, never
 # cached or stored, and gov never starts an embedder for a search. So the answer was wrong today, and DEC-1033's
 # entry, which states "any device", is no longer gold. The question is kept: it is answerable as asked.
-# One entry of alternatives, the governing source first: DEC-1065's entry (the rule and why), W2-32's S10 KPI line
-# (the rule as the ticket states it), semantic.py's docstring lines on the question's vector (where, the GPU only,
-# the CPU's vector refused, the drift accepted and why) and ollama.py's on the two daemons (no CPU fallback, the
-# query daemon at its own host, the GPU the only device). Category kept: the answer is a decision.
+# Split into two entries by the owner's DEC-1069 (3) (2026-11-04; the audit's R7-PARTIAL-ALTERNATIVE), checked
+# blind at the commit by a session independent of the retrieval work. The label had one entry of four alternatives,
+# but no single one held all three asked facts: DEC-1065's entry names no host, and W2-32's S10 line gives neither
+# where nor why. So a hit on either was scored as full evidence for an answer it cannot give. The question and the
+# gold answer are kept. (1) Where: ollama.py's docstring (the query daemon at GOV_QUERY_OLLAMA_HOST, which embeds the
+# questions and nothing else; the shared one builds the index) or semantic.py's lines on the question's vector (the
+# query embedder at ollama.query_host()). (2) The device and why: DEC-1065's entry (no CPU fallback, anywhere; its
+# basis: a private CPU embedder skews the measures and loads the machine), the governing source, or semantic.py's
+# lines (the GPU only, the drift accepted and why). S10's line is left out: it states the device part without the why,
+# so it is not a whole entry. It is not needed as a third, because the governing entry holds the rule. The label before
+# is in ../retired/q03-pre-dec1069.yaml. Category kept: the answer is a decision.
 id: Q03
 category: decision
-commit: b32e8504b8d3
+commit: cc9c94d42a54
 question: Where are query embeddings computed now, on which device, and why?
 gold_answer: >-
   By gov's own query embedder, the Ollama daemon at GOV_QUERY_OLLAMA_HOST (127.0.0.1:11435 by default), which embeds
@@ -30,15 +37,15 @@ gold_answer: >-
   on the prompt computed just before it, DEC-773) on the evidence that it changed no answer of the standing memory
   measure; DEC-1065 then ruled the CPU out, because a private CPU embedder skews the measures and loads the machine.
 sources:
-  - - path: docs/DECISION_REGISTER.md
-      heading: "### DEC-1065 — No CPU fallback for embeddings; search respects role separation; the fusion as a gap if a single route beats it; the search's speed near the pin's (standing for 1 and 2)"
-      lines: [13145, 13148]
-    - path: .tickets/DAEO-0pyc.md
-      heading: "  - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'"
-      lines: [39, 39]
+  - - path: src/gov/retrieval/ollama.py
+      heading: "**No CPU fallback (W2-32 S10, DEC-1065 (1), DEC-1031):** ``ensure_available`` and ``ensure_query_available``"
+      lines: [3, 17]
     - path: src/gov/retrieval/semantic.py
       heading: "- A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare"
       lines: [12, 18]
-    - path: src/gov/retrieval/ollama.py
-      heading: "**No CPU fallback (W2-32 S10, DEC-1065 (1), DEC-1031):** ``ensure_available`` and ``ensure_query_available``"
-      lines: [3, 17]
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-1065 — No CPU fallback for embeddings; search respects role separation; the fusion as a gap if a single route beats it; the search's speed near the pin's (standing for 1 and 2)"
+      lines: [13146, 13154]
+    - path: src/gov/retrieval/semantic.py
+      heading: "- A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare"
+      lines: [12, 18]

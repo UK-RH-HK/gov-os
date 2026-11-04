@@ -1,0 +1,16 @@
+# Lens B's Q02 (Table 2): "DEC-782, or semantic.py 15–25": one piece of evidence held in two places, so the two are
+# alternatives of one entry. semantic.py's docstring lines on the cache are 19–23 at the commit.
+id: Q02
+category: decision
+commit: 23079f92a6fa
+question: Which decision lets a read command write the query-vector cache?
+gold_answer: >-
+  DEC-782: a read command may write the query-vector cache (.gov-runtime/query-vectors.db), and only that file,
+  under limits; DEC-379's "a read writes nothing" is amended for that one file.
+sources:
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-782 — A read command may write the query-vector cache, and only that, under limits (P-W2-32 (a))"
+      lines: [8574, 8592]
+    - path: src/gov/retrieval/semantic.py
+      heading: "- That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in"
+      lines: [19, 23]
