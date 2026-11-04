@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-03. Where the prompt, a brief or RESUME HERE differs, it holds; a
+The one list of what holds (DEC-1052 R-9), 2026-11-04. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -29,6 +29,25 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   the visible half alone; the hidden half reported separately; hidden ranks never in the index or on integrate);
   labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; no measure or
   rebuild beside one; the GPU back in budget between); no install until the owner decides the bigger models.
+- DEC-1068 (2026-11-04): re-pin window 3 done (`pin-8284fb408bd4` live, registry `b05f62b8`; the integration store at
+  `8284fb40` with `embed_headers` on); class 3 gains the force-stop (SIGKILL 30 s after SIGTERM); the reranker's memory
+  release (W2-112) goes into window 4; h02, h24 and any hidden label are corrected by the owner's operator, outside the
+  guard, nothing reaching the CTO. Basis: question 1 (sessions run the product measured, not the old pin).
+- DEC-1069 (2026-11-04, standing for the measure): the set is about **40 per half** (DEC-1009 amended); **R5** (each
+  governing domain at least 10 % of each half, no subsystem above 25 %); **R11** (no question whose answer changes with
+  ordinary work unless its gold is computed at the measured head); **R1.3** (test-harness code never governs a code
+  fact, except about the harness; a generated Contract record counts only when its own status is ACCEPTED); the
+  measure script writes a reason line for every automatic re-anchor; every run keeps every search's ranked output
+  (`~/gov-os-eval/runs/`), so an approved label change is re-scored without running again; the reranker trial runs
+  all three candidates, adoption by its written rule only; a standing model bench. Basis: question 2 (a measure that
+  is wrong or keyword-only misjudges memory).
+- **Standing practice, the owner (2026-11-04):** whenever the CTO waits on the owner or the operator, it writes
+  `log/cto-standby.txt` (what it waits for) and ends it when the wait ends, so the sentinel raises no false alarm;
+  `tools/sentinel_check.sh` runs while `dispatch/sentinel-expected` exists (the sentinel's login, Remote Control,
+  tmux session or watch log down: an inbox item, and the CTO pushes the owner at any hour); **bisect only in a
+  throwaway `git clone` under `/tmp`, never `git bisect run` in a linked worktree of the main repository** (it exports
+  `GIT_DIR`, and a test's `git init` re-initialised the main repository as bare on 2026-11-04 00:31); a process is
+  stopped only by the pids a check named, never by a text match.
 - DEC-1060: lens B's q03 rewritten to DEC-1033's rule; a measure question never rewards a replaced decision.
 - DEC-1053: D-0 done; `w2/W2-78` and the in-flight branches with unmerged work wait for D-9.
 - DEC-1050: this repository kept; no full `gov check` in leads' runs (T-1); attribution once each way (Q-1); the
