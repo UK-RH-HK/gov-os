@@ -13200,6 +13200,32 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   (5) **The nonexistent-id question** passes when the product stops with `UNRESOLVED_IDS` naming that id, and is scored apart from hit@5, for h24 and the measurement set alike.
 - **Basis:** question 1 (memory: a structure that serves any question scores alike on any set) and question 2 (a fix aimed at a named miss fits the set it was aimed at).
 
+### DEC-1072 — D4B-STRUCTURE's order stands; steps 5 to 7 as prototypes only; step 7 widened to every stated link, with a drift count; memory-building a Gov OS practice for every adopted repository's Wave 0
+- **Status:** ACCEPTED (owner, 2026-11-04 ~22:15, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1071, DEC-1070 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-STRUCTURE.md` (`33ba2842`)
+- **Decision:** **The order of D4B-STRUCTURE stands.** Steps 5 to 7 are approved as **prototypes in measure clones only**, each coming back to the owner with its figures before any product change. Steps 2 onward go on; the stand-by ends.
+  - **(1) Step 7 widens from decisions to every link the repository states.**
+    - **First a census:** each kind of relationship stated in records, front matter, commit trailers and text, against the edges the graph holds, in counts. The kinds include:
+      - a decision supersedes, amends or cites a decision;
+      - a ticket implements or depends on a decision;
+      - commits' `Task:` and `Implements:` trailers;
+      - a capability and its provider tickets;
+      - a KPI and its tests;
+      - a role and its skills;
+      - a lesson and the failure or decision it came from;
+      - any others found.
+    - **Then the prototype** builds the missing kinds the evidence supports, measured as before.
+    - **The report** says what an agent could not follow before and can now. It also says how many decisions an agent could today retrieve as current although the register says they are superseded or amended: that matters for drift, whatever it does to hit@5.
+  - **(2) Memory-building becomes a Gov OS practice for every adopted repository's Wave 0.**
+    - The ticket that owns adoption memory is found (W2-127 is the sandbox's access to the shared services, as far as the owner recalls); if none fits, one is proposed.
+    - Either way, everything learned so far is written into it now, and kept up to date as D-4b goes:
+      - how the store is built (chunking, embedding, headings, links);
+      - how it is measured (the rubric, the three sets and their jobs, the independent writers, the hidden-half rule, the scoring);
+      - how it is tuned (structural fixes only, judged on all sets, consistency as the proof);
+      - every method tried, with its figures, adopted or not, and why;
+      - the lessons: the overfitting to the visible half, labels checked because questions missed, the GPU trips.
+    - After the refactoring it becomes a kernel skill.
+- **Basis:** question 1 (memory: an agent follows what the repository states, and is not handed a superseded decision as current) and question 2 (a practice learned once is kept for every adoption).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13208,3 +13234,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.453 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1069. Next free id: DEC-1070. |
 | 0.454 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1070; DEC-1069 (12)-(13) amended. Next free id: DEC-1071. |
 | 0.455 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1071; DEC-1070 amended. Next free id: DEC-1072. |
+| 0.456 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1072. Next free id: DEC-1073. |

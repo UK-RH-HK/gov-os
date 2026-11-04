@@ -150,3 +150,9 @@ other restart is an ACT.
   widen. **The proof is consistency:** the halves agree within 3 points; then memory-verdict (60) is measured once as
   the confirmation (if it disagrees, to the owner first). **Then** all three rerankers on the three sets. The
   nonexistent-id question passes on `UNRESOLVED_IDS` naming its id, scored apart from hit@5. Basis: questions 1 and 2.
+- DEC-1072 (2026-11-04): D4B-STRUCTURE's order stands; its steps 5-7 are prototypes in measure clones only, back to
+  the owner with figures before any product change. **Step 7 covers every stated link:** a census of each kind of
+  relationship stated (records, front matter, trailers, text) against the graph's edges; the missing kinds built as
+  the evidence supports; a drift count (decisions retrievable as current though superseded or amended). **Memory-building
+  is a Wave 0 practice** for every adopted repository, kept in its ticket as D-4b goes, a kernel skill after the
+  refactoring.
