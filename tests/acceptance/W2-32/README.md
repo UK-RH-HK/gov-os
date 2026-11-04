@@ -166,6 +166,19 @@ Each item names its file and its test function in full, as `gov accept` matches 
 - **Other tickets' cases that W2-32's S2 makes fail closed** are revised to pin their stand-in's digest in their
   planted project's `models.yaml` (each with its own `Rewrite-Reason`; the return lists them).
 
+## Round 18 (the padded request bound; `Rewrite-Reason: the padded bound groups requests by length (ties in the pool's order)`)
+
+The engineer's bound (`b7085897`) is the padded size: a request's texts times its longest at most 24,000 characters,
+at most 16 texts, the fewest requests grouped longest first, each score put back at its candidate's place (the order
+the unbatched one: scores descending, ties in the merged pool's order). The requests no longer come in pool order, so:
+
+- **S8's stand-in reranker gives no ties** (`w2_32_driver.rank_score`: the `rankNN` plus half a hash fraction under
+  1, so the ranks still decide), and "the reranker's order" is the order of those scores alone, whatever the order
+  of the requests. The guards are unchanged.
+- **The size bound** (`test_w2_32_s7_size_bound.py`, and the phrasings' "reranked once"): every request within 16
+  texts and 24,000 characters in total and padded; the fewest requests grouped longest first.
+- **On `w2/W2-32`'s head `5c6dd724`:** the whole folder 151 passed, 1 skipped (S5's order case), 1 xfailed (R2-F1).
+
 ## Round 17 (the phrasings: DEC-1067 order (4), measure 3; a note within S8)
 
 `test_w2_32_s8_phrasings.py` (11 cases): with `routing.phrasings: true` in `governance/project/retrieval.yaml`, each

@@ -32,7 +32,7 @@ import yaml
 
 import w2_32_routing as r
 import w2_32_support as s
-from test_w2_32_s7_size_bound import CAP_CHARS, CAP_TEXTS, _fewest
+from test_w2_32_s7_size_bound import CAP_TEXTS, _fewest, _within_both_bounds
 
 KEY = "routing.phrasings"
 CONTENT_QUESTION = "Where is the tide ledger quorum kept?"
@@ -128,9 +128,7 @@ def test_the_merged_pool_is_reranked_once_within_16_texts_and_24000_characters(p
     pool = [text for request in requests for text in request]
     assert len(pool) > CAP_TEXTS, f"premise: the merged pool holds more than {CAP_TEXTS} texts ({len(pool)})"
     assert len(set(pool)) == len(pool), "a text was given to the reranker twice: the merged pool was not reranked once"
-    for number, request in enumerate(requests, 1):
-        assert len(request) <= CAP_TEXTS and sum(map(len, request)) <= CAP_CHARS, \
-            f"request {number}: {len(request)} texts, {sum(map(len, request))} characters (bounds 16, 24,000)"
+    _within_both_bounds(requests)  # 16 texts; 24,000 characters in total and padded (the engineer's bound)
     assert len(requests) == _fewest(pool), \
         f"{len(requests)} rerank requests where {_fewest(pool)} meet both bounds: not one rerank of the merged pool"
 

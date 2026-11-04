@@ -4,9 +4,9 @@ split into the fewest requests meeting both; a single chunk above the budget is 
 unbatched one.
 
 - **Ten long chunks:** ten notes, each one line of about 6,000 characters (so one chunk each), all answering the
-  question: no request above 24,000 characters (counting every text the reranker is given, its path line too) or 16
-  texts; the requests are the fewest that meet both in the order the pool is sent (the pool cut where the next text
-  would break a bound: no contiguous split meeting both has fewer); the order is the unbatched one.
+  question: no request above 16 texts or 24,000 characters, in total and padded (its texts times its longest, as
+  the engineer's bound counts it; every text the reranker is given counted whole, its path line too); the requests
+  are the fewest that meet both, grouped longest first; the order is the unbatched one.
 - **One chunk of 40,000 characters:** the reranker is given its first part, at most 24,000 characters, and no request
   goes above the budget.
 
@@ -58,12 +58,17 @@ def _path_of(text):
 
 
 def _fewest(pool):
-    """How many requests the pool, in the order sent, takes when cut only where the next text would break a bound."""
-    count, texts, chars = 0, 0, 0
-    for text in pool:
-        if texts and (texts + 1 > CAP_TEXTS or chars + len(text) > CAP_CHARS):
-            count, texts, chars = count + 1, 0, 0
-        texts, chars = texts + 1, chars + len(text)
+    """How many requests the pool takes under the padded bound (a request's texts times its longest text at most
+    ``CAP_CHARS``, at most ``CAP_TEXTS`` texts), grouped longest first: each group opens with its longest text and
+    takes the next while the bound holds; no grouping meets the bound with fewer.
+
+    Rewrite-Reason: the padded bound groups requests by length (ties in the pool's order): the engineer's bound
+    (b7085897) is the padded size, the requests grouped longest first; this counted the summed size in the order sent."""
+    count, texts, longest = 0, 0, 0
+    for size in sorted((len(text) for text in pool), reverse=True):
+        if texts and (texts + 1 > CAP_TEXTS or (texts + 1) * longest > CAP_CHARS):
+            count, texts, longest = count + 1, 0, 0
+        texts, longest = texts + 1, max(longest, size)
     return count + (1 if texts else 0)
 
 
@@ -77,8 +82,13 @@ def _ask(box, project, op):
 def _within_both_bounds(requests):
     for number, request in enumerate(requests, 1):
         chars = sum(len(text) for text in request)
+        padded = len(request) * max((len(text) for text in request), default=0)
         assert len(request) <= CAP_TEXTS, f"request {number} carries {len(request)} texts (DEC-1067 (f): at most 16)"
         assert chars <= CAP_CHARS, f"request {number} carries {chars} characters (S7-F4: at most {CAP_CHARS})"
+        # Rewrite-Reason: the padded bound groups requests by length: the bound is the padded size (b7085897).
+        assert padded <= CAP_CHARS, \
+            f"request {number}'s padded size is {padded} characters ({len(request)} texts of up to " \
+            f"{padded // max(len(request), 1)}): above {CAP_CHARS}"
 
 
 @pytest.mark.parametrize("op", ["fusion_search", "retrieve"])

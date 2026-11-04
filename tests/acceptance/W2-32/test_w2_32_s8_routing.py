@@ -25,6 +25,7 @@ from pathlib import Path
 
 import pytest
 
+import w2_32_driver as driver
 import w2_32_routing as r
 import w2_32_support as s
 
@@ -86,8 +87,10 @@ def _ask(box, project, question):
         head, _, body = text.partition("\n")
         if (head, body) not in seen:
             seen.add((head, body))
-            unique.append((head[len("[path: "):-1], r.rank_of(text)))
-    order = [key for _, key in sorted(enumerate(unique), key=lambda pair: (-pair[1][1], pair[0]))]
+            unique.append(((head[len("[path: "):-1], r.rank_of(text)), driver.rank_score(text)))
+    # Rewrite-Reason: the padded bound groups requests by length (ties in the pool's order): the stand-in gives no
+    # ties (``rank_score``), so the reranker's order is the scores' alone, whatever order the requests come in.
+    order = [key for key, _ in sorted(unique, key=lambda pair: -pair[1])]
     return data["result"], requests, order
 
 

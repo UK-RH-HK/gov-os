@@ -81,16 +81,22 @@ def calls_loader(path):
     return load
 
 
-def ranks_loader(path):
-    """A reranker that keeps each request (one JSON line per call) and scores each text by its ``rankNN`` (S8)."""
+def rank_score(text):
+    """The S8 stand-in's score of a text: its ``rankNN`` (0 without one), plus half a hash fraction of the text, so
+    no two texts tie and the ranks still decide (each fraction is under 1). Rewrite-Reason: the padded bound groups
+    requests by length (ties in the pool's order): with no ties, the unbatched order is the scores' alone."""
     import re
-    rank = re.compile(r"\brank(\d{2})\b")
+    found = [int(n) for n in re.findall(r"\brank(\d{2})\b", text)]
+    return float(max(found) if found else 0) + 0.5 * hashed_score(text)
 
+
+def ranks_loader(path):
+    """A reranker that keeps each request (one JSON line per call) and scores each text by ``rank_score`` (S8)."""
     def load():
         def score(query, texts):
             with open(path, "a", encoding="utf-8") as out:
                 out.write(json.dumps(list(texts)) + "\n")
-            return [float(max([int(n) for n in rank.findall(text)] or [0])) for text in texts]
+            return [rank_score(text) for text in texts]
         return score
     return load
 
