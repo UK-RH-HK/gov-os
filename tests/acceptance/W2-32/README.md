@@ -9,7 +9,7 @@ integrated code at `9c468dbd` was read for today's interfaces (DEC-963).
 **Round 1:** S1 to S5, S9 and F1. **Round 2:** S3's hidden miss (the CTO's ruling), S10 (DEC-1065), S5's premise,
 the map in the runner's form, and the stand-in reporting the GPU (below, "Round 2's rewrites"). Round 3: the hidden
 miss made strict (P-W2-32-5). Round 4: S7, the owner's first gap (G1, DEC-1066); S8 (G3) and S6 (G2) come in later
-rounds. **105 cases from 50 test functions in nine files**, with a support module, a driver, the S9/F1 rule module
+rounds; round 10 adds DEC-1067 order (5)'s contextual headers. **119 cases from 59 test functions in ten files**, with a support module, a driver, the S9/F1 rule module
 and a conftest. They run in under a minute on the engineer's head.
 
 ## How the tests reach the code under test
@@ -132,7 +132,7 @@ Each item names its file and its test function in full, as `gov accept` matches 
 | S9 | Below 85 % after two improvement rounds: escalated to the owner, who decides at the third; at 85 % or above but under 95 % with room, not closed: escalated [DEC-954 Q9e, DEC-957] | `test_w2_32_record.py::test_the_baseline_record_holds_both_figures_against_their_bars`; `test_w2_32_record.py::test_s9_escalates_below_85_after_two_rounds_and_under_95_with_room` (6 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | F1 | An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted | `test_w2_32_record.py::test_the_baseline_was_run_more_than_once_on_one_commit_so_it_has_a_noise_band`; `test_w2_32_record.py::test_f1_reverts_a_round_below_the_baselines_noise_band` (5 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | S10 | No CPU fallback for embeddings: the GPU embedders unreachable, the semantic part named unavailable and a keyword answer; no private embedder started; a vector computed on the CPU refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1] | `test_w2_32_s10_no_cpu_fallback.py::test_ensure_available_with_the_embedders_unreachable_checks_health_only`; `test_w2_32_s10_no_cpu_fallback.py::test_a_search_with_the_embedders_unreachable_reports_the_semantic_part_unavailable_with_a_named_code`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_embedders_unreachable_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing`; `test_w2_32_s10_no_cpu_fallback.py::test_a_question_vector_computed_on_the_cpu_is_refused_and_nothing_cached`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_query_embedder_on_the_cpu_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed` |
-| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named` |
+| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named`; `test_w2_32_s7_headers.py::test_with_the_setting_on_each_chunk_is_embedded_after_a_header_of_its_path_and_the_headings_above_it` (DEC-1067 order (5): a title and nested sections); `test_w2_32_s7_headers.py::test_a_file_with_no_headings_is_embedded_after_a_header_of_its_path_alone`; `test_w2_32_s7_headers.py::test_the_header_is_deterministic`; `test_w2_32_s7_headers.py::test_a_headed_chunk_stays_within_the_embedders_limit`; `test_w2_32_s7_headers.py::test_the_keyword_chunk_and_the_evidence_are_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_the_rerankers_input_is_unchanged_with_the_setting_on`; `test_w2_32_s7_headers.py::test_with_the_setting_absent_or_false_the_embedder_receives_the_chunk_as_today` (3 cases: no file, no key, false); `test_w2_32_s7_headers.py::test_an_invalid_setting_is_refused_with_config_invalid_naming_the_key` (4 cases: yes, 1, a quoted "true", a word); `test_w2_32_s7_headers.py::test_switching_the_setting_makes_the_store_stale_and_the_next_rebuild_re_embeds_every_chunk` |
 
 ## What the record judges instead of a test
 
@@ -164,6 +164,35 @@ Each item names its file and its test function in full, as `gov accept` matches 
   hidden-shaped miss.
 - **Other tickets' cases that W2-32's S2 makes fail closed** are revised to pin their stand-in's digest in their
   planted project's `models.yaml` (each with its own `Rewrite-Reason`; the return lists them).
+
+## Round 10 (DEC-1067 order (5), index-time method 1: contextual headers when embedded)
+
+`test_w2_32_s7_headers.py`, 14 cases from the ticket's note "DEC-1067 order (5), index-time method 1" (the CTO,
+2026-11-04), mapped under S7 as round 9's were (the note has no KPI line of its own). The interface they assume:
+
+- **The setting:** `embed_headers: true|false` in the project's `governance/project/rebuild.yaml`, read as it stands in
+  the working tree; absent (no file or no key) is off. Only the YAML booleans `true` and `false` are values: `yes`,
+  `1`, a quoted `"true"` or a word refuse `gov rebuild` with `CONFIG_INVALID` naming `embed_headers` (anywhere in the
+  envelope), and no chunk is sent to the embedder. (PyYAML's `safe_load` reads `yes` as true: the check reads the
+  scalar as written, as `read_yaml(..., plain=True)` does.)
+- **On:** the text the embedder is sent for a chunk is a header followed by the chunk's own text (its file's lines, as
+  the keyword index holds them). The header names the file's path (relative) and, in order, the headings the chunk
+  lies under (title, section, subsection; its own first heading may be named too); no heading it does not lie under,
+  no word of the file's body. A file with no headings (Markdown or text): its path alone. The same in two projects with
+  the same files. A chunk above the embedder's limit is sent, header and all, within the length it is sent at with the
+  setting off (at most 16,384 characters), and the rebuild still names it.
+- **Unchanged with it on:** the keyword index of the embedded files (chunk and parent rows, the full-text rows), the
+  evidence text `retrieve` returns (each item its file's lines) and the text the reranker is given for each chunk.
+- **Off:** each chunk's own text exactly, as today.
+- **Switched:** with the settings file outside the index (a namespace with `lexical_policy: not indexed`, so no indexed
+  file changes) and left uncommitted, turning the setting on after a rebuild makes `semantic.search` (no refresh)
+  answer unavailable with no hit, `semantic.manifest` changes, and the next rebuild re-embeds every chunk with its
+  header; turning it off again does the same back.
+
+Red on W2-32's reviewed head `612cd009` (a scratch tree, not merged): 11 of 14. The header cases: no header is sent;
+the unchanged cases and the determinism case: their premise (the setting took effect) fails; the invalid values:
+the rebuild succeeds (`ok: true`, the key ignored); the switch: the store is answered from after the switch. Green:
+the three "off" cases (today's behaviour, kept as guards).
 
 ## Round 9 (S7's note under DEC-1067)
 
