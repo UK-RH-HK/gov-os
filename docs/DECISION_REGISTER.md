@@ -12631,6 +12631,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 ### DEC-1009 — W2-61h's P-W2-61h-1 (a); the CTO's return watcher retired for the dispatcher's inbox (delegated)
 - **Status:** ACCEPTED (orchestrator, delegated: a P2, older tests revised under an approved decision by the same role, DEC-957; a tools-lane change) · **Under:** DEC-954 Q9a, DEC-995, DEC-1007
+- **Amended:** by DEC-1069 (4) (owner, 2026-11-04): the set grows to about 40 per half; the visible half is no longer only lens B's 20 and W2-61h's 4.
 - **Decision:** (1) P-W2-61h-1 (a): W2-61h's paths gain W2-61's visible-half, baseline and scores cases and README; its fresh test designer revises the four cases that assume 20 visible questions (lens B's 20 still required exactly; nothing lowered). (2) `lead_return_watch.sh` is retired: it marked returns seen before the dispatcher could put them in its inbox (W2-61h's return of 20:06 was missed by the inbox that way). The CTO wakes on `tools/inbox_wait.sh`, which only reads the inbox; the 30-minute stale-inbox alert is the net.
 
 | Version | Date | Change |
