@@ -16,6 +16,10 @@ query.
 ``q09.yaml`` is re-labelled blind (the owner's DEC-1066 (4), 2026-11-03): its question and gold answer are lens B's,
 its sources now the Contract's statements of the packet's ceiling with the ticket's KPI lines as one alternative;
 Table 2's Q09 is matched by the retired original, kept unchanged in ``retired/q09-lens-b.yaml``.
+``q16.yaml`` is re-labelled blind (the owner's DEC-1067 (c), 2026-11-04): lens B's label's one source was DEC-798
+item 4, superseded by DEC-1033, so its question names the launch gate's memory rule in force (DEC-961 item 1, the
+floor of DEC-947 item 5) and repeats no Table 2 query; Table 2's Q16 is matched by the retired original, kept
+unchanged in ``retired/q16-pre-dec1067.yaml``.
 Every source exists at this worktree's HEAD, every heading it gives is a line of that file there, and no source
 names lens B's report or ``fixtures/evaluation/**`` (failure KPI 4).
 
@@ -45,7 +49,11 @@ RETIRED_FROM = "8d09eb40"   # the commit that wrote lens B's Q03 into the visibl
 # wrote it too.
 RELABELLED = "q09.yaml"
 RETIRED_Q09 = s.REAL_VISIBLE.parent / "retired" / "q09-lens-b.yaml"
-RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09}
+# The owner's DEC-1067 (c) blind label check: q16.yaml re-labelled (DEC-798, its one source, superseded by DEC-1033;
+# the question re-worded to the launch gate's rule in force), lens B's label retired unchanged; 8d09eb40 wrote it too.
+REWRITTEN_Q16 = "q16.yaml"
+RETIRED_Q16 = s.REAL_VISIBLE.parent / "retired" / "q16-pre-dec1067.yaml"
+RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09, REWRITTEN_Q16: RETIRED_Q16}
 
 
 def _files():
@@ -69,7 +77,7 @@ def _extra_files():
 
 def _table_2_files():
     """The files that hold Table 2's 20 commands: lens B's 20, with the retired originals in the rewritten q03's and
-    the re-labelled q09's places (the owner's q03 decision of 2026-11-03; DEC-1066 (4))."""
+    the re-labelled q09's and q16's places (the owner's q03 decision of 2026-11-03; DEC-1066 (4); DEC-1067 (c))."""
     for retired in RETIRED_ORIGINALS.values():
         assert retired.is_file(), f"{retired.relative_to(s.REPO_ROOT)} (lens B's original) is not on record"
     return [RETIRED_ORIGINALS.get(path.name, path) for path in _lens_b_files()]
@@ -160,9 +168,10 @@ def test_each_question_is_table_2_s_command_with_its_options():
         f"lens B's 20 files are not Table 2's commands; Table 2 rows not matched: {unmatched}; "
         f"files not in Table 2: {not_in_table}")
     queries = {command[0] for command in commands.values()}
-    copies = [path.name for path in [*_extra_files(), s.REAL_VISIBLE / REWRITTEN]
+    copies = [path.name for path in [*_extra_files(), s.REAL_VISIBLE / REWRITTEN, s.REAL_VISIBLE / REWRITTEN_Q16]
               if _load(path).get("question") in queries]
-    assert not copies, f"a visible file beyond lens B's 20, or the rewritten q03, repeats a Table 2 query: {copies}"
+    assert not copies, (
+        f"a visible file beyond lens B's 20, or the rewritten q03 or q16, repeats a Table 2 query: {copies}")
 
 
 def test_q03_is_rewritten_to_dec_1033_and_the_original_is_kept_unchanged():
@@ -255,6 +264,39 @@ def test_q09_is_relabelled_to_the_contract_and_the_original_is_kept_unchanged():
             faults.append(f"{source['path']} is not a file at HEAD")
         elif "6k tokens" not in "\n".join(span):
             faults.append(f"{source['path']} ({source.get('heading')!r}): its span does not state ~6k tokens")
+    assert not faults, "\n".join(faults)
+
+
+def test_q16_is_relabelled_off_dec_798_and_the_original_is_kept_unchanged():
+    """The owner's DEC-1067 (c), 2026-11-04: lens B's Q16 label is kept, byte for byte as W2-61 wrote it, in
+    ``retired/`` outside the visible half; the visible ``q16.yaml`` keeps the id Q16, no longer asks lens B's question,
+    and no source is DEC-798's entry or its item 4 (superseded by DEC-1033): the rule's entry has DEC-961 item 1's
+    span among its alternatives and another entry DEC-947 item 5's floor, each span (the measure's rule) found at
+    HEAD."""
+    rel = (s.REAL_VISIBLE / REWRITTEN_Q16).relative_to(s.REPO_ROOT).as_posix()
+    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{RETIRED_FROM}:{rel}"], capture_output=True,
+                          timeout=s.TIMEOUT_S)
+    assert done.returncode == 0, f"lens B's Q16 is not found at {RETIRED_FROM}"
+    assert RETIRED_Q16.is_file() and RETIRED_Q16.read_bytes() == done.stdout, (
+        f"{RETIRED_Q16.relative_to(s.REPO_ROOT)} is not lens B's Q16 as {RETIRED_FROM} wrote it")
+    assert RETIRED_Q16.parent != s.REAL_VISIBLE
+    data = _load(s.REAL_VISIBLE / REWRITTEN_Q16)
+    assert data.get("id") == "Q16", "the re-labelled q16 does not keep the id Q16"
+    assert data.get("question") != _load(RETIRED_Q16).get("question"), "q16 still asks lens B's question"
+    spans, faults = [], []
+    for source in _entries(data):
+        span = _span_at_head(source)
+        if span is None:
+            faults.append(f"{source['path']} is not a file at HEAD")
+            continue
+        text = "\n".join(span)
+        spans.append(text)
+        if str(source.get("heading") or "").startswith("### DEC-798 ") or "CPU embedder's 2.4 GB" in text:
+            faults.append(f"{source['path']}: DEC-798's entry or its item 4, the superseded decision")
+    assert any("No memory is set aside for a full test run" in text for text in spans), (
+        "no source of q16 is DEC-961 item 1, the rule in force")
+    assert any("The floor goes from 6.4 GiB to 3 GiB" in text for text in spans), (
+        "no source of q16 is DEC-947 item 5, the floor")
     assert not faults, "\n".join(faults)
 
 
