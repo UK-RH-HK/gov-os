@@ -25,8 +25,10 @@ of words: no model runs, DEC-1064).
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -233,6 +235,62 @@ def in_vocabulary(word, terms_by_table):
         if grams and grams <= terms:
             return True
     return False
+
+
+# --------------------------------------------------------------------------
+# A store built before the policy existed (S6-F1)
+# --------------------------------------------------------------------------
+
+# The code before S6: ``w2/integrate`` at DEC-1066's placing, whose ``src/gov`` names no ``lexical_policy``. Its
+# keyword index is incremental by blob (its docstring): ``lexical_file(path, blob, indexed)`` holds every judged
+# file, and only a change of the path map's (or the rules') blob judges every file again.
+PRE_S6_COMMIT = "68ce354a74c77d74560ce696c03982bd9e004b2a"
+
+
+def pre_s6_src(workdir):
+    """``src/`` of ``PRE_S6_COMMIT``, taken from this repository's history into ``workdir``: the folder to put on
+    ``PYTHONPATH``. Fails, naming the commit, where the history does not hold it."""
+    import io
+    import tarfile
+
+    done = subprocess.run(["git", "-C", str(support.REPO_ROOT), "archive", "--format=tar", PRE_S6_COMMIT, "src"],
+                          capture_output=True)
+    assert done.returncode == 0, \
+        f"premise: this repository's history does not hold the pre-S6 commit {PRE_S6_COMMIT[:12]}: " \
+        f"{done.stderr.decode(errors='replace')[-500:]}"
+    with tarfile.open(fileobj=io.BytesIO(done.stdout)) as archive:
+        archive.extractall(workdir, filter="data")
+    src = Path(workdir) / "src"
+    assert "lexical_policy" not in (src / "gov" / "config" / "loader.py").read_text(encoding="utf-8"), \
+        f"premise: {PRE_S6_COMMIT[:12]}'s validator already knows lexical_policy"
+    return src
+
+
+def pre_s6_rebuild(box, root, src):
+    """``gov rebuild --json --no-embeddings`` by the pre-S6 code (``src`` first on ``PYTHONPATH``, not the run's)."""
+    path = os.pathsep.join(filter(None, [str(src), str(box.site) if box.site else None]))
+    env = {**box.scratch_env(), "PYTHONPATH": path}
+    done = subprocess.run([sys.executable, "-m", "gov.cli.main", "rebuild", "--json", "--no-embeddings", "--root",
+                           str(root)], capture_output=True, text=True, cwd=str(box.workdir / "elsewhere"), env=env,
+                          timeout=support.MEASURE_TIMEOUT_S, stdin=subprocess.DEVNULL)
+    run = support.Run(("gov (pre-S6)", "rebuild"), done)
+    result = run.result()
+    assert result.get("stores", {}).get("lexical", {}).get("status") == "recreated", \
+        f"premise: the pre-S6 rebuild did not build the keyword index: {result!r}"
+    return result
+
+
+def stored_files(root):
+    """``path -> (blob, indexed)`` of the pre-S6 store's ``lexical_file`` table, read-only."""
+    import sqlite3
+
+    with sqlite3.connect(f"file:{Path(root) / support.STORE_REL}?mode=ro", uri=True) as connection:
+        return {path: (blob, indexed) for path, blob, indexed in
+                connection.execute("SELECT path, blob, indexed FROM lexical_file")}
+
+
+def blob_of(root, rel):
+    return support.git(root, "hash-object", rel).strip()
 
 
 # --------------------------------------------------------------------------
