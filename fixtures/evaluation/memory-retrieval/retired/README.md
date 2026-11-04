@@ -158,3 +158,26 @@ gives.
   (`# MR-3: ...`, lines 11-16). Figures for Q19 before 2026-11-04 are the old label's: the new one counts more
   sources, so they are not comparable.
 - **Past results:** not read, as for Q16.
+
+## q03-pre-dec1067.yaml: q03's DEC-1033 label, retired 2026-11-04
+
+- **What it was:** the owner's rewritten Q03 of 2026-11-03, "Where are query embeddings computed now, on which
+  device, and why?", written at commit acfea6d9d4ef (commit 68252f5c). Its gold answer said that a question's vector
+  is used from whichever device computed it, CPU or GPU (DEC-1033 (2) (b), "accepted from any device"). It had one
+  entry of three alternatives: DEC-1033's entry (`docs/DECISION_REGISTER.md`, lines 12838-12845), `semantic.py`
+  lines 12-18 and `ollama.py` lines 8-12. The file here is that file, byte for byte.
+- **Why its label was retired:** the DEC-1067 (c) form (a blind label check by a session independent of the
+  retrieval work, the independent test designer), on the CTO's order after W2-32's review (F-9), once W2-32 merged
+  into `w2/integrate` at b32e8504. The label was wrong. DEC-1065 (1) (the owner, 2026-11-03: no CPU fallback for
+  embeddings, anywhere), carried out by W2-32 S10, makes the GPU the only device. A vector computed on the CPU is
+  now refused (`EMBEDDER_ON_CPU`) and never cached or stored. `gov` never starts an embedder for a search: an
+  unreachable embedder makes the semantic part unavailable, and the search answers by keywords. So the answer's "CPU
+  or GPU" no longer held, and DEC-1033's entry, which states "any device", was no longer gold. `ollama.py`'s cited
+  lines had also changed (the measure's pre-check found entry 1.3 unresolved). The question still holds and is kept.
+- **Its replacement:** `visible/q03.yaml`, still `id: Q03`, with the same question and category, written at commit
+  b32e8504b8d3. It has one entry of four alternatives, any one of which counts, the governing source first:
+  DEC-1065's entry (`docs/DECISION_REGISTER.md`, lines 13145-13148), W2-32's S10 KPI line (`.tickets/DAEO-0pyc.md`,
+  line 39), `semantic.py`'s docstring lines on the question's vector (lines 12-18) and `ollama.py`'s on no CPU
+  fallback and the two daemons (lines 3-17). Figures for Q03 before 2026-11-04 are the old label's and are not
+  comparable with the new one's.
+- **Past results:** not read, as for Q16.
