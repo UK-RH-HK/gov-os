@@ -190,6 +190,9 @@ def module(tmp_path, needs_vectors, box):
     return project
 
 
+# Rewrite-Reason: R2-F1 deferred to D-9: a known failure, marked strict so it turns red the moment the behaviour is
+# fixed and the mark is not removed.
+@pytest.mark.xfail(strict=True, reason="R2-F1 deferred to D-9 (the CTO, 2026-11-04; DEC-802); park/W2-32-R2-F1")
 def test_nested_parents_send_no_line_twice_and_name_every_span_left_out(module, box, standin):
     """The round-2 review's R2-F1 (DEC-1067; the owner's order: parent expansion sends no span twice, and every span
     left out is named as a span record). A paged retrieval (one item a batch, followed through its continuations):
