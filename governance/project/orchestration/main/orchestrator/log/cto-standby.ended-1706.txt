@@ -1,0 +1,1 @@
+2026-11-04 15:34:09 CTO stand-by (session 33b3628c): waiting on the owner's operator for ACT-HLABEL-3 (three minor fixes to hidden h26, h28, h29) before m6; meanwhile the trial's section 4.1 preparation (no GPU). The CTO ends this stand-by when the ACT is reported done.

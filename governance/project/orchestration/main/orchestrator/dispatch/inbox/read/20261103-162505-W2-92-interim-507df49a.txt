@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-92
+status: interim result 507df49a: W2-92 tests: S4/F1's pinned bundles are the integrated code's (w2/integrate 23625eb2aebe), W2-112's rerank field part of the baseline; any other change still red

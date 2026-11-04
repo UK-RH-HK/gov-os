@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-32
+status: interim result 020e5230: W2-32 S8: the symbol half in its measured form (the code route's hits by stored-vector cosine), the fallback, the reranker's order read once per chunk

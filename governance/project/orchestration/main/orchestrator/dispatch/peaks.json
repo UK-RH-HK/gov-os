@@ -1,76 +1,76 @@
 {
- "computed": "2026-11-03 13:10:05",
+ "computed": "2026-11-04 17:19:07",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 10.54,
+   "cpu_p95": 10.56,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 5338532,
+   "rss_kb_p95": 6090868,
    "rss_kb_max": 10563972,
-   "samples": 3375
+   "samples": 4959
   },
   "embedding": {
-   "cpu_p95": 7.98,
+   "cpu_p95": 7.94,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2721248,
+   "rss_kb_p95": 2584656,
    "rss_kb_max": 8676476,
-   "samples": 3375
+   "samples": 4959
   },
   "rebuild": {
-   "cpu_p95": 12.15,
+   "cpu_p95": 11.73,
    "cpu_max": 126.32,
-   "rss_kb_p95": 518296,
+   "rss_kb_p95": 477456,
    "rss_kb_max": 637492,
-   "samples": 2028
+   "samples": 2228
   },
   "test_run": {
-   "cpu_p95": 18.04,
+   "cpu_p95": 17.47,
    "cpu_max": 294.7,
-   "rss_kb_p95": 4056876,
+   "rss_kb_p95": 3851804,
    "rss_kb_max": 6778004,
-   "samples": 2649
+   "samples": 3239
   },
   "claude": {
-   "cpu_p95": 3.39,
+   "cpu_p95": 1.19,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2581420,
+   "rss_kb_p95": 2373100,
    "rss_kb_max": 4055288,
-   "samples": 2952
+   "samples": 4536
   },
   "reranker": {
-   "cpu_p95": 6.07,
+   "cpu_p95": 5.86,
    "cpu_max": 13.9,
-   "rss_kb_p95": 9368700,
+   "rss_kb_p95": 9219676,
    "rss_kb_max": 14331404,
-   "samples": 2124
+   "samples": 2268
   },
   "gitleaks": {
-   "cpu_p95": 0.33,
+   "cpu_p95": 0.31,
    "cpu_max": 4.08,
-   "rss_kb_p95": 2161396,
-   "rss_kb_max": 3528312,
-   "samples": 1451
+   "rss_kb_p95": 2034112,
+   "rss_kb_max": 5162396,
+   "samples": 1815
   },
   "git": {
    "cpu_p95": 0.02,
    "cpu_max": 0.03,
-   "rss_kb_p95": 124468,
+   "rss_kb_p95": 123948,
    "rss_kb_max": 164968,
-   "samples": 108
+   "samples": 126
   },
   "codegraph": {
-   "cpu_p95": 0.26,
+   "cpu_p95": 0.25,
    "cpu_max": 1.21,
-   "rss_kb_p95": 114972,
-   "rss_kb_max": 844648,
-   "samples": 1064
+   "rss_kb_p95": 206036,
+   "rss_kb_max": 987864,
+   "samples": 1312
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 15.18,
+   "cpu_p95": 14.62,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3441468,
+   "rss_kb_p95": 3403184,
    "rss_kb_max": 9074876,
-   "samples": 2028
+   "samples": 2228
   }
  },
  "lead": {
@@ -158,9 +158,9 @@
   "samples": 7801
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 717290.6666666666,
+  "rss_kb_p95": 700592.0,
   "rss_kb_max": 1464452.0,
-  "samples": 2649
+  "samples": 3239
  },
  "slot_run_kb": 1873832
 }

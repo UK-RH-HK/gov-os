@@ -1,0 +1,3 @@
+log: (interim)
+Interim: D4-cut-b
+status: interim result c0a3520a: D-4 T-6: W1-19 and W1-21 leave the path-map/gitleaks coupling and are selected by a model-path change only (the embedder's and reranker's code and pins, the vector cache, the dev tier's baseline); W2-

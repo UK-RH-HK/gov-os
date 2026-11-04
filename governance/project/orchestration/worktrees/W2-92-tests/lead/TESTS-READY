@@ -1,0 +1,1 @@
+TESTS-READY: W2-92 (DAEO-n0wb) S6, tests/acceptance/W2-92/test_w2_92_speed.py, 15 tests, red 3 of 15 on w2/integrate eb28c40866af, README map success-6 with full node ids, commit e8d51868 (written by the CTO; merged into w2/W2-92 outside the sandbox)

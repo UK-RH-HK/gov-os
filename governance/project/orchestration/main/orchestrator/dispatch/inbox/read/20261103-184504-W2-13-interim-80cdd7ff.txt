@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-13
+status: interim result 80cdd7ff: W2-13: revert the bundle-budget cut of ea486253 (review R3): DEC-419 DP-3, W1-21's approved spec, has the budget bound parent expansion only and never drop a child hit; the cut turned 11 W1-21 paging 

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-32
+status: interim result fdc440b3: W2-32: embed_headers' repository case reads the setting as written (adopted on at measure 4, dc8a2829), not off

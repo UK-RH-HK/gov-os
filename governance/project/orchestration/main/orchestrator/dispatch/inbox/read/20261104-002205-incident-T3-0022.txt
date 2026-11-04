@@ -1,0 +1,3 @@
+log: incidents/2026-11-04-0022-T3.md
+Incident: T3
+status: GPU used at most total minus headroom: GPU 15754 MiB used of 16303 (at most 14255) (since 2026-11-04 00:07:04); fill Cause and Fix in the record

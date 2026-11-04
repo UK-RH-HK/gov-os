@@ -293,3 +293,33 @@
 2026-11-03 11:18:03 embedding server shared: BUSY again after NOT RUNNING since 2026-11-03 03:55:05
 2026-11-03 11:18:03 embedding server query: BUSY again after NOT RUNNING since 2026-11-03 03:55:05
 2026-11-03 11:18:03 gpu watch: the shared log was truncated or rotated (offset 450399815, size 19291): from 0
+2026-11-03 16:17:08 interim result: W2-92 0024c753 W2-92: the evidence per KPI line at the merge ebba014a (gov accept 25 of 30, S4/
+2026-11-03 16:25:05 interim result: W2-92 7f4d519b W2-92: merge w2/W2-92-tests (507df49a): S4/F1's reference revised by the test de
+2026-11-03 16:25:05 interim result: W2-92 507df49a W2-92 tests: S4/F1's pinned bundles are the integrated code's (w2/integrate 2362
+2026-11-03 18:02:04 interim result: W2-13 dcaba8bd W2-13: the evidence per KPI line on the merged head (S2's lexical-only hit@5: 87
+2026-11-03 18:45:04 interim result: W2-13 80cdd7ff W2-13: revert the bundle-budget cut of ea486253 (review R3): DEC-419 DP-3, W1-21
+2026-11-03 19:12:08 interim result: D4-cut-b 7b7b1270 D-4 cut B, R4 deferred: W1-19's and W1-21's READMEs say the hit@5 pass line stay
+2026-11-03 19:33:03 interim result: D4-cut-b c0a3520a D-4 T-6: W1-19 and W1-21 leave the path-map/gitleaks coupling and are selected b
+2026-11-03 23:23:04 interim result: W2-61-q09 320b98f3 Q11 entry 1 re-anchored to search's calling line at fusion.py 63 (W2-13's 449937
+2026-11-03 23:26:03 interim result: W2-61-q09 49752de0 W2-61h S2: the writers judged by their Role (designer, owner, orchestrator; neve
+2026-11-04 00:07:04 gpu rule: ALERT GPU budget: GPU memory 15.1 of 13.9 GB (used 15.1 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free) above total minus headroom -> inbox/20261104-000704-gpu-alert.txt
+2026-11-04 00:11:04 interim result: D-7 ef6acd49 D-7: W2-91's unit guards follow D-7's decided scope (the root files, the overlay
+2026-11-04 00:22:05 incident T3 opened: GPU 15754 MiB used of 16303 (at most 14255) -> 2026-11-04-0022-T3.md, inbox/20261104-002205-incident-T3-0022.txt
+2026-11-04 00:43:04 interim result: research-retrieval 3c14830e EXP-003 retrieval survey: the variant harness (fusion, cut, rerank swapped in-pr
+2026-11-04 00:45:04 gpu rule: within its budget again (GPU memory 3.1 of 13.9 GB (used 3.1 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))
+2026-11-04 01:01:04 incident T3 closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-04-0022-T3.md)
+2026-11-04 01:05:04 interim result: D-7 e44d6732 D-7 + G4: W2-15a's raw measure output out of both indexes (the D-7 review's F5; 
+2026-11-04 03:42:06 interim result: W2-32 00d63718 Merge w2/W2-32-tests into w2/W2-32 (the CTO, outside the sandbox): S8's symbol h
+2026-11-04 03:42:06 interim result: W2-32 020e5230 W2-32 S8: the symbol half in its measured form (the code route's hits by stored-
+2026-11-04 03:54:07 gpu rule: ALERT GPU budget: GPU memory 15.5 of 13.9 GB (used 15.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free) above total minus headroom -> inbox/20261104-035407-gpu-alert.txt
+2026-11-04 04:01:06 gpu rule: within its budget again (GPU memory 5.1 of 13.9 GB (used 5.1 + running jobs' peaks 0.0 + the newcomer's 0.0; 1 GPU reranker slot(s) free))
+2026-11-04 04:15:04 gpu rule: ALERT GPU budget: GPU memory 15.4 of 13.9 GB (used 15.4 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free) above total minus headroom -> inbox/20261104-041504-gpu-alert.txt
+2026-11-04 04:19:05 gpu rule: within its budget again (GPU memory 6.6 of 13.9 GB (used 6.6 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))
+2026-11-04 04:52:06 interim result: research-retrieval a41d22e6 EXP-003 night (DEC-1067 (3)): each query-time method alone on the fixed stores (
+2026-11-04 05:38:05 gpu rule: ALERT GPU budget: GPU memory 15.6 of 13.9 GB (used 15.6 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free) above total minus headroom -> inbox/20261104-053805-gpu-alert.txt
+2026-11-04 05:39:03 gpu rule: within its budget again (GPU memory 0.1 of 13.9 GB (used 0.1 + running jobs' peaks 0.0 + the newcomer's 0.0; 1 GPU reranker slot(s) free))
+2026-11-04 05:49:05 interim result: W2-32 3ea1c8c3 W2-32 S8's note (DEC-1067 order (4), measure 3's x5): three deterministic phrasi
+2026-11-04 09:30:06 interim result: W2-32 fdc440b3 W2-32: embed_headers' repository case reads the setting as written (adopted on a
+2026-11-04 09:59:07 interim result: emg-retired-readme d845c5ca The retired README keeps only the labels' history and reasons; the retired label
+2026-11-04 10:39:07 interim result: W2-32 d42cca0e W2-32 evidence: M5's first form marked as replaced by P-W2-32-11's (review S7-F6
+2026-11-04 13:18:07 interim result: emg-new-visible b8273d7f The memory-measure rubric, version 2 (DEC-1069): R5's decided thresholds and the

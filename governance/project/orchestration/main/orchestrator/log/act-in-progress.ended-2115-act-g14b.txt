@@ -1,0 +1,1 @@
+2026-11-03 21:05:04 ACT-G14b handed to the owner (drafts/g14/ACT-G14b.md, READY by the G-14b delta check); no CTO main-tree commit until the owner says done

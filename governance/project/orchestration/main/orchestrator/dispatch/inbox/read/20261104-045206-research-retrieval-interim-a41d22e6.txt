@@ -1,0 +1,3 @@
+log: (interim)
+Interim: research-retrieval
+status: interim result a41d22e6: EXP-003 night (DEC-1067 (3)): each query-time method alone on the fixed stores (g1, 296a4639), visible half only; best visible 20/24 hit@5, 19/24 full evidence

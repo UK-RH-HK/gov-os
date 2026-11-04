@@ -1,0 +1,8 @@
+# W2-32 engineer: the review's fixes before the merge (the CTO; DEC-802, no extra round)
+
+The independent review of W2-32 at `85c16e9b` is READY (no blocking finding). Its record: `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/w2-32.md` (read F-1, F-2, F-3, F-6 there; it quotes no acceptance test). Fix these four before the merge that follows measure 2:
+- **F-1 (S3):** the hidden-id rule `HIDDEN_ID = re.compile(r"H\d+")` misses the measure's real ids (`h` plus two digits): make it case-insensitive (`[Hh]\d+`, or the measure's own id form), with a unit case for `h07`.
+- **F-2 (S10):** the device check after each rebuild batch is one `/api/ps` read; an unreadable or transient `/api/ps` is named `EMBEDDER_ON_CPU` with no retry. Treat an unreadable `/api/ps` as transient, retried as the request is; name the CPU only when the model is listed with `size_vram` 0. Still fail closed after the retries (never assume the GPU), with a code that says the device could not be read. Unit cases with stand-ins.
+- **F-3 (S10):** on the health-only path `ensure_available` returns `settings: None` when the server answers: return the computed settings.
+- **F-6 (S10):** the three stale docstrings the review names (`ollama.py` lines 15-16 and the others) to S10's rule.
+F-4, F-5, F-7 are rows (the CTO watches F-4 at the rebuild); F-8 is the test designer's; F-9 is the CTO's. Same rules (`EMG-d4b-launched.md`: the sandbox check first, no merge, the exclusion flags with an empty HOME, no gov retrieve, no real model, the ps check). Update `docs/changes/W2-32-evidence.md` for S3 and S10. Commit with `Task: DAEO-0pyc`, `Implements: DEC-1065`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

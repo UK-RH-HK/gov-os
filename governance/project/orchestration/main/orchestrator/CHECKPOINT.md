@@ -1,6 +1,28 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-03 14:03: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
+## RESUME HERE — 2026-11-04 ~18:00: session `33b3628c` (D-4b; the reranker trial running)
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-04): the reading list, what
+is done, live and next, what waits on the owner, the checks at start. Detail: `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md`
+(today) and `NIGHT.md` (the night of DEC-1067). **Next free id DEC-1070.**
+
+- **Pin:** `pin-8284fb408bd4` live (re-pin window 3, registry `b05f62b8`); the integration store at `8284fb40` with
+  headers; the main tree's store rebuilt with the new pin (both facets).
+- **The measure:** 80 questions (40 visible + 40 hidden), labels audited and fixed (DEC-1068, DEC-1069), every search's
+  ranked output kept from m6 on (`~/gov-os-eval/runs/`). **m6 (the baseline, `24f06026`): 65/80, visible 36/40,
+  hidden 29/40; full evidence 66; search 1.39 s median.**
+- **Now:** the reranker trial (ACT-RERANK-TRIAL-1 section 4; the rule in `DAY.md`, written before any candidate): the
+  live reranker stopped at 17:54 (the hold file `log/act-in-progress.txt` is the CTO's own for the window); T2 (the
+  0.6B on the trial copy) running with `drafts/rerank-trial/trial_model.sh`; then T3 mxbai, T4 Qwen3-4B 8-bit, T6 the
+  restore (class 3), the result to the owner. Two GPU backstops armed (`MARK=research-retrieval`, `MARK=rerank-trial`).
+- **Then:** the methods' measures (`DAY.md`'s rule on m6), the embedder trial, re-pin window 4 (W2-112's release, on
+  its branch, not merged), D-5 to D-9.
+- **Watchers:** the inbox waiter; `tools/sentinel_check.sh` (push the owner on a `sentinel-down` item, any hour);
+  `tools/bare_watch.sh`; the dispatcher; the samplers.
+- **Standing (the owner, 2026-11-04):** write `log/cto-standby.txt` whenever waiting on the owner or the operator; bisect
+  only in a throwaway clone; stop processes only by the pids a check named.
+
+## RESUME HERE (history) — 2026-11-03 14:03: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (the emergency, the reading list, what is done,
 live and next, what waits on the owner, the checks at start); this block is its detail.
@@ -493,9 +515,11 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-02T14:25:00Z 11715889ad43893f7b3b5d2c8a1ff93400b0ce47097255b73b91fe65cc399bb1
-git head: a7182f6c7de00d91b3c5161e10590e06641f0baa
+generated: 2026-11-03T23:41:14Z 1960e2f99f6127becec1814fe44d5de6a3b88e3e8083fa77b822fb7592d4f59d
+git head: a3b4a8170b65735d8050782378f800b08af50667
 tickets in progress (`tk ls --status=in_progress`):
+  DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
+  DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
   DAEO-3r1j [in_progress] - W2-110 A product's CTO-only install rule
   DAEO-6b2q [in_progress] - W2-109 Contract v4.3
@@ -523,69 +547,46 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS  a7182f6c [w2/integrate]
-  /home/usain/gov-os-worktrees/EMG-query      75f18d11 [emg/query]
-  /home/usain/gov-os-worktrees/W1-01b         76f12566 [w2/W1-01b]
-  /home/usain/gov-os-worktrees/W2-00-record   3a8ed9f9 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a  d88a1fff (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b  6ebd7b56 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-03          92e03a72 [w2/W2-03]
-  /home/usain/gov-os-worktrees/W2-04          a0c79a6c [w2/W2-04]
-  /home/usain/gov-os-worktrees/W2-05          8d2a1f54 [w2/W2-05]
-  /home/usain/gov-os-worktrees/W2-07          31ddf173 [w2/W2-07]
-  /home/usain/gov-os-worktrees/W2-104         909d7ff0 [w2/W2-104]
-  /home/usain/gov-os-worktrees/W2-105         fa653609 [w2/W2-105]
-  /home/usain/gov-os-worktrees/W2-106         9525808d [w2/W2-106]
-  /home/usain/gov-os-worktrees/W2-107         3861d3f3 [w2/W2-107]
-  /home/usain/gov-os-worktrees/W2-108         d3f87c55 [w2/W2-108]
-  /home/usain/gov-os-worktrees/W2-109         695eea48 [w2/W2-109]
-  /home/usain/gov-os-worktrees/W2-11          c9f99b28 [w2/W2-11]
-  /home/usain/gov-os-worktrees/W2-110         d0ecd1bc [w2/W2-110]
-  /home/usain/gov-os-worktrees/W2-112         0b9deb2d [w2/W2-112]
-  /home/usain/gov-os-worktrees/W2-112-tests   9af602dc [w2/W2-112-tests]
-  /home/usain/gov-os-worktrees/W2-114         e9214850 [w2/W2-114]
-  /home/usain/gov-os-worktrees/W2-122         3fc44860 [w2/W2-122]
-  /home/usain/gov-os-worktrees/W2-123         3de9bcf4 [w2/W2-123]
-  /home/usain/gov-os-worktrees/W2-126         2a3c998f [w2/W2-126]
-  /home/usain/gov-os-worktrees/W2-13          bdc4b795 [w2/W2-13]
-  /home/usain/gov-os-worktrees/W2-16          05952376 [w2/W2-16]
-  /home/usain/gov-os-worktrees/W2-20          1a54976c [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-26          5cee4e6b [w2/W2-26]
-  /home/usain/gov-os-worktrees/W2-37          38e74a5d [w2/W2-37]
-  /home/usain/gov-os-worktrees/W2-49          9fc4dcd9 [w2/W2-49]
-  /home/usain/gov-os-worktrees/W2-51          61b6600b [w2/W2-51]
-  /home/usain/gov-os-worktrees/W2-52          2b922bf7 [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-55          aca86233 [w2/W2-55]
-  /home/usain/gov-os-worktrees/W2-55-tests    1f7a4dd9 [w2/W2-55-tests]
-  /home/usain/gov-os-worktrees/W2-56          23079f92 [w2/W2-56]
-  /home/usain/gov-os-worktrees/W2-57          70ee48e2 [w2/W2-57]
-  /home/usain/gov-os-worktrees/W2-58          09f5ebfa [w2/W2-58]
-  /home/usain/gov-os-worktrees/W2-60a         4d798caf [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61          6b517db9 [w2/W2-61]
-  /home/usain/gov-os-worktrees/W2-61h         ac7dfa17 [w2/W2-61h]
-  /home/usain/gov-os-worktrees/W2-63          ad38ed68 [w2/W2-63]
-  /home/usain/gov-os-worktrees/W2-64          bb389b71 [w2/W2-64]
-  /home/usain/gov-os-worktrees/W2-65          f6881547 [w2/W2-65]
-  /home/usain/gov-os-worktrees/W2-66b         2536346b [w2/W2-66b]
-  /home/usain/gov-os-worktrees/W2-67          ff2cc697 [w2/W2-67]
-  /home/usain/gov-os-worktrees/W2-68          05ec0f6a [w2/W2-68]
-  /home/usain/gov-os-worktrees/W2-71          027d4f10 [w2/W2-71]
-  /home/usain/gov-os-worktrees/W2-75          e7f90cd3 [w2/W2-75]
-  /home/usain/gov-os-worktrees/W2-76          e1ddcaa6 [w2/W2-76]
-  /home/usain/gov-os-worktrees/W2-77          3ce51300 [w2/W2-77]
-  /home/usain/gov-os-worktrees/W2-78          8e7640b9 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-81          e78e6af7 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-84          e3096fae [w2/W2-84]
-  /home/usain/gov-os-worktrees/W2-85          d113ff5e [w2/W2-85]
-  /home/usain/gov-os-worktrees/W2-86          01e21d63 [w2/W2-86]
-  /home/usain/gov-os-worktrees/W2-87          51a72c7f [w2/W2-87]
-  /home/usain/gov-os-worktrees/W2-90          12f85350 [w2/W2-90]
-  /home/usain/gov-os-worktrees/W2-90b         73c18fea [w2/W2-90b]
-  /home/usain/gov-os-worktrees/W2-91          55b47e07 [w2/W2-91]
-  /home/usain/gov-os-worktrees/W2-91-tests    a5bf211f [w2/W2-91-tests]
-  /home/usain/gov-os-worktrees/W2-92          448a835a [w2/W2-92]
-  /home/usain/gov-os-worktrees/W2-95          6ce82952 [w2/W2-95]
-  /home/usain/gov-os-worktrees/W2-96          220e2923 [w2/W2-96]
-  /home/usain/gov-os-worktrees/W2-97          115def7e [w2/W2-97]
+  /home/usain/Dynamic-Agentic-Engineering-OS       a3b4a817 [w2/integrate]
+  /home/usain/gov-os-worktrees/D4-cut-a            10025b21 [w2/D4-cut-a]
+  /home/usain/gov-os-worktrees/D4-cut-b            6bd8fbbd [w2/D4-cut-b]
+  /home/usain/gov-os-worktrees/EMG-lb2             3a82896d [emg/lb2]
+  /home/usain/gov-os-worktrees/EMG-noscan          b8957843 [emg/noscan]
+  /home/usain/gov-os-worktrees/EMG-queue           04568e14 [emg/queue]
+  /home/usain/gov-os-worktrees/EMG-select          9e603f70 [emg/select]
+  /home/usain/gov-os-worktrees/W2-00-record        3376ba9c [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a       9894b0cf (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b       1f440a96 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-04               98993db4 [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-104              909d7ff0 [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-105              fa653609 [w2/W2-105]
+  /home/usain/gov-os-worktrees/W2-11               c9f99b28 [w2/W2-11]
+  /home/usain/gov-os-worktrees/W2-110              d0ecd1bc [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-112              d5216599 [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-122              3fc44860 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123              3de9bcf4 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-126              15c80ebb [w2/W2-126]
+  /home/usain/gov-os-worktrees/W2-126-tests        741f9edd [w2/W2-126-tests]
+  /home/usain/gov-os-worktrees/W2-13               f37da27f [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-13-tests         7a31f1e5 [w2/W2-13-tests]
+  /home/usain/gov-os-worktrees/W2-15a              fd637510 [w2/W2-15a]
+  /home/usain/gov-os-worktrees/W2-20               1a54976c [w2/W2-20]
+  /home/usain/gov-os-worktrees/W2-32               85c16e9b [w2/W2-32]
+  /home/usain/gov-os-worktrees/W2-32-tests         bdf1f181 [w2/W2-32-tests]
+  /home/usain/gov-os-worktrees/W2-37               38e74a5d [w2/W2-37]
+  /home/usain/gov-os-worktrees/W2-42a              ce03bb8b [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a-tests        6f4a6f3c [w2/W2-42a-tests]
+  /home/usain/gov-os-worktrees/W2-52               2b922bf7 [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-60a              4d798caf [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-61-q09           49752de0 [w2/W2-61-q09]
+  /home/usain/gov-os-worktrees/W2-61h-d8           68252f5c [w2/W2-61h-d8]
+  /home/usain/gov-os-worktrees/W2-78               8e7640b9 [w2/W2-78]
+  /home/usain/gov-os-worktrees/W2-81               e78e6af7 [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-90b              73c18fea [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91               e5d41714 [w2/W2-91]
+  /home/usain/gov-os-worktrees/W2-91-tests         3191a794 [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92               321aa3f1 [w2/W2-92]
+  /home/usain/gov-os-worktrees/W2-92-tests         c8317622 [w2/W2-92-tests]
+  /home/usain/gov-os-worktrees/research-retrieval  68ce354a [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

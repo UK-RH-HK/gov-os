@@ -1,0 +1,84 @@
+prepared /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS at 6cf2e7d2d3ff on g14b-rehearsal; branches 38; root mentions left: 0
+ACT-G14b rehearsal: 2026-11-03 20:59:36 GMT in /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS at 6cf2e7d2d3ff
+== §3
+
+$ cd /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS
+[exit 0]
+
+$ rm -rf /tmp/gov-os-act-g14b
+[exit 0]
+
+$ D=.gov-runtime/scratch/orchestrator/drafts/g14; T=.gov-runtime/scratch/orchestrator/tools; echo D=$D T=$T
+D=.gov-runtime/scratch/orchestrator/drafts/g14 T=.gov-runtime/scratch/orchestrator/tools
+[exit 0]
+
+$ env | grep -c "^[DT]=" || true
+0
+[exit 0]
+
+$ git status --short -- .claude/
+[exit 0]
+
+$ sha256sum .claude/hooks/pretooluse.py .claude/hooks/role_reads.py $D/pretooluse.py $D/role_reads.py | cut -c1-12
+e406653ef6c9
+8c1ea44b2313
+e406653ef6c9
+5407aade9417
+[exit 0]
+
+$ python3 $T/guard4_check.py --settings /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS | grep -E '^FAIL|^PASS'
+FAIL lifted engineer reads acceptance: want allow, got deny | 
+FAIL
+[exit 0]
+
+$ mkdir -p $D/backup-g14b
+[exit 0]
+
+$ cp -p .claude/hooks/role_reads.py $D/backup-g14b/
+[exit 0]
+
+$ cp $D/role_reads.py .claude/hooks/
+[exit 0]
+
+$ python3 $T/guard4_check.py --settings /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS | grep -E '^FAIL|^PASS'
+PASS
+[exit 0]
+
+$ TMPDIR=/tmp/gov-os-act-g14b bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider tests/unit/hooks/test_live_hook.py -rf | grep -E "^FAILED|failed|passed"
+63 passed in 11.93s
+[exit 0]
+
+$ GUARD_FIX4_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14b bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py -rf | grep -E "^FAILED|failed|passed"
+467 passed in 16.30s
+[exit 0]
+
+$ G14_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14b bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider $D/test_g14.py -rf | grep -E "^FAILED|failed|passed"
+151 passed, 1 skipped in 4.05s
+[exit 0]
+
+$ git add .claude/hooks/role_reads.py
+[exit 0]
+
+$ git commit -m "ACT-G14b: a coordination ticket's {ticket_tests} is its own folder only (DEC-1056, DEC-1058): W2-00's Task: links no longer refuse other tickets' tests" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1056, DEC-1058" --trailer "Role: owner"
+[g14b-rehearsal d611da71] ACT-G14b: a coordination ticket's {ticket_tests} is its own folder only (DEC-1056, DEC-1058): W2-00's Task: links no longer refuse other tickets' tests
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+[exit 0]
+
+$ git rev-parse HEAD > $D/backup-g14b/act-commit && cut -c1-12 $D/backup-g14b/act-commit
+d611da71dc24
+[exit 0]
+
+== §4 (the rollback)
+
+$ cd /home/usain/gov-os-runs/G14b-rehearsal/Dynamic-Agentic-Engineering-OS && D=.gov-runtime/scratch/orchestrator/drafts/g14 && read -r H < $D/backup-g14b/act-commit && git revert --no-commit "$H" && git commit -m "Revert ACT-G14b (${H:0:12})" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1058" --trailer "Role: owner" && python3 .gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings $PWD | grep -E '^FAIL|^PASS'
+[g14b-rehearsal a23d908c] Revert ACT-G14b (d611da71dc24)
+ 1 file changed, 2 insertions(+), 31 deletions(-)
+FAIL lifted engineer reads acceptance: want allow, got deny | 
+FAIL
+[exit 0]
+
+$ sha256sum .claude/hooks/role_reads.py | cut -c1-12; git status --short -- .claude/
+8c1ea44b2313
+[exit 0]
+
+rehearsal done: 2026-11-03 21:00:24 GMT

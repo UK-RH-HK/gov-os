@@ -1,0 +1,3 @@
+log: (interim)
+Interim: research-retrieval
+status: interim result 3c14830e: EXP-003 retrieval survey: the variant harness (fusion, cut, rerank swapped in-process; src unchanged) and 61 measure runs on m1's clone (best 36/48 hit@5)

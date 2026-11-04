@@ -1,0 +1,3 @@
+log: (interim)
+Interim: D-7
+status: interim result e44d6732: D-7 + G4: W2-15a's raw measure output out of both indexes (the D-7 review's F5; DEC-1066 (3))

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: D4-cut-b
+status: interim result 7b7b1270: D-4 cut B, R4 deferred: W1-19's and W1-21's READMEs say the hit@5 pass line stays 80 until after D-4b's measure 3

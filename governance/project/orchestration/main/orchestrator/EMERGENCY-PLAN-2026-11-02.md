@@ -1,5 +1,5 @@
 # READ THIS FIRST — THIS FILE IS HISTORY. A fresh session starts from `governance/project/orchestration/START-NEXT-SESSION.md`
-# (2026-11-03). The working plan is DEC-1052's:
+# (rewritten 2026-11-04 ~18:00). The working plan is DEC-1052's:
 # `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section "DECIDED BY DEC-1052" (D-0 to D-11),
 # with RESUME HERE in `.gov-runtime/scratch/orchestrator/CHECKPOINT.md` and the owner's intent in
 # `governance/project/orchestration/INTENT-DEC-1052.md`. Every plan and step list below is SUPERSEDED: do not follow it.

@@ -3,7 +3,9 @@ interpreter with event JSON, as the registered hook line does, and checks each k
 passes. Prints one line per case and a last line PASS or FAIL. Usage: python3 guard4_check.py [hook path]
 ACT-GUARD-FIX-4 (DEC-1050 (8), (12)): four cases re-baselined to allow (a write whose target the guard cannot work
 out, or that resolves outside every tree, is let through: G-1, G-2); added: a reviewer's record into the CTO's
-reviews/ (allowed), and rm: the catastrophic refused, an honest one passed."""
+reviews/ (allowed), and rm: the catastrophic refused, an honest one passed.
+G-14 (DEC-1052, ACT-G14): five cases added; when the tested tree's path map holds role_paths:, W2-126's engineer is
+refused its own acceptance tests and the case revised for it, and reads the rest; the 65 cases above are unchanged."""
 import json
 import os
 import subprocess
@@ -149,6 +151,21 @@ CASES = [
      {"command": "cp /tmp/x.py tests/acceptance/W2-64/t.py"}, "deny"),
 ]
 
+# G-14 (DEC-1052, the owner's engineer rule of 2026-11-03): with the path map's role_paths: section in the tested
+# tree, an engineer is refused its own ticket's acceptance tests ({ticket_tests}: its folder and the cases revised for
+# it, linked by a test designer's Task: trailer); other tickets' tests stay readable, so every case above holds.
+G14 = os.environ.get("G14_EXPECT") == "1" or "role_paths:" in open(PROJECT + "/governance/project/path-map.yaml").read().splitlines()  # G14_EXPECT=1: a simulation (TMPDIR)
+CASES += [("G-14 W2-126's engineer reads its own acceptance tests", "engineer@DAEO-jpr0", "Read",
+           {"file_path": ROOT + "/tests/acceptance/W2-126/README.md"}, "deny" if G14 else "allow"),
+          ("G-14 W2-126's engineer reads W2-123's case revised for it (Task: DAEO-jpr0, 741f9edd)", "engineer@DAEO-jpr0",
+           "Bash", {"command": "sed -n 1,20p " + ROOT + "/tests/acceptance/W2-123/test_w2_123_retry.py"},
+           "deny" if G14 else "allow"),
+          ("G-14 W2-126's engineer reads another ticket's tests (regressions)", "engineer@DAEO-jpr0", "Read",
+           {"file_path": ROOT + "/tests/acceptance/W2-64/README.md"}, "allow"),
+          ("G-14 engineer greps for the tests' name (a pattern, not a read)", "engineer@DAEO-jpr0", "Bash",
+           {"command": "grep -rn tests/acceptance/W2-126 " + ROOT + "/src/gov/guard/"}, "allow"),
+          ("G-14 orchestrator reads the acceptance tests", "orchestrator", "Read",
+           {"file_path": ROOT + "/tests/acceptance/W2-126/README.md"}, "allow")]
 ok = True
 for name, role, tool, tin, want in CASES:
     agent = None

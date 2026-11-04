@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-32
+status: interim result 3ea1c8c3: W2-32 S8's note (DEC-1067 order (4), measure 3's x5): three deterministic phrasings behind routing.phrasings (absent: false): the question, its content words, the question with the record route's ids;

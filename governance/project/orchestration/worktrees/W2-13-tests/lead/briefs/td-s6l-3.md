@@ -1,0 +1,7 @@
+# W2-13 test designer, S6: one premise left over from P2 (the CTO)
+
+The CTO merged your `3a24fde6` into the engineer's branch (`d4285bad`) and ran `gov accept W2-13` outside the sandbox: S6 27 of 30. Two reds are your repository cases (wait on D-7, expected). The third is a premise of yours that the P2 rule now refuses:
+
+`test_w2_13_lexical_policy.py::test_the_path_map_validator_accepts_both_values[not indexed]`: `s6.build_one_namespace(..., "not indexed")` builds the namespace `everything` with `embedding_policy: embedded`, so the validator refuses it: "not indexed cannot be embedded: the vectors are built from the keyword index's chunks (embedding_policy is embedded)", `CONFIG_INVALID`.
+
+Revise the premise only: when the value is `not indexed`, the one-namespace project is `embedding_policy: not embedded` (the only combination P2 allows); the case still asserts the value is accepted and kept and the rebuild runs. Check whether any other case calls `build_one_namespace` with `not indexed` and an embedded namespace (the invalid-value cases use other values; keep them as they are). Show the file's counts on the engineer's head if you can read it from your worktree's merge of integrate; otherwise state the expected counts (28 of 30, the two repository cases red). Same rules (no merge; the exclusion flags; no gov retrieve). Commit with `Task: DAEO-zqvn`, `Implements: DEC-1066`, `Role: independent-test-designer`, `Rewrite-Reason: P2 (not indexed cannot be embedded) applies to the one-namespace premise`, Co-Authored-By. Return the twelve fields, brief.

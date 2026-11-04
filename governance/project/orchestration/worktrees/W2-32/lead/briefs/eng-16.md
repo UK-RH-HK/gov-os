@@ -1,0 +1,6 @@
+# W2-32 engineer: the S8 review's findings riding along (the CTO; DEC-802)
+
+The review of S8 and the size bound is READY (`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/w2-32-s8.md`; read S8-F1, S8-F4; it quotes no acceptance test). Two for you:
+1. **S8-F1 (do it):** the measured r01 ranks the code route by stored-vector cosine **before the fusion** (`rx.py` lines 278-279: `code: sem`), while the product fuses the code route in its own order and uses cosine only for the front. When `routing.code_first` is on, order the code route by cosine to the question before it enters the fusion (as r01), and keep the front as now; off stays today's order byte for byte. Unit cases.
+2. **S8-F4 (do it):** an empty `routing:` block (or one with no keys) is off, not `CONFIG_INVALID`; a present key with an invalid value stays `CONFIG_INVALID` naming it, checked when the config loads (before any search work).
+**S8-F2 (the CTO's ruling: keep):** the record half keeps P-W2-32-9's form (the best among the record's chunks already on the page, by the pool's scores); the measure tests that form. Same rules as before. Commit with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

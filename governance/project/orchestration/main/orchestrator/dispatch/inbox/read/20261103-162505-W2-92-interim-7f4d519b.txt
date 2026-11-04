@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-92
+status: interim result 7f4d519b: W2-92: merge w2/W2-92-tests (507df49a): S4/F1's reference revised by the test designer to the integrated baseline with W2-112's rerank field (P-W2-92-D4B-1 (a))

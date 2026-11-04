@@ -1,0 +1,25 @@
+--- a/governance/project/path-map.yaml	2026-11-03 15:21:09.018993162 +0000
++++ b/governance/project/path-map.yaml	2026-11-03 15:21:09.019051523 +0000
+@@ -541,6 +541,22 @@
+     hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
+     measures:
+       roles: [engineer, research]
++# Role separation (DEC-1052 G-14): the globs each role does not read, judged by the guard's role_reads.py from the
++# main tree's copy of this file by simple path checks (a target the guard cannot resolve, a search from a folder
++# above and a listing of names are let through). Only this block is parsed. A plain glob applies in every tree.
++# {ticket_tests} is the session ticket's acceptance tests (the owner, 2026-11-03): its own tests/acceptance/<WBS>/**
++# and each file in another ticket's folder that a test designer's commit made for it touched (the commit's Task:
++# trailer names the ticket, or the commit is on w2/<WBS>-tests's own first-parent line); other tickets' tests stay
++# readable. {ticket_impl} is the engineer's new work (the owner's (c3), 2026-11-03): the ticket's allowed_paths but
++# tests/acceptance/, less the shared test files (any conftest.py, __init__.py, *support*.py, *helper*.py), in the
++# engineer's tree ~/gov-os-worktrees/<WBS> and on its branch w2/<WBS>; in a designer's session in that tree only the
++# files its branch changes, and in the designer's <WBS>-tests tree the files the engineer's commits carried in; the
++# rest is the integrated code, which the test designer reads (DEC-963). No section, no check.
++role_paths:
++  engineer:
++    reads_denied: ["{ticket_tests}"]
++  independent-test-designer:
++    reads_denied: ["{ticket_impl}"]
+ # The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
+ # a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
+ retrieval_authority:

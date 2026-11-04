@@ -1,0 +1,4 @@
+2026-11-04 04:16:05 start: flag /tmp/gov-os-research-wait.flag
+2026-11-04 04:18:19 reset: 15774 -> 5429 MiB; 2026-11-04T04:18:18+0000	READY	pid 954393 device cuda:0
+2026-11-04 04:37:56 reset: 15261 -> 5383 MiB; 2026-11-04T04:37:55+0000	READY	pid 1050146 device cuda:0
+2026-11-04 07:22:58 stopped: the night's experiments ended

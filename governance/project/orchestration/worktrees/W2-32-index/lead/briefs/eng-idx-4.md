@@ -1,0 +1,3 @@
+# W2-32 engineer (headers): the review's F2 (the CTO; DEC-802)
+
+The headers review is READY (`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/w2-32-headers.md`; read F2; it quotes no acceptance test). **F2:** with headers on, `_Texts._PARENTS` scans the whole keyword table once per file (about 79 s on every rebuild and close's refresh here; 79 s more on a full re-embed); adding `AND c.path = ?` gives the same rows in 0.07 s. Make that change (the query bound to the file), with a unit case that the rows are the same. The CTO committed the merge with integrate (`2eaf9dcc`). Same rules as before. Commit with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

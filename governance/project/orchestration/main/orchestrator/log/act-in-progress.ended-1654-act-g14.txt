@@ -1,0 +1,1 @@
+2026-11-03 15:43:17 ACT-G14 handed to the owner (drafts/g14/ACT-G14.md, READY round 2; F4: docs kept on the designer's no-read list, as built); no CTO main-tree commit until the owner says done; agents commit only in their own worktrees

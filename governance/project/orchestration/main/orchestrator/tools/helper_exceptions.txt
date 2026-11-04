@@ -1,0 +1,8 @@
+# The test helpers whose change reaches only the suites that import them directly (DEC-1061 item 9, DEC-1052 T-7).
+# select_tests.py reads this list: for a listed helper, the product's helper rule (gov.close.select._helper_reach,
+# which also follows imports through other helpers) is narrowed to the suites a plain scan of tests/ finds importing
+# the helper itself; each suite so dropped is named in `helper_exceptions_dropped`. A change that breaks a suite
+# reaching the helper only through another helper is found by the full run (accepted by T-7). The test map's schema
+# is closed, so the list is here, not in the map. One helper path per line, then `#` and why.
+
+tests/acceptance/W1-07/w1_07_support.py  # run_gov and friends: 33 suites reach it through other helpers, 15 import it

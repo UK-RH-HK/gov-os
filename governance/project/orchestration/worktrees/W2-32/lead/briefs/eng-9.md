@@ -1,0 +1,8 @@
+# W2-32 engineer: two reds after the merge (the CTO, outside the sandbox)
+
+`gov accept W2-32` at `82dcb360` (your `d3e154be` + the designer's cases + integrate): 103 passed, 1 failed (S7), 1 skipped. And one unit red. Both yours:
+
+1. **S7, F-5's converse (no span twice):** in a paged retrieval over a planted `docs/almanac.md`, a later call expanded the section `start_line 1, end_line 46` and reported `left_out: [[16, 31], [30, 45]]`, but the lines it left out are not named as the spans the earlier calls actually sent as children: note the two ranges **overlap at lines 30-31**, which suggests the end-line convention (inclusive or exclusive) of the spans you record differs from the lines the children carried. The left-out spans must be exactly the line ranges sent earlier (the same convention as the chunks' own `start_line`/`end_line`), each named once. Check against your own unit cases with a child that ends one line before the next begins.
+2. **`tests/unit/retrieval/test_w2_112_shared_reranker.py::test_a_request_over_the_cap_is_refused_and_the_search_falls_back`** fails on the merged head: with requests now at most 16 texts, a request may no longer reach the shared service's own cap. Judge what the case guards (the service refusing an over-cap request, and the search falling back named): if the service's cap is above 16, keep the guard by calling the service directly with an over-cap request (or a planted lower service cap), and keep a case that the search's batches never exceed it; never drop the guard. It is a unit test in your paths.
+
+Same rules as before. Commit with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

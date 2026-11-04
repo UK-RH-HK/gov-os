@@ -1,0 +1,688 @@
+
+=== R0 the rehearsal (2026-11-04 09:40:17)
+host Usain; repo head bd87a8b21941 on w2/integrate; user usain
+GPU used,free MiB at start: 10267,5731
+live service pid at start: 1185831; last live log line: 2026-11-04T05:39:26+0000	READY	pid 1185831 device cuda:0
+
+=== R1 step 0: the conditions (read-only) (2026-11-04 09:40:17)
+ok: /home/usain/.cache/gov-os-trial absent (the ACT creates it)
+ok: /home/usain/.local/share/gov-os/reranker-trial-venv absent (the ACT creates it)
+ok: /home/usain/.local/share/gov-os/rerank-trial absent (the ACT creates it)
+free disk under HOME:  868G
+leads running (0, from the processes): none
+Jobs by phase: slot pid 1862515 test (0.98 cores, 0.1 GB)
+heavy slots held: gov-os-heavy-slot-1.lock; queue free; land: nothing to land; main tree clean on w2/integrate
+-rw------- 1 usain usain 0 Nov  3 11:36 /tmp/gov-os-rerank-gpu-0.lock
+-rw------- 1 usain usain 0 Nov  3 11:37 /tmp/gov-os-rerank-gpu-1.lock
+   8416 python3 tools/rerank_service_slot_hold.py --watch
+HF token: not read (every hf call below runs with HF_HOME in scratch; no HF_* variable in the environment: 0)
+
+=== R2 the live reranker venv (read-only): versions, absent packages, the freeze, uv's cache (2026-11-04 09:40:17)
+torch 2.14.1
+transformers 5.18.0
+sentence-transformers 6.1.0
+huggingface-hub 1.33.0
+tokenizers 0.23.2
+safetensors 0.8.0
+triton 3.8.0
+bitsandbytes: absent
+accelerate: absent
+psutil: absent
+mxbai_rerank: absent
+torchao: absent
+kernels: absent
+Version: 2.14.1
+cu13 cudnn cusparselt nccl nvshmem 
+live freeze: 60 packages; sha256 754a6f6da0f1c23c
+uv's wheel cache holds 60 of 60 live packages at their exact versions (missing: 0)
+bitsandbytes: not in uv's cache (step 2 downloads it)
+accelerate: not in uv's cache (step 2 downloads it)
+psutil: not in uv's cache (step 2 downloads it)
+49d544c8bb4c8bfc9cc42eb98d3e5094f557819bc05585825c84ed38bb26cb88  rerank_service.py
+daf90827b3a7dba6330634b5fce752b0c229eda37a2879fc7d94ff08a931c191  rerank_worker.py
+c4e1fc99e6d6da82b95297d06c96fb740cdf777c5f706ba326519895bfdd0b80  rerank.py
+
+=== R3 the download's dry run (file list and sizes from the hub; nothing downloaded) (2026-11-04 09:40:17)
+--- mixedbread-ai/mxbai-rerank-large-v2 @ ca7e1ee484c37c0ddd8d178a9a5c33cec575c5e6
+Hint: A new version of huggingface_hub (2.4.0) is available! You are using version 1.33.0.
+Hint: The `hf-cli` skill is not installed. Run `hf skills add -g` to teach your AI agents how to use the `hf` CLI.
+[dry-run] Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[dry-run] Fetching 17 files:  12%|█▏        | 2/17 [00:00<00:00, 16.15it/s][dry-run] Fetching 17 files:  71%|███████   | 12/17 [00:00<00:00, 60.13it/s][dry-run] Fetching 17 files: 100%|██████████| 17/17 [00:00<00:00, 56.65it/s]
+[dry-run] Will download 17 files (out of 17) totalling 3.1G.
+FILE                              SIZE 
+--------------------------------- -----
+.gitattributes                    1.6K 
+1_LogitScore/config.json          50.0 
+LICENSE                           10.8K
+README.md                         46.8K
+added_tokens.json                 605.0
+chat_template.jinja               576.0
+config.json                       768.0
+config_sentence_transformers.json 204.0
+generation_config.json            242.0
+merges.txt                        1.7M 
+model.safetensors                 3.1G 
+modules.json                      281.0
+sentence_bert_config.json         309.0
+special_tokens_map.json           613.0
+tokenizer.json                    11.4M
+tokenizer_config.json             4.7K 
+vocab.json                        2.8M 
+--- Qwen/Qwen3-Reranker-4B @ 22e683669bc0f0bd69640a1354a6d0aebcfeede5
+[dry-run] Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[dry-run] Fetching 17 files:  12%|█▏        | 2/17 [00:00<00:00, 16.16it/s][dry-run] Fetching 17 files:  65%|██████▍   | 11/17 [00:00<00:00, 55.49it/s][dry-run] Fetching 17 files: 100%|██████████| 17/17 [00:00<00:00, 59.61it/s]
+[dry-run] Will download 17 files (out of 17) totalling 8.1G.
+FILE                              SIZE 
+--------------------------------- -----
+.gitattributes                    1.6K 
+1_LogitScore/config.json          57.0 
+README.md                         14.7K
+chat_template.jinja               741.0
+config.json                       727.0
+config_sentence_transformers.json 325.0
+generation_config.json            214.0
+merges.txt                        1.7M 
+model-00001-of-00002.safetensors  4.1G 
+model-00002-of-00002.safetensors  4.0G 
+model.safetensors.index.json      32.8K
+modules.json                      280.0
+sentence_bert_config.json         362.0
+special_tokens_map.json           613.0
+tokenizer.json                    11.4M
+tokenizer_config.json             9.7K 
+vocab.json                        2.8M 
+scratch HF_HOME after the dry runs (must hold no weights): 12K
+
+=== R4 the trial venv: created and removed (no package installed; uv's cache not written) (2026-11-04 09:40:18)
+Using CPython 3.12.3 interpreter at: /usr/bin/python3
+Creating virtual environment at: standin-home/.local/share/gov-os/reranker-trial-venv
+Activate with: source standin-home/.local/share/gov-os/reranker-trial-venv/bin/activate
+home = /usr/bin
+implementation = CPython
+uv = 0.12.21
+version_info = 3.12.3
+include-system-site-packages = false
+trial venv python 3.12.3 /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt/standin-home/.local/share/gov-os/reranker-trial-venv
+step 2's install (uv pip install --offline -r the freeze, then the three new packages): NOT rehearsed (an install)
+rollback: trial venv removed
+
+=== R5 the trial service's two files (copies of the pin; the worker with the trial's two changes) (2026-11-04 09:40:19)
+ok: rerank_service.py is the pin's, unchanged
+  --- /home/usain/.local/share/gov-os/pin-9894b0cf/lib/python3.12/site-packages/gov/retrieval/rerank_worker.py	2026-11-03 12:22:12.827450991 +0000
+  +++ /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt/standin-home/.local/share/gov-os/rerank-trial/svc/rerank_worker.py	2026-11-04 09:40:19.042493956 +0000
+  @@ -68,15 +68,36 @@
+   
+   
+   def load(model: str, revision: str, device: str | None = None):
+  -    """The pinned cross-encoder; ``device`` None is the library's choice (the GPU when there is one), as before."""
+  +    """The pinned cross-encoder; ``device`` None is the library's choice (the GPU when there is one), as before.
+  +    TRIAL (ACT-RERANK-TRIAL-1, never the live service): ``GOV_RERANK_TRIAL_8BIT=1`` loads it in 8-bit (bitsandbytes
+  +    LLM.int8, on GPU 0)."""
+       from sentence_transformers import CrossEncoder
+   
+  +    extra = {}
+  +    if os.environ.get("GOV_RERANK_TRIAL_8BIT") == "1":
+  +        from transformers import BitsAndBytesConfig
+  +
+  +        extra["model_kwargs"] = {"quantization_config": BitsAndBytesConfig(load_in_8bit=True), "device_map": {"": 0}}
+       # The snapshot's own configuration carries the instruction and the yes/no scoring.
+  -    return CrossEncoder(model, revision=revision, **({"device": device} if device else {}))
+  +    return CrossEncoder(model, revision=revision, **({"device": device} if device else {}), **extra)
+   
+   
+   def scores(encoder, query: str, texts: list) -> list:
+  -    return [float(score) for score in encoder.predict([(query, text) for text in texts])]
+  +    """TRIAL: each request's own peak (PyTorch's reserved memory) and time on standard error (the service's log), and
+  +    the cache released after it (window 4's form) unless ``GOV_RERANK_TRIAL_RELEASE=0`` (today's live behaviour)."""
+  +    import torch
+  +
+  +    torch.cuda.reset_peak_memory_stats()
+  +    started = time.monotonic()
+  +    out = [float(score) for score in encoder.predict([(query, text) for text in texts])]
+  +    seconds, peak = time.monotonic() - started, torch.cuda.max_memory_reserved() >> 20
+  +    if os.environ.get("GOV_RERANK_TRIAL_RELEASE", "1") == "1":
+  +        torch.cuda.empty_cache()
+  +    padded = len(texts) * max((len(query) + len(text) for text in texts), default=0)
+  +    print(json.dumps({"trial": "request", "texts": len(texts), "padded_chars": padded, "seconds": round(seconds, 3),
+  +                      "peak_reserved_mib": peak, "reserved_after_mib": torch.cuda.memory_reserved() >> 20}),
+  +          file=sys.stderr, flush=True)
+  +    return out
+   
+   
+   def device_of(encoder) -> str | None:
+ok: both parse
+
+=== R6 a dry run of the load with a stand-in model name (offline, empty HF_HOME, GPU hidden): fails cleanly (2026-11-04 09:40:19)
+GPU before: 10256,5742
+--- load() of retrieval/rerank_worker.py, GOV_RERANK_TRIAL_8BIT=0
+clean failure: OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.
+--- load() of svc/rerank_worker.py, GOV_RERANK_TRIAL_8BIT=0
+clean failure: OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.
+--- load() of svc/rerank_worker.py, GOV_RERANK_TRIAL_8BIT=1
+clean failure: OSError: We couldn't connect to 'https://huggingface.co' to load the files, and couldn't find them in the cached files.
+GPU after: 10250,5748
+
+=== R6b the same with a stand-in local model folder (the 0.6B's configs and tokenizer, NO weights): reaches the 8-bit check (2026-11-04 09:40:33)
+stand-in folder: 1_LogitScore chat_template.jinja config.json config_sentence_transformers.json generation_config.json merges.txt modules.json sentence_bert_config.json tokenizer.json tokenizer_config.json vocab.json  (no model.safetensors)
+--- load() of the trial worker, stand-in folder, GOV_RERANK_TRIAL_8BIT=0, live venv (no bitsandbytes, no accelerate)
+clean failure: OSError: Error no file named model.safetensors, or pytorch_model.bin, found in directory /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt/standin-m
+--- load() of the trial worker, stand-in folder, GOV_RERANK_TRIAL_8BIT=1, live venv (no bitsandbytes, no accelerate)
+clean failure: ValueError: Using a `device_map`, `tp_plan`, `torch.device` context manager or setting `torch.set_default_device(device)` requires `accelerate`. You can install it with `pip install accelerate`
+GPU after: 10250,5748
+
+=== R7 a dry run of the trial service's start, the ACT's exact form, stand-in model, GPU hidden: REFUSED, exit 76 (2026-11-04 09:40:41)
+trial service exit code: 76 (76 = the GPU hidden: it refused before torch or any model)
+trial log: 2026-11-04T09:40:41+0000	REFUSED	the shared reranker does not start: the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no reranker runs on the CPU
+ok: no socket left
+ok: the start lock is free again
+live log untouched: 2026-11-04T05:39:26+0000	READY	pid 1185831 device cuda:0
+(the ACT's start uses /tmp's GPU slots, not GOV_RERANK_GPU_LOCK_DIR: here only so a stand-in cannot hold one)
+
+=== R8 the probe against a stand-in server (protocol, timing, the 30 s timeout; no model, no GPU) (2026-11-04 09:40:41)
+socket path for the ACT: ~/.local/share/gov-os/rerank-trial/run/rerank.sock = 11+49 = 60 bytes (< 108); here a relative name (the scratch path is 172 bytes)
+READY standin
+1x23926: ok in 0.30 s; GPU 10250 -> 10250 MiB
+2x11926: ok in 0.30 s; GPU 10250 -> 10250 MiB
+4x5926: ok in 0.30 s; GPU 10250 -> 10250 MiB
+8x2926: ok in 0.30 s; GPU 10250 -> 10250 MiB
+16x1426: ok in 0.30 s; GPU 10250 -> 10250 MiB
+load 1: 3 requests in 0.9 s; per request p50 0.30 s, p95 0.30 s, max 0.30 s; not ok 0 (timeouts 0); GPU peak 10250 MiB
+load 10: 30 requests in 9.0 s; per request p50 3.00 s, p95 3.00 s, max 3.00 s; not ok 0 (timeouts 0); GPU peak 10250 MiB
+load 20: 60 requests in 18.0 s; per request p50 6.00 s, p95 6.01 s, max 6.01 s; not ok 0 (timeouts 0); GPU peak 10254 MiB
+--- a slow stand-in (1.6 s a request, as a 4B in 8-bit might be): 20 at once against the product's 30 s timeout
+(the first rehearsal run, 09:38, found the stand-in ended on a timed-out caller's broken pipe and the probe did not catch the resets after it; both fixed; the real service's serve() already catches OSError)
+load 20: 60 requests in 90.1 s; per request p50 30.02 s, p95 30.03 s, max 30.03 s; not ok 42 (timeouts 42); GPU peak 10270 MiB
+probe exit 4 (4 = some requests not ok)
+
+=== R9 the force-stop (DEC-1068 (f)): SIGTERM, 30 s, then SIGKILL, by the trial folder's path only (2026-11-04 09:42:53)
+BUSY 1930066 python3 -c import signal,time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(600) /tmp/claude-1000/-home-usa
+no stop within 30 s: SIGKILL 1930066
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt/rehearse.sh: line 158: 1930066 Killed                  python3 -c "import signal,time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(600)" "$TR/svc/rerank_service.py"
+stopped
+dummy's exit status 137 (137 = SIGKILL)
+the live service was not matched: BUSY 1185831
+
+=== R10 the rollback: the trial's folders removed; the live service, venv, pin and HF cache unchanged (2026-11-04 09:43:41)
+ok: trial folders removed
+ok: the live venv's packages unchanged
+ok: the pin's three files unchanged
+ok: the live service is the same process (1185831), never stopped
+last live log line: 2026-11-04T05:39:26+0000	READY	pid 1185831 device cuda:0
+ok: no candidate in the HF cache
+class 3's restart of the live service (the rollback's last step after a real trial; NOT run here: it starts a reranker):
+  cd /home/usain/gov-os-worktrees/W2-00-store && GOV_RERANK_IDLE_S=43200 ~/.local/bin/gov retrieve "what decides a close" --json > /dev/null
+GPU used,free MiB at the end: 10266,5732
+
+=== R11 not rehearsed, and why (2026-11-04 09:43:42)
+- step 1, the downloads (3.1 GB and 8.1 GB): a download (the brief forbids it); its dry run is R3
+- step 2, the trial venv's install (the offline clone and bitsandbytes, accelerate, psutil): an install; R2 shows every
+  live package at its exact version in uv's cache, R4 the venv's creation and removal
+- any load of a real model, the trial service READY on cuda:0, the probe on a real model, the measure: they start a
+  reranker (DEC-1065 (1)); R6 and R7 run the same code paths up to the first GPU or model step
+- class 3's restart of the live service: it starts a reranker; the live service was never stopped here
+scratch used: 100K	/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt
+scratch inodes: 18	/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt
+
+=== Appendix A: the trial's probe, as rehearsed (rerank_trial_probe.py; sha256 0dd9922e580dec4a)
+#!/usr/bin/env python3
+"""ACT-RERANK-TRIAL-1's probe: speaks the shared reranker's protocol ([query, [text, ...]] in, one JSON line out) to a
+TRIAL service's socket only. Never starts a service.
+
+  rerank_trial_probe.py SOCKET peak  [--limit MIB]   the padded bound's worst shapes, one at a time, GPU read before
+                                                     and after each; stops at --limit (default 14255, the budget)
+  rerank_trial_probe.py SOCKET load N [--limit MIB]  N clients at once, each sending a search's requests (3 of the
+                                                     bound's shapes), as N searches at once would
+
+Texts are cut from this repository's own visible files (code first, the densest in tokens), never from evaluation
+fixtures. The client's answer timeout is the product's (GOV_RERANK_TIMEOUT_S, 30 s): a request past it is counted as
+a search that would have gone unranked."""
+import json, os, socket, statistics, subprocess, sys, threading, time
+
+REPO = "/home/usain/Dynamic-Agentic-Engineering-OS"
+SOURCES = [f"{REPO}/src/gov/retrieval/{n}" for n in ("retrieve.py", "semantic.py", "lexical.py", "fusion.py")]
+BOUND, MAX_TEXTS = 24_000, 16  # the product's padded bound since b7085897 (count x longest pair) and its count cap
+QUERY = "where does the reranker's request bound get applied and what does it count"
+TIMEOUT = float(os.environ.get("GOV_RERANK_TIMEOUT_S", "30"))
+
+
+def corpus() -> str:
+    return "\n".join(open(p, encoding="utf-8").read() for p in SOURCES)
+
+
+def shapes(text: str):
+    """(name, texts): each at the bound, count x (len(query) + len(text)) <= 24,000."""
+    out = []
+    for count in (1, 2, 4, 8, 16):
+        size = BOUND // count - len(QUERY)
+        out.append((f"{count}x{size}", [text[i * 997 % (len(text) - size):][:size] for i in range(count)]))
+    return out
+
+
+def gpu_used():
+    try:
+        return int(subprocess.run(["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"],
+                                  capture_output=True, text=True, timeout=10).stdout.split()[0])
+    except Exception:
+        return None
+
+
+def ask(path: str, texts: list) -> tuple[float, str]:
+    started = time.monotonic()
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+        s.settimeout(2.0)
+        try:
+            s.connect(path)
+        except OSError as error:
+            return time.monotonic() - started, f"error: {error}"
+        s.settimeout(TIMEOUT)
+        s.sendall((json.dumps([QUERY, texts]) + "\n").encode())
+        try:
+            line = s.makefile("rb").readline()
+        except socket.timeout:
+            return time.monotonic() - started, "timeout"
+        except OSError as error:
+            return time.monotonic() - started, f"error: {error}"
+    answer = json.loads(line) if line else {"error": "closed"}
+    ok = "scores" in answer and len(answer["scores"]) == len(texts)
+    return time.monotonic() - started, "ok" if ok else f"error: {answer.get('error')}"
+
+
+def main(argv):
+    path, mode = argv[1], argv[2]
+    limit = int(argv[argv.index("--limit") + 1]) if "--limit" in argv else 14255
+    text, cases = corpus(), None
+    cases = shapes(text)
+    if mode == "peak":
+        for name, texts in cases:
+            before = gpu_used()
+            if before is not None and before >= limit:
+                print(f"STOP before {name}: GPU {before} MiB >= {limit}"); return 3
+            seconds, how = ask(path, texts)
+            after = gpu_used()
+            print(f"{name}: {how} in {seconds:.2f} s; GPU {before} -> {after} MiB")
+            if after is not None and after >= limit:
+                print(f"STOP after {name}: GPU {after} MiB >= {limit}"); return 3
+        return 0
+    n = int(argv[3])
+    search = [cases[0][1], cases[2][1], cases[4][1]]  # one search: three requests of the bound's shapes, in turn
+    times, outcomes, peak = [], [], [gpu_used() or 0]
+    stop = threading.Event()
+
+    def sample():
+        while not stop.is_set():
+            peak[0] = max(peak[0], gpu_used() or 0)
+            time.sleep(1)
+
+    def client():
+        for texts in search:
+            seconds, how = ask(path, texts)
+            times.append(seconds); outcomes.append(how)
+
+    sampler = threading.Thread(target=sample, daemon=True); sampler.start()
+    started = time.monotonic()
+    threads = [threading.Thread(target=client) for _ in range(n)]
+    for t in threads: t.start()
+    for t in threads: t.join()
+    stop.set()
+    wall = time.monotonic() - started
+    bad = sum(1 for o in outcomes if o != "ok")
+    if not times:
+        print(f"load {n}: no request answered"); return 4
+    q = statistics.quantiles(times, n=20) if len(times) > 1 else times * 19
+    print(f"load {n}: {len(times)} requests in {wall:.1f} s; per request p50 {statistics.median(times):.2f} s, "
+          f"p95 {q[18]:.2f} s, max {max(times):.2f} s; not ok {bad} (timeouts {outcomes.count('timeout')}); "
+          f"GPU peak {peak[0]} MiB")
+    return 0 if bad == 0 and peak[0] < limit else 4
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
+
+=== Appendix B: the rehearsal's stand-in server (standin_server.py; rehearsal only, never used in the trial)
+#!/usr/bin/env python3
+"""REHEARSAL ONLY: a stand-in for the reranker service's protocol, no model, no GPU, no torch. One connection at a
+time (as the service), [query, [text, ...]] in, {"scores": [...], "device": "standin"} out after SECONDS_PER_REQUEST.
+  standin_server.py SOCKET SECONDS_PER_REQUEST"""
+import json, os, socket, sys, time
+
+path, per = sys.argv[1], float(sys.argv[2])
+if os.path.lexists(path):
+    os.unlink(path)
+mask = os.umask(0o177)
+listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+listener.bind(path)
+os.umask(mask)
+listener.listen(128)
+print("READY standin", flush=True)
+while True:
+    connection, _ = listener.accept()
+    with connection:
+        try:
+            query, texts = json.loads(connection.makefile("rb").readline())
+            time.sleep(per)
+            connection.sendall((json.dumps({"scores": [0.0] * len(texts), "device": "standin"}) + "\n").encode())
+        except OSError:
+            pass  # the caller gave up (as rerank_service.serve)
+
+=== Appendix C: the trial copy of rerank_worker.py, whole (the pin's file with R5's diff; sha256 9beb9e4b3457c1f4); rerank_service.py is the pin's unchanged (sha256 49d544c8bb4c8bfc)
+"""The reranker's own process (W1-19; ADR-0002 §2, DEC-397). Started by ``gov.retrieval.rerank``, never imported
+except by ``rerank_service.py``, which shares ``take_slot``, ``load`` and ``scores``.
+
+It runs in the reranker environment, loads the pinned model once, and then answers one line with one line until
+its caller closes the pipe: ``[query, [text, …]]`` in, ``[score, …]`` out, as JSON. The first line it writes says
+the model is loaded and on which device (``{"device": ...}``); a process that ends without it has no model, and its
+reason is on standard error.
+
+The GPU slot rule (DEC-1033, W2-112): before torch or the model loads, the worker holds one of
+``GOV_RERANK_GPU_SLOTS`` (default 2) lock files ``gov-os-rerank-gpu-<n>.lock`` in ``GOV_RERANK_GPU_LOCK_DIR`` (default
+/tmp) for its life, waiting for one up to ``GOV_RERANK_GPU_WAIT_S`` (default 20) seconds; without one it ends named
+(exit 75). It never hides the GPU to run on the CPU: a GPU already hidden ends it named (exit 76), and so does a
+machine where torch sees no GPU at all (exit 78, after the slot, before the model loads), unless
+``GOV_RERANK_ALLOW_CPU=1`` (tests and measurements only). While the interim module ``gov_reranker_gpu_slot`` is
+installed it has already taken a slot in this process (``GOV_RERANK_GPU_SLOT``), and the worker takes nothing more.
+"""
+
+import json
+import os
+import sys
+import time
+
+NO_SLOT, GPU_HIDDEN, NO_GPU = 75, 76, 78
+_HELD = []  # the slot's lock file, open for the process's life
+
+
+def gpu_present() -> bool:
+    """True when torch sees a CUDA GPU; any failure to ask is no GPU."""
+    try:
+        import torch
+
+        return bool(torch.cuda.is_available())
+    except Exception:
+        return False
+
+
+def take_slot(allow_cpu: bool):
+    """None when this process may load its model, holding a GPU slot for its life (or, with ``allow_cpu``, on the
+    CPU); otherwise ``(exit code, reason)``. The shared service calls it too, never allowing the CPU (DEC-1036)."""
+    import fcntl
+
+    if os.environ.get("GOV_RERANK_GPU_SLOT"):
+        return None  # the interim module holds one for this process
+    if os.environ.get("CUDA_VISIBLE_DEVICES") in ("-1", ""):
+        return None if allow_cpu else (GPU_HIDDEN, "the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no "
+                                                   "reranker runs on the CPU")
+    slots, wait = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2")), float(os.environ.get("GOV_RERANK_GPU_WAIT_S", "20"))
+    if not 0 <= wait < float("inf"):
+        raise ValueError("GOV_RERANK_GPU_WAIT_S must be a finite number of seconds")
+    folder, deadline = os.environ.get("GOV_RERANK_GPU_LOCK_DIR", "/tmp"), time.monotonic() + wait
+    while True:
+        for i in range(slots):
+            fd = os.open(os.path.join(folder, f"gov-os-rerank-gpu-{i}.lock"), os.O_CREAT | os.O_RDWR, 0o600)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                os.close(fd)
+                continue
+            _HELD.append(fd)
+            os.environ["GOV_RERANK_GPU_SLOT"] = str(i)
+            return None
+        if allow_cpu:  # the old fallback, for tests only
+            os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+            return None
+        if time.monotonic() >= deadline:
+            return NO_SLOT, f"no GPU slot free within {wait:g} s"
+        time.sleep(min(1.0, max(0.0, deadline - time.monotonic())))
+
+
+def load(model: str, revision: str, device: str | None = None):
+    """The pinned cross-encoder; ``device`` None is the library's choice (the GPU when there is one), as before.
+    TRIAL (ACT-RERANK-TRIAL-1, never the live service): ``GOV_RERANK_TRIAL_8BIT=1`` loads it in 8-bit (bitsandbytes
+    LLM.int8, on GPU 0)."""
+    from sentence_transformers import CrossEncoder
+
+    extra = {}
+    if os.environ.get("GOV_RERANK_TRIAL_8BIT") == "1":
+        from transformers import BitsAndBytesConfig
+
+        extra["model_kwargs"] = {"quantization_config": BitsAndBytesConfig(load_in_8bit=True), "device_map": {"": 0}}
+    # The snapshot's own configuration carries the instruction and the yes/no scoring.
+    return CrossEncoder(model, revision=revision, **({"device": device} if device else {}), **extra)
+
+
+def scores(encoder, query: str, texts: list) -> list:
+    """TRIAL: each request's own peak (PyTorch's reserved memory) and time on standard error (the service's log), and
+    the cache released after it (window 4's form) unless ``GOV_RERANK_TRIAL_RELEASE=0`` (today's live behaviour)."""
+    import torch
+
+    torch.cuda.reset_peak_memory_stats()
+    started = time.monotonic()
+    out = [float(score) for score in encoder.predict([(query, text) for text in texts])]
+    seconds, peak = time.monotonic() - started, torch.cuda.max_memory_reserved() >> 20
+    if os.environ.get("GOV_RERANK_TRIAL_RELEASE", "1") == "1":
+        torch.cuda.empty_cache()
+    padded = len(texts) * max((len(query) + len(text) for text in texts), default=0)
+    print(json.dumps({"trial": "request", "texts": len(texts), "padded_chars": padded, "seconds": round(seconds, 3),
+                      "peak_reserved_mib": peak, "reserved_after_mib": torch.cuda.memory_reserved() >> 20}),
+          file=sys.stderr, flush=True)
+    return out
+
+
+def device_of(encoder) -> str | None:
+    return str(getattr(encoder, "device", "") or "") or None
+
+
+def main(model: str, revision: str) -> None:
+    answers, sys.stdout = sys.stdout, sys.stderr  # whatever the libraries print stays out of the answers
+    allow_cpu = os.environ.get("GOV_RERANK_ALLOW_CPU") == "1"
+    refused = take_slot(allow_cpu)
+    if not refused and not allow_cpu and not gpu_present():  # no GPU at all: never the CPU (DEC-1033, DEC-1036)
+        refused = NO_GPU, "no GPU is available to it, and no reranker runs on the CPU"
+    if refused:
+        print(f"gov reranker: {refused[1]}; this search goes without reranking", file=sys.stderr, flush=True)
+        sys.exit(refused[0])
+    encoder = load(model, revision)
+    print(json.dumps({"device": device_of(encoder)}), file=answers, flush=True)
+    for line in sys.stdin:
+        query, texts = json.loads(line)
+        print(json.dumps(scores(encoder, query, texts)), file=answers, flush=True)
+
+
+if __name__ == "__main__":
+    main(*sys.argv[1:3])
+
+=== Appendix D: the rehearsal script (rehearse.sh)
+#!/usr/bin/env bash
+# ACT-RERANK-TRIAL-1's rehearsal: every step that downloads nothing and installs nothing, in a scratch folder.
+# The real paths of the ACT are replaced by scratch stand-ins (SH = stand-in home). Read-only on the live venv, the
+# pin, the HF cache, uv's cache and the live service. No model, reranker or embedder is started; the GPU is never
+# touched (every Python that could reach it runs with CUDA_VISIBLE_DEVICES=-1).
+set -u
+S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4/scratchpad/rt
+R=/home/usain/Dynamic-Agentic-Engineering-OS
+T=$R/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh
+LIVE=$HOME/.local/share/gov-os/reranker-venv
+PIN=$HOME/.local/share/gov-os/pin-9894b0cf/lib/python3.12/site-packages/gov/retrieval
+SH=$S/standin-home                       # stands in for $HOME in the ACT's own paths
+TRIAL_CACHE=$SH/.cache/gov-os-trial      # ACT: ~/.cache/gov-os-trial  (HF_HOME of the downloads, the freeze)
+TRIAL_VENV=$SH/.local/share/gov-os/reranker-trial-venv   # ACT: ~/.local/share/gov-os/reranker-trial-venv
+TR=$SH/.local/share/gov-os/rerank-trial  # ACT: ~/.local/share/gov-os/rerank-trial (svc/: the two files; run/)
+export TMPDIR=$S/tmp; mkdir -p "$TMPDIR"
+gpu() { /usr/lib/wsl/lib/nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader,nounits | tr -d ' '; }
+hdr() { echo; echo "=== $* ($(date '+%F %T'))"; }
+
+hdr "R0 the rehearsal"
+echo "host $(hostname); repo head $(git -C $R rev-parse --short=12 HEAD) on $(git -C $R branch --show-current); user $(id -un)"
+echo "GPU used,free MiB at start: $(gpu)"
+LIVEPID=$(bash $T --cmd "$PIN/rerank_service.py" 2>/dev/null | awk '/^BUSY/{print $2}' | head -1)
+echo "live service pid at start: ${LIVEPID:-none}; last live log line: $(tail -1 ~/.cache/gov-os/rerank.log)"
+
+hdr "R1 step 0: the conditions (read-only)"
+for d in "$HOME/.cache/gov-os-trial" "$HOME/.local/share/gov-os/reranker-trial-venv" "$HOME/.local/share/gov-os/rerank-trial"; do
+  [ -e "$d" ] && echo "STOP: $d exists" || echo "ok: $d absent (the ACT creates it)"
+done
+df -h --output=avail "$HOME" | tail -1 | sed 's/^/free disk under HOME: /'
+grep -E '^(heavy slots held|Jobs by phase|leads running)' $R/.gov-runtime/scratch/orchestrator/dispatch/status.txt
+ls -la /tmp/gov-os-rerank-gpu-0.lock /tmp/gov-os-rerank-gpu-1.lock
+ps -eo pid,args | grep -E '[r]erank_service_slot_hold|[g]pu_backstop|[r]erank_reset_watch' | cut -c1-120 || true
+echo "HF token: not read (every hf call below runs with HF_HOME in scratch; no HF_* variable in the environment: $(env | grep -c '^HF_'))"
+
+hdr "R2 the live reranker venv (read-only): versions, absent packages, the freeze, uv's cache"
+cd "$S"
+CUDA_VISIBLE_DEVICES=-1 "$LIVE/bin/python" -I -B -c "
+import importlib.util as u, importlib.metadata as m
+for n in ('torch','transformers','sentence-transformers','huggingface-hub','tokenizers','safetensors','triton'):
+    print(f'{n} {m.version(n)}')
+for n in ('bitsandbytes','accelerate','psutil','mxbai_rerank','torchao','kernels'):
+    print(f'{n}: ' + ('PRESENT' if u.find_spec(n) else 'absent'))
+"
+grep -h '^Version' "$LIVE"/lib/python3.12/site-packages/torch-*.dist-info/METADATA
+ls "$LIVE"/lib/python3.12/site-packages/nvidia/ 2>/dev/null | tr '\n' ' '; echo
+uv pip freeze --python "$LIVE/bin/python" > "$S/live-freeze.before.txt" 2>/dev/null
+echo "live freeze: $(wc -l < $S/live-freeze.before.txt) packages; sha256 $(sha256sum < $S/live-freeze.before.txt | cut -c1-16)"
+miss=0
+while IFS= read -r line; do
+  n=${line%%==*}; v=${line#*==}; n=$(echo "$n" | tr 'A-Z_.' 'a-z--')
+  ls -d ~/.cache/uv/wheels-v6/pypi/$n/$v-* >/dev/null 2>&1 || { echo "not in uv's cache: $line"; miss=$((miss+1)); }
+done < "$S/live-freeze.before.txt"
+echo "uv's wheel cache holds $(( $(wc -l < $S/live-freeze.before.txt) - miss )) of $(wc -l < $S/live-freeze.before.txt) live packages at their exact versions (missing: $miss)"
+for n in bitsandbytes accelerate psutil; do ls -d ~/.cache/uv/wheels-v6/pypi/$n 2>/dev/null || echo "$n: not in uv's cache (step 2 downloads it)"; done
+sha256sum "$PIN/rerank_service.py" "$PIN/rerank_worker.py" "$PIN/rerank.py" | sed "s#$PIN/##" > "$S/pin-sums.before.txt"; cat "$S/pin-sums.before.txt"
+
+hdr "R3 the download's dry run (file list and sizes from the hub; nothing downloaded)"
+mkdir -p "$TRIAL_CACHE/hf"
+for spec in "mixedbread-ai/mxbai-rerank-large-v2 ca7e1ee484c37c0ddd8d178a9a5c33cec575c5e6" \
+            "Qwen/Qwen3-Reranker-4B 22e683669bc0f0bd69640a1354a6d0aebcfeede5"; do
+  set -- $spec
+  echo "--- $1 @ $2"
+  HF_HOME="$TRIAL_CACHE/hf" HF_HUB_DISABLE_TELEMETRY=1 CUDA_VISIBLE_DEVICES=-1 timeout 120 "$LIVE/bin/python" -I -B -c "
+import sys; sys.argv=['hf','download','$1','--revision','$2','--dry-run','--format','human']
+from huggingface_hub.cli.hf import main; main()" 2>&1 | tail -25
+done
+echo "scratch HF_HOME after the dry runs (must hold no weights): $(du -sh $TRIAL_CACHE/hf | cut -f1)"
+
+hdr "R4 the trial venv: created and removed (no package installed; uv's cache not written)"
+UV_CACHE_DIR=$S/uvcache uv venv --no-cache --offline --python /usr/bin/python3 "$TRIAL_VENV" 2>&1 | tail -3
+cat "$TRIAL_VENV/pyvenv.cfg"
+"$TRIAL_VENV/bin/python" -I -B -c "import sys; print('trial venv python', sys.version.split()[0], sys.prefix)"
+echo "step 2's install (uv pip install --offline -r the freeze, then the three new packages): NOT rehearsed (an install)"
+rm -rf "$TRIAL_VENV" && [ ! -e "$TRIAL_VENV" ] && echo "rollback: trial venv removed"
+
+hdr "R5 the trial service's two files (copies of the pin; the worker with the trial's two changes)"
+mkdir -p "$TR/svc" && cp "$S/svc/rerank_service.py" "$S/svc/rerank_worker.py" "$TR/svc/"
+cmp "$PIN/rerank_service.py" "$TR/svc/rerank_service.py" && echo "ok: rerank_service.py is the pin's, unchanged"
+diff -u "$PIN/rerank_worker.py" "$TR/svc/rerank_worker.py" | sed 's/^/  /'
+python3 -c "import ast,sys; [ast.parse(open(f).read(), f) for f in sys.argv[1:]]; print('ok: both parse')" "$TR/svc/rerank_service.py" "$TR/svc/rerank_worker.py"
+
+hdr "R6 a dry run of the load with a stand-in model name (offline, empty HF_HOME, GPU hidden): fails cleanly"
+echo "GPU before: $(gpu)"
+for f in "$PIN/rerank_worker.py" "$TR/svc/rerank_worker.py"; do
+  for eight in 0 1; do
+    [ $f = "$PIN/rerank_worker.py" ] && [ $eight = 1 ] && continue
+    echo "--- load() of $(basename $(dirname $f))/$(basename $f), GOV_RERANK_TRIAL_8BIT=$eight"
+    HF_HOME="$TRIAL_CACHE/hf-empty" HF_HUB_OFFLINE=1 CUDA_VISIBLE_DEVICES=-1 GOV_RERANK_TRIAL_8BIT=$eight \
+      "$LIVE/bin/python" -I -B -c "
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location('w', '$f'); w = importlib.util.module_from_spec(spec); spec.loader.exec_module(w)
+try:
+    w.load('gov-os-trial/stand-in-not-a-model', '0000000000000000000000000000000000000000')
+    print('UNEXPECTED: loaded'); sys.exit(1)
+except Exception as e:
+    print(f'clean failure: {type(e).__name__}: {str(e).splitlines()[0][:160]}'); sys.exit(0)
+" 2>&1 | grep -v -E 'Warning|warn\(' | tail -2
+  done
+done
+echo "GPU after: $(gpu)"
+
+hdr "R6b the same with a stand-in local model folder (the 0.6B's configs and tokenizer, NO weights): reaches the 8-bit check"
+SNAP=$HOME/.cache/huggingface/hub/models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed45024b0ed8a2d74b80b4d909f1255473
+STAND=$S/standin-model; mkdir -p "$STAND/1_LogitScore"
+for f in config.json config_sentence_transformers.json modules.json sentence_bert_config.json chat_template.jinja \
+         generation_config.json tokenizer.json tokenizer_config.json vocab.json merges.txt 1_LogitScore/config.json; do
+  cp -L "$SNAP/$f" "$STAND/$f"; done
+echo "stand-in folder: $(ls $STAND | tr '\n' ' ') (no model.safetensors)"
+for eight in 0 1; do
+  echo "--- load() of the trial worker, stand-in folder, GOV_RERANK_TRIAL_8BIT=$eight, live venv (no bitsandbytes, no accelerate)"
+  HF_HOME="$TRIAL_CACHE/hf-empty" HF_HUB_OFFLINE=1 CUDA_VISIBLE_DEVICES=-1 GOV_RERANK_TRIAL_8BIT=$eight \
+    "$LIVE/bin/python" -I -B -c "
+import importlib.util, sys
+spec = importlib.util.spec_from_file_location('w', '$TR/svc/rerank_worker.py'); w = importlib.util.module_from_spec(spec); spec.loader.exec_module(w)
+try:
+    w.load('$STAND', 'unused-for-a-local-folder')
+    print('UNEXPECTED: loaded'); sys.exit(1)
+except Exception as e:
+    print(f'clean failure: {type(e).__name__}: {str(e).splitlines()[0][:200]}')
+" 2>&1 | grep -v -E 'Warning|warn\(' | tail -2
+done
+rm -rf "$STAND"
+echo "GPU after: $(gpu)"
+
+hdr "R7 a dry run of the trial service's start, the ACT's exact form, stand-in model, GPU hidden: REFUSED, exit 76"
+mkdir -p -m 700 "$TR/run"
+(
+  exec 9>"$TR/run/rerank.lock"; flock -n 9 || { echo "lock busy"; exit 1; }
+  HF_HOME="$TRIAL_CACHE/hf" HF_HUB_OFFLINE=1 GOV_RERANK_IDLE_S=60 GOV_RERANK_GPU_LOCK_DIR="$TR/run" CUDA_VISIBLE_DEVICES=-1 \
+    "$LIVE/bin/python" -I -B "$TR/svc/rerank_service.py" gov-os-trial/stand-in-not-a-model 0000 "$TR/run/rerank.sock" 9 \
+    >> "$TR/run/service.log" 2>&1 < /dev/null
+  echo "trial service exit code: $? (76 = the GPU hidden: it refused before torch or any model)"
+)
+echo "trial log: $(cat $TR/run/rerank.log)"
+[ -e "$TR/run/rerank.sock" ] && echo "UNEXPECTED: a socket" || echo "ok: no socket left"
+flock -n "$TR/run/rerank.lock" true && echo "ok: the start lock is free again"
+echo "live log untouched: $(tail -1 ~/.cache/gov-os/rerank.log)"
+echo "(the ACT's start uses /tmp's GPU slots, not GOV_RERANK_GPU_LOCK_DIR: here only so a stand-in cannot hold one)"
+
+hdr "R8 the probe against a stand-in server (protocol, timing, the 30 s timeout; no model, no GPU)"
+cd "$TR/run"; echo "socket path for the ACT: ~/.local/share/gov-os/rerank-trial/run/rerank.sock = ${#HOME}+49 = $(( ${#HOME} + 49 )) bytes (< 108); here a relative name (the scratch path is $(( ${#TR} + 16 )) bytes)"
+python3 "$S/tools/standin_server.py" standin.sock 0.30 > standin.log 2>&1 &
+SP=$!; sleep 1; cat standin.log
+python3 "$S/tools/rerank_trial_probe.py" standin.sock peak
+for n in 1 10 20; do python3 "$S/tools/rerank_trial_probe.py" standin.sock load $n; done
+kill $SP; wait $SP 2>/dev/null
+echo "--- a slow stand-in (1.6 s a request, as a 4B in 8-bit might be): 20 at once against the product's 30 s timeout"
+echo "(the first rehearsal run, 09:38, found the stand-in ended on a timed-out caller's broken pipe and the probe did not catch the resets after it; both fixed; the real service's serve() already catches OSError)"
+python3 "$S/tools/standin_server.py" standin.sock 1.6 > standin.log 2>&1 &
+SP=$!; sleep 1
+python3 "$S/tools/rerank_trial_probe.py" standin.sock load 20; echo "probe exit $? (4 = some requests not ok)"
+kill $SP; wait $SP 2>/dev/null; cd "$S"
+
+hdr "R9 the force-stop (DEC-1068 (f)): SIGTERM, 30 s, then SIGKILL, by the trial folder's path only"
+python3 -c "import signal,time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(600)" "$TR/svc/rerank_service.py" &
+D=$!; sleep 1
+stop_trial() {
+  local M=$1 P i
+  for P in $(bash $T --cmd "$M" 2>/dev/null | awk '/^BUSY/{print $2}'); do kill -TERM $P; done
+  for i in $(seq 1 30); do bash $T --cmd "$M" > /dev/null 2>&1 || { echo "stopped on SIGTERM after ${i} s"; return 0; }; sleep 1; done
+  for P in $(bash $T --cmd "$M" 2>/dev/null | awk '/^BUSY/{print $2}'); do echo "no stop within 30 s: SIGKILL $P"; kill -KILL $P; done
+  sleep 1; bash $T --cmd "$M" > /dev/null 2>&1 && { echo "STOP: still running"; return 1; } || echo "stopped"
+}
+bash $T --cmd "$TR/svc/rerank_service.py" 2>/dev/null
+stop_trial "$TR/svc/rerank_service.py"; wait $D 2>/dev/null; echo "dummy's exit status $? (137 = SIGKILL)"
+echo "the live service was not matched: $(bash $T --cmd "$PIN/rerank_service.py" 2>/dev/null | awk '/^BUSY/{print "BUSY", $2}')"
+
+hdr "R10 the rollback: the trial's folders removed; the live service, venv, pin and HF cache unchanged"
+rm -rf "$TR" "$TRIAL_CACHE"; [ ! -e "$TR" ] && [ ! -e "$TRIAL_CACHE" ] && echo "ok: trial folders removed"
+uv pip freeze --python "$LIVE/bin/python" 2>/dev/null | cmp - "$S/live-freeze.before.txt" && echo "ok: the live venv's packages unchanged"
+sha256sum "$PIN/rerank_service.py" "$PIN/rerank_worker.py" "$PIN/rerank.py" | sed "s#$PIN/##" | cmp - "$S/pin-sums.before.txt" && echo "ok: the pin's three files unchanged"
+L2=$(bash $T --cmd "$PIN/rerank_service.py" 2>/dev/null | awk '/^BUSY/{print $2}' | head -1)
+[ "$L2" = "$LIVEPID" ] && echo "ok: the live service is the same process ($L2), never stopped" || echo "CHANGED: live pid $LIVEPID -> $L2"
+echo "last live log line: $(tail -1 ~/.cache/gov-os/rerank.log)"
+ls ~/.cache/huggingface/hub | grep -E 'mxbai|Reranker-4B' || echo "ok: no candidate in the HF cache"
+echo "class 3's restart of the live service (the rollback's last step after a real trial; NOT run here: it starts a reranker):"
+echo "  cd /home/usain/gov-os-worktrees/W2-00-store && GOV_RERANK_IDLE_S=43200 ~/.local/bin/gov retrieve \"what decides a close\" --json > /dev/null"
+echo "GPU used,free MiB at the end: $(gpu)"
+
+hdr "R11 not rehearsed, and why"
+echo "- step 1, the downloads (3.1 GB and 8.1 GB): a download (the brief forbids it); its dry run is R3"
+echo "- step 2, the trial venv's install (the offline clone and bitsandbytes, accelerate, psutil): an install; R2 shows every"
+echo "  live package at its exact version in uv's cache, R4 the venv's creation and removal"
+echo "- any load of a real model, the trial service READY on cuda:0, the probe on a real model, the measure: they start a"
+echo "  reranker (DEC-1065 (1)); R6 and R7 run the same code paths up to the first GPU or model step"
+echo "- class 3's restart of the live service: it starts a reranker; the live service was never stopped here"
+du -sh "$S" | sed 's/^/scratch used: /'; du -s --inodes "$S" | sed 's/^/scratch inodes: /'
+
+=== R7b (09:5x, after the appendices) the ACT's detached start form (start_trial, setsid -f, lock fd 9), stand-in, GPU hidden (2026-11-04 09:46:45)
+new trial log lines: 2026-11-04T09:46:45+0000	REFUSED	the shared reranker does not start: the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no reranker runs on the CPU
+ok: the lock was held by the detached service and is free after it ended
+ok: no socket
+service.log: 0 bytes
+ok: removed

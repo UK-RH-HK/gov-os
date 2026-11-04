@@ -1,0 +1,122 @@
+prepared /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS at f451207018ce on g14-rehearsal; branches 35; root mentions left: 0
+ACT-G14 rehearsal: 2026-11-03 16:23:38 GMT in /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS at f451207018ce
+== §3
+
+$ cd /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS
+[exit 0]
+
+$ rm -rf /tmp/gov-os-act-g14
+[exit 0]
+
+$ D=.gov-runtime/scratch/orchestrator/drafts/g14; T=.gov-runtime/scratch/orchestrator/tools; echo D=$D T=$T
+D=.gov-runtime/scratch/orchestrator/drafts/g14 T=.gov-runtime/scratch/orchestrator/tools
+[exit 0]
+
+$ git status --short -- .claude/ governance/project/path-map.yaml
+[exit 0]
+
+$ sha256sum .claude/hooks/pretooluse.py governance/project/path-map.yaml $T/guard4_check.py | cut -c1-12
+8cf1daf2804b
+592e542b748c
+5f1b94fafe45
+[exit 0]
+
+$ sha256sum $D/pretooluse.py $D/role_reads.py $D/guard4_check.py $D/path-map-role_paths.patch | cut -c1-12
+e406653ef6c9
+8c1ea44b2313
+727ba3eb5be5
+f8372ccdc4dd
+[exit 0]
+
+$ GUARD_FIX4_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14 bash $T/heavy_slot.sh python3 -m pytest -q -o tmp_path_retention_policy=failed -p no:cacheprovider .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py -k test_logged_refusals -rf | grep -E "^FAILED|failed|passed"
+1 passed, 461 deselected in 8.13s
+[exit 0]
+
+$ mkdir -p $D/backup
+[exit 0]
+
+$ cp -p .claude/hooks/pretooluse.py governance/project/path-map.yaml $T/guard4_check.py $D/backup/
+[exit 0]
+
+$ git apply --check -p1 $D/path-map-role_paths.patch && git apply -p1 $D/path-map-role_paths.patch
+[exit 0]
+
+$ PYTHONPATH=src python3 -c "import yaml; from gov.config import loader; d=yaml.safe_load(open('governance/project/path-map.yaml')); loader._validate_path_map(d, 'path-map'); print(d['role_paths'])"
+{'engineer': {'reads_denied': ['{ticket_tests}']}, 'independent-test-designer': {'reads_denied': ['{ticket_impl}']}}
+[exit 0]
+
+$ cp $D/pretooluse.py $D/role_reads.py .claude/hooks/
+[exit 0]
+
+$ cp $D/guard4_check.py $T/guard4_check.py
+[exit 0]
+
+$ python3 $T/guard4_check.py --settings /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS | tail -1
+PASS
+[exit 0]
+(rehearsal only, not in §3: guard4_check.py's case count and its G-14 lines)
+
+$ python3 $T/guard4_check.py --settings /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS | grep -c '^ok'; python3 $T/guard4_check.py --settings /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS | grep 'G-14\|^FAIL'
+70
+ok   G-14 W2-126's engineer reads its own acceptance tests: want deny, got deny
+ok   G-14 W2-126's engineer reads W2-123's case revised for it (Task: DAEO-jpr0, 741f9edd): want deny, got deny
+ok   G-14 W2-126's engineer reads another ticket's tests (regressions): want allow, got allow
+ok   G-14 engineer greps for the tests' name (a pattern, not a read): want allow, got allow
+ok   G-14 orchestrator reads the acceptance tests: want allow, got allow
+[exit 0]
+(end of the rehearsal-only lines)
+
+$ GUARD_FIX4_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14 bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-4/test_guard_fix_4.py -rf | grep -E "^FAILED|failed|passed"
+467 passed in 15.28s
+[exit 0]
+
+$ G14_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14 bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider $D/test_g14.py | tail -1
+146 passed in 3.64s
+[exit 0]
+(rehearsal only, not in §3: the failures by name, and D and T not exported)
+
+$ G14_HOOK=$PWD/.claude/hooks/pretooluse.py TMPDIR=/tmp/gov-os-act-g14 bash $T/heavy_slot.sh python3 -m pytest -q -n 6 -o tmp_path_retention_policy=failed -p no:cacheprovider $D/test_g14.py -rfE 2>&1 | grep -E "^(FAILED|ERROR)" | cut -c1-220
+[exit 0]
+
+$ env | grep -c "^[DT]=" || true
+0
+[exit 0]
+(end of the rehearsal-only lines)
+
+$ bash $D/scoped_tests.sh
+scoped files: 35
+747 passed in 51.79s
+[exit 0]
+
+$ git add .claude/hooks/pretooluse.py .claude/hooks/role_reads.py governance/project/path-map.yaml
+[exit 0]
+
+$ git commit -m "ACT-G14: role separation from the path map (DEC-1052 G-14): role_paths: engineer {ticket_tests}, test designer {ticket_impl} (c3)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1052" --trailer "Role: owner"
+[g14-rehearsal 6317b034] ACT-G14: role separation from the path map (DEC-1052 G-14): role_paths: engineer {ticket_tests}, test designer {ticket_impl} (c3)
+ 3 files changed, 905 insertions(+), 1 deletion(-)
+ create mode 100644 .claude/hooks/role_reads.py
+[exit 0]
+
+$ git rev-parse HEAD > $D/backup/act-commit && cut -c1-12 $D/backup/act-commit
+6317b03496c7
+[exit 0]
+
+== §4 (the rollback)
+
+$ cd /home/usain/gov-os-runs/G14-rehearsal/Dynamic-Agentic-Engineering-OS && D=.gov-runtime/scratch/orchestrator/drafts/g14 && read -r H < $D/backup/act-commit && git revert --no-commit "$H" && git commit -m "Revert ACT-G14 (${H:0:12}): role separation from the path map" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1052" --trailer "Role: owner" && cp -p $D/backup/guard4_check.py .gov-runtime/scratch/orchestrator/tools/guard4_check.py && python3 .gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings $PWD | tail -1
+[g14-rehearsal de8d5ca1] Revert ACT-G14 (6317b03496c7): role separation from the path map
+ 3 files changed, 1 insertion(+), 905 deletions(-)
+ delete mode 100644 .claude/hooks/role_reads.py
+PASS
+[exit 0]
+
+$ sha256sum .claude/hooks/pretooluse.py governance/project/path-map.yaml $T/guard4_check.py | cut -c1-12; ls .claude/hooks/; git status --short -- .claude/ governance/project/path-map.yaml
+8cf1daf2804b
+592e542b748c
+5f1b94fafe45
+__pycache__
+bash_writes.py
+pretooluse.py
+[exit 0]
+
+rehearsal done: 2026-11-03 16:25:30 GMT

@@ -1,0 +1,3 @@
+# W2-32 engineer: your P2, decided (the CTO, P-W2-32-8)
+
+Yes: `src/gov/rebuild/command.py` is now in W2-32's allowed paths (ticket `dba6de2b`). Add the one line so `gov rebuild`'s result names the chunks the embedder's limit cut (`stores.semantic.cut` with `limit`, `count`, `paths`, copied from `semantic.refresh`'s report), with a unit case. The CTO merged `w2/integrate` into your branch (`be55d98a`: W2-13 S6 with its own change to `rebuild/command.py` (the keyword index's `kept_out`): keep both) and the designer's cases. Same rules as before. Commit with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

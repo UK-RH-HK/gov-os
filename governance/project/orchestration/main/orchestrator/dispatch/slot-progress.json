@@ -1,1 +1,1 @@
-{}
+{"2802266:10365751": {"slot": "1", "pid": 2802266, "cpu": 55, "since": 1793814967.463047, "reported": false, "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/taskset -c 0,1,2,3,4,5 python3 -m gov.retrieval.measure memory-retrieval --root /home/usain/gov-os-runs/D4B/m6/repo --sets-root /home/usain/go", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS"}}

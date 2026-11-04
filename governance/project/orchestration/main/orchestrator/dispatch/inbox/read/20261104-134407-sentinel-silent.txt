@@ -1,0 +1,3 @@
+log: deadman.log
+Sentinel: silent
+status: the sentinel's watch is silent since 2026-11-04 11:43:27 (120 min); restart the sentinel (ACT-SENTINEL-1) or remove dispatch/sentinel-expected

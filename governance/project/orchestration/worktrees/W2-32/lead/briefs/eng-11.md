@@ -1,0 +1,8 @@
+# W2-32 engineer: round 2's findings riding along (the CTO; DEC-802)
+
+W2-32 is merged into `w2/integrate` (`b32e8504`, review READY in two rounds). The CTO merged integrate back into your branch (`92960b84`). The round-2 review record: `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/reviews/w2-32.md` (read its "## Round 2": R2-F1, R2-F2; it quotes no acceptance test).
+
+1. **R2-F1 (must, before measure 3; the owner's order "parent expansion sends no span twice"):** Python's module parent is the whole file and contains its function parents; expansion is judged by parent id, not by lines, so a function's lines are sent again in a later call (and within one call) and not named. The review's probe: `foo.py` 1-45 sent in call 1 and 3-45 in call 3 (43 lines twice). Judge by lines: the continuation token carries every span already sent (as evidence or inside an expanded parent), and any later evidence or expansion leaves out the lines already sent and names them as span records (as `repeats` does), within one call and across calls, for nested parents too. Unit cases: nested Python parents (module ⊃ function), both orders, one call and across calls.
+2. **R2-F2 (do it if small):** with the shared reranker hung, each 16-text batch waits its own 30 s timeout before falling back: once one batch has fallen back, send the remaining batches of that rerank to the same fallback directly, and name every batch's answerer (not only the last) in the outcome.
+
+Same rules (`EMG-d4b-launched.md`). Update the evidence file (S7). Commit with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

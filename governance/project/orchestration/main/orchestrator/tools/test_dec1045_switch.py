@@ -231,8 +231,10 @@ def test_the_list_is_read_with_its_reasons_and_an_absent_list_leaves_nothing_out
 
 
 def test_every_entry_of_the_real_list_has_a_reason_exists_and_runs_gitleaks(st):
+    # DEC-1061 item 9 (T-10): the list is kept but empty since D-4's cut (its entries are in tests/optin-lifted.txt);
+    # it must still be present, so the selection names it, and whatever it lists still meets the rule
     entries = st.nightly_only()
-    assert entries, "nightly_only.txt is empty or absent"
+    assert entries is not None, "nightly_only.txt is absent"
     for entry, why in entries:
         file = TREE / entry.partition("::")[0]
         assert why, f"{entry}: no reason"

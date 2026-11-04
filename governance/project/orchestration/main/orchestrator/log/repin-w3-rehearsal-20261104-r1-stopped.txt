@@ -1,0 +1,54 @@
+half a: 9894b0cf514a, store 506M
+half b: 1f440a9639de, store 485M
+registry clone at 94a5e381ed42 on w2/integrate
+mirror ready: gov -> /tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/pin-9894b0cf/bin/gov; store -> /tmp/gov-os-emg-repin3/r/home/gov-os-worktrees/W2-00-store-a
+======== the operator's script, against the mirror
+== 0. preconditions
+ok (gov -> pin-9894b0cf; store -> W2-00-store-a at 9894b0cf514a)
+== A. the wheel of 8284fb408bd4, built twice from clean exports, checked against the dry run; its own environment
+build 1 82fbe15b2fccfe2c06872b6389a2ca8dc67c601d08efbf53e63801c41860c02e
+build 2 82fbe15b2fccfe2c06872b6389a2ca8dc67c601d08efbf53e63801c41860c02e
+/tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/wheels/8284fb408bd4/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/pin-8284fb408bd4/bin/python
+== S. the integration store re-embedded with headers at 8284fb408bd4, in the spare half; the link flips on success
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1712507/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1712508/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713204/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713255/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713256/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713258/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713259/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713260/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713699/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713716/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713777/cmdline: No such file or directory
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh: line 23: /proc/1713780/cmdline: No such file or directory
+GPU before the re-embed: 10287 MiB used
+2026-11-04 09:28:36 built 8284fb408bd4 in W2-00-store-b rc=0 in 43 s; link -> W2-00-store-b
+the refresh: exit 0, 45 s wall (the lock's wait included), GPU peak 10525 MiB
+rebuild timing: {"record_s": 4.1, "lexical_s": 7.3, "secrets_s": 4.6, "semantic_s": 8.2, "codeintel_s": 19.5, "compaction_s": 1.6, "total_s": 40.7}
+semantic: {"status": "recreated", "cut": {"limit": 10000, "count": 10, "paths": [".tickets/DAEO-2d6f.md", "docs/changes/W2-32-evidence.md", "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json", "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json", "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json", "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json", "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json", "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json", "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json", "docs/plan/wave-1-exi
+the store: /tmp/gov-os-emg-repin3/r/home/gov-os-worktrees/W2-00-store -> W2-00-store-b at 8284fb408bd4
+== B. every check before the switch, through /tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/pin-8284fb408bd4 by its path (the store's and the guard's included)
+ok   gov imports from the pin (/tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/pin-8284fb408bd4/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint
+ok   gov accept --help and gov launch --help
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 16 texts and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   the store W2-00-store-b at 8284fb408bd4: embed_headers true, 18896 vectors
+ok   gov retrieve on the store: lexical and semantic available, rerank.by service, 2.044072601 s
+ok   gov context DAEO-sdxk --json and --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   guard4_check.py: PASS (71 lines)
+CHECK FAILED: test_guard_fix_3.py (49 failed, 236 passed, 1 skipped in 24.03s)
+
+STOP: a check before the switch failed (above)
+the store link is back on W2-00-store-a
+Nothing was switched: /tmp/gov-os-emg-repin3/r/home/.local/bin/gov is still pin-9894b0cf. Tell the CTO.
+(to run this again later, the CTO says when: rm -rf /tmp/gov-os-emg-repin3/r/home/.local/share/gov-os/pin-8284fb408bd4)
+======== the script ended: exit 1, 87 s
+the live gov link: /home/usain/.local/share/gov-os/pin-9894b0cf/bin/gov
+the live store link: /home/usain/gov-os-worktrees/W2-00-store-a at 9894b0cf514a
+the live pins: pin-5c401220 pin-6a4696eb pin-9894b0cf pin-a7182f6c pin-fecb870c reranker-venv wheels 
+exit 1

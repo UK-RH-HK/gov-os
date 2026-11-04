@@ -1,0 +1,7 @@
+TESTS-READY W2-32 (DAEO-0pyc) round 1: S1-S5, S9, F1
+commit: 4776db3ef814 on w2/W2-32-tests (base 9c468dbd)
+path: tests/acceptance/W2-32/ (README maps each KPI line to its cases and states the interface they assume)
+run: PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-32 -q -p no:cacheprovider -o tmp_path_retention_policy=failed
+today: 67 cases, 46 red, 21 green, about 32 s; stand-ins only, no embedder started
+next: S6-S8 after the owner approves the gaps
+(written by the CTO: the designer's Write was refused in .gov-runtime/scratch/lead/)

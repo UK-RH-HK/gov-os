@@ -1,0 +1,7 @@
+# W2-32 engineer: you were stopped by the CTO's mistake; one safety fix first, then the phrasings (the CTO)
+
+At 05:38 the CTO's process-match for a GPU stop also caught your session (your brief named `rx.py`) and ended it: that was the CTO's mistake, not yours. Your uncommitted phrasings work is still in the tree (`src/gov/config/loader.py`, `src/gov/retrieval/retrieve.py`, `src/gov/retrieval/routing.py`, `tests/unit/retrieval/test_w2_32_routing.py` modified): keep it, check it, carry on from it.
+
+**First, as its own commit (a safety fix):** the GPU backstop tripped again at 05:37 (15.9 GB, the reranker stuck spilling). The 24,000-character bound counts the **sum** of a request's texts, but the reranker pads every text in a batch to the longest one: one 23,000-character chunk with 15 short ones is a padded batch of 16 × 23,000. Make the bound the **padded size**: for every reranker request, `count × longest text (characters) ≤ MAX_REQUEST_CHARS` (24,000), at most 16 texts, the fewest requests meeting both (sort or group by length if it lowers the count; the order of scores stays the unbatched one); a single text above the budget read up to it. Unit cases (the stand-in records count × longest per request). Commit that alone.
+
+**Then the phrasings** as your brief `eng-17.md` stated. Same rules as before. Commits with `Task: DAEO-0pyc`, `Implements: DEC-1067`, `Role: engineer`, Co-Authored-By. Return the twelve fields, brief.

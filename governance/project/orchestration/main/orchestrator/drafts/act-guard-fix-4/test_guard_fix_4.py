@@ -382,7 +382,8 @@ def test_the_reason_is_plain():
 TWIN = {50: 54, 51: 55, 52: 58, 53: 59}
 ROLE = {**{i: O for i in (61, 62, 63, 70, 71, 72)}, **{i: A for i in (64, 67, 68, 69, 75, 76)},
         **{i: E for i in (65, 66, 73, 74, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86)}}
-# Refused by this hook, each by a rule this ACT does not change or by a write that resolves:
+# Refused by this hook, each by a rule this ACT does not change or by a write that resolves (as written before ACT-D8;
+# rows 65, 73, 74, 77-79 and 82-86 now pass, see below):
 # - rule 2 (reads), as today: rows 65, 74, 77, 78, 79, 82, 83, 84, 85, 86 (a listing whose start the guard cannot
 #   place: W2-42a's patterns) and 73, 80 (the hidden half of an evaluation set, refused as designed);
 # - rule 4, as today: row 64 (an auditor's probe whose heredoc text holds "sudo touch ...": has_sudo reads text;
@@ -391,7 +392,13 @@ ROLE = {**{i: O for i in (61, 62, 63, 70, 71, 72)}, **{i: A for i in (64, 67, 68
 # into the CTO's reviews/ folder, labelled "as designed" then; rule 5 now names that folder, the CTO's brief of
 # 2026-11-03) and 81 (inline code writing a scratch repository's tests/acceptance in /tmp: not a tree of this
 # repository).
-STILL_REFUSED = [64, 65, 73, 74, 77, 78, 79, 80, 82, 83, 84, 85, 86]
+# Re-baselined 2026-11-03 after ACT-D8 (DEC-1055 (4), G-3): the memory measure's hidden half is out of every tree
+# and out of git, so rule 2's hidden part holds no file. Its run-time-listing check (rows 65, 74, 77, 78, 79, 82-86)
+# and its walk under a search's start (row 73) refuse only while the part holds a file; they now pass, as designed.
+# Each was checked: refused once a stand-in path is placed in the hidden folder, passed by the judge with no
+# hidden part, and by every other rule. Row 80 names the hidden folder by its path (refused whether or not it
+# exists); row 64 is rule 4's (sudo).
+STILL_REFUSED = [64, 80]
 
 
 @pytest.mark.skipif(not os.path.exists(CORPUS), reason="the rebuilt corpus is not here (GUARD_FIX4_CORPUS)")

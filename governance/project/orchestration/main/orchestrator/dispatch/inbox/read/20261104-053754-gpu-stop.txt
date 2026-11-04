@@ -1,0 +1,3 @@
+log: gpu-backstop.log
+GPU: backstop tripped
+status: GPU memory 15904 MiB > 15872 MiB; experiment processes paused (SIGSTOP): 1171222 ; resume with kill -CONT on the owner's word

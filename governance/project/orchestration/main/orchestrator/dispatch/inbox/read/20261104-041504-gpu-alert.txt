@@ -1,0 +1,8 @@
+log: dispatch.log
+GPU: GPU budget
+status: GPU budget: GPU memory 15.4 of 13.9 GB (used 15.4 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free) above total minus headroom; the GPU now: RTX 5070 Ti 15.4/15.9 GB, 100 %; holders: embedder shared (0), embedder query (1), reranker (0)
+
+layers: shared 29/29, query 29/29
+holders:
+  pid 7309 embedder query ([Not Found])
+running jobs: slot pid 945153 test

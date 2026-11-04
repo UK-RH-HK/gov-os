@@ -1,0 +1,8 @@
+# W2-32 test designer: W2-126's two retry cases (the CTO)
+
+The CTO merged your `16678eab` into `w2/W2-32` (`26ad7ca2`, with the engineer's fixes `d600d33c`: F-1, F-2, F-3, F-6) and ran the stand-in suites outside the sandbox. W2-54, W2-123 and W2-32's own cases pass. Two reds remain that are W2-32's to settle:
+
+- `tests/acceptance/W2-126/test_w2_126_retry.py::test_a_refused_connection_then_an_answer_is_tried_again_and_the_stage_is_built`
+- `tests/acceptance/W2-126/test_w2_126_retry.py::test_a_refused_connection_at_every_try_fails_closed_after_the_last_try_within_the_bound`
+
+The engineer's F-2: after each rebuild batch the device is read from `/api/ps`; an unreadable read is retried as the request is, and after the last try the stage fails closed (`EMBEDDER_DEVICE_UNREAD`), never assuming the GPU; the CPU is named only when the model is listed with `size_vram` 0. These cases' stand-in server answers the embedding request but (as far as the CTO can see) never answers `/api/ps`, so the stage now fails closed where the case expects it built. Revise the stand-in so that, once it answers, it also answers `/api/ps` with the model on the GPU (`size_vram` = `size`), keeping what each case guards (a refused connection is retried and the stage is built; a refusal at every try fails closed within the bound); and add, if W2-126's README has room for it under DEC-1065 (1), a row where `/api/ps` never answers and the stage fails closed with nothing stored. Show both green on `26ad7ca2` (a scratch tree of it) and their state on integrate. `Rewrite-Reason: DEC-1065 (1) (the device is read, never assumed)`. Same rules as before. Return the twelve fields, brief, and `TESTS-READY` text.

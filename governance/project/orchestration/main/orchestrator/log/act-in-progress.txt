@@ -1,1 +1,1 @@
-2026-11-02 13:51:06 ACT-QUERY-GPU-2 handed to the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO or its tools until the owner says done; the W2-123 landing waits.
+2026-11-04 17:54:15 ACT-RERANK-TRIAL-1 section 4, the CTO's trial window (DEC-1069 (11)-(12)): the live reranker stopped, the trial copy on its own socket, three models in turn; no CTO main-tree commit until T6's restore

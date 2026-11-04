@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-0pyc-0019
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-0pyc at stop
+task: DAEO-0pyc
+task_status: in_progress
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-04T09:57:58Z'
+inputs:
+- id: DAEO-0pyc
+  version: bd87a8b2
+  hash: sha256:96bb902b7db2660dfa61644403524b75cbe9cc1e0a2f6b7127e8af5fedd8f676
+head_commit: 28cf3372a535aa8db246ec5ddaa10b3c2458d9f5
+---
+
+# CP-DAEO-0pyc-0019 — DAEO-0pyc at stop
+
+## Next action
+
+Resume after stop

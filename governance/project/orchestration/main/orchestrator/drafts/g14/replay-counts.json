@@ -1,0 +1,309 @@
+{
+ "refined, review round 2 with the owner's engineer rule (d)": {
+  "refusals": {
+   "a": {
+    "refusals": 567,
+    "sessions": 89,
+    "by_tool": {
+     "Bash grep": 208,
+     "Read": 199,
+     "Bash sed": 77,
+     "Grep": 63,
+     "Bash cat": 11,
+     "Bash git grep": 5,
+     "Bash head": 2,
+     "Bash git show rev:path": 2
+    },
+    "by_tree": {
+     "own tree": 526,
+     "tests tree": 1,
+     "main tree": 40
+    },
+    "by_kind": {
+     "tests": 567
+    }
+   },
+   "b": {
+    "refusals": 173,
+    "sessions": 35,
+    "by_tool": {
+     "Read": 124,
+     "Bash grep": 28,
+     "Grep": 10,
+     "Bash sed": 6,
+     "Bash cat": 5
+    },
+    "by_tree": {
+     "own tree": 172,
+     "tests tree": 1
+    },
+    "by_kind": {
+     "tests": 173
+    }
+   },
+   "d": {
+    "refusals": 178,
+    "sessions": 35,
+    "by_tool": {
+     "Read": 125,
+     "Bash grep": 30,
+     "Grep": 10,
+     "Bash sed": 8,
+     "Bash cat": 5
+    },
+    "by_tree": {
+     "own tree": 177,
+     "tests tree": 1
+    },
+    "by_kind": {
+     "tests": 173,
+     "linked (revised for the ticket)": 5
+    }
+   },
+   "c1": {
+    "refusals": 32,
+    "sessions": 15,
+    "by_tool": {
+     "Read": 19,
+     "Bash grep": 10,
+     "Bash cat": 2,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 31,
+     "other tree": 1
+    },
+    "by_kind": {
+     "docs": 24,
+     "code": 8
+    }
+   },
+   "c2": {
+    "refusals": 35,
+    "sessions": 16,
+    "by_tool": {
+     "Read": 20,
+     "Bash grep": 11,
+     "Bash cat": 2,
+     "Grep": 1,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 34,
+     "other tree": 1
+    },
+    "by_kind": {
+     "docs": 24,
+     "tests": 3,
+     "code": 8
+    }
+   },
+   "c3": {
+    "refusals": 35,
+    "sessions": 16,
+    "by_tool": {
+     "Read": 20,
+     "Bash grep": 11,
+     "Bash cat": 2,
+     "Grep": 1,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 34,
+     "other tree": 1
+    },
+    "by_kind": {
+     "docs": 24,
+     "tests": 3,
+     "code": 8
+    }
+   },
+   "c3-code": {
+    "refusals": 11,
+    "sessions": 4,
+    "by_tool": {
+     "Read": 6,
+     "Bash grep": 2,
+     "Bash cat": 2,
+     "Grep": 1
+    },
+    "by_tree": {
+     "own tree": 11
+    },
+    "by_kind": {
+     "tests": 3,
+     "code": 8
+    }
+   }
+  },
+  "judged": {
+   "calls|engineer": 8228,
+   "calls|independent-auditor": 15548,
+   "calls|independent-test-designer": 9015,
+   "calls|orchestrator": 30895,
+   "calls|product-spec": 796,
+   "calls|research": 434,
+   "calls|unknown": 1021,
+   "judged|a": 8228,
+   "judged|b": 8228,
+   "judged|c1": 9015,
+   "judged|c2": 9015,
+   "judged|c3": 9015,
+   "judged|c3-code": 9015,
+   "judged|d": 8228
+  },
+  "info": {
+   "whole-branch-diff|c1": 5,
+   "whole-branch-diff|c2": 5,
+   "whole-branch-diff|c3": 5,
+   "whole-branch-diff|c3-code": 5
+  }
+ },
+ "briefed (path checks alone, no own-tree rule)": {
+  "refusals": {
+   "a": {
+    "refusals": 567,
+    "sessions": 89,
+    "by_tool": {
+     "Bash grep": 208,
+     "Read": 199,
+     "Bash sed": 77,
+     "Grep": 63,
+     "Bash cat": 11,
+     "Bash git grep": 5,
+     "Bash head": 2,
+     "Bash git show rev:path": 2
+    },
+    "by_tree": {
+     "own tree": 526,
+     "other tree": 1,
+     "main tree": 40
+    },
+    "by_kind": {
+     "tests": 567
+    }
+   },
+   "b": {
+    "refusals": 173,
+    "sessions": 35,
+    "by_tool": {
+     "Read": 124,
+     "Bash grep": 28,
+     "Grep": 10,
+     "Bash sed": 6,
+     "Bash cat": 5
+    },
+    "by_tree": {
+     "own tree": 172,
+     "other tree": 1
+    },
+    "by_kind": {
+     "tests": 173
+    }
+   },
+   "c1": {
+    "refusals": 101,
+    "sessions": 37,
+    "by_tool": {
+     "Read": 47,
+     "Bash grep": 32,
+     "Bash cat": 12,
+     "Bash sed": 7,
+     "Bash head": 2,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 100,
+     "other tree": 1
+    },
+    "by_kind": {
+     "code": 59,
+     "docs": 42
+    }
+   },
+   "c2": {
+    "refusals": 108,
+    "sessions": 42,
+    "by_tool": {
+     "Read": 48,
+     "Bash grep": 35,
+     "Bash cat": 13,
+     "Bash sed": 8,
+     "Bash head": 2,
+     "Grep": 1,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 107,
+     "other tree": 1
+    },
+    "by_kind": {
+     "code": 59,
+     "docs": 42,
+     "tests": 7
+    }
+   },
+   "c3": {
+    "refusals": 106,
+    "sessions": 40,
+    "by_tool": {
+     "Read": 48,
+     "Bash grep": 34,
+     "Bash cat": 12,
+     "Bash sed": 8,
+     "Bash head": 2,
+     "Grep": 1,
+     "Bash git show rev:path": 1
+    },
+    "by_tree": {
+     "own tree": 105,
+     "other tree": 1
+    },
+    "by_kind": {
+     "code": 59,
+     "docs": 42,
+     "tests": 5
+    }
+   },
+   "c3-code": {
+    "refusals": 64,
+    "sessions": 29,
+    "by_tool": {
+     "Read": 25,
+     "Bash grep": 18,
+     "Bash cat": 12,
+     "Bash sed": 8,
+     "Grep": 1
+    },
+    "by_tree": {
+     "own tree": 64
+    },
+    "by_kind": {
+     "code": 59,
+     "tests": 5
+    }
+   }
+  },
+  "judged": {
+   "calls|engineer": 8188,
+   "calls|independent-auditor": 15486,
+   "calls|independent-test-designer": 9015,
+   "calls|orchestrator": 30861,
+   "calls|product-spec": 742,
+   "calls|research": 434,
+   "calls|unknown": 1021,
+   "judged|a": 8188,
+   "judged|b": 8188,
+   "judged|c1": 9015,
+   "judged|c2": 9015,
+   "judged|c3": 9015,
+   "judged|c3-code": 9015
+  },
+  "info": {
+   "whole-branch-diff|c1": 5,
+   "whole-branch-diff|c2": 5,
+   "whole-branch-diff|c3": 5,
+   "whole-branch-diff|c3-code": 5
+  }
+ }
+}

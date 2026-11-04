@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-61-q09
+status: interim result 320b98f3: Q11 entry 1 re-anchored to search's calling line at fusion.py 63 (W2-13's 44993791 changed it); question and gold answer kept; measure 1 judged Q11 against the stale anchor, recorded
