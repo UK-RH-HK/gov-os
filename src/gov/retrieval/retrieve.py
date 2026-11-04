@@ -43,6 +43,9 @@ MUST_NOT_CITE_STATUSES = frozenset({"DEPRECATED", "REJECTED", "WITHDRAWN"})
 AHEAD_TYPES = frozenset({"failure", "lesson"})
 # What sqlite raises for a store that cannot be opened, holds no record graph or is no database; no fault of a query
 STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
+# W2-32 S7, DEC-1067: why a span is named in ``repeats`` and not sent
+IN_EARLIER_PARENT = "SENT_IN_AN_EARLIER_PARENT"  # the chunk lies inside a parent an earlier call expanded
+EARLIER_CHILD = "SENT_EARLIER_AS_A_CHILD"  # an earlier call sent these lines as a child: left out of a later parent
 NO_RECORD_GRAPH = "the record graph is unreadable, so whether this record is current cannot be judged"  # DEC-1019
 
 
@@ -119,14 +122,16 @@ def _expanded_of(payload: dict) -> set[str]:
     return set(named)
 
 
-def _alone_of(payload: dict) -> set[tuple[str, int, int]]:
-    """The spans the earlier calls sent as a child on its own (``c``); none for a token made before DEC-1067."""
+def _alone_of(payload: dict) -> set[tuple[str, int, int, str]]:
+    """The spans the earlier calls sent as a child on its own (``c``: path, first line, last line and the chunk; a
+    token that names no chunk gives ""); none for a token made before DEC-1067."""
     named = payload.get("c", [])
     if not isinstance(named, list) or not all(
-            isinstance(item, list) and len(item) == 3 and isinstance(item[0], str)
-            and all(isinstance(n, int) and not isinstance(n, bool) for n in item[1:]) for item in named):
+            isinstance(item, list) and len(item) in (3, 4) and isinstance(item[0], str)
+            and all(isinstance(n, int) and not isinstance(n, bool) for n in item[1:3])
+            and (len(item) == 3 or isinstance(item[3], str)) for item in named):
         raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
-    return {(path, first, last) for path, first, last in named}
+    return {(item[0], item[1], item[2], item[3] if len(item) == 4 else "") for item in named}
 
 
 def _merged(spans) -> list[tuple[int, int]]:
@@ -347,9 +352,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         ranked = ahead_ranked + rest_ranked
 
     # W2-32 S7: a chunk whose parent an earlier call expanded lies inside a span already sent: it is not sent again,
-    # and is named in ``repeats`` (within one call a parent's other children are still sent, DP-3)
-    repeats = [{key: candidate[key] for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")}
-               for candidate in ranked if candidate["parent_id"] in earlier]
+    # and is named in ``repeats`` (within one call a parent's other children are still sent, DP-3). The converse
+    # (DEC-1067): lines an earlier call sent as a child on its own are left out of a parent expanded later, and each
+    # such child's span is named in ``repeats`` the same way, with its own reason.
+    repeats = [{**{key: candidate[key] for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")},
+                "reason": IN_EARLIER_PARENT} for candidate in ranked if candidate["parent_id"] in earlier]
     ranked = [candidate for candidate in ranked if candidate["parent_id"] not in earlier]
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
     evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
@@ -365,7 +372,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         if parent and (parent["start_line"], parent["end_line"]) != (first, last) and parent["parent_id"] not in expanded:
             top, bottom = parent["start_line"], parent["end_line"]
             # DEC-1067 (review F-5): the lines an earlier call sent as a child on its own are left out of the parent
-            held = _merged((a, b) for path, a, b in alone if path == rel and top <= a and b <= bottom)
+            children = sorted(child for child in alone if child[0] == rel and top <= child[1] and child[2] <= bottom)
+            held = _merged((a, b) for _, a, b, _ in children)
             runs = _without(top, bottom, held)
             pieces = [(a, b, span(rel, a, b)) for a, b in runs]
             cost = sum(_tokens(piece.decode("utf-8", "replace")) for *_, piece in pieces) \
@@ -376,12 +384,16 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 expansions.append({"chunk_id": candidate["chunk_id"], "parent_id": parent["parent_id"], "path": rel,
                                    "start_line": top, "end_line": bottom,
                                    **({"left_out": [list(span_) for span_ in held]} if held else {})})
+                repeats.extend({"chunk_id": chunk_id, "path": path, "start_line": a, "end_line": b,
+                                "parent_id": parent["parent_id"], "reason": EARLIER_CHILD}
+                               for path, a, b, chunk_id in children)  # each span sent earlier, as it was sent
                 if not pieces:  # the whole parent was sent before, child by child: nothing of it again
-                    repeats.append({key: candidate[key]
-                                    for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")})
+                    repeats.append({**{key: candidate[key]
+                                       for key in ("chunk_id", "path", "start_line", "end_line", "parent_id")},
+                                    "reason": EARLIER_CHILD})
                 evidence.extend(item(candidate, rel, a, b, piece) for a, b, piece in pieces)
                 continue
-        sent_alone.add((rel, first, last))
+        sent_alone.add((rel, first, last, candidate["chunk_id"]))
         evidence.append(item(candidate, rel, first, last, body))
 
     reasons = {gap["reason"] for gap in gaps}

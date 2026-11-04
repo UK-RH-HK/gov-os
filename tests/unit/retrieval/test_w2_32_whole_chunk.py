@@ -375,3 +375,31 @@ def test_overlapping_children_sent_earlier_are_left_out_of_a_later_parent_as_one
              for line in range(i["start_line"], i["end_line"] + 1)]
     assert later and not set(later) & set(named)  # nothing left out is sent again
     assert set(later) | set(named) == set(range(1, chunks[-1][1] + 1))  # the parent whole, across the calls
+
+
+RECORD = frozenset({"chunk_id", "path", "start_line", "end_line", "parent_id", "reason"})  # a span left out, named
+
+
+@needs_gitleaks
+def test_the_converse_direction_s_left_out_spans_are_span_records_as_the_first_direction_s(almanac):
+    """The CTO's red after 28a3f5e9: each span an earlier call sent as a child, left out of a later parent, is named
+    in ``repeats`` as a record of its own (path, lines, reason), exactly as a chunk left out for lying inside an
+    earlier parent is (the next case), outside the evidence and the expansion records."""
+    from gov.retrieval.retrieve import EARLIER_CHILD
+    bundles = _calls(almanac, budget=300)
+    earlier = [i for b in bundles[:-1] for i in b["evidence"] if i["path"] == "docs/almanac.md"]
+    converse = [r for b in bundles for r in b["repeats"] if r["reason"] == EARLIER_CHILD]
+    named = sorted((r["path"], r["start_line"], r["end_line"]) for r in converse)
+    assert named == sorted((i["path"], i["start_line"], i["end_line"]) for i in earlier)  # one each, as sent
+    assert {r["chunk_id"] for r in converse} == {i["chunk_id"] for i in earlier}
+    expansion = [e for b in bundles for e in b["expansions"]][0]
+    assert all(r["parent_id"] == expansion["parent_id"] and frozenset(r) == RECORD for r in converse)
+    later = {(i["path"], i["start_line"], i["end_line"]) for i in bundles[-1]["evidence"]}
+    assert not later & set(named)  # named, not sent
+
+
+@needs_gitleaks
+def test_the_first_direction_s_spans_are_span_records_of_the_same_form(repository):
+    from gov.retrieval.retrieve import IN_EARLIER_PARENT
+    first = [r for b in _calls(repository) for r in b["repeats"]]
+    assert first and all(r["reason"] == IN_EARLIER_PARENT and frozenset(r) == RECORD for r in first)
