@@ -16,6 +16,17 @@ while it lives. The same pinned model and the same model call as ``rerank_worker
 - **Requests:** one connection per request, answered first come, first served, one request at a time (no batching
   across callers, so every answer is a private reranker's): ``[query, [text, …]]`` in, one JSON line out,
   ``{"scores": […], "device": …}`` or ``{"error": …, "device": …}``. More than ``MAX_TEXTS`` texts is refused.
+- **Memory after each request (DEC-1068, re-pin window 4):** once a request's answer is sent (or the caller has
+  gone, or the request failed, a GPU out-of-memory among them), the service empties PyTorch's caching allocator
+  (``torch.cuda.empty_cache()``), so its GPU memory falls back to the model's between requests instead of staying at
+  the highest peak any request reached (7.7 -> 15.8 GB on 2026-11-04). After every request, not only after large
+  ones: a threshold on the padded size would need a measured value this code cannot know (the padded bound,
+  ``rerank.MAX_REQUEST_CHARS``, already sets the largest), and below it the cache would still climb to the bound's peak
+  and hold it beside the embedder. The cost per request is the device sync and the frees of ``empty_cache`` and the
+  next request's fresh allocations, estimated at a few milliseconds against a request's hundreds (to be measured on
+  the GPU in window 4). Then one line in ``rerank.log``: ``MEMORY``, ``allocated <n> MiB, reserved <n> MiB``
+  (``torch.cuda.memory_allocated`` and ``memory_reserved``, after the release); a release that fails is the line
+  ``MEMORY``, ``not released (<error>)``, and the service goes on.
 - **Idle end:** with no request for ``GOV_RERANK_IDLE_S`` seconds (default 900) it removes its socket, answers what
   was already queued, and ends. Stopped with SIGTERM, it removes its socket and ends at once.
 """
@@ -36,7 +47,7 @@ _spec.loader.exec_module(_worker)
 load, scores, device_of = _worker.load, _worker.scores, _worker.device_of
 
 NO_GPU_SHARE = 77  # holding a slot, the GPU has too little free memory, or none can be read
-GIB = 2 ** 30
+GIB, MIB = 2 ** 30, 2 ** 20
 SHARE, HEADROOM = 3.5 * GIB, 2.0 * GIB  # DEC-1032: the reranker's share (2.5 to 3.5 GB, the top taken), 2 GB spare
 MAX_TEXTS = 512  # a search sends at most (rounds + 1) x batch size candidates: 90 at the defaults
 READ_S = 10.0  # a caller sends its request as soon as it connects
@@ -74,15 +85,43 @@ def answer(encoder, device: str, line: bytes) -> dict:
         return {"error": f"{type(error).__name__}: {error}", "device": device}
 
 
-def serve(listener, encoder, device: str) -> None:
+def release() -> str:
+    """The GPU memory a request used given back (DEC-1068): the caching allocator's cache emptied; the detail of the
+    ``MEMORY`` line, the allocated and reserved MiB after it."""
+    import torch
+
+    torch.cuda.empty_cache()
+    return (f"allocated {torch.cuda.memory_allocated() / MIB:.0f} MiB, "
+            f"reserved {torch.cuda.memory_reserved() / MIB:.0f} MiB")
+
+
+def released(log: str) -> None:
+    """``release`` and its ``MEMORY`` line; neither a failed release nor an unwritable log ends the service."""
+    try:
+        detail = release()
+    except Exception as error:
+        detail = f"not released ({type(error).__name__}: {error})"
+    try:
+        note(log, "MEMORY", detail)
+    except OSError:
+        pass
+
+
+def serve(listener, encoder, device: str, log: str) -> None:
     connection, _ = listener.accept()
-    with connection:
-        try:
-            connection.settimeout(READ_S)
-            line = connection.makefile("rb").readline(64 * 2 ** 20)
-            connection.sendall((json.dumps(answer(encoder, device, line)) + "\n").encode())
-        except OSError:
-            pass  # the caller gave up: its search has gone on without this answer
+    asked = False
+    try:
+        with connection:
+            try:
+                connection.settimeout(READ_S)
+                line = connection.makefile("rb").readline(64 * 2 ** 20)
+                asked = True  # from here the request may reach the model, so its memory is released
+                connection.sendall((json.dumps(answer(encoder, device, line)) + "\n").encode())
+            except OSError:
+                pass  # the caller gave up: its search has gone on without this answer
+    finally:
+        if asked:  # after the answer is sent, whatever became of the request
+            released(log)
 
 
 def main(model: str, revision: str, path: str, lock_fd: str) -> None:
@@ -117,13 +156,13 @@ def main(model: str, revision: str, path: str, lock_fd: str) -> None:
     listener.settimeout(idle)
     try:
         while True:
-            serve(listener, encoder, device)
+            serve(listener, encoder, device, log)
     except socket.timeout:
         os.unlink(path)  # no new caller reaches it; those already queued are answered
         listener.settimeout(0.2)
         try:
             while True:
-                serve(listener, encoder, device)
+                serve(listener, encoder, device, log)
         except OSError:
             pass
     note(log, "END", f"pid {os.getpid()} idle {idle:g} s")
