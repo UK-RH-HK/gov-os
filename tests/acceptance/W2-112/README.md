@@ -69,6 +69,7 @@ Beyond the base's public `gov.retrieval.rerank` (`rerank(query, candidates, rera
 | The fallback log | a file under `~/.cache/gov-os/` written since the search began, mentioning the fallback (rerank, fall back, unavailable or private); below the service's share, also its reason (the GPU, its share or its memory) | DEC-1034 item 3, DEC-1036 |
 | The bundle's `rerank` entry | at the bundle's top level or in its `merge`; `unavailable` with its reason when unranked (the reason any other text in the entry, or in a key beside it whose name holds "reason"); otherwise which reranker answered (the service, "shared" also taken; a "private" one) and its device (`cuda`/`gpu`); never the CPU | DEC-1034 item 2, KPI 4, 6, 7, DEC-1036 |
 | `gov status`'s count | `gov status --json`: a whole number of at least the fallbacks made, under an entry whose key holds "rerank" | KPI 4, DEC-1034 items 2 and 3 |
+| The memory release | `torch.cuda.empty_cache` in the service's process once it has answered each request, a failed one too; one line per request in `~/.cache/gov-os/rerank.log` naming the allocated and the reserved MiB after the release | the ticket's note "DEC-1068, for re-pin window 4" |
 | The stand-in GPU | 14 GiB of 16 free (room) or 1 GiB (below any share of 2.5 to 3.5 GB), so no exact share is assumed. With 1 GiB free a search may be answered by a private reranker on a free slot or go on unranked: whether a private reranker weighs the GPU's free memory is not stated, so either is taken | DEC-1032, DEC-1036 |
 
 How the service is seen from outside: the socket file; the sockets listening at its path (`/proc/net/unix`); the
@@ -173,6 +174,48 @@ kept is not stated: only that the fallback's reason reaches the log and the bund
 the GPU" is read as the service's: one service loads one copy however many searches start it (also in the
 20-concurrent case); the slot rule bounds the rest (the service holds one of the two slots, DEC-1036 T6 (b)).
 
+### Success 6, DEC-1068's note (for re-pin window 4): the service releases the GPU memory each request used — `test_w2_112_memory_release.py`
+
+The ticket's note "DEC-1068, for re-pin window 4" (CTO, 2026-11-04): once it has answered a request, the service
+empties the PyTorch caching allocator's cache (after each request, or after each whose padded size exceeds a named
+threshold), so its memory no longer climbs to its peak and stays there; the client's padded bound (W2-32,
+`MAX_REQUEST_CHARS`) stays; its memory after each request goes to `rerank.log` (the allocated and reserved MiB). The
+CTO's brief: after a failed request too; nothing else changes (the socket, the answers, the idle end: held by
+success 1's and success 3's cases above, and every answer in these cases is checked against a private reranker's).
+
+| Test | Red reason on the base |
+|---|---|
+| `test_w2_112_memory_release.py::test_each_request_the_service_answers_is_followed_by_its_own_release_of_the_gpu_memory` (N = 4 requests give 4 releases, each after its request's scoring and before the next one's; the answers unchanged) | request 1: no release within 10 s of its answer (the service never calls `torch.cuda.empty_cache`; 3583 MiB stay reserved) |
+| `test_w2_112_memory_release.py::test_each_request_writes_one_line_to_rerank_log_with_the_allocated_and_reserved_mib` (4 requests, 4 lines, each with the figures read after the release) | 4 requests wrote 0 lines with the allocated and reserved memory to `~/.cache/gov-os/rerank.log` |
+| `test_w2_112_memory_release.py::test_a_request_that_fails_still_releases_its_gpu_memory_and_writes_its_line` (the service's model fails while scoring: answered with an error, released and logged; the next request answered and released) | the request that failed: no release within 10 s of its answer |
+| `test_w2_112_memory_release.py::test_the_release_comes_after_the_answer_and_never_holds_it` (a release that takes 3 s; the answer arrives before it ends) | no release within 10 s of the answer |
+
+How these cases read the note:
+
+- **A release** is a call of `torch.cuda.empty_cache` in the service's process (the stand-in records it, with when it
+  began and ended and the reserved MiB before and after). `synchronize`, `ipc_collect` and the peak resets are
+  answered and not counted. More than one release per request is taken; none in a request's interval is red.
+- **The stand-in GPU's memory:** once the model is on the GPU, `torch.cuda.memory_allocated` gives 1187 MiB and
+  `memory_reserved` 1534 MiB, plus 2049 MiB that each scoring call (failed or not) leaves in the cache until
+  `empty_cache` gives it back (`memory_stats`, `max_memory_*` and `torch.cuda.memory` agree). Uneven figures, so a
+  log line can be matched.
+- **The requests are full ones:** 16 texts of 1,440 characters (about 23,650 of the client's 24,000 padded
+  characters), sent one at a time on the service's socket. So the cases hold under either rule the note allows: a
+  threshold that skipped a full request would not serve the note.
+- **"After it has answered":** the release comes after the request's scoring ends and before the next request's
+  begins; and with a release that takes 3 s, the answer reaches the caller before the release ends (a release
+  before the answer would hold every search by its length).
+- **The log line:** a line in `~/.cache/gov-os/rerank.log` (where the service already writes its READY, REFUSED and
+  END lines) that names the allocated and the reserved memory (the words "alloc…" and "reserv…", any case), with
+  each figure in MiB (whole or with decimals): the allocated 1187 and the reserved 1534 as read after the request's
+  release (3583, read before it, is red: the figure that shows the memory no longer climbing is the one after).
+  Exactly one such line per request, the failed one included.
+- **In the launch sandbox** (Unix sockets refused), these four cases alone carry the box's Unix sockets over loopback
+  TCP (`standin/w2112_unix_over_tcp.py`: installed by a `.pth` in the box's reranker environment, a `usercustomize`
+  in its `HOME` and a patch of the test's own process), so they show red or green for the release itself; where Unix
+  sockets are allowed nothing is installed and the product's own sockets are used. Nothing of a socket's
+  permissions is emulated: the socket's mode stays success 1's case, run outside the sandbox.
+
 ### Success 7 (corrected under DEC-1033): the fallback through the GPU slot rule, never the CPU — `test_w2_112_slots.py`, `test_w2_112_bundle.py`
 
 | Test | Red reason on the base |
@@ -220,7 +263,8 @@ Where `socket(AF_UNIX)` is refused, the four broken-service cases (`test_a_servi
 making the stand-in, whatever the code; on the base they pass elsewhere. Once the service exists, every case that
 needs it running (the service, concurrency, answers, GPU service cases, the service's GPU slot, the killed and
 failing service cases, and the service-naming bundle case) would also fail inside that sandbox for this reason
-alone.
+alone. The four memory-release cases (DEC-1068's note) are the exception: they carry the box's Unix sockets over
+loopback TCP there, and run red or green for the release itself.
 
 ## Earlier tests this ticket would turn red
 
@@ -239,7 +283,8 @@ the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--
 switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
 (`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 48 in the full run, 7 in `breadth`, 0 in `lifted`.
+Cases: 48 in the full run, 7 in `breadth`, 0 in `lifted`; since DEC-1068's note, 52 in the full run (its four
+memory-release cases, in no opt-in list, are mapped to success 6 in that section above, not in this generated table).
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
