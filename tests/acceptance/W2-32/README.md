@@ -9,7 +9,7 @@ integrated code at `9c468dbd` was read for today's interfaces (DEC-963).
 **Round 1:** S1 to S5, S9 and F1. **Round 2:** S3's hidden miss (the CTO's ruling), S10 (DEC-1065), S5's premise,
 the map in the runner's form, and the stand-in reporting the GPU (below, "Round 2's rewrites"). Round 3: the hidden
 miss made strict (P-W2-32-5). Round 4: S7, the owner's first gap (G1, DEC-1066); S8 (G3) and S6 (G2) come in later
-rounds. **133 cases from 60 test functions in ten files**, with a support module, a driver, the S9/F1 rule module
+rounds. **134 cases from 61 test functions in ten files**, with a support module, a driver, the S9/F1 rule module
 and a conftest. They run in under a minute on the engineer's head.
 
 ## How the tests reach the code under test
@@ -133,7 +133,7 @@ Each item names its file and its test function in full, as `gov accept` matches 
 | F1 | An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted | `test_w2_32_record.py::test_the_baseline_was_run_more_than_once_on_one_commit_so_it_has_a_noise_band`; `test_w2_32_record.py::test_f1_reverts_a_round_below_the_baselines_noise_band` (5 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | S10 | No CPU fallback for embeddings: the GPU embedders unreachable, the semantic part named unavailable and a keyword answer; no private embedder started; a vector computed on the CPU refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1] | `test_w2_32_s10_no_cpu_fallback.py::test_ensure_available_with_the_embedders_unreachable_checks_health_only`; `test_w2_32_s10_no_cpu_fallback.py::test_a_search_with_the_embedders_unreachable_reports_the_semantic_part_unavailable_with_a_named_code`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_embedders_unreachable_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing`; `test_w2_32_s10_no_cpu_fallback.py::test_a_question_vector_computed_on_the_cpu_is_refused_and_nothing_cached`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_query_embedder_on_the_cpu_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed` |
 | S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named`; `test_w2_32_s7_dec1067.py::test_nested_parents_send_no_line_twice_and_name_every_span_left_out` (a Python module and its functions, the round-2 review's R2-F1) |
-| S8 | Routing by question type: a question that names a symbol puts the code route's first 2 hits ahead after the rerank; a question that names a record puts that record's 2 best chunks ahead; each half kept only if it holds at its measure (each half behind its own setting, both off by default) [DEC-1067 (a)] | `test_w2_32_s8_routing.py::test_with_both_halves_off_the_order_is_the_rerankers` (12 cases: no setting, both 0 or an empty block, four questions); `test_w2_32_s8_routing.py::test_off_by_setting_gives_the_same_bundle_as_no_setting`; `test_w2_32_s8_routing.py::test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rerank`; `test_w2_32_s8_routing.py::test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_route_by_record_puts_the_records_two_best_chunks_ahead_after_the_rerank`; `test_w2_32_s8_routing.py::test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead`; `test_w2_32_s8_routing.py::test_the_16_text_cap_holds_with_routing_on`; `test_w2_32_s8_routing.py::test_an_invalid_setting_is_config_invalid_naming_the_key` (6 cases: a negative number, a word, a list, each key) |
+| S8 | Routing by question type: a question that names a symbol puts the code route's first 2 hits ahead after the rerank; a question that names a record puts that record's 2 best chunks ahead; each half kept only if it holds at its measure (each half behind its own setting, both off by default) [DEC-1067 (a)] | `test_w2_32_s8_routing.py::test_with_both_halves_off_the_order_is_the_rerankers` (12 cases: no setting, both 0 or an empty block, four questions); `test_w2_32_s8_routing.py::test_off_by_setting_gives_the_same_bundle_as_no_setting`; `test_w2_32_s8_routing.py::test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rerank` (S8's measured form: the code route's hits by stored-vector cosine to the question); `test_w2_32_s8_routing.py::test_route_by_symbol_without_stored_vectors_falls_back_to_the_routes_own_order`; `test_w2_32_s8_routing.py::test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_route_by_record_puts_the_records_two_best_chunks_ahead_after_the_rerank`; `test_w2_32_s8_routing.py::test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_order` (2 cases); `test_w2_32_s8_routing.py::test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead`; `test_w2_32_s8_routing.py::test_the_16_text_cap_holds_with_routing_on`; `test_w2_32_s8_routing.py::test_an_invalid_setting_is_config_invalid_naming_the_key` (6 cases: a negative number, a word, a list, each key) |
 
 ## What the record judges instead of a test
 
@@ -166,9 +166,26 @@ Each item names its file and its test function in full, as `gov accept` matches 
 - **Other tickets' cases that W2-32's S2 makes fail closed** are revised to pin their stand-in's digest in their
   planted project's `models.yaml` (each with its own `Rewrite-Reason`; the return lists them).
 
+## Round 14 (S8's measured form; `Rewrite-Reason: S8's measured form (cosine order of the code route)`)
+
+- **The symbol half's "first 2 hits"** are the code route's hits ranked by their stored vectors' cosine to the
+  question (the research's r01, the form the owner adopted; the code graph returns a set), the route's own order only
+  where a hit has no vector. The case works the cosine order out from the stand-in's own vectors (the question's,
+  from the text it was sent; each code chunk's, from the store): gamma and alpha go ahead, where the route's own
+  order would put alpha and beta. A new case, `test_route_by_symbol_without_stored_vectors_falls_back_to_the_routes_own_order`,
+  plants the code out of the vectors: alpha and beta go ahead.
+- **The reranker's order** is now each chunk once, at its first place: the code may score a chunk again in a later
+  request, and the cases counted it twice. The `routing` record may name what it moved by chunk id or by path.
+- **On the engineer's branch `808f7c90`:** 27 passed, 1 failed. The record half and the "both" case pass once the
+  order is read right. `test_the_16_text_cap_holds_with_routing_on` is red for its own reason: with the record half
+  on the reranker gets requests of 16, 4 and 5, the last re-scoring the named record's 5 chunks the first request
+  scored already, so the pool is not cut into full requests of 16 (each request is at most 16, so DEC-1067 (f)'s
+  cap holds; the guard asks the merged set be reranked once, as R2-F3 asked of W1-19 and W1-21).
+- **On `296a4639`:** 10 red (the three routing cases, the fallback, the six invalid settings), 18 green.
+
 ## Round 12 (S8: routing by question type; DEC-1067 (a))
 
-`test_w2_32_s8_routing.py` (27 cases) and `w2_32_routing.py` (the planted project and the helpers).
+`test_w2_32_s8_routing.py` (28 cases) and `w2_32_routing.py` (the planted project and the helpers).
 
 - **The settings, as the engineer stated them** (round 13; `Rewrite-Reason: the engineer's stated setting names`,
   where round 12 had `route_by_symbol`/`route_by_record`, true or false): `governance/project/retrieval.yaml`, a

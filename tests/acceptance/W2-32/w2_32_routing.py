@@ -15,6 +15,12 @@
 - **The code route** is a stand-in (the driver's ``code_route`` option): the real code-graph tool needs a local
   coordination endpoint the launch sandbox refuses. It answers a question naming ``SYMBOL`` with the chunks of
   ``CODE`` in that order, and a question naming none with nothing (no route), as the real route does.
+- **S8's measured form** (the research's r01, which the owner adopted): the code route's hits are ranked by their
+  stored vectors' cosine to the question (the code graph returns a set), and fall back to the route's own order only
+  where a hit has no vector. The code texts are written so that the cosine order (gamma, alpha, beta, worked out in
+  the cases from the stand-in's own vectors) is not the route's (alpha, beta, gamma); ``plant(..., code_vectors=False)``
+  leaves the code out of the vectors for the fallback. Rewrite-Reason: S8's measured form (cosine order of the code
+  route).
 """
 
 from __future__ import annotations
@@ -58,12 +64,12 @@ def _record_text():
     return "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n\n# Quayside lamp hours\n" + sections
 
 
-def plant(project):
+def plant(project, code_vectors=True):
     files = {**s.NOTES, **FILLERS, **CODE_TEXT, "app/__init__.py": "", RECORD_REL: _record_text()}
     project = s.plant(project, files)
     document = yaml.safe_load((Path(project) / s.PATH_MAP_REL).read_text(encoding="utf-8"))
     document.pop("retrieval_authority", None)  # W2-87's authority order is not under test here
-    document["namespaces"]["code"] = s.namespace(["app/**"], "embedded")
+    document["namespaces"]["code"] = s.namespace(["app/**"], "embedded" if code_vectors else "not embedded")
     document["namespaces"]["records"] = s.namespace(["records/**"], "embedded")
     document["namespaces"]["project"]["paths"] = [p for p in document["namespaces"]["project"]["paths"]
                                                   if p != "records/**"]
