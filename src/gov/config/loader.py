@@ -54,7 +54,11 @@ EMBEDDED = "embedded"
 REBUILD_FILE = "rebuild.yaml"
 EMBED_HEADERS = "embed_headers"
 EMBED_HEADERS_VALUES = ("true", "false")
-KNOWN_FILES[REBUILD_FILE] = {}  # loaded for ``embed_headers`` alone (``_rebuild_settings``); its schema is the rebuild's
+# DEC-1068's index-time methods, each a flag of the same form (absent: false, today's index): M1, a vector per file
+# beside the chunks' (``file_level_index``).
+FILE_LEVEL_INDEX = "file_level_index"
+INDEX_FLAGS = (EMBED_HEADERS, FILE_LEVEL_INDEX)
+KNOWN_FILES[REBUILD_FILE] = {}  # loaded for its ``INDEX_FLAGS`` alone (``_rebuild_settings``); its schema the rebuild's
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
@@ -323,14 +327,14 @@ def load_config(root: Path) -> dict:
     return loaded
 
 
-def _check_embed_headers(written: dict, value: dict, rel: str) -> bool:
-    """``embed_headers`` of the settings as written (every scalar a string) and as read: false when absent, else
-    ``true`` or ``false`` exactly; any other value is CONFIG_INVALID naming the key."""
-    if EMBED_HEADERS not in written:
+def _check_flag(written: dict, value: dict, rel: str, key: str = EMBED_HEADERS) -> bool:
+    """The index-time flag ``key`` of the settings as written (every scalar a string) and as read: false when absent,
+    else ``true`` or ``false`` exactly; any other value is CONFIG_INVALID naming the key."""
+    if key not in written:
         return False
-    if written[EMBED_HEADERS] not in EMBED_HEADERS_VALUES or not isinstance(value.get(EMBED_HEADERS), bool):
-        raise _invalid(rel, EMBED_HEADERS, f"must be true or false (absent: false), not {written[EMBED_HEADERS]!r}")
-    return value[EMBED_HEADERS]
+    if written[key] not in EMBED_HEADERS_VALUES or not isinstance(value.get(key), bool):
+        raise _invalid(rel, key, f"must be true or false (absent: false), not {written[key]!r}")
+    return value[key]
 
 
 def _rebuild_settings(path: Path, rel: str) -> dict | None:
@@ -346,7 +350,8 @@ def _rebuild_settings(path: Path, rel: str) -> dict | None:
         return None
     if not isinstance(written, dict) or not isinstance(value, dict):
         return None
-    _check_embed_headers(written, value, rel)
+    for key in INDEX_FLAGS:
+        _check_flag(written, value, rel, key)
     return value
 
 
@@ -356,6 +361,14 @@ def embed_headers(root: Path) -> bool:
     alone absent: false. Any other value (``yes``, ``on``, ``True``, a quoted ``"true"``, none) is CONFIG_INVALID
     naming the key, never read as either (``load_config`` refuses it the same way); a file that is not a map is
     CONFIG_INVALID here too. Reads no other key."""
+    return index_flag(root, EMBED_HEADERS)
+
+
+def index_flag(root: Path, key: str) -> bool:
+    """The index-time flag ``key`` (one of ``INDEX_FLAGS``) of ``rebuild.yaml``, as ``embed_headers`` reads its own:
+    absent false, ``true`` or ``false`` exactly, anything else CONFIG_INVALID naming the key. Reads no other key."""
+    if key not in INDEX_FLAGS:
+        raise ValueError(f"{key!r} is no index-time flag of {REBUILD_FILE}")
     rel = f"{PROJECT_DIR}/{REBUILD_FILE}"
     path = Path(root) / rel
     if not path.is_file():
@@ -365,7 +378,7 @@ def embed_headers(root: Path) -> bool:
         return False
     if not isinstance(written, dict):
         raise _invalid(rel, None, "the top level must be a map")
-    return _check_embed_headers(written, read_yaml(path, "CONFIG_INVALID", rel) or {}, rel)
+    return _check_flag(written, read_yaml(path, "CONFIG_INVALID", rel) or {}, rel, key)
 
 
 def secrets_scan_on(root: Path) -> bool:

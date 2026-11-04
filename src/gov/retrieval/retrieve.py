@@ -252,6 +252,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         asked = routing.phrasings(query, graph_route.start_ids(root, query, known))
     answers = {lexical.FACET: _phrased(lexical.search, root, asked, "ranked"),
                semantic.FACET: _phrased(semantic.search, root, asked, "hits", cut=semantic.TOP_K)}
+    if semantic.file_level_on(root):  # DEC-1068 M1: the file route beside the chunks', fused as one route more
+        answers[semantic.FILE_FACET] = _phrased(semantic.file_search, root, asked, "hits", cut=semantic.TOP_K)
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
