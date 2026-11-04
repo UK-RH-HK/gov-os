@@ -1,0 +1,162 @@
+# Building memory for a repository: the practice learned in D-4b (DEC-1072 (2))
+
+- **Status:** a living record, kept up to date as D-4b goes. It becomes a kernel skill after the refactoring.
+- **Owner ticket:** W2-88 (`DAEO-2bdu`), memory for any repository at adoption.
+- **Who uses it:** whoever builds memory in an adopted repository's Wave 0: the W2-88 engineer, the adopting team,
+  and later the kernel skill.
+- **Sources:** DEC-1009, DEC-1060, DEC-1066 to DEC-1072; the rubric (`docs/research/memory-measure-audit/RUBRIC.md`);
+  the structural review (`governance/project/orchestration/packages/LIFT-1/D4B-STRUCTURE.md`); the measures' records
+  under `~/gov-os-runs/D4B/` (figures only are quoted here).
+
+## 1. How the store is built
+- **Four stores:**
+  - the record graph (records, edges);
+  - the keyword index (SQLite FTS5, BM25, `porter unicode61`);
+  - the vectors (an embedder on the GPU, sqlite-vec);
+  - the code graph.
+- **The path map decides which namespaces are embedded.** Everything else is keyword-only. In this repository, 19,113
+  of 69,464 chunks are embedded, from 1,126 files. The evaluation set's own documents are indexed nowhere (G4).
+- **Chunking:**
+  - Chunks are sized at about 1,000 characters, inside parent sections.
+  - Python chunks may be cut on definitions (M2's `chunk_code_by_definition`). The register may be cut one entry per
+    span (M5).
+  - **The lesson:** size-based chunks split 75 % of embedded chunks off their section, and bury one-item answers.
+    Plan chunking by meaning from the start: answer units (list items, rows, fields) with their heading path, beside
+    section chunks. This is being prototyped as D4B-STRUCTURE C2.
+- **Embedding:**
+  - Each chunk is embedded with a header: its path and the headings above it (`embed_headers`, adopted).
+  - Up to 10,000 characters per chunk; the embedder cuts silently above its 4,096-token context.
+  - The reranker reads up to 24,000 characters with the path.
+  - **The lesson:** give the heading path to every reader of a chunk (the keyword index and the reranker too), not
+    only the embedder (C1).
+- **Links:**
+  - The record graph holds the edges the records state in their own fields: 743 `DEPENDS_ON`, 9 `CONSTRAINS`,
+    3 `SUPERSEDES` and 2 `IMPLEMENTS` here.
+  - **The lesson:** the register states 103 supersessions or amendments and 9,111 citations in its text, which the
+    graph does not hold. Census every kind of link the repository states before building (D4B-STRUCTURE step 7,
+    DEC-1072 (1)).
+- **Retrieval:**
+  - three phrasings (no model);
+  - keyword and meaning routes, 30 each;
+  - the record route and the closure;
+  - the code route;
+  - RRF (k = 60) with an authority lift;
+  - 20 chunks reranked per call (Qwen3-Reranker-0.6B);
+  - routing by question type;
+  - a 6,000-token bundle.
+
+## 2. How it is measured
+- **The measure:** W2-61's `gov.retrieval.measure`. It reports hit@5 (a gold source in the first 5 stacked items) and
+  full evidence (every gold piece in the stack). Each search's ranked output is kept, so a label change is re-scored
+  without running again.
+- **The rubric (R1-R11),** applied to every question:
+  - correct today, from the governing source;
+  - searchable by meaning, or marked as a keyword question;
+  - unambiguous;
+  - the kind agents ask;
+  - spread across code, decisions, tickets, the plan and the Contract (R5: each domain at least 10 %, no subsystem
+    over 25 %);
+  - every source holds its answer;
+  - well formed;
+  - never from the evaluation's own documents;
+  - distinct;
+  - recorded;
+  - stable under ordinary work (R11).
+- **Three sets, three jobs (DEC-1070):**
+  - **The tuning set** (visible, 40): methods are tried on it.
+  - **The hidden check** (40): reported in counts only, kept outside every tree and read only by the measure.
+  - **The measurement set** (`memory-verdict`, 60):
+    - written fresh and blind by a writer outside the CTO's system, cross-checked by a second fresh session;
+    - never used to choose;
+    - measured only at decision points;
+    - its figure is the verdict.
+- **The writers are independent of the retrieval work.** A writer never reads search results, the other sets, or the
+  research that names misses. It never finds gold with the product's own search: a set built with the product favours
+  what the product finds.
+- **The hidden-half rule:** no hidden question, answer, path, heading or line reaches the tuning session. Ids, counts,
+  ranks and kinds only. A label is corrected only by an independent checker (the owner's operator).
+- **Scoring:** hit@5, then the MRR of the first gold source (DEC-1070 (9)). A question about an id that exists nowhere
+  is scored apart: it passes when the product stops with `UNRESOLVED_IDS` naming that id (DEC-1071 (5)).
+
+## 3. How it is tuned (DEC-1071)
+- **Structural fixes only:** chunking, embedding, ranking, the graph. Never a fix aimed at a named question.
+- **Judged on all sets together** (hit@5, then MRR). A fix is adopted if the total does not fall and the gap between
+  the halves does not widen.
+- **Consistency is the proof:** the same product must score within 3 points on different sets. Then the measurement
+  set is measured once, as the confirmation.
+- **Diagnose before fixing:** classify every miss by where it is lost. The stages: never searched, in no route's top
+  30, a sibling only, a phrasing cut, cut from the reranked pool, reranked low. Then turn the kinds into structural
+  weaknesses measured across the whole index.
+- **Models last:** a reranker or embedder trial comes after the structure is sound, on all three sets, with speed and
+  GPU figures beside quality.
+
+## 4. Every method tried, with its figures
+The figures are hit@5. The 48-question set ran from m1 to m5 (24 visible + 24 hidden); the 80-question set from m6 on.
+
+| Method | Measure | Visible | Hidden | Adopted | Why |
+|---|---|---|---|---|---|
+| Baseline (pin) | m1 | 12/24 | 16/24 | - | - |
+| G4: the evaluation documents out of the index; re-labels | m2 | 13/24 | 16/24 | yes | an honest measure (effect 0) |
+| G1: the models read the whole chunk | m2g1 | 18/24 | 17/24 | yes | DEC-1066 (chosen with all 48 in view) |
+| x5: routing by question type + three phrasings | measure 3 | 20/24 | 17/24 | yes | the visible rule (tie, fewer methods) |
+| x7: x5 + the reranker shown title and section + expansion | measure 3 | 20/24 | 17/24 | no | tie; more methods |
+| Contextual headers in the embedding | measure 4 | 21/24 | 17/24 | yes | the visible rule |
+| The product with all the above | m5 | 21/24 | 17/24 | - | - |
+| The same, on the 80 questions | m6 | 36/40 | 29/40 | - | the baseline |
+| The meaning route uncut after phrasings | stage A v1 | 35/40 | 30/40 | no (visible rule) | to re-judge on all 80 |
+| Routes 60 deep | v2 | 34/40 | 30/40 | no (visible rule) | to re-judge |
+| 40 reranked | v3 | 34/40 | 30/40 | no (visible rule) | to re-judge |
+| v1 + v2 + v3 | v4 | 33/40 | 33/40 | no (visible rule) | re-judged with v5 + v6 (DEC-1071 (2)) |
+| At most 2 chunks of a file in the first 10 | v5 | 36/40 | 29/40 | yes (MRR) | small |
+| Nested repeats dropped | v6 | 36/40 | 29/40 | yes (MRR) | small |
+| v5 + v6, three runs | v56 | 36/40 | 29/40 | yes | MRR 0.6925 visible, 0.4912 hidden |
+| M1, a file-level index | m6-M1 | 36/40 | 30/40 | to judge on all 80 | MRR 0.7015 visible, 0.4835 hidden |
+| M2, code chunks cut on definitions | m6-M2 | 36/40 | 29/40 | to judge | no change (embedded code changed by 50 chunks) |
+| M3-M5 | running | | | | |
+
+Night one's survey (63 variants on all 48) and night two's (32 on the visible half) also found:
+- **Losers:** pool quotas, a global pool, an embedder instruction, a reranker instruction, authority ×2.
+- **Neutral:** route agreement, a blend.
+- **Speed:** every method within 0.08 s.
+
+## 5. The lessons
+1. **Overfitting to the tuning set.**
+   - The visible half rose from 12 to 21 of 24 while the hidden half stayed at 16 to 17. Every method was chosen by
+     looking at the visible half's misses, two of them with all 48 in view.
+   - When recall was widened, the visible half fell and the hidden half rose: its hits depended on the exact pool
+     it was tuned on.
+   - **The practice:** three sets with three jobs, structural fixes only, consistency as the proof.
+2. **Labels checked because questions missed.**
+   - Missed questions were the ones whose labels got checked, on both halves, so the labels were not audited evenly.
+   - **The practice:** labels are audited on a schedule, all questions at once, never because one missed
+     (DEC-1070 (14)).
+3. **The halves were not alike.**
+   - The hidden half held more one-item answers in chunks without their heading. That is a structural trait, which
+     cost about 16 points of hit@5 across all 80.
+   - **The practice:** measure the gold's structure (form, dilution, heading) per set, and fix the structure.
+4. **The GPU trips** (twice, the night of DEC-1067).
+   - The reranker's requests were bounded by text count only, then by summed characters; padding to the longest text
+     exceeded memory.
+   - **The practice:**
+     - bound each request by count × longest text (24,000 characters, 16 texts);
+     - a GPU backstop at 15.5 GB;
+     - one GPU job at a time;
+     - the reranker's memory released after each request (window 4).
+5. **Process hazards seen on the way.**
+   - `git bisect` from a linked worktree re-initialised the repository (`core.bare`). Bisect only in a throwaway clone.
+   - Stopping processes by a text match killed another agent's work. Stop only by named pids.
+   - A measure script on a clone with an uncommitted setting was refused by the re-pin's clean-tree check. Commit the
+     setting in the throwaway clone.
+6. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
+   nothing. Score it apart.
+
+## 6. For an adopted repository's Wave 0 (the practice in order)
+1. Assess the repository, and plan its refactoring for full indexing (W2-88's KPIs).
+2. Census its stated links (records, front matter, trailers, text). Build the graph from them.
+3. Chunk by meaning (sections, answer units, code by definition), and give every reader the heading path.
+4. Write the three sets by independent writers under the rubric. Keep the hidden check and the measurement set outside
+   every tree.
+5. Measure. Diagnose by stage and by structure. Fix the structure on all sets until they agree within 3 points.
+   Confirm on the measurement set once.
+6. Then choose the models (reranker, embedder) on all three sets, with speed and GPU figures.
+7. Record every method and figure here, or in the repository's copy of this record.
