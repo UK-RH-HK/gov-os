@@ -361,20 +361,16 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         own = [chunk for chunk in routes[CLOSURE]
                if (record_of.get(chunk["path"]) if chunk["path"] != register
                    else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in named_ids]
-        on_page = {candidate["chunk_id"] for candidate in ranked}
-        if any(chunk["chunk_id"] in on_page for chunk in own):  # none on the page: nothing to move, nothing asked
-            texts = []
-            for chunk in own:  # as the page's candidates are given to the reranker
-                body = span(chunk["path"], chunk["start_line"], chunk["end_line"]).decode("utf-8", "replace")
-                texts.append({**chunk, "text": f"[path: {chunk['path']}]\n{body[:RERANK_CHARS]}"})
-            try:
-                scored = rerank(query, texts, reranker)  # the named record's chunks, by the reranker's score
-            except (OSError, RuntimeError, ValueError):
-                scored = []
-            if any("rerank_score" in chunk for chunk in scored):
-                best = [chunk["chunk_id"] for chunk in scored]
-            else:  # no reranker: by the stored vectors' cosine, else the closure's own order
-                best = _by_cosine(root, query, [chunk["chunk_id"] for chunk in own])
+        # P-W2-32-9: the scores the pool's rerank already gave (the chunks put ahead are on the page, so scored);
+        # no request of its own, so the rerank stays one of the merged set in full requests of 16
+        own_ids = {chunk["chunk_id"] for chunk in own}
+        mine = [(position, candidate) for position, candidate in enumerate(ranked) if candidate["chunk_id"] in own_ids]
+        if mine:
+            if all("rerank_score" in candidate for _, candidate in mine):
+                best = [candidate["chunk_id"] for _, candidate in
+                        sorted(mine, key=lambda pair: (-pair[1]["rerank_score"], pair[0]))]
+            else:  # no reranker scored the page: by the stored vectors' cosine, else the page's order
+                best = _by_cosine(root, query, [candidate["chunk_id"] for _, candidate in mine])
             ranked, routed[routing.NAMED] = routing.ahead(ranked, routing.firsts(best, route_settings["named_first"]))
     if route_settings["code_first"] and coded is not None and routes.get(code_route.FACET):
         best = _by_cosine(root, query, [hit["chunk_id"] for hit in routes[code_route.FACET]])

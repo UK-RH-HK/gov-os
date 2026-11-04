@@ -15,7 +15,8 @@ variants r01 and s01):
   vectors' cosine to the question's (``semantic.distances``; with no vector to compare, the route's own order); its
   first ``code_first``, those on the page, go first.
 - **named:** the closure's chunks of the records the question names (its ``--ticket``, its ``--id``s and the record
-  route's start ids), ranked by the reranker's score; the first ``named_first``, those on the page, go first.
+  route's start ids) that are on the page, ranked by the scores the page's rerank gave them (no request of its own,
+  P-W2-32-9: the rerank stays one of the merged set in full requests of 16); the first ``named_first`` go first.
 - Both on, for a question naming both: the code route's first, then the named record's, then the rest.
 """
 

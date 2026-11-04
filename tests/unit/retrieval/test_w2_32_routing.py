@@ -200,3 +200,37 @@ def test_a_route_s_first_are_cut_before_the_page_is_looked_at():
 def lexical_text(root, chunk):
     lines = (Path(root) / chunk["path"]).read_text().splitlines(keepends=True)
     return "".join(lines[chunk["start_line"] - 1:chunk["end_line"]])
+
+
+def test_routing_on_keeps_one_rerank_of_the_merged_set_in_full_requests_of_16(project):
+    """P-W2-32-9: the record half reuses the page's scores; no request of its own."""
+    root, code, record, state = project
+    for number in range(3, 15):  # a pool above 16, so the requests are cut
+        (root / f"note{number}.md").write_text(f"# Note {number}\n\nThe {PHRASE} of pier {number}.\n")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "more notes")
+    lexical.refresh(root)
+    store.load(root)
+    state.update(symbol=True, record=True, distance={c["chunk_id"]: n for n, c in enumerate(code)})
+    sizes = []
+
+    def recording():
+        def score(query, texts):
+            sizes.append(len(texts))
+            return _score(query, texts)
+        return score
+
+    def ask():
+        sizes.clear()
+        bundle = retrieve(root, PHRASE, batch_size=30, bundle_budget=0, reranker=recording)
+        return bundle, list(sizes)
+
+    _ask(root)  # no file: off
+    off, off_sizes = ask()
+    (root / "governance/project/retrieval.yaml").write_text(yaml.safe_dump({"routing": {"code_first": 2,
+                                                                                         "named_first": 2}}))
+    on, on_sizes = ask()
+    pool = len(on["evidence"])
+    assert pool > 16
+    assert on_sizes == off_sizes == [16] * (pool // 16) + ([pool % 16] if pool % 16 else [])
+    assert on["routing"]["named"] and on["routing"]["code"]
