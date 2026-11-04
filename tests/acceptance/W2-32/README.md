@@ -9,7 +9,7 @@ integrated code at `9c468dbd` was read for today's interfaces (DEC-963).
 **Round 1:** S1 to S5, S9 and F1. **Round 2:** S3's hidden miss (the CTO's ruling), S10 (DEC-1065), S5's premise,
 the map in the runner's form, and the stand-in reporting the GPU (below, "Round 2's rewrites"). Round 3: the hidden
 miss made strict (P-W2-32-5). Round 4: S7, the owner's first gap (G1, DEC-1066); S8 (G3) and S6 (G2) come in later
-rounds. **105 cases from 50 test functions in nine files**, with a support module, a driver, the S9/F1 rule module
+rounds. **106 cases from 51 test functions in nine files**, with a support module, a driver, the S9/F1 rule module
 and a conftest. They run in under a minute on the engineer's head.
 
 ## How the tests reach the code under test
@@ -132,7 +132,7 @@ Each item names its file and its test function in full, as `gov accept` matches 
 | S9 | Below 85 % after two improvement rounds: escalated to the owner, who decides at the third; at 85 % or above but under 95 % with room, not closed: escalated [DEC-954 Q9e, DEC-957] | `test_w2_32_record.py::test_the_baseline_record_holds_both_figures_against_their_bars`; `test_w2_32_record.py::test_s9_escalates_below_85_after_two_rounds_and_under_95_with_room` (6 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | F1 | An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted | `test_w2_32_record.py::test_the_baseline_was_run_more_than_once_on_one_commit_so_it_has_a_noise_band`; `test_w2_32_record.py::test_f1_reverts_a_round_below_the_baselines_noise_band` (5 cases, the rule); `test_w2_32_record.py::test_the_evidence_file_states_s9s_and_f1s_outcome` (the verdict is judged by the record, below) |
 | S10 | No CPU fallback for embeddings: the GPU embedders unreachable, the semantic part named unavailable and a keyword answer; no private embedder started; a vector computed on the CPU refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1] | `test_w2_32_s10_no_cpu_fallback.py::test_ensure_available_with_the_embedders_unreachable_checks_health_only`; `test_w2_32_s10_no_cpu_fallback.py::test_a_search_with_the_embedders_unreachable_reports_the_semantic_part_unavailable_with_a_named_code`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_embedders_unreachable_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_unreachable_refuses_the_vectors_and_starts_nothing`; `test_w2_32_s10_no_cpu_fallback.py::test_a_question_vector_computed_on_the_cpu_is_refused_and_nothing_cached`; `test_w2_32_s10_no_cpu_fallback.py::test_retrieve_with_the_query_embedder_on_the_cpu_answers_by_keywords`; `test_w2_32_s10_no_cpu_fallback.py::test_a_rebuild_with_the_embedder_on_the_cpu_refuses_to_embed` |
-| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named` |
+| S7 | The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk's size; the manifest's cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice) [G1, DEC-1066] | `test_w2_32_s7_whole_chunk.py::test_the_embedder_reads_the_whole_chunk_and_the_semantic_route_finds_words_past_the_old_cut`; `test_w2_32_s7_whole_chunk.py::test_the_reranker_reads_the_whole_chunk` (2 cases: retrieve, the fusion); `test_w2_32_s7_whole_chunk.py::test_the_manifest_records_a_cut_that_is_not_the_old_one`; `test_w2_32_s7_whole_chunk.py::test_a_store_embedded_at_the_old_cut_is_stale_and_the_next_rebuild_embeds_the_chunk_whole`; `test_w2_32_s7_whole_chunk.py::test_across_continuations_no_span_is_sent_twice`; `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one` (2 cases: the fusion, retrieve; DEC-1067 (f)); `test_w2_32_s7_dec1067.py::test_a_parent_expanded_later_leaves_out_the_children_sent_alone_earlier_and_names_them` (the converse, the review's F-5); `test_w2_32_s7_dec1067.py::test_a_chunk_above_the_embedders_limit_is_embedded_from_its_first_part_and_named`; `test_w2_32_s7_dec1067.py::test_nested_parents_send_no_line_twice_and_name_every_span_left_out` (a Python module and its functions, the round-2 review's R2-F1) |
 
 ## What the record judges instead of a test
 
@@ -164,6 +164,19 @@ Each item names its file and its test function in full, as `gov accept` matches 
   hidden-shaped miss.
 - **Other tickets' cases that W2-32's S2 makes fail closed** are revised to pin their stand-in's digest in their
   planted project's `models.yaml` (each with its own `Rewrite-Reason`; the return lists them).
+
+## Round 11 (the round-2 review: R2-F1, R2-F3)
+
+- **R2-F1:** `test_w2_32_s7_dec1067.py::test_nested_parents_send_no_line_twice_and_name_every_span_left_out`. A
+  planted Python file (a module of 59 lines and five functions; each function and each run of module lines one
+  chunk, so no two chunks overlap) asked with one item a batch through its continuations: no line is sent twice,
+  across calls or within one; in each call every gathered chunk is sent or named as a span record outside the
+  evidence and the expansions (`merge.candidates` = the evidence plus the named spans); a named span lies within
+  lines already sent. Red on `b32e8504`: call 1 sends lines 18-26, then the module 1-59 that holds them, and calls
+  2 and 3 send three more functions inside it, unnamed. With the twice check off (a scratch copy), the naming and
+  the count pass there.
+- **R2-F3 (W1-19's and W1-21's one-rerank cases):** every rerank request but the last carries exactly 16 texts,
+  the last at most 16, so two passes of their own (one per route) no longer pass. Green on `b32e8504`.
 
 ## Round 9 (S7's note under DEC-1067)
 
