@@ -231,3 +231,57 @@ def test_m5_on_a_question_about_an_entry_s_last_line_finds_the_whole_entry(regis
     lexical.refresh(root)
     ranked = lexical.search(root, "Line 39 of decision 2", refresh=False)["ranked"]
     assert (ranked[0]["start_line"], ranked[0]["end_line"]) == _entry_spans(REGISTER)["### DEC-002 — Decision 2"]
+
+
+# --- M4: identifier tokenisation in the keyword index ------------------------------------------------------------
+
+def test_m4_splits_the_identifiers_the_tokenizer_keeps_whole():
+    text = "the rerank_service, rerankService, HTTPServer and MAX_REQUEST_TEXTS; gov.retrieval.semantic; plain W2-32"
+    assert lexical.identifier_parts(text) == "rerank service http server max request texts"
+    assert lexical.identifier_parts("plain words and gov/retrieval/semantic.py") == ""  # the tokenizer splits these
+
+
+def _columns(root):
+    with sqlite3.connect(root / STORE_REL) as connection:
+        return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)"))
+
+
+SPLIT_CODE = "def open_rerank_service(port):\n    return port\n\n\ndef startHarbourWatch():\n    return 1\n"
+
+
+@pytest.fixture()
+def identifiers(project):
+    root = project
+    (root / "src/ops.py").write_text(SPLIT_CODE, encoding="utf-8")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "identifiers")
+    return root
+
+
+def test_switching_m4_rebuilds_the_whole_index_with_the_parts_and_off_restores_today_s(identifiers):
+    root = identifiers
+    lexical.refresh(root)
+    today, chunks = lexical.digest(root), lexical.chunks(root)
+    assert _columns(root) == lexical.COLUMNS
+    _settings(root, lexical_split_identifiers=True)
+    fresh = lexical.freshness(root)
+    assert fresh["status"] == "stale" and set(fresh["stale"]) == {c["path"] for c in chunks}  # every file
+    assert sorted(lexical.refresh(root)["indexed"]) == sorted({c["path"] for c in chunks})
+    assert _columns(root) == lexical.SPLIT_COLUMNS and lexical.chunks(root) == chunks  # the chunks themselves stand
+    _settings(root)
+    assert lexical.freshness(root)["status"] == "stale"
+    lexical.refresh(root)
+    assert lexical.digest(root) == today and _columns(root) == lexical.COLUMNS and "lexical_recipe" not in _tables(root)
+
+
+def test_m4_on_plain_words_find_a_snake_case_or_camel_case_identifier_and_the_exact_route_is_unchanged(identifiers):
+    root = identifiers
+    lexical.refresh(root)
+    off_words = [c["path"] for c in lexical.search(root, "rerank service", refresh=False)["ranked"]]
+    off_exact = lexical.search(root, "open_rerank_service", refresh=False)["hits"]
+    assert "src/ops.py" not in off_words  # off: one token, not its words
+    _settings(root, lexical_split_identifiers=True)
+    lexical.refresh(root)
+    assert lexical.search(root, "rerank service", refresh=False)["ranked"][0]["path"] == "src/ops.py"
+    assert lexical.search(root, "harbour watch", refresh=False)["ranked"][0]["path"] == "src/ops.py"
+    assert lexical.search(root, "open_rerank_service", refresh=False)["hits"] == off_exact  # the exact route as before

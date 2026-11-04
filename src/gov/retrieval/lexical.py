@@ -55,7 +55,8 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.config.loader import (CODE_BY_DEFINITION, INDEX_FLAGS, LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, REBUILD_FILE,
-                               REGISTER_BY_ENTRY, SECRETS_FILE, index_recipe, read_yaml, validate_lexical_policy)
+                               REGISTER_BY_ENTRY, SECRETS_FILE, SPLIT_IDENTIFIERS, index_recipe, read_yaml,
+                               validate_lexical_policy)
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
@@ -70,6 +71,11 @@ FIELD_SEP, ROW_SEP = "\x1f", "\x1e"
 KEPT_OUT = 2  # ``lexical_file.indexed`` of a file the path map's lexical_policy keeps out (0: the filter refused it)
 COLUMNS = ("text", "ident", "title")
 WEIGHTS = (1.0, 10.0, 4.0)  # bm25's weight of each of COLUMNS: body, id, title
+# DEC-1068's M4 (``lexical_split_identifiers``): a fourth column, ``parts``, the pieces of the chunk's identifiers that
+# the tokenizer keeps whole (``identifier_parts``), weighted as the body; absent when M4 is off (today's index).
+SPLIT_COLUMNS, SPLIT_WEIGHTS = (*COLUMNS, "parts"), (*WEIGHTS, 1.0)
+_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:[./-][A-Za-z0-9_]+)*")
+_CAMEL = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+")
 TOP_K = 30  # the chunks the words add to the ranked list, as many as the semantic route returns
 MAX_TERMS = 32  # the question's words and ids asked of the index, at most
 # An id: capitals and digits, then one or more '-' parts, with a digit somewhere (DEC-900, W2-13, RETR-X-02, W2-M071).
@@ -91,6 +97,7 @@ CREATE INDEX IF NOT EXISTS lexical_chunk_by_path ON lexical_chunk (path);
 CREATE INDEX IF NOT EXISTS lexical_parent_by_path ON lexical_parent (path);
 CREATE VIRTUAL TABLE IF NOT EXISTS lexical_fts USING fts5({", ".join(COLUMNS)}, tokenize = "{TOKENIZE}");
 """
+_SPLIT_SCHEMA = SCHEMA.replace(f"fts5({', '.join(COLUMNS)},", f"fts5({', '.join(SPLIT_COLUMNS)},")
 _OLD = "DROP TABLE IF EXISTS lexical_fts; DROP TABLE IF EXISTS lexical_chunk; DROP TABLE IF EXISTS lexical_parent; " \
        "DROP TABLE IF EXISTS lexical_file;"
 # The chunks that match, best first by bm25 with the column weights; ``{}`` adds the text, or a limit.
@@ -98,6 +105,8 @@ _RANKED = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.r
           f"FROM lexical_fts WHERE lexical_fts MATCH ? AND rank MATCH 'bm25({', '.join(map(str, WEIGHTS))})' " \
           "ORDER BY rank{}) f JOIN lexical_chunk c ON c.id = f.rowid ORDER BY f.rank, c.path, c.start_line"
 _RANKED_TEXT, _RANKED_TOP = _RANKED.format(", f.text", ""), _RANKED.format("", " LIMIT ?")
+_SPLIT_RANKED = _RANKED.replace(f"bm25({', '.join(map(str, WEIGHTS))})", f"bm25({', '.join(map(str, SPLIT_WEIGHTS))})")
+_SPLIT_TEXT, _SPLIT_TOP = _SPLIT_RANKED.format(", f.text", ""), _SPLIT_RANKED.format("", " LIMIT ?")
 _CHUNKS = "SELECT chunk_id, path, start_line, end_line, parent_id FROM lexical_chunk"
 _DIGESTED = (
     "SELECT path, blob, indexed FROM lexical_file ORDER BY path",
@@ -210,9 +219,28 @@ def _fields(rel: str, text: str, parent_rows: list) -> dict[str, tuple[str, str]
     return fields
 
 
+def _columns(connection: sqlite3.Connection) -> tuple:
+    return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)"))
+
+
 def _current(connection: sqlite3.Connection) -> bool:
-    """Whether the store's ``lexical_fts`` has the columns of this code (W2-13)."""
-    return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)")) == COLUMNS
+    """Whether the store's ``lexical_fts`` has the columns of this code (W2-13), with M4's ``parts`` or without."""
+    return _columns(connection) in (COLUMNS, SPLIT_COLUMNS)
+
+
+def identifier_parts(text: str) -> str:
+    """The pieces of each identifier of ``text`` that the tokenizer keeps whole (DEC-1068's M4): a token with ``_``
+    (a token character) or a camelCase change is split on ``_ . / -`` and on case changes; each piece once, in order.
+    Dotted and path tokens are split by the tokenizer already; the original stays in ``text``."""
+    pieces: dict[str, None] = {}
+    for token in _IDENTIFIER.findall(text):
+        if "_" not in token and not re.search(r"[a-z][A-Z]|[A-Z]{2}[a-z]", token):
+            continue
+        for part in re.split(r"[_./-]+", token):
+            for piece in _CAMEL.findall(part):
+                if piece.lower() != token.lower():
+                    pieces.setdefault(piece.lower(), None)
+    return " ".join(pieces)
 
 
 def _open(root: Path) -> sqlite3.Connection | None:
@@ -261,6 +289,8 @@ def _affected(keys, paths, register: str | None = None) -> set[str]:
             out |= {rel for rel in paths if rel.endswith(".py")}
         elif key == REGISTER_BY_ENTRY and register is not None:
             out |= {rel for rel in paths if rel == register}
+        elif key == SPLIT_IDENTIFIERS:  # every row's terms change: the whole index
+            out |= set(paths)
     return out
 
 
@@ -298,11 +328,13 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL)
     try:
+        recipe = _recipe_now(root)
+        split = bool(recipe.get(SPLIT_IDENTIFIERS))
         if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_fts'").fetchone() \
-                and not _current(connection):
-            connection.executescript(_OLD)  # an index of the code before W2-13: built again from nothing
-        connection.executescript(SCHEMA)
-        recipe, built = _recipe_now(root), _recipe_of(connection)
+                and _columns(connection) != (SPLIT_COLUMNS if split else COLUMNS):
+            connection.executescript(_OLD)  # before W2-13, or of the other M4 form: built again from nothing
+        connection.executescript(_SPLIT_SCHEMA if split else SCHEMA)
+        built = _recipe_of(connection)
         switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
         register = _register(root)
@@ -333,8 +365,13 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                 for *record, chunk in chunk_rows:
                     rowid = connection.execute("INSERT INTO lexical_chunk (chunk_id, path, start_line, end_line, "
                                                "parent_id) VALUES (?, ?, ?, ?, ?)", record).lastrowid
-                    connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
-                                       (rowid, chunk, *fields[record[4]]))
+                    if split:  # M4: the identifiers' pieces as terms of their own
+                        connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title, parts) "
+                                           "VALUES (?, ?, ?, ?, ?)",
+                                           (rowid, chunk, *fields[record[4]], identifier_parts(chunk)))
+                    else:
+                        connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
+                                           (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
             if recipe:  # the methods it is built with now
                 connection.execute(_RECIPE_SCHEMA)
@@ -516,10 +553,12 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 def _ranked(connection: sqlite3.Connection, query: str) -> dict:
     """``hits`` and ``ranked`` of ``query`` in the open, fresh index."""
     keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
+    split = _columns(connection) == SPLIT_COLUMNS  # M4's index: its parts column weighted too
+    ranked_text, ranked_top = (_SPLIT_TEXT, _SPLIT_TOP) if split else (_RANKED_TEXT, _RANKED_TOP)
     names = [name for name in ids_in(query) if name != query][:MAX_TERMS]  # the ids it holds among other words
     if any(char.isalnum() or char == "_" for char in query):
         # FTS5 finds the chunks that hold the query's tokens, or an id's, as a phrase; they are then matched exactly.
-        rows = connection.execute(_RANKED_TEXT, (" OR ".join(map(_phrase, [query, *names])),))
+        rows = connection.execute(ranked_text, (" OR ".join(map(_phrase, [query, *names])),))
     else:  # no token to match by: every chunk is read
         rows = connection.execute("SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, NULL, f.text "
                                   "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
@@ -538,7 +577,7 @@ def _ranked(connection: sqlite3.Connection, query: str) -> dict:
                              "parent_id": parent_id})
     words, added = _words(query), 0
     if words:
-        for record in connection.execute(_RANKED_TOP, (words, TOP_K + len(ranked))):
+        for record in connection.execute(ranked_top, (words, TOP_K + len(ranked))):
             if added < TOP_K and record[0] not in ranked:
                 ranked[record[0]] = {**dict(zip(keys, record)), "exact": False}
                 added += 1
