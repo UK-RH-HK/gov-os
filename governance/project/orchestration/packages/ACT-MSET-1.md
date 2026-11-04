@@ -11,9 +11,13 @@ section 6.
 - **Its value depends on staying unseen.** No method, label or setting may be fitted to it. So it is written without
   sight of the other questions or of any retrieval result.
 
-## 2. The size: 60 (the owner's minimum is 40)
-- At a pass rate near 75 %, 60 questions give a standard error of about 5.6 points, against 6.8 at 40. That's enough
-  to tell the hidden half's 72 % from the visible half's 90 %.
+## 2. The size: 60, as the owner decided (the owner's minimum was 40)
+- **The target is unchanged: 95 % hit@5, with 85 % the floor, and it is to be achieved.** The set is written to measure
+  memory honestly against that target. It is never made easier or harder to reach it: each question follows the
+  rubric, whatever the product is expected to score.
+- **The precision:** at a pass rate near 75 %, 60 questions give a standard error of about 5.6 points, against 6.8 at
+  40. That's enough to tell the hidden half's 72 % from the visible half's 90 %. The 75 % is only the assumption
+  behind this precision figure, not an expectation. Near the target the error is smaller: about 2.8 points at 95 %.
 - It gives each governing domain at least 6 questions (10 %), so a per-domain figure means something.
 - **The quotas** (R5 item 6, scaled to 60; exact counts, summing to 60):
 

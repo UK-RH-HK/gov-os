@@ -509,6 +509,14 @@ evaluation_sets:
     hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
     measures:
       roles: [engineer, research]
+  # memory-verdict is the measurement set (DEC-1070 (4), ACT-MSET-1): 60 questions written blind by a writer outside
+  # the CTO's system, kept under ~/gov-os-eval (the measure's --sets-root), never used to choose or tune; measured by
+  # the CTO only at decision points, counts only. Every role but the orchestrator is refused it.
+  memory-verdict:
+    visible: []
+    hidden: ["fixtures/evaluation/memory-verdict/hidden/**"]
+    measures:
+      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
 # Role separation (DEC-1052 G-14): the globs each role does not read, judged by the guard's role_reads.py from the
 # main tree's copy of this file by simple path checks (a target the guard cannot resolve, a search from a folder
 # above and a listing of names are let through). Only this block is parsed. A plain glob applies in every tree.
