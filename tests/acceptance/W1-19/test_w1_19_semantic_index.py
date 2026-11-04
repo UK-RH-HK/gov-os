@@ -19,6 +19,7 @@ import pytest
 import w1_19_support as support
 
 ROOT = support.path_arg
+RERANK_CAP = 16  # DEC-1067 (f): no reranker request carries more than 16 texts
 INDEX = pytest.mark.needs("gitleaks", "sqlite_vec")
 
 
@@ -189,9 +190,17 @@ def test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass(api, index
             if {support.LEXICAL_FACET, support.SEMANTIC_FACET} <= set(entry["routes"])]
     assert both, "no chunk is named by both routes: the lists were joined, not fused by chunk"
     assert answer["reranked"] is True
-    assert outcome.loads == 1 and len(outcome.passes) == 1, \
-        f"{outcome.loads} loads and {len(outcome.passes)} passes of the reranker for one retrieval; the KPI says one"
-    assert len(outcome.passes[0]["texts"]) == len(answer["hits"]), "the one pass was not over the merged set"
+    # Rewrite-Reason: DEC-1067 (f) (reranker requests capped at 16): the one rerank over the merged set is now sent
+    # in requests of at most 16 texts, its scores combined in order. What the case guards stands: one reranker load
+    # for one retrieval, and the requests together score the merged set once, each candidate once, in as few
+    # requests as the cap allows; the first result is still the reranker's highest.
+    assert outcome.loads == 1, f"{outcome.loads} loads of the reranker for one retrieval; the KPI says one"
+    sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
+    texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
+    assert sizes and max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts: {sizes}"
+    assert len(sizes) == -(-len(texts) // RERANK_CAP), f"more rerank requests than the cap needs: {sizes}"
+    assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
+    assert len(texts) == len(answer["hits"]), "the rerank was not over the merged set"
     assert found[0] == support.ZETA, f"the first result is not the one the reranker scored highest: {found}"
 
 
