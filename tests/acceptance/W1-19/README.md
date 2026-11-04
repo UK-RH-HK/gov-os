@@ -542,7 +542,7 @@ fusion receives the lexical route's ranked list); DEC-1055`.
 "one rerank" as one reranker call. The owner's DEC-1067 (f) caps each request at 16 texts, a larger pool sent in
 batches of at most 16 with the scores combined in order. Revised by W2-32's independent test designer; the name
 stands. It now asks: one reranker load; every request at most 16 texts; the requests together score the merged set
-once (each candidate once, as many texts as hits); no more requests than the cap needs; the first result still the
+once (each candidate once, as many texts as hits); no more requests than the cap needs, every one but the last carrying exactly 16 (the round-2 review's R2-F3: so two passes of their own, one per route, do not pass); the first result still the
 reranker's highest. Nothing else in the case changes.
 
 ## KPI map after D-4's cut (DEC-1061)
