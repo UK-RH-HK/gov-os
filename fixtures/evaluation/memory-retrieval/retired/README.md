@@ -158,3 +158,8 @@ question before 2026-11-04 are the old label's.
   block, which runs 6-288. It is re-anchored to 6-288.
 - **q23-pre-dec1069.yaml** (W2-61h's q23): its gold answer gave line 26, while `MAP_REL` is at line 27 (its value
   unchanged). The line number is dropped.
+- **q19-pre-dec1069b.yaml** (Q19's DEC-1067 (c) label, 429a53ca): one of its six alternatives was the generated
+  record `docs/contract/master-rules/MR-3.md`, whose status is PROPOSED. A PROPOSED record is never a gold source
+  (the rubric's R1 item 2). The cross-check of DEC-1069 (8) (`docs/audit/memory-measure-new-visible.md`) found it,
+  and it was confirmed blind at 0255bba3. That alternative is removed. MR-3 in `contract.yaml` and in
+  `CONTRACT_v4.md`, the Charter and the two role files are kept, with the question and the gold answer.
