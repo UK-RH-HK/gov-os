@@ -91,10 +91,11 @@ def _newly_embedded_by_dec_957(rel: str) -> bool:
 # anything more out (a namespace silently not embedded, a folder slipped into a records namespace) stays red. The
 # overlay's four record folders sit under governance/, which DEC-957's sets already leave out of this comparison.
 # W2-15a's raw measure output quotes the visible questions, names gold positions and holds the hidden half's ranks:
-# G4 keeps it out of both indexes, as lens B (DEC-1066 (3); the D-7 review's F5).
+# G4 keeps it out of both indexes, as lens B (DEC-1066 (3); the D-7 review's F5). The measure's audit quotes the
+# visible questions: DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068.
 D7_NOT_EMBEDDED = ("tests/**", "docs/close/**", "docs/checkpoints/**", "docs/probes/**",
                    "docs/assessment/2026-10/B-memory-retrieval.md", "docs/research/EXP-003/w2-15a/raw/**",
-                   "fixtures/evaluation/**",
+                   "docs/research/memory-measure-audit/**", "fixtures/evaluation/**",
                    "governance/project/orchestration/closes/**", "governance/project/orchestration/nightly/**",
                    "governance/project/orchestration/sessions/**", "governance/project/orchestration/reviews/**")
 
