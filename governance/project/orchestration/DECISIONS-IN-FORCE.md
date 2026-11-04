@@ -40,7 +40,15 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   measure script writes a reason line for every automatic re-anchor; every run keeps every search's ranked output
   (`~/gov-os-eval/runs/`), so an approved label change is re-scored without running again; the reranker trial runs
   all three candidates, adoption by its written rule only; a standing model bench. Basis: question 2 (a measure that
-  is wrong or keyword-only misjudges memory).
+  is wrong or keyword-only misjudges memory). *(The trial's (12)-(13) amended by DEC-1070.)*
+- DEC-1070 (2026-11-04, standing for the measure): **three sets, three jobs**: the visible 40 tune and choose; the
+  hidden 40 check (counts only, never choose; a visible-only gain is suspect); a **new measurement set** (fresh, blind,
+  by the rubric, a new writer, outside every tree) is the verdict, measured only at decision points. Memory is reported
+  as those three figures. **The choice rule:** hit@5, then MRR of the first gold source from the kept ranks. **Recall
+  first:** no new method chosen until the recall diagnosis is in; fixes are generic, never aimed at named misses;
+  the rerankers (mxbai, Qwen3-4B) and the embedder trial wait for the 0.6B's new record; M1-M5 also confirmed on the
+  measurement set before window 4. **Labels** are audited on a schedule, all questions at once, never because one
+  missed. Basis: question 1 and question 2 (selection pressure from named misses fits the tuning set).
 - **Standing practice, the owner (2026-11-04):** whenever the CTO waits on the owner or the operator, it writes
   `log/cto-standby.txt` (what it waits for) and ends it when the wait ends, so the sentinel raises no false alarm;
   `tools/sentinel_check.sh` runs while `dispatch/sentinel-expected` exists (the sentinel's login, Remote Control,
