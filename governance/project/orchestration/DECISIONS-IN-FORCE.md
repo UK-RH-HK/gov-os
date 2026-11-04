@@ -25,6 +25,10 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   unavailable, named, keywords answer; never a private embedder on the CPU, as the reranker's ACT-RERANK-WAIT-1);
   search respects role separation (`gov retrieve` filtered by the caller's `role_paths`, before W2-127 and the restart).
   DEC-1064: sandboxed workers run no `gov retrieve` and no real-model test until then.
+- DEC-1067 (standing for D-4b): the memory measure's hidden half never chooses a method (adopted only if it wins on
+  the visible half alone; the hidden half reported separately; hidden ranks never in the index or on integrate);
+  labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; no measure or
+  rebuild beside one; the GPU back in budget between); no install until the owner decides the bigger models.
 - DEC-1060: lens B's q03 rewritten to DEC-1033's rule; a measure question never rewards a replaced decision.
 - DEC-1053: D-0 done; `w2/W2-78` and the in-flight branches with unmerged work wait for D-9.
 - DEC-1050: this repository kept; no full `gov check` in leads' runs (T-1); attribution once each way (Q-1); the
