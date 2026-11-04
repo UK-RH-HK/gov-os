@@ -10,6 +10,11 @@ reranker that scores each text by its ``rankNN`` and keeps each request, and the
 reranker's order" is the order the same scores give the pool as the reranker received it (stable for ties); "ahead"
 is the first places of the evidence; the rest keeps the reranker's order. Whether a half holds at its measure is
 D-4b's record, not a case here.
+
+Rewrite-Reason: the engineer's stated setting names: ``routing.code_first`` and ``routing.named_first`` in
+``governance/project/retrieval.yaml``, counts (on: 2, the measured form; off: absent or 0), where the cases had
+``route_by_symbol`` and ``route_by_record``, true or false. Every guard is kept; the "on" cases also ask for the
+bundle's ``routing`` record of what it moved, which the engineer states.
 """
 
 from __future__ import annotations
@@ -61,6 +66,15 @@ def _reranker_order(evidence, order):
     return [key for key in order if key in present]
 
 
+def _moved_named(bundle, routed):
+    """With a half on, the bundle carries a ``routing`` record of what it moved (the engineer's statement)."""
+    record = bundle.get("routing")
+    assert record, f"the bundle carries no routing record of what it moved: {sorted(bundle)}"
+    text = json.dumps(record)
+    missing = sorted({path for path, _ in routed if path not in text})
+    assert not missing, f"the routing record does not name what it moved ({missing}): {record}"
+
+
 def _ahead(evidence, order, routed):
     """Fails unless the evidence starts with exactly ``routed`` and the rest keeps the reranker's order."""
     assert routed <= set(evidence), f"premise: the routed chunks are gathered: {sorted(routed - set(evidence))}"
@@ -80,10 +94,12 @@ QUESTIONS = {"symbol": r.SYMBOL_QUESTION, "record": r.RECORD_QUESTION, "both": r
 # ---- off (the default): today's order exactly ---------------------------------------------------------------------
 
 @pytest.mark.parametrize("asked", sorted(QUESTIONS))
-@pytest.mark.parametrize("settings", ["absent", "both-false"])
+@pytest.mark.parametrize("settings", ["absent", "both-zero", "empty-block"])
 def test_with_both_halves_off_the_order_is_the_rerankers(routed, box, standin, settings, asked):
-    if settings == "both-false":
-        r.set_routing(routed, symbol=False, record=False)
+    if settings == "both-zero":
+        r.set_routing(routed, symbol=r.OFF, record=r.OFF)
+    elif settings == "empty-block":
+        r.set_routing(routed)
     bundle, _, order = _ask(box, routed, QUESTIONS[asked])
     assert bundle is not None, f"the retrieval raised with routing off: {_}"
     evidence = _evidence(bundle)
@@ -93,7 +109,7 @@ def test_with_both_halves_off_the_order_is_the_rerankers(routed, box, standin, s
 
 def test_off_by_setting_gives_the_same_bundle_as_no_setting(routed, box, standin):
     absent, _, _ = _ask(box, routed, r.BOTH_QUESTION)
-    r.set_routing(routed, symbol=False, record=False)
+    r.set_routing(routed, symbol=r.OFF, record=r.OFF)
     off, _, _ = _ask(box, routed, r.BOTH_QUESTION)
     assert [(e["path"], e["start_line"], e["end_line"]) for e in off["evidence"]] == \
         [(e["path"], e["start_line"], e["end_line"]) for e in absent["evidence"]], "off differs from the default"
@@ -102,15 +118,16 @@ def test_off_by_setting_gives_the_same_bundle_as_no_setting(routed, box, standin
 # ---- route by symbol ----------------------------------------------------------------------------------------------
 
 def test_route_by_symbol_puts_the_code_routes_first_two_hits_ahead_after_the_rerank(routed, box, standin):
-    r.set_routing(routed, symbol=True)
+    r.set_routing(routed, symbol=r.ON)
     bundle, _, order = _ask(box, routed, r.SYMBOL_QUESTION)
     assert bundle["facets"].get("code", {}).get("available") is True, f"premise: the code route answers: {bundle['facets']}"
     _ahead(_evidence(bundle), order, CODE_AHEAD)
+    _moved_named(bundle, CODE_AHEAD)
 
 
 @pytest.mark.parametrize("asked", ["plain", "record"])
 def test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_order(routed, box, standin, asked):
-    r.set_routing(routed, symbol=True)
+    r.set_routing(routed, symbol=r.ON)
     bundle, _, order = _ask(box, routed, QUESTIONS[asked])
     evidence = _evidence(bundle)
     assert evidence == _reranker_order(evidence, order), f"a question naming no symbol was routed: {evidence[:6]}"
@@ -119,16 +136,17 @@ def test_route_by_symbol_leaves_a_question_naming_no_symbol_in_the_rerankers_ord
 # ---- route by record ----------------------------------------------------------------------------------------------
 
 def test_route_by_record_puts_the_records_two_best_chunks_ahead_after_the_rerank(routed, box, standin):
-    r.set_routing(routed, record=True)
+    r.set_routing(routed, record=r.ON)
     bundle, _, order = _ask(box, routed, r.RECORD_QUESTION)
     assert bundle["facets"].get("closure", {}).get("available") is True, \
         f"premise: the record route answers: {bundle['facets']}"
     _ahead(_evidence(bundle), order, RECORD_AHEAD)
+    _moved_named(bundle, RECORD_AHEAD)
 
 
 @pytest.mark.parametrize("asked", ["plain", "symbol"])
 def test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_order(routed, box, standin, asked):
-    r.set_routing(routed, record=True)
+    r.set_routing(routed, record=r.ON)
     bundle, _, order = _ask(box, routed, QUESTIONS[asked])
     evidence = _evidence(bundle)
     assert evidence == _reranker_order(evidence, order), f"a question naming no record was routed: {evidence[:6]}"
@@ -137,13 +155,14 @@ def test_route_by_record_leaves_a_question_naming_no_record_in_the_rerankers_ord
 # ---- both halves ----------------------------------------------------------------------------------------------------
 
 def test_both_halves_on_a_question_naming_a_symbol_and_a_record_puts_both_ahead(routed, box, standin):
-    r.set_routing(routed, symbol=True, record=True)
+    r.set_routing(routed, symbol=r.ON, record=r.ON)
     bundle, _, order = _ask(box, routed, r.BOTH_QUESTION)
     _ahead(_evidence(bundle), order, CODE_AHEAD | RECORD_AHEAD)
+    _moved_named(bundle, CODE_AHEAD | RECORD_AHEAD)
 
 
 def test_the_16_text_cap_holds_with_routing_on(routed, box, standin):
-    r.set_routing(routed, symbol=True, record=True)
+    r.set_routing(routed, symbol=r.ON, record=r.ON)
     _, requests, _ = _ask(box, routed, r.BOTH_QUESTION)
     sizes = [len(request) for request in requests]
     assert sum(sizes) > CAP, f"premise: the rerank pool holds more than {CAP} texts ({sum(sizes)})"
@@ -153,9 +172,13 @@ def test_the_16_text_cap_holds_with_routing_on(routed, box, standin):
 
 # ---- an invalid setting --------------------------------------------------------------------------------------------
 
+@pytest.mark.parametrize("value", [-1, "maybe", [2]], ids=["negative", "word", "list"])
 @pytest.mark.parametrize("half", ["symbol", "record"])
-def test_an_invalid_setting_is_config_invalid_naming_the_key(routed, box, standin, half):
-    r.set_routing(routed, raw=f"{r.KEYS[half]}: maybe\n")
+def test_an_invalid_setting_is_config_invalid_naming_the_key(routed, box, standin, half, value):
+    if half == "symbol":
+        r.set_routing(routed, symbol=value)
+    else:
+        r.set_routing(routed, record=value)
     bundle, raised, _ = _ask(box, routed, r.BOTH_QUESTION)
     assert bundle is None and raised, f"an invalid {r.KEYS[half]} was taken: the retrieval answered"
     assert "CONFIG_INVALID" in (str(raised.get("code")) + raised["message"]), \

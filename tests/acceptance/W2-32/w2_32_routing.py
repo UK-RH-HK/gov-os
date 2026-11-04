@@ -1,9 +1,13 @@
 """S8's planted project and helpers (W2-32; DEC-1067 (a): routing by question type).
 
 - **The settings** (the CTO's ruling: each half behind its own setting, both off by default; off gives today's order
-  exactly; an invalid value is ``CONFIG_INVALID`` naming the key). Until the engineer states the file and the keys,
-  the cases write ``governance/project/retrieval.yaml`` with ``route_by_symbol`` and ``route_by_record`` (``SETTINGS_REL``
-  and ``KEYS`` below: the CTO aligns the names on merge if they differ).
+  exactly; an invalid value is ``CONFIG_INVALID`` naming the key). As the engineer stated them: in
+  ``governance/project/retrieval.yaml`` a ``routing`` block with ``code_first`` (the symbol half: how many of the code
+  route's first hits go ahead) and ``named_first`` (the record half: how many of the named record's best chunks go
+  ahead); absent or 0 is off, the measured form is 2; invalid values are ``CONFIG_INVALID`` naming the key
+  (``routing.code_first``). With either half on, the bundle carries a ``routing`` record of what it moved.
+  Rewrite-Reason: the engineer's stated setting names (they were ``route_by_symbol`` and ``route_by_record``,
+  true or false).
 - **The corpus:** three code files, one function each (``CODE``: the code route's hits, in its order); a record
   (``CAP-88``) of three sections, one chunk each; notes enough for a rerank pool above 16. Every chunk that a case
   orders holds a token ``rankNN``: the stand-in reranker's score is that number (no token: 0), so the reranker's
@@ -23,7 +27,9 @@ import yaml
 import w2_32_support as s
 
 SETTINGS_REL = "governance/project/retrieval.yaml"
-KEYS = {"symbol": "route_by_symbol", "record": "route_by_record"}
+BLOCK = "routing"
+KEYS = {"symbol": "routing.code_first", "record": "routing.named_first"}  # as the loader names them
+ON, OFF = 2, 0  # the measured form; 0 (or absent) is off
 
 SYMBOL = "w32_alpha"
 CODE = ["app/alpha.py", "app/beta.py", "app/gamma.py"]  # the code route's hits, first to last
@@ -67,12 +73,14 @@ def plant(project):
 
 
 def set_routing(project, symbol=None, record=None, raw=None):
-    """Write the routing settings: each half ``True``/``False`` or left out (``None``); ``raw`` writes that text."""
+    """Write the routing settings: each half a count (``ON``, ``OFF``, or any value to plant) or left out (``None``);
+    ``raw`` writes that text as the file."""
     if raw is not None:
         s.write(project, SETTINGS_REL, raw)
         return
-    settings = {KEYS[half]: value for half, value in (("symbol", symbol), ("record", record)) if value is not None}
-    s.write(project, SETTINGS_REL, yaml.safe_dump(settings, sort_keys=False))
+    block = {KEYS[half].split(".", 1)[1]: value for half, value in (("symbol", symbol), ("record", record))
+             if value is not None}
+    s.write(project, SETTINGS_REL, yaml.safe_dump({BLOCK: block}, sort_keys=False))
 
 
 def unset_routing(project):
