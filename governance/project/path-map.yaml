@@ -107,6 +107,7 @@ namespaces:
     paths:
       - "docs/assessment/2026-10/B-memory-retrieval.md"
       - "docs/research/EXP-003/w2-15a/raw/**"
+      - "docs/research/memory-measure-audit/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
