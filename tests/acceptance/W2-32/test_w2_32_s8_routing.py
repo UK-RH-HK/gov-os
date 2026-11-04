@@ -142,12 +142,16 @@ QUESTIONS = {"symbol": r.SYMBOL_QUESTION, "record": r.RECORD_QUESTION, "both": r
 # ---- off (the default): today's order exactly ---------------------------------------------------------------------
 
 @pytest.mark.parametrize("asked", sorted(QUESTIONS))
-@pytest.mark.parametrize("settings", ["absent", "both-zero", "empty-block"])
+@pytest.mark.parametrize("settings", ["absent", "both-zero", "empty-block", "bare-block"])
 def test_with_both_halves_off_the_order_is_the_rerankers(routed, box, standin, settings, asked):
+    """Off: no file, both 0, a block with no keys (``routing: {}``) or a bare ``routing:`` (the review's S8-F4: an
+    empty block is off, today's order, never a refusal)."""
     if settings == "both-zero":
         r.set_routing(routed, symbol=r.OFF, record=r.OFF)
     elif settings == "empty-block":
         r.set_routing(routed)
+    elif settings == "bare-block":
+        r.set_routing(routed, raw=f"{r.BLOCK}:\n")
     bundle, _, order = _ask(box, routed, QUESTIONS[asked])
     assert bundle is not None, f"the retrieval raised with routing off: {_}"
     evidence = _evidence(bundle)
