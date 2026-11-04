@@ -25,7 +25,7 @@ from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
 from gov.guard import role_paths
-from gov.retrieval import authority, code_route, graph_route, lexical, routing, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, reverse_edges, routing, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
@@ -272,6 +272,15 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
+        if reverse_edges.on(root):  # DEC-1068 M3: the lines stating that a record depends on a start record, first
+            stating = reverse_edges.first(root, start, chunks)
+            if stating is None:
+                facets[CLOSURE][reverse_edges.FACET_KEY] = reverse_edges.STALE  # today's route until a rebuild
+            else:
+                ahead, dependents = stating
+                reached |= dependents
+                named = {chunk["chunk_id"] for chunk in ahead}
+                routes[CLOSURE] = ahead + [chunk for chunk in routes[CLOSURE] if chunk["chunk_id"] not in named]
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
         routes[code_route.FACET], facets[code_route.FACET] = coded

@@ -55,9 +55,11 @@ REBUILD_FILE = "rebuild.yaml"
 EMBED_HEADERS = "embed_headers"
 EMBED_HEADERS_VALUES = ("true", "false")
 # DEC-1068's index-time methods, each a flag of the same form (absent: false, today's index): M1, a vector per file
-# beside the chunks' (``file_level_index``).
+# beside the chunks' (``file_level_index``); M3, the line stating each depends_on edge, put first in the closure
+# route (``closure_reverse_depends_on``).
 FILE_LEVEL_INDEX = "file_level_index"
-INDEX_FLAGS = (EMBED_HEADERS, FILE_LEVEL_INDEX)
+CLOSURE_REVERSE_DEPENDS_ON = "closure_reverse_depends_on"
+INDEX_FLAGS = (EMBED_HEADERS, FILE_LEVEL_INDEX, CLOSURE_REVERSE_DEPENDS_ON)
 KNOWN_FILES[REBUILD_FILE] = {}  # loaded for its ``INDEX_FLAGS`` alone (``_rebuild_settings``); its schema the rebuild's
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
