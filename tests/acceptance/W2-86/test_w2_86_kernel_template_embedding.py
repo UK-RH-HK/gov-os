@@ -86,6 +86,16 @@ def _newly_embedded_by_dec_957(rel: str) -> bool:
     return "/" not in rel or rel.startswith(("governance/", "schemas/"))
 
 
+# D-7's decided cut (DEC-1052 M-4, DEC-1055 (3), DEC-1066 (3)): these files leave the vectors on purpose, and only
+# towards not embedded. Written here as the decisions word them, not read from the path map, so a path map that takes
+# anything more out (a namespace silently not embedded, a folder slipped into a records namespace) stays red. The
+# overlay's four record folders sit under governance/, which DEC-957's sets already leave out of this comparison.
+D7_NOT_EMBEDDED = ("tests/**", "docs/close/**", "docs/checkpoints/**", "docs/probes/**",
+                   "docs/assessment/2026-10/B-memory-retrieval.md", "fixtures/evaluation/**",
+                   "governance/project/orchestration/closes/**", "governance/project/orchestration/nightly/**",
+                   "governance/project/orchestration/sessions/**", "governance/project/orchestration/reviews/**")
+
+
 def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     base = tmp_path / "base"
     (base / PROJECT_DIR).mkdir(parents=True)
@@ -93,7 +103,13 @@ def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     (base / PATH_MAP).write_bytes(text)
     outside = [rel for rel in _tracked(inside=False) if not _newly_embedded_by_dec_957(rel)]
     assert outside, "no tracked path outside template/ is left to compare: the case would pass vacuously"
+    cut = {rel for rel in outside if any(_matches(rel, pattern) for pattern in D7_NOT_EMBEDDED)}
+    assert cut, "no tracked file in D-7's cut: the exception would be vacuous"
     head_db, base_db = tmp_path / "head", tmp_path / "base-db"
     head_db.mkdir(), base_db.mkdir()
     head, before = _selected(ROOT, outside, head_db), _selected(base, outside, base_db)
-    assert sorted(head ^ before) == [], "a file outside template/ gained or lost its embedding"
+    still = sorted(head & cut)
+    assert still == [], f"{len(still)} files of D-7's cut still embedded, e.g. {still[:5]}"
+    moved = sorted((head ^ before) - cut)
+    assert moved == [], f"{len(moved)} files outside template/ and D-7's cut gained or lost their embedding, " \
+                        f"e.g. {moved[:5]}"
