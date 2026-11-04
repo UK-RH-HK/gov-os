@@ -146,6 +146,9 @@ def run(call):
     if op == "manifest":
         from gov.retrieval import semantic
         return semantic.manifest(call["root"])
+    if op == "lexical_search":  # DEC-1068's index-time methods: the keyword route's answer, refreshed or not
+        from gov.retrieval import lexical
+        return lexical.search(call["root"], call["query"], refresh=call.get("refresh", False))
     if call.get("code_route"):
         code_route_stand_in(call["code_route"])
     if op == "retrieve":
