@@ -129,6 +129,19 @@ def _alone_of(payload: dict) -> set[tuple[str, int, int]]:
     return {(path, first, last) for path, first, last in named}
 
 
+def _merged(spans) -> list[tuple[int, int]]:
+    """``spans`` (first and last line, both inclusive, as a chunk's) in order, those that share a line made one, so
+    each line is named once. Neighbouring chunks share their overlap lines (``chunking.OVERLAP_CHARS``); spans that
+    only touch stay apart, as they were sent."""
+    merged: list[list[int]] = []
+    for first, last in sorted(spans):
+        if merged and first <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], last)
+        else:
+            merged.append([first, last])
+    return [(first, last) for first, last in merged]
+
+
 def _without(first: int, last: int, sent: list[tuple[int, int]]) -> list[tuple[int, int]]:
     """The runs of lines ``first`` to ``last`` that none of the ``sent`` spans holds, in order."""
     runs, at = [], first
@@ -352,7 +365,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         if parent and (parent["start_line"], parent["end_line"]) != (first, last) and parent["parent_id"] not in expanded:
             top, bottom = parent["start_line"], parent["end_line"]
             # DEC-1067 (review F-5): the lines an earlier call sent as a child on its own are left out of the parent
-            held = sorted((a, b) for path, a, b in alone if path == rel and top <= a and b <= bottom)
+            held = _merged((a, b) for path, a, b in alone if path == rel and top <= a and b <= bottom)
             runs = _without(top, bottom, held)
             pieces = [(a, b, span(rel, a, b)) for a, b in runs]
             cost = sum(_tokens(piece.decode("utf-8", "replace")) for *_, piece in pieces) \

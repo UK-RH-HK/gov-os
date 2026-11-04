@@ -314,3 +314,64 @@ def test_a_token_from_before_dec_1067_without_its_children_is_still_read(reposit
     old = base64.urlsafe_b64encode(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()).decode()
     assert retrieve(repository, PHRASE, batch_size=1, bundle_budget=1_000_000, continuation=old,
                     reranker=lambda: None) is not None
+
+
+# --- the left-out lines named once (the CTO's red after 82dcb360) ---------------------------------------------------
+
+@pytest.mark.parametrize("spans, merged", [
+    ([(16, 31), (30, 45)], [(16, 45)]),  # neighbouring chunks share their overlap lines: one run, each line once
+    ([(16, 29), (30, 45)], [(16, 29), (30, 45)]),  # a child that ends one line before the next begins: both, as sent
+    ([(30, 45), (16, 31)], [(16, 45)]),  # in any order
+    ([(10, 40), (12, 20)], [(10, 40)]),  # one inside another
+    ([], []),
+])
+def test_the_left_out_spans_name_each_line_once(spans, merged):
+    from gov.retrieval.retrieve import _merged
+    assert _merged(spans) == merged
+
+
+@pytest.fixture()
+def almanac(tmp_path, monkeypatch):
+    """A section of three overlapping chunks, the phrase in each, and four short notes that rank first."""
+    root = tmp_path
+    (root / "governance/project").mkdir(parents=True)
+    path_map = yaml.safe_load((REPO / "governance/project/path-map.yaml").read_text(encoding="utf-8"))
+    path_map["namespaces"] = {"notes": {**next(iter(path_map["namespaces"].values())), "paths": ["**"]}}
+    path_map.pop("decision_register", None)
+    (root / "governance/project/path-map.yaml").write_text(yaml.safe_dump(path_map), encoding="utf-8")
+    shutil.copy2(REPO / "template/.gitleaks.toml", root / ".gitleaks.toml")
+    (root / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
+    (root / "docs").mkdir()
+    body = "".join(f"Line {n:02d}: the {PHRASE} entry.\n" if n % 7 == 0 else
+                   f"Line {n:02d} of plain filler prose in the almanac section text.\n" for n in range(45))
+    (root / "docs/almanac.md").write_text("# Almanac\n" + body, encoding="utf-8")
+    for number in range(4):
+        (root / f"docs/note{number}.md").write_text(f"# Note {number}\n\nThe {PHRASE} of pier {number}.\n",
+                                                    encoding="utf-8")
+    _git(root, "init", "-q")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "fixture")
+    lexical.refresh(root)
+    store.load(root)
+    monkeypatch.setattr(semantic, "search", lambda *_args, **_kwargs: {"available": True, "reason": None, "hits": []})
+    return root
+
+
+@needs_gitleaks
+def test_overlapping_children_sent_earlier_are_left_out_of_a_later_parent_as_one_run(almanac):
+    chunks = [(c["start_line"], c["end_line"]) for c in lexical.chunks(almanac, "docs/almanac.md")]
+    assert len(chunks) == 3 and chunks[0][1] >= chunks[1][0]  # the chunker's overlap: neighbours share lines
+    bundles = _calls(almanac, budget=300)  # no expansion fits until the last child's turn
+    expansions = [e for b in bundles for e in b["expansions"]]
+    assert len(expansions) == 1
+    left_out = expansions[0]["left_out"]
+    earlier = [(i["start_line"], i["end_line"]) for b in bundles[:-1] for i in b["evidence"]
+               if i["path"] == "docs/almanac.md"]
+    assert sorted(earlier) == chunks[:2]  # the two children sent alone, each its own lines
+    assert left_out == [[chunks[0][0], chunks[1][1]]]  # one run: every line they sent, each named once
+    named = [line for first, last in left_out for line in range(first, last + 1)]
+    assert len(named) == len(set(named))
+    later = [line for i in bundles[-1]["evidence"] if i["path"] == "docs/almanac.md"
+             for line in range(i["start_line"], i["end_line"] + 1)]
+    assert later and not set(later) & set(named)  # nothing left out is sent again
+    assert set(later) | set(named) == set(range(1, chunks[-1][1] + 1))  # the parent whole, across the calls
