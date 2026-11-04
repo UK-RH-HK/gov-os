@@ -60,7 +60,11 @@ namespaces:
       - "docs/lessons/**"
       - "docs/plan/**"
       - "docs/releases/**"
-      - "docs/research/**"
+      - "docs/research/*"
+      - "docs/research/EXP-003/*"
+      - "docs/research/EXP-003/examin/**"
+      - "docs/research/EXP-003/w2-15a/*"
+      - "docs/research/EXP-003/w2-15a/diag/**"
       - "docs/spec/**"
       - "docs/assessment/2026-10/A-purpose-roadmap.md"
       - "docs/assessment/2026-10/C-decisions-to-spec.md"
@@ -97,10 +101,12 @@ namespaces:
     embedding_policy: not embedded
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
-  # DEC-1066 (3), G4: lens B's report quotes the measure's questions: out of both indexes
+  # DEC-1066 (3), G4: lens B's report and W2-15a's raw measure output quote the measure's questions or name their
+  # gold positions and hold the hidden half's ranks: out of both indexes (the D-7 review's F5)
   evaluation-sources:
     paths:
       - "docs/assessment/2026-10/B-memory-retrieval.md"
+      - "docs/research/EXP-003/w2-15a/raw/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
