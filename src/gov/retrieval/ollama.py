@@ -9,11 +9,12 @@ stopped by ``gov``; Ollama's own idle unload frees the model's memory. The warni
 
 What follows describes such an explicit start (DEC-261 as DEC-798, DEC-1033 and DEC-1065 amend it).
 
-Two daemons are started so (DEC-261 as DEC-798 amends it and DEC-1033 replaces its
-CPU-only rule): the shared one at ``OLLAMA_HOST``, which builds the index, and the
-query one at ``GOV_QUERY_OLLAMA_HOST``, which embeds the questions and nothing else.
-The second is started with its own ``OLLAMA_HOST`` and the GPU left visible: a
-question's vector is used from any device (DEC-1033).
+Two daemons are started so (DEC-261 as DEC-798 amends it, DEC-1033 replaces its
+CPU-only rule and DEC-1065 makes the GPU the only device): the shared one at ``OLLAMA_HOST``,
+which builds the index, and the query one at ``GOV_QUERY_OLLAMA_HOST``, which embeds the
+questions and nothing else. The second is started with its own ``OLLAMA_HOST`` and the GPU
+left visible: a vector, a question's or a chunk's, is used only when computed on the GPU
+(W2-32 S10); one computed on the CPU is refused, never cached or stored.
 
 Every start of either daemon is capped (DEC-1014, DEC-1017): its parallel requests, its logical CPUs and its
 niceness come from the ``embedding_servers`` section of the resource gate's configuration file (W2-20), else from
@@ -202,13 +203,15 @@ def ensure_available(*, timeout_s: float = 20.0, env=None, start: bool = False) 
     url = _url(env.get("OLLAMA_HOST") or DEFAULT_HOST, HEALTH_PATH)
     available = _healthy(url, deadline)
     started = False
-    if not start:
+    if not start:  # the settings a start would use are stated, as on the start path (W2-123; W2-32 review F-3)
         if available:
             return {"available": True, "started": False, "facet": FACET, "state": "AVAILABLE", "warning": invalid,
-                    "settings": None}
+                    "settings": settings}
         print(WARNING, file=sys.stderr)  # W1-18's result; the warning names EMBEDDER_UNAVAILABLE first
-        return {"available": False, "started": False, "facet": FACET, "state": "FACET_UNAVAILABLE",
-                "warning": WARNING}
+        result = {"available": False, "started": False, "facet": FACET, "state": "FACET_UNAVAILABLE",
+                  "warning": WARNING}
+        found = _executable(env)  # a file that would start; a named one that is not there is none (W1-18)
+        return {**result, "settings": settings} if found and os.path.isfile(found) else result
     if invalid:
         print(invalid, file=sys.stderr)
         if available:

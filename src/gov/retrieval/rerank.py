@@ -35,6 +35,9 @@ CACHE_REL = ".cache/gov-os"  # the socket, its start lock and the logs, in the u
 SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "rerank-service.log"
 CONNECT_S = 2.0  # to connect and be accepted (DEC-1034 T3); the answer is bounded by GOV_RERANK_TIMEOUT_S
 START_S = 60.0  # the bound on a search's wait while the service starts and loads its model
+# The most texts one request to a reranker carries (DEC-1067 (f)): requests of 100 whole chunks held the shared
+# reranker at 15.75 GB (PyTorch keeps its peak), so a larger pool goes in batches of at most this many.
+MAX_REQUEST_TEXTS = 16
 _ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
           77: "the GPU has too little free memory for its share", 78: "no GPU is available to it"}
 _last = threading.local()
@@ -204,8 +207,10 @@ def default_reranker():
 
 def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     """``candidates`` in the order of the reranker's scores, each with ``rerank_score``; equal scores keep the order
-    given. One call of ``score``, with the ``text`` of every candidate. Without a reranker the candidates are returned
-    as given.
+    given. ``score`` is called with the ``text`` of the candidates in batches of at most ``MAX_REQUEST_TEXTS`` (16,
+    DEC-1067 (f): no request to any reranker carries more), in order, and the scores combined in that order; one
+    batch that scores nothing or fails leaves every candidate unscored. Without a reranker the candidates are
+    returned as given.
 
     A reranker that fails once loaded (W2-32 S4, W2-M104: it died, closed its pipe, answered garbage or the wrong
     number of scores) is reported, not raised: the candidates come back in the order given, with no score, and
@@ -222,12 +227,18 @@ def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     if reranker is not None:
         _note("given", None, None)
     try:
-        values = score(query, [candidate["text"] for candidate in candidates])
-        if values is None:
-            if reranker is not None:
-                _note("unavailable", None, "the reranker given scored nothing: the order given is kept")
-            return candidates
-        scores = [float(value) for value in values]
+        texts, scores = [candidate["text"] for candidate in candidates], []
+        for start in range(0, len(texts), MAX_REQUEST_TEXTS):
+            batch = texts[start:start + MAX_REQUEST_TEXTS]
+            values = score(query, batch)
+            if values is None:
+                if reranker is not None:
+                    _note("unavailable", None, "the reranker given scored nothing: the order given is kept")
+                return candidates
+            values = [float(value) for value in values]
+            if len(values) != len(batch):
+                raise ValueError(f"{len(values)} scores for {len(batch)} texts")
+            scores += values
         ranked = sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])
     except Exception as error:
         _note("unavailable", None, f"the reranker failed after loading ({type(error).__name__}: {error}): "

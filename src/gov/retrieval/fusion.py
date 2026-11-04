@@ -18,7 +18,12 @@ from gov.store import STORE_REL
 
 RRF_K = 60
 RERANK_TOP = 30  # the fused chunks that are reranked and returned: the first ones, as S0b2's R1 takes them (DEC-406)
-RERANK_CHARS = chunking.READ_CHARS  # the reranker reads a chunk's path and the whole chunk (W2-32 S7; was 500)
+# The reranker reads a chunk's path and the whole chunk up to this many characters (W2-32 S7, DEC-1067; was 500).
+# The shared service sets no length of its own (its tokenizer allows 131,072 tokens), so the model's context of
+# 32,768 tokens is the bound: 32,768 characters is about 8,800 tokens at 3.7 characters a token, well inside it.
+# Its memory is bounded by the request cap of 16 texts (``rerank.MAX_REQUEST_TEXTS``).
+RERANK_LIMIT_CHARS = chunking.READ_CHARS
+RERANK_CHARS = RERANK_LIMIT_CHARS
 _RECORD = "SELECT c.path, c.start_line, c.end_line, c.parent_id, f.text FROM lexical_chunk c " \
           "JOIN lexical_fts f ON f.rowid = c.id WHERE c.chunk_id = ?"
 

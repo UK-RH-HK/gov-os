@@ -16,9 +16,10 @@ DEC-381).
   measure. The vector is used only when that embedder reports the model loaded on the GPU after computing it and the
   two vectors are well-formed (one length above 0, every number finite); a vector computed on the CPU is
   ``EMBEDDER_ON_CPU``, never cached; otherwise the facet is unavailable and the question goes nowhere else.
-  The chunks go to the shared runner at ``OLLAMA_HOST``, with no runner option; a batch the runner reports
-  computing on the CPU (or on no device it names) is ``EMBEDDER_ON_CPU``: nothing of it is stored or cached, and the
-  stage is not reported built. No embedder is ever started here (``ollama.ensure_*`` check health only): one that
+  The chunks go to the shared runner at ``OLLAMA_HOST``, with no runner option; a batch the runner lists the model
+  for with ``size_vram`` 0 is ``EMBEDDER_ON_CPU``, and one whose device cannot be read after the waits of
+  ``RETRY_WAITS_S`` is ``EMBEDDER_DEVICE_UNREAD``: either way nothing of it is stored or cached, and the stage is not
+  reported built. No embedder is ever started here (``ollama.ensure_*`` check health only): one that
   does not answer is ``EMBEDDER_UNAVAILABLE``.
 - That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in
   it, keyed by the model, the revision the model list reports at the time of the search, the device that computed
@@ -48,6 +49,7 @@ import math
 import os
 import sqlite3
 import struct
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -67,7 +69,14 @@ EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
 DEVICES = ("gpu",)  # the one device a vector is used from (W2-32 S10, DEC-1065 (1)); the cache key names it
 ON_CPU = "EMBEDDER_ON_CPU"  # a vector computed on the CPU: refused, never cached or stored (W2-32 S10)
-EMBED_CHARS = chunking.READ_CHARS  # a chunk is embedded whole (W2-32 S7, DEC-1066 G1; was 512, DEC-406)
+DEVICE_UNREAD = "EMBEDDER_DEVICE_UNREAD"  # the device a batch was computed on could not be read: refused (S10)
+# A chunk is embedded whole up to this many characters (W2-32 S7, DEC-1066 G1, DEC-1067; was 512, DEC-406). The
+# shared embedder's context is 4,096 tokens and cuts a longer input silently (the CTO's measure, 2026-11-04: 3.7 to
+# 3.8 characters a token on the register, 24,000 characters read as 4,095 tokens). 10,000 characters is about 2,650
+# tokens there, and still fits text as dense as 2.5 characters a token. A chunk above it is embedded from its first
+# part and named in the refresh's ``cut`` and on standard error, never silently.
+EMBED_LIMIT_CHARS = 10_000
+EMBED_CHARS = EMBED_LIMIT_CHARS  # the cut the manifest records (W2-L065)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
 TIMEOUT_S = 120.0  # each try of a request (the first loads the model); unchanged by DEC-1026
@@ -98,6 +107,9 @@ QUERY_ON_CPU = f"{ON_CPU}: the query embedder computed the question's vector wit
                f"or cached (no CPU fallback, DEC-1065)"
 BUILD_ON_CPU = f"{ON_CPU}: the shared embedder computed the chunks' vectors with {MODEL} on the CPU: none is stored "\
                f"or cached, and the stage is not reported built (no CPU fallback, DEC-1065)"
+BUILD_DEVICE_UNREAD = f"{DEVICE_UNREAD}: the shared embedder's listing did not say on which device it computed the " \
+                      f"chunks' vectors with {MODEL}, after every try: none is stored or cached, and the stage is " \
+                      f"not reported built (the GPU is never assumed, DEC-1065)"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS semantic_vector (chunk_id TEXT PRIMARY KEY, embedding BLOB NOT NULL);
@@ -292,11 +304,11 @@ def _cache(path: Path, key: tuple, vector: bytes) -> None:
 def query_vector(root: Path, query: str, counts: dict | None = None,
                  expect: str | None = None) -> tuple[bytes | None, str | None]:
     """The vector a search compares with for ``query``, and why there is none: the one cached under its key for
-    either device, else the one the query embedder gives the question, sent right after the bare instruction in one
-    request, if the vectors are well-formed and that embedder then reports the model loaded, on any device (DEC-1033;
-    cached then, under that device). When the embedder gives no vector, malformed vectors or does not report the model
-    loaded, there is no vector and nothing is cached. Without a revision in the model list there is no key and nothing
-    is cached. The machine-wide cache is looked up first, and given the vector whenever the tree's cache is.
+    the GPU, else the one the query embedder gives the question, sent right after the bare instruction in one
+    request, if the vectors are well-formed and that embedder then reports the model loaded on the GPU (W2-32 S10,
+    DEC-1065; cached then, under that device). When the embedder gives no vector, malformed vectors, does not report
+    the model loaded, or computed it on the CPU (``EMBEDDER_ON_CPU``), there is no vector and nothing is cached.
+    Without a revision in the model list there is no key and nothing is cached. The machine-wide cache is looked up first, and given the vector whenever the tree's cache is.
 
     With ``expect`` (the revision the vectors were built with), a query embedder whose model list reports another
     revision, or none, gives no vector: ``MODEL_MISMATCH``, before any cache is read or anything is sent."""
@@ -378,7 +390,15 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
-def _build(root: Path, counts: dict, retries: list) -> str | None:
+def _over_limit(connection: sqlite3.Connection, wanted: list[str]) -> list[str]:
+    """The paths of the embedded chunks longer than ``EMBED_LIMIT_CHARS``, once each, in order."""
+    over = connection.execute(f"SELECT c.chunk_id, c.path FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
+                              f"WHERE length(f.text) > {EMBED_LIMIT_CHARS} ORDER BY c.path, c.start_line").fetchall()
+    keep = set(wanted)
+    return list(dict.fromkeys(path for chunk_id, path in over if chunk_id in keep))
+
+
+def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> str | None:
     """Bring the lexical index up to date, then embed the chunks that have no vector, each whole (up to
     ``EMBED_CHARS``, W2-32 S7), those the machine-wide cache holds taken from it (counted in ``counts``) and the rest
     embedded, recording timed-out requests in ``retries``; why it cannot be done, or None.
@@ -401,6 +421,12 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
                              f"{pin.revision}: nothing is embedded")
         connection.executescript(SCHEMA)
         wanted = _wanted(root, connection)
+        if cut is not None:  # the chunks above the embedder's limit, named (DEC-1067; review F-4)
+            over = _over_limit(connection, wanted)
+            cut.update(limit=EMBED_LIMIT_CHARS, count=len(over), paths=over)
+            if over:
+                print(f"semantic: {len(over)} file(s) hold a chunk over {EMBED_LIMIT_CHARS} characters, embedded "
+                      f"from its first {EMBED_LIMIT_CHARS}: {', '.join(over)}", file=sys.stderr, flush=True)
         with connection:
             built_by = connection.execute("SELECT embedder_model, embedder_revision FROM semantic_manifest").fetchone()
             if built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS:
@@ -426,10 +452,11 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
                         return _gave_up(gave_up.args[0])
                     if embedded is None:
                         return _say(NO_EMBEDDING)
-                    device = _device(None)  # W2-32 S10: read after the request, which loads the model
-                    if device not in DEVICES:  # on the CPU, or not reported: nothing of this batch is kept
-                        return Refused(ON_CPU, f"{_say(BUILD_ON_CPU)} (the shared embedder reports "
-                                               f"{device or 'no device'} for it)")
+                    device = _batch_device()  # W2-32 S10: read after the request, which loads the model
+                    if device is None:  # never assumed the GPU: nothing of this batch is kept (review F-2)
+                        return Refused(DEVICE_UNREAD, _say(BUILD_DEVICE_UNREAD))
+                    if device not in DEVICES:  # listed on the CPU (size_vram 0): nothing of this batch is kept
+                        return Refused(ON_CPU, _say(BUILD_ON_CPU))
                     machine.put([texts[i] for i in todo], embedded)
                     for i, vector in zip(todo, embedded):
                         vectors[i] = vector
@@ -437,6 +464,19 @@ def _build(root: Path, counts: dict, retries: list) -> str | None:
         return None
     finally:
         connection.close()
+
+
+def _batch_device() -> str | None:
+    """The device the shared embedder reports the model on, read after a chunk batch (W2-32 S10). A listing that
+    cannot be read, or lacks the model, is transient, as a failed request is (DEC-1026): read again after each wait
+    of ``RETRY_WAITS_S`` in turn. None after the last try; ``"cpu"`` only for the model listed with ``size_vram`` 0."""
+    device = _device(None)
+    for wait in RETRY_WAITS_S:
+        if device is not None:
+            break
+        time.sleep(wait)
+        device = _device(None)
+    return device
 
 
 def _gave_up(failures: list[str]) -> str:
@@ -528,8 +568,9 @@ def refresh(root: Path) -> dict:
     each chunk batch request that failed transiently at least once (timed out, a server error, a refused or reset
     connection): its tries, the waits taken and whether it embedded. Under another pin than the store's, every
     chunk is embedded again; an unpinned or mismatched pin embeds nothing (``error`` names which)."""
-    counts, retries = vector_cache.zero(), []
-    return _report(_build(Path(root), counts, retries), retries=retries, vector_cache=counts)
+    counts, retries, cut = vector_cache.zero(), [], {}
+    return _report(_build(Path(root), counts, retries, cut), retries=retries, vector_cache=counts,
+                   cut=cut or {"limit": EMBED_LIMIT_CHARS, "count": 0, "paths": []})
 
 
 @_pinned
@@ -538,8 +579,8 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 
     With ``refresh`` the vectors are brought up to date first. Without, the store is not written, and missing, empty
     or stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342). Either way, the
-    question is embedded by the query embedder alone (started if needed, on any device) and its vector is cached
-    beside the store once the vectors can be answered from (DEC-782, DEC-1033).
+    question is embedded by the query embedder alone (never started here, and used only from the GPU: W2-32 S10,
+    DEC-1065) and its vector is cached beside the store once the vectors can be answered from (DEC-782).
 
     Under the pin (W2-32 S2): an unpinned configuration, vectors built under another pin, or a query embedder that
     reports another revision than the vectors were built with give no hit, with ``error`` naming the refusal.

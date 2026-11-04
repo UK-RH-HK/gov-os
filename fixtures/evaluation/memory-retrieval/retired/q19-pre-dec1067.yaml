@@ -1,0 +1,19 @@
+# Lens B's Q19 (Table 2): "engineer.md 1–15; independent-test-designer.md 1–12; Charter 93–96 (MR-3)". My reading:
+# each states the answer (no: MR-3, the independent test designer writes them), alternatives of one entry.
+id: Q19
+category: policy
+commit: 23079f92a6fa
+question: May an engineer write acceptance tests?
+gold_answer: >-
+  No. By MR-3 the builder never writes its own acceptance tests: a separate, freshly spawned independent test designer
+  writes them from the KPIs before implementation, and the guard refuses an engineer tests/acceptance/**.
+sources:
+  - - path: docs/charter/CHARTER_v5.md
+      heading: "- **MR-3 Every task carries KPIs, and the builder never writes its own acceptance tests.** Each task states"
+      lines: [93, 96]
+    - path: template/governance/kernel/roles/engineer.md
+      heading: "- **Allowed paths:** the `allowed_paths` of its own `in_progress` ticket, plus `.gov-runtime/scratch/**` (DEC-108)."
+      lines: [8, 10]
+    - path: template/governance/kernel/roles/independent-test-designer.md
+      heading: "- **Allowed paths:** `tests/acceptance/**`, whatever the ticket's own `allowed_paths` name, while its ticket is"
+      lines: [8, 10]
