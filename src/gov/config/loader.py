@@ -42,6 +42,11 @@ LEXICAL_POLICIES = (INDEXED, NOT_INDEXED)
 # ``not indexed`` with ``embedding_policy: embedded`` is refused (the CTO, P2): the vectors are built from the keyword
 # index's chunks, so such a namespace would get no vectors while claiming them. The value semantic retrieval embeds.
 EMBEDDED = "embedded"
+# The rebuild's settings (``gov.rebuild.watch`` and ``seed`` read their own keys of it). ``embed_headers``: each chunk
+# embedded with its contextual header (DEC-1067 order (5)); ``true`` or ``false``, absent false (``embed_headers``).
+REBUILD_FILE = "rebuild.yaml"
+EMBED_HEADERS = "embed_headers"
+EMBED_HEADERS_VALUES = ("true", "false")
 
 _TYPE_NAMES = {dict: "map", list: "list", str: "string"}
 
@@ -288,6 +293,28 @@ def load_config(root: Path) -> dict:
         if document is not None:
             loaded[name] = document
     return loaded
+
+
+def embed_headers(root: Path) -> bool:
+    """Whether each chunk is embedded with its contextual header (DEC-1067 order (5), index-time method 1): the key
+    ``embed_headers`` of ``rebuild.yaml``, written ``true`` or ``false``. The file, the key or a file of comments
+    alone absent: false. Any other value (``yes``, ``on``, ``True``, a quoted ``"true"``, none) is CONFIG_INVALID
+    naming the key, never read as either; a file that is not a map is CONFIG_INVALID too. Reads no other key."""
+    rel = f"{PROJECT_DIR}/{REBUILD_FILE}"
+    path = Path(root) / rel
+    if not path.is_file():
+        return False
+    written = read_yaml(path, "CONFIG_INVALID", rel, plain=True)
+    if written is None:
+        return False
+    if not isinstance(written, dict):
+        raise _invalid(rel, None, "the top level must be a map")
+    if EMBED_HEADERS not in written:
+        return False
+    value = (read_yaml(path, "CONFIG_INVALID", rel) or {}).get(EMBED_HEADERS)
+    if written[EMBED_HEADERS] not in EMBED_HEADERS_VALUES or not isinstance(value, bool):
+        raise _invalid(rel, EMBED_HEADERS, f"must be true or false (absent: false), not {written[EMBED_HEADERS]!r}")
+    return value
 
 
 def secrets_scan_on(root: Path) -> bool:
