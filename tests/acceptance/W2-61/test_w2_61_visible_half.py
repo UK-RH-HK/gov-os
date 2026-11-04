@@ -11,8 +11,10 @@ Table 2's Command column, with its ``--ticket``, ``--id`` and ``--radius`` as ``
 [DEC-954 (Q9a), DEC-1009].
 ``q03.yaml`` is the owner's rewritten Q03 (2026-11-03: DEC-1033 replaced DEC-798, the rule lens B's Q03 asked for):
 Table 2's Q03 is matched by the retired original, kept unchanged in ``fixtures/evaluation/memory-retrieval/retired/
-q03-lens-b.yaml`` outside the visible half, and the rewritten question states DEC-1033's rule and repeats no Table 2
-query.
+q03-lens-b.yaml`` outside the visible half, and the rewritten question repeats no Table 2 query. Its label was
+checked blind after W2-32's merge (the owner's DEC-1067 (c) form, 2026-11-04): DEC-1065 (1) made the GPU the only
+device, so its sources state DEC-1065's rule, and the DEC-1033 label is kept unchanged in
+``retired/q03-pre-dec1067.yaml``.
 ``q09.yaml`` is re-labelled blind (the owner's DEC-1066 (4), 2026-11-03): its question and gold answer are lens B's,
 its sources now the Contract's statements of the packet's ceiling with the ticket's KPI lines as one alternative;
 Table 2's Q09 is matched by the retired original, kept unchanged in ``retired/q09-lens-b.yaml``.
@@ -45,6 +47,10 @@ LENS_B_NAMES = tuple(f"q{n:02d}.yaml" for n in range(1, 21))   # lens B's 20, by
 REWRITTEN = "q03.yaml"
 RETIRED = s.REAL_VISIBLE.parent / "retired" / "q03-lens-b.yaml"
 RETIRED_FROM = "8d09eb40"   # the commit that wrote lens B's Q03 into the visible half
+# The DEC-1067 (c) form's check of q03 after W2-32's merge: DEC-1065 (1) replaced DEC-1033's "any device", so q03.yaml
+# is re-labelled to DEC-1065's rule and the DEC-1033 label, as 68252f5c wrote it, is kept unchanged in retired/.
+RETIRED_Q03_DEC1033 = s.REAL_VISIBLE.parent / "retired" / "q03-pre-dec1067.yaml"
+RETIRED_Q03_DEC1033_FROM = "68252f5c"   # the commit that wrote q03's DEC-1033 label
 # The owner's Q09 re-label (DEC-1066 (4)): q09.yaml's sources re-set blind, lens B's label retired unchanged; 8d09eb40
 # wrote it too.
 RELABELLED = "q09.yaml"
@@ -174,43 +180,38 @@ def test_each_question_is_table_2_s_command_with_its_options():
         f"a visible file beyond lens B's 20, or the rewritten q03 or q16, repeats a Table 2 query: {copies}")
 
 
-def test_q03_is_rewritten_to_dec_1033_and_the_original_is_kept_unchanged():
-    """The owner's q03 decision of 2026-11-03: lens B's original Q03 is kept, byte for byte as W2-61 wrote it, in
-    ``retired/`` outside the visible half; the visible ``q03.yaml`` keeps the id Q03 and its sources state the rule
-    in force: each source span (the measure's rule: a heading found governs) holds DEC-1033 at HEAD, and none is
-    DEC-798's entry, the replaced decision."""
+def test_q03_is_relabelled_to_dec_1065_and_the_earlier_labels_are_kept_unchanged():
+    """The owner's q03 decision of 2026-11-03, then the DEC-1067 (c) form's check after W2-32's merge (2026-11-04):
+    lens B's original Q03 is kept, byte for byte as W2-61 wrote it, and the DEC-1033 label, byte for byte as
+    68252f5c wrote it, both in ``retired/`` outside the visible half; the visible ``q03.yaml`` keeps the id Q03 and
+    the DEC-1033 label's question, its gold answer is not that label's, and its sources state the rule in force:
+    each source span (the measure's rule: a heading found governs) holds DEC-1065 at HEAD, and none is DEC-798's
+    entry or DEC-1033's, whose "any device" DEC-1065 (1) replaced."""
     rel = (s.REAL_VISIBLE / REWRITTEN).relative_to(s.REPO_ROOT).as_posix()
-    done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{RETIRED_FROM}:{rel}"], capture_output=True,
-                          timeout=s.TIMEOUT_S)
-    assert done.returncode == 0, f"lens B's Q03 is not found at {RETIRED_FROM}"
-    assert RETIRED.is_file() and RETIRED.read_bytes() == done.stdout, (
-        f"{RETIRED.relative_to(s.REPO_ROOT)} is not lens B's Q03 as {RETIRED_FROM} wrote it")
-    assert RETIRED.parent != s.REAL_VISIBLE
-    data = _load(s.REAL_VISIBLE / REWRITTEN)
+    for retired, commit, label in ((RETIRED, RETIRED_FROM, "lens B's Q03"),
+                                   (RETIRED_Q03_DEC1033, RETIRED_Q03_DEC1033_FROM, "q03's DEC-1033 label")):
+        done = subprocess.run(["git", "-C", str(s.REPO_ROOT), "show", f"{commit}:{rel}"], capture_output=True,
+                              timeout=s.TIMEOUT_S)
+        assert done.returncode == 0, f"{label} is not found at {commit}"
+        assert retired.is_file() and retired.read_bytes() == done.stdout, (
+            f"{retired.relative_to(s.REPO_ROOT)} is not {label} as {commit} wrote it")
+        assert retired.parent != s.REAL_VISIBLE
+    data, earlier = _load(s.REAL_VISIBLE / REWRITTEN), _load(RETIRED_Q03_DEC1033)
     assert data.get("id") == "Q03", "the rewritten q03 does not keep the id Q03"
     assert data.get("question") != _load(RETIRED).get("question"), "q03 still asks lens B's question"
+    assert data.get("question") == earlier.get("question"), "q03 no longer asks the DEC-1033 label's question"
+    assert data.get("gold_answer") != earlier.get("gold_answer"), "q03 still gives the DEC-1033 label's answer"
     faults = []
     for source in _entries(data):
-        text = _at_head(source["path"])
-        if text is None:
+        span = _span_at_head(source)
+        if span is None:
             faults.append(f"{source['path']} is not a file at HEAD")
             continue
-        lines = text.splitlines()
-        heading, stated = source.get("heading"), source.get("lines")
-        at = next((i for i, line in enumerate(lines) if heading is not None and line.rstrip() == str(heading)), None)
-        if at is not None and str(heading).startswith("#"):
-            level = len(str(heading)) - len(str(heading).lstrip("#"))
-            end = next((j for j in range(at + 1, len(lines)) if lines[j].startswith("#")
-                        and len(lines[j]) - len(lines[j].lstrip("#")) <= level), len(lines))
-            span = lines[at:end]
-        elif at is not None:
-            span = lines[at:at + (stated[1] - stated[0] + 1 if stated else 1)]
-        else:
-            span = lines[stated[0] - 1:stated[1]] if stated else lines
-        if "DEC-1033" not in "\n".join(span):
-            faults.append(f"{source['path']}: its span does not hold DEC-1033")
-        if str(heading or "").startswith("### DEC-798 "):
-            faults.append(f"{source['path']}: DEC-798's entry, the replaced decision")
+        heading = str(source.get("heading") or "")
+        if "DEC-1065" not in "\n".join(span):
+            faults.append(f"{source['path']}: its span does not hold DEC-1065")
+        if heading.startswith("### DEC-798 ") or heading.startswith("### DEC-1033 "):
+            faults.append(f"{source['path']}: DEC-798's or DEC-1033's entry, a replaced rule")
     assert not faults, "\n".join(faults)
 
 
