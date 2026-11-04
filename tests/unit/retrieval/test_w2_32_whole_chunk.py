@@ -408,45 +408,66 @@ def test_the_first_direction_s_spans_are_span_records_of_the_same_form(repositor
 
 
 
-# --- DEC-1067 (f): the size bound on every request, beside the count -------------------------------------------------
+# --- DEC-1067 (f): the size bound on every request, beside the count: the padded size ---------------------------
+
+def _padded(query, texts):
+    """A request's size as the reranker pads it: its count times its longest pair."""
+    return len(texts) * max(len(query) + len(text) for text in texts)
+
 
 def _recorder(log):
     def score(query, texts):
-        log.append((len(texts), sum(len(query) + len(text) for text in texts)))
+        log.append((len(texts), _padded(query, texts)))
         return [float(len(text)) for text in texts]  # longer is better: the unbatched order is known
     return score
 
 
 @pytest.mark.parametrize("lengths", [[100] * 40, [9_000] * 5, [5_000, 20_000, 3_000, 23_000, 1_000],
-                                     [23_990, 23_990], [40_000], [1] * 3])
-def test_no_request_is_above_16_texts_or_24000_characters_and_the_order_is_the_unbatched_one(lengths):
+                                     [23_000] + [50] * 15, [23_990, 23_990], [40_000], [1] * 3,
+                                     [1_000, 7_000, 1_000, 7_000, 1_000, 7_000, 1_000]])
+def test_no_request_is_above_16_texts_or_24000_padded_characters_and_the_order_is_the_unbatched_one(lengths):
     from gov.retrieval import rerank
     query, log = "who fires the bowls", []
     given = [{"chunk_id": str(n), "text": "x" * length} for n, length in enumerate(lengths)]
     ranked = rerank.rerank(query, given, lambda: _recorder(log))
-    assert all(texts <= 16 and chars <= rerank.MAX_REQUEST_CHARS for texts, chars in log)
+    assert all(texts <= 16 and padded <= rerank.MAX_REQUEST_CHARS for texts, padded in log), log
     assert sum(texts for texts, _ in log) == len(lengths)
     room = rerank.MAX_REQUEST_CHARS - len(query)
     expected = sorted(range(len(lengths)), key=lambda n: -min(lengths[n], room))  # one request, as if unbatched
     assert [c["chunk_id"] for c in ranked] == [str(n) for n in expected]
 
 
-def test_a_pool_is_split_into_the_fewest_requests_meeting_both_bounds():
+def test_one_long_chunk_with_short_ones_is_never_a_padded_batch_of_16_longs():
+    """The trip of 05:37: one 23,000-character chunk with 15 short ones was a padded batch of 16 x 23,000."""
+    from gov.retrieval import rerank
+    query = "q"
+    groups = rerank.requests(query, ["x" * 23_000] + ["y" * 50] * 15)
+    assert [len(indices) for indices, _ in groups] == [1, 15]  # the long one alone, the 15 short ones together
+    assert all(_padded(query, texts) <= rerank.MAX_REQUEST_CHARS for _, texts in groups)
+
+
+def test_a_pool_is_split_into_the_fewest_requests_meeting_both_bounds_by_grouping_lengths():
     from gov.retrieval import rerank
     query = "q" * 10
-    pairs = lambda lengths: [(last - first, sum(len(query) + n for n in lengths[first:last]))  # noqa: E731
-                             for first, last, _ in rerank.requests(query, ["x" * n for n in lengths])]
-    assert pairs([100] * 40) == [(16, 1760), (16, 1760), (8, 880)]  # the count binds
-    assert pairs([9_000] * 5) == [(2, 18020), (2, 18020), (1, 9010)]  # the size binds
-    assert pairs([5_000, 20_000, 3_000]) == [(1, 5010), (2, 23020)]
-    assert pairs([]) == []
+
+    def shape(lengths):
+        groups = rerank.requests(query, ["x" * n for n in lengths])
+        return [(len(indices), _padded(query, texts)) for indices, texts in groups]
+
+    assert shape([100] * 40) == [(16, 1760), (16, 1760), (8, 880)]  # the count binds
+    assert shape([9_000] * 5) == [(2, 18020), (2, 18020), (1, 9010)]  # the padded size binds
+    # in the given order, pairs of 1,000 and 7,000 would make four requests; grouped by length, two
+    assert shape([1_000, 7_000, 1_000, 7_000, 1_000, 7_000, 1_000]) == [(3, 21030), (4, 4040)]
+    assert shape([]) == []
+    indices = [i for group, _ in rerank.requests(query, ["x" * n for n in [5, 9_000, 7, 9_000]]) for i in group]
+    assert sorted(indices) == [0, 1, 2, 3]  # every text in one request, once
 
 
 def test_one_chunk_above_the_budget_is_read_up_to_it():
     from gov.retrieval import rerank
     query = "who fires the bowls"
-    [(first, last, texts)] = rerank.requests(query, ["y" * 40_000])
-    assert (first, last) == (0, 1) and len(query) + len(texts[0]) == rerank.MAX_REQUEST_CHARS
+    [(indices, texts)] = rerank.requests(query, ["y" * 40_000])
+    assert indices == [0] and len(query) + len(texts[0]) == rerank.MAX_REQUEST_CHARS
 
 
 def test_the_shared_service_and_a_private_reranker_are_each_asked_within_both_bounds(tmp_path, monkeypatch):
@@ -459,20 +480,19 @@ def test_the_shared_service_and_a_private_reranker_are_each_asked_within_both_bo
     service, private = [], []
 
     def ask(interpreter, query, texts):
-        service.append(sum(len(query) + len(text) for text in texts))
+        service.append(_padded(query, texts))
         if len(service) > 1:
             raise TimeoutError("timed out")  # the second request falls back to the private reranker
         return [1.0] * len(texts), "cuda:0"
 
     @functools.lru_cache(maxsize=None)
     def started(interpreter):
-        return (lambda query, texts: private.append(sum(len(query) + len(t) for t in texts)) or [2.0] * len(texts)), \
-            "cuda:0", None
+        return (lambda query, texts: private.append(_padded(query, texts)) or [2.0] * len(texts)), "cuda:0", None
 
     monkeypatch.setattr(rerank, "_ask", ask)
     monkeypatch.setattr(rerank, "_started", started)
-    rerank.rerank("q", [{"chunk_id": str(n), "text": "z" * 9_000} for n in range(6)])
-    assert service and private and all(chars <= rerank.MAX_REQUEST_CHARS for chars in service + private)
+    rerank.rerank("q", [{"chunk_id": str(n), "text": "z" * (9_000 if n % 3 else 100)} for n in range(9)])
+    assert service and private and all(padded <= rerank.MAX_REQUEST_CHARS for padded in service + private)
 
 
 def test_the_fusion_reads_a_chunk_up_to_the_budget(monkeypatch):

@@ -38,10 +38,11 @@ START_S = 60.0  # the bound on a search's wait while the service starts and load
 # The most texts one request to a reranker carries (DEC-1067 (f)): requests of 100 whole chunks held the shared
 # reranker at 15.75 GB (PyTorch keeps its peak), so a larger pool goes in batches of at most this many.
 MAX_REQUEST_TEXTS = 16
-# And the most characters one request carries (the CTO's bound after the GPU backstop of 2026-11-04 03:53: 16 whole
-# chunks of up to 32,768 characters, about 140k tokens, took the shared reranker to 15.9 GB and into shared memory).
-# Counted as the service scores, by pair: each text with the question, ``len(query) + len(text)``; the model's own
-# fixed instruction (about 80 characters a pair) is not counted and sits in the margin.
+# And the most characters one request carries, padded (the CTO's bound after the GPU backstop of 2026-11-04 03:53 and
+# 05:37: the reranker pads every pair of a batch to the longest, so one 23,000-character chunk with 15 short ones is a
+# batch of 16 x 23,000). Counted as the service scores, by pair (each text with the question): a request's size is its
+# count times its longest pair, ``count * max(len(query) + len(text))``; the model's own fixed instruction (about 80
+# characters a pair) is not counted and sits in the margin.
 MAX_REQUEST_CHARS = 24_000
 _ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
           77: "the GPU has too little free memory for its share", 78: "no GPU is available to it"}
@@ -210,30 +211,31 @@ def default_reranker():
     return score
 
 
-def requests(query: str, texts: list[str]) -> list[tuple[int, int, list[str]]]:
-    """The fewest requests, in order, each of at most ``MAX_REQUEST_TEXTS`` texts and ``MAX_REQUEST_CHARS``
-    characters (``len(query) + len(text)`` a text): ``(first, last + 1, texts)``. A text whose pair alone is above
-    the budget is read up to it, as a chunk is read up to ``fusion.RERANK_LIMIT_CHARS``. Taken greedily in order,
-    which for a split into consecutive runs is the fewest."""
+def requests(query: str, texts: list[str]) -> list[tuple[list[int], list[str]]]:
+    """The fewest requests, each of at most ``MAX_REQUEST_TEXTS`` texts and of at most ``MAX_REQUEST_CHARS`` padded
+    characters (its count times its longest pair, ``len(query) + len(text)``): ``(indices, texts)``, the indices into
+    ``texts``. The texts are grouped longest first: each request takes the longest left and as many of the next
+    longest as fit, which is the fewest (a request's size is set by its longest text). A text whose pair alone is
+    above the budget is read up to it, as a chunk is read up to ``fusion.RERANK_LIMIT_CHARS``."""
     room = max(0, MAX_REQUEST_CHARS - len(query))
     sent = [text[:room] for text in texts]
-    out, start, size = [], 0, 0
-    for index, text in enumerate(sent):
-        pair = len(query) + len(text)
-        if index > start and (index - start >= MAX_REQUEST_TEXTS or size + pair > MAX_REQUEST_CHARS):
-            out.append((start, index, sent[start:index]))
-            start, size = index, 0
-        size += pair
-    if sent:
-        out.append((start, len(sent), sent[start:]))
+    order = sorted(range(len(sent)), key=lambda index: -len(sent[index]))  # longest first, ties in the order given
+    out, at = [], 0
+    while at < len(order):
+        longest = len(query) + len(sent[order[at]])
+        fits = max(1, min(MAX_REQUEST_TEXTS, MAX_REQUEST_CHARS // max(1, longest)))
+        group = sorted(order[at:at + fits])
+        out.append((group, [sent[index] for index in group]))
+        at += fits
     return out
 
 
 def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     """``candidates`` in the order of the reranker's scores, each with ``rerank_score``; equal scores keep the order
     given. ``score`` is called with the ``text`` of the candidates in requests of at most ``MAX_REQUEST_TEXTS`` (16,
-    DEC-1067 (f)) and at most ``MAX_REQUEST_CHARS`` characters (``requests``): no request to any reranker, the shared
-    service or a private one, carries more. The scores are combined in order, so the order is the unbatched one;
+    DEC-1067 (f)) and at most ``MAX_REQUEST_CHARS`` padded characters (``requests``): no request to any reranker,
+    the shared service or a private one, carries more. Each score goes back to its candidate, so the order is the
+    unbatched one;
     one request that scores nothing or fails leaves every candidate unscored. Without a reranker the candidates are
     returned as given.
 
@@ -252,8 +254,8 @@ def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     if reranker is not None:
         _note("given", None, None)
     try:
-        scores = []
-        for _, _, batch in requests(query, [candidate["text"] for candidate in candidates]):
+        scores: list = [None] * len(candidates)
+        for indices, batch in requests(query, [candidate["text"] for candidate in candidates]):
             values = score(query, batch)
             if values is None:
                 if reranker is not None:
@@ -262,7 +264,8 @@ def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
             values = [float(value) for value in values]
             if len(values) != len(batch):
                 raise ValueError(f"{len(values)} scores for {len(batch)} texts")
-            scores += values
+            for index, value in zip(indices, values):  # each score back in its place: the unbatched order
+                scores[index] = value
         ranked = sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])
     except Exception as error:
         _note("unavailable", None, f"the reranker failed after loading ({type(error).__name__}: {error}): "
