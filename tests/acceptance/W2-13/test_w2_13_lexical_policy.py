@@ -175,6 +175,47 @@ def test_the_path_map_validator_refuses_an_invalid_value(box, tmp_path, value):
 
 
 # --------------------------------------------------------------------------
+# a store built before the policy existed (the review's S6-F1)
+# --------------------------------------------------------------------------
+
+def test_a_store_built_before_the_policy_is_put_right_by_the_next_refresh(box, tmp_path):
+    """A file whose namespace says ``not indexed`` never enters the keyword index, whatever store the refresh starts
+    from. The hard case: the pre-S6 code (which does not know the field) built the store once with no
+    ``lexical_policy``, then once more after the path map was marked, so the store has already recorded the marked
+    path map's blob and holds the files as indexed. The path map's text is not changed after that. One ordinary
+    refresh by the code under test must keep the files out and name them."""
+    old = s6.pre_s6_src(tmp_path / "pre-s6")
+    root = s6.build_project(tmp_path / "repo", with_policy=False)
+    s6.pre_s6_rebuild(box, root, old)  # every file indexed, as before S6
+    s6.write_path_map(root, s6.planted_namespaces(True))  # the namespaces marked: not indexed, not embedded
+    support.commit(root, "the namespaces marked not indexed")
+    s6.pre_s6_rebuild(box, root, old)  # the code that does not know the field records the marked path map
+
+    stored = s6.stored_files(root)
+    path_map_blob = s6.blob_of(root, support.PATH_MAP_REL)
+    assert stored.get(support.PATH_MAP_REL, (None,))[0] == path_map_blob, \
+        f"premise: the pre-S6 store has not recorded the marked path map's blob: {stored.get(support.PATH_MAP_REL)}"
+    for kept_out in s6.KEPT_OUT:
+        assert stored.get(kept_out.path) == (s6.blob_of(root, kept_out.path), 1), \
+            f"premise: the pre-S6 store does not hold {kept_out.path} as indexed: {stored.get(kept_out.path)}"
+
+    report = s6.rebuild(box, root)  # one ordinary refresh by the code under test; the path map is as it was
+    assert s6.blob_of(root, support.PATH_MAP_REL) == path_map_blob, "premise: the path map changed"
+    found = {kept_out.path: s6.search_paths(box, root, kept_out.question) for kept_out in s6.KEPT_OUT}
+    still = {path: sorted(paths) for path, paths in found.items() if path in paths}
+    assert not still, \
+        f"after the refresh, the keyword route still finds files whose namespace says not indexed (the store was " \
+        f"built by the code before S6 with the marked path map): {still}"
+    for kept_in in s6.KEPT_IN:
+        assert kept_in.path in s6.search_paths(box, root, kept_in.question), \
+            f"after the refresh, the keyword route no longer finds the indexed file {kept_in.path}"
+    text = s6.report_text(root, report)
+    missing = [kept_out.path for kept_out in s6.KEPT_OUT if not s6.named(text, kept_out.path)]
+    assert not missing, f"the refresh's report does not name the files it kept out: {missing}\n" \
+                        f"report: {text[-2000:]}"
+
+
+# --------------------------------------------------------------------------
 # the vectors keep their embedding_policy
 # --------------------------------------------------------------------------
 

@@ -5,7 +5,7 @@ its card (`docs/plan/WAVE_2_WBS.md`, W2-13), its list rows and its sources (DEC-
 engineer and without reading the implementation (DEC-462, DEC-963). Other decisions used: DEC-260, DEC-342, DEC-343,
 DEC-396, DEC-414, DEC-372, DEC-732, DEC-911, DEC-956 item 2; AR-9; CAP-11.
 
-**98 cases from 49 test functions in nine files** (counted by collection), with three support modules
+**99 cases from 50 test functions in nine files** (counted by collection), with three support modules
 (`w2_13_support.py`, `w2_13_roles_support.py`, `w2_13_lexical_policy_support.py`) and a conftest. Seven of S1's and
 S2's cases were rewritten after implementation to read the lexical route's ranking from `ranked` (DEC-1000,
 P-W2-13-3 (b)): see "Rewrite after implementation". S5 (search respects role separation, DEC-1065 (2)) was added in
@@ -83,7 +83,7 @@ The test files are all `test_w2_13_<name>.py`.
 | S3 | Lexical search returns "unavailable" instead of raising [W2-M071]; retrieval latency within the retrieve budget on the dev tiers | `test_w2_13_unavailable.py::test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises`, `test_w2_13_unavailable.py::test_a_default_search_that_may_refresh_never_raises_on_an_unreadable_store`, `test_w2_13_unavailable.py::test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback`, `test_w2_13_unavailable.py::test_no_question_makes_a_search_raise`, `test_w2_13_unavailable.py::test_gov_retrieve_answers_any_question_without_a_traceback`, `test_w2_13_latency.py::test_the_ranked_lexical_route_answers_a_warm_question_within_the_budget`, `test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget` |
 | S4 | A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap (RETR-X-02) [AR-9, W2-M296, DEC-900] | `test_w2_13_stated_gap.py::test_premise_no_file_of_the_fixture_holds_the_missing_id`, `test_w2_13_stated_gap.py::test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap`, `test_w2_13_stated_gap.py::test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap`, `test_w2_13_stated_gap.py::test_a_question_naming_an_id_that_exists_is_answered_with_no_gap_for_it`, `test_w2_13_stated_gap.py::test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap` |
 | S5 | Search respects role separation: `gov retrieve`'s results (every route) and `gov context`'s supplementary block filtered by the caller's role_paths (GOV_ROLE or --role, and GOV_TICKET; the guard's path checks); an engineer never its own ticket's acceptance tests, a test designer never the ticket's new code; what is filtered named (how many, by which rule); no role_paths section, no filter [DEC-1065, DEC-1056, DEC-1063] | `test_w2_13_role_separation.py::test_engineer_retrieve_returns_none_of_its_own_tickets_acceptance_tests`, `test_w2_13_role_separation.py::test_engineer_context_supplementary_holds_none_of_its_own_tickets_acceptance_tests`, `test_w2_13_role_separation.py::test_engineer_retrieve_holds_back_its_tickets_cases_revised_in_another_folder`, `test_w2_13_role_separation.py::test_coordination_ticket_holds_back_its_own_folder_only`, `test_w2_13_role_separation.py::test_designer_retrieve_returns_none_of_the_tickets_new_code`, `test_w2_13_role_separation.py::test_designer_retrieve_keeps_the_shared_test_files`, `test_w2_13_role_separation.py::test_no_role_paths_section_means_no_filter` |
-| S6 | The keyword index honours the path map: a namespace whose `lexical_policy` is `not indexed` keeps its files out of the keyword index (absent: indexed, as today); the validator accepts the field with its two values; a file kept out is named in the rebuild's report; the evaluation set's own documents (lens B's report, `fixtures/evaluation/**`) are what D-7 marks so [DEC-1066, DEC-1052 M-4] | `test_w2_13_lexical_policy.py::test_a_namespace_not_indexed_keeps_its_files_out_of_the_keyword_index`, `test_w2_13_lexical_policy.py::test_no_term_of_the_keyword_index_spells_a_word_of_a_file_kept_out`, `test_w2_13_lexical_policy.py::test_gov_retrieve_cites_nothing_of_a_file_kept_out`, `test_w2_13_lexical_policy.py::test_the_rebuild_names_each_file_it_kept_out`, `test_w2_13_lexical_policy.py::test_a_namespace_with_no_lexical_policy_or_indexed_is_indexed_as_today`, `test_w2_13_lexical_policy.py::test_with_no_lexical_policy_anywhere_every_file_is_indexed_and_none_named`, `test_w2_13_lexical_policy.py::test_the_path_map_validator_accepts_both_values`, `test_w2_13_lexical_policy.py::test_the_path_map_validator_refuses_an_invalid_value`, `test_w2_13_lexical_policy.py::test_the_vectors_keep_their_embedding_policy`, `test_w2_13_lexical_policy.py::test_a_namespace_not_indexed_and_embedded_is_refused_naming_it`, `test_w2_13_lexical_policy.py::test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed` |
+| S6 | The keyword index honours the path map: a namespace whose `lexical_policy` is `not indexed` keeps its files out of the keyword index (absent: indexed, as today); the validator accepts the field with its two values; a file kept out is named in the rebuild's report; the evaluation set's own documents (lens B's report, `fixtures/evaluation/**`) are what D-7 marks so [DEC-1066, DEC-1052 M-4] | `test_w2_13_lexical_policy.py::test_a_namespace_not_indexed_keeps_its_files_out_of_the_keyword_index`, `test_w2_13_lexical_policy.py::test_no_term_of_the_keyword_index_spells_a_word_of_a_file_kept_out`, `test_w2_13_lexical_policy.py::test_gov_retrieve_cites_nothing_of_a_file_kept_out`, `test_w2_13_lexical_policy.py::test_the_rebuild_names_each_file_it_kept_out`, `test_w2_13_lexical_policy.py::test_a_namespace_with_no_lexical_policy_or_indexed_is_indexed_as_today`, `test_w2_13_lexical_policy.py::test_with_no_lexical_policy_anywhere_every_file_is_indexed_and_none_named`, `test_w2_13_lexical_policy.py::test_the_path_map_validator_accepts_both_values`, `test_w2_13_lexical_policy.py::test_the_path_map_validator_refuses_an_invalid_value`, `test_w2_13_lexical_policy.py::test_the_vectors_keep_their_embedding_policy`, `test_w2_13_lexical_policy.py::test_a_namespace_not_indexed_and_embedded_is_refused_naming_it`, `test_w2_13_lexical_policy.py::test_a_store_built_before_the_policy_is_put_right_by_the_next_refresh`, `test_w2_13_lexical_policy.py::test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed` |
 | F1 | RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason) | `test_w2_13_bundle_unchanged.py::test_the_bundle_keeps_its_form`, `test_w2_13_bundle_unchanged.py::test_a_child_hit_is_still_cited_as_its_parent_and_named_as_an_expansion`, `test_w2_13_bundle_unchanged.py::test_retr_a_04_cites_both_files_with_three_named_expansions_and_its_stopping_reason` |
 | F2 | The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed | `test_w2_13_secrets.py::test_no_row_or_term_of_the_store_holds_the_canary`, `test_w2_13_secrets.py::test_no_lexical_search_for_the_canary_or_its_words_finds_its_file`, `test_w2_13_secrets.py::test_gov_retrieve_cites_nothing_from_the_file_that_holds_the_canary`, `test_w2_13_secrets.py::test_a_second_rebuild_answered_from_the_secrets_cache_indexes_the_canary_no_more` |
 
@@ -279,7 +279,7 @@ confidence medium-high. No case depends on which file changes.
 
 Written in the DEC-1066 round (launched by the CTO, no lead) from the S6 line, DEC-1066 (3) and DEC-1052 M-4, and the
 integrated code's interfaces only (DEC-963: the path map's validator `gov.config.loader.load_config`, which every
-command runs first, and `gov.check.pathmap.check`); nothing of W2-13's S6 work was read. **30 cases from 11 functions**
+command runs first, and `gov.check.pathmap.check`); nothing of W2-13's S6 work was read. **31 cases from 12 functions**
 in `test_w2_13_lexical_policy.py`; the projects, the calls and the checks are in `w2_13_lexical_policy_support.py`.
 
 **The projects.** Planted from nothing and indexed by `gov rebuild --no-embeddings` (the record store and the keyword
@@ -370,6 +370,34 @@ by the same words. The other rows and cases are unchanged; nothing else is lower
 refuses. For `not indexed` the one-namespace project is now `not embedded` (the only combination P2 allows); the case
 still asserts the value is accepted and kept and that the rebuild runs. `[indexed]` and the invalid-value cases
 (none of whose values is `not indexed`) keep the namespace `embedded`. Expected on the engineer's head: 28 of 30, the
+two repository cases red (D-7).
+
+**Added from the review (S6-F1, the CTO): a store built before the policy existed is put right by the next refresh.**
+`test_a_store_built_before_the_policy_is_put_right_by_the_next_refresh`, from S6's line ("a namespace whose
+`lexical_policy` is `not indexed` keeps its files out of the keyword index"), without reading the engineer's code.
+The keyword index is incremental by blob: the integrated code judges every file again only when the path map's (or
+the rules') blob changes. The hard case is a store that has already recorded the *marked* path map's blob while still
+holding the files as indexed:
+
+1. The pre-S6 code is taken from this repository's history: `src/` of `68ce354a74c7` (`w2/integrate` at DEC-1066's
+   placing; its `src/gov` names no `lexical_policy`), extracted with `git archive` into the case's temporary folder.
+   The case fails, naming the commit, where the history does not hold it.
+2. The planted project with no `lexical_policy` anywhere is rebuilt by that code (`gov rebuild --json
+   --no-embeddings`): every file indexed.
+3. The two namespaces are marked `not indexed`, `not embedded` and committed; the pre-S6 code rebuilds again. Premise,
+   read from the store's `lexical_file(path, blob, indexed)` table (the pre-S6 code's documented schema, read-only):
+   the store holds the marked path map's blob, and each of the three kept-out files with its blob and `indexed = 1`.
+4. The path map's text is not changed again. One ordinary refresh by the code under test (`gov rebuild --json
+   --no-embeddings`): no keyword search for a kept-out file's words finds it, the indexed files are still found, and
+   the refresh's report names each kept-out file.
+
+**Red on the W2-13 head** (`0f448c06`, its `src/` extracted into a scratch folder and put on `PYTHONPATH`; run in the
+launch sandbox through the heavy slot): the premises hold, then "after the refresh, the keyword route still finds files
+whose namespace says not indexed …: {'evaluation/lens-report.md', 'evaluation/cases/q01.yaml', 'kept-out/notes.md'}"
+(the refresh sees the path map's blob unchanged and judges nothing again). The whole file on that head: **31 run, 3
+failed, 28 passed** — this case and the two repository cases; S6's fresh-store cases pass there, so what this case
+asks after the refresh is what the head already does on a store built from nothing. On today's integrated code
+(`fd22f3d0`): 31 run, 23 failed, 8 passed, this case red the same way. Expected on the engineer's fix: 29 of 31, the
 two repository cases red (D-7).
 
 ## Rewrite after implementation (DEC-1000, P-W2-13-3 (b))
