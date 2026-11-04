@@ -13226,6 +13226,46 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     - After the refactoring it becomes a kernel skill.
 - **Basis:** question 1 (memory: an agent follows what the repository states, and is not handed a superseded decision as current) and question 2 (a practice learned once is kept for every adoption).
 
+### DEC-1073 — The structure finished before the measurement set's single use; drift's definitions; M5 retested with the register links; waits and stops by process id only; link integrity as a Gov OS capability, as one package first
+- **Status:** ACCEPTED (owner, 2026-11-04 ~23:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1071, DEC-1072, L-0075, DEC-1052 · **Source:** `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md` (v456 and the halves' agreement), `docs/research/D4B-link-census.md` (`3d1c459e`)
+- **Decision:**
+  - **(1) The measurement set's single use is held until the structure is final.** D4B-STRUCTURE's steps 2 and 4 to 7 are measured first, each under DEC-1071's rule on the best structure so far:
+    - the reranker shown title and section;
+    - one place per identical text;
+    - the heading and answer-unit prototypes;
+    - the graph links.
+
+    If the halves still agree within 3 points after them, the 60 are used once on that final structure; if they drift apart, it goes to the owner first.
+  - **(2) Drift: the register is the authority.**
+    - The 110 decisions the archive calls spent while the register lists them as current go into a separate list for a status reconciliation. They are not counted as drift for now.
+    - A PROPOSED decision is not in force and does not count as current. Retrieval must show its status, so no agent takes it as a rule.
+  - **(3) M5** (one span per register entry) gets one more test, combined with the register links once they are built.
+  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper.
+  - **(5) Link integrity becomes a Gov OS capability,** for this repository and every adopted one. The census shows drift comes from links nobody is required to record and nothing checks. It has three parts:
+    - **(a) Clean up what is here:**
+      - the 215 drifting decisions, the 87 with no hint in their own entry first;
+      - tickets linked to the decisions they cite;
+      - commit trailers linked;
+      - the status conflicts.
+
+      The CTO proposes when. The owner's suggestion is right after the graph links are adopted, since they fix much of it automatically.
+    - **(b) A mechanism that spots it from now on:** one tool, cheap and incremental, used by the CTO now and by the Wave 3 orchestrator. It finds every unlinked or contradicted record across the whole repository and its memory, not only decisions:
+      - a decision changed without a mark on it;
+      - a ticket, commit, KPI, test, role, skill, lesson or plan line that cites an id it does not link, or an id that does not exist;
+      - a status that disagrees between two records;
+      - a PROPOSED record used as a rule.
+
+      Each finding names the role responsible and is fixed straight away. It must pass DEC-1052's basis: cheap, no new gates or ceremony.
+    - **(c) Prevention at the source:** every role that records decisions, tickets, commits or other records has, in its skill and brief, the template showing how to record each link (front-matter fields, trailers, Changes and Changed-by lines), so links are made when the record is written. These roles are the orchestrator, leads, product-spec, engineers, test designers and auditors. The owner's suggestion is D-5, with the templates per session kind.
+
+    **The wider look first:**
+    - every kind of record and link in the repository and in memory;
+    - which existing tickets must change (W2-88, W2-92, D-5's templates, and any others);
+    - which new tickets are needed, with their specs and KPIs, built in the normal flow (independent tests first).
+
+    It comes to the owner as one package, with the timing for (a), (b) and (c), before anything is built.
+- **Basis:** question 1 (memory: a link recorded when a record is written, and checked cheaply, keeps every agent on the current rule) and question 2 (a measurement used once must measure the final structure).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13235,3 +13275,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.454 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1070; DEC-1069 (12)-(13) amended. Next free id: DEC-1071. |
 | 0.455 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1071; DEC-1070 amended. Next free id: DEC-1072. |
 | 0.456 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1072. Next free id: DEC-1073. |
+| 0.457 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1073. Next free id: DEC-1074. |

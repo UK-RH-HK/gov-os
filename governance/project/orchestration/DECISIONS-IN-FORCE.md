@@ -156,3 +156,11 @@ other restart is an ACT.
   the evidence supports; a drift count (decisions retrievable as current though superseded or amended). **Memory-building
   is a Wave 0 practice** for every adopted repository, kept in its ticket as D-4b goes, a kernel skill after the
   refactoring.
+- DEC-1073 (2026-11-04): the measurement set is used once, **after the structure is final** (D4B-STRUCTURE steps 2 and
+  4-7 measured first), and only if the halves still agree within 3 points; otherwise to the owner. **Drift:** the
+  register is the authority. The archive's 110 "spent" decisions go to a separate status-reconciliation list. A
+  PROPOSED decision is not current, and retrieval must show its status. M5 is retested with the register links.
+  **Link integrity** (clean-up, a cheap incremental checker, link templates in every recording role's skill and brief)
+  comes to the owner as one package before anything is built. **Standing (L-0075):** every wait and every stop is by
+  process id or process group, never a name match, through `.gov-runtime/scratch/orchestrator/tools/proc.sh` (`wait
+  --max`, `stop --grace`, `pgid`).
