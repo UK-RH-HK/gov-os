@@ -1,10 +1,11 @@
-"""W2-61h's form tests: shared constants and readers (DAEO-h2k3; DEC-1055 (4), DEC-1052 G-3, DEC-820 (d)).
+"""W2-61h's form tests: shared constants and readers (DAEO-h2k3; DEC-1055 (4), DEC-1052 G-3, DEC-820 (d), DEC-1069).
 
-The 28 new memory questions: ``q21.yaml`` to ``q24.yaml`` in this tree's visible folder, and 24 in the hidden folder
-of the sets root outside every worktree, named by ``GOV_EVAL_SETS_ROOT`` (absent: every hidden case skips). The
-question form is ``src/gov/retrieval/measure.py``'s docstring: ``question``, ``gold_answer`` and ``sources``
-required; a source is a map with ``path`` and optionally ``heading``, ``lines: [first, last]`` and ``commit``, or a
-list of such maps (alternatives).
+The new memory questions: ``q21.yaml`` to ``q24.yaml`` in this tree's visible folder (the first 28's draw), and the
+hidden 40 (DEC-1069 (4): W2-61h's 24 and the operator's 16) in the hidden folder of the sets root outside every
+worktree, named by ``GOV_EVAL_SETS_ROOT`` (absent: every hidden case skips). The question form is
+``src/gov/retrieval/measure.py``'s docstring and loader: ``question``, ``gold_answer`` and ``sources`` required; a
+source is a map with ``path`` and optionally ``heading``, ``lines: [first, last]`` and ``commit``, or a list of such
+maps (alternatives). Comments (a ``# volatile:`` line, RUBRIC.md R11) are no part of the form.
 
 Nothing here prints a hidden question, answer, category or gold path: the readers return faults as short words, and
 the hidden cases name a file by its file name only (S5, DEC-820 (d)).
@@ -28,19 +29,30 @@ VISIBLE = REPO_ROOT / "fixtures/evaluation" / SET / "visible"
 HIDDEN_REL = f"fixtures/evaluation/{SET}/hidden"
 NEW_VISIBLE = ("q21.yaml", "q22.yaml", "q23.yaml", "q24.yaml")
 LENS_B = tuple(f"q{n:02d}.yaml" for n in range(1, 21))
-HIDDEN_COUNT = 24
+# The hidden half as DEC-1069 (4) sets it: W2-61h's 24 (h01-h24) and the operator's 16 (h25-h40).
+HIDDEN_COUNT = 40
 SETS_ROOT_VAR = "GOV_EVAL_SETS_ROOT"
 TICKET = "DAEO-h2k3"
 TIMEOUT_S = 60.0
 
-# S3's spread of the 28 new questions, by the category labels the writer's draw used (recorded in the README).
-# "A plan, ticket or path-map fact" takes any of its three labels.
+# S3's spread of the first 28 new questions, by the category labels the writer's draw used (recorded in the README).
+# "A plan, ticket or path-map fact" takes any of its three labels. It still judges q21-q24, the draw's visible share.
 SPREAD = {
     "decision": 5, "exact-string": 4, "callers": 4, "code-paraphrase": 3, "kernel-template": 3,
     "multi-file": 3, "history": 2, "failure-memory": 2, "plan-ticket-path-map": 1, "nonexistent-id": 1,
 }
 LABELS = {**{name: name for name in SPREAD if name != "plan-ticket-path-map"},
           "plan": "plan-ticket-path-map", "ticket": "plan-ticket-path-map", "path-map": "plan-ticket-path-map"}
+
+# DEC-1069 (5): S3's quotas amended to fit R5, for a 40-question half (RUBRIC.md, version 2, R5 item 6's table):
+# each `category` value and its "at least"; the twelve sum to 40, and the hidden half is judged by them in full.
+R5_QUOTAS = {
+    "decision": 6, "contract": 4, "plan": 4, "ticket": 4, "exact-string": 4, "callers": 4, "code-paraphrase": 3,
+    "kernel-template": 3, "multi-file": 3, "failure-memory": 3, "history": 1, "nonexistent-id": 1,
+}
+# The owner's accepted shortfall (DEC-1069; the operator's note on ACT-HNEW-1): the hidden 40 end one short in these
+# three categories. No other category may fall short, and none of these by more than one.
+R5_SHORT = {"decision": 1, "callers": 1, "code-paraphrase": 1}
 
 
 def real_home() -> Path:
@@ -79,8 +91,10 @@ def entries(data: dict):
     return out
 
 
-def form_faults(data) -> list[str]:
-    """The question form's faults, as fixed words only."""
+def form_faults(data, labels=LABELS, named: str = "S3's ten") -> list[str]:
+    """The question form's faults, as fixed words only. ``labels`` are the category values allowed (S3's ten for
+    q21-q24, R5's twelve for the hidden 40). Comments are no part of the form: a ``# volatile: ...`` line (R11) is
+    ignored, as the measure's YAML loader ignores it."""
     if data is None:
         return ["not a YAML map"]
     faults = []
@@ -90,11 +104,22 @@ def form_faults(data) -> list[str]:
         faults.append("no gold_answer")
     if entries(data) is None:
         faults.append("sources is not a non-empty list of maps with a path")
-    if "category" in data and data["category"] not in LABELS:
-        faults.append("a category outside S3's ten")
+    if "category" in data and data["category"] not in labels:
+        faults.append(f"a category outside {named}")
     if "category" not in data:
         faults.append("no category")
     return faults
+
+
+def commit_faults(data: dict) -> list[str]:
+    """The commits a question names (R10 item 2): its own ``commit``, or one on every source alternative (the
+    operator's form, ACT-HNEW-1); every commit named, the question's or a source's, a commit of this repository.
+    Fixed words only."""
+    alts = [a for alts in entries(data) or [] for a in alts]
+    if not (data.get("commit") or (alts and all(a.get("commit") for a in alts))):
+        return ["names no commit, neither its own nor one on every source"]
+    named = {str(c) for c in [data.get("commit"), *(a.get("commit") for a in alts)] if c}
+    return ["names a commit this repository does not hold"] if not all(commit_exists(c) for c in named) else []
 
 
 def cat_file(specs: list[str]) -> dict[str, bytes | None]:
@@ -199,8 +224,15 @@ def source_faults(data: dict, rev: str = "HEAD") -> list[tuple[int, str]]:
                 faults.append((n, "the question's commit does not hold the path"))
                 continue
             old_lines = old.decode("utf-8", "replace").splitlines()
-            if old_lines[span[0] - 1:span[1]] != lines[span[0] - 1:span[1]]:
-                faults.append((n, f"its cited lines at {rev} differ from the question's commit"))
+            block = old_lines[span[0] - 1:span[1]]
+            if block != lines[span[0] - 1:span[1]]:
+                # The measure reads the stated lines at the measured root and re-anchors nothing itself, so a block
+                # that moved is red too; it is told apart because repin_gold.py --write fixes it (DEC-1069 (6)).
+                width = len(block)
+                moved = sum(lines[i:i + width] == block for i in range(len(lines) - width + 1)) if width else 0
+                faults.append((n, f"its cited block moved unchanged to other lines at {rev} (a re-anchor: "
+                                  "repin_gold.py --write)" if moved == 1 else
+                                  f"its cited lines at {rev} differ from the question's commit"))
     return faults
 
 

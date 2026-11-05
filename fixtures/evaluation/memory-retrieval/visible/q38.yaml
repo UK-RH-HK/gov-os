@@ -1,0 +1,11 @@
+category: decision
+commit: cc9c94d42a54
+question: "Where in a commit message do the Task, Implements and Role trailers go, and how do I add them?"
+gold_answer: >-
+  In the final trailer block, added with git commit --trailer, because git reads trailers only from the last paragraph
+  of a message (DEC-182); checks that read trailers fall back to the message body only for commits made before
+  2026-10-03.
+sources:
+  - path: docs/DECISION_REGISTER.md
+    heading: "### DEC-182 — Commit trailers go in the final trailer block, with `git commit --trailer`"
+    lines: [1691, 1703]

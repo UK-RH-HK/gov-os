@@ -42,6 +42,11 @@ DEC-381).
   whole cut to ``EMBED_CHARS``; the keyword chunk, the evidence text and the reranker's input are unchanged. The
   store records the recipe (``HEADERS_KEY``), so switching the setting makes the store ``stale`` and the next build
   a full re-embed, as another cut does.
+- With ``file_level_index: true`` in ``rebuild.yaml`` (absent: false; DEC-1068 M1), each embedded file also gets one
+  vector, of its path, its headings and its opening (``_FileTexts``), in ``semantic_file_vector``; ``file_search``
+  is the file route ``retrieve`` fuses beside the others: the nearest files, each expanded to its best chunks. Off,
+  that table and its ``semantic_pin`` row do not exist. Switching it makes the store ``stale``, and the next build
+  makes or drops the file vectors alone; the chunk vectors are not touched.
 """
 
 from __future__ import annotations
@@ -62,7 +67,7 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.config import models
-from gov.config.loader import KNOWN_FILES, PROJECT_DIR, embed_headers, load_config
+from gov.config.loader import FILE_LEVEL_INDEX, KNOWN_FILES, PROJECT_DIR, embed_headers, index_flag, load_config
 from gov.retrieval import chunking, learning, lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
@@ -127,6 +132,18 @@ CUT_KEY = "embed_chars"  # the row of ``semantic_pin`` that records the cut the 
 # contextual header (``chunking.headers``; DEC-1067 order (5), ``embed_headers`` in ``rebuild.yaml``), ``false``
 # without. A store that records none was built without (every store before it), so it stays fresh with the setting off.
 HEADERS_KEY = "embed_headers"
+# DEC-1068 M1, a file-level index beside the chunk index (``file_level_index`` in ``rebuild.yaml``, absent: off): one
+# vector per embedded file, of ``_FileTexts``'s text, in a table of its own made only while the setting is on, and the
+# ``semantic_pin`` row ``FILE_KEY`` = ``true``. Off, neither exists, so the store is today's. A search's file route
+# takes the ``FILE_TOP`` nearest files and each one's ``FILE_CHUNKS`` nearest chunks (``file_search``).
+FILE_KEY = "file_level_index"
+FILE_FACET = "file"
+FILE_TOP = 10
+FILE_CHUNKS = 2
+OPENING_CHARS = chunking.MAX_CHARS  # the file's first characters in its vector's text, as much as one chunk holds
+FILE_OFF = f"{FILE_LEVEL_INDEX} is off in rebuild.yaml: no file route"
+_FILE_TABLE = "CREATE TABLE IF NOT EXISTS semantic_file_vector (path TEXT PRIMARY KEY, text_sha256 TEXT NOT NULL, " \
+              "embedding BLOB NOT NULL)"
 _MODEL = contextvars.ContextVar("semantic_model", default=None)  # the pinned model for this refresh or search
 
 
@@ -170,6 +187,63 @@ def _recipe(root: Path) -> tuple[bool | None, Refused | None]:
         return embed_headers(root), None
     except GovError as error:
         return None, Refused(error.code, error.message)
+
+
+def _file_setting(root: Path) -> tuple[bool | None, Refused | None]:
+    """Whether the file-level index is on at ``root`` (``rebuild.yaml``'s ``file_level_index``, DEC-1068 M1), or why
+    the setting cannot be read (``CONFIG_INVALID``, naming the key)."""
+    try:
+        return index_flag(root, FILE_LEVEL_INDEX), None
+    except GovError as error:
+        return None, Refused(error.code, error.message)
+
+
+def file_level_on(root: Path) -> bool:
+    """Whether a search asks the file route (DEC-1068 M1); raises CONFIG_INVALID for a setting that cannot be read."""
+    return index_flag(root, FILE_LEVEL_INDEX)
+
+
+def _recorded_files(connection: sqlite3.Connection) -> bool | None:
+    """Whether the store holds the file-level index (``FILE_KEY``): absent is off; None when it cannot say."""
+    try:
+        row = connection.execute("SELECT value FROM semantic_pin WHERE key = ?", (FILE_KEY,)).fetchone()
+    except sqlite3.Error:
+        return None
+    return False if row is None else {"true": True}.get(row[0])
+
+
+class _FileTexts:
+    """The text a file's vector is made from (DEC-1068 M1): ``[path: <path>]``, then ``[headings: <a> | <b> | ...]``
+    (each Markdown heading the chunker starts a section at, or each Python function it makes a parent, in the file's
+    order; the line left out when there is none), then the file's opening: its lines from the first, each once (the
+    chunks' overlap read once), up to ``OPENING_CHARS`` characters; the whole cut to ``EMBED_CHARS``."""
+
+    _PARENTS = "SELECT p.kind, p.start_line, f.text FROM lexical_parent p JOIN lexical_chunk c " \
+               "ON c.parent_id = p.parent_id AND c.start_line = p.start_line JOIN lexical_fts f ON f.rowid = c.id " \
+               "WHERE p.path = ? AND c.path = ? ORDER BY p.start_line"
+    _LINES = "SELECT c.start_line, f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id WHERE c.path = ? " \
+             "ORDER BY c.start_line, c.end_line"
+
+    def __init__(self, connection: sqlite3.Connection):
+        self.connection = connection
+
+    def __call__(self, path: str) -> str:
+        names = []
+        for kind, _, text in self.connection.execute(self._PARENTS, (path, path)):
+            line = (text.splitlines() or [""])[0]
+            if kind == "section" and (found := chunking._heading(line)):
+                names.append(found[1])
+            elif kind == "function" and (match := chunking._DEF.match(line)):
+                names.append(match.group(1))
+        opening, done = "", 0  # the last line read into the opening
+        for start, text in self.connection.execute(self._LINES, (path,)):
+            if len(opening) >= OPENING_CHARS:
+                break
+            for number, line in enumerate(text.splitlines(keepends=True), start):
+                if number > done:
+                    opening, done = opening + line, number
+        headings = f"[headings: {' | '.join(names)}]\n" if names else ""
+        return (chunking.header(path) + headings + opening[:OPENING_CHARS])[:EMBED_CHARS]
 
 
 def _recorded_headers(connection: sqlite3.Connection) -> bool | None:
@@ -475,8 +549,9 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
     lexical.refresh(root)
     pin, refused = _pin(root)
     headers, unread = _recipe(root)
-    if refused or unread:
-        return refused or unread  # nothing was sent to be embedded, the store's vectors left as they are
+    files_on, unread_files = _file_setting(root)
+    if refused or unread or unread_files:
+        return refused or unread or unread_files  # nothing was sent to be embedded, the store's vectors as they are
     connection = sqlite3.connect(root / STORE_REL)
     try:
         reason = _ready(connection)
@@ -497,8 +572,8 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
                       f"from its first {EMBED_LIMIT_CHARS}: {', '.join(over)}", file=sys.stderr, flush=True)
         with connection:
             built_by = connection.execute("SELECT embedder_model, embedder_revision FROM semantic_manifest").fetchone()
-            if built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS \
-                    or _recorded_headers(connection) is not headers:
+            other_pin = built_by != (pin.model, revision) or _cut(connection) != EMBED_CHARS
+            if other_pin or _recorded_headers(connection) is not headers:
                 connection.execute("DELETE FROM semantic_vector")  # another pin, cut or recipe: a full re-embed
             connection.execute("DELETE FROM semantic_manifest")
             connection.execute("INSERT INTO semantic_manifest VALUES (?, ?, ?, ?)",
@@ -513,28 +588,70 @@ def _build(root: Path, counts: dict, retries: list, cut: dict | None = None) -> 
             machine = vector_cache.Cache(pin.model, revision, counts)
             for start in range(0, len(missing), BATCH):
                 batch = missing[start:start + BATCH]
-                texts = [text_of(chunk_id) for chunk_id in batch]
-                vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
-                todo = [i for i, vector in enumerate(vectors) if vector is None]
-                if todo:
-                    try:
-                        embedded = _embed([texts[i] for i in todo], retries=retries)
-                    except GaveUp as gave_up:  # the vectors made so far stay; the store is not reported built
-                        return _gave_up(gave_up.args[0])
-                    if embedded is None:
-                        return _say(NO_EMBEDDING)
-                    device = _batch_device()  # W2-32 S10: read after the request, which loads the model
-                    if device is None:  # never assumed the GPU: nothing of this batch is kept (review F-2)
-                        return Refused(DEVICE_UNREAD, _say(BUILD_DEVICE_UNREAD))
-                    if device not in DEVICES:  # listed on the CPU (size_vram 0): nothing of this batch is kept
-                        return Refused(ON_CPU, _say(BUILD_ON_CPU))
-                    machine.put([texts[i] for i in todo], embedded)
-                    for i, vector in zip(todo, embedded):
-                        vectors[i] = vector
+                vectors, failed = _embedded([text_of(chunk_id) for chunk_id in batch], machine, retries)
+                if failed:
+                    return failed
                 connection.executemany("INSERT INTO semantic_vector VALUES (?, ?)", zip(batch, vectors))
-        return None
+            return _build_files(connection, wanted, files_on, other_pin, machine, retries)
     finally:
         connection.close()
+
+
+def _embedded(texts: list[str], machine, retries: list) -> tuple[list[bytes] | None, str | None]:
+    """A vector for each text, those the machine-wide cache holds taken from it and the rest embedded on the GPU (W2-32
+    S10), or why none is kept (the request gave up or gave nothing, or the device was the CPU or could not be read)."""
+    vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
+    todo = [i for i, vector in enumerate(vectors) if vector is None]
+    if todo:
+        try:
+            embedded = _embed([texts[i] for i in todo], retries=retries)
+        except GaveUp as gave_up:  # the vectors made so far stay; the store is not reported built
+            return None, _gave_up(gave_up.args[0])
+        if embedded is None:
+            return None, _say(NO_EMBEDDING)
+        device = _batch_device()  # W2-32 S10: read after the request, which loads the model
+        if device is None:  # never assumed the GPU: nothing of this batch is kept (review F-2)
+            return None, Refused(DEVICE_UNREAD, _say(BUILD_DEVICE_UNREAD))
+        if device not in DEVICES:  # listed on the CPU (size_vram 0): nothing of this batch is kept
+            return None, Refused(ON_CPU, _say(BUILD_ON_CPU))
+        machine.put([texts[i] for i in todo], embedded)
+        for i, vector in zip(todo, embedded):
+            vectors[i] = vector
+    return vectors, None
+
+
+def _build_files(connection: sqlite3.Connection, wanted: list[str], on: bool, other_pin: bool, machine,
+                 retries: list) -> str | None:
+    """The file-level index brought to the setting (DEC-1068 M1). Off: its table and its ``semantic_pin`` row
+    dropped, so the store is today's. On: one vector per file of the embedded chunks, of ``_FileTexts``'s text; a
+    file whose text changed, or every file under another pin or cut, embedded again, and a file no longer embedded
+    dropped. The chunk vectors are never touched here, so switching the setting rebuilds the file vectors alone."""
+    if not on:
+        connection.execute("DROP TABLE IF EXISTS semantic_file_vector")
+        connection.execute("DELETE FROM semantic_pin WHERE key = ?", (FILE_KEY,))
+        return None
+    connection.execute(_FILE_TABLE)
+    if other_pin:
+        connection.execute("DELETE FROM semantic_file_vector")
+    keep = set(wanted)
+    paths = list(dict.fromkeys(path for chunk_id, path in connection.execute(
+        "SELECT chunk_id, path FROM lexical_chunk ORDER BY path, start_line") if chunk_id in keep))
+    file_text = _FileTexts(connection)
+    texts = {path: file_text(path) for path in paths}
+    digests = {path: hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest() for path, text in texts.items()}
+    have = dict(connection.execute("SELECT path, text_sha256 FROM semantic_file_vector"))
+    connection.executemany("DELETE FROM semantic_file_vector WHERE path = ?",
+                           [(path,) for path, digest in have.items() if digests.get(path) != digest])
+    connection.execute("INSERT OR REPLACE INTO semantic_pin VALUES (?, ?)", (FILE_KEY, "true"))
+    missing = [path for path in paths if have.get(path) != digests[path]]
+    for start in range(0, len(missing), BATCH):
+        batch = missing[start:start + BATCH]
+        vectors, failed = _embedded([texts[path] for path in batch], machine, retries)
+        if failed:
+            return failed
+        connection.executemany("INSERT INTO semantic_file_vector VALUES (?, ?, ?)",
+                               [(path, digests[path], vector) for path, vector in zip(batch, vectors)])
+    return None
 
 
 def _batch_device() -> str | None:
@@ -602,8 +719,9 @@ def _vectors(root: Path) -> str | None:
     refused by name (``CONFIG_INVALID``)."""
     pin, refused = _pin(root)
     headers, unread = _recipe(root)
-    if refused or unread:
-        return refused or unread
+    files_on, unread_files = _file_setting(root)
+    if refused or unread or unread_files:
+        return refused or unread or unread_files
     connection = _open(root)
     if connection is None:
         return "missing"
@@ -620,9 +738,29 @@ def _vectors(root: Path) -> str | None:
             return "stale"
         if _recorded_headers(connection) is not headers:  # the setting switched since the vectors were made
             return "stale"
-        return "stale" if have != set(_wanted(root, connection)) else None if have else "empty"
+        if _recorded_files(connection) is not files_on:  # DEC-1068 M1: the file index built otherwise than set
+            return "stale"
+        wanted = _wanted(root, connection)
+        if files_on and _file_paths(connection) != set(_paths_of(connection, wanted)):
+            return "stale"  # a file of the embedded chunks without its vector, or one no longer embedded
+        return "stale" if have != set(wanted) else None if have else "empty"
     finally:
         connection.close()
+
+
+def _file_paths(connection: sqlite3.Connection) -> set[str] | None:
+    """The files the file-level index holds a vector of; None when it has no table."""
+    try:
+        return {path for (path,) in connection.execute("SELECT path FROM semantic_file_vector")}
+    except sqlite3.Error:
+        return None
+
+
+def _paths_of(connection: sqlite3.Connection, chunk_ids: list[str]) -> list[str]:
+    """The files of ``chunk_ids``, once each."""
+    keep = set(chunk_ids)
+    return list(dict.fromkeys(path for chunk_id, path in connection.execute("SELECT chunk_id, path FROM lexical_chunk")
+                              if chunk_id in keep))
 
 
 def _pinned(work):
@@ -681,6 +819,45 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
         connection.close()
 
 
+_NEAREST_FILES = "SELECT path, vec_distance_cosine(embedding, ?) AS distance FROM semantic_file_vector " \
+                 "ORDER BY distance, path LIMIT ?"
+_BEST_OF_FILE = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, " \
+                "vec_distance_cosine(v.embedding, ?) AS distance FROM semantic_vector v " \
+                "JOIN lexical_chunk c ON c.chunk_id = v.chunk_id WHERE c.path = ? ORDER BY distance, c.chunk_id LIMIT ?"
+
+
+@_pinned
+def file_search(root: Path, query: str, refresh: bool = False) -> dict:
+    """The file route (DEC-1068 M1): the ``FILE_TOP`` files whose file vectors are nearest the question, each
+    expanded to its ``FILE_CHUNKS`` chunks nearest the question by their own vectors; ``hits`` are those chunks as
+    the chunk records ``search`` gives (with ``file_distance`` beside the chunk's ``distance``), file by file, nearest
+    first. Unavailable, with the reason and no hit, when the setting is off (``FILE_OFF``), the vectors cannot be
+    answered from as they stand (as ``search``: missing, empty, stale or refused) or no question vector can be had.
+    Reads only: ``refresh`` is accepted for the routes' call and never builds anything."""
+    root, counts = Path(root), vector_cache.zero()
+    on, unread = _file_setting(root)
+    reason = unread or (None if on else FILE_OFF) or _status(root)
+    if reason:
+        return _report(reason, hits=[], vector_cache=counts)
+    connection = _open(root)
+    try:
+        reason = _ready(connection, ollama.ensure_query_available)
+        built_at = None if reason else _built_at(connection)
+        if not reason and built_at is None:
+            reason = "missing"
+        vector, reason = (None, reason) if reason else query_vector(root, query, counts, expect=built_at)
+        if vector is None:
+            return _report(reason, hits=[], vector_cache=counts)
+        keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
+        hits = []
+        for path, file_distance in connection.execute(_NEAREST_FILES, (vector, FILE_TOP)).fetchall():
+            hits += [{**dict(zip(keys, row)), "file_distance": file_distance}
+                     for row in connection.execute(_BEST_OF_FILE, (vector, path, FILE_CHUNKS))]
+        return _report(None, hits=hits, vector_cache=counts)
+    finally:
+        connection.close()
+
+
 @_pinned
 def distances(root: Path, query: str, chunk_ids: list[str]) -> dict[str, float] | None:
     """Each chunk's cosine distance from its stored vector to the question's (W2-32 S8: the code route ranked); a
@@ -730,8 +907,9 @@ def manifest(root: Path) -> dict | None:
         return None
     try:
         row = connection.execute("SELECT * FROM semantic_manifest").fetchone()
-        cut, headers = _cut(connection), _recorded_headers(connection)
+        cut, headers, files = _cut(connection), _recorded_headers(connection), _recorded_files(connection)
     finally:
         connection.close()
     return row and {"embedder": {"model": row[0], "revision": row[1]},
-                    "reranker": {"model": row[2], "revision": row[3]}, CUT_KEY: cut, HEADERS_KEY: headers}
+                    "reranker": {"model": row[2], "revision": row[3]}, CUT_KEY: cut, HEADERS_KEY: headers,
+                    FILE_KEY: files}

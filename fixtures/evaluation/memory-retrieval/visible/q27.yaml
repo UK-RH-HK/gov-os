@@ -1,0 +1,15 @@
+category: plan
+commit: cc9c94d42a54
+question: "Is W2-41's close and escalation integrity work in Wave 2, and if not, why not?"
+gold_answer: >-
+  No, it is Wave 3. The plan's card: by DEC-953 and DEC-954 gov close is not a gate in this repository, so its high
+  rows go to Wave 3's hardening, and W2-81's proof shows whether any of them bites. The revised plan had moved it
+  already (§8): its high rows (W2-H022, H024, H025, H033) guard against task-less configuration edits, forged
+  escalation lifts and resets, deliberate constructions under DEC-801; W2-H023 rides in W2-57 if ordinary.
+sources:
+  - path: docs/plan/WAVE_2_WBS.md
+    heading: "- **Wave 3 (DEC-953, DEC-954).** `gov close` is not a gate here. Its high rows go to Wave 3's hardening; W2-81's proof shows whether any of them bites."
+    lines: [995, 995]
+  - path: docs/plan/WAVE_2_REVISED_PLAN.md
+    heading: "| W2-41 Close and escalation integrity | — | 23 | Its high rows (W2-H022, H024, H025, H033) guard against task-less configuration edits, forged escalation lifts and resets: deliberate constructions under DEC-801. W2-H023 rides in W2-57 if ordinary |"
+    lines: [462, 462]

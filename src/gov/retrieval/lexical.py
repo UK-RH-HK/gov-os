@@ -54,7 +54,8 @@ import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.config.loader import (LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, SECRETS_FILE, read_yaml,
+from gov.config.loader import (CODE_BY_DEFINITION, INDEX_FLAGS, LEXICAL_POLICY, NOT_INDEXED, PROJECT_DIR, REBUILD_FILE,
+                               REGISTER_BY_ENTRY, SECRETS_FILE, SPLIT_IDENTIFIERS, index_recipe, read_yaml,
                                validate_lexical_policy)
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
@@ -70,6 +71,11 @@ FIELD_SEP, ROW_SEP = "\x1f", "\x1e"
 KEPT_OUT = 2  # ``lexical_file.indexed`` of a file the path map's lexical_policy keeps out (0: the filter refused it)
 COLUMNS = ("text", "ident", "title")
 WEIGHTS = (1.0, 10.0, 4.0)  # bm25's weight of each of COLUMNS: body, id, title
+# DEC-1068's M4 (``lexical_split_identifiers``): a fourth column, ``parts``, the pieces of the chunk's identifiers that
+# the tokenizer keeps whole (``identifier_parts``), weighted as the body; absent when M4 is off (today's index).
+SPLIT_COLUMNS, SPLIT_WEIGHTS = (*COLUMNS, "parts"), (*WEIGHTS, 1.0)
+_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:[./-][A-Za-z0-9_]+)*")
+_CAMEL = re.compile(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|[0-9]+")
 TOP_K = 30  # the chunks the words add to the ranked list, as many as the semantic route returns
 MAX_TERMS = 32  # the question's words and ids asked of the index, at most
 # An id: capitals and digits, then one or more '-' parts, with a digit somewhere (DEC-900, W2-13, RETR-X-02, W2-M071).
@@ -91,6 +97,7 @@ CREATE INDEX IF NOT EXISTS lexical_chunk_by_path ON lexical_chunk (path);
 CREATE INDEX IF NOT EXISTS lexical_parent_by_path ON lexical_parent (path);
 CREATE VIRTUAL TABLE IF NOT EXISTS lexical_fts USING fts5({", ".join(COLUMNS)}, tokenize = "{TOKENIZE}");
 """
+_SPLIT_SCHEMA = SCHEMA.replace(f"fts5({', '.join(COLUMNS)},", f"fts5({', '.join(SPLIT_COLUMNS)},")
 _OLD = "DROP TABLE IF EXISTS lexical_fts; DROP TABLE IF EXISTS lexical_chunk; DROP TABLE IF EXISTS lexical_parent; " \
        "DROP TABLE IF EXISTS lexical_file;"
 # The chunks that match, best first by bm25 with the column weights; ``{}`` adds the text, or a limit.
@@ -98,6 +105,8 @@ _RANKED = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.r
           f"FROM lexical_fts WHERE lexical_fts MATCH ? AND rank MATCH 'bm25({', '.join(map(str, WEIGHTS))})' " \
           "ORDER BY rank{}) f JOIN lexical_chunk c ON c.id = f.rowid ORDER BY f.rank, c.path, c.start_line"
 _RANKED_TEXT, _RANKED_TOP = _RANKED.format(", f.text", ""), _RANKED.format("", " LIMIT ?")
+_SPLIT_RANKED = _RANKED.replace(f"bm25({', '.join(map(str, WEIGHTS))})", f"bm25({', '.join(map(str, SPLIT_WEIGHTS))})")
+_SPLIT_TEXT, _SPLIT_TOP = _SPLIT_RANKED.format(", f.text", ""), _SPLIT_RANKED.format("", " LIMIT ?")
 _CHUNKS = "SELECT chunk_id, path, start_line, end_line, parent_id FROM lexical_chunk"
 _DIGESTED = (
     "SELECT path, blob, indexed FROM lexical_file ORDER BY path",
@@ -105,6 +114,11 @@ _DIGESTED = (
     "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.text FROM lexical_chunk c "
     "JOIN lexical_fts f ON f.rowid = c.id ORDER BY c.chunk_id",
 )
+# DEC-1068's index-time methods that are on, as the index was built with them (W2-32): a row a method, none when all
+# are off, and then no table at all, so an index with every method off is today's. Any difference from
+# ``rebuild.yaml``'s makes the index stale; a refresh re-chunks the files the switched methods change (``_affected``).
+RECIPE = "lexical_recipe"
+_RECIPE_SCHEMA = f"CREATE TABLE IF NOT EXISTS {RECIPE} (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
 RACY_NS = 10_000_000  # a file changed this recently (a coarse clock's tick) may not yet tell a later write apart
 _FRESHNESS: dict = {}  # resolved root -> (key, answer): the freshness worked out last in this process (W2-108)
 _LISTED: dict = {}  # resolved root -> ((head, index stamp), ``ls-files -z``): the tracked paths listed last (W2-108)
@@ -205,9 +219,28 @@ def _fields(rel: str, text: str, parent_rows: list) -> dict[str, tuple[str, str]
     return fields
 
 
+def _columns(connection: sqlite3.Connection) -> tuple:
+    return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)"))
+
+
 def _current(connection: sqlite3.Connection) -> bool:
-    """Whether the store's ``lexical_fts`` has the columns of this code (W2-13)."""
-    return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)")) == COLUMNS
+    """Whether the store's ``lexical_fts`` has the columns of this code (W2-13), with M4's ``parts`` or without."""
+    return _columns(connection) in (COLUMNS, SPLIT_COLUMNS)
+
+
+def identifier_parts(text: str) -> str:
+    """The pieces of each identifier of ``text`` that the tokenizer keeps whole (DEC-1068's M4): a token with ``_``
+    (a token character) or a camelCase change is split on ``_ . / -`` and on case changes; each piece once, in order.
+    Dotted and path tokens are split by the tokenizer already; the original stays in ``text``."""
+    pieces: dict[str, None] = {}
+    for token in _IDENTIFIER.findall(text):
+        if "_" not in token and not re.search(r"[a-z][A-Z]|[A-Z]{2}[a-z]", token):
+            continue
+        for part in re.split(r"[_./-]+", token):
+            for piece in _CAMEL.findall(part):
+                if piece.lower() != token.lower():
+                    pieces.setdefault(piece.lower(), None)
+    return " ".join(pieces)
 
 
 def _open(root: Path) -> sqlite3.Connection | None:
@@ -226,9 +259,48 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
+def _recipe_now(root: Path) -> dict[str, str]:
+    """The methods ``rebuild.yaml`` switches on (``index_recipe``), as the store records them."""
+    return {key: "true" for key, on in index_recipe(root).items() if on}
+
+
+def _recipe_of(connection: sqlite3.Connection) -> dict[str, str]:
+    """The methods the index was built with: none for an index without the table (every one off, or before them)."""
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE name = ?", (RECIPE,)).fetchone() is None:
+        return {}
+    return dict(connection.execute(f"SELECT key, value FROM {RECIPE}"))
+
+
+def _register(root: Path) -> str | None:
+    """The decision register the path map names (``decision_register``), read without the record store."""
+    try:
+        named = read_yaml(Path(root) / PROJECT_DIR / "path-map.yaml", "CONFIG_INVALID", f"{PROJECT_DIR}/path-map.yaml")
+    except (GovError, OSError):
+        return None
+    value = named.get("decision_register") if isinstance(named, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def _affected(keys, paths, register: str | None = None) -> set[str]:
+    """The paths whose chunks or index terms a switch of ``keys`` changes."""
+    out: set[str] = set()
+    for key in keys:
+        if key == CODE_BY_DEFINITION:
+            out |= {rel for rel in paths if rel.endswith(".py")}
+        elif key == REGISTER_BY_ENTRY and register is not None:
+            out |= {rel for rel in paths if rel == register}
+        elif key == SPLIT_IDENTIFIERS:  # every row's terms change: the whole index
+            out |= set(paths)
+    return out
+
+
 def _digest(connection: sqlite3.Connection) -> str:
-    """sha256 of the index's logical content: its files, parents and chunks with their text, in sorted order."""
+    """sha256 of the index's logical content: its files, parents and chunks with their text, in sorted order, and
+    the methods it was built with when one is on (none on: today's digest)."""
     digest = hashlib.sha256()
+    recipe = sorted(_recipe_of(connection).items())
+    if recipe:
+        digest.update(FIELD_SEP.join(f"{key}={value}" for key, value in recipe).encode() + ROW_SEP.encode())
     for query in _DIGESTED:
         for row in connection.execute(query):
             digest.update(FIELD_SEP.join(str(value) for value in row).encode("utf-8", "replace"))
@@ -256,15 +328,21 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL)
     try:
+        recipe = _recipe_now(root)
+        split = bool(recipe.get(SPLIT_IDENTIFIERS))
         if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_fts'").fetchone() \
-                and not _current(connection):
-            connection.executescript(_OLD)  # an index of the code before W2-13: built again from nothing
-        connection.executescript(SCHEMA)
+                and _columns(connection) != (SPLIT_COLUMNS if split else COLUMNS):
+            connection.executescript(_OLD)  # before W2-13, or of the other M4 form: built again from nothing
+        connection.executescript(_SPLIT_SCHEMA if split else SCHEMA)
+        built = _recipe_of(connection)
+        switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
+        register = _register(root)
+        rechunk = _affected(switched, [rel for rel, (_, indexed) in stored.items() if indexed == 1], register)
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
         policy = kept_out(root, list(current)) if current else {}
         asked = [rel for rel in current if judge_all or stored.get(rel, (None,))[0] != current[rel]
-                 or (rel in policy) != (stored[rel][1] == KEPT_OUT)]
+                 or (rel in policy) != (stored[rel][1] == KEPT_OUT) or rel in rechunk]
         kept = {rel: policy[rel] for rel in asked if rel in policy}  # before the filter: neither scanned nor read
         judged = [rel for rel in asked if rel not in kept]
         allowed = set(indexable(root, judged)) if judged else set()
@@ -274,22 +352,33 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str], dict[str, str]]:
                 _drop(connection, rel)
             for rel in asked:
                 state = (current[rel], KEPT_OUT if rel in kept else int(rel in allowed))
-                if stored.get(rel) == state:
+                if stored.get(rel) == state and rel not in rechunk:
                     continue  # judged again and nothing changed: the chunks stand
                 _drop(connection, rel)
                 connection.execute("INSERT INTO lexical_file VALUES (?, ?, ?)", (rel, *state))
                 if rel not in allowed:
                     continue
                 text = (root / rel).read_bytes().decode("utf-8", "replace")  # only after the filter let it through
-                parent_rows, chunk_rows = chunk_file(rel, current[rel], text)
+                parent_rows, chunk_rows = chunk_file(rel, current[rel], text, recipe, register)
                 fields = _fields(rel, text, parent_rows)
                 connection.executemany("INSERT INTO lexical_parent VALUES (?, ?, ?, ?, ?)", parent_rows)
                 for *record, chunk in chunk_rows:
                     rowid = connection.execute("INSERT INTO lexical_chunk (chunk_id, path, start_line, end_line, "
                                                "parent_id) VALUES (?, ?, ?, ?, ?)", record).lastrowid
-                    connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
-                                       (rowid, chunk, *fields[record[4]]))
+                    if split:  # M4: the identifiers' pieces as terms of their own
+                        connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title, parts) "
+                                           "VALUES (?, ?, ?, ?, ?)",
+                                           (rowid, chunk, *fields[record[4]], identifier_parts(chunk)))
+                    else:
+                        connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
+                                           (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
+            if recipe:  # the methods it is built with now
+                connection.execute(_RECIPE_SCHEMA)
+                connection.execute(f"DELETE FROM {RECIPE}")
+                connection.executemany(f"INSERT INTO {RECIPE} VALUES (?, ?)", sorted(recipe.items()))
+            else:  # every method off: no table, today's index
+                connection.execute(f"DROP TABLE IF EXISTS {RECIPE}")
         return connection, indexed, policy
     except BaseException:
         connection.close()
@@ -365,7 +454,8 @@ def _checked(root: Path) -> tuple[tuple | None, str, list[str]]:
     root = Path(root)
     place = root.resolve()
     store, tree = _store_stamp(root), _tree(root, place)
-    key = None if store is None or tree is None else (store, tree)
+    settings = _stamps([root / PROJECT_DIR / REBUILD_FILE])  # the index-time methods' file, tracked or not
+    key = None if store is None or tree is None or settings is None else (store, tree, settings)
     if key is None or _FRESHNESS.get(place, (None,))[0] != key:
         _FRESHNESS[place] = (key, _freshness(root))
     status, stale = _FRESHNESS[place][1]
@@ -391,6 +481,11 @@ def _freshness(root: Path) -> tuple[str, list[str]]:
         stored = dict(connection.execute("SELECT path, blob FROM lexical_file"))
         current = _tracked(Path(root))
         stale = sorted(rel for rel in stored.keys() | current.keys() if stored.get(rel) != current.get(rel))
+        recipe, built = _recipe_now(Path(root)), _recipe_of(connection)
+        if recipe != built:  # DEC-1068: built with other index-time methods than rebuild.yaml's
+            indexed = [rel for (rel,) in connection.execute("SELECT path FROM lexical_file WHERE indexed = 1")]
+            switched = {key for key in INDEX_FLAGS if recipe.get(key) != built.get(key)}
+            return "stale", sorted(set(stale) | _affected(switched, indexed, _register(Path(root))))
         return "stale" if stale else "empty" if _empty(connection) else "fresh", stale
     finally:
         connection.close()
@@ -458,10 +553,12 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 def _ranked(connection: sqlite3.Connection, query: str) -> dict:
     """``hits`` and ``ranked`` of ``query`` in the open, fresh index."""
     keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
+    split = _columns(connection) == SPLIT_COLUMNS  # M4's index: its parts column weighted too
+    ranked_text, ranked_top = (_SPLIT_TEXT, _SPLIT_TOP) if split else (_RANKED_TEXT, _RANKED_TOP)
     names = [name for name in ids_in(query) if name != query][:MAX_TERMS]  # the ids it holds among other words
     if any(char.isalnum() or char == "_" for char in query):
         # FTS5 finds the chunks that hold the query's tokens, or an id's, as a phrase; they are then matched exactly.
-        rows = connection.execute(_RANKED_TEXT, (" OR ".join(map(_phrase, [query, *names])),))
+        rows = connection.execute(ranked_text, (" OR ".join(map(_phrase, [query, *names])),))
     else:  # no token to match by: every chunk is read
         rows = connection.execute("SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, NULL, f.text "
                                   "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
@@ -480,7 +577,7 @@ def _ranked(connection: sqlite3.Connection, query: str) -> dict:
                              "parent_id": parent_id})
     words, added = _words(query), 0
     if words:
-        for record in connection.execute(_RANKED_TOP, (words, TOP_K + len(ranked))):
+        for record in connection.execute(ranked_top, (words, TOP_K + len(ranked))):
             if added < TOP_K and record[0] not in ranked:
                 ranked[record[0]] = {**dict(zip(keys, record)), "exact": False}
                 added += 1

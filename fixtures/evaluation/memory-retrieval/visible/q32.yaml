@@ -1,0 +1,13 @@
+category: failure-memory
+commit: cc9c94d42a54
+question: "Why did the Phase 1 write guard let writes to new paths through, and what was the lesson?"
+gold_answer: >-
+  L-0074: a universal negative ("no unauthorised path may be written") was implemented as a positive enumeration of
+  denied paths, so paths added later that the author had not listed were silently permitted, and tests derived from
+  the same list could not see the gap. The lesson: universal negatives need default-deny allow-lists, where everything
+  not explicitly permitted is refused, and checks derive their scope from the repository's actual state, not from a
+  hand-maintained list.
+sources:
+  - path: docs/lessons/L-0074.md
+    heading: "During Phase 1, a universal negative — \"no unauthorised path may be written\" — was implemented as a positive enumeration of denied paths. When the product grew new paths that the original author had not listed, writes to those paths were silently permitted. Tests derived from the same enumeration could not detect the gap, because they checked only the paths the list contained."
+    lines: [12, 16]
