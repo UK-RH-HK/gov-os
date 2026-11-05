@@ -13,7 +13,12 @@ semantic one): the pins are W2-13's head ``d6cba69e`` (the code that lands on ``
 question's bundle gains the three chunks BM25 finds for its words without the whole phrase (README, the register's
 head, the lantern note) after the six pages that hold the phrase; the "unknown id" question's bundle is the plain
 question's (the id adds nothing: it is in no planted line and names no record); the ticket's lesson and ticket
-chunks come in BM25 order, the lesson still first (DEC-424). Every other field is as before."""
+chunks come in BM25 order, the lesson still first (DEC-424). Every other field is as before.
+
+Revised under DEC-1074 (5) for W2-32's S7 (a span an earlier call sent is not sent again, and is named in the
+bundle's ``repeats``): the integrated code ``w2/integrate`` ``8c28aa70fb3f`` gives every bundle that field. None of
+these questions expands a parent, so it is empty in each; it is pinned as that code gives it, part of the baseline,
+not a W2-92 change. Any other new or changed field, ordering or content still fails."""
 
 from __future__ import annotations
 
@@ -42,15 +47,16 @@ _NOTHING = {"by": "unavailable", "device": None, "reason": "nothing to rerank"}
 _EMPTY = {"batches": [{"size": 0}], "budget": {"bundle": {"limit": 6000, "used": 0}, "rounds": {"limit": 1, "used": 0}},
           "continued": False, "evidence": [], "expansions": [], "facets": _FACETS, "gaps": [],
           "merge": {"candidates": 0, "dropped": [], "duplicates": 0, "reranked": False},
-          "rerank": _NOTHING, "stopping_reason": "FACET_UNAVAILABLE"}
+          "rerank": _NOTHING, "repeats": [], "stopping_reason": "FACET_UNAVAILABLE"}
 
 # The integrated code's bundles (support.projection): recorded at the base 7ca16b19df3f, with W2-112's ``rerank``
-# recorded at w2/integrate 23625eb2aebe, then re-pinned at W2-13's head d6cba69e for its S2 (DEC-1055)
+# recorded at w2/integrate 23625eb2aebe, then re-pinned at W2-13's head d6cba69e for its S2 (DEC-1055), with W2-32's
+# ``repeats`` (empty: no parent is expanded) as w2/integrate 8c28aa70fb3f gives it (DEC-1074 (5))
 _PLAIN = {"batches": [{"size": 9}], "budget": {"bundle": {"limit": 6000, "used": 157},
                                                "rounds": {"limit": 1, "used": 0}},
           "continued": False, "evidence": _ALL, "expansions": [], "facets": _FACETS, "gaps": [],
           "merge": {"candidates": 9, "dropped": [], "duplicates": 0, "reranked": False},
-          "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"}
+          "rerank": _NOT_LOADED, "repeats": [], "stopping_reason": "FACET_UNAVAILABLE"}
 TODAY = {
     "plain": _PLAIN,
     "batched": {"batches": [{"size": 2}, {"size": 2}], "budget": {"bundle": {"limit": 6000, "used": 72},
@@ -58,14 +64,14 @@ TODAY = {
                 "continued": True, "evidence": _ALL[:4], "expansions": [], "facets": _FACETS,
                 "gaps": [{"chunk_id": chunk, "path": path, "reason": "NOT_GATHERED"} for chunk, path, _, _ in _ALL[4:]],
                 "merge": {"candidates": 4, "dropped": [], "duplicates": 0, "reranked": False},
-                "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
+                "rerank": _NOT_LOADED, "repeats": [], "stopping_reason": "FACET_UNAVAILABLE"},
     "batched, continued": {"batches": [{"size": 2}, {"size": 2}], "budget": {"bundle": {"limit": 6000, "used": 69},
                                                                              "rounds": {"limit": 1, "used": 1}},
                            "continued": True, "evidence": _ALL[4:8], "expansions": [], "facets": _FACETS,
                            "gaps": [{"chunk_id": chunk, "path": path, "reason": "NOT_GATHERED"}
                                     for chunk, path, _, _ in _ALL[8:]],
                            "merge": {"candidates": 4, "dropped": [], "duplicates": 0, "reranked": False},
-                           "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
+                           "rerank": _NOT_LOADED, "repeats": [], "stopping_reason": "FACET_UNAVAILABLE"},
     "unknown id": _PLAIN,
     "unknown symbol": _EMPTY,
     "ticket": {"batches": [{"size": 4}], "budget": {"bundle": {"limit": 6000, "used": 92},
@@ -77,7 +83,7 @@ TODAY = {
                             ("5a7ba3b5a82464c9fa94703f", support.TICKET_REL, 1, 8)],
                "expansions": [], "facets": _FACETS, "gaps": [],
                "merge": {"candidates": 4, "dropped": [], "duplicates": 3, "reranked": False},
-               "rerank": _NOT_LOADED, "stopping_reason": "FACET_UNAVAILABLE"},
+               "rerank": _NOT_LOADED, "repeats": [], "stopping_reason": "FACET_UNAVAILABLE"},
 }
 
 CASES = {
@@ -104,7 +110,7 @@ def _diff(found, expected):
 def test_u1_a_question_naming_no_record_or_symbol_gets_todays_bundle(asked, case):
     """Failure 1: the plain question, the same in batches, an id the store does not hold, a symbol the index does
     not hold, and DEC-424's records ahead (a ticket's lesson first) give the integrated code's bundle, item for
-    item (W2-112's ``rerank`` included)."""
+    item (W2-112's ``rerank`` and W2-32's ``repeats`` included)."""
     question, kwargs = CASES[case]
     bundle, _ = asked("full", question, **kwargs)
     found = support.projection(bundle)
