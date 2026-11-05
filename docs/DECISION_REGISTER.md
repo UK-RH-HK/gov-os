@@ -13180,6 +13180,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Accepted later (owner, 2026-11-04 ~19:10, in the chat):** (4) the measurement set is **60 questions**, as the CTO proposed in ACT-MSET-1; its "about 75 %" is only the assumption behind the precision figure, not an expectation: **the target is unchanged, 95 % hit@5, with 85 % the floor, and it is to be achieved** (stated in ACT-MSET-1 before the writer reads it). The path-map line declaring `memory-verdict` (its hidden glob; every role but the orchestrator refused) is approved. **The order stands:** the recall diagnosis and its generic fixes; then the 0.6B re-measured on the tuning sets and the measurement set; then the rerankers (mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit) trialled the same way; then the results to the owner, who decides.
 - **Basis:** question 1 (memory: a verdict from a set never used to choose, and recall fixed before ranking is tuned) and question 2 (selection pressure from named misses fits the tuning set; the hidden half and a fresh set keep the figure honest).
 - **Amended:** by DEC-1071 (owner, 2026-11-04 ~22:00): (7)'s and (9)'s choice for structural fixes is judged on all 80 together; (8) and (10) wait for the halves' agreement within 3 points.
+- **Amended:** by DEC-1074 (1) (owner, 2026-11-05): the visible 40, the hidden 40 and the spent 60 are tuning or diagnostic sets; only a fresh set gives a verdict.
 
 ### DEC-1071 — Structural fixes only, judged on all 80; consistency across the sets as the proof; then the measurement set once; then all three rerankers; the nonexistent-id question scored apart
 - **Status:** ACCEPTED (owner, 2026-11-04 ~22:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1070 (amended here), DEC-1067 (b) (amended here for structural fixes), DEC-1009 · **Source:** the owner's message after stage A (`.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md`, stage A's result)
@@ -13198,6 +13199,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   (4) **Only then the reranker trial:** the 0.6B, mxbai-rerank-large-v2 and Qwen3-Reranker-4B in 8-bit, all three, on the same three sets, each recorded for hits, speed and quality, beside each other; the owner decides from that record.
 
   (5) **The nonexistent-id question** passes when the product stops with `UNRESOLVED_IDS` naming that id, and is scored apart from hit@5, for h24 and the measurement set alike.
+- **Amended:** by DEC-1074 (4) (owner, 2026-11-05): (3)'s consistency bound becomes within 5 points, on sets of about 80.
 - **Basis:** question 1 (memory: a structure that serves any question scores alike on any set) and question 2 (a fix aimed at a named miss fits the set it was aimed at).
 
 ### DEC-1072 — D4B-STRUCTURE's order stands; steps 5 to 7 as prototypes only; step 7 widened to every stated link, with a drift count; memory-building a Gov OS practice for every adopted repository's Wave 0
@@ -13266,6 +13268,46 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     It comes to the owner as one package, with the timing for (a), (b) and (c), before anything is built.
 - **Basis:** question 1 (memory: a link recorded when a record is written, and checked cheaply, keeps every agent on the current rule) and question 2 (a measurement used once must measure the final structure).
 
+### DEC-1074 — The night's result decided: 67.8 % the 0.6B's honest figure; every used set now tuning or diagnostic; the 60's misses classified before the next lever; a new verdict set of 80; consistency within 5 points; v456 and the stated links approved for window 4; W2-54's premise rewritten; LINK-INTEGRITY adopted; the open items
+- **Status:** ACCEPTED (owner, 2026-11-05 morning, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1071, DEC-1072, DEC-1073 · **Changes:** DEC-1071 (3) (the consistency bound, item 4), DEC-1070 (2)-(4) (the sets' jobs, item 1) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md` (`7f5a80b7`), `LINK-INTEGRITY.md` (`23610a2e`)
+- **Decision:**
+  - **(1) 67.8 % is recorded as the 0.6B's honest figure on this structure:** v456 + the stated links, 40/59 on
+    `memory-verdict`.
+    - **The owner's reading:** the gap is mainly both halves having become tuning sets since DEC-1071 (every fix
+      judged on all 80, the hidden misses guiding the levers), with vocabulary a smaller part. The hidden half and the
+      new set are almost equally far from their answers (0.43 against 0.41), yet score 84.6 % against 67.8 %.
+    - **From now on** the visible 40, the hidden 40 and the spent 60 are tuning or diagnostic sets. Only a fresh set
+      gives a verdict.
+  - **(2) The assessment first.**
+    - The spent 60 become a diagnostic set.
+    - An independent role classifies their 19 misses by kind (never retrieved; retrieved but ranked below 5;
+      vocabulary; other), in kinds and counts.
+    - The result goes to the owner with the CTO's recommendation for the next lever: mostly ranked low, the reranker
+      trial next; mostly never retrieved, the embedder and phrasing first.
+    - **Nothing is tuned or trialled until the owner decides.**
+  - **(3) In parallel, a new verdict set of 80 questions,** by a new writer, blind, by the rubric, with an independent
+    cross-check, as for the 60. The CTO gives the owner the writer's brief and its folder's settings. It is used only at
+    the next decision point, for the next testing and the trial.
+  - **(4) The consistency rule becomes: within 5 points, on sets of about 80** (DEC-1071 (3) changed).
+  - **(5) Approved for re-pin window 4,** in the normal flow with tests first:
+    - v456 into W2-32;
+    - the stated links into W2-92, its KPI text from LINK-INTEGRITY §6.1.
+  - **(6) W2-54's test:** its test designer rewrites the premise of `test_an_empty_retrieval_result_gives_one_packet`,
+    since the links now legitimately bring a record.
+  - **(7) LINK-INTEGRITY is adopted as recommended:**
+    - W2-129 and W2-130 as new tickets, the ticket changes of §6.1 and the timing of §7;
+    - **O1 (A):** no pre-commit hook;
+    - **O2 (A):** the owner decides the 150 ids in one sitting, with the CTO's proposal per id;
+    - **unlinked mentions** in tests, roles, skills, lessons and plans are reported as notices from the start, until
+      (c) gives them a link field.
+  - **(8) The open items go on:**
+    - Q07 and Q14 re-worded to stable facts (DEC-1070 (13));
+    - the visible categories;
+    - the tests' half of the `core.bare` fix;
+    - the MR-1..MR-6 status row.
+- **Basis:** question 1 (memory: a verdict only from a set nothing was tuned on; the next lever chosen from the misses'
+  kinds) and question 2 (a link recorded and checked keeps agents on the current rule).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13276,3 +13318,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.455 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1071; DEC-1070 amended. Next free id: DEC-1072. |
 | 0.456 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1072. Next free id: DEC-1073. |
 | 0.457 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1073. Next free id: DEC-1074. |
+| 0.458 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1074; DEC-1071 (3) and DEC-1070 (2)-(4) changed. Next free id: DEC-1075. |

@@ -164,3 +164,13 @@ other restart is an ACT.
   comes to the owner as one package before anything is built. **Standing (L-0075):** every wait and every stop is by
   process id or process group, never a name match, through `.gov-runtime/scratch/orchestrator/tools/proc.sh` (`wait
   --max`, `stop --grace`, `pgid`).
+- DEC-1074 (2026-11-05): **67.8 % is the 0.6B's honest figure** (v456 + the stated links, `memory-verdict`).
+  - **The sets:** every used set (visible 40, hidden 40, the spent 60) is now tuning or diagnostic; only a fresh set
+    gives a verdict. A **new verdict set of 80** is written blind by a new writer and cross-checked, then used only at
+    the next decision point.
+  - **The next lever:** the 60's 19 misses are classified by an independent role (kinds and counts) before the owner
+    chooses it. Nothing is tuned or trialled until then.
+  - **Consistency:** within 5 points, on sets of about 80.
+  - **Approved for re-pin window 4,** tests first: v456 into W2-32, the stated links into W2-92.
+  - **W2-54's premise** is rewritten by its test designer.
+  - **LINK-INTEGRITY is adopted:** O1 (A), O2 (A); unlinked mentions are notices from the start.

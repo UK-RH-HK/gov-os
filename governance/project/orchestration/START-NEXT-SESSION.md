@@ -1,4 +1,4 @@
-# Start here — the next CTO session (written 2026-11-05 ~01:45 by session 33b3628c, the night's end state)
+# Start here — the next CTO session (written 2026-11-05 morning by session 33b3628c, after DEC-1074)
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
@@ -31,7 +31,7 @@ the register and the owner's word hold over both.
 5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068 to DEC-1073 and the standing practice: the
    stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, **waits and stops by pid only
    through `tools/proc.sh`**).
-6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1073 (**next free id DEC-1074**).
+6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1074 (**next free id DEC-1075**).
 7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/NIGHT2.md` (the night of 2026-11-05: every
    structural step, the measurement set's single use), `DAY.md` (2026-11-04: m6, the trial stopped, the diagnosis,
    stage A, M1-M5) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips); `DIAG.md`; the packages
@@ -95,30 +95,58 @@ the register and the owner's word hold over both.
   `drafts/d4b/`.
 - **Must not start:** §1's list.
 
-## 5. Next, in order (the owner decides first: the morning package, section 6)
-1. **The owner's decisions** on the measurement set's disagreement and on the product changes (v456 in W2-32, the
-   links in W2-92) for re-pin window 4.
-2. **Q07 and Q14 re-worded** to stable facts by an independent session (DEC-1070 (13)). Not yet done.
-3. **What the owner chooses next:**
-   - the vocabulary lever: the embedder trial (Qwen3-Embedding-4B), phrasing;
-   - the reranker trial (mxbai, Qwen3-4B 8-bit) on the adopted structure;
-   - a new measurement set for the next decision point.
-4. **Re-pin window 4:** W2-112's memory release, the adopted fixes once built in the product, and the link-integrity
-   tickets as the owner decides (W2-129, W2-130).
-5. D-5 (the templates, with the link lines and the MR-1..MR-6 row), D-6, D-9, D-10 (the owner's word), the lift; D-11
-   after it.
+## 5. Next, in order (DEC-1074; the owner starts this fresh session)
+1. **The assessment (DEC-1074 (2)).**
+   - The spent 60 (`memory-verdict`) are now a diagnostic set.
+   - An independent role (W2-61h's, or a fresh auditor under the hidden-half rule) classifies its 19 misses by kind:
+     never retrieved; retrieved but ranked below 5; vocabulary; other. Kinds and counts only.
+   - **The inputs:**
+     - the kept outputs `~/gov-os-eval/runs/verdict/v-run1/`;
+     - the run `~/gov-os-runs/D4B/verdict/v/run1/measure.txt`;
+     - the structure g1 + v456;
+     - the stage scripts `drafts/d4b/diag_recall.py`, `diag_routes.py` and `diag_depth.py`. Run them for counts only:
+       the 60 are hidden-like.
+   - **To the owner,** with the recommendation: mostly ranked low, the reranker trial next; mostly never retrieved, the
+     embedder and phrasing first. **Nothing is tuned or trialled until the owner decides.**
+2. **In parallel, the new verdict set of 80 (DEC-1074 (3)).**
+   - Give the owner the writer's brief (`ACT-MSET-3`, after ACT-MSET-1: 80 questions, R5's quotas scaled, the target
+     unchanged at 95 % with an 85 % floor) and its folder's settings (a copy of the writer's, as in ACT-MSET-2 §7).
+   - Then the cross-check as before (`ACT-MSET-2`'s form).
+   - Its folder is new: `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/`. Declare it in both path maps as
+     a new set; `memory-verdict` stays as the diagnostic set.
+   - It is used only at the next decision point.
+3. **Re-pin window 4's builds, approved (DEC-1074 (5)),** in the normal flow, independent tests first:
+   - **v456 into W2-32:** `retrieve._phrased` uncut, routes 60 deep, a single 40-chunk rerank pass, at most 2 chunks
+     of a file in the first 10, nested repeats dropped. The harness switches in `rx.py` are the reference.
+   - **The stated links into W2-92:** from `w2/W2-92-proto` `e884675b`, with the KPI text from LINK-INTEGRITY §6.1
+     applied to the ticket.
+   - **W2-112's memory release.**
+4. **W2-54 (DEC-1074 (6)):** its test designer rewrites the premise of `test_an_empty_retrieval_result_gives_one_packet`.
+5. **LINK-INTEGRITY, adopted (DEC-1074 (7)):**
+   - file W2-129 (`gov links`) and W2-130 (the clean-up) from `LINK-INTEGRITY-tickets/`;
+   - apply §6.1's ticket changes (W2-92, W2-55, W2-88, W2-98; W2-128 when filed);
+   - W2-129's acceptance tests first;
+   - unlinked mentions in tests, roles, skills, lessons and plans are notices from the start;
+   - O2: prepare the 150-id reconciliation list with a proposal per id, for one sitting with the owner;
+   - meanwhile, run `PYTHONPATH=src python3 -m gov.decisions.tags | grep STATUS_RELATION` after each decision record
+     (§4.6).
+6. **The open items (DEC-1074 (8)):**
+   - Q07 and Q14 re-worded to stable facts by an independent session (DEC-1070 (13));
+   - the visible 40's category shortfalls;
+   - the tests' half of the `core.bare` fix (a CIT-P: the root conftest clears `GIT_*`; W2-122's helper);
+   - the D-5 row on MR-1..MR-6's status.
+7. Then D-5 (the templates with the link lines), D-6, D-9, D-10 (the owner's word), the lift; D-11 after it.
+
+**Rules to carry:**
+- Consistency is within 5 points on sets of about 80 (DEC-1074 (4)).
+- Every used set is tuning or diagnostic.
+- A structural fix is judged on all the tuning sets together (DEC-1071 (2)).
 
 ## 6. Waiting on the owner
-The morning package, section 6:
-1. the measurement set's disagreement;
-2. the product changes;
-3. W2-54's test premise;
-4. the link-integrity package (O1, O2);
-5. the 3-point rule's noise;
-6. Q07/Q14 (decided, not yet done);
-7. the visible category shortfalls;
-8. the `core.bare` tests' CIT-P;
-9. the MR-1..MR-6 row.
+- The assessment's result and the choice of the next lever (DEC-1074 (2)).
+- The new verdict set's brief and folder settings, which the CTO prepares first.
+- The 150-id reconciliation list (O2), once it is prepared.
+- The visible category shortfalls, if a choice is needed.
 
 ## 7. The checks at start (after the prompt's §1)
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -176,6 +176,14 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
      noise.
    - **The practice:** keep the blind set for the verdict, profile the sets' phrasing, and treat vocabulary (the
      embedder, the query) as its own lever.
+   - **The owner's reading (DEC-1074 (1)):** the gap is mainly that both halves had become tuning sets once every fix
+     was judged on all 80, with vocabulary a smaller part. The hidden half and the blind set are about equally far
+     from their answers (0.43 against 0.41), yet score 84.6 % against 67.8 %.
+   - **The practice:**
+     - a set used to judge a fix is a tuning set from then on;
+     - only a fresh blind set gives a verdict, used once;
+     - consistency is judged within 5 points, on sets of about 80;
+     - the next lever is chosen from the misses' kinds (never retrieved against ranked low).
 7. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
    nothing. Score it apart.
 
