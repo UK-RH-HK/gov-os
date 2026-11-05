@@ -1,0 +1,13 @@
+category: code-paraphrase
+commit: cc9c94d42a54
+question: "How does an entry of the close's serial-only list get sent to the nightly instead, and what if its comment is missing or not understood?"
+gold_answer: >-
+  By its comment: an entry is the text before " #", and in this project the comment reads "<route>: <kind>: <reason>";
+  a route (its first word) of nightly sends it to the nightly, collected by the close and left out of both phases,
+  while serial keeps it in the close, run after the parallel run, alone and serially. Nothing is routed out by
+  default: an entry with no comment or an unknown first word, or one another line keeps there, stays in the serial
+  phase (src/gov/close/serial.py).
+sources:
+  - path: src/gov/close/serial.py
+    heading: "\"\"\"The close's serial phase and the routes of the serial-only list (W2-57; DEC-889 item 5, DEC-925 item 3)."
+    lines: [1, 13]

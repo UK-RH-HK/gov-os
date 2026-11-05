@@ -25,12 +25,12 @@ each way. Nothing scheduled but the dispatcher (DEC-1051).
 |---|---|---|
 | D-0 clean-up | **done** (DEC-1053 `d855e41a`) | `D0-CLEANUP-LIST.md` |
 | D-1 memory branches merged as built; re-pin window 2 | **done**: seven branches and emg/w1-19-helper merged; `pin-9894b0cf` live (registry `b74d2c7f`) | `ACT-REPIN-W2.md` |
-| D-2 the CTO's tools | **in progress**: E1 (Q-1, G-1), R1-21, E3 (ACT-GUARD-FIX-4, hooks `3bc25241`), O-A1 and the LB held-slot fix **live**; **G-14 next** (stopped at a safe point: `.gov-runtime/scratch/orchestrator/drafts/g14/NEXT.md`) | `ACT-GUARD-FIX-4.md`, `reviews/` |
-| D-3 configuration and text lifts | **under way** (2026-11-03): items 11 and 12 drafted for the owner; T-6, T-7, T-10, Q-8, Q-10 moved to D-4 | `D3-WORKLIST.md` |
-| D-4 the test suite cut | not started (the deletions listed to the owner first); runs beside D-4b (DEC-1055) | — |
-| **D-4b the memory stage** (DEC-1055) | **starting**: W2-92, W2-91, W2-13, W2-61h, D-8, D-7, W2-15a/b's parts here, W2-32; measures 1 to 3; then re-pin window 3 and the integration store before D-5 | `D4B-MEMORY-STAGE.md` |
-| D-5, D-6 | not started (after measure 3 and the re-pin) | — |
-| D-7, D-8 | moved into D-4b (DEC-1055) | `D4B-MEMORY-STAGE.md` §5, §10 |
+| D-2 the CTO's tools | **done**: E1 (Q-1, G-1), R1-21, E3 (ACT-GUARD-FIX-4), O-A1 and the LB held-slot fix; G-14 live by ACT-G14 (`4edd196c`, DEC-1059) | `ACT-GUARD-FIX-4.md`, `ACT-G14.md`, `reviews/` |
+| D-3 configuration and text lifts | **done** (DEC-1057, `2e5c9cd9`); items 2-7 and 5 moved to D-4, item 9 to D-5 | `D3-WORKLIST.md` |
+| D-4 the test suite cut | **done** (DEC-1061; merged `6008a41f`): 5,628 cases in the full run of 20,094 (opt-in `lifted` and `breadth` hold the rest); review READY at round 2; selection re-checked (34 tool tests pass). Open: ACT-G14b (a coordination ticket's link-based tests; `guard4_check` FAIL since the cut) | `D4-LIST.md`, `reviews/d4-cut.md` |
+| **D-4b the memory stage** (DEC-1055, DEC-1066-DEC-1073) | **decided by DEC-1074 (2026-11-05)**: 67.8 % the honest figure; the 60's misses classified next; a new verdict set of 80; v456 and the links approved for window 4; LINK-INTEGRITY adopted. Before that: m6 65/80; three sets (tuning 40, hidden 40, `memory-verdict` 60); structural fixes judged on the 79: **adopted v456 (67/79, the halves' gap 15.6 → 0.4) and the stated links (drift 184 → 0 unjoined)**, every other step measured and not kept; **the measurement set used once: 40/59 (67.8 %), it disagrees** (vocabulary), so the trial was not run; nothing in the product yet; the link-integrity package ready; next: the owner's decisions (the morning package), re-pin window 4 | `D4B-MORNING-2026-11-05.md`, `D4B-STRUCTURE.md`, `LINK-INTEGRITY.md`, `.gov-runtime/scratch/orchestrator/drafts/d4b/NIGHT2.md` |
+| D-5, D-6 | not started (after the trial, the methods' measures and re-pin window 4); D-5 row: the generated MR-1..MR-6 records take the Contract's status (the owner, 2026-11-04) | `D5-ROWS.md`, `DAY.md` rows |
+| D-7, D-8 | **done inside D-4b**: D-8 (ACT-D8), D-7 + G4 (`27a80411`, extended to W2-15a's raw output and the measure's audit) (DEC-1055) | `D4B-MEMORY-STAGE.md` §5, §10 |
 | D-9 the WBS refactor | not started (the fates and K9 to the owner first) | — |
 | D-10 the full suite | not started (the owner's word) | — |
 | D-11 the basis as a standing practice | after the lift | — |

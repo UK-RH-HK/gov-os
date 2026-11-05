@@ -62,3 +62,5 @@ The owner's P-RERANKER-1 (a) (DEC-979 item 4, DEC-982): before the three layers.
 - **Later, not here:** the service on the GPU, after W2-15b's GPU-against-CPU result (DEC-975).
 
 **DEC-1032 (owner, 2026-11-02):** the shared reranker starts now, at the front of the infrastructure sprint, on the GPU within its budget; its dependency on W2-32 is lifted (the owner's order).
+
+**DEC-1068, for re-pin window 4 (CTO, 2026-11-04 ~09:35):** the shared service releases the GPU memory a request used once it has answered (the PyTorch caching allocator's cache emptied after each request, or after each request whose padded size exceeded a named threshold; state which and why), so its memory no longer climbs to its highest peak and stays there (on 2026-11-04 it climbed 7.7 -> 15.8 GB across experiments and twice tripped the GPU backstop, at 03:53 and 05:37). The client's padded request bound (W2-32, `MAX_REQUEST_CHARS`) stays. The service's memory after each request is reported in its log (`rerank.log`: the allocated and reserved MiB). Built now, live with window 4.

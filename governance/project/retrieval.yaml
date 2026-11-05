@@ -1,0 +1,6 @@
+# Retrieval's query-time settings (DEC-1067 (a) and order (4); W2-32's S8 and its phrasings note). Measure 3 adopted
+# x5 (routing by question type + three deterministic phrasings) by the rule written before it ran; absent or 0 is off.
+routing:
+  code_first: 2     # a question naming a symbol: the code route's first 2 hits (by stored-vector cosine) ahead
+  named_first: 2    # a question naming a record: that record's 2 best chunks (by the pool's rerank scores) ahead
+  phrasings: true   # the question, its content words, the question with the record route's ids: searched and fused

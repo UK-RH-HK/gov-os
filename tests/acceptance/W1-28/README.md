@@ -41,6 +41,28 @@ python3 -m pytest tests/acceptance/W1-28 -q -p no:cacheprovider
 - **The record commit** (DEC-367) is made by the command as its own process, after the same call set the freeze
   (DEC-368). The guard judges tool calls, not the command's process; the cases assert the flag and the commit together.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 103 in the full run, 52 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov pause sets the freeze flag and the next write by any role is denied; gov pause --off clears it [CAP-05.a] | `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5), `test_w1_28_freeze.py::test_pause_sets_the_flag_in_the_runtime_directory` | part A's row, by its words |
+| S2: gov pause --cancel-agents releases every claim and records the cancelled sessions; gov pause --rollback <ticket> reverts the ticket's commits w... | `test_w1_28_cancel.py::test_the_cancel_is_recorded_by_one_commit_per_released_ticket`, `test_w1_28_cancel.py::test_each_cancelled_session_is_recorded_in_its_ticket`, `test_w1_28_rollback.py::test_rollback_reverts_the_commits_of_the_ticket_and_no_other`, `test_w1_28_rollback.py::test_rollback_makes_one_revert_commit_per_commit_newest_first`, `test_w1_28_command.py::test_rollback_without_a_ticket_is_a_usage_error`, `test_w1_28_command.py::test_gov_pause_is_no_longer_answered_as_not_implemented` | part A's row, by its words |
+| S3: Pause, cancel and rollback run only on the owner's or the orchestrator's invocation and give the same result on repeat; cancel and rollback eac... | `test_w1_28_roles.py::test_the_orchestrator_can_pause`, `test_w1_28_roles.py::test_the_orchestrator_cannot_lift_a_pause`, `test_w1_28_repeat.py::test_pause_on_a_paused_project_succeeds_and_stays_paused` | part A's row, by its words |
+| S4: Every test fixture that copies the repository leaves governance/project/held-out.yaml out, so it is never copied into a temporary project (DEC-... | `test_w1_28_fixture_copies.py::test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out` (1 of 12) | part A's row, by its words |
+| S5: gov launch removes its per-session temp folder when the session ends (DEC-386) | `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends` (1 of 5), `test_w1_28_launch_temp_folder.py::test_the_temp_folder_is_removed_when_the_session_ends_with_an_error` (1 of 2) | part A's row, by its words |
+| S6: gov launch starts a product-spec worker sandboxed, with an empty network allowlist (DEC-386) | `test_w1_28_launch_product_spec.py::test_the_product_spec_session_has_an_empty_network_allowlist`, `test_w1_28_launch_product_spec.py::test_the_launcher_starts_one_product_spec_session` | part A's row, by its words |
+| F1: A write succeeds while paused | `test_w1_28_freeze.py::test_a_bash_write_is_denied_while_paused` (2 of 2), `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` (2 of 5) | part A's row, by its words |
+| F2: The flag lives outside the repository runtime directory | `test_w1_28_freeze.py::test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else` | part A's row, by its words |
+
 ## KPI lines and covers ids
 
 Red reason, for every row but the second: the `built` fixture stops the case with
@@ -275,9 +297,9 @@ its text is never a route.
   all its arguments; the message of an `assert` statement; the value of a `reason=` or `msg=` keyword of any call.
   These nodes are left out of the whole function's reading (copies, listings and routes alike).
 - **A route is still found only at a call that holds the bare root among its arguments** (as before), and only in:
-  - its **argument list**: an argv word (`clone`, `archive`, `worktree`, `checkout-index`, `bundle`) as one of the
+  - its **argument list**: an argv word (`clone`, `archive`, `checkout-index`, `bundle`, or `worktree` with `add`) as one of the
     strings it is given, directly or as an item of a list, a tuple, a `+` or a `*` given there; or a shell route
-    (`cp -r`, `rsync`, `git archive|clone|worktree`, `tar -c`) in such a list or tuple read as one text, its items
+    (`cp -r`, `rsync`, `git archive|clone|worktree add`, `tar -c`) in such a list or tuple read as one text, its items
     joined by spaces;
   - a **`subprocess`, `os.system` or copy call** (callee `run`, `call`, `check_call`, `check_output`, `Popen`,
     `getoutput`, `getstatusoutput`, `system`, `popen`, `create_subprocess_exec`, `create_subprocess_shell`, or a
@@ -305,6 +327,7 @@ argv list, still counts.
 |---|---|
 | Success 1: message text is not read; routes only in argument lists and `subprocess`, `os.system` and copy calls | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` (W2-108's old skip; a `pytest.fail` and two `assert` messages naming the root with `git clone`, `cp -r`, `rsync`, `git worktree`) |
 | Success 2: every true whole-tree copy still found, nothing lowered | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` (`cp -r`, `copytree`, `git worktree add`, `git clone` of the root, and a skip message followed by a clone) · `test_cp_r_and_tar_c_given_as_separate_argv_items_are_reported` · the cases before it in this file and W1-50's, unchanged |
+| Success 2 (D-4's cut, DEC-1061): `git worktree` is a route only as `worktree add` (it makes a checkout); `worktree list` (W2-61h's `worktrees()`, 15592622) copies nothing | `test_git_worktree_is_a_copy_only_as_worktree_add` (W2-61h's helper and a shell `worktree list` not reported; `worktree add` as argv and as a shell string reported) |
 | Success 3: this section, with `Rewrite-Reason: DEC-982` | this README |
 | Failure 1: a real whole-tree copy no longer reported | `test_a_true_whole_tree_copy_in_a_test_function_is_still_reported` · `test_a_whole_tree_copy_without_a_root_parameter_is_caught_by_reading` · `test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` |
 | Failure 2: a message that names the root reported as a copy | `test_a_message_that_names_the_root_and_a_route_is_not_a_copy` |

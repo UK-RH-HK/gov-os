@@ -18,6 +18,26 @@ Standard library and `pytest` only. No network, no dev tiers, no `local_only` te
 run.** Each is text in the hook's input; the test reads the guard's decision. Nothing is installed and nothing in the
 repository is written. The run takes about 90 seconds.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 69 in the full run, 267 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Install commands (package managers, curl\|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role the... | `test_w1_04_install_rule.py::test_an_install_by_any_other_role_is_denied` (3 of 15), `test_w1_04_install_rule.py::test_an_install_in_a_session_without_a_role_is_denied` (3 of 25), `test_w1_04_probe_findings.py::test_an_install_through_another_package_manager_is_asked_about_or_denied` (2 of 10) | part A's row, by its words |
+| S2: The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b] | `test_w1_04_auto_mode.py::test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too` (2 of 2), `test_w1_04_auto_mode.py::test_an_install_by_the_orchestrator_is_asked_about_in_every_permission_mode` (2 of 30) | part A's row, by its words |
+| S3: The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id [CAP-25.a] | `test_w1_04_registry_schema.py::test_the_schema_is_the_one_tool_registry_file_of_the_kernel_schemas`, `test_w1_04_registry_schema.py::test_the_schema_is_a_json_schema_of_draft_2020_12` | part A's row, by its words |
+| F1: Any install executes without an owner approval in chat | `test_w1_04_install_rule.py::test_an_install_in_a_session_without_a_role_is_denied` (3 of 25), `test_w1_04_probe_findings.py::test_while_frozen_an_install_is_denied_to_every_role_the_orchestrator_included` (1 of 5), `test_w1_04_probe_findings.py::test_while_frozen_an_install_by_the_orchestrator_is_denied_in_every_permission_mode` (1 of 6) | part A's row, by its words |
+| F2: sudo is ever allowed to an agent role | `test_w1_04_probe_findings.py::test_sudo_in_a_later_part_of_the_command_is_denied_to_every_role` (2 of 10), `test_w1_04_sudo.py::test_sudo_is_denied_to_every_role` (3 of 30), `test_w1_04_sudo.py::test_sudo_is_denied_in_a_session_without_a_role` (3 of 6) | part A's row, by its words |
+| F3: A matcher result ever allows a command that the harness would otherwise ask about (matching only escalates to ask or deny) | `test_w1_04_only_escalates.py::test_the_hook_never_gives_an_explicit_allow`, `test_w1_04_only_escalates.py::test_a_command_that_installs_nothing_gets_no_decision_from_the_rule` (1 of 5) | part A's row, by its words |
+
 ## KPI → tests → red reason today
 
 Run on `w1/integrate` at `5e14561`, after implementation: **329 passed, 7 failed** (336 cases, 35 test functions).

@@ -51,6 +51,18 @@ retired from this suite. The ticket's other lines keep their numbers (K1 to K4, 
   `PATH`; no code-graph tool on `PATH` (as in W2-76: the code index reports itself not recreated and no daemon
   starts); `GOV_OLLAMA_BIN` naming no program; `GOV_SECRETS_CACHE` empty. Cases skip where `gitleaks`, `git` or
   `sqlite_vec` is missing.
+- **Every rebuild gets a new, empty machine-wide vector cache (W2-126, DEC-1032).** Each `gov rebuild` the
+  support starts is given `GOV_VECTOR_CACHE_DIR` set to a fresh folder under the case's `tmp_path`
+  (`<box>/vector-cache/run-*`, `run_environment` in the support); `XDG_CACHE_HOME` is the case's empty home's
+  `.cache`. No case reads or writes the machine's cache (`~/.cache/gov-os/vector-cache`), with the real `HOME` or an
+  empty one. *Why one cache per rebuild and not one per case:* W2-126's cache is keyed by model, revision and text.
+  With one cache per case, the cold rebuild after the base's build is served the base's vectors and sends the
+  endpoint no text at all. That is W2-126's design and no fault: a cold rebuild may reuse cached vectors. This
+  suite's premise, though, is "cold" in both senses, with no store and no cache. A cold rebuild (and a rebuild after
+  a refused seed) embeds every file at the endpoint, so when a seeded rebuild does not send a kept note's text, that
+  is the seed's work and not the cache's. The isolation states that premise exactly; whether the cache serves a
+  rebuild is for W2-126's tests. (Rewritten 2026-11-04, DEC-968, D-4b: from W2-126's merge `0c5d7f4c` on, the cache
+  each case shared made the cold rebuilds of 11 cases look seeded.)
 
 ## KPI lines and their tests
 
@@ -82,3 +94,22 @@ retired from this suite. The ticket's other lines keep their numbers (K1 to K4, 
   base folder. Returned to the lead as a package; no case guesses it.
 - **A rebuild whose semantic store was not recreated** (the former KPI 5): moved to W2-124 (DEC-1027 C); its
   tests are W2-124's.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 22 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: `gov rebuild --seed <store folder>` copies a warm base's stores (the lexical, semantic and code-graph stores and the secrets cache's entries) i... | `test_w2_122_configured_base.py::test_seed_without_a_folder_reads_the_configured_base`, `test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` (4 of 4), `test_w2_122_seeded_equals_cold.py::test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry` | the ticket's words |
+| S2: A seed whose code fingerprint, embedder model or schema differs from the tree's is refused, named, and the rebuild runs cold (fail closed: neve... | `test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` (4 of 4), `test_w2_122_fail_closed.py::test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold`, `test_w2_122_fail_closed.py::test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold` | the ticket's words |
+| S3: Measured, in docs/changes/W2-122-evidence.md: a new worktree's first rebuild seeded from the integration store against a cold one, alone and wi... | `test_w2_122_evidence.py::test_the_evidence_file_names_the_measurement` | the ticket's words |
+| S4: A product feature for every adopted repository: the warm base is the project's configured integration store (W2-116's, a path in the project's ... | `test_w2_122_configured_base.py::test_a_project_with_no_configured_base_rebuilds_cold_named`, `test_w2_122_configured_base.py::test_a_configured_path_that_holds_no_base_rebuilds_cold_named`, `test_w2_122_configured_base.py::test_a_configured_base_that_does_not_match_is_refused_and_the_rebuild_runs_cold` | the ticket's words |
+| F1: A seeded store that differs from a cold rebuild's; a seed from another embedder or schema used [DEC-1014] | `test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` (4 of 4), `test_w2_122_seeded_equals_cold.py::test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry`, `test_w2_122_fail_closed.py::test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold` | the ticket's words |

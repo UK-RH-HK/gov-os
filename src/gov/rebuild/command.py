@@ -141,14 +141,31 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             )
 
     stores: dict = {}
+    # DEC-1068 M3: the line stating each depends_on edge, from the record store just built; only with the setting on
+    # is it a stage and a part of the result, so a rebuild with it off is today's (its table dropped if there is one).
+    import sqlite3
+
+    from gov.retrieval import reverse_edges
+
+    if reverse_edges.on(root):
+        with watch.stage(reverse_edges.RECIPE_KEY):
+            try:
+                stores[reverse_edges.RECIPE_KEY] = reverse_edges.refresh(root)
+            except (OSError, ValueError, LookupError, sqlite3.Error) as exc:
+                stores[reverse_edges.RECIPE_KEY] = {"status": "not_recreated", "reason": str(exc)}
+    else:
+        reverse_edges.refresh(root)
     # The secrets filter's counts around the stages that run it, all in this process (W2-107, DEC-970 P-W2-107-3).
     counted = scan_counts()
 
     if has_path_map:
         with watch.stage("lexical"), watch.filtered(lexical, "indexable"):
             try:
-                lexical_refresh(root)
-                stores["lexical"] = {"status": "recreated"}
+                # Every file the path map's lexical_policy keeps out, by namespace (W2-13 S6, DEC-1066 (3)); where none
+                # is, the report is as before.
+                built = lexical_refresh(root)
+                kept = built.get("kept_out") if isinstance(built, dict) else None
+                stores["lexical"] = {"status": "recreated"} | ({"kept_out": kept} if kept else {})
             except GovError:
                 raise
             except Exception as exc:
@@ -185,6 +202,9 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                         "status": "not_recreated",
                         "reason": sem.get("reason", "unknown"),
                     }
+                cut = sem.get("cut")  # W2-32 S7 (DEC-1067): the chunks the embedder's limit cut, named, never silent
+                if isinstance(cut, dict) and cut.get("count"):
+                    stores["semantic"]["cut"] = cut
             except Exception as exc:
                 stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
     note = none_embedded(config)

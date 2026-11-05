@@ -1,5 +1,10 @@
 """KPIs 1, 4 and 6: both servers start under their cap and parallel requests, from the gate's file or the defaults,
-and state them in the result (S1, S2)."""
+and state them in the result (S1, S2).
+
+Rewrite-Reason: DEC-1065 (1): a server is started only by the explicit restart (``safe_restart``), never by
+``ensure_*``, which checks health only. The three start cases call ``safe_restart``; every assertion on the cap, the
+parallel requests, the settings and the caller's GPU variables is unchanged. The case of a server already answering
+still calls ``ensure_available`` (a health check) and still asks for the settings a start would use."""
 
 from __future__ import annotations
 
@@ -7,6 +12,11 @@ import pytest
 
 import w2_123_support as support
 from w2_123_support import assert_capped, assert_settings
+
+# Rewrite-Reason: DEC-1065 (1): ``ensure_*`` is a health check only, and only an explicit restart starts a server, so
+# the cases that start a server under its cap call ``safe_restart`` (the explicit start; W2-123's cap still applies to
+# it). Its result names the server, whether it was restarted, the new process and the settings its start used.
+RESTART_KEYS = ("server", "restarted", "new_pid", "settings")
 
 
 def test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner(stage):
@@ -16,11 +26,11 @@ def test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by
     cpus, nice = support.lower_cpus(), support.a_nice()
     gate = stage.configure({"shared": support.probe_section(parallel=3, cpus=support.cpu_list(cpus), nice=nice)})
 
-    call = stage.call("ensure_available", timeout_s=support.START_TIMEOUT_S, env_extra={"OLLAMA_NUM_PARALLEL": "9"})
+    call = stage.call("safe_restart", "shared", env_extra={"OLLAMA_NUM_PARALLEL": "9"})
 
     result = call.result
-    support.assert_keys(result, support.RESULT_KEYS, "ensure_available's result")
-    assert result["available"] is True and result["started"] is True and result["state"] == "AVAILABLE", result
+    support.assert_keys(result, RESTART_KEYS, "safe_restart's result")
+    assert result["server"] == "shared" and result["restarted"] is True and result["new_pid"], result
     assert_settings(result["settings"], parallel=3, cpus=cpus, nice=nice, source=gate)
     serves = stage.serves()
     assert len(serves) == 1, f"one start was expected, the planted executable ran as serve {len(serves)} times"
@@ -38,11 +48,11 @@ def test_shared_start_without_configuration_uses_the_default_resolved_from_the_c
     started process runs as the result states."""
     caller = support.lower_cpus()
 
-    call = stage.call("ensure_available", timeout_s=support.START_TIMEOUT_S, affinity=caller)
+    call = stage.call("safe_restart", "shared", affinity=caller)
 
     result = call.result
-    support.assert_keys(result, support.RESULT_KEYS, "ensure_available's result")
-    assert result["available"] is True and result["started"] is True, result
+    support.assert_keys(result, RESTART_KEYS, "safe_restart's result")
+    assert result["restarted"] is True and result["new_pid"], result
     settings = result["settings"]
     assert_settings(settings, source="default")
     applied = support.parse_cpus(settings["cpus"])
@@ -70,11 +80,11 @@ def test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it(
     })
 
     caller_env = {} if caller_gpu is None else {"CUDA_VISIBLE_DEVICES": caller_gpu}
-    call = stage.call("ensure_query_available", timeout_s=support.START_TIMEOUT_S, env_extra=caller_env)
+    call = stage.call("safe_restart", "query", env_extra=caller_env)
 
     result = call.result
-    support.assert_keys(result, support.RESULT_KEYS, "ensure_query_available's result")
-    assert result["available"] is True and result["started"] is True, result
+    support.assert_keys(result, RESTART_KEYS, "safe_restart's result")
+    assert result["server"] == "query" and result["restarted"] is True and result["new_pid"], result
     assert_settings(result["settings"], parallel=2, cpus=query_cpus, nice=query_nice, source=gate)
     daemon = stage.serves()[0]
     assert daemon["host"] == stage.query_host, f"the query server was started at {daemon['host']}"

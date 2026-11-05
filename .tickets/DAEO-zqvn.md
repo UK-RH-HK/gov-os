@@ -18,10 +18,19 @@ depends_on:
 - DAEO-g0ip
 - DAEO-ym8a
 allowed_paths:
+- src/gov/config/loader.py
+- src/gov/check/pathmap.py
+- src/gov/retrieval/supplementary.py
+- src/gov/context/__init__.py
+- src/gov/context/command.py
+- src/gov/rebuild/command.py
+- src/gov/guard/role_paths.py
+- tests/unit/guard/test_role_paths*
 - src/gov/retrieve/**
 - src/gov/retrieval/lexical*
 - src/gov/retrieval/fusion*
 - src/gov/rebuild/lexical*
+- src/gov/retrieval/retrieve.py
 - tests/unit/retrieve/**
 - tests/unit/retrieval/**
 kpis:
@@ -33,6 +42,8 @@ kpis:
     [DEC-725].
   - Lexical search returns "unavailable" instead of raising [W2-M071]. Retrieval latency stays within the retrieve budget on the dev tiers.
   - 'A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42''s RETR-X-02 case is retired, so this ticket''s own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].'
+  - 'S5 Search respects role separation (DEC-1065 (2)): gov retrieve''s results (every route) and gov context''s supplementary block are filtered by the caller''s role_paths (GOV_ROLE or --role, and GOV_TICKET; the same path checks as the guard''s, from one product module): an engineer never receives its own ticket''s acceptance tests, a test designer never the ticket''s new code; what is filtered is named in the bundle (how many, by which rule), never dropped silently; no role_paths section means no filter [DEC-1065, DEC-1056, DEC-1063]'
+  - 'S6 The keyword index honours the path map (DEC-1066 (3), G4): a namespace whose `lexical_policy` is `not indexed` keeps its files out of the keyword index (absent: indexed, as today); the path map''s validator accepts the field with its two values; a file kept out is named in the rebuild''s report; the evaluation set''s own documents (lens B''s report, `fixtures/evaluation/**`) are what D-7 marks so [DEC-1066, DEC-1052 M-4]'
   failure:
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - 'The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.'
@@ -72,3 +83,19 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 - **KPIs, failure:**
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.
+
+**Delegated (CTO, 2026-11-03, P2 under DEC-957; DEC-1057 R-8: a line here, not a register entry):** `src/gov/retrieval/retrieve.py` added to the allowed paths, so that S2's fusion takes the ranked lexical list W2-92's merged `retrieve()` now carries (one line, `answer.get("ranked", answer["hits"])`); D-4b (DEC-1055) finishes W2-13 on top of W2-92.
+
+**Delegated (CTO, 2026-11-03, P2; DEC-1057 R-8):** P-W2-13-R3 (a): the bundle budget bounds parent expansion only, as W1-21's approved spec DEC-419 DP-3 says (a cut of the gathered children was tried and reverted, `ea486253`/`80cdd7ff`); whether the budget should bound the whole bundle (DEC-860) is W2-32's S5, with its own tests. The 13 cases of W2-92, W2-87, W1-21 and W1-19 that W2-13's S2 and DP-3 changed were re-pinned by a test designer (`d71df8f8`). Merged as built in D-4b (`8550788b`).
+
+**DEC-1065 (2) placed here (CTO, 2026-11-03):** S5 added (W2-13 owns `gov retrieve`); the filter at `retrieve.py`'s chunk list, the matcher in a product module the hook can later reuse.
+
+**P-W2-13-TD-5 (a) (CTO, 2026-11-03, P2):** the supplementary block is built in `src/gov/retrieval/supplementary.py` (not `src/gov/context/`): that file replaces the wrong path in S5's allowed paths.
+
+**S5 (CTO, 2026-11-03, P2):** `src/gov/context/__init__.py` added to the paths: `gov context --role` must reach the supplementary block's filter (S5 names `GOV_ROLE` or `--role`); the one red case of S5 outside the sandbox is the `--role` variant.
+
+**S5 (CTO, 2026-11-03, P2):** `src/gov/context/command.py` added too: its `context(...)` call must pass the parsed `--role` (the one line the engineer named).
+
+**DEC-1066 (3) placed here (CTO, 2026-11-03):** S6 added (W2-13 owns the keyword index): `lexical.py` takes every tracked file today (no exclusion list); the path map gains `lexical_policy`.
+
+**S6 (CTO, 2026-11-03, P2):** `src/gov/rebuild/command.py` added: the rebuild's report names the files the keyword index kept out (one line, as S5's command.py). S6's two repository cases turn green with D-7's path-map marking (the CTO's), right after W2-13 merges.

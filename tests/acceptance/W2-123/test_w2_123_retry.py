@@ -55,6 +55,10 @@ FILES = 80                    # chunks (Markdown sections): with BATCH 32, at le
 SECTIONS = 40                 # sections per file: two files, so the secret filter scans few files
 MARKER = "w2123chunk"         # every chunk text holds one ``w2123chunkNNN``; no other text sent holds it
 DIMENSIONS = 16
+# The digest the stand-in's model list reports. Rewrite-Reason: W2-32's S2 (DEC-1064): a revision that no pin names
+# fails closed, so each planted project pins this one in its models.yaml (W2-32's interface); the retry is unchanged.
+DIGEST = "4f" + "0123456789abcdef" * 3 + "0123456789ab"
+MODELS_REL = "governance/project/models.yaml"
 
 
 # --------------------------------------------------------------------------
@@ -110,13 +114,14 @@ class Runner:
 
     def reply(self, route, asked):
         model = {"name": semantic_module().MODEL, "model": semantic_module().MODEL,
-                 "digest": "4f" + "0123456789abcdef" * 3 + "0123456789ab", "size": 639150000}
+                 "digest": DIGEST, "size": 639150000}
         if route == "/api/version":
             return 200, {"version": "0.35.0"}
         if route == "/api/tags":
             return 200, {"models": [model]}
         if route == "/api/ps":
-            return 200, {"models": [{**model, "size_vram": 0}]}
+            # Rewrite-Reason: W2-32's S10 (DEC-1065): the model on the GPU
+            return 200, {"models": [{**model, "size_vram": model["size"]}]}
         if route != "/api/embed":
             return 404, {"error": "not found"}
         given = asked.get("input", "")
@@ -212,6 +217,8 @@ def make_project(project):
                                  "embedding_policy": policy} for name, (patterns, policy) in spaces.items()}
     (project / PATH_MAP_REL).parent.mkdir(parents=True)
     (project / PATH_MAP_REL).write_text(yaml.safe_dump(keep, sort_keys=False), encoding="utf-8")
+    (project / MODELS_REL).write_text(yaml.safe_dump(  # the stand-in's revision, pinned (W2-32's S2)
+        {"embedder": {"model": semantic_module().MODEL, "revision": DIGEST}}, sort_keys=False), encoding="utf-8")
     shutil.copy2(REPO_ROOT / GITLEAKS_TEMPLATE_REL, project / ".gitleaks.toml")
     (project / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
     for part in range(FILES // SECTIONS):

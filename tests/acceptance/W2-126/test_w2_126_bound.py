@@ -49,6 +49,11 @@ def test_a_revision_change_is_a_new_key_space(box, stand_in, tmp_path):
     stand_in.revision = S.REVISION_2
     stand_in.reset()
     second = S.clone(first, tmp_path / "second")
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): a revision that no pin names fails closed, so the second project pins
+    # the new revision in its models.yaml (W2-32's interface; untracked, so its corpus is the first's). The first and
+    # third stay on the default pin, which REVISION_1 begins with.
+    (second / "governance/project/models.yaml").write_text(
+        f"embedder:\n  model: {S.MODEL}\n  revision: {S.REVISION_2}\n", encoding="utf-8")
     box.build(second)
     [two] = box.run(second, [S.query(QUESTION)])
     assert sorted(stand_in.texts()) == texts_one, "with a new revision, texts were served from the old one's cache"

@@ -71,11 +71,15 @@ def test_f3_a_missing_record_store_is_named_and_the_code_routes_evidence_is_retu
                         f"{support.items(bundle)}"
 
 
-def test_f4_a_question_naming_no_symbol_does_not_report_the_code_route_ok_or_fail(asked):
+def test_f4_a_question_naming_no_symbol_does_not_report_the_code_route_ok_or_fail(api, planted, asked):
     """With no code index, a question that names no symbol still gets an answer, and nothing calls the code route
-    fine."""
+    fine. The answer is the whole of today's routes' answer: the plain fused order of the lexical route (since
+    W2-13's S2 its ranked list: the six pages that hold the phrase, then BM25's chunks for its words; DEC-1055)."""
     bundle, _ = asked("nocode", support.PLAIN_PHRASE)
     fine = [entry for entry in support.route_entries(bundle, support.CODE_ROUTE_WORDS)
             if support.reported_ok(entry[1])]
     assert not fine, f"the code route is reported ok in a project with no code index: {fine}"
-    assert len(bundle["evidence"]) == len(support.PLAIN_PAGES), support.items(bundle)
+    assert set(support.PLAIN_PAGES) <= set(support.paths(bundle)), support.items(bundle)
+    plain = api.plain_order(planted("nocode"), support.PLAIN_PHRASE)
+    assert [(item[0], item[1]) for item in support.items(bundle)] == plain, \
+        f"with no code index the answer is not the lexical route's whole fused order: {support.items(bundle)}, {plain}"

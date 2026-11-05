@@ -239,3 +239,25 @@ mandatory source today and after this piece, because the comparison is with the 
 Options: (a) leave; (b) compare without regard to case. Recommendation (b), stricter, in the same
 change if the lead agrees; no case holds either. *Confidence:* medium.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 54 in the full run, 15 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The packet holds every mandatory input by id and sha256, the authority block first, stays under the ceiling (default ~6k tokens) and carries it... | `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` | the ticket's words |
+| S2: --brief delivers a file path plus a summary <= 2.5k tokens [CAP-15.g] | `test_w1_24_brief.py::test_brief_delivers_a_file_path_and_a_summary` | the ticket's words |
+| S3: Under token pressure supplementary context is dropped before any mandatory input, and the packet records what was dropped; with an index down o... | `test_w1_24_pressure.py::test_supplementary_is_dropped_before_mandatory_inputs`, `test_w1_24_pressure.py::test_mandatory_inputs_are_delivered_without_the_lexical_index`, `test_w1_24_supplementary.py::test_supplementary_is_dropped_before_mandatory_and_the_drop_is_named` | the ticket's words |
+| S4: Mandatory inputs are resolved deterministically from the ticket's declared ids, never by retrieval rank; each lists its authority and lifecycle... | `test_w1_24_mandatory.py::test_mandatory_inputs_are_resolved_from_the_tickets_declared_ids`, `test_w1_24_mandatory.py::test_each_mandatory_input_lists_its_version_or_hash_constraint`, `test_w1_24_mandatory.py::test_each_mandatory_input_lists_its_lifecycle_state` | the ticket's words |
+| S5: A missing mandatory input makes gov context refuse with an explicit BLOCKED state; a superseded record cannot satisfy a current requirement; co... | `test_w1_24_blocked.py::test_conflicting_inputs_at_the_same_level_raise_a_contradiction`, `test_w1_24_blocked.py::test_a_missing_mandatory_input_refuses_with_blocked`, `test_w1_24_blocked.py::test_a_superseded_record_cannot_satisfy_a_requirement` | the ticket's words |
+| S6: Registers the context-reproducibility family check: the same ticket and commit give the same packet hash [CAP-38.b] | `test_w1_24_family_check.py::test_the_same_ticket_and_commit_give_the_same_packet_hash` | the ticket's words |
+| S7: Given two conflicting records, the authority block holds only the one with higher precedence (Charter → Contract → ADRs → specifications → task... | `test_w1_24_authority.py::test_the_authority_block_holds_only_the_higher_precedence_record` | the ticket's words |
+| F1: A mandatory input is missing from the packet | `test_w1_24_blocked.py::test_a_missing_mandatory_input_refuses_with_blocked`, `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` | the ticket's words |
+| F2: A lower-precedence record appears in the authority block | `test_w1_24_authority.py::test_the_authority_block_holds_only_the_higher_precedence_record` | the ticket's words |

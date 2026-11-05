@@ -96,7 +96,8 @@ def test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so(api,
     # from the environment under the home folder (DEC-397), and the scratch environment has an empty HOME (no
     # environment, no Hugging Face cache) and the libraries held offline.
     lexical = api.call(support.LEXICAL, "search", ROOT(repo), support.PHRASE)
-    routes = {support.LEXICAL_FACET: lexical["hits"], support.SEMANTIC_FACET: []}
+    # the list the lexical route gives the fusion: its ``ranked`` list where it gives one (W2-13's S2), else ``hits``
+    routes = {support.LEXICAL_FACET: lexical.get("ranked", lexical["hits"]), support.SEMANTIC_FACET: []}
     outcome = api.run([(support.FUSION, "rrf", (routes,), {}),
                        (support.FUSION, "search", (ROOT(repo), support.PHRASE), {"limit": None})])
     assert outcome.calls[1]["error"] is None, \
@@ -120,7 +121,8 @@ def test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fet
     try:
         env = api.env_with_the_reranker_environment_and_no_snapshot(hub.host)
         lexical = api.call(support.LEXICAL, "search", ROOT(repo), support.PHRASE, env=env)
-        routes = {support.LEXICAL_FACET: lexical["hits"], support.SEMANTIC_FACET: []}
+        # the list the lexical route gives the fusion: ``ranked`` where it gives one (W2-13's S2), else ``hits``
+        routes = {support.LEXICAL_FACET: lexical.get("ranked", lexical["hits"]), support.SEMANTIC_FACET: []}
         outcome = api.run([(support.FUSION, "rrf", (routes,), {}),
                            (support.FUSION, "search", (ROOT(repo), support.PHRASE), {"limit": None})], env=env)
     finally:

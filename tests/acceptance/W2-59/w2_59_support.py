@@ -37,6 +37,10 @@ PYPROJECT = WORKTREE / "pyproject.toml"
 CHECKS_REL = "template/governance/kernel/checks"
 KERNEL_LAYOUTS = {"template": "template/governance/kernel", "installed": "governance/kernel"}  # DEC-579
 HOOKS_REL = "template/governance/kernel/hooks"
+# This repository's own five-rule hook (DEC-953 item 2): the source's preToolUse line runs
+# ``$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py`` since ACT-GUARD-FIX-4, so a planted project holds its three
+# files too (D-4's red fix R-2, DEC-1061). With no ``role_paths:`` in the project, ``role_reads`` checks nothing.
+LIVE_HOOKS_REL = ".claude/hooks"
 HOOK_SOURCE_REL = ".rulesync/hooks.jsonc"
 BASELINE_IN_PACKAGE = "gov/retrieval/retrieve_baseline.yaml"
 REAL_PYTHON = os.path.realpath(sys.executable)
@@ -399,10 +403,19 @@ def hook_input(event: str, project: Path) -> dict:
     }[event]
 
 
-def hook_project(base: Path, markers: Path, *, with_src: bool) -> Path:
-    """A project that holds the kernel's hook programs (single named files of this worktree) and, when asked, a
-    ``gov`` package of its own under ``src/`` that leaves a marker when imported."""
+def hook_copies() -> dict:
+    """The hook programs a planted project holds: the kernel's and this repository's own five-rule hook (single
+    named files of this worktree)."""
     copies = {f"{HOOKS_REL}/{path.name}": path for path in sorted((WORKTREE / HOOKS_REL).glob("*.py"))}
+    copies.update({f"{LIVE_HOOKS_REL}/{path.name}": path
+                   for path in sorted((WORKTREE / LIVE_HOOKS_REL).glob("*.py"))})
+    return copies
+
+
+def hook_project(base: Path, markers: Path, *, with_src: bool) -> Path:
+    """A project that holds the hook programs (``hook_copies``) and, when asked, a ``gov`` package of its own under
+    ``src/`` that leaves a marker when imported."""
+    copies = hook_copies()
     files = {"README.md": "w259 hook project\n"}
     if with_src:
         files.update(tree_gov_files(markers))
@@ -466,7 +479,7 @@ def worker_project(base: Path, markers: Path, *, src_in_project: bool) -> tuple:
     their own import path themselves (row W2-M389), a folder outside the project, so that only the line decides
     whether the inherited path reaches the program. Returns ``(project, the inherited folder)``."""
     base = Path(base)
-    copies = {f"{HOOKS_REL}/{path.name}": path for path in sorted((WORKTREE / HOOKS_REL).glob("*.py"))}
+    copies = hook_copies()
     files = {"README.md": "w259 worker project\n"}
     if src_in_project:
         files.update(worker_import_path_files(markers))
@@ -503,10 +516,13 @@ def install_rollback(box: Box) -> Path:
 
 
 def refused_write(project: Path) -> dict:
-    """A PreToolUse input the pin's guard refuses: an engineer's Write outside the ticket's paths."""
+    """A PreToolUse input the pin's guard refuses: an engineer's Write into the acceptance tests (rule 1, which both
+    the product's full guard and this repository's five-rule hook keep; a write outside the ticket's paths is the
+    full guard's alone since DEC-953 item 2, so the five-rule line lets it through)."""
     return {"session_id": "w259-session", "transcript_path": str(project / "transcript.jsonl"), "cwd": str(project),
             "hook_event_name": "PreToolUse", "tool_name": "Write", "tool_use_id": "toolu_w259_0002",
-            "tool_input": {"file_path": str(project / "outside-the-ticket" / "w259.txt"), "content": "w259\n"}}
+            "tool_input": {"file_path": str(project / "tests" / "acceptance" / "W2-59" / "w259.py"),
+                           "content": "w259\n"}}
 
 
 def denies(done: Run) -> bool:

@@ -20,19 +20,19 @@ allowed_paths:
 - tests/acceptance/W2-61/test_w2_61_baseline.py
 - tests/acceptance/W2-61/test_w2_61_scores.py
 - tests/acceptance/W2-61/README.md
-- fixtures/evaluation/memory-retrieval/hidden/**
+- tests/acceptance/W2-61h/**
 - fixtures/evaluation/memory-retrieval/visible/q21.yaml
 - fixtures/evaluation/memory-retrieval/visible/q22.yaml
 - fixtures/evaluation/memory-retrieval/visible/q23.yaml
 - fixtures/evaluation/memory-retrieval/visible/q24.yaml
 kpis:
   success:
-  - 'Twenty-eight new questions about this repository''s governance and code, each with its gold answer and the governing source or sources an answer must cite, in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, sends 4 to the visible half and 24 to the hidden half (fixtures/evaluation/memory-retrieval/visible/q21.yaml to q24.yaml, and hidden/) [DEC-954 Q9a, DEC-957, DEC-828 items 3 and 4, DEC-820 (d)]'
+  - 'Twenty-eight new questions about this repository''s governance and code, each with its gold answer and the governing source or sources an answer must cite, in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, sends 4 to the visible half and 24 to the hidden half (fixtures/evaluation/memory-retrieval/visible/q21.yaml to q24.yaml in the repository; the hidden 24 in the sets root outside every worktree, ~/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/) [DEC-954 Q9a, DEC-957, DEC-828 items 3 and 4, DEC-820 (d), DEC-1055 (4)]'
   - 'Written by a session independent of the retrieval tickets: no session that builds or tunes retrieval (W2-03, W2-55, W2-61''s engineer, W2-64, W2-04, W2-05, W2-06, W2-13, W2-15a) writes or reads them [DEC-828 item 3, DEC-845 item 2]'
   - 'The spread covers the combined memory spec (DEC-954 Q9c): decisions and supersession 5 (at least 2 whose naive answer is superseded), exact strings and identifiers with file and line 4, callers, callees and definitions 4, code facts by paraphrase 3, the kernel template (roles, skills, hooks) 3, multi-file stacked 3 (each needing two or more files), history 2, failure memory 2, a plan, ticket or path-map fact 1, an id that exists nowhere 1 [DEC-954 Q9a, Q9c, DEC-833, DEC-866]'
   - 'Every gold source exists at the commit the auditor reads and holds the answer, cited by path and heading or line [DEC-828 item 4]'
-  - 'Nothing written outside fixtures/evaluation/memory-retrieval/hidden/; no question or answer quoted in a commit message, a return, a log or a ticket note [DEC-820 (d)]'
-  - 'The hidden half is used for a measure only after ACT 1''s five-rule hook and W2-84 refuse it from every worktree and run clone [DEC-954 Q9b, DEC-950]'
+  - 'The hidden half is held only in the sets root outside every worktree (~/gov-os-eval, mode 700): in no worktree, run clone, store or commit; no question or answer quoted in a commit message, a return, a log or a ticket note [DEC-820 (d), DEC-1052 G-3, DEC-1055 (4), ACT-D8]'
+  - 'The hidden half is read for a measure only by the unmeasured measure run (`measure.py --sets-root ~/gov-os-eval`), and its form is checked by tests that report counts and pass or fail only, never its contents [DEC-954 Q9b, DEC-1052 G-3, DEC-1055 (4)]'
   failure:
   - A hidden question or answer readable by a measured role by a route an honest agent takes in ordinary work.
   - A question copied from or paraphrasing lens B's visible 20.
@@ -65,3 +65,5 @@ Companion to W2-61 (DEC-941). W2-61's engineer writes the measure and runs the v
 - **Form:** the auditor reads W2-61's script's input form once it is merged (`src/gov/retrieval/measure.py` and its README or docstring) and writes in that form. Before then, one YAML file per question with `question`, `gold_answer` and `sources` (path plus heading or line).
 - **After it:** the orchestrator, which no set measures, runs W2-61's script on the hidden half and records the scores only (never the questions or answers) beside the visible baseline in `docs/research/W2-61-baseline.md`.
 - **No path map change:** the hidden folder and its refusal are already in the path map (`evaluation_sets.memory-retrieval`, W2-58).
+
+**DEC-1069 (owner, 2026-11-04 ~13:00):** the set grows to about 40 per half (DEC-1009 amended); **this ticket's category quotas are amended to fit R5** (each governing domain, the plan, tickets, the Contract, decisions and code, at least 10 % of each half; no subsystem above 25 %; at least 3 on failure and lesson memory, at least 2 on the kernel's skills or roles), as stated in `docs/research/memory-measure-audit/RUBRIC.md`'s R5 for a 40-question half; R11 (no answer that changes with ordinary work unless its gold is computed at the measured head) and R1.3 (test-harness code never governs a code fact, except for a question about the harness) apply. The hidden 16 new questions and the corrections of h03 and h08 are written by the owner's operator as the independent checker (ACT-HLABEL-2, ACT-HNEW-1), outside the guard; nothing about them reaches the CTO's session.

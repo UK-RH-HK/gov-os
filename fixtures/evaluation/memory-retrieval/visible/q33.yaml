@@ -1,0 +1,12 @@
+category: failure-memory
+commit: cc9c94d42a54
+question: "What must a wait loop in a script have so that it cannot stall forever?"
+gold_answer: >-
+  A maximum elapsed time or iteration count, an observable condition that can actually change, and a deterministic
+  timeout action; tracked-PID or process-group state rather than a process-name pattern, and where a pattern is
+  unavoidable, proof that the waiter cannot match itself (L-0075: a pgrep -f wait matched its own command line and ran
+  about 10 hours; a handshake stall ran 420 minutes).
+sources:
+  - path: docs/lessons/L-0075.md
+    heading: "During Phase 2, two unbounded wait incidents occurred. A coordinator-handshake stall ran for 420 minutes, and a self-matching `pgrep -f` wait-loop ran for approximately 10 hours — the process's pattern matched its own command line, so the wait condition could never become false."
+    lines: [12, 16]

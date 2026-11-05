@@ -1,15 +1,20 @@
-"""Start Ollama on demand, or say that retrieval is FTS-only (DEC-260, DEC-261, DEC-257).
+"""Check that the shared embedders answer, or say that retrieval is FTS-only (DEC-260, DEC-257; W2-32 S10, DEC-1065).
 
-``gov`` starts ``ollama serve`` when the endpoint is down and never stops it:
-Ollama's own 5-minute idle unload frees the model's memory. There is no unit and
-no keep-alive override. When the daemon cannot be reached within the deadline,
-the result names the facet state and the warning is written once to standard error.
+**No CPU fallback (W2-32 S10, DEC-1065 (1), DEC-1031):** ``ensure_available`` and ``ensure_query_available``
+check health only. A search, a rebuild, a close's refresh, the seed and the launch sandbox never start an embedder:
+when the shared GPU embedders cannot be reached, the result is ``EMBEDDER_UNAVAILABLE`` (named first in the warning)
+and retrieval answers by keywords. Only an explicit restart of the shared servers (``safe_restart``, which passes
+``start=True``) starts ``ollama serve``, under the cap of their committed configuration. That start is never
+stopped by ``gov``; Ollama's own idle unload frees the model's memory. The warning is written once to standard error.
 
-Two daemons are started so (DEC-261 as DEC-798 amends it and DEC-1033 replaces its
-CPU-only rule): the shared one at ``OLLAMA_HOST``, which builds the index, and the
-query one at ``GOV_QUERY_OLLAMA_HOST``, which embeds the questions and nothing else.
-The second is started with its own ``OLLAMA_HOST`` and the GPU left visible: a
-question's vector is used from any device (DEC-1033).
+What follows describes such an explicit start (DEC-261 as DEC-798, DEC-1033 and DEC-1065 amend it).
+
+Two daemons are started so (DEC-261 as DEC-798 amends it, DEC-1033 replaces its
+CPU-only rule and DEC-1065 makes the GPU the only device): the shared one at ``OLLAMA_HOST``,
+which builds the index, and the query one at ``GOV_QUERY_OLLAMA_HOST``, which embeds the
+questions and nothing else. The second is started with its own ``OLLAMA_HOST`` and the GPU
+left visible: a vector, a question's or a chunk's, is used only when computed on the GPU
+(W2-32 S10); one computed on the CPU is refused, never cached or stored.
 
 Every start of either daemon is capped (DEC-1014, DEC-1017): its parallel requests, its logical CPUs and its
 niceness come from the ``embedding_servers`` section of the resource gate's configuration file (W2-20), else from
@@ -40,7 +45,8 @@ from pathlib import Path
 DEFAULT_HOST = "127.0.0.1:11434"
 HEALTH_PATH = "/api/version"
 FACET = "semantic"
-WARNING = "Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."
+UNAVAILABLE = "EMBEDDER_UNAVAILABLE"  # the shared GPU embedder does not answer, and gov starts none (W2-32 S10)
+WARNING = f"{UNAVAILABLE}: Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."
 QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"  # the query embedder's address, in OLLAMA_HOST's form (DEC-798)
 QUERY_DEFAULT_HOST = "127.0.0.1:11435"
 
@@ -184,10 +190,12 @@ def _capped(settings: dict):
     return cap
 
 
-def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
-    """Make the Ollama endpoint answer within ``timeout_s``, starting ``ollama serve`` if needed, capped; never raises
-    when it cannot. ``env`` (default: the process environment) is read for the three variables and given to
-    the daemon."""
+def ensure_available(*, timeout_s: float = 20.0, env=None, start: bool = False) -> dict:
+    """Whether the Ollama endpoint answers; never raises. Without ``start`` (every caller but ``safe_restart``) it is
+    a health check only: nothing is started, and a server that does not answer is ``EMBEDDER_UNAVAILABLE`` (W2-32
+    S10, DEC-1065). With ``start``, ``ollama serve`` is started if needed, capped, and waited for within
+    ``timeout_s``. ``env`` (default: the process environment) is read for the three variables and given to the
+    daemon."""
     env = os.environ if env is None else env
     server = _server(env)
     settings, _, invalid = _config(server, env)
@@ -195,6 +203,15 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
     url = _url(env.get("OLLAMA_HOST") or DEFAULT_HOST, HEALTH_PATH)
     available = _healthy(url, deadline)
     started = False
+    if not start:  # the settings a start would use are stated, as on the start path (W2-123; W2-32 review F-3)
+        if available:
+            return {"available": True, "started": False, "facet": FACET, "state": "AVAILABLE", "warning": invalid,
+                    "settings": settings}
+        print(WARNING, file=sys.stderr)  # W1-18's result; the warning names EMBEDDER_UNAVAILABLE first
+        result = {"available": False, "started": False, "facet": FACET, "state": "FACET_UNAVAILABLE",
+                  "warning": WARNING}
+        found = _executable(env)  # a file that would start; a named one that is not there is none (W1-18)
+        return {**result, "settings": settings} if found and os.path.isfile(found) else result
     if invalid:
         print(invalid, file=sys.stderr)
         if available:
@@ -234,12 +251,12 @@ def query_host(env=None) -> str:
     return env.get(QUERY_HOST_SETTING) or QUERY_DEFAULT_HOST
 
 
-def ensure_query_available(*, timeout_s: float = 20.0, env=None) -> dict:
-    """Make the query embedder answer at ``query_host``, as ``ensure_available`` does, starting ``ollama serve``
-    with ``OLLAMA_HOST`` set to that address and the rest of the caller's environment as it is: the GPU is not
-    hidden (DEC-1033 replaces DEC-798's ``CUDA_VISIBLE_DEVICES=-1``); never stopped."""
+def ensure_query_available(*, timeout_s: float = 20.0, env=None, start: bool = False) -> dict:
+    """Whether the query embedder answers at ``query_host``, as ``ensure_available`` says: a health check only
+    unless ``start`` (``safe_restart``), which starts ``ollama serve`` with ``OLLAMA_HOST`` set to that address and
+    the rest of the caller's environment as it is: the GPU is not hidden (DEC-1033); never stopped."""
     env = os.environ if env is None else env
-    return ensure_available(timeout_s=timeout_s, env={**env, "OLLAMA_HOST": query_host(env)})
+    return ensure_available(timeout_s=timeout_s, env={**env, "OLLAMA_HOST": query_host(env)}, start=start)
 
 
 def _embed_one(host: str, text: str, timeout_s: float) -> bytes | None:
@@ -379,7 +396,7 @@ def safe_restart(server: str, *, env=None) -> dict:
         if not _stop(old, port):
             _record(env, result, checked)
             return {**result, "reason": f"process {old} or a process it started did not stop; nothing is started"}
-    start = (ensure_query_available if server == "query" else ensure_available)(env=env)
+    start = (ensure_query_available if server == "query" else ensure_available)(env=env, start=True)  # explicit
     result.update(restarted=start["started"], new_pid=_listener(port) if start["started"] else None,
                   reason=f"the server was {checked['state']}: " + (
                       "started again under its cap" if start["started"] and start["available"] else

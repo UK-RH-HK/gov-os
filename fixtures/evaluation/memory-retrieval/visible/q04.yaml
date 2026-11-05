@@ -1,30 +1,41 @@
 # Lens B's Q04 (Table 2): "CAP-15 (Contract 255–262), CAP-15.md, CAP-15.g.md, DEC-004, context/__init__.py 19–23,
-# retrieve.py:33". My reading: each place states the same ceiling (about 6k tokens), so all are alternatives of one
-# entry. CAP-15.g states the summary's ~2.5k beside it; kept because lens B names it.
+# retrieve.py:33".
+# Re-labelled by the owner's DEC-1069 (1) and (2) (2026-11-04; the audit's R1-NOT-GOVERNING, R6-NO-ANSWER and
+# R10-CATEGORY), checked blind at the commit by a session independent of the retrieval work. The question is kept,
+# and Q04 stays beside Q09 (the owner's option (a)). The label before is in ../retired/q04-pre-dec1069.yaml.
+# Dropped: DEC-004's entry, which is PROPOSED and was settled by DEC-086, which does not state the size (Q09's
+# re-label left it out for the same reason); CAP-15.g's record, which states only the summary's ~2.5k, not the
+# ceiling; and retrieve.py's BUNDLE_BUDGET, which is the retrieval bundle's budget, another limit that only borrows
+# DEC-004's number. The gold answer no longer cites DEC-004.
+# Added: CAP-15 in contract.yaml, the authority whose generated copies CONTRACT_v4.md and CAP-15.md are. Also the
+# Contract's envelope (its token budget, "Context packet ≤ ~6k tokens") in contract.yaml and in CONTRACT_v4.md. The
+# audit did not name the envelope, but it states the ceiling as fully as CAP-15 does, as Q09's label counts it.
+# Kept: CAP-15 in CONTRACT_v4.md and in CAP-15's record, and the code's default (context/__init__.py DEFAULT_BUDGET),
+# all alternatives of one entry. Category `contract`: the Contract governs the answer.
 id: Q04
-category: decision
-commit: 23079f92a6fa
+category: contract
+commit: cc9c94d42a54
 question: What is the token ceiling of a context packet?
 gold_answer: >-
-  About 6,000 tokens: CAP-15 holds the packet under the configured ceiling (default ~6k tokens, after DEC-004's
-  target of at most ~6k), delivered as a file path plus a summary of at most ~2.5k tokens; the code's default is
-  DEFAULT_BUDGET = 6000.
+  About 6,000 tokens: by the Contract (CAP-15, and its envelope's "Context packet ≤ ~6k tokens") the packet stays
+  under the configured ceiling, default ~6k tokens, and is delivered as a file path plus a summary of at most ~2.5k
+  tokens; the code's default is DEFAULT_BUDGET = 6000.
 sources:
-  - - path: docs/contract/CONTRACT_v4.md
+  - - path: docs/contract/contract.yaml
+      heading: "- id: CAP-15"
+      lines: [962, 969]
+    - path: docs/contract/CONTRACT_v4.md
       heading: "### CAP-15 — Context packet compilation"
-      lines: [255, 272]
+      lines: [256, 273]
     - path: docs/contract/capabilities/CAP-15.md
       heading: "# CAP-15: Context packet compilation"
       lines: [11, 19]
-    - path: docs/contract/capabilities/CAP-15.g.md
-      heading: "# CAP-15.g: File path + summary ≤ ~2.5k tokens (harness output caps)"
-      lines: [11, 16]
-    - path: docs/DECISION_REGISTER.md
-      heading: "### DEC-004 — Governance overhead budget (hard SLO)"
-      lines: [61, 65]
+    - path: docs/contract/contract.yaml
+      heading: "  token_budget:"
+      lines: [52, 60]
+    - path: docs/contract/CONTRACT_v4.md
+      heading: "- **Token budget** (DEC-004, DEC-086). Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md ≤ ~1.5k tokens. A breach is a health finding, never a silent cost."
+      lines: [44, 44]
     - path: src/gov/context/__init__.py
       heading: "DEFAULT_BUDGET = 6000"
-      lines: [21, 21]
-    - path: src/gov/retrieval/retrieve.py
-      heading: "BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)"
-      lines: [33, 33]
+      lines: [22, 22]

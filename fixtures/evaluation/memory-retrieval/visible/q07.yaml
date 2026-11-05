@@ -1,17 +1,28 @@
+# volatile: its answer changes with ordinary work (DEC-1069 (6)); gold as at cc9c94d42a54
 # Lens B's Q07 (Table 2): "The front matter's dependency list (DAEO-0mab.md 1–72) or WBS:118": one piece of
-# evidence in two places, alternatives of one entry. The list is lines 17–44 at the commit.
+# evidence in two places, alternatives of one entry.
+# Re-labelled by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-WRONG and R6-SPAN-OVERRUNS), checked blind at
+# the commit by a session independent of the retrieval work. The gold answer gave 27 tickets, DAEO-g0ip to DAEO-7rr2.
+# At the commit DAEO-0mab's depends_on (and its tk deps, the same list) holds 23, DAEO-g0ip to DAEO-2bdu: DEC-954's
+# change moved nine out and put five new ones in. The ticket's span (17 to 44) ran past the list into allowed_paths
+# and the KPIs; the list is lines 17 to 40. The WBS row's heading is found at line 150 (it was 118). The question
+# and both sources are kept. The label before is in ../retired/q07-pre-dec1069.yaml.
 id: Q07
 category: ticket
-commit: 23079f92a6fa
+commit: cc9c94d42a54
 ticket: DAEO-0mab
 question: Which tickets must be done before the Track A gate run?
 gold_answer: >-
-  Every other Track A ticket: DAEO-0mab's depends_on lists the 27 tickets from DAEO-g0ip to DAEO-7rr2 (among them
-  W2-03 DAEO-ym8a, W2-04 DAEO-u4oz and W2-06 DAEO-kia7).
+  Every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954): DAEO-0mab's depends_on
+  lists 23 tickets, DAEO-g0ip (W2-01), DAEO-zflj (W2-02), DAEO-ym8a (W2-03), DAEO-u4oz (W2-04), DAEO-0z8c (W2-05),
+  DAEO-kia7 (W2-06), DAEO-r9ss (W2-07), DAEO-7r5e (W2-08), DAEO-k7hz (W2-11), DAEO-zqvn (W2-13), DAEO-rd0g (W2-15a),
+  DAEO-49o5 (W2-16), DAEO-r30l (W2-20), DAEO-1ahb (W2-21), DAEO-kmcr (W2-23), DAEO-ha8z (W2-49), DAEO-kl5e (W2-50),
+  DAEO-7rr2 (W2-53), DAEO-cy5o (W2-57), DAEO-siiz (W2-52), DAEO-wnnz (W2-56), DAEO-egsy (W2-51) and DAEO-2bdu
+  (W2-88).
 sources:
   - - path: .tickets/DAEO-0mab.md
       heading: "depends_on:"
-      lines: [17, 44]
+      lines: [17, 40]
     - path: docs/plan/WAVE_2_WBS.md
       heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954) | 0 | AR-1 … AR-10 (the lines whose tickets moved are named Wave 3 in its report) |"
-      lines: [118, 118]
+      lines: [150, 150]

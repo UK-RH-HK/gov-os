@@ -1,0 +1,4 @@
+# The rebuild's settings (DEC-1067 order (5); W2-32's index-time method 1, measure 4: x5 + headers 38 of 48, visible 21
+# against 20, adopted by the rule written before it ran). Each chunk is embedded with its file path and the headings
+# above it; the keyword chunk, the evidence and the reranker's input are unchanged. Switching it re-embeds every chunk.
+embed_headers: true

@@ -1,0 +1,13 @@
+# Re-worded by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-DETAIL), checked blind at cc9c94d42a54 by a session
+# independent of the retrieval work: the gold answer's line number (26; MAP_REL is at line 27 there, its value
+# unchanged) is dropped: the source's heading locates it. The question, its commit and the source are kept. The
+# label before is in ../retired/q23-pre-dec1069.yaml.
+category: exact-string
+commit: f46b96537d74
+question: "Which constant in the close's test selection holds the test map's path, and what is its exact value?"
+gold_answer: >-
+  MAP_REL = "governance/project/test-map.yaml", in src/gov/close/select.py.
+sources:
+  - path: src/gov/close/select.py
+    heading: 'MAP_REL = "governance/project/test-map.yaml"'
+    lines: [26, 26]

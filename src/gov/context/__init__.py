@@ -206,12 +206,15 @@ def _make_item(record: dict, sha: str, reason: str, tokens: int) -> dict:
     }
 
 
-def _try_supplementary(root: Path, title: str, kpis: list, room: int, skip_paths: set, skip_entries: set) -> dict:
-    """The supplementary block (``gov.retrieval.supplementary.stack``) for ``room`` tokens; a failed lookup is one
-    entry of ``dropped``, named by its kind (W2-L180), and the block empty."""
+def _try_supplementary(root: Path, title: str, kpis: list, room: int, skip_paths: set, skip_entries: set,
+                       role: str | None = None, ticket: str | None = None) -> dict:
+    """The supplementary block (``gov.retrieval.supplementary.stack``) for ``room`` tokens, filtered for the caller's
+    role (``GOV_ROLE`` and ``role``, a ``--role`` beside it; W2-13 S5); a failed lookup is one entry of ``dropped``,
+    named by its kind (W2-L180), and the block empty."""
     from gov.retrieval import supplementary
     try:
-        return supplementary.stack(root, title, kpis, room, skip_paths=skip_paths, skip_entries=skip_entries)
+        return supplementary.stack(root, title, kpis, room, skip_paths=skip_paths, skip_entries=skip_entries,
+                                   role=role, ticket=ticket)
     except Exception as exc:
         reason = str(exc) if isinstance(exc, supplementary.Unavailable) else _lookup_failure(root, exc)
         return {"query": supplementary.query(title, kpis), "supplementary": [], "further_batch": [],
@@ -243,7 +246,9 @@ def _lookup_failure(root: Path, exc: Exception) -> str:
 
 
 def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None = None,
-            dry_run: bool = False) -> dict:
+            dry_run: bool = False, role: str | None = None) -> dict:
+    """``role``: a ``--role`` given; it adds its role-paths filter to the supplementary block beside ``GOV_ROLE``'s,
+    never lifts it (W2-13 S5, DEC-1065 (2))."""
     root = Path(root)
     limit = budget if budget is not None else DEFAULT_BUDGET
 
@@ -341,7 +346,7 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     skip_paths = {ticket_rel} | {rec["path"] for rec in resolved if not rec.get("in_register")}
     skip_entries = {rec["id"] for rec in resolved if rec.get("in_register")}
     block = _try_supplementary(root, str(front.get("title", "")), _kpi_lines(front), limit - mandatory_tokens,
-                               skip_paths, skip_entries)
+                               skip_paths, skip_entries, role, ticket)  # S5-F1: the packet's ticket too
     supplementary, left_out = block["supplementary"], block["left_out"]
     # one order whatever order the retrieval returned its items in (DEC-768): an entry is its id and its reason,
     # so the two decide every pair that differ; what is kept still follows the retrieval's rank

@@ -625,3 +625,25 @@ Brought to DEC-491 and DEC-495 (two versions before):
 | `test_no_session_of_the_ticket_gives_no_figure`, `test_named_session_without_a_log_gives_no_figure`, `test_absent_log_folder_gives_no_figure`, `test_empty_log_folder_gives_no_figure`, `test_ccusage_that_cannot_be_read_gives_no_figure` | unchanged text; the shared `assert_no_figure` now asks for the three share figures and cache creation to say `"not measured"` | DEC-495 |
 | every case that writes logs | unchanged text; the logs are now written in the specimen's form (two lines a message, a `cost-state` line) | DEC-495 |
 | every case | unchanged text; the fixture project now has the designer's commit before the engineer's | DEC-491 |
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 56 in the full run, 105 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov counts governance tokens per ticket (instruction files, SessionStart packet, hook output, gov output, governance MCP definitions, checkpoin... | `test_w1_31_share_counter.py::test_joins_ccusage_input_and_output_of_the_tickets_sessions`, `test_w1_31_measured_and_estimated.py::test_mcp_definitions_count_zero_and_the_record_gives_the_reason` (1 of 4), `test_w1_31_share_counter.py::test_counts_the_tickets_checkpoint_records` | the ticket's words |
+| S2: The close record carries the share and the locally observable Contract v3 P1 fields (session, model, role, ticket, skill/tool versions, packet ... | `test_w1_31_measured_and_estimated.py::test_the_model_is_reported_from_the_logs_and_from_the_commits`, `test_w1_31_second_specimen.py::test_a_subagents_lines_and_tokens_belong_to_the_named_session`, `test_w1_31_third_specimen.py::test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes` | the ticket's words |
+| S3: The close record also carries agent, provider, latency and files read, taken from the harness session log [CAP-40.a] | `test_w1_31_share_counter.py::test_record_names_agent_provider_latency_and_files_read` | the ticket's words |
+| S4: The share is reported per profile (LITE, STANDARD, FULL), so the budget is judged against the ceremony applied [CAP-53.c] | `test_w1_31_measured_and_estimated.py::test_a_ticket_without_a_profile_is_not_measured_for_the_profile`, `test_w1_31_share_counter.py::test_record_names_the_tickets_profile_beside_the_share` (3 of 3) | the ticket's words |
+| S5: The close record carries the three Wave 1 learning metrics: KPI disputes raised by the test designer, acceptance tests rewritten after implemen... | `test_w1_31_share_counter.py::test_record_carries_the_three_learning_metrics`, `test_w1_31_measured_and_estimated.py::test_the_record_states_no_verdict_and_no_threshold`, `test_w1_31_measured_and_estimated.py::test_rewrites_are_the_designers_commits_after_the_first_engineer_commit` | the ticket's words |
+| S6: For a launched worker session the close record reports the sandbox's added system-prompt tokens (about 3,250 input tokens per session, EXP-001 ... | `test_w1_31_share_counter.py::test_sandbox_tokens_are_a_line_apart_and_never_assumed`, `test_w1_31_third_specimen.py::test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes`, `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes` | the ticket's words |
+| F1: A ticket closes without a share figure | `test_w1_31_measured_and_estimated.py::test_the_three_share_figures_are_the_numbers_the_case_computes`, `test_w1_31_share_counter.py::test_counts_the_tickets_close_record`, `test_w1_31_share_counter.py::test_no_session_of_the_ticket_gives_no_figure` | the ticket's words |
+| F2: Cache reads are counted in the share | `test_w1_31_share_counter.py::test_cache_reads_change_neither_share_nor_tokens`, `test_w1_31_share_counter.py::test_cache_reads_and_cache_creation_are_figures_of_their_own` | the ticket's words |

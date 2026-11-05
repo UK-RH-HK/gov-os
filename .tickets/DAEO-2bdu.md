@@ -146,3 +146,21 @@ Card: from the owner's DEC-954 Q9f (2026-10-30): "Memory for any repository, not
   - It builds no indexed vector store (a proposal if the scale figures call for one).
   - It adds no graph route to plain-question retrieval (MEMORY-SPEC-MAP gaps 2 and 3).
   - It writes no question for W2-81's or EXAMIN's hidden halves (gaps 6 and 7).
+
+## The memory-building practice (DEC-1072 (2), 2026-11-04)
+- **Memory-building is a Gov OS practice for every adopted repository's Wave 0,** and this ticket owns it. The
+  practice learned in D-4b is recorded in `docs/research/W2-88-memory-practice.md`, kept up to date as D-4b goes, and
+  becomes a kernel skill after the refactoring. The record holds:
+  - how the store is built;
+  - how it is measured (the rubric, the three sets and their jobs, independent writers, the hidden-half rule,
+    scoring);
+  - how it is tuned (structural fixes only, judged on all sets, consistency as the proof);
+  - every method tried, with its figures;
+  - the lessons.
+- **What it adds to this ticket's work:**
+  - A9's index follows the record's section 6:
+    - a census of the repository's stated links before the graph is built;
+    - chunking by meaning, with the heading path given to every reader;
+    - the three sets by independent writers.
+  - The 10 questions per real repository (KPI "Memory works there") follow the rubric.
+- **The KPIs are unchanged until the owner amends them.** A KPI change goes through this ticket's test designer.

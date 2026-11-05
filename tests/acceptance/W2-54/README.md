@@ -1016,7 +1016,21 @@ file. No case is retired; the count stays 14 in the file and 103 in the suite.
 | `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | a read with an environment that says nothing about the GPU starts the executable found as DEC-260 finds it as `serve` at the query address, told nothing about the GPU (none of `CUDA_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, `ROCR_VISIBLE_DEVICES`, `GPU_DEVICE_ORDINAL`, `OLLAMA_LLM_LIBRARY`), so it serves on the GPU; the read gets its semantic answer; never stopped; a second read starts nothing |
 | `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | two reads at once: both answered, every start told the address and nothing about the GPU, one embedder serving there on the GPU, nothing stopped |
 
-**What was removed:** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
+**DEC-1065 (1) (owner, 2026-11-03; W2-32's S10; the review of W2-32, F-8):** no CPU fallback anywhere, `ensure_*` a
+health check only, and only an explicit restart starts a server. Revised by W2-32's independent test designer; each
+change carries `Rewrite-Reason: DEC-1065 (1)` in the file. The count stays 14 in the file.
+
+| old case | new case | what it now checks |
+|---|---|---|
+| the `cpu` fixture (the query embedder's stand-in, on the CPU) | the same fixture, on the GPU | the 9 cases that use it keep what they guard: the questions to the query embedder only, the chunks to the shared runner, round 3's key never served, a model not reported loaded gives no vector |
+| `test_a_vector_cached_under_round_3_s_key_is_never_served`'s twin query embedder, on the CPU | the same, on the GPU | the reference answer is the twin's again (a CPU vector is refused) |
+| `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_with_nothing_at_the_query_address_starts_nothing_and_answers_by_keywords[GOV_OLLAMA_BIN, PATH, HOME]` | with nothing at the query address and the stand-in `ollama` where DEC-260 looks: two reads run no executable, name the semantic part `EMBEDDER_UNAVAILABLE`, answer by keywords, send nothing to the shared runner |
+| `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_with_nothing_at_the_query_address_start_nothing_and_both_answer_by_keywords` | two reads at once: both clean, both named `EMBEDDER_UNAVAILABLE` and answered by keywords, no executable run, nothing to the shared runner |
+
+**What was removed (DEC-1065 (1)):** the start by a read and the "never stopped" of what it started (nothing is
+started), and the use of a vector the query embedder computed on the CPU.
+
+**What was removed (DEC-1033):** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
 none, and the demand that every start hides the GPU (`gpu_hidden`). The start cases now hold the opposite, the GPU
 left visible, since DEC-1033 puts the query server on the GPU; a caller's own GPU variables are not judged (the cases
 give none). What each case guarded that still holds is kept.
@@ -1130,3 +1144,29 @@ at the base `b644d28a`, but the context check's line) failed on it ("secrets-ind
   back at its base bytes.
 - **Counts:** unchanged, 10 cases in the file, 105 in the suite (103 selected).
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 87 in the full run, 16 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order ... | `test_w2_54_dropped_order.py::test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash` (3 of 3), `test_w2_54_dropped_order.py::test_two_computations_with_the_retrieval_s_own_order_give_one_packet`, `test_w2_54_dropped_order.py::test_the_check_is_green_when_two_computations_see_two_orders` | the ticket's words |
+| S2: The same text always gets the same query vector, whatever was embedded before it: query vectors are stored, keyed by the model, the model's rev... | `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_query_vector.py::test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`, `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2) | the ticket's words |
+| S3: The query-vector cache is the one file a read command writes: a derived file under .gov-runtime/, keyed by model, model revision and a hash of ... | `test_w2_54_query_vector.py::test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`, `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the ticket's words |
+| S4: Where the cache cannot be written (a sandboxed worker, whose .gov-runtime is read-only), the same text still gets the same vector; a test shows... | `test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written` | the ticket's words |
+| S5: On the shared GPU Ollama, the same text read many times, after different texts and by two sessions at once, gets one vector: query embeddings c... | `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2), `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2) | the ticket's words |
+| S6: W1-21's hit@5 on the real models, with the query embedder's vectors (any device, DEC-1033) against the GPU-built index, is at or above its pass... | `test_w2_54_cpu_embedder.py::test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80`, `test_w2_54_cpu_embedder.py::test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on` (2 of 2), `test_w2_54_cpu_embedder.py::test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector` (2 of 2) | the ticket's words |
+| S7: W1-46's live cases launch their sessions with no CLAUDE* variable in the environment [owner, 2026-10-18, P-W2-34 (a)]. | `test_w2_54_cpu_embedder.py::test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner`, `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | the ticket's words |
+| S8: The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the ... | `test_w2_54_time_limit.py::test_the_change_record_states_the_limit_and_its_measurement`, `test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit` | the ticket's words |
+| S9: `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768]. | `test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here`, `test_w2_54_time_limit.py::test_the_two_checks_of_this_ticket_stay_hard_block` (2 of 2) | designer |
+| S10: The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`): its schema file byte for byte as W2-02's; in `src/gov/check/sc... | `test_w2_54_audit_report.py::test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report` (2 of 2), `test_w2_54_audit_report.py::test_a_record_of_type_audit_report_owes_no_shared_frontmatter` (1 of 2), `test_w2_54_audit_report.py::test_core_schema_is_green_on_this_repository_with_w1_43_untouched` | the ticket's words |
+| F1: A context whose items or hash differ between two computations still fails the check, naming the ticket. | `test_w2_54_dropped_order.py::test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_w2_54_dropped_order.py::test_the_check_names_only_the_ticket_whose_context_differs` | the ticket's words |
+| F2: A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4]. | `test_w2_54_time_limit.py::test_a_check_past_its_declared_limit_is_red`, `test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened`, `test_w2_54_time_limit.py::test_the_two_checks_of_this_ticket_stay_hard_block` (2 of 2) | designer |
+| F3: A record outside `docs/audit/` that states no `type` still fails core-schema; an audit report that lacks `milestone`, `commit` or `pack_sha256`... | `test_w2_54_audit_report.py::test_a_record_outside_the_audit_folder_that_states_no_type_still_fails` (3 of 3), `test_w2_54_audit_report.py::test_an_audit_report_lacking_a_required_field_fails_naming_it` (6 of 6) | the ticket's words |

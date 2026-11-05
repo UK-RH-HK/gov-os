@@ -1054,7 +1054,9 @@ class EmbedderStandIn:
     Every request is recorded: ``embedded()`` lists the texts sent to be embedded, in order.
     """
 
-    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT, device="cpu", bind=None, size=CPU_SIZE, log=None):
+    # Rewrite-Reason: W2-32's S10 (DEC-1065): the GPU is the only device, so a stand-in loads the model on the GPU
+    # unless a case names the CPU (it was "cpu" by default).
+    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT, device="gpu", bind=None, size=CPU_SIZE, log=None):
         self.digest, self.targets, self.drift, self.mode = digest, dict(targets or {}), drift, "healthy"
         self.requests, self.previous = [], None
         self.device, self.size, self.log, self.ps, self.loaded = device, size, log, None, None
@@ -1662,8 +1664,21 @@ class Daemons:
     def env(self, base, place=None):
         env = dict(base)
         env.pop("GOV_OLLAMA_BIN", None)
-        folders = [str(self.bin)] + [folder for folder in base.get("PATH", "/usr/bin:/bin").split(os.pathsep)
-                                     if folder and not (Path(folder) / "ollama").exists()]
+        # Rewrite-Reason: DEC-1061 (D-4's red fix R-1, latent copy): the folders holding ``ollama`` stay dropped, but
+        # the tools a read's refresh may need (``gitleaks``) are resolved on the full PATH first and linked from a
+        # scratch ``tools`` folder, so a dropped folder (~/.local/bin, the ollama wrapper beside gitleaks) takes no
+        # tool away; the dropped folder is never put back (W2-91's form).
+        full = base.get("PATH", "/usr/bin:/bin")
+        tools = self.root / "tools"
+        tools.mkdir(parents=True, exist_ok=True)
+        for name in ("gitleaks",):
+            found = shutil.which(name, path=full)
+            link = tools / name
+            if found and not link.is_symlink():
+                link.symlink_to(Path(found).resolve())
+        assert not (tools / "ollama").exists(), "the scratch tools folder must hold no ollama"
+        folders = [str(self.bin), str(tools)] + [folder for folder in full.split(os.pathsep)
+                                                 if folder and not (Path(folder) / "ollama").exists()]
         env.update({"PATH": os.pathsep.join(folders), "HOME": str(self.home)})
         if place is not None:
             path = self.install(place)

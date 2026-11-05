@@ -75,6 +75,8 @@ def endpoint(monkeypatch):
     def ask(path, body=None, host=None):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": state["digest"]}]}
+        if path == "/api/ps":  # Rewrite-Reason: W2-32's S10 (DEC-1065): the model loaded on the GPU, the one device
+            return {"models": [{"name": semantic.MODEL, "model": semantic.MODEL, "size": 1, "size_vram": 1}]}
         if state["fails"] or (state["fails_after"] is not None and len(state["sent"]) >= state["fails_after"]):
             return None
         state["sent"] += body["input"]
@@ -169,7 +171,11 @@ def test_a_base_that_differs_is_refused_named_and_the_rebuild_runs_cold(base, tr
 
 
 def test_an_endpoint_now_reporting_another_revision_refuses_the_base(base, tree, endpoint):
+    # Rewrite-Reason: W2-32's S2 (DEC-1064): an endpoint revision that no pin names fails closed, so the tree pins the
+    # endpoint's new revision in its models.yaml (W2-32's interface); the base, built at the old one, is still refused.
     endpoint["digest"] = "b" * 64
+    (tree / "governance/project/models.yaml").write_text(
+        f"embedder:\n  model: {semantic.MODEL}\n  revision: {'b' * 64}\n", encoding="utf-8")
     result = run(tree, _args("--seed", str(base)), CONFIG)
     assert result["seed"]["status"] == "refused" and "embedder model" in result["seed"]["reason"]
     assert set(map(tuple, json.loads((tree / seed.RECORD_REL).read_text())["embedder"].items())) == \
