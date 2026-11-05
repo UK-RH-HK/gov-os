@@ -203,3 +203,31 @@ W2-61's §8, with these changes:
 5. **The context check,** alone and not beside the measure (deviation 3): `TMPDIR=/tmp/gov-os-lead-W2-92 PYTHONPATH=<the head's src> timeout 3000 python3 -m gov.context.context_check` (`ctx-head2.sh`); its limit is 600 s.
 6. **The routes' reading** (§6): apply `graph_route`'s and `code_route`'s rules, the cue gate included, to the questions' text against the head store opened immutable (`/tmp/gov-os-lead-W2-92/eng7/routes2.py <head clone> <visible set>`); run no route and retrieve no question.
 7. **Never `--part hidden`.**
+
+## 10. Drift before and after the stated links (S10, DEC-1072 (1), DEC-1073 (2))
+
+- **The question:** of the decisions current though the register states them changed, how many does a search that reaches the decision also reach a changer of?
+- **The definitions are the census's** (`docs/research/D4B-link-census.py`, `3d1c459e`). A statement is a register label, its free text, the change log or ARCHIVE-SUPERSEDED §A. The register's statements come from `loader.register_statements`, which gives the census's 3,171 statements one for one on this repository's register (S7; `tests/unit/store/test_w2_92_links.py`). Current means status ACCEPTED and no SUPERSEDES edge in `edges`. DEC-1073 (2): the decisions ARCHIVE-SUPERSEDED §B calls spent are listed apart for a status reconciliation and are not counted; a decision that is not ACCEPTED (PROPOSED above all) is never current and is counted apart, by status.
+- **Before:** a one-hop SUPERSEDES edge in `edges` from a changer to the decision (all the graph held). **After:** the same, or an AMENDS or SUPERSEDES row of `stated_links`. **Reached by the hop:** `graph_route.follow` from the decision and its closure at R0/R1, within its bound of 12 records.
+- **The command** (read-only; no model, no network, no GPU; writes nothing but `<out.json>`), on the rebuilt store:
+
+  ```
+  PYTHONPATH=<tree>/src python3 docs/research/W2-92-proto-drift.py <tree> <out.json>
+  ```
+
+  `--from-head` reads the records and links from HEAD by the loader's own rule, with no store.
+
+| Figure | On the rebuilt store (the CTO) |
+|---|---:|
+| Store head, fingerprints row | _to fill_ |
+| Stated links by type (CITES, OF_TASK, UNDER, AMENDS, SUPERSEDES) | _to fill_ |
+| Drifted current, spent included (the census's count) | _to fill_ |
+| Drifted current (counted) / of them with no hint in their own entry | _to fill_ |
+| Spent, for the status reconciliation (of them stated changed) | _to fill_ |
+| Stated changed but not ACCEPTED, by status | _to fill_ |
+| **Before:** one-hop edge to a changer | _to fill_ |
+| **After:** one-hop link to a changer / to every changer | _to fill_ |
+| **After:** reached by the hop, a changer / every changer | _to fill_ |
+| Changer pairs / joined after | _to fill_ |
+
+The engineer's reading with `--from-head` at the ticket's head (`5a9e36c07571` plus W2-92 S7), not the figure of record: links CITES 1,679, OF_TASK 381, UNDER 2,481, AMENDS 388, SUPERSEDES 7; drifted current 221 with the spent and 190 counted (83 with no hint), 110 spent for the reconciliation (31 of them stated changed); not ACCEPTED: PROPOSED 12, SUPERSEDED 7, DONE 1. **Before 0, after 190 of 190** joined to a changer (184 to every changer); reached by the hop 190 (184 every changer); changer pairs 325, 312 joined.

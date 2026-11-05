@@ -19,6 +19,10 @@ commit gives the same store wherever and whenever it is loaded.
   ``HEAD`` does not hold as a file of text refuses the load (DEC-579: one that is not in the commit too).
 - A record of a file whose frontmatter ``title`` is a string keeps it in ``record_titles`` (W2-92 S6), outside the
   digest.
+- The links the records state that no edge holds are kept in ``stated_links`` (W2-92 S7, DEC-1072 (1)), outside the
+  digest: a record's frontmatter id keys (``CITE_KEYS`` as CITES, ``task`` as OF_TASK, a W2 id read through
+  ``wbs_id``/``external-ref``), and the register's statements (``register_statements``): a supersession that names
+  ids alone as SUPERSEDES, any other supersession or amendment as AMENDS, ``**Under:**`` as UNDER.
 - ``Task:`` and ``Implements:`` trailers are read from the final trailer block;
   a commit made before 2026-10-03 is read from the whole message (DEC-182).
 """
@@ -73,7 +77,25 @@ _TABLES = {
 # (``rebuild/seed.py``), so a warm base built without it is refused.
 TITLES_TABLE = "record_titles"
 _TABLES[TITLES_TABLE] = "path TEXT, id TEXT, title TEXT NOT NULL, PRIMARY KEY (path, id)"
-_DIGESTED = tuple(table for table in _TABLES if table != TITLES_TABLE)  # register_entries stays the last of them
+# W2-92 S7 (DEC-1072 (1), the census's kinds 1 to 4): the links the records state between records that no edge holds,
+# typed, from the record that states them; ``via`` names the key or the register's form that stated it (the first of
+# them, sorted). A table of its own, so the closure, ``gov dangling`` and every reader of ``edges`` are unchanged; kept
+# out of the digest like the titles; part of the schema version. Only links whose two ends are records are kept, and
+# none that ``edges`` already holds with the same type.
+LINKS_TABLE = "stated_links"
+_TABLES[LINKS_TABLE] = "type TEXT, source TEXT, target TEXT, via TEXT NOT NULL, PRIMARY KEY (type, source, target)"
+CITES = "CITES"  # a record -> a decision, capability or record it rests on (sources:, decisions:, closes:, ...)
+OF_TASK = "OF_TASK"  # a checkpoint or close record -> its ticket (task:)
+SUPERSEDES = "SUPERSEDES"  # a decision -> a decision it supersedes whole: the statement names ids alone
+AMENDS = "AMENDS"  # a decision -> a decision it changes in part: amendments, and supersessions of a part
+UNDER = "UNDER"  # a decision -> a decision it stands under (**Under:**)
+LINK_TYPES = (CITES, OF_TASK, SUPERSEDES, AMENDS, UNDER)
+CITE_KEYS = ("sources", "closes", "decisions", "decisions_applied", "decisions_carried", "decisions_recorded",
+             "decisions_read", "requirements_implemented")
+TASK_KEYS = ("task",)
+ALIAS_KEYS = ("wbs_id", "external-ref")  # a W2 id stands for the record whose frontmatter names it
+_DIGESTED = tuple(table for table in _TABLES
+                  if table not in (TITLES_TABLE, LINKS_TABLE))  # register_entries stays the last of them
 # W2-68: the one row of the load that built the store (its head, the head's two fingerprints, the kind of load),
 # kept out of the graph's tables and out of the digest, so the recovery-rebuild check (CAP-38.b) is unchanged.
 FINGERPRINTS_TABLE = "fingerprints"
@@ -204,7 +226,8 @@ def register_entries(text: str) -> tuple[list[dict], list[str]]:
 
 
 def _read_register(path: str, text: str, recorded: dict[str, str]):
-    """The decision records, the SUPERSEDES edges, the headings and the entries that are no records of a register.
+    """The decision records, the SUPERSEDES edges, the headings, the entries that are no records of a register and
+    its statements of change and governance (``register_statements``).
 
     ``recorded`` is ``id -> path`` of the records of the files: an id a file records is the file's, never two.
     """
@@ -224,7 +247,187 @@ def _read_register(path: str, text: str, recorded: dict[str, str]):
         if superseded and _IDS_ALONE.fullmatch(superseded.group(1).strip()):  # a part of a decision gives none
             edges.update(("SUPERSEDES", record_id, target)
                          for target in re.findall(r"DEC-[0-9]+", superseded.group(1)))
-    return records, edges, headings, invalid
+    return records, edges, headings, invalid, register_statements(text, entries)
+
+
+# The register's statements of change and governance, by the census's own patterns (docs/research/D4B-link-census.py,
+# §1): a label ``**Name:**`` and its value; ``Changed by``-like labels state the change from the other side; free text
+# "... amended by DEC-n" takes the nearest id before it as its subject; the change log outside the entries is read too.
+# Every pattern is a regular expression, approximate where the census says so. ``gov links`` (W2-129) reads these too.
+_LABEL = re.compile(r"\*\*([A-Z][A-Za-z ]{1,40}?):\*\*")
+_DEC = re.compile(r"\bDEC-(\d{3,})\b")
+_OUT_LABELS = {  # this entry -> the ids its value names
+    "Supersedes": "supersede", "Replaces": "supersede", "Withdraws": "supersede", "Reverses": "supersede",
+    "Narrows": "amend", "Restores": "amend", "Clarifies": "refine",
+    "Amends": "amend", "Changes": "amend", "Corrects": "amend",
+    "Refines": "refine", "Extends": "extend", "Settles": "settle", "Ratifies": "ratify", "Confirms": "confirm",
+    "Implements": "implement", "Under": "under", "Source": "source",
+}
+_IN_LABELS = ("Changed by", "Amended by", "Lifted by", "Superseded by", "Amended")  # the ids named -> this entry
+_VERB_CLASS = {"supersed": "supersede", "replac": "supersede", "withdr": "supersede", "revers": "supersede",
+               "overturn": "supersede", "end": "supersede", "amend": "amend", "correct": "amend", "chang": "amend",
+               "lift": "amend", "refin": "refine", "extend": "extend", "settl": "settle", "mark": "mark",
+               "shown": "mark", "show": "mark", "carri": "carry", "kept": "mark", "confirm": "confirm"}
+_BY = re.compile(r"\b(superseded|replaced|withdrawn|reversed|overturned|ended|amended|corrected|changed|lifted|refined|"
+                 r"extended|settled|marked|shown|carried|kept|confirmed)\b[^.;·]{0,60}?\bby\s+(?:the\s+)?((?:DEC-\d{3,}"
+                 r"(?:\s*\([^)]{0,40}\))?(?:\s*(?:item|items|Q)\s*[\w.]+(?:\s*(?:and|,)\s*[\w.]+)*)?"
+                 r"(?:\s*,\s*|\s+and\s+)?)+)")
+_OUTVERB = re.compile(r"\b(supersedes|replaces|withdraws|amends|overturns|reverses|corrects|refines|extends)\s+"
+                      r"(?:the\s+[^.;·]{0,40}?of\s+)?(DEC-\d{3,})")
+_HERE = re.compile(r"(DEC-\d{3,})((?:\s*\([^)]*\))*?)\s*\((?:[^)]*?\b)?(amended|superseded|replaced|changed|withdrawn)"
+                   r" here")
+
+
+def _verb_class(verb: str) -> str:
+    v = verb.lower()
+    return next((kind for stem, kind in _VERB_CLASS.items() if v.startswith(stem)), "amend")
+
+
+def _alone(value: str) -> bool:
+    """The value names decisions alone (whole): ids, commas, 'and', dates in parentheses; nothing else."""
+    rest = re.sub(r"\(\d{4}-\d{2}-\d{2}[^)]*\)", "", value)
+    rest = re.sub(r"\(owner[^)]*\)", "", rest)
+    rest = _DEC.sub("", rest)
+    return re.sub(r"\b(and|by)\b|[,.;\s]", "", rest) == ""
+
+
+def _entry_statements(entry: dict) -> list[dict]:
+    """One entry's statements, in the census's order (its labels, then its free text)."""
+    me, span, found = entry["id"], entry["span"], []
+
+    def said(source, target, cls, form, whole, where):
+        found.append({"source": source, "target": target, "cls": cls, "form": form, "whole": whole, "where": where})
+
+    labels, consumed = list(_LABEL.finditer(span)), []
+    for index, label in enumerate(labels):
+        name = label.group(1).strip()
+        end = labels[index + 1].start() if index + 1 < len(labels) else len(span)
+        value = span[label.end():end]
+        line = (value.split("\n- **")[0] if name == "Changes" else value.split("\n- ")[0]).split(" · ")[0]
+        if name in _OUT_LABELS:
+            consumed.append((label.start(), label.end() + len(line)))
+            for target in _DEC.finditer(line):
+                if target.group(0) != me:
+                    said(me, target.group(0), _OUT_LABELS[name], f"**{name}:**", _alone(line), "label")
+            if name == "Under":  # "DEC-x (amended here)" inside an Under value
+                for here in _HERE.finditer(line):
+                    said(me, here.group(1), _verb_class(here.group(3)), "(amended here)", False, "label")
+        elif name in _IN_LABELS:
+            consumed.append((label.start(), label.end() + len(line)))
+            whole = bool(re.match(r"\s*(superseded|replaced|withdrawn)\s+by", line)) and _alone(
+                re.sub(r"\b(superseded|replaced|withdrawn)\b", "", line))
+            by = [(b.group(1), t) for b in _BY.finditer(line) for t in _DEC.findall(b.group(2))]
+            for verb, target in by:
+                said("DEC-" + target, me, _verb_class(verb), f"**{name}:** {verb} by", whole, "label")
+            if not by:  # "**Changed by:** DEC-953 (item 3)": a change with no verb
+                for target in _DEC.findall(line):
+                    said("DEC-" + target, me, "supersede" if name == "Superseded by" else "amend", f"**{name}:**",
+                         False, "label")
+        elif name == "Superseded":  # "**Superseded:** DEC-002 (by DEC-058, DEC-064); ..."
+            consumed.append((label.start(), label.end() + len(line)))
+            for target, by in re.findall(r"(DEC-\d{3,})\s*\(by ([^)]*)\)", line):
+                for source in _DEC.findall(by):
+                    said("DEC-" + source, target, "supersede", "**Superseded:** X (by Y)", True, "label")
+
+    def free(at: int) -> bool:
+        return not any(a <= at < b for a, b in consumed)
+
+    for b in _BY.finditer(span):  # free text: "... superseded by DEC-x": the subject is the nearest id before
+        if not free(b.start()):
+            continue
+        clause = re.split(r"(?<=\.)\s|·|\n", span[max(0, b.start() - 160):b.start()])[-1]
+        if clause.count('"') % 2 or clause.count("“") > clause.count("”"):
+            continue  # inside a quotation: an example, not a statement
+        subject = _DEC.findall(clause.split(";")[-1]) or re.findall(r"DEC-(\d{3,})['’]s\b", clause)
+        target = "DEC-" + subject[-1] if subject else me
+        for source in _DEC.findall(b.group(2)):
+            if "DEC-" + source != target:
+                said("DEC-" + source, target, _verb_class(b.group(1)), f"text: {b.group(1)} by", False, "text")
+    for o in _OUTVERB.finditer(span):
+        if not free(o.start()):
+            continue
+        clause = re.split(r"(?<=\.)\s|·|\n", span[max(0, o.start() - 120):o.start()])[-1]
+        if clause.count('"') % 2:
+            continue
+        subject = _DEC.findall(clause)
+        source = "DEC-" + subject[-1] if subject else me
+        if o.group(2) != source:
+            said(source, o.group(2), _verb_class(o.group(1)), f"text: {o.group(1)}", False, "text")
+    for here in _HERE.finditer(span):
+        if free(here.start()) and here.group(1) != me:
+            said(me, here.group(1), _verb_class(here.group(3)), "text: (… here)", False, "text")
+    return found
+
+
+def register_statements(text: str, entries: list[dict] | None = None) -> list[dict]:
+    """The register's statements that one decision supersedes, amends, stands under, refines, ... another, by the
+    census's patterns: ``{source, target, cls, form, whole, where}``, ``source`` the deciding decision, ``cls`` one of
+    supersede, amend, under, refine, extend, settle, ratify, confirm, implement, source, mark, carry; ``whole`` where
+    the statement names ids alone; ``where`` label, text or preamble (the change log outside the entries).
+
+    ``text`` is the register's; ``entries`` its ``register_entries(text)[0]`` where the caller holds them. One
+    statement per (source, target, cls, form) within the entries, then the change log's, as the census counts them.
+    """
+    if entries is None:
+        entries = register_entries(text)[0]
+    found, seen = [], set()
+    for entry in entries:
+        for statement in _entry_statements(entry):
+            key = (statement["source"], statement["target"], statement["cls"], statement["form"])
+            if key not in seen:
+                seen.add(key)
+                found.append(statement)
+    inside = set()
+    for entry in entries:
+        inside.update(range(entry["line"], entry["line"] + entry["span"].count("\n") + 1))
+    preamble = "\n".join(line for number, line in enumerate(text.split("\n"), 1) if number not in inside)
+    for o in _OUTVERB.finditer(preamble):  # the change log: "DEC-051 (...; supersedes DEC-048)"
+        subject = _DEC.findall(preamble[max(0, o.start() - 120):o.start()])
+        if subject:
+            found.append({"source": "DEC-" + subject[-1], "target": o.group(2), "cls": _verb_class(o.group(1)),
+                          "form": f"change log: {o.group(1)}", "whole": False, "where": "preamble"})
+    return found
+
+
+def _link_type(statement: dict) -> str | None:
+    """The stated link a register statement gives: UNDER, SUPERSEDES (a whole supersession), AMENDS (any other
+    supersession or amendment), or None (a refinement, a confirmation, a source, ...)."""
+    if statement["cls"] == "under":
+        return UNDER
+    if statement["cls"] == "supersede" and statement["whole"]:
+        return SUPERSEDES
+    return AMENDS if statement["cls"] in ("supersede", "amend") else None
+
+
+def _stated_links(fronts: list[tuple[str, dict]], statements: list[dict], ids: set[str], edges: set) -> set:
+    """``(type, source, target, via)`` of the links stated in frontmatter id keys and the register's statements,
+    between two records, that ``edges`` does not hold with the same type; one row per (type, source, target)."""
+    alias = {}
+    for _, front in fronts:
+        for key in ALIAS_KEYS:
+            if isinstance(front.get(key), str):
+                alias.setdefault(front[key].strip(), front["id"])
+    lead = re.compile(r"\s*([A-Za-z][A-Za-z0-9]*(?:[-.][A-Za-z0-9]+)*)")  # "DEC-954 Q9c" names DEC-954
+    found = {}
+
+    def add(kind, source, target, via):
+        if source in ids and target in ids and source != target and (kind, source, target) not in edges:
+            key = (kind, source, target)
+            found[key] = min(found.get(key, via), via)
+
+    for _, front in fronts:
+        for kind, keys in ((CITES, CITE_KEYS), (OF_TASK, TASK_KEYS)):
+            for key in keys:
+                for value in _ids(front.get(key)):
+                    token = lead.match(value)
+                    if token:
+                        named = token.group(1)
+                        add(kind, front["id"], named if named in ids else alias.get(named, ""), key)
+    for statement in statements:
+        kind = _link_type(statement)
+        if kind:
+            add(kind, statement["source"], statement["target"], statement["form"])
+    return {(*key, via) for key, via in found.items()}
 
 
 def _markdown(root: Path, tree: dict) -> list[tuple[str, str]]:
@@ -273,8 +476,9 @@ def _ids(value) -> list[str]:
 
 
 def _read_records(root: Path):
-    """The records, edges, entries that are no records, register headings and frontmatter titles of ``HEAD``."""
-    records, edges, invalid, titles = [], set(), [], []
+    """The records, edges, entries that are no records, register headings, frontmatter titles and stated links
+    (``LINKS_TABLE``) of ``HEAD``."""
+    records, edges, invalid, titles, fronts = [], set(), [], [], []
     tree = _tree(root)
     register = _register(root, tree)
     for path, text in _markdown(root, tree):
@@ -290,19 +494,21 @@ def _read_records(root: Path):
             invalid.append({"path": path, "reason": f"required key missing or not a string: {', '.join(missing)}"})
             continue
         records.append((path, front["id"], front["type"], front["status"]))
+        fronts.append((path, front))
         if isinstance(front.get("title"), str):
             titles.append((path, front["id"], front["title"]))
         for edge_type in EDGE_TYPES:
             edges.update((edge_type, front["id"], target) for target in _ids(front.get(edge_type.lower())))
         edges.update(("SUPERSEDES", successor, front["id"]) for successor in _ids(front.get("superseded_by")))
-    headings = []
+    headings, statements = [], []
     if register:
         of_files = {record_id: path for path, record_id, _, _ in reversed(records)}
-        entries, supersedes, headings, no_records = _read_register(*register, of_files)
+        entries, supersedes, headings, no_records, statements = _read_register(*register, of_files)
         records += entries
         edges |= supersedes
         invalid += no_records
-    return records, edges, invalid, headings, titles
+    links = _stated_links(fronts, statements, {record_id for _, record_id, _, _ in records}, edges)
+    return records, edges, invalid, headings, titles, links
 
 
 def _read_commits(root: Path):
@@ -340,10 +546,11 @@ def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict
     from gov.close.fingerprint import of_commit
 
     head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
-    records, edges, invalid, headings, titles = _read_records(root)
+    records, edges, invalid, headings, titles, links = _read_records(root)
     commits, trailers, paths = _read_commits(root)
     prints = of_commit(root, head)
-    rows = dict(zip(_TABLES, (records, edges, commits, trailers, paths, headings, titles)))
+    rows = {"records": records, "edges": edges, "commits": commits, "trailers": trailers, "commit_paths": paths,
+            REGISTER_TABLE: headings, TITLES_TABLE: titles, LINKS_TABLE: links}  # by name, never by position
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
     try:
