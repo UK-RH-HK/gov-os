@@ -177,3 +177,8 @@ other restart is an ACT.
 - DEC-1075 (2026-11-05): ACT-MSET-3/4 approved: the verdict set of 80 (`memory-verdict-2`, declared in both path maps,
   measured by the CTO only at the next decision point, counts only), written and cross-checked outside the CTO's system;
   failure-memory 4, a shortfall of at most 2 to `decision`. W2-32's S11 (v456) as worded. Basis: questions 1 and 2.
+- DEC-1076 (2026-11-05): the 80 by the 60's writer and checker sessions (resumed, new settings); the writer varies its
+  phrasing by role. **The reranker trial now** (mxbai, then Qwen3-4B 8-bit, the 0.6B beside), then phrasing, then the
+  embedder; adoption the owner's. **The trial's rule:** on the 40 + 39 + 59 together, hit@5 then MRR, the spread between
+  the three sets not wider than the 0.6B's; eligible only at a median ≤ 3.0 s alone, no timeout at 10 at once, no shape
+  at the GPU budget. The checker lists every other place stating an answer. Basis: questions 1 and 2.

@@ -28,7 +28,6 @@
       "Bash(python3 -m gov.cli.main context *)",
       "Read(//home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/**)",
       "Read(//home/usain/gov-os-eval/transcripts/**)",
-      "Read(//home/usain/gov-os-writer/**)",
       "Read(//home/usain/gov-os-checker/**)",
       "Read(//home/usain/gov-os-worktrees/**)",
       "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/**)",
@@ -55,7 +54,7 @@
             "args": [
               "-I",
               "-c",
-              "import json, os, sys\nT = ('/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/', '/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/')\ntry:\n    i = json.load(sys.stdin).get('tool_input') or {}\n    p = i.get('file_path') or i.get('notebook_path') or ''\n    ok = bool(p) and os.path.realpath(os.path.expanduser(p)).startswith(T)\nexcept Exception:\n    ok = False\nif not ok:\n    sys.stderr.write('ACT-MSET-3: this session may write only under ' + ' and '.join(T) + '\\n')\n    sys.exit(2)\n"
+              "import json, os, sys\nT = ('/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/', '/home/usain/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/')\ntry:\n    i = json.load(sys.stdin).get('tool_input') or {}\n    p = i.get('file_path') or i.get('notebook_path') or ''\n    ok = bool(p) and os.path.realpath(os.path.expanduser(p)).startswith(T)\nexcept Exception:\n    ok = False\nif not ok:\n    sys.stderr.write('ACT-MSET-3: this session may write only ' + ' and '.join(T) + '\\n')\n    sys.exit(2)\n"
             ],
             "onFailure": "block"
           }

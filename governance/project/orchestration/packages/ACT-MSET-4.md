@@ -1,8 +1,7 @@
 # ACT-MSET-4: the cross-check of the new verdict set's 80 questions (DEC-1074 (3), ACT-MSET-3 section 6)
 
-- **For:** a **second new session the owner opens, outside the CTO's system** (`~/gov-os-checker2`, ACT-MSET-3
-  section 9), used only for this. It is neither the writer's session nor the 60's checker, and was never shown the
-  writer's work.
+- **For:** **the checker session of the 60** (`~/gov-os-checker`), outside the CTO's system, resumed by the owner with
+  `claude --continue` so its new settings load (ACT-MSET-3 section 9; DEC-1076). It has never seen the 80.
 - **Nothing about the 80 reaches the CTO's session.** The checker writes its report where only the owner and the
   writer read it, and the CTO receives only the counts line of section 6.
 - **By:** the CTO, session `812bc5ce`, 2026-11-05, from ACT-MSET-2 (the 60's cross-check), with the set's name, size and
@@ -23,7 +22,7 @@
 - ACT-MSET-3 section 2 (the size and the quotas).
 
 **Never reads** (the session's settings deny each): every other question set (the visible and hidden tuning sets and
-the spent 60, `~/gov-os-eval/fixtures/evaluation/memory-verdict/`); the earlier writers' and checkers' folders; any
+the 60, `~/gov-os-eval/fixtures/evaluation/memory-verdict/`); the writer's folder (`~/gov-os-writer`); any
 measure, search or run output; the records about the measure and its misses (ACT-MSET-3 section 3's list); all of
 `.gov-runtime/`; the decision register's DEC-1066 to DEC-1074 for anything beyond the rubric's rules.
 
@@ -59,6 +58,13 @@ measure, search or run output; the records about the measure and its misses (ACT
    fixes.
 5. **A FAIL is major** when it changes what is scored (a wrong or missing gold source, a span that misses the answer,
    a wrong answer). **It is minor** when it does not (a stale detail in the gold answer's text, a category).
+6. **Every other place that states the same answer (DEC-1076).** For each question, search the repository (named
+   folders, as section 2 says) for every other place that states the answer, or one piece of it, in the governing
+   tier or as a faithful restatement (a decision, the Contract or a capability page with status ACCEPTED, a ticket's
+   KPI line, a plan, a kernel role or skill, the code). List each as a **suggested extra source** for its entry, with
+   whether it holds the whole piece on its own. The writer adds them by the rubric (R7 item 1, R1 item 3). A missing
+   place that holds the whole piece is a major FAIL under R7 (`R7-MISSING-ALTERNATIVE`), since a hit on it would be
+   scored a miss.
 
 ## 4. The report
 Write one file: `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md`. It is outside the questions folder,
@@ -75,7 +81,11 @@ which this session may not read; the form is restated here):
    - **It never quotes** a question, gold answer, path, heading, line or fact. The writer, who has the files, applies
      each fix from it.
 4. **The set:** R5's counts per governing domain, tag and category; R2's two counts; the number of FAILs per item,
-   major and minor apart.
+   major and minor apart; the number of suggested extra sources, whole and partial apart.
+5. **The suggested extra sources (item 6 of section 3),** in a section of their own at the end: per question id, each
+   place as `path`, `heading` (one whole line of the file) and `lines`, and "whole" or "part". This section alone names
+   places, because the writer needs them; the report still never quotes a question, an answer or a fact, and only the
+   owner and the writer read it.
 
 The checker makes no fix. The writer's session makes them, by the report and the owner's word, keeping each changed
 question's old copy in `memory-verdict-2/retired/`.
@@ -88,16 +98,17 @@ question's old copy in `memory-verdict-2/retired/`.
 One line, from the owner:
 
 ```
-xcheck: <n> as written, <n> minor fix, <n> major fix, <n> drop; after fixes: anchors 0, unresolved 0, overlapping 0, quota PASS
+xcheck: <n> as written, <n> minor fix, <n> major fix, <n> drop; extra sources <n> suggested, <n> added; after fixes: anchors 0, unresolved 0, overlapping 0, quota PASS
 ```
 
 The CTO then measures `memory-verdict-2` only at the next decision point (DEC-1074 (3)).
 
 ## 7. Start it
-From `~/gov-os-checker2` (its settings in ACT-MSET-3 section 9), once the writer says "done". Then paste:
+With `cd ~/gov-os-checker && claude --continue` (its settings in ACT-MSET-3 section 9), once the writer says "done".
+Then paste:
 
 > Read `/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/packages/ACT-MSET-4.md` and follow
-> it exactly. Write your report only to `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md`. Tell me only
+> it exactly. It is a new task: the 60's cross-check is finished. Write your report only to `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md`. Tell me only
 > "done" and the verdict table's four counts.
 
 ## Rollback

@@ -13168,7 +13168,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: the sessions should run the product that scores 38, not the pin's 25) and question 2 (a measure whose questions are wrong or keyword-only misjudges memory; GPU work in turns fails safe).
 
 ### DEC-1069 — D4B-AUDIT decided: every recommended label fix; the set grows to about 40 per half (DEC-1009 amended); R5's thresholds and two new rubric rules; the merges; the reranker trial approved, all three candidates run in turn; a standing model bench
-- **Status:** ACCEPTED (owner, 2026-11-04 ~13:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1068, DEC-1067, DEC-1060, DEC-1009 (amended here), W2-61h's KPIs (amended here) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-AUDIT.md` (`b598288b`), `governance/project/orchestration/packages/ACT-RERANK-TRIAL-1.md`
+- **Status:** ACCEPTED (owner, 2026-11-04 ~13:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1068, DEC-1067, DEC-1060, DEC-1009 (amended here), W2-61h's KPIs (amended here) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-AUDIT.md` (`b598288b`), `governance/project/orchestration/packages/ACT-RERANK-TRIAL-1.md` · **Changed by:** DEC-1076 (4)
 - **Decision:** **The labels.** (1) Every recommended label fix is applied: the visible ones (Q14, Q07, Q04 re-labelled; Q13, Q17 re-anchored; the five minor re-words of Q02, Q10, Q11, Q12, Q23) by a session independent of the retrieval work, as for Q16 and Q19; the hidden h03 and h08 by the owner's operator, as for h02 and h24 (a brief like ACT-HLABEL-1). (2) Q04: kept beside Q09 after its re-label (option (a)). (3) Q03's split into two entries confirmed. **The bigger set.** (4) The set grows to **about 40 per half**: **DEC-1009 is amended** (the visible half is no longer lens B's 20 + W2-61h's 4 only), recorded as the owner's. (5) **R5:** each governing domain at least 10 % of each half, no subsystem above 25 %; **W2-61h's category quotas are amended to fit**. (6) **A rubric rule before the new questions are written:** no question whose answer changes with ordinary work (counts of dependents, lists that grow) unless its gold is computed from the repository at the measured head; and **the measure script writes a reason line for every automatic re-anchor**. (7) **The hidden auditor's P2:** test-harness code is never the governing source for a code fact, except for a question about the test harness itself. (8) **The writers:** the visible 16 by a session independent of the retrieval work; the hidden 16 by the owner's operator from the rubric (a brief like ACT-HLABEL-1); then the cross-check as proposed. (9) **Then m6:** the live product with today's 0.6B reranker on the 80, three runs, every search's ranked output kept: the new baseline for the methods and the trial. **The merges.** (10) The retired-README fix and the five methods (each off by default) merge now; the methods' measures follow m6, by DAY.md's rule re-based on m6. **The reranker trial (ACT-RERANK-TRIAL-1).** (11) Approved: the operator's steps 0 to 3 now (the downloads and the trial venv), so the models are ready by m6; the CTO stops the live reranker for the trial's quiet window when no agent's work depends on ranked search, and says when; the choice rule as written, with the 3.0 s median limit. (12) After m6, **all three candidates run in turn, whatever the scores** (the 0.6B with m6's own figures, mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit); no early stop at 95 % or more: the full comparison is wanted; for each: hit@5 and full evidence on the visible half (it chooses) and the hidden half (reported, never used to choose), the GPU peak, the load time, the time per search alone and with 10 and 20 searches at once, and any failure; adoption follows the choice rule (running a model is not adopting it); the result to the owner. (13) **A standing model bench:** the harness and its commands kept, so any future reranker or embedder is measured the same way; the embedder trial (Qwen3-Embedding-4B) follows the reranker's decision, recorded the same way. **All GPU work takes turns, one at a time, under the GPU safety rules.** The operator's three briefs (h03 and h08; the hidden 16; the trial's steps 0 to 3) go to the owner in one message, in the order they should run.
 - **Accepted later (owner, 2026-11-04 ~15:20, in the chat):** the hidden 40's category table ends one short in each of the decision, callers and code-paraphrase categories (16 slots could not meet quotas needing 17); every governing domain reaches at least 4 of 40.
 - **Amended:** by DEC-1070 (owner, 2026-11-04 ~18:40): (12) stops after the 0.6B (T2); mxbai-rerank-large-v2 and Qwen3-Reranker-4B wait for the recall work and the 0.6B's new record; (13)'s embedder trial waits likewise.
@@ -13269,7 +13269,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: a link recorded when a record is written, and checked cheaply, keeps every agent on the current rule) and question 2 (a measurement used once must measure the final structure).
 
 ### DEC-1074 — The night's result decided: 67.8 % the 0.6B's honest figure; every used set now tuning or diagnostic; the 60's misses classified before the next lever; a new verdict set of 80; consistency within 5 points; v456 and the stated links approved for window 4; W2-54's premise rewritten; LINK-INTEGRITY adopted; the open items
-- **Status:** ACCEPTED (owner, 2026-11-05 morning, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1071, DEC-1072, DEC-1073 · **Changes:** DEC-1071 (3) (the consistency bound, item 4), DEC-1070 (2)-(4) (the sets' jobs, item 1) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md` (`7f5a80b7`), `LINK-INTEGRITY.md` (`23610a2e`)
+- **Status:** ACCEPTED (owner, 2026-11-05 morning, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1071, DEC-1072, DEC-1073 · **Changes:** DEC-1071 (3) (the consistency bound, item 4), DEC-1070 (2)-(4) (the sets' jobs, item 1) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md` (`7f5a80b7`), `LINK-INTEGRITY.md` (`23610a2e`) · **Changed by:** DEC-1076 (1)
 - **Decision:**
   - **(1) 67.8 % is recorded as the 0.6B's honest figure on this structure:** v456 + the stated links, 40/59 on
     `memory-verdict`.
@@ -13309,7 +13309,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   kinds) and question 2 (a link recorded and checked keeps agents on the current rule).
 
 ### DEC-1075 — ACT-MSET-3 and ACT-MSET-4 approved: the verdict set of 80, the failure-memory quota (A), the two session folders, the path-map line for memory-verdict-2; W2-32's S11 as worded; the auditor's read of the spent 60 is DEC-1074 (2)'s
-- **Status:** ACCEPTED (owner, 2026-11-05 ~12:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074, DEC-1070, DEC-1069 · **Source:** `governance/project/orchestration/packages/ACT-MSET-3.md`, `ACT-MSET-4.md` (`91c780bf`); `.tickets/DAEO-0pyc.md` (`8c28aa70`)
+- **Status:** ACCEPTED (owner, 2026-11-05 ~12:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074, DEC-1070, DEC-1069 · **Source:** `governance/project/orchestration/packages/ACT-MSET-3.md`, `ACT-MSET-4.md` (`91c780bf`); `.tickets/DAEO-0pyc.md` (`8c28aa70`) · **Changed by:** DEC-1076 (1)
 - **Decision:**
   - **(1) ACT-MSET-3 and ACT-MSET-4 approved as written:** the writer's brief for 80 questions, the cross-check's
     brief, the two session folders (`~/gov-os-writer2`, `~/gov-os-checker2`) with their settings, and the path-map line
@@ -13324,6 +13324,37 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: only a set nothing was tuned on gives a verdict) and question 2 (a set that shares the
   tuning sets' gold or phrasing would misjudge memory).
 
+### DEC-1076 — The 80 written and cross-checked by the 60's writer and checker sessions (DEC-1074 (3) amended); the writer varies its phrasing by role; D4B-MISSES decided: the reranker trial now, its choice rule on the 79 and the spent 59, then phrasing, then the embedder; extra sources listed by the checker
+- **Status:** ACCEPTED (owner, 2026-11-05 ~13:40, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074, DEC-1075, DEC-1071, DEC-1070 · **Changes:** DEC-1074 (3) (the writer and the checker), DEC-1075 (1) (the folders), DEC-1069 (12) (the trial's choice rule) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MISSES.md` (`c44257b2`), `ACT-MSET-3.md`, `ACT-MSET-4.md`
+- **Decision:**
+  - **(1) The same sessions (DEC-1074 (3) amended):** the 80 are written and cross-checked by the 60's writer and
+    checker sessions, not new ones. Their folders stay `~/gov-os-writer` and `~/gov-os-checker`; their settings gain
+    ACT-MSET-3 section 9's denials and the writer's write rule, never a denial of a session's own folder; the owner's
+    operator puts them in place, and the sessions are resumed with `claude --continue` so the settings load.
+  - **(2) The writer's brief** asks it to vary its phrasing from its earlier work: each question asked as a different
+    working role would ask it (an engineer, a test designer, a lead, an auditor, the owner), in plain working words,
+    never echoing a source's wording.
+  - **(3) The next lever (D4B-MISSES (a)):** the reranker trial now, as ACT-RERANK-TRIAL-1 sets it up
+    (mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit), on the adopted structure (v456 and the stated links), with
+    the 0.6B's figures beside them, under the GPU safety rules and in a quiet window. Then query phrasing as a
+    no-install research prototype; the embedder trial third. Adoption stays the owner's.
+  - **(4) The trial's choice rule (D4B-MISSES (b)), recorded before it runs:**
+    - the sets: the visible 40, the hidden 39 (h24 apart) and the spent 59 (m60 apart), 138 questions together;
+    - a candidate is **eligible** only if its median search alone is at most 3.0 s, no request times out at 10
+      searches at once, and no request shape reaches the GPU budget (14,255 MiB);
+    - an eligible candidate **wins** over the 0.6B if its hit@5 on the 138 is higher, or equal with a higher MRR of the
+      first gold source; and the spread between the three sets' hit@5 (the highest set's per cent less the lowest's)
+      is not wider than the 0.6B's;
+    - recorded side by side for each model: hits per set, MRR, the median search alone and at 10 and 20 at once,
+      timeouts, the GPU peak and the load time;
+    - the verdict comes later, from the new 80, at the next decision point.
+  - **(5) Extra sources (D4B-MISSES (c)):** ACT-MSET-4's checker lists, per question, every other place that states
+    the same answer, as suggested extra sources the writer adds by the rubric; a new item in the rubric's next version
+    (a missing alternative that holds the whole piece is a major R7 fault); the same check for the tuning sets at their
+    next scheduled audit.
+- **Basis:** question 1 (memory: the lever chosen from the misses' kinds, judged on every used set) and question 2 (a
+  label missing a true answer, or a set phrased like its sources, misjudges memory).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13336,3 +13367,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.457 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1073. Next free id: DEC-1074. |
 | 0.458 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1074; DEC-1071 (3) and DEC-1070 (2)-(4) changed. Next free id: DEC-1075. |
 | 0.459 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1075. Next free id: DEC-1076. |
+| 0.460 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1076; DEC-1074 (3), DEC-1075 (1) and DEC-1069 (12) changed. Next free id: DEC-1077. |
