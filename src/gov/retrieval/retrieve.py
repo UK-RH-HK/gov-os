@@ -9,6 +9,11 @@ reads (DEC-322).
 Paging (DEC-422): batches beyond the first, rounds scaled by radius, a stateless continuation token.
 Must-not-cite (DEC-423): DEPRECATED, REJECTED, WITHDRAWN; frontmatter check for files not in the store.
 Failure/lesson ahead (DEC-424): failure and lesson records in the ticket's closure come ahead of other evidence.
+Stated links (W2-92 S8, DEC-1072 (1)): one bounded hop over the store's ``stated_links`` from what the record route or
+the closure reached (``graph_route.follow``), after today's closure chunks; the closure facet names what it added and
+the decisions in reach that others change. The links never change what is current, the edges or the authority order.
+Status (W2-92 S9, DEC-1073 (2)): every register evidence item names its entry's status word and changers, and whether
+it is in force; any other record's item that is not in force says so (``in_force``, ``not_in_force``).
 """
 
 from __future__ import annotations
@@ -47,6 +52,13 @@ STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
 IN_EARLIER_PARENT = "SENT_IN_AN_EARLIER_PARENT"  # the chunk lies inside a parent an earlier call expanded
 EARLIER_CHILD = "SENT_EARLIER_AS_A_CHILD"  # an earlier call sent these lines as a child: left out of a later parent
 NO_RECORD_GRAPH = "the record graph is unreadable, so whether this record is current cannot be judged"  # DEC-1019
+# W2-92 S8: what the closure facet says of the one hop over the stated links
+FOLLOWED, CHANGED_BY, STATED_LINKS = "followed", "changed_by", "stated_links"
+NO_STATED_LINKS = "the store holds no stated links (built before them): today's closure until a rebuild"
+# W2-92 S9 (DEC-1073 (2)): a decision with one of these status words, or superseded whole, is not in force; records of
+# work (a ticket's state is no rule) are never marked
+NOT_IN_FORCE_STATUSES = frozenset({"PROPOSED", "REJECTED", "WITHDRAWN", SUPERSEDED, "DEPRECATED"})
+WORK_TYPES = frozenset({"task", "checkpoint", "close", "evidence", "research"})
 
 
 def _declares_record(root: Path, rel: str) -> str | None:
@@ -242,6 +254,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         unread = (f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure;"
                   " record files are left out, as their currency cannot be judged without the record graph")
         record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
+    # W2-92 S8, S9: the stated links (None for a store built before them); read beside the edges, never into them
+    links = graph_route.stated_links(root) if unread is None else []
+    changed_by = graph_route.changers(links or [], edges)
+    whole = {link["target"] for link in links or [] if link["type"] == loader.SUPERSEDES}  # superseded whole
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
     if unread is not None:
         register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
@@ -274,17 +290,35 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
             else:
                 reached |= set(walked.dependents)
                 note = f"{reverse_edges.CAPPED}: {walked.capped}" if walked.capped else None
-        routes[CLOSURE] = [chunk for chunk in chunks.values()
-                           if (record_of.get(chunk["path"]) if chunk["path"] != register
-                               else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in reached]
+        id_of = {chunk_id: (record_of.get(chunk["path"]) if chunk["path"] != register
+                            else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id"))
+                 for chunk_id, chunk in chunks.items()}
+        routes[CLOSURE] = [chunk for chunk in chunks.values() if id_of[chunk["chunk_id"]] in reached]
         if walked is not None:  # the chunks stating each dependency walked, first
             ahead = walked.first(chunks)
             named = {chunk["chunk_id"] for chunk in ahead}
             routes[CLOSURE] = ahead + [chunk for chunk in routes[CLOSURE] if chunk["chunk_id"] not in named]
+        # W2-92 S8: one hop over the stated links, bounded; each bound record's first chunks come after today's
+        # closure chunks, so those keep their ranks in the fusion
+        hop = graph_route.follow(links or [], start, reached,
+                                 {rid for rid, kind in record_types.items() if kind == "decision"})
+        held, of_record, bound = {chunk["chunk_id"] for chunk in routes[CLOSURE]}, {}, set(hop["records"])
+        for chunk in chunks.values():  # each bound record's chunks, in the index's order
+            if id_of[chunk["chunk_id"]] in bound:
+                of_record.setdefault(id_of[chunk["chunk_id"]], []).append(chunk)
+        routes[CLOSURE] += [chunk for rid in hop["records"]
+                            for chunk in of_record.get(rid, [])[:graph_route.FOLLOW_CHUNKS]
+                            if chunk["chunk_id"] not in held]
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         if note:
             facets[CLOSURE][reverse_edges.FACET_KEY] = note
+        if links is None:
+            facets[CLOSURE][STATED_LINKS] = NO_STATED_LINKS
+        if hop["records"]:
+            facets[CLOSURE][FOLLOWED] = {"records": hop["records"], "left": hop["left"]}
+        if hop["changed_by"]:  # each decision in reach that another changes, by its changers
+            facets[CLOSURE][CHANGED_BY] = hop["changed_by"]
         closure_gaps += closed["gaps"]
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
@@ -427,10 +461,52 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
     evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
 
+    standing = {record["id"]: (record["type"], record["status"]) for record in known}
+
+    def force(rid, status):
+        """Why the record ``rid`` is not in force (its status word, or SUPERSEDED for a whole supersession that
+        leaves its word ACCEPTED); None where it is."""
+        if status in NOT_IN_FORCE_STATUSES:
+            return status
+        return SUPERSEDED if not_current.get(rid) == SUPERSEDED or rid in whole else None
+
+    def entry_mark(rid):
+        status = standing.get(rid, (None, None))[1]
+        why = force(rid, status)
+        return {"entry": rid, "status": status, "changed_by": list(changed_by.get(rid, ())), "in_force": why is None,
+                **({"not_in_force": why} if why else {})}
+
+    def entries_in(rel, first, last):
+        """The register entries whose spans the lines ``first`` to ``last`` touch, in order."""
+        found, at = [], first
+        while at <= last:
+            entry = entry_of(rel, at)
+            if entry is None:
+                at += 1
+                continue
+            found.append(entry["id"])
+            at = entry["end_line"] + 1
+        return found
+
     def item(candidate, rel, first, last, body):
-        return {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
-                "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
-                "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
+        found = {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
+                 "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
+                 "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
+        # W2-92 S9 (DEC-1073 (2)): beside the text (unchanged), the entry's status word and changers, and whether it
+        # is in force; any other record not in force says so
+        if rel == register:
+            entries = entries_in(rel, first, last)
+            if entries:
+                found.update(entry_mark(entries[0]))
+                if len(entries) > 1:  # a parent over several entries: each of the others, the same way
+                    found["also"] = [entry_mark(rid) for rid in entries[1:]]
+        else:
+            rid = record_of.get(rel)
+            kind, status = standing.get(rid, (None, None))
+            why = force(rid, status) if rid in standing and kind not in WORK_TYPES else None
+            if why:
+                found.update({"status": status, "in_force": False, "not_in_force": why})
+        return found
 
     for candidate in ranked:
         rel, first, last, body = candidate["path"], candidate["start_line"], candidate["end_line"], candidate["body"]
