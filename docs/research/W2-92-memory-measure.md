@@ -219,15 +219,21 @@ W2-61's §8, with these changes:
 
 | Figure | On the rebuilt store (the CTO) |
 |---|---:|
-| Store head, fingerprints row | _to fill_ |
-| Stated links by type (CITES, OF_TASK, UNDER, AMENDS, SUPERSEDES) | _to fill_ |
-| Drifted current, spent included (the census's count) | _to fill_ |
-| Drifted current (counted) / of them with no hint in their own entry | _to fill_ |
-| Spent, for the status reconciliation (of them stated changed) | _to fill_ |
-| Stated changed but not ACCEPTED, by status | _to fill_ |
-| **Before:** one-hop edge to a changer | _to fill_ |
-| **After:** one-hop link to a changer / to every changer | _to fill_ |
-| **After:** reached by the hop, a changer / every changer | _to fill_ |
-| Changer pairs / joined after | _to fill_ |
+| Store head, fingerprints row | `d9d48449` (the measure clone `~/gov-os-runs/D4B/w4-92`, rebuilt 2026-11-05) |
+| Stated links by type (CITES, OF_TASK, UNDER, AMENDS, SUPERSEDES) | 1,679; 381; 2,481; 388; 7 |
+| Drifted current, spent included (the census's count) | 221 |
+| Drifted current (counted) / of them with no hint in their own entry | 190 / 83 |
+| Spent, for the status reconciliation (of them stated changed) | 110 (31) |
+| Stated changed but not ACCEPTED, by status | PROPOSED 12, SUPERSEDED 7, DONE 1 |
+| **Before:** one-hop edge to a changer | 0 |
+| **After:** one-hop link to a changer / to every changer | 190 / 184 |
+| **After:** reached by the hop, a changer / every changer | 190 / 184 (not joined: none) |
+| Changer pairs / joined after | 325 / 312 |
 
 The engineer's reading with `--from-head` at the ticket's head (`5a9e36c07571` plus W2-92 S7), not the figure of record: links CITES 1,679, OF_TASK 381, UNDER 2,481, AMENDS 388, SUPERSEDES 7; drifted current 221 with the spent and 190 counted (83 with no hint), 110 spent for the reconciliation (31 of them stated changed); not ACCEPTED: PROPOSED 12, SUPERSEDED 7, DONE 1. **Before 0, after 190 of 190** joined to a changer (184 to every changer); reached by the hop 190 (184 every changer); changer pairs 325, 312 joined.
+
+**The CTO's measure of the build (DEC-1071's rule, DEC-1074 (5); 2026-11-05):** the harness's v456 on the build
+(`d9d48449`) against the same on integrate's head (`5a9e36c0`, the control), one run each, counts only. The 79: 67
+against 67, visible 33 and hidden 34 on both (the halves' gap −4.7 on both), MRR over the 79 0.6306 against 0.6242:
+**adopted by the rule** (the 79 not lower, the gap not wider, MRR higher). Beside it, the 138 (with the spent 59): 106
+against 105, the spread between the three sets 21.1 against 22.8. Records `~/gov-os-runs/D4B/w4-i-rx`, `w4-92-rx`.
