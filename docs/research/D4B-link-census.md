@@ -10,7 +10,7 @@
   - **Its rules:** read in `src/gov/store/loader.py` and `src/gov/retrieval/retrieve.py` (`_graph`), and in
     `authority.py` (`register_entries_of`, `Order`).
   - **The stated links:** the clone's files, its `git log` and the store's `lexical_chunk` table, parsed by one script,
-    `docs/research/D4B-link-census/census.py`. It is run as
+    `docs/research/D4B-link-census.py`. It is run as
     `PYTHONPATH=<clone>/src python3 census.py <clone> <out.json>` and takes about a minute.
   - **Columns:** *pairs* counts distinct source→target pairs. A pair is *resolvable* when its target is a store record
     (a W1-/W2- id counts through its ticket's `wbs_id`). A pair is *in the graph* when an edge of any type joins the
