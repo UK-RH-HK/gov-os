@@ -119,12 +119,20 @@ The figures are hit@5. The 48-question set ran from m1 to m5 (24 visible + 24 hi
 | M1, a file-level index | m6-M1 | 36/40 | 30/40 | to judge on all 80 | MRR 0.7015 visible, 0.4835 hidden |
 | M2, code chunks cut on definitions | m6-M2 | 36/40 | 29/40 | to judge | no change (embedded code changed by 50 chunks) |
 | M3, dependents beyond one hop | m6-M3 | 37/40 | 29/40 | no (DEC-1071) | the 80 rise, the gap widens (92.5 against 74.4) |
-| M4-M5 | running | | | | |
+| M4, identifier tokenisation | m6-M4 | 36/40 | 29/40 | no | MRR lower |
+| M5, one span per register entry | m6-M5 | 34/40 | 30/40 | no (retest with the links) | the 79 fall by 1 (gap 8.1) |
+| **v456 = v4 + v5 + v6** (judged on the 79, DEC-1071) | fix-b | 34/40 | 33/39 | **yes** | the 79 at 67 (from 65); **gap 15.6 → 0.4**; 0.34 s |
+| M1 + v456 | fix-c | 34/40 | 33/39 | no | a tie; MRR over the 79 lower (0.6300 against 0.6313); 1.0 s |
+| v456 + the reranker shown title and section | fix-d | 32/40 | 34/39 | no | the 79 fall, the gap widens |
+| v456 + one place per identical text | fix-d | 34/40 | 33/39 | no | no effect |
 
 Night one's survey (63 variants on all 48) and night two's (32 on the visible half) also found:
 - **Losers:** pool quotas, a global pool, an embedder instruction, a reranker instruction, authority ×2.
 - **Neutral:** route agreement, a blend.
 - **Speed:** every method within 0.08 s.
+
+**From m6-M1 on, the figures are judged on the 79** (h24, the nonexistent-id question, scored apart): adopted when
+the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
 
 ## 5. The lessons
 1. **Overfitting to the tuning set.**
