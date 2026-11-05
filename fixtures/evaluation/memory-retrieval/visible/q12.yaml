@@ -10,16 +10,33 @@
 # malformed list of expanded parents or of spans sent alone. They are added to the gold answer. The source is kept:
 # its span holds the two calls. The helpers are not added as a second entry (the audit's advice; it would make full
 # evidence stricter). The label before is in ../retired/q12-pre-dec1069.yaml.
+# Re-labelled by R1 (DEC-1069 (6), the CTO's order at W2-32's S11 round 2, w2/W2-32 9446d3225c1c; the measure's anchor
+# check found entry 1 unresolved), checked blind from the code by a session independent of the retrieval work. The
+# fact changed (R1-INCOMPLETE): S11 round 2 gave _decode_continuation a keyword parameter (carried), so its heading
+# line changed, and it added three cases raised for the same token. In _decode_continuation (through
+# pool.well_formed): the token's pool part is malformed. In pool.reorder, which retrieve calls with that pool part: the
+# token's candidate pool is not this question's (the store or the pool settings changed), or its order is no order of
+# the candidates. The five earlier cases hold. Entry 1 is re-anchored to the new heading line, its span the whole
+# function (retrieve.py 168-193, the pool check included). pool.reorder is a second entry (R7 item 2): its two checks
+# are raised there and no part of entry 1's span holds them. The question, the category and the question's commit
+# are kept. The label before is in ../retired/q12-pre-w2-32-r2.yaml.
 id: Q12
 category: code location
 commit: 23079f92a6fa
 question: CONTINUATION_INVALID
 gold_answer: >-
   In _decode_continuation in src/gov/retrieval/retrieve.py: when the token is not base64 JSON, when it belongs to a
-  different question or arguments, when its offset is not a non-negative integer, or (through _expanded_of and
-  _alone_of, W2-32 S7) when its list of expanded parents or of spans sent alone is malformed.
+  different question or arguments, when its offset is not a non-negative integer, (through _expanded_of and
+  _alone_of, W2-32 S7) when its list of expanded parents or of spans sent alone is malformed, or (through
+  pool.well_formed, W2-32 S11) when its candidate-pool part is malformed. And in reorder in
+  src/gov/retrieval/pool.py, when the token's pool is applied: when its candidate pool is not this question's (the
+  store or the pool settings changed since the earlier call), or when its order is no order of the candidates.
 sources:
   - path: src/gov/retrieval/retrieve.py
-    heading: "def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None):"
-    lines: [162, 181]
-    commit: b32e8504b8d381337e3b3120ba91109cee156684
+    heading: "def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None,"
+    lines: [168, 193]
+    commit: 9446d3225c1c9aac1758bf90efcff8481a64e6e7
+  - path: src/gov/retrieval/pool.py
+    heading: "def reorder(head: list[dict], token_pool: dict) -> list[dict] | None:"
+    lines: [76, 89]
+    commit: 9446d3225c1c9aac1758bf90efcff8481a64e6e7
