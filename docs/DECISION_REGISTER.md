@@ -13376,6 +13376,29 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: the reranker's contribution measured before its model is chosen; the design compared
   with the field) and question 2 (a model judged on a faulty input misjudges it).
 
+### DEC-1078 — The verdict set of 80 (`memory-verdict-2`) ready: the writer's checks pass, the cross-check closed after two rounds; unused until the next decision point; source families for the rubric's next version
+- **Status:** ACCEPTED (owner, 2026-11-05 evening, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074 (3), DEC-1075, DEC-1076, DEC-1010 · **Source:** the owner's report of the writer's and checker's lines (ACT-MSET-3 section 6, ACT-MSET-4 section 6)
+- **Decision:**
+  - **(1) The set is ready.** The writer's final checks: sources 179, path missing 0, heading on no line 0, heading on
+    more than one line 0; unresolved 0 (179 heading-anchored); 80 new questions, 0 overlapping an earlier set's gold
+    source; categories callers 8, code-paraphrase 7, contract 8, decision 15 of 13, exact-string 8, failure-memory 2
+    of 4, history 2, kernel-template 7, multi-file 6, nonexistent-id 1, plan 8, ticket 8: total 80 of 80, PASS
+    (failure-memory short by 2, moved to `decision`, as quota (A) of DEC-1075 (2) allows). The CTO's own check at
+    `21bbb7e4`, counts only: 80 files, both folders mode 700, 179 sources resolved.
+  - **(2) The cross-check:** round 1, 40 as written, 3 minor fix, 36 major, 1 drop; round 2, 75 as written, 5 major,
+    all missing places that state the answer; the writer added the 7 whole places from the checker's own list,
+    changing nothing else. **No third round** (DEC-1010's two-round rule; the owner's decision). The old copies are in
+    `memory-verdict-2/retired/`.
+  - **(3) The set stays unused** until the next decision point: after the research package (DEC-1077 (d)) and the
+    trial's re-runs. It is measured once, by the CTO, counts only.
+  - **(4) A row for the rubric's next version:** the measure treats a gold source and its generated twins (the
+    Contract's Markdown and YAML, the generated capability and master-rule pages, and any other official copy) as one
+    **source family**, counted automatically, so labels stop chasing copies. With DEC-1076 (5)'s missing-alternative
+    item, it is the rubric's next version; the family rule is code in W2-61's measure (`gov.retrieval.measure`), built
+    in the normal flow with tests first, and the tuning sets are re-scored on their kept ranks once it lands.
+- **Basis:** question 1 (memory: a verdict only from a fresh set, measured once) and question 2 (a label that misses
+  an official copy of its answer misjudges memory).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13390,3 +13413,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.459 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1075. Next free id: DEC-1076. |
 | 0.460 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1076; DEC-1074 (3), DEC-1075 (1) and DEC-1069 (12) changed. Next free id: DEC-1077. |
 | 0.461 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1077. Next free id: DEC-1078. |
+| 0.462 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1078. Next free id: DEC-1079. |

@@ -185,3 +185,7 @@ other restart is an ACT.
 - DEC-1077 (2026-11-05): the trial's second window: mxbai with its own template (rehearsed on a stand-in), the 4B at
   24 candidates, the reranker off as a control, each on the 138 under DEC-1076 (4)'s rule beside the 0.6B; the 4B not
   adopted now; a research survey and the memory's invention disclosure; nothing adopted before the owner decides.
+- DEC-1078 (2026-11-05): `memory-verdict-2` (80) ready (checks pass; the cross-check closed at round 2); unused until
+  the next decision point, after the research package and the trial's re-runs; measured once, counts only. The
+  rubric's next version: source families (a gold source and its generated twins counted as one) and missing
+  alternatives (DEC-1076 (5)). Basis: questions 1 and 2.
