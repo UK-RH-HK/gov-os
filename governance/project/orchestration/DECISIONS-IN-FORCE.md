@@ -182,3 +182,6 @@ other restart is an ACT.
   embedder; adoption the owner's. **The trial's rule:** on the 40 + 39 + 59 together, hit@5 then MRR, the spread between
   the three sets not wider than the 0.6B's; eligible only at a median ≤ 3.0 s alone, no timeout at 10 at once, no shape
   at the GPU budget. The checker lists every other place stating an answer. Basis: questions 1 and 2.
+- DEC-1077 (2026-11-05): the trial's second window: mxbai with its own template (rehearsed on a stand-in), the 4B at
+  24 candidates, the reranker off as a control, each on the 138 under DEC-1076 (4)'s rule beside the 0.6B; the 4B not
+  adopted now; a research survey and the memory's invention disclosure; nothing adopted before the owner decides.

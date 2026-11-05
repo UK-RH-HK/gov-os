@@ -13355,6 +13355,27 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: the lever chosen from the misses' kinds, judged on every used set) and question 2 (a
   label missing a true answer, or a set phrased like its sources, misjudges memory).
 
+### DEC-1077 — D4B-TRIAL-W4 decided: mxbai re-run with its own input template; the 4B not adopted now, and measured at 24 candidates; the reranker off as a measured control; a research and discovery survey; the memory's invention disclosure
+- **Status:** ACCEPTED (owner, 2026-11-05 evening, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1076, DEC-1074 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-TRIAL-W4.md` (`5a9e36c0`)
+- **Decision:**
+  - **(a) a1:** mxbai-rerank-large-v2 is re-run with its own input template applied, rehearsed on a stand-in first,
+    under DEC-1076 (4)'s rule.
+  - **(b) b1:** Qwen3-Reranker-4B in 8-bit is not adopted now. **b2, in the same quiet window:** the 4B reranking 24
+    candidates instead of 40, on the 138 under the same rule, with its speed alone and at 10 and 20 at once and its GPU
+    peak.
+  - **(c) In the same window,** the 138 with the reranker switched off on today's adopted structure (the fused order
+    alone), so the reranker's net contribution is known: hits, MRR, and how many answers it lifts into the top 5 and
+    how many it pushes out. The three results come to the owner side by side with today's 0.6B.
+  - **(d) A research and discovery session, now,** read-only, no installs, web research within its allowlist: the
+    rerankers that fit this machine; how other memory systems build, recall, fuse and rerank, with their reported hit
+    rates and what each was measured on; what each component is for and where ours may go wrong. Then one package to
+    the owner: what to adopt, what not, why, and how much each could raise the hits. Nothing is adopted before the
+    owner decides.
+  - **(e) The CTO writes the memory's architecture as an invention disclosure**
+    (`governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md`), in plain words.
+- **Basis:** question 1 (memory: the reranker's contribution measured before its model is chosen; the design compared
+  with the field) and question 2 (a model judged on a faulty input misjudges it).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13368,3 +13389,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.458 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1074; DEC-1071 (3) and DEC-1070 (2)-(4) changed. Next free id: DEC-1075. |
 | 0.459 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1075. Next free id: DEC-1076. |
 | 0.460 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1076; DEC-1074 (3), DEC-1075 (1) and DEC-1069 (12) changed. Next free id: DEC-1077. |
+| 0.461 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1077. Next free id: DEC-1078. |
