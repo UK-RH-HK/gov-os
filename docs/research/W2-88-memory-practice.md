@@ -125,6 +125,12 @@ The figures are hit@5. The 48-question set ran from m1 to m5 (24 visible + 24 hi
 | M1 + v456 | fix-c | 34/40 | 33/39 | no | a tie; MRR over the 79 lower (0.6300 against 0.6313); 1.0 s |
 | v456 + the reranker shown title and section | fix-d | 32/40 | 34/39 | no | the 79 fall, the gap widens |
 | v456 + one place per identical text | fix-d | 34/40 | 33/39 | no | no effect |
+| C1, the heading path in the keyword index | p1 | 33/40 | 34/39 | no | a tie with its control (p0: 33/34, gap 4.7); MRR lower |
+| C2, answer-unit chunks (26.8k more) | p2 | 35/40 | 32/39 | no | the gap widens (5.4) |
+| C1 + C2 | p3 | 35/40 | 31/39 | no | the 79 fall |
+| **The stated links** (ticket → decision, amends/supersedes, `Under:`, front-matter ids) + a bounded hop | g1 | 34/40 | 33/39 | **yes** | nothing falls; **drift 184 → 0 unjoined** |
+| The stated links + M5 | g2 | 33/40 | 34/39 | no | the gap widens |
+| **The measurement set, its single use, on v456 + the links** | verdict | — | — | — | **40/59 (67.8 %)** against 85.0 / 84.6: disagrees |
 
 Night one's survey (63 variants on all 48) and night two's (32 on the visible half) also found:
 - **Losers:** pool quotas, a global pool, an embedder instruction, a reranker instruction, authority ×2.
@@ -162,7 +168,15 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
    - Stopping processes by a text match killed another agent's work. Stop only by named pids.
    - A measure script on a clone with an uncommitted setting was refused by the re-pin's clean-tree check. Commit the
      setting in the throwaway clone.
-6. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
+6. **Agreement between two tuned halves is not the verdict.**
+   - The halves came within 0.4 points; the blind measurement set scored 17 points lower.
+   - Its questions share the fewest words with their answers (median 0.41, against 0.50 tuning and 0.43 hidden), which
+     is a vocabulary gap that structure does not close.
+   - Content change alone moved the halves by one question each way, so a 3-point bound on 40 questions is within
+     noise.
+   - **The practice:** keep the blind set for the verdict, profile the sets' phrasing, and treat vocabulary (the
+     embedder, the query) as its own lever.
+7. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
    nothing. Score it apart.
 
 ## 6. For an adopted repository's Wave 0 (the practice in order)

@@ -1,4 +1,4 @@
-# Start here — the next CTO session (written 2026-11-04 ~18:00 by session 33b3628c)
+# Start here — the next CTO session (written 2026-11-05 ~01:45 by session 33b3628c, the night's end state)
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
@@ -24,19 +24,25 @@ the register and the owner's word hold over both.
 ## 2. The reading list, in order
 1. `governance/project/prompts/w2-orchestrator.md` §0 (the standing decisions in short) and §1 (session start).
 2. **This file.**
-3. `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`, its **RESUME HERE** (2026-11-04): the session state, what is open.
+3. `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`, its **RESUME HERE** (2026-11-05): the session state, what is open.
+3b. **The morning package** `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md`: the night's figures, the structure, the measurement set's result, every decision waiting on the owner.
 4. `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section **"DECIDED BY DEC-1052"** with the status
-   table (D-4b's row holds the measures m1 to m6, re-pin window 3 and the trial).
-5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068, DEC-1069 and today's standing practice:
-   the stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, a stop only by named pids).
+   table (D-4b's row: the measures, the structural fixes, the night).
+5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068 to DEC-1073 and the standing practice: the
+   stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, **waits and stops by pid only
+   through `tools/proc.sh`**).
 6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1073 (**next free id DEC-1074**).
-7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md` (today: m6, the trial's rule and state,
-   the methods' rule, rows) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips, the slips); the packages
+7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/NIGHT2.md` (the night of 2026-11-05: every
+   structural step, the measurement set's single use), `DAY.md` (2026-11-04: m6, the trial stopped, the diagnosis,
+   stage A, M1-M5) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips); `DIAG.md`; the packages
+   `D4B-STRUCTURE.md`, `LINK-INTEGRITY.md`, `D4B-MORNING-2026-11-05.md`; the research `docs/research/D4B-link-census.md`,
+   `docs/research/W2-88-memory-practice.md`, `docs/audit/memory-recall-diagnosis-hidden.md`; the older packages
    `packages/LIFT-1/D4B-NIGHT.md`, `D4B-RESEARCH.md`, `D4B-AUDIT.md`; the measure's audit
    `docs/research/memory-measure-audit/` (RUBRIC.md version 2, VISIBLE.md, HIDDEN.md, NEW-VISIBLE.md) and
    `docs/audit/memory-measure-new-*.md`.
-8. The ACTs in flight or done today: `packages/ACT-REPIN-W3.md` (done), `ACT-RERANK-TRIAL-1.md` (section 4 is the
-   CTO's: running), `ACT-HLABEL-1`, `-2`, `-3`, `ACT-HNEW-1` (done by the operator).
+8. The ACTs: `packages/ACT-REPIN-W3.md` (done), `ACT-RERANK-TRIAL-1.md` (stopped after T2 by DEC-1070; T3/T4 wait),
+   `ACT-HLABEL-1`, `-2`, `-3`, `ACT-HNEW-1`, `ACT-MSET-1`, `ACT-MSET-2` (done by the owner's writer, checker and
+   operator).
 9. `INTENT-DEC-1052.md`, `OWNER-GLOSSARY.md`; the agents' common rules `.gov-runtime/scratch/orchestrator/briefs/EMG-common.md`;
    reviewers `governance/project/briefs/JUDGEMENT.md`.
 
@@ -56,48 +62,73 @@ the register and the owner's word hold over both.
   `GIT_DIR`, and W2-122's test helper ran `git init` with it; the fix for the tests waits for the proposal flow;
   the CTO's rule is in force); the GPU backstop's two trips (a request bound by count, not size: the padded bound now).
 
+## 3b. Done on 2026-11-04 evening and the night (DEC-1070 to DEC-1073)
+- **The trial stopped after T2:** the 0.6B on the trial copy equals m6. The live reranker was restored (DEC-1070 (1)).
+- **The three sets:**
+  - the tuning 40 and the hidden check 40;
+  - `memory-verdict` (60), written blind and cross-checked (ACT-MSET-1/2), declared in both path maps.
+  - **It has had its single use** (40/59, 67.8 %).
+- **The recall diagnosis:** `DIAG.md`, the hidden kinds, the structural review `D4B-STRUCTURE.md`.
+- **The structural fixes,** judged on the 79 (h24 apart):
+  - **v456 adopted:** 67/79, gap 0.4 from 15.6;
+  - **the stated links adopted** (`w2/W2-92-proto` `e884675b`): drift 184 → 0 unjoined;
+  - every other step measured and not kept (the morning package, section 1).
+- **Nothing from the prototypes is in the product.**
+- **The link census** (`3d1c459e`) and **the link-integrity package** (`23610a2e`).
+- **W2-88 owns the memory-building practice:** `docs/research/W2-88-memory-practice.md`.
+
 ## 4. Live and running now
 - **gov:** `~/.local/bin/gov` -> `pin-8284fb408bd4` (rollback `pin-9894b0cf`, one line in `ACT-REPIN-W3.md`).
 - **The servers:** the shared embedder 127.0.0.1:11434 and the query server :11435, both on the GPU (29/29 layers).
-- **The shared reranker:** **stopped for the trial's quiet window** (since 17:54 on 2026-11-04); the trial copy serves on
-  `~/.local/share/gov-os/rerank-trial/run/rerank.sock`. The window ends with T6's restore: the live service restarted
-  under class 3 (it then starts from the new pin). If you find the window open and no trial step running: run T6
-  (`ACT-RERANK-TRIAL-1.md` section 5) first.
-- **The hold file** `log/act-in-progress.txt`: the CTO's own, for the trial window; it ends with T6.
-- **Watchers:** the dispatcher (cron); the inbox waiter; `tools/sentinel_check.sh` (the sentinel's login, Remote
-  Control, tmux and watch log); `tools/bare_watch.sh` (`core.bare`); `tools/gpu_backstop.sh` twice during the trial
-  (`MARK=research-retrieval`, `MARK=rerank-trial`); the samplers; the slot watcher (pid 8416).
-- **The sentinel:** tmux `cto-sentinel`, restarted by the operator at 15:17 (its login had expired at 11:43).
+- **The shared reranker:** live, under class 3. There is no trial window and no hold file. The trial copy, its venv
+  and the downloads are kept (`~/.local/share/gov-os/rerank-trial/`, `reranker-trial-venv`).
+- **Watchers:**
+  - the dispatcher (cron) and the inbox waiter;
+  - `tools/sentinel_check.sh`;
+  - `tools/bare_watch.sh`;
+  - `tools/gpu_backstop.sh` (`MARK=research-retrieval`);
+  - the sentinel's own deadman.
+- **Prototype branches** (never merge without the owner):
+  - `w2/W2-32-proto` `f8a5fdad`: C1 `heading_path_everywhere` and C2 `answer_units`, measured, not kept;
+  - `w2/W2-92-proto` `e884675b`: the stated links, adopted as measured, awaiting the owner's product decision.
+- **Measure clones** under `~/gov-os-runs/D4B/`: m6, m6-M1..M5, p0-p3, g1, g2, verdict; the scripts in
+  `drafts/d4b/`.
 - **Must not start:** §1's list.
 
-## 5. Next, in order
-1. **The reranker trial** (DEC-1069 (11)-(13); `DAY.md`'s rule, written before any candidate ran): T2 (the 0.6B on
-   the trial copy, the faithfulness check against m6), T3 (mxbai-rerank-large-v2), T4 (Qwen3-Reranker-4B 8-bit), each
-   with `drafts/rerank-trial/trial_model.sh`; T6, the restore; the result to the owner (all three, both halves, the
-   GPU peak, the load time, the speed alone and at 10 and 20 at once). The standing model bench recorded.
-2. **The methods' measures** (`DAY.md`'s rule, re-based on m6): each of M1-M5 alone, one run on the 80; m7 with the
-   kept ones, three runs.
-3. **The embedder trial** (Qwen3-Embedding-4B), after the reranker's decision, measured the same way.
-4. **Re-pin window 4:** W2-112's memory release (built on `w2/W2-112`, 52 of 52, not merged) and what the trial and the
-   methods adopt.
-5. D-5 (with the row: the generated MR-1..MR-6 records take the Contract's status), D-6, D-9, D-10 (the owner's word),
-   the lift; D-11 after it.
+## 5. Next, in order (the owner decides first: the morning package, section 6)
+1. **The owner's decisions** on the measurement set's disagreement and on the product changes (v456 in W2-32, the
+   links in W2-92) for re-pin window 4.
+2. **Q07 and Q14 re-worded** to stable facts by an independent session (DEC-1070 (13)). Not yet done.
+3. **What the owner chooses next:**
+   - the vocabulary lever: the embedder trial (Qwen3-Embedding-4B), phrasing;
+   - the reranker trial (mxbai, Qwen3-4B 8-bit) on the adopted structure;
+   - a new measurement set for the next decision point.
+4. **Re-pin window 4:** W2-112's memory release, the adopted fixes once built in the product, and the link-integrity
+   tickets as the owner decides (W2-129, W2-130).
+5. D-5 (the templates, with the link lines and the MR-1..MR-6 row), D-6, D-9, D-10 (the owner's word), the lift; D-11
+   after it.
 
 ## 6. Waiting on the owner
-- The trial's result and the adoption it implies (the rule decides; the owner sees all three).
-- Q07 and Q14 (R11: their answers grow with ordinary work): computed gold (a measure change) or re-worded.
-- The visible 40's category shortfalls (2 exact-string, callers, history): filled by the next additions or left.
-- The tests' half of the `core.bare` fix (the root conftest clears `GIT_*`; W2-122's helper): a proposal (CIT-P).
+The morning package, section 6:
+1. the measurement set's disagreement;
+2. the product changes;
+3. W2-54's test premise;
+4. the link-integrity package (O1, O2);
+5. the 3-point rule's noise;
+6. Q07/Q14 (decided, not yet done);
+7. the visible category shortfalls;
+8. the `core.bare` tests' CIT-P;
+9. the MR-1..MR-6 row.
 
 ## 7. The checks at start (after the prompt's §1)
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
 2. Register: your session id into `log/cto-session.txt`; arm `tools/inbox_wait_quiet.sh` and `tools/sentinel_check.sh`
    (the Bash tool's background runs); one test push; the sentinel's last line in `log/deadman.log` under 10 minutes old.
-3. **Holds:** if `log/act-in-progress.txt` exists, read it: an owner's ACT means no main-tree commit; the CTO's trial
-   window means finish or restore it (T6). While you wait on the owner or the operator, write `log/cto-standby.txt`.
+3. **Holds:** if `log/act-in-progress.txt` exists, read it: an owner's ACT means no main-tree commit. While you wait on
+   the owner or the operator, write `log/cto-standby.txt`. **Every wait and stop by pid only (`tools/proc.sh`).**
 4. **The pin:** `readlink -f ~/.local/bin/gov` = `/home/usain/.local/share/gov-os/pin-8284fb408bd4/bin/gov`; the guard:
    `python3 .gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS` = `PASS`.
-5. **The servers on the GPU:** both embedders 29/29 layers; the reranker (after T6): `tail -2 ~/.cache/gov-os/rerank.log`
+5. **The servers on the GPU:** both embedders 29/29 layers; the reranker: `tail -2 ~/.cache/gov-os/rerank.log`
    `READY ... cuda:0`, and `gov retrieve` from `~/gov-os-worktrees/W2-00-store` gives `rerank.by` = `service`.
 6. **`core.bare`:** `git --git-dir=.git config --get core.bare` = `false`; `tools/bare_watch.sh` running.
 7. **The inbox:** read and file each item; a `*-sentinel-down.txt` is pushed to the owner at once.
