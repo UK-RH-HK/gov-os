@@ -16,12 +16,15 @@ each search (``top_k``), never set on a module: one search's setting never reach
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
+from gov.cli.errors import GovError
 from gov.config.loader import POOL_FLAGS, POOL_KEYS, RETRIEVAL_FILE, RETRIEVAL_SCHEMA, _load
 
 FIRST = 10  # the head of the final order ``per_file_first10`` holds to
 UNPOOLED = -10 ** 9  # the order key of a page's candidate the pool did not rerank: after the pool's, as given
+DIGEST_CHARS = 16  # the token's digest of the pool's candidates (their chunk ids, in fused order)
 
 
 def settings(root: Path) -> dict:
@@ -44,6 +47,46 @@ def capped(ordered: list[dict], cap: int, first: int = FIRST) -> list[dict]:
         else:
             rest.append(item)
     return head + rest
+
+
+def digest(chunk_ids) -> str:
+    """The pool's candidates named in a continuation token: a digest of their chunk ids in fused order."""
+    return hashlib.sha256("\n".join(chunk_ids).encode()).hexdigest()[:DIGEST_CHARS]
+
+
+def carried(head: list[dict], order: list[dict] | None, outcome: dict) -> dict:
+    """What a continuation token carries of the pool (round 2): ``h`` the candidates' digest, ``o`` the pool's
+    order as positions in ``head`` (None: the pool's rerank was not scored, so the question ranks page by page),
+    ``b`` and ``d`` who scored and on which device. At most ``rerank_depth`` small numbers: bounded."""
+    at = {hit["chunk_id"]: position for position, hit in enumerate(head)}
+    return {"h": digest(hit["chunk_id"] for hit in head),
+            "o": None if order is None else [at[candidate["chunk_id"]] for candidate in order],
+            "b": outcome.get("by"), "d": outcome.get("device")}
+
+
+def well_formed(value) -> bool:
+    """A token's pool part as ``carried`` writes it (its positions checked against the candidates by ``reorder``)."""
+    return (isinstance(value, dict) and set(value) == {"h", "o", "b", "d"}
+            and isinstance(value["h"], str) and len(value["h"]) == DIGEST_CHARS
+            and (value["o"] is None or (isinstance(value["o"], list)
+                                        and all(type(n) is int for n in value["o"])))
+            and isinstance(value["b"], str) and (value["d"] is None or isinstance(value["d"], str)))
+
+
+def reorder(head: list[dict], token_pool: dict) -> list[dict] | None:
+    """``head`` in the order the earlier call's pool gave (``token_pool``, from ``carried``); None when that pool was
+    not scored. A token whose candidates are not this call's (the store or the settings changed) or whose order is no
+    order of them is refused: ``CONTINUATION_INVALID``."""
+    if token_pool["h"] != digest(hit["chunk_id"] for hit in head):
+        raise GovError("CONTINUATION_INVALID",
+                       "the continuation's candidate pool is not this question's: the store or the pool settings "
+                       "changed since the earlier call") from None
+    positions = token_pool["o"]
+    if positions is None:
+        return None
+    if sorted(positions) != list(range(len(head))):
+        raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    return [head[position] for position in positions]
 
 
 def without_nested(evidence: list[dict]) -> tuple[list[dict], list[dict]]:

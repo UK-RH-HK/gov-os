@@ -8,6 +8,7 @@ model starts.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import shutil
@@ -60,6 +61,16 @@ class Reranker:
 
 @pytest.fixture()
 def project(tmp_path, monkeypatch):
+    return _project(tmp_path, monkeypatch, LONG_NOTES)
+
+
+@pytest.fixture()
+def short_project(tmp_path, monkeypatch):
+    """The same notes, none of them long: the pool's 40 go in three requests of at most 16."""
+    return _project(tmp_path, monkeypatch, 0)
+
+
+def _project(tmp_path, monkeypatch, long_notes):
     root = tmp_path
     (root / "governance/project").mkdir(parents=True)
     path_map = yaml.safe_load((REPO / "governance/project/path-map.yaml").read_text(encoding="utf-8"))
@@ -70,7 +81,7 @@ def project(tmp_path, monkeypatch):
     shutil.copy2(REPO / "template/.gitleaks.toml", root / ".gitleaks.toml")
     (root / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
     for number in range(NOTES):
-        filler = "x" * 5000 if number < LONG_NOTES else "plain words"
+        filler = "x" * 5000 if number < long_notes else "plain words"
         (root / f"note{number:02}.md").write_text(f"# Note {number}\n\nThe {PHRASE} of pier {number}. {filler}\n"
                                                   f"A ledger, and a heron by it.\n", encoding="utf-8")
     sections = "".join(f"## Part {n}\n\nThe {PHRASE}, part {n}.\n\n" for n in range(6))
@@ -326,7 +337,8 @@ def test_rerank_depth_reranks_the_first_n_once_and_cuts_every_page_from_that_ord
     pages = _all_pages(root, reranker, batch_size=4)
     assert pages == expected and len(set(pages)) == len(fused)
     calls = len(fused_lists) - 1
-    assert len(reranker.texts()) == 12 * (1 + calls)  # one pass of the 12 a call, never a page's own request
+    assert calls > 2  # the question's continuations, each a new call
+    assert len(reranker.texts()) == 12 * 2  # one pass of the 12 a question (asked twice here), never a call's own
 
 
 def test_the_pool_s_requests_stay_under_the_padded_bound(project):
@@ -355,7 +367,7 @@ def test_the_pool_is_lifted_by_authority_before_the_cut(project, monkeypatch):
     assert seen == [6] and _ids(bundle)[:6] == list(reversed(expected[:6]))
 
 
-def test_a_pool_rerank_that_fails_is_reported_and_the_fused_order_kept(project):
+def test_a_pool_rerank_that_fails_falls_back_to_the_per_page_path_of_that_call(project):
     root, fused_lists = project
     _settings(root, {"rerank_depth": 10})
     calls = []
@@ -366,9 +378,136 @@ def test_a_pool_rerank_that_fails_is_reported_and_the_fused_order_kept(project):
             raise BrokenPipeError("the stand-in died")
         return score
     bundle = _ask(root, broken)
+    # the pool's first request failed; the page then asked on its own (today's path), and failed too
+    assert len(calls) == 2 and bundle["pool"]["order"] == "per-page" and bundle["pool"]["reranked"] == 0
+    assert bundle["pool"]["fallback"]["by"] == "unavailable" and "died" in bundle["pool"]["fallback"]["reason"]
     assert bundle["rerank"]["by"] == "unavailable" and "died" in bundle["rerank"]["reason"]
-    assert not bundle["merge"]["reranked"] and bundle["pool"]["reranked"] == 0
-    assert len(calls) == 1 and _ids(bundle) == fused_lists[-1]["fused"]  # one request failed: no other asked
+    assert not bundle["merge"]["reranked"] and _ids(bundle) == fused_lists[-1]["fused"]
+
+
+class FailsFirst(Reranker):
+    """The stand-in, its first request failing (the pool's), the later ones scored."""
+
+    def __call__(self):
+        scored = super().__call__()
+
+        def score(query, texts):
+            if not self.requests:
+                self.requests.append((query, list(texts)))
+                raise BrokenPipeError("the stand-in died once")
+            return scored(query, texts)
+        return score
+
+
+def test_a_failed_pool_ranks_each_page_on_its_own_and_the_question_s_cut_stays_whole(project):
+    root, fused_lists = project
+    _settings(root, {"rerank_depth": 10})
+    first = _ask(root, FailsFirst(), batch_size=4)
+    fused = fused_lists[-1]["fused"]
+    assert first["pool"]["order"] == "per-page" and "died once" in first["pool"]["fallback"]["reason"]
+    assert first["merge"]["reranked"] and first["rerank"]["by"] == "given"  # the page scored on its own
+    reranker = FailsFirst()
+    order, token, pages = [], None, []
+    while True:
+        bundle = _ask(root, reranker, batch_size=4, continuation=token)
+        pages.append(bundle)
+        order += _ids(bundle)
+        token = bundle["continuation"]
+        if token is None:
+            break
+    assert len(pages) > 2 and sorted(order) == sorted(fused) and len(set(order)) == len(order)  # none lost or twice
+    assert all(page["pool"]["order"] == "per-page" for page in pages)
+    assert all("fallback" not in page["pool"] for page in pages[1:])  # a later call never asks the pool
+    # the later calls' requests are their own pages' only (today's path), never the pool's 10 again
+    failed = len(reranker.requests[0][1])  # the pool's first request, the one that failed
+    assert len(reranker.texts()) == failed + sum(len(page["evidence"]) for page in pages)
+    assert all(page["merge"]["reranked"] for page in pages)
+
+
+# ---- the continuation carries the pool's order (round 2)
+
+
+def _tree(*roots):
+    return {str(path): (path.stat().st_size, path.stat().st_mtime_ns)
+            for root in roots for path in Path(root).rglob("*") if path.is_file()}
+
+
+def test_a_question_with_three_continuations_sends_one_pass_and_writes_nothing(short_project, tmp_path_factory,
+                                                                                 monkeypatch):
+    root, fused_lists = short_project
+    home = tmp_path_factory.mktemp("home")
+    monkeypatch.setenv("HOME", str(home))
+    _settings(root, {"meaning_uncut": True, "route_depth": 60, "rerank_depth": 40, "per_file_first10": 2,
+                     "drop_nested": True})
+    _ask(root, Reranker())
+    total = len(fused_lists[-1]["fused"])
+    batch_size = -(-total // 8)  # radius 0: two batches a call, so four calls in all
+    reranker = Reranker()
+    first = _ask(root, reranker, batch_size=batch_size)
+    after_first = list(reranker.requests)
+    assert first["pool"]["order"] == "first" and first["pool"]["reranked"] == 40
+    assert len(after_first) <= 3 and len(reranker.texts()) == 40  # one pass: three requests of at most 16
+    for query, texts in after_first:  # the padded bound on every request
+        assert 0 < len(texts) <= rerank_module.MAX_REQUEST_TEXTS
+        assert len(texts) * max(len(query) + len(text) for text in texts) <= rerank_module.MAX_REQUEST_CHARS
+    before = _tree(root, home)
+    token, later = first["continuation"], []
+    while token is not None:
+        bundle = _ask(root, reranker, batch_size=batch_size, continuation=token)
+        later.append(bundle)
+        token = bundle["continuation"]
+    assert len(later) == 3  # three continuations
+    assert reranker.requests == after_first  # not one request more
+    assert _tree(root, home) == before  # nothing written by a continuation
+    assert all(page["pool"]["order"] == "carried" and page["pool"]["reranked"] == 40 for page in later)
+    assert all(page["rerank"]["by"] == "given" and page["merge"]["reranked"] for page in later)
+    expected = _pool_order(root, fused_lists[-1]["fused"], _scores_of(root, Reranker()), 40, cap=2)
+    order = _ids(first) + [cid for page in later for cid in _ids(page)]
+    assert [cid for cid in expected if cid in set(order)] == order  # every page cut from the one order
+
+
+def test_the_token_s_pool_part_is_bounded(project):
+    root, _ = project
+    _settings(root, {"rerank_depth": 40})
+    token = _ask(root, Reranker(), batch_size=4)["continuation"]
+    carried = json.loads(base64.urlsafe_b64decode(token))["p"]
+    assert set(carried) == {"h", "o", "b", "d"} and len(carried["h"]) == pool.DIGEST_CHARS
+    assert sorted(carried["o"]) == list(range(40))  # 40 positions, no chunk text or id
+    _settings(root, None)
+    assert "p" not in json.loads(base64.urlsafe_b64decode(_ask(root, Reranker(), batch_size=4)["continuation"]))
+
+
+def _forged(token, **pool_part):
+    payload = json.loads(base64.urlsafe_b64decode(token))
+    payload["p"] = {**payload["p"], **pool_part} if pool_part.pop("_keep", True) else pool_part
+    return base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
+
+
+@pytest.mark.parametrize("change", [{"h": "0" * 16}, {"o": [1, 0] + list(range(2, 39))}, {"o": [0] * 40},
+                                    {"o": list(range(41))}, {"o": "0,1"}, {"o": [True] * 40}, {"h": 3}, {"b": None},
+                                    {"_keep": False, "h": "0" * 16}])
+def test_a_token_whose_pool_does_not_match_the_question_is_refused(project, change):
+    root, _ = project
+    _settings(root, {"rerank_depth": 40})
+    token = _ask(root, Reranker(), batch_size=4)["continuation"]
+    forged = _forged(token, **change)
+    reranker = Reranker()
+    with pytest.raises(GovError) as raised:
+        _ask(root, reranker, batch_size=4, continuation=forged)
+    assert raised.value.code == "CONTINUATION_INVALID" and not reranker.requests
+
+
+def test_a_token_from_another_question_or_other_pool_settings_is_refused(project):
+    root, _ = project
+    _settings(root, {"rerank_depth": 40})
+    token = _ask(root, Reranker(), batch_size=4)["continuation"]
+    with pytest.raises(GovError) as raised:
+        _ask(root, Reranker(), "ledger", batch_size=4, continuation=token)
+    assert raised.value.code == "CONTINUATION_INVALID"
+    _settings(root, {"rerank_depth": 30})  # another pool: its candidates are not the token's
+    with pytest.raises(GovError) as raised:
+        _ask(root, Reranker(), batch_size=4, continuation=token)
+    assert raised.value.code == "CONTINUATION_INVALID" and "pool" in raised.value.message
 
 
 # ---- per_file_first10
@@ -392,6 +531,38 @@ def test_per_file_first10_holds_the_first_10_and_keeps_the_rest_after(project, b
     assert max(_per_file(capped).values()) <= 2 and sorted(_ids(capped)) == sorted(_ids(plain))
     held_back = [cid for cid in _ids(plain)[:10] if cid not in _ids(capped)[:10]]
     assert held_back and _ids(capped)[10:] == [cid for cid in _ids(plain) if cid not in _ids(capped)[:10]]
+
+
+@pytest.mark.parametrize("rerank_depth", [0, 40])
+def test_per_file_first10_holds_after_the_routing_moved_hits_ahead(project, monkeypatch, rerank_depth):
+    """The review's F2: S8's code route moves two more of multi.md's chunks ahead; the cap holds the first 10 after."""
+    root, _ = project
+    chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)}
+    scores_of = _scores_of(root, Reranker())
+    multi = sorted((cid for cid, chunk in chunks.items() if chunk["path"] == "multi.md"), key=lambda c: -scores_of[c])
+    lead = multi[2:] + multi[:2]  # the code route's order: its first two are not the two the cap keeps first
+    monkeypatch.setattr(retrieve_module.code_route, "route",
+                        lambda root_, query, chunks_: ([chunks_[cid] for cid in lead], {"available": True,
+                                                                                         "reason": None}))
+    monkeypatch.setattr(semantic, "distances", lambda *a, **k: None)  # the code route's own order kept
+    routing = {"code_first": 2}
+    _settings(root, {"rerank_depth": rerank_depth} if rerank_depth else None, routing)
+    uncapped = _ask(root, Reranker())
+    assert _ids(uncapped)[:2] == lead[:2] and _per_file(uncapped)["multi.md"] > 2
+    _settings(root, {"rerank_depth": rerank_depth, "per_file_first10": 2}, routing)
+    bundle = _ask(root, Reranker())
+    assert _ids(bundle)[:2] == lead[:2] and bundle["routing"]["code"] == lead[:2]  # the routed hits first
+    assert max(_per_file(bundle).values()) <= 2  # and the first 10 held after them
+    assert sorted(_ids(bundle)) == sorted(_ids(uncapped))  # none lost
+
+
+def test_a_pooled_page_the_routing_left_unchanged_keeps_the_pool_s_order(project, monkeypatch):
+    """The cap in the pool's order only (the harness's ``_final``): a later page of it is not capped again."""
+    root, fused_lists = project
+    _settings(root, {"rerank_depth": 40, "per_file_first10": 2})
+    pages = _all_pages(root, Reranker(), batch_size=4)
+    expected = _pool_order(root, fused_lists[-1]["fused"], _scores_of(root, Reranker()), 40, cap=2)
+    assert pages == expected
 
 
 # ---- drop_nested
