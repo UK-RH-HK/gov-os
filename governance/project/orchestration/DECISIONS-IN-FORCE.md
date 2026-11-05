@@ -174,3 +174,6 @@ other restart is an ACT.
   - **Approved for re-pin window 4,** tests first: v456 into W2-32, the stated links into W2-92.
   - **W2-54's premise** is rewritten by its test designer.
   - **LINK-INTEGRITY is adopted:** O1 (A), O2 (A); unlinked mentions are notices from the start.
+- DEC-1075 (2026-11-05): ACT-MSET-3/4 approved: the verdict set of 80 (`memory-verdict-2`, declared in both path maps,
+  measured by the CTO only at the next decision point, counts only), written and cross-checked outside the CTO's system;
+  failure-memory 4, a shortfall of at most 2 to `decision`. W2-32's S11 (v456) as worded. Basis: questions 1 and 2.
