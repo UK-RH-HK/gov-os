@@ -1,6 +1,6 @@
 # D4B-PACKAGE-DRAFT: the next memory levers (a draft for the owner, for the CTO's review)
 
-- **By:** the research role, 2026-11-05, from `REPORT.md` in this folder. Nothing here is adopted. It is a draft for
+- **By:** the research role, 2026-11-05, from `docs/research/D4B-memory-survey.md`. Nothing here is adopted. It is a draft for
   the CTO to review and put to the owner. Written to disk by the CTO from the session's return.
 - **The base:** v456 + the stated links + Qwen3-Reranker-0.6B.
   - hit@5 **107 of 138**: visible 34/40, hidden 33/39, spent 40/59;
@@ -44,7 +44,7 @@
 ## What not to do, and why
 - **mxbai re-run "with its template":**
   - The trial already applied it. The snapshot's `chat_template.jinja` matches the vendor library's prompt, and
-    `sentence-transformers` 6.1 renders every pair through it (REPORT 1.3).
+    `sentence-transformers` 6.1 renders every pair through it (the survey, section 1.3).
   - P2(c) tests the one design confound found, the lift scale, for free.
 - **Deeper pools** (routes past 60, more than 40 reranked): weak pointwise rerankers degrade with depth ("Drowning in
   Documents"), and only 2 of the 19 misses were below the 40.

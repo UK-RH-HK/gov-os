@@ -51,7 +51,7 @@ method to measure such a memory honestly while it is being tuned.
 - **Records:** architecture decision records (ADRs, Nygard 2011), requirements traceability matrices, commit trailers.
 - **Measurement:** held-out test sets, benchmark contamination studies, blind annotation with adjudication.
 
-The research session started on 2026-11-05 (DEC-1077 (d)) adds a sourced survey (`docs/research/D4B-memory-survey/`).
+The research session started on 2026-11-05 (DEC-1077 (d)) adds a sourced survey (`docs/research/D4B-memory-survey.md`).
 
 ## 4. Summary
 A repository's memory is built as **four stores from one rebuild**: a keyword index, a meaning index, a record graph

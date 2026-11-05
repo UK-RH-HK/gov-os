@@ -4,7 +4,7 @@
 - **Evidence:**
   - the second and third trial windows: `~/gov-os-runs/D4B/trial-w4b/`, `trial-w4-t4b-qwen4b-8bit-d24/`,
     `trial-w4b-norerank/`;
-  - the research survey `docs/research/D4B-memory-survey/REPORT.md` and its draft `PACKAGE-DRAFT.md`, written to
+  - the research survey `docs/research/D4B-memory-survey.md` and its draft `docs/research/D4B-memory-survey-package-draft.md`, written to
     disk from the session's return.
 - **Nothing is adopted until you decide.** The verdict set of 80 stays unused until the decision point (DEC-1078 (3)).
 
@@ -55,7 +55,7 @@ both runs were repeated there. No other figure is affected (`drafts/d4b/ROWS.md`
      ACT), W2-112's loader must change for the 8-bit load, and the GPU must be watched.
 - **The 4B at 40:** not eligible (3.89 s alone; 10 GPU samples over the budget).
 
-## 3. What the research found (the short of `REPORT.md`)
+## 3. What the research found (the short of `docs/research/D4B-memory-survey.md`)
 1. **Our pipeline may hide the reranker's own order.** After the rerank:
    - the authority lift adds 1.0 per tier step to the raw score;
    - up to 2 named-record and 2 code chunks move ahead;
