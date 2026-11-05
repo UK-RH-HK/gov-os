@@ -277,7 +277,7 @@ def test_per_file_first10_holds_at_most_n_of_a_file_in_the_first_10_and_loses_no
         first[item["path"]] = first.get(item["path"], 0) + 1
     assert max(first.values()) <= n, f"pool.per_file_first10 {n}: a file holds more in the first 10: {first}"
     assert sorted(p.items(capped)) == sorted(p.items(today)), "pool.per_file_first10 lost or added an item"
-    assert p.items(capped) == p.items(p.capped(today["evidence"], n)), \
+    assert p.items(capped) == p.items({"evidence": p.capped(today["evidence"], n)}), \
         f"pool.per_file_first10 {n}: the first 10 are not today's order with the file's extra chunks passed over, " \
         f"or the rest do not follow in their order"
 
@@ -345,7 +345,7 @@ def test_v456_meaning_uncut_keeps_the_chunk_one_phrasing_finds_with_the_others_o
 def test_v456_per_file_first10_holds_with_the_others_on(files_store, box, standin):
     today, _ = _bundle(box, files_store, p.FILES_QUESTION, pool=_without("per_file_first10"), kind="ranks")
     together, _ = _bundle(box, files_store, p.FILES_QUESTION, pool=p.V456, kind="ranks")
-    assert p.items(together) == p.items(p.capped(today["evidence"], 2)), \
+    assert p.items(together) == p.items({"evidence": p.capped(today["evidence"], 2)}), \
         "v456: the first 10 are not at most 2 of a file, the rest in their order, none lost"
 
 
