@@ -140,6 +140,80 @@ unreadable, unavailable, failed), none may say available or ok, and the bundle's
 re-runs `tests/acceptance/W2-87`, `W1-21`, `W1-19` and `W1-42` for "nothing else changes" (some of their questions
 may hold ids or symbol-shaped words; see Risks in the return).
 
+## KPI lines S7 to S10 (DEC-1074 (5), LINK-INTEGRITY §6.1), tests and red reasons on the integrated code `8c28aa70fb3f`
+
+Added under DEC-1074 (5) by the test designer (re-pin window 4, `DAEO-n0wb`), from the KPI lines, the failure line
+"a partial supersession that drops its target from what is current; a register chunk in a bundle without its
+status", the census's forms and patterns (`docs/research/D4B-link-census.md` §0–2, §4 and its script's patterns)
+and LINK-INTEGRITY §2.2, never from the prototype. "Today" is `w2/integrate` `8c28aa70fb3f`, the tree merged into
+this branch at `436a7520` (`support.LINKS_BASE`, its `src/` taken by `git archive` into the session's folder).
+
+- **The marina** (`support.links_corpus`): a project of its own, so the harbour's pinned bundles do not move. Its
+  register states `**Under:**`, `**Changes:**`, `**Changed by:**`, `**Amends:**`, `**Supersedes:**` naming a part,
+  `**Supersedes:**` naming ids alone on a later line (no edge today), `**Supersedes:**` ids alone on the status line
+  (today's edge), `**Replaces:**`, `**Changed by:** superseded by` and a free-text "superseded by"; one entry each
+  PROPOSED, REJECTED, WITHDRAWN and SUPERSEDED; DEC-432, four chunks long, changed twice. Its tickets state
+  `sources:` and `closes:` (DAEO-lk03 cites twenty decisions), DAEO-lk02 `depends_on` DAEO-lk01, a checkpoint
+  `task:`, a close record `task:`, `decisions_applied:` and `requirements_implemented:`, a spec `decisions:`, a
+  change record `decisions_carried:`, `decisions_recorded:` and `decisions_read:`. Every record's text uses words no
+  other record and no question holds. The expected links are `support.STATED` (the census's direction: the changer
+  to the changed decision).
+- **Built twice** in the session's folder, the same commit: by this worktree's code (`marina`) and by the integrated
+  code (`marina_at_base`); lexical index and record store; no vector, no code index, the code-graph tool off `PATH`,
+  no reranker, an empty `HOME`. Never this repository's store. Runs inside a worker's sandbox; about 12 s.
+- **The questions are titles alone.** The record route reaches the record by its title; no id is in the question,
+  so the lexical route's id boost (W2-13) brings no chunk that names the record's id. Each S8 case first checks that
+  today's bundle holds the named record and not the hop's record.
+
+Red run on `8c28aa70fb3f` (this branch's `src/`, identical to it), in the sandbox through the heavy slot, with the
+exclusions of `EMG-d4b-launched.md` (they leave none of these out): **71 tests, 51 failed, 20 passed** (about 11 s).
+Every red fails on its KPI's own assertion, none on a premise. The 20 that pass are guards, named below. A check of
+the readers themselves (in a scratch run, not committed): a register chunk with fields (`status`, `in_force`,
+`changed_by`), with an entry keyed by its id outside the evidence, or with a header line in its text, gives no S9
+fault; a row `("CITES", "DAEO-lk01", "DEC-411", ...)` reads as CITES and not the other way round.
+
+| KPI line | Tests | Red on the integrated code because |
+|---|---|---|
+| **S7.** The stated links kept at rebuild, in a table of their own outside the digest: the front-matter id keys as CITES, `task` as OF_TASK, `**Under:**` as UNDER, a supersession naming ids alone as SUPERSEDES, every other supersession or amendment as AMENDS, by the census's patterns in one function (`register_statements`); the closure, `gov dangling` and every reader of edges unchanged | `test_w2_92_stated_links.py::test_s7_each_stated_link_is_kept_as_its_type_in_a_table_of_its_own` (cases: each of the 21 forms of `support.STATED` but the twenty sources) · `test_w2_92_stated_links.py::test_s7_a_tickets_twenty_sources_are_each_kept` · `test_w2_92_stated_links.py::test_s7_the_census_patterns_are_one_function_register_statements` · guards: `test_w2_92_stated_links.py::test_s7_a_supersession_of_ids_alone_on_the_status_line_stays_todays_edge` · `test_w2_92_stated_links.py::test_s7_the_store_digest_is_unchanged` · `test_w2_92_stated_links.py::test_s7_every_reader_of_the_graph_answers_as_today` (cases: edges, gov dangling, records) · `test_w2_92_stated_links.py::test_s7_the_closure_is_unchanged` (cases: five start sets at depth 1 and 3) | Each form: "the store has no table the integrated code's store lacks: the stated links are kept nowhere". The twenty sources: none kept as CITES. `register_statements`: "defined 0 times in src/gov". **The guards pass** (by construction): today's edge DEC-445 → DEC-446, the digest, `edges`, `gov dangling`, `records` and the closure equal the integrated code's on the same commit. |
+| S7, "on this repository's register they match the census's statements one for one" | none: the CTO's measured check on this repository's store, **verified by the evidence file** (`docs/changes/W2-92-evidence.md`) | n/a |
+| **S8** and the failure line's first half. From what the record route or the closure reached, one hop: CITES, UNDER and OF_TASK out, AMENDS and SUPERSEDES in, at most 12 records, after today's closure chunks; a question that reaches no record gets today's bundle; a partial supersession never drops its target from what is current | `test_w2_92_hop.py::test_s8_a_reached_record_brings_its_stated_links_in_one_hop` (cases: a ticket's sources, a ticket's closes, a checkpoint's task, a close record's three keys, a spec's decisions, a change record's three keys, a decision's Under, a changer stated on the changer, a changer stated on the changed entry, Amends, a partial supersession by Supersedes naming a part, one in free text, a whole supersession by Replaces, by Supersedes on a later line, by Changed by superseded by, from a record the closure reached) · `test_w2_92_hop.py::test_s8_a_partial_supersession_never_drops_its_target` (cases: Supersedes naming a part, free text) · `test_w2_92_hop.py::test_s8_one_hop_brings_at_most_twelve_records` · `test_w2_92_hop.py::test_s8_the_hop_comes_after_todays_closure_chunks` · guards: `test_w2_92_hop.py::test_s8_the_hop_follows_each_link_its_one_way_once` (cases: CITES not in, AMENDS not out, UNDER not in, OF_TASK not in, one hop not two) · `test_w2_92_hop.py::test_s8_a_question_reaching_no_record_gets_todays_bundle` (cases: plain, unknown id, batched) | The hop's record is not in the bundle: e.g. "a ticket's sources: the bundle for 'Quayside winch overhaul' (reaching DAEO-lk01) does not bring ['DEC-411'] in one hop" (today's bundle holds the ticket and DAEO-lk02, by depends_on). The partial supersessions: the target stays (its text in the bundle, not dropped, not marked) but "its changer DEC-436 is not brought". At most 12: "brings none of DAEO-lk03's twenty sources". After the closure: "the hop brought nothing". **The guards pass** (by construction). |
+| S8, "adopted only under DEC-1071's rule (all 80 not lower, the halves' gap not wider)" | none: the CTO's measure, **verified by the evidence file** | n/a |
+| **S9** and the failure line's second half. Every register chunk a bundle carries names its entry's status word and the entries that change it; a PROPOSED, REJECTED, WITHDRAWN or SUPERSEDED decision is marked not in force | `test_w2_92_status.py::test_s9_every_register_chunk_names_its_status_and_its_changers` (cases: a long entry changed twice, every chunk; the same, its chunks alone (no parent); PROPOSED; REJECTED; WITHDRAWN; SUPERSEDED; in force though superseded in part; guards: in force though superseded in part, in free text; in force, changed by nothing) | DEC-432: "its chunk at lines 65-78 does not name its status ACCEPTED", the same for its other later chunks, and every chunk "does not name the entries that change it: ['DEC-431', ...]" (DEC-431's `**Changes:**` stands in DEC-431's entry only). Each status not in force: "DEC-451's chunk ... is PROPOSED and not marked not in force". DEC-437: "does not name the entries that change it: ['DEC-436']". **The two guards pass**: DEC-438's own text names its changer and its status; DEC-455 is in force and changed by nothing. |
+| **S10.** The drift count before and after, by the census's definitions, in `docs/research/W2-92-memory-measure.md` | `test_w2_92_drift.py::test_s10_the_measure_record_holds_the_drift_count_before_and_after` (the record holds the section; the counts themselves are the CTO's measure, **verified by the evidence file**) | "W2-92-memory-measure.md has no section whose heading names drift". |
+
+**How the S9 tests read "names" and "marked not in force".** What an agent is told about a register chunk
+(`support.what_the_item_says`) is its text, every field of its evidence item beyond its place (`path`, the lines,
+`id`, `chunk_id`, `sha256`, `routes`, `batch`), and any entry outside the evidence that names the chunk or its entry
+(a mapping keyed by either, or a listed entry holding either). "Names its status" is the status word in capitals
+anywhere in that; "names a changer" its id. "Marked not in force" is a field `not_in_force: true` or `in_force:
+false` (`_`, `-` or a space between the words), else the words "not in force"; an entry in force must not be so
+marked. The planted texts hold none of these words.
+
+- **S7-P1. The table's form.** The KPI names neither the table nor its columns. The tests take any table the
+  integrated store lacks, and read a row as a link when one cell is the type (any case) and it holds the source and,
+  after it, the target, as `edges` orders them. A table that stores the target before the source fails. Confidence
+  medium-high.
+- **S7-P2. Direction.** AMENDS and SUPERSEDES run from the changer to the changed decision (S8's "in (from the
+  changed decision to its changer)", the census's `source`, and the loader's SUPERSEDES edge), whichever entry states
+  the link (`**Changes:**` on the changer, `**Changed by:**` on the changed). Confidence high.
+- **S7-P3. Whole or part.** By the census's `alone` rule: `**Supersedes:** DEC-437 (2)` names a part (AMENDS);
+  `**Replaces:** DEC-442`, `**Supersedes:** DEC-444` and `**Changed by:** superseded by DEC-455` name ids alone
+  (SUPERSEDES); free text is never whole in the census (AMENDS). A `**Supersedes:**` of ids alone on the status line
+  stays today's edge; whether the table holds it too is not tested, only that it is never AMENDS. Confidence
+  medium-high.
+- **S7-P4. `register_statements`.** Tested only as exactly one definition of that name in `src/gov`; its signature
+  is the implementation's (W2-129 reads it). Confidence medium.
+- **S8-P1. The hop's directions.** The guards hold the KPI's words strictly: a cited decision does not bring the
+  ticket that cites it, a changer does not bring the decision it changes, a governing decision does not bring the
+  decisions under it, a task does not bring its checkpoint, and the hop is one step. Confidence medium-high.
+- **S8-P2. "After today's closure chunks."** Read as the evidence order: every chunk of a record today's closure
+  reaches comes before every chunk the hop brings (no reranker). Confidence medium.
+- **S8-P3. Whole supersessions.** The tests do not say whether a decision superseded whole by a stated link (not an
+  edge) becomes not current; only that its changer is brought, and (S9) that a SUPERSEDED status word is marked.
+  Confidence medium.
+- **S9-P1. The form of the mark.** A per-item field is recommended: a new top-level key of every bundle would change
+  `test_w2_92_unchanged.py`'s pinned bundles (`test_u1`, `test_u3`), which include register chunks. Confidence medium.
+
 ## Packages (the KPI lines were not clear; the tests follow the recommendation)
 
 - **P-1. A missing record store and a question that names no record.** Today such a project refuses every question
@@ -173,3 +247,7 @@ may hold ids or symbol-shaped words; see Risks in the return).
   asks a question once per session).
 - `test_w2_92_record_route.py`, `test_w2_92_code_route.py`, `test_w2_92_fail_closed.py`, `test_w2_92_unchanged.py`.
 - `test_w2_92_speed.py`: S6 (DEC-1065 (4)), its many-records project, its counting child process and its fixtures.
+- `w2_92_support.py`'s S7–S10 part and `conftest.py`'s `marina*` fixtures: the marina, built by this worktree's code
+  and by the integrated code; the store's tables read with sqlite; the readers of register chunks.
+- `test_w2_92_stated_links.py` (S7), `test_w2_92_hop.py` (S8), `test_w2_92_status.py` (S9), `test_w2_92_drift.py`
+  (S10).
