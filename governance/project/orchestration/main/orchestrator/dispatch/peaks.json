@@ -1,20 +1,20 @@
 {
- "computed": "2026-11-05 01:22:05",
+ "computed": "2026-11-05 11:26:05",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 10.18,
+   "cpu_p95": 9.4,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 6224088,
+   "rss_kb_p95": 7788956,
    "rss_kb_max": 10563972,
-   "samples": 5424
+   "samples": 5985
   },
   "embedding": {
-   "cpu_p95": 7.93,
+   "cpu_p95": 7.9,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2524768,
+   "rss_kb_p95": 2479236,
    "rss_kb_max": 8676476,
-   "samples": 5424
+   "samples": 5985
   },
   "rebuild": {
    "cpu_p95": 11.72,
@@ -31,11 +31,11 @@
    "samples": 3340
   },
   "claude": {
-   "cpu_p95": 1.03,
+   "cpu_p95": 0.85,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2288892,
+   "rss_kb_p95": 2204476,
    "rss_kb_max": 4055288,
-   "samples": 5001
+   "samples": 5562
   },
   "reranker": {
    "cpu_p95": 5.78,
@@ -63,7 +63,7 @@
    "cpu_max": 1.21,
    "rss_kb_p95": 255964,
    "rss_kb_max": 1169916,
-   "samples": 1437
+   "samples": 1439
   },
   "rebuild_with_embedding": {
    "cpu_p95": 14.49,

@@ -1,6 +1,34 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-05 ~01:50: session `33b3628c`, the night's end state (the owner asleep; DEC-1071-DEC-1073)
+## RESUME HERE — 2026-11-05 morning: session `33b3628c` closes; the owner starts a FRESH session (DEC-1074)
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md` §5** (the order after DEC-1074). The morning
+package is `packages/LIFT-1/D4B-MORNING-2026-11-05.md`; the night's record is `drafts/d4b/NIGHT2.md`. **Next free id
+DEC-1075.**
+
+- **Decided (DEC-1074):**
+  - 67.8 % is the 0.6B's honest figure;
+  - every used set is tuning or diagnostic;
+  - the 60's 19 misses are classified before the next lever;
+  - a new verdict set of 80;
+  - consistency within 5 points;
+  - v456 and the stated links approved for window 4 (tests first);
+  - W2-54's premise rewritten;
+  - LINK-INTEGRITY adopted (O1 A, O2 A, notices from the start);
+  - the open items go on.
+- **Nothing is in the product yet.** The pin and the reranker are unchanged; there is no hold file and no stand-by.
+- **The structure, as measured:**
+  - v456 = the harness switches in `rx.py` over m6's clone;
+  - the links on `w2/W2-92-proto` `e884675b`;
+  - clones and scripts under `~/gov-os-runs/D4B/` and `drafts/d4b/`.
+- **Standing:**
+  - waits and stops by pid only (`tools/proc.sh`);
+  - one GPU job at a time; no installs;
+  - the structural pass after each record commit;
+  - `log/cto-standby.txt` while waiting;
+  - briefs name the heavy slot for test runs.
+
+## RESUME HERE (history) — 2026-11-05 ~01:50: the night's end state
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`, then the morning package
 `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md`.** The night's record is

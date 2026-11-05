@@ -104,3 +104,4 @@
   would ask it"). Its answers are list items less often. **Its difficulty reads as vocabulary,** which no structural
   step tonight touched. The levers are the meaning route's quality (the embedder) and the query's phrasing.
 - **GPU:** no job after 01:25. The live reranker is kept as it is (class 3), with no trial window.
+- **Morning (2026-11-05): DEC-1074.** The night's result decided. The order after it is in START-NEXT-SESSION §5. Session 33b3628c closes; the owner starts a fresh session.
