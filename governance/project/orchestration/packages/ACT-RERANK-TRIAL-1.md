@@ -171,9 +171,10 @@ creation and removal (R4), and step 2's file lists and sizes (R3, `--dry-run`).
 - **Before:** the dispatcher reads `heavy slots held: none`, `Jobs by phase: none`, and `leads running ... none`. No
   measure, rebuild, `gov accept` with real models, or experiment runs beside it. `rerank_reset_watch.sh` is not
   running (its reset stops every `rerank_service.py`, the trial's too).
-- **The backstop:** two instances of `tools/gpu_backstop.sh`:
-  - `MARK=research-retrieval` covers the harness's searches;
-  - `MARK=rerank-trial` covers the trial service and the probe, whose command lines name `$TR`.
+- **The backstop:** `tools/gpu_backstop.sh <pgid> ...`, armed with the process groups of the harness's run, the trial
+  service and the probe (each started in its own group with `setsid`; `proc.sh pgid <pid>`). Since 2026-11-05 it
+  pauses only the groups it is given, never processes matched by their command text (the owner, L-0075); it ends by
+  itself when they have all ended, so it is re-armed for each model's run.
   
   It pauses past 15,872, on a spill, or when an embedder loses layers. Then the CTO force-stops the trial service
   and goes to T6.

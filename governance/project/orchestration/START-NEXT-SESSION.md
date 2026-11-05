@@ -86,7 +86,8 @@ the register and the owner's word hold over both.
   - the dispatcher (cron) and the inbox waiter;
   - `tools/sentinel_check.sh`;
   - `tools/bare_watch.sh`;
-  - `tools/gpu_backstop.sh` (`MARK=research-retrieval`);
+  - `tools/gpu_backstop.sh <pgid> ...`, armed per GPU job on that job's process groups (since 2026-11-05: never a
+    text match; it ends by itself with the job);
   - the sentinel's own deadman.
 - **Prototype branches** (never merge without the owner):
   - `w2/W2-32-proto` `f8a5fdad`: C1 `heading_path_everywhere` and C2 `answer_units`, measured, not kept;
