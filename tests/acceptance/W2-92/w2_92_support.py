@@ -603,3 +603,353 @@ def projection(bundle):
     out["evidence"] = items(bundle)
     out["continued"] = bundle.get("continuation") is not None
     return out
+
+
+# ==========================================================================
+# S7 to S10 (DEC-1074 (5), LINK-INTEGRITY §6.1): the stated links
+# ==========================================================================
+#
+# A second planted project, the marina, whose records state each link kind S7 names, in the census's forms
+# (docs/research/D4B-link-census.md §1 and its patterns). It is a project of its own, so the harbour's pinned bundles
+# (test_w2_92_unchanged.TODAY) do not move. Every record's text uses words no other record and no question holds, so
+# a hop's record can reach a bundle only through the hop: the questions name records by their titles (no id in the
+# question, so the lexical route's id boost brings nothing), and each case checks that the integrated code's bundle
+# does not already hold what the hop must bring.
+
+# The integrated code the S7 to S10 cases are compared with: w2/integrate 8c28aa70fb3f, the tree merged into this
+# branch at 436a7520 (DEC-1074 (5), re-pin window 4).
+LINKS_BASE = "8c28aa70fb3f88187984f3f9b39479696a41a38a"
+
+# Link types (S7's words)
+CITES, OF_TASK, UNDER, SUPERSEDES, AMENDS = "CITES", "OF_TASK", "UNDER", "SUPERSEDES", "AMENDS"
+NOT_IN_FORCE = ("PROPOSED", "REJECTED", "WITHDRAWN", "SUPERSEDED")   # S9: marked not in force
+
+# The front-matter records: (id, type, status, title, text, front-matter links)
+LK_TICKET, LK_DEPENDENT, LK_MANY, LK_TASK = "DAEO-lk01", "DAEO-lk02", "DAEO-lk03", "DAEO-lk04"
+LK_CHECKPOINT, LK_CLOSE, LK_REQ, LK_SPEC, LK_CHANGE = "CKP-0401", "CLS-0401", "REQ-0401", "SPEC-0401", "CHG-0401"
+MANY_NOUNS = ("herring", "mackerel", "pilchard", "sprat", "whiting", "haddock", "plaice", "sole", "turbot", "brill",
+              "skate", "conger", "pollack", "ling", "hake", "gurnard", "dab", "flounder", "mullet", "bass")
+MANY_IDS = tuple(f"DEC-{461 + index}" for index in range(len(MANY_NOUNS)))   # DAEO-lk03's twenty sources
+HOP_LIMIT = 12   # S8: one hop brings at most 12 records
+
+FRONT_RECORDS = [
+    (LK_TICKET, "task", "open", "Quayside winch overhaul", "Grease the capstan gears and fit new pawl springs.",
+     {"sources": ["DEC-411"], "closes": ["DEC-412"]}),
+    (LK_DEPENDENT, "task", "open", "Lobster pot tally", "Count the creels stacked behind the fish market.",
+     {"depends_on": [LK_TICKET]}),
+    (LK_MANY, "task", "open", "Dredger hopper refit", "Reline the spoil chute with hardened plates.",
+     {"sources": list(MANY_IDS)}),
+    (LK_TASK, "task", "open", "Boathouse gutter repair", "Gutters on the boathouse get new copper troughs.", {}),
+    (LK_CHECKPOINT, "checkpoint", "ACTIVE", "Midday progress snapshot", "Half the troughs are fitted; the clamps wait.",
+     {"task": LK_TASK}),
+    (LK_CLOSE, "close", "ACTIVE", "Final handover memo", "Closed after the last inspection walk.",
+     {"task": LK_TASK, "decisions_applied": ["DEC-413"], "requirements_implemented": [LK_REQ]}),
+    (LK_REQ, "requirement", "ACTIVE", "Downpipe sizing", "Each downpipe carries a hundred millimetre bore.", {}),
+    (LK_SPEC, "specification", "ACTIVE", "Varnish curing method", "Three thin coats, each left a full day.",
+     {"decisions": ["DEC-414"]}),
+    (LK_CHANGE, "change", "ACTIVE", "Halyard swap diary", "The old halyards come down after the regatta.",
+     {"decisions_carried": ["DEC-415"], "decisions_recorded": ["DEC-416"], "decisions_read": ["DEC-417"]}),
+]
+FRONT_RELS = {
+    LK_TICKET: f".tickets/{LK_TICKET}.md", LK_DEPENDENT: f".tickets/{LK_DEPENDENT}.md",
+    LK_MANY: f".tickets/{LK_MANY}.md", LK_TASK: f".tickets/{LK_TASK}.md",
+    LK_CHECKPOINT: "records/checkpoints/ckp-0401.md", LK_CLOSE: "records/close/cls-0401.md",
+    LK_REQ: "records/requirements/req-0401.md", LK_SPEC: "docs/spec/spec-0401.md",
+    LK_CHANGE: "records/changes/chg-0401.md",
+}
+
+# The register's entries: (id, title, status, the rest of its status line, its decision line, more lines). Each
+# entry is "### <id>: <title>", its status line, "- **Decision:** <text>" and its more lines; the decision line
+# starts with "- ", so a label's value on the status line ends there, as the census reads it.
+_RACKS = [f"- Rack {n:02d}: the dinghies of row {n:02d} stow keel-up on trestles, oars lashed beside them."
+          for n in range(1, 46)]   # DEC-432 runs to about 4,000 characters: several chunks of the register
+REGISTER_ENTRIES = [
+    ("DEC-411", "The kelp harvest limit", "ACCEPTED", "", "Kelp is cut only below the third marker.", []),
+    ("DEC-412", "The anchor chain gauge", "ACCEPTED", "", "Chains are measured in fathoms of galvanised links.", []),
+    ("DEC-413", "The tern colony fence", "ACCEPTED", "", "A low fence guards the nesting shingle from April.", []),
+    ("DEC-414", "The ballast water log", "ACCEPTED", "", "Every tanker records its pumped tonnage on arrival.", []),
+    ("DEC-415", "The rope locker inventory", "ACCEPTED", "", "Coils are counted each Monday and tagged by length.", []),
+    ("DEC-416", "The barnacle scraping rota", "ACCEPTED", "", "Hulls are scraped in turn during the spring lows.", []),
+    ("DEC-417", "The tidepole calibration day", "ACCEPTED", "", "Tidepoles are checked against the benchmark bolt.",
+     []),
+    # UNDER: DEC-421 is under DEC-422 and DEC-423
+    ("DEC-421", "The mooring fee schedule", "ACCEPTED", " · **Under:** DEC-422, DEC-423",
+     "Fees rise with the length of the vessel.", []),
+    ("DEC-422", "The harbourmaster charter", "ACCEPTED", " · **Under:** DEC-424",
+     "The harbourmaster answers to the town council.", []),
+    ("DEC-423", "The quay levy principle", "ACCEPTED", "", "A levy funds the upkeep of the stone quay.", []),
+    ("DEC-424", "The wharf statute", "ACCEPTED", "", "The borough has owned the wharf since an old statute.", []),
+    # AMENDS: DEC-431 changes DEC-432 (stated on the changer); DEC-433 changes DEC-432 (stated on the changed entry)
+    ("DEC-431", "The slipway booking rule", "ACCEPTED", " · **Changes:** DEC-432 (item 2)",
+     "Launch times are booked a week ahead.", []),
+    ("DEC-432", "The dinghy rack allocation", "ACCEPTED", " · **Changed by:** DEC-433 (item 3's wording)",
+     "Racks are allotted each season by lot.", _RACKS),
+    ("DEC-433", "The fender colour code", "ACCEPTED", "", "Fenders are coloured orange for visitors.", []),
+    # AMENDS: **Amends:**
+    ("DEC-434", "The bilge pump inspection", "ACCEPTED", " · **Amends:** DEC-435",
+     "Pumps are run dry for one minute each quarter.", []),
+    ("DEC-435", "The crane lift permit", "ACCEPTED", "", "Lifts above two tonnes need a signed permit.", []),
+    # AMENDS: a supersession naming a part (**Supersedes:** with an item) and one in free text; both targets current
+    ("DEC-436", "The buoy lantern spacing", "ACCEPTED", " · **Supersedes:** DEC-437 (2)",
+     "Lanterns hang every forty metres along the channel.", []),
+    ("DEC-437", "The pontoon width standard", "ACCEPTED", "", "Walkways are two metres wide with a kerb.", []),
+    ("DEC-438", "The ferry ramp curfew", "ACCEPTED", "",
+     "The ramp closes at ten each night. Its weekend clause is superseded by DEC-439.", []),
+    ("DEC-439", "The jetty bell signal", "ACCEPTED", "", "The bell rings twice before each departure.", []),
+    # SUPERSEDES: ids alone, as **Replaces:** on the status line and as **Supersedes:** on a later line (no edge
+    # holds either: the loader reads only a **Supersedes:** on the status line)
+    ("DEC-441", "The net drying yard", "ACCEPTED", " · **Replaces:** DEC-442", "Nets dry along the north wall.", []),
+    ("DEC-442", "The cellar storage custom", "ACCEPTED", "", "Gear was kept in the cellar under the inn.", []),
+    ("DEC-443", "The pier lighting plan", "ACCEPTED", "", "Lights line the pier from end to end.",
+     ["- **Supersedes:** DEC-444", "- **Basis of the plan:** the council's survey."]),
+    ("DEC-444", "The torch bracket order", "ACCEPTED", "", "Torches were fixed on iron brackets.", []),
+    # SUPERSEDES ids alone on the status line: an edge today (loader), kept as it is
+    ("DEC-445", "The sail loft lease", "ACCEPTED", " · **Supersedes:** DEC-446", "The loft is let to the rowing crews.",
+     []),
+    ("DEC-446", "The rigging shed tenancy", "ACCEPTED", "", "Riggers once rented the shed by the gatehouse.", []),
+    # S9: statuses not in force, and a whole supersession stated on the changed entry ("Changed by: superseded by")
+    ("DEC-451", "The oyster bed survey", "PROPOSED", "", "Divers would map the beds each autumn.", []),
+    ("DEC-452", "The gull deterrent trial", "REJECTED", "", "Kites shaped like hawks were to fly over the stalls.", []),
+    ("DEC-453", "The cockle licence draw", "WITHDRAWN", "", "Licences were to be drawn from a hat.", []),
+    ("DEC-454", "The seawall paint scheme", "SUPERSEDED", " · **Changed by:** superseded by DEC-455",
+     "The seawall was to be coated grey.", []),
+    ("DEC-455", "The breakwater lamp rota", "ACCEPTED", "", "Keepers take the lamp in weekly turns.", []),
+] + [(MANY_IDS[index], f"The {noun} ledger", "ACCEPTED", "", f"Entry for the {noun} trade, kept in ink.", [])
+     for index, noun in enumerate(MANY_NOUNS)]
+
+# What S7 must find: (type, source, target), the census's direction (a changer to the changed decision)
+STATED = [
+    (CITES, LK_TICKET, "DEC-411", "a ticket's sources:"),
+    (CITES, LK_TICKET, "DEC-412", "a ticket's closes:"),
+    (OF_TASK, LK_CHECKPOINT, LK_TASK, "a checkpoint's task:"),
+    (OF_TASK, LK_CLOSE, LK_TASK, "a close record's task:"),
+    (CITES, LK_CLOSE, "DEC-413", "a close record's decisions_applied:"),
+    (CITES, LK_CLOSE, LK_REQ, "a close record's requirements_implemented:"),
+    (CITES, LK_SPEC, "DEC-414", "a spec's decisions:"),
+    (CITES, LK_CHANGE, "DEC-415", "a change record's decisions_carried:"),
+    (CITES, LK_CHANGE, "DEC-416", "a change record's decisions_recorded:"),
+    (CITES, LK_CHANGE, "DEC-417", "a change record's decisions_read:"),
+    (UNDER, "DEC-421", "DEC-422", "the register's **Under:** (first id)"),
+    (UNDER, "DEC-421", "DEC-423", "the register's **Under:** (second id)"),
+    (UNDER, "DEC-422", "DEC-424", "the register's **Under:** (one id)"),
+    (AMENDS, "DEC-431", "DEC-432", "the register's **Changes:**"),
+    (AMENDS, "DEC-433", "DEC-432", "the register's **Changed by:**"),
+    (AMENDS, "DEC-434", "DEC-435", "the register's **Amends:**"),
+    (AMENDS, "DEC-436", "DEC-437", "a **Supersedes:** naming a part"),
+    (AMENDS, "DEC-439", "DEC-438", "a free-text 'superseded by'"),
+    (SUPERSEDES, "DEC-441", "DEC-442", "a **Replaces:** naming ids alone"),
+    (SUPERSEDES, "DEC-443", "DEC-444", "a **Supersedes:** naming ids alone, on a later line"),
+    (SUPERSEDES, "DEC-455", "DEC-454", "a **Changed by:** superseded by, ids alone"),
+] + [(CITES, LK_MANY, target, "a ticket's sources: (one of twenty)") for target in MANY_IDS]
+EDGE_ONLY = (SUPERSEDES, "DEC-445", "DEC-446")   # a **Supersedes:** ids alone on the status line: today's edge
+
+
+def changers():
+    """``decision -> the decisions that change it`` (AMENDS and SUPERSEDES toward it, the edge's too)."""
+    found = {}
+    for kind, source, target, _ in [*STATED, (*EDGE_ONLY, "")]:
+        if kind in (AMENDS, SUPERSEDES):
+            found.setdefault(target, set()).add(source)
+    return found
+
+
+TEXT_OF = {**{rid: text for rid, _, _, _, text, _ in FRONT_RECORDS},
+           **{rid: text for rid, _, _, _, text, _ in REGISTER_ENTRIES}}
+TITLE_OF = {**{rid: title for rid, _, _, title, _, _ in FRONT_RECORDS},
+            **{rid: title for rid, title, _, _, _, _ in REGISTER_ENTRIES}}
+STATUS_OF = {rid: status for rid, _, status, _, _, _ in REGISTER_ENTRIES}
+WEATHER = "weather almanac gales"   # the plain pages' words: no record holds them
+WEATHER_PAGES = [f"docs/notes/weather-{number:02d}.md" for number in range(1, 4)]
+
+
+def links_register():
+    """The marina's register text, and ``id -> (first line, last line)`` of each entry (1-based, inclusive: its
+    heading to the line before the next heading)."""
+    lines = ["# Decision register", "", "The decisions of the planted marina, oldest first.", ""]
+    spans = {}
+    for rid, title, status, rest, decision, more in REGISTER_ENTRIES:
+        first = len(lines) + 1
+        lines += [f"### {rid}: {title}", f"- **Status:** {status} · **Basis:** OWNER{rest}",
+                  f"- **Decision:** {decision}", *more, ""]
+        spans[rid] = (first, len(lines))
+    return "\n".join(lines), spans
+
+
+def links_corpus():
+    register, _ = links_register()
+    files = {"README.md": "# The planted marina\n\nOrdinary words about the moorings' owners.\n",
+             ".gitignore": ".gov-runtime/\n", REGISTER: register + "\n"}
+    for rid, kind, status, title, text, links in FRONT_RECORDS:
+        files[FRONT_RELS[rid]] = _record(rid, kind, status, title, text, **links)
+    for number, rel in enumerate(WEATHER_PAGES, 1):
+        files[rel] = f"# Weather page {number}\n\nThe {WEATHER} of week {number} are listed here.\n"
+    return files
+
+
+def build_links_project(project):
+    """The marina, committed (fixed dates and author: the same commit wherever it is built)."""
+    project = Path(project)
+    project.mkdir(parents=True, exist_ok=True)
+    git(project, "init", "-q", "-b", "main")
+    for rel, text in {**links_corpus(), PATH_MAP_REL: path_map()}.items():
+        (project / rel).parent.mkdir(parents=True, exist_ok=True)
+        (project / rel).write_text(text, encoding="utf-8")
+    shutil.copy2(GITLEAKS_TEMPLATE, project / ".gitleaks.toml")
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", "the planted marina")
+    return project
+
+
+class AtSrc(Api):
+    """``Api`` running the ``src/`` given: this worktree's (``SRC``) or the integrated code's (``LINKS_BASE``)."""
+
+    def __init__(self, workdir, src=SRC):
+        super().__init__(workdir)
+        self.src = Path(src)
+
+    def env(self, path):
+        return {**super().env(path), "PYTHONPATH": str(self.src)}
+
+    def value(self, module, function, *args, **kwargs):
+        """The value of one call of ``module.function`` in a new process (a ``Path`` argument passed as one)."""
+        encode = lambda item: {"$path": str(item)} if isinstance(item, Path) else item  # noqa: E731
+        out, _ = self.run([(module, function, [encode(arg) for arg in args], kwargs)])
+        assert out[0]["error"] is None, f"{module}.{function} raised {out[0]['error']} ({self.src})"
+        return out[0]["value"]
+
+    def bundle(self, root, query, **kwargs):
+        """The bundle of one plain question; the code-graph tool off ``PATH`` (the marina has no code)."""
+        return self.retrieve(root, query, tool=ABSENT, **kwargs)[0]
+
+
+def base_src(place):
+    """``LINKS_BASE``'s ``src/``, taken from this repository's git into ``place``; its path."""
+    archive = subprocess.run(["git", "-C", str(REPO_ROOT), "archive", "--format=tar", LINKS_BASE, "src"],
+                             capture_output=True)
+    if archive.returncode != 0:
+        raise AssertionError(f"the integrated code {LINKS_BASE[:12]} is not in this repository's git: "
+                             f"{archive.stderr[-500:]!r}")
+    subprocess.run(["tar", "-x", "-C", str(place)], input=archive.stdout, check=True)
+    return Path(place) / "src"
+
+
+# --------------------------------------------------------------------------
+# Reading the store's tables (S7): the stated links in a table of their own
+# --------------------------------------------------------------------------
+
+def store_tables(root):
+    """``table -> rows`` of every table of ``root``'s store, read-only (sqlite's own tables left out)."""
+    import sqlite3
+
+    path = Path(root) / ".gov-runtime/store.db"
+    connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        names = [name for (name,) in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")]
+        return {name: [tuple(row) for row in connection.execute(f'SELECT * FROM "{name}"')] for name in names}
+    finally:
+        connection.close()
+
+
+def _kind(cell):
+    return str(cell).strip().upper().replace("-", "_").replace(" ", "_")
+
+
+def typed(rows, kind, source, target):
+    """Whether a row states ``source`` -> ``target`` as ``kind``: a cell that is the type (in any case), a cell that
+    is the source and, after it, a cell that is the target (the edges table's order: type, source, target)."""
+    for row in rows:
+        cells = [str(cell) for cell in row]
+        if not any(_kind(cell) == kind for cell in cells) or source not in cells:
+            continue
+        if target in cells[cells.index(source) + 1:]:
+            return True
+    return False
+
+
+def kinds_of(rows, source, target):
+    """Every link type a row states for ``source`` -> ``target`` (of S7's five)."""
+    return sorted(kind for kind in (CITES, OF_TASK, UNDER, SUPERSEDES, AMENDS) if typed(rows, kind, source, target))
+
+
+# --------------------------------------------------------------------------
+# Reading a bundle's register chunks (S9)
+# --------------------------------------------------------------------------
+
+_PLACE_KEYS = ("text", "sha256", "chunk_id", "path", "start_line", "end_line", "batch", "routes", "id")
+
+
+def entry_of_line(spans, line):
+    """The register entry whose lines hold ``line``; None for the register's head."""
+    return next((rid for rid, (first, last) in spans.items() if first <= line <= last), None)
+
+
+def register_items(bundle, spans):
+    """``(item, entry id)`` of every evidence item of the register that lies in an entry."""
+    return [(item, entry_of_line(spans, item["start_line"])) for item in bundle["evidence"]
+            if item["path"] == REGISTER and entry_of_line(spans, item.get("start_line") or 0)]
+
+
+def _mentions(value, names):
+    text = json.dumps(value, default=str)
+    return any(name and name in text for name in names)
+
+
+def what_the_item_says(bundle, item, entry):
+    """Everything the bundle tells an agent about this register chunk, as text: its own text and every field it
+    carries beyond its place (path, lines, ids, hash, routes, batch), and any entry outside the evidence that names
+    the chunk or its entry (a mapping keyed by either, or a listed entry holding either)."""
+    told = [str(item.get("text", ""))]
+    told += [json.dumps({key: value}, default=str) for key, value in item.items() if key not in _PLACE_KEYS]
+    names = (item.get("chunk_id"), entry)
+
+    def walk(value):
+        if isinstance(value, dict):
+            for key, inner in value.items():
+                if key in names:
+                    told.append(json.dumps({key: inner}, default=str))
+                elif isinstance(inner, (dict, list)):
+                    walk(inner)
+        elif isinstance(value, list):
+            for inner in value:
+                if isinstance(inner, dict) and any(inner.get(key) in names for key in inner):
+                    told.append(json.dumps(inner, default=str))
+                elif isinstance(inner, (dict, list)):
+                    walk(inner)
+
+    walk({key: value for key, value in bundle.items() if key != "evidence"})
+    return "\n".join(told)
+
+
+def _says_not_in_force(text):
+    """A field ``not_in_force: true`` or ``in_force: false`` (any of ``_ - space`` between the words), else the
+    words "not in force" in the text."""
+    lower = text.lower()
+    field = re.search(r'"not[ _-]?in[ _-]?force"\s*:\s*(true|false)', lower)
+    if field:
+        return field.group(1) == "true"
+    field = re.search(r'"in[ _-]?force"\s*:\s*(true|false)', lower)
+    if field:
+        return field.group(1) == "false"
+    return bool(re.search(r"\bnot in force\b", re.sub(r"[_\-]+", " ", lower)))
+
+
+def status_faults(bundle, spans):
+    """S9's faults in a bundle: each register chunk that does not name its entry's status word, does not name an
+    entry that changes it, is not marked not in force while its status is one of ``NOT_IN_FORCE``, or is marked not
+    in force while its status is not."""
+    faults, changed = [], changers()
+    for item, entry in register_items(bundle, spans):
+        told, status = what_the_item_says(bundle, item, entry), STATUS_OF[entry]
+        where = f"{entry}'s chunk at lines {item['start_line']}-{item['end_line']}"
+        if not re.search(rf"(?<![A-Z_]){status}(?![A-Z_])", told):
+            faults.append(f"{where} does not name its status {status}")
+        missing = sorted(rid for rid in changed.get(entry, ()) if not re.search(rf"{rid}(?!\d)", told))
+        if missing:
+            faults.append(f"{where} does not name the entries that change it: {missing}")
+        marked = _says_not_in_force(told)
+        if status in NOT_IN_FORCE and not marked:
+            faults.append(f"{where} is {status} and not marked not in force")
+        if status not in NOT_IN_FORCE and marked:
+            faults.append(f"{where} is {status} and marked not in force")
+    return faults
