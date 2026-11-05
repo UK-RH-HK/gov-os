@@ -1,76 +1,76 @@
 {
- "computed": "2026-11-04 17:19:07",
+ "computed": "2026-11-05 01:22:05",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 10.56,
+   "cpu_p95": 10.18,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 6090868,
+   "rss_kb_p95": 6224088,
    "rss_kb_max": 10563972,
-   "samples": 4959
+   "samples": 5424
   },
   "embedding": {
-   "cpu_p95": 7.94,
+   "cpu_p95": 7.93,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2584656,
+   "rss_kb_p95": 2524768,
    "rss_kb_max": 8676476,
-   "samples": 4959
+   "samples": 5424
   },
   "rebuild": {
-   "cpu_p95": 11.73,
+   "cpu_p95": 11.72,
    "cpu_max": 126.32,
-   "rss_kb_p95": 477456,
+   "rss_kb_p95": 475056,
    "rss_kb_max": 637492,
-   "samples": 2228
+   "samples": 2250
   },
   "test_run": {
-   "cpu_p95": 17.47,
+   "cpu_p95": 17.41,
    "cpu_max": 294.7,
-   "rss_kb_p95": 3851804,
+   "rss_kb_p95": 3830300,
    "rss_kb_max": 6778004,
-   "samples": 3239
+   "samples": 3340
   },
   "claude": {
-   "cpu_p95": 1.19,
+   "cpu_p95": 1.03,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2373100,
+   "rss_kb_p95": 2288892,
    "rss_kb_max": 4055288,
-   "samples": 4536
+   "samples": 5001
   },
   "reranker": {
-   "cpu_p95": 5.86,
+   "cpu_p95": 5.78,
    "cpu_max": 13.9,
-   "rss_kb_p95": 9219676,
+   "rss_kb_p95": 9218132,
    "rss_kb_max": 14331404,
-   "samples": 2268
+   "samples": 2272
   },
   "gitleaks": {
    "cpu_p95": 0.31,
    "cpu_max": 4.08,
    "rss_kb_p95": 2034112,
    "rss_kb_max": 5162396,
-   "samples": 1815
+   "samples": 1831
   },
   "git": {
-   "cpu_p95": 0.02,
+   "cpu_p95": 0.01,
    "cpu_max": 0.03,
-   "rss_kb_p95": 123948,
+   "rss_kb_p95": 123932,
    "rss_kb_max": 164968,
-   "samples": 126
+   "samples": 136
   },
   "codegraph": {
-   "cpu_p95": 0.25,
+   "cpu_p95": 0.24,
    "cpu_max": 1.21,
-   "rss_kb_p95": 206036,
-   "rss_kb_max": 987864,
-   "samples": 1312
+   "rss_kb_p95": 255964,
+   "rss_kb_max": 1169916,
+   "samples": 1437
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 14.62,
+   "cpu_p95": 14.49,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3403184,
+   "rss_kb_p95": 3403032,
    "rss_kb_max": 9074876,
-   "samples": 2228
+   "samples": 2250
   }
  },
  "lead": {
@@ -158,9 +158,9 @@
   "samples": 7801
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 700592.0,
+  "rss_kb_p95": 696010.0,
   "rss_kb_max": 1464452.0,
-  "samples": 3239
+  "samples": 3340
  },
  "slot_run_kb": 1873832
 }

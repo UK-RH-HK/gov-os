@@ -1,0 +1,1 @@
+2026-11-04 21:55:39 waiting on the owner: D4B-STRUCTURE (33ba2842), the order of the structural fixes; steps 2-7 held until the owner's word. Running meanwhile (ordered): M1-M5 alone (measure_m.sh), then stage A re-judged (fix-b v456, three runs).

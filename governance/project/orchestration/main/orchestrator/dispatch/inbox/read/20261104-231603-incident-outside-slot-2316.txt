@@ -1,0 +1,3 @@
+log: incidents/2026-11-04-2316-outside-slot.md
+Incident: outside-slot
+status: no heavy step outside a slot: timeout 3000 python3 -m (pid 3484897, 20 min, /home/usain/gov-os-worktrees/W2-92-proto); python3 -m pytest -q (pid 3484898, 20 min, /home/usain/gov-os-worktrees/W2-92-proto) (since 2026-11-04 23:01:03); fill Cause and Fix in the record

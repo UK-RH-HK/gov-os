@@ -1,10 +1,34 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-04 ~18:00: session `33b3628c` (D-4b; the reranker trial running)
+## RESUME HERE — 2026-11-05 ~01:50: session `33b3628c`, the night's end state (the owner asleep; DEC-1071-DEC-1073)
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`, then the morning package
+`governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md`.** The night's record is
+`drafts/d4b/NIGHT2.md`. **Next free id DEC-1074.**
+
+- **Done tonight:** every structural step measured on the 79 (`score79.py`):
+  - **adopted:** v456 (67/79, gap 0.4) and the stated links (`w2/W2-92-proto` `e884675b`; drift 184 → 0 unjoined);
+  - **not kept:** M1 on v456, `decorate`, `dedup_text`, C1, C2, C1+C2, the links + M5.
+- **The measurement set has had its single use** (01:20, the links + v456): **40/59 (67.8 %)** against the halves'
+  85.0 / 84.6.
+  - **It disagrees, so it went to the owner first (DEC-1071 (3)). The trial was not run.**
+  - The sets' profile reads its difficulty as vocabulary.
+- **Nothing is in the product.** The live pin is unchanged; the reranker is live (class 3), with no hold.
+- **Waiting on the owner:** the morning package, section 6. Write `log/cto-standby.txt` while waiting.
+- **Not yet done (decided):** Q07/Q14 re-worded by an independent session (DEC-1070 (13)).
+- **Standing:**
+  - waits and stops by pid only (`tools/proc.sh`);
+  - one GPU job at a time; no installs;
+  - no ping 02:00-07:30 unless an emergency;
+  - the structural pass after each record commit.
+- **Watchers:** the inbox waiter (re-arm after each return), `tools/sentinel_check.sh`, `tools/bare_watch.sh`, the GPU
+  backstop (`MARK=research-retrieval`).
+
+## RESUME HERE (history) — 2026-11-04 ~18:00: session `33b3628c` (D-4b; the reranker trial; superseded by the above)
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-04): the reading list, what
 is done, live and next, what waits on the owner, the checks at start. Detail: `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md`
-(today) and `NIGHT.md` (the night of DEC-1067). **Next free id DEC-1070.**
+(today) and `NIGHT.md` (the night of DEC-1067). **Next free id DEC-1074.**
 
 - **Pin:** `pin-8284fb408bd4` live (re-pin window 3, registry `b05f62b8`); the integration store at `8284fb40` with
   headers; the main tree's store rebuilt with the new pin (both facets).
@@ -515,8 +539,8 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-03T23:41:14Z 1960e2f99f6127becec1814fe44d5de6a3b88e3e8083fa77b822fb7592d4f59d
-git head: a3b4a8170b65735d8050782378f800b08af50667
+generated: 2026-11-04T18:43:57Z 2327f7fcd783fe123961e6c818b5203d6198d1a9d556332ae8ae8c7d39b2760a
+git head: f463ed4e9f1392975fc394c9f2be485646b3150e
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
@@ -547,32 +571,37 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS       a3b4a817 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS       f463ed4e [w2/integrate]
+  /home/usain/gov-os-worktrees/D-7                 3501474f [emg/d7]
+  /home/usain/gov-os-worktrees/D-7-tests           67585f7f [emg/d7-tests]
   /home/usain/gov-os-worktrees/D4-cut-a            10025b21 [w2/D4-cut-a]
   /home/usain/gov-os-worktrees/D4-cut-b            6bd8fbbd [w2/D4-cut-b]
   /home/usain/gov-os-worktrees/EMG-lb2             3a82896d [emg/lb2]
   /home/usain/gov-os-worktrees/EMG-noscan          b8957843 [emg/noscan]
   /home/usain/gov-os-worktrees/EMG-queue           04568e14 [emg/queue]
   /home/usain/gov-os-worktrees/EMG-select          9e603f70 [emg/select]
-  /home/usain/gov-os-worktrees/W2-00-record        3376ba9c [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-record        773b1a43 [record/w2]
   /home/usain/gov-os-worktrees/W2-00-store-a       9894b0cf (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b       1f440a96 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b       8284fb40 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-04               98993db4 [w2/W2-04]
   /home/usain/gov-os-worktrees/W2-104              909d7ff0 [w2/W2-104]
   /home/usain/gov-os-worktrees/W2-105              fa653609 [w2/W2-105]
   /home/usain/gov-os-worktrees/W2-11               c9f99b28 [w2/W2-11]
   /home/usain/gov-os-worktrees/W2-110              d0ecd1bc [w2/W2-110]
-  /home/usain/gov-os-worktrees/W2-112              d5216599 [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-112              453b4708 [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-112-tests        789abcfa [w2/W2-112-tests]
   /home/usain/gov-os-worktrees/W2-122              3fc44860 [w2/W2-122]
   /home/usain/gov-os-worktrees/W2-123              3de9bcf4 [w2/W2-123]
   /home/usain/gov-os-worktrees/W2-126              15c80ebb [w2/W2-126]
   /home/usain/gov-os-worktrees/W2-126-tests        741f9edd [w2/W2-126-tests]
-  /home/usain/gov-os-worktrees/W2-13               f37da27f [w2/W2-13]
-  /home/usain/gov-os-worktrees/W2-13-tests         7a31f1e5 [w2/W2-13-tests]
+  /home/usain/gov-os-worktrees/W2-13               5e5d74dd [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-13-tests         b6eb2267 [w2/W2-13-tests]
   /home/usain/gov-os-worktrees/W2-15a              fd637510 [w2/W2-15a]
   /home/usain/gov-os-worktrees/W2-20               1a54976c [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-32               85c16e9b [w2/W2-32]
-  /home/usain/gov-os-worktrees/W2-32-tests         bdf1f181 [w2/W2-32-tests]
+  /home/usain/gov-os-worktrees/W2-32               6fa9d5c2 [w2/W2-32]
+  /home/usain/gov-os-worktrees/W2-32-index         068344b8 [w2/W2-32-index]
+  /home/usain/gov-os-worktrees/W2-32-index-tests   9a946f72 [w2/W2-32-index-tests]
+  /home/usain/gov-os-worktrees/W2-32-tests         8c512d7e [w2/W2-32-tests]
   /home/usain/gov-os-worktrees/W2-37               38e74a5d [w2/W2-37]
   /home/usain/gov-os-worktrees/W2-42a              ce03bb8b [w2/W2-42a]
   /home/usain/gov-os-worktrees/W2-42a-tests        6f4a6f3c [w2/W2-42a-tests]
@@ -587,6 +616,16 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-91-tests         3191a794 [w2/W2-91-tests]
   /home/usain/gov-os-worktrees/W2-92               321aa3f1 [w2/W2-92]
   /home/usain/gov-os-worktrees/W2-92-tests         c8317622 [w2/W2-92-tests]
-  /home/usain/gov-os-worktrees/research-retrieval  68ce354a [w2/research-retrieval]
+  /home/usain/gov-os-worktrees/emg-g4-audit        fb4b2144 [emg/g4-audit]
+  /home/usain/gov-os-worktrees/emg-label-q03       bc1219c1 [emg/label-q03]
+  /home/usain/gov-os-worktrees/emg-label-q19       961b31b5 [emg/label-q19]
+  /home/usain/gov-os-worktrees/emg-labels-dec1069  00ef8222 [emg/labels-dec1069]
+  /home/usain/gov-os-worktrees/emg-labels-visible  429a53ca [emg/labels-visible]
+  /home/usain/gov-os-worktrees/emg-new-visible     5a7de84d [emg/new-visible]
+  /home/usain/gov-os-worktrees/emg-q10-anchor      ba08ca77 [emg/q10-anchor]
+  /home/usain/gov-os-worktrees/emg-retired-readme  d845c5ca [emg/retired-readme]
+  /home/usain/gov-os-worktrees/emg-w2-122-cache    a7454359 [emg/w2-122-cache]
+  /home/usain/gov-os-worktrees/emg-w2-61h-40       3775bdd1 [emg/w2-61h-40]
+  /home/usain/gov-os-worktrees/research-retrieval  62ecf81c [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->
