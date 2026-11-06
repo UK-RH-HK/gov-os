@@ -28,11 +28,11 @@ allowed_paths:
 kpis:
   success:
   - 'The metric is defined and recorded before the first run [AR-10]: what counts as a hit; how the needed evidence for each question is labelled (by whom, blind to the system''s answers); per-question recall of needed evidence in the stacked context; the corpus mean, against the owner''s goal of 99 % Answered by DEC-954 Q9 and DEC-957: the metric is W2-61''s measure, both figures, on the enlarged set of 48 questions (24 visible, 24 hidden), the hidden half used only once the five-rule hook and W2-84 refuse it from every worktree; hit@5 is judged against the owner''s target of 95 % with CAP-10''s 85 the floor, memory proven on the hidden half at least 21 of 24, judged on the combined memory spec (Q9c) [DEC-954 Q9, DEC-957]'
-  - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone.'
+  - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone. [moved to W2-15b, DEC-1083]'
   - 'Five modes compared: lexical only (now ranked), semantic only, fused, fused plus reranker, and the lighter-reranker spike (DEC-074 Q3) [W2-L329].'
-  - Indexing time, peak RSS and incremental update per corpus, against DEC-078's envelope [W2-L102, W2-L321].
+  - 'Indexing time, peak RSS and incremental update per corpus, against DEC-078''s envelope [W2-L102, W2-L321]. [moved to W2-15b, DEC-1083]'
   - The stacking test (a question needing about 24k tokens, retrieved in 8k batches, assembled complete, no duplicates by span hash), run once as a baseline [AR-10].
-  - Decision-level retrieval after W2-03 [AR-10]. The thin-margin cases and the two dev queries without gold paths are fixed or named [W2-M342, W2-L322, W2-M340].
+  - 'Decision-level retrieval after W2-03 [AR-10]. The thin-margin cases and the two dev queries without gold paths are fixed or named [W2-M342, W2-L322, W2-M340]. [moved to W2-15b, DEC-1083]'
   - Closes when the evidence record holds every measure per corpus and mode, with commands, versions and raw answers kept, and names the gaps that W2-32 will work on (at most three, chosen with the owner's
     approval of the metric).
   failure: []

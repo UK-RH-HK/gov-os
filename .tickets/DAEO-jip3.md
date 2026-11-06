@@ -24,6 +24,7 @@ kpis:
   - A fresh, read-only auditor gives a finding row to every Wave 2 covers item, every Contract v4.2 lite item, every AR line and every MR clause, against Contract v4.2 and the decisions.
   - The audit→repair loop runs on its findings under DEC-096.
   - The report commits through the hook.
+  - 'A fresh, read-only auditor checks AR-1 to AR-10 and Track A''s tickets against DEC-718, DEC-720 to DEC-727 and this plan. Its verdict is Track A''s pass or fail. A BLOCKER is fixed; every other finding goes to the owner (§6). [moved from W2-25 S1, DEC-1083]'
   failure: []
 profile: FULL
 sources:

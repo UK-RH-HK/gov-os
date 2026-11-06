@@ -24,7 +24,7 @@ allowed_paths:
 kpis:
   success:
   - 'Role files for the CTO (the master orchestrator) and the Senior Engineer (a stream''s sub-orchestrator, with its stream''s skills), generated as agents, each with its reads and writes, skills, model, brief contents and handover, as ROLES-SPEC-1 (approved, DEC-957) states them [DEC-954 Q6, Q13, DEC-957]'
-  - 'The ticket lead''s own role file (today a section of orchestrator.md) [DEC-954, DEC-236]'
+  - 'The ticket lead''s own role file (today a section of orchestrator.md) [DEC-954, DEC-236] (folds W2-21 S2)'
   - 'Machine-readable defaults per role (model, effort, skills) in each role file, read by W2-60a''s launcher; effort high for the CTO and the Senior Engineers [DEC-954, DEC-839 item 5, DEC-957]'
   - 'A typed handoff record, from which a fresh agent states the task, inputs, open questions and next step identically; the twelve-field return is one [CAP-22.b (lite), AR-6]'
   - 'Any role the roles spec finds undefined is scoped and drafted here [DEC-954 Q13a]'
