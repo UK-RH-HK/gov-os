@@ -13495,7 +13495,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   drift) and question 4 (prompts only where they carry a decision).
 
 ### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md`
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c)
 - **Decision:**
   - **D9-FATES:**
     - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
@@ -13524,6 +13524,42 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: one bar on a set used once) and question 2 (a ticket's readiness is computed by
   code, not warned).
 
+### DEC-1084 — D9-FATES §5 decided and the fates applied; exit criterion 5 re-worded; the spill floor 2,048 MiB; the measure re-anchors in memory (a W2-61h line); ACT-GUARD-SETS-1 decided; L5 and an 80-candidate cell measured; the bundle's figures asked
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1083, DEC-1082 (3), DEC-1081 (3), DEC-1079 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md` (v2.1), `packages/ACT-GUARD-SETS-1.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changes:** DEC-1083 (7) (W2-66b and W2-90c)
+- **Decision:**
+  - **D9-FATES §5:**
+    - (1) W2-111 stays open as a LITE test revision outside K9.
+    - (2) W2-55's S1 is re-worded as proposed ("the decisions validator checks domain, status and scope, and names
+      each entry without them (`TAG_MISSING`)"), and W2-55 closes formally.
+    - (3) W2-66b is a red-fix item in D-10. W2-90c stays open as its own ticket, its named run after W2-105 and
+      W2-110 merge.
+    - **The fates are applied now.**
+  - **Exit criterion 5 is approved as worded:** AR-1 to AR-10, each shown once, in order, in the Wave 2 exit run's
+    record (W2-46), and audited in the exit audit (W2-47). The AR lines whose tickets moved to Wave 3 are named as
+    Wave 3 in W2-46's record (DEC-953, DEC-954, W-8).
+  - **The spill floor:** 2,048 MiB, set by the CTO and re-read in a week.
+  - **The measure's anchoring: a W2-61h line, tests first.** The measure re-anchors a set's labels in memory for the
+    commit it measures and never rewrites the sets root.
+  - **ACT-GUARD-SETS-1:**
+    - (1) yes: six refused roles, and `transcripts/**`;
+    - (2) (a): applied right after re-pin window 4. Before that, the CTO's hidden-set tools take the sets root as an
+      argument and open the files in their own code, printing ids and counts only;
+    - (3) diagnostics on spent sets run outside the guard, by the owner's checker or operator, with no exception in
+      the code;
+    - (4) the live worktrees with measured roles get the merge the same day.
+  - **After the grid:**
+    - L5 (phrasing and the term map) is measured on the 138, by the rule;
+    - one more cell: the 0.6B reranking 80 candidates instead of 40, scored in a short window, to show whether a
+      wider pool helps or hurts.
+  - **A question, figures only, from the kept runs, with no GPU.** For the 0.6B and the 4B on the 138:
+    - hit@5, hit@10 and "in the bundle", side by side, per set;
+    - the first call's bundle size in tokens (median and p90);
+    - what a full top 10 would cost, if it is not already sent.
+
+    Nothing is decided on the bar until the owner sees them.
+- **Basis:** question 1 (memory: the bar judged on what agents receive) and question 2 (the hidden halves refused to
+  every measured role).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13544,3 +13580,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.465 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1081; DEC-1080 (2) and DEC-1079 (a) changed. Next free id: DEC-1082. |
 | 0.466 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1082; DEC-1080 changed. Next free id: DEC-1083. |
 | 0.467 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1083. Next free id: DEC-1084. |
+| 0.468 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1084; DEC-1083 (7) changed. Next free id: DEC-1085. |

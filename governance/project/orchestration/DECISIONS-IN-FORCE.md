@@ -215,3 +215,7 @@ other restart is an ACT.
   hit@5 on the fresh 80 once, on the pin with W2-92, W2-32 S11, W2-131 and the chosen reranker (95 % the target);
   W2-32 S6 dropped; W2-15b out of K9; W2-128 in K9; W2-128's ready check computed by code (only advisory items warn);
   W2-131's follow-up a ticket, tests first; grid v2 and v3 accepted. Basis: 1 and 2.
+- DEC-1084 (2026-11-06): D9-FATES §5 decided (W2-111 open, LITE, outside K9; W2-55 S1 re-worded and closed; W2-66b a
+  D-10 red-fix item; W2-90c its own ticket) and the fates applied; exit criterion 5 re-worded; spill floor 2,048 MiB;
+  the measure re-anchors in memory (W2-61h, tests first); ACT-GUARD-SETS-1 decided (after window 4; the CTO's tools
+  take the sets root first); L5 and an 80-candidate 0.6B cell measured. Basis: 1 and 2.
