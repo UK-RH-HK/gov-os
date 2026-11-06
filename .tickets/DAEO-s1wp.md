@@ -1,6 +1,6 @@
 ---
 id: DAEO-s1wp
-status: open
+status: closed
 deps: [DAEO-c1uz]
 links: []
 created: 2026-10-27T19:52:51Z
@@ -11,6 +11,7 @@ parent: DAEO-c1uz
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-c1uz]
 allowed_paths:
 - src/gov/close/select.py
 - src/gov/close/nightly.py
@@ -35,3 +36,4 @@ repair_of_findings: findings-1519c203817db5ca
 Findings of the refused close of DAEO-c1uz (disposition: unclassed):
 - tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/] is red (failed) and accepted_reds does not list it
 
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (8). Its parent is closed; its lines go with it, and D-10 catches any red it names that still stands.

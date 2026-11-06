@@ -520,14 +520,7 @@ def _wanted(root: Path, connection: sqlite3.Connection) -> list[str]:
 
 def _open(root: Path) -> sqlite3.Connection | None:
     """The store at ``root``, read-only; None when there is no store or it holds no vector index."""
-    path = Path(root) / STORE_REL
-    if not path.is_file():
-        return None
-    connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
-    if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'semantic_manifest'").fetchone() is None:
-        connection.close()
-        return None
-    return connection
+    return lexical.open_store(root, "semantic_manifest")
 
 
 def _over_limit(connection: sqlite3.Connection, wanted: list[str]) -> list[str]:

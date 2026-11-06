@@ -46,3 +46,5 @@ made the resolution (td-9) but the merge carries `Role: orchestrator`. The path 
 only the commits a merge brings in. This test revision lets a listed merge be exempt for its own changes; the owner
 commits the entry for `0568d91baf56` (ACT-W1-01-EXEMPT-1). From now on such a merge carries the test designer's role
 (DEC-1031 item 3, standing), so no further entry is needed.
+
+**D9-FATES (DEC-1083):** Met by `10025b21` (W1-01 README:155), so it closes now, not at D-10 (audit 10). The CTO closes it.

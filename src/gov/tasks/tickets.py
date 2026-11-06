@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from gov.util.frontmatter import of_file
 from gov.util.gitenv import git_env
 
 TICKETS_REL = ".tickets"
@@ -13,14 +14,7 @@ TK_REL = "governance/kernel/bin/tk"  # where an adopted project holds the vendor
 
 def frontmatter(path: Path) -> dict | None:
     """The frontmatter of the ticket file ``path``; None when it is no file or cannot be read."""
-    import yaml
-
-    try:
-        lines = [line.rstrip() for line in Path(path).read_text(encoding="utf-8").split("\n")]
-        front = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)])) if lines[0] == "---" else None
-    except (OSError, ValueError, yaml.YAMLError):
-        return None
-    return front if isinstance(front, dict) else None
+    return of_file(path)
 
 
 def create(root: Path, title: str) -> str:

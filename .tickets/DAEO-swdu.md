@@ -33,11 +33,15 @@ kpis:
   - CAP-10's hit@5 against 85, per class beside the single-class figure, for the owner's CAP-10 package (Q-10) [W2-M017, F-m2].
   - 'Batched, ranked, stacked retrieval: a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent''s budget, never by one giant query or context; the
     measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner''s target of 99 % [DEC-860]'
-  - 'Both figures in every report: hit@5 against CAP-10''s floor of 85, and the complete-stacked-evidence share against 99 % [DEC-833]'
   - 'Memory is judged on the combined memory spec (semantic and lexical search, full indexing, full embeddings, the knowledge and code graph, the SQLite and vector-store structure); EXAMIN''s clone and ~/workspace are indexed with W2-88''s tools [DEC-954 Q9c, Q9f]'
   - 'hit@5 is judged against the owner''s target of 95 %, CAP-10''s 85 the floor; at 85 or above with room for improvement found, memory is not closed: an escalation to the owner [DEC-957]'
   - 'The query embedder, GPU against CPU, re-investigated on the full combined measure (DEC-798 kept the CPU on a measure of the embedding model alone): whether the final answers stay the same (the retrieved and stacked evidence per question, over repeated runs on each device and between the devices), the retrieval quality (both figures per device), the speed (query latency and the whole measure''s time), and the CPU a GPU query embedder would free; recorded in the evidence record and brought to the owner as a package to decide; the CPU embedder stays until then [DEC-975, DEC-798]'
+  - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone. [moved from W2-15a S2, DEC-1083]'
+  - 'Indexing time, peak RSS and incremental update per corpus, against DEC-078''s envelope [W2-L102, W2-L321]. [moved from W2-15a S4, DEC-1083]'
+  - 'Decision-level retrieval after W2-03 [AR-10]. The thin-margin cases and the two dev queries without gold paths are fixed or named [W2-M342, W2-L322, W2-M340]. [moved from W2-15a S6, DEC-1083]'
   failure: []
+  lifted:
+  - 'Both figures in every report: hit@5 against CAP-10''s floor of 85, and the complete-stacked-evidence share against 99 % [DEC-833] [lifted (was S7), DEC-1083: "both figures" is one rule in W2-61''s measure (W-3)]'
 profile: FULL
 sources:
 - DEC-078

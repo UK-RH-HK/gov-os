@@ -1,4 +1,4 @@
-# Start here — the next CTO session (written 2026-11-05 morning by session 33b3628c, after DEC-1074)
+# Start here — the next CTO session (written 2026-11-06 by session 812bc5ce, after DEC-1079; was 2026-11-05 morning, 33b3628c)
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
@@ -31,7 +31,8 @@ the register and the owner's word hold over both.
 5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068 to DEC-1073 and the standing practice: the
    stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, **waits and stops by pid only
    through `tools/proc.sh`**).
-6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1074 (**next free id DEC-1075**).
+6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1086 (**next free id DEC-1087**). DEC-1086 holds re-pin window 4 and
+   every experiment until the owner has read `packages/LIFT-1/SEVEN-ANSWERS.md` and given the go.
 7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/NIGHT2.md` (the night of 2026-11-05: every
    structural step, the measurement set's single use), `DAY.md` (2026-11-04: m6, the trial stopped, the diagnosis,
    stage A, M1-M5) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips); `DIAG.md`; the packages
@@ -77,66 +78,50 @@ the register and the owner's word hold over both.
 - **The link census** (`3d1c459e`) and **the link-integrity package** (`23610a2e`).
 - **W2-88 owns the memory-building practice:** `docs/research/W2-88-memory-practice.md`.
 
+## 3c. Done on 2026-11-05 and 2026-11-06 (session 812bc5ce; DEC-1075 to DEC-1079)
+- **The 60's 19 misses classified** (`docs/audit/memory-verdict-misses-kinds.md`, `3f975a3e`; D4B-MISSES): ranked
+  below 5 10, vocabulary 4, never retrieved 3, other 2.
+- **The verdict set of 80 ready** (`memory-verdict-2`, DEC-1075, DEC-1076, DEC-1078): written and cross-checked by the
+  60's writer and checker sessions (resumed), declared in both path maps; **unused until the decision point**.
+- **The reranker trials** (D4B-TRIAL-W4, D4B-LEVERS): on the 138 (the 79 + the spent 59), the 0.6B 107, the 4B 8-bit at
+  40 112 and at 24 112 (2.84 s alone, 33 s at 20 at once), mxbai 76 (its input checked on a stand-in: genuine), no
+  reranker 95 (the reranker +12 net, p 0.04); the 4B's +5 not significant (p 0.27-0.33).
+- **Re-pin window 4's builds:** W2-92 (the stated links, S7-S10) **merged into integrate** (`3679ca0b`; acceptance
+  116/0, review READY, adopted by DEC-1071's rule, drift 0 → 190 of 190). W2-32 S11 (v456 as five pool settings) on
+  `w2/W2-32` `1aeae788` (acceptance 257/0, review READY, round 2): 107/138 with the pool, 108 without, the halves' gap
+  2.9 against 13.1, 1.20 s a call against 1.48 s; its "the harness question for question" line cannot hold (the
+  harness's own fusion): a wording package to the owner is due.
+- **The research survey** (`docs/research/D4B-memory-survey.md`, its draft beside it) and the **invention disclosure**
+  (`packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md`).
+- **The GPU backstop pauses by process group only** (`tools/gpu_backstop.sh <pgid> ...`, 11 tests).
+
 ## 4. Live and running now
 - **gov:** `~/.local/bin/gov` -> `pin-8284fb408bd4` (rollback `pin-9894b0cf`, one line in `ACT-REPIN-W3.md`).
 - **The servers:** the shared embedder 127.0.0.1:11434 and the query server :11435, both on the GPU (29/29 layers).
-- **The shared reranker:** live, under class 3. There is no trial window and no hold file. The trial copy, its venv
-  and the downloads are kept (`~/.local/share/gov-os/rerank-trial/`, `reranker-trial-venv`).
-- **Watchers:**
-  - the dispatcher (cron) and the inbox waiter;
-  - `tools/sentinel_check.sh`;
-  - `tools/bare_watch.sh`;
-  - `tools/gpu_backstop.sh <pgid> ...`, armed per GPU job on that job's process groups (since 2026-11-05: never a
-    text match; it ends by itself with the job);
-  - the sentinel's own deadman.
-- **Prototype branches** (never merge without the owner):
-  - `w2/W2-32-proto` `f8a5fdad`: C1 `heading_path_everywhere` and C2 `answer_units`, measured, not kept;
-  - `w2/W2-92-proto` `e884675b`: the stated links, adopted as measured, awaiting the owner's product decision.
-- **Measure clones** under `~/gov-os-runs/D4B/`: m6, m6-M1..M5, p0-p3, g1, g2, verdict; the scripts in
-  `drafts/d4b/`.
+- **The shared reranker:** the 0.6B, live under class 3 (restored after each trial window). The trial copy, its venv
+  and the downloads are kept (`~/.local/share/gov-os/rerank-trial/`, `reranker-trial-venv`, `~/.cache/gov-os-trial/`).
+- **Watchers:** the dispatcher (cron); the inbox waiter, `tools/sentinel_check.sh` and `tools/bare_watch.sh` (the
+  session's background runs: **re-arm them at every session start**); `tools/gpu_backstop.sh <pgid> ...` armed per GPU
+  job on its process groups; the sentinel's deadman.
+- **Branches:** `w2/W2-32` (S11, round 2, not merged); `w2/W2-92-proto` and `w2/W2-32-proto` (prototypes, never merge).
+- **Measure clones and scripts:** `~/gov-os-runs/D4B/` (w4-*, trial-w4*, g1, verdict ...); `drafts/d4b/` (score138.py,
+  lift_push.py, w4_point.sh with `VISIBLE_FROM_CLONE`, w4_32_product.sh, leak_check.py, mset_*.py) and
+  `drafts/rerank-trial/` (trial_window*.sh, trial_w4.sh).
 - **Must not start:** §1's list.
 
-## 5. Next, in order (DEC-1074; the owner starts this fresh session)
-1. **The assessment (DEC-1074 (2)).**
-   - The spent 60 (`memory-verdict`) are now a diagnostic set.
-   - An independent role (W2-61h's, or a fresh auditor under the hidden-half rule) classifies its 19 misses by kind:
-     never retrieved; retrieved but ranked below 5; vocabulary; other. Kinds and counts only.
-   - **The inputs:**
-     - the kept outputs `~/gov-os-eval/runs/verdict/v-run1/`;
-     - the run `~/gov-os-runs/D4B/verdict/v/run1/measure.txt`;
-     - the structure g1 + v456;
-     - the stage scripts `drafts/d4b/diag_recall.py`, `diag_routes.py` and `diag_depth.py`. Run them for counts only:
-       the 60 are hidden-like.
-   - **To the owner,** with the recommendation: mostly ranked low, the reranker trial next; mostly never retrieved, the
-     embedder and phrasing first. **Nothing is tuned or trialled until the owner decides.**
-2. **In parallel, the new verdict set of 80 (DEC-1074 (3)).**
-   - Give the owner the writer's brief (`ACT-MSET-3`, after ACT-MSET-1: 80 questions, R5's quotas scaled, the target
-     unchanged at 95 % with an 85 % floor) and its folder's settings (a copy of the writer's, as in ACT-MSET-2 §7).
-   - Then the cross-check as before (`ACT-MSET-2`'s form).
-   - Its folder is new: `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/`. Declare it in both path maps as
-     a new set; `memory-verdict` stays as the diagnostic set.
-   - It is used only at the next decision point.
-3. **Re-pin window 4's builds, approved (DEC-1074 (5)),** in the normal flow, independent tests first:
-   - **v456 into W2-32:** `retrieve._phrased` uncut, routes 60 deep, a single 40-chunk rerank pass, at most 2 chunks
-     of a file in the first 10, nested repeats dropped. The harness switches in `rx.py` are the reference.
-   - **The stated links into W2-92:** from `w2/W2-92-proto` `e884675b`, with the KPI text from LINK-INTEGRITY §6.1
-     applied to the ticket.
-   - **W2-112's memory release.**
-4. **W2-54 (DEC-1074 (6)):** its test designer rewrites the premise of `test_an_empty_retrieval_result_gives_one_packet`.
-5. **LINK-INTEGRITY, adopted (DEC-1074 (7)):**
-   - file W2-129 (`gov links`) and W2-130 (the clean-up) from `LINK-INTEGRITY-tickets/`;
-   - apply §6.1's ticket changes (W2-92, W2-55, W2-88, W2-98; W2-128 when filed);
-   - W2-129's acceptance tests first;
-   - unlinked mentions in tests, roles, skills, lessons and plans are notices from the start;
-   - O2: prepare the 150-id reconciliation list with a proposal per id, for one sitting with the owner;
-   - meanwhile, run `PYTHONPATH=src python3 -m gov.decisions.tags | grep STATUS_RELATION` after each decision record
-     (§4.6).
-6. **The open items (DEC-1074 (8)):**
-   - Q07 and Q14 re-worded to stable facts by an independent session (DEC-1070 (13));
-   - the visible 40's category shortfalls;
-   - the tests' half of the `core.bare` fix (a CIT-P: the root conftest clears `GIT_*`; W2-122's helper);
-   - the D-5 row on MR-1..MR-6's status.
-7. Then D-5 (the templates with the link lines), D-6, D-9, D-10 (the owner's word), the lift; D-11 after it.
+## 5. Next, in order (DEC-1079)
+1. **The memory work (no GPU first):** L1 (every comparison with gains, losses, exact McNemar); L2 (for the 31 misses
+   on the 138, where the answer left the top 5, ids and ranks only); **source families** in `gov.retrieval.measure`
+   (W2-61's code; tests first), then every kept run re-scored. Then L3 (the lift on a normalised score, the moves ahead
+   bounded) and the three rerankers replayed under equal weights; L5 (phrasing prototype); L6 (records of work in a
+   lower tier, one measured test, to the owner with figures).
+2. **After L3:** one quiet window for the cascade (0.6B over 40, then the 4B over the top 12, its requests at 8 texts or
+   12,000 padded characters) beside the 4B at 24; the best onto the fresh 80 once, beside the 0.6B, at the decision
+   point. No install until then.
+3. **W2-32's S11 wording** to the owner; then re-pin window 4 (W2-92, W2-32, W2-112's memory release) as an ACT.
+4. **D-5, D-6, D-9 start now** (DEC-1079), their agents on the CPU, the GPU for the memory measures: the plan is in
+   P1-PLAN's status table. LINK-INTEGRITY: file W2-129 and W2-130; W2-129's tests first.
+5. Then D-10 (the owner's word), the lift; D-11 after it.
 
 **Rules to carry:**
 - Consistency is within 5 points on sets of about 80 (DEC-1074 (4)).
@@ -144,10 +129,11 @@ the register and the owner's word hold over both.
 - A structural fix is judged on all the tuning sets together (DEC-1071 (2)).
 
 ## 6. Waiting on the owner
-- The assessment's result and the choice of the next lever (DEC-1074 (2)).
-- The new verdict set's brief and folder settings, which the CTO prepares first.
-- The 150-id reconciliation list (O2), once it is prepared.
-- The visible category shortfalls, if a choice is needed.
+- **The go after `packages/LIFT-1/SEVEN-ANSWERS.md` (DEC-1086).** Re-pin window 4 and every experiment wait on it.
+  S11's wording, W2-135 and the search-again reader are decided (DEC-1086 A to C), to be acted on at the go.
+- D-9's fates and K9 were decided and applied (DEC-1083, DEC-1084); W2-128 was filed.
+- Still the owner's: the templates' approval and their `.claude/` copies (an ACT); the 150-id reconciliation list
+  (O2); M3's adoption (DEC-1043), after E4.
 
 ## 7. The checks at start (after the prompt's §1)
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

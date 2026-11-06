@@ -1,6 +1,6 @@
 ---
 id: DAEO-cuao
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-a3m2]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -70,3 +70,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-10), as approved (DEC-729). The list row
   - A loop counter records identical refused calls; the third identical refusal in a session writes a finding [AR-5].
   - An exception inside a stop hook lets the agent stop and records the exception; it does not exit 2 silently [AR-6, W2-M049, W2-M280].
 - **KPIs, failure:** a helper briefed for JSON lines only is refused once, with the missing fields named, then stops with a recorded finding (the AR-6 case).
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): G-4 (DEC-954 had already dropped W2-10).

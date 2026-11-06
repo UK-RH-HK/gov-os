@@ -1,6 +1,6 @@
 ---
 id: DAEO-pr0y
-status: open
+status: closed
 deps: [DAEO-5j8b]
 links: []
 created: 2026-10-28T21:31:54Z
@@ -11,6 +11,7 @@ parent: DAEO-5j8b
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-5j8b]
 allowed_paths:
 - src/gov/guard/protected.py
 - src/gov/guard/heldout.py
@@ -38,3 +39,4 @@ Findings of the refused close of DAEO-5j8b (disposition: unclassed):
 - tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here is red (error) and accepted_reds does not list it
 - tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched is red (error) and accepted_reds does not list it
 
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (8). Its parent is closed; its lines go with it, and D-10 catches any red it names that still stands.

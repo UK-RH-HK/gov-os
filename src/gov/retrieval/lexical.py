@@ -243,20 +243,26 @@ def identifier_parts(text: str) -> str:
     return " ".join(pieces)
 
 
-def _open(root: Path) -> sqlite3.Connection | None:
-    """The store at ``root``, read-only; None when there is no store or it holds no index."""
+def open_store(root: Path, table: str) -> sqlite3.Connection | None:
+    """The store at ``root``, read-only; None when there is no store or it holds no ``table`` (DEC-1039 (2): the
+    lexical and the semantic index open it so)."""
     path = Path(root) / STORE_REL
     if not path.is_file():
         return None
     connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
     try:
-        if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_file'").fetchone() is None:
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE name = ?", (table,)).fetchone() is None:
             connection.close()
             return None
     except sqlite3.Error:
         connection.close()
         raise
     return connection
+
+
+def _open(root: Path) -> sqlite3.Connection | None:
+    """The store at ``root``, read-only; None when there is no store or it holds no index."""
+    return open_store(root, "lexical_file")
 
 
 def _recipe_now(root: Path) -> dict[str, str]:

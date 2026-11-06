@@ -1,6 +1,6 @@
 ---
 id: DAEO-1vka
-status: open
+status: closed
 deps: [DAEO-clon]
 links: [DAEO-clon, DAEO-wnnz, DAEO-cv58]
 created: 2026-11-02T13:50:25Z
@@ -50,3 +50,5 @@ GPU slot or unranked, named). Until this lands, that fallback stands (option (c)
 socket path in the sandbox block that `src/gov/launch/launcher.py` builds, and nothing else. It runs right after
 W2-112 lands, before EXAMIN's copy. W2-56 and W2-60a (built, held) also hold `launcher.py`: keep the change small;
 the merge order settles any overlap. FULL: the sandbox is containment.
+
+**D9-FATES (DEC-1083):** Merged into W2-56 by DEC-1083. its six lines moved to W2-56.

@@ -1,6 +1,6 @@
 ---
 id: DAEO-6b2q
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-31T12:40:26Z
@@ -60,3 +60,5 @@ From the owner's DEC-971 item 2 (P1-MORNING-2026-10-31 item 2, W2-49's P-A (b) a
 - **The forms (P-B):** on v4.2 the two forms differ only on three provider lists (CAP-28 and CAP-28.a lack W1-35, CAP-30.e lacks W1-26 in `CONTRACT_v4.md`). All 276 records name `contract.yaml` the authority "by DEC-614", which names none; DEC-971 now does.
 - **Paths:** W2-49's Contract files, and W2-51's validator (W2-51 is closed). No running ticket holds them.
 - **The work order:** the CIT-P first, then its review and the owner's answer, then the text. The test designer writes the forms-agree and wave tests from these KPIs in parallel.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): it built nothing (W-6); K-2 is retired into P1-11's Contract re-baseline.

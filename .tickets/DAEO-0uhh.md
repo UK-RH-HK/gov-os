@@ -1,7 +1,7 @@
 ---
 id: DAEO-0uhh
 status: closed
-deps: []
+deps: [DAEO-zflj]
 links: []
 created: 2026-10-29T15:55:50Z
 type: task

@@ -1859,7 +1859,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
    - **the stacking test:** a question needing about 24k tokens, retrieved in 8k batches, assembled complete, with no duplicates;
    - **the scale probe** against DEC-078's envelope, on EXAMIN's clone and `~/workspace`;
    - CAP-10's figures for the owner (F-m2).
-5. **The adoption-readiness block passes:** AR-1 to AR-10, shown in order (W2-24) and audited (W2-25). **The AR lines whose tickets moved to Wave 3 are named as Wave 3 in W2-24's report** (DEC-953, DEC-954).
+5. **The adoption-readiness block passes:** AR-1 to AR-10, each shown once, in order, in the Wave 2 exit run's record (W2-46), and audited in the exit audit (W2-47). **The AR lines whose tickets moved to Wave 3 are named as Wave 3 in W2-46's record** (DEC-953, DEC-954, W-8; re-worded by DEC-1084, W2-24 and W2-25 retired).
 6. **EXAMIN is adopted with a healthy verdict.** ADOPTED_HEALTHY comes from a fresh independent auditor on the real repository (W2-30), after the copy's verdict (W2-28), against Contract v4.2's lite CAP-44.h. **EXAMIN runs W2-16's release** (DEC-722; DEC-954 Q8c: numbered and frozen). W2-18 is deferred to Wave 3.
 7. **CAP-45.a (W2-17) moves to Wave 3 by a CIT-P note, or is a named exception** (DEC-953, DEC-954). The rest of this criterion stands:
    - *(Revision 3)* **The Contract's Wave 2 items after the re-baseline** (DEC-841: eight, CAP-17.b, CAP-45.a, CAP-10.b, CAP-19.a, CAP-19.c, CAP-33.b, CAP-33.g and CAP-61.f; the other nine moved to Wave 3 through W2-49's CIT-P), **and Contract v4.2's lite items** (CAP-44.h with A7 and A10, CAP-43.b), are each delivered by a closed ticket and cited by an acceptance test. The plan validator checks this both ways.

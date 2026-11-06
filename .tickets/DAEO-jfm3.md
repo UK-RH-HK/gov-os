@@ -1,6 +1,6 @@
 ---
 id: DAEO-jfm3
-status: open
+status: closed
 deps: [DAEO-u4oz]
 links: [DAEO-u4oz, DAEO-emq1]
 created: 2026-11-02T10:37:58Z
@@ -49,3 +49,5 @@ The owner's DEC-1027 H (P-W2-04-7 (b)): W2-04's review 1 found 31 open or in-pro
 (`template/governance/kernel/hooks/sessionstart.py` 150-158). Starts after W2-04 lands. W2-115 (the smart close) holds
 `src/gov/close/command.py`: this ticket adds the gate as its own module and returns a package for the one call site in
 `command.py` if W2-115 has not taken it. The generated `.claude/hooks/` copy follows by the owner's regeneration.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C.

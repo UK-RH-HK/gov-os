@@ -1,6 +1,6 @@
 ---
 id: DAEO-u5g6
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-7r5e]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -95,3 +95,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-43), as approved (DEC-729). The list row
   - gitleaks scans every commit of the pushed range [W2-H028].
   - The template and canary secret rules hold whatever the project file says [W2-H008].
   - The store deletes securely, so removed text leaves no free-page copy [W2-H014].
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

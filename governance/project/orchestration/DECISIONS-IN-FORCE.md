@@ -182,3 +182,63 @@ other restart is an ACT.
   embedder; adoption the owner's. **The trial's rule:** on the 40 + 39 + 59 together, hit@5 then MRR, the spread between
   the three sets not wider than the 0.6B's; eligible only at a median ≤ 3.0 s alone, no timeout at 10 at once, no shape
   at the GPU budget. The checker lists every other place stating an answer. Basis: questions 1 and 2.
+- DEC-1077 (2026-11-05): the trial's second window: mxbai with its own template (rehearsed on a stand-in), the 4B at
+  24 candidates, the reranker off as a control, each on the 138 under DEC-1076 (4)'s rule beside the 0.6B; the 4B not
+  adopted now; a research survey and the memory's invention disclosure; nothing adopted before the owner decides.
+- DEC-1078 (2026-11-05): `memory-verdict-2` (80) ready (checks pass; the cross-check closed at round 2); unused until
+  the next decision point, after the research package and the trial's re-runs; measured once, counts only. The
+  rubric's next version: source families (a gold source and its generated twins counted as one) and missing
+  alternatives (DEC-1076 (5)). Basis: questions 1 and 2.
+- DEC-1079 (2026-11-06): every comparison with its gains, losses and an exact McNemar test (standing for the measure);
+  L2 (where the 31 misses left the top 5) and source families in the measure's code now, then every kept run
+  re-scored; after L2, the lift normalised and the moves bounded (L3), the three rerankers replayed under equal
+  weights; L5 phrasing; L6 one measured test; the 0.6B stays; after L3 one window for the cascade beside the 4B at 24;
+  the best onto the fresh 80 once; no install until then. **D-5, D-6 and D-9 start now** (CPU), the memory measures
+  keep the GPU. Every report ends with DEC-948's block. **mxbai is dropped** (closed as measured, not replayed; its
+  downloads kept): the reranker comparisons are among the Qwen3 models only (the 0.6B, the 4B at 24, the cascade).
+  Basis: questions 1 and 4.
+- DEC-1080 (2026-11-06, standing): the CTO reads with the Read and Grep tools, runs one simple command per call, no
+  `cd … &&` chains, and says in one line before any command that will prompt what it does and why; the same rule in
+  every agent's brief. P-PERMISSIONS-1 approved with read-only git through `git -C` only; the settings change is the
+  operator's ACT (`ACT-PERMISSIONS-1.md`). Basis: questions 4 and 2.
+- DEC-1081 (2026-11-06): ACT-PERMISSIONS-1 without the `git -C` rules; W2-128 filed; gte-reranker-modernbert-base and
+  zerank-1-small measured now (their downloads an ACT): every Qwen3 model and these two score each kept candidate list
+  of the 138 once in one quiet window; then replays at no GPU cost on the fixed pipeline (alone; by question type;
+  cascades; two merged), the grid declared first, judged with McNemar; a winner's speed and GPU measured for real before
+  the owner; the best onto the fresh 80 once. Nothing adopted or installed before the owner decides. Basis: 1 and 4.
+- DEC-1082 (2026-11-06): the user-level allow-all accepted (the guard is the check); ACT-PERMISSIONS-2 applied; the
+  three stopped agents started again (L5 from its lines if sound); the DEC-999 labels a priority fix ahead of the
+  levers (window 4's builds checked first, else a ticket, tests first); the guard refuses the hidden sets outside the
+  repository to engineer, research and orchestrator (an ACT); the spill reading investigated; the score-once window
+  after its review. Basis: 2 and 4.
+- DEC-1083 (2026-11-06): D9-FATES approved (the auditor checks the 792 lines before any edit); K9's memory bar 85 %
+  hit@5 on the fresh 80 once, on the pin with W2-92, W2-32 S11, W2-131 and the chosen reranker (95 % the target);
+  W2-32 S6 dropped; W2-15b out of K9; W2-128 in K9; W2-128's ready check computed by code (only advisory items warn);
+  W2-131's follow-up a ticket, tests first; grid v2 and v3 accepted. Basis: 1 and 2.
+- DEC-1084 (2026-11-06): D9-FATES §5 decided (W2-111 open, LITE, outside K9; W2-55 S1 re-worded and closed; W2-66b a
+  D-10 red-fix item; W2-90c its own ticket) and the fates applied; exit criterion 5 re-worded; spill floor 2,048 MiB;
+  the measure re-anchors in memory (W2-61h, tests first); ACT-GUARD-SETS-1 decided (after window 4; the CTO's tools
+  take the sets root first); L5 and an 80-candidate 0.6B cell measured. Basis: 1 and 2.
+- DEC-1085 (2026-11-06): the memory build finished first (the open list to the owner); W2-134 filed (S8's code, tests
+  first); the two-reranker cells measured, adoption to the owner (DEC-1043); no 4B embedder; the search-again test
+  (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
+  (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
+  first; the fresh 80 unused until the owner decides what it measures. Basis: 1.
+- DEC-1086 (2026-11-06): S11 re-worded ("within 2 of the harness on the 138"; speed against the pin in window 4);
+  W2-135, a 4,000-character cap per item (a guard against one-line files; the total size tested in E5); the
+  search-again reader sees the 138 (no tools, no transcript, counts only; the pilot, then the owner's cap). Recorded,
+  acted on only at the owner's go: no re-pin and no experiment before the owner reads the seven answers. Basis: 1.
+- DEC-1087 (2026-11-06): before re-pin window 4, all done and tested:
+  - W2-135 and S11 (DEC-1086);
+  - the integration store refreshed now (if safe);
+  - W2-116's refresh after every merge, the daily backstop and the worktree store path;
+  - W2-129 (`gov links`);
+  - the dependency-mapping tool's decision, spec and KPI package (its home and timing assessed);
+  - the status block fixed (countdown, (a) to (d), the sixth line);
+  - a clean tree and the worktree list;
+  - window 4 as a rehearsed ACT;
+  - dates re-estimated.
+
+  After the re-pin: the parallel-agents and memory test first, then E0 to E5 and the fresh 80; M3's adoption after
+  all the experiments. The three layers stay in Wave 2 (reversing W3-P23): after the lift, streams and a trial plan
+  as a package. Basis: 1.

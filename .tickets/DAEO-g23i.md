@@ -1,6 +1,6 @@
 ---
 id: DAEO-g23i
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-6n5k, DAEO-s694, DAEO-xxgp]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -59,3 +59,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-38), as approved (DEC-729). The list row
   - An R0 change runs only the LITE checks, and an R3 change raises the FULL gate and readiness rows, with the profile computed by `gov impact` [CAP-53.b].
   - A close runs the tests `gov impact` names, on top of W2-66's path-scoped selection (W2-48's cache was withdrawn, DEC-880). The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
 - **Failure:** a change whose impact misses a test that would fail is caught by the milestone run and recorded as a learning event.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).
