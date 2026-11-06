@@ -200,6 +200,13 @@ cases, `there is no gov.links package`. The four greens are two premises and the
 | S16 | `test_w2_129_tickets.py::test_s16_a_commit_that_edits_a_closed_ticket_is_closed_ticket_edited[status-reopened]` | red | as above: `status` closed to in_progress; the status exemption is for open tickets only |
 | S16 | `test_w2_129_tickets.py::test_s16_a_ticket_closed_in_the_range_is_closed_ticket_edited_only_by_the_commits_after` | red | no `gov links`; then: DAEO-t005 closed in the range (no finding), then its `title` edited (CLOSED_TICKET_EDITED for that commit only) |
 | S16 | `test_w2_129_tickets.py::test_s16_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range` | red | no `gov links`; then: `--since <the commit>` lists no S16 finding; `--since <the commit>~1` lists it |
+| S16 | `test_w2_129_tickets.py::test_s16_a_closing_commit_that_also_changes_a_field_unmarked_is_ticket_change_unmarked[kpis]` | red | no `gov links`; then (review F2): one unmarked commit closes the in-progress DAEO-t005 and re-words a KPI line: TICKET_CHANGE_UNMARKED naming DAEO-t005, the commit and `kpis`, role orchestrator, exit 1; no CLOSED_TICKET_EDITED for it (the status before decides) |
+| S16 | `test_w2_129_tickets.py::test_s16_a_closing_commit_that_also_changes_a_field_unmarked_is_ticket_change_unmarked[allowed_paths]` | red | as above: a path added to `allowed_paths` in the closing commit |
+| S16 | `test_w2_129_tickets.py::test_s16_a_closing_commit_that_also_changes_a_field_unmarked_is_ticket_change_unmarked[acceptance_tests]` | red | as above: `acceptance_tests`' path changed in the closing commit |
+| S16 | `test_w2_129_tickets.py::test_s16_a_commit_closing_an_open_ticket_with_an_unmarked_change_is_ticket_change_unmarked` | red | as above from status open: DAEO-t004 closed and its `acceptance_tests` path changed in one unmarked commit |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[status]` | red | no `gov links`; then: DAEO-t005 closed, `status` alone, unmarked: no S16 finding for it; the control on DAEO-t004 is found |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[status-and-assignee]` | red | as above: `status` and `assignee` in the closing commit |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[kpis-marked-in-the-line]` | red | as above: the closing commit's KPI line carries `[re-worded, DEC-113]` |
 | F1 | `test_w2_129_sources.py::test_s13_no_close_queue_landing_launch_claim_readiness_or_hook_module_calls_gov_links` | green (guard) | as S13 |
 | F2 | `test_w2_129_command.py::test_s1_writes_nothing_but_its_mark_the_head_it_judged` | red | as S1 |
 | F2 | `test_w2_129_command.py::test_s1_starts_only_git_opens_no_socket_and_writes_only_the_mark` | red | as S1 |
@@ -234,6 +241,12 @@ fail on `there is no gov links command in the tree under test`, after their plan
 sketch of S16 (scratch only, never committed) passes all 32; six faults planted in it one at a time are each caught:
 the decision mark ignored (15 reds), status, assignee and links judged (5), the closed status read at HEAD instead
 of before the commit (2), the range ignored (1), the commit's `Role:` as the role (1), the field left out (13).
+
+**S16, the third pass (review F2: the closing commit).** 7 cases added to `test_w2_129_tickets.py` (39 S16 cases in
+all): a commit that closes an open or in-progress ticket is judged by the status before it, so an unmarked change of
+`kpis`, `allowed_paths` or `acceptance_tests` in the same commit is TICKET_CHANGE_UNMARKED (4 reds, one from status
+open); the closing commit's `status` alone, `status` with `assignee`, or a KPI change marked in the line, is no finding
+(3 guards, each with the unmarked control on DAEO-t004). Every other case is unchanged.
 
 ## The interface the tests assume
 
