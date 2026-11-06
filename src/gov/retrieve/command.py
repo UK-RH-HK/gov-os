@@ -94,7 +94,8 @@ _NOT_GIVEN = object()
 
 
 def _store_root(root: Path, args) -> Path:
-    """The folder the search answers from: ``GOV_STORE``'s where the command line gave no ``--root`` (W2-116 S3)."""
+    """The folder the search answers from: ``GOV_STORE``'s where the command line gave no ``--root`` (W2-116 S3), its
+    link followed once here, so every facet of this search opens the same half (review F2)."""
     import os
 
     from gov.cli.errors import GovError

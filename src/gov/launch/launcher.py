@@ -34,6 +34,7 @@ from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
+from gov.launch.store import main_root as main_store_root
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
@@ -160,9 +161,10 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
         raise _refuse(f"{error} (DEC-820)") from None
     env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id}
     # W2-116 S3 (DEC-963, DEC-1087 (3)): every worker's plain `gov retrieve` answers from the integration store, the
-    # configured link itself (followed at each search), never from the worktree the session runs in.
+    # configured link itself (followed at each search), never from the worktree the session runs in. The place is the
+    # main repository's (review F4): a worktree branched before the line was added still gets it.
     try:
-        store = configured_store(root)
+        store = configured_store(main_store_root(root))
     except StoreSettingError as error:
         raise _refuse(f"{error}: the session's retrieval would have no store to answer from (W2-116)") from None
     if store is not None:

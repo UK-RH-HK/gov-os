@@ -327,6 +327,88 @@ def test_a_held_lock_is_waited_for(project, endpoint, capfd):
     assert "waiting for the integration store's lock" in capfd.readouterr().err
 
 
+def _hold(link):
+    holder = os.open(link.with_name(link.name + ".lock"), os.O_RDWR | os.O_CREAT)
+    fcntl.flock(holder, fcntl.LOCK_EX)
+    return holder
+
+
+def _release(holder):
+    fcntl.flock(holder, fcntl.LOCK_UN)
+    os.close(holder)
+
+
+def test_review_f1_a_refresh_that_waited_builds_the_head_as_it_is_once_it_holds_the_lock(project, endpoint):
+    """Review F1: the head is read after the lock, so a landing during the wait is what gets built."""
+    _refresh(project)
+    link = _link(project)
+    holder = _hold(link)
+    outcome = {}
+    worker = threading.Thread(target=lambda: outcome.update(result=_refresh(project)))
+    worker.start()
+    try:
+        time.sleep(1.0)
+        assert worker.is_alive()
+        newer = _commit(project, {"docs/plum.md": "plum orchards\n"})  # lands while the refresh waits
+    finally:
+        _release(holder)
+    worker.join(120)
+    assert outcome["result"]["integration"]["status"] == "switched"
+    assert outcome["result"]["integration"]["head"] == newer
+    assert _git(os.path.realpath(link), "rev-parse", "HEAD") == newer
+
+
+def test_review_f1_of_two_refreshes_that_waited_one_builds_the_latest_head_and_the_other_does_nothing(project,
+                                                                                                    endpoint):
+    """Review F1 (the reviewer's probe P1): two waiters started at different heads never move the link back."""
+    _refresh(project)
+    link = _link(project)
+    holder = _hold(link)
+    outcomes = []
+    workers = [threading.Thread(target=lambda: outcomes.append(_refresh(project))) for _ in range(2)]
+    try:
+        workers[0].start()  # started at the old head
+        time.sleep(0.5)
+        newer = _commit(project, {"docs/fig.md": "fig orchards\n"})
+        workers[1].start()  # started at the newer head
+        time.sleep(1.0)
+        assert all(worker.is_alive() for worker in workers)
+    finally:
+        _release(holder)
+    for worker in workers:
+        worker.join(120)
+    assert sorted(outcome["integration"]["status"] for outcome in outcomes) == ["switched", "unchanged"]
+    assert all(outcome["integration"]["head"] == newer for outcome in outcomes)
+    assert _git(os.path.realpath(link), "rev-parse", "HEAD") == newer
+
+
+_DATED = r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d rebuild"
+
+
+def test_review_f6_every_line_a_refresh_logs_starts_with_its_date_and_time(project, endpoint, capfd):
+    import re
+    import sys
+
+    before = sys.stderr
+    _refresh(project)
+    _commit(project, {"docs/plum.md": "plum orchards\n"})
+    _refresh(project)  # seeded: the seed's line, written by the rebuild, is dated too
+    _refresh(project)  # unchanged
+    lines = [line for line in capfd.readouterr().err.splitlines() if line.strip()]
+    assert any("seed:" in line for line in lines) and any("nothing to do" in line for line in lines)
+    assert lines and all(re.match(_DATED, line) for line in lines), lines
+    assert sys.stderr is before  # the dating ends with the refresh
+
+
+def test_review_f6_a_refused_refresh_logs_its_failure_with_the_date_and_time(project, capfd):
+    import re
+
+    with pytest.raises(GovError, match="not known"):
+        run(project, _args("--integration", "nowhere"), {})
+    lines = [line for line in capfd.readouterr().err.splitlines() if line.strip()]
+    assert any(re.match(_DATED + r" --integration: REBUILD_FAILED: the branch 'nowhere'", line) for line in lines)
+
+
 # S4: the seed names a base behind the head ------------------------------------------------------------------------
 
 def test_a_seed_at_the_head_does_not_say_behind(project, endpoint, tmp_path):
@@ -346,9 +428,35 @@ def test_a_seed_from_a_base_behind_names_its_head_and_how_far(project, endpoint,
     _commit(tree, {"docs/plum.md": "plum orchards\n"})
     _commit(tree, {"docs/fig.md": "fig orchards\n"})
     result = run(tree, _args("--seed", str(project)), load_config(tree))
-    assert result["seed"]["base_head"] == old
+    assert result["seed"]["base_head"] == old and result["seed"]["relation"] == "behind"
     assert f"built at {old}, behind this tree's head" in result["seed"]["behind"] and "by 2 commit" in \
         result["seed"]["behind"]
+
+
+def test_review_f8_a_seed_from_a_base_ahead_of_the_tree_is_named_ahead_never_behind(project, endpoint, tmp_path):
+    old = _git(project, "rev-parse", "HEAD")
+    tree = tmp_path / "tree"
+    _git(project, "worktree", "add", "-q", "--detach", str(tree), old)  # an older worktree
+    _commit(project, {"docs/plum.md": "plum orchards\n"})
+    newer = _commit(project, {"docs/fig.md": "fig orchards\n"})
+    run(project, _args(), load_config(project))  # the base, built at the newer head
+    result = run(tree, _args("--seed", str(project)), load_config(tree))
+    assert result["seed"]["base_head"] == newer and result["seed"]["relation"] == "ahead"
+    assert f"built at {newer}, ahead of this tree's head {old} by 2 commit" in result["seed"]["ahead"]
+    assert "behind" not in result["seed"] and "behind" not in result["seed"]["ahead"]
+
+
+def test_review_f8_a_seed_from_a_base_on_another_line_is_named_diverged(project, endpoint, tmp_path):
+    old = _git(project, "rev-parse", "HEAD")
+    tree = tmp_path / "tree"
+    _git(project, "worktree", "add", "-q", "-b", "side", str(tree), old)
+    _commit(tree, {"docs/pear.md": "pear orchards\n"})
+    newer = _commit(project, {"docs/plum.md": "plum orchards\n"})
+    run(project, _args(), load_config(project))
+    result = run(tree, _args("--seed", str(project)), load_config(tree))
+    assert result["seed"]["base_head"] == newer and result["seed"]["relation"] == "diverged"
+    assert "1 commit(s) only in the base, 1 only in this tree" in result["seed"]["diverged"]
+    assert "behind" not in result["seed"] and "ahead" not in result["seed"]
 
 
 # S5, F3: a re-index never empties the semantic index ---------------------------------------------------------------

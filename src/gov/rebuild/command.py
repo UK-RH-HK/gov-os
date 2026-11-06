@@ -106,8 +106,10 @@ def _store_head(base: Path) -> str | None:
 
 
 def _behind(root: Path, answer: dict) -> dict:
-    """The seed's answer, with the base's head named and said to be behind where the base was built at another commit
-    than the tree's head (W2-116 S4); unchanged at the head, or where either head cannot be read."""
+    """The seed's answer, with the base's head named and how it stands to the tree's head where the base was built at
+    another commit (W2-116 S4; review F8): ``relation`` is ``behind``, ``ahead``, ``diverged``, or ``unknown`` where
+    the base's head is not in this tree's repository, and the sentence is under the key of that name. Unchanged at
+    the head, or where either head cannot be read."""
     import sys
 
     base = answer.get("base")
@@ -117,15 +119,28 @@ def _behind(root: Path, answer: dict) -> dict:
     ours = _commit_of(root, "rev-parse", "--verify", "-q", "HEAD^{commit}")
     if not base_head or not ours or base_head == ours:
         return answer
-    count = _commit_of(root, "rev-list", "--count", f"{base_head}..{ours}")  # None: the base's head is not known here
-    if count is not None and _commit_of(root, "rev-list", "--count", f"{ours}..{base_head}") == "0":
-        said = (f"the base {base} was built at {base_head}, behind this tree's head {ours} by {count} commit(s): "
-                f"only what changed since is re-embedded")
+    # None from either count: the base's head is not known in this repository.
+    only_ours = _commit_of(root, "rev-list", "--count", f"{base_head}..{ours}")
+    only_base = _commit_of(root, "rev-list", "--count", f"{ours}..{base_head}")
+    built = f"the base {base} was built at {base_head}"
+    if only_ours is None or only_base is None:
+        relation = "unknown"
+        said = (f"{built}, a commit this tree's repository does not know (its head is {ours}): only what differs "
+                f"is re-embedded")
+    elif only_base == "0":
+        relation = "behind"
+        said = (f"{built}, behind this tree's head {ours} by {only_ours} commit(s): only what changed since is "
+                f"re-embedded")
+    elif only_ours == "0":
+        relation = "ahead"
+        said = (f"{built}, ahead of this tree's head {ours} by {only_base} commit(s): only what differs is "
+                f"re-embedded")
     else:
-        said = (f"the base {base} was built at {base_head}, not at this tree's head {ours} (behind it, or on another "
-                f"line): only what differs is re-embedded")
+        relation = "diverged"
+        said = (f"{built}, diverged from this tree's head {ours} ({only_base} commit(s) only in the base, {only_ours} "
+                f"only in this tree): only what differs is re-embedded")
     print(f"rebuild: seed: {said}", file=sys.stderr, flush=True)
-    return answer | {"base_head": base_head, "behind": said}
+    return answer | {"base_head": base_head, "relation": relation, relation: said}
 
 
 def add_arguments(parser) -> None:

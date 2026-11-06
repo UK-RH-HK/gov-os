@@ -5,15 +5,17 @@ the store of the integration branch's head, double-buffered, so a search is alwa
   (W2-122's key). The two halves are detached worktrees of the project's repository beside it, ``<link>-a`` and
   ``<link>-b``; the link points at the ready one. A link that is not a symbolic link, or a half that is not a worktree
   of this repository, refuses the refresh: nothing is removed or built.
-- **The lock:** ``<link>.lock``, an exclusive ``flock`` held from before the link is read to after it is switched (the
-  CTO's ``refresh_integration_store.sh`` and the merge queue's promotion take the same file). A refresh that finds it
-  held says so and waits. Searches take no lock.
+- **The lock:** ``<link>.lock``, an exclusive ``flock`` held from before the branch's head and the link are read to
+  after it is switched (the CTO's ``refresh_integration_store.sh`` and the merge queue's promotion take the same file).
+  A refresh that finds it held says so and waits; it reads the head only once it holds the lock, so a refresh that
+  waited never builds an older head than the one already built. Searches take no lock.
+- **The log:** every line a refresh writes on stderr starts with its date and time (``%Y-%m-%d %H:%M:%S``).
 - **Unchanged:** where the ready half is at the branch's head and its stores' record (W2-122) names the running code,
   nothing is done (``status: unchanged``). The command is safe to run after every merge, by a hook or by hand.
 - **The build:** the half not in use is checked out at the branch's head and rebuilt there by the code this command
   runs under (never the half's own ``src/``), so the store always matches the code that searches it. It is seeded
   from the ready half (``--seed``, W2-122), so only what changed since is chunked and embedded again; the seed names
-  the ready half's head and says that it is behind. A seed refused (another code, embedder or schema) leaves the
+  the ready half's head and how it stands to the head built (behind, ahead or diverged). A seed refused (another code, embedder or schema) leaves the
   half's own stores, built incrementally or cold.
 - **The switch:** only when the build succeeded: the rebuild raised nothing, the lexical index and the semantic store
   were recreated (a build whose semantic store is not recreated counts as failed, N-2), the half's lexical and
@@ -32,6 +34,8 @@ import fcntl
 import os
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -188,20 +192,62 @@ def _faults(half: Path, head: str, result: dict) -> list[str]:
     return said
 
 
+class _Dated:
+    """``sys.stderr`` while a refresh runs: each line written starts with its date and time, as the CTO's script's
+    lines do (review F6), whichever stage writes it."""
+
+    def __init__(self, stream):
+        self._stream, self._fresh, self._guard = stream, True, threading.Lock()
+
+    def write(self, text: str) -> int:
+        with self._guard:
+            out = []
+            for piece in text.splitlines(keepends=True):
+                if self._fresh:
+                    out.append(time.strftime("%Y-%m-%d %H:%M:%S "))
+                out.append(piece)
+                self._fresh = piece.endswith("\n")
+            self._stream.write("".join(out))
+        return len(text)
+
+    def flush(self) -> None:
+        self._stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self._stream, name)
+
+
 def refresh(root: Path, branch: str) -> dict:
-    """The integration store brought to ``branch``'s head (module docstring); the result, or ``REBUILD_FAILED``."""
+    """The integration store brought to ``branch``'s head (module docstring); the result, or ``REBUILD_FAILED``. Every
+    line it writes on stderr starts with the date and time; a failure is also said there before it is raised."""
+    installed = not isinstance(sys.stderr, _Dated)
+    if installed:
+        sys.stderr = _Dated(sys.stderr)
+    try:
+        try:
+            return _refresh(Path(root), branch)
+        except GovError as error:
+            print(f"rebuild --integration: {error.code}: {error.message}", file=sys.stderr, flush=True)
+            raise
+    finally:
+        if installed and isinstance(sys.stderr, _Dated):
+            sys.stderr = sys.stderr._stream
+
+
+def _refresh(root: Path, branch: str) -> dict:
     from gov.config.loader import load_config
     from gov.rebuild import command
     from gov.store import STORE_REL
 
-    root = Path(root)
     link = place(root)
-    done = _git(root, "rev-parse", "--verify", "-q", f"{branch}^{{commit}}", check=False)
-    head = done.stdout.strip()
-    if done.returncode != 0 or not head:
-        raise _failed(f"the branch {branch!r} is not known in {root}: nothing is built", {"branch": branch})
     fd = _lock(link)
     try:
+        # The head is read under the lock (review F1): a refresh that waited builds the head as it is now, never the
+        # one it saw before waiting, so it never moves the link back; at a head already built it does nothing.
+        done = _git(root, "rev-parse", "--verify", "-q", f"{branch}^{{commit}}", check=False)
+        head = done.stdout.strip()
+        if done.returncode != 0 or not head:
+            raise _failed(f"the branch {branch!r} is not known in {root}: nothing is built", {"branch": branch})
         ready = _ready(link)
         first, second = halves(link)
         summary = {"branch": branch, "head": head, "link": str(link), "ready": None if ready is None else str(ready)}
