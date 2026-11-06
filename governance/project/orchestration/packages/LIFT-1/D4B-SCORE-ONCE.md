@@ -162,6 +162,43 @@ differ.
 - **The same for every cell, B0 included:** every cell is replayed on v456 with `"rq":"question"` and
   `"lift_norm": 0.0766`.
 
+## The grid's results (2026-11-06 ~13:50; L3, v456 with the question; counts only)
+`drafts/score-once/grid_report.py`; the replays are in `~/gov-os-runs/D4B/score-once-replay/g-*`. All 17 exited 0,
+and no text was unscored.
+- **B0** (q06 alone, L3): 107/138, MRR 0.5589, spread 18.0 (visible 35, hidden 31, spent 41). As measured, before
+  L3: 108, 16.3.
+
+| cell | hit@5 | MRR | vis / hid / spent | spread | gains / losses | McNemar p | Holm p |
+|---|---|---|---|---|---|---|---|
+| **M2** q4b + gte, merged | **118** | **0.6376** | 36 / 35 / 47 | 10.3 | 14 / 3 | 0.013 | 0.191 |
+| M3 zer + gte, merged | 118 | 0.6120 | 35 / 35 / 48 | 8.4 | 13 / 2 | 0.007 | 0.118 |
+| C2 gte, then q4b on its top 12 | 117 | 0.6359 | 37 / 33 / 47 | 12.8 | 13 / 3 | 0.021 | 0.234 |
+| C4 gte, then zer on its top 12 | 117 | 0.6199 | 37 / 34 / 46 | 14.5 | 12 / 2 | 0.013 | 0.191 |
+| M6 q06 + q4b, merged | 117 | 0.6175 | 36 / 34 / 47 | 10.3 | 12 / 2 | 0.013 | 0.191 |
+| M5 q4b + zer, merged | 115 | 0.6302 | 37 / 33 / 45 | 16.2 | 13 / 5 | 0.096 | 0.831 |
+| A2 gte alone | 114 | 0.6233 | 34 / 34 / 46 | 9.2 | 11 / 4 | 0.118 | 0.831 |
+| T2 gte for code, q4b for the rest | 114 | 0.6186 | 37 / 33 / 44 | 17.9 | 12 / 5 | 0.143 | 0.861 |
+| A1 q4b alone | 114 | 0.6164 | 37 / 33 / 44 | 17.9 | 12 / 5 | 0.143 | 0.861 |
+| C3 q06, then zer on its top 12 | 114 | 0.6086 | 35 / 34 / 45 | 11.2 | 10 / 3 | 0.092 | 0.831 |
+| M1 q06 + gte, merged | 114 | 0.6048 | 35 / 34 / 45 | 11.2 | 8 / 1 | 0.039 | 0.391 |
+| M4 q06 + zer, merged | 114 | 0.6004 | 36 / 32 / 46 | 12.0 | 7 / 0 | 0.016 | 0.191 |
+| C1 q06, then q4b on its top 12 | 113 | 0.6251 | 35 / 33 / 45 | 11.2 | 11 / 5 | 0.210 | 0.861 |
+| A3 zer alone | 113 | 0.5953 | 35 / 33 / 45 | 11.2 | 13 / 7 | 0.263 | 0.861 |
+| T3 gte for code, zer for the rest | 113 | 0.5947 | 35 / 33 / 45 | 11.2 | 13 / 7 | 0.263 | 0.861 |
+| T1 gte for code, q06 for the rest | 107 | 0.5613 | 35 / 32 / 40 | 19.7 | 1 / 1 | 1.000 | 1.000 (spread wider than B0) |
+
+- **By the rule:**
+  - **M2 leads:** 118, then MRR 0.6376, with a spread of 10.3 against B0's 18.0.
+  - **M3 ties on hit@5** (118) and comes second on MRR. It needs no package: the 4B needs bitsandbytes in the
+    product's reranker environment (an install).
+  - No cell is significant after Holm's correction on 138 questions. M2's own exact p is 0.013. That is what the
+    fresh 80 is for.
+- **What L3 showed:** under the raw-scale lift, gte gave 78 and zerank 82. Under L3 they give 114 and 113, so their
+  low scores were the lift's artefact, not the models'.
+- **Next, before anything goes to the owner (§4):** the speed and GPU memory of M2, and of M3 as the runner-up, in a
+  real window: both models loaded, each search scored by both, alone and 10 at once, under the GPU rules. Only an
+  eligible cell goes onto the fresh 80.
+
 ## Version 4 (2026-11-06 ~12:50, before any stage or cell replay is judged): a follow-up call's unscored texts
 - **The finding:** L2's replays with routing's moves switched off stopped: "4 of 40 texts were not scored by q06 in
   the window".
