@@ -1,6 +1,6 @@
 ---
 id: DAEO-wnnz
-status: in_progress
+status: open
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -25,7 +25,7 @@ allowed_paths:
 - docs/changes/W2-56-CIT-E.md
 kpis:
   success:
-  - 'Inside a launched, sandboxed worker, a suite that builds the code graph runs: the code graph''s folder (DAEMON_BASE, src/gov/codeintel/__init__.py:35) is under the session''s own temporary folder, and outside a sandbox it stays where it is [DEC-799 item 1]'
+  - 'A suite that builds the code graph uses one daemon folder per test session (DAEMON_BASE, src/gov/codeintel/__init__.py:35), removed when the session ends, so no daemon folder is left behind (T-8); inside a launched, sandboxed worker that folder is under the session''s own temporary folder, and the suite runs there [DEC-799 item 1, INVESTIGATION-1 T-8] [re-scoped, DEC-1083]'
   - 'The sandbox''s write list is the ticket''s allowed paths plus git''s folders (with the session''s temp folder, DEC-159, and its own run folder, DEC-728, as today), written as literal paths, since the Linux sandbox skips patterns: a worker''s script writing a file outside them (python3 -c with open(..., ''w'')), .gov-runtime/ outside the session''s scratch, another worktree and tests/acceptance/** for every role but the test designer included, is refused by the operating system [DEC-799 item 1, DEC-789, DEC-180, DEC-315]'
   - 'An allowed path the operating system cannot hold literally (a name pattern such as test_batch*) is never widened silently: the CIT-E states how each form is held, and what the operating system leaves open beside it is named there and in the launcher''s one line on stderr, with the guard''s refusal of the file tools still on [DEC-799 item 1, DEC-801]'
   - 'No placeholder file that the sandbox makes (.bashrc, .gitconfig, .mcp.json and the others, in the worktree or at a denied name) can reach a commit: a test plants each name the sandbox makes and shows it neither staged nor committed by an ordinary git add and git commit [DEC-799 item 1, DEC-402, row W2-I012]'

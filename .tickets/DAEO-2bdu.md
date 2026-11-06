@@ -58,7 +58,7 @@ kpis:
   - 'A store of another layout version read as current; a rebuild record whose only digest is the record graph''s.'
   - 'The assessment loading the whole tree in memory, or exceeding the resource gate''s per-session figure on the largest proof repository.'
   - 'A clone of a GitHub repository, or any of its files, in this repository or in a commit; a clone outside ~/gov-os-runs/W2-88/; a write in the workbench, EXAMIN''s real repository or the held-out qualification material.'
-  - 'A secret''s value in any record, log or output; a figure of the measure reported without the other; a hidden question read or printed.'
+  - 'A secret''s value in any record, log or output; a hidden question read or printed. [re-worded, DEC-1084]'
 profile: FULL
 sources:
 - DEC-954

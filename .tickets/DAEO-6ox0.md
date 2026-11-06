@@ -22,12 +22,12 @@ allowed_paths:
 - experiments/EXP-002/**
 kpis:
   success:
-  - 'Each of these is measured: the sandbox cases: denyWrite on a path that does not exist yet; symlink and hard-link tricks; the seccomp filter; bypassPermissions; subagents inside a sandboxed worker session;
-    excludedCommands [CAP-61.f, DEC-160, W2-M336, W2-M337, W2-M350, W2-L316]'
-  - 'Each of these is measured: file tools, hooks and MCP servers outside the sandbox [W2-M334, W2-M335]'
   - 'Each of these is measured: the harness''s behaviour at a hook''s time limit, so that the guard''s deadline sits below it [W2-H052, W2-M347, W2-L328]'
-  - 'Each of these is measured: live auto-compaction and the PreCompact output [W2-M338, W2-M344].'
   failure: []
+  lifted:
+  - 'Each of these is measured: the sandbox cases: denyWrite on a path that does not exist yet; symlink and hard-link tricks; the seccomp filter; bypassPermissions; subagents inside a sandboxed worker session; excludedCommands [CAP-61.f, DEC-160, W2-M336, W2-M337, W2-M350, W2-L316] [lifted (was S1), DEC-1083: re-scoped to S3]'
+  - 'Each of these is measured: file tools, hooks and MCP servers outside the sandbox [W2-M334, W2-M335] [lifted (was S2), DEC-1083: re-scoped to S3]'
+  - 'Each of these is measured: live auto-compaction and the PreCompact output [W2-M338, W2-M344]. [lifted (was S4), DEC-1083: re-scoped to S3]'
 profile: FULL
 sources:
 - CAP-61.f
