@@ -176,8 +176,18 @@ def test_gov_rebuild_fails_with_config_invalid_before_any_stage(tmp_path, monkey
     assert sent == [] and not (tmp_path / STORE_REL).exists() and not (tmp_path / ".gov-runtime").exists()
 
 
-def test_this_repository_does_not_switch_it_on():
-    assert loader.embed_headers(REPO) is False
+def test_this_repository_s_setting_reads_as_written():
+    # adopted at measure 4 (dc8a2829, DEC-1067): the repository's rebuild.yaml switches it on; whatever it says, it
+    # reads as a boolean, never CONFIG_INVALID
+    written = (REPO / "governance/project/rebuild.yaml").read_text(encoding="utf-8")
+    assert loader.embed_headers(REPO) is ("embed_headers: true" in written)
+
+
+def test_this_repository_s_setting_is_read_as_its_file_states_it():
+    """Off until measure 4 adopted it (DEC-1067 (b)); the CTO switched it on in ``dc8a2829``."""
+    import yaml
+    written = yaml.safe_load((REPO / "governance/project/rebuild.yaml").read_text(encoding="utf-8")) or {}
+    assert loader.embed_headers(REPO) is written.get("embed_headers", False)
 
 
 # --- the embedder's input --------------------------------------------------------------------------------------------

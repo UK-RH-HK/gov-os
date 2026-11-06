@@ -74,3 +74,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-18), as approved (DEC-729). The list row
   - The kernel hooks import the pinned `gov`, never a product's own package named `gov`. With no `gov` installed, they say so clearly instead of blocking every call [W2-H032, W2-M279, W2-L172, W2-L230, W2-L173, W2-L174].
   - Two repositories on the machine can run two different releases side by side [CAP-43].
 - **KPIs, failure:** a product session that imports this repository's `src/gov` is refused by doctor and reported.
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.

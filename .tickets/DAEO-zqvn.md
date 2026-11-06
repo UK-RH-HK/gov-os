@@ -99,3 +99,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **DEC-1066 (3) placed here (CTO, 2026-11-03):** S6 added (W2-13 owns the keyword index): `lexical.py` takes every tracked file today (no exclusion list); the path map gains `lexical_policy`.
 
 **S6 (CTO, 2026-11-03, P2):** `src/gov/rebuild/command.py` added: the rebuild's report names the files the keyword index kept out (one line, as S5's command.py). S6's two repository cases turn green with D-7's path-map marking (the CTO's), right after W2-13 merges.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 8: `8550788b` (S1 to S4, F1, F2; FULL review READY), `9ed83413` (S5), `261d6415` and `27a80411` (S6); `W2-13-evidence.md`. The CTO closes it at the lift (P1-13).

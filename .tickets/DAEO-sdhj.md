@@ -62,3 +62,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-17), as approved (DEC-729). The list row
 - **KPIs, failure:**
   - An update to a release that fails hash verification refuses.
   - An overlay file changed by the update is a failure and triggers the rollback.
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.

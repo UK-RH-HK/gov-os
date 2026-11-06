@@ -415,6 +415,9 @@ two repository cases red (D-7).
   - the same on `doc-records` (plant D);
   - `docs/research/EXP-003/examin/**` moved into `evaluation-sources`, which the namespace form alone would not
     catch.
+- **G4 extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's `363c1459`).
+  `KEPT_OUT_BY_DECISION` also names `docs/research/memory-measure-audit/**` (3 tracked files), whose `VISIBLE.md`
+  quotes the visible questions. Without it the converse was red on `363c1459`, as it should be.
 
 ## Rewrite after implementation (DEC-1000, P-W2-13-3 (b))
 

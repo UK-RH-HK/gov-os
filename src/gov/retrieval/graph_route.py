@@ -8,6 +8,9 @@ whole, by word, in any case. Everything is sorted. It only reads.
 
 The frontmatter titles come from the store's ``record_titles``, parsed once at the load (S6, DEC-1065 (4)); only a
 store built before that table is read file by file, with the C loader where PyYAML has it.
+
+``follow`` is S8 (DEC-1072 (1)): one bounded hop over the store's stated links (``stated_links``) from what the record
+route or the closure reached; ``changers`` gives, for S9, each decision's changers by the links and the edges.
 """
 
 from __future__ import annotations
@@ -20,6 +23,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
+from gov.store import loader
 from gov.store.loader import TITLES_TABLE, connect
 
 _LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)  # the C parser: about 9x faster on ~840 frontmatters
@@ -93,6 +97,79 @@ def _title(root: Path, record: dict, titles: dict | None = None) -> str:
     if not isinstance(front, dict) or front.get("id") != record["id"] or not isinstance(front.get("title"), str):
         return ""
     return front["title"]
+
+
+# S8 (DEC-1072 (1)): one hop over the stated links from the records the record route or the closure reached, so the
+# records they state they are bound to join the closure route. The direction: a record to what it cites, stands under
+# or records the work of (out); a decision to the decisions that change it (in: from the amended or superseded to its
+# changer). The bound: at most FOLLOW_RECORDS records, each with at most its first FOLLOW_CHUNKS chunks, appended after
+# today's closure chunks, so those keep their places in the fusion.
+FOLLOW_RECORDS = 12
+FOLLOW_CHUNKS = 2
+OUT_LINKS = (loader.CITES, loader.UNDER, loader.OF_TASK)
+CHANGE_LINKS = (loader.AMENDS, loader.SUPERSEDES)
+
+
+def stated_links(root: Path) -> list[dict] | None:
+    """The store's stated links (``loader.LINKS_TABLE``), sorted; None where the store holds no such table (built
+    before them) or cannot be read."""
+    try:
+        connection = connect(root)
+    except GovError:
+        return None
+    try:
+        return [{"type": kind, "source": source, "target": target, "via": via}
+                for kind, source, target, via in sorted(connection.execute(
+                    f"SELECT type, source, target, via FROM {loader.LINKS_TABLE}"))]
+    except sqlite3.Error:
+        return None
+    finally:
+        connection.close()
+
+
+def _natural(record_id: str) -> tuple:
+    return tuple((0, int(part), "") if part.isdigit() else (1, 0, part) for part in re.split(r"(\d+)", record_id))
+
+
+def changers(links: list[dict], edges: list[dict] = ()) -> dict[str, list[str]]:
+    """``decision -> the decisions that change it``, newest first: every AMENDS and SUPERSEDES stated link to it, and
+    every SUPERSEDES edge to it (``edges``, the store's)."""
+    by: dict[str, set[str]] = {}
+    for link in list(links) + [edge for edge in edges if edge["type"] == loader.SUPERSEDES]:
+        if link["type"] in CHANGE_LINKS:
+            by.setdefault(link["target"], set()).add(link["source"])
+    return {target: sorted(sources, key=_natural, reverse=True) for target, sources in by.items()}
+
+
+def follow(links: list[dict], start: list[str], reached: set[str], decisions: set[str]) -> dict:
+    """One hop over ``links`` from ``reached`` (``start`` first): ``records``, the records it adds in order, at most
+    FOLLOW_RECORDS; ``left``, how many more it found past the bound; ``changed_by``, each decision in reach (reached or
+    added) that a link says is amended or superseded, with every decision that changes it, newest first.
+
+    The order under the bound: the changers of the start records; what the start records cite, stand under or record
+    the work of; the changers of what that added and of the other reached decisions; what the other reached records
+    cite or stand under. Within each, by source and then by target, newest changer first. Deterministic."""
+    out, changed_by = {}, changers(links)
+    for link in links:
+        if link["type"] in OUT_LINKS:
+            out.setdefault(link["source"], set()).add(link["target"])
+    first = sorted(set(start) & reached, key=_natural)
+    rest = sorted(reached - set(first), key=_natural)
+
+    def changed(ids):
+        return [changer for rid in ids for changer in changed_by.get(rid, ())]
+
+    def cited(ids):
+        return [target for rid in ids for target in sorted(out.get(rid, ()), key=_natural)]
+
+    hop, found = cited(first), []
+    for rid in changed(first) + hop + changed(sorted(set(hop), key=_natural) + rest) + cited(rest):
+        if rid not in reached and rid not in found:
+            found.append(rid)
+    added = found[:FOLLOW_RECORDS]
+    reach = (reached | set(added)) & decisions
+    return {"records": added, "left": len(found) - len(added),
+            "changed_by": {rid: changed_by[rid] for rid in sorted(reach, key=_natural) if rid in changed_by}}
 
 
 def _named(query: str) -> set[str]:

@@ -77,6 +77,11 @@ indexed, as lens B's report is. The cut names it, in the same direction only. Wi
 `e44d6732`. A plant that moves another `docs/research/` folder out, here `docs/research/EXP-003/examin/**` put into
 `evaluation-sources`, stays red.
 
+**Added when G4 was extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's
+`363c1459`): `docs/research/memory-measure-audit/**` (3 tracked files) is in `evaluation-sources`, because its
+`VISIBLE.md` quotes the visible questions. The cut names it, in the same direction only. Without it the case was red on
+`363c1459`.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

@@ -1,7 +1,7 @@
 ---
 id: DAEO-b926
 status: open
-deps: [DAEO-g0ip, DAEO-csj8, DAEO-btt7, DAEO-swdu, DAEO-49o5]
+deps: [DAEO-g0ip, DAEO-csj8, DAEO-swdu, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -17,7 +17,6 @@ role: orchestrator
 depends_on:
 - DAEO-g0ip
 - DAEO-csj8
-- DAEO-btt7
 - DAEO-swdu
 - DAEO-49o5
 allowed_paths:

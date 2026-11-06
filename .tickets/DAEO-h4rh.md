@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-lxzn, DAEO-uw5h, DAEO-6icv, DAEO-rpfv, DAEO-hgv3, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-6b2q, DAEO-3r1j, DAEO-nqa2]
+deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -19,10 +19,8 @@ depends_on:
 - DAEO-ym8a
 - DAEO-u4oz
 - DAEO-0z8c
-- DAEO-kia7
 - DAEO-49o5
 - DAEO-r30l
-- DAEO-1ahb
 - DAEO-kmcr
 - DAEO-2ds6
 - DAEO-ha8z
@@ -35,8 +33,6 @@ depends_on:
 - DAEO-k7hz
 - DAEO-lrre
 - DAEO-l78m
-- DAEO-4k3l
-- DAEO-dy7j
 - DAEO-2bdu
 - DAEO-g87r
 - DAEO-h2k3
@@ -48,32 +44,34 @@ depends_on:
 - DAEO-ouet
 - DAEO-wq2b
 - DAEO-wi46
-- DAEO-lxzn
-- DAEO-uw5h
-- DAEO-6icv
-- DAEO-rpfv
-- DAEO-hgv3
-- DAEO-drhj
 - DAEO-zpdj
 - DAEO-0mtg
 - DAEO-kiar
 - DAEO-zoex
-- DAEO-6b2q
 - DAEO-3r1j
 - DAEO-nqa2
+- DAEO-clon
+- DAEO-blwa
+- DAEO-qzrq
+- DAEO-jpr0
+- DAEO-emq1
+- DAEO-cb2b
+- DAEO-mb2t
+- DAEO-t8mp
+- DAEO-r8vq
+- DAEO-k4wm
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
 kpis:
   success:
-  - The pinned, hash-verified release is installed (W2-16, W2-18).
+  - 'The pinned, hash-verified release is installed: W2-16''s release only. [re-scoped, DEC-1083]'
   - gov adopt runs A0 to A6 and A8 with the A5 independent review, and the lite A7 and A10 gates of Contract v4.2.
   - EXAMIN's own CLAUDE.md, settings and untracked files are preserved (W2-23).
-  - gov doctor and gov check are green.
+  - '`gov doctor` is green (the `gov check` families follow T-2, W2-45). [re-scoped, DEC-1083]'
   - 'One LITE ticket goes through the full cycle: test designer, red, implement, green, then gov close at exit 0 with EXAMIN''s own test command.'
   - Its governance share is measured and ≤ 15 %.
   - At the first full gov rebuild after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler, against DEC-078's envelope; a figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735].
-  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones; the owner does not know whether its governance suite passes on Windows, so the hour finds out (DEC-745).
-    Then the reds go into W2-19's ratchet baseline (exact id, owner, cause class, how it shrinks), which the owner accepts [DEC-736].
+  - 'EXAMIN''s red tests are named in the close record, each with its cause (an environment red or a real one), with no ratchet baseline and no known-red list [DEC-736, DEC-745, W-4] [re-scoped, DEC-1083]'
   - One pinned install package goes to the owner. It holds EXAMIN's 10 product-suite packages from EXAMIN's own lock file, installed into the clone's own virtual environment only. With the owner's approval,
     the product suite is measured before W2-30's verdict. Until then it is "needs environment", reported UNMEASURED by name and never as passed [DEC-736].
   - EXAMIN's governance kit stays in a legacy namespace, and its tests stay in the declared test command. The A5 review maps each of its checks to a Gov OS check family or to "no equivalent" [DEC-736].

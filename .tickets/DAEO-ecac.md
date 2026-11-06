@@ -1,7 +1,7 @@
 ---
 id: DAEO-ecac
 status: open
-deps: []
+deps: [DAEO-cv58, DAEO-r9ss]
 links: []
 created: 2026-10-29T15:55:51Z
 type: task

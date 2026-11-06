@@ -67,3 +67,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-05), as approved (DEC-729). The list row
   - A hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (the DEC-710 case) [AR-2].
   - `lefthook install` and `uninstall` leave `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green [AR-2].
 - **KPIs, failure:** a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 4 (landed `b4a747f1`). The CTO closes it at the lift (P1-13).

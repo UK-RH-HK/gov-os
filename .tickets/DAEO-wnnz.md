@@ -1,6 +1,6 @@
 ---
 id: DAEO-wnnz
-status: in_progress
+status: open
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -25,17 +25,28 @@ allowed_paths:
 - docs/changes/W2-56-CIT-E.md
 kpis:
   success:
-  - 'Inside a launched, sandboxed worker, a suite that builds the code graph runs: the code graph''s folder (DAEMON_BASE, src/gov/codeintel/__init__.py:35) is under the session''s own temporary folder, and outside a sandbox it stays where it is [DEC-799 item 1]'
+  - 'A suite that builds the code graph uses one daemon folder per test session (DAEMON_BASE, src/gov/codeintel/__init__.py:35), cleaned when the session ends, so no daemon folder is left behind; the real code-graph daemon runs only in W1-16 and W1-20, and on a change under `src/gov/codeintel/**` or to the tool''s pin, and elsewhere the tool is off PATH (T-8); inside a launched, sandboxed worker the session''s daemon folder is under its own temporary folder, and the suite runs there [DEC-799 item 1, DEC-1052, P1-PLAN T-8, INVESTIGATION-1 T-8] [re-scoped, DEC-1083]'
   - 'The sandbox''s write list is the ticket''s allowed paths plus git''s folders (with the session''s temp folder, DEC-159, and its own run folder, DEC-728, as today), written as literal paths, since the Linux sandbox skips patterns: a worker''s script writing a file outside them (python3 -c with open(..., ''w'')), .gov-runtime/ outside the session''s scratch, another worktree and tests/acceptance/** for every role but the test designer included, is refused by the operating system [DEC-799 item 1, DEC-789, DEC-180, DEC-315]'
   - 'An allowed path the operating system cannot hold literally (a name pattern such as test_batch*) is never widened silently: the CIT-E states how each form is held, and what the operating system leaves open beside it is named there and in the launcher''s one line on stderr, with the guard''s refusal of the file tools still on [DEC-799 item 1, DEC-801]'
   - 'No placeholder file that the sandbox makes (.bashrc, .gitconfig, .mcp.json and the others, in the worktree or at a denied name) can reach a commit: a test plants each name the sandbox makes and shows it neither staged nor committed by an ordinary git add and git commit [DEC-799 item 1, DEC-402, row W2-I012]'
   - 'A launched session gets a cleaned process environment: PATH, HOME, the locale, what the CLI needs to sign in, its identity and the launcher''s own values (TMPDIR, CLAUDE_CODE_TMPDIR); none of the parent''s CLAUDE* and GOV* variables (its session id, messaging socket and token, child-session mark, effort, compaction window, subagent model, GOV_DEV_TIERS) and no PYTHONPATH reach it, shown by a test that starts the launcher with each set [DEC-826 Q5, lens E F13, DEC-784, DEC-877 item 4, row W2-M393]'
   - 'The remaining arguments that drop the guard or add context are refused after --, beside DEC-313''s: --restricted, --safe-mode, --agents, --plugin-dir, --plugin-url, --mcp-config and --system-prompt, each in its spaced and = forms; the CIT-E weighs an accepted-arguments list against this refusal list (lens E R6) [DEC-826 Q5, DEC-313]'
   - 'Sandboxed sessions started together in worktrees that share one .git do not fail on a missing .git/*.lock source path: the launcher starts sessions one at a time per repository (a short start lock), or the CIT-E shows another way; a test starts at least three launches at once [lens E F17]'
+  - 'A session started by `gov launch` (sandboxed) can connect to the shared reranker service''s socket (W2-112: one path in the user''s own folder, mode 0600) and gets its answers: the sandbox block allows that one Unix socket path and no other; the path comes from the same setting the service uses, never a pattern wider than it [DEC-1035, P-W2-112-T2 (a)] [moved from W2-127 S1, DEC-1083]'
+  - 'Nothing else in the sandbox widens: no other Unix socket, no network port, `allowUnsandboxedCommands` false and `strictAllowlist` as today; `sandbox_faults` still refuses any other change; a planted sandboxed session that opens another Unix socket is refused [DEC-1035] [moved from W2-127 S2, DEC-1083]'
+  - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035] [moved from W2-127 S3, DEC-1083]'
+  - 'A sandboxed session''s reranker fallback is logged and counted where the service''s own answers are, so `gov status` shows it (today it shows 0) [W2-112 review round 1, F3; the CTO as moderator, DEC-1010] [moved from W2-127 S4, DEC-1083]'
+  - 'Signals reach the session''s process group, and temporary folders are removed on every ending [W2-M187, W2-M095, W2-L105]. [moved from W2-21 S5, DEC-1083]'
+  - 'Launched sessions can run gov check, gov rebuild and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181]. [moved from W2-21 S6, DEC-1083]'
+  - 'The kernel template''s settings carry one narrow allow rule, Bash(gov launch:*) [DEC-715]. [moved from W2-21 S7, DEC-1083]'
+  - 'A sandboxed worker''s temp folder is removed when the worker ends, whatever its exit, and a test shows none left under /tmp after a worker''s run [W2-M405, DEC-902] [moved from W2-21 S8, DEC-1083]'
   failure:
   - A write outside the list from a script still succeeds; /tmp/gov-cbm-<uid> is on the write list (DEC-799 item 2); an allowed path widened with nothing naming it.
   - A launch whose sandbox cannot be built starts; a refusal the launcher makes today no longer refuses.
   - A placeholder file in a commit; a parent's CLAUDE*, GOV* or PYTHONPATH value in a launched session.
+  - 'A sandboxed session that can open any Unix socket or port beyond the reranker''s one path (containment widened). [moved from W2-127 F1, DEC-1083]'
+  - 'A sandboxed search that still falls back while the service runs. [moved from W2-127 F2, DEC-1083]'
+  - 'A raw claude launch stays unallowed in the template. [moved from W2-21 F1, DEC-1083]'
 profile: FULL
 sources:
 - DEC-799

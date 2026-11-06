@@ -1,7 +1,7 @@
 ---
 id: DAEO-arrl
 status: in_progress
-deps: []
+deps: [DAEO-ym8a]
 links: []
 created: 2026-10-29T15:55:50Z
 type: task
@@ -24,18 +24,18 @@ allowed_paths:
 - docs/research/W2-55-backfill.md
 kpis:
   success:
-  - 'Every register entry has a domain from the closed list (guard, close, retrieval, context, adopt, launch, checks, plan, roles, records, release), a status that names what superseded or amended it, and a scope (this repository, or kernel-wide); the decisions validator checks all three [DEC-791 item 1]'
-  - 'Every entry also has a "lands in" tag (the kernel file, the prompt or the project brief that states it), which the decisions validator checks [DEC-825 item 2, DEC-851]'
+  - 'The decisions validator checks domain, status and scope, and names each entry without them (`TAG_MISSING`) [DEC-791 item 1] [re-worded, DEC-1084]'
+  - 'Every entry also has a "lands in" tag (the kernel file, the prompt or the project brief that states it), which the decisions validator checks [DEC-825 item 2, DEC-851] [lifted, DEC-1083; left in place because the acceptance README maps its tests by number]'
   - 'gov context and gov retrieve leave out superseded and done entries, and say how many they left out; lens B''s Q05 (a superseded decision served unmarked) no longer happens [DEC-791 item 1]'
   - 'The backfill is a proposal in docs/research/W2-55-backfill.md: every entry''s proposed tags with the reason for each, the 120 amends and refines that DEC-825 left for this ticket included, and a sample drawn for the owner''s review; nothing is applied to the register before the owner accepts it [DEC-791 item 1, DEC-825 item 4]'
-  - 'Supersession propagates: a check fails when anything (a test, code, a skill, a brief, a ticket''s KPI, the prompt, the path map) still enforces a superseded or changed decision without a recorded reason; each superseded entry''s status line names the entry that replaced it, and every place that cites or enforces the old one is updated or listed with its reason in the register. Its first fixture is the sweep of 2026-10-20 (governance/project/orchestration/packages/SWEEP-2026-10-20.md): W1-49''s two window cases and W2-59''s three earlier cases are found [DEC-866]'
+  - 'Supersession propagates: a check reports, as a notice naming the place and the role, run as a family of gov links and the structural pass and never a refusal of a commit, a close or a landing, anything (a test, code, a skill, a brief, a ticket''s KPI, the prompt, the path map) that still enforces a superseded or changed decision without a recorded reason; each superseded entry''s status line names the entry that replaced it, and every place that cites or enforces the old one is updated or listed with its reason in the register. Its first fixture is the sweep of 2026-10-20 (governance/project/orchestration/packages/SWEEP-2026-10-20.md): W1-49''s two window cases and W2-59''s three earlier cases are found [DEC-866] [re-worded, DEC-1084]'
   - 'W2-61''s 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3]'
-  - 'The backfill proposal stays current by a mechanism: the proposer gains an append mode that adds the rows of register entries the file lacks, in register order, and never rewrites an existing row; the orchestrator''s decision-recording tool runs it in the same commit as each new entry; the backfill''s acceptance case reads the register as of the proposal file''s own commit, not the moving base [DEC-1028 item 2]'
+  - 'The backfill proposal stays current by a mechanism: the proposer gains an append mode that adds the rows of register entries the file lacks, in register order, and never rewrites an existing row; the orchestrator''s decision-recording tool runs it in the same commit as each new entry; the backfill''s acceptance case reads the register as of the proposal file''s own commit, not the moving base [DEC-1028 item 2] [lifted, DEC-1083; left in place because the acceptance README maps its tests by number]'
   - '`gov context --in-force` prints the digest of the decisions in force (one line each, superseded and done ones left out), generated from the register, and the kernel''s session-start hook loads it with RESUME HERE where the project turns that on (the hook''s injection is the owner''s CIT-P question, DEC-952 item 5) [DEC-953 item 7, DEC-983, DEC-982]'
   failure:
   - An entry with no domain, status or scope fails the decisions validator, naming it.
   - A superseded entry that still reaches an agent's context fails a test.
-  - A test or check that enforces a superseded decision with no recorded reason fails the new check, naming both decisions and the place.
+  - 'A test or check that enforces a superseded decision with no recorded reason is not reported, naming both decisions and the place. [re-worded, DEC-1084]'
   - A backfill tag written to the register before the owner accepts it.
 profile: STANDARD
 sources:
@@ -63,3 +63,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-55), from P-W2-37 (owner, DEC-791 item 1
 - **Paths:** `src/gov/context/**` and `src/gov/retrieve/**` for the decisions filter only. The backfill is a proposal in `docs/research/W2-55-backfill.md`; the register itself (`docs/DECISION_REGISTER.md`) is not in the paths, and the accepted backfill is applied by the orchestrator after the owner's acceptance.
 
 **DEC-983 (the owner's order, SMART-WORK-1):** W2-55 runs before W2-115 (the smart close): its KPI 5 ("supersession propagates") finds the tests, code, skills and KPIs that still enforce a superseded or changed decision before the close is rebuilt on them. It also gives the digest of the decisions in force (its last success KPI).
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: S1 (re-worded by DEC-1084 (2)), S3, S4 (built as `docs/research/W2-55-backfill.md`), F1, F2 and F4 (landed `e0cb7d13`); met in part: S5 (re-worded here per LINK-INTEGRITY §6.1; its second half is W2-130's clean-up), F3 (re-worded here per LINK-INTEGRITY §6.1), S6 (no measure recorded after the merge) and S8 (only `--in-force` built; the hook half is the owner's CIT-P); lifted: S2 and S7, left in place in `kpis.success` because the acceptance README maps its tests by line number. The CTO closes it at the lift (P1-13).

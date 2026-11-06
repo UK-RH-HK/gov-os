@@ -16,6 +16,7 @@ import subprocess
 import time
 from pathlib import Path
 
+from gov.util.digest import sha256_file
 from gov.util.gitenv import git_env
 
 CLASS = "read"
@@ -94,13 +95,6 @@ def _extract_path_prefix(install_cmd: str) -> str | None:
 
 def _version_tuple(v: str) -> tuple:
     return tuple(int(x) for x in re.findall(r"\d+", v))
-
-
-def _sha256_file(path: Path) -> str | None:
-    try:
-        return hashlib.sha256(path.read_bytes()).hexdigest()
-    except OSError:
-        return None
 
 
 def _real_home() -> Path:
@@ -329,7 +323,7 @@ def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -
             return {"name": name, "pinned_version": pinned, "found_version": None,
                     "sha256_match": False, "ok": False,
                     "reason": "vec0.so not found"}
-        found_sha = _sha256_file(vec_so)
+        found_sha = sha256_file(vec_so)
         sha_match = bool(found_sha and found_sha == pinned_sha)
         result = {"name": name, "pinned_version": pinned, "found_version": None,
                   "sha256_match": sha_match, "ok": sha_match}
@@ -348,7 +342,7 @@ def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -
             return {"name": name, "pinned_version": pinned, "found_version": None,
                     "sha256_match": False, "ok": False,
                     "reason": "model blob not found"}
-        found_sha = _sha256_file(blob_path)
+        found_sha = sha256_file(blob_path)
         sha_match = bool(found_sha and found_sha == pinned_sha)
         result = {"name": name, "pinned_version": pinned, "found_version": None,
                   "sha256_match": sha_match, "ok": sha_match}
@@ -413,7 +407,7 @@ def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -
             return {"name": name, "pinned_version": pinned, "found_version": None,
                     "sha256_match": False, "ok": False,
                     "reason": "model.safetensors not found at pinned revision"}
-        found_sha = _sha256_file(model_file)
+        found_sha = sha256_file(model_file)
         sha_match = bool(found_sha and found_sha == pinned_sha)
         result = {"name": name, "pinned_version": pinned, "found_version": None,
                   "sha256_match": sha_match, "ok": sha_match}
@@ -497,7 +491,7 @@ def _check_tools(root: Path) -> dict:
             all_ok = False
             continue
 
-        found_sha = _sha256_file(binary)
+        found_sha = sha256_file(binary)
         sha_match = bool(pinned_sha and found_sha and pinned_sha == found_sha)
         found_version = _tool_version(binary, name)
 
@@ -725,7 +719,7 @@ def _check_claude_code(root: Path) -> dict:
     cli_sha = None
     unread = "its --version gave no version"
     if cli_path:
-        cli_sha = _sha256_file(Path(cli_path))
+        cli_sha = sha256_file(Path(cli_path))
         # Out of the shared budget (W2-57 run 2): the tools' probes before it cannot leave it no time.
         try:
             out = _probe([cli_path, "--version"], VERSION_LIMIT, shared=False).stdout.strip()
@@ -759,7 +753,7 @@ def _check_claude_code(root: Path) -> dict:
                                     ext_version = pkg.get("version", ext_version)
                                 binary = Path(ext_path) / "resources" / "native-binary" / "claude"
                                 if binary.is_file():
-                                    ext_binary_sha = _sha256_file(binary)
+                                    ext_binary_sha = sha256_file(binary)
                             break
             except Exception:
                 pass

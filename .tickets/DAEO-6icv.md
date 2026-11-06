@@ -8,7 +8,7 @@ type: task
 priority: 3
 assignee: product-spec
 external-ref: W2-101
-tags: [wave-2, skill, domain, after-act-2, standard]
+tags: [wave-2, skill, domain, after-act-2, standard, wave-3]
 wbs_id: W2-101
 title: 'Domain skills B: frontend, UI/UX and DevOps, each the engineer''s skill for its area'
 class: specification
@@ -61,3 +61,5 @@ list_rows: []
 **Dependencies (PLAN-GROWTH-1 §2 gaps 3 and 4):** after ACT 2, the WBS milestone row (the one re-pin, DEC-954 item 6), and after W2-104 (the skill harness, DEC-959 item 5).
 
 Card: ROLES-RESEARCH-1 §5.3 item 10, approved (DEC-959 item 4): **after ACT 2, still in Wave 2.**
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.

@@ -50,3 +50,5 @@ close copy is seeded from; it is refreshed after every landing (the CTO's tools 
 `gov rebuild --seed`. Related: W2-116 (the integration store as a product command), which can build on it.
 
 **DEC-1027 C (owner, 2026-11-02):** KPI 5 (a rebuild without its semantic store fails) moved to W2-124 (`DAEO-mb2t`); this ticket's K5 tests are retired by its test designer under that decision, and its seeding lands without it.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 4 of 5 (`5543a03a`); met in part: S3 (its "alone" measure was not taken, evidence:60); W2-06's lines do not come here. The CTO closes it at the lift (P1-13).

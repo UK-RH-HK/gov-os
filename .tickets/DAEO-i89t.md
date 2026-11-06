@@ -20,11 +20,12 @@ allowed_paths:
 - tests/unit/check/test_w2_120*
 kpis:
   success:
-  - 'gov check''s skill validator refuses a brief template without the twelve-field rule (the twelve labelled return fields, the payload-after rule and the two-refusal stop), naming the file and what is missing; the kernel''s five brief templates as W2-11 leaves them pass [AR-5, AR-6, W2-L097, DEC-995]'
-  - 'The validator checks every `gov` command a skill or brief names against the reserved command list, not the gov installed on the machine [W2-L097]'
   - 'gov check''s skill validator refuses a skill whose front matter has no output class or carries a key outside the skill template''s list (allowed-tools, permissions, paths, sandbox, network, model, effort or any other), naming the file and the key; it reads the kernel skills and every generated copy, and names each vendored skill so found [DEC-995, DEC-996, CAP-24.b]'
-  failure:
-  - 'A brief template without the twelve-field rule, or a skill with allowed-tools or another permission key in its front matter, that the validator passes [DEC-995]'
+  failure: []
+  lifted:
+  - 'gov check''s skill validator refuses a brief template without the twelve-field rule (the twelve labelled return fields, the payload-after rule and the two-refusal stop), naming the file and what is missing; the kernel''s five brief templates as W2-11 leaves them pass [AR-5, AR-6, W2-L097, DEC-995] [lifted (was S1), DEC-1083: re-scoped to S3]'
+  - 'The validator checks every `gov` command a skill or brief names against the reserved command list, not the gov installed on the machine [W2-L097] [lifted (was S2), DEC-1083: re-scoped to S3]'
+  - 'A brief template without the twelve-field rule, or a skill with allowed-tools or another permission key in its front matter, that the validator passes [DEC-995] [lifted (was F1), DEC-1083: re-scoped to S3]'
 profile: STANDARD
 sources:
 - DEC-995

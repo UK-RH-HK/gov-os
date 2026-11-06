@@ -31,12 +31,12 @@ kpis:
   - A Rust fixture and a TypeScript fixture each close a ticket with their own command [AR-10].
   - A run that collects or passes nothing counts as unmeasured or failed, never passed [W2-H026, W2-M162].
   - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
-  - A ratchet baseline of known reds. Each red test at adoption is listed by its exact id, with an owner, a cause class and how it shrinks. A new red refuses the close. A listed test that turns green leaves
-    the list, and the output says so. The list never grows without the project owner's decision [DEC-736].
   - A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed [DEC-736, W2-H026].
-  - 'The ratchet''s field rule, tested: one acceptance case per list (accepted_reds, load_sensitive): an entry that names no fix is refused by the ratchet''s check, naming the entry [lens H finding 19; DEC-890]'
   failure:
   - An undeclared language in a project with no test command is a named refusal, not a silent pytest run.
+  lifted:
+  - 'A ratchet baseline of known reds. Each red test at adoption is listed by its exact id, with an owner, a cause class and how it shrinks. A new red refuses the close. A listed test that turns green leaves the list, and the output says so. The list never grows without the project owner''s decision [DEC-736]. [lifted (was S5), DEC-1083: the ratchet lists are lifted (INVESTIGATION-1 §5)]'
+  - 'The ratchet''s field rule, tested: one acceptance case per list (accepted_reds, load_sensitive): an entry that names no fix is refused by the ratchet''s check, naming the entry [lens H finding 19; DEC-890] [lifted (was S7), DEC-1083: the ratchet lists are lifted (INVESTIGATION-1 §5)]'
 profile: FULL
 sources:
 - DEC-534
@@ -94,3 +94,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-19), as approved (DEC-729). The list row
 - **On EXAMIN's path (DEC-736, correcting DEC-735 item 2):** `gov close` runs its regression only over `tests/`, and EXAMIN's suites are in `product/tests` and `governance/scripts/tests`. W2-27's close with EXAMIN's own test command therefore needs this ticket's declared test commands. The estimate is 300 lines with the ratchet baseline (DEC-736).
 - **DEC-757 (owner, 2026-10-17):** depends on W2-53, whose accepted-red ratchet core this ticket reuses for declared test commands and EXAMIN (DEC-736).
 - **DEC-762 (owner, 2026-10-17):** the ratchet core reads each `load_sensitive` entry's `fixed_by` (a ticket or a Wave 3 row) and refuses an entry without one; the close of the ticket an entry names refuses while that entry is still listed.
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. S5 and S7 are lifted (under `kpis.lifted`).

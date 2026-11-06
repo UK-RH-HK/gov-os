@@ -28,6 +28,7 @@ kpis:
   - 'A project with nothing to embed (no path map, or no embedded namespace) is not asked for a semantic store, so its rebuild answers ok [DEC-1027 C]'
   - 'Adoption never fails for a missing embedder: stage A6 finishes, and its record and the adoption report carry a named finding (the semantic store not recreated, with the reason) and the command to rebuild it later [DEC-1027 C]'
   - 'The close (and the merge queue''s prepare) treats a rebuild without its semantic store as failed, as the CTO''s `rebuild_slot.sh` does today (exit 75) [DEC-1015 item 4, DEC-1027 C]'
+  - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved from W2-88 S5, DEC-1083]'
   failure:
   - 'An ok answer, or a close, over a partial semantic store.'
   - 'An adoption that fails, or reports success without the finding, when the embedder is unavailable.'

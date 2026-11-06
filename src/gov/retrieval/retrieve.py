@@ -9,6 +9,14 @@ reads (DEC-322).
 Paging (DEC-422): batches beyond the first, rounds scaled by radius, a stateless continuation token.
 Must-not-cite (DEC-423): DEPRECATED, REJECTED, WITHDRAWN; frontmatter check for files not in the store.
 Failure/lesson ahead (DEC-424): failure and lesson records in the ticket's closure come ahead of other evidence.
+The candidate pool (W2-32 S11): ``retrieval.yaml``'s ``pool:`` settings (``gov.retrieval.pool``), each absent or 0
+today's path: the routes' depth per search, the meaning route uncut, one rerank of the first n fused (the pages cut
+from its order), at most n chunks of a file in the first 10, and an item nested in an earlier one left out.
+Stated links (W2-92 S8, DEC-1072 (1)): one bounded hop over the store's ``stated_links`` from what the record route or
+the closure reached (``graph_route.follow``), after today's closure chunks; the closure facet names what it added and
+the decisions in reach that others change. The links never change what is current, the edges or the authority order.
+Status (W2-92 S9, DEC-1073 (2)): every register evidence item names its entry's status word and changers, and whether
+it is in force; any other record's item that is not in force says so (``in_force``, ``not_in_force``).
 """
 
 from __future__ import annotations
@@ -25,7 +33,7 @@ from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
 from gov.guard import role_paths
-from gov.retrieval import authority, code_route, graph_route, lexical, routing, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, pool, reverse_edges, routing, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank
 from gov.store import loader
@@ -35,6 +43,11 @@ SATURATED, BUDGET_EXHAUSTED = "SATURATED", "BUDGET_EXHAUSTED_WITH_GAPS"
 SUPERSEDED, NOT_GATHERED = "SUPERSEDED", "NOT_GATHERED"
 BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)
 TOKEN_CHARS = 4
+# W2-135 (DEC-1086 B): each line of an evidence item over this many characters is sent as its first ITEM_CHARS, the
+# item marked ``cut``; a guard against one-line files only (a chunk is never shorter than one line), so an item of
+# ordinary lines is never cut. Its lines, ids and sha256 stay those of the full span, and the budget's ``used`` stays
+# counted on the full text.
+ITEM_CHARS = 4000
 NO_CODE_INDEX = "the code index did not answer for an id that is no record"
 
 ROUNDS_BY_RADIUS = {0: 1, 1: 1, 2: 3, 3: 8, 4: 8}
@@ -47,6 +60,35 @@ STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
 IN_EARLIER_PARENT = "SENT_IN_AN_EARLIER_PARENT"  # the chunk lies inside a parent an earlier call expanded
 EARLIER_CHILD = "SENT_EARLIER_AS_A_CHILD"  # an earlier call sent these lines as a child: left out of a later parent
 NO_RECORD_GRAPH = "the record graph is unreadable, so whether this record is current cannot be judged"  # DEC-1019
+# W2-92 S8: what the closure facet says of the one hop over the stated links
+FOLLOWED, CHANGED_BY, STATED_LINKS = "followed", "changed_by", "stated_links"
+NO_STATED_LINKS = "the store holds no stated links (built before them): today's closure until a rebuild"
+# W2-92 S9 (DEC-1073 (2)): a decision with one of these status words, or superseded whole, is not in force; records of
+# work (a ticket's state is no rule) are never marked
+NOT_IN_FORCE_STATUSES = frozenset({"PROPOSED", "REJECTED", "WITHDRAWN", SUPERSEDED, "DEPRECATED"})
+WORK_TYPES = frozenset({"task", "checkpoint", "close", "evidence", "research"})
+
+
+def capped(body: bytes, first: int) -> tuple[str, dict]:
+    """W2-135 (DEC-1086 B): the text sent for an item whose span ``body`` starts at line ``first``, and its ``cut``
+    key (``{}`` where no line is cut). A line is measured without its newline; one over ITEM_CHARS characters is sent
+    as its first ITEM_CHARS and keeps its newline; every other line is sent whole. ``cut`` names the full text's
+    length, the length sent and the cut lines' numbers. The lines are the file's (``bytes.splitlines``)."""
+    text = body.decode("utf-8", "replace")
+    if len(text) <= ITEM_CHARS:  # no line in it can be over the cap
+        return text, {}
+    sent, lines = [], []
+    for number, raw in enumerate(body.splitlines(keepends=True), first):
+        line = raw.decode("utf-8", "replace")
+        bare = line.rstrip("\r\n")
+        if len(bare) > ITEM_CHARS:
+            line = bare[:ITEM_CHARS] + line[len(bare):]
+            lines.append(number)
+        sent.append(line)
+    if not lines:
+        return text, {}
+    sent_text = "".join(sent)
+    return sent_text, {"cut": {"chars": len(text), "sent": len(sent_text), "lines": lines}}
 
 
 def _declares_record(root: Path, rel: str) -> str | None:
@@ -68,11 +110,14 @@ def _named_register(root: Path) -> str | None:
 
 
 def _graph(root: Path) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    """``path -> id`` of every record, ``id -> reason`` for not-current records (superseded or must-not-cite),
-    and ``id -> type`` for every record. Raises what the store raises when it is missing or cannot be read."""
+    """``path -> id`` of every record that is its file, ``id -> reason`` for not-current records (superseded or
+    must-not-cite), and ``id -> type`` for every record. A record that carries a span (a register entry) is left out of
+    the path map, as ``supplementary`` does: no one entry stands for the register's path (W2-131, DEC-1082 (2)); a
+    register chunk is its own entry, by ``authority.register_entries_of``. Raises what the store raises when it is
+    missing or cannot be read."""
     known = records.records(root)
     superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
-    record_of = {record["path"]: record["id"] for record in known}
+    record_of = {record["path"]: record["id"] for record in known if record.get("span") is None}
     not_current: dict[str, str] = {}
     for record in known:
         if record["status"] == SUPERSEDED or record["id"] in superseded_edges:
@@ -104,12 +149,15 @@ def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
 
 
-def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=(), alone=()):
+def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=(), alone=(),
+                         pooled=None):
     """The stateless token of the next call; ``x`` carries the parents already expanded and ``c`` the spans already
-    sent as a child on its own (``[path, first, last]``), so a later call sends neither again (W2-32 S7, DEC-1067)."""
+    sent as a child on its own (``[path, first, last]``), so a later call sends neither again (W2-32 S7, DEC-1067).
+    ``p`` (W2-32 S11, only when the pool reranked: ``pool.carried``) is the first call's pool order, so a later call
+    cuts its page from it without a rerank request and without writing anything (DEC-782)."""
     payload = json.dumps({"q": query, "i": sorted(ids), "t": ticket, "r": radius,
                           "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded),
-                          "c": sorted([list(item) for item in alone])},
+                          "c": sorted([list(item) for item in alone]), **({"p": pooled} if pooled is not None else {})},
                          separators=(",", ":"), sort_keys=True)
     return base64.urlsafe_b64encode(payload.encode()).decode()
 
@@ -159,9 +207,11 @@ def _without(first: int, last: int, sent: list[tuple[int, int]]) -> list[tuple[i
     return [(a, b) for a, b in runs if a <= b]
 
 
-def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None):
-    """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added, and
-    with ``alone`` (a set), the spans they sent as a child on its own."""
+def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None,
+                         carried=None):
+    """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added, with
+    ``alone`` (a set), the spans they sent as a child on its own, and with ``carried`` (a dict), the first call's pool
+    (``carried["pool"]``, None when the token holds none; W2-32 S11)."""
     try:
         payload = json.loads(base64.urlsafe_b64decode(token))
     except Exception:
@@ -178,18 +228,29 @@ def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_b
         expanded |= _expanded_of(payload)
     if alone is not None:
         alone |= _alone_of(payload)
+    if carried is not None:
+        carried["pool"] = payload.get("p")
+        if carried["pool"] is not None and not pool.well_formed(carried["pool"]):
+            raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
     return offset
 
 
-def _phrased(search, root: Path, asked: list[str], key: str, cut: int | None = None) -> dict:
+def _phrased(search, root: Path, asked: list[str], key: str, cut: int | None = None, depth: int = 0) -> dict:
     """One route's answer for the question (one phrasing: today's answer, unchanged), or for several phrasings: the
     question's answer with ``key`` the phrasings' lists fused (``routing.fused``), cut to ``cut``; when any phrasing's
-    answer is unavailable, the question's alone, as the research harness does (W2-32 S8's note, DEC-1067 order (4))."""
-    answers = [search(root, phrasing, refresh=False) for phrasing in asked]
+    answer is unavailable, the question's alone, as the research harness does (W2-32 S8's note, DEC-1067 order (4)).
+    ``depth`` (W2-32 S11's ``pool.route_depth``; 0: none) is passed to each search as its ``top_k``."""
+    more = {"top_k": depth} if depth else {}
+    answers = [search(root, phrasing, refresh=False, **more) for phrasing in asked]
     if len(answers) == 1 or not all(answer.get("available", True) for answer in answers):
         return answers[0]
     merged = routing.fused([answer.get(key, answer["hits"]) for answer in answers])
     return {**answers[0], key: merged[:cut] if cut is not None else merged}
+
+
+def _rerank_text(chunk: dict, body: bytes) -> str:
+    """What the reranker reads of a chunk: its path and its text up to ``RERANK_CHARS`` (W2-32 S7)."""
+    return f"[path: {chunk['path']}]\n{body.decode('utf-8', 'replace')[:RERANK_CHARS]}"
 
 
 def _by_cosine(root: Path, query: str, chunk_ids: list[str]) -> list[str]:
@@ -221,14 +282,16 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
 
     offset, earlier, alone = 0, set(), set()  # the parents the earlier calls expanded, the children they sent alone
+    carried = {"pool": None}  # W2-32 S11: the first call's pool order, from the token
     if continuation is not None:
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget,
-                                      earlier, alone)
+                                      earlier, alone, carried)
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
     # W2-32 S8: the routing settings read first, so an invalid file is refused before any search work (S8-F4)
     route_settings, routed = routing.settings(root), {}
+    pooling = pool.settings(root)  # W2-32 S11: read first too, so an invalid value is refused before any search
     root = Path(root)
     unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
     try:
@@ -242,6 +305,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         unread = (f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure;"
                   " record files are left out, as their currency cannot be judged without the record graph")
         record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
+    # W2-92 S8, S9: the stated links (None for a store built before them); read beside the edges, never into them
+    links = graph_route.stated_links(root) if unread is None else []
+    changed_by = graph_route.changers(links or [], edges)
+    whole = {link["target"] for link in links or [] if link["type"] == loader.SUPERSEDES}  # superseded whole
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
     if unread is not None:
         register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
@@ -250,8 +317,14 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     asked = [query]
     if route_settings["phrasings"]:  # DEC-1067 order (4): three deterministic phrasings, searched and fused
         asked = routing.phrasings(query, graph_route.start_ids(root, query, known))
-    answers = {lexical.FACET: _phrased(lexical.search, root, asked, "ranked"),
-               semantic.FACET: _phrased(semantic.search, root, asked, "hits", cut=semantic.TOP_K)}
+    # W2-32 S11: the routes' depth per search (as the harness's ``lex_k``/``sem_k``, which the meaning routes' cut
+    # follows), and the meaning routes' phrasings fused and not cut back to it (``sem_uncut``)
+    depth = pooling["route_depth"]
+    cut = None if pooling["meaning_uncut"] else (depth or semantic.TOP_K)
+    answers = {lexical.FACET: _phrased(lexical.search, root, asked, "ranked", depth=depth),
+               semantic.FACET: _phrased(semantic.search, root, asked, "hits", cut=cut, depth=depth)}
+    if semantic.file_level_on(root):  # DEC-1068 M1: the file route beside the chunks', fused as one route more
+        answers[semantic.FILE_FACET] = _phrased(semantic.file_search, root, asked, "hits", cut=cut)
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
     routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
@@ -264,11 +337,43 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     elif start:
         closed = closures.closure(root, start, depth)
         reached = {item["id"] for item in closed["closure"]}
-        routes[CLOSURE] = [chunk for chunk in chunks.values()
-                           if (record_of.get(chunk["path"]) if chunk["path"] != register
-                               else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in reached]
+        walked, note = None, None
+        if reverse_edges.on(root):  # DEC-1068 M3 (P-W2-32-10): the start records' dependents beyond one hop
+            walked = reverse_edges.walk(root, start)
+            if walked is None:
+                note = reverse_edges.STALE  # today's closure until a rebuild
+            else:
+                reached |= set(walked.dependents)
+                note = f"{reverse_edges.CAPPED}: {walked.capped}" if walked.capped else None
+        id_of = {chunk_id: (record_of.get(chunk["path"]) if chunk["path"] != register
+                            else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id"))
+                 for chunk_id, chunk in chunks.items()}
+        routes[CLOSURE] = [chunk for chunk in chunks.values() if id_of[chunk["chunk_id"]] in reached]
+        if walked is not None:  # the chunks stating each dependency walked, first
+            ahead = walked.first(chunks)
+            named = {chunk["chunk_id"] for chunk in ahead}
+            routes[CLOSURE] = ahead + [chunk for chunk in routes[CLOSURE] if chunk["chunk_id"] not in named]
+        # W2-92 S8: one hop over the stated links, bounded; each bound record's first chunks come after today's
+        # closure chunks, so those keep their ranks in the fusion
+        hop = graph_route.follow(links or [], start, reached,
+                                 {rid for rid, kind in record_types.items() if kind == "decision"})
+        held, of_record, bound = {chunk["chunk_id"] for chunk in routes[CLOSURE]}, {}, set(hop["records"])
+        for chunk in chunks.values():  # each bound record's chunks, in the index's order
+            if id_of[chunk["chunk_id"]] in bound:
+                of_record.setdefault(id_of[chunk["chunk_id"]], []).append(chunk)
+        routes[CLOSURE] += [chunk for rid in hop["records"]
+                            for chunk in of_record.get(rid, [])[:graph_route.FOLLOW_CHUNKS]
+                            if chunk["chunk_id"] not in held]
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
+        if note:
+            facets[CLOSURE][reverse_edges.FACET_KEY] = note
+        if links is None:
+            facets[CLOSURE][STATED_LINKS] = NO_STATED_LINKS
+        if hop["records"]:
+            facets[CLOSURE][FOLLOWED] = {"records": hop["records"], "left": hop["left"]}
+        if hop["changed_by"]:  # each decision in reach that another changes, by its changers
+            facets[CLOSURE][CHANGED_BY] = hop["changed_by"]
         closure_gaps += closed["gaps"]
     coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
     if coded is not None:
@@ -282,6 +387,51 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
 
     fused = rrf(routes)
     fused = order.fused(fused, chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
+
+    files: dict[str, list[bytes]] = {}
+
+    def span(rel: str, first: int, last: int) -> bytes:
+        if rel not in files:
+            files[rel] = (root / rel).read_bytes().splitlines(keepends=True)
+        return b"".join(files[rel][first - 1:last])
+
+    # W2-32 S11 (``pool.rerank_depth``, the harness's ``depth``): the first n fused candidates the lexical index holds
+    # reranked once, in one pass (requests within ``rerank``'s bounds), lifted by authority and held to
+    # ``per_file_first10`` (the harness's ``_final``); the fused list is that order, then the rest as fused, and every
+    # page is cut from it. Only the first call asks: its order goes in the token (``pool.carried``) and a continuation
+    # rebuilds it from there, with no request and nothing written. A pool rerank that is not scored leaves this call,
+    # and the question's later calls, on today's per-page path (the review's F1), so the cut stays the fused one.
+    pooled, pool_outcome, pool_sent, pool_token, pool_failed = None, None, 0, None, None
+    if pooling["rerank_depth"]:
+        head = [hit for hit in fused[:pooling["rerank_depth"]] if hit["chunk_id"] in chunks]
+        lifted = None
+        if continuation is not None:  # a later call: the first call's order, or its per-page path; never a request
+            if carried["pool"] is not None:
+                lifted, pool_token = pool.reorder(head, carried["pool"]), carried["pool"]
+                if lifted is not None:
+                    pool_outcome = {"by": pool_token["b"], "device": pool_token["d"], "reason": None}
+        elif head:
+            texts = []
+            for hit in head:
+                chunk = chunks[hit["chunk_id"]]
+                body = span(chunk["path"], chunk["start_line"], chunk["end_line"])
+                texts.append({**chunk, "text": _rerank_text(chunk, body)})
+            try:
+                scored, pool_outcome = rerank(query, texts, reranker), last_outcome()
+            except (OSError, RuntimeError, ValueError) as error:
+                scored = texts
+                pool_outcome = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
+            if scored and all("rerank_score" in candidate for candidate in scored):
+                lifted = pool.capped(order.reranked(scored), pooling["per_file_first10"])
+            else:
+                pool_failed = pool_outcome
+            pool_token = pool.carried(head, lifted, pool_outcome)
+        if lifted is not None:
+            pool_sent = len(head)
+            by_id = {hit["chunk_id"]: hit for hit in head}
+            pooled = {candidate["chunk_id"]: -position for position, candidate in enumerate(lifted)}
+            fused = [by_id[candidate["chunk_id"]] for candidate in lifted] + \
+                    [hit for hit in fused if hit["chunk_id"] not in pooled]
 
     # DEC-424: move failure/lesson records ahead so they're gathered even in small batches
     ahead_paths: set[str] = set()
@@ -316,13 +466,6 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     gaps = list(closure_gaps)
     gaps += [{"path": hit["path"], "chunk_id": hit["chunk_id"], "reason": NOT_GATHERED} for hit in remaining]
 
-    files: dict[str, list[bytes]] = {}
-
-    def span(rel: str, first: int, last: int) -> bytes:
-        if rel not in files:
-            files[rel] = (root / rel).read_bytes().splitlines(keepends=True)
-        return b"".join(files[rel][first - 1:last])
-
     dropped: dict[str, dict] = {}
     candidates = []
     frontmatter_cache: dict[str, tuple[str | None, str | None]] = {}
@@ -351,8 +494,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 dropped[chunk["path"]] = {"path": chunk["path"], "id": record_id, "reason": not_current[record_id]}
             continue
 
-        # DEC-423: files the store could not load — read frontmatter
-        if record_id is None:
+        # DEC-423: files the store could not load — read frontmatter (the register's entries are loaded: W2-131)
+        if record_id is None and not in_register:
             rel = chunk["path"]
             if rel not in frontmatter_cache:
                 frontmatter_cache[rel] = _frontmatter_status(root, rel)
@@ -363,16 +506,22 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 continue
 
         body = span(chunk["path"], chunk["start_line"], chunk["end_line"])
-        candidates.append({**chunk, "routes": hit["routes"], "body": body,
-                           "text": f"[path: {chunk['path']}]\n{body.decode('utf-8', 'replace')[:RERANK_CHARS]}",
+        candidates.append({**chunk, "routes": hit["routes"], "body": body, "text": _rerank_text(chunk, body),
                            "_batch": batch_assignments[hit["chunk_id"]]})
 
-    try:
-        ranked, reranked_by = rerank(query, candidates, reranker), last_outcome()
-    except (OSError, RuntimeError, ValueError) as error:
-        ranked = candidates
-        reranked_by = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
-    ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
+    if pooled is not None:  # W2-32 S11: the page in the pool's one order (no request of its own), the rest after
+        ranked = sorted(candidates, key=lambda candidate: -pooled.get(candidate["chunk_id"], pool.UNPOOLED))
+        ranked = [{**candidate, "rerank_score": float(pooled.get(candidate["chunk_id"], pool.UNPOOLED))}
+                  for candidate in ranked]  # the order's scores, so routing's named half reads this order
+        reranked_by = pool_outcome
+    else:  # today's per-page path: the pool off, or its rerank not scored (W2-32 S11, F1: the page scored itself)
+        try:
+            ranked, reranked_by = rerank(query, candidates, reranker), last_outcome()
+        except (OSError, RuntimeError, ValueError) as error:
+            ranked = candidates
+            reranked_by = {"by": "unavailable", "device": None, "reason": f"{type(error).__name__}: {error}"}
+        ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
+    before_routing = [candidate["chunk_id"] for candidate in ranked]
 
     # W2-32 S8 (DEC-1067 (a)): routing by question type, each half behind its own setting (off: today's order)
     if route_settings["named_first"] and start and routes.get(CLOSURE):
@@ -394,6 +543,12 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     if route_settings["code_first"] and coded is not None and routes.get(code_route.FACET):
         best = [hit["chunk_id"] for hit in routes[code_route.FACET]]  # already by cosine, before the fusion
         ranked, routed[routing.CODE] = routing.ahead(ranked, routing.firsts(best, route_settings["code_first"]))
+    # W2-32 S11 (the review's F2): ``per_file_first10`` after the routing, as the harness's cap after its ``front``
+    # and ``pin``. The pool's order holds it already (in its ``_final`` place), so a pooled page is capped again only
+    # when the routing changed its order; without the pool, every page's order is capped here.
+    if pooling["per_file_first10"] and (pooled is None
+                                        or [candidate["chunk_id"] for candidate in ranked] != before_routing):
+        ranked = pool.capped(ranked, pooling["per_file_first10"])
 
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
     if ahead_paths:
@@ -411,10 +566,57 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     used = sum(_tokens(candidate["body"].decode("utf-8", "replace")) for candidate in ranked)
     evidence, expansions, expanded = [], [], set(earlier)  # W2-32 S7: never a parent an earlier call sent
 
+    standing = {record["id"]: (record["type"], record["status"]) for record in known}
+
+    def force(rid, status):
+        """Why the record ``rid`` is not in force (its status word, or SUPERSEDED for a whole supersession that
+        leaves its word ACCEPTED); None where it is."""
+        if status in NOT_IN_FORCE_STATUSES:
+            return status
+        return SUPERSEDED if not_current.get(rid) == SUPERSEDED or rid in whole else None
+
+    def entry_mark(rid):
+        status = standing.get(rid, (None, None))[1]
+        why = force(rid, status)
+        return {"entry": rid, "status": status, "changed_by": list(changed_by.get(rid, ())), "in_force": why is None,
+                **({"not_in_force": why} if why else {})}
+
+    def entries_in(rel, first, last):
+        """The register entries whose spans the lines ``first`` to ``last`` touch, in order."""
+        found, at = [], first
+        while at <= last:
+            entry = entry_of(rel, at)
+            if entry is None:
+                at += 1
+                continue
+            found.append(entry["id"])
+            at = entry["end_line"] + 1
+        return found
+
     def item(candidate, rel, first, last, body):
-        return {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
-                "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
-                "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
+        text, cut = capped(body, first)  # W2-135: a line over ITEM_CHARS characters cut, the cut named
+        found = {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
+                 "path": rel, "start_line": first, "end_line": last, "text": text, **cut,
+                 "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
+        # W2-92 S9 (DEC-1073 (2)): beside the text (unchanged), the entry's status word and changers, and whether it
+        # is in force; any other record not in force says so
+        if rel == register:
+            # W2-131 (DEC-1082 (2)), W2-133 (DEC-1083): the id is the entry holding the item's first line, as its
+            # ``entry`` key; a first line in the preface or a gap: the chunk id, never an entry further down
+            own = (entry_of(rel, first) or {}).get("id")
+            if own:
+                found["id"] = own
+                found.update(entry_mark(own))
+            others = [rid for rid in entries_in(rel, first, last) if rid != own]
+            if others:  # the other entries its lines touch: each of them, the same way
+                found["also"] = [entry_mark(rid) for rid in others]
+        else:
+            rid = record_of.get(rel)
+            kind, status = standing.get(rid, (None, None))
+            why = force(rid, status) if rid in standing and kind not in WORK_TYPES else None
+            if why:
+                found.update({"status": status, "in_force": False, "not_in_force": why})
+        return found
 
     for candidate in ranked:
         rel, first, last, body = candidate["path"], candidate["start_line"], candidate["end_line"], candidate["body"]
@@ -446,6 +648,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         sent_alone.add((rel, first, last, candidate["chunk_id"]))
         evidence.append(item(candidate, rel, first, last, body))
 
+    nested = []
+    if pooling["drop_nested"]:  # W2-32 S11 (the harness's ``dedup``): an item inside an earlier one's lines left out
+        evidence, nested = pool.without_nested(evidence)
+
     reasons = {gap["reason"] for gap in gaps}
     if not all(facet["available"] for facet in facets.values()):
         stopping = closures.FACET_UNAVAILABLE
@@ -461,7 +667,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     new_offset = offset + len(gathering)
     if remaining:
         token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset,
-                                     expanded, sent_alone)
+                                     expanded, sent_alone, pool_token)
     else:
         token = None
 
@@ -480,4 +686,14 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                              **({"phrasings": asked} if route_settings["phrasings"] else {})}
     if withhold is not None:
         bundle["role_filter"] = withhold.summary()  # DEC-1065 (2): what was withheld, how many and by which rule
+    if any(pooling.values()):  # W2-32 S11: the settings in force, how many the pool's one rerank read, what was left out
+        bundle["pool"] = {"settings": {key: value for key, value in pooling.items() if value},
+                          "reranked": pool_sent if pooled is not None else 0,
+                          # round 2: "first" the pool reranked in this call, "carried" its order from the token (no
+                          # request), "per-page" today's path (the pool off, not scored, or not scored earlier)
+                          "order": ("per-page" if pooled is None else "carried" if continuation is not None
+                                    else "first"),
+                          **({"fallback": pool_failed} if pool_failed is not None else {}),
+                          "nested": [{key: item_[key] for key in ("chunk_id", "path", "start_line", "end_line")}
+                                     for item_ in nested]}
     return bundle

@@ -48,3 +48,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-36), as approved (DEC-729). The list row
 
 - **Allowed paths:** `src/gov/discover/**` (new), `tests/unit/discover/**`.
 - **KPIs:** `gov discover <question or feature>` opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records back the answer. The same request in plain language works the same way [CAP-32.d, DEC-166, W2-M284].
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. First in line in Wave 3 (the discovery agents, aim 2).

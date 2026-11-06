@@ -56,3 +56,5 @@ Card: ROLES-RESEARCH-1 §5.3 item 6, approved by the owner as a priority now (DE
 - **Where:** a new command module, `src/gov/accept/command.py` (`gov accept`), by the command-module convention (`src/gov/cli/main.py`'s docstring): no change to the CLI file.
 - **Not in this ticket:** a guard rule refusing engineers' direct pytest runs on the acceptance folder would be a sixth guard rule, the owner's decision (DEC-953 item 2); the brief carries the rule until then.
 - **Overlaps:** none running.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 9 of 10 (landed `107514f5`); met in half: S6 (`brief-engineer.md` does not name `gov accept`). The CTO closes it at the lift (P1-13).

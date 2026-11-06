@@ -96,3 +96,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-42), as approved (DEC-729). The list row
   - Links are resolved, and a write that reaches the acceptance tests through a link is refused [W2-H013, W2-M031, W2-M067].
   - The guard creates the folder of an allowed file instead of refusing it [W2-M173, W2-L216].
   - A quoted `$NAME` target is judged as the literal the shell writes [W2-M019].
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. Its S3, atomic saves, comes first.

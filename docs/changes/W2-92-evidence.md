@@ -28,6 +28,11 @@ worktree. Unit = `pytest tests/unit/retrieval/test_w2_92_routes.py tests/unit/re
 | F2 a whole-graph query or one over the row cap | `gov accept` line failure-2; unit small-page cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F3 a missing index reported ok or failing the whole answer | `gov accept` line failure-3; unit missing-index cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F4 a figure without the other, or the hidden half read or run | the measure record (§4 gives both figures together; §8: the hidden half neither read nor run) | measure: D-4b measure 1 | earlier record as cited; re-measured: D-4b measure 1 | `d72c96fc029c` (record); D-4b measure 1 |
+| S7 the stated links (DEC-1072 (1), the census's kinds 1 to 4) | the store keeps `stated_links` (CITES, OF_TASK, UNDER, SUPERSEDES, AMENDS) outside the digest and `edges`; `loader.register_statements` is the census's §1 code's output one for one, on a planted register and on this repository's (3,171 statements, same order) | unit `tests/unit/store/test_w2_92_links.py` (9 cases); `gov accept` after the designer's S7 tests merge | unit pass; `gov accept`: after the merge | `21623ae258a1` |
+| S8 one bounded hop | `graph_route.follow`: CITES, UNDER, OF_TASK out, AMENDS and SUPERSEDES in, at most 12 records of 2 chunks each, after today's closure chunks; the links never reach `edges` or the authority order | unit `tests/unit/retrieval/test_w2_92_follow.py` (12 cases); adoption under DEC-1071's rule: the CTO's measure | unit pass; measure: CTO | `21623ae258a1` |
+| S9 status in the bundle (DEC-1073 (2)) | every register evidence item carries `entry`, `status`, `changed_by`, `in_force` (and `not_in_force` with the reason); a file record not in force carries `status`, `in_force`, `not_in_force`; records of work none; the text unchanged | unit `tests/unit/retrieval/test_w2_92_follow.py` (3 cases on the marks, 1 on a question naming no record) | unit pass | `21623ae258a1` |
+| S10 the drift count before and after | `docs/research/W2-92-proto-drift.py` reads the register through `register_statements`; `docs/research/W2-92-memory-measure.md` §10 holds the definitions, the command and the table the CTO fills on the rebuilt store | `PYTHONPATH=<tree>/src python3 docs/research/W2-92-proto-drift.py <tree> <out.json>` (the engineer: `--from-head`) | from HEAD: before 0, after 190 of 190 joined (184 to every changer); figures of record: CTO | `21623ae258a1` |
+| F5 a partial supersession drops its target; a register chunk without its status | unit: a part replaced stays ACCEPTED and current, nothing dropped, its changer named; every register item carries its status | the S7 and S9 unit files | unit pass | `21623ae258a1` |
 | S6 a plain question costs about one second (DEC-1065 (4)) | the record route reads the titles the store keeps (`record_titles`), parses no record file; same start ids as before; the route timed cold with stand-ins (below); the cold `gov retrieve` median of ten: the CTO's, on the shared servers | unit `tests/unit/retrieval/test_w2_92_titles.py` (18 cases) with the W2-92 and store unit files (81 cases, `--optin=lifted,breadth`); the timing scripts (below); `gov accept` after the test designer's S6 tests merge | unit 81 passed; the record route 2.97 s → 0.0045 s median of ten; 1,968 records' titles equal both ways; `gov accept` in the launch sandbox at `00a3daa0`: 14 of 15, 1 failed (pre-S6 code: 12 of 15); `gov retrieve` median: CTO | `62013a81`; `00a3daa0` |
 
 `gov accept` totals at `ebba014ac355`: 25 passed, 5 failed, 0 skipped; 5 of 7 lines pass (2026-11-03 15:39-15:41
@@ -161,3 +166,51 @@ ran in a clone of `00a3daa0` with only `src/gov/store/loader.py` and `src/gov/re
   code and with the code before it, so it may be the sandbox's as the others, or a reading of S6 the change does not
   meet; `gov accept` outside the sandbox tells which.
 
+
+## S7 to S10: the stated links (DEC-1072 (1), DEC-1073 (2), DEC-1074 (5); re-pin window 4)
+
+Built from the prototype `w2/W2-92-proto` (`e884675b`, the measured reference), on `w2/W2-92` at `5a9e36c07571`
+(today's `w2/integrate`); the code commit is `21623ae258a1`. Built to the KPI text; the engineer has not read
+`tests/acceptance/W2-92/`.
+
+- **S7, `store/loader.py`:** `register_statements(text, entries=None)` is the census's §1 (its labels, free text and
+  change log, every class, its form strings and its de-duplication), public, for `gov links` (W2-129) to import.
+  `_stated_links` turns the front-matter keys (`sources`, `closes`, `decisions`, `decisions_applied`,
+  `decisions_carried`, `decisions_recorded`, `decisions_read`, `requirements_implemented` as CITES; `task` as OF_TASK;
+  a W2 id through `wbs_id`/`external-ref`) and the register's statements (under → UNDER; a supersession naming ids
+  alone → SUPERSEDES; every other supersession or amendment → AMENDS) into rows of `stated_links (type, source,
+  target, via)`: both ends records, none `edges` holds with the same type. The table is outside the digest and part
+  of `seed.schema_version()`, so old warm bases are refused and a full rebuild is needed (`loader.py` is in the code
+  fingerprint). `edges`, the closure and `gov dangling` are untouched. `_load` fills its tables by name.
+- **One for one with the census:** `tests/unit/store/test_w2_92_links.py::test_this_repositorys_register_statements_are_the_censuss_one_for_one`
+  runs the census's own §1 code from `docs/research/D4B-link-census.py` and compares: 3,171 statements on this
+  repository's register, equal as lists (same order, same fields). The rows from HEAD: CITES 1,679, OF_TASK 381,
+  UNDER 2,481, AMENDS 388, SUPERSEDES 7.
+- **S8, `graph_route.follow` and `retrieve.py`:** from what the record route or the closure reached, one hop: the start
+  records' changers, what they cite, stand under or record the work of, then the changers of those and of the other
+  reached decisions, then what the other reached records cite; at most `FOLLOW_RECORDS` = 12 records,
+  `FOLLOW_CHUNKS` = 2 chunks each, appended after today's closure chunks. The closure facet names `followed`
+  (records, left) and `changed_by`; a store without the table names `stated_links` there and gives today's closure.
+  No start id: no hop, the closure facet absent as today.
+- **One difference from the prototype, to meet S4, S7 and failure line 1:** the prototype added the stated whole
+  supersessions to `edges` inside `retrieve` (so W2-87's authority order and what is current moved, for questions
+  naming no record too). Here the links never reach `edges`, `not_current` or the authority order; a whole supersession
+  the links state is shown as not in force (S9) and nothing else. The prototype's 67/79 was measured with the
+  addition; the 7 SUPERSEDES rows are its whole effect, so the CTO's DEC-1071 measure is the check.
+- **S9, `retrieve.py`:** each register evidence item carries `entry` (the entry's id), `status` (its status word),
+  `changed_by` (its changers by the stated AMENDS and SUPERSEDES links and the SUPERSEDES edges, newest first, possibly
+  empty) and `in_force`; one not in force (PROPOSED, REJECTED, WITHDRAWN, SUPERSEDED, DEPRECATED, or superseded whole
+  by an edge or a stated link) adds `not_in_force` with the reason. An item over several entries (a parent) adds
+  `also`, one such mark per further entry. A record file not in force (not a record of work) carries `status`,
+  `in_force` False and `not_in_force`. The marks are keys of the evidence items, never new top-level keys; the text is
+  unchanged. CONDITIONAL and DONE are shown and not marked not in force (the KPI names four words).
+- **S10:** `docs/research/W2-92-proto-drift.py` is the prototype's, reading the register through
+  `register_statements` in place of its copy of the census's patterns; `docs/research/W2-92-memory-measure.md` §10
+  holds the definitions, the command and the table for the CTO's figures on the rebuilt store, with the engineer's
+  `--from-head` reading beside it (before 0, after 190 of 190).
+- **Unit runs (the launch sandbox, `HOME` an empty folder, stand-ins only):** the two new files, 21 passed. Both whole
+  folders `tests/unit/store tests/unit/retrieval` through `heavy_slot.sh` with `-m "not local_only" -k "not real and
+  not green_here and not time_limit"`: **390 passed, 0 failed, 293 deselected** (255 s). Left out besides the
+  exclusion: `tests/unit/retrieval/test_w2_112_shared_reranker.py`, whose stand-in service waits on its GPU lock in
+  `/tmp` (`rerank_worker.py`, `GOV_RERANK_GPU_LOCK_DIR`), read-only in the sandbox; this change touches no reranker
+  file. The scoped set from `select_tests.py`: the CTO's, outside the sandbox.

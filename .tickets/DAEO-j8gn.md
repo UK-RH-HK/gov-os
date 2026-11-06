@@ -1,6 +1,6 @@
 ---
 id: DAEO-j8gn
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -107,3 +107,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-12), as approved (DEC-729). The list row
   - A `Decided-by` trailer alone, on a commit not in the owner's pushed ref, never counts as the owner's (DEC-862 (c): never, it fails open).
   - `gov approve` run from an agent's Bash call, piped input included, commits nothing.
   - A `Role: owner` trailer on a commit made inside an agent's call is a containment finding, not an approval.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

@@ -1,15 +1,25 @@
+# volatile: its answer changes with ordinary work (DEC-1069 (6)); gold as at cc9c94d42a54
 # Lens B's Q14 (Table 2): "The nine dependents (0mab, 6n5k, h4rh, j8gn, nn1s, rd0g, u4oz, yadm, zqvn)": the answer
-# needs all nine, so each dependent's depends_on line naming DAEO-ym8a (W2-03) is its own entry. Still nine at the
-# commit.
+# needs all of them, so each dependent's depends_on line naming DAEO-ym8a (W2-03) is its own entry.
+# Re-labelled by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-WRONG, R7-MISSING-PIECE and R3-AMBIGUOUS),
+# checked blind at the commit by a session independent of the retrieval work (every ticket's front matter read).
+# The gold answer said nine, but at the commit 13 tickets list DAEO-ym8a in depends_on: the nine, plus DAEO-2bdu
+# (W2-88), DAEO-arrl (W2-55), DAEO-n0wb (W2-92) and DAEO-s9qc (W2-87, closed). The four had no entry, so full
+# evidence was scored without them; each now has its own. DAEO-rd0g's line is now 19 (the heading governs). The
+# question is kept (Table 2's command). Its "depend on" is settled in the gold answer: depends_on is the governed
+# field. DAEO-2d6f, a child of W2-03 (parent DAEO-ym8a) with no depends_on, depends on it only through tk's deps,
+# and is named as outside it. The label before is in ../retired/q14-pre-dec1069.yaml.
 id: Q14
 category: ticket
-commit: 23079f92a6fa
+commit: cc9c94d42a54
 ticket: DAEO-ym8a
 radius: 1
 question: Which tickets depend on W2-03?
 gold_answer: >-
-  Nine tickets list DAEO-ym8a (W2-03) in depends_on: DAEO-0mab, DAEO-6n5k, DAEO-h4rh, DAEO-j8gn, DAEO-nn1s,
-  DAEO-rd0g, DAEO-u4oz, DAEO-yadm and DAEO-zqvn.
+  Thirteen tickets list DAEO-ym8a (W2-03) in depends_on: DAEO-0mab (W2-24), DAEO-2bdu (W2-88), DAEO-6n5k (W2-37),
+  DAEO-arrl (W2-55), DAEO-h4rh (W2-27), DAEO-j8gn (W2-12), DAEO-n0wb (W2-92), DAEO-nn1s (W2-46), DAEO-rd0g (W2-15a),
+  DAEO-s9qc (W2-87, closed), DAEO-u4oz (W2-04), DAEO-yadm (W2-34) and DAEO-zqvn (W2-13). Outside depends_on,
+  DAEO-2d6f, a child ticket of W2-03 (parent DAEO-ym8a), names it only in tk's deps.
 sources:
   - path: .tickets/DAEO-0mab.md
     heading: "- DAEO-ym8a"
@@ -28,7 +38,7 @@ sources:
     lines: [20, 20]
   - path: .tickets/DAEO-rd0g.md
     heading: "- DAEO-ym8a"
-    lines: [18, 18]
+    lines: [19, 19]
   - path: .tickets/DAEO-u4oz.md
     heading: "- DAEO-ym8a"
     lines: [19, 19]
@@ -38,3 +48,15 @@ sources:
   - path: .tickets/DAEO-zqvn.md
     heading: "- DAEO-ym8a"
     lines: [19, 19]
+  - path: .tickets/DAEO-2bdu.md
+    heading: "- DAEO-ym8a"
+    lines: [18, 18]
+  - path: .tickets/DAEO-s9qc.md
+    heading: "- DAEO-ym8a"
+    lines: [18, 18]
+  - path: .tickets/DAEO-arrl.md
+    heading: "depends_on: [DAEO-ym8a]"
+    lines: [17, 17]
+  - path: .tickets/DAEO-n0wb.md
+    heading: "depends_on: [DAEO-s9qc, DAEO-ym8a]"
+    lines: [17, 17]

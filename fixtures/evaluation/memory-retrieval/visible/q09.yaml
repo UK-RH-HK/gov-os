@@ -12,8 +12,11 @@
 # included. Left out: DEC-004's entry (it states "≤ ~6k tokens (tunable)" but is PROPOSED, settled by DEC-086, which
 # does not state the size; the Contract carries the rule) and the code (it carries the rule out; no line of it states
 # the rule).
+# Category changed by the owner's DEC-1069 (1) (2026-11-04; the audit's R10-CATEGORY, its top change 7), checked blind
+# at cc9c94d42a54 by a session independent of the retrieval work: `ticket` to `contract`, as the Contract governs
+# the answer. Nothing else changed; the label before is in ../retired/q09-pre-dec1069.yaml.
 id: Q09
-category: ticket
+category: contract
 commit: 68ce354a74c7
 ticket: DAEO-u4oz
 question: How large may the context packet be?

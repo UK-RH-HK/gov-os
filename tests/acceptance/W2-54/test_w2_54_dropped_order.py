@@ -192,12 +192,21 @@ def none(box):
 
 
 def test_an_empty_retrieval_result_gives_one_packet(box, none):
-    """The context's lookup finds nothing (``gov retrieve`` of the ticket's title gives no evidence either): two
-    computations, in processes with two hash seeds, give one packet and one hash, with nothing supplementary,
-    nothing read, nothing left and nothing in ``dropped``."""
-    found = S.gov(box, "retrieve", "--json", "--root", none, S.NONE_TITLE)
+    """The context's lookup finds nothing (no document the index holds has a word of the ticket's title, so
+    ``gov retrieve`` of those words gives no evidence either): two computations, in processes with two hash seeds,
+    give one packet and one hash, with nothing supplementary, nothing read, nothing left and nothing in ``dropped``.
+
+    Rewrite-Reason: DEC-1074 (6): a ticket's sources now legitimately bring a record (W2-92 S8). The premise asked
+    ``gov retrieve`` the ticket's title itself, which names TK-W254-NONE by its title: under W2-92 S8 the record
+    route reaches the ticket and one hop brings its source, the big charter, so that question is no longer empty.
+    The premise now asks the title's words in another order: a question that names no record (a title is found
+    whole) and whose every word is asked of the index, so it is empty today and under S8 alike exactly when no
+    document holds a word of the title. What the case asserts about the packet is unchanged."""
+    asked = " ".join(reversed(S.NONE_TITLE.split()))
+    assert asked.casefold() != S.NONE_TITLE.casefold(), "premise: the question would name the ticket by its title"
+    found = S.gov(box, "retrieve", "--json", "--root", none, asked)
     assert found.envelope().get("ok") is True and found.envelope()["result"].get("evidence") == [], \
-        f"the fixture is wrong: the project holds evidence for {S.NONE_TITLE!r}\n{found.describe()[:1500]}"
+        f"the fixture is wrong: the project holds evidence for {asked!r}\n{found.describe()[:1500]}"
     budget = S.room_for_all(box, none, S.NONE_TICKET)
     first = S.packet_of(S.context_run(box, none, S.NONE_TICKET, "--budget", budget, env=_seeded(box, "base")))
     second = S.packet_of(S.context_run(box, none, S.NONE_TICKET, "--budget", budget, env=_seeded(box, "shuffle")))

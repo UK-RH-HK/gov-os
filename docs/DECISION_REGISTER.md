@@ -12631,6 +12631,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 ### DEC-1009 — W2-61h's P-W2-61h-1 (a); the CTO's return watcher retired for the dispatcher's inbox (delegated)
 - **Status:** ACCEPTED (orchestrator, delegated: a P2, older tests revised under an approved decision by the same role, DEC-957; a tools-lane change) · **Under:** DEC-954 Q9a, DEC-995, DEC-1007
+- **Amended:** by DEC-1069 (4) (owner, 2026-11-04): the set grows to about 40 per half; the visible half is no longer only lens B's 20 and W2-61h's 4.
 - **Decision:** (1) P-W2-61h-1 (a): W2-61h's paths gain W2-61's visible-half, baseline and scores cases and README; its fresh test designer revises the four cases that assume 20 visible questions (lens B's 20 still required exactly; nothing lowered). (2) `lead_return_watch.sh` is retired: it marked returns seen before the dispatcher could put them in its inbox (W2-61h's return of 20:06 was missed by the inbox that way). The CTO wakes on `tools/inbox_wait.sh`, which only reads the inbox; the 30-minute stale-inbox alert is the net.
 
 | Version | Date | Change |
@@ -13166,8 +13167,561 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Decision:** (e) **Re-pin window 3 now**, before anything else and not after the floor (the product 38 of 48 against the pin's 25; D-5 to D-9 work on it): built at integrate's head, rehearsed end to end (DEC-1057), the integration store rebuilt with `embed_headers` on as part of it; the reranker's memory release waits for window 4 (the padded bound keeps it near 4.6 GB). The CTO confirms the pinned gov still searches correctly with `retrieval.yaml` and `rebuild.yaml` on the main tree, or takes them off until the re-pin. (a) **The reranker trial:** one ACT for the operator with **mxbai-rerank-large-v2** and **Qwen3-Reranker-4B in 8-bit** as a second candidate (each one's licence, size and GPU fit within the budget, rehearsed, with a rollback); the visible half chooses; with the padded bound; the GPU peak and the speed alone and with 10 and 20 searches at once, beside today's reranker, under the GPU safety rules. (b) **The embedder:** a separate trial after the reranker's decision, measured the same way. (c) **h02 and h24:** the owner's operator corrects them acting as the independent checker (a blind redo of the check, the corrections and the retired copies written by itself, outside the guard); nothing about them reaches the CTO's session. (d) **Q16's rewording kept**, the old one on record. (f) **Class 3 gains a force-stop:** if the reranker does not stop within 30 s of SIGTERM, SIGKILL. **No install for the hit:** the five index-time methods the research named (a file-level index; code chunks cut on definitions; the reverse `depends_on` edge; identifier tokenisation; one span per register entry), each measured on the visible half and kept only if it wins; the reranker's memory release after each request (W2-112's code) built for window 4. The CTO finds why `core.bare` turned true at 00:31 and reports the cause and the fix. **An audit of the 48 questions:** (1) an independent session (not the retrieval work's) drafts a rubric for a good measure question from W2-61's KPIs, DEC-1009, DEC-1060 and DEC-1067 (c) (at least: correct today and from the governing source, never a superseded decision; gold sources in what memory searches by meaning after M-4, or the question says it is a keyword question; unambiguous and answerable as asked; the kind agents really ask; the set spread across code, decisions, tickets, the plan and the Contract); (2) it applies it to the 24 visible; the hidden 24 are checked by W2-61h's role under the hidden-half rule (read-only; ids, rubric items and reasons in general terms only); (3) the result to the owner (per question the items failed and why; how many depend on keyword-only locations; the recommended changes); nothing changes until the owner decides; a label changes only where wrong, never to fit a result; (4) the work does not wait: the re-pin, the reranker trial (after the operator's install) and the index-time methods go on in parallel; every run keeps its per-question ranks so a result can be re-scored after an approved label change without running again; GPU work takes turns, one at a time, under the GPU safety rules.
 - **Basis:** question 1 (memory: the sessions should run the product that scores 38, not the pin's 25) and question 2 (a measure whose questions are wrong or keyword-only misjudges memory; GPU work in turns fails safe).
 
+### DEC-1069 — D4B-AUDIT decided: every recommended label fix; the set grows to about 40 per half (DEC-1009 amended); R5's thresholds and two new rubric rules; the merges; the reranker trial approved, all three candidates run in turn; a standing model bench
+- **Status:** ACCEPTED (owner, 2026-11-04 ~13:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1068, DEC-1067, DEC-1060, DEC-1009 (amended here), W2-61h's KPIs (amended here) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-AUDIT.md` (`b598288b`), `governance/project/orchestration/packages/ACT-RERANK-TRIAL-1.md` · **Changed by:** DEC-1076 (4)
+- **Decision:** **The labels.** (1) Every recommended label fix is applied: the visible ones (Q14, Q07, Q04 re-labelled; Q13, Q17 re-anchored; the five minor re-words of Q02, Q10, Q11, Q12, Q23) by a session independent of the retrieval work, as for Q16 and Q19; the hidden h03 and h08 by the owner's operator, as for h02 and h24 (a brief like ACT-HLABEL-1). (2) Q04: kept beside Q09 after its re-label (option (a)). (3) Q03's split into two entries confirmed. **The bigger set.** (4) The set grows to **about 40 per half**: **DEC-1009 is amended** (the visible half is no longer lens B's 20 + W2-61h's 4 only), recorded as the owner's. (5) **R5:** each governing domain at least 10 % of each half, no subsystem above 25 %; **W2-61h's category quotas are amended to fit**. (6) **A rubric rule before the new questions are written:** no question whose answer changes with ordinary work (counts of dependents, lists that grow) unless its gold is computed from the repository at the measured head; and **the measure script writes a reason line for every automatic re-anchor**. (7) **The hidden auditor's P2:** test-harness code is never the governing source for a code fact, except for a question about the test harness itself. (8) **The writers:** the visible 16 by a session independent of the retrieval work; the hidden 16 by the owner's operator from the rubric (a brief like ACT-HLABEL-1); then the cross-check as proposed. (9) **Then m6:** the live product with today's 0.6B reranker on the 80, three runs, every search's ranked output kept: the new baseline for the methods and the trial. **The merges.** (10) The retired-README fix and the five methods (each off by default) merge now; the methods' measures follow m6, by DAY.md's rule re-based on m6. **The reranker trial (ACT-RERANK-TRIAL-1).** (11) Approved: the operator's steps 0 to 3 now (the downloads and the trial venv), so the models are ready by m6; the CTO stops the live reranker for the trial's quiet window when no agent's work depends on ranked search, and says when; the choice rule as written, with the 3.0 s median limit. (12) After m6, **all three candidates run in turn, whatever the scores** (the 0.6B with m6's own figures, mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit); no early stop at 95 % or more: the full comparison is wanted; for each: hit@5 and full evidence on the visible half (it chooses) and the hidden half (reported, never used to choose), the GPU peak, the load time, the time per search alone and with 10 and 20 searches at once, and any failure; adoption follows the choice rule (running a model is not adopting it); the result to the owner. (13) **A standing model bench:** the harness and its commands kept, so any future reranker or embedder is measured the same way; the embedder trial (Qwen3-Embedding-4B) follows the reranker's decision, recorded the same way. **All GPU work takes turns, one at a time, under the GPU safety rules.** The operator's three briefs (h03 and h08; the hidden 16; the trial's steps 0 to 3) go to the owner in one message, in the order they should run.
+- **Accepted later (owner, 2026-11-04 ~15:20, in the chat):** the hidden 40's category table ends one short in each of the decision, callers and code-paraphrase categories (16 slots could not meet quotas needing 17); every governing domain reaches at least 4 of 40.
+- **Amended:** by DEC-1070 (owner, 2026-11-04 ~18:40): (12) stops after the 0.6B (T2); mxbai-rerank-large-v2 and Qwen3-Reranker-4B wait for the recall work and the 0.6B's new record; (13)'s embedder trial waits likewise.
+- **Basis:** question 1 (memory: a finer, wider and correct measure decides the methods and the models) and question 2 (a label never changes to fit a result; GPU work in turns fails safe).
+
+### DEC-1070 — The holistic report decided: the trial stopped after T2; three question sets with three jobs; the recall work in one fix before any new method; hit@5 then MRR as the written choice rule; Q07 and Q14 re-worded; labels audited on a schedule only
+- **Status:** ACCEPTED (owner, 2026-11-04 ~18:40, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1069 (amended here), DEC-1068, DEC-1067, DEC-1009, DEC-1060 · **Source:** the CTO's holistic report in the chat (2026-11-04 ~18:20), recorded in `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md` · **Changed by:** DEC-1074 (1)
+- **Decision:** **First, now.** (1) The reranker trial stops after T2: no mxbai-rerank-large-v2 and no Qwen3-Reranker-4B until the recall work is done and the 0.6B has its new record; the live reranker restored at once (T6) and ranked searches confirmed; the trial's venv and downloads kept as they are for later. **The question sets: three jobs from now on.** (2) **The visible 40 are the tuning set:** methods are tried and chosen on it. (3) **The hidden 40 are the check on the tuning:** reported in counts only, never used to choose; a method that helps the visible half but not the hidden half is suspect. (4) **A new measurement set:** written fresh, blind, by the rubric, by a new writer, outside every tree; never used to choose or tune; measured only at decision points (before a re-pin); its figure is the verdict on memory. The CTO proposes its size (at least 40) and the brief for the writer: a new session the owner opens, outside the CTO's system, used only for this. (5) **Memory is reported at every decision point as three figures:** the tuning set, the hidden check, and the measurement set once it exists. The honest reading of memory today is nearer the hidden 72 % than the visible 90 %. **The recall work, in one fix.** (6) **A recall diagnosis** of every never-retrieved question and of the misses beyond the 20 that reach the reranker (ranks 22 and 40 among them); the hidden half by W2-61h's role, in kinds only. It includes the closure route's unranked set: whether it crowds the fusion or cuts gold chunks out of the 20. (7) **Then generic fixes** that help any question (candidate depth, how the routes and the closure enter the fusion, coverage), never fixes aimed at named misses; each is chosen on the visible half and checked on the hidden half. No new method is chosen on the visible half alone until the diagnosis is in. (8) **Then the 0.6B re-measured with the fixes**, on the tuning sets and the new measurement set: its new record. **How choices are made.** (9) **The finer choice measure:** hit@5, then the mean reciprocal rank of the first gold source, from the kept ranks; recorded as the written rule before any further choice, for the methods and for the rerankers when they return. (10) **The rerankers come back only after the 0.6B's new record:** chosen on the tuning sets with that measure, confirmed on the measurement set. (11) **The index-time methods (M1 to M5):** judged as written (DAY.md's rule on m6, with (9)'s tie-break), and each also confirmed on the measurement set before window 4, so a gain on the tuning set alone cannot carry it. **The questions themselves.** (12) **A blind phrasing audit** on both halves, counts only. (13) **Q07 and Q14 re-worded to stable facts** (R11), by an independent session. (14) **A standing rule:** labels are audited on a schedule, all questions at once, never because a question missed.
+- **Accepted later (owner, 2026-11-04 ~19:10, in the chat):** (4) the measurement set is **60 questions**, as the CTO proposed in ACT-MSET-1; its "about 75 %" is only the assumption behind the precision figure, not an expectation: **the target is unchanged, 95 % hit@5, with 85 % the floor, and it is to be achieved** (stated in ACT-MSET-1 before the writer reads it). The path-map line declaring `memory-verdict` (its hidden glob; every role but the orchestrator refused) is approved. **The order stands:** the recall diagnosis and its generic fixes; then the 0.6B re-measured on the tuning sets and the measurement set; then the rerankers (mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit) trialled the same way; then the results to the owner, who decides.
+- **Basis:** question 1 (memory: a verdict from a set never used to choose, and recall fixed before ranking is tuned) and question 2 (selection pressure from named misses fits the tuning set; the hidden half and a fresh set keep the figure honest).
+- **Amended:** by DEC-1071 (owner, 2026-11-04 ~22:00): (7)'s and (9)'s choice for structural fixes is judged on all 80 together; (8) and (10) wait for the halves' agreement within 3 points.
+- **Amended:** by DEC-1074 (1) (owner, 2026-11-05): the visible 40, the hidden 40 and the spent 60 are tuning or diagnostic sets; only a fresh set gives a verdict.
+
+### DEC-1071 — Structural fixes only, judged on all 80; consistency across the sets as the proof; then the measurement set once; then all three rerankers; the nonexistent-id question scored apart
+- **Status:** ACCEPTED (owner, 2026-11-04 ~22:00, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1070 (amended here), DEC-1067 (b) (amended here for structural fixes), DEC-1009 · **Source:** the owner's message after stage A (`.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md`, stage A's result) · **Changed by:** DEC-1074 (4)
+- **Decision:** (1) **Fixes are structural, never per question.** The diagnosis goes beyond why each question missed, to what in memory's structure causes misses of each kind across the whole memory:
+  - **chunking:** code cut away from its definition; answers that are one list item, table row, field or line; long diluted chunks; split sections;
+  - **embedding:** what is embedded and how (headers, duplicated or generated copies);
+  - **ranking:** the routes' depth, the cuts, the fusion, the pool the reranker sees, the authority lift;
+  - **the graph:** supersession and citation hops, the closure, dependents.
+
+  It is written as one **structural review**: each weakness, the evidence across both halves in counts, and the fix that would apply to the whole memory. Fixes aimed at named misses stay forbidden. The review comes to the owner before the fixes, with the plan and order.
+
+  (2) **The rule for structural fixes:** judged on **all 80 together** (hit@5, then MRR), with the hidden half reported in counts only. A fix is adopted if the 80 do not fall and **the gap between the halves does not widen**. On that rule stage A is re-judged: v4 (the meaning route uncut, routes 60 deep, 40 reranked) with v5 and v6, three runs.
+
+  (3) **The proof of the structure is consistency:** the 0.6B must score the same on different question sets, within 2 to 3 points; today visible 90 % and hidden 72.5 % are not consistent. The structural fixes are worked until **the two halves agree within 3 points**. Then the new set of 60 is measured once, as the confirmation. If it agrees too, that figure is the 0.6B's honest record on a sound structure, whatever it is. If it does not, the CTO reports to the owner before anything else.
+
+  (4) **Only then the reranker trial:** the 0.6B, mxbai-rerank-large-v2 and Qwen3-Reranker-4B in 8-bit, all three, on the same three sets, each recorded for hits, speed and quality, beside each other; the owner decides from that record.
+
+  (5) **The nonexistent-id question** passes when the product stops with `UNRESOLVED_IDS` naming that id, and is scored apart from hit@5, for h24 and the measurement set alike.
+- **Amended:** by DEC-1074 (4) (owner, 2026-11-05): (3)'s consistency bound becomes within 5 points, on sets of about 80.
+- **Basis:** question 1 (memory: a structure that serves any question scores alike on any set) and question 2 (a fix aimed at a named miss fits the set it was aimed at).
+
+### DEC-1072 — D4B-STRUCTURE's order stands; steps 5 to 7 as prototypes only; step 7 widened to every stated link, with a drift count; memory-building a Gov OS practice for every adopted repository's Wave 0
+- **Status:** ACCEPTED (owner, 2026-11-04 ~22:15, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1071, DEC-1070 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-STRUCTURE.md` (`33ba2842`)
+- **Decision:** **The order of D4B-STRUCTURE stands.** Steps 5 to 7 are approved as **prototypes in measure clones only**, each coming back to the owner with its figures before any product change. Steps 2 onward go on; the stand-by ends.
+  - **(1) Step 7 widens from decisions to every link the repository states.**
+    - **First a census:** each kind of relationship stated in records, front matter, commit trailers and text, against the edges the graph holds, in counts. The kinds include:
+      - a decision supersedes, amends or cites a decision;
+      - a ticket implements or depends on a decision;
+      - commits' `Task:` and `Implements:` trailers;
+      - a capability and its provider tickets;
+      - a KPI and its tests;
+      - a role and its skills;
+      - a lesson and the failure or decision it came from;
+      - any others found.
+    - **Then the prototype** builds the missing kinds the evidence supports, measured as before.
+    - **The report** says what an agent could not follow before and can now. It also says how many decisions an agent could today retrieve as current although the register says they are superseded or amended: that matters for drift, whatever it does to hit@5.
+  - **(2) Memory-building becomes a Gov OS practice for every adopted repository's Wave 0.**
+    - The ticket that owns adoption memory is found (W2-127 is the sandbox's access to the shared services, as far as the owner recalls); if none fits, one is proposed.
+    - Either way, everything learned so far is written into it now, and kept up to date as D-4b goes:
+      - how the store is built (chunking, embedding, headings, links);
+      - how it is measured (the rubric, the three sets and their jobs, the independent writers, the hidden-half rule, the scoring);
+      - how it is tuned (structural fixes only, judged on all sets, consistency as the proof);
+      - every method tried, with its figures, adopted or not, and why;
+      - the lessons: the overfitting to the visible half, labels checked because questions missed, the GPU trips.
+    - After the refactoring it becomes a kernel skill.
+- **Basis:** question 1 (memory: an agent follows what the repository states, and is not handed a superseded decision as current) and question 2 (a practice learned once is kept for every adoption).
+
+### DEC-1073 — The structure finished before the measurement set's single use; drift's definitions; M5 retested with the register links; waits and stops by process id only; link integrity as a Gov OS capability, as one package first
+- **Status:** ACCEPTED (owner, 2026-11-04 ~23:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-04)`) · **Under:** DEC-1071, DEC-1072, L-0075, DEC-1052 · **Source:** `.gov-runtime/scratch/orchestrator/drafts/d4b/DAY.md` (v456 and the halves' agreement), `docs/research/D4B-link-census.md` (`3d1c459e`)
+- **Decision:**
+  - **(1) The measurement set's single use is held until the structure is final.** D4B-STRUCTURE's steps 2 and 4 to 7 are measured first, each under DEC-1071's rule on the best structure so far:
+    - the reranker shown title and section;
+    - one place per identical text;
+    - the heading and answer-unit prototypes;
+    - the graph links.
+
+    If the halves still agree within 3 points after them, the 60 are used once on that final structure; if they drift apart, it goes to the owner first.
+  - **(2) Drift: the register is the authority.**
+    - The 110 decisions the archive calls spent while the register lists them as current go into a separate list for a status reconciliation. They are not counted as drift for now.
+    - A PROPOSED decision is not in force and does not count as current. Retrieval must show its status, so no agent takes it as a rule.
+  - **(3) M5** (one span per register entry) gets one more test, combined with the register links once they are built.
+  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper.
+  - **(5) Link integrity becomes a Gov OS capability,** for this repository and every adopted one. The census shows drift comes from links nobody is required to record and nothing checks. It has three parts:
+    - **(a) Clean up what is here:**
+      - the 215 drifting decisions, the 87 with no hint in their own entry first;
+      - tickets linked to the decisions they cite;
+      - commit trailers linked;
+      - the status conflicts.
+
+      The CTO proposes when. The owner's suggestion is right after the graph links are adopted, since they fix much of it automatically.
+    - **(b) A mechanism that spots it from now on:** one tool, cheap and incremental, used by the CTO now and by the Wave 3 orchestrator. It finds every unlinked or contradicted record across the whole repository and its memory, not only decisions:
+      - a decision changed without a mark on it;
+      - a ticket, commit, KPI, test, role, skill, lesson or plan line that cites an id it does not link, or an id that does not exist;
+      - a status that disagrees between two records;
+      - a PROPOSED record used as a rule.
+
+      Each finding names the role responsible and is fixed straight away. It must pass DEC-1052's basis: cheap, no new gates or ceremony.
+    - **(c) Prevention at the source:** every role that records decisions, tickets, commits or other records has, in its skill and brief, the template showing how to record each link (front-matter fields, trailers, Changes and Changed-by lines), so links are made when the record is written. These roles are the orchestrator, leads, product-spec, engineers, test designers and auditors. The owner's suggestion is D-5, with the templates per session kind.
+
+    **The wider look first:**
+    - every kind of record and link in the repository and in memory;
+    - which existing tickets must change (W2-88, W2-92, D-5's templates, and any others);
+    - which new tickets are needed, with their specs and KPIs, built in the normal flow (independent tests first).
+
+    It comes to the owner as one package, with the timing for (a), (b) and (c), before anything is built.
+- **Basis:** question 1 (memory: a link recorded when a record is written, and checked cheaply, keeps every agent on the current rule) and question 2 (a measurement used once must measure the final structure).
+
+### DEC-1074 — The night's result decided: 67.8 % the 0.6B's honest figure; every used set now tuning or diagnostic; the 60's misses classified before the next lever; a new verdict set of 80; consistency within 5 points; v456 and the stated links approved for window 4; W2-54's premise rewritten; LINK-INTEGRITY adopted; the open items
+- **Status:** ACCEPTED (owner, 2026-11-05 morning, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1071, DEC-1072, DEC-1073 · **Changes:** DEC-1071 (3) (the consistency bound, item 4), DEC-1070 (2)-(4) (the sets' jobs, item 1) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MORNING-2026-11-05.md` (`7f5a80b7`), `LINK-INTEGRITY.md` (`23610a2e`) · **Changed by:** DEC-1076 (1)
+- **Decision:**
+  - **(1) 67.8 % is recorded as the 0.6B's honest figure on this structure:** v456 + the stated links, 40/59 on
+    `memory-verdict`.
+    - **The owner's reading:** the gap is mainly both halves having become tuning sets since DEC-1071 (every fix
+      judged on all 80, the hidden misses guiding the levers), with vocabulary a smaller part. The hidden half and the
+      new set are almost equally far from their answers (0.43 against 0.41), yet score 84.6 % against 67.8 %.
+    - **From now on** the visible 40, the hidden 40 and the spent 60 are tuning or diagnostic sets. Only a fresh set
+      gives a verdict.
+  - **(2) The assessment first.**
+    - The spent 60 become a diagnostic set.
+    - An independent role classifies their 19 misses by kind (never retrieved; retrieved but ranked below 5;
+      vocabulary; other), in kinds and counts.
+    - The result goes to the owner with the CTO's recommendation for the next lever: mostly ranked low, the reranker
+      trial next; mostly never retrieved, the embedder and phrasing first.
+    - **Nothing is tuned or trialled until the owner decides.**
+  - **(3) In parallel, a new verdict set of 80 questions,** by a new writer, blind, by the rubric, with an independent
+    cross-check, as for the 60. The CTO gives the owner the writer's brief and its folder's settings. It is used only at
+    the next decision point, for the next testing and the trial.
+  - **(4) The consistency rule becomes: within 5 points, on sets of about 80** (DEC-1071 (3) changed).
+  - **(5) Approved for re-pin window 4,** in the normal flow with tests first:
+    - v456 into W2-32;
+    - the stated links into W2-92, its KPI text from LINK-INTEGRITY §6.1.
+  - **(6) W2-54's test:** its test designer rewrites the premise of `test_an_empty_retrieval_result_gives_one_packet`,
+    since the links now legitimately bring a record.
+  - **(7) LINK-INTEGRITY is adopted as recommended:**
+    - W2-129 and W2-130 as new tickets, the ticket changes of §6.1 and the timing of §7;
+    - **O1 (A):** no pre-commit hook;
+    - **O2 (A):** the owner decides the 150 ids in one sitting, with the CTO's proposal per id;
+    - **unlinked mentions** in tests, roles, skills, lessons and plans are reported as notices from the start, until
+      (c) gives them a link field.
+  - **(8) The open items go on:**
+    - Q07 and Q14 re-worded to stable facts (DEC-1070 (13));
+    - the visible categories;
+    - the tests' half of the `core.bare` fix;
+    - the MR-1..MR-6 status row.
+- **Basis:** question 1 (memory: a verdict only from a set nothing was tuned on; the next lever chosen from the misses'
+  kinds) and question 2 (a link recorded and checked keeps agents on the current rule).
+
+### DEC-1075 — ACT-MSET-3 and ACT-MSET-4 approved: the verdict set of 80, the failure-memory quota (A), the two session folders, the path-map line for memory-verdict-2; W2-32's S11 as worded; the auditor's read of the spent 60 is DEC-1074 (2)'s
+- **Status:** ACCEPTED (owner, 2026-11-05 ~12:55, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074, DEC-1070, DEC-1069 · **Source:** `governance/project/orchestration/packages/ACT-MSET-3.md`, `ACT-MSET-4.md` (`91c780bf`); `.tickets/DAEO-0pyc.md` (`8c28aa70`) · **Changed by:** DEC-1076 (1)
+- **Decision:**
+  - **(1) ACT-MSET-3 and ACT-MSET-4 approved as written:** the writer's brief for 80 questions, the cross-check's
+    brief, the two session folders (`~/gov-os-writer2`, `~/gov-os-checker2`) with their settings, and the path-map line
+    declaring `memory-verdict-2` in both path maps (every role but the orchestrator refused; measured by the CTO only
+    at the next decision point, counts only).
+  - **(2) The failure-memory quota, option (A):** 4 questions; if fewer can be written without sharing a gold source
+    with an earlier set, the shortfall (at most 2) moves to `decision` (failure-memory + decision = 17).
+  - **(3) W2-32's S11** (v456 as five pool settings in `retrieval.yaml`, absent meaning today's behaviour) is accepted
+    as worded.
+  - **(4) The auditor's read of the spent 60** (an independent auditor in W2-61h's role, kinds and counts only) is what
+    DEC-1074 (2) meant; the path map's refusal of that role for `memory-verdict` stands for every other purpose.
+- **Basis:** question 1 (memory: only a set nothing was tuned on gives a verdict) and question 2 (a set that shares the
+  tuning sets' gold or phrasing would misjudge memory).
+
+### DEC-1076 — The 80 written and cross-checked by the 60's writer and checker sessions (DEC-1074 (3) amended); the writer varies its phrasing by role; D4B-MISSES decided: the reranker trial now, its choice rule on the 79 and the spent 59, then phrasing, then the embedder; extra sources listed by the checker
+- **Status:** ACCEPTED (owner, 2026-11-05 ~13:40, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074, DEC-1075, DEC-1071, DEC-1070 · **Changes:** DEC-1074 (3) (the writer and the checker), DEC-1075 (1) (the folders), DEC-1069 (12) (the trial's choice rule) · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-MISSES.md` (`c44257b2`), `ACT-MSET-3.md`, `ACT-MSET-4.md`
+- **Decision:**
+  - **(1) The same sessions (DEC-1074 (3) amended):** the 80 are written and cross-checked by the 60's writer and
+    checker sessions, not new ones. Their folders stay `~/gov-os-writer` and `~/gov-os-checker`; their settings gain
+    ACT-MSET-3 section 9's denials and the writer's write rule, never a denial of a session's own folder; the owner's
+    operator puts them in place, and the sessions are resumed with `claude --continue` so the settings load.
+  - **(2) The writer's brief** asks it to vary its phrasing from its earlier work: each question asked as a different
+    working role would ask it (an engineer, a test designer, a lead, an auditor, the owner), in plain working words,
+    never echoing a source's wording.
+  - **(3) The next lever (D4B-MISSES (a)):** the reranker trial now, as ACT-RERANK-TRIAL-1 sets it up
+    (mxbai-rerank-large-v2, then Qwen3-Reranker-4B in 8-bit), on the adopted structure (v456 and the stated links), with
+    the 0.6B's figures beside them, under the GPU safety rules and in a quiet window. Then query phrasing as a
+    no-install research prototype; the embedder trial third. Adoption stays the owner's.
+  - **(4) The trial's choice rule (D4B-MISSES (b)), recorded before it runs:**
+    - the sets: the visible 40, the hidden 39 (h24 apart) and the spent 59 (m60 apart), 138 questions together;
+    - a candidate is **eligible** only if its median search alone is at most 3.0 s, no request times out at 10
+      searches at once, and no request shape reaches the GPU budget (14,255 MiB);
+    - an eligible candidate **wins** over the 0.6B if its hit@5 on the 138 is higher, or equal with a higher MRR of the
+      first gold source; and the spread between the three sets' hit@5 (the highest set's per cent less the lowest's)
+      is not wider than the 0.6B's;
+    - recorded side by side for each model: hits per set, MRR, the median search alone and at 10 and 20 at once,
+      timeouts, the GPU peak and the load time;
+    - the verdict comes later, from the new 80, at the next decision point.
+  - **(5) Extra sources (D4B-MISSES (c)):** ACT-MSET-4's checker lists, per question, every other place that states
+    the same answer, as suggested extra sources the writer adds by the rubric; a new item in the rubric's next version
+    (a missing alternative that holds the whole piece is a major R7 fault); the same check for the tuning sets at their
+    next scheduled audit.
+- **Basis:** question 1 (memory: the lever chosen from the misses' kinds, judged on every used set) and question 2 (a
+  label missing a true answer, or a set phrased like its sources, misjudges memory).
+
+### DEC-1077 — D4B-TRIAL-W4 decided: mxbai re-run with its own input template; the 4B not adopted now, and measured at 24 candidates; the reranker off as a measured control; a research and discovery survey; the memory's invention disclosure
+- **Status:** ACCEPTED (owner, 2026-11-05 evening, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1076, DEC-1074 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-TRIAL-W4.md` (`5a9e36c0`)
+- **Decision:**
+  - **(a) a1:** mxbai-rerank-large-v2 is re-run with its own input template applied, rehearsed on a stand-in first,
+    under DEC-1076 (4)'s rule.
+  - **(b) b1:** Qwen3-Reranker-4B in 8-bit is not adopted now. **b2, in the same quiet window:** the 4B reranking 24
+    candidates instead of 40, on the 138 under the same rule, with its speed alone and at 10 and 20 at once and its GPU
+    peak.
+  - **(c) In the same window,** the 138 with the reranker switched off on today's adopted structure (the fused order
+    alone), so the reranker's net contribution is known: hits, MRR, and how many answers it lifts into the top 5 and
+    how many it pushes out. The three results come to the owner side by side with today's 0.6B.
+  - **(d) A research and discovery session, now,** read-only, no installs, web research within its allowlist: the
+    rerankers that fit this machine; how other memory systems build, recall, fuse and rerank, with their reported hit
+    rates and what each was measured on; what each component is for and where ours may go wrong. Then one package to
+    the owner: what to adopt, what not, why, and how much each could raise the hits. Nothing is adopted before the
+    owner decides.
+  - **(e) The CTO writes the memory's architecture as an invention disclosure**
+    (`governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md`), in plain words.
+- **Basis:** question 1 (memory: the reranker's contribution measured before its model is chosen; the design compared
+  with the field) and question 2 (a model judged on a faulty input misjudges it).
+
+### DEC-1078 — The verdict set of 80 (`memory-verdict-2`) ready: the writer's checks pass, the cross-check closed after two rounds; unused until the next decision point; source families for the rubric's next version
+- **Status:** ACCEPTED (owner, 2026-11-05 evening, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) · **Under:** DEC-1074 (3), DEC-1075, DEC-1076, DEC-1010 · **Source:** the owner's report of the writer's and checker's lines (ACT-MSET-3 section 6, ACT-MSET-4 section 6)
+- **Decision:**
+  - **(1) The set is ready.** The writer's final checks: sources 179, path missing 0, heading on no line 0, heading on
+    more than one line 0; unresolved 0 (179 heading-anchored); 80 new questions, 0 overlapping an earlier set's gold
+    source; categories callers 8, code-paraphrase 7, contract 8, decision 15 of 13, exact-string 8, failure-memory 2
+    of 4, history 2, kernel-template 7, multi-file 6, nonexistent-id 1, plan 8, ticket 8: total 80 of 80, PASS
+    (failure-memory short by 2, moved to `decision`, as quota (A) of DEC-1075 (2) allows). The CTO's own check at
+    `21bbb7e4`, counts only: 80 files, both folders mode 700, 179 sources resolved.
+  - **(2) The cross-check:** round 1, 40 as written, 3 minor fix, 36 major, 1 drop; round 2, 75 as written, 5 major,
+    all missing places that state the answer; the writer added the 7 whole places from the checker's own list,
+    changing nothing else. **No third round** (DEC-1010's two-round rule; the owner's decision). The old copies are in
+    `memory-verdict-2/retired/`.
+  - **(3) The set stays unused** until the next decision point: after the research package (DEC-1077 (d)) and the
+    trial's re-runs. It is measured once, by the CTO, counts only.
+  - **(4) A row for the rubric's next version:** the measure treats a gold source and its generated twins (the
+    Contract's Markdown and YAML, the generated capability and master-rule pages, and any other official copy) as one
+    **source family**, counted automatically, so labels stop chasing copies. With DEC-1076 (5)'s missing-alternative
+    item, it is the rubric's next version; the family rule is code in W2-61's measure (`gov.retrieval.measure`), built
+    in the normal flow with tests first, and the tuning sets are re-scored on their kept ranks once it lands.
+- **Basis:** question 1 (memory: a verdict only from a fresh set, measured once) and question 2 (a label that misses
+  an official copy of its answer misjudges memory).
+
+### DEC-1079 — D4B-LEVERS decided: significance in every comparison; where each miss left the top 5; source families in the measure's code; the lift normalised and the moves bounded, then the three rerankers replayed under equal weights; phrasing; a records-of-work tier as one test; the 0.6B kept, a cascade measured beside the 4B at 24, the best onto the fresh 80; D-5, D-6 and D-9 start
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1077, DEC-1078, DEC-1076, DEC-1052, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-LEVERS.md` (`b3efc98c`, `4dea932f`) · **Changed by:** DEC-1081 (3)
+- **Decision:**
+  - **(b) Now, no GPU:**
+    - **L1:** every comparison from here on reports its gains, its losses and an exact McNemar test.
+    - **L2:** for each of the 31 misses on the 138, where the answer left the top 5: in the reranker's own order,
+      after the authority lift, or after the moves ahead; ids and ranks only.
+    - **Source families (DEC-1078 (4)) built into the measure's code** (a gold source and its official copies counted
+      as one), tests first; then every kept run re-scored, so the comparisons rest on fairer labels.
+  - **(c) After L2:**
+    - **L3:** the authority lift on a per-query normalised score, and the moves ahead bounded. Then the three
+      rerankers (0.6B, 4B, mxbai) replayed from their kept scores under the fixed pipeline, at no GPU cost, so they
+      are compared under equal weights.
+    - **L5 (query phrasing, no model):** go ahead.
+    - **L6 (records of work in a tier below the middle):** one measured test under the rule; adopted only if it wins;
+      it comes to the owner with its figures.
+  - **(a) a1, in this order:** the 0.6B stays in the product. After L3, one quiet window measuring the cascade (the
+    0.6B over 40, then the 4B over the 0.6B's top 12, the 4B's requests bounded at 8 texts or 12,000 padded
+    characters) beside the 4B at 24, on the fixed pipeline. At the decision point, the best one goes onto the fresh 80
+    once, beside the 0.6B. No install until then.
+  - **(d)** Non-commercial rerankers stay excluded. L7 (the embedder): later.
+  - **D-5, D-6 and D-9 start now,** beside the memory work: their agents on the CPU; the memory measures keep the GPU;
+    one GPU job at a time. The next report gives their plan (who, what first, what waits on the owner) and the
+    re-estimated dates for the lift and EXAMIN's copy.
+  - **Standing, restated:** every report to the owner ends with DEC-948's status block; before any compaction the
+    handover records are current in their usual places, committed, and the record branch synced.
+- **Accepted later (owner, 2026-11-06, in the chat):** mxbai-rerank-large-v2 is dropped from everything that
+  remains: closed as measured (76 of 138), and not replayed under the fixed pipeline. From here on the reranker
+  comparisons are among the Qwen3 models only: the 0.6B, the 4B at 24, and the cascade (the 0.6B over 40, then the 4B
+  over its top 12). Its downloads are kept as they are for now.
+- **Basis:** question 1 (memory: comparisons that say whether a gain is more than chance, labels that do not chase
+  copies, rerankers compared under equal weights) and question 4 (the refactoring's remaining steps move beside the
+  memory work, not after it).
+
+### DEC-1080 — P-PERMISSIONS-1 approved with read-only git through `git -C` only; the CTO's command rule (Read and Grep tools, one simple command per call, a line before any prompting command) standing, and in every agent's brief
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; standing) · **Under:** DEC-1058 (P-ACT-SPLIT), DEC-1057, DEC-1052 · **Source:** `governance/project/orchestration/packages/P-PERMISSIONS-1.md` · **Changed by:** DEC-1081 (1), DEC-1082 (0)
+- **Decision:**
+  - **(1) The CTO's own rule, now and from here on:** reading with the Read and Grep tools; one simple command per
+    call; no `cd … &&` chains; before any command that will prompt the owner, one line saying what it does and why.
+    The same rule goes into the brief of every agent the CTO starts in its session (`briefs/EMG-common.md`).
+  - **(2) P-PERMISSIONS-1 approved, with one correction:** only read-only git through `git -C` (`log`, `show`,
+    `diff`, `status`, `rev-parse`, `branch --list`, `ls-files`, `merge-base`); every other git command keeps asking,
+    and `git push` stays denied. The rest as proposed: the read-only commands, `~/.local/bin/gov`, and `cd` into the
+    repository and the worktrees allowed; `rm`, `mv`, `cp` and `mkdir` outside the repository, writes to
+    `~/gov-os-eval`, `~/.local`, `~/.cache`, `~/.config` and `~/.ollama`, GPU and job launches, `curl` and web access
+    keep asking. The settings change is the operator's ACT, rehearsed end to end (`ACT-PERMISSIONS-1.md`).
+  - **(3)** The work resumes as decided.
+- **Basis:** question 4 (the owner's time spent only on prompts that carry a decision) and question 2 (every write
+  outside the repository, deletion, job and network call still asks).
+
+### DEC-1081 — ACT-PERMISSIONS-1 without the eight `git -C` rules; W2-128 (the templates) filed; two more rerankers measured now (gte-reranker-modernbert-base, zerank-1-small); "score once, combine freely"
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1080, DEC-1079, DEC-1076, DEC-974 · **Changes:** DEC-1080 (2) (the `git -C` rules), DEC-1079 (a) (the reranker candidates)
+- **Decision:**
+  - **(1) ACT-PERMISSIONS-1 approved without the eight `git -C` rules** (the CTO uses plain git; the wildcard overlap
+    goes with them). The ACT and its rehearsal are revised to that and handed to the operator.
+  - **(2) W2-128, the templates ticket, approved: filed** (DEC-974).
+  - **(3) Two more rerankers, measured now:** gte-reranker-modernbert-base (149M) and zerank-1-small (1.7B,
+    Qwen3-based). Each one's licence, size and input template confirmed; their downloads an ACT for the operator, with
+    nothing else installed if possible (a needed package is named).
+    - **Score once, combine freely:** each model (the 0.6B, the 4B, gte-modernbert, zerank-1-small) scores every kept
+      candidate list of the 138 once, in one quiet GPU window under the safety rules. Then, at no GPU cost and on the
+      fixed pipeline (after L3), replays of: each model alone; gte-modernbert for code questions and a Qwen model for
+      the rest; cascades (a small or fast model first, a stronger one over its top N); two rerankers in parallel, their
+      scores normalised and merged. The grid is declared before the runs; judged by the rule with McNemar; the speed and
+      GPU memory of any winning combination measured in a real window before it goes to the owner.
+    - At the decision point the best combination goes onto the fresh 80 once, beside the 0.6B. Nothing is adopted or
+      installed in the product before the owner decides.
+- **Basis:** question 1 (memory: the reranker chosen from every candidate that fits, with its cost beside it) and
+  question 4 (scores computed once and combined offline cost the GPU once).
+
+### DEC-1082 — The permissions' missed points accepted and ACT-PERMISSIONS-2 applied; the health check's decisions: the three stopped agents started again, the DEC-999 labels a priority fix, the guard refuses the hidden sets outside the repository to the measured roles, the spill reading investigated, the score-once window after its review
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1080, DEC-1081, DEC-1073, DEC-820 (d), DEC-1052 · **Changes:** DEC-1080 (P-PERMISSIONS-1's premise: the user-level settings allow all; the guard is the check)
+- **Decision:**
+  - **(0) Permissions.** P-PERMISSIONS-1 missed two points, accepted under our threat model: the owner's user-level
+    settings allow every Bash command, Read, Edit, Write and web access, so the project's allow list adds nothing for
+    Bash and its "keep asking" list does not ask; the guard is the real check. ACT-PERMISSIONS-2 (the measure clones
+    and the worktrees as additional directories; `~/gov-os-eval` kept asking as the owner's last check; Read denied on
+    the three hidden folders) is applied by the operator (check 2 of 2, 3 of 3).
+  - **(1) The three agents stopped at 09:36 are started again:** L5 (phrasing), D-6 part 1, D-9's drafter. L5's 427
+    uncommitted lines are reviewed first: continued from if sound, else L5 starts clean; the owner is told which.
+  - **(2) The DEC-999 labels** (the live pin labels register chunks of other entries `DEC-999`): a priority fix,
+    ahead of the levers' work, since an agent citing the wrong decision is drift. First: whether re-pin window 4's
+    builds already fix it; if not, a ticket of its own (an independent test designer, then an engineer), the fix in
+    re-pin window 4.
+  - **(3) The guard and the sets root:** no user-level denies (they would lock out the owner's writer, checker and
+    operator, who must read and write those folders). The root fix instead: the guard refuses the hidden sets outside
+    the repository to the measured roles (engineer, research and the orchestrator) and allows the roles that write
+    and check them; a guard change, an ACT for the operator, rehearsed.
+  - **(4) The dispatcher's spill reading:** why `powershell.exe` fails from WSL ("Exec format error"), and the smallest
+    fix; a WSL setting is an ACT for the operator.
+  - **(5) The score-once window:** the review's findings fixed, a short re-review, then the window, as planned
+    (DEC-1081 (3)).
+- **Basis:** question 2 (the hidden halves refused to every measured role wherever they lie; a wrong citation is
+  drift) and question 4 (prompts only where they carry a decision).
+
+### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c)
+- **Decision:**
+  - **D9-FATES:**
+    - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
+      is applied.
+    - (2) **K9's memory bar:** 85 % hit@5 on the fresh 80, used once, on the pin that carries W2-92, W2-32's S11,
+      W2-131 and the reranker chosen at the decision point. 95 % stays the target. If the bar is missed, S9's
+      options come to the owner.
+    - (3) W2-32's S6 is dropped as overtaken by the levers; R2-F1 goes to the Wave 3 parking list.
+    - (4) W2-15b is out of K9.
+    - (5) W2-128 is in K9; the W2-132 split comes when it is reached.
+    - (6) W2-99's 13 lines go into W2-128 where they concern templates or briefs; the others are retired. The CTO
+      says which.
+    - (7) W1-01b, W2-66b and W2-90c close at D-10's green run.
+    - (8) The six old repair tickets are retired.
+    - (9) W2-42a is the home of DEC-1082 (3)'s guard rule and of G-14's path-map lines.
+    - (10) Exit criterion 5: the CTO brings the proposed wording.
+  - **W2-128's ready check follows DEC-1052:** missing required fields make a ticket not READY, computed by code;
+    only advisory items (est_loc, non_goals) warn. **The `core.bare` tests' half** goes on D-10's red-fix list.
+  - **W2-131's follow-up** (`register.leave_out` keeps a narrowed parent's id): a small ticket of its own, tests
+    first, in re-pin window 4.
+  - **Grid v2** (the reranker given the question) stands, and **grid v3's faithfulness check by ranked outputs** is
+    accepted.
+  - **h23:** the CTO reads `REANCHOR-LOG-hidden.md` (ids and dates only) before asking the checker, and reports what
+    it shows.
+  - **The spill floor:** the CTO proposes the new one from today's readings.
+- **Basis:** question 1 (memory: one bar on a set used once) and question 2 (a ticket's readiness is computed by
+  code, not warned).
+
+### DEC-1084 — D9-FATES §5 decided and the fates applied; exit criterion 5 re-worded; the spill floor 2,048 MiB; the measure re-anchors in memory (a W2-61h line); ACT-GUARD-SETS-1 decided; L5 and an 80-candidate cell measured; the bundle's figures asked
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1083, DEC-1082 (3), DEC-1081 (3), DEC-1079 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md` (v2.1), `packages/ACT-GUARD-SETS-1.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changes:** DEC-1083 (7) (W2-66b and W2-90c)
+- **Decision:**
+  - **D9-FATES §5:**
+    - (1) W2-111 stays open as a LITE test revision outside K9.
+    - (2) W2-55's S1 is re-worded as proposed ("the decisions validator checks domain, status and scope, and names
+      each entry without them (`TAG_MISSING`)"), and W2-55 closes formally.
+    - (3) W2-66b is a red-fix item in D-10. W2-90c stays open as its own ticket, its named run after W2-105 and
+      W2-110 merge.
+    - **The fates are applied now.**
+  - **Exit criterion 5 is approved as worded:** AR-1 to AR-10, each shown once, in order, in the Wave 2 exit run's
+    record (W2-46), and audited in the exit audit (W2-47). The AR lines whose tickets moved to Wave 3 are named as
+    Wave 3 in W2-46's record (DEC-953, DEC-954, W-8).
+  - **The spill floor:** 2,048 MiB, set by the CTO and re-read in a week.
+  - **The measure's anchoring: a W2-61h line, tests first.** The measure re-anchors a set's labels in memory for the
+    commit it measures and never rewrites the sets root.
+  - **ACT-GUARD-SETS-1:**
+    - (1) yes: six refused roles, and `transcripts/**`;
+    - (2) (a): applied right after re-pin window 4. Before that, the CTO's hidden-set tools take the sets root as an
+      argument and open the files in their own code, printing ids and counts only;
+    - (3) diagnostics on spent sets run outside the guard, by the owner's checker or operator, with no exception in
+      the code;
+    - (4) the live worktrees with measured roles get the merge the same day.
+  - **After the grid:**
+    - L5 (phrasing and the term map) is measured on the 138, by the rule;
+    - one more cell: the 0.6B reranking 80 candidates instead of 40, scored in a short window, to show whether a
+      wider pool helps or hurts.
+  - **A question, figures only, from the kept runs, with no GPU.** For the 0.6B and the 4B on the 138:
+    - hit@5, hit@10 and "in the bundle", side by side, per set;
+    - the first call's bundle size in tokens (median and p90);
+    - what a full top 10 would cost, if it is not already sent.
+
+    Nothing is decided on the bar until the owner sees them.
+- **Basis:** question 1 (memory: the bar judged on what agents receive) and question 2 (the hidden halves refused to
+  every measured role).
+
+### DEC-1085 — The memory build finished first; W2-134 filed; the two-reranker cells measured, adoption to the owner; the search-again test; its practice and the end-to-end experiments as packages; the fresh 80 decided after them
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1084, DEC-1081 (3), DEC-1079, DEC-1043 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-SCORE-ONCE.md` (the bundle figures, the live window, version 6's result)
+- **Decision** (the bundle figures change the question: agents already receive 18 or 19 items, so what matters is
+  whether an agent, reading its bundle, answers right and cites the right source). In this order:
+  - (1) **The memory build is finished first.** The CTO lists everything still open in the build itself and
+    completes what is decided before any experiment below. Anything needing the owner's decision goes to the owner.
+  - (2) **W2-134** is filed: the engineer's ticket for W2-61h S8, small, tests first.
+  - (3) **The two-reranker cells** are measured as planned. Adopting one would change DEC-1043's one shared reranker,
+    so adoption comes to the owner.
+  - (4) **Vocabulary: no 4B embedder for now.** The search-again mechanism is tested instead. When an agent's first
+    search does not answer the question, it searches again in different words, then settles as not found. It is
+    tested with two attempts and with three. The test shows how many misses each recovers, at what cost in tokens and
+    time, and how often an agent claims an answer that is wrong (the nonexistent-id questions included).
+  - (5) **If it works,** the CTO proposes how it becomes a practice for the agents (skills, role templates through
+    W2-128, hooks if needed), as a package. Nothing goes into the skills or roles before the owner approves.
+  - (6) **Then the end-to-end experiments, designed as a package, nothing run before the owner approves.** On the 138
+    (tuning), an agent of the kind Gov OS launches answers each question from its bundle. The conditions:
+    - the top 5 only;
+    - the top 10 only;
+    - the top 20;
+    - today's bundle;
+    - all 40 fused and unranked;
+    - each with the search-again practice in place.
+
+    An independent grader checks each answer and its citation against the gold. Accuracy, tokens and time are
+    recorded per condition, with McNemar between conditions. Written before any run: the reader and grader models,
+    the grading rule, the cost in tokens and time, and a proposed K9 bar on end-to-end accuracy.
+  - (7) **Then the owner decides what the fresh 80 is measured on.** It stays unused until then and is measured
+    once: hit@5, hit@10, hit@20, in the bundle, and end-to-end accuracy.
+  - (8) **The cause of the 8,886-token first call** is reported when known.
+- **Basis:** DEC-1084's bundle figures (the first call sends 18 or 19 items, the top 10 always).
+
+### DEC-1086 — S11 re-worded; W2-135, a cap per item; the search-again reader sees the 138; nothing acted on before the owner's go
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1085, DEC-1074 (5), DEC-105 · **Source:** `governance/project/orchestration/packages/LIFT-1/W2-32-S11-WORDING.md`, `packages/LIFT-1/BUNDLE-BUDGET-1.md`, `packages/LIFT-1/D4B-SEARCH-AGAIN.md`
+- **Decision:**
+  - **A. W2-32 S11's wording, option (a):** S11's equality line becomes "within 2 of the harness on the 138". Speed is
+    checked against the pin, side by side, in re-pin window 4.
+  - **B. BUNDLE-BUDGET-1, option (a):** the 4,000-character cap per item, filed as W2-135. It is a guard against
+    one-line files only. The bundle's total size is tested separately, in the experiments (E5).
+  - **C. D4B-SEARCH-AGAIN §6, option (a):** the reader sees all 138, with no tools and no transcript kept, and the CTO
+    sees counts only. The 5-question pilot runs first, then the projected tokens and time of the full run are reported;
+    the owner sets the cap then.
+  - **Recorded now, acted on only at the owner's word.** Neither re-pin window 4 nor any experiment starts until the
+    owner has read the CTO's answers to the seven questions asked with this decision (the grid; memory freshness; the
+    links; the emergency plan; the three-layer agent work; the status block; the experiments' order and design) and
+    has decided.
+- **Basis:** DEC-1085 (1), (6) and (7).
+
+### DEC-1087 — SEVEN-ANSWERS decided: the items before re-pin window 4, the parallel-agents test first after it, then the experiments; dependency mapping as a tool in Wave 2; the three layers back in Wave 2
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1086, DEC-1085, DEC-1083, DEC-1074 (7), DEC-954, DEC-953 item 8, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/SEVEN-ANSWERS.md` · **Changes:** DEC-1083 and DEC-1084 (W2-33's layer lines moved to Wave 3, W3-P23: reversed by (13)); DEC-1074 (7) O1 (A) (no automatic refresh: W2-116's refresh after every merge is built now, (3))
+- **Decision:** the re-pin comes only when every item before it is done and tested. Then the owner re-pins window 4,
+  the parallel-agents test runs first, then the experiments.
+  - **Before the re-pin:**
+    - (1) **DEC-1086 carried out:** W2-135, tests first, built and reviewed; W2-32 S11 re-worded and merged.
+    - (2) **Memory current now:** the integration store refreshed with `refresh_integration_store.sh`, so the agents
+      working today get current decisions and tickets, if the CTO confirms it is safe with the pinned code.
+    - (3) **The automatic refresh:** W2-116's refresh after every merge into integrate is built, tested and reviewed
+      before the re-pin, so window 4 puts it live. The daily refresh is re-armed as a backstop. Worktrees are given
+      the integration store's path, so workers can search.
+    - (4) **Automated drift detection:** W2-129 (`gov links`) is built, tested and reviewed before the re-pin, so
+      window 4 puts it live for the agents and orchestrators.
+    - (5) **Dependency mapping as a tool,** integrated with the path map, done in Wave 2 with the W2-116 work. It is
+      registered carefully as a decision and a spec, and scoped with KPI lines, before the re-pin, using the refreshed
+      memory and path map:
+      - when a ticket is filed, a template sets the paths it will write (strict and limited) and the paths it reads
+        (wide, not limited), with the research, specs or other tickets it waits on;
+      - the template feeds the path map, per ticket, in the ticket store;
+      - the tool derives the dependency map from those paths across tickets. A ticket that reads what another is
+        still writing, or waits on unfinished research or a spec, runs after it. Tickets whose writes overlap run in
+        series. The rest may run in parallel;
+      - from that map the tool sets the launch: which tickets run in parallel in one batch, and which wait for a named
+        ticket or batch. It uses the link graph, deterministically. The orchestrator and leads add what the paths
+        cannot show, from memory and the graph, and record it as links.
+
+      The CTO finds its home (W2-116, W2-121's dispatcher, W2-128's ticket template and ready check, or a new ticket)
+      and brings the decision, the spec, the KPI lines and an estimate as one package before the re-pin, with an
+      assessment of whether it is built before the re-pin or right after it.
+    - (6) **The status block:** the countdown and the four lapses fixed now, with SEVEN-ANSWERS §6 (a) to (d) and the
+      sixth line for the emergency plan, from the CTO's next message on.
+    - (7) **A clean tree:** everything committed and the record branch synced. Every worktree is listed with its state
+      (merged and clean, unmerged, uncommitted). Only those fully merged and clean are removed, their branches kept,
+      and the list is shown to the owner. The owner pushes before the re-pin.
+    - (8) **Re-pin window 4 as an ACT** for the owner's operator, rehearsed, carrying all of the above.
+    - (9) **Dates re-estimated** for all of this, the experiments, the lift and EXAMIN's copy.
+  - **After the re-pin:**
+    - (10) **The first test, before any experiment: parallel agents and memory.** Explained, then tested:
+      - agents in parallel worktrees search the shared integration store, and read and edit their own worktree;
+      - whether results carry their commit, so an agent whose branch is behind integrate is not misled by line
+        numbers (or whether worktrees take integrate's latest at launch);
+      - what a search does while the store is being refreshed, and what happens to a continuation after the switch;
+      - that the link graph and the dependency gating are used;
+      - the search time with 10 and 20 agents at once.
+
+      Tested with two agents in two worktrees searching while a merge refreshes the store. Any gap is reported before
+      the experiments start.
+    - (11) **Then the experiments,** in the CTO's order with its improvements: E0 and E0b, E1, the owner's cap, E2, E3,
+      E4, E5, the owner's decisions on the final design and the agents' practices, then the fresh 80. The pilot's cost
+      comes to the owner before E2.
+    - (12) **M3's adoption** is decided only after all the experiments, from what they show about chunking, context and
+      agents ranking the bundle.
+  - **The three layers:**
+    - (13) **They stay in Wave 2, reversing their move to Wave 3.** Straight after the emergency lift, the CTO assesses
+      the Wave 2 tickets that are left, splits them into streams, and closes Wave 2 with the three layers (the CTO as
+      master, a Senior Engineer per stream, its leads and agents), as the trial of their behaviour. The plan comes to
+      the owner as a package, with the streams, the capacity and RAM they need, and how the trial is measured.
+- **Basis:** question 1 (memory as agents use it) and the owner's direction on parallel work.
+
+### DEC-1088 — Dependency mapping decided: `gov plan` (W2-136), the template's `reads:`, `needs:` and `waits_on:`, enforcement at launch; closed tickets are never edited (standing)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; item (6) standing) · **Under:** DEC-1087 (5), DEC-1007 (2), DEC-936 item 3.4, DEC-899, DEC-235, DEC-1052 · **Source:** `governance/project/orchestration/packages/LIFT-1/DEPENDENCY-MAP-1.md` · **Changes:** DEC-936 item 3.4 (the planner's dependency half moves from Wave 3 into Wave 2)
+- **Decision:**
+  - (1) **DEPENDENCY-MAP-1 §2 is approved.** `gov plan` proposes the batches deterministically, and the orchestrator
+    approves them into the ready list, so DEC-1007 (2) holds.
+  - (2) **W2-136's KPI lines, and the lines added to W2-128 and W2-121, are approved,** updated to (3) and (5).
+  - (3) **§5 (b):**
+    - `reads:` stays wide, for information and the `READS_WIDE` warning;
+    - `needs:` lists the paths whose finished state the ticket depends on, and orders tickets together with
+      `waits_on:`;
+    - the template asks for both, and W2-128's ready check refuses a new ticket without them, by name.
+  - (4) **Timing:** W2-136 is built right after re-pin window 4, beside the experiments, tests first, so it is live at
+    the lift's re-pin, before the three layers' streams start.
+  - (5) **Enforcement at launch.** `gov launch` refuses:
+    - (a) a lead for a ticket that is not in the approved batch, or whose waits are not met when checked at launch time
+      against the current tickets;
+    - (b) any session, lead or worker, when the dispatcher's gate is closed or the machine's limits would be passed.
+
+    One recorded override, with a decision id, is shown in the plan and the log (DEC-899). Every refusal names what the
+    ticket waits for: the ticket, the path or the limit. The CTO finds its home and gives its KPI lines. It lands with
+    W2-136.
+  - (6) **Tickets, standing:**
+    - a closed ticket is never edited; any bug fix, new spec or upgrade to its work is a new ticket;
+    - an open ticket may change while it is in flight, and `gov plan` recomputes the plan from the current tickets;
+    - each change to an open ticket is marked on it with the decision that made it, and `gov links` flags any change
+      without one.
+- **Where (5) lives (the CTO, from the code):**
+  - (a) is W2-136's: it holds the plan, and the launcher calls its check;
+  - (b) is W2-20's: the machine-wide gate, built and held, whose lines already refuse a start while the gate is shut.
+    It gains one line covering every session and the override, and lands with W2-136.
+  - (6)'s flag is a line added to W2-129 (open, in flight).
+- **Basis:** question 2 (agents in parallel never collide in ordinary work: an order the tool proves, enforced at launch).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
 | 0.451 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1067. Next free id: DEC-1068. |
 | 0.452 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1068. Next free id: DEC-1069. |
+| 0.453 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1069. Next free id: DEC-1070. |
+| 0.454 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1070; DEC-1069 (12)-(13) amended. Next free id: DEC-1071. |
+| 0.455 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1071; DEC-1070 amended. Next free id: DEC-1072. |
+| 0.456 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1072. Next free id: DEC-1073. |
+| 0.457 | 2026-11-04 | Owner (recorded by the orchestrator, DEC-861): DEC-1073. Next free id: DEC-1074. |
+| 0.458 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1074; DEC-1071 (3) and DEC-1070 (2)-(4) changed. Next free id: DEC-1075. |
+| 0.459 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1075. Next free id: DEC-1076. |
+| 0.460 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1076; DEC-1074 (3), DEC-1075 (1) and DEC-1069 (12) changed. Next free id: DEC-1077. |
+| 0.461 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1077. Next free id: DEC-1078. |
+| 0.462 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1078. Next free id: DEC-1079. |
+| 0.463 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1079. Next free id: DEC-1080. |
+| 0.464 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1080. Next free id: DEC-1081. |
+| 0.465 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1081; DEC-1080 (2) and DEC-1079 (a) changed. Next free id: DEC-1082. |
+| 0.466 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1082; DEC-1080 changed. Next free id: DEC-1083. |
+| 0.467 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1083. Next free id: DEC-1084. |
+| 0.468 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1084; DEC-1083 (7) changed. Next free id: DEC-1085. |
+| 0.469 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1085. Next free id: DEC-1086. |
+| 0.470 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1086. Next free id: DEC-1087. |
+| 0.471 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1087; DEC-1083/DEC-1084 (W2-33's layers to Wave 3) and DEC-1074 (7) O1 (A) changed. Next free id: DEC-1088. |
+| 0.472 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1088 (item 6 standing); DEC-936 item 3.4 changed. Next free id: DEC-1089. |

@@ -23,11 +23,12 @@ allowed_paths:
 - tests/unit/impact/**
 kpis:
   success:
-  - A decision change raises a CIT-P that lists the affected specifications, decisions, tickets, tests and code from both graphs, with a radius [CAP-33.b, W2-M285].
-  - After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319].
   - '"What''s the impact of X?" in plain language runs gov impact [CAP-33.g, DEC-167].'
   - It also takes the S0b2 glue G-16 (id mapping) and G-24 (deletable-class join).
   failure: []
+  lifted:
+  - 'A decision change raises a CIT-P that lists the affected specifications, decisions, tickets, tests and code from both graphs, with a radius [CAP-33.b, W2-M285]. [lifted (was S1), DEC-1083: the query only, no CIT-P (INVESTIGATION-1 §5, W-3)]'
+  - 'After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319]. [lifted (was S2), DEC-1083: the query only, no CIT-P (INVESTIGATION-1 §5, W-3)]'
 profile: FULL
 sources:
 - CAP-33.b

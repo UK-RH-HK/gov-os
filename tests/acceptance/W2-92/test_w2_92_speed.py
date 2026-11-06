@@ -36,8 +36,9 @@ import pytest
 import w2_92_support as support
 
 # The integrated code the bundles are compared with: w2/integrate eb28c40866af (DEC-1065 placed), where the record
-# route reads every record's front matter per process.
-BASE = "eb28c40866afdc315bfa9cf5de37e06888410cd5"
+# route read every record's front matter per process; moved under DEC-1074 (5) to w2/integrate 8c28aa70fb3f (the
+# tree merged into this branch at 436a7520: S6 landed there, and its bundles carry W2-32's ``repeats``; README S6-P3).
+BASE = "8c28aa70fb3f88187984f3f9b39479696a41a38a"
 
 MASS = 240                       # planted records besides the harbour's (this repository holds about 840)
 ALLOWED = MASS // 20             # "not every record": at most 5 % of them opened or parsed for a plain question
