@@ -1,7 +1,7 @@
 ---
 id: DAEO-arrl
 status: in_progress
-deps: []
+deps: [DAEO-ym8a]
 links: []
 created: 2026-10-29T15:55:50Z
 type: task

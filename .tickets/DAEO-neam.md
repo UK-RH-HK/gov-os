@@ -1,7 +1,7 @@
 ---
 id: DAEO-neam
 status: open
-deps: [DAEO-g0ip, DAEO-7r5e]
+deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-g0ip
-- DAEO-7r5e
 allowed_paths:
 - src/gov/check/runner.py
 - src/gov/check/commands.py

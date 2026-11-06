@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-lxzn, DAEO-uw5h, DAEO-6icv, DAEO-rpfv, DAEO-hgv3, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-6b2q, DAEO-3r1j, DAEO-nqa2]
+deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -19,10 +19,8 @@ depends_on:
 - DAEO-ym8a
 - DAEO-u4oz
 - DAEO-0z8c
-- DAEO-kia7
 - DAEO-49o5
 - DAEO-r30l
-- DAEO-1ahb
 - DAEO-kmcr
 - DAEO-2ds6
 - DAEO-ha8z
@@ -35,8 +33,6 @@ depends_on:
 - DAEO-k7hz
 - DAEO-lrre
 - DAEO-l78m
-- DAEO-4k3l
-- DAEO-dy7j
 - DAEO-2bdu
 - DAEO-g87r
 - DAEO-h2k3
@@ -48,19 +44,22 @@ depends_on:
 - DAEO-ouet
 - DAEO-wq2b
 - DAEO-wi46
-- DAEO-lxzn
-- DAEO-uw5h
-- DAEO-6icv
-- DAEO-rpfv
-- DAEO-hgv3
-- DAEO-drhj
 - DAEO-zpdj
 - DAEO-0mtg
 - DAEO-kiar
 - DAEO-zoex
-- DAEO-6b2q
 - DAEO-3r1j
 - DAEO-nqa2
+- DAEO-clon
+- DAEO-blwa
+- DAEO-qzrq
+- DAEO-jpr0
+- DAEO-emq1
+- DAEO-cb2b
+- DAEO-mb2t
+- DAEO-t8mp
+- DAEO-r8vq
+- DAEO-k4wm
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
 kpis:

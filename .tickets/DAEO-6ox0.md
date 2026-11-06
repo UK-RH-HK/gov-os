@@ -1,7 +1,7 @@
 ---
 id: DAEO-6ox0
 status: open
-deps: [DAEO-g0ip, DAEO-1ahb]
+deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: research
 depends_on:
 - DAEO-g0ip
-- DAEO-1ahb
 allowed_paths:
 - docs/research/EXP-002/**
 - experiments/EXP-002/**

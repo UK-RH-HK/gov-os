@@ -1,7 +1,7 @@
 ---
 id: DAEO-wi46
 status: open
-deps: [DAEO-k7hz, DAEO-drhj]
+deps: [DAEO-k7hz]
 links: []
 created: 2026-10-30T23:20:53Z
 type: task
@@ -14,7 +14,7 @@ title: 'The spec-writing skill for product-spec: problem, goals and non-goals, K
 class: specification
 state_class: AUTHORITATIVE
 role: product-spec
-depends_on: [DAEO-k7hz, DAEO-drhj]
+depends_on: [DAEO-k7hz]
 allowed_paths:
 - template/governance/kernel/skills/spec-writing/**
 - .claude/skills/spec-writing/**
