@@ -37,9 +37,13 @@ SCAN_VALUES = ("on", "off")
 # number of 0 or more (absent or 0: off, today's order); ``routing.phrasings``, true or false (absent: false; DEC-1067
 # order (4), measure 3). Any other key or value is CONFIG_INVALID.
 RETRIEVAL_FILE = "retrieval.yaml"
-RETRIEVAL_SCHEMA = {"routing": {"required": False, "type": dict}}
+RETRIEVAL_SCHEMA = {"routing": {"required": False, "type": dict}, "pool": {"required": False, "type": dict}}
 ROUTING_KEYS = ("code_first", "named_first", "phrasings")
 ROUTING_FLAGS = ("phrasings",)  # the keys that are true or false; the others are counts
+# The candidate pool (W2-32 S11, DEC-1071 (2), DEC-1074 (5)): five query-time settings, each absent or 0 today's
+# behaviour; the flags true or false (0 also off), the others whole numbers of 0 or more (``gov.retrieval.pool``).
+POOL_KEYS = ("meaning_uncut", "route_depth", "rerank_depth", "per_file_first10", "drop_nested")
+POOL_FLAGS = ("meaning_uncut", "drop_nested")
 KNOWN_FILES = {"path-map.yaml": PATH_MAP_SCHEMA, SECRETS_FILE: SECRETS_SCHEMA, RETRIEVAL_FILE: RETRIEVAL_SCHEMA}
 # A namespace's keyword-index policy (DEC-1066 (3)): optional, one of two values; absent is indexed. Any other value is
 # CONFIG_INVALID in either form of the path map, so a misspelt exclusion never leaves its files in the index.
@@ -268,7 +272,7 @@ def validate(document, schema: dict, rel: str) -> None:
 def _validate_retrieval(document, rel):
     for key in document:
         if key not in RETRIEVAL_SCHEMA:
-            raise _invalid(rel, str(key), "unknown key (the only key is 'routing')")
+            raise _invalid(rel, str(key), f"unknown key (the keys are {', '.join(RETRIEVAL_SCHEMA)})")
     for key, value in (document.get("routing") or {}).items():
         if key not in ROUTING_KEYS:
             raise _invalid(rel, f"routing.{key}", f"unknown key (the keys are {', '.join(ROUTING_KEYS)})")
@@ -277,6 +281,17 @@ def _validate_retrieval(document, rel):
                 raise _invalid(rel, f"routing.{key}", "must be true or false")
         elif isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise _invalid(rel, f"routing.{key}", "must be a whole number of 0 or more (0: off)")
+    pool = document.get("pool") or {}
+    if not isinstance(pool, dict):
+        raise _invalid(rel, "pool", "must be a map")
+    for key, value in pool.items():
+        if key not in POOL_KEYS:
+            raise _invalid(rel, f"pool.{key}", f"unknown key (the keys are {', '.join(POOL_KEYS)})")
+        if key in POOL_FLAGS:
+            if not isinstance(value, bool) and not (type(value) is int and value == 0):
+                raise _invalid(rel, f"pool.{key}", f"must be true or false (absent or 0: off), not {value!r}")
+        elif type(value) is not int or value < 0:
+            raise _invalid(rel, f"pool.{key}", f"must be a whole number of 0 or more (absent or 0: off), not {value!r}")
 
 
 def _validate_namespace_minimal(ns_name, ns_value, rel):
@@ -323,6 +338,8 @@ def _load(root: Path, name: str, schema: dict):
         document = {}
     if name == RETRIEVAL_FILE and isinstance(document, dict) and document.get("routing", {}) is None:
         document = {**document, "routing": {}}  # a ``routing:`` block with its keys commented out: off (S8-F4)
+    if name == RETRIEVAL_FILE and isinstance(document, dict) and document.get("pool", {}) is None:
+        document = {**document, "pool": {}}  # a ``pool:`` block with its keys commented out: off (S11)
     validate(document, schema, rel)
     return document
 

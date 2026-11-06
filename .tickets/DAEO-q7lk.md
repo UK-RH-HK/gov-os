@@ -106,3 +106,21 @@ responsible and is fixed straight away. It must pass DEC-1052's basis: cheap, no
   - It reads no unindexed scratch file.
 
 **Filed 2026-11-06 by the CTO** from LINK-INTEGRITY-tickets/W2-129-gov-links.md, approved by DEC-1074 (7); placed by D9-FATES (DEC-1083, DEC-1084).
+
+**Built before re-pin window 4 (DEC-1087 (4)). TESTS-READY:** `tests/acceptance/W2-129/` at `5d5fe8abb1cb` on
+`w2/W2-129-tests`: 103 cases, 99 red, 4 guards. The KPI success lines are numbered S1 to S15 in the ticket's order, so
+never-a-gate is S13 and the timing S15. The interface the tests assume is in their README.
+
+**The designer's points settled (CTO, 2026-11-06, delegated P3):**
+- **(2) Exit codes 0, 1 and 2, and the text output:** the command sets `gov.cli.main`'s child exit code (the
+  `CHILD_EXIT_CODE` form other commands use) inside `src/gov/links/**`. `cli/main.py` is not changed.
+- **(3) Whole or part:** the one pattern set is `register_statements` (S8). Where its reading of a label disagrees with
+  the loader's own SUPERSEDES edge (a `**Supersedes:**` followed by plain text), the tool follows `register_statements`
+  and states the disagreement in its research record. The loader is not changed here.
+- **(4) S8's parity on this repository:** the CTO's check, with whole supersessions apart (the prototype's drifting
+  list holds current decisions only).
+- **(5) No path-map key** for ARCHIVE-SUPERSEDED or DECISIONS-IN-FORCE: the tool looks in
+  `governance/project/orchestration/`, the repository's place. A key is a row for the next pass.
+- **(6) `depends_on`** is not a typed place for UNKNOWN_ID (LINK-INTEGRITY §4.1); the store's graph check covers it.
+- **(10) MR-1 to MR-6** PROPOSED against `contract.yaml` ACCEPTED: six STATUS_CONFLICTs expected on the first `--all`
+  run. They are findings, not a fault of the tool.
