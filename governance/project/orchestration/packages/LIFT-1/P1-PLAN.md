@@ -33,7 +33,7 @@ each way. Nothing scheduled but the dispatcher (DEC-1051).
 | D-6 the code tidy-up | **started 2026-11-06** (DEC-1079): one senior engineer, one review: §6b first (one frontmatter parser, `_ids`, `_open`, sha256, `junit_rel`), then E-2's four coupling edges; `retrieve.py` and `measure.py` left until S11 and the source families land | §A P1-6, §D |
 | D-7, D-8 | **done inside D-4b**: D-8 (ACT-D8), D-7 + G4 (`27a80411`, extended to W2-15a's raw output and the measure's audit) (DEC-1055) | `D4B-MEMORY-STAGE.md` §5, §10 |
 | D-9 the WBS refactor | **started 2026-11-06** (DEC-1079): the CTO drafts the fates list and K9 (P1-PLAN §C updated for D-4b, with W2-128, W2-129, W2-130) to the owner first; then applied, with an independent auditor's check of the KPI lines; W2-130's ticket findings folded in | §C, `LINK-INTEGRITY.md` §7 |
-| D-10 the full suite | not started (the owner's word) | — |
+| D-10 the full suite | not started (the owner's word). **The red-fix list so far:** (1) the `core.bare` tests' half (DEC-1074 (8), DEC-1083); (2) `tests/acceptance/W1-19/test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors`, red only under `-n auto` (`'February' in ''`), red at `6958acff` too, green alone (found by D-6 part 1, 11-06); (3) W1-01b, W2-66b and W2-90c close at the green run (DEC-1083 (7)) | — |
 | D-11 the basis as a standing practice | after the lift | — |
 
 **The order, as decided:**
