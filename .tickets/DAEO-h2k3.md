@@ -13,14 +13,9 @@ wbs_id: W2-61h
 title: 'W2-61''s enlarged set: 28 new memory questions with their gold sources, 24 hidden and 4 visible, by an independent session'
 class: audit
 state_class: AUTHORITATIVE
-role: engineer
+role: independent-test-designer
 depends_on: [DAEO-m1u3]
 allowed_paths:
-- tests/acceptance/W2-61/test_w2_61_visible_half.py
-- tests/acceptance/W2-61/test_w2_61_baseline.py
-- tests/acceptance/W2-61/test_w2_61_scores.py
-- tests/acceptance/W2-61/README.md
-- tests/acceptance/W2-61h/**
 - fixtures/evaluation/memory-retrieval/visible/q21.yaml
 - fixtures/evaluation/memory-retrieval/visible/q22.yaml
 - fixtures/evaluation/memory-retrieval/visible/q23.yaml
@@ -87,3 +82,8 @@ named in the question's line by the member's path and the word "family", the lin
 **Role changed to engineer (CTO, 2026-11-06, delegated P3):** W2-61h's remaining work is S7's code; `gov launch`
 starts an engineer only on an engineer's ticket, and a test designer launches on an engineer's ticket as before. The
 guard so keeps S7's engineer from this ticket's own acceptance tests (DEC-1056).
+
+**Role restored to independent-test-designer (CTO, 2026-11-06, the same day):** S2 requires this ticket's questions to
+come from no measured role, and its acceptance case checks the ticket's role front matter; the engineer role broke it.
+S7's code was built under this ticket's id while the role read engineer (`ab18f6f5`, launched 09:40); the role is
+back, and the case passes again. Any later engineering on the measure goes under a ticket of its own.
