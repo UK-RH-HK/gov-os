@@ -467,6 +467,15 @@ def test_the_mark_holds_heads_sha_alone_and_nothing_else_is_written(tmp_path, ca
     assert set(after.splitlines()) - set(before.splitlines()) == {"?? .gov-runtime/links/mark"}
 
 
+def test_a_mark_it_cannot_write_is_named_and_the_findings_stand(tmp_path, capsys):
+    root = _plant(tmp_path, {".tickets/T-nnnn.md": _ticket("T-nnnn", "open", ["DEC-999"])})
+    (root / ".gov-runtime").mkdir()
+    (root / ".gov-runtime/links").write_text("not a folder")  # the mark's folder cannot be made
+    code, out, err = _run(root, "--all", capsys=capsys)
+    assert code == 1 and "LINKS_MARK_UNWRITTEN" in err and "Traceback" not in err
+    assert any(line.startswith("UNKNOWN_ID DEC-999 in T-nnnn's sources") for line in out.splitlines())
+
+
 def test_findings_older_than_the_mark_are_counted_and_listed_with_all(tmp_path, capsys):
     root = _plant(tmp_path, {".tickets/T-gggg.md": _ticket("T-gggg", "open", ["DEC-999"])})
     _run(root, "--all", capsys=capsys)  # sets the mark

@@ -7,7 +7,8 @@ judged, alone. The range is ``<rev>..HEAD`` from ``--since``, else from the mark
 
 Its output: the line ``gov links: N new since <rev>, M standing (...)``, then one line per new finding (and, with
 ``--all``, per standing finding); ``--json`` gives the same in gov's envelope. Its exit code is 0 with no new finding,
-1 with new findings and 2 when it cannot run (named). ``--propose-marks`` and ``--propose-sources`` print a patch
+1 with new findings and 2 when it cannot run (named); a mark it cannot write (a read-only tree) is named on stderr
+(``LINKS_MARK_UNWRITTEN``) and changes neither the findings nor the exit code. ``--propose-marks`` and ``--propose-sources`` print a patch
 for ``git apply`` instead, write nothing (not the mark) and end with 0.
 """
 
@@ -126,8 +127,13 @@ def run(root, args, config):
              + (f"{breakdown}; " if breakdown else "") + counts
              + (f"; not applicable: {', '.join(gone)}" if gone else "") + ")")
     listed = new + (standing if args.all else [])
-    mark_path.parent.mkdir(parents=True, exist_ok=True)
-    mark_path.write_text(head, encoding="utf-8")
+    try:
+        mark_path.parent.mkdir(parents=True, exist_ok=True)
+        mark_path.write_text(head, encoding="utf-8")
+    except OSError as error:  # a read-only tree: the findings stand; the next run's range starts at the old mark
+        import sys
+        print(f"gov links: LINKS_MARK_UNWRITTEN: {check.MARK_REL} not written ({error.strerror or error}); "
+              "the next run judges from the previous mark", file=sys.stderr)
     if args.json:
         standing_by: dict = {}
         for (code, role), count in by.items():

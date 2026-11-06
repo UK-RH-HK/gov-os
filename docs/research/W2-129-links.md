@@ -1,53 +1,71 @@
 # W2-129 `gov links`: the engineer's record
 
-The engineer's record for W2-129 (`DAEO-q7lk`, DEC-1073 (5)(b), design `LINK-INTEGRITY.md` §4). It covers:
+The engineer's record for W2-129 (`DAEO-q7lk`, DEC-1073 (5)(b), DEC-1088 (6), design `LINK-INTEGRITY.md` §4). It
+covers:
 - each finding code's form;
 - the readings chosen where the KPI and §4.4 leave a detail open;
-- the first `--all` run's counts by code and role, and the timing;
+- the `--all` run's counts by code and role, and the timing;
 - S8's parity with W2-92's drift script;
 - one row of evidence per KPI line.
 
 The code is `src/gov/links/` (`check.py`, `patch.py`, `command.py`); the unit tests are `tests/unit/links/test_links.py`.
 
-## 1. The run measured
+The KPI success lines are numbered S1 to S16 in the ticket's order: S9 is the role table, S10 the incremental line,
+S11 the output, S12 the patches, S13 never a gate, S14 any repository, S15 the timing and S16 the ticket changes. The
+first pass of this record numbered them wrongly from S9 on; §7 is corrected.
 
-- **Head:** `422aac40581a` (`w2/W2-129`: `w2/integrate` at `e3355def9f99` with the designer's cases and this ticket's
-  code).
-- **The tree:** the engineer's worktree, read-only. The only file written is `.gov-runtime/links/mark`. The CTO's
-  measured run on the main tree is still due (S15).
-- **The command:** `PYTHONPATH=src python3 -m gov.cli.main links …`, through `heavy_slot.sh`. No model, network or
-  GPU; no store.
-- **CPython 3.12.3, PyYAML 6.0.1 with libyaml.** The frontmatter is read with the C loader. With the pure loader,
-  `--all` took about 5.0 s.
+## 1. The run measured (second pass)
+
+- **Head:** `90ddd18a01ce` (`w2/W2-129`: `w2/integrate` at `a1d3e81a9`, the designer's S16 cases and this ticket's
+  code). It is one commit behind integrate's head `416b59da1779`.
+- **The tree: the engineer's worktree, not the main tree.** The launch sandbox keeps the main tree read-only, so the
+  tool cannot write its mark there. A scratch folder whose `.git` names the main repository was refused as a
+  sensitive write; the refusal was taken. The CTO's measured run on the main tree is still due (S15).
+- **The mark:** the sandbox also keeps this worktree's `.gov-runtime/` read-only. Each run named
+  `LINKS_MARK_UNWRITTEN` on stderr and printed its findings (§4 reading 2). With no mark, `--all` judged the whole
+  history.
+- **The command:** `PYTHONPATH=src python3 -m gov.cli.main links …`, through `heavy_slot.sh`, timed from outside the
+  process by `perf_counter`. No model, network or GPU; no store.
+- **CPython 3.12.3, PyYAML 6.0.1 with libyaml.** The frontmatter is read with the C loader.
 
 | Command | Five runs (s) | Median |
 |---|---|---|
-| `gov links --all` | 3.51, 2.52, 2.53, 2.50, 2.40 | **2.52 s** (bound 10 s) |
-| `gov links --since HEAD~1` | 2.38, 2.34, 2.30, 2.29, 2.40 | **2.34 s** (bound 5 s) |
+| `gov links --all` | 2.82, 2.81, 2.80, 2.74, 2.77 | **2.80 s** (bound 10 s) |
+| `gov links --since HEAD~1` | 2.79, 2.80, 2.83, 2.83, 2.89 | **2.83 s** (bound 5 s) |
 
-- `--since` costs about the same as `--all`, because every run reads the whole record set (S9).
-- About 1.7 s of each run is W2-55's `check_propagation`, used as it stands. Its frontmatter read uses the pure YAML
-  loader, and it sits in W2-55's paths.
+- The first pass measured 2.52 s and 2.34 s at `422aac40581a`. S16 adds about 0.3 s: one `git log --raw` over the
+  ticket folder (685 commits touch it) and one `cat-file --batch` of the blobs before and after.
+- `--since` costs about the same as `--all`, because every run reads the whole record set and every commit (S10).
+- About 1.7 s of each run is W2-55's `check_propagation`, used as it stands.
 
-## 2. The first `--all` run: counts by code and role (the clean-up's baseline)
+## 2. The `--all` run: counts by code and role
 
-2,843 findings at `422aac40581a`. 29 of them are free-text findings (all UNMARKED_CHANGE).
+3,065 findings at `90ddd18a01ce`. 29 of them are free-text findings (all UNMARKED_CHANGE).
 
-| Code | Role | Count |
-|---|---|---|
-| UNMARKED_CHANGE | orchestrator | 187 |
-| UNKNOWN_ID | independent-test-designer | 405 |
-| UNKNOWN_ID | orchestrator | 55 |
-| UNKNOWN_ID | product-spec | 3 |
-| UNKNOWN_ID | owner (a commit whose `Role:` is `owner`) | 1 |
-| UNLINKED_ID | orchestrator | 1,891 |
-| STATUS_CONFLICT | orchestrator | 110 |
-| STATUS_CONFLICT | product-spec | 6 |
-| NOT_IN_FORCE_AS_RULE | product-spec | 106 |
-| NOT_IN_FORCE_AS_RULE | orchestrator | 35 |
-| ENFORCES_SUPERSEDED | independent-test-designer | 44 |
+| Code | Role | Count | First pass (`422aac40581a`) |
+|---|---|---|---|
+| UNMARKED_CHANGE | orchestrator | 188 | 187 |
+| UNKNOWN_ID | independent-test-designer | 408 | 405 |
+| UNKNOWN_ID | orchestrator | 55 | 55 |
+| UNKNOWN_ID | product-spec | 3 | 3 |
+| UNKNOWN_ID | owner (a commit whose `Role:` is `owner`) | 1 | 1 |
+| UNLINKED_ID | orchestrator | 1,899 | 1,891 |
+| STATUS_CONFLICT | orchestrator | 110 | 110 |
+| STATUS_CONFLICT | product-spec | 6 | 6 |
+| NOT_IN_FORCE_AS_RULE | product-spec | 106 | 106 |
+| NOT_IN_FORCE_AS_RULE | orchestrator | 35 | 35 |
+| ENFORCES_SUPERSEDED | independent-test-designer | 44 | 44 |
+| CLOSED_TICKET_EDITED | orchestrator | 117 | (new) |
+| TICKET_CHANGE_UNMARKED | orchestrator | 93 | (new) |
 
-By place:
+- No commit's finding has a landed lead on this repository. The commits with an unknown `Task:` or `Implements:` are
+  on the first-parent line, or their `Role:` is orchestrator.
+- The 210 S16 findings touch 72 tickets in 60 commits.
+  - CLOSED_TICKET_EDITED, by the fields the edit changed: `depends_on` 52, `status` 14 (a reopening), `body` 11,
+    `sources` 11, `state_class` 10, `deps` 7, `status, allowed_paths` 6, `links` 2, three others.
+  - TICKET_CHANGE_UNMARKED, by field: `kpis` 51, `allowed_paths` 29, `depends_on` 13.
+
+The first pass's counts by place (at `422aac40581a`) stand for the six older codes:
 
 | Code | Place | Count |
 |---|---|---|
@@ -84,8 +102,11 @@ One line per finding:
   its change log, and ARCHIVE-SUPERSEDED §A.
 - `--json` gives the same findings in gov's envelope: `{ok, command: "links", result, session}`.
   - Each finding carries `code`, `ids`, `path`, `line`, `role`, `fix`, `subject`, `text` and `new`.
-  - It also carries `commit` for a commit's finding, `via` for the other places that stated it, and `whole`, `form`
-    and `mark` for UNMARKED_CHANGE.
+  - It also carries:
+    - `commit` for a commit's finding, and `lead` (`orchestrator`) when that commit has landed;
+    - `via` for the other places that stated it;
+    - `whole`, `form` and `mark` for UNMARKED_CHANGE;
+    - `field` for the two S16 codes.
 
 | Code | Subject | Where the line points | Fix |
 |---|---|---|---|
@@ -95,6 +116,10 @@ One line per finding:
 | STATUS_CONFLICT | `<id> <status> in the register, spent in ARCHIVE-SUPERSEDED §B` / `… listed in DECISIONS-IN-FORCE` / `<ticket> <status> against its close record <CL> <status>` / `MR-n <status> against contract.yaml <status>` | the list line, the ticket's `status:`, the MR record's `status:` | reconcile the two |
 | NOT_IN_FORCE_AS_RULE | `<id> (<STATUS>) in <place>` | the place | decide it, or cite it as proposed (or rejected, …), not as a rule |
 | ENFORCES_SUPERSEDED | propagation's own message | the path and line propagation names | cite the decision in force, or record a `**Kept:**` reason |
+| CLOSED_TICKET_EDITED | `<ticket> <sha12> <fields changed>: closed before the commit` (`body` when no frontmatter field changed; `the file (deleted)`) | the ticket's file, the commit's first changed line | revert the edit, or carry the change in a new ticket |
+| TICKET_CHANGE_UNMARKED | `<ticket> <sha12> <field>: changed with no DEC-n in the lines, Implements: or Decided-by:` | the ticket's file, the field's key line at HEAD | name the decision behind the change (a DEC-n in a commit's `Implements:` or `Decided-by:`), or revert it |
+
+Both S16 codes are orchestrator's. One TICKET_CHANGE_UNMARKED is listed per field changed.
 
 The first line:
 
@@ -114,6 +139,10 @@ Where neither the KPI nor §4.4 states a detail, the tool takes the simplest for
    - `--all` with neither runs, because the acceptance cases run it that way.
 2. **The mark** holds HEAD's 40-character sha and nothing else, with no newline. Every run that can run writes it.
    The two `--propose-*` options write nothing and need no range.
+   - **A mark it cannot write** (a read-only tree, as in the launch sandbox) is named on stderr,
+     `LINKS_MARK_UNWRITTEN`. The findings and the exit code are unchanged, and the next run judges from the previous
+     mark, a wider range. A notice does not fail on its one side effect. Unit:
+     `test_a_mark_it_cannot_write_is_named_and_the_findings_stand`.
 3. **Exit codes:** 0 with no new finding (also when `--all` lists standing ones), 1 with a new finding, 2 when the
    run cannot be made. A run that cannot be made is named on stderr or in the JSON error:
    - `LINKS_NOT_A_WORK_TREE`, `LINKS_NO_HEAD`;
@@ -121,8 +150,9 @@ Where neither the KPI nor §4.4 states a detail, the tool takes the simplest for
    - `STORE_REGISTER_UNREADABLE`, the loader's own.
 
    The patches end with 0. The exit code goes through `CHILD_EXIT_CODE`; `cli/main.py` is unchanged.
-4. **"New" (S9):**
-   - A commit's finding is new when the commit is in the range.
+4. **"New" (S10):**
+   - A commit's finding is new when the commit is in the range. That includes the two S16 codes: a ticket change
+     is listed only when its commit is in the range, and is counted as standing otherwise.
    - A record file (one with a frontmatter id) changed in the range makes every finding in it new.
    - Any other file is judged by line: a finding is new when the range added or changed its line. This covers a hand
      list, a kernel text, a brief, the path map, `contract.yaml` and the test files.
@@ -134,12 +164,19 @@ Where neither the KPI nor §4.4 states a detail, the tool takes the simplest for
    - "An entry a changed entry names" is met through the changer: its new statement's finding sits on the named
      entry's status line and is new because the changer changed.
    - The named entry's older findings stay standing.
-5. **Commits:** every commit is judged on every run, so no finding older than the mark is lost (F5). One about a
-   commit outside the range is standing.
+5. **Commits and their role (S9):** every commit is judged on every run, so no finding older than the mark is lost
+   (F5). One about a commit outside the range is standing.
    - A commit's trailers are read as the loader reads them: its final trailer block, or the whole message before
      2026-10-03 (DEC-182).
-   - The role is the commit's `Role:`, or the orchestrator (the ticket's lead) once it is landed. A commit counts as
-     landed when it is not on HEAD's first-parent line.
+   - **The role field names the commit's `Role:` trailer** (for example `independent-test-designer`). A commit with
+     no `Role:` names `orchestrator`. The fix text no longer carries the role.
+   - **Once landed**, the finding also names the ticket's lead: `lead: orchestrator` in `--json`. A commit counts as
+     landed when it is not on HEAD's first-parent line. The counts by role use the role field.
+   - **Where this departs from the brief:** the brief asked for the text line's role field to read
+     `independent-test-designer; once landed: orchestrator`. That form passes S9's commit case but fails one other
+     acceptance case, mapped to S9 and F3, so `gov accept` gave 134/1. With the bare `Role:` in the role field and
+     the lead in `--json`, `gov accept` gives 135/0. The engineer does not read the cases; the probe runs are in §6.
+     To print the lead in the text line, `render` in `check.py` is the one line to change, once the case allows it.
    - Worker commits are those whose `Role:` is one of the five worker roles; landing commits never give an
      UNLINKED_ID.
 6. **Ids:** the store's grammars (common.schema.json):
@@ -158,7 +195,7 @@ Where neither the KPI nor §4.4 states a detail, the tool takes the simplest for
    `Task: decision-record` is not a finding (DEC-861).
 7. **Test files:** only the census's two patterns, `DEC-n` and `W[1-3]-n` (`D4B-link-census.py` §5). The other
    grammars in tests are planted stand-ins far more often than citations: reading them all gave 983 findings, against
-   405 now.
+   405 at the first pass.
 8. **Kernel lines:** every line of `template/governance/kernel/{roles,skills,templates}/**`, the vendored superpowers
    skills excepted.
    - UNKNOWN_ID reads the ids inside `(…)` or `[…]`, which is how those texts bracket a citation ("(DEC-066, MR-5)").
@@ -198,10 +235,27 @@ Where neither the KPI nor §4.4 states a detail, the tool takes the simplest for
     - `--propose-sources` adds the ids to `sources:`: a block list, a flow list, a scalar made a list, or a new key.
     - Both are unified diffs with 3 lines of context against HEAD's text. The unit tests apply them with `git apply`
       and see the findings clear.
+16. **Ticket changes (S16, DEC-1088 (6)):**
+    - **The commits read:** every non-merge commit that changes a file under `.tickets/`
+      (`git log --full-history --raw`, so a side branch's commits are not simplified away). A merge's changes are its
+      parents' commits'. A commit that adds a ticket is not a change of one.
+    - **Closed** is the ticket's `status` in the commit's parent. Any change to that file is CLOSED_TICKET_EDITED: an
+      edit, a reopening, a deletion. A decision id in the lines or the trailers does not excuse it.
+    - **Open** is `open` or `in_progress` in the parent. A field changed is a field whose parsed frontmatter value
+      differs between the parent and the commit, among `title`, `kpis`, `allowed_paths`, `reads`, `needs`,
+      `waits_on`, `depends_on` and `acceptance_tests`. Any other field (`status`, `assignee`, `links`, `sources`, …)
+      and the body are not findings.
+    - **The commit that closes the ticket** (open in the parent, closed in the commit) is not a finding, whatever
+      else it changes.
+    - **Marked:** a `DEC-n` in a line the commit removed or added in that ticket's file (the lines that are not in
+      both versions), or in the commit's `Implements:` or `Decided-by:` trailers, read as the loader reads trailers.
+    - **The line:** for TICKET_CHANGE_UNMARKED, the field's key line in HEAD's copy of the ticket (the commit's copy
+      if the ticket is gone); for CLOSED_TICKET_EDITED, the first line the commit changed.
+    - The short sha is the first 12 digits, as in the other commit subjects.
 
 ## 5. S8's parity with `docs/research/W2-92-proto-drift.py`
 
-Both were run `--from-head` at the worktree's head before this ticket's commit.
+Both were run `--from-head` at the worktree's head before this ticket's first commit (first pass).
 
 | | Count |
 |---|---|
@@ -219,26 +273,27 @@ Both were run `--from-head` at the worktree's head before this ticket's commit.
 
 ## 6. `gov accept W2-129`
 
-102 passed, 1 failed, 0 skipped (HOME=/home/usain).
-- The red is one case of `success-9` (S9, the incremental line).
-- The engineer does not read the case (DEC-957, DEC-1056), and `gov accept` reports counts only.
-- What was tried, each run through `gov accept`:
-  - judging every commit: fixed F5 and two S10 cases;
-  - a narrower "new": no change to the S9 case;
-  - the refusal printed on stdout too: no change, reverted;
-  - `--all` refusing without a mark: seven more reds, reverted.
-- The case is unchanged by every reading of "new" tried, so it most likely checks an output detail. The candidates:
-  - the `<rev>` after "since" (reading 1);
-  - the shape of the standing counts (the first line's parentheses, or JSON `standing` as an integer beside
-    `standing_by`);
-  - the refusal's stream (stderr).
-- The CTO, who can read the case, can say which reading it holds.
+**135 passed, 0 failed, 0 skipped** (HOME=/home/usain), at the second pass's code. S16's 32 cases pass.
+
+The S9 role, probed through `gov accept` (counts only; the engineer does not read the cases, DEC-957, DEC-1056):
+
+| The role field of a landed commit's finding | `gov accept` |
+|---|---|
+| `orchestrator` (the first pass) | 134/1: S9 5/6, F3 2/2 |
+| `independent-test-designer; once landed: orchestrator` in the text and in JSON `role` | 134/1: S9 5/6, F3 1/2 |
+| the same in the text; JSON `role` the bare `Role:` with `lead` | 134/1: S9 5/6, F3 1/2 |
+| the bare `Role:` in the text and JSON; JSON `lead: orchestrator` (kept) | **135/0** |
+
+- The suffix form fixes S9's commit case but fails another case, mapped to S9 and F3. That case reads the text
+  line's role field and accepts one role name there.
+- The CTO can read both cases and decide whether the lead belongs in the text line. If it does, the case and
+  `render` change together.
 
 ## 7. Evidence by KPI line
 
 | KPI line | Evidence |
 |---|---|
-| S1 one read-only command, writes only its mark | `command.py` (CLASS read, no ACT_PATHS); unit `test_the_mark_holds_heads_sha_alone_and_nothing_else_is_written`; accept success-1 4/4 |
+| S1 one read-only command, writes only its mark | `command.py` (CLASS read, no ACT_PATHS); units `test_the_mark_holds_heads_sha_alone_and_nothing_else_is_written`, `test_a_mark_it_cannot_write_is_named_and_the_findings_stand`; accept success-1 4/4 |
 | S2 UNMARKED_CHANGE | `check.unmarked`; units `test_unmarked_change_…`, `test_archive_section_a_…`, `test_a_supersedes_followed_by_plain_text_…`; accept success-2 10/10 |
 | S3 UNKNOWN_ID | `check.records`, `register_places`, `contract`, `texts`, `commits`; units `test_the_typed_places_of_tickets`, `test_records_contract_kernel_and_list_rows`, `test_commit_trailers`; accept success-3 22/22 |
 | S4 UNLINKED_ID | `check.records`, `commits`; units as S3; accept success-4 5/5 |
@@ -246,11 +301,12 @@ Both were run `--from-head` at the worktree's head before this ticket's commit.
 | S6 NOT_IN_FORCE_AS_RULE | `check.records`, `register_places`, `_rule_lines`, `commits`; accept success-6 18/18 |
 | S7 ENFORCES_SUPERSEDED | `check.enforces` (W2-55's `check_propagation`, imported); unit `test_enforces_superseded_is_propagations`; accept success-7 2/2 |
 | S8 one source of patterns | `register_statements` imported, §5 above; accept success-8 4/4 |
-| S9 incremental | `check.touched`, `is_new`; units `test_findings_older_than_the_mark_…`, `test_a_changed_entry_…`, `test_an_entry_a_changed_entry_names_…`, `test_a_status_changed_…`, `test_an_older_commits_finding_…`; accept success-9 **5/6** (§6) |
-| S10 output and exit codes | `command.run`, `check.render`; units `test_json_is_the_shared_envelope_…`, `test_cannot_run_exits_2_named`; accept success-10 8/8 |
-| S11 the two patches | `patch.py`; units `test_propose_marks_…`, `test_propose_sources_…`; accept success-11 7/7 |
-| S12 the role table | `check.ROLE_TABLE`, `role_of`; unit `test_role_table` (14 paths); accept success-12 5/5 |
+| S9 the role table, a commit's role | `check.ROLE_TABLE`, `role_of`, `commit_role_field`; units `test_role_table` (14 paths), `test_a_commits_finding_names_its_role_then_the_lead_once_landed`; accept success-9 6/6 (§4 reading 5, §6) |
+| S10 incremental | `check.touched`, `is_new`; units `test_findings_older_than_the_mark_…`, `test_a_changed_entry_…`, `test_an_entry_a_changed_entry_names_…`, `test_a_status_changed_…`, `test_an_older_commits_finding_…`; accept success-10 8/8 |
+| S11 output and exit codes | `command.run`, `check.render`; units `test_json_is_the_shared_envelope_…`, `test_cannot_run_exits_2_named`; accept success-11 7/7 |
+| S12 the two patches | `patch.py`; units `test_propose_marks_…`, `test_propose_sources_…`; accept success-12 5/5 |
 | S13 never a gate | nothing outside `src/gov/links` imports it; unit `test_never_a_gate_…`; accept success-13 2/2 |
 | S14 any repository | `check.not_applicable`; unit `test_a_repository_without_the_kinds_is_not_applicable`; accept success-14 2/2 |
-| S15 cheap, measured | §1 (the engineer's run: 2.52 s and 2.34 s); the CTO's measured run on the main tree is still due |
+| S15 cheap, measured | §1 (the engineer's worktree run: 2.80 s and 2.83 s); the CTO's measured run on the main tree is still due |
+| S16 ticket changes | `check.ticket_changes`; units `test_a_closed_tickets_file_edited_…`, `test_reopening_a_closed_ticket_…`, `test_an_open_tickets_scope_changed_unmarked_…` (4 fields), `test_marked_or_unwatched_ticket_changes_…` (7 forms), `test_a_decision_in_a_removed_line_…`, `test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range`; accept success-16 32/32 |
 | F1 to F5 | accept failure-1 to failure-5: 1/1, 4/4, 2/2, 5/5, 2/2 |
