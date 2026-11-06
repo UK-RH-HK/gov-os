@@ -5,6 +5,24 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
 what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~22:30, DEC-1087 under way (next free id DEC-1088).** The items before re-pin window 4:
+  - **Done:**
+    - the store refreshed: by hand with the pinned gov, then by the refresh script through `tools/rebuild_pinned.sh`
+      (tested 4/4); now at `e3355def`;
+    - the daily backstop re-armed in the background with `SEED_REBUILD_CMD`;
+    - `EMG-common.md` tells workers to search with `--root ~/gov-os-worktrees/W2-00-store`;
+    - the status block: `--countdown`, the emergency line, `log/status-latest.txt` on `--mark`; the digests by
+      CronCreate at 09:02 and 18:02 (session jobs, re-arm each session);
+    - 39 merged, clean worktrees removed (`tools/worktree_states.py`; scratch in `~/gov-os-runs/worktree-archive/`);
+    - S11 merged (`e3355def`; 257/0 and 677 passed);
+    - DEPENDENCY-MAP-1 committed for the owner.
+  - **Running** (waits by process group):
+    - W2-135's engineer (pid 407032; tests `ee54d3ca`);
+    - W2-129's engineer (pid 440775; tests `5d5fe8ab`);
+    - W2-116's engineer (pid 441209; tests `c3406602`; paths widened).
+  - **Next:** a review each; merges; the store refreshed after each; `retrieval.yaml`'s pool switched on; window 4's ACT
+    (`REPIN-COMMANDS-<sha>.sh` with the reranker restart for W2-112, the hook for W2-116, the pool) rehearsed; the
+    worktree list to the owner; then "ready" to the owner.
 - **~19:00, DEC-1086 recorded (next free id DEC-1087); SEVEN-ANSWERS committed; STAND-BY on the owner's go.**
   - **Nothing is acted on before the go:** no re-pin and no experiment. W2-135 is not yet filed (it is filed at the go).
   - **The findings:**

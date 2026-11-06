@@ -37,8 +37,11 @@ hold for every one of them.
   The guard misreads heredocs and `$(…)` loops today (W2-42a fixes it): prefer the Edit/Write tools for file edits.
 - **Under `.gov-runtime/`:** commit hashes written as 12 digits; row W2-L423's rule (write none of the keywords
   `tools/keyword_warn.py` looks for).
-- **Knowledge:** use `gov retrieve "<question>"` (run in your worktree) for what you need to know about the codebase
-  and the decisions (DEC-836); code questions by small, targeted searches, never one giant query (DEC-859, DEC-860).
+- **Knowledge:** use `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "<question>"` for what you need to
+  know about the codebase and the decisions (DEC-836, DEC-1087 (3)). A worktree has no store of its own (a plain
+  `gov retrieve` there answers `STORE_MISSING`). The integration store holds integrate's head, so its line numbers are
+  integrate's: read the file in your own worktree before relying on a line. Ask code questions by small, targeted
+  searches, never one giant query (DEC-859, DEC-860).
 - **Judgement (reviewers):** `governance/project/briefs/JUDGEMENT.md` word for word; each finding with
   `Ordinary work: yes|no, because ...` and `Consequence: fails open|loses work|other`, and the fenced `verdict` block.
 - **Scratch budget:** 20 GB and 1,000,000 files and folders outside the tracked tree; report `du -sh` and
