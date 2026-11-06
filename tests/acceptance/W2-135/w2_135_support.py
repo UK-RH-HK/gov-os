@@ -28,8 +28,9 @@ SRC = REPO / "src"
 if importlib.util.find_spec("gov") is None:  # a PYTHONPATH given names the tree under test; else this one
     sys.path.insert(0, str(SRC))
 
-TODAY_COMMIT = "fc61f303d467"  # w2/integrate when these tests were written (DEC-1086 B, DEC-1087 (1))
-TODAY_BLOB = ("src/gov/retrieval/retrieve.py", "7444017b123c283af7e5124a66e0ae4b5ce6f365")
+# w2/integrate after W2-32 S11 merged (first pass: fc61f303d467, blob 7444017b123c; README N-5)
+TODAY_COMMIT = "e3355def9f99"
+TODAY_BLOB = ("src/gov/retrieval/retrieve.py", "1fb6a75b10b9601cf271efc877e8f918e55e9034")
 
 CAP = 4000  # DEC-1086 B: an item's text is sent up to this many characters
 

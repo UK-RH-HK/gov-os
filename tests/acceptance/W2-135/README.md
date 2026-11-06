@@ -30,8 +30,8 @@ The tests use the tree `PYTHONPATH` names; without one, the worktree's own `src`
 - **The oracle** (`w2_135_support.span_text`, `span_bytes`): an item's full text and bytes read from the planted
   files alone, never from the code under test.
 - **"Today" for S1's guard, S2 and S3** (`w2_135_support.today`): `src/gov/retrieval/retrieve.py` (blob
-  `7444017b123c`) as `w2/integrate` `fc61f303d467` held it, read from git and loaded as a module of its own beside the
-  running tree's. It is the ticket's only source path, so the two differ by the fix alone; both are asked on the same
+  `1fb6a75b10b9`) as `w2/integrate` `e3355def9f99` held it after W2-32 S11 merged (N-5), read from git and loaded as
+  a module of its own beside the running tree's. It is the ticket's only source path, so the two differ by the fix alone; both are asked on the same
   store, in the same process, with the same stand-ins.
 - **S3's comparison** sets apart each item's `text` and `cut` only, and holds even those: an item with a `cut` key
   is today's text's first 4,000 characters; one without is today's text, unchanged. Every other item field, the
@@ -45,10 +45,12 @@ The tests use the tree `PYTHONPATH` names; without one, the worktree's own `src`
   `used` (8,802, on the full text) is over the 6,000 limit, so the survey's section is not expanded, while a `used`
   counted on the cut text would let it expand: a fix that counts the cut text fails S3 there.
 
-## KPI lines, tests, and the outcome on `w2/integrate` `fc61f303d467`
+## KPI lines, tests, and the outcome on `w2/integrate` `e3355def9f99`
 
 Run in the launch sandbox through the heavy slot, with `-m "not local_only" -k "not real and not green_here and not
-time_limit"` (it leaves none of these out): **48 tests, 11 failed, 37 passed** (1.00 s). Every red fails because the
+time_limit"` (it leaves none of these out): **48 tests, 11 failed, 37 passed** (0.84 s; the first pass, on
+`fc61f303d467`, gave the same). The per-scenario figures below (`used` 2,658, 8,802, 13,879) are the first pass's;
+S11's settings off leave the path, and so these bundles, as they were. Every red fails because the
 item is sent whole or carries no `cut` key, none on a premise. `gov accept W2-135` reads this map: S1 10 passed and
 11 failed, S2 4 passed, S3 23 passed, none unmapped (outcome `fail`, exit 3).
 
@@ -123,10 +125,15 @@ item's lines changed by that expansion).
   section, 11,220) is cut and carries `cut`.
 - **N-4. The reranker's input** is read as the texts the reranker is sent (`candidate["text"]`, already cut at
   `RERANK_CHARS` with its `[path: …]` line, today). The stand-in reranker sees every request, over every page.
-- **N-5. S3's reference is pinned.** `TODAY_BLOB` is integrate's `retrieve.py` at `fc61f303d467`. W2-116, W2-129 or
-  W2-32 may also change `retrieve.py` in re-pin window 4. If one lands first and changes these planted bundles, S3
-  goes red for a reason that is not this fix; then `TODAY_BLOB` moves to the new integrated blob by a test
-  designer's revision, and what S3 compares is unchanged.
+- **N-5. S3's reference is pinned.** `TODAY_BLOB` is integrate's `retrieve.py` at `e3355def9f99` (blob
+  `1fb6a75b10b9`), the merge of W2-32 S11 (the candidate pool, DEC-1086 A). The first pass pinned it at
+  `fc61f303d467` (blob `7444017b123c`); the second pass (DAEO-c4pb) moved it because S11 changed `retrieve.py`. S11's
+  five `pool:` settings are absent in the planted repository (no `retrieval.yaml`), so each is 0 and the path is
+  the earlier one: the routes' searches get no `top_k`, the meaning routes keep their `TOP_K` cut, every page
+  reranks itself, no item is left out as nested, and no `pool` key is written. S3's premise holds on the new
+  reference and S2 and S3 stay green on integrate. W2-116 or W2-129 may still change `retrieve.py` in re-pin window
+  4; if one lands first and changes these planted bundles, `TODAY_BLOB` moves again the same way, and what S3
+  compares is unchanged.
 
 ## Files
 
