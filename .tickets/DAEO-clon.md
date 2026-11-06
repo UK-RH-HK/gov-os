@@ -65,4 +65,16 @@ The owner's P-RERANKER-1 (a) (DEC-979 item 4, DEC-982): before the three layers.
 
 **DEC-1068, for re-pin window 4 (CTO, 2026-11-04 ~09:35):** the shared service releases the GPU memory a request used once it has answered (the PyTorch caching allocator's cache emptied after each request, or after each request whose padded size exceeded a named threshold; state which and why), so its memory no longer climbs to its highest peak and stays there (on 2026-11-04 it climbed 7.7 -> 15.8 GB across experiments and twice tripped the GPU backstop, at 03:53 and 05:37). The client's padded request bound (W2-32, `MAX_REQUEST_CHARS`) stays. The service's memory after each request is reported in its log (`rerank.log`: the allocated and reserved MiB). Built now, live with window 4.
 
+**The memory release merged (CTO, 2026-11-06; review `reviews/w2-112-release.md` READY):**
+- **F1:** measured live in the parallel-agents test after window 4 (DEC-1087 (10)):
+  - the 20-search p50, p95 and max against 2.32, 3.82 and 4.01 s;
+  - the MEMORY lines against `nvidia-smi` (the logged reserved figure leaves out the CUDA context);
+  - error answers and fallbacks counted.
+- **Rows:**
+  - F2: `rerank.log` trimmed, since `gov status` reads it whole;
+  - F3: a multi-line error kept on one log line;
+  - F4, Wave 3: the service ended after a sticky CUDA error.
+
+[DEC-1068, DEC-1087]
+
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 9 of 10 (`9a02a474`, D-1); met in part: S3 (its 48-question half is not yet measured, research:173). The CTO closes it at the lift (P1-13).
