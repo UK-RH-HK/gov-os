@@ -40,6 +40,7 @@ kpis:
   - 'A commit brought into a lead''s branch by a merge from the integration branch never wakes the caller [DEC-1003, SMART-WORK-3] [moved from W2-118 S3, DEC-1083]'
   - 'Every commit id and path a return names is resolved against git; one that does not resolve is named in the inbox item [DEC-1014 item 2, SMART-WORK-4 line 2] [moved from W2-118 S4, DEC-1083]'
   - 'gov launch lead <ticket> builds the whole lead invocation (absolute paths, the identity in --settings, the model, background mode, the log and PID files) and passes the resource gate [DEC-715, W2-H046]. [moved from W2-21 S1, DEC-1083]'
+  - 'The ready list the dispatcher reads may come from gov plan --ready (W2-136), reviewed and committed by the orchestrator; the dispatcher starts only what is on it, and its own order is never its choice [DEC-1007 (2), DEC-1088 (1)] [added, DEC-1088]'
   failure:
   - 'A session started for an entry not on the ready list, not ready, already running, or without room for its peak; a ticket landed that was not approved, or twice; a return never put in the inbox; a lead count not from the processes [DEC-1007, DEC-1008]'
   - 'A key result or a return reported twice, or not at all. [moved from W2-118 F1, DEC-1083]'

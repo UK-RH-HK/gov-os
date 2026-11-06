@@ -2,3 +2,7 @@
 # against 20, adopted by the rule written before it ran). Each chunk is embedded with its file path and the headings
 # above it; the keyword chunk, the evidence and the reranker's input are unchanged. Switching it re-embeds every chunk.
 embed_headers: true
+# The integration branch's store (W2-116, DEC-1087 (3); W2-122's warm base): the link `gov rebuild --integration`
+# keeps at the branch's head in two halves beside it (-a, -b), and the store `gov launch` points every worker's
+# `gov retrieve` at (GOV_STORE). The CTO's refresh scripts keep the same link until window 4 puts W2-116 live.
+integration_store: /home/usain/gov-os-worktrees/W2-00-store
