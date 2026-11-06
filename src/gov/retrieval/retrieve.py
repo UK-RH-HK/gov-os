@@ -498,13 +498,15 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         # W2-92 S9 (DEC-1073 (2)): beside the text (unchanged), the entry's status word and changers, and whether it
         # is in force; any other record not in force says so
         if rel == register:
-            entries = entries_in(rel, first, last)
-            if entries:
-                # W2-131 (DEC-1082 (2)): the id is the item's own entry, as its ``entry`` key; none: the chunk id
-                found["id"] = entries[0]
-                found.update(entry_mark(entries[0]))
-                if len(entries) > 1:  # a parent over several entries: each of the others, the same way
-                    found["also"] = [entry_mark(rid) for rid in entries[1:]]
+            # W2-131 (DEC-1082 (2)), W2-133 (DEC-1083): the id is the entry holding the item's first line, as its
+            # ``entry`` key; a first line in the preface or a gap: the chunk id, never an entry further down
+            own = (entry_of(rel, first) or {}).get("id")
+            if own:
+                found["id"] = own
+                found.update(entry_mark(own))
+            others = [rid for rid in entries_in(rel, first, last) if rid != own]
+            if others:  # the other entries its lines touch: each of them, the same way
+                found["also"] = [entry_mark(rid) for rid in others]
         else:
             rid = record_of.get(rel)
             kind, status = standing.get(rid, (None, None))
