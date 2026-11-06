@@ -81,3 +81,5 @@ tests first. The measured reference is the prototype `w2/W2-92-proto` (`e884675b
 67/79 with v456, drift 184 → 0 unjoined); the engineer builds from it, the test designer from these KPIs and never from
 the prototype's code. W2-54's `test_an_empty_retrieval_result_gives_one_packet` has its premise rewritten by its test
 designer (DEC-1074 (6)), with `Task:` this ticket, since the links now legitimately bring a record into it.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 14 of 15, all but S6 (S1 to S5 at `0d33901a`; S7 to S10 and F5 at `3679ca0b`, acceptance 116/0, READY, DEC-1071's rule); met in part: S6 (14/15 at `88748f99`, green only at `3679ca0b`; its 1.2 s median is recorded nowhere, evidence:120); the pin carries them at re-pin window 4. The CTO closes it at the lift (P1-13).

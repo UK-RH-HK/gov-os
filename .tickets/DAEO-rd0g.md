@@ -78,3 +78,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-15a), as approved (DEC-729). The list ro
 ## The wbs_id
 
 This ticket has no `wbs_id`: the kernel's grammar (`common.schema.json`, `^W[0-9]+-[0-9]{2,}$`) refuses the letter suffix. Its W2 id is its `external-ref`, which `gov close` reads when `wbs_id` is absent (`src/gov/close/command.py`).
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: S1, S5 and S7 (`ff691ec2`, `docs/research/EXP-003/w2-15a-baseline.md`); met in part: S3 (its lighter reranker was not run, not installed); S2, S4 and S6 moved to W2-15b (the cold-rebuild peak RSS moves with S4). The CTO closes it at the lift (P1-13).

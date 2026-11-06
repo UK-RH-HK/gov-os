@@ -83,3 +83,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-34), as approved (DEC-729). The list row
   - The delivered `tasks.md` template is accepted by the bridge [W2-H051].
   - A direct `openspec archive` or a hand-set status does not bypass readiness [W2-H015].
   - The bridge checks the role against the roster [W2-M082].
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept.

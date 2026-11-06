@@ -1,6 +1,6 @@
 ---
 id: DAEO-rpfv
-status: open
+status: closed
 deps: [DAEO-49o5, DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
@@ -54,3 +54,5 @@ list_rows: []
 **Dependencies (PLAN-GROWTH-1 §2 gap 3):** also after W2-104 (the skill harness, DEC-959 item 5).
 
 Card: ROLES-RESEARCH-1 §5.3 item 11, approved (DEC-959 item 8). With W2-16 (`DAEO-49o5`), after its release form is merged.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): as P1-PLAN §C.

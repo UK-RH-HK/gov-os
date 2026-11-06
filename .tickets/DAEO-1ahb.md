@@ -1,6 +1,6 @@
 ---
 id: DAEO-1ahb
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-r30l]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -111,3 +111,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-21), as approved (DEC-729). The list row
 
 - **W2-H054 (high):** a ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree. Until this ticket lands, the rule is kept by hand: every lead and worker brief sets `PYTHONPATH` to the worktree's absolute `src` path per command, and each verification shows `gov.__file__` pointing into the worktree. The launcher is where the mechanism belongs; it sets the code path for test runs and gov commands, not for the guard's own hooks, which keep running the code the session started under.
 - **Row W2-M359 (DEC-743 §6.3, 2026-10-17):** the launch work shows whether a launched worker's Write and Edit reach its own folder under `~/gov-os-runs`, and either they do or the launch states that only Bash writes there.
+
+**D9-FATES (DEC-1083):** Merged into W2-121, W2-33, W2-60a and W2-56 by DEC-1083. S1 moved to W2-121; S2 folds into W2-33's S2; S3 (its launch record) folds into W2-60a's S8 and S4 into its S3, S4 and S6, and S3's `Session:` trailer half is lifted; S5 to S8 and F1 moved to W2-56.

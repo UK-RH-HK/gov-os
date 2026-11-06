@@ -61,3 +61,5 @@ Card: MEMORY-SPEC-MAP gap 1, resolved by the owner in DEC-957 ("full embeddings:
 - **The one check first:** `project-overlay` is `sensitivity: restricted`, `export_policy: denied`. The ticket shows from the code that sensitivity is read by export, not by the indexer, and keeps both as they are.
 - **Order:** after W2-86 (same block of the same file; it depends on it). W2-87 adds a different top-level block: split by lines; whichever merges second merges back.
 - **The re-measure:** W2-61's procedure, as W2-86's.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 10 (`947da7a4`, `W2-91-evidence.md`); S6's and F4's evidence is `docs/changes/W2-91-evidence.md` §3 to §5 (control `f46b9653` against head `b652fc96`, 2026-11-01, both figures, per question); S1 re-worded to M-4's scope (DEC-1055 (2)). The CTO closes it at the lift (P1-13).

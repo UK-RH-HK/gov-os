@@ -75,3 +75,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-04), as approved (DEC-729). The list row
   - The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126].
   - **Never one giant query or context (DEC-860, owner, 2026-10-20):** within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked in order of relevance; the packet names what it left for a further batch.
 - **KPIs, failure:** DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 8, as built at `70965cf6` (D-1), on DEC-1052 M-1 only; `gov accept` runs once for the close (M-1's "warning" variant is not pursued). The CTO closes it at the lift (P1-13).

@@ -1,6 +1,6 @@
 ---
 id: DAEO-btt7
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-0mab]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -42,3 +42,5 @@ list_rows: []
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-25), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
 - A fresh, read-only auditor checks AR-1 to AR-10 and Track A's tickets against DEC-718, DEC-720 to DEC-727 and this plan. Its verdict is Track A's pass or fail. A BLOCKER is fixed; every other finding goes to the owner (§6).
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): W-8: its AR lines are shown once in W2-46 and audited in W2-47; S1 moved to W2-47; exit criterion 5 re-worded (DEC-1084).

@@ -1,6 +1,6 @@
 ---
 id: DAEO-s694
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-jzvg, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -86,3 +86,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-41), as approved (DEC-729). The list row
   - The probe gate judges every commit after the probe that touches the ticket's paths, whatever its task, and refuses a hand-resolved merge that drops probed code [W2-M015, W2-M204, W2-M255, W2-M256, W2-M203, W2-M254].
   - A late commit on a closed ticket is caught [W2-M115].
   - The tree and HEAD are re-checked before the record is written [W2-M164].
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

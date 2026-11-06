@@ -50,3 +50,5 @@ The owner's DEC-1014 (SIZING-1 option 0): the shared embedding server answers on
 rebuild and retrieval check queues behind it; ACT-OLLAMA-CAP-1 capped it at 8 cores. This ticket lets it serve several
 requests at once, keeps every vector the same, and measures that the 8-core cap does not become the new limit (W2-20's
 gate then counts the server's CPU, as SMART-WORK-3 proposed).
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 9 (`f704f7d3`); its S7 already holds the start half of W2-20's S12, and the admission half stays with W2-20, so nothing moves in. The CTO closes it at the lift (P1-13).
