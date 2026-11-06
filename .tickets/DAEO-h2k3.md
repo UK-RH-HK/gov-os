@@ -16,11 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-m1u3]
 allowed_paths:
-- tests/acceptance/W2-61/test_w2_61_visible_half.py
-- tests/acceptance/W2-61/test_w2_61_baseline.py
-- tests/acceptance/W2-61/test_w2_61_scores.py
-- tests/acceptance/W2-61/README.md
-- tests/acceptance/W2-61h/**
 - fixtures/evaluation/memory-retrieval/visible/q21.yaml
 - fixtures/evaluation/memory-retrieval/visible/q22.yaml
 - fixtures/evaluation/memory-retrieval/visible/q23.yaml
