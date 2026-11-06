@@ -64,3 +64,10 @@ one-line files only", so the first wording was the CTO's error.
   longer be touched once only long lines are cut. Then the engineer revises, then the same reviewer reviews round 2
   (the last, DEC-1010).
 - **F4** (the measure's stack figures read the sent text) is noted for window 4's comparison with the pin.
+
+**Round 2's tests are ready** (CTO, 2026-11-06): `tests/acceptance/W2-135/` on `w2/W2-135-tests`.
+- **The reading pinned:** a line is measured without its newline, and a cut line keeps its newline (the README's N-1).
+- **F3 is answered:** W2-133's 48 cases pass with line cuts; its planted lines are all short.
+- **Known, a row:** `src/gov/retrieval/validate.py` would flag `TEXT_NOT_FOUND` on an item with a cut line in its
+  middle. No product code calls it on a real bundle (the retrieval skill's check is the stopping reason, ids, sha256
+  and supersession), so it is a row for the validator's next change, not this ticket's [DEC-1086 B].
