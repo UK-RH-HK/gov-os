@@ -228,3 +228,17 @@ other restart is an ACT.
   W2-135, a 4,000-character cap per item (a guard against one-line files; the total size tested in E5); the
   search-again reader sees the 138 (no tools, no transcript, counts only; the pilot, then the owner's cap). Recorded,
   acted on only at the owner's go: no re-pin and no experiment before the owner reads the seven answers. Basis: 1.
+- DEC-1087 (2026-11-06): before re-pin window 4, all done and tested:
+  - W2-135 and S11 (DEC-1086);
+  - the integration store refreshed now (if safe);
+  - W2-116's refresh after every merge, the daily backstop and the worktree store path;
+  - W2-129 (`gov links`);
+  - the dependency-mapping tool's decision, spec and KPI package (its home and timing assessed);
+  - the status block fixed (countdown, (a) to (d), the sixth line);
+  - a clean tree and the worktree list;
+  - window 4 as a rehearsed ACT;
+  - dates re-estimated.
+
+  After the re-pin: the parallel-agents and memory test first, then E0 to E5 and the fresh 80; M3's adoption after
+  all the experiments. The three layers stay in Wave 2 (reversing W3-P23): after the lift, streams and a trial plan
+  as a package. Basis: 1.

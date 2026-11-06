@@ -13608,6 +13608,65 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     has decided.
 - **Basis:** DEC-1085 (1), (6) and (7).
 
+### DEC-1087 — SEVEN-ANSWERS decided: the items before re-pin window 4, the parallel-agents test first after it, then the experiments; dependency mapping as a tool in Wave 2; the three layers back in Wave 2
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1086, DEC-1085, DEC-1083, DEC-1074 (7), DEC-954, DEC-953 item 8, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/SEVEN-ANSWERS.md` · **Changes:** DEC-1083 and DEC-1084 (W2-33's layer lines moved to Wave 3, W3-P23: reversed by (13)); DEC-1074 (7) O1 (A) (no automatic refresh: W2-116's refresh after every merge is built now, (3))
+- **Decision:** the re-pin comes only when every item before it is done and tested. Then the owner re-pins window 4,
+  the parallel-agents test runs first, then the experiments.
+  - **Before the re-pin:**
+    - (1) **DEC-1086 carried out:** W2-135, tests first, built and reviewed; W2-32 S11 re-worded and merged.
+    - (2) **Memory current now:** the integration store refreshed with `refresh_integration_store.sh`, so the agents
+      working today get current decisions and tickets, if the CTO confirms it is safe with the pinned code.
+    - (3) **The automatic refresh:** W2-116's refresh after every merge into integrate is built, tested and reviewed
+      before the re-pin, so window 4 puts it live. The daily refresh is re-armed as a backstop. Worktrees are given
+      the integration store's path, so workers can search.
+    - (4) **Automated drift detection:** W2-129 (`gov links`) is built, tested and reviewed before the re-pin, so
+      window 4 puts it live for the agents and orchestrators.
+    - (5) **Dependency mapping as a tool,** integrated with the path map, done in Wave 2 with the W2-116 work. It is
+      registered carefully as a decision and a spec, and scoped with KPI lines, before the re-pin, using the refreshed
+      memory and path map:
+      - when a ticket is filed, a template sets the paths it will write (strict and limited) and the paths it reads
+        (wide, not limited), with the research, specs or other tickets it waits on;
+      - the template feeds the path map, per ticket, in the ticket store;
+      - the tool derives the dependency map from those paths across tickets. A ticket that reads what another is
+        still writing, or waits on unfinished research or a spec, runs after it. Tickets whose writes overlap run in
+        series. The rest may run in parallel;
+      - from that map the tool sets the launch: which tickets run in parallel in one batch, and which wait for a named
+        ticket or batch. It uses the link graph, deterministically. The orchestrator and leads add what the paths
+        cannot show, from memory and the graph, and record it as links.
+
+      The CTO finds its home (W2-116, W2-121's dispatcher, W2-128's ticket template and ready check, or a new ticket)
+      and brings the decision, the spec, the KPI lines and an estimate as one package before the re-pin, with an
+      assessment of whether it is built before the re-pin or right after it.
+    - (6) **The status block:** the countdown and the four lapses fixed now, with SEVEN-ANSWERS §6 (a) to (d) and the
+      sixth line for the emergency plan, from the CTO's next message on.
+    - (7) **A clean tree:** everything committed and the record branch synced. Every worktree is listed with its state
+      (merged and clean, unmerged, uncommitted). Only those fully merged and clean are removed, their branches kept,
+      and the list is shown to the owner. The owner pushes before the re-pin.
+    - (8) **Re-pin window 4 as an ACT** for the owner's operator, rehearsed, carrying all of the above.
+    - (9) **Dates re-estimated** for all of this, the experiments, the lift and EXAMIN's copy.
+  - **After the re-pin:**
+    - (10) **The first test, before any experiment: parallel agents and memory.** Explained, then tested:
+      - agents in parallel worktrees search the shared integration store, and read and edit their own worktree;
+      - whether results carry their commit, so an agent whose branch is behind integrate is not misled by line
+        numbers (or whether worktrees take integrate's latest at launch);
+      - what a search does while the store is being refreshed, and what happens to a continuation after the switch;
+      - that the link graph and the dependency gating are used;
+      - the search time with 10 and 20 agents at once.
+
+      Tested with two agents in two worktrees searching while a merge refreshes the store. Any gap is reported before
+      the experiments start.
+    - (11) **Then the experiments,** in the CTO's order with its improvements: E0 and E0b, E1, the owner's cap, E2, E3,
+      E4, E5, the owner's decisions on the final design and the agents' practices, then the fresh 80. The pilot's cost
+      comes to the owner before E2.
+    - (12) **M3's adoption** is decided only after all the experiments, from what they show about chunking, context and
+      agents ranking the bundle.
+  - **The three layers:**
+    - (13) **They stay in Wave 2, reversing their move to Wave 3.** Straight after the emergency lift, the CTO assesses
+      the Wave 2 tickets that are left, splits them into streams, and closes Wave 2 with the three layers (the CTO as
+      master, a Senior Engineer per stream, its leads and agents), as the trial of their behaviour. The plan comes to
+      the owner as a package, with the streams, the capacity and RAM they need, and how the trial is measured.
+- **Basis:** question 1 (memory as agents use it) and the owner's direction on parallel work.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13631,3 +13690,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.468 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1084; DEC-1083 (7) changed. Next free id: DEC-1085. |
 | 0.469 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1085. Next free id: DEC-1086. |
 | 0.470 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1086. Next free id: DEC-1087. |
+| 0.471 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1087; DEC-1083/DEC-1084 (W2-33's layers to Wave 3) and DEC-1074 (7) O1 (A) changed. Next free id: DEC-1088. |
