@@ -217,6 +217,19 @@ class World:
         git(self.root, "checkout", "-q", rev)
         assert git(self.root, "rev-parse", "HEAD").strip() == rev
 
+    def commit(self, files: dict[str, list[str]], message: str = "W2-134 fixture: another commit") -> str:
+        """Write ``files`` into the measured root and commit them on top of HEAD; returns the new commit."""
+        for rel, lines in files.items():
+            write_lines(self.root / rel, lines)
+        git(self.root, "add", "-A")
+        git(self.root, "commit", "-q", "-m", message, when="2026-01-03T00:00:00+00:00")
+        return git(self.root, "rev-parse", "HEAD").strip()
+
+    def set_sets_families(self, families: dict | None) -> None:
+        """Rewrite the sets root's path map only (the measured root's committed path map is left as it is)."""
+        assert not self.in_tree
+        write_lines(self.sets_root / "governance/project/path-map.yaml", path_map(families).splitlines())
+
     # -- evidence and questions ------------------------------------------------------------------------------------
 
     def item(self, rel: str, first: int, last: int, rev: str | None = None) -> dict:
@@ -316,6 +329,12 @@ def total_line(text: str) -> str:
     found = [line for line in text.splitlines() if line.startswith("total: ")]
     assert found, f"no total line in:\n{text}"
     return found[-1]
+
+
+def first_line(text: str) -> str:
+    lines = text.splitlines()
+    assert lines, "the measure printed nothing"
+    return lines[0]
 
 
 def names_family_hit(line: str, member: str) -> bool:
