@@ -136,6 +136,32 @@ GPU used once; every combination replayed from kept scores).
     unchanged). The other 69 line-cited sources, the spent 60 and the visible half were already right for the clone.
   - Every model's figure is re-scored on these labels by replaying it alone (exact, as R0 showed).
 
+## L2's result and L3, written before any cell is replayed (2026-11-06 ~13:30)
+**L2:** q06 alone, on the labels re-anchored at `e884675b` (12:42), with the routing move switched off by the
+sentinel. Counts and ids only (`drafts/score-once/l2_table.py`).
+- **hit@5 on the 138 by stage:** the reranker's own order 100; plus the authority lift 106; plus routing's moves 108;
+  the full pipeline 108.
+- **Of the 30 misses, 27 never reach the top 5 in the reranker's own order.** Only 3 are pushed out by the lift (h26,
+  m02, m30, each from 4 or 5 to 6 or 7), against about 9 it brings in (net +6). The routing moves push none out
+  (net +2).
+- **So for the 0.6B the misses are the reranker's, not the lift's or the moves'.**
+
+**What L2 does not show, and L3 is for:** the lift adds 1.0 per tier step to the model's raw score, and the raw scales
+differ.
+- The 0.6B and the 4B give logits of about −14 to +11 (the 0.6B's median per-pass range is 13.06), so a step is
+  about 1/13 of a pass's spread.
+- gte and zerank give 0 to 1, so the same step outweighs everything they say. Merged or cascaded scores (0 to 1) are
+  swamped the same way.
+- Judged as measured, those cells would be judged mostly by the authority tiers, not by their reranker.
+
+**L3 (the change; `rx.py` `_final`, `"lift_norm"`; tested 23 of 23):**
+- **The lift:** each pass's rerank scores are min-max normalised to [0, 1], and the lift is added there.
+- **The step:** **0.0766** per tier step, the inverse of the 0.6B's median per-pass range (686 passes,
+  `l3-range`'s log). It is set from the baseline, so the 0.6B ranks about as today, and it is never tuned on a cell.
+- **The routing moves unchanged:** L2 shows they push no answer out, so no bound is needed.
+- **The same for every cell, B0 included:** every cell is replayed on v456 with `"rq":"question"` and
+  `"lift_norm": 0.0766`.
+
 ## Version 4 (2026-11-06 ~12:50, before any stage or cell replay is judged): a follow-up call's unscored texts
 - **The finding:** L2's replays with routing's moves switched off stopped: "4 of 40 texts were not scored by q06 in
   the window".
