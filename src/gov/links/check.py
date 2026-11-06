@@ -6,8 +6,9 @@ file's frontmatter), the register the path map names, ``ARCHIVE-SUPERSEDED.md`` 
 ``CONTRACT_v*.md``, the kernel's role, skill and template texts, the project's briefs and prompts, the path map, the
 test files and the commits. The only file written is the mark (``command.py``).
 
-The six kinds (``CODES``), each finding carrying its code, ids, path and line, the role from ``ROLE_TABLE`` and a
-one-line fix, ``text`` when a free-text pattern found it:
+The eight kinds (``CODES``), each finding carrying its code, ids, path and line, the role from ``ROLE_TABLE`` (a
+commit's finding: its ``Role:``, and once landed the lead, ``commit_role_field``) and a one-line fix, ``text`` when
+a free-text pattern found it:
 
 - UNMARKED_CHANGE: a register entry another entry, the register's change log or ARCHIVE-SUPERSEDED §A supersedes or
   amends, whose status line does not name that changer. The statements are the loader's ``register_statements``
@@ -18,6 +19,8 @@ one-line fix, ``text`` when a free-text pattern found it:
 - STATUS_CONFLICT: two records that disagree on a status.
 - NOT_IN_FORCE_AS_RULE: a PROPOSED, REJECTED, WITHDRAWN or SUPERSEDED decision named in a rule-bearing place.
 - ENFORCES_SUPERSEDED: W2-55's ``gov.decisions.propagation`` findings, as that module gives them.
+- CLOSED_TICKET_EDITED and TICKET_CHANGE_UNMARKED (S16, DEC-1088 (6)): a commit that edits a closed ticket's file,
+  or changes an open ticket's scope fields with no decision id (``ticket_changes``).
 
 Incremental (``touched``, ``is_new``): the whole record set and every commit are read every run; a finding is new
 when it touches what changed in ``<base>..HEAD``: a commit in the range; the record it sits in (a file with a
@@ -38,7 +41,9 @@ from gov.store.loader import register_entries, register_statements
 
 UNMARKED_CHANGE, UNKNOWN_ID, UNLINKED_ID = "UNMARKED_CHANGE", "UNKNOWN_ID", "UNLINKED_ID"
 STATUS_CONFLICT, NOT_IN_FORCE_AS_RULE, ENFORCES_SUPERSEDED = "STATUS_CONFLICT", "NOT_IN_FORCE_AS_RULE", "ENFORCES_SUPERSEDED"
-CODES = (UNMARKED_CHANGE, UNKNOWN_ID, UNLINKED_ID, STATUS_CONFLICT, NOT_IN_FORCE_AS_RULE, ENFORCES_SUPERSEDED)
+CLOSED_TICKET_EDITED, TICKET_CHANGE_UNMARKED = "CLOSED_TICKET_EDITED", "TICKET_CHANGE_UNMARKED"  # S16, DEC-1088 (6)
+CODES = (UNMARKED_CHANGE, UNKNOWN_ID, UNLINKED_ID, STATUS_CONFLICT, NOT_IN_FORCE_AS_RULE, ENFORCES_SUPERSEDED,
+         CLOSED_TICKET_EDITED, TICKET_CHANGE_UNMARKED)
 
 ORCHESTRATOR, PRODUCT_SPEC, ENGINEER = "orchestrator", "product-spec", "engineer"
 TEST_DESIGNER, AUDITOR, RESEARCH = "independent-test-designer", "independent-auditor", "research"
@@ -83,7 +88,7 @@ _ROLE = re.compile(r"^Role:[ \t]*(\S+)", re.MULTILINE | re.IGNORECASE)
 _LOG = "--format=%x1e%H%x1f%cs%x1f%(trailers:key=Task,key=Implements,key=Role,unfold)%x1f%B"
 
 # The role responsible, by path (LINK-INTEGRITY §4.1, the KPI's one fixed table); the register and the path map are
-# the orchestrator's, as is any path the table does not name. A commit's finding names the commit's role (``_commit``).
+# the orchestrator's, as is any path the table does not name. A commit's finding: ``commit_role_field``.
 ROLE_TABLE = (
     ((TICKETS, PLANS, "governance/project/prompts/", "governance/project/briefs/", "docs/lessons/", LISTS),
      ORCHESTRATOR),
@@ -101,6 +106,15 @@ def role_of(path: str) -> str:
         if path.startswith(prefixes):
             return role
     return ORCHESTRATOR
+
+
+def commit_role_field(commit_role: str | None, *, landed: bool) -> tuple[str, str | None]:
+    """A commit's finding's role and lead (S9): the role field names the commit's ``Role:`` trailer, the
+    orchestrator for a commit with no ``Role:``; once landed, the ticket's lead (orchestrator) is the finding's
+    ``lead`` (in ``--json``). The text line's role field stays the one role (the record, §4 reading 5)."""
+    if not commit_role or commit_role == ORCHESTRATOR:
+        return ORCHESTRATOR, None
+    return commit_role, (ORCHESTRATOR if landed else None)
 
 
 def _num(record_id: str) -> tuple:
@@ -257,31 +271,44 @@ class _Repo:
         return entry["line"] + next((n for n, line in enumerate(lines[1:], 1) if line.strip()), 0)
 
 
-def _read(root: Path, tree: dict, paths: list[str]) -> dict[str, str]:
-    """``path -> text`` of each of ``paths`` that ``HEAD`` holds as UTF-8 text, in one ``git cat-file --batch``."""
-    if not paths:
+def _blobs(root: Path, ids: list[str]) -> dict[str, str]:
+    """``object id -> text`` of each of ``ids`` held as UTF-8 text, in one ``git cat-file --batch``."""
+    if not ids:
         return {}
-    out = loader._git(root, "cat-file", "--batch", stdin="".join(f"{tree[path][2]}\n" for path in paths).encode())
-    files, position = {}, 0
-    for path in paths:
+    out = loader._git(root, "cat-file", "--batch", stdin="".join(f"{object_id}\n" for object_id in ids).encode())
+    texts, position = {}, 0
+    for object_id in ids:
         header_end = out.index(b"\n", position)
-        size = int(out[position:header_end].split()[2])
+        header = out[position:header_end].split()
+        if len(header) < 3:  # "<id> missing"
+            position = header_end + 1
+            continue
+        size = int(header[2])
         blob, position = out[header_end + 1:header_end + 1 + size], header_end + size + 2
         try:
             text = blob.decode("utf-8")
         except UnicodeDecodeError:
             continue
         if "\0" not in text:
-            files[path] = text
-    return files
+            texts[object_id] = text
+    return texts
 
 
-def _finding(code, ids, path, line, fix, subject, *, text=False, role=None, commit=None, via=()) -> dict:
+def _read(root: Path, tree: dict, paths: list[str]) -> dict[str, str]:
+    """``path -> text`` of each of ``paths`` that ``HEAD`` holds as UTF-8 text."""
+    texts = _blobs(root, [tree[path][2] for path in paths])
+    return {path: texts[tree[path][2]] for path in paths if tree[path][2] in texts}
+
+
+def _finding(code, ids, path, line, fix, subject, *, text=False, role=None, lead=None, commit=None, via=()) -> dict:
     """One finding; ``via`` names the other places that stated it, ``(path, line)`` or a record's ``path`` (an
-    ARCHIVE §A line, a close record, contract.yaml's status line), so a range that changes one makes it new."""
+    ARCHIVE §A line, a close record, contract.yaml's status line), so a range that changes one makes it new;
+    ``lead`` is a landed commit's lead (``commit_role_field``)."""
     found = {"code": code, "ids": list(ids), "path": path, "line": int(line), "role": role or role_of(path),
              "fix": " ".join(str(fix).split()).replace("|", "/"), "subject": " ".join(subject.split()).replace("|", "/"),
              "text": bool(text)}
+    if lead:
+        found["lead"] = lead
     if commit is not None:
         found["commit"] = commit
     if via:
@@ -640,8 +667,7 @@ def commits(repo: _Repo, judged: set[str] | None) -> tuple[list[dict], int]:
         read_from = message if date < loader.TRAILER_RULE_DATE else block
         role_match = _ROLE.search(read_from)
         commit_role = role_match.group(1) if role_match else None
-        landed = sha not in first_parent
-        role = ORCHESTRATOR if landed or not commit_role else commit_role
+        role, lead = commit_role_field(commit_role, landed=sha not in first_parent)
         new = judged is None or sha in judged
         in_range += new
         lines = message.split("\n")
@@ -656,12 +682,11 @@ def commits(repo: _Repo, judged: set[str] | None) -> tuple[list[dict], int]:
         for key, value in loader._TRAILER.findall(read_from):
             items = [item for item in re.split(r"[,\s]+", value) if item]
             (tasks if key.lower() == "task" else implements).extend(items[:1] if key.lower() == "task" else items)
-        by = f"the commit's author (Role: {commit_role})" if commit_role else "the commit's author"
         for task in tasks:
             if task not in EXEMPT_TASKS and not repo.resolves(task):
                 found.append(_finding(UNKNOWN_ID, [task], sha, at("Task", task),
-                                      f"name the ticket {task} should have named (history is not rewritten); "
-                                      f"{by}", f"{task} in {sha[:12]}'s Task:", role=role, commit=sha))
+                                      f"name the ticket {task} should have named (history is not rewritten)",
+                                      f"{task} in {sha[:12]}'s Task:", role=role, lead=lead, commit=sha))
         ticket = None
         for task in tasks:
             named = repo.alias.get(task, task)
@@ -678,14 +703,15 @@ def commits(repo: _Repo, judged: set[str] | None) -> tuple[list[dict], int]:
                 continue
             if not repo.resolves(named):
                 found.append(_finding(UNKNOWN_ID, [named], sha, at("Implements", named),
-                                      f"name the id {named} should have named (history is not rewritten); {by}",
-                                      f"{named} in {sha[:12]}'s Implements:", role=role, commit=sha))
+                                      f"name the id {named} should have named (history is not rewritten)",
+                                      f"{named} in {sha[:12]}'s Implements:", role=role, lead=lead, commit=sha))
                 continue
             status = repo.status.get(named)
             if status in NOT_IN_FORCE:
                 found.append(_finding(NOT_IN_FORCE_AS_RULE, [named], sha, at("Implements", named),
-                                      f"decide {named} or implement a decision in force; {by}",
-                                      f"{named} ({status}) in {sha[:12]}'s Implements:", role=role, commit=sha))
+                                      f"decide {named} or implement a decision in force",
+                                      f"{named} ({status}) in {sha[:12]}'s Implements:", role=role, lead=lead,
+                                      commit=sha))
             if ticket is not None and commit_role in WORKERS and named not in cited:
                 cited.add(named)
                 path, front = ticket
@@ -694,6 +720,102 @@ def commits(repo: _Repo, judged: set[str] | None) -> tuple[list[dict], int]:
                                       f"{named} in {sha[:12]}'s Implements: ({commit_role}), not in {front['id']}'s "
                                       "sources", commit=sha))
     return found, in_range
+
+
+# ---------------------------------------------------------------- S16: ticket changes (DEC-1088 (6))
+
+WATCHED = ("title", "kpis", "allowed_paths", "reads", "needs", "waits_on", "depends_on", "acceptance_tests")
+_TICKET_LOG = "--format=%x1e%H%x1f%cs%x1f%(trailers:key=Implements,key=Decided-by,unfold)%x1f%B%x1f"
+_MARKING = re.compile(r"^(?:Implements|Decided-by):[ \t]*(.*)$", re.IGNORECASE | re.MULTILINE)
+_DEC_ANY = re.compile(r"(?<![A-Za-z0-9_])DEC-[0-9]+(?![0-9])")
+_NO_BLOB = "0" * 40
+
+
+def _first_change(before: str, after: str) -> int:
+    """The 1-based line of ``after`` where it first differs from ``before``."""
+    old, new = before.split("\n"), after.split("\n")
+    for number, (a, b) in enumerate(zip(old, new), 1):
+        if a != b:
+            return number
+    return min(len(old), len(new)) + 1 if len(old) != len(new) else 1
+
+
+def ticket_changes(repo: _Repo) -> list[dict]:
+    """CLOSED_TICKET_EDITED and TICKET_CHANGE_UNMARKED for every commit that changed a ticket's file. Each is the
+    commit's finding (``commit``), so it is new only when its commit is in the range, and standing otherwise.
+
+    - Closed means the ticket's status in the commit's parent; a decision id does not excuse the edit.
+    - An open or in-progress ticket's ``WATCHED`` field changed, with no ``DEC-n`` in the changed lines (added or
+      removed) nor in the commit's ``Implements:`` or ``Decided-by:``, is one finding per field.
+    - A change of any other field (``status``, ``assignee``, ``links``, …) is none; nor is the commit that closes
+      the ticket, nor a merge (its changes are its parents' commits'), nor the commit that adds the ticket."""
+    from collections import Counter
+
+    log = loader._git(repo.root, "-c", "core.quotePath=false", "log", "--full-history", "--raw", "--no-abbrev",
+                      "--no-renames", _TICKET_LOG, "HEAD", "--", TICKETS).decode("utf-8", "replace")
+    changes, wanted = [], {}
+    for chunk in log.split("\x1e")[1:]:
+        sha, date, block, message, raw = chunk.split("\x1f", 4)
+        said = message if date < loader.TRAILER_RULE_DATE else block
+        marked = any(_DEC_ANY.search(value) for value in _MARKING.findall(said))
+        for line in raw.split("\n"):
+            meta, tab, path = line.partition("\t")
+            parts = meta.split()
+            if not tab or not line.startswith(":") or len(parts) < 5:
+                continue
+            old, new = parts[2], parts[3]
+            if not path.startswith(TICKETS) or not path.endswith(".md") or old == _NO_BLOB:
+                continue
+            changes.append((sha, marked, path, old, new))
+            wanted[old] = wanted[new] = None
+    wanted.pop(_NO_BLOB, None)
+    texts = _blobs(repo.root, list(wanted))
+    fronts: dict[str, object] = {}
+
+    def front(object_id):
+        if object_id not in fronts:
+            fronts[object_id] = _front(texts[object_id]) if object_id in texts else None
+        return fronts[object_id]
+
+    found = []
+    for sha, marked, path, old, new in changes:
+        was = front(old)
+        if not isinstance(was, dict):
+            continue
+        deleted = new == _NO_BLOB
+        after = "" if deleted else texts.get(new)
+        now = {} if deleted else front(new)
+        if after is None or not isinstance(now, dict):
+            continue
+        ticket, short = str(was.get("id") or now.get("id") or path), sha[:12]
+        status = str(was.get("status", "")).strip()
+        if status == "closed":
+            keys = list(dict.fromkeys([*now, *was]))
+            fields = "the file (deleted)" if deleted else \
+                ", ".join(key for key in keys if was.get(key) != now.get(key)) or "body"
+            found.append(_finding(
+                CLOSED_TICKET_EDITED, [ticket, short], path, 1 if deleted else _first_change(texts[old], after),
+                f"revert {short}'s edit of {ticket} or carry the change in a new ticket; a closed ticket is not edited",
+                f"{ticket} {short} {fields}: closed before the commit", role=ORCHESTRATOR, commit=sha)
+                | {"field": fields})
+            continue
+        if deleted or status not in OPEN or str(now.get("status", "")).strip() == "closed":
+            continue  # the closing commit itself is not a finding
+        fields = [key for key in WATCHED if was.get(key) != now.get(key)]
+        if not fields or marked:
+            continue
+        before_lines, after_lines = Counter(texts[old].split("\n")), Counter(after.split("\n"))
+        if any(_DEC_ANY.search(line) for line in (before_lines - after_lines) + (after_lines - before_lines)):
+            continue
+        at_head = repo.files.get(path, after)
+        for field in fields:
+            found.append(_finding(
+                TICKET_CHANGE_UNMARKED, [ticket, short], path, _key_line(at_head, field),
+                f"name the decision behind {short}'s change of {ticket}'s {field} (a DEC-n in a commit's "
+                "Implements: or Decided-by:), or revert it",
+                f"{ticket} {short} {field}: changed with no DEC-n in the lines, Implements: or Decided-by:",
+                role=ORCHESTRATOR, commit=sha) | {"field": field})
+    return found
 
 
 # ---------------------------------------------------------------- ENFORCES_SUPERSEDED
@@ -738,10 +860,10 @@ def findings(repo: _Repo, judged: set[str] | None) -> tuple[list[dict], int]:
     found = unmarked(repo, said) + register_places(repo, said) + records(repo) + contract(repo) + texts(repo)
     found += statuses(repo)
     from_commits, in_range = commits(repo, judged)
-    found += from_commits + enforces(repo)
+    found += from_commits + enforces(repo) + ticket_changes(repo)
     unique = {}
     for finding in found:
-        key = (finding["code"], tuple(finding["ids"]), finding["path"], finding["line"])
+        key = (finding["code"], tuple(finding["ids"]), finding["path"], finding["line"], finding.get("field"))
         unique.setdefault(key, finding)
     ordered = sorted(unique.values(), key=lambda f: (CODES.index(f["code"]), f["path"], f["line"], f["ids"]))
     return ordered, in_range

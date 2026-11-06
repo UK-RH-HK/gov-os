@@ -280,6 +280,117 @@ def test_commit_trailers(tmp_path, capsys):
     assert not any("decision-record" in line for line in out.splitlines())
 
 
+def test_a_commits_finding_names_its_role_then_the_lead_once_landed(tmp_path, capsys):
+    """S9: the role field is the commit's ``Role:``; landed, the lead is the JSON ``lead``; no ``Role:``, the
+    orchestrator."""
+    root = _plant(tmp_path)
+    main_branch = _git(root, "rev-parse", "--abbrev-ref", "HEAD").strip()
+    direct = _commit(root, {"src/a.py": "x\n"}, "d\n\nTask: T-one\nRole: engineer")
+    bare = _commit(root, {"src/b.py": "x\n"}, "b\n\nTask: T-two")
+    _git(root, "checkout", "-q", "-b", "side")
+    landed = _commit(root, {"tests/t.py": "x\n"}, "t\n\nTask: T-three\nRole: independent-test-designer")
+    _git(root, "checkout", "-q", main_branch)
+    _git(root, "merge", "-q", "--no-ff", "-m", "land\n\nTask: decision-record\nRole: orchestrator", "side")
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    roles = {line.split(" | ")[1].rpartition(":")[0]: line.split(" | ")[2] for line in _lines(out, "UNKNOWN_ID")}
+    assert roles[direct] == "engineer"
+    assert roles[bare] == "orchestrator"
+    assert roles[landed] == "independent-test-designer"
+    assert not any("Role:" in line.split(" | ")[3] for line in _lines(out, "UNKNOWN_ID"))  # not in the fix
+    (root / check.MARK_REL).unlink()
+    _, out, _ = _run(root, "--all", "--json", capsys=capsys)
+    leads = {f["commit"]: f.get("lead") for f in json.loads(out)["result"]["findings"] if f["code"] == "UNKNOWN_ID"}
+    assert leads[landed] == "orchestrator" and leads[direct] is None and leads[bare] is None
+
+
+# ---------------------------------------------------------------- S16: ticket changes
+
+_SCOPED = "title: A ticket\nassignee: engineer\nlinks: []\nallowed_paths:\n- src/a/**\n"
+
+
+def _s16(tmp_path, status: str = "open") -> Path:
+    return _plant(tmp_path, {".tickets/T-mmmm.md": _ticket("T-mmmm", status, ["DEC-100"], "A line", _SCOPED)})
+
+
+def _edit(root: Path, old: str, new: str, message: str = "e\n\nTask: decision-record\nRole: orchestrator") -> str:
+    text = (root / ".tickets/T-mmmm.md").read_text()
+    assert old in text
+    return _commit(root, {".tickets/T-mmmm.md": text.replace(old, new)}, message)
+
+
+def test_a_closed_tickets_file_edited_is_a_finding_a_decision_does_not_excuse(tmp_path, capsys):
+    root = _s16(tmp_path, "closed")
+    sha = _edit(root, "# body", "# body\n\nA note added after the close (DEC-100).",
+                "e\n\nTask: decision-record\nImplements: DEC-100\nRole: orchestrator")
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    found = _lines(out, "CLOSED_TICKET_EDITED")
+    assert len(found) == 1 and found[0].startswith(f"CLOSED_TICKET_EDITED T-mmmm {sha[:12]} body")
+    assert found[0].split(" | ")[2] == "orchestrator" and found[0].split(" | ")[1].startswith(".tickets/T-mmmm.md:")
+
+
+def test_reopening_a_closed_ticket_is_an_edit_of_it(tmp_path, capsys):
+    root = _s16(tmp_path, "closed")
+    sha = _edit(root, "status: closed", "status: open")
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert [line.split(" | ")[0] for line in _lines(out, "CLOSED_TICKET_EDITED")] == [
+        f"CLOSED_TICKET_EDITED T-mmmm {sha[:12]} status: closed before the commit"]
+
+
+@pytest.mark.parametrize("old, new, field", [
+    ("A line", "Another line", "kpis"),
+    ("- src/a/**", "- src/a/**\n- src/b/**", "allowed_paths"),
+    ("title: A ticket", "title: A wider ticket", "title"),
+    ("---\n# body", "depends_on: [T-mmmm]\n---\n# body", "depends_on"),
+])
+def test_an_open_tickets_scope_changed_unmarked_names_ticket_commit_and_field(tmp_path, capsys, old, new, field):
+    root = _s16(tmp_path)
+    sha = _edit(root, old, new)
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    found = _lines(out, "TICKET_CHANGE_UNMARKED")
+    assert [line.split(" | ")[0].split(":")[0] for line in found] == [f"TICKET_CHANGE_UNMARKED T-mmmm {sha[:12]} {field}"]
+    assert found[0].split(" | ")[2] == "orchestrator"
+
+
+@pytest.mark.parametrize("old, new, message", [
+    ("A line", "A line (DEC-100)", None),  # the decision in an added line
+    ("A line", "Another line", "e\n\nTask: decision-record\nImplements: DEC-100\nRole: orchestrator"),
+    ("A line", "Another line", "e\n\nTask: decision-record\nDecided-by: DEC-100\nRole: orchestrator"),
+    ("status: open", "status: in_progress", None),  # status, assignee and links alone are none
+    ("assignee: engineer", "assignee: research", None),
+    ("links: []", "links: [T-zzzz]", None),
+    ("status: open\n", "status: closed\n", None),  # the closing commit itself
+])
+def test_marked_or_unwatched_ticket_changes_are_not_findings(tmp_path, capsys, old, new, message):
+    root = _s16(tmp_path)
+    if old == "status: open\n":  # a closing commit that also edits a KPI
+        text = (root / ".tickets/T-mmmm.md").read_text().replace(old, new).replace("A line", "Done line")
+        _commit(root, {".tickets/T-mmmm.md": text})
+    else:
+        _edit(root, old, new, *([message] if message else []))
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert _lines(out, "TICKET_CHANGE_UNMARKED") == [] and _lines(out, "CLOSED_TICKET_EDITED") == []
+
+
+def test_a_decision_in_a_removed_line_marks_the_change(tmp_path, capsys):
+    root = _plant(tmp_path, {".tickets/T-mmmm.md": _ticket("T-mmmm", "open", [], "A line [DEC-100]", _SCOPED)})
+    _edit(root, "A line [DEC-100]", "A line")
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert _lines(out, "TICKET_CHANGE_UNMARKED") == []
+
+
+def test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range(tmp_path, capsys):
+    root = _s16(tmp_path)
+    old = _edit(root, "A line", "Another line")
+    head = _git(root, "rev-parse", "HEAD").strip()
+    new = _edit(root, "- src/a/**", "- src/c/**")
+    code, out, _ = _run(root, "--since", head, capsys=capsys)
+    listed = out.splitlines()[1:]
+    assert code == 1 and len(listed) == 1 and listed[0].startswith(f"TICKET_CHANGE_UNMARKED T-mmmm {new[:12]} ")
+    assert "TICKET_CHANGE_UNMARKED orchestrator 1" in out.splitlines()[0]  # the older one, standing
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert any(line.startswith(f"TICKET_CHANGE_UNMARKED T-mmmm {old[:12]} kpis") for line in out.splitlines())
+
+
 # ---------------------------------------------------------------- STATUS_CONFLICT and ENFORCES_SUPERSEDED
 
 def test_status_conflicts(tmp_path, capsys):
