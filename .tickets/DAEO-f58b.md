@@ -91,3 +91,17 @@ the integration store's path, so workers can search.
 - **A build whose semantic store is not recreated counts as failed** (N-2), as the CTO's script counts it.
 - **Untested (N-4):** a search through the link writes its question-vector cache into the ready half. The engineer
   states whether a sandboxed session may write there, or where the cache goes instead.
+
+**Pass 1 merged (CTO, 2026-11-06, `75acb0ff`; review READY in round 2, `reviews/w2-116.md`).** For the next pass (S2),
+riding along (DEC-802):
+- **R2-F1:** `gov retrieve --root <link>` still resolves the link once per facet. Resolve the root once in
+  `_store_root` in both branches. The plain form with `GOV_STORE` is fixed.
+- **R2-F3:** a continuation token carries no mark of the half it was made on. Page 2, asked after a switch, pages the
+  other half. The parallel-agents test after window 4 measures it (DEC-1087 (10)).
+- **F7:** the merge queue's promotion builds with the clone's code. Retire it, or make it build with the pinned gov,
+  once the hook is live.
+- **Window 4's ACT** installs the hook with `flock -o` (R2-F2), `env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u
+  GOV_REBUILD_LOCK` (F5), and the separate `W2-00-store.refresh.lock` taken before the heavy slot (F6).
+- **F3,** a stale `index.lock` after a refresh killed during its checkout, is a row (not ordinary work).
+
+[DEC-1087]
