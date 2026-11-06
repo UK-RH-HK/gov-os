@@ -1,7 +1,7 @@
 ---
 id: DAEO-dy7j
 status: closed
-deps: []
+deps: [DAEO-0uhh]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task

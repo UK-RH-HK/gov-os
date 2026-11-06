@@ -1,7 +1,7 @@
 ---
 id: DAEO-mc6n
 status: closed
-deps: []
+deps: [DAEO-dy7j]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task

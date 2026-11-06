@@ -100,9 +100,9 @@ kpis:
   - 'Every exit criterion of §5 is run and evidenced, including: every Wave 2 close record listed with its exit code'
   - 'Every exit criterion of §5 is run and evidenced, including: the governance share per programme, the EXAMIN pilot included'
   - 'Every exit criterion of §5 is run and evidenced, including: gov doctor green in EXAMIN. [re-scoped, DEC-1083]'
-  - 'AR-1 to AR-10 are each shown to pass, in order, with the evidence path of each (DEC-721). EXP-003''s line is shown by W2-15a. [moved from W2-24 S5, DEC-1083]'
+  - 'AR-1 to AR-10 are each shown once, in order, in the Wave 2 exit run''s record, with the evidence path of each (DEC-721); the AR lines whose tickets moved to Wave 3 are named as Wave 3 there (DEC-953, DEC-954, W-8). EXP-003''s line is shown by W2-15a. [moved from W2-24 S5, DEC-1083] [re-worded, DEC-1084]'
   failure:
-  - 'Any AR line not shown; the fixture importing this repository''s src/. [moved from W2-24 F1, DEC-1083]'
+  - 'Any AR line not shown. [moved from W2-24 F1, DEC-1083] [re-worded, DEC-1084]'
 profile: FULL
 sources:
 - DEC-729

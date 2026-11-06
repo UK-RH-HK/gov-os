@@ -11,6 +11,7 @@ parent: DAEO-5j8b
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-5j8b]
 allowed_paths:
 - src/gov/guard/protected.py
 - src/gov/guard/heldout.py

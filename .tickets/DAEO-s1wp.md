@@ -11,6 +11,7 @@ parent: DAEO-c1uz
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-c1uz]
 allowed_paths:
 - src/gov/close/select.py
 - src/gov/close/nightly.py

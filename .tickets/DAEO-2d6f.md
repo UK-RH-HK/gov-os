@@ -11,6 +11,7 @@ parent: DAEO-ym8a
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-ym8a]
 allowed_paths:
 - src/gov/store/**
 - src/gov/records/**

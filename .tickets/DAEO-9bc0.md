@@ -62,4 +62,4 @@ W2-11 goes back for another round instead, the seven lines ride along in that ro
 SMART-WORK-5 B fixes a product defect: the kernel orchestration skill counts the recommendation's and the proposer's
 agreement as corroboration (`template/governance/kernel/skills/orchestration/SKILL.md`).
 
-**D9-FATES (DEC-1083):** Merged into W2-128 by DEC-1083. S1, F1 and F2 fold into W2-128's TPL-1 S3 and TPL-4 (no new line); S2 moved to W2-128 as the reviewer template's line; S3 to S7 lifted.
+**D9-FATES (DEC-1083):** Merged into W2-128 by DEC-1083. S1, F1 and F2 fold into W2-128's TPL-1 S3 and TPL-4 (no new line); S2 moved to W2-128 as the reviewer template's line; S3 to S7 lifted. S1's other half (the qa-review skill's triage, its blocking rule, the two-round cap and the two questions) lives in W2-11 S12 and W2-33's moderator line (S10 in D9-FATES' numbering, its S6 since its lifts and moves).

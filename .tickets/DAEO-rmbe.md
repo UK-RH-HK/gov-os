@@ -1,7 +1,7 @@
 ---
 id: DAEO-rmbe
 status: closed
-deps: []
+deps: [DAEO-kl5e]
 links: []
 created: 2026-10-22T15:54:42Z
 type: task

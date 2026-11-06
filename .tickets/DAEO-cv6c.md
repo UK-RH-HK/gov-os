@@ -11,6 +11,7 @@ parent: DAEO-cy5o
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: engineer
+depends_on: [DAEO-cy5o]
 allowed_paths:
 - src/gov/adapters/portability.py
 - src/gov/doctor/command.py

@@ -11,6 +11,7 @@ parent: DAEO-uzme
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: independent-test-designer
+depends_on: [DAEO-uzme]
 allowed_paths:
 - tests/acceptance/W1-05/**
 - tests/acceptance/W1-47/**

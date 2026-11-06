@@ -54,4 +54,4 @@ The owner's SMART-WORK-1 decision 3 (DEC-983): after EXAMIN's copy (Wave 3 work,
 - **Why:** the three layers in this repository use the CTO's watchers (`interim_watch.sh`, `lead_return_watch.sh`); an adopted product's Senior Engineers need the same, in the product. The kernel's lead brief gains `brief_gaps:` with W2-11 round 2; this ticket checks it.
 - **Order:** after W2-33 (the roles), W2-60b (the session records it reads) and W2-27 (EXAMIN's copy).
 
-**D9-FATES (DEC-1083):** Merged into W2-121 by DEC-1083. S1, S3, S4 and F1 moved to W2-121 as lines; S5 folds into W2-121's S13; S2 and F2 (the `brief_gaps:` check) go to Wave 3 (W3-P02, W-10); its `after-examin` tag is resolved with the merge.
+**D9-FATES (DEC-1083):** Merged into W2-121 by DEC-1083. S1, S3, S4 and F1 moved to W2-121 as lines; S5 folds into W2-121's S13 (D9-FATES' numbering; its S12 since S12 moved to `kpis.moved`); S2 and F2 (the `brief_gaps:` check) go to Wave 3 (W3-P02, W-10); its `after-examin` tag is resolved with the merge.

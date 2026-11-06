@@ -11,6 +11,7 @@ parent: DAEO-e8f0
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: independent-test-designer
+depends_on: [DAEO-e8f0]
 allowed_paths:
 - tests/acceptance/W2-71/**
 kpis:
