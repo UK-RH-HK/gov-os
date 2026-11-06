@@ -13667,6 +13667,39 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
       the owner as a package, with the streams, the capacity and RAM they need, and how the trial is measured.
 - **Basis:** question 1 (memory as agents use it) and the owner's direction on parallel work.
 
+### DEC-1088 — Dependency mapping decided: `gov plan` (W2-136), the template's `reads:`, `needs:` and `waits_on:`, enforcement at launch; closed tickets are never edited (standing)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; item (6) standing) · **Under:** DEC-1087 (5), DEC-1007 (2), DEC-936 item 3.4, DEC-899, DEC-235, DEC-1052 · **Source:** `governance/project/orchestration/packages/LIFT-1/DEPENDENCY-MAP-1.md` · **Changes:** DEC-936 item 3.4 (the planner's dependency half moves from Wave 3 into Wave 2)
+- **Decision:**
+  - (1) **DEPENDENCY-MAP-1 §2 is approved.** `gov plan` proposes the batches deterministically, and the orchestrator
+    approves them into the ready list, so DEC-1007 (2) holds.
+  - (2) **W2-136's KPI lines, and the lines added to W2-128 and W2-121, are approved,** updated to (3) and (5).
+  - (3) **§5 (b):**
+    - `reads:` stays wide, for information and the `READS_WIDE` warning;
+    - `needs:` lists the paths whose finished state the ticket depends on, and orders tickets together with
+      `waits_on:`;
+    - the template asks for both, and W2-128's ready check refuses a new ticket without them, by name.
+  - (4) **Timing:** W2-136 is built right after re-pin window 4, beside the experiments, tests first, so it is live at
+    the lift's re-pin, before the three layers' streams start.
+  - (5) **Enforcement at launch.** `gov launch` refuses:
+    - (a) a lead for a ticket that is not in the approved batch, or whose waits are not met when checked at launch time
+      against the current tickets;
+    - (b) any session, lead or worker, when the dispatcher's gate is closed or the machine's limits would be passed.
+
+    One recorded override, with a decision id, is shown in the plan and the log (DEC-899). Every refusal names what the
+    ticket waits for: the ticket, the path or the limit. The CTO finds its home and gives its KPI lines. It lands with
+    W2-136.
+  - (6) **Tickets, standing:**
+    - a closed ticket is never edited; any bug fix, new spec or upgrade to its work is a new ticket;
+    - an open ticket may change while it is in flight, and `gov plan` recomputes the plan from the current tickets;
+    - each change to an open ticket is marked on it with the decision that made it, and `gov links` flags any change
+      without one.
+- **Where (5) lives (the CTO, from the code):**
+  - (a) is W2-136's: it holds the plan, and the launcher calls its check;
+  - (b) is W2-20's: the machine-wide gate, built and held, whose lines already refuse a start while the gate is shut.
+    It gains one line covering every session and the override, and lands with W2-136.
+  - (6)'s flag is a line added to W2-129 (open, in flight).
+- **Basis:** question 2 (agents in parallel never collide in ordinary work: an order the tool proves, enforced at launch).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13691,3 +13724,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.469 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1085. Next free id: DEC-1086. |
 | 0.470 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1086. Next free id: DEC-1087. |
 | 0.471 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1087; DEC-1083/DEC-1084 (W2-33's layers to Wave 3) and DEC-1074 (7) O1 (A) changed. Next free id: DEC-1088. |
+| 0.472 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1088 (item 6 standing); DEC-936 item 3.4 changed. Next free id: DEC-1089. |
