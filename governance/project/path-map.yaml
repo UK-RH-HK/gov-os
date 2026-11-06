@@ -526,6 +526,15 @@ evaluation_sets:
     hidden: ["fixtures/evaluation/memory-verdict-2/hidden/**"]
     measures:
       roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+# The source families (DEC-1078 (4), DEC-1079; W2-61h S7): a gold source and its official copies, each family a list
+# of member path globs. The memory measure (gov.retrieval.measure) counts an evidence item in another member of a gold
+# source's family as a hit on that source only when the item's text holds the gold span's text (whitespace and
+# Markdown or YAML formatting normalised), never by its path alone.
+evaluation_families:
+  contract: ["docs/contract/CONTRACT_v4.md", "docs/contract/contract.yaml",
+             "docs/contract/capabilities/*.md", "docs/contract/master-rules/*.md"]
+  kernel: ["template/governance/kernel/**", ".claude/**", ".rulesync/**"]
+  agents: ["AGENTS.md", "CLAUDE.md"]
 # Role separation (DEC-1052 G-14): the globs each role does not read, judged by the guard's role_reads.py from the
 # main tree's copy of this file by simple path checks (a target the guard cannot resolve, a search from a folder
 # above and a listing of names are let through). Only this block is parsed. A plain glob applies in every tree.
