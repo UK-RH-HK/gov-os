@@ -197,3 +197,7 @@ other restart is an ACT.
   keep the GPU. Every report ends with DEC-948's block. **mxbai is dropped** (closed as measured, not replayed; its
   downloads kept): the reranker comparisons are among the Qwen3 models only (the 0.6B, the 4B at 24, the cascade).
   Basis: questions 1 and 4.
+- DEC-1080 (2026-11-06, standing): the CTO reads with the Read and Grep tools, runs one simple command per call, no
+  `cd … &&` chains, and says in one line before any command that will prompt what it does and why; the same rule in
+  every agent's brief. P-PERMISSIONS-1 approved with read-only git through `git -C` only; the settings change is the
+  operator's ACT (`ACT-PERMISSIONS-1.md`). Basis: questions 4 and 2.
