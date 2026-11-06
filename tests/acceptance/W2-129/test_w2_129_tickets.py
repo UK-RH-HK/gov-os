@@ -218,6 +218,58 @@ def test_s16_a_ticket_closed_in_the_range_is_closed_ticket_edited_only_by_the_co
     assert not [f for f in s16(out) if names_commit(f, closing)], out.text()
 
 
+CLOSING = ("status: in_progress\n", "status: closed\n")
+
+
+@pytest.mark.parametrize("field", ["kpis", "allowed_paths", "acceptance_tests"])
+def test_s16_a_closing_commit_that_also_changes_a_field_unmarked_is_ticket_change_unmarked(fresh, field):
+    """The commit that closes a ticket is judged by the status before it: still open, so its other changes count.
+
+    Review F2: status alone is exempt, not status with kpis, allowed_paths or acceptance_tests beside it.
+    """
+    repo = fresh["repo"]
+    base = prepare(fresh)
+    edit(repo, T005, *CLOSING)
+    before, after, _ = FIELDS[field]
+    edit(repo, T005, before, after)
+    sha = support.commit(repo, f"close DAEO-t005 and change its {field}", UNMARKED, 11, [T005])
+    out = support.links(repo, "--since", base)
+    check(of(out, "TICKET_CHANGE_UNMARKED", "DAEO-t005", sha), out, repo, T005, field)
+    assert not of(out, "CLOSED_TICKET_EDITED", "DAEO-t005", sha), out.text()
+    assert out.code == 1, out.text()
+
+
+def test_s16_a_commit_closing_an_open_ticket_with_an_unmarked_change_is_ticket_change_unmarked(fresh):
+    """The same from status open: DAEO-t004 closed and its acceptance path changed in one unmarked commit."""
+    repo = fresh["repo"]
+    base = prepare(fresh)
+    edit(repo, T004, "status: open\n", "status: closed\n")
+    edit(repo, T004, "  path: tests/acceptance/W2-904/\n", "  path: tests/acceptance/W2-904/cases/\n")
+    sha = support.commit(repo, "close DAEO-t004 and change its acceptance path",
+                         {"Task": "DAEO-t004", "Role": "orchestrator"}, 11, [T004])
+    out = support.links(repo, "--since", base)
+    check(of(out, "TICKET_CHANGE_UNMARKED", "DAEO-t004", sha), out, repo, T004, "acceptance_tests")
+    assert not of(out, "CLOSED_TICKET_EDITED", "DAEO-t004", sha), out.text()
+    assert out.code == 1, out.text()
+
+
+@pytest.mark.parametrize("case", ["status", "status-and-assignee", "kpis-marked-in-the-line"])
+def test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding(fresh, case):
+    repo = fresh["repo"]
+    base = prepare(fresh)
+    edit(repo, T005, *CLOSING)
+    if case == "status-and-assignee":
+        edit(repo, T005, *ALONE["assignee"])
+    elif case == "kpis-marked-in-the-line":
+        before, _, marked = FIELDS["kpis"]
+        edit(repo, T005, before, marked)
+    sha = support.commit(repo, f"close DAEO-t005 ({case})", UNMARKED, 11, [T005])
+    seen = control(fresh, 12)
+    out = support.links(repo, "--since", base)
+    assert of(out, "TICKET_CHANGE_UNMARKED", "DAEO-t004", seen), out.text()
+    assert not [f for f in s16(out) if f.names("DAEO-t005") or names_commit(f, sha)], out.text()
+
+
 def test_s16_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range(fresh):
     repo = fresh["repo"]
     prepare(fresh)
