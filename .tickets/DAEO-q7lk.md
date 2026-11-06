@@ -36,6 +36,7 @@ kpis:
   - 'Never a gate: no command of the close, the merge queue, the landing, gov launch, gov claim, the readiness check or a hook calls it or refuses on its result; the CTO''s structural pass runs it as its links family, a notice only [DEC-1052, DEC-1073]'
   - 'Any repository: it reads the register''s place and the record places from the project''s path map, and a kind the repository does not have (no register, no contract.yaml, no .tickets/) is reported "not applicable", never an error [DEC-1072 (2), DEC-1073 (5)]'
   - 'Cheap, measured: on this repository''s main tree gov links --all finishes in under 10 s and gov links --since HEAD~1 in under 5 s, the median of five runs measured by the CTO and recorded with the head in docs/research/W2-129-links.md, beside the first --all run''s counts by code and role (the clean-up''s baseline). The estimate from today''s parts is about 3 s [DEC-1052 basis (3)]'
+  - 'S16 Ticket changes (DEC-1088 (6), standing): a commit in the range that changes a closed ticket''s file (its status closed before the commit) is CLOSED_TICKET_EDITED; a commit that changes an open or in-progress ticket''s title, kpis, allowed_paths, reads, needs, waits_on, depends_on or acceptance_tests with no decision id in the changed lines nor in the commit''s Implements: or Decided-by: trailers is TICKET_CHANGE_UNMARKED; a change of status, assignee or links alone is not a finding. Each names the ticket, the commit and the field, the role orchestrator. Verify: planted commits of each kind [DEC-1088 (6)] [added, DEC-1088]'
   failure:
   - 'A finding that refuses or stops a commit, a close, a landing, a launch or an adoption.'
   - 'Any file written other than the mark; a record changed by the tool; a model, network or GPU call.'
@@ -106,3 +107,21 @@ responsible and is fixed straight away. It must pass DEC-1052's basis: cheap, no
   - It reads no unindexed scratch file.
 
 **Filed 2026-11-06 by the CTO** from LINK-INTEGRITY-tickets/W2-129-gov-links.md, approved by DEC-1074 (7); placed by D9-FATES (DEC-1083, DEC-1084).
+
+**Built before re-pin window 4 (DEC-1087 (4)). TESTS-READY:** `tests/acceptance/W2-129/` at `5d5fe8abb1cb` on
+`w2/W2-129-tests`: 103 cases, 99 red, 4 guards. The KPI success lines are numbered S1 to S15 in the ticket's order, so
+never-a-gate is S13 and the timing S15. The interface the tests assume is in their README.
+
+**The designer's points settled (CTO, 2026-11-06, delegated P3):**
+- **(2) Exit codes 0, 1 and 2, and the text output:** the command sets `gov.cli.main`'s child exit code (the
+  `CHILD_EXIT_CODE` form other commands use) inside `src/gov/links/**`. `cli/main.py` is not changed.
+- **(3) Whole or part:** the one pattern set is `register_statements` (S8). Where its reading of a label disagrees with
+  the loader's own SUPERSEDES edge (a `**Supersedes:**` followed by plain text), the tool follows `register_statements`
+  and states the disagreement in its research record. The loader is not changed here.
+- **(4) S8's parity on this repository:** the CTO's check, with whole supersessions apart (the prototype's drifting
+  list holds current decisions only).
+- **(5) No path-map key** for ARCHIVE-SUPERSEDED or DECISIONS-IN-FORCE: the tool looks in
+  `governance/project/orchestration/`, the repository's place. A key is a row for the next pass.
+- **(6) `depends_on`** is not a typed place for UNKNOWN_ID (LINK-INTEGRITY §4.1); the store's graph check covers it.
+- **(10) MR-1 to MR-6** PROPOSED against `contract.yaml` ACCEPTED: six STATUS_CONFLICTs expected on the first `--all`
+  run. They are findings, not a fault of the tool.

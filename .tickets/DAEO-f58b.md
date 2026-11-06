@@ -21,6 +21,9 @@ allowed_paths:
 - src/gov/rebuild/integration.py
 - src/gov/rebuild/command.py
 - src/gov/launch/store.py
+- src/gov/launch/launcher.py
+- src/gov/retrieve/command.py
+- docs/changes/W2-116-evidence.md
 - tests/unit/rebuild/test_w2_116*
 - tests/unit/launch/test_w2_116*
 kpis:
@@ -73,3 +76,18 @@ the integration store's path, so workers can search.
 - **The rebuild uses the code it runs under.** The store at window 4's head is built by window 4's code, so the pinned
   code and the store always match. The engineer states how the double buffer keeps the ready half answering while the
   other builds (F2).
+
+**TESTS-READY and the designer's points settled (CTO, 2026-11-06, delegated P3):**
+- **The tests:** `tests/acceptance/W2-116/` on `w2/W2-116-tests`.
+- **The interface they assume:**
+  - `gov rebuild --integration <branch>`, its link at the path `rebuild.yaml`'s `integration_store` names (W2-122's
+    key);
+  - a seed from a store behind the head names the base's head commit (12 hex digits or more) and says `behind`.
+- **`allowed_paths` widened:** S3 needs a plain `gov retrieve` in a launched session to answer from the integration
+  store. So the launcher's session env (`src/gov/launch/launcher.py`) and the place `gov retrieve` picks its root
+  (`src/gov/retrieve/command.py`) are added, with the evidence record. Use an environment variable the launch sets and
+  `gov retrieve` reads when no `--root` is given.
+- **The refresh after a merge seeds from the ready half,** so it re-embeds only what changed (the designer's N-1).
+- **A build whose semantic store is not recreated counts as failed** (N-2), as the CTO's script counts it.
+- **Untested (N-4):** a search through the link writes its question-vector cache into the ready half. The engineer
+  states whether a sandboxed session may write there, or where the cache goes instead.
