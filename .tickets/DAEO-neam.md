@@ -8,7 +8,7 @@ type: task
 priority: 4
 assignee: engineer
 external-ref: W2-45
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [wave-2, implementation, standard]
 wbs_id: W2-45
 title: gov check runner semantics and scale
 class: implementation
