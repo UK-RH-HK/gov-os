@@ -8,7 +8,7 @@ type: task
 priority: 1
 assignee: engineer
 external-ref: W2-82
-tags: [wave-2, implementation, readiness, standard, keystone-9]
+tags: [wave-2, implementation, readiness, standard]
 wbs_id: W2-82
 title: 'A Definition of Ready: gov claim checks it, and gov launch refuses a lead on a ticket that is not ready'
 class: implementation
