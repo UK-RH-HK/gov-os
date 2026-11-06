@@ -1,0 +1,1 @@
+launch_worker independent-test-designer DAEO-0pyc: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-32-r2f1/.gov-runtime/scratch/lead/log/W2-32-r2f1-designer.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-32-r2f1/.gov-runtime/scratch/lead/log/W2-32-r2f1-designer.json

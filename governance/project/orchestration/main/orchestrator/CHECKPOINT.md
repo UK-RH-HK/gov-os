@@ -5,6 +5,19 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
 what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~16:50 (DEC-1085 recorded; next free id DEC-1086):** the owner's order: finish the memory build, then
+  search-again, then the end-to-end package, then the fresh 80.
+  - **Done:**
+    - the extend window: E1 (depth 80) 107, not a lever; E4 (split + termmap) 109, p 0.50;
+    - L6: 107, no change;
+    - the 8,886-token cause (one-line files sent whole; the budget governs expansions only);
+    - W2-134 filed (`DAEO-m4rq`; S1-S4 tests `7227c5e8`, 13 cases);
+    - R2-F1's reason merged;
+    - packages: `W2-32-S11-WORDING`, `BUNDLE-BUDGET-1`, `D4B-SEARCH-AGAIN` (declared, its §6 asks the owner).
+  - **S7's review: NOT READY** (F1, short golds). Its fix is W2-134's S5 and S6. S7 and W2-134 merge together after one
+    review.
+  - **Running:** W2-134's designer, second pass (S5, S6), pid 4111903, wait task. Next: the engineer from
+    `w2/W2-61h-s7` with the tests merged, then one review, then the merge.
 - **~10:10 (DEC-1081 carried out):**
   - ACT-PERMISSIONS-1 is applied by the operator: 18 of 18 rules, deny `git push`, ask []. Use plain git; `git -C`
     still asks. One slip at ~10:20: a read-only `git -C … log`, not announced.
@@ -790,23 +803,23 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-06T09:53:09Z e9d5cde2108b076cfb6e52420dc242529fa01f2fd2d7711df664b3eb6ffee3a5
-git head: 747d9ac63b1428f5b62ec6c36e58662f05a95540
+generated: 2026-11-06T15:07:24Z 56e5e43ede890f348b33ee31d1eb03071ce564c4bfa7228acfee68669f4dabc5
+git head: f883bba196b3c6da803e451b7778938f37d24ab0
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
   DAEO-3r1j [in_progress] - W2-110 A product's CTO-only install rule
-  DAEO-6b2q [in_progress] - W2-109 Contract v4.3
   DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-a3u2 [in_progress] - W2-91 Full embeddings: the root files, the governance overlay and schemas/ <- [DAEO-jsg1]
-  DAEO-arrl [in_progress] - W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see
+  DAEO-arrl [in_progress] - W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see <- [DAEO-ym8a]
   DAEO-blwa [in_progress] - W2-122 Seeded rebuilds
   DAEO-clon [in_progress] - W2-112 One reranker serves every session
   DAEO-cv58 [in_progress] - W2-60a The role, its skills and its model and effort loaded at launch; the launch record
   DAEO-drhj [in_progress] - W2-104 The skill evaluation harness
   DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
   DAEO-jpr0 [in_progress] - W2-126 A machine-wide vector cache keyed by the text <- [DAEO-qzrq]
+  DAEO-k4wm [in_progress] - W2-133 A narrowed or gap-starting register item carries its own entry's id <- [DAEO-r8vq]
   DAEO-k7hz [in_progress] - W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 <- [DAEO-g0ip]
   DAEO-l78m [in_progress] - W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository
   DAEO-n0wb [in_progress] - W2-92 The knowledge graph and the code graph as routes of plain-question retrieval <- [DAEO-s9qc, DAEO-ym8a]
@@ -814,16 +827,16 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-ouet [in_progress] - W2-96 The opaque acceptance runner
   DAEO-qzrq [in_progress] - W2-123 Parallel requests on the embedding server
   DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
+  DAEO-r8vq [in_progress] - W2-131 A register chunk carries its own entry's id
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
   DAEO-u4oz [in_progress] - W2-04 gov context bounded and reproducible <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-vhad [in_progress] - W1-01b A listed merge is exempt for its own changes
-  DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
   DAEO-zpdj [in_progress] - W2-105 The template's install block removed
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS       747d9ac63 [w2/integrate]
-  /home/usain/gov-os-worktrees/D-6                 6958acffa [emg/d6]
+  /home/usain/Dynamic-Agentic-Engineering-OS       f883bba19 [w2/integrate]
+  /home/usain/gov-os-worktrees/D-6                 8305dd13f [emg/d6]
   /home/usain/gov-os-worktrees/D-7                 3501474fe [emg/d7]
   /home/usain/gov-os-worktrees/D-7-tests           67585f7f1 [emg/d7-tests]
   /home/usain/gov-os-worktrees/D4-cut-a            10025b210 [w2/D4-cut-a]
@@ -832,7 +845,7 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/EMG-noscan          b8957843a [emg/noscan]
   /home/usain/gov-os-worktrees/EMG-queue           04568e140 [emg/queue]
   /home/usain/gov-os-worktrees/EMG-select          9e603f70c [emg/select]
-  /home/usain/gov-os-worktrees/W2-00-record        96d94f8dc [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-record        c77445d18 [record/w2]
   /home/usain/gov-os-worktrees/W2-00-store-a       9894b0cf5 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-00-store-b       8284fb408 (detached HEAD)
   /home/usain/gov-os-worktrees/W2-04               98993db4e [w2/W2-04]
@@ -848,6 +861,10 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-126-tests        741f9eddd [w2/W2-126-tests]
   /home/usain/gov-os-worktrees/W2-13               5e5d74dde [w2/W2-13]
   /home/usain/gov-os-worktrees/W2-13-tests         b6eb2267f [w2/W2-13-tests]
+  /home/usain/gov-os-worktrees/W2-131              4a4f2f59c [w2/W2-131]
+  /home/usain/gov-os-worktrees/W2-131-tests        2d97295b8 [w2/W2-131-tests]
+  /home/usain/gov-os-worktrees/W2-133              c39197b6b [w2/W2-133]
+  /home/usain/gov-os-worktrees/W2-133-tests        74e2d0f37 [w2/W2-133-tests]
   /home/usain/gov-os-worktrees/W2-15a              fd637510d [w2/W2-15a]
   /home/usain/gov-os-worktrees/W2-20               1a54976c7 [w2/W2-20]
   /home/usain/gov-os-worktrees/W2-32               1aeae7887 [w2/W2-32]
@@ -882,6 +899,6 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/emg-retired-readme  d845c5cab [emg/retired-readme]
   /home/usain/gov-os-worktrees/emg-w2-122-cache    a74543590 [emg/w2-122-cache]
   /home/usain/gov-os-worktrees/emg-w2-61h-40       3775bdd16 [emg/w2-61h-40]
-  /home/usain/gov-os-worktrees/research-retrieval  f38402a70 [w2/research-retrieval]
+  /home/usain/gov-os-worktrees/research-retrieval  a5c0c34f6 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

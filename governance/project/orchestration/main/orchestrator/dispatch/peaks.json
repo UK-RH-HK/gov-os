@@ -1,27 +1,27 @@
 {
- "computed": "2026-11-06 13:59:07",
+ "computed": "2026-11-06 14:59:07",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 8.98,
+   "cpu_p95": 8.93,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 8973012,
-   "rss_kb_max": 11846624,
-   "samples": 7146
+   "rss_kb_p95": 9009552,
+   "rss_kb_max": 13410904,
+   "samples": 7202
   },
   "embedding": {
-   "cpu_p95": 7.78,
+   "cpu_p95": 7.77,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2431488,
+   "rss_kb_p95": 2425332,
    "rss_kb_max": 8676476,
-   "samples": 7146
+   "samples": 7202
   },
   "rebuild": {
-   "cpu_p95": 11.46,
+   "cpu_p95": 11.44,
    "cpu_max": 126.32,
-   "rss_kb_p95": 472656,
+   "rss_kb_p95": 450388,
    "rss_kb_max": 637492,
-   "samples": 2271
+   "samples": 2273
   },
   "test_run": {
    "cpu_p95": 17.23,
@@ -31,11 +31,11 @@
    "samples": 3507
   },
   "claude": {
-   "cpu_p95": 0.65,
+   "cpu_p95": 0.64,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2092220,
+   "rss_kb_p95": 2088304,
    "rss_kb_max": 4055288,
-   "samples": 6723
+   "samples": 6779
   },
   "reranker": {
    "cpu_p95": 5.45,
@@ -56,27 +56,27 @@
    "cpu_max": 0.03,
    "rss_kb_p95": 123200,
    "rss_kb_max": 164968,
-   "samples": 156
+   "samples": 158
   },
   "codegraph": {
    "cpu_p95": 0.23,
    "cpu_max": 1.21,
    "rss_kb_p95": 262264,
    "rss_kb_max": 1169916,
-   "samples": 1542
+   "samples": 1545
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 14.41,
+   "cpu_p95": 14.370000000000001,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3400592,
+   "rss_kb_p95": 3396304,
    "rss_kb_max": 9074876,
-   "samples": 2271
+   "samples": 2273
   }
  },
  "lead": {
   "rss_kb_p95": 4254340,
   "rss_kb_max": 9810916,
-  "samples": 14343
+  "samples": 14181
  },
  "lead_own_max_kb": {
   "DAEO-0uhh": 7296300,

@@ -33,7 +33,16 @@ The variant's keys (all optional; ``{}`` is the shipped path, measured to reprod
 - ``pin``: routes whose rank-1 hit is placed at final rank ``pin_at`` (default 3) when it is below it;
 - ``dedup``: true drops an item whose lines lie inside an earlier item's of the same file, in each call;
 - ``dedup_text``: true drops an item whose text (over 80 characters, whitespace folded) equals an earlier item's in
-  any file, in each call (D4B-STRUCTURE E1: generated and copied texts take one place).
+  any file, in each call (D4B-STRUCTURE E1: generated and copied texts take one place);
+- ``split`` and ``termmap`` (DEC-1079 L5, DEC-1084; ported from the research harness at a5c0c34f, its
+  ``GOV_RX_SCORELOG`` not ported): ``split`` adds, as extra phrasings, the parts of a question that asks two things
+  (``_split_parts``); ``termmap`` adds the question in the record's own words, from a term map of the repository's
+  labels built once per root and commit (``_termmap_from``, ``_termmap_phrase``). Both extend the phrasings the
+  lexical and semantic routes are asked: the product's ``routing.phrasings`` (on at the g1 clone) or, on a tree
+  without it, this file's ``phrasings``; with neither on the run is refused (it would measure nothing), and with both
+  on too (each phrasing would be phrased again). They never change the text the reranker or a ``sem`` ranking is
+  given: the extras are a union marked per question (``STATE["extra"]``) that never sets ``STATE["query"]``. Off
+  (absent or false): nothing is patched. ``test_rx_l5.py`` checks them.
 ``GOV_RX_LOG`` names a file that gets one line per rerank: who scored and how many texts were sent to the service.
 LIVE (D4B-SCORE-ONCE §4): ``GOV_RX_RERANK_DIR2``, ``GOV_RX_RERANK_MODEL2`` and ``GOV_RX_LIVE_RULE`` score each pass
 with two trial services at once, merged by a ``combine`` rule; see the block after ``combine``.
@@ -121,7 +130,367 @@ def _phrasings(query: str) -> list[str]:
     out = [query, " ".join(words)]
     if STATE["root"] is not None:
         out.append(_expanded(STATE["root"], query))
-    return list(dict.fromkeys(p for p in out if p.strip()))
+    out = list(dict.fromkeys(p for p in out if p.strip()))
+    return out + _extras(query, out) if EXTRA else out
+
+
+# ---- L5 (DEC-1079): query phrasing with no model, ``split`` and ``termmap`` (structural: any question, by its form)
+EXTRA = [name for name in ("split", "termmap") if V.get(name)]
+_ASK = ("what|which|who|whom|whose|where|when|why|how|does|do|did|is|are|was|were|can|could|should|would|will|may|"
+        "must|has|have|had")
+_ASK_AFTER = re.compile(rf"\s*(?:[,;]\s*)?\b(?:and also|and|but also|as well as)\s+(?=(?:{_ASK})\b)|"
+                        rf"\s*;\s*(?=(?:{_ASK})\b)|\s*,?\s*\band also\s+", re.IGNORECASE)
+_ENUM = re.compile(r"(?:(?<=\s)|^)(?:\(([1-9]|[a-h]|i{1,3}|iv)\)|([1-9]|[a-h])\))\s+")
+_ROMAN = ["i", "ii", "iii", "iv"]
+_ID = re.compile(r"\b[A-Z][A-Z0-9]*(?:-[A-Za-z0-9]+)+\b")
+_NAMED_CAND = re.compile(r"`[^`]+`|\w[\w./-]*\w")  # candidates only: ``_named_thing`` decides
+_ID_DOTTED = re.compile(r"[A-Z][A-Z0-9]*(?:-[A-Za-z0-9]+)+(?:\.[A-Za-z0-9]+)*")  # DEC-820, CAP-24.b, W2-32
+_EXT = re.compile(r"\.[A-Za-z][A-Za-z0-9]{0,5}$")
+
+
+def _named_thing(token: str) -> bool:
+    """Whether ``token`` names a thing a part must keep: a `quoted` span; an id (``DEC-820``, ``CAP-24.b``); a
+    snake_case name (``allowed_paths``); a path with a file extension or three or more segments
+    (``src/gov/x.py``, ``a/b/c``); a dotted name of two or more segments of two or more characters each, starting
+    with a letter (``routing.phrasings``, ``rx.py``). Not a slash pair of words (``and/or``, ``read/write``) nor an
+    abbreviation of single letters (``e.g``, ``i.e``)."""
+    if token.startswith("`"):
+        return True
+    if _ID_DOTTED.fullmatch(token):
+        return True
+    if re.search(r"[A-Za-z0-9]_[A-Za-z0-9]", token):
+        return True
+    if "/" in token:
+        segs = [s for s in token.split("/") if s]
+        return len(segs) >= 3 or bool(segs and _EXT.search(segs[-1]))
+    if "." in token:
+        segs = token.split(".")
+        return token[0].isalpha() and len(segs) >= 2 and all(len(s) >= 2 for s in segs)
+    return False
+
+
+def _named_things(text: str) -> list[str]:
+    """The named things of ``text`` (``_named_thing``), each once, in order."""
+    return list(dict.fromkeys(t for t in (m.group(0) for m in _NAMED_CAND.finditer(text)) if _named_thing(t)))
+
+
+def _content(text: str) -> list[str]:
+    return [w for w in re.findall(r"[\w./-]+", text) if w.lower() not in _STOP]
+
+
+def _enumerated(text: str) -> tuple[str, list[str]] | None:
+    """The lead-in and items of an enumerated list of asks ("(1) ... (2) ...", "a) ... b) ...", "(i) ... (ii)"), its
+    markers in sequence from the first; None when there are fewer than two."""
+    marks = [(m.start(), m.end(), m.group(1) or m.group(2)) for m in _ENUM.finditer(text)]
+    for first in ("1", "a", "i"):
+        seq = [str(n) for n in range(1, 10)] if first == "1" else list("abcdefgh") if first == "a" else _ROMAN
+        run, want = [], 0
+        for start, end, label in marks:
+            if want < len(seq) and label == seq[want]:
+                run.append((start, end))
+                want += 1
+        if len(run) >= 2:
+            items = [text[run[i][1]:run[i + 1][0] if i + 1 < len(run) else len(text)] for i in range(len(run))]
+            items = [re.sub(r"(?:[,;:]\s*)?(?:\band\b|\bor\b)?\s*$", "", item.strip(), flags=re.IGNORECASE).strip()
+                     for item in items]
+            return text[:run[0][0]].strip(), items
+    return None
+
+
+_FRONTED = re.compile(rf"^(?!(?:{_ASK})\b)([^?]+?,)\s*(?=(?:{_ASK})\b)", re.IGNORECASE)  # a phrase, then the ask
+
+
+def _split_parts(query: str) -> list[str]:
+    """The parts of a question that asks two (or more) things, each searchable alone; [] for a question that asks
+    one. Each part keeps the question's lead-in (the text before an enumerated list; the statements before its first
+    question; for asks joined by a conjunction, a fronted phrase before the first ask's question word, "In the
+    guard, what ... and what ...") and gets the named things of the question (``_named_things``) it does not hold.
+    A part is kept when its own ask holds at least one content word and the part, lead-in and named things attached,
+    holds at least two content words or a named thing; at most four parts; a question with fewer than two kept parts
+    is not split."""
+    text = " ".join(query.split())
+    lead, items = "", []
+    listed = _enumerated(text)
+    if listed:
+        lead, items = listed
+    elif text.count("?") >= 2:
+        sentences = re.split(r"(?<=[.?!])\s+", text)
+        asks = [s for s in sentences if s.endswith("?")]
+        lead = " ".join(s for s in sentences[:sentences.index(asks[0])] if not s.endswith("?"))
+        items = asks
+    else:
+        items = [p for p in _ASK_AFTER.split(text) if p and p.strip()]
+        fronted = _FRONTED.match(items[0]) if len(items) >= 2 else None
+        if fronted:
+            lead, items = fronted.group(1), [items[0][fronted.end():]] + items[1:]
+    items = [re.sub(r"^(?:and also|and|also|but also|then)\s+", "", i.strip(" ,;"), flags=re.IGNORECASE) for i in items]
+    named = _named_things(text)
+    parts = []
+    for item in items:
+        if not _content(item):
+            continue  # an ask of question words alone ("... and why?") is no part
+        part = f"{lead} {item}".strip() if lead else item
+        if lead and not part.endswith(("?", ".")) and text.endswith("?"):
+            part += "?"
+        missing = [n for n in named if n not in part]
+        part += " " + " ".join(missing) if missing else ""
+        if len(_content(part)) >= 2 or _named_things(part):
+            parts.append(part)
+    parts = list(dict.fromkeys(parts))[:4]
+    if len(parts) < 2:
+        return []
+    return [p for p in parts if p != query]
+
+
+# the term map: words of the repository's own labels (the record's words), keyed so that the question's words find them
+TERMMAP_V = "termmap-1"
+_GLUE = _STOP | {"not", "no", "all", "any", "each", "every", "also", "only", "has", "have", "had", "i", "if", "but",
+                 "so", "we", "you", "our", "your", "my", "me", "us", "he", "she", "his", "her", "one", "two"}
+_TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:[_-][A-Za-z0-9]+)*")
+_HUMP = re.compile(r"[A-Z]+(?=[A-Z][a-z])|[A-Z]?[a-z0-9]+|[A-Z]+")
+_ACR_AFTER = re.compile(r"((?:[A-Za-z][A-Za-z'-]*\s+){1,8}[A-Za-z][A-Za-z'-]*)\s*\(([A-Z][A-Za-z0-9]*[A-Z0-9]"
+                        r"(?:-[A-Z0-9]+)?)\)")
+_ACR_BEFORE = re.compile(r"\b([A-Z][A-Za-z0-9]*[A-Z0-9](?:-[A-Z0-9]+)?)\s*\(([A-Za-z][A-Za-z' -]{3,80})\)")
+
+
+def _parts(token: str) -> list[str]:
+    """A token's word parts: split at ``_`` and ``-`` and at camel humps, lower case."""
+    return [h.lower() for piece in re.split(r"[_-]+", token) for h in _HUMP.findall(piece)]
+
+
+def _fold(word: str) -> str:
+    return word[:-1] if len(word) > 3 and word.endswith("s") and not word.endswith("ss") else word
+
+
+def _compound(token: str) -> bool:
+    return bool(re.search(r"[_-]", token)) or bool(re.search(r"[a-z0-9][A-Z]", token))
+
+
+def _acr_expansion(words: list[str], acr: str) -> list[str] | None:
+    """The shortest run of ``words`` ending at the last whose initials (glue words skipped, or not) spell ``acr``'s
+    letters; None when no run does."""
+    letters = re.sub(r"[^A-Z]", "", acr.upper())
+    if not 2 <= len(letters) <= 8:
+        return None
+    for skip in (True, False):
+        for n in range(1, len(words) + 1):
+            run = words[-n:]
+            initials = "".join(w[0].upper() for w in run if not (skip and w.lower() in _GLUE))
+            if initials == letters and run[0].lower() not in _GLUE:
+                return run
+            if len(initials) > len(letters):
+                break
+    return None
+
+
+def _termmap_from(labels: list[str], symbols: list[str]) -> dict:
+    """The term map of ``labels`` (titles, headings) and ``symbols`` (code names): ``compound``, the folded
+    concatenation of a word sequence -> the record's one spelling of it (only keys whose words are one sequence:
+    ``rerank`` and ``re-rank`` both seen is ambiguous, dropped); ``acronym``, an acronym -> its one expansion, and
+    ``expansion``, an expansion (lower case) -> its one acronym (an acronym with two expansions, or the reverse, is
+    dropped). A pure function: no file, no question."""
+    seqs: dict[str, dict[tuple, dict[str, int]]] = {}
+    for token in [t for label in labels for t in _TOKEN.findall(label)] + list(symbols):
+        if _ID.fullmatch(token) and any(c.isdigit() for c in token):
+            continue  # an id is the record route's, not a word
+        parts = tuple(_fold(p) for p in _parts(token))
+        key = "".join(parts)
+        if len(key) < 5 or not parts:
+            continue
+        forms = seqs.setdefault(key, {}).setdefault(parts, {})
+        forms[token] = forms.get(token, 0) + 1
+    compound = {}
+    for key, by_parts in seqs.items():
+        if len(by_parts) != 1:
+            continue
+        forms = next(iter(by_parts.values()))  # one word sequence; its spellings (case, _ or -): the most seen
+        compound[key] = sorted(forms, key=lambda f: (-forms[f], f))[0]
+    acr_exp: dict[str, dict[str, str]] = {}
+    for label in labels:
+        flat = " ".join(label.split())
+        found = []
+        for m in _ACR_AFTER.finditer(flat):
+            run = _acr_expansion(m.group(1).split(), m.group(2))
+            if run:
+                found.append((m.group(2), " ".join(run)))
+        for m in _ACR_BEFORE.finditer(flat):
+            words = m.group(2).split()
+            letters = re.sub(r"[^A-Z]", "", m.group(1))
+            run = None
+            for n in range(1, len(words) + 1):
+                if _acr_expansion(words[:n], m.group(1)) == words[:n]:
+                    run = words[:n]
+                    break
+            if run and len(letters) >= 2:
+                found.append((m.group(1), " ".join(run)))
+        for acr, exp in found:
+            if _ID.fullmatch(acr) and any(c.isdigit() for c in acr):
+                continue
+            acr_exp.setdefault(acr, {}).setdefault(exp.lower(), exp)
+    acronym = {a: next(iter(e.values())) for a, e in acr_exp.items() if len(e) == 1 and len(next(iter(e))) > len(a)}
+    by_exp: dict[str, set] = {}
+    for a, e in acronym.items():
+        by_exp.setdefault(e.lower(), set()).add(a)
+    expansion = {e: next(iter(a)) for e, a in by_exp.items() if len(a) == 1 and len(e.split()) >= 2}
+    acronym = {a: e for a, e in acronym.items() if by_exp[e.lower()] == {a}}
+    return {"compound": compound, "acronym": acronym, "expansion": expansion}
+
+
+def _termmap_phrase(query: str, tmap: dict) -> str | None:
+    """``query`` in the record's own words by ``tmap`` (``_termmap_from``), or None when the map changes nothing.
+    Compounds: a run of one to three of the question's tokens, next to each other, no glue word in a run of two or
+    more, whose folded words concatenate to a key, becomes the record's spelling (a single plain word is never
+    respelled). Acronyms: the question's acronym (as a whole token) or its expansion (as a whole phrase, any case)
+    becomes ``Expansion (ACR)``, where the other is not in the question already. Spans do not overlap: the first,
+    then the longest, wins."""
+    spans = []  # (start, end, replacement)
+    toks = [(m.start(), m.end(), m.group(0)) for m in _TOKEN.finditer(query)]
+    for i in range(len(toks)):
+        for n in (3, 2, 1):
+            run = toks[i:i + n]
+            if len(run) < n or any(query[run[j][1]:run[j + 1][0]].strip() for j in range(len(run) - 1)):
+                continue
+            words = [t[2] for t in run]
+            if any(_ID.fullmatch(w) and any(c.isdigit() for c in w) for w in words):
+                continue
+            if n > 1 and any(w.lower() in _GLUE for w in words):
+                continue
+            if n == 1 and not _compound(words[0]) and words[0].lower() in _GLUE:
+                continue
+            key = "".join(_fold(p) for w in words for p in _parts(w))
+            form = tmap["compound"].get(key)
+            if not form:
+                continue
+            said = query[run[0][0]:run[-1][1]]
+            if form.lower() == said.lower() or (n == 1 and not _compound(form) and not _compound(said)):
+                continue
+            if form in query:
+                continue
+            spans.append((run[0][0], run[-1][1], form))
+            break
+    lower = query.lower()
+    for acr, exp in tmap["acronym"].items():
+        m = re.search(rf"(?<![\w-]){re.escape(acr)}(?![\w-])", query)
+        if m and exp.lower() not in lower:
+            spans.append((m.start(), m.end(), f"{exp} ({acr})"))
+    for exp, acr in tmap["expansion"].items():
+        m = re.search(rf"(?<![\w-]){re.escape(exp)}(?![\w-])", lower)
+        if m and not re.search(rf"(?<![\w-]){re.escape(acr)}(?![\w-])", query):
+            spans.append((m.start(), m.end(), f"{tmap['acronym'][acr]} ({acr})"))
+    if not spans:
+        return None
+    out, at = [], 0
+    for start, end, rep in sorted(spans, key=lambda s: (s[0], -(s[1] - s[0]))):
+        if start < at:
+            continue
+        out += [query[at:start], rep]
+        at = end
+    phrased = "".join(out) + query[at:]
+    return phrased if phrased != query else None
+
+
+def _harvest(root: Path) -> tuple[list[str], list[str]]:
+    """The repository's labels and code symbols at ``root``: the store's record titles and register headings (no
+    record under fixtures/), the Markdown headings of the tracked files under governance/, docs/ and
+    template/governance/, and the def/class names and module constants of the tracked files under src/; fixtures/ and
+    ``exclude``'s globs are never read."""
+    import subprocess
+
+    def kept(rel: str) -> bool:
+        return not rel.startswith("fixtures/") and not _excluded(rel)
+    labels: list[str] = []
+    try:
+        known = records.records(root)
+        titles = graph_route._titles(root) if known else None
+        for record in known:
+            if not kept(record.get("path") or ""):
+                continue
+            labels += [t for t in (graph_route._title(root, record, titles), record.get("heading")) if t]
+    except Exception:  # a store that cannot be read gives no titles; the files' labels still count
+        pass
+    try:
+        files = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "governance/*.md", "docs/*.md",
+                                "template/governance/*.md", "src/*.py"], capture_output=True, text=True,
+                               timeout=120).stdout.split("\0")
+    except (OSError, subprocess.SubprocessError):
+        files = []
+    symbols: list[str] = []
+    for rel in sorted(f for f in files if f and kept(f)):
+        try:
+            text = (root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if rel.endswith(".md"):
+            fence = False
+            for line in text.splitlines():
+                if line.startswith("```"):
+                    fence = not fence
+                m = None if fence else _MD_HEAD.match(line)
+                if m:
+                    labels.append(m.group(2))
+        else:
+            symbols += re.findall(r"^\s*(?:async\s+)?(?:def|class)\s+(\w+)", text, re.MULTILINE)
+            symbols += re.findall(r"^([A-Z][A-Z0-9_]*[A-Z0-9])\s*[:=]", text, re.MULTILINE)
+    return labels, symbols
+
+
+def _commit_of(root: Path) -> tuple[str, bool]:
+    """``root``'s commit (``git rev-parse HEAD``; "" outside a repository) and whether its tracked files are as
+    committed (``git status --porcelain --untracked-files=no`` prints nothing)."""
+    import subprocess
+    try:
+        head = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True,
+                              timeout=30)
+        dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"],
+                               capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return "", False
+    if head.returncode != 0 or dirty.returncode != 0:
+        return "", False
+    return head.stdout.strip(), not dirty.stdout.strip()
+
+
+def _termmap(root: Path) -> dict:
+    """The term map of ``root``, built once per root and commit (labels only, no question): kept in this process
+    by (root, commit) and, for a root whose tracked files are as committed, in the cache by (version, root, commit,
+    ``exclude``). A root outside git or with changed tracked files is harvested afresh in each process."""
+    where = str(Path(root).resolve())
+    commits = STATE.setdefault("commits", {})  # once per root in a process: the git calls are not per question
+    if where not in commits:
+        commits[where] = _commit_of(Path(where))
+    head, clean = commits[where]
+    maps = STATE.setdefault("termmaps", {})
+    if (where, head, clean) in maps:
+        return maps[(where, head, clean)]
+    key = _key("termmap", TERMMAP_V, where, head, tuple(EXCLUDE)) if head and clean else None
+    row = _db.execute("SELECT v FROM memo WHERE k = ?", (key,)).fetchone() if key else None
+    if row:
+        tmap = pickle.loads(row[0])
+    else:
+        tmap = _termmap_from(*_harvest(Path(where)))
+        if key:
+            _db.execute("INSERT OR REPLACE INTO memo VALUES (?, ?)", (key, pickle.dumps(tmap)))
+            _db.commit()
+    maps[(where, head, clean)] = tmap
+    return tmap
+
+
+def _extras(query: str, have: list[str]) -> list[str]:
+    """The switches' extra phrasings of ``query``, those not in ``have``: the parts (``split``), then the question
+    in the record's words (``termmap``). Each is added to ``STATE["extra"]``, a union over the question's calls that
+    ``_retrieve_wrapped`` empties once per question, so no extra phrasing, however many phrasing calls are made,
+    becomes the text the reranker or a ``sem`` ranking is given (``_lex``)."""
+    out = []
+    if V.get("split"):
+        out += _split_parts(query)
+    if V.get("termmap"):
+        root = STATE.get("qroot") or STATE.get("root")
+        phrased = _termmap_phrase(query, _termmap(root)) if root is not None else None
+        if phrased:
+            out.append(phrased)
+    out = [p for p in dict.fromkeys(out) if p.strip() and p not in have]
+    STATE.setdefault("extra", set()).update(out)
+    return out
 
 
 def _rrf_lists(lists: list[list[dict]], k: float = 60.0) -> list[dict]:
@@ -138,7 +507,9 @@ def _rrf_lists(lists: list[list[dict]], k: float = 60.0) -> list[dict]:
 
 
 def _lex(root, query, refresh=True):
-    STATE["query"], STATE["root"] = query, Path(root)
+    if query not in STATE.get("extra", ()):  # L5: an extra phrasing never becomes the reranker's or sem's text
+        STATE["query"] = query
+    STATE["root"] = Path(root)
     asked = _expanded(root, query) if V.get("expand") in ("lex", "both") else query
     if not V.get("phrasings"):
         return _lex_memo(root, asked, refresh)
@@ -190,6 +561,26 @@ def _capture_order(*a, **kw):
 
 authority.order = _capture_order
 rt.authority.order = _capture_order
+
+# SCORE-ONCE L6 (DEC-1079, D4B-SCORE-ONCE v7): ``"work_tier": [glob, ...]`` puts those paths in the tier one step below
+# the default (the path map's next tier, today ``reports``), the other tiers as read. Absent: the path map's tiers.
+_read_block = authority.read_block
+
+
+def _read_block_rx(root):
+    block = _read_block(root)
+    globs = V.get("work_tier")
+    if block is None or not globs:
+        return block
+    below = block["default"] + 1
+    if below >= len(block["tiers"]):
+        sys.exit("rx: work_tier needs a tier below the default in the path map")
+    tiers = [dict(tier) for tier in block["tiers"]]
+    tiers[below] = {**tiers[below], "paths": list(tiers[below]["paths"]) + [authority._pattern(g) for g in globs]}
+    return {**block, "tiers": tiers}
+
+
+authority.read_block = _read_block_rx
 
 # ---- the reranker: the shared service only, its scores cached by (question, text)
 rr._start = lambda *_a, **_k: (_ for _ in ()).throw(ConnectionError("rx: the harness never starts the service"))
@@ -781,7 +1172,7 @@ def _quota(fused: list[dict], routes: dict) -> list[dict]:
     return head + [e for e in fused if e["chunk_id"] not in seen]
 
 
-CUSTOM = bool(set(V) - {"exclude", "chars", "sem_k", "lex_k", "sem_uncut"}) or bool(EXCLUDE)
+CUSTOM = bool(set(V) - {"exclude", "chars", "sem_k", "lex_k", "sem_uncut", "split", "termmap"}) or bool(EXCLUDE)
 
 # DEC-1070 (7), lever L1: the product fuses the meaning route's phrasings and cuts the fused list to semantic.TOP_K
 # (retrieve._phrased's cut); ``sem_uncut`` keeps every phrasing's hits, fused, uncut. The product's own fusion stays.
@@ -936,6 +1327,9 @@ _retrieve = rt.retrieve
 
 def _retrieve_wrapped(*a, **kw):
     STATE["question"] = kw.get("query", a[1] if len(a) > 1 else None)  # the question as retrieve was asked it
+    if EXTRA:  # L5: the root for the term map, and the extra phrasings' marker this question's alone (``_extras``)
+        STATE["qroot"] = Path(a[0] if a else kw["root"])
+        STATE["extra"] = set()
     bundle = _retrieve(*a, **kw)
     if V.get("dedup"):
         kept = []
@@ -977,6 +1371,34 @@ if "routing" in V:
     _routing.settings = lambda root: {**_settings(root), **_want}
 if "ahead_types" in V:
     rt.AHEAD_TYPES = frozenset(V["ahead_types"])
+
+# L5's switches extend the product's phrasings (routing.phrasings) where the tree has them. Not patched when off.
+if EXTRA:
+    try:
+        from gov.retrieval import routing as _l5_routing
+    except ImportError:  # a tree before W2-32 S8: the harness's own ``phrasings`` only
+        _l5_routing = None
+    if _l5_routing is None and not V.get("phrasings"):
+        sys.exit(f"rx: {'/'.join(EXTRA)} extend the phrasings, and this tree has neither routing.phrasings nor the "
+                 f"harness's 'phrasings' on: refused (it would measure nothing)")
+    if _l5_routing is not None:
+        _phrasings_product, _settings_product = _l5_routing.phrasings, _l5_routing.settings
+
+        def _phrasings_rx(query, named):
+            out = _phrasings_product(query, named)
+            return out + _extras(query, out)
+
+        def _settings_rx(root):
+            got = _settings_product(root)
+            if not got.get("phrasings") and not V.get("phrasings"):
+                sys.exit(f"rx: {'/'.join(EXTRA)} extend the phrasings, and routing.phrasings is off at {root} (and "
+                         f"the harness's 'phrasings' too): refused (it would measure nothing)")
+            if got.get("phrasings") and V.get("phrasings"):  # one layer of phrasings only
+                sys.exit(f"rx: {'/'.join(EXTRA)} with routing.phrasings on at {root} and the harness's 'phrasings' "
+                         f"too: refused (each phrasing would be phrased again, the extras of the extras searched; "
+                         f"not the lever measured; drop 'phrasings' from GOV_RX)")
+            return got
+        _l5_routing.phrasings, _l5_routing.settings = _phrasings_rx, _settings_rx
 
 from gov.cli.main import main  # noqa: E402
 
