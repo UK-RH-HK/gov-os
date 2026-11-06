@@ -45,6 +45,11 @@ sources:
 - DEC-974
 - DEC-374
 - DEC-397
+- DEC-1032
+- DEC-1033
+- DEC-1036
+- DEC-1048
+- DEC-1068
 - ADR-0002
 est_loc: 200
 acceptance_tests:
