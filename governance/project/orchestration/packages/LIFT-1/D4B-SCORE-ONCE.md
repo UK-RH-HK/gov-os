@@ -110,3 +110,20 @@ GPU used once; every combination replayed from kept scores).
 - **The grid (§3) is judged on the version-2 runs only.** B0 is q06 on the question, after L3. q06f is recorded
   beside it, so the size of the artefact is known. No cell is judged on the old text.
 - **Cost:** one more 0.6B pass, about 20 minutes of GPU.
+
+## Version 3 (2026-11-06 ~12:05): the faithfulness check reads the outputs, not the verdicts. Written after the stop, and said so
+- **What happened:** the window stopped as written. q06f gave 106 of 138 against the kept run's 107, differing in
+  one question, h23 (a hit at rank 2 in the kept run, missed now), so the window stopped before any other model.
+- **What the outputs show** (`drafts/score-once/diff_one.py`, `diff_all.py`; chunk ids, paths, line spans and
+  expansions only, no text):
+  - **all 140 questions are identical, across all 689 calls:** the 80 (397 calls) and the 60 (292 calls), against
+    the kept run (`trial-w4-t2-qwen06b`), h23 included;
+  - **retrieval reproduced exactly; only the measure's verdict on h23 changed.** On the same clone, that means h23's
+    gold label changed in the sets root after 11-05 13:21. The CTO cannot confirm it, since it may not open the
+    hidden file (the new deny rules refused even its `stat`). The owner's checker can.
+- **The change:** the trial path's check compares the ranked outputs. It is stricter for the path (every item, span
+  and expansion of every call, not 138 verdicts), and blind to a label edit, which no path can cause. Passed: 140 of
+  140.
+- **No cell is affected:** every cell, B0 included, is scored against the same labels, as they stand at the replay.
+  The past figures (107 of 138) were scored on the labels of 11-05; the replays' figures use today's.
+- **The window resumes from q06** (q06f's kept scores stand; no GPU repeated): q06, q4b, gte and zer on the question.
