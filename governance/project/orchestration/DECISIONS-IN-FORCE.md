@@ -211,3 +211,7 @@ other restart is an ACT.
   levers (window 4's builds checked first, else a ticket, tests first); the guard refuses the hidden sets outside the
   repository to engineer, research and orchestrator (an ACT); the spill reading investigated; the score-once window
   after its review. Basis: 2 and 4.
+- DEC-1083 (2026-11-06): D9-FATES approved (the auditor checks the 792 lines before any edit); K9's memory bar 85 %
+  hit@5 on the fresh 80 once, on the pin with W2-92, W2-32 S11, W2-131 and the chosen reranker (95 % the target);
+  W2-32 S6 dropped; W2-15b out of K9; W2-128 in K9; W2-128's ready check computed by code (only advisory items warn);
+  W2-131's follow-up a ticket, tests first; grid v2 and v3 accepted. Basis: 1 and 2.
