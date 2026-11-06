@@ -201,3 +201,8 @@ other restart is an ACT.
   `cd … &&` chains, and says in one line before any command that will prompt what it does and why; the same rule in
   every agent's brief. P-PERMISSIONS-1 approved with read-only git through `git -C` only; the settings change is the
   operator's ACT (`ACT-PERMISSIONS-1.md`). Basis: questions 4 and 2.
+- DEC-1081 (2026-11-06): ACT-PERMISSIONS-1 without the `git -C` rules; W2-128 filed; gte-reranker-modernbert-base and
+  zerank-1-small measured now (their downloads an ACT): every Qwen3 model and these two score each kept candidate list
+  of the 138 once in one quiet window; then replays at no GPU cost on the fixed pipeline (alone; by question type;
+  cascades; two merged), the grid declared first, judged with McNemar; a winner's speed and GPU measured for real before
+  the owner; the best onto the fresh 80 once. Nothing adopted or installed before the owner decides. Basis: 1 and 4.

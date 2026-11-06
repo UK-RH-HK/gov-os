@@ -13400,7 +13400,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   an official copy of its answer misjudges memory).
 
 ### DEC-1079 — D4B-LEVERS decided: significance in every comparison; where each miss left the top 5; source families in the measure's code; the lift normalised and the moves bounded, then the three rerankers replayed under equal weights; phrasing; a records-of-work tier as one test; the 0.6B kept, a cascade measured beside the 4B at 24, the best onto the fresh 80; D-5, D-6 and D-9 start
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1077, DEC-1078, DEC-1076, DEC-1052, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-LEVERS.md` (`b3efc98c`, `4dea932f`)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1077, DEC-1078, DEC-1076, DEC-1052, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-LEVERS.md` (`b3efc98c`, `4dea932f`) · **Changed by:** DEC-1081 (3)
 - **Decision:**
   - **(b) Now, no GPU:**
     - **L1:** every comparison from here on reports its gains, its losses and an exact McNemar test.
@@ -13434,7 +13434,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   memory work, not after it).
 
 ### DEC-1080 — P-PERMISSIONS-1 approved with read-only git through `git -C` only; the CTO's command rule (Read and Grep tools, one simple command per call, a line before any prompting command) standing, and in every agent's brief
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; standing) · **Under:** DEC-1058 (P-ACT-SPLIT), DEC-1057, DEC-1052 · **Source:** `governance/project/orchestration/packages/P-PERMISSIONS-1.md`
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`; standing) · **Under:** DEC-1058 (P-ACT-SPLIT), DEC-1057, DEC-1052 · **Source:** `governance/project/orchestration/packages/P-PERMISSIONS-1.md` · **Changed by:** DEC-1081 (1)
 - **Decision:**
   - **(1) The CTO's own rule, now and from here on:** reading with the Read and Grep tools; one simple command per
     call; no `cd … &&` chains; before any command that will prompt the owner, one line saying what it does and why.
@@ -13448,6 +13448,26 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - **(3)** The work resumes as decided.
 - **Basis:** question 4 (the owner's time spent only on prompts that carry a decision) and question 2 (every write
   outside the repository, deletion, job and network call still asks).
+
+### DEC-1081 — ACT-PERMISSIONS-1 without the eight `git -C` rules; W2-128 (the templates) filed; two more rerankers measured now (gte-reranker-modernbert-base, zerank-1-small); "score once, combine freely"
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1080, DEC-1079, DEC-1076, DEC-974 · **Changes:** DEC-1080 (2) (the `git -C` rules), DEC-1079 (a) (the reranker candidates)
+- **Decision:**
+  - **(1) ACT-PERMISSIONS-1 approved without the eight `git -C` rules** (the CTO uses plain git; the wildcard overlap
+    goes with them). The ACT and its rehearsal are revised to that and handed to the operator.
+  - **(2) W2-128, the templates ticket, approved: filed** (DEC-974).
+  - **(3) Two more rerankers, measured now:** gte-reranker-modernbert-base (149M) and zerank-1-small (1.7B,
+    Qwen3-based). Each one's licence, size and input template confirmed; their downloads an ACT for the operator, with
+    nothing else installed if possible (a needed package is named).
+    - **Score once, combine freely:** each model (the 0.6B, the 4B, gte-modernbert, zerank-1-small) scores every kept
+      candidate list of the 138 once, in one quiet GPU window under the safety rules. Then, at no GPU cost and on the
+      fixed pipeline (after L3), replays of: each model alone; gte-modernbert for code questions and a Qwen model for
+      the rest; cascades (a small or fast model first, a stronger one over its top N); two rerankers in parallel, their
+      scores normalised and merged. The grid is declared before the runs; judged by the rule with McNemar; the speed and
+      GPU memory of any winning combination measured in a real window before it goes to the owner.
+    - At the decision point the best combination goes onto the fresh 80 once, beside the 0.6B. Nothing is adopted or
+      installed in the product before the owner decides.
+- **Basis:** question 1 (memory: the reranker chosen from every candidate that fits, with its cost beside it) and
+  question 4 (scores computed once and combined offline cost the GPU once).
 
 | Version | Date | Change |
 |---|---|---|
@@ -13466,3 +13486,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.462 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1078. Next free id: DEC-1079. |
 | 0.463 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1079. Next free id: DEC-1080. |
 | 0.464 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1080. Next free id: DEC-1081. |
+| 0.465 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1081; DEC-1080 (2) and DEC-1079 (a) changed. Next free id: DEC-1082. |
