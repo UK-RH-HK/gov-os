@@ -166,6 +166,7 @@ def leave_out(root: Path, evidence: list[dict]) -> tuple[list[dict], dict | None
 
     from gov import records
     from gov.retrieval import authority, lexical
+    from gov.retrieval.retrieve import capped
 
     if not any("start_line" in item for item in evidence):  # an item without lines is no entry's span
         return evidence, None
@@ -188,12 +189,19 @@ def leave_out(root: Path, evidence: list[dict]) -> tuple[list[dict], dict | None
         """W2-133 (DEC-1083): the item narrowed to its own chunk, labelled from the chunk's own lines as ``retrieve``
         labels an item (W2-131): its id the entry holding its first line (the chunk id in the preface or a gap), with
         that entry's mark, and each other entry it touches in ``also``. The marks are the parent's own, per entry; the
-        parent's id, entry, status and ``also`` are never kept."""
+        parent's id, entry, status, ``also`` and ``cut`` are never kept. Its text goes through ``retrieve``'s line cap,
+        and it carries a ``cut`` of its own only where its own lines hold a cut line (W2-135 S2, the review's F2)."""
         marks = {mark["entry"]: mark for mark in [{key: item[key] for key in MARK if key in item},
                                                     *item.get("also", ())] if "entry" in mark}
-        new = {key: value for key, value in item.items() if key not in MARK + ("also",)}  # ``id`` keeps its place
+        text, cut = capped(body, chunk["start_line"])
+        new = {}
+        for key, value in item.items():  # ``id`` keeps its place, and a cut of its own sits after ``text``
+            if key not in MARK + ("also", "cut"):
+                new[key] = value
+            if key == "text":
+                new.update(cut)
         new.update({"start_line": chunk["start_line"], "end_line": chunk["end_line"],
-                    "sha256": hashlib.sha256(body).hexdigest(), "text": body.decode("utf-8", "replace")})
+                    "sha256": hashlib.sha256(body).hexdigest(), "text": text})
         holder = (entry_of(register["path"], chunk["start_line"]) or {}).get("id")
         new["id"] = holder or chunk["chunk_id"]
         new.update(marks.get(holder, {}))
