@@ -1,1 +1,1 @@
-2026-11-05 19:10:15 waiting on the owner: D4B-LEVERS (a)-(d) (4dea932f); W2-32 S11 wording package to come; no job running
+2026-11-06 15:59:33 STAND-BY: the memory build's decided items are done (DEC-1085 (1)); waiting on the owner for W2-32-S11-WORDING, BUNDLE-BUDGET-1 and D4B-SEARCH-AGAIN section 6 plus a cost cap. Nothing running but the watchers.

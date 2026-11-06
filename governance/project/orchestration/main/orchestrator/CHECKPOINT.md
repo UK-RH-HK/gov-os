@@ -5,6 +5,14 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
 what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~18:00, STAND-BY on the owner** (`log/cto-standby.txt`):
+  - **Merged:** W2-61h S7 and W2-134 at `50d79efe`. `gov accept W2-134` 28/28; review READY. W3-P26 and W3-P27 are its
+    rows.
+  - **Re-score:** 26 kept runs re-scored with families (`drafts/score-once/rescore_families.sh`; root
+    `~/gov-os-runs/D4B/g1-fam`, a worktree of g1 at `e884675b` plus the families block). No count changes.
+  - **Waits on the owner:** S11's wording, BUNDLE-BUDGET-1 (W2-135), and D4B-SEARCH-AGAIN §6 with a cost cap.
+  - **Then:** re-pin window 4's ACT (W2-92, W2-32 S11, W2-131, W2-133, W2-112, W2-134, W2-135), D-6 part 2, the
+    search-again pilot, and the end-to-end package.
 - **~16:50 (DEC-1085 recorded; next free id DEC-1086):** the owner's order: finish the memory build, then
   search-again, then the end-to-end package, then the fresh 80.
   - **Done:**

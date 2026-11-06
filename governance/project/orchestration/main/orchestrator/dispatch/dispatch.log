@@ -330,3 +330,4 @@
 2026-11-06 09:37:07 interim result: W2-61h-s7 ab18f6f5b W2-61h S7: source families in the memory measure (evaluation_families in the pat
 2026-11-06 11:31:08 gpu rule: ALERT GPU spill: 1581 MiB of shared GPU memory in use > the floor 1019 MiB (dedicated 7668 MiB): the card's memory is spilling into the host's -> inbox/20261106-113108-gpu-alert.txt
 2026-11-06 13:39:05 gpu rule: no spill again (1569 MiB shared)
+2026-11-06 15:47:08 interim result: W2-134 a543a10f9 W2-134 (DAEO-m4rq): the measure re-anchors line-cited gold in memory for the mea

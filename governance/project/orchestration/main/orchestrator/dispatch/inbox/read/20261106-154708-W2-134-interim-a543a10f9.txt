@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-134
+status: interim result a543a10f9: W2-134 (DAEO-m4rq): the measure re-anchors line-cited gold in memory for the measured commit and never writes the sets root (S1-S4); the family floor and token edges (S5); the families line first (S6)
