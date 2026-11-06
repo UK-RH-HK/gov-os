@@ -13,7 +13,7 @@ wbs_id: W2-61h
 title: 'W2-61''s enlarged set: 28 new memory questions with their gold sources, 24 hidden and 4 visible, by an independent session'
 class: audit
 state_class: AUTHORITATIVE
-role: independent-test-designer
+role: engineer
 depends_on: [DAEO-m1u3]
 allowed_paths:
 - tests/acceptance/W2-61/test_w2_61_visible_half.py
@@ -83,3 +83,7 @@ top-level key of the path map: a map of a family's name to the list of its membe
 re-scored with `python3 -m gov.retrieval.measure <set> ... --kept <dir>`, where `<dir>` holds the kept ranked outputs
 in call order (`00001.json` …, beside `.n` and `.n.lock`), and the output is the measure's own; (3) a family hit is
 named in the question's line by the member's path and the word "family", the line keeping its present pattern.
+
+**Role changed to engineer (CTO, 2026-11-06, delegated P3):** W2-61h's remaining work is S7's code; `gov launch`
+starts an engineer only on an engineer's ticket, and a test designer launches on an engineer's ticket as before. The
+guard so keeps S7's engineer from this ticket's own acceptance tests (DEC-1056).
