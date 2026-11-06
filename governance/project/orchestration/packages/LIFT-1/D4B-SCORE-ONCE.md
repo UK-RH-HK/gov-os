@@ -127,3 +127,27 @@ GPU used once; every combination replayed from kept scores).
 - **No cell is affected:** every cell, B0 included, is scored against the same labels, as they stand at the replay.
   The past figures (107 of 138) were scored on the labels of 11-05; the replays' figures use today's.
 - **The window resumes from q06** (q06f's kept scores stand; no GPU repeated): q06, q4b, gte and zer on the question.
+- **h23, found from `REANCHOR-LOG-hidden.md` (DEC-1083):** the label had not been edited.
+  - My measure script's automatic re-anchoring (`repin_gold.py`, in `w4_point.sh`) moved h23's lines on 11-05 at
+    14:40 to another clone's commit (`5a9e36c0`, lines 545-559).
+  - The score-once runner (`so_measure.sh`) does not re-anchor, so on the g1 clone (`e884675b`, where the block sits
+    at 528-542) h23's gold was looked for in the wrong lines.
+  - Re-anchored at 12:42 to `e884675b`, after fetching that commit's history into the clone (objects only; its tree
+    unchanged). The other 69 line-cited sources, the spent 60 and the visible half were already right for the clone.
+  - Every model's figure is re-scored on these labels by replaying it alone (exact, as R0 showed).
+
+## Version 4 (2026-11-06 ~12:50, before any stage or cell replay is judged): a follow-up call's unscored texts
+- **The finding:** L2's replays with routing's moves switched off stopped: "4 of 40 texts were not scored by q06 in
+  the window".
+  - A question's first call reranks the fused list's first 40, the same under every stage and every cell, and the
+    window scored them all.
+  - A follow-up call (`--continue`) reranks the next ones, and which they are depends on what the earlier calls sent.
+  - So a replay that changes the order can ask for texts the window never scored.
+- **The change** (`rx.py` `_kept`, tested 22 of 22): in a follow-up call only, an unscored text is placed below every
+  scored text of that pass and counted (`LOWFILL`). A first call with an unscored text still stops the run.
+- **What it costs:**
+  - **hit@5 stays exact.** It is decided in the first call, which returns 13 to 23 items.
+  - **MRR is approximate only** where the first gold lies beyond the first call, by at most 1/13 a question.
+  - The count of filled texts is reported beside every replay. A cell with filled texts is judged on hit@5 first, as
+    the rule already says.
+- **Not affected:** a model alone, B0 included, reproduces its window run exactly, with no text filled.
