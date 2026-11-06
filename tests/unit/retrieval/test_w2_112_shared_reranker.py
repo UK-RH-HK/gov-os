@@ -42,6 +42,16 @@ class _Cuda:
         if "STANDIN_GPU_FREE" not in os.environ:
             raise RuntimeError("no CUDA GPU (stand-in)")
         return int(os.environ["STANDIN_GPU_FREE"]), 16 * 2 ** 30
+    @staticmethod
+    def empty_cache():
+        with open(os.path.join(os.environ["MARKS"], "released"), "a") as out:
+            out.write("released\\n")
+    @staticmethod
+    def memory_allocated():
+        return 1200 * 2 ** 20
+    @staticmethod
+    def memory_reserved():
+        return 1300 * 2 ** 20
 cuda = _Cuda()
 """
 FAKE_SENTENCE_TRANSFORMERS = """import json, os, sys, time
@@ -397,6 +407,152 @@ def test_a_search_s_requests_never_reach_the_service_s_cap(home):
     ranked, outcome = ask("q", texts)
     assert outcome["by"] == "service" and outcome["reason"] is None and not fallbacks(home)
     assert len(ranked) == len(texts) and all("rerank_score" in entry for entry in ranked)
+
+
+# --- the memory a request used, released after it (DEC-1068, re-pin window 4) ---
+
+MEMORY_LINE = "allocated 1200 MiB, reserved 1300 MiB"
+
+
+class _Torch:
+    """A stand-in torch, in this process: each allocator call is an event."""
+
+    def __init__(self, events: list, fail: bool = False):
+        self.cuda, self.events, self.fail = self, events, fail
+
+    def empty_cache(self):
+        self.events.append("release")
+        if self.fail:
+            raise RuntimeError("stand-in release failure")
+
+    def memory_allocated(self):
+        return 1200 * 2 ** 20
+
+    def memory_reserved(self):
+        return 1300 * 2 ** 20
+
+
+class _Connection:
+    def __init__(self, events: list, line: bytes, send_fails: bool = False):
+        self.events, self.line, self.send_fails = events, line, send_fails
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.events.append("closed")
+
+    def settimeout(self, _):
+        pass
+
+    def makefile(self, _):
+        import io
+
+        return io.BytesIO(self.line)
+
+    def sendall(self, data: bytes):
+        if self.send_fails:
+            raise BrokenPipeError("the caller gave up")
+        self.events.append(("sent", json.loads(data)))
+
+
+class _Listener:
+    def __init__(self, connection):
+        self.connection = connection
+
+    def accept(self):
+        return self.connection, None
+
+
+class _Encoder:
+    def __init__(self, events: list, fail: bool = False):
+        self.events, self.fail = events, fail
+
+    def predict(self, pairs):
+        self.events.append("predict")
+        if self.fail:
+            raise RuntimeError("CUDA out of memory (stand-in)")
+        return [float(len(text)) for _, text in pairs]
+
+
+def _memory_lines(log: Path) -> list[list[str]]:
+    return [line.split("\t") for line in log.read_text().splitlines() if "\tMEMORY\t" in line] if log.exists() else []
+
+
+def _serve(tmp_path, monkeypatch, line: bytes, fail_predict=False, fail_release=False, send_fails=False):
+    events: list = []
+    monkeypatch.setitem(sys.modules, "torch", _Torch(events, fail_release))
+    log = tmp_path / "rerank.log"
+    rerank_service.serve(_Listener(_Connection(events, line, send_fails)), _Encoder(events, fail_predict), "cuda:0",
+                         str(log))
+    return events, _memory_lines(log)
+
+
+def test_the_service_releases_once_per_answered_request_after_the_answer(tmp_path, monkeypatch):
+    events, lines = _serve(tmp_path, monkeypatch, json.dumps(["q", ["a", "bbb"]]).encode() + b"\n")
+    assert events == ["predict", ("sent", {"scores": [1.0, 3.0], "device": "cuda:0"}), "closed", "release"]
+    assert [line[1:] for line in lines] == [["MEMORY", MEMORY_LINE]]
+
+
+def test_the_memory_line_has_its_fixed_form(tmp_path, monkeypatch):
+    import re
+
+    _serve(tmp_path, monkeypatch, json.dumps(["q", ["a"]]).encode() + b"\n")
+    [line] = (tmp_path / "rerank.log").read_text().splitlines()
+    assert re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d{4}\tMEMORY\tallocated \d+ MiB, reserved \d+ MiB", line)
+
+
+@pytest.mark.parametrize("case", ["the model fails", "the request is malformed", "the request is over the cap",
+                                  "the caller has gone"])
+def test_a_failed_request_still_releases(tmp_path, monkeypatch, case):
+    line = json.dumps(["q", ["x"] * (rerank_service.MAX_TEXTS + 1) if case == "the request is over the cap" else ["a"]])
+    events, lines = _serve(tmp_path, monkeypatch, b"not json\n" if case == "the request is malformed" else
+                           line.encode() + b"\n", fail_predict=case == "the model fails",
+                           send_fails=case == "the caller has gone")
+    assert events.count("release") == 1 and events[-1] == "release"
+    if case != "the caller has gone":
+        [sent] = [event for event in events if isinstance(event, tuple)]
+        assert "error" in sent[1] and events.index(sent) < events.index("release")
+    assert [line[1:] for line in lines] == [["MEMORY", MEMORY_LINE]]
+
+
+def test_a_failed_release_is_logged_and_the_service_goes_on(tmp_path, monkeypatch):
+    events, lines = _serve(tmp_path, monkeypatch, json.dumps(["q", ["a"]]).encode() + b"\n", fail_release=True)
+    assert events[-1] == "release"
+    assert [line[1:] for line in lines] == [["MEMORY", "not released (RuntimeError: stand-in release failure)"]]
+
+
+def test_an_unwritable_log_does_not_end_the_service(tmp_path, monkeypatch):
+    (tmp_path / "rerank.log").mkdir()  # the log's path is not writable as a file
+    events: list = []
+    monkeypatch.setitem(sys.modules, "torch", _Torch(events))
+    rerank_service.serve(_Listener(_Connection(events, json.dumps(["q", ["a"]]).encode() + b"\n")), _Encoder(events),
+                         "cuda:0", str(tmp_path / "rerank.log"))  # returns: no OSError from the log reaches main
+    assert events[-1] == "release"
+
+
+def test_a_caller_that_sends_nothing_in_time_releases_nothing(tmp_path, monkeypatch):
+    class Silent(_Connection):
+        def makefile(self, _):
+            raise socket.timeout("timed out")
+
+    events: list = []
+    monkeypatch.setitem(sys.modules, "torch", _Torch(events))
+    rerank_service.serve(_Listener(Silent(events, b"")), _Encoder(events), "cuda:0", str(tmp_path / "rerank.log"))
+    assert events == ["closed"] and not (tmp_path / "rerank.log").exists()
+
+
+def test_the_running_service_writes_one_memory_line_per_request(home):
+    for number in range(3):
+        assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+    assert (home / "marks/released").read_text().splitlines() == ["released"] * 3
+    lines = [line for line in (home / rerank.CACHE_REL / rerank.LOG).read_text().splitlines() if "\tMEMORY\t" in line]
+    assert [line.split("\t")[2] for line in lines] == [MEMORY_LINE] * 3
+    assert rerank.status()["fallbacks"] == 0
+
+
+def test_the_release_leaves_the_client_s_bounds_as_they_were():
+    assert (rerank.MAX_REQUEST_TEXTS, rerank.MAX_REQUEST_CHARS, rerank_service.MAX_TEXTS) == (16, 24_000, 512)
 
 
 def test_a_service_that_cannot_start_leaves_the_search_to_the_private_reranker(home, monkeypatch):

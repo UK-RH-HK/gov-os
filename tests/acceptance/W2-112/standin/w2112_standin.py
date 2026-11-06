@@ -181,6 +181,58 @@ def cuda_get_device_properties(device=None):
     return _Properties()
 
 
+# ---------------------------------------------------------------- the stand-in GPU's memory (DEC-1068)
+#
+# The caching allocator, as this process's ``torch.cuda`` reports it: once the model is on the GPU, ``allocated`` is
+# its weights (``ALLOCATED_MIB``) and ``reserved`` the allocator's pool (``RESERVED_MIB``); a scoring call on the GPU
+# leaves ``REQUEST_MIB`` more reserved (the cache a request's tensors leave behind), until ``empty_cache`` gives it
+# back. Each ``empty_cache`` is an ``empty-cache`` event (when it began, when it ended, the reserved MiB before and
+# after); ``empty_cache_delay`` makes it take that long. Distinct, uneven figures, so a log line can be matched.
+
+MIB = 1024 * 1024
+ALLOCATED_MIB, RESERVED_MIB, REQUEST_MIB = 1187, 1534, 2049
+_MEMORY = {"on_gpu": False, "cached": False}
+
+
+def cuda_memory_allocated(device=None) -> int:
+    return ALLOCATED_MIB * MIB if _MEMORY["on_gpu"] else 0
+
+
+def cuda_memory_reserved(device=None) -> int:
+    if not _MEMORY["on_gpu"]:
+        return 0
+    return (RESERVED_MIB + (REQUEST_MIB if _MEMORY["cached"] else 0)) * MIB
+
+
+def cuda_memory_stats(device=None) -> dict:
+    allocated, reserved = cuda_memory_allocated(), cuda_memory_reserved()
+    return {"allocated_bytes.all.current": allocated, "allocated_bytes.all.peak": allocated,
+            "reserved_bytes.all.current": reserved, "reserved_bytes.all.peak": reserved,
+            "active_bytes.all.current": allocated, "num_alloc_retries": 0, "num_ooms": 0}
+
+
+def cuda_max_memory_allocated(device=None) -> int:
+    return cuda_memory_allocated()
+
+
+def cuda_max_memory_reserved(device=None) -> int:
+    return (RESERVED_MIB + REQUEST_MIB) * MIB if _MEMORY["on_gpu"] else 0
+
+
+def cuda_empty_cache() -> None:
+    began, before = time.time(), cuda_memory_reserved() // MIB
+    delay = float(_mine("empty_cache_delay", 0.0) or 0.0)
+    if delay:
+        time.sleep(delay)
+    _MEMORY["cached"] = False
+    log("empty-cache", began=began, reserved_before_mib=before, reserved_after_mib=cuda_memory_reserved() // MIB,
+        allocated_mib=cuda_memory_allocated() // MIB)
+
+
+def cuda_nothing(*args, **kwargs) -> None:
+    """``synchronize``, ``reset_peak_memory_stats``, ``ipc_collect``: nothing to do, nothing released."""
+
+
 def _device_name(device) -> str:
     """``cuda`` or ``cpu`` (or another type) from whatever names a device."""
     if device is None:
@@ -338,12 +390,14 @@ def _texts_of(sentences):
     return [tuple(pair) for pair in sentences], False
 
 
-def _scored(pairs, how: str):
+def _scored(pairs, how: str, device: str | None = None):
     queries = []
     for query, _ in pairs:
         if query not in queries:
             queries.append(query)
-    log("predict-begin", queries=queries, pairs=len(pairs), how=how, device=_device_name(None))
+    if device == "cuda":
+        _MEMORY["cached"] = True  # the request's tensors leave the allocator's cache behind, even when it fails
+    log("predict-begin", queries=queries, pairs=len(pairs), how=how, device=device or _device_name(None))
     delay = float(_mine("predict_delay", 0.0) or 0.0)
     if delay:
         time.sleep(delay)
@@ -401,6 +455,7 @@ class CrossEncoder:
             log("load-failed", **fields)
             raise RuntimeError("Found no NVIDIA driver on your system")
         log("load", device=self._device, slots_held=slots_held(), **fields)
+        _MEMORY["on_gpu"] = self._device == "cuda"
         self.model = _Inner(self)
         self.tokenizer = ANYTHING
         self.max_length = kwargs.get("max_length", 512)
@@ -416,6 +471,7 @@ class CrossEncoder:
             name = _device_name(target)
             if name in ("cuda", "cpu") and name != self._device:
                 self._device = name
+                _MEMORY["on_gpu"] = name == "cuda"
                 log("move", device=name)
         return self
 
@@ -439,14 +495,14 @@ class CrossEncoder:
 
     def predict(self, sentences, *args, **kwargs):
         pairs, single = _texts_of(sentences)
-        result = _scored(pairs, "predict")
+        result = _scored(pairs, "predict", self._device)
         return result[0] if single else Scores(result)
 
     __call__ = predict
 
     def rank(self, query, documents, top_k=None, return_documents=False, *args, **kwargs):
         documents = list(documents)
-        result = _scored([(query, document) for document in documents], "rank")
+        result = _scored([(query, document) for document in documents], "rank", self._device)
         ranked = sorted(range(len(documents)), key=lambda index: -result[index])
         answers = [{"corpus_id": index, "score": result[index],
                     **({"text": documents[index]} if return_documents else {})} for index in ranked]

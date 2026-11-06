@@ -53,6 +53,7 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]
 SESSION = HERE / "w2_112_session.py"
 STANDIN = HERE / "standin" / "w2112_standin.py"
+UNIX_OVER_TCP = HERE / "standin" / "w2112_unix_over_tcp.py"  # the memory-release cases' answer to the sandbox
 
 # ---- the pins and the places (ADR-0002 §2, DEC-397, P-RERANKER-1)
 MODEL = "Qwen/Qwen3-Reranker-0.6B"
@@ -472,9 +473,20 @@ class Box:
                 "import w2112_standin as _s\nis_available = _s.cuda_is_available\ndevice_count = _s.cuda_device_count\n"
                 "mem_get_info = _s.cuda_mem_get_info\nget_device_name = _s.cuda_get_device_name\n"
                 "get_device_properties = _s.cuda_get_device_properties\n\n\nclass OutOfMemoryError(RuntimeError):\n"
-                "    pass\n\n\ndef memory_allocated(*a, **k):\n    return 0\n\n\nmemory_reserved = memory_allocated\n\n\n"
+                "    pass\n\n\nfrom .memory import *  # noqa: F401,F403 - the allocator's figures and empty_cache\n"
+                "from . import memory\n\n\n"
                 "def current_device():\n    return 0\n\n\ndef __getattr__(name):\n    if name.startswith('__'):\n"
                 "        raise AttributeError(name)\n    return _s.ANYTHING\n",
+            # the caching allocator (DEC-1068): empty_cache is recorded, the figures are the stand-in's
+            "torch/cuda/memory.py":
+                "import w2112_standin as _s\nempty_cache = _s.cuda_empty_cache\n"
+                "memory_allocated = _s.cuda_memory_allocated\nmemory_reserved = _s.cuda_memory_reserved\n"
+                "memory_stats = _s.cuda_memory_stats\nmax_memory_allocated = _s.cuda_max_memory_allocated\n"
+                "max_memory_reserved = _s.cuda_max_memory_reserved\nmemory_cached = memory_reserved\n"
+                "synchronize = reset_peak_memory_stats = reset_max_memory_allocated = ipc_collect = _s.cuda_nothing\n"
+                "__all__ = ['empty_cache', 'memory_allocated', 'memory_reserved', 'memory_stats',\n"
+                "           'max_memory_allocated', 'max_memory_reserved', 'memory_cached', 'synchronize',\n"
+                "           'reset_peak_memory_stats', 'reset_max_memory_allocated', 'ipc_collect']\n",
         }
         for rel, text in files.items():
             path = site / rel
@@ -575,6 +587,26 @@ class Box:
         site = self.home / ".local" / "lib" / version / "site-packages"
         site.mkdir(parents=True, exist_ok=True)
         (site / "usercustomize.py").write_text(REFUSE_UNIX_SOCKETS, encoding="utf-8")
+
+    def unix_over_tcp(self) -> bool:
+        """Where this machine refuses ``socket(AF_UNIX)`` (the launch sandbox), carry the box's Unix sockets over
+        loopback TCP (``standin/w2112_unix_over_tcp.py``) in its reranker environment (a ``.pth``) and its sessions
+        (a ``usercustomize``), so a case can see the service at all; elsewhere nothing is installed. Whether it was.
+        The test's own process is the caller's (``over_tcp_here``). Only the memory-release cases use it."""
+        if not unix_sockets_refused():
+            return False
+        shutil.copy2(UNIX_OVER_TCP, self.state / "lib" / UNIX_OVER_TCP.name)
+        if hasattr(self, "site"):
+            shutil.copy2(UNIX_OVER_TCP, self.site / UNIX_OVER_TCP.name)
+            (self.site / "w2112-unix-over-tcp.pth").write_text(
+                "import w2112_unix_over_tcp; w2112_unix_over_tcp.install()\n", encoding="utf-8")
+        version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        user_site = self.home / ".local" / "lib" / version / "site-packages"
+        user_site.mkdir(parents=True, exist_ok=True)
+        (user_site / "usercustomize.py").write_text(
+            f"import sys\nsys.path.insert(0, {str(self.state / 'lib')!r})\nimport w2112_unix_over_tcp\n"
+            "w2112_unix_over_tcp.install()\n", encoding="utf-8")
+        return True
 
     def cache_texts(self, since: float) -> list[str]:
         """Every file under ``~/.cache/gov-os/`` written since ``since`` (the planted blocker left out), as
