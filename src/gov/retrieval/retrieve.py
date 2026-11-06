@@ -80,11 +80,14 @@ def _named_register(root: Path) -> str | None:
 
 
 def _graph(root: Path) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    """``path -> id`` of every record, ``id -> reason`` for not-current records (superseded or must-not-cite),
-    and ``id -> type`` for every record. Raises what the store raises when it is missing or cannot be read."""
+    """``path -> id`` of every record that is its file, ``id -> reason`` for not-current records (superseded or
+    must-not-cite), and ``id -> type`` for every record. A record that carries a span (a register entry) is left out of
+    the path map, as ``supplementary`` does: no one entry stands for the register's path (W2-131, DEC-1082 (2)); a
+    register chunk is its own entry, by ``authority.register_entries_of``. Raises what the store raises when it is
+    missing or cannot be read."""
     known = records.records(root)
     superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
-    record_of = {record["path"]: record["id"] for record in known}
+    record_of = {record["path"]: record["id"] for record in known if record.get("span") is None}
     not_current: dict[str, str] = {}
     for record in known:
         if record["status"] == SUPERSEDED or record["id"] in superseded_edges:
@@ -401,8 +404,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 dropped[chunk["path"]] = {"path": chunk["path"], "id": record_id, "reason": not_current[record_id]}
             continue
 
-        # DEC-423: files the store could not load — read frontmatter
-        if record_id is None:
+        # DEC-423: files the store could not load — read frontmatter (the register's entries are loaded: W2-131)
+        if record_id is None and not in_register:
             rel = chunk["path"]
             if rel not in frontmatter_cache:
                 frontmatter_cache[rel] = _frontmatter_status(root, rel)
@@ -497,6 +500,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         if rel == register:
             entries = entries_in(rel, first, last)
             if entries:
+                # W2-131 (DEC-1082 (2)): the id is the item's own entry, as its ``entry`` key; none: the chunk id
+                found["id"] = entries[0]
                 found.update(entry_mark(entries[0]))
                 if len(entries) > 1:  # a parent over several entries: each of the others, the same way
                     found["also"] = [entry_mark(rid) for rid in entries[1:]]
