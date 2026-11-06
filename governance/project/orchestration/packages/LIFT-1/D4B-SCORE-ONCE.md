@@ -221,6 +221,28 @@ question. Each variant runs into its own copy of the kept q06 cache, so only tex
   - Measuring it with M3 needs zerank and gte to score its new texts, in a window of its own, at the owner's word.
 - **E1 answers the owner's question** directly: does a wider pool help or hurt?
 
+## Version 6's result (2026-11-06 14:50-15:06 window, replays 15:07-15:20; `~/gov-os-runs/D4B/score-once-extend/`)
+The control b0 scored 0 new texts and equalled g-B0 in all 138 questions. Each cell's replay equals its window run in
+all 138 (0 differing in hit@5 or first gold rank). The GPU peak was 9,668 MiB (E1), never at the budget. Counts only.
+
+| cell | new texts scored | hit@5 /138 | MRR | visible /40 | hidden /39 | spent /59 | spread | gains / losses vs B0 | McNemar p | Holm (4) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| B0 | 0 | 107 | 0.5589 | 35 | 31 | 41 | 18.0 | | | |
+| E1 depth 80 | 5,320 | 107 | 0.5497 | 32 | 31 | 44 | 5.4 | 4 / 4 | 1.000 | 1.000 |
+| E2 split | 205 | 108 | 0.5608 | 35 | 32 | 41 | 18.0 | 1 / 0 | 1.000 | 1.000 |
+| E3 termmap | 60 | 108 | 0.5606 | 35 | 31 | 42 | 16.3 | 1 / 0 | 1.000 | 1.000 |
+| E4 both | 250 | 109 | 0.5619 | 35 | 32 | 42 | 16.3 | 2 / 0 | 0.500 | 1.000 |
+
+- **E1, a wider pool: it neither helps nor hurts the count, and it lowers MRR.** It gains 4 questions and loses 4,
+  and its MRR falls (0.5497 against 0.5589). It narrows the spread because the visible set loses 3 and the spent set
+  gains 3. The wider pool needs about twice the scoring (5,320 new texts on top of 5,486). Not a lever.
+- **E4 (split and the term map) is the best cell by §4's rule:** 109, the highest MRR, with a spread no wider than
+  B0's. E2 and E3 also pass the rule, each with 108. **None is significant:** +2 with no loss, p 0.50.
+  - By version 6, E4 is a lever to apply on top of the chosen reranker. It is not measured with M3. That needs zerank
+    and gte to score its 250 new texts, in a window of its own, at the owner's word.
+- **Cost, not measured live here.** The replays' search times come from cached scores. E4 adds up to three phrasings
+  a question, each searched and reranked. Its live time would be measured in M3's window, if the owner asks for one.
+
 ## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
 - The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
   service).
