@@ -529,9 +529,10 @@ def _unavailable(reason: str) -> dict:
             "ranked": []}
 
 
-def search(root: Path, query: str, refresh: bool = True) -> dict:
+def search(root: Path, query: str, refresh: bool = True, top_k: int | None = None) -> dict:
     """Every line of the corpus that holds the exact string ``query`` (``hits``, with its path, line, chunk and
-    parent), and the chunks ranked for the fusion (``ranked``): see the module's docstring.
+    parent), and the chunks ranked for the fusion (``ranked``): see the module's docstring. ``top_k`` is this
+    search's depth in place of ``TOP_K`` (W2-32 S11's ``pool.route_depth``; None or 0: ``TOP_K``).
 
     With ``refresh`` the index is brought up to date first. Without, nothing is written, and a missing, empty or
     stale index is reported as ``FACET_UNAVAILABLE`` with its reason and no hit (DEC-342). It never raises: a store
@@ -548,7 +549,7 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
         if status != "fresh":
             return _unavailable(status)
         return {"available": True, "facet": FACET, "state": "AVAILABLE", "reason": None,
-                **_ranked(connection, query)}
+                **_ranked(connection, query, top_k)}
     except (sqlite3.Error, OSError, GovError):
         return _unavailable("unreadable")
     finally:
@@ -556,8 +557,10 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
             connection.close()
 
 
-def _ranked(connection: sqlite3.Connection, query: str) -> dict:
-    """``hits`` and ``ranked`` of ``query`` in the open, fresh index."""
+def _ranked(connection: sqlite3.Connection, query: str, top_k: int | None = None) -> dict:
+    """``hits`` and ``ranked`` of ``query`` in the open, fresh index; at most ``top_k`` (``TOP_K``) chunks added by
+    the words."""
+    top_k = top_k or TOP_K
     keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
     split = _columns(connection) == SPLIT_COLUMNS  # M4's index: its parts column weighted too
     ranked_text, ranked_top = (_SPLIT_TEXT, _SPLIT_TOP) if split else (_RANKED_TEXT, _RANKED_TOP)
@@ -583,8 +586,8 @@ def _ranked(connection: sqlite3.Connection, query: str) -> dict:
                              "parent_id": parent_id})
     words, added = _words(query), 0
     if words:
-        for record in connection.execute(ranked_top, (words, TOP_K + len(ranked))):
-            if added < TOP_K and record[0] not in ranked:
+        for record in connection.execute(ranked_top, (words, top_k + len(ranked))):
+            if added < top_k and record[0] not in ranked:
                 ranked[record[0]] = {**dict(zip(keys, record)), "exact": False}
                 added += 1
     return {"hits": hits, "ranked": list(ranked.values())}
