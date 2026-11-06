@@ -12,6 +12,10 @@ that runs the skill validator). Each command is the tree's own declaration
 when the change <base>..HEAD touches template/governance/kernel/{roles,skills,hooks}/** or .rulesync/**, or when
 <base> does not resolve; with no <base> it is left out.
 
+Links (W2-129 S13, DEC-1088 (6)): with a <base>, the tree's own `gov links --since <base>` runs after the others, a
+notice only: `links: ok (0 new since <base>, M standing)` or `links: NOTICE N new: <the first finding lines>`. It
+writes only its own mark (`.gov-runtime/links/mark`). Skipped with no <base>, or in a tree without `src/gov/links/`.
+
 Prints one line per family, `<family>: ok`, `<family>: ok (not applicable: ...)`, `<family>: skipped (...)` or
 `<family>: NOTICE <what it found, its first lines>`, then one last line `structural pass at <head12> ...`. Exit 0
 whatever the checks find; 2 only when it could not run at all (no such folder, not a git work tree, bad arguments).
@@ -186,6 +190,28 @@ def touches_kernel(repo, base):
     return False, f"no change under template/governance/kernel/{{roles,skills,hooks}}/ or .rulesync/ since {b[:12]}"
 
 
+def links_line(repo, base, bound):
+    """(ok, line) for the links family, or (True, None) when it is skipped (then the caller prints the skip)."""
+    if base is None:
+        return True, "links: skipped (no base given)"
+    if not (repo / "src/gov/links").is_dir():
+        return True, "links: skipped (no gov links in this tree)"
+    rc, out, err = run_one(repo, f"python3 -m gov.cli.main links --since {shlex.quote(base)}", bound)
+    if rc is None:
+        return False, f"links: NOTICE gov links did not end within {bound:g} s"
+    lines = [l for l in out.splitlines() if l.strip()]
+    m = re.match(r"gov links: (\d+) new since (\S+), (\d+) standing", lines[0]) if lines else None
+    if rc not in (0, 1) or not m:
+        last = (err.strip() or out.strip() or "no output").splitlines()[-1]
+        return False, f"links: NOTICE gov links could not run (exit {rc}): {short(last)}"
+    new, standing = int(m.group(1)), int(m.group(3))
+    if new == 0:
+        return True, f"links: ok (0 new since {base}, {standing} standing)"
+    shown = " | ".join(short(l) for l in lines[1:1 + SHOWN])
+    more = f" (+{new - SHOWN} more)" if new > SHOWN else ""
+    return False, f"links: NOTICE {new} new since {base} ({standing} standing): {shown}{more}"
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("repo")
@@ -223,6 +249,12 @@ def main(argv=None):
         print(line, flush=True)
     if not with_port:
         print(f"portability: skipped ({port_why})", flush=True)
+    links_ok, links = links_line(repo, a.base, bound)
+    print(links, flush=True)
+    if not links.startswith("links: skipped"):
+        n += 1
+        if not links_ok:
+            notices.append("links")
     dirty = [l for l in git(repo, "status", "--porcelain", "--untracked-files=no").stdout.splitlines() if l]
     took = f"{time.monotonic() - start:.1f} s"
     at = f"structural pass at {head[:12]}" + (f" (the work tree differs from it at {len(dirty)} tracked path(s): "

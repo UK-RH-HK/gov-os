@@ -15,7 +15,9 @@
     "W2-32",
     "W2-131",
     "W2-133",
-    "W2-134"
+    "W2-134",
+    "W2-135",
+    "W2-129"
   ],
   "built_held": [
     "W2-20",
@@ -27,7 +29,7 @@
   ],
   "closes_next": "none: the refactoring (DEC-1052); D-1 and D-4b merges as built, formal closes at the lift (P1-13)",
   "examin": "AT RISK (re-estimated 11-06 20:00, DEC-1087 (9)): re-pin window 4 ready about 11-07 evening (range 11-07 to 11-08); the parallel-agents test and the experiments 11-08 to 11-10; the lift about 11-15 (range 11-14 to 11-18); EXAMIN's copy about 11-21 (range 11-20 to 11-26): the items before the re-pin (W2-116, W2-129, W2-135) and the experiments come first; memory 67.8 % on the blind 60, below the 85 % floor; K9 gates the start (DEC-954 Q1)",
-  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); next: the items before re-pin window 4 (DEC-1087), then the re-pin",
+  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); next: re-pin window 4 (ACT-REPIN-W4, ready and rehearsed), then the parallel-agents test",
   "countdown": [
     "Before the re-pin (DEC-1087 (1)-(9)): W2-135, W2-129 and W2-116 tests first, built and reviewed; S11 merged; the dependency-mapping package; a clean tree; window 4's ACT rehearsed. Est. 1 to 1.5 days: ready about 11-07 evening",
     "The re-pin (your operator) and the parallel-agents and memory test (DEC-1087 (10)). Est. 0.5 day: 11-08",
@@ -37,7 +39,7 @@
     "D-10, the full suite and its red fixes, then the lift (your word). Est. 1 to 2 days: the lift about 11-15",
     "After the lift: the three-layer plan and Wave 2's streams (DEC-1087 (13)), then the remaining 40 not-started and 7 in-flight tickets under the three layers; EXAMIN's copy about 11-21"
   ],
-  "owner_action": "P2 DEPENDENCY-MAP-1 - your decision on the tool (its section 2), its KPI lines, wide reads (section 5, (b) recommended) and timing (after the re-pin recommended); due to you from the CTO: the worktree list for your push; window 4's ACT when every item is done and tested; later: the pilot's cost before E2; M3's adoption after all the experiments; the 150-id sitting; the templates' approval",
+  "owner_action": "P1 ACT-REPIN-W4 - your push, then your operator runs pin/REPIN-COMMANDS-W4.sh in a plain terminal (packages/ACT-REPIN-W4.md; rehearsed, exit 0, 123 s); P2 ADR-0002 (PROPOSED, cited by W2-112); later: the pilot's cost before E2; M3's adoption after all the experiments; the 150-id sitting; the templates' approval",
   "last_report": "2026-11-06 18:26:25",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
@@ -50,6 +52,9 @@
     "W2-61h": "MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift",
     "W2-134": "MERGED 50d79efe (S8's re-anchoring + S7's F1/F3 fix; gov accept 28/28; review READY); 26 kept runs re-scored with families: no count changes",
     "W2-112": "MERGED as built (D-1); its memory release in window 4; formal close at the lift",
+    "W2-135": "MERGED ff64f148 (a line over 4,000 characters cut; review READY in round 2); window 4",
+    "W2-129": "MERGED 34eed411 (gov links, S1-S16; review READY in round 2; 3,037 standing); window 4",
+    "W2-116": "pass 1 MERGED 75acb0ff (the integration store, refreshed after every merge from window 4's hook; GOV_STORE for every worker); S2 next pass",
     "W2-126": "MERGED as built (D-1); formal close at the lift",
     "W2-122": "MERGED as built (D-1); formal close at the lift",
     "W2-123": "MERGED as built (D-1); formal close at the lift",

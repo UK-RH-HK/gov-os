@@ -5,6 +5,27 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
 what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~00:30 11-07, RE-PIN READY; STAND-BY on the owner's push and the operator's ACT** (`log/act-in-progress.txt`,
+  `log/cto-standby.txt`). Next free id **DEC-1089**.
+  - **Merged** (each tests first, review READY by `verdict.py`):
+    - W2-32 S11 `e3355def`;
+    - W2-116 pass 1 `75acb0ff`;
+    - W2-129 `34eed411`;
+    - W2-135 `ff64f148`;
+    - W2-112's memory release (`9e248e3f`; found unmerged by rehearsal 1).
+  - **Filed:** W2-136 (`DAEO-p3ln`, `gov plan`, open, built after the re-pin) and DEC-1088 (with its standing rule: a
+    closed ticket is never edited).
+  - **The ACT:** `packages/ACT-REPIN-W4.md`; `pin/REPIN-COMMANDS-W4.sh` (`C=bcea09060ebc`, sha `11a16d0f…`). Rehearsed:
+    run 4, exit 0, 123 s.
+  - **Right after "done":**
+    1. `mv` the hold;
+    2. commit `retrieval.yaml`'s `pool:` (meaning_uncut true, route_depth 60, rerank_depth 40, per_file_first10 2,
+       drop_nested true). The old pin refuses this key, so never before the switch;
+    3. check the hook refreshed the store;
+    4. then the parallel-agents test (DEC-1087 (10)), with W2-112's live measure; then E0 and E0b.
+  - **Tools:** the structural pass has a `links` family (`gov links --since <base>`, a notice). `EMG-queue` is kept as
+    the guard suite's fixture.
+  - **For the owner:** ADR-0002 is PROPOSED and cited by W2-112 (a `gov links` notice).
 - **~22:30, DEC-1087 under way (next free id DEC-1088).** The items before re-pin window 4:
   - **Done:**
     - the store refreshed: by hand with the pinned gov, then by the refresh script through `tools/rebuild_pinned.sh`

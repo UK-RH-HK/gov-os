@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-129
+status: interim result 2481feedd: W2-129 review round 2: F2 the closing commit's watched fields are judged (TICKET_CHANGE_UNMARKED), its status change still none; F1 a PROPOSED, REJECTED or WITHDRAWN changer gives no UNMARKED_CHANGE a

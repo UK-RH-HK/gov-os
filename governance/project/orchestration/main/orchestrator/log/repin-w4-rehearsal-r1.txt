@@ -1,0 +1,36 @@
+half a: 75acb0ff22e7, store 382M
+half b: 34eed411ac8c, store 385M
+registry clone at ff64f14835f6 on w2/integrate
+mirror ready: gov -> /tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/pin-8284fb408bd4/bin/gov; store -> /tmp/gov-os-emg-repin4/r1/home/gov-os-worktrees/W2-00-store-b
+======== the operator's script, against the mirror
+== 0. preconditions
+ok (gov -> pin-8284fb408bd4; store -> W2-00-store-b at 34eed411ac8c)
+== A. the wheel of ff64f14835f6, built twice from clean exports, checked against the dry run; its own environment
+build 1 9c58407abd0f3d102f42be67776b264997dd866754186d32da4600101d075036
+build 2 9c58407abd0f3d102f42be67776b264997dd866754186d32da4600101d075036
+/tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/wheels/ff64f14835f6/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/pin-ff64f14835f6/bin/python
+== S. the integration store rebuilt at ff64f14835f6 in the spare half, by ff64f14835f6's own code; the link flips on success
+GPU before the rebuild: 9486 MiB used
+2026-11-06 23:33:36 built ff64f14835f6 in W2-00-store-a rc=0 in 27 s; link -> W2-00-store-a
+the rebuild: exit 0, 28 s wall, GPU peak 9493 MiB
+the store: /tmp/gov-os-emg-repin4/r1/home/gov-os-worktrees/W2-00-store -> W2-00-store-a at ff64f14835f6
+== B. every check before the switch, through /tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/pin-ff64f14835f6 by its path
+ok   gov imports from the pin (/tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/pin-ff64f14835f6/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint
+ok   gov accept --help and gov launch --help
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 16 texts and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+CHECK FAILED: rerank_service.py does not release its GPU memory after a request (W2-112)
+
+STOP: a check before the switch failed (above)
+the store link is back on W2-00-store-b
+Nothing was switched: /tmp/gov-os-emg-repin4/r1/home/.local/bin/gov is still pin-8284fb408bd4. Tell the CTO.
+(to run this again later, the CTO says when: rm -rf /tmp/gov-os-emg-repin4/r1/home/.local/share/gov-os/pin-ff64f14835f6)
+======== the script ended: exit 1, 35 s
+the live gov link: /home/usain/.local/share/gov-os/pin-8284fb408bd4/bin/gov
+the live store link: /home/usain/gov-os-worktrees/W2-00-store-b at 34eed411ac8c
+the live pins: pin-5c401220 pin-6a4696eb pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+the live hooks: 
+the scratch hook: 

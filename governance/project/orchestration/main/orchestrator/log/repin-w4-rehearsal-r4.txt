@@ -1,0 +1,72 @@
+half a: ff64f14835f6, store 386M
+half b: 34eed411ac8c, store 385M
+registry clone at bcea09060ebc on w2/integrate
+mirror ready: gov -> /tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-8284fb408bd4/bin/gov; store -> /tmp/gov-os-emg-repin4/r4/home/gov-os-worktrees/W2-00-store-a
+======== the operator's script, against the mirror
+== 0. preconditions
+ok (gov -> pin-8284fb408bd4; store -> W2-00-store-a at ff64f14835f6)
+== A. the wheel of bcea09060ebc, built twice from clean exports, checked against the dry run; its own environment
+build 1 11a16d0fb0f9d1a23df72474a99c320c48f61a9cd025d8b320a2f1e4eb93d406
+build 2 11a16d0fb0f9d1a23df72474a99c320c48f61a9cd025d8b320a2f1e4eb93d406
+/tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/wheels/bcea09060ebc/gov-0.1.0-py3-none-any.whl: OK
+#!/tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-bcea09060ebc/bin/python
+== S. the integration store rebuilt at bcea09060ebc in the spare half, by bcea09060ebc's own code; the link flips on success
+GPU before the rebuild: 9467 MiB used
+2026-11-06 23:50:31 built bcea09060ebc in W2-00-store-b rc=0 in 27 s; link -> W2-00-store-b
+the rebuild: exit 0, 28 s wall, GPU peak 9468 MiB
+the store: /tmp/gov-os-emg-repin4/r4/home/gov-os-worktrees/W2-00-store -> W2-00-store-b at bcea09060ebc
+== B. every check before the switch, through /tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-bcea09060ebc by its path
+ok   gov imports from the pin (/tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-bcea09060ebc/lib/python3.12/site-packages/gov)
+ok   gov --help lists accept, release, retrieve, context, launch, checkpoint
+ok   gov accept --help and gov launch --help
+ok   semantic.py has no NOT_ON_CPU or _on_cpu
+ok   rerank.py: at most 16 texts and 24,000 padded characters a request
+ok   yaml, sqlite_vec, pytest, xdist, pytest_timeout import
+ok   W2-112: the shared reranker's service releases its memory after each request
+ok   W2-129: gov links is a command
+ok   W2-116: gov rebuild --integration; the launcher sets GOV_STORE
+ok   W2-135: a line over 4,000 characters is cut
+ok   W2-32 S11: the pool module, and the new pin accepts the five pool settings (switched on by the CTO after the act)
+ok   W2-61h S7 and W2-134: the measure's families and re-anchoring
+ok   the store W2-00-store-b at bcea09060ebc: embed_headers true, 20399 vectors
+ok   gov retrieve on the store: lexical and semantic available, rerank.by service, 1.755948768 s
+ok   gov context DAEO-sdxk --json and --in-force
+ok   SessionStart, PreCompact and Stop hooks exit 0 under the new pin
+ok   guard4_check.py: PASS (70 cases)
+ok   test_guard_fix_4.py: 467 passed
+ok   test_g14.py: 151 passed, 1 skipped
+ok   tests/unit/hooks/test_live_hook.py: 63 passed
+ok   test_guard_fix_3.py: 49 failed, 236 passed, 1 skipped, the same 49 cases as the old pin (ACT-GUARD-FIX-4's LET_THROUGH)
+ok   hook_timing.py: exit 0 out '' seconds [0.11, 0.12, 0.11, 0.11, 0.11]
+ALL CHECKS PASS (/tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-bcea09060ebc)
+== C. the quiet point
+the shared reranker: pid 3997564 from /home/usain/.local/share/gov-os/pin-8284fb408bd4/lib/python3.12/site-packages/gov/retrieval/rerank_service.py differs from the new pin's (W2-112): restarted after the switch (class 3)
+== D. the switch (an atomic rename), then the shared reranker restarted from the new pin
+/tmp/gov-os-emg-repin4/r4/home/.local/bin/gov -> /tmp/gov-os-emg-repin4/r4/home/.local/share/gov-os/pin-bcea09060ebc/bin/gov
+the reranker restart is skipped (rehearsal)
+1 Read README.md: exit 0;  
+2 Write tests/acceptance: exit 0; "permissionDecision": "deny" 
+3 no judge reachable: exit 2; gov hook: no pinned gov at /tmp/gov-os-emg-repin4/r4/x/smoke/smoke-nohome/.local/bin/gov or on PATH, so /home/usain/Dynamic-Agentic-Engineering-OS/.claude/hooks
+a search through /tmp/gov-os-emg-repin4/r4/home/.local/bin/gov on the store: both facets available, rerank.by service, 1.803048952 s
+== H. W2-116's hook: the integration store refreshed after every update of w2/integrate
+the hook is installed; the new pin's gov rebuild offers --integration (its first run is the next merge's)
+== E. the registry entry (refuses unless A and D hold), committed as the owner's
+  - name: gov
+    version: "0.1.0"
+    sha256: "11a16d0fb0f9d1a23df72474a99c320c48f61a9cd025d8b320a2f1e4eb93d406"
+    install: "python3 -m venv --system-site-packages ~/.local/share/gov-os/pin-bcea09060ebc && ~/.local/share/gov-os/pin-bcea09060ebc/bin/python -m pip install --no-deps --no-index ~/.local/share/gov-os/wheels/bcea09060ebc/gov-0.1.0-py3-none-any.whl && ln -s ~/.local/share/gov-os/pin-bcea09060ebc/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov"
+    uninstall: "ln -s ~/.local/share/gov-os/pin-8284fb408bd4/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov && rm -rf ~/.local/share/gov-os/pin-bcea09060ebc"
+    date: "2026-11-06"
+    approved_by: "DEC-1037"
+    note: "Re-pin window 4 (DEC-1087 (8), under DEC-1037's re-pin windows): a non-editable install of the wheel built from commit bcea09060ebc, w2/integrate with W2-92 (the stated links), W2-32 S11 (the candidate pool, switched on in retrieval.yaml by the CTO right after this act, since the old pin refuses the key), W2-131 and W2-133 (register ids), W2-112 (the reranker releases its memory after each request), W2-134 and W2-61h S7 (the measure re-anchors; source families), W2-135 (a line over 4,000 characters cut), W2-116 (the integration store refreshed after every merge; GOV_STORE for every worker) and W2-129 (gov links), D-6 part 1 and D-9's records (git archive, then pip wheel --no-deps --no-build-isolation with SOURCE_DATE_EPOCH=1794008644, the commit's time; two builds gave the same bytes), in its own environment ~/.local/share/gov-os/pin-bcea09060ebc (Python 3.12, with the system and user site packages for PyYAML, pytest, pytest-xdist, pytest-timeout and sqlite-vec), linked from ~/.local/bin/gov by an atomic rename; the integration store rebuilt at the same commit before the switch; the shared reranker restarted from the new pin (class 3); the reference-transaction hook installed. sha256 is the wheel's; the installed script ~/.local/bin/gov (a link) has sha256 42013c689d47d8cf102dfaf7b3119f7f81a9977dd029c06923c759e44491f348. Replaces window 3's entry (pin-8284fb408bd4); pin-8284fb408bd4 stays for a one-command rollback (the uninstall line)."
+
+written: /tmp/gov-os-emg-repin4/r4/repo/governance/project/tool-registry.yaml; commit it with the decision trailer DEC-1087 (Role: owner)
+committed: 08b37cd8a DEC-1087 (8): re-pin window 4, gov from the wheel of bcea09060ebc (W2-92, W2-32 S11 with t
+
+RE-PIN DONE: pin-bcea09060ebc is live; pin-8284fb408bd4 kept for the rollback; the store at bcea09060ebc; the reranker from the new pin; the hook installed. Tell the CTO.
+======== the script ended: exit 0, 123 s
+the live gov link: /home/usain/.local/share/gov-os/pin-8284fb408bd4/bin/gov
+the live store link: /home/usain/gov-os-worktrees/W2-00-store-a at ff64f14835f6
+the live pins: pin-5c401220 pin-6a4696eb pin-8284fb408bd4 pin-9894b0cf pin-a7182f6c pin-fecb870c rerank-trial reranker-trial-venv reranker-venv wheels 
+the live hooks: 
+the scratch hook: reference-transaction
