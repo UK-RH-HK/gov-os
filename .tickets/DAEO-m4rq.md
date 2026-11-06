@@ -77,3 +77,11 @@ not a round.
 - **The interface** the cases assume is in the designer's return: the command unchanged, a block read with git at the
   source's own commit (else the question's), and the new lines used by the overlap rule and by S7's family text, live
   and under `--kept`.
+
+**TESTS-READY (CTO, 2026-11-06):** `tests/acceptance/W2-134/` at `2428193c6`, 28 cases. S1-S4: 8 red, 5 guards. S5-S6:
+13 red, 2 guards. The S5 and S6 interface, from the designer's second pass:
+- **S5:** a leading `DEC-nnnn:` is never dropped as a key in a way that lets `DEC-1078: X` match `DEC-1079: X`. The
+  floor alone does not catch that probe: the rest is 5 words.
+- **S6:** the text output's first line, before `measure: set …`, is `families: <name> (<n> members), …` in the path
+  map's order, or `families: none`. It names the families in force live and under `--kept`, including families
+  declared only in the sets root's path map. With `--json`, standard output stays one JSON document.
