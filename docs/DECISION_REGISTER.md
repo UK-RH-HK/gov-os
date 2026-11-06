@@ -13425,6 +13425,10 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     re-estimated dates for the lift and EXAMIN's copy.
   - **Standing, restated:** every report to the owner ends with DEC-948's status block; before any compaction the
     handover records are current in their usual places, committed, and the record branch synced.
+- **Accepted later (owner, 2026-11-06, in the chat):** mxbai-rerank-large-v2 is dropped from everything that
+  remains: closed as measured (76 of 138), and not replayed under the fixed pipeline. From here on the reranker
+  comparisons are among the Qwen3 models only: the 0.6B, the 4B at 24, and the cascade (the 0.6B over 40, then the 4B
+  over its top 12). Its downloads are kept as they are for now.
 - **Basis:** question 1 (memory: comparisons that say whether a gain is more than chance, labels that do not chase
   copies, rerankers compared under equal weights) and question 4 (the refactoring's remaining steps move beside the
   memory work, not after it).

@@ -194,4 +194,6 @@ other restart is an ACT.
   re-scored; after L2, the lift normalised and the moves bounded (L3), the three rerankers replayed under equal
   weights; L5 phrasing; L6 one measured test; the 0.6B stays; after L3 one window for the cascade beside the 4B at 24;
   the best onto the fresh 80 once; no install until then. **D-5, D-6 and D-9 start now** (CPU), the memory measures
-  keep the GPU. Every report ends with DEC-948's block. Basis: questions 1 and 4.
+  keep the GPU. Every report ends with DEC-948's block. **mxbai is dropped** (closed as measured, not replayed; its
+  downloads kept): the reranker comparisons are among the Qwen3 models only (the 0.6B, the 4B at 24, the cascade).
+  Basis: questions 1 and 4.
