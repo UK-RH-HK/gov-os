@@ -77,3 +77,9 @@ Companion to W2-61 (DEC-941). W2-61's engineer writes the measure and runs the v
 measure's code, here because W2-61 (the measure's ticket) is closed and this ticket holds the measure's sets. Tests
 first (an independent test designer from S7's text, on a planted repository and planted sets), then an engineer; the
 CTO re-scores every kept run (`~/gov-os-eval/runs/`) once it lands, counts only.
+
+**S7's interface (CTO, 2026-11-06, delegated P3, from the designer's choices):** (1) `evaluation_families:` is a
+top-level key of the path map: a map of a family's name to the list of its member path globs; (2) kept outputs are
+re-scored with `python3 -m gov.retrieval.measure <set> ... --kept <dir>`, where `<dir>` holds the kept ranked outputs
+in call order (`00001.json` …, beside `.n` and `.n.lock`), and the output is the measure's own; (3) a family hit is
+named in the question's line by the member's path and the word "family", the line keeping its present pattern.
