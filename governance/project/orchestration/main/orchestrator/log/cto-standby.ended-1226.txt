@@ -1,0 +1,1 @@
+2026-11-05 12:22:16 waiting on the owner: the session-start report (session 812bc5ce); no work starts until the owner replies

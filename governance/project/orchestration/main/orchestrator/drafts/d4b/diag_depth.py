@@ -11,6 +11,7 @@ fuses them), by the chunk's own span or its parent's (an expansion). The query e
 The hidden half: ids, ranks and counts only (DEC-820 (d)). Nothing of a hidden question is printed or written.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -21,7 +22,7 @@ from gov.retrieval.measure import EVALUATION, _load, _Part
 
 clone, sets_root, depth, out = Path(sys.argv[1]), Path(sys.argv[2]), int(sys.argv[3]), Path(sys.argv[4])
 lexical.TOP_K = semantic.TOP_K = depth
-SET = "memory-retrieval"
+SET = os.environ.get("DIAG_SET", "memory-retrieval")  # memory-verdict for the spent 60 (DEC-1074 (2))
 entry = evaluation_sets(str(sets_root))[SET]
 quoting = _Part("/q", [*entry.get("visible", []), *entry["hidden"], f"{EVALUATION}/**"], "")
 known = records.records(clone)

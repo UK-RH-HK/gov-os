@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-92
+status: interim result e0f95adc: W2-92's measure record: §10's drift table filled from the rebuilt store (before 0, after 190 of 190, 184 to every changer; not joined none), and the CTO's DEC-1071 measure of the build: the 79 at 67 l

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-92
+status: interim result 5214e0f0: W2-92's acceptance tests for S7 to S10 (DEC-1074 (5), LINK-INTEGRITY §6.1): the marina, a planted register and records stating each link kind in the census's forms, built by this worktree's code and b

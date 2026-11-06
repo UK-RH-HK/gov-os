@@ -1,0 +1,40 @@
+{
+ "merged_not_closed": [
+  "W2-05",
+  "W2-55",
+  "W2-96",
+  "W2-122",
+  "W2-123",
+  "W2-112",
+  "W2-126",
+  "W2-04"
+ ],
+ "built_held": [
+  "W2-20",
+  "W2-52",
+  "W2-37",
+  "W2-60a",
+  "W2-78",
+  "W2-110"
+ ],
+ "closes_next": "none: the refactoring (DEC-1052); D-1 merges as built, formal closes at the lift (P1-13)",
+ "examin": "AT RISK: the refactoring holds ticket work; plan estimate 11-14 (range 11-12 to 11-19), re-estimated after D-4's test count; K9 gates the start (DEC-954 Q1)",
+ "owner_action": "ACT ACT-GUARD-FIX-4 - the guard's rules 1 and 5 by path, rm free but the catastrophic, reviews/ records (packages/ACT-GUARD-FIX-4.md); HOLD on CTO commits",
+ "last_report": "2026-10-30 21:36:47",
+ "chain_spec": "../dispatch/ready.txt",
+ "chain_log": "chain-2026-10-31f.log",
+ "parked": [],
+ "memory_notes": {
+  "W2-86": "CLOSED 7f1041d4 (merged and closed in one step by the queue)",
+  "W2-92": "run 2 PACKAGES P-W2-92-5, decided (a) DEC-1019; run 3 on the ready list",
+  "W2-91": "on the ready list (test design)",
+  "W2-13": "waits for W2-92's landing (retrieve.py)",
+  "W2-15a": "waits for W2-04 and W2-61h",
+  "W2-32": "after W2-15a",
+  "W2-112": "MERGED as built 9a02a474e3d5 (D-1); formal close at the lift",
+  "W2-126": "MERGED as built 0c5d7f4c935f (D-1, with KPI 7); formal close at the lift",
+  "W2-122": "MERGED as built 5543a03a44c0 (D-1); formal close at the lift",
+  "W2-123": "MERGED as built f704f7d3fee3 (D-1); formal close at the lift",
+  "W2-04": "MERGED as built 70965cf61311 (D-1, M-1); formal close at the lift"
+ }
+}

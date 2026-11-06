@@ -14,6 +14,7 @@ The hidden half: ids, stages, positions, counts and yes/no only. No question, go
 of a hidden question is printed or written (DEC-820 (d), the hidden-half rule).
 """
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -24,7 +25,7 @@ from gov.retrieval.measure import EVALUATION, _load, _Part
 
 clone, sets_root, kept, mtxt = (Path(a) for a in sys.argv[1:5])
 out_json = sys.argv[sys.argv.index("--json") + 1] if "--json" in sys.argv else None
-SET = "memory-retrieval"
+SET = os.environ.get("DIAG_SET", "memory-retrieval")  # memory-verdict for the spent 60 (DEC-1074 (2)), counts only
 
 entry = evaluation_sets(str(sets_root))[SET]
 quoting = _Part("/q", [*entry.get("visible", []), *entry["hidden"], f"{EVALUATION}/**"], "")
@@ -86,9 +87,10 @@ for qid, hit5, rank, ncalls in order:
         routes = ev[pos20 - 1].get("routes") if pos20 else None
         fpos = fpos_parent = None
         if pos20 is None:  # in the cut list: the gold's own chunk, or (later widened) a sibling under its parent
-            own = [n for n, g in enumerate(gaps, 21)
+            # the cut list starts after the reranked pool (20 in the product, 40 under v456)
+            own = [n for n, g in enumerate(gaps, len(ev) + 1)
                    if any(overlaps(*chunk_lines.get(g["chunk_id"], ("", 0, -1)), a) for a in alts)]
-            par = [n for n, g in enumerate(gaps, 21)
+            par = [n for n, g in enumerate(gaps, len(ev) + 1)
                    if any(overlaps(*parent_lines.get(g["chunk_id"], ("", 0, -1)), a) for a in alts)]
             fpos, fpos_parent = (own[0] if own else None), (par[0] if par else None)
         sib = None
@@ -118,6 +120,8 @@ def best(r):
 
 for part in ("visible", "hidden"):
     rs = [r for r in rows if r["part"] == part]
+    if not rs:
+        continue
     print(f"== {part}: {len(rs)} questions, hit@5 {sum(r['hit5'] for r in rs)}")
     for r in rs:
         if r["hit5"]:

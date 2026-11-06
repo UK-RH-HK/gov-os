@@ -11,3 +11,21 @@
 - The CTO's slip, 00:33: a fast-forward of `w2/W2-32-tests` onto `w2/W2-32` (the engineer's merge `26ad7ca2`) put the engineer's commits on the tests branch's first-parent line (the guard's link source (ii)); the designer stopped within a minute with no change, the branch reset to `16678eab`. Rule: into a tests branch, only `--no-ff` merges.
 - W2-122's 11 reds on integrate since W2-126 (`0c5d7f4c`): fixed (`45c9cc94`, each rebuild its own vector cache). 17 other suites rebuild without `GOV_VECTOR_CACHE_DIR` (W1-08, W1-19, W1-27, W1-30, W1-41, W2-03, W2-05, W2-123, W2-13, W2-50, W2-55, W2-68, W2-69, W2-76, W2-87, W2-91, W2-92): one cache per sandbox, not per rebuild; latent where a case rebuilds twice and judges "cold" by the endpoint. D-9 row.
 - Empty-HOME artefacts (add to the 00:20 row): `tests/acceptance/W1-19/test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors` (green with the real HOME).
+- **2026-11-05 (W2-92's designer, the re-pin):** `tests/acceptance/W1-19/test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors`
+  fails in a folder run (3 of 3) and passes alone: W2-126's machine-wide vector cache serves the earlier policy test's
+  embeddings, so the stand-in endpoint sees no request. Not W2-92's. A fix: each test its own `GOV_VECTOR_CACHE_DIR`
+  (DEC-1042 (1)'s rule). Home: W1-19's or W2-126's test designer, in D-6 or D-9.
+- **2026-11-05 (both launched engineers):** the sandbox's code-graph daemon folder (`/tmp/gov-cbm-<uid>`) and the GPU
+  lock in `/tmp` are outside the sandbox's writable paths: W2-92's code-index cases and `test_w2_112_shared_reranker.py`
+  cannot run inside a worker's sandbox; the CTO runs them outside. Home: W2-127 / W2-56 (the sandbox's access).
+- **2026-11-05 (the CTO):** a launched engineer could not read its brief in the main tree's scratch (the designers
+  could); engineers' briefs go in their own worktree's `.gov-runtime/scratch/brief/`. For D-5's lead template.
+- **2026-11-05 (the owner, DEC-1078 (4)):** the rubric's next version: gold-source families (a source and its generated
+  twins: the Contract's Markdown and YAML, capability and master-rule pages, other official copies) counted as one by
+  the measure's code (W2-61, tests first), with DEC-1076 (5)'s missing-alternative item; the tuning sets re-scored on
+  their kept ranks after it lands. Owner of the rubric text: the rubric's independent author session.
+- **2026-11-05 (the CTO's slip, 18:50):** `w4_point.sh` copied each measure clone's visible half into the sets root; W2-32's
+  clone carried its re-labelled q12 (a source in `pool.py`), so the second window's two 80-question runs refused at the
+  start (the 60-question runs, the speed and the GPU figures were valid). Restored from integrate (diff clean); the copy
+  now happens only on `VISIBLE_FROM_CLONE=1`, with a backup; the third window checks the sets root equals integrate's
+  first. Earlier measures unaffected (the first window, w4-i and w4-92 ran before the copy).

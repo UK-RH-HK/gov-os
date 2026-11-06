@@ -1,5 +1,124 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
+## RESUME HERE — 2026-11-06: session `812bc5ce`, after DEC-1079 (D4B-LEVERS decided; D-5, D-6, D-9 start)
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
+what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1080**. The detail of 11-05 is in the block
+below (history), kept for its figures.
+- **Decided today (DEC-1079):** L1 (every comparison with gains, losses, exact McNemar); L2 (the 31 misses on the 138,
+  where each left the top 5); source families in `gov.retrieval.measure` (tests first), then every kept run
+  re-scored; after L2, L3 (the lift normalised, the moves bounded) and the three rerankers replayed under equal
+  weights; L5 phrasing; L6 one measured test; the 0.6B stays; after L3, one window for the cascade beside the 4B at 24;
+  the best onto the fresh 80 once at the decision point. **D-5, D-6, D-9 start now** (CPU; the GPU for memory).
+- **Standing, restated by the owner:** every report ends with DEC-948's block (`tools/status_block.py`; the
+  hand-kept facts in `log/report-state.json`, updated at each merge, hold and close); before any compaction the
+  handover records are current, committed, and `record/w2` synced (`sync_context.py --commit`).
+- **Nothing is running.** No GPU job, no hold file. The live reranker is the 0.6B (class 3, checked 19:01).
+- **Waiting on the owner:** nothing blocking; due from the CTO: W2-32's S11 wording package, D-9's fates and K9 list.
+
+## RESUME HERE (history) — 2026-11-05 ~12:50: session `812bc5ce` (DEC-1074's first three actions, the owner's go at ~12:25)
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md` §5; this block is the state since.** Next free id
+DEC-1075. The start checks passed; the old session's watchers were re-armed (inbox waiter, `sentinel_check.sh`,
+`bare_watch.sh`); `log/cto-session.txt` names `812bc5ce`.
+- **(1) The 60's 19 misses (DEC-1074 (2)):** stage 1 (`diag_recall.py`, `DIAG_SET=memory-verdict`) and the depth
+  stage (`diag_depth.py`, 1,000 deep) run, ids and ranks only: `~/gov-os-runs/D4B/diag/stage1-verdict.{txt,json}`,
+  `stage2-verdict-depth1000.json`. Stages: 10 in the reranked 40 but ranked 6-12 (4 of them in a route's own top 5),
+  2 cut below the 40, 3 with only a sibling of the section in the 40, 4 in neither route's top 60. **The kinds:** an
+  independent auditor in W2-61h's role, in-session, brief `briefs/D4B-verdict-misses-auditor.md`, writing
+  `docs/audit/memory-verdict-misses-kinds.md` (not committed until `drafts/d4b/leak_check.py` prints 0 and 0). Then the
+  result with the recommendation to the owner.
+- **(2) ACT-MSET-3 and ACT-MSET-4** committed (`91c780bf`), rehearsed (`drafts/mset3/`, 23 checks pass), pushed to the
+  owner: waiting on the owner's approval (the brief, the failure-memory quota, the folders, the path-map line). New
+  writer's checks: `drafts/d4b/mset_anchors.py`, `mset_quota.py`.
+- **(3) Window 4, tests first:** W2-92 gains S7-S10 (LINK-INTEGRITY §6.1), W2-32 gains S11 (v456 as five pool settings)
+  (`8c28aa70`). Both tests branches merged with integrate (`436a7520`, `0748bdd6`). Two designers launched by
+  `gov launch` under their tickets (W2-92 `DAEO-n0wb`, pgid 1069775, brief `briefs/W2-92-tests-w4.md`, with W2-54's
+  premise; W2-32 `DAEO-0pyc`, pgid 1069880, brief `briefs/W2-32-tests-s11.md`). Their returns come as the Bash tasks'
+  output. Then: the CTO re-runs each folder through the heavy slot, writes TESTS-READY, then the engineers.
+- **(4) The GPU backstop** pauses only the process groups it is given (`tools/gpu_backstop.sh <pgid> ...`, 11 tests in
+  `tools/test_gpu_backstop.sh`), ends by itself with its job; the records brought to it (`d5264ed2`).
+- **~13:15:** the auditor returned; its record committed (`3f975a3e`, leak check 0/0); its doubt about the run checked:
+  the verdict run was v456 (rx.log: every first-call rerank 40 texts). **D4B-MISSES** to the owner (`c44257b2`): ranked
+  below 5 10, vocabulary 4, never retrieved 3, other 2; the reranker trial next. **DEC-1075** (`efcd91a2`): ACT-MSET-3/4
+  approved, quota (A), S11 as worded; `memory-verdict-2` declared in both path maps (sets root backup
+  `.pre-dec1075`). Waiting: the owner on D4B-MISSES; the operator's folders and the writer.
+- **~13:15:** **DEC-1076** (`749ea97c`): the 80 by the 60's writer and checker (folders `~/gov-os-writer`,
+  `~/gov-os-checker`, settings replaced, resumed with `--continue`); the writer varies its phrasing by role; the
+  reranker trial now, its rule recorded in the entry; the checker lists every other place stating an answer.
+  ACT-MSET-3/4 adjusted and rehearsed again (24 checks). Both designers DONE: W2-32 S11 `68d02872` (35 red, folder's
+  other 222 green, heavy slot); W2-92 S7-S10 `5214e0f0` (51 red, 20 guards) and W2-54's premise `67e02d3c` (green).
+  **Found:** 15 older W2-92 cases (u1, s6c) are red on today's code: their pinned baseline predates the bundle's
+  `repeats` field (W2-32): a re-pin by W2-92's designer, after the window. **13:14 the trial window opened**
+  (`drafts/rerank-trial/trial_window.sh` with `trial_w4.sh`, the g1 clone + v456, the 80 and the 60 per model, T2's
+  faithfulness against `g1-rx/v` and `verdict/v`; stops by pid; the backstop per model on the job's groups; records
+  `~/gov-os-runs/D4B/trial-w4*`). Nothing else starts during it. After it: the side-by-side to the owner; W2-92's
+  re-pin; the two engineers.
+- **~14:20:** the trial window ended 14:02 (live 0.6B restored, class 3 checked, the hold ended). **D4B-TRIAL-W4**
+  to the owner (`5a9e36c0`): 0.6B 107/138, mxbai 76 (likely fed without its template), Qwen3-4B 8-bit 112 but 3.89 s a
+  search alone and the GPU at the budget; nothing adopted by the rule; waiting on the owner's (a), (b). **W2-92's
+  engineer DONE** (`21623ae2`, `720a2cbb` on `w2/W2-92`; 21 new unit cases, 390 store/retrieval unit pass; the
+  prototype's edges addition left out of the product, so the 67/79 is re-measured on the build). It first could not
+  read its brief in the main tree's scratch: launched engineers get their briefs in their own worktree's
+  `.gov-runtime/scratch/brief/`. Running: W2-92's designer re-pin (pgid 1293147), W2-32's engineer (pgid 1293356).
+  Next: merge `w2/W2-92-tests` into `w2/W2-92` after the re-pin returns; `gov accept` by a fresh engineer; then the
+  CTO's measure of the build on the g1 clone.
+- **~14:35:** W2-92's re-pin `bc7c9bf4` (45 older cases green outside the sandbox); W2-32's engineer DONE
+  (`30c39e3b`: `pool.py`, the loader's `pool:` block, 39 unit cases). Tests merged: `w2/W2-92` `d9d48449`, `w2/W2-32`
+  `277b38fc`; TESTS-READY markers in each worktree's `.gov-runtime/scratch/lead/`. `gov accept` for both running
+  (heavy slot, outside the sandbox). Then: the CTO's measure of the builds; one review each (READY by `verdict.py`).
+  Rows in `drafts/d4b/ROWS.md` (W1-19's cache order; the sandbox's /tmp paths; engineers' briefs).
+- **~14:50:** `gov accept`: W2-92 116/0, every KPI line pass; W2-32 254/3: S11's 3 per-file cases fail inside the
+  test (a helper given a list for a bundle): W2-32's designer fixing (`briefs/W2-32-tests-s11-fix.md`). Running: the
+  measures `drafts/d4b/w4_measures.sh` (w4-i control, w4-92, w4-32 product vs harness; records
+  `~/gov-os-runs/D4B/w4*`); W2-92's review (`briefs/W2-92-review-w4.md`, record `reviews/w2-92-w4.md`).
+- **~15:05:** W2-32's per-file cases fixed (`6a7ff7e9`), merged (`w2/W2-32` `a4c5e9c4`): `gov accept W2-32` 257/0/2.
+  W2-92's review `reviews/w2-92-w4.md`: every line pass, F1 (a register chunk outside every entry has no status mark,
+  minor) and F2 (the §10 table to fill): READY true by `verdict.py`. W2-32's review running
+  (`briefs/W2-32-review-s11.md`, record `reviews/w2-32-s11.md`). The measures still running.
+- **~15:25:** W2-32's review READY (`reviews/w2-32-s11.md`: F1 no retry of a failed pool rerank; F2 the per-file cap
+  before S8's routing). The measures (`w4/measures.log`): **W2-92 adopted by DEC-1071's rule** (the 79 67 = control
+  67, gap −4.7 both, MRR79 0.6306 against 0.6242; the 138 106 against 105, spread 21.1 against 22.8); drift on the
+  rebuilt store 0 → 190 of 190 (184 every changer); §10 filled and the measure recorded on `w2/W2-92` (`e0f95adc`).
+  W2-32's harness run failed: the harness's `_phrased` override lacks the build's `depth` argument (a harness limit);
+  re-measured by the product's own path (`drafts/d4b/w4_32_product.sh`, running) against the harness's v456 on the
+  control. Next: W2-92's scoped set, then the CTO merges it into integrate (`--no-ff`); W2-32 after its measure.
+- **~15:55:** W2-32's product measure (`w4-32-product`): the pool on 108/138 (spent 42/59), against the harness's
+  v456 on the control 105; 15 questions differ in hit@5 (+9 −6), 47 in first rank only; median call 1.75 s against
+  m6's 0.75 s: S11's equality and speed lines not met. **Round 2** for W2-32's engineer
+  (`~/gov-os-worktrees/W2-32/.gov-runtime/scratch/brief/W2-32-engineer-s11-r2.md`): the per-file cap after S8's
+  routing (F2); no rerank on a continuation, the pool order carried in the token (DEC-782: no new file); a failed pool
+  rerank falls back per page (F1). W2-92's scoped set running (141 selected; then the CTO merges W2-92 into integrate).
+- **~17:00:** **W2-92 merged into integrate** (`3679ca0b`): scoped set 3,027 passed, 8 red: 6 on integrate too (the
+  CTO safety nets read the live stand-by file; W1-28's two whole-tree copy helpers), W2-54's two from W2-92's stale
+  worktree store (green after a rebuild). W2-32 round 2 (`9446d322`): the token carries the pool order (no rerank on a
+  continuation), F1's fallback, F2's cap after routing; 55 unit, `gov accept` 257/0/2. **Its finding:** the measured
+  v456 had the cap before S8's routing (the product's routing ran after the harness's `_final`), so F2 moves away from
+  the reference though it follows S11's text; the measure decides (`drafts/d4b/w4_32b.sh`, running). If F2 loses
+  equality, the cap goes back and S11's words are corrected with the owner.
+- **~17:45:** q12 re-labelled by an independent designer (`c48d7ce8`, round 2 added refusals; old label retired;
+  the retired README line is a row), merged (`w2/W2-32` `1aeae788`). Round 2's measure (`w4-32b-product`): 107/138
+  (spent 41/59, spread 15.5), median call 1.20 s (round 1 1.75 s; m6 0.75 s); 63 questions still differ from the
+  harness, the same set as round 1: with v456's keys the harness uses its own fusion (CUSTOM), so equality question for
+  question cannot hold by design. Running: the same commit with the pool off (`drafts/d4b/w4_32c.sh`), for what S11
+  adds; then a package to the owner on S11's two measured lines.
+- **~18:30:** **DEC-1077** (`8a395630`): the second window, the survey, the disclosure. mxbai's input checked on a
+  stand-in (its config, tokenizer and template, tiny random weights): sentence-transformers 6.1 renders its own
+  template for every pair and keeps the instruction at every length we send: **its 76 is genuine, the hypothesis was
+  wrong**, so no identical re-run (the owner told). Window 2 running (`drafts/rerank-trial/trial_window2.sh`: the 4B at
+  24 candidates; the reranker off on the 138 with lift/push counts, `drafts/d4b/lift_push.py`). The research survey
+  running (`briefs/D4B-research-memory-survey.md`, folder `docs/research/D4B-memory-survey/`). **The disclosure**
+  committed (`21bbb7e4`, `packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md`). W2-32's pool off at `1aeae788`: 108/138,
+  gap 13.1, 1.48 s a call (the pool on: 107, gap 2.9, 1.20 s): S11's speed line met; the equality line cannot hold
+  (the harness's own fusion): a package on S11's wording to the owner.
+- **~19:20:** **DEC-1078** (`83db7540`): the verdict set of 80 ready, unused until the decision point. Windows 2 and 3
+  (the slip: `w4_point.sh` had copied W2-32's q12 into the sets root; restored, the copy now opt-in): the 4B at 24
+  112/138, 2.84 s alone, 33 s at 20, 14,722 MiB peak; no reranker 95/138 (the reranker +12 net, 21 up 9 down, p 0.04;
+  spread 33.3); McNemar against the 0.6B: the 4B +5 p 0.27-0.33. Embedder end-of-text check clean (cosine 0.995 /
+  0.976). The survey written from the research session's return (its Write was refused): `docs/research/D4B-memory-survey.md`
+  and `-package-draft.md`. **D4B-LEVERS** to the owner (`b3efc98c`, `4dea932f`): recommended (a1) keep the 0.6B,
+  measure a cascade beside the 4B at 24, take the best onto the fresh 80; L1, L2 now; L5 now; L3 after L2; L6 the owner's.
+
 ## RESUME HERE — 2026-11-05 morning: session `33b3628c` closes; the owner starts a FRESH session (DEC-1074)
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md` §5** (the order after DEC-1074). The morning

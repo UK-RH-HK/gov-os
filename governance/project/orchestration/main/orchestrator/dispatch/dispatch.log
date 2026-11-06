@@ -325,3 +325,5 @@
 2026-11-04 13:18:07 interim result: emg-new-visible b8273d7f The memory-measure rubric, version 2 (DEC-1069): R5's decided thresholds and the
 2026-11-04 23:16:03 incident outside-slot opened: timeout 3000 python3 -m (pid 3484897, 20 min, /home/usain/gov-os-worktrees/W2-92-proto); python3 -m pytest -q (pid 3484898, 20 min, /home/usain/gov-os-worktrees/W2-92-proto) -> 2026-11-04-2316-outside-slot.md, inbox/20261104-231603-incident-outside-slot-2316.txt
 2026-11-05 00:03:02 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-04-2316-outside-slot.md)
+2026-11-05 14:31:04 interim result: W2-92 5214e0f0 W2-92's acceptance tests for S7 to S10 (DEC-1074 (5), LINK-INTEGRITY §6.1): the 
+2026-11-05 15:09:04 interim result: W2-92 e0f95adc W2-92's measure record: §10's drift table filled from the rebuilt store (before 

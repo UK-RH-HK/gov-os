@@ -1,0 +1,1 @@
+ACT-RERANK-TRIAL-1 (DEC-1076): the CTO's own hold for the trial window, from 2026-11-05 13:14:35: the live reranker stopped, a trial service on its own socket

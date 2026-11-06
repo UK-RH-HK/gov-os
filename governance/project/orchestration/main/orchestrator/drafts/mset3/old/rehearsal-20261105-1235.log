@@ -1,0 +1,31 @@
+== step 1: the folders and the files (as the operator runs them, HOME=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/812bc5ce-547b-488f-8e6c-059122e2ef48/scratchpad/mset3-home)
+ok   the set's folder and hidden/ are mode 700
+ok   both settings files parse
+ok   copied byte for byte
+== step 2: each session's write rule (its PreToolUse hook, fed the tool input it would see)
+ok   writer: a question file is allowed
+ok   writer: a retired copy is allowed
+ok   writer: the checker's report is refused
+ok   writer: the repository is refused
+ok   writer: the spent 60 refused
+ok   writer: a .. path out of hidden/ refused
+ok   checker: its report is allowed
+ok   checker: a question file is refused
+ok   denials: the spent 60, the tuning sets, the runs, the misses' records and both old sessions
+== step 3: the writer's checks, on planted folders (no hidden question is read or printed)
+line-cited: 0; unchanged: 0; re-pinned: 0; unresolved: 0; heading-anchored: 0; dry run
+new questions: 0; overlapping a tuning question's gold source: 0
+ok   overlap check loads all three other sets
+ok   quota check: an empty folder is not yet
+ok   overlap check catches a copied tuning question
+line-cited: 1; unchanged: 1; re-pinned: 0; unresolved: 0; heading-anchored: 0; dry run
+sources: 1; path missing: 0; heading on no line: 1 (Q01); heading on more than one line: 0
+ok   the heading check catches a heading on no line
+sources: 1; path missing: 0; heading on no line: 0; heading on more than one line: 0
+ok   the heading check passes a well-anchored question
+ok   the heading check passes an empty folder
+ok   leak check catches a copied question
+ok   quota: the exact table passes
+ok   quota: the allowed shift passes, named
+ok   quota: failure-memory below 2 fails
+REHEARSAL PASS

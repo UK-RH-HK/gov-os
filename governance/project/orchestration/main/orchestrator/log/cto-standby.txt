@@ -1,1 +1,1 @@
-2026-11-03 14:03:40 CTO stand-by (session bb5cd8bd): handover written (RESUME HERE 2026-11-03 14:03 in CHECKPOINT.md; commit 06f2078a; record 3fe30cc9); the owner starts a fresh session; nothing runs but the dispatcher, the shared reranker (pid 356621) and its slot watcher; the fresh session ends this stand-by when it registers.
+2026-11-05 19:10:15 waiting on the owner: D4B-LEVERS (a)-(d) (4dea932f); W2-32 S11 wording package to come; no job running

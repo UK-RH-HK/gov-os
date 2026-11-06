@@ -1,0 +1,3 @@
+{"at": "2026-11-05 14:02:28", "class": 3, "reason": "the reranker trial window ended (DEC-1076)", "check": "rerank.by service"}
+{"at": "2026-11-05 18:46:11", "class": 3, "reason": "the second trial window ended (DEC-1077)", "check": "rerank.by service"}
+{"at": "2026-11-05 19:01:08", "class": 3, "reason": "the third trial window ended (DEC-1077)", "check": "rerank.by service"}

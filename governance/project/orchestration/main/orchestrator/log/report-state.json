@@ -7,7 +7,12 @@
   "W2-123",
   "W2-112",
   "W2-126",
-  "W2-04"
+  "W2-04",
+  "W2-92",
+  "W2-91",
+  "W2-13",
+  "W2-61h",
+  "W2-32"
  ],
  "built_held": [
   "W2-20",
@@ -17,24 +22,23 @@
   "W2-78",
   "W2-110"
  ],
- "closes_next": "none: the refactoring (DEC-1052); D-1 merges as built, formal closes at the lift (P1-13)",
- "examin": "AT RISK: the refactoring holds ticket work; plan estimate 11-14 (range 11-12 to 11-19), re-estimated after D-4's test count; K9 gates the start (DEC-954 Q1)",
- "owner_action": "ACT ACT-GUARD-FIX-4 - the guard's rules 1 and 5 by path, rm free but the catastrophic, reviews/ records (packages/ACT-GUARD-FIX-4.md); HOLD on CTO commits",
- "last_report": "2026-10-30 21:36:47",
+ "closes_next": "none: the refactoring (DEC-1052); D-1 and D-4b merges as built, formal closes at the lift (P1-13)",
+ "examin": "AT RISK: the lift re-estimated to 11-13 (range 11-12 to 11-17), EXAMIN's copy to 11-19 (range 11-17 to 11-25): D-5, D-6 and D-9 started 11-06 beside D-4b's levers; re-pin window 4 and D-10 still to run; memory 67.8 % on the blind 60, below the 85 % floor; K9 gates the start (DEC-954 Q1)",
+ "owner_action": "none blocking now; due from the CTO: W2-32's S11 wording package and D-9's fates and K9 list",
+ "last_report": "2026-11-06 09:17:25",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
  "parked": [],
  "memory_notes": {
-  "W2-86": "CLOSED 7f1041d4 (merged and closed in one step by the queue)",
-  "W2-92": "run 2 PACKAGES P-W2-92-5, decided (a) DEC-1019; run 3 on the ready list",
-  "W2-91": "on the ready list (test design)",
-  "W2-13": "waits for W2-92's landing (retrieve.py)",
-  "W2-15a": "waits for W2-04 and W2-61h",
-  "W2-32": "after W2-15a",
-  "W2-112": "MERGED as built 9a02a474e3d5 (D-1); formal close at the lift",
-  "W2-126": "MERGED as built 0c5d7f4c935f (D-1, with KPI 7); formal close at the lift",
-  "W2-122": "MERGED as built 5543a03a44c0 (D-1); formal close at the lift",
-  "W2-123": "MERGED as built f704f7d3fee3 (D-1); formal close at the lift",
-  "W2-04": "MERGED as built 70965cf61311 (D-1, M-1); formal close at the lift"
+  "W2-92": "MERGED 3679ca0b (S7-S10, the stated links; D-4b, window 4); formal close at the lift",
+  "W2-32": "S1-S10 merged in D-4b; S11 (v456 pool) built on w2/W2-32 1aeae788, review READY, wording package due",
+  "W2-91": "MERGED in D-4b; formal close at the lift",
+  "W2-13": "MERGED in D-4b; formal close at the lift",
+  "W2-61h": "MERGED in D-4b (w2/W2-61h-d8); formal close at the lift",
+  "W2-112": "MERGED as built (D-1); its memory release in window 4; formal close at the lift",
+  "W2-126": "MERGED as built (D-1); formal close at the lift",
+  "W2-122": "MERGED as built (D-1); formal close at the lift",
+  "W2-123": "MERGED as built (D-1); formal close at the lift",
+  "W2-04": "MERGED as built (D-1, M-1); formal close at the lift"
  }
 }
