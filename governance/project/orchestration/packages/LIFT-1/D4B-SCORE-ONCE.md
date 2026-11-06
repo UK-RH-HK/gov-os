@@ -199,6 +199,33 @@ and no text was unscored.
   real window: both models loaded, each search scored by both, alone and 10 at once, under the GPU rules. Only an
   eligible cell goes onto the fresh 80.
 
+## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
+- The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
+  service).
+
+| | M2: q4b 8-bit + gte | M3: zer + gte |
+|---|---|---|
+| median search alone (limit 3.0 s, GPU reads included) | **4.51 s: not met** (4.15 s less the reads; p90 10.16 s) | **2.84 s: met** (2.56 s less the reads; p90 8.40 s) |
+| failed or unranked, alone | 0 | 0 |
+| 10 at once | median 27.24 s, slowest 32.08 s; none past 30 s per request, the slowest request 5.95 s: met | median 12.67 s, slowest 20.27 s; slowest request 3.81 s: met |
+| the probe at the budget | met (both services) | met (both services) |
+| GPU, judged (budget 14,255 MiB) | peak 13,327, 0 of 174 samples at or above: met | peak 12,712, 0 of 132 samples: met |
+| GPU, reported only | after the warm-up 11,536; derived bound 14,922 | after the warm-up 10,436 |
+| **verdict** | **not eligible** (speed alone) | **ELIGIBLE** |
+
+- **M2** fails on speed alone: the 4B's reranking takes a median 2.54 s of each search.
+- **M3 is the grid's eligible leader:** 118 of 138, MRR 0.612, spread 8.4; against B0, 13 gains and 2 losses, exact
+  p 0.007, Holm 0.118.
+- **Beside today's 0.6B** (D4B-LEVERS: 1.80 s alone, 6.6 s median at 10 at once), M3 is about 1.6 times slower alone
+  and about twice as slow at 10 at once.
+- **By §4, M3 goes onto the fresh 80 once, at the decision point, beside the 0.6B.**
+- **For the owner's adoption decision, all of which this window assumes:**
+  - two reranker models resident in the product (against W2-112's KPI and DEC-1043 (2)'s reasoning);
+  - the cache released after each request (W2-112's memory release, re-pin window 4);
+  - a product loader for zerank's "Yes"-logit score (the trial loader, in `src/`, a ticket);
+  - L3's normalised lift in the product's ranking;
+  - no install: zerank and gte need no new package.
+
 ## Version 5 (2026-11-06 ~14:30, before the live window runs): how the live window is read and judged
 **The live window** (`drafts/score-once/live_window.sh`) measures M2 (the 4B in 8-bit + gte, merged) and then M3
 (zerank + gte, merged), as they would run: both models loaded, each search scored by both.
