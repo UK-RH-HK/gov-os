@@ -243,6 +243,28 @@ all 138 (0 differing in hit@5 or first gold rank). The GPU peak was 9,668 MiB (E
 - **Cost, not measured live here.** The replays' search times come from cached scores. E4 adds up to three phrasings
   a question, each searched and reranked. Its live time would be measured in M3's window, if the owner asks for one.
 
+## Version 7 (2026-11-06 ~16:20, before L6 runs): L6, records of work one tier lower (DEC-1079 L6, DEC-1085 (1))
+**The cell:** B0 with `"work_tier"`, one switch in the harness copy (`rx.py`, tested in `test_rx_l6.py`, 4 of 4; L5's
+48 and combine's 23 still pass). The records of work below go one tier step under the middle, where reports already
+sit. Every other tier is as the path map reads it, and reports keep their step: one change, one test.
+- **The paths** (close, checkpoint, review and session records, which restate decisions; D4B-LEVERS L6):
+  `docs/close/**`, `docs/checkpoints/**`, `governance/project/orchestration/closes/**`, `…/reviews/**`,
+  `…/sessions/**`, `…/nightly/**`, `governance/project/orchestration/main/orchestrator/CHECKPOINT.md` and
+  `…/main/orchestrator/PR-*.md`.
+- **The lift moves both lists,** as the product's would: the fused list (0.004 a step) before the cut to 40, and the
+  reranked list (L3's 0.0766 on the normalised score).
+
+**How it runs, with no GPU:**
+- It is replayed from E1's extended cache (`score-once-extend/caches/d80`). That cache holds the 0.6B's scores for the
+  first 80 fused candidates of every call, and the same route answers as B0.
+- **A control first:** B0 replayed from that cache must equal g-B0 in all 138. Otherwise the cell does not count.
+- If the cell asks for a text that cache does not hold, the replay stops. That is reported, and it would need a short
+  0.6B window.
+
+**How it is judged:** by §4's rule against B0, with gains, losses and an exact McNemar test. It is a single
+comparison, so no Holm. It is an add-on, like E2 to E4. If it wins, it is a lever to state for the owner, as a tier
+change (DEC-952).
+
 ## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
 - The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
   service).
