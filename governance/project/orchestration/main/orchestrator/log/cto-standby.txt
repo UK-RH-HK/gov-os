@@ -1,1 +1,1 @@
-2026-11-06 15:59:33 STAND-BY: the memory build's decided items are done (DEC-1085 (1)); waiting on the owner for W2-32-S11-WORDING, BUNDLE-BUDGET-1 and D4B-SEARCH-AGAIN section 6 plus a cost cap. Nothing running but the watchers.
+2026-11-06 18:26:17 STAND-BY: DEC-1086 holds re-pin window 4 and every experiment until the owner reads packages/LIFT-1/SEVEN-ANSWERS.md and gives the go. Nothing running but the watchers.

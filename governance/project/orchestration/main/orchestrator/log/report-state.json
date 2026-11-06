@@ -27,7 +27,7 @@
  ],
  "closes_next": "none: the refactoring (DEC-1052); D-1 and D-4b merges as built, formal closes at the lift (P1-13)",
  "examin": "AT RISK: the lift re-estimated to 11-13 (range 11-12 to 11-17), EXAMIN's copy to 11-19 (range 11-17 to 11-25): D-5, D-6 and D-9 started 11-06 beside D-4b's levers; re-pin window 4 and D-10 still to run; memory 67.8 % on the blind 60, below the 85 % floor; K9 gates the start (DEC-954 Q1)",
- "owner_action": "yours (DEC-1085): W2-32 S11's wording (W2-32-S11-WORDING, (a) recommended); BUNDLE-BUDGET-1 (W2-135, (a) recommended); D4B-SEARCH-AGAIN §6 (the reader sees hidden and spent questions; (a) recommended) and a cost cap; M3's adoption (DEC-1043) and E4 as a lever, after the end-to-end; due from the CTO, after your S11 and W2-135 words: re-pin window 4's ACT, D-6 part 2; then the search-again run and the end-to-end package",
+ "owner_action": "P1 DEC-1086 - your go after SEVEN-ANSWERS (packages/LIFT-1/SEVEN-ANSWERS.md): its recommendations (§2 the memory refresh and the worktree store path; §6 the block's delivery and a sixth line; §7 the order: window 4 with W2-135 and S11, then E0/E0b, E1, your cap, E2-E5, your decisions, the fresh 80); later: M3's adoption (DEC-1043) after E4; the 150-id sitting; the templates' approval",
  "last_report": "2026-11-06 16:55:00",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",

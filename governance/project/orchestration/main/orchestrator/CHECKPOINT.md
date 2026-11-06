@@ -5,6 +5,14 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
 what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~19:00, DEC-1086 recorded (next free id DEC-1087); SEVEN-ANSWERS committed; STAND-BY on the owner's go.**
+  - **Nothing is acted on before the go:** no re-pin and no experiment. W2-135 is not yet filed (it is filed at the go).
+  - **The findings:**
+    - the live memory is a snapshot of `8284fb40` (11-04): the main tree is stale, worktrees have no store, and nothing
+      refreshes it (W2-116 S4 is open);
+    - M3 is the eligible leader;
+    - the reporting rules were missed: the countdown, `--mark` and the digests.
+  - **Proposals in §6 and §7:** E0b, a shared baseline, and E5 as a page of 40.
 - **~18:00, STAND-BY on the owner** (`log/cto-standby.txt`):
   - **Merged:** W2-61h S7 and W2-134 at `50d79efe`. `gov accept W2-134` 28/28; review READY. W3-P26 and W3-P27 are its
     rows.
