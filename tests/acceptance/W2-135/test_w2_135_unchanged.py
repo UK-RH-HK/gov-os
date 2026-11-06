@@ -2,10 +2,12 @@
 their left-out spans, the repeats, the gaps, the continuation, and the budget's ``used`` (still counted on the full
 text, as today). The reranker's input is unchanged.
 
-"Before" is ``retrieve.py`` as ``w2/integrate`` held it (``w2_135_support.TODAY_BLOB``), loaded from git beside the
-running tree's; both are asked on the same store, in the same process, with the same stand-ins, every batched question
-followed through its continuations. The comparison sets apart each item's ``text`` and ``cut`` only, and even those
-are held: an item with a ``cut`` key is today's text's first 4,000 characters, and one without is today's text.
+"Before" is ``retrieve.py`` and ``register.py`` as ``w2/integrate`` held them (``w2_135_support.TODAY_BLOBS``), loaded
+from git beside the running tree's; both are asked on the same store, in the same process, with the same stand-ins,
+through ``retrieve`` alone and, on the register's repository, through ``gov retrieve``'s pipeline, every batched
+question followed through its continuations. The comparison takes off only the cut lines' text and the cut key: an
+item's text is today's line for line, each line either today's whole or, where today's line is over 4,000 characters,
+its first 4,000 and its newline. Every other field and bundle key must be today's.
 """
 
 from __future__ import annotations
@@ -24,10 +26,21 @@ def _cited(bundle):
             for item in bundle["evidence"]]
 
 
+def _lines_today_s_but_cut(was: str, now: str, span: str) -> None:
+    """``now`` is ``was`` line for line, each line whole or, where ``was``'s line is over CAP, cut to CAP."""
+    old, new = was.splitlines(keepends=True), now.splitlines(keepends=True)
+    assert len(new) == len(old), f"{span}: sent in {len(new)} lines, where today sends {len(old)}"
+    for number, (line, sent) in enumerate(zip(old, new), 1):
+        body = line.rstrip("\n")
+        if sent != line:
+            assert len(body) > CAP and sent == body[:CAP] + line[len(body):], \
+                f"{span}: its line {number} ({len(body)} characters) is changed beside a cut of a line over {CAP}"
+
+
 def _same(old, new, where):
     assert set(new) == set(old), f"{where}: the bundle's keys changed: {sorted(set(new) ^ set(old))}"
     for key in ("budget", "batches", "expansions", "repeats", "gaps", "continuation", "merge", "facets",
-                "stopping_reason", "rerank"):
+                "stopping_reason", "rerank", "left_out"):
         assert new.get(key) == old.get(key), f"{where}: the bundle's {key!r} changed"
     for key in sorted(set(new) - {"evidence"}):
         assert new[key] == old[key], f"{where}: the bundle's {key!r} changed"
@@ -36,10 +49,7 @@ def _same(old, new, where):
         span = f"{where}: {now['path']}:{now['start_line']}-{now['end_line']}"
         assert {k: v for k, v in now.items() if k not in APART} == {k: v for k, v in was.items() if k not in APART}, \
             f"{span}: a field beside the text and the cut key changed"
-        if "cut" in now:
-            assert now["text"] == was["text"][:CAP], f"{span}: the cut text is not today's first {CAP} characters"
-        else:
-            assert now["text"] == was["text"], f"{span}: the text changed with no cut key"
+        _lines_today_s_but_cut(was["text"], now["text"], span)
 
 
 def _both(ask, today, query, kwargs):
@@ -51,7 +61,7 @@ def _both(ask, today, query, kwargs):
 
 
 @pytest.mark.parametrize("name, query, kwargs", CASES)
-def test_s3_the_bundles_are_today_s_but_for_the_cut_text_and_cut_key(ask, today, name, query, kwargs):
+def test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key(ask, today, name, query, kwargs):
     olds, news, *_ = _both(ask, today, query, kwargs)
     assert len(news) == len(olds), f"{name}: {len(news)} pages, where today gives {len(olds)}"
     for number, (old, new) in enumerate(zip(olds, news), 1):
@@ -67,8 +77,9 @@ def test_s3_the_reranker_s_input_is_today_s(ask, today, name, query, kwargs):
 
 def test_s3_premise_the_scenarios_hold_what_s3_names(ask, today):
     """Today's bundles of the scenarios hold an expansion with a left-out span, repeats of both kinds, gaps, a
-    continuation, items over the cap alone and inside an expansion, and a call whose budget, counted on the cut text,
-    would let a parent expand that today's (on the full text) does not."""
+    continuation, a register entry left out, items with a line over the cap alone and inside an expansion, an
+    expansion over the cap with no such line, and a call whose budget, counted on the cut text, would let a parent
+    expand that today's (on the full text) does not."""
     held = {}
     for name, query, kwargs in support.SCENARIOS:
         held[name] = support.pages(lambda q, **more: ask(q, module=today, **more), query, kwargs)
@@ -79,10 +90,14 @@ def test_s3_premise_the_scenarios_hold_what_s3_names(ask, today):
     assert any(g["reason"] == "NOT_GATHERED" for b in every for g in b["gaps"]), "no gap"
     assert any(b["continuation"] for b in every), "no continuation"
     assert any(len(b["batches"]) > 1 for b in every), "no second batch"
+    assert any(b.get("left_out") for b in every), "no register entry left out"
     expanded = {(e["path"], e["start_line"], e["end_line"]) for b in every for e in b["expansions"]}
-    over = [(i["path"], i["start_line"], i["end_line"]) for b in every for i in b["evidence"] if len(i["text"]) > CAP]
-    assert any(span not in expanded for span in over), "no item over the cap sent alone"
-    assert any(span in expanded for span in over), "no expansion over the cap"
+    spans = [((i["path"], i["start_line"], i["end_line"]), i["text"]) for b in every for i in b["evidence"]]
+    long = [span for span, text in spans if support.has_long_line(text)]
+    assert any(span not in expanded for span in long), "no item with a line over the cap sent alone"
+    assert any(span in expanded for span in long), "no expansion with a line over the cap"
+    assert any(span in expanded and len(text) > 10_000 and not support.has_long_line(text) for span, text in spans), \
+        "no expansion of ordinary lines over 10,000 characters"
     # the JSON file beside the long line: today used is over the limit, so the survey's section is not expanded;
     # counted on the cut text it would fit, so a count on the cut text changes the bundle
     bundle = held["json-beside-the-long-line"][0]
@@ -90,8 +105,8 @@ def test_s3_premise_the_scenarios_hold_what_s3_names(ask, today):
     assert used > limit and not bundle["expansions"], bundle["budget"]
     assert used == sum(support.tokens(item["text"]) for item in bundle["evidence"])
     first, last = support.section_of_survey("# Survey of the harbour")
-    long = support.line_of(support.SURVEY, "The quillwort tally")
+    long_line = support.line_of(support.SURVEY, "The quillwort tally")
     cost = support.tokens(support.span_text(support.SURVEY, first, last)) \
-        - support.tokens(support.span_text(support.SURVEY, long, long))
-    on_cut = sum(support.tokens(item["text"][:CAP]) for item in bundle["evidence"])
+        - support.tokens(support.span_text(support.SURVEY, long_line, long_line))
+    on_cut = sum(support.tokens(support.cut(item["text"])[0]) for item in bundle["evidence"])
     assert on_cut + cost <= limit < used + cost, (on_cut, cost, used, limit)
