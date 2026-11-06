@@ -18,6 +18,7 @@ depends_on: []
 allowed_paths:
 - src/gov/retrieval/retrieve.py
 - tests/unit/retrieval/test_w2_131*
+- docs/changes/W2-131-evidence.md
 kpis:
   success:
   - 'S1 Every evidence item of a bundle that lies in the decision register carries as its id the entry that holds its first line: a chunk inside DEC-476 is labelled DEC-476, whatever other entries the register holds (DEC-999 and DEC-1082 among them); a chunk in the preface or between entries carries its chunk id; a parent expansion carries the id of its first entry. Where the bundle also names the entry (W2-92 S9''s entry key), the two agree. Verify: a unit test on a planted register with DEC-476, DEC-999 and DEC-1082, a query only DEC-476 answers, a preface hit and an expansion [DEC-1082 (2), DEC-1073]'
