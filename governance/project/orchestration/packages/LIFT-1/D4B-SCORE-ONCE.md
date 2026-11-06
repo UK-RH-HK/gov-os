@@ -272,6 +272,19 @@ change (DEC-952).
   moved down, but no move crossed a gold's place in the top 5, nor changed a first gold rank.
 - **Not a lever.** The 4 misses where records of work crowded the gold (D4B-MISSES) are not recovered by one tier step.
 
+## Every kept run re-scored with source families (DEC-1079; W2-61h S7 and W2-134 merged at `50d79efe`)
+`drafts/score-once/rescore_families.sh`: 26 kept runs (B0, the 16 cells, the four models alone, E1 to E4, L6), each
+re-scored by the merged measure under `--kept`, with no retrieval and no GPU. Each was scored twice.
+- **Without families** (the g1 clone at `e884675b`): a control. Every run equals its own counts, 0 of 138 differing in
+  each. Unresolved: 0 in all.
+- **With families** (`~/gov-os-runs/D4B/g1-fam`, the same commit with integrate's `evaluation_families` block only;
+  the first line `families: contract (4 members), kernel (3 members), agents (2 members)`). **Every count is
+  unchanged in all 26 runs:** hit@5, MRR, per set and spread.
+- **The families do match:** B0 names a family hit on 6 question lines, and M3 on 6. Each falls where the gold's own
+  path already had a hit in the top 5, so no verdict moves.
+- **So every figure above stands as measured,** with families or without. Against B0, with families: M3 118 (13 gains,
+  2 losses, p 0.007); M2 118 (14 and 3, p 0.013); E4 109 (2 and 0, p 0.50).
+
 ## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
 - The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
   service).
