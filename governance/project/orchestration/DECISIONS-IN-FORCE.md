@@ -242,3 +242,14 @@ other restart is an ACT.
   After the re-pin: the parallel-agents and memory test first, then E0 to E5 and the fresh 80; M3's adoption after
   all the experiments. The three layers stay in Wave 2 (reversing W3-P23): after the lift, streams and a trial plan
   as a package. Basis: 1.
+- DEC-1088 (2026-11-06): `gov plan`, W2-136:
+  - it proposes the batches deterministically, and the orchestrator approves them into the ready list;
+  - the template's `reads:` (wide, warnings), `needs:` and `waits_on:` (the order); the ready check refuses a new
+    ticket without them;
+  - built right after window 4, live at the lift's re-pin;
+  - `gov launch` refuses a lead not in the approved batch or with unmet waits (W2-136), and any session when the gate
+    is closed or limits would be passed (W2-20); one override with a decision id; every refusal names what it waits
+    for.
+
+  **Standing:** a closed ticket is never edited (a fix or upgrade is a new ticket); an open ticket may change, marked
+  with the decision that made it, and `gov links` flags a change without one. Basis: 2.

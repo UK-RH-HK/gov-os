@@ -51,6 +51,7 @@ kpis:
   - 'The lesson, failure and research schemas allow sources (ids), and research decisions, both optional; every existing record stays valid [DEC-1073]'
   - 'The kernel part goes through one CIT-P under CAP-33 (evidence R2 and R3, an independent review, the owner''s approval, a versioned promotion), recorded in docs/changes/W2-128-CIT-P.md; the .claude/ copies are installed by the owner''s operator as an ACT [CAP-33, DEC-1050, DEC-1081]'
   - 'The reviewer states, per finding, what evidence would reverse it [DEC-1014, SMART-WORK-4 line 4] [moved from W2-11b S2, DEC-1083]'
+  - 'Dependency fields (DEC-1088 (3)): the ticket template (T-1) sets reads: (the paths the ticket reads, wide, path patterns as the guard reads them; information and the plan''s READS_WIDE warning), needs: (the paths whose finished state the ticket depends on) and waits_on: (the research, specs or tickets it waits on, ids or record paths, each with a one-line reason), beside allowed_paths: (its writes, strict). The ready check refuses a new ticket without reads: or needs: or waits_on: (an empty list is a declared none), by name (READS_MISSING, NEEDS_MISSING, WAITS_ON_MISSING), and checks each waits_on id exists. The guard reads reads: as information only; reads stay open (DEC-820). Verify: string tests on the template; the ready check on planted tickets [DEC-1088, DEC-1087 (5), DEC-1052] [added, DEC-1088]'
   failure:
   - 'A template names a path or command that is not in facts.yaml (TPL-1 F1, TPL-2 F1).'
   - 'Two runs of gov brief on the same inputs differ (TPL-3 F1).'

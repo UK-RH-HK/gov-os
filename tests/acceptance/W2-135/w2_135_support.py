@@ -1,17 +1,25 @@
-"""The planted repository of the W2-135 acceptance tests, today's ``retrieve.py`` and a recording stand-in reranker.
+"""The planted repositories of the W2-135 acceptance tests, today's code, the line-cut oracle and a recording reranker.
 
 - ``build(root)``: a temporary git repository with a one-line JSON file of 24,575 characters (no newline at its end),
-  a Markdown file holding one line of 10,631 characters among ordinary lines, one-line text files at the cap's edge
-  (4,000 and 4,001 characters), two one-line files of accented text (where characters and bytes differ), and ordinary
-  notes. Its lexical index and record store are built in the temporary folder (the caller replaces the secret
+  a Markdown file holding one line of 10,631 characters among ordinary lines, a Markdown section of about 11,000
+  characters of ordinary lines (the word asked for past character 4,000), a two-line file whose first line is exactly
+  4,000 characters and its newline, one-line text files at the cap's edge (4,000 and 4,001 characters), two one-line
+  files of accented text (where characters and bytes differ), and an ordinary note.
+- ``build_register(root)``: a second temporary repository whose path map names a register in plain text
+  (``docs/DECISION_REGISTER.txt``): a preface, a superseded DEC-100 and DEC-101, whose clause 6 is one line of 5,200
+  characters. A register that is not Markdown is one parent, the whole file, cut by size alone, so an expanded parent
+  spans DEC-100 and DEC-101 and ``gov retrieve``'s ``leave_out`` narrows it to its own chunk (W2-133; the review's F2).
+- Each repository's lexical index and record store are built in the temporary folder (the caller replaces the secret
   filter, as the unit tests do). Never this repository's store.
-- ``today()``: ``src/gov/retrieval/retrieve.py`` as ``w2/integrate`` held it when these tests were written
-  (``TODAY_BLOB``, read from git), loaded as a module of its own beside the running tree's. It is the ticket's only
-  source path, so the two differ by the fix alone.
+- ``today()``: ``retrieve.py`` and ``register.py`` as ``w2/integrate`` held them (``TODAY_BLOBS``, read from git), each
+  loaded as a module of its own beside the running tree's. They are the ticket's only source paths, so the two
+  pipelines differ by the fix alone.
 - ``Scorer``: a stand-in reranker that keeps every text it is sent (the reranker's input) and scores each by a hash
   of it, so no two texts tie and the order is the same whichever code asks.
-- The oracle (``span_text``, ``span_bytes``): an item's full text and bytes read from the planted files alone,
-  never from the code under test.
+- The oracle (``span_text``, ``span_bytes``, ``cut``, ``sent_text``, ``cut_key``): an item's full text, its bytes and
+  what S1 says is sent, read from the planted files alone, never from the code under test. A line's length is
+  counted without its newline, and a cut line keeps its newline, so the lines after it stay lines of their own
+  (README N-1).
 """
 
 from __future__ import annotations
@@ -28,11 +36,14 @@ SRC = REPO / "src"
 if importlib.util.find_spec("gov") is None:  # a PYTHONPATH given names the tree under test; else this one
     sys.path.insert(0, str(SRC))
 
-# w2/integrate after W2-32 S11 merged (first pass: fc61f303d467, blob 7444017b123c; README N-5)
+# w2/integrate after W2-32 S11 merged; integrate's head 33a8b77db663 (round 2) holds the same two blobs (README N-5)
 TODAY_COMMIT = "e3355def9f99"
-TODAY_BLOB = ("src/gov/retrieval/retrieve.py", "1fb6a75b10b9601cf271efc877e8f918e55e9034")
+TODAY_BLOBS = {
+    "retrieve": ("src/gov/retrieval/retrieve.py", "1fb6a75b10b9601cf271efc877e8f918e55e9034"),
+    "register": ("src/gov/decisions/register.py", "491959f0527148304c61dd4ce71427d38f2a3494"),
+}
 
-CAP = 4000  # DEC-1086 B: an item's text is sent up to this many characters
+CAP = 4000  # DEC-1086 B: a line of an item is sent up to this many characters
 
 
 def _exactly(head: str, filler: str, length: int, tail: str = "") -> str:
@@ -59,6 +70,21 @@ _ALMANAC = "".join(f"Almanac entry {n:02d}: the tide almanac lists the harbour t
 SURVEY_TEXT = ("# Survey of the harbour\n\n" + _ORDINARY + LONG_LINE + "\n" + _AFTER
                + "\n## Almanac of the harbour\n\n" + _ALMANAC)
 
+# -- a Markdown section of ordinary lines, about 11,000 characters; the word asked for sits past character 4,000 -----
+LOGBOOK = "docs/logbook.md"
+LOGBOOK_WORD = "gannet"
+LOGBOOK_LINE = 90  # the logbook line that holds LOGBOOK_WORD
+_LOG = "".join((f"Logbook entry {n:03d}: the watch saw a {LOGBOOK_WORD} dive past mooring {n:03d}, "
+                "wind and swell steady.\n") if n == LOGBOOK_LINE - 2 else
+               f"Logbook entry {n:03d}: the watch notes the swell, the wind and the boats at mooring {n:03d}.\n"
+               for n in range(1, 130))
+LOGBOOK_TEXT = "# Logbook of the quay\n\n" + _LOG
+
+# -- two lines: the first exactly 4,000 characters and its newline (not over the cap), then an ordinary line --------
+CANDLE = "notes/candle.txt"
+CANDLE_TEXT = _exactly("the candlewick list of the quay: ", "candle wax ", CAP) + "\n" \
+    + "the second line names the wax and the wick."
+
 # -- one-line text files at the cap's edge, no newline at their end -------------------------------------------------
 AT_CAP = "notes/lantern.txt"  # exactly 4,000 characters: sent whole (S2)
 AT_CAP_TEXT = _exactly("the lantern list of the harbour: ", "lantern wick ", CAP)
@@ -80,12 +106,48 @@ FILES = {
     ".gitignore": ".gov-runtime/\n",
     JSON: JSON_TEXT,
     SURVEY: SURVEY_TEXT,
+    LOGBOOK: LOGBOOK_TEXT,
+    CANDLE: CANDLE_TEXT,
     AT_CAP: AT_CAP_TEXT,
     OVER_CAP: OVER_CAP_TEXT,
     ACCENTED_OVER: ACCENTED_OVER_TEXT,
     ACCENTED_UNDER: ACCENTED_UNDER_TEXT,
     NOTE: NOTE_TEXT,
 }
+
+# -- the second repository: a register in plain text, one parent, a long clause in DEC-101 (the review's F2) --------
+REGISTER = "docs/DECISION_REGISTER.txt"
+REG_LONG_CHARS = 5_200  # without its newline
+REG_LONG = _exactly("- **Clause 6:** the new rule's samphire table of the quay: ", "samphire and sea kale, ",
+                    REG_LONG_CHARS)
+
+
+def _clauses(count: int, marked: dict[int, str]) -> str:
+    return "".join(f"{marked[n]}\n" if n in marked else
+                   f"- **Clause {n}:** the new rule keeps the quay's boats in order, berth by berth, row {n}.\n"
+                   for n in range(1, count + 1))
+
+
+REGISTER_TEXT = (
+    "Decision register\n"
+    "\n"
+    "The register's preface keeps the almanac of the quay.\n"
+    "\n"
+    "### DEC-100 — The old quay rule\n"
+    "- **Status:** SUPERSEDED by DEC-101\n"
+    "- **Decision:** The quay keeps wicker fences at the gate.\n"
+    "\n"
+    "### DEC-101 — The new quay rule\n"
+    "- **Status:** ACCEPTED\n"
+    "- **Decision:** The quay keeps open gates.\n"
+    + _clauses(30, {6: REG_LONG, 24: "- **Clause 24:** the new rule rings the marjoram bell at noon, row by row."})
+)
+REGISTER_FILES = {
+    ".gitignore": ".gov-runtime/\n",
+    "governance/project/path-map.yaml": f"decision_register: {REGISTER}\n",
+    REGISTER: REGISTER_TEXT,
+}
+ALL_FILES = {**FILES, **{rel: text for rel, text in REGISTER_FILES.items() if rel == REGISTER}}
 
 _ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t.invalid",
         "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t.invalid",
@@ -100,16 +162,23 @@ def premises() -> None:
     assert len(AT_CAP_TEXT) == CAP and len(OVER_CAP_TEXT) == CAP + 1
     assert len(ACCENTED_OVER_TEXT) > CAP and len(ACCENTED_UNDER_TEXT) <= CAP
     assert len(ACCENTED_UNDER_TEXT.encode("utf-8")) > CAP  # a cap on bytes would cut it
+    log = LOGBOOK_TEXT.splitlines(keepends=True)
+    assert 10_500 <= len(LOGBOOK_TEXT) <= 11_500 and max(map(len, log)) < 200
+    assert LOGBOOK_WORD in log[LOGBOOK_LINE - 1] and LOGBOOK_TEXT.count(LOGBOOK_WORD) == 1
+    assert len("".join(log[:LOGBOOK_LINE - 1])) > CAP  # the word past character 4,000 of its section
+    first, second = CANDLE_TEXT.split("\n")
+    assert len(first) == CAP and len(first + "\n") == CAP + 1 and len(second) < 100
+    assert len(REG_LONG) == REG_LONG_CHARS and REGISTER_TEXT.count("samphire") > 1 \
+        and REGISTER_TEXT.count("marjoram") == 1
 
 
-def build(root: Path) -> Path:
-    """The planted repository at ``root``, committed, its lexical index and record store built."""
+def _planted(root: Path, files: dict[str, str]) -> Path:
     from gov import store
     from gov.retrieval import lexical
 
     premises()
     root.mkdir(parents=True, exist_ok=True)
-    for rel, text in FILES.items():
+    for rel, text in files.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_bytes(text.encode("utf-8"))
     for args in (["init", "-q", "-b", "main"], ["add", "-A"], ["commit", "-q", "-m", "the planted repository"]):
@@ -120,39 +189,96 @@ def build(root: Path) -> Path:
     return root
 
 
-def today():
-    """``retrieve`` as ``TODAY_COMMIT`` held it, beside the running tree's."""
-    rel, blob = TODAY_BLOB
+def build(root: Path) -> Path:
+    """The planted repository at ``root``, committed, its lexical index and record store built."""
+    return _planted(root, FILES)
+
+
+def build_register(root: Path) -> Path:
+    """The planted register's repository at ``root``, committed, its lexical index and record store built."""
+    return _planted(root, REGISTER_FILES)
+
+
+def _module(name: str):
+    rel, blob = TODAY_BLOBS[name]
     source = subprocess.run(["git", "-C", str(REPO), "cat-file", "blob", blob], check=True,
                             capture_output=True).stdout.decode("utf-8")
-    spec = importlib.util.spec_from_loader("w2_135_today_retrieve", loader=None)
+    spec = importlib.util.spec_from_loader(f"w2_135_today_{name}", loader=None)
     module = importlib.util.module_from_spec(spec)
     exec(compile(source, f"{rel}@{TODAY_COMMIT}", "exec"), module.__dict__)  # noqa: S102 - our own blob
     return module
 
 
+def today():
+    """``retrieve`` as ``TODAY_COMMIT`` held it, beside the running tree's."""
+    return _module("retrieve")
+
+
+def today_register():
+    """``register`` as ``TODAY_COMMIT`` held it, beside the running tree's."""
+    return _module("register")
+
+
 def span_bytes(rel: str, first: int, last: int) -> bytes:
     """Lines ``first`` to ``last`` of the planted file ``rel``, as its bytes (with their newlines)."""
-    return b"".join(FILES[rel].encode("utf-8").splitlines(keepends=True)[first - 1:last])
+    return b"".join(ALL_FILES[rel].encode("utf-8").splitlines(keepends=True)[first - 1:last])
 
 
 def span_text(rel: str, first: int, last: int) -> str:
     return span_bytes(rel, first, last).decode("utf-8")
 
 
+def cut(text: str, first: int = 1) -> tuple[str, list[int]]:
+    """S1 on ``text`` whose first line is line ``first``: each line over ``CAP`` characters (its newline not counted)
+    as its first ``CAP`` characters and its newline, every other line whole; and the numbers of the lines cut."""
+    sent, lines = [], []
+    for number, line in enumerate(text.splitlines(keepends=True), first):
+        body = line.rstrip("\n")
+        if len(body) > CAP:
+            lines.append(number)
+            line = body[:CAP] + line[len(body):]
+        sent.append(line)
+    return "".join(sent), lines
+
+
+def sent_text(rel: str, first: int, last: int) -> str:
+    """What S1 says an item of lines ``first`` to ``last`` of ``rel`` is sent as."""
+    return cut(span_text(rel, first, last), first)[0]
+
+
+def cut_key(rel: str, first: int, last: int) -> dict | None:
+    """The ``cut`` key S1 says an item of lines ``first`` to ``last`` of ``rel`` carries, or None (no line over CAP)."""
+    full = span_text(rel, first, last)
+    sent, lines = cut(full, first)
+    return {"chars": len(full), "sent": len(sent), "lines": lines} if lines else None
+
+
+def has_long_line(text: str) -> bool:
+    return any(len(line.rstrip("\n")) > CAP for line in text.splitlines(keepends=True))
+
+
 def line_of(rel: str, start: str) -> int:
     """The 1-based line of the planted file ``rel`` that starts with ``start``."""
-    return next(n for n, line in enumerate(FILES[rel].split("\n"), 1) if line.startswith(start))
+    return next(n for n, line in enumerate(ALL_FILES[rel].split("\n"), 1) if line.startswith(start))
 
 
-def section_of_survey(start: str) -> tuple[int, int]:
-    """The lines of the survey's section whose heading starts with ``start`` (to the line before the next heading)."""
-    lines = FILES[SURVEY].split("\n")
+def line_count(rel: str) -> int:
+    return len(ALL_FILES[rel].splitlines())
+
+
+def section_of(rel: str, start: str) -> tuple[int, int]:
+    """The lines of the Markdown section of ``rel`` whose heading starts with ``start`` (to the line before the next
+    heading)."""
+    lines = ALL_FILES[rel].split("\n")
     if lines[-1] == "":
         lines = lines[:-1]
     heads = [n for n, line in enumerate(lines, 1) if line.startswith("#")] + [len(lines) + 1]
-    first = line_of(SURVEY, start)
+    first = line_of(rel, start)
     return first, heads[heads.index(first) + 1] - 1
+
+
+def section_of_survey(start: str) -> tuple[int, int]:
+    return section_of(SURVEY, start)
 
 
 class Scorer:
@@ -170,8 +296,9 @@ class Scorer:
         return [int(hashlib.sha256(text.encode("utf-8")).hexdigest()[:8], 16) / 2 ** 32 for text in texts]
 
 
-# S3's questions on the planted repository: (name, question, keyword arguments of ``retrieve``). A batched question
-# is followed through its continuations to its end.
+# S3's questions: (name, question, keyword arguments of ``ask``). ``repo="register"`` asks the register's repository;
+# ``pipeline=True`` is ``gov retrieve``'s pipeline (``retrieve``, then the register's ``leave_out``). A batched
+# question is followed through its continuations to its end.
 SCENARIOS = [
     ("json-alone", "zephyrine", {}),
     ("long-line-alone", "quillwort", {"bundle_budget": 1}),
@@ -184,6 +311,14 @@ SCENARIOS = [
     ("almanac-batched", "tide almanac", {"batch_size": 1}),
     ("every-file-batched", "harbour", {"batch_size": 1}),
     ("almanac-batched-budget-1000", "tide almanac", {"batch_size": 1, "bundle_budget": 1000}),  # a left-out span
+    ("logbook-section-expanded", LOGBOOK_WORD, {}),  # about 11,000 characters of ordinary lines
+    ("candle-expanded", "candlewick", {}),  # a line of exactly 4,000 characters and its newline, then one more
+    ("candle-alone", "candlewick", {"bundle_budget": 1}),
+    ("register-long-clause-retrieve-alone", "samphire", {"repo": "register"}),
+    ("register-long-clause-gov-retrieve", "samphire", {"repo": "register", "pipeline": True}),
+    ("register-marjoram-gov-retrieve", "marjoram", {"repo": "register", "pipeline": True}),
+    ("register-dec-100-gov-retrieve", "wicker", {"repo": "register", "pipeline": True}),
+    ("register-every-chunk-batched-gov-retrieve", "quay", {"repo": "register", "pipeline": True, "batch_size": 1}),
 ]
 
 
