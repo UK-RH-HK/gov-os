@@ -199,6 +199,45 @@ and no text was unscored.
   real window: both models loaded, each search scored by both, alone and 10 at once, under the GPU rules. Only an
   eligible cell goes onto the fresh 80.
 
+## Version 5 (2026-11-06 ~14:30, before the live window runs): how the live window is read and judged
+**The live window** (`drafts/score-once/live_window.sh`) measures M2 (the 4B in 8-bit + gte, merged) and then M3
+(zerank + gte, merged), as they would run: both models loaded, each search scored by both.
+- **The two services:**
+  - two trial services on their own sockets, at `GOV_RERANK_GPU_SLOTS=3` for the trial services only. The slot-hold
+    watcher keeps slot 1, so the live service and private rerankers are unaffected;
+  - the smaller (gte) starts first;
+  - the live 0.6B is stopped for the window and restored on every exit path.
+- **The warm-up:** after both loads, one small request to each service. It releases the load's cached memory, as a
+  live service's first request does.
+- **The readings:** the GPU before and after the warm-up; the probe's peak at each model's own request bound (the
+  4B's 8 texts and 12,000 characters).
+- **The searches:**
+  - 20 visible first calls, one at a time, each with a cold cache;
+  - then 10 at once;
+  - each search asks the two services one after the other. That is conservative for time; in parallel would be
+    faster.
+- **The variant:** v456, the question, L3 (`lift_norm` 0.0766).
+
+**The four eligibility lines (§4), as read:**
+1. **Speed alone:** the median whole search of the 20 is at most 3.0 s, and none failed or went unranked.
+   - The median includes the harness's GPU read before each request, as in every earlier window, so it overstates
+     the product.
+   - The median without those reads is reported beside it, not judged.
+2. **10 at once:** no request times out (the product's 30 s), and none failed or went unranked.
+3. **The probe:** no shape at the budget, on either service.
+4. **The GPU:**
+   - **Judged:** the 1 Hz samples from after the warm-up to the end of the 10-at-once run, none at or above 14,255
+     MiB.
+   - **Reported, not judged:** the load-time samples' peak, and a derived bound (the GPU after the warm-up plus each
+     service's peak minus its reserved-after).
+
+**The outcome:**
+- A cell that fails a line is not eligible, and the other is taken.
+- If both fail, the 4B alone or gte alone (A1, A2: 114) are the eligible fallbacks. Each is measured the same way, in
+  a window of its own.
+- **Adoption is the owner's.** Two reranker models resident in the product is a new pattern, against W2-112's KPI
+  and DEC-1043 (2)'s budget reasoning. M2 also needs bitsandbytes installed.
+
 ## Version 4 (2026-11-06 ~12:50, before any stage or cell replay is judged): a follow-up call's unscored texts
 - **The finding:** L2's replays with routing's moves switched off stopped: "4 of 40 texts were not scored by q06 in
   the window".
