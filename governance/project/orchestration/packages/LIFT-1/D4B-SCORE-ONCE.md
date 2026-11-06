@@ -265,6 +265,13 @@ sit. Every other tier is as the path map reads it, and reports keep their step: 
 comparison, so no Holm. It is an add-on, like E2 to E4. If it wins, it is a lever to state for the owner, as a tier
 change (DEC-952).
 
+**L6's result (2026-11-06 ~16:45, no GPU):**
+- **The control** (B0 from E1's cache) equals g-B0 in all 138. Unscored texts: 0.
+- **L6: 107 of 138, MRR 0.5589, spread 18.0, the same as B0.** Gains 0, losses 0, McNemar p 1.000.
+- **The switch acted:** the bundles differ in 34 of the 138 questions (23 of the 80, 11 of the 60). Records of work
+  moved down, but no move crossed a gold's place in the top 5, nor changed a first gold rank.
+- **Not a lever.** The 4 misses where records of work crowded the gold (D4B-MISSES) are not recovered by one tier step.
+
 ## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
 - The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
   service).
