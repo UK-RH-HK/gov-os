@@ -43,6 +43,10 @@ SATURATED, BUDGET_EXHAUSTED = "SATURATED", "BUDGET_EXHAUSTED_WITH_GAPS"
 SUPERSEDED, NOT_GATHERED = "SUPERSEDED", "NOT_GATHERED"
 BUNDLE_BUDGET = 6000  # tokens: DEC-004's packet ceiling, until a decision gives another number (DP-3)
 TOKEN_CHARS = 4
+# W2-135 (DEC-1086 B): an evidence item's text over this many characters is sent as its first ITEM_CHARS, marked
+# ``cut``; a guard against one-line files (a chunk is never shorter than one line). Its lines, ids and sha256 stay
+# those of the full span, and the budget's ``used`` stays counted on the full text.
+ITEM_CHARS = 4000
 NO_CODE_INDEX = "the code index did not answer for an id that is no record"
 
 ROUNDS_BY_RADIUS = {0: 1, 1: 1, 2: 3, 3: 8, 4: 8}
@@ -567,8 +571,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         return found
 
     def item(candidate, rel, first, last, body):
+        text = body.decode("utf-8", "replace")
+        # W2-135: over ITEM_CHARS characters (not bytes), the first ITEM_CHARS sent and the cut named
+        cut = {"cut": {"chars": len(text), "sent": ITEM_CHARS}} if len(text) > ITEM_CHARS else {}
         found = {"id": record_of.get(rel, candidate["chunk_id"]), "sha256": hashlib.sha256(body).hexdigest(),
-                 "path": rel, "start_line": first, "end_line": last, "text": body.decode("utf-8", "replace"),
+                 "path": rel, "start_line": first, "end_line": last, "text": text[:ITEM_CHARS], **cut,
                  "chunk_id": candidate["chunk_id"], "routes": candidate["routes"], "batch": candidate["_batch"]}
         # W2-92 S9 (DEC-1073 (2)): beside the text (unchanged), the entry's status word and changers, and whether it
         # is in force; any other record not in force says so
