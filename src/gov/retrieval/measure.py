@@ -25,13 +25,24 @@ spans to the line before the next heading of the same or a higher level (or the 
 heading as many lines as ``lines`` state (its own line without them). Not found, ``lines`` are used; with neither,
 the question is malformed. An item from the set's own parts or ``fixtures/evaluation/`` is never a hit.
 
+**Re-anchoring, in memory** (W2-134 S1 to S3; DEC-1084, DEC-1085 (2)): a source scored by its ``lines`` (no heading
+found) that names a ``commit``, its own or else the question's, is found again in the measured root: its block is
+those lines of the file at that commit (read with ``git show``), and the source is scored against the lines where the
+block stands now, the same lines when unmoved, else its one place elsewhere. A block that cannot be read, or is found
+nowhere or more than once, is unresolved: named by question id and ``entry <n>`` (``<n>.<m>`` for an alternative) and
+counted as not found (on standard output, or standard error with ``--json``). A source with no commit keeps its stated
+lines. The measure never writes the sets root or a question file.
+
 **Source families** (S7; DEC-1078 (4), DEC-1079): the path map's top-level ``evaluation_families`` (the sets root's,
 else the measured root's) maps a family's name to the list of its member path globs: a gold source and its official
 copies. An evidence item in another member of a gold source's family is a hit on that source only when its own text
 holds the gold span's text, both normalised (whitespace; Markdown and YAML formatting: ``#`` heading marks, list
-marks, ``>`` quote marks, quotes, backticks, ``*`` emphasis and ``key:`` prefixes); never by its path alone. A
-question's line names each such item ("family hit: <path>"; for the hidden part only their count). With no family
-declared, every figure and line is as before.
+marks, ``>`` quote marks, quotes, backticks, ``*`` emphasis and ``key:`` prefixes, but never an id such as
+``DEC-1078:``); never by its path alone. The gold's normalised text must be at least 4 words and 24 characters
+(below that it counts only in its own path) and is held only on token edges (``CAP-1`` is not held by ``CAP-10``, nor
+``85`` by ``1985``) (W2-134 S5). A question's line names each such item ("family hit: <path>"; for the hidden part
+only their count). The text output's first line names the families in force, ``families: <name> (<n> members), …``
+or ``families: none`` (S6). With no family declared, every figure and question line is as before.
 
 **Re-scoring kept outputs:** ``--kept <dir>`` reads each call's ranked output from ``<dir>`` (``00001.json`` … in call
 order, as the measure's ``GOV_KEEP`` wrapper keeps them) in place of running a retriever; the same set, parts and
@@ -74,8 +85,12 @@ _KEPT = re.compile(r"\d+\.json")
 _ESCAPED = re.compile(r"\\([\"'])")
 _DROPPED = re.compile(r"[\"'`*]")
 _MARKS = re.compile(r"^(?:\s*(?:>(?=\s|$)|#{1,6}(?=\s|$)|[-+](?=\s)|\d+[.)](?=\s)))+\s*")
-_KEY = re.compile(r"^[A-Za-z_][\w.-]*:(?:\s+|$)")
+# a key, but never an id (``DEC-1078:``, ``CAP-10.a:``), so two ids' lines never normalise alike (S5)
+_KEY = re.compile(r"^(?![A-Za-z]+-\d)[A-Za-z_][\w.-]*:(?:\s+|$)")
 _BLOCK = {"|", ">", "|-", ">-", "|+", ">+"}
+# a family hit's floor and its token edges: no hit inside a longer token (``CAP-10``, ``1985``, ``0.85``) (S5)
+FAMILY_WORDS, FAMILY_CHARS = 4, 24
+_EDGE_BEFORE, _EDGE_AFTER = r"(?<![\w-])(?<!\w[.,])", r"(?![\w-])(?![.,]\w)"
 
 
 class MeasureError(Exception):
@@ -140,23 +155,61 @@ def _measured(entry: dict, sets_root: Path) -> bool:
     return bool(tickets and ticket) and not _ticket(str(sets_root), ticket)[0].isdisjoint(tickets)
 
 
-def _span(source: dict, root: Path, part: str, qid: str) -> tuple[int, int]:
-    file = root / source["path"]
-    if not file.is_file():
-        raise _fault(part, qid, "a source's path does not exist in the measured root", source["path"])
-    lines = file.read_text(encoding="utf-8", errors="replace").splitlines()
+def _lines_at(root: Path, commit: str, path: str, cache: dict) -> list[str] | None:
+    """A file's lines at a commit, read with git once per run (S1); ``None`` when git cannot show them. Only read:
+    nothing is written (S2)."""
+    if (commit, path) not in cache:
+        lines = None
+        if not commit.startswith("-"):  # never an option to git
+            done = subprocess.run(["git", "-C", str(root), "show", f"{commit}:./{path}"], capture_output=True)
+            lines = done.stdout.decode("utf-8", "replace").splitlines() if done.returncode == 0 else None
+        cache[(commit, path)] = lines
+    return cache[(commit, path)]
+
+
+def _anchored(stated: list, now: list[str], old: list[str] | None) -> tuple[int, int] | None:
+    """The stated block's lines in the measured root: the same lines when unmoved, else its one place elsewhere;
+    ``None`` when it cannot be read or is found nowhere or more than once (as ``repin_gold.py`` finds it)."""
+    first, last = stated
+    if old is None or last > len(old):
+        return None
+    block = old[first - 1:last]
+    if now[first - 1:last] == block:
+        return first, last
+    size = len(block)
+    found = [i + 1 for i in range(len(now) - size + 1) if now[i:i + size] == block]
+    return (found[0], found[0] + size - 1) if len(found) == 1 else None
+
+
+def _span(source: dict, root: Path, part: str, qid: str, base=None, cache: dict | None = None
+          ) -> tuple[int, int] | None:
+    """A source's span in the measured root; ``None`` when its line-cited block is unresolved (S1, S3). ``base`` is
+    the question's commit, used when the source names none."""
     stated = source.get("lines")
     if stated is not None and not (isinstance(stated, list) and len(stated) == 2
                                    and all(isinstance(n, int) for n in stated) and 1 <= stated[0] <= stated[1]):
         raise _fault(part, qid, "malformed question", "lines is not [first, last]")
+    commit = next((str(c) for c in (source.get("commit"), base) if c is not None and str(c).strip()), "").strip()
+    file = root / source["path"]
+    if not file.is_file():
+        if stated and commit:  # a line-cited block whose file is gone is not found at the measured root
+            return None
+        raise _fault(part, qid, "a source's path does not exist in the measured root", source["path"])
+    lines = file.read_text(encoding="utf-8", errors="replace").splitlines()
+
+    def by_lines() -> tuple[int, int] | None:
+        if not commit:
+            return tuple(stated)
+        return _anchored(stated, lines, _lines_at(root, commit, source["path"], {} if cache is None else cache))
+
     heading = source.get("heading")
     if heading is None:
-        return tuple(stated) if stated else (1, max(len(lines), 1))
+        return by_lines() if stated else (1, max(len(lines), 1))
     at = next((i for i, line in enumerate(lines) if line.rstrip() == str(heading).rstrip()), None)
     if at is None:
         if not stated:
             raise _fault(part, qid, "malformed question", "a heading is not found and no lines are stated")
-        return tuple(stated)
+        return by_lines()
     mark = _HEADING.match(lines[at])
     if not mark:
         return at + 1, at + (stated[1] - stated[0] + 1 if stated else 1)
@@ -166,19 +219,26 @@ def _span(source: dict, root: Path, part: str, qid: str) -> tuple[int, int]:
     return at + 1, end
 
 
-def _alternative(a: dict, root: Path, part: str, qid: str, declared: list[_Part]) -> tuple:
+def _alternative(a: dict, root: Path, part: str, qid: str, declared: list[_Part], base=None,
+                 cache: dict | None = None) -> tuple | None:
     """One source alternative: its path and span, and, when it is in a family, those families and the span's
-    normalised text (an empty text never makes a family hit)."""
-    first, last = _span(a, root, part, qid)
+    normalised text (empty below the floor, and an empty text never makes a family hit); ``None`` when unresolved."""
+    span = _span(a, root, part, qid, base, cache)
+    if span is None:
+        return None
+    first, last = span
     own = tuple(f for f in declared if f.match(a["path"]))
     text = ""
     if own:
         lines = (root / a["path"]).read_text(encoding="utf-8", errors="replace").splitlines()
         text = _normal("\n".join(lines[first - 1:last]))
+        if len(text.split()) < FAMILY_WORDS or len(text) < FAMILY_CHARS:
+            text = ""
     return a["path"], first, last, own, text
 
 
-def _load(file: Path, part: str, root: Path, quoting: _Part, declared: list[_Part] = ()) -> dict:
+def _load(file: Path, part: str, root: Path, quoting: _Part, declared: list[_Part] = (),
+          cache: dict | None = None) -> dict:
     qid = file.stem
     try:
         data = yaml.safe_load(file.read_text(encoding="utf-8"))
@@ -191,17 +251,26 @@ def _load(file: Path, part: str, root: Path, quoting: _Part, declared: list[_Par
     if not (isinstance(data.get("question"), str) and data["question"].strip() and data.get("gold_answer")
             and isinstance(sources, list) and sources):
         raise _fault(part, qid, "malformed question", "question, gold_answer and sources are required")
-    entries = []
-    for entry in sources:
+    entries, unresolved, cache = [], [], {} if cache is None else cache
+    for n, entry in enumerate(sources, 1):
         alternatives = entry if isinstance(entry, list) else [entry]
         if not alternatives or not all(isinstance(a, dict) and isinstance(a.get("path"), str) and a["path"]
                                        for a in alternatives):
             raise _fault(part, qid, "malformed question", "a source names no path")
-        # an alternative in the set's own parts or the evaluation files never counts and is never opened
-        entries.append([_alternative(a, root, part, qid, list(declared)) for a in alternatives
-                        if not quoting.inside(f"/q/{a['path']}")])
+        kept = []
+        for m, a in enumerate(alternatives, 1):
+            # an alternative in the set's own parts or the evaluation files never counts and is never opened
+            if quoting.inside(f"/q/{a['path']}"):
+                continue
+            alt = _alternative(a, root, part, qid, list(declared), data.get("commit"), cache)
+            if alt is None:  # named by its entry number only, never its text, path or lines (S3)
+                unresolved.append(f"entry {n}.{m}" if isinstance(entry, list) else f"entry {n}")
+            else:
+                kept.append(alt)
+        entries.append(kept)
     return {"id": qid, "part": part, "question": data["question"], "sources": entries, "ticket": data.get("ticket"),
-            "ids": data.get("ids") or [], "radius": data.get("radius"), "families": bool(declared)}
+            "ids": data.get("ids") or [], "radius": data.get("radius"), "families": bool(declared),
+            "unresolved": unresolved}
 
 
 def _retriever(gov: str, root: Path, env: dict) -> dict:
@@ -257,14 +326,14 @@ def _runner(exe: str, root: Path, env: dict):
 
 def _match(item: tuple, entry: list[tuple]) -> str | None:
     """``direct`` when the item lies in an alternative's span, ``family`` when it lies in another member of an
-    alternative's family and its normalised text holds the span's normalised text, else ``None``."""
+    alternative's family and its normalised text holds the span's normalised text on token edges, else ``None``."""
     if any(item[0] == path and item[1] <= last and first <= item[2] for path, first, last, *_ in entry):
         return "direct"
     held = None
     for path, _, _, own, text in entry:
         if text and item[0] != path and any(f.match(item[0]) for f in own):
             held = _normal(item[3]) if held is None else held
-            if text in held:
+            if re.search(_EDGE_BEFORE + re.escape(text) + _EDGE_AFTER, held):
                 return "family"
     return None
 
@@ -328,6 +397,8 @@ def _ask(q: dict, args, call, quoting: _Part) -> dict:
         scored["family_hit_count"] = len(named)
         if q["part"] != "hidden":
             scored["family_hits"] = named
+    if q.get("unresolved"):
+        scored["unresolved"] = list(q["unresolved"])
     return scored
 
 
@@ -366,9 +437,20 @@ def _line(q: dict) -> str:
     return line
 
 
+def _unresolved(q: dict) -> list[str]:
+    """One line per unresolved source: the question's id and the entry number, nothing of the label (S3)."""
+    return [f"{q['id']} ({q['part']}): {e} unresolved: its cited block is not found once at the measured commit; "
+            f"counted as not found" for e in q.get("unresolved", [])]
+
+
+def _families_line(doc: dict) -> str:
+    named = doc.get("families") or []
+    return "families: " + (", ".join(f"{f['name']} ({f['members']} members)" for f in named) or "none")
+
+
 def _text(doc: dict) -> str:
     r, b, t = doc["retriever"], doc["budget"], doc["total"]
-    out = [f"measure: set {doc['set']}, part {doc['part']}",
+    out = [_families_line(doc), f"measure: set {doc['set']}, part {doc['part']}",
            f"retriever: kept outputs in {r['kept']} (no retriever run)" if r.get("kept") else
            f"retriever: {r['executable']}; version: {r['version']}; gov.__file__: {r['gov_file']}",
            f"root: {doc['root']} at commit {doc['commit']}",
@@ -376,6 +458,7 @@ def _text(doc: dict) -> str:
            f"stack budget {b['stack_budget']} tokens"]
     for q in doc["questions"]:
         out.append(_line(q))
+        out += _unresolved(q)
         for n, c in enumerate(q.get("compare", []), 1):  # a line that names one figure gives both (DEC-833)
             now = (f"; now hit@5 {'yes' if q['hit_at_5'] else 'no'}, "
                    f"full evidence {'yes' if q['full_evidence'] else 'no'}")
@@ -400,7 +483,7 @@ def measure(args) -> dict:
         raise MeasureError(f"the set {args.set} cannot be worked out: {error}") from None
     quoting = _Part("/q", [*entry.get("visible", []), *entry["hidden"], f"{EVALUATION}/**"], "")
     declared = families(sets_root, root)
-    questions = []
+    questions, cache = [], {}  # the gold files' lines at their commits, read once per run (S1)
     for part in parts:
         folder = sets_root / EVALUATION / args.set / part
         files = sorted(folder.glob("*.yaml")) if folder.is_dir() else []
@@ -408,7 +491,7 @@ def measure(args) -> dict:
             covered = _Part(str(sets_root), entry["hidden"], "")
             if not (covered.inside(str(folder)) or files and all(covered.inside(str(f)) for f in files)):
                 raise MeasureError(f"the set {args.set}'s hidden globs do not cover its hidden folder: refused")
-        questions += [_load(f, part, root, quoting, declared) for f in files]
+        questions += [_load(f, part, root, quoting, declared, cache) for f in files]
     if getattr(args, "kept", None):
         call = _Kept(args.kept)
         retriever = {"executable": None, "version": None, "gov_file": None, "kept": str(call.folder.resolve())}
@@ -421,7 +504,8 @@ def measure(args) -> dict:
     if isinstance(call, _Kept):
         call.done()
     _compare(scored, args.compare)
-    return {"retriever": retriever, "root": str(root), "commit": done.stdout.strip()[:12] or None, "set": args.set,
+    return {"families": [{"name": f.reason, "members": len(f.globs)} for f in declared],
+            "retriever": retriever, "root": str(root), "commit": done.stdout.strip()[:12] or None, "set": args.set,
             "part": args.part, "budget": {"batch_size": args.batch_size, "bundle_budget": args.bundle_budget,
                                           "stack_budget": args.stack_budget},
             "questions": scored, "total": _total(scored)}
@@ -447,6 +531,10 @@ def main(argv: list[str] | None = None) -> int:
     except MeasureError as error:
         print(f"measure: {error}", file=sys.stderr)
         return 1
+    if args.json:  # standard output stays one JSON document; the unresolved lines go to standard error
+        for q in doc["questions"]:
+            for line in _unresolved(q):
+                print(line, file=sys.stderr)
     print(json.dumps(doc, indent=2) if args.json else _text(doc))
     if args.out:
         out = Path(args.out)
