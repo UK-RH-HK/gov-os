@@ -6,7 +6,13 @@ Two rebuilds from the same commit give the same digest. Needs only git.
 
 ``--seed [FOLDER]`` (W2-122) seeds the stores from a warm base before the stages, so only what differs from it is
 built again (``gov.rebuild.seed``); every full rebuild whose semantic store is recreated leaves the record that makes
-its tree such a base, and no other rebuild does (DEC-1027 C).
+its tree such a base, and no other rebuild does (DEC-1027 C). A seed from a base built at another commit than the
+tree's head names the base's head and says it is behind (``behind``, ``base_head``; W2-116 S4); at the head it says
+neither.
+
+``--integration <branch>`` (W2-116) keeps the integration store at the branch's head, double-buffered: the halves, the
+seed from the ready half and the switch are ``gov.rebuild.integration``'s. It takes neither ``--seed`` nor
+``--no-embeddings``: it seeds itself, and a build without its semantic store is never switched to.
 
 Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
 ``gov.rebuild.watch``).
@@ -71,6 +77,57 @@ def _compact(root: Path, rels) -> dict:
     return done
 
 
+def _commit_of(where: Path, *args: str) -> str | None:
+    import subprocess
+
+    from gov.util.gitenv import git_binary, git_env
+
+    done = subprocess.run([git_binary() or "git", "-C", str(where), *args], capture_output=True, text=True,
+                          env=git_env(where))
+    return done.stdout.strip() if done.returncode == 0 and done.stdout.strip() else None
+
+
+def _store_head(base: Path) -> str | None:
+    """The commit the base's record store was built at (its fingerprints row), read-only; None where it says none."""
+    import sqlite3
+
+    from gov.store import STORE_REL
+    from gov.store.loader import fingerprints
+
+    try:
+        connection = sqlite3.connect((base / STORE_REL).resolve().as_uri() + "?mode=ro", uri=True, timeout=30.0)
+        try:
+            row = fingerprints(connection)
+        finally:
+            connection.close()
+    except sqlite3.Error:
+        return None
+    return (row or {}).get("head") or None
+
+
+def _behind(root: Path, answer: dict) -> dict:
+    """The seed's answer, with the base's head named and said to be behind where the base was built at another commit
+    than the tree's head (W2-116 S4); unchanged at the head, or where either head cannot be read."""
+    import sys
+
+    base = answer.get("base")
+    if not base:
+        return answer
+    base_head = _store_head(Path(base)) or _commit_of(Path(base), "rev-parse", "--verify", "-q", "HEAD^{commit}")
+    ours = _commit_of(root, "rev-parse", "--verify", "-q", "HEAD^{commit}")
+    if not base_head or not ours or base_head == ours:
+        return answer
+    count = _commit_of(root, "rev-list", "--count", f"{base_head}..{ours}")  # None: the base's head is not known here
+    if count is not None and _commit_of(root, "rev-list", "--count", f"{ours}..{base_head}") == "0":
+        said = (f"the base {base} was built at {base_head}, behind this tree's head {ours} by {count} commit(s): "
+                f"only what changed since is re-embedded")
+    else:
+        said = (f"the base {base} was built at {base_head}, not at this tree's head {ours} (behind it, or on another "
+                f"line): only what differs is re-embedded")
+    print(f"rebuild: seed: {said}", file=sys.stderr, flush=True)
+    return answer | {"base_head": base_head, "behind": said}
+
+
 def add_arguments(parser) -> None:
     from gov.rebuild.seed import CONFIGURED
 
@@ -82,14 +139,34 @@ def add_arguments(parser) -> None:
                         help="first copy the stores of the warm base at FOLDER (default: integration_store in "
                              "governance/project/rebuild.yaml), where its record matches this build's code, embedder "
                              "and schema; then rebuild only what differs from it")
+    parser.add_argument("--integration", metavar="BRANCH", default=None,
+                        help="keep the integration store (integration_store in governance/project/rebuild.yaml) at "
+                             "BRANCH's head: build the half not in use, seeded from the ready one, and switch the "
+                             "link to it only when the build succeeded; nothing at an unchanged head")
 
 
 def run(root: Path, args, config: dict) -> dict:
     """The rebuild under the machine's rebuild lock, each stage timed and watched (W2-76): the lock is taken before
-    anything is read or written, and released after the last record is written."""
+    anything is read or written, and released after the last record is written. With ``--integration``, the
+    integration store's refresh (``gov.rebuild.integration``), whose build is this rebuild in the half not in use."""
     import os
 
     from gov.rebuild.watch import Watch, settings, take
+
+    branch = getattr(args, "integration", None)
+    if branch is not None:
+        from gov.cli.errors import GovError
+        from gov.rebuild import integration
+
+        given = [flag for flag, on in ((NO_EMBEDDINGS, getattr(args, "no_embeddings", False)),
+                                       ("--seed", getattr(args, "seed", None) is not None)) if on]
+        if given:
+            raise GovError("REBUILD_FAILED", f"--integration takes no {' or '.join(given)}: it seeds from the ready "
+                                             f"half itself, and a build without its semantic store is never switched "
+                                             f"to; nothing is built", {"flags": given})
+        if not branch:
+            raise GovError("REBUILD_FAILED", "--integration names no branch: nothing is built", {"branch": branch})
+        return integration.refresh(Path(root), branch)
 
     slow_after_s, lock_path, source = settings(root)
     fd, lock = take(lock_path, source)
@@ -126,7 +203,7 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     seeded = None
     if getattr(args, "seed", None) is not None:
         with watch.stage("seed"):
-            seeded = seed.seed(root, args.seed, embeddings)
+            seeded = _behind(root, seed.seed(root, args.seed, embeddings))
 
     with watch.stage("record"):
         try:

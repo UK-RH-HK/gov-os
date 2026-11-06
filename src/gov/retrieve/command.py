@@ -19,6 +19,12 @@ Role separation (W2-13 S5, DEC-1065 (2)): every route's hits are filtered by the
 (``GOV_ROLE``, a ``--role`` beside it, ``GOV_TICKET``; ``gov.guard.role_paths``), and the bundle's ``role_filter``
 counts what was withheld, by rule; no section, no filter, no ``role_filter``. ``ROLE_PATHS_UNREADABLE``: the section
 or the session's ticket cannot be read, so nothing is handed out.
+
+The store it answers from (W2-116 S3, DEC-963): with no ``--root`` given on the command line and ``GOV_STORE`` set
+(``gov launch`` sets it to the integration store's link, ``gov.launch.store``), the folder ``GOV_STORE`` names, never
+the working tree: nothing there falls back to the working tree's store (``STORE_MISSING`` names that folder). A
+``GOV_STORE`` that is not an absolute path is ``STORE_ROOT_INVALID``. A ``--root`` given wins; a call that does not come
+through the command line (no ``root`` in its arguments) is answered from the ``root`` it is given.
 """
 
 from __future__ import annotations
@@ -84,6 +90,25 @@ def _stated_gap(root: Path, query: str, names: list[str], lexical_facet: dict, a
             "continuation": None}
 
 
+_NOT_GIVEN = object()
+
+
+def _store_root(root: Path, args) -> Path:
+    """The folder the search answers from: ``GOV_STORE``'s where the command line gave no ``--root`` (W2-116 S3)."""
+    import os
+
+    from gov.cli.errors import GovError
+    from gov.launch.store import ENV, StoreSettingError, session_root
+
+    if getattr(args, "root", _NOT_GIVEN) is not None:  # a --root given, or a call that did not parse the line
+        return root
+    try:
+        chosen = session_root(os.environ.get(ENV))
+    except StoreSettingError as error:
+        raise GovError("STORE_ROOT_INVALID", f"{error}: nothing is retrieved", {"variable": ENV}) from None
+    return root if chosen is None else chosen
+
+
 def run(root: Path, args, config: dict) -> dict:
     import sqlite3
 
@@ -91,6 +116,7 @@ def run(root: Path, args, config: dict) -> dict:
     from gov.decisions.register import leave_out
     from gov.retrieval.retrieve import retrieve, role_filter
 
+    root = _store_root(root, args)
     role = getattr(args, "role", None)  # W2-13 S5: a --role given adds its filter beside GOV_ROLE's (DEC-1065 (2))
     if args.continuation is None:
         nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
