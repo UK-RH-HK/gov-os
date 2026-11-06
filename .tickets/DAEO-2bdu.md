@@ -1,7 +1,7 @@
 ---
 id: DAEO-2bdu
 status: open
-deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m]
+deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk]
 links: []
 created: 2026-10-30T22:14:08Z
 type: task
@@ -19,6 +19,7 @@ depends_on:
 - DAEO-siiz
 - DAEO-tgk2
 - DAEO-l78m
+- DAEO-q7lk
 allowed_paths:
 - src/gov/adopt/assess.py
 - src/gov/adopt/refactor_plan.py
