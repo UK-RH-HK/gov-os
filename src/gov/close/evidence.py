@@ -19,11 +19,6 @@ KEY = "evidence"
 _SCOPE_KEYS = ("scope", "why_full", "base", "head", "tree", "changed", "selected", "left_out")
 
 
-def junit_rel(ticket: str, stamp: str, number: int, run: str, form: str) -> str:
-    """Where the JUnit XML of one run of a close goes, relative to the project."""
-    return f"{JUNIT_DIR}/{ticket}/{stamp}/{number:02d}-{run}-{form}.xml"
-
-
 def _node(root: Path, base: Path | None, case) -> str:
     """The pytest node id, relative to the project, of a JUnit ``testcase`` written with ``junit_family=xunit1``."""
     file = case.get("file") or ""
