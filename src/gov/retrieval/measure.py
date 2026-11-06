@@ -2,8 +2,8 @@
 items 3 and 4, DEC-833, DEC-860, DEC-820 (d)).
 
 ``python3 -m gov.retrieval.measure <set> [--root <dir>] [--sets-root <dir>] [--part visible|hidden|all]
-[--gov <executable>] [--batch-size 10] [--bundle-budget 6000] [--stack-budget 24000] [--json] [--out <dir>]
-[--compare <record>]...``
+[--gov <executable> | --kept <dir>] [--batch-size 10] [--bundle-budget 6000] [--stack-budget 24000] [--json]
+[--out <dir>] [--compare <record>]...``
 
 The set is one the ``evaluation_sets`` block of the sets root's path map declares; its questions are
 ``<sets-root>/fixtures/evaluation/<set>/<part>/*.yaml``, taken in file-name order. The hidden folder must be covered
@@ -24,6 +24,18 @@ as the first line equal to it with trailing whitespace removed; found, it govern
 spans to the line before the next heading of the same or a higher level (or the end of the file), any other
 heading as many lines as ``lines`` state (its own line without them). Not found, ``lines`` are used; with neither,
 the question is malformed. An item from the set's own parts or ``fixtures/evaluation/`` is never a hit.
+
+**Source families** (S7; DEC-1078 (4), DEC-1079): the path map's top-level ``evaluation_families`` (the sets root's,
+else the measured root's) maps a family's name to the list of its member path globs: a gold source and its official
+copies. An evidence item in another member of a gold source's family is a hit on that source only when its own text
+holds the gold span's text, both normalised (whitespace; Markdown and YAML formatting: ``#`` heading marks, list
+marks, ``>`` quote marks, quotes, backticks, ``*`` emphasis and ``key:`` prefixes); never by its path alone. A
+question's line names each such item ("family hit: <path>"; for the hidden part only their count). With no family
+declared, every figure and line is as before.
+
+**Re-scoring kept outputs:** ``--kept <dir>`` reads each call's ranked output from ``<dir>`` (``00001.json`` … in call
+order, as the measure's ``GOV_KEEP`` wrapper keeps them) in place of running a retriever; the same set, parts and
+budgets as the kept run give the same calls. A kept output missing, or one left over, refuses the run.
 
 **The figures**, always together (DEC-833 item 3): hit@5, a source matched by one of the first five items of the
 stacked context (in the bundle: by an item of the first call), against CAP-10's floor of 85; full evidence, every
@@ -51,14 +63,69 @@ import yaml
 from gov.guard.reads import PATH_MAP_REL, SETS_KEY, PolicyError, _Part, _ticket, evaluation_sets, set_fault
 
 EVALUATION = "fixtures/evaluation"
+FAMILIES_KEY = "evaluation_families"
 FLOOR, TARGET = 85, 99
 TOKEN_CHARS = 4
 FIGURES = ("hit_at_5", "in_bundle", "full_evidence", "first_gold_rank", "stacked_digest")
 _HEADING = re.compile(r"(#{1,6})\s")
+_KEPT = re.compile(r"\d+\.json")
+# the formatting a copy may differ by: escapes before quotes, quote and emphasis characters, then leading marks
+# (``>`` quotes, ``#`` headings, list marks) and a YAML ``key:`` prefix, each line; whitespace collapsed after
+_ESCAPED = re.compile(r"\\([\"'])")
+_DROPPED = re.compile(r"[\"'`*]")
+_MARKS = re.compile(r"^(?:\s*(?:>(?=\s|$)|#{1,6}(?=\s|$)|[-+](?=\s)|\d+[.)](?=\s)))+\s*")
+_KEY = re.compile(r"^[A-Za-z_][\w.-]*:(?:\s+|$)")
+_BLOCK = {"|", ">", "|-", ">-", "|+", ">+"}
 
 
 class MeasureError(Exception):
     """A refusal or a fault that ends the run; its text names a hidden question by its id only."""
+
+
+def _normal(text: str) -> str:
+    """The text with whitespace and Markdown or YAML formatting normalised away (S7)."""
+    out = []
+    for line in text.splitlines():
+        line = _DROPPED.sub("", _ESCAPED.sub(r"\1", line))
+        line = _KEY.sub("", _MARKS.sub("", line).strip()).strip()
+        if line and line not in _BLOCK:
+            out.append(line)
+    return " ".join(" ".join(out).split())
+
+
+def _families_in(root: Path) -> dict | None:
+    """One path map's ``evaluation_families``: ``None`` when it declares none; a fault when malformed."""
+    path = root / PATH_MAP_REL
+    try:
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    except (OSError, UnicodeDecodeError):
+        raise MeasureError(f"{PATH_MAP_REL} cannot be read") from None
+    if FAMILIES_KEY not in text:
+        return None
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError:
+        raise MeasureError(f"{PATH_MAP_REL} cannot be read") from None
+    if not isinstance(data, dict) or data.get(FAMILIES_KEY) is None:
+        return None
+    block = data[FAMILIES_KEY]
+    if not (isinstance(block, dict) and all(
+            isinstance(name, str) and isinstance(globs, list) and globs and all(
+                isinstance(g, str) and g and not g.startswith("/") and ".." not in g.split("/") for g in globs)
+            for name, globs in block.items())):
+        raise MeasureError(f"{PATH_MAP_REL}: {FAMILIES_KEY} is not a map of names to lists of path globs")
+    return block
+
+
+def families(sets_root: Path, root: Path) -> list[_Part]:
+    """The declared source families, each a part matched against ``/f/<path>``: the sets root's, else the root's."""
+    for where in dict.fromkeys([sets_root, root]):
+        block = _families_in(where)
+        if block is not None:
+            return [_Part("/f", globs, name) for name, globs in block.items()]
+    return []
 
 
 def _fault(part: str, qid: str, kind: str, detail: str = "") -> MeasureError:
@@ -99,7 +166,19 @@ def _span(source: dict, root: Path, part: str, qid: str) -> tuple[int, int]:
     return at + 1, end
 
 
-def _load(file: Path, part: str, root: Path, quoting: _Part) -> dict:
+def _alternative(a: dict, root: Path, part: str, qid: str, declared: list[_Part]) -> tuple:
+    """One source alternative: its path and span, and, when it is in a family, those families and the span's
+    normalised text (an empty text never makes a family hit)."""
+    first, last = _span(a, root, part, qid)
+    own = tuple(f for f in declared if f.match(a["path"]))
+    text = ""
+    if own:
+        lines = (root / a["path"]).read_text(encoding="utf-8", errors="replace").splitlines()
+        text = _normal("\n".join(lines[first - 1:last]))
+    return a["path"], first, last, own, text
+
+
+def _load(file: Path, part: str, root: Path, quoting: _Part, declared: list[_Part] = ()) -> dict:
     qid = file.stem
     try:
         data = yaml.safe_load(file.read_text(encoding="utf-8"))
@@ -119,10 +198,10 @@ def _load(file: Path, part: str, root: Path, quoting: _Part) -> dict:
                                        for a in alternatives):
             raise _fault(part, qid, "malformed question", "a source names no path")
         # an alternative in the set's own parts or the evaluation files never counts and is never opened
-        entries.append([(a["path"], *_span(a, root, part, qid)) for a in alternatives
+        entries.append([_alternative(a, root, part, qid, list(declared)) for a in alternatives
                         if not quoting.inside(f"/q/{a['path']}")])
     return {"id": qid, "part": part, "question": data["question"], "sources": entries, "ticket": data.get("ticket"),
-            "ids": data.get("ids") or [], "radius": data.get("radius")}
+            "ids": data.get("ids") or [], "radius": data.get("radius"), "families": bool(declared)}
 
 
 def _retriever(gov: str, root: Path, env: dict) -> dict:
@@ -142,25 +221,72 @@ def _retriever(gov: str, root: Path, env: dict) -> dict:
     return {"executable": exe, "version": version, "gov_file": gov_file}
 
 
-def _ask(q: dict, args, exe: str, root: Path, env: dict, quoting: _Part) -> dict:
+class _Kept:
+    """The kept ranked outputs of a run, read in call order in place of a retriever (``--kept``)."""
+
+    def __init__(self, folder: str):
+        self.folder = Path(folder)
+        if not self.folder.is_dir():
+            raise MeasureError(f"the kept outputs' folder does not exist: {folder}")
+        self.files = sorted((f for f in self.folder.iterdir() if _KEPT.fullmatch(f.name) and f.is_file()),
+                            key=lambda f: int(f.stem))
+        self.used = 0
+
+    def __call__(self, q: dict, words: list[str]) -> tuple[int, str]:
+        if self.used >= len(self.files):
+            raise _fault(q["part"], q["id"], "the kept outputs end before the run's calls",
+                         f"{len(self.files)} kept")
+        file = self.files[self.used]
+        self.used += 1
+        try:
+            return 0, file.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            return 1, ""
+
+    def done(self) -> None:
+        if self.used != len(self.files):
+            raise MeasureError(f"the kept outputs do not match the run: {len(self.files)} kept, {self.used} calls")
+
+
+def _runner(exe: str, root: Path, env: dict):
+    def call(q: dict, words: list[str]) -> tuple[int, str]:
+        done = subprocess.run([exe, "retrieve", *words], cwd=root, env=env, capture_output=True, text=True)
+        return done.returncode, done.stdout
+    return call
+
+
+def _match(item: tuple, entry: list[tuple]) -> str | None:
+    """``direct`` when the item lies in an alternative's span, ``family`` when it lies in another member of an
+    alternative's family and its normalised text holds the span's normalised text, else ``None``."""
+    if any(item[0] == path and item[1] <= last and first <= item[2] for path, first, last, *_ in entry):
+        return "direct"
+    held = None
+    for path, _, _, own, text in entry:
+        if text and item[0] != path and any(f.match(item[0]) for f in own):
+            held = _normal(item[3]) if held is None else held
+            if text in held:
+                return "family"
+    return None
+
+
+def _ask(q: dict, args, call, quoting: _Part) -> dict:
     options = [*(["--ticket", str(q["ticket"])] if q["ticket"] else []),
                *[w for i in q["ids"] for w in ("--id", str(i))],
                *(["--radius", str(q["radius"])] if q["radius"] is not None else []),
                "--batch-size", str(args.batch_size), "--bundle-budget", str(args.bundle_budget)]
     stacked, seen, used, first, token, calls = [], set(), 0, None, None, 0
     while True:
-        done = subprocess.run([exe, "retrieve", *options, *(["--continue", token] if token else []), q["question"],
-                               "--json"], cwd=root, env=env, capture_output=True, text=True)
+        code, stdout = call(q, [*options, *(["--continue", token] if token else []), q["question"], "--json"])
         calls += 1
         try:
-            doc = json.loads(done.stdout)
+            doc = json.loads(stdout)
             bundle = doc["result"] if isinstance(doc.get("result"), dict) else doc
             items = [(i["path"], int(i["start_line"]), int(i["end_line"]), str(i.get("text", "")))
                      for i in bundle["evidence"]]
         except (ValueError, KeyError, TypeError, AttributeError):
             items = None
-        if done.returncode != 0 or items is None or doc.get("ok") is False:
-            raise _fault(q["part"], q["id"], "the retrieval failed", f"exit {done.returncode}")
+        if code != 0 or items is None or doc.get("ok") is False:
+            raise _fault(q["part"], q["id"], "the retrieval failed", f"exit {code}")
         first = items if first is None else first
         full = False
         for item in items:
@@ -177,17 +303,32 @@ def _ask(q: dict, args, exe: str, root: Path, env: dict, quoting: _Part) -> dict
         if full or not token or used >= args.stack_budget:
             break
 
-    def hits(item, entry):
-        return not quoting.inside(f"/q/{item[0]}") and any(
-            item[0] == path and item[1] <= last and first_line <= item[2] for path, first_line, last in entry)
+    matched: dict[tuple, list] = {}
 
-    rank = next((n for n, item in enumerate(stacked, 1) if any(hits(item, e) for e in q["sources"])), None)
-    found = sum(any(hits(item, e) for item in stacked) for e in q["sources"])
+    def kinds(item) -> list:
+        if item[:3] not in matched:
+            matched[item[:3]] = ([None] * len(q["sources"]) if quoting.inside(f"/q/{item[0]}")
+                                 else [_match(item, e) for e in q["sources"]])
+        return matched[item[:3]]
+
+    def hits(item, n):
+        return kinds(item)[n] is not None
+
+    pieces = range(len(q["sources"]))
+    rank = next((n for n, item in enumerate(stacked, 1) if any(hits(item, e) for e in pieces)), None)
+    found = sum(any(hits(item, e) for item in stacked) for e in pieces)
     digest = hashlib.sha256(json.dumps([list(i[:3]) for i in stacked]).encode()).hexdigest()[:16]
-    return {"id": q["id"], "part": q["part"], "hit_at_5": rank is not None and rank <= 5,
-            "in_bundle": any(hits(item, e) for item in first for e in q["sources"]),
-            "full_evidence": found == len(q["sources"]), "first_gold_rank": rank, "pieces_found": found,
-            "pieces_needed": len(q["sources"]), "calls": calls, "stacked_digest": digest}
+    scored = {"id": q["id"], "part": q["part"], "hit_at_5": rank is not None and rank <= 5,
+              "in_bundle": any(hits(item, e) for item in first for e in pieces),
+              "full_evidence": found == len(q["sources"]), "first_gold_rank": rank, "pieces_found": found,
+              "pieces_needed": len(q["sources"]), "calls": calls, "stacked_digest": digest}
+    if q.get("families"):
+        # each stacked or first-call item that is a hit by its family only, in order, once
+        named = list(dict.fromkeys(item[0] for item in [*stacked, *first] if "family" in kinds(item)))
+        scored["family_hit_count"] = len(named)
+        if q["part"] != "hidden":
+            scored["family_hits"] = named
+    return scored
 
 
 def _total(questions: list[dict]) -> dict:
@@ -215,14 +356,20 @@ def _compare(questions: list[dict], records: list[str]) -> None:
 def _line(q: dict) -> str:
     def yes(v):
         return "yes" if v else "no"
-    return (f"{q['id']} ({q['part']}): hit@5 {yes(q['hit_at_5'])} (first gold rank {q['first_gold_rank'] or '-'}), "
+    line = (f"{q['id']} ({q['part']}): hit@5 {yes(q['hit_at_5'])} (first gold rank {q['first_gold_rank'] or '-'}), "
             f"in the bundle {yes(q['in_bundle'])}; full evidence {yes(q['full_evidence'])} "
             f"({q['pieces_found']} of {q['pieces_needed']} pieces); {q['calls']} calls")
+    if q.get("family_hits"):
+        line += f"; family hit: {', '.join(q['family_hits'])}"
+    elif q.get("family_hit_count"):  # the hidden part: the count only, never a path
+        line += f"; family hits: {q['family_hit_count']}"
+    return line
 
 
 def _text(doc: dict) -> str:
     r, b, t = doc["retriever"], doc["budget"], doc["total"]
     out = [f"measure: set {doc['set']}, part {doc['part']}",
+           f"retriever: kept outputs in {r['kept']} (no retriever run)" if r.get("kept") else
            f"retriever: {r['executable']}; version: {r['version']}; gov.__file__: {r['gov_file']}",
            f"root: {doc['root']} at commit {doc['commit']}",
            f"budget: batch size {b['batch_size']}, bundle budget {b['bundle_budget']}, "
@@ -252,6 +399,7 @@ def measure(args) -> dict:
     except PolicyError as error:
         raise MeasureError(f"the set {args.set} cannot be worked out: {error}") from None
     quoting = _Part("/q", [*entry.get("visible", []), *entry["hidden"], f"{EVALUATION}/**"], "")
+    declared = families(sets_root, root)
     questions = []
     for part in parts:
         folder = sets_root / EVALUATION / args.set / part
@@ -260,11 +408,18 @@ def measure(args) -> dict:
             covered = _Part(str(sets_root), entry["hidden"], "")
             if not (covered.inside(str(folder)) or files and all(covered.inside(str(f)) for f in files)):
                 raise MeasureError(f"the set {args.set}'s hidden globs do not cover its hidden folder: refused")
-        questions += [_load(f, part, root, quoting) for f in files]
-    env = {k: v for k, v in os.environ.items() if k not in ("PYTHONPATH", "GOV_TICKET")}
-    retriever = _retriever(args.gov, root, env)
+        questions += [_load(f, part, root, quoting, declared) for f in files]
+    if getattr(args, "kept", None):
+        call = _Kept(args.kept)
+        retriever = {"executable": None, "version": None, "gov_file": None, "kept": str(call.folder.resolve())}
+    else:
+        env = {k: v for k, v in os.environ.items() if k not in ("PYTHONPATH", "GOV_TICKET")}
+        retriever = _retriever(args.gov, root, env)
+        call = _runner(retriever["executable"], root, env)
     done = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True)
-    scored = [_ask(q, args, retriever["executable"], root, env, quoting) for q in questions]
+    scored = [_ask(q, args, call, quoting) for q in questions]
+    if isinstance(call, _Kept):
+        call.done()
     _compare(scored, args.compare)
     return {"retriever": retriever, "root": str(root), "commit": done.stdout.strip()[:12] or None, "set": args.set,
             "part": args.part, "budget": {"batch_size": args.batch_size, "bundle_budget": args.bundle_budget,
@@ -279,6 +434,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--sets-root")
     parser.add_argument("--part", choices=("visible", "hidden", "all"), default="visible")
     parser.add_argument("--gov", default="gov")
+    parser.add_argument("--kept", help="re-score a run's kept outputs (00001.json ... in call order); no retriever")
     parser.add_argument("--batch-size", type=int, default=10)
     parser.add_argument("--bundle-budget", type=int, default=6000)
     parser.add_argument("--stack-budget", type=int, default=24000)
