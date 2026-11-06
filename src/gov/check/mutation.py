@@ -5,28 +5,13 @@ import fnmatch
 import json
 from pathlib import Path
 
-import yaml
+from gov.util.frontmatter import quiet as _frontmatter
 
 VERSION = "1.0.0"
 
 TICKETS_REL = ".tickets"
 IMPLEMENTER_ROLES = ("engineer", "product-spec", "research")
 ACCEPTANCE_PATTERNS = ("tests/acceptance/**", "tests/acceptance/*")
-
-
-def _frontmatter(text: str) -> dict | None:
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None
-    try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
 
 
 def _is_under_acceptance(pattern: str) -> bool:

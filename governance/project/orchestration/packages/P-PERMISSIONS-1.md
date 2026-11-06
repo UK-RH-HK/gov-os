@@ -2,7 +2,22 @@
 
 **DECIDED (owner, 2026-11-06, DEC-1080): approved, with read-only git only through `git -C` (section 4 (A)).** The
 CTO's own change (C) holds from now on and goes into the brief of every agent it starts. The settings change is
-`ACT-PERMISSIONS-1.md`, for the operator.
+`ACT-PERMISSIONS-1.md`, for the operator. **Changed by DEC-1081 (1):** the `git -C` rules were dropped; the ACT applied
+18 rules (operator, 2026-11-06).
+
+**Two points this package missed (the owner, 2026-11-06, seen in `/permissions`; accepted by the owner under our
+threat model):**
+1. **The owner's user-level settings already allow every Bash command, every Read, Edit and Write, and web access**
+   (`~/.claude/settings.json`: `Bash(*)`, `Read(*)`, `Edit(*)`, `Write(*)`, `WebFetch(*)`, `WebSearch(*)`; deny
+   empty). So:
+   - section 4 (A)'s project list adds nothing for Bash;
+   - section 4 (B)'s "keep asking" list does not ask.
+
+   **The guard (the PreToolUse hook) is the real check**, not the permission lists.
+2. **The prompts that remain are Read calls outside the repository.** `Read(*)` does not reach a folder outside the
+   working directories. `ACT-PERMISSIONS-2.md` adds the measure clones and the worktrees as additional directories,
+   keeps `~/gov-os-eval` asking, and denies Read on the three hidden folders, which the guard does not cover outside
+   the repository.
 
 - **By:** the CTO (session `812bc5ce`), 2026-11-06, at the owner's question. Nothing is changed: a settings change is
   the operator's ACT (P-ACT-SPLIT (a)).

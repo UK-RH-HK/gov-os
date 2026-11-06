@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ACT-PERMISSIONS-1 (P-PERMISSIONS-1, DEC-1080): add the approved allow rules to a Claude Code settings file.
+"""ACT-PERMISSIONS-1 (P-PERMISSIONS-1, DEC-1080, DEC-1081 (1)): add the approved allow rules to a settings file.
 
     python3 apply.py <settings.local.json>           add the rules (a backup beside it first)
     python3 apply.py <settings.local.json> --check   print what is present and missing; change nothing
@@ -20,10 +20,7 @@ RULES = [
     "Bash(/usr/lib/wsl/lib/nvidia-smi --query-gpu=*)",
     # the pinned gov, by its path (the same command `gov *` already allows)
     "Bash(~/.local/bin/gov *)", "Bash(/home/usain/.local/bin/gov *)",
-    # read-only git through -C only (the owner's correction); every other git command keeps asking
-    "Bash(git -C * log *)", "Bash(git -C * show *)", "Bash(git -C * diff *)", "Bash(git -C * status *)",
-    "Bash(git -C * rev-parse *)", "Bash(git -C * branch --list*)", "Bash(git -C * ls-files *)",
-    "Bash(git -C * merge-base *)",
+    # no git -C rules (DEC-1081 (1)): the CTO uses plain git; every git command not already allowed keeps asking
     # cd into the repository and the worktrees
     "Bash(cd /home/usain/Dynamic-Agentic-Engineering-OS*)", "Bash(cd ~/gov-os-worktrees/*)",
 ]

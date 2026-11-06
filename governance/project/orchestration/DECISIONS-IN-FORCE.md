@@ -201,3 +201,26 @@ other restart is an ACT.
   `cd … &&` chains, and says in one line before any command that will prompt what it does and why; the same rule in
   every agent's brief. P-PERMISSIONS-1 approved with read-only git through `git -C` only; the settings change is the
   operator's ACT (`ACT-PERMISSIONS-1.md`). Basis: questions 4 and 2.
+- DEC-1081 (2026-11-06): ACT-PERMISSIONS-1 without the `git -C` rules; W2-128 filed; gte-reranker-modernbert-base and
+  zerank-1-small measured now (their downloads an ACT): every Qwen3 model and these two score each kept candidate list
+  of the 138 once in one quiet window; then replays at no GPU cost on the fixed pipeline (alone; by question type;
+  cascades; two merged), the grid declared first, judged with McNemar; a winner's speed and GPU measured for real before
+  the owner; the best onto the fresh 80 once. Nothing adopted or installed before the owner decides. Basis: 1 and 4.
+- DEC-1082 (2026-11-06): the user-level allow-all accepted (the guard is the check); ACT-PERMISSIONS-2 applied; the
+  three stopped agents started again (L5 from its lines if sound); the DEC-999 labels a priority fix ahead of the
+  levers (window 4's builds checked first, else a ticket, tests first); the guard refuses the hidden sets outside the
+  repository to engineer, research and orchestrator (an ACT); the spill reading investigated; the score-once window
+  after its review. Basis: 2 and 4.
+- DEC-1083 (2026-11-06): D9-FATES approved (the auditor checks the 792 lines before any edit); K9's memory bar 85 %
+  hit@5 on the fresh 80 once, on the pin with W2-92, W2-32 S11, W2-131 and the chosen reranker (95 % the target);
+  W2-32 S6 dropped; W2-15b out of K9; W2-128 in K9; W2-128's ready check computed by code (only advisory items warn);
+  W2-131's follow-up a ticket, tests first; grid v2 and v3 accepted. Basis: 1 and 2.
+- DEC-1084 (2026-11-06): D9-FATES §5 decided (W2-111 open, LITE, outside K9; W2-55 S1 re-worded and closed; W2-66b a
+  D-10 red-fix item; W2-90c its own ticket) and the fates applied; exit criterion 5 re-worded; spill floor 2,048 MiB;
+  the measure re-anchors in memory (W2-61h, tests first); ACT-GUARD-SETS-1 decided (after window 4; the CTO's tools
+  take the sets root first); L5 and an 80-candidate 0.6B cell measured. Basis: 1 and 2.
+- DEC-1085 (2026-11-06): the memory build finished first (the open list to the owner); W2-134 filed (S8's code, tests
+  first); the two-reranker cells measured, adoption to the owner (DEC-1043); no 4B embedder; the search-again test
+  (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
+  (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
+  first; the fresh 80 unused until the owner decides what it measures. Basis: 1.

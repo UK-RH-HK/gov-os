@@ -41,3 +41,5 @@ The owner's DEC-1027 B: the close of W2-05, W2-55 and W2-96 was refused partly o
 `governance/project/orchestration/tools/win_toast.ps1` (the CTO's tools, `42104b11`) is neither in the test's code
 suffixes nor in `record_only`. The owner named the fix at its source: W2-66's independent test designer adds the
 PowerShell suffix to the case's code suffixes. A test revision only; no product code.
+
+**D9-FATES (DEC-1083, DEC-1084):** A red-fix item in D-10 (DEC-1084 (3)): a test designer builds the `.ps1` suffix (`Rewrite-Reason: DEC-1027 B`; not built today: `CODE_SUFFIXES` at `test_w2_66_live_test_map.py:34` has no `.ps1`), and D-10 runs its cases by name and records them as the close evidence. The status is kept.

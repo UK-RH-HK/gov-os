@@ -55,3 +55,5 @@ list_rows: []
 The owner split W2-90b on 2026-11-01 (DEC-999) so it does not wait for W2-105 or ACT 2: W2-90b fixes now every case
 whose fixtures need only the kernel's hook file; this ticket holds the cases that truly need W2-105 (the template's
 install block removed) or W2-110 (a product's CTO-only install rule), after both land and after W2-90b.
+
+**D9-FATES (DEC-1083, DEC-1084):** Stays open as its own ticket (DEC-1084 (3)), closed by its own named run of its cases after W2-105 and W2-110 merge (its S1 and S2). Its cases sit in `optin-lifted-guard.txt` (lines 276 and 427 to 430), which run report-only in D-10.

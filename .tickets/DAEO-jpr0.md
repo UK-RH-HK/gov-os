@@ -70,3 +70,5 @@ KPIs; the engineer starts when W2-123 (which holds `semantic.py` for the bounded
 assert behaviour this ticket's KPIs reverse, on DEC-1042 (2)'s reasoning: W2-123's two cases become "a 4xx ends at
 once" and "a refused connection is retried within the bound, then named" (KPI 7); W2-122's seed cases give the cold
 rebuild its own empty `GOV_VECTOR_CACHE_DIR`, so they still prove nothing of the base store was used.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 9 of 10 (`0c5d7f4c`); met in part: S6 (its per-day "after" figure was not measured, evidence:81-82). The CTO closes it at the lift (P1-13).

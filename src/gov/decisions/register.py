@@ -25,6 +25,7 @@ DOMAINS = ("guard", "close", "retrieval", "context", "adopt", "launch", "checks"
 SCOPES = {"repository": "governance/project/", "kernel": "template/governance/kernel/"}  # where each scope lands
 CHANGING = ("Changes", "Settles", "Corrects", "Reverses", "Withdraws")
 TAG_PARTS = ("domain", "scope", "lands in")
+MARK = ("entry", "status", "changed_by", "in_force", "not_in_force")  # an item's entry mark (W2-92 S9, DEC-1073 (2))
 
 _ID = re.compile(r"(?<![A-Za-z0-9_])DEC-[0-9]+(?![A-Za-z0-9_])")
 _FIELD = re.compile(r"\*\*([A-Za-z][A-Za-z ]*):\*\*([^·]*)")
@@ -175,9 +176,32 @@ def leave_out(root: Path, evidence: list[dict]) -> tuple[list[dict], dict | None
     entry_of = authority.register_entries_of(records.records(root), records.edges(root, type=authority.SUPERSEDES),
                                              root)
 
+    def entries_in(first: int, last: int) -> list:
+        """The entries whose spans the lines ``first`` to ``last`` touch, in order, each once."""
+        return list(dict.fromkeys(entry["id"] for line in range(first, last + 1)
+                                  if (entry := entry_of(register["path"], line)) is not None))
+
     def touched(first: int, last: int) -> set:
-        return {entry["id"] for line in range(first, last + 1)
-                if (entry := entry_of(register["path"], line)) is not None}
+        return set(entries_in(first, last))
+
+    def narrowed(item: dict, chunk: dict, body: bytes) -> dict:
+        """W2-133 (DEC-1083): the item narrowed to its own chunk, labelled from the chunk's own lines as ``retrieve``
+        labels an item (W2-131): its id the entry holding its first line (the chunk id in the preface or a gap), with
+        that entry's mark, and each other entry it touches in ``also``. The marks are the parent's own, per entry; the
+        parent's id, entry, status and ``also`` are never kept."""
+        marks = {mark["entry"]: mark for mark in [{key: item[key] for key in MARK if key in item},
+                                                    *item.get("also", ())] if "entry" in mark}
+        new = {key: value for key, value in item.items() if key not in MARK + ("also",)}  # ``id`` keeps its place
+        new.update({"start_line": chunk["start_line"], "end_line": chunk["end_line"],
+                    "sha256": hashlib.sha256(body).hexdigest(), "text": body.decode("utf-8", "replace")})
+        holder = (entry_of(register["path"], chunk["start_line"]) or {}).get("id")
+        new["id"] = holder or chunk["chunk_id"]
+        new.update(marks.get(holder, {}))
+        others = [marks[rid] for rid in entries_in(chunk["start_line"], chunk["end_line"])
+                  if rid != holder and rid in marks]
+        if others:
+            new["also"] = others
+        return new
 
     kept, left, own, lines = [], set(), None, None
     for item in evidence:
@@ -195,7 +219,5 @@ def leave_out(root: Path, evidence: list[dict]) -> tuple[list[dict], dict | None
         chunk = own.get(item.get("chunk_id"))
         if chunk and (chunk["start_line"], chunk["end_line"]) != (item["start_line"], item["end_line"]) \
                 and not touched(chunk["start_line"], chunk["end_line"]) & out:
-            body = b"".join(lines[chunk["start_line"] - 1:chunk["end_line"]])
-            kept.append({**item, "start_line": chunk["start_line"], "end_line": chunk["end_line"],
-                         "sha256": hashlib.sha256(body).hexdigest(), "text": body.decode("utf-8", "replace")})
+            kept.append(narrowed(item, chunk, b"".join(lines[chunk["start_line"] - 1:chunk["end_line"]])))
     return kept, (left_out_record(register, left) if left else None)

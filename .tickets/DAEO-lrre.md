@@ -23,18 +23,20 @@ allowed_paths:
 - .claude/agents/**
 kpis:
   success:
-  - 'Role files for the CTO (the master orchestrator) and the Senior Engineer (a stream''s sub-orchestrator, with its stream''s skills), generated as agents, each with its reads and writes, skills, model, brief contents and handover, as ROLES-SPEC-1 (approved, DEC-957) states them [DEC-954 Q6, Q13, DEC-957]'
-  - 'The ticket lead''s own role file (today a section of orchestrator.md) [DEC-954, DEC-236]'
+  - 'The ticket lead''s own role file (today a section of orchestrator.md) [DEC-954, DEC-236] (folds W2-21 S2)'
   - 'Machine-readable defaults per role (model, effort, skills) in each role file, read by W2-60a''s launcher; effort high for the CTO and the Senior Engineers [DEC-954, DEC-839 item 5, DEC-957]'
-  - 'A typed handoff record, from which a fresh agent states the task, inputs, open questions and next step identically; the twelve-field return is one [CAP-22.b (lite), AR-6]'
-  - 'Any role the roles spec finds undefined is scoped and drafted here [DEC-954 Q13a]'
   - 'The QA engineer replaces the planned independent reviewer: `qa-engineer.md` (not `independent-reviewer.md`) is the per-stream checking role, which reads the spec, the KPIs, the tests and the code, changes neither, writes only its findings report, and works per stream: tickets that touch the core (the guard, the close, memory''s retrieval, anything that could fail open) one by one before they merge, the others in batches of up to about five (more when they batch well and the machine and context allow), a large stream''s QA split; the independent auditor keeps the milestone audits [DEC-959 item 3, ROLES-RESEARCH-1 §2.9]'
   - 'Every role file states the work order in one line: product-spec writes the spec and KPIs; the test designer and the engineer work in parallel from it, never reading each other''s work; the engineer runs the acceptance tests once ready (through gov accept); the QA engineer alone reads both [DEC-959 item 7, DEC-957]'
   - 'Every role file states one writer per worktree: two sessions that write never share a worktree; a ticket''s test designer works in its own tests worktree, merged by the lead [DEC-847, DEC-963, DEC-983, DEC-982]'
-  - 'The CTO''s role file states the approval classes (a call that may need the owner''s approval: the host''s ask rules and safety checks) and the quiet hours and morning package time as role defaults read from the project''s configuration, so an adopted product sets its own hours [DEC-991, DEC-994 item 3]'
   - 'The QA engineer''s role file makes it the moderator: it triages every finding against the ticket''s own scope and KPIs; a finding out of scope, or needing an unusual construction, is a Wave 3 row, never a round; it returns the structured verdict per KPI; at most two review rounds per ticket [DEC-1010 item 1, SMART-WORK-3]'
   failure:
   - 'A role built other than as the approved roles spec states it; a role file placed by hand rather than generated; a role without its machine-readable defaults.'
+  lifted:
+  - 'The CTO''s role file states the approval classes (a call that may need the owner''s approval: the host''s ask rules and safety checks) and the quiet hours and morning package time as role defaults read from the project''s configuration, so an adopted product sets its own hours [DEC-991, DEC-994 item 3] [lifted (was S9), DEC-1083: re-scoped by D9-FATES (INVESTIGATION-1 §5)]'
+  moved:
+  - 'Role files for the CTO (the master orchestrator) and the Senior Engineer (a stream''s sub-orchestrator, with its stream''s skills), generated as agents, each with its reads and writes, skills, model, brief contents and handover, as ROLES-SPEC-1 (approved, DEC-957) states them [DEC-954 Q6, Q13, DEC-957] (to Wave 3, W-10) [re-scoped, DEC-1083] (was S1)'
+  - 'A typed handoff record, from which a fresh agent states the task, inputs, open questions and next step identically; the twelve-field return is one [CAP-22.b (lite), AR-6] (to Wave 3, W-10) [re-scoped, DEC-1083] (was S4)'
+  - 'Any role the roles spec finds undefined is scoped and drafted here [DEC-954 Q13a] (to Wave 3, W-10) [re-scoped, DEC-1083] (was S5)'
 profile: STANDARD
 sources:
 - CAP-22.b

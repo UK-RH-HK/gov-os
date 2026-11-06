@@ -1,0 +1,13 @@
+[Unit]
+Description=Re-register WSL's Windows interop (WSLInterop) in binfmt_misc after systemd mounts it (ACT-WSL-INTEROP-1)
+After=proc-sys-fs-binfmt_misc.mount
+Wants=proc-sys-fs-binfmt_misc.mount
+ConditionPathExists=/init
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '[ -e /proc/sys/fs/binfmt_misc/WSLInterop ] || echo ":WSLInterop:M::MZ::/init:PF" > /proc/sys/fs/binfmt_misc/register'
+
+[Install]
+WantedBy=multi-user.target

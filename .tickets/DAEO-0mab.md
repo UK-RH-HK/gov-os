@@ -1,6 +1,6 @@
 ---
 id: DAEO-0mab
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-ha8z, DAEO-kl5e, DAEO-7rr2, DAEO-cy5o, DAEO-siiz, DAEO-wnnz, DAEO-egsy, DAEO-2bdu]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -84,3 +84,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-24), as approved (DEC-729). The list row
   - The full, uncached regression runs once and is green (DEC-726).
   - AR-1 to AR-10 are each shown to pass, in order, with the evidence path of each (DEC-721). EXP-003's line is shown by W2-15a.
 - **Failure:** any AR line not shown; the fixture importing this repository's `src/`.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): W-8: its AR lines are shown once in W2-46 and audited in W2-47; S1 to S4 retired (W-4), S5 and F1 moved to W2-46; exit criterion 5 re-worded (DEC-1084).

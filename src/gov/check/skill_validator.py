@@ -20,10 +20,9 @@ import re
 import sys
 from pathlib import Path
 
-import yaml
-
 from gov.check.commands import GOV_COMMANDS
 from gov.context import TOKEN_CHARS
+from gov.util.frontmatter import with_body as _parse_frontmatter
 
 _MAX_DESC_TOKENS = 60
 _MAX_BODY_TOKENS = 2500
@@ -35,23 +34,6 @@ _TEMPLATE_PREFIX = "template/"
 
 def _tokens(text: str) -> int:
     return math.ceil(len(text) / TOKEN_CHARS)
-
-
-def _parse_frontmatter(content: str) -> tuple[dict | None, str]:
-    if not content.startswith("---"):
-        return None, content
-    end = content.find("\n---", 3)
-    if end < 0:
-        return None, content
-    fm_text = content[3:end].strip()
-    body = content[end + 4:].strip()
-    try:
-        parsed = yaml.safe_load(fm_text)
-    except yaml.YAMLError:
-        return None, content
-    if not isinstance(parsed, dict):
-        return None, content
-    return parsed, body
 
 
 def _extract_code_text(body: str) -> list[str]:
