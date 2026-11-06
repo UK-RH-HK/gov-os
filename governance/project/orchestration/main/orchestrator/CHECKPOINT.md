@@ -1,10 +1,95 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-06: session `812bc5ce`, after DEC-1079 (D4B-LEVERS decided; D-5, D-6, D-9 start)
+## RESUME HERE — 2026-11-06: session `812bc5ce`, after DEC-1081 (score once, combine freely)
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
-what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1080**. The detail of 11-05 is in the block
+what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
 below (history), kept for its figures.
+- **~10:10 (DEC-1081 carried out):**
+  - ACT-PERMISSIONS-1 is applied by the operator: 18 of 18 rules, deny `git push`, ask []. Use plain git; `git -C`
+    still asks. One slip at ~10:20: a read-only `git -C … log`, not announced.
+  - W2-128 is filed as `DAEO-t8mp`.
+  - ACT-RERANK-TRIAL-2 is applied: gte and zerank are in `~/.cache/gov-os-trial/hf`, with no code file and no
+    package.
+- **The three agents stopped by the owner at 09:36 (L5, D-6 part 1, D-9's drafter) cannot be resumed** (the harness
+  treats them as cancelled; new ones need the owner's word). This is put to the owner. L5 left 427 uncommitted lines
+  in `research-retrieval`'s `night/harness/rx.py`: they are not touched and not used.
+- **Score once (in hand), `drafts/score-once/`:**
+  - `rerank_worker.py`: the zerank `yes-logit` loader, tested 15 of 15;
+  - `rx.py`: f38402a7 plus combine mode, the request bounds, the routing and ahead_types keys; tested 14 of 14;
+  - `so_measure.sh` (kept caches) and `score_once_window.sh` (DRY=1 for the checks).
+  - The grid is committed: `packages/LIFT-1/D4B-SCORE-ONCE.md`.
+  - Review round 1: NOT READY (no trap, an orphaned slow load, an unbounded wait, cut counts, a fragile base, no
+    cross-model check). All fixed, tests 16/16 each; **re-review running** (the same reviewer).
+  - **Next:** READY → write `REVIEWED.sha256`; install the worker into `$TR/svc` (a write outside the repo: announce
+    it); DRY=1; the window (setsid); R0; L2; L3 committed; the replays; the winner's real window; then to the owner.
+- **~11:20 (DEC-1082):**
+  - ACT-PERMISSIONS-2 is applied (the clones and worktrees are additional directories; Read is denied on the three
+    hidden folders).
+  - The health check is reported. Its findings: the guard does not cover the sets root; the live pin labels
+    register chunks `DEC-999`; the spill reading fails.
+  - Running:
+    - the L5 reviewer (continue or start clean, then L5 is started again);
+    - D-6 part 1 again (its worktree inspected first);
+    - D-9's drafter again;
+    - the DEC-999 investigation (window 4's builds first);
+    - the guard sets-root design (the ACT after it).
+  - **ACT-WSL-INTEROP-1 is committed for the operator.** systemd's binfmt_misc mount (11-03 11:15) dropped
+    `WSLInterop`: re-register it, plus a one-shot unit.
+- **~14:15 (DEC-1083, DEC-1084 recorded):**
+  - **Grid:** L2 says 27 of 30 misses are the reranker's. L3 is the lift on a normalised score, 0.0766 a step. The 16
+    cells, B0 107: M2 (q4b+gte) 118, MRR 0.638; M3 (zer+gte) 118, 0.612. gte alone goes from 78 to 114 under L3.
+    Committed on D4B-SCORE-ONCE, versions 2 to 5.
+  - **The live window for M2 and M3 is running** (`drafts/score-once/live_window.sh`; reviewed READY;
+    `LIVE-REVIEWED.sha256` pinned; outputs in `~/gov-os-runs/D4B/live-window/<stamp>/`).
+  - **Next:**
+    - L5 (split and termmap) and the 0.6B at depth 80, which need L5 ported into the score-once harness and a short
+      GPU window;
+    - then the owner, with the eligible cell;
+    - then the fresh 80 at the decision point.
+  - **D-9:** the fates are applied, audited and corrected. W2-129 is `DAEO-q7lk` and W2-130 `DAEO-q8cl`. Still for a
+    test designer: R2-F1's xfail reason pointed at W3-P22, and W2-11's README re-mapped so its S13 can move.
+  - **W2-131 and W2-133 are merged** (107/107 on the merged tree), for re-pin window 4.
+  - **Hidden-set tools:** converted to the `--sets-root` form (`drafts/d4b/sets_form.py`). ACT-GUARD-SETS-1 is
+    decided: applied after window 4.
+  - **Spill floor:** 2,048 MiB in `dispatch/config.json`; re-read on 11-13.
+  - **Exit criterion 5** is re-worded in the WBS.
+  - **W2-61h S8** (the measure re-anchors in memory) is added. Its code needs an engineer's ticket (W2-134?); the
+    owner is asked.
+  - **Finding:** 13 first calls are over the 6,000-token budget (one-line JSON files, a 16k ticket line); a fix line is
+    to be proposed.
+  - **h23:** `repin_gold.py` re-anchored it to another clone at 11-05 14:40. It was re-anchored at 12:42 to
+    `e884675b`, after fetching integrate's history into the g1 clone.
+- **~12:20, the score-once window DONE** (`~/gov-os-runs/D4B/score-once/`; the live service restored 12:18):
+  - **First pass (11:29):** q06f gave 106 against 107 (h23's verdict only). The outputs were identical in 140 of 140
+    questions and 689 calls, so a label changed; grid v3 was committed (the faithfulness check reads the outputs).
+  - **Resumed (11:45), each model alone on the question, before L3:**
+    - q06: 107/138, MRR 0.5593, spread 16.3;
+    - q4b: 113, 0.6126, 17.9 (11 gains, 5 losses against q06, p 0.21);
+    - gte: 78, 0.433;
+    - zer: 82, 0.452.
+  - **Checks:** all scored the same 5,486 texts on 875 route answers; the GPU peak was 12,748 (q4b), never over the
+    budget; the shared reading was flat at about 1,500, so the spill alert was not ours.
+  - **Next:**
+    - R0 (`drafts/score-once/replay.sh r0`, running);
+    - L2 (the stages off one at a time);
+    - L3 committed;
+    - the 16 cells;
+    - the winner's real window.
+  - **Ask the owner's checker** whether h23's label changed after 11-05 13:21.
+  - **ACT-GUARD-SETS-1** is committed for the owner (timing after re-pin window 4 recommended).
+- **~12:00:**
+  - **D-6 part 1 is DONE:** `8305dd13` on `emg/d6` (22 files, src −69 lines; 707 unit tests pass; the scoped set has 1
+    red). Its review is running.
+  - **For D-10's red list:** `tests/acceptance/W1-19/test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors`
+    fails under `-n auto` only (`'February' in ''`), red at the base `6958acff` too; it passes alone.
+  - **L5 is DONE** (`a5c0c34f`, 79/79), with its finding: v456's depth rerank was given the last phrasing. Grid v2
+    (`"rq":"question"`, q06f first) is committed; its re-review is running.
+  - **W2-131:** the tests are in (`2d97295b`, 14 red, 15 green, merged into `w2/W2-131` as `a75a2704`); the engineer is
+    running (pid 3097775).
+  - **D9-FATES** is committed for the owner.
+  - **The guard design** returned; its full restatement was asked for (the agent was resumed), then an engineer
+    builds the candidate.
 - **Decided today (DEC-1079):** L1 (every comparison with gains, losses, exact McNemar); L2 (the 31 misses on the 138,
   where each left the top 5); source families in `gov.retrieval.measure` (tests first), then every kept run
   re-scored; after L2, L3 (the lift normalised, the moves bounded) and the three rerankers replayed under equal
@@ -15,6 +100,25 @@ below (history), kept for its figures.
   handover records are current, committed, and `record/w2` synced (`sync_context.py --commit`).
 - **Nothing is running.** No GPU job, no hold file. The live reranker is the 0.6B (class 3, checked 19:01).
 - **Waiting on the owner:** nothing blocking; due from the CTO: W2-32's S11 wording package, D-9's fates and K9 list.
+- **~09:40 running (all CPU):** W2-61h's designer for S7, the source families (`gov launch`, worktree
+  `~/gov-os-worktrees/W2-61h-tests`, branch `w2/W2-61h-tests`; S7 added to the ticket `6958acff`); D-6 part 1's engineer
+  (in-session, `~/gov-os-worktrees/D-6`, `emg/d6`, brief `briefs/D6-engineer.md`); D-9's fates and K9 drafter
+  (in-session orchestrator role, returns text); D-5's TPL-3b scripts' engineer (in-session, the tools lane); L5's
+  phrasing prototype (research, in the harness on `w2/research-retrieval`; asked to add `GOV_RX_SCORELOG` too).
+- **~09:35:** W2-61h S7 tests DONE (`353b4937`: 13 cases, 12 red on integrate); the interface stated on the ticket;
+  merged into `w2/W2-61h-s7` (`8e6f79b7`, TESTS-READY); the engineer launched (brief in its worktree). mxbai dropped
+  (DEC-1079 accepted later, `d5d5f704`): the score-log window is the 0.6B and the 4B over 40 only.
+- **~09:55:** D-5's TPL-3b DONE (`tools/wait_for.sh`, `lead_verify.sh`, `launch_worker.sh` with their tests: 24, 29, 35
+  ok; detached by default, `--fg` to stay; `launch_worker.sh` copies the brief into the worktree). Use them on the next
+  launch; then TPL-2's facts file (the CTO's lane) maps them. W2-61h's role set to engineer (`gov launch` refused an
+  engineer on a designer's ticket); its engineer running (pgid 2792723).
+- **~10:30: DEC-1080** (`011e8ac0`): the CTO's command rule, standing: the Read and Grep tools for reading, one simple
+  command per call, no `cd … &&` chains, one line before any command that will prompt (in `briefs/EMG-common.md` for
+  every agent). P-PERMISSIONS-1 approved with read-only `git -C` only; **ACT-PERMISSIONS-1** for the operator
+  (`packages/ACT-PERMISSIONS-1.md`, `apply.py`; rehearsed 15/15; the wildcard caveat stated). W2-61h's acceptance paths
+  removed from its allowed paths (`acf8f46c`). Use plain `git add` and `git commit` (the session sits in the repo).
+- **Found:** the kept outputs hold no reranker scores, so L2 and the replays need one GPU window with the score log
+  (the 0.6B, the 4B, mxbai on the 138; no install); told to the owner.
 
 ## RESUME HERE (history) — 2026-11-05 ~12:50: session `812bc5ce` (DEC-1074's first three actions, the owner's go at ~12:25)
 
@@ -686,8 +790,8 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-04T18:43:57Z 2327f7fcd783fe123961e6c818b5203d6198d1a9d556332ae8ae8c7d39b2760a
-git head: f463ed4e9f1392975fc394c9f2be485646b3150e
+generated: 2026-11-06T09:53:09Z e9d5cde2108b076cfb6e52420dc242529fa01f2fd2d7711df664b3eb6ffee3a5
+git head: 747d9ac63b1428f5b62ec6c36e58662f05a95540
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
@@ -718,61 +822,66 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS       f463ed4e [w2/integrate]
-  /home/usain/gov-os-worktrees/D-7                 3501474f [emg/d7]
-  /home/usain/gov-os-worktrees/D-7-tests           67585f7f [emg/d7-tests]
-  /home/usain/gov-os-worktrees/D4-cut-a            10025b21 [w2/D4-cut-a]
-  /home/usain/gov-os-worktrees/D4-cut-b            6bd8fbbd [w2/D4-cut-b]
-  /home/usain/gov-os-worktrees/EMG-lb2             3a82896d [emg/lb2]
-  /home/usain/gov-os-worktrees/EMG-noscan          b8957843 [emg/noscan]
-  /home/usain/gov-os-worktrees/EMG-queue           04568e14 [emg/queue]
-  /home/usain/gov-os-worktrees/EMG-select          9e603f70 [emg/select]
-  /home/usain/gov-os-worktrees/W2-00-record        773b1a43 [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a       9894b0cf (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b       8284fb40 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-04               98993db4 [w2/W2-04]
-  /home/usain/gov-os-worktrees/W2-104              909d7ff0 [w2/W2-104]
-  /home/usain/gov-os-worktrees/W2-105              fa653609 [w2/W2-105]
-  /home/usain/gov-os-worktrees/W2-11               c9f99b28 [w2/W2-11]
-  /home/usain/gov-os-worktrees/W2-110              d0ecd1bc [w2/W2-110]
-  /home/usain/gov-os-worktrees/W2-112              453b4708 [w2/W2-112]
-  /home/usain/gov-os-worktrees/W2-112-tests        789abcfa [w2/W2-112-tests]
-  /home/usain/gov-os-worktrees/W2-122              3fc44860 [w2/W2-122]
-  /home/usain/gov-os-worktrees/W2-123              3de9bcf4 [w2/W2-123]
-  /home/usain/gov-os-worktrees/W2-126              15c80ebb [w2/W2-126]
-  /home/usain/gov-os-worktrees/W2-126-tests        741f9edd [w2/W2-126-tests]
-  /home/usain/gov-os-worktrees/W2-13               5e5d74dd [w2/W2-13]
-  /home/usain/gov-os-worktrees/W2-13-tests         b6eb2267 [w2/W2-13-tests]
-  /home/usain/gov-os-worktrees/W2-15a              fd637510 [w2/W2-15a]
-  /home/usain/gov-os-worktrees/W2-20               1a54976c [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-32               6fa9d5c2 [w2/W2-32]
-  /home/usain/gov-os-worktrees/W2-32-index         068344b8 [w2/W2-32-index]
-  /home/usain/gov-os-worktrees/W2-32-index-tests   9a946f72 [w2/W2-32-index-tests]
-  /home/usain/gov-os-worktrees/W2-32-tests         8c512d7e [w2/W2-32-tests]
-  /home/usain/gov-os-worktrees/W2-37               38e74a5d [w2/W2-37]
-  /home/usain/gov-os-worktrees/W2-42a              ce03bb8b [w2/W2-42a]
-  /home/usain/gov-os-worktrees/W2-42a-tests        6f4a6f3c [w2/W2-42a-tests]
-  /home/usain/gov-os-worktrees/W2-52               2b922bf7 [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-60a              4d798caf [w2/W2-60a]
-  /home/usain/gov-os-worktrees/W2-61-q09           49752de0 [w2/W2-61-q09]
-  /home/usain/gov-os-worktrees/W2-61h-d8           68252f5c [w2/W2-61h-d8]
-  /home/usain/gov-os-worktrees/W2-78               8e7640b9 [w2/W2-78]
-  /home/usain/gov-os-worktrees/W2-81               e78e6af7 [w2/W2-81]
-  /home/usain/gov-os-worktrees/W2-90b              73c18fea [w2/W2-90b]
-  /home/usain/gov-os-worktrees/W2-91               e5d41714 [w2/W2-91]
-  /home/usain/gov-os-worktrees/W2-91-tests         3191a794 [w2/W2-91-tests]
-  /home/usain/gov-os-worktrees/W2-92               321aa3f1 [w2/W2-92]
-  /home/usain/gov-os-worktrees/W2-92-tests         c8317622 [w2/W2-92-tests]
-  /home/usain/gov-os-worktrees/emg-g4-audit        fb4b2144 [emg/g4-audit]
-  /home/usain/gov-os-worktrees/emg-label-q03       bc1219c1 [emg/label-q03]
-  /home/usain/gov-os-worktrees/emg-label-q19       961b31b5 [emg/label-q19]
-  /home/usain/gov-os-worktrees/emg-labels-dec1069  00ef8222 [emg/labels-dec1069]
-  /home/usain/gov-os-worktrees/emg-labels-visible  429a53ca [emg/labels-visible]
-  /home/usain/gov-os-worktrees/emg-new-visible     5a7de84d [emg/new-visible]
-  /home/usain/gov-os-worktrees/emg-q10-anchor      ba08ca77 [emg/q10-anchor]
-  /home/usain/gov-os-worktrees/emg-retired-readme  d845c5ca [emg/retired-readme]
-  /home/usain/gov-os-worktrees/emg-w2-122-cache    a7454359 [emg/w2-122-cache]
-  /home/usain/gov-os-worktrees/emg-w2-61h-40       3775bdd1 [emg/w2-61h-40]
-  /home/usain/gov-os-worktrees/research-retrieval  62ecf81c [w2/research-retrieval]
+  /home/usain/Dynamic-Agentic-Engineering-OS       747d9ac63 [w2/integrate]
+  /home/usain/gov-os-worktrees/D-6                 6958acffa [emg/d6]
+  /home/usain/gov-os-worktrees/D-7                 3501474fe [emg/d7]
+  /home/usain/gov-os-worktrees/D-7-tests           67585f7f1 [emg/d7-tests]
+  /home/usain/gov-os-worktrees/D4-cut-a            10025b210 [w2/D4-cut-a]
+  /home/usain/gov-os-worktrees/D4-cut-b            6bd8fbbdd [w2/D4-cut-b]
+  /home/usain/gov-os-worktrees/EMG-lb2             3a82896d2 [emg/lb2]
+  /home/usain/gov-os-worktrees/EMG-noscan          b8957843a [emg/noscan]
+  /home/usain/gov-os-worktrees/EMG-queue           04568e140 [emg/queue]
+  /home/usain/gov-os-worktrees/EMG-select          9e603f70c [emg/select]
+  /home/usain/gov-os-worktrees/W2-00-record        96d94f8dc [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a       9894b0cf5 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b       8284fb408 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-04               98993db4e [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-104              909d7ff0a [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-105              fa653609c [w2/W2-105]
+  /home/usain/gov-os-worktrees/W2-11               c9f99b28b [w2/W2-11]
+  /home/usain/gov-os-worktrees/W2-110              d0ecd1bc8 [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-112              453b47081 [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-112-tests        789abcfa7 [w2/W2-112-tests]
+  /home/usain/gov-os-worktrees/W2-122              3fc448601 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123              3de9bcf44 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-126              15c80ebb7 [w2/W2-126]
+  /home/usain/gov-os-worktrees/W2-126-tests        741f9eddd [w2/W2-126-tests]
+  /home/usain/gov-os-worktrees/W2-13               5e5d74dde [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-13-tests         b6eb2267f [w2/W2-13-tests]
+  /home/usain/gov-os-worktrees/W2-15a              fd637510d [w2/W2-15a]
+  /home/usain/gov-os-worktrees/W2-20               1a54976c7 [w2/W2-20]
+  /home/usain/gov-os-worktrees/W2-32               1aeae7887 [w2/W2-32]
+  /home/usain/gov-os-worktrees/W2-32-index         068344b80 [w2/W2-32-index]
+  /home/usain/gov-os-worktrees/W2-32-index-tests   9a946f723 [w2/W2-32-index-tests]
+  /home/usain/gov-os-worktrees/W2-32-proto         f8a5fdade [w2/W2-32-proto]
+  /home/usain/gov-os-worktrees/W2-32-tests         c48d7ce80 [w2/W2-32-tests]
+  /home/usain/gov-os-worktrees/W2-37               38e74a5d9 [w2/W2-37]
+  /home/usain/gov-os-worktrees/W2-42a              ce03bb8b3 [w2/W2-42a]
+  /home/usain/gov-os-worktrees/W2-42a-tests        6f4a6f3c9 [w2/W2-42a-tests]
+  /home/usain/gov-os-worktrees/W2-52               2b922bf7d [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-60a              4d798caf1 [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-61-q09           49752de0f [w2/W2-61-q09]
+  /home/usain/gov-os-worktrees/W2-61h-d8           68252f5c1 [w2/W2-61h-d8]
+  /home/usain/gov-os-worktrees/W2-61h-s7           9e85fb97e [w2/W2-61h-s7]
+  /home/usain/gov-os-worktrees/W2-61h-tests        353b49377 [w2/W2-61h-tests]
+  /home/usain/gov-os-worktrees/W2-78               8e7640b96 [w2/W2-78]
+  /home/usain/gov-os-worktrees/W2-81               e78e6af75 [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-90b              73c18fea1 [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91               e5d41714b [w2/W2-91]
+  /home/usain/gov-os-worktrees/W2-91-tests         3191a7948 [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92               e0f95adca [w2/W2-92]
+  /home/usain/gov-os-worktrees/W2-92-proto         e884675b4 [w2/W2-92-proto]
+  /home/usain/gov-os-worktrees/W2-92-tests         bc7c9bf46 [w2/W2-92-tests]
+  /home/usain/gov-os-worktrees/emg-g4-audit        fb4b21441 [emg/g4-audit]
+  /home/usain/gov-os-worktrees/emg-label-q03       bc1219c17 [emg/label-q03]
+  /home/usain/gov-os-worktrees/emg-label-q19       961b31b56 [emg/label-q19]
+  /home/usain/gov-os-worktrees/emg-labels-dec1069  00ef8222d [emg/labels-dec1069]
+  /home/usain/gov-os-worktrees/emg-labels-visible  429a53ca2 [emg/labels-visible]
+  /home/usain/gov-os-worktrees/emg-new-visible     5a7de84d8 [emg/new-visible]
+  /home/usain/gov-os-worktrees/emg-q10-anchor      ba08ca774 [emg/q10-anchor]
+  /home/usain/gov-os-worktrees/emg-retired-readme  d845c5cab [emg/retired-readme]
+  /home/usain/gov-os-worktrees/emg-w2-122-cache    a74543590 [emg/w2-122-cache]
+  /home/usain/gov-os-worktrees/emg-w2-61h-40       3775bdd16 [emg/w2-61h-40]
+  /home/usain/gov-os-worktrees/research-retrieval  f38402a70 [w2/research-retrieval]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

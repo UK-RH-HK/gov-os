@@ -12,8 +12,13 @@ the block is the file's lines a..b at the source's own `commit`, else the questi
 is found again, unchanged. Found at the same lines: left. Found exactly once elsewhere: re-pinned (with --write) to
 its new lines, and the source gains `commit: <the root's HEAD>`. Otherwise UNRESOLVED, named by question file name and
 source entry number only. Prints counts and file names, never a question, an answer, a path or a line of text.
-    repin_gold.py <questions dir> <measured root> [--write]
+    repin_gold.py --sets-root <root> --set <memory-retrieval|memory-verdict|memory-verdict-2> --part <hidden|visible>
+                  <measured root> [--write]
+    repin_gold.py <questions dir> <measured root> [--write]      (the old form: the visible half in a tree)
+The first form is the one for a set in the sets root (DEC-1084, ACT-GUARD-SETS-1): the folder is built here
+(sets_form.py), so the command line names no hidden folder.
 """
+import os
 import re
 import shutil
 import subprocess
@@ -22,6 +27,9 @@ import time
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))  # sets_form.py beside this file (also under -I)
+from sets_form import sets_argv  # noqa: E402
 
 LINES = re.compile(r"^(?P<lead>[ \t]*(?:- )?)lines:[ \t]*\[[ \t]*\d+[ \t]*,[ \t]*\d+[ \t]*\][ \t]*$", re.M)
 OWN_COMMIT = re.compile(r"^[ \t]+commit:[ \t]*[0-9a-f]{7,40}[ \t]*$")
@@ -170,4 +178,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sets_argv(sys.argv)))

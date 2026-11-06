@@ -1,0 +1,17 @@
+g-B0	{"kind":"alone","m":"q06"}
+g-A1	{"kind":"alone","m":"q4b"}
+g-A2	{"kind":"alone","m":"gte"}
+g-A3	{"kind":"alone","m":"zer"}
+g-T1	{"kind":"by_type","code":"gte","other":"q06"}
+g-T2	{"kind":"by_type","code":"gte","other":"q4b"}
+g-T3	{"kind":"by_type","code":"gte","other":"zer"}
+g-C1	{"kind":"cascade","first":"q06","top":12,"second":"q4b"}
+g-C2	{"kind":"cascade","first":"gte","top":12,"second":"q4b"}
+g-C3	{"kind":"cascade","first":"q06","top":12,"second":"zer"}
+g-C4	{"kind":"cascade","first":"gte","top":12,"second":"zer"}
+g-M1	{"kind":"merge","a":"q06","b":"gte"}
+g-M2	{"kind":"merge","a":"q4b","b":"gte"}
+g-M3	{"kind":"merge","a":"zer","b":"gte"}
+g-M4	{"kind":"merge","a":"q06","b":"zer"}
+g-M5	{"kind":"merge","a":"q4b","b":"zer"}
+g-M6	{"kind":"merge","a":"q06","b":"q4b"}

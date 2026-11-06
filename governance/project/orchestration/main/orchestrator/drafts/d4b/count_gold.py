@@ -2,13 +2,21 @@
 """D-4b step 0 (DEC-1055): where the memory measure's gold sources sit, as COUNTS only.
 
 Prints no question, answer or path of the hidden half: only how many gold sources fall in each bucket, so D-4's cut
-and D-7's embedding scope can be checked against them. Usage: count_gold.py <questions dir> <repo root>
-With --check <file of paths> it prints only how many listed paths are gold sources (for D-4's deletion list).
+and D-7's embedding scope can be checked against them. Usage:
+    count_gold.py --sets-root <root> --set <name> --part <hidden|visible> <repo root>
+    count_gold.py <questions dir> <repo root>      (the old form: a folder in a tree)
+With --check <file of paths> it prints only how many listed paths are gold sources (for D-4's deletion list). The first
+form is the one for a set in the sets root (DEC-1084, ACT-GUARD-SETS-1): the folder is built here (sets_form.py). Its
+first line's `questions: <n>` is the count the measure scripts print for a hidden half (in place of an ls of it).
 """
+import os
 import sys
 from pathlib import Path
 
 import yaml
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))  # sets_form.py beside this file (also under -I)
+from sets_form import sets_argv  # noqa: E402
 
 BUCKETS = [
     ("tests/", "under tests/ (D-4 may delete; D-7 un-embeds)"),
@@ -47,4 +55,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sets_argv(sys.argv)))

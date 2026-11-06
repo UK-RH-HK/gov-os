@@ -22,9 +22,10 @@ t0=$(date +%s)
 flock /tmp/gov-os-d4b-rebuild.lock env -u GOV_TICKET PYTHONPATH="$RUN/repo/src" \
   bash "$O/tools/rebuild_slot.sh" "$RUN/repo" --seed > "$RUN/rebuild.out" 2>&1 || { echo "REBUILD FAILED"; tail -5 "$RUN/rebuild.out"; exit 1; }
 echo "rebuild: $(( $(date +%s) - t0 )) s"
-python3 "$O/drafts/d4b/repin_gold.py" "$EVAL/fixtures/evaluation/memory-retrieval/hidden" "$RUN/repo" --write | tail -1 || { echo "STOP: hidden anchors unresolved"; exit 1; }
+# DEC-1084 (ACT-GUARD-SETS-1): the sets-root form for the sets root's halves; no line names a hidden folder
+python3 "$O/drafts/d4b/repin_gold.py" --sets-root "$EVAL" --set memory-retrieval --part hidden "$RUN/repo" --write | tail -1 || { echo "STOP: hidden anchors unresolved"; exit 1; }
 python3 "$O/drafts/d4b/repin_gold.py" "$RUN/repo/fixtures/evaluation/memory-retrieval/visible" "$RUN/repo" | tail -1 || { echo "STOP: visible anchors unresolved"; exit 1; }
-python3 "$O/drafts/d4b/repin_gold.py" "$EVAL/fixtures/evaluation/memory-verdict/hidden" "$RUN/repo" --write | tail -1 || { echo "STOP: verdict anchors unresolved"; exit 1; }
+python3 "$O/drafts/d4b/repin_gold.py" --sets-root "$EVAL" --set memory-verdict --part hidden "$RUN/repo" --write | tail -1 || { echo "STOP: verdict anchors unresolved"; exit 1; }
 echo "visible half: the sets root keeps integrate's; a branch that re-labels a visible question is measured on its own copy (VISIBLE_FROM_CLONE=1), restored after"
 if [ "${VISIBLE_FROM_CLONE:-0}" = 1 ]; then cp -r "$EVAL/fixtures/evaluation/memory-retrieval/visible" "$RUN/visible-sets-root-backup"; cp -r "$RUN/repo/fixtures/evaluation/memory-retrieval/visible/." "$EVAL/fixtures/evaluation/memory-retrieval/visible/"; fi
 export CLONE="$RUN/repo"

@@ -66,7 +66,8 @@ EOF
 echo "== step 3: the writer's checks, on planted folders (no hidden question is read or printed)"
 E=$H/plant-empty; mkdir -p "$E"
 python3 "$O/repin_gold.py" "$E" "$R" | tail -1
-out=$(python3 -I "$O/mset_overlap.py" "$E" "$R/fixtures/evaluation/memory-retrieval/visible" /home/usain/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden /home/usain/gov-os-eval/fixtures/evaluation/memory-verdict/hidden); echo "$out"
+# DEC-1084 (ACT-GUARD-SETS-1): the sets root's hidden folders by the sets-root form, never named on the line
+out=$(python3 -I "$O/mset_overlap.py" "$E" "$R/fixtures/evaluation/memory-retrieval/visible" --sets-root /home/usain/gov-os-eval --set memory-retrieval --part hidden --set memory-verdict --part hidden); echo "$out"
 echo "$out" | grep -q "new questions: 0; overlapping a tuning question's gold source: 0" && ok "overlap check loads all three other sets" || no "overlap check on empty"
 python3 -I "$O/mset_quota.py" "$E" | tail -1 | grep -q "NOT YET" && ok "quota check: an empty folder is not yet" || no "quota on empty"
 D=$H/plant-dup; mkdir -p "$D"; cp "$R/fixtures/evaluation/memory-retrieval/visible/q01.yaml" "$D/v01.yaml"

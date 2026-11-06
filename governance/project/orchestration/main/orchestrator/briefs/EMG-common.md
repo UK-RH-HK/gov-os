@@ -8,6 +8,11 @@ hold for every one of them.
   there, on its own branch, with `git commit -m "<subject>" --trailer "Task: <id>" --trailer "Implements: <ids>"
   --trailer "Role: <your role>" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"` and `-- <paths>`.
   Never commit on `w2/integrate`, never merge into it, never push, never amend or rebase. The CTO merges.
+- **Commands that do not prompt the owner (DEC-1080, standing):** read with the Read and Grep tools, never with shell
+  chains; one simple command per call; no `cd … &&` chains (run commands by full path, or with `git -C <dir>`); no
+  pipes, loops or here-documents where a tool or a script file does the job (write the script with the Write tool, then
+  run it in one call). Before any command that will prompt the owner (anything outside the allow list: a write, copy,
+  move or delete outside the repository, a job launch, the network), say in one line what it does and why.
 - **Every heavy job through the gate (DEC-1038 (4)):** every test run (pytest beyond a single small unit file, a
   measurement, a collect-only over the whole tree) runs as
   `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh <command>`;

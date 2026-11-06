@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/runs",
+      "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/wt",
+      "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/eval"
+    ],
+    "deny": [
+      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/eval/fixtures/evaluation/memory-retrieval/hidden/**)",
+      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/eval/fixtures/evaluation/memory-verdict/**)",
+      "Read(//home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-permissions-2/run3/B/eval/fixtures/evaluation/memory-verdict-2/**)"
+    ]
+  }
+}

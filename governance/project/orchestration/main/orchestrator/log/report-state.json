@@ -12,7 +12,9 @@
   "W2-91",
   "W2-13",
   "W2-61h",
-  "W2-32"
+  "W2-32",
+  "W2-131",
+  "W2-133"
  ],
  "built_held": [
   "W2-20",
@@ -24,8 +26,8 @@
  ],
  "closes_next": "none: the refactoring (DEC-1052); D-1 and D-4b merges as built, formal closes at the lift (P1-13)",
  "examin": "AT RISK: the lift re-estimated to 11-13 (range 11-12 to 11-17), EXAMIN's copy to 11-19 (range 11-17 to 11-25): D-5, D-6 and D-9 started 11-06 beside D-4b's levers; re-pin window 4 and D-10 still to run; memory 67.8 % on the blind 60, below the 85 % floor; K9 gates the start (DEC-954 Q1)",
- "owner_action": "none blocking now; due from the CTO: W2-32's S11 wording package and D-9's fates and K9 list",
- "last_report": "2026-11-06 09:17:25",
+ "owner_action": "yours: the bar, after the bundle figures; an engineer's ticket for W2-61h S8's code (W2-134)?; due from the CTO: the real window for M2 and M3 (built, under review); L5 and the 80-candidate cell (after it); the applied fates' audit check; the over-budget first call (8,886 tokens); D-6 part 2; W2-32 S11 wording",
+ "last_report": "2026-11-06 10:06:00",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
  "parked": [],

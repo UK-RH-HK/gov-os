@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-61h-s7
+status: interim result ab18f6f5b: W2-61h S7: source families in the memory measure (evaluation_families in the path map, a family hit only on the gold span's normalised text, named in the question's line; --kept re-scores kept outputs

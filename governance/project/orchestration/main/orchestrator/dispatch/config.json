@@ -8,5 +8,7 @@
   "nightly_hold_until": "00:00",
   "_nightly_hold_note": "DEC-1049: an empty window (no nightly while it holds); restore from config.json.pre-dec1049",
   "guard_harvest_s": 1000000000,
-  "_guard_harvest_note": "DEC-1050 item 6: the guard harvest stops (interval 10^9 s); restore from config.json.pre-dec1050"
+  "_guard_harvest_note": "DEC-1050 item 6: the guard harvest stops (interval 10^9 s); restore from config.json.pre-dec1050",
+  "gpu_shared_floor_mib": 2048,
+  "_gpu_shared_floor_note": "DEC-1084: 2,048 MiB from 11-06's readings (1,490-1,581 MiB shared, flat while dedicated ran 6.1-12.7 GB; the derived 1/16 of the card was 1,019); re-read on 2026-11-13"
 }

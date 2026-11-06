@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 """The hidden-half rule's check on a report written from hidden questions, before the CTO reads it (DEC-820 (d)).
 
-    python3 -I leak_check.py <questions folder> <report.md>
+    python3 -I leak_check.py --sets-root <root> --set <name> --part <hidden|visible> <report.md>
+    python3 -I leak_check.py <questions folder> <report.md>      (the old form: a folder in a tree)
 
 Reads the questions (question, gold_answer, every source's path and heading) and the report, and prints counts only:
 how many report lines share a run of 6 or more words with any question or gold answer, and how many name a gold
-path or quote a gold heading. Nothing of a question is printed. 0 and 0 is the pass.
+path or quote a gold heading. Nothing of a question is printed. 0 and 0 is the pass. The first form is the one for a
+set in the sets root (DEC-1084, ACT-GUARD-SETS-1): the folder is built here (sets_form.py), never named on the line.
 """
+import os
 import re
 import sys
 from pathlib import Path
 
 import yaml
 
-qdir, report = Path(sys.argv[1]), Path(sys.argv[2])
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))  # sets_form.py beside this file (also under -I)
+from sets_form import sets_argv  # noqa: E402
+
+argv = sets_argv(sys.argv)
+qdir, report = Path(argv[1]), Path(argv[2])
 words = lambda t: re.findall(r"[a-z0-9_]+", str(t).lower())
 shingles, strings = set(), set()
 for f in sorted(qdir.glob("*.yaml")):

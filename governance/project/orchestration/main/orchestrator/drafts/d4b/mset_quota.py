@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """ACT-MSET-3: the new verdict set's category counts against its table. Counts only.
 
-    python3 -I mset_quota.py <questions folder>
+    python3 -I mset_quota.py --sets-root <root> --set <name> --part <hidden|visible>
+    python3 -I mset_quota.py <questions folder>      (the old form: a folder in a tree)
 
 Prints the count per category beside the table's, and PASS when every count is exact and the total is 80. The one
 allowed shift (ACT-MSET-3 section 2): lesson memory is thin, so failure-memory may fall to 2, its shortfall moved
-to decision (failure-memory + decision = 17).
+to decision (failure-memory + decision = 17). The first form is the one for a set in the sets root (DEC-1084,
+ACT-GUARD-SETS-1): the folder is built here (sets_form.py).
 """
 import collections
 import glob
@@ -14,10 +16,15 @@ import sys
 
 import yaml
 
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))  # sets_form.py beside this file (also under -I)
+from sets_form import sets_argv  # noqa: E402
+
+argv = sets_argv(sys.argv)
+
 TABLE = {"decision": 13, "contract": 8, "plan": 8, "ticket": 8, "exact-string": 8, "callers": 8,
          "code-paraphrase": 7, "kernel-template": 7, "multi-file": 6, "failure-memory": 4, "history": 2,
          "nonexistent-id": 1}
-files = sorted(glob.glob(os.path.join(sys.argv[1], "*.yaml")))
+files = sorted(glob.glob(os.path.join(argv[1], "*.yaml")))
 got = collections.Counter((yaml.safe_load(open(f)) or {}).get("category") for f in files)
 bad = []
 for k in sorted(set(TABLE) | set(got), key=str):

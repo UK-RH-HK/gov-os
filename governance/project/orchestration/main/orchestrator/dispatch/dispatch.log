@@ -327,3 +327,6 @@
 2026-11-05 00:03:02 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-04-2316-outside-slot.md)
 2026-11-05 14:31:04 interim result: W2-92 5214e0f0 W2-92's acceptance tests for S7 to S10 (DEC-1074 (5), LINK-INTEGRITY §6.1): the 
 2026-11-05 15:09:04 interim result: W2-92 e0f95adc W2-92's measure record: §10's drift table filled from the rebuilt store (before 
+2026-11-06 09:37:07 interim result: W2-61h-s7 ab18f6f5b W2-61h S7: source families in the memory measure (evaluation_families in the pat
+2026-11-06 11:31:08 gpu rule: ALERT GPU spill: 1581 MiB of shared GPU memory in use > the floor 1019 MiB (dedicated 7668 MiB): the card's memory is spilling into the host's -> inbox/20261106-113108-gpu-alert.txt
+2026-11-06 13:39:05 gpu rule: no spill again (1569 MiB shared)

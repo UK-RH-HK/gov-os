@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Count files under a folder that hold any hidden question's text or gold answer (counts only, nothing printed)."""
+"""Count files under a folder that hold any hidden question's text or gold answer (counts only, nothing printed).
+    scan_copies.py --sets-root <root> --set <name> --part hidden <folder>
+    scan_copies.py <hidden dir> <folder>      (the old form)
+The first form builds the hidden folder here (sets_form.py; DEC-1084, ACT-GUARD-SETS-1), never named on the line."""
+import os
 import sys
 from pathlib import Path
 import yaml
-hidden, folder = Path(sys.argv[1]), Path(sys.argv[2])
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))  # sets_form.py beside this file (also under -I)
+from sets_form import sets_argv  # noqa: E402
+argv = sets_argv(sys.argv)
+hidden, folder = Path(argv[1]), Path(argv[2])
 needles = []
 for f in sorted(hidden.glob("*.yaml")):
     d = yaml.safe_load(f.read_text()) or {}

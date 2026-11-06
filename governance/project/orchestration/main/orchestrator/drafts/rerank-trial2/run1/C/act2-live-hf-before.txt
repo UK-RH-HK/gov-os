@@ -1,0 +1,3 @@
+CACHEDIR.TAG
+blobs
+models--Qwen--Qwen3-Reranker-0.6B

@@ -1,0 +1,21 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "ba8d269c033e",
+   "after": "a4ac4890d5b0"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/LIFT-1/D9-FATES.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-133",
+   "change": "head",
+   "before": "c59e6cd84f9b",
+   "after": "c39197b6b53f"
+  }
+ ]
+}

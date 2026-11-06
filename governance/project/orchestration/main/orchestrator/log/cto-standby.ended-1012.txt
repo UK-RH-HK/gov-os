@@ -1,0 +1,2 @@
+2026-11-06 10:06 CTO stand-by (partial): waiting on the owner's operator for ACT-PERMISSIONS-1 and ACT-RERANK-TRIAL-2.
+CPU work continues meanwhile: the zerank trial loader, the score-once grid, W2-61h S7's review, D-5/D-6/D-9.

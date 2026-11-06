@@ -1,0 +1,158 @@
+--- a/.claude/hooks/pretooluse.py
++++ b/.claude/hooks/pretooluse.py
+@@ -7,6 +7,10 @@
+   2. no reads of the hidden half of an evaluation set (by the sessions it measures, DEC-820 (d)), in this tree and
+      in every other worktree and run clone of this repository (W2-84's fix, DEC-954 Q9b), or of the held-out
+      material (every role, DEC-820 (b));
++  2b (DEC-1082 (3)). no reads, and no writes the guard resolves, of the sets root's hidden folders (the hidden halves
++     kept outside the repository, the measure's --sets-root): the main tree's path-map.yaml sets_root_hidden: names the
++     root, its hidden globs and the roles refused them; each role a set in evaluation_sets measures is refused that
++     set's hidden globs too; under the sets root and in every tree. No block, no check;
+   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
+      docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
+      own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
+@@ -194,6 +198,82 @@
+     return os.path.realpath(root)
+ 
+ 
++SETS_BLOCK = "sets_root_hidden"  # DEC-1082 (3)
++PATH_MAP = os.path.join("governance", "project", "path-map.yaml")
++SETS_WRITE_REFUSAL = ("the call writes into the hidden part of an evaluation set, which is refused to this session "
++                      "(DEC-1082 (3))")
++
++
++def sets_root_rule(main):
++    """DEC-1082 (3): the main tree's sets_root_hidden block (a branch cannot weaken it): the sets root as a real path,
++    its hidden globs (project-relative, from the root) and the roles refused them; None with no block. A block not of
++    that shape raises, and the hook refuses (fail closed)."""
++    try:
++        with open(os.path.join(main, PATH_MAP), encoding="utf-8") as f:
++            lines = f.read().splitlines(keepends=True)
++    except FileNotFoundError:
++        return None
++    at = [i for i, line in enumerate(lines) if re.match(SETS_BLOCK + r"\s*:", line)]
++    if not at:
++        return None
++    if len(at) > 1:
++        raise RuntimeError(f"{PATH_MAP}: {SETS_BLOCK} is written more than once")
++    end = next((j for j in range(at[0] + 1, len(lines))
++                if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
++    from gov.guard.heldout import load_yaml_unique
++    from gov.guard.reads import _paths_ok
++    data = load_yaml_unique("".join(lines[at[0]:end]))
++    block = data.get(SETS_BLOCK) if isinstance(data, dict) else None
++    if not isinstance(block, dict):
++        raise RuntimeError(f"{PATH_MAP}: {SETS_BLOCK} is not a map")
++    top, globs, roles = block.get("root"), block.get("hidden"), block.get("refused_roles")
++    top = os.path.expanduser(top) if isinstance(top, str) else ""
++    if (not os.path.isabs(top) or os.path.realpath(top) in ("/", HOME) or not _paths_ok(globs, True)
++            or not isinstance(roles, list) or not roles or not all(isinstance(r, str) and r for r in roles)):
++        raise RuntimeError(f"{PATH_MAP}: {SETS_BLOCK} is not a root, a list of hidden globs and a list of roles")
++    return os.path.realpath(top), list(globs), list(roles)
++
++
++_CLASSES = []
++
++
++def classes():
++    """SetsRoot and Judge (DEC-1082 (3)), made once the pinned judge is imported (inside main's fail-closed try)."""
++    if _CLASSES:
++        return _CLASSES[0]
++    from gov.guard import reads
++
++    class SetsRoot(reads._Part):
++        """The sets root's hidden part. The guard walks it for file names only, never their text."""
++
++    class Judge(reads._Judge):
++        def listing(self, stages, cwd):
++            """A listing the guard cannot place is refused as before, but for one case: only the sets root's part
++            holds files, the listing is a real feed (not the stand-in for names read from a file: xargs -a, a while
++            loop fed by a redirect), it starts outside the sets root, and none of its words names the sets root or
++            a folder above it (~, /). Then the sets root cannot be what it lists, and the call is not refused for it."""
++            why = super().listing(stages, cwd)
++            if why != reads.RUNTIME_REFUSAL or cwd is None or stages == [["cat", "--"]]:
++                return why
++            tops = [p.root for p in self.parts if isinstance(p, SetsRoot)]
++            if not tops or any(p.held() for p in self.parts if not isinstance(p, SetsRoot)):
++                return why
++            if any(reads._related(os.path.realpath(cwd), t) for t in tops):
++                return why
++            for words in stages:
++                for w in words:
++                    exp = reads._expand_token(w) or w
++                    if not exp or (exp.startswith("-") and exp != "-"):
++                        continue
++                    full = os.path.realpath(os.path.join(cwd, exp))
++                    if any(reads._related(full, t) for t in tops):
++                        return why
++            return ""
++
++    _CLASSES.append((SetsRoot, Judge))
++    return _CLASSES[0]
++
++
+ def inside(path, folder):
+     return path == folder or path.startswith(folder.rstrip("/") + "/")
+ 
+@@ -361,25 +441,58 @@
+         answer("deny", "the call names or reaches the held-out material")
+ 
+     # Rules 2 and 3, the hidden half and secrets: the product's read judge with only these parts.
++    SetsRoot, Judge = classes()
++    mine = list(dict.fromkeys((role, acting)))
+     hidden = []
+-    for r in dict.fromkeys((role, acting)):
++    for r in mine:
+         hidden += reads._hidden(root, r, ticket)
+     parts = [reads._Part(t, hidden, reads.HIDDEN_REFUSAL) for t in tree_roots(root)] if hidden else []
++    # DEC-1082 (3): the sets root outside the repository. The main tree's block names the root, its globs and the roles
++    # refused them. To those globs are added the hidden globs of each set that measures the role, from the main tree's
++    # map (an older branch's map cannot drop a set). They are refused under the sets root and in every tree.
++    main = main_tree(root)
++    rule = sets_root_rule(main)
++    sets_parts = []
++    if rule:
++        top, globs, refused = rule
++        outside = list(globs) if any(r in refused for r in mine if r) else []
++        for r in mine:
++            outside += reads._hidden(main, r, ticket)
++        outside = list(dict.fromkeys(outside))
++        if outside:
++            sets_parts = [SetsRoot(top, outside, reads.HIDDEN_REFUSAL)] + \
++                         [reads._Part(t, outside, reads.HIDDEN_REFUSAL) for t in tree_roots(root)]
++    parts += sets_parts
+     seen = tin
+     if command is not None:
+         # ACT-GUARD-FIX-3: a heredoc that cat or tee takes as data is no read; $((n+6)) is no listing.
+         import bash_writes
+         seen = dict(tin, command=bash_writes.reads_view(command))
+-    why = reads._Judge(root, parts).tool(tool, seen, cwd)
++    why = Judge(root, parts).tool(tool, seen, cwd)
+     if why:
+         answer("deny", why)
+ 
++    # DEC-1082 (3): no write into those hidden folders by the roles refused them. Only a write whose target the guard
++    # works out is judged; one it cannot work out is let through, as for rules 1 and 5 (G-1, G-2).
++    if sets_parts:
++        targets = []
++        if tool in WRITE_TOOLS:
++            targets = [tin.get("file_path") or tin.get("notebook_path")]
++        elif command is not None:
++            shell, code = bash_writes_of(command, cwd)
++            targets = shell + code
++        for t in targets:
++            if isinstance(t, str) and t:
++                full = os.path.realpath(os.path.join(cwd, os.path.expanduser(t)))
++                if any(p.inside(full) for p in sets_parts):
++                    answer("deny", SETS_WRITE_REFUSAL)
++
+     # G-14 (DEC-1052), role separation: what the main tree's path map's role_paths: denies the session's role and
+     # the acting role to read, by simple path checks (role_reads.py beside this file). No section, no check.
+     if tool in ("Read", "NotebookRead", "Grep", "Bash"):
+         import role_reads
+         from gov.guard.decide import _expand_token
+-        why = role_reads.refusal(main_tree(root), os.path.realpath(root), tool, seen, cwd,
++        why = role_reads.refusal(main, os.path.realpath(root), tool, seen, cwd,
+                                  [r for r in dict.fromkeys((role, acting)) if r], ticket,
+                                  lambda: tree_roots(root), _expand_token)
+         if why:

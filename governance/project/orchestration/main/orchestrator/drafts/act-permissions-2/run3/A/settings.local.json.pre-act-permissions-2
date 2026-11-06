@@ -1,0 +1,83 @@
+{
+  "env": {
+    "GOV_ROLE": "orchestrator",
+    "GOV_TICKET": "DAEO-sdxk",
+    "GOV_DEV_TIERS": "/home/usain/gov-os-workbench/synthetic"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(~/.local/bin/claude:*)",
+      "Bash(cd /home/usain/gov-os-worktrees/:*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git restore *)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git tag *)",
+      "Bash(git notes *)",
+      "Bash(git rev-parse *)",
+      "Bash(git reflog *)",
+      "Bash(gov *)",
+      "Bash(tk *)",
+      "Bash(python3 *)",
+      "Bash(sha256sum *)",
+      "Bash(sleep *)",
+      "Bash(bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/*)",
+      "Bash(ls *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(cat *)",
+      "Bash(stat *)",
+      "Bash(diff *)",
+      "Bash(ps *)",
+      "Bash(date *)",
+      "Bash(du *)",
+      "Bash(tmux ls)",
+      "Bash(crontab -l)",
+      "Bash(/usr/lib/wsl/lib/nvidia-smi --query-gpu=*)",
+      "Bash(~/.local/bin/gov *)",
+      "Bash(/home/usain/.local/bin/gov *)",
+      "Bash(cd /home/usain/Dynamic-Agentic-Engineering-OS*)",
+      "Bash(cd ~/gov-os-worktrees/*)"
+    ],
+    "deny": [
+      "Bash(git push *)"
+    ]
+  },
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/tools/permission_request.py",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -E /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/tools/stop_waiter_check.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

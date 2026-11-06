@@ -42,7 +42,8 @@ rebuild() {
 }
 rebuild 1
 echo "-- the hidden half's gold sources re-pinned at $HEAD12"
-python3 "$O/drafts/d4b/repin_gold.py" "$EVAL/fixtures/evaluation/memory-retrieval/hidden" "$RUN/repo" --write || { echo "REPIN UNRESOLVED: stop, to the owner"; exit 1; }
+# DEC-1084 (ACT-GUARD-SETS-1): the sets-root form; no line names a hidden folder (the tools build it)
+python3 "$O/drafts/d4b/repin_gold.py" --sets-root "$EVAL" --set memory-retrieval --part hidden "$RUN/repo" --write || { echo "REPIN UNRESOLVED: stop, to the owner"; exit 1; }
 echo "-- the visible half's anchors at $HEAD12 (a dry run: any unresolved anchor stops the measure)"
 python3 "$O/drafts/d4b/repin_gold.py" "$RUN/repo/fixtures/evaluation/memory-retrieval/visible" "$RUN/repo" || { echo "VISIBLE ANCHORS UNRESOLVED: a test designer re-anchors them before the measure"; exit 1; }
 echo "-- the visible half from the clone"
@@ -52,7 +53,7 @@ mkdir -p "$EVAL/fixtures/evaluation/memory-retrieval/visible"
 cp -a "$RUN/repo/fixtures/evaluation/memory-retrieval/visible/." "$EVAL/fixtures/evaluation/memory-retrieval/visible/"
 extra=$(comm -13 <(ls "$RUN/repo/fixtures/evaluation/memory-retrieval/visible") <(ls "$EVAL/fixtures/evaluation/memory-retrieval/visible"))
 [ -z "$extra" ] || { echo "STOP: the sets root's visible half holds files the clone lacks: $extra"; exit 1; }
-echo "visible questions: $(ls "$EVAL/fixtures/evaluation/memory-retrieval/visible" | wc -l); hidden: $(ls "$EVAL/fixtures/evaluation/memory-retrieval/hidden" | wc -l)"
+echo "visible questions: $(ls "$EVAL/fixtures/evaluation/memory-retrieval/visible" | wc -l); hidden: $(python3 -I "$O/drafts/d4b/count_gold.py" --sets-root "$EVAL" --set memory-retrieval --part hidden "$RUN/repo" | sed -n 's/^questions: \([0-9]*\);.*/\1/p')"
 measure() {
   local tag=$1; shift
   local t0=$(date +%s)

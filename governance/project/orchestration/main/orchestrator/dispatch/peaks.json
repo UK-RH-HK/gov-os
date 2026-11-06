@@ -1,91 +1,84 @@
 {
- "computed": "2026-11-06 08:55:07",
+ "computed": "2026-11-06 13:59:07",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 8.93,
+   "cpu_p95": 8.98,
    "cpu_max": 7206.96,
    "rss_kb_p95": 8973012,
    "rss_kb_max": 11846624,
-   "samples": 6865
+   "samples": 7146
   },
   "embedding": {
-   "cpu_p95": 7.8,
+   "cpu_p95": 7.78,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2448848,
+   "rss_kb_p95": 2431488,
    "rss_kb_max": 8676476,
-   "samples": 6865
+   "samples": 7146
   },
   "rebuild": {
    "cpu_p95": 11.46,
    "cpu_max": 126.32,
    "rss_kb_p95": 472656,
    "rss_kb_max": 637492,
-   "samples": 2261
+   "samples": 2271
   },
   "test_run": {
-   "cpu_p95": 17.31,
+   "cpu_p95": 17.23,
    "cpu_max": 294.7,
-   "rss_kb_p95": 3817416,
+   "rss_kb_p95": 3787332,
    "rss_kb_max": 6778004,
-   "samples": 3441
+   "samples": 3507
   },
   "claude": {
-   "cpu_p95": 0.68,
+   "cpu_p95": 0.65,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2111248,
+   "rss_kb_p95": 2092220,
    "rss_kb_max": 4055288,
-   "samples": 6442
+   "samples": 6723
   },
   "reranker": {
-   "cpu_p95": 5.78,
+   "cpu_p95": 5.45,
    "cpu_max": 13.9,
-   "rss_kb_p95": 9218132,
+   "rss_kb_p95": 9217732,
    "rss_kb_max": 14331404,
-   "samples": 2286
+   "samples": 2303
   },
   "gitleaks": {
    "cpu_p95": 0.3,
    "cpu_max": 4.08,
-   "rss_kb_p95": 2016112,
+   "rss_kb_p95": 2006752,
    "rss_kb_max": 5162396,
-   "samples": 1877
+   "samples": 1906
   },
   "git": {
    "cpu_p95": 0.01,
    "cpu_max": 0.03,
-   "rss_kb_p95": 123932,
+   "rss_kb_p95": 123200,
    "rss_kb_max": 164968,
-   "samples": 147
+   "samples": 156
   },
   "codegraph": {
    "cpu_p95": 0.23,
    "cpu_max": 1.21,
    "rss_kb_p95": 262264,
    "rss_kb_max": 1169916,
-   "samples": 1533
+   "samples": 1542
   },
   "rebuild_with_embedding": {
    "cpu_p95": 14.41,
    "cpu_max": 126.32,
    "rss_kb_p95": 3400592,
    "rss_kb_max": 9074876,
-   "samples": 2261
+   "samples": 2271
   }
  },
  "lead": {
-  "rss_kb_p95": 4252724,
+  "rss_kb_p95": 4254340,
   "rss_kb_max": 9810916,
-  "samples": 15277
+  "samples": 14343
  },
  "lead_own_max_kb": {
-  "DAEO-iw1f": 1374784,
-  "DAEO-ym8a": 2181904,
-  "DAEO-cv58": 5898948,
-  "DAEO-2ds6": 1903748,
-  "DAEO-m1u3": 7407956,
-  "DAEO-egsy": 7928712,
-  "DAEO-9nys": 5484900,
   "DAEO-0uhh": 7296300,
   "DAEO-v4is": 8063632,
   "DAEO-tgk2": 7483684,
@@ -98,7 +91,10 @@
   "DAEO-ouet": 5549268,
   "DAEO-57hm": 6067188,
   "DAEO-0z8c": 6946292,
+  "DAEO-m1u3": 4152792,
+  "DAEO-cv58": 5898948,
   "DAEO-siiz": 2138660,
+  "DAEO-9nys": 5484900,
   "DAEO-ha8z": 7363732,
   "DAEO-49o5": 5655068,
   "DAEO-zoex": 2242924,
@@ -155,9 +151,9 @@
   "samples": 7801
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 690634.0,
+  "rss_kb_p95": 690380.0,
   "rss_kb_max": 1464452.0,
-  "samples": 3441
+  "samples": 3507
  },
  "slot_run_kb": 1873832
 }

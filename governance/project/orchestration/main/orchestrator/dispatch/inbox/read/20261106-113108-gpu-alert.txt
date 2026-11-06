@@ -1,0 +1,8 @@
+log: dispatch.log
+GPU: GPU spill
+status: GPU spill: 1581 MiB of shared GPU memory in use > the floor 1019 MiB (dedicated 7668 MiB): the card's memory is spilling into the host's; the GPU now: RTX 5070 Ti 7.5/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (0)
+
+layers: shared 29/29, query 29/29
+holders:
+  pid 7309 embedder query ([Not Found])
+running jobs: slot pid 3106707 test; slot pid 3107303 test; slot pid 3108304 test
