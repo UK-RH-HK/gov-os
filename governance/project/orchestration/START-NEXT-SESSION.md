@@ -31,7 +31,8 @@ the register and the owner's word hold over both.
 5. `governance/project/orchestration/DECISIONS-IN-FORCE.md` (DEC-1068 to DEC-1073 and the standing practice: the
    stand-by file while waiting, the sentinel check, bisect only in a throwaway clone, **waits and stops by pid only
    through `tools/proc.sh`**).
-6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1079 (**next free id DEC-1080**).
+6. `docs/DECISION_REGISTER.md`: DEC-1054 to DEC-1086 (**next free id DEC-1087**). DEC-1086 holds re-pin window 4 and
+   every experiment until the owner has read `packages/LIFT-1/SEVEN-ANSWERS.md` and given the go.
 7. **D-4b's record:** `.gov-runtime/scratch/orchestrator/drafts/d4b/NIGHT2.md` (the night of 2026-11-05: every
    structural step, the measurement set's single use), `DAY.md` (2026-11-04: m6, the trial stopped, the diagnosis,
    stage A, M1-M5) and `NIGHT.md` (2026-11-04's night: m2 to m5, the GPU trips); `DIAG.md`; the packages
@@ -128,10 +129,11 @@ the register and the owner's word hold over both.
 - A structural fix is judged on all the tuning sets together (DEC-1071 (2)).
 
 ## 6. Waiting on the owner
-- W2-32's S11 wording (the package, due).
-- D-9's ticket fates and K9 (the list, when drafted); filing W2-128 (a new WBS ticket, DEC-974); the templates'
-  approval and their `.claude/` copies (an ACT); the 150-id reconciliation list (O2).
-- Re-pin window 4's ACT, when its builds are ready.
+- **The go after `packages/LIFT-1/SEVEN-ANSWERS.md` (DEC-1086).** Re-pin window 4 and every experiment wait on it.
+  S11's wording, W2-135 and the search-again reader are decided (DEC-1086 A to C), to be acted on at the go.
+- D-9's fates and K9 were decided and applied (DEC-1083, DEC-1084); W2-128 was filed.
+- Still the owner's: the templates' approval and their `.claude/` copies (an ACT); the 150-id reconciliation list
+  (O2); M3's adoption (DEC-1043), after E4.
 
 ## 7. The checks at start (after the prompt's §1)
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
