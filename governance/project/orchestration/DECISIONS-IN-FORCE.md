@@ -219,3 +219,8 @@ other restart is an ACT.
   D-10 red-fix item; W2-90c its own ticket) and the fates applied; exit criterion 5 re-worded; spill floor 2,048 MiB;
   the measure re-anchors in memory (W2-61h, tests first); ACT-GUARD-SETS-1 decided (after window 4; the CTO's tools
   take the sets root first); L5 and an 80-candidate 0.6B cell measured. Basis: 1 and 2.
+- DEC-1085 (2026-11-06): the memory build finished first (the open list to the owner); W2-134 filed (S8's code, tests
+  first); the two-reranker cells measured, adoption to the owner (DEC-1043); no 4B embedder; the search-again test
+  (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
+  (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
+  first; the fresh 80 unused until the owner decides what it measures. Basis: 1.

@@ -13560,6 +13560,38 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: the bar judged on what agents receive) and question 2 (the hidden halves refused to
   every measured role).
 
+### DEC-1085 — The memory build finished first; W2-134 filed; the two-reranker cells measured, adoption to the owner; the search-again test; its practice and the end-to-end experiments as packages; the fresh 80 decided after them
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1084, DEC-1081 (3), DEC-1079, DEC-1043 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-SCORE-ONCE.md` (the bundle figures, the live window, version 6's result)
+- **Decision** (the bundle figures change the question: agents already receive 18 or 19 items, so what matters is
+  whether an agent, reading its bundle, answers right and cites the right source). In this order:
+  - (1) **The memory build is finished first.** The CTO lists everything still open in the build itself and
+    completes what is decided before any experiment below. Anything needing the owner's decision goes to the owner.
+  - (2) **W2-134** is filed: the engineer's ticket for W2-61h S8, small, tests first.
+  - (3) **The two-reranker cells** are measured as planned. Adopting one would change DEC-1043's one shared reranker,
+    so adoption comes to the owner.
+  - (4) **Vocabulary: no 4B embedder for now.** The search-again mechanism is tested instead. When an agent's first
+    search does not answer the question, it searches again in different words, then settles as not found. It is
+    tested with two attempts and with three. The test shows how many misses each recovers, at what cost in tokens and
+    time, and how often an agent claims an answer that is wrong (the nonexistent-id questions included).
+  - (5) **If it works,** the CTO proposes how it becomes a practice for the agents (skills, role templates through
+    W2-128, hooks if needed), as a package. Nothing goes into the skills or roles before the owner approves.
+  - (6) **Then the end-to-end experiments, designed as a package, nothing run before the owner approves.** On the 138
+    (tuning), an agent of the kind Gov OS launches answers each question from its bundle. The conditions:
+    - the top 5 only;
+    - the top 10 only;
+    - the top 20;
+    - today's bundle;
+    - all 40 fused and unranked;
+    - each with the search-again practice in place.
+
+    An independent grader checks each answer and its citation against the gold. Accuracy, tokens and time are
+    recorded per condition, with McNemar between conditions. Written before any run: the reader and grader models,
+    the grading rule, the cost in tokens and time, and a proposed K9 bar on end-to-end accuracy.
+  - (7) **Then the owner decides what the fresh 80 is measured on.** It stays unused until then and is measured
+    once: hit@5, hit@10, hit@20, in the bundle, and end-to-end accuracy.
+  - (8) **The cause of the 8,886-token first call** is reported when known.
+- **Basis:** DEC-1084's bundle figures (the first call sends 18 or 19 items, the top 10 always).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13581,3 +13613,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.466 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1082; DEC-1080 changed. Next free id: DEC-1083. |
 | 0.467 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1083. Next free id: DEC-1084. |
 | 0.468 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1084; DEC-1083 (7) changed. Next free id: DEC-1085. |
+| 0.469 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1085. Next free id: DEC-1086. |
