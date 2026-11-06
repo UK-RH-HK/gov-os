@@ -27,7 +27,7 @@ kpis:
   - 'S3 Nothing else changes: the same items in the same order, the batches, the expansions and their left-out spans, the repeats, the gaps, the continuation, and the budget''s used figure (still counted on the full text, as today). The reranker''s input is unchanged. Verify: a unit test comparing bundles field by field before and after on the planted repository, the cut text and the cut key apart [DEC-1086 B]'
   - 'S4 It lands on w2/integrate before re-pin window 4 is built, and the window carries it. Verify: the CTO''s check after the re-pin [DEC-1087 (1)]'
   failure:
-  - 'An item over 4,000 characters sent whole, or a cut item without its cut key.'
+  - 'A line over 4,000 characters sent whole, or a cut item without its cut key. [re-worded, DEC-1086 B: lines, not items; the review''s R2-F5]'
   - 'A change to which items a bundle holds, their order, or their cited lines.'
 profile: STANDARD
 sources:
