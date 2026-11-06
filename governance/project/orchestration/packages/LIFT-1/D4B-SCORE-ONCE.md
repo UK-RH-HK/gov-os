@@ -199,6 +199,28 @@ and no text was unscored.
   real window: both models loaded, each search scored by both, alone and 10 at once, under the GPU rules. Only an
   eligible cell goes onto the fresh 80.
 
+## Version 6 (2026-11-06 ~14:45, before the extend window runs): DEC-1084's two measures
+**What runs** (`drafts/score-once/extend_window.sh`, reviewed READY). One short window with the 0.6B alone, L3, the
+question. Each variant runs into its own copy of the kept q06 cache, so only texts not scored before go to the GPU.
+- **b0, a control and not a cell:** v456 as B0. It must score 0 new texts and equal g-B0 question for question, or
+  the window stops.
+- **E1:** `depth` 80, the 0.6B reranking 80 candidates instead of 40. L3's step stays 0.0766, set from the
+  40-candidate passes, as declared.
+- **E2:** `split`, a two-part question split, its parts searched as extra phrasings (L5).
+- **E3:** `termmap`, the question in the records' own words as one extra phrasing (L5).
+- **E4:** `split` and `termmap`.
+
+**How they are judged:**
+- **The comparison:** each cell is replayed from its extended cache (route answers and the 0.6B's scores from that
+  cache only) and compared with B0, by §4's rule: hit@5 on the 138, then MRR, the spread not wider than B0's. Gains,
+  losses and an exact McNemar test are given for each.
+- **Holm over these 4 comparisons,** a family of their own. It is shown, not part of the rule.
+- **Each replay must equal its window run,** as R0 did, or it does not count.
+- **They are add-ons to the 0.6B, not rerankers.** They do not compete with M3.
+  - A cell that beats B0 by the rule is reported as a lever to apply on top of the chosen reranker.
+  - Measuring it with M3 needs zerank and gte to score its new texts, in a window of its own, at the owner's word.
+- **E1 answers the owner's question** directly: does a wider pool help or hurt?
+
 ## The live window's result (2026-11-06 14:14-14:20; `~/gov-os-runs/D4B/live-window/20261106-141359/`)
 - The window ran to its end (exit 0). The live service was restored at 14:20:48 (class 3's check: `rerank.by`
   service).
