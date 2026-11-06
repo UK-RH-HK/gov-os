@@ -13399,6 +13399,36 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory: a verdict only from a fresh set, measured once) and question 2 (a label that misses
   an official copy of its answer misjudges memory).
 
+### DEC-1079 — D4B-LEVERS decided: significance in every comparison; where each miss left the top 5; source families in the measure's code; the lift normalised and the moves bounded, then the three rerankers replayed under equal weights; phrasing; a records-of-work tier as one test; the 0.6B kept, a cascade measured beside the 4B at 24, the best onto the fresh 80; D-5, D-6 and D-9 start
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1077, DEC-1078, DEC-1076, DEC-1052, DEC-948 · **Source:** `governance/project/orchestration/packages/LIFT-1/D4B-LEVERS.md` (`b3efc98c`, `4dea932f`)
+- **Decision:**
+  - **(b) Now, no GPU:**
+    - **L1:** every comparison from here on reports its gains, its losses and an exact McNemar test.
+    - **L2:** for each of the 31 misses on the 138, where the answer left the top 5: in the reranker's own order,
+      after the authority lift, or after the moves ahead; ids and ranks only.
+    - **Source families (DEC-1078 (4)) built into the measure's code** (a gold source and its official copies counted
+      as one), tests first; then every kept run re-scored, so the comparisons rest on fairer labels.
+  - **(c) After L2:**
+    - **L3:** the authority lift on a per-query normalised score, and the moves ahead bounded. Then the three
+      rerankers (0.6B, 4B, mxbai) replayed from their kept scores under the fixed pipeline, at no GPU cost, so they
+      are compared under equal weights.
+    - **L5 (query phrasing, no model):** go ahead.
+    - **L6 (records of work in a tier below the middle):** one measured test under the rule; adopted only if it wins;
+      it comes to the owner with its figures.
+  - **(a) a1, in this order:** the 0.6B stays in the product. After L3, one quiet window measuring the cascade (the
+    0.6B over 40, then the 4B over the 0.6B's top 12, the 4B's requests bounded at 8 texts or 12,000 padded
+    characters) beside the 4B at 24, on the fixed pipeline. At the decision point, the best one goes onto the fresh 80
+    once, beside the 0.6B. No install until then.
+  - **(d)** Non-commercial rerankers stay excluded. L7 (the embedder): later.
+  - **D-5, D-6 and D-9 start now,** beside the memory work: their agents on the CPU; the memory measures keep the GPU;
+    one GPU job at a time. The next report gives their plan (who, what first, what waits on the owner) and the
+    re-estimated dates for the lift and EXAMIN's copy.
+  - **Standing, restated:** every report to the owner ends with DEC-948's status block; before any compaction the
+    handover records are current in their usual places, committed, and the record branch synced.
+- **Basis:** question 1 (memory: comparisons that say whether a gain is more than chance, labels that do not chase
+  copies, rerankers compared under equal weights) and question 4 (the refactoring's remaining steps move beside the
+  memory work, not after it).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13414,3 +13444,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.460 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1076; DEC-1074 (3), DEC-1075 (1) and DEC-1069 (12) changed. Next free id: DEC-1077. |
 | 0.461 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1077. Next free id: DEC-1078. |
 | 0.462 | 2026-11-05 | Owner (recorded by the orchestrator, DEC-861): DEC-1078. Next free id: DEC-1079. |
+| 0.463 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1079. Next free id: DEC-1080. |

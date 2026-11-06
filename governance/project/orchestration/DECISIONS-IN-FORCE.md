@@ -189,3 +189,9 @@ other restart is an ACT.
   the next decision point, after the research package and the trial's re-runs; measured once, counts only. The
   rubric's next version: source families (a gold source and its generated twins counted as one) and missing
   alternatives (DEC-1076 (5)). Basis: questions 1 and 2.
+- DEC-1079 (2026-11-06): every comparison with its gains, losses and an exact McNemar test (standing for the measure);
+  L2 (where the 31 misses left the top 5) and source families in the measure's code now, then every kept run
+  re-scored; after L2, the lift normalised and the moves bounded (L3), the three rerankers replayed under equal
+  weights; L5 phrasing; L6 one measured test; the 0.6B stays; after L3 one window for the cascade beside the 4B at 24;
+  the best onto the fresh 80 once; no install until then. **D-5, D-6 and D-9 start now** (CPU), the memory measures
+  keep the GPU. Every report ends with DEC-948's block. Basis: questions 1 and 4.
