@@ -206,3 +206,8 @@ other restart is an ACT.
   of the 138 once in one quiet window; then replays at no GPU cost on the fixed pipeline (alone; by question type;
   cascades; two merged), the grid declared first, judged with McNemar; a winner's speed and GPU measured for real before
   the owner; the best onto the fresh 80 once. Nothing adopted or installed before the owner decides. Basis: 1 and 4.
+- DEC-1082 (2026-11-06): the user-level allow-all accepted (the guard is the check); ACT-PERMISSIONS-2 applied; the
+  three stopped agents started again (L5 from its lines if sound); the DEC-999 labels a priority fix ahead of the
+  levers (window 4's builds checked first, else a ticket, tests first); the guard refuses the hidden sets outside the
+  repository to engineer, research and orchestrator (an ACT); the spill reading investigated; the score-once window
+  after its review. Basis: 2 and 4.
