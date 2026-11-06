@@ -4,6 +4,9 @@ Written by the independent test designer under DEC-1055 (D-4b), after ACT-D8 mov
 and out of git (DEC-1052 G-3). They check the set's **form** only: counts, fields, the spread, that gold sources
 resolve, and where the hidden half is held. They never print a hidden question, answer, category or gold path.
 
+S7 (source families, DEC-1078 (4), DEC-1079) and failure line 4 are tested apart, on planted data only: see
+"S7 and F4: source families" below.
+
 ## How to run
 
 ```bash
@@ -99,3 +102,46 @@ Cases: 15 in the full run, 9 in `breadth`, 0 in `lifted` (S2's planted case adde
 | F1: A hidden question or answer readable by a measured role by a route an honest agent takes in ordinary work. | `test_w2_61h_hidden_form.py::test_s1_the_hidden_half_holds_40_question_files`, `test_w2_61h_hidden_form.py::test_s1_every_hidden_question_is_in_the_question_form`, `test_w2_61h_hidden_form.py::test_s6_a_measured_role_is_refused_the_hidden_half_by_the_measure` | the ticket's words |
 | F2: A question copied from or paraphrasing lens B's visible 20. | `test_w2_61h_visible_new.py::test_f2_no_new_visible_question_repeats_lens_b_s_twenty_or_another_new_one`, `test_w2_61h_hidden_form.py::test_f2_no_hidden_question_repeats_a_visible_one` | the ticket's words |
 | F3: A gold source that does not hold its answer. | `test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer`, `test_w2_61h_hidden_form.py::test_s4_f3_every_hidden_gold_source_resolves_at_head`, `test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head` | the ticket's words |
+
+## S7 and F4: source families (DEC-1078 (4), DEC-1079; DEC-1068 (4))
+
+`test_w2_61h_families.py`, by the independent test designer from S7's text and failure line 4 alone (no
+implementation existed; the integrated `measure.py` and RUBRIC.md section 1 item 2 read for the matching rule,
+DEC-963). Everything is planted in `tmp_path`: a measured root that is also the sets root, its own path map with the
+set `planted`, its own questions, and a stand-in `gov` that returns chosen evidence and can keep its answers as a run's
+kept outputs. No store, no model, no network; never this repository's sets, `~/gov-os-eval` or `~/gov-os-runs`. The
+13 cases take about 5 seconds.
+
+**Interface choices the tests make** (S7 names the key and the behaviour, not these details):
+
+1. `evaluation_families:` is a top-level key of the planted path map, a **map of family name to a list of member
+   globs** in the path map's glob language (`*` stays in one folder), for example
+   `contract: [docs/contract/CONTRACT.md, docs/contract/contract.yaml, "docs/contract/capabilities/*.md"]`.
+2. Kept outputs are re-scored with **`python3 -m gov.retrieval.measure <set> ... --kept <dir>`**, `<dir>` in the
+   form `~/gov-os-eval/runs/<point>/<name>-run<k>/` has (`drafts/d4b/measure_verdict.sh`): each `gov retrieve`
+   call's `--json` output as `00001.json`, `00002.json`, ... in call order, beside `.n` and `.n.lock`. Its output is
+   the measure's own (the text, or the record with `--json`); `--gov` may be given and must not be asked to
+   `retrieve`.
+3. A family hit is named in the question's line by the **member's path** and the word **"family"**; the line keeps
+   the form the CTO's scorer reads (`drafts/d4b/score.py`'s pattern).
+
+The gold span's text is the measure's own span (`_span`) at the measured root; an evidence item's text is its `text`
+field. Each planted item's text is the planted file's own lines, so a rule that reads the member file gives the same
+result.
+
+| KPI | Test | What is checked |
+|---|---|---|
+| S7 | `test_w2_61h_families.py::test_s7_a_family_member_holding_the_gold_text_is_a_hit_named_in_the_line` | Families declared. q01: CONTRACT.md's prose is gold, the second item is contract.yaml's entry holding it: hit@5, first gold rank 2, in the bundle, full evidence 1 of 1. q02: two entries, one matched on its own path, the other (a `##` heading's section) only by the generated capability page: full evidence 2 of 2. Each family hit's member is named with "family" in the line; the line still matches the scorer's pattern |
+| S7 | `test_w2_61h_families.py::test_s7_normalised_text_still_matches` | Four cases, each a family hit at rank 1, named: `whitespace` (the same Markdown, wrapped, indented, two spaces and a tab), `markdown-prose-against-yaml-value` (prose with `**` emphasis against the quoted YAML value under its key), `yaml-value-against-markdown-prose` (a folded block value's lines against one line of prose with emphasis), `heading-level` (a `##` section against the generated page's `#` heading, body wrapped otherwise) |
+| S7, F4 | `test_w2_61h_families.py::test_s7_f4_a_member_whose_text_does_not_hold_the_gold_is_no_hit` | A member whose item does not hold the gold span's text is no hit (hit@5 no, no rank, full evidence 0 of 1) and is not named: `a-word-changed` (write to read), `half-the-span`, `same-lines-other-text` (the member's item on the gold span's own line numbers, other text: never by path alone). Each run carries a control question with a family hit, so the case is red until families are counted |
+| S7 | `test_w2_61h_families.py::test_s7_a_file_outside_the_family_is_no_hit_by_its_text` | A file outside the gold's family is no hit even when it holds the text byte for byte: `in-no-family`, `in-another-family` (the kernel family's role file), `a-folder-below-the-glob` (`capabilities/old/CAP-7.md`; `*` stays in one folder). With the same control |
+| S7 | `test_w2_61h_families.py::test_s7_with_no_family_declared_every_score_is_as_today` | No `evaluation_families`: the items that would be family hits count for nothing; per question hit@5, first gold rank (MRR's input: none, 1, 6), in the bundle, full evidence and pieces, and the total line (1 of 3, 33.3 %) are today's; no line mentions a family. **Green today by design** (it guards today's figures) |
+| S7 | `test_w2_61h_families.py::test_s7_kept_outputs_are_re_scored_with_families_without_running_again` | A run made with no family declared keeps its 4 calls (q01 one, q02 two by a continuation, q03 one) in the kept form; q03 is no hit. Families are then declared and the retriever replaced by one that answers nothing: `--kept` gives the family-aware figures (q02 full evidence 2 of 2, q03 hit at rank 2), each call assigned to its own question (calls 1, 2, 1), no `retrieve` asked, the family hits named; and every figure (with the stacked digest) equals a fresh run's with families |
+
+**Expected state at `6958acffa` (today's integrate in this branch):** 12 red, 1 green (the as-today case). The
+family cases fail with no hit; the negative cases fail on their control ("families are not counted at all"); the
+re-score fails on the unknown `--kept`, after its first half (the kept form written, 4 files, q03 no hit) passed.
+**Checked against a scratch oracle** (a copy of `measure.py`, outside the tree and never committed, with a
+minimal family rule, `--kept` and a "family hits" clause in the line): 13 passed. Three planted faults in it each
+turned their own cases red: a member counted by path alone (the three F4 cases), any file counted by its text (the
+three outside cases), no normalising (the hit, the four normalisation cases and, through their controls, the rest).
