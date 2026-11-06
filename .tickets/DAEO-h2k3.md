@@ -22,6 +22,7 @@ allowed_paths:
 - fixtures/evaluation/memory-retrieval/visible/q24.yaml
 - src/gov/retrieval/measure.py
 - tests/unit/retrieval/test_w2_61h_families*
+- tests/unit/retrieval/test_w2_61h_anchor*
 - governance/project/path-map.yaml
 kpis:
   success:
@@ -32,8 +33,10 @@ kpis:
   - 'The hidden half is held only in the sets root outside every worktree (~/gov-os-eval, mode 700): in no worktree, run clone, store or commit; no question or answer quoted in a commit message, a return, a log or a ticket note [DEC-820 (d), DEC-1052 G-3, DEC-1055 (4), ACT-D8]'
   - 'The hidden half is read for a measure only by the unmeasured measure run (`measure.py --sets-root ~/gov-os-eval`), and its form is checked by tests that report counts and pass or fail only, never its contents [DEC-954 Q9b, DEC-1052 G-3, DEC-1055 (4)]'
   - 'S7 Source families (DEC-1078 (4), DEC-1079): the measure counts a gold source and its official copies as one family. The families are declared in the path map (`evaluation_families:`, each a list of member path globs, e.g. the Contract''s `docs/contract/CONTRACT_v4.md`, `docs/contract/contract.yaml` and the generated `docs/contract/capabilities/*.md` and `master-rules/*.md`; the kernel template and its generated `.claude/` and `.rulesync/` copies; `AGENTS.md` and `CLAUDE.md`). An evidence item in another member of the gold source''s family counts as a hit on that source when its text holds the gold span''s text (whitespace and Markdown-or-YAML formatting normalised), never by path alone; each family hit is named in the measure''s per-question line; with no family declared, every score is as today; a run''s kept outputs are re-scored with families without running again [DEC-1078, DEC-1079, DEC-1068 (4)]'
+  - 'S8 The measure re-anchors in memory (DEC-1084): before it scores, the measure finds each line-cited gold source''s block again in the commit it measures (the block read at the source''s own commit, found once at the measured root, as repin_gold.py does), and scores against those lines; it never writes the sets root or any label file; an unresolved source is named by question id and entry number only and counts as not found. Two measures on different commits, run one after the other, score each commit against its own lines and leave every label file byte for byte as it was. Verify: tests on a planted repository with two commits where a cited block moves, and a planted sets root hashed before and after [DEC-1084, DEC-1083, DEC-820 (d)]'
   failure:
   - A hidden question or answer readable by a measured role by a route an honest agent takes in ordinary work.
+  - 'A measure that writes a label file or the sets root, or scores a commit against another commit''s lines.'
   - A question copied from or paraphrasing lens B's visible 20.
   - A gold source that does not hold its answer.
   - 'A family hit counted on a member whose text does not hold the gold span''s text.'
@@ -87,3 +90,8 @@ guard so keeps S7's engineer from this ticket's own acceptance tests (DEC-1056).
 come from no measured role, and its acceptance case checks the ticket's role front matter; the engineer role broke it.
 S7's code was built under this ticket's id while the role read engineer (`ab18f6f5`, launched 09:40); the role is
 back, and the case passes again. Any later engineering on the measure goes under a ticket of its own.
+
+**S8 placed here (CTO, 2026-11-06, DEC-1084):** the measure re-anchors in memory, never rewriting the sets root
+(h23 was re-anchored on 11-05 at 14:40 to another clone's commit by `repin_gold.py` and so misjudged on the score-once
+clone). Tests first, from S8's text, by an independent test designer. The code, by the note above, goes under an
+engineer's ticket of its own, which the CTO asks the owner to file.
