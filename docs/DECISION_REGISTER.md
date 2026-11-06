@@ -13592,6 +13592,22 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (8) **The cause of the 8,886-token first call** is reported when known.
 - **Basis:** DEC-1084's bundle figures (the first call sends 18 or 19 items, the top 10 always).
 
+### DEC-1086 — S11 re-worded; W2-135, a cap per item; the search-again reader sees the 138; nothing acted on before the owner's go
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1085, DEC-1074 (5), DEC-105 · **Source:** `governance/project/orchestration/packages/LIFT-1/W2-32-S11-WORDING.md`, `packages/LIFT-1/BUNDLE-BUDGET-1.md`, `packages/LIFT-1/D4B-SEARCH-AGAIN.md`
+- **Decision:**
+  - **A. W2-32 S11's wording, option (a):** S11's equality line becomes "within 2 of the harness on the 138". Speed is
+    checked against the pin, side by side, in re-pin window 4.
+  - **B. BUNDLE-BUDGET-1, option (a):** the 4,000-character cap per item, filed as W2-135. It is a guard against
+    one-line files only. The bundle's total size is tested separately, in the experiments (E5).
+  - **C. D4B-SEARCH-AGAIN §6, option (a):** the reader sees all 138, with no tools and no transcript kept, and the CTO
+    sees counts only. The 5-question pilot runs first, then the projected tokens and time of the full run are reported;
+    the owner sets the cap then.
+  - **Recorded now, acted on only at the owner's word.** Neither re-pin window 4 nor any experiment starts until the
+    owner has read the CTO's answers to the seven questions asked with this decision (the grid; memory freshness; the
+    links; the emergency plan; the three-layer agent work; the status block; the experiments' order and design) and
+    has decided.
+- **Basis:** DEC-1085 (1), (6) and (7).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13614,3 +13630,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.467 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1083. Next free id: DEC-1084. |
 | 0.468 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1084; DEC-1083 (7) changed. Next free id: DEC-1085. |
 | 0.469 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1085. Next free id: DEC-1086. |
+| 0.470 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1086. Next free id: DEC-1087. |

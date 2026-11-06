@@ -224,3 +224,7 @@ other restart is an ACT.
   (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
   (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
   first; the fresh 80 unused until the owner decides what it measures. Basis: 1.
+- DEC-1086 (2026-11-06): S11 re-worded ("within 2 of the harness on the 138"; speed against the pin in window 4);
+  W2-135, a 4,000-character cap per item (a guard against one-line files; the total size tested in E5); the
+  search-again reader sees the 138 (no tools, no transcript, counts only; the pilot, then the owner's cap). Recorded,
+  acted on only at the owner's go: no re-pin and no experiment before the owner reads the seven answers. Basis: 1.
