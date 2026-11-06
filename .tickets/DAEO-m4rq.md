@@ -67,3 +67,13 @@ ticket builds on S7's branch already. So S7's fix rides here (DEC-802): the engi
 `w2/W2-61h-s7`, and S7 and this ticket merge together after one review. The review's F2 (the kernel family joins
 distinct files that may share a line) follows S7's own wording of the families: a row for the families' next review,
 not a round.
+
+**The designer's open points settled (CTO, 2026-11-06, delegated P3; tests `7227c5e8`, 13 cases):**
+- **A block found more than once at the measured root is unresolved,** as `repin_gold.py` treats it, and is named as S3
+  says.
+- **A source that names no commit** (nor its question) is scored on its stated lines, as today.
+- **S3's naming** is the designer's: a line holding the question id and `entry <n>` (1-based), on standard output for
+  a text run or on standard error; with `--json`, standard output stays one JSON document.
+- **The interface** the cases assume is in the designer's return: the command unchanged, a block read with git at the
+  source's own commit (else the question's), and the new lines used by the overlap rule and by S7's family text, live
+  and under `--kept`.
