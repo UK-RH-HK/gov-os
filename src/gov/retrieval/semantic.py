@@ -781,8 +781,9 @@ def refresh(root: Path) -> dict:
 
 
 @_pinned
-def search(root: Path, query: str, refresh: bool = True) -> dict:
-    """The ``TOP_K`` chunks nearest to ``query``, nearest first, as the chunk records of the lexical index.
+def search(root: Path, query: str, refresh: bool = True, top_k: int | None = None) -> dict:
+    """The ``TOP_K`` chunks nearest to ``query``, nearest first, as the chunk records of the lexical index; ``top_k``
+    is this search's depth in place of ``TOP_K`` (W2-32 S11's ``pool.route_depth``; None or 0: ``TOP_K``).
 
     With ``refresh`` the vectors are brought up to date first. Without, the store is not written, and missing, empty
     or stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342). Either way, the
@@ -806,7 +807,7 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
         if vector is None:
             return _report(reason, hits=[], vector_cache=counts)
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
-        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))],
+        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, top_k or TOP_K))],
                        vector_cache=counts)
     finally:
         connection.close()
