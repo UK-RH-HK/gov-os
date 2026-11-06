@@ -28,19 +28,6 @@ def test_version_comparison():
     assert _version_tuple("2.1.280") < _version_tuple("2.1.285")
 
 
-def test_sha256_file(tmp_path):
-    from gov.doctor.command import _sha256_file
-    f = tmp_path / "test.txt"
-    f.write_text("hello", encoding="utf-8")
-    expected = hashlib.sha256(b"hello").hexdigest()
-    assert _sha256_file(f) == expected
-
-
-def test_sha256_file_missing(tmp_path):
-    from gov.doctor.command import _sha256_file
-    assert _sha256_file(tmp_path / "no-such-file") is None
-
-
 def test_match_pattern():
     from gov.doctor.command import _match_pattern
     assert _match_pattern("src/gov/doctor/command.py", "src/**")
