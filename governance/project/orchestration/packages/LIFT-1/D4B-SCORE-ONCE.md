@@ -207,8 +207,14 @@ and no text was unscored.
     watcher keeps slot 1, so the live service and private rerankers are unaffected;
   - the smaller (gte) starts first;
   - the live 0.6B is stopped for the window and restored on every exit path.
-- **The warm-up:** after both loads, one small request to each service. It releases the load's cached memory, as a
-  live service's first request does.
+- **The warm-up:** after both loads, one small request to each service. It releases the load's cached memory, because
+  the trial copy empties its cache after every request (`GOV_RERANK_TRIAL_RELEASE=1`, window 4's form).
+  - **Correction (2026-11-06 ~14:50, before the run):** an earlier line here said a live service's first request does
+    this. It does not. Today's live worker never empties its cache (`src/gov/retrieval/rerank_worker.py`'s `scores`
+    has no `empty_cache`; the live service held up to 15.75 GB, `rerank.py:38-39`).
+  - **So every GPU figure of this window is with the release after each request.** Adopting M2 or M3 needs that
+    release in the product (W2-112's memory release, re-pin window 4) as well as two services, and the owner decides
+    with this stated.
 - **The readings:** the GPU before and after the warm-up; the probe's peak at each model's own request bound (the
   4B's 8 texts and 12,000 characters).
 - **The searches:**
