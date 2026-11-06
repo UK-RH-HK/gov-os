@@ -151,3 +151,15 @@ GPU used once; every combination replayed from kept scores).
   - The count of filled texts is reported beside every replay. A cell with filled texts is judged on hit@5 first, as
     the rule already says.
 - **Not affected:** a model alone, B0 included, reproduces its window run exactly, with no text filled.
+- **Withdrawn on review the same hour; nothing was judged under it.** The reviewer found the real cause in the code:
+  - **`code_first` acts twice in the product:** before the fusion (`retrieve.py:327`, the code route sorted by cosine
+    when the setting is truthy) and after the rerank (`:445`, the move).
+  - **So L2's `code_first: 0` changed the fused head itself,** not only the move. That gave "4 of 40", and it would
+    have confounded L2's stages.
+  - Within one variant, a follow-up call reranks the same head as the first, so no fill is needed.
+- **The fix:**
+  - `code_first: 0` in a variant now keeps the setting truthy (a sentinel, so the pre-fusion sort stays as measured)
+    and makes `routing.firsts` return nothing for it, so only the move is off. `named_first` and `ahead_types` act
+    only after the rerank.
+  - An unscored text again stops a replay in any call.
+  - Tested: 21 of 21.
