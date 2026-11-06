@@ -20,7 +20,7 @@ first pass of this record numbered them wrongly from S9 on; §7 is corrected.
   code). It is one commit behind integrate's head `416b59da1779`.
 - **The tree: the engineer's worktree, not the main tree.** The launch sandbox keeps the main tree read-only, so the
   tool cannot write its mark there. A scratch folder whose `.git` names the main repository was refused as a
-  sensitive write; the refusal was taken. The CTO's measured run on the main tree is still due (S15).
+  sensitive write; the refusal was taken. The CTO's measured run on the main tree is §1a (S15).
 - **The mark:** the sandbox also keeps this worktree's `.gov-runtime/` read-only. Each run named
   `LINKS_MARK_UNWRITTEN` on stderr and printed its findings (§4 reading 2). With no mark, `--all` judged the whole
   history.
@@ -37,6 +37,39 @@ first pass of this record numbered them wrongly from S9 on; §7 is corrected.
   ticket folder (685 commits touch it) and one `cat-file --batch` of the blobs before and after.
 - `--since` costs about the same as `--all`, because every run reads the whole record set and every commit (S10).
 - About 1.7 s of each run is W2-55's `check_propagation`, used as it stands.
+
+## 1a. The CTO's measured run on the main tree (S15)
+
+Measured by the CTO on the main tree at `416b59da1779` (`w2/integrate`), median of five runs each:
+
+| Command | Median |
+|---|---|
+| `gov links --all` | **3.14 s** (bound 10 s) |
+| `gov links --since HEAD~1` | **2.94 s** (bound 5 s) |
+
+The first `--all` gave **3,037 standing findings**. These are the clean-up's baseline:
+
+| Code | Role | Count |
+|---|---|---|
+| UNMARKED_CHANGE | orchestrator | 188 |
+| UNKNOWN_ID | independent-test-designer | 381 |
+| UNKNOWN_ID | orchestrator | 56 |
+| UNKNOWN_ID | owner | 1 |
+| UNKNOWN_ID | product-spec | 3 |
+| UNLINKED_ID | orchestrator | 1,897 |
+| STATUS_CONFLICT | orchestrator | 110 |
+| STATUS_CONFLICT | product-spec | 6 |
+| NOT_IN_FORCE_AS_RULE | orchestrator | 35 |
+| NOT_IN_FORCE_AS_RULE | product-spec | 106 |
+| ENFORCES_SUPERSEDED | independent-test-designer | 44 |
+| CLOSED_TICKET_EDITED | orchestrator | 117 |
+| TICKET_CHANGE_UNMARKED | orchestrator | 93 |
+
+- The main tree has 27 fewer UNKNOWN_ID findings for the test designer than this worktree (381 against 408). 25 of
+  the worktree's are in `tests/acceptance/W2-129/` (counted by path from `--json`), which `w2/integrate` does not hold
+  yet; the other 2 are not traced.
+- This baseline is from the code before review round 2. Round 2 (§8) takes out the one UNMARKED_CHANGE whose changer
+  is PROPOSED (DEC-056 <- DEC-017), and adds no TICKET_CHANGE_UNMARKED on this history.
 
 ## 2. The `--all` run: counts by code and role
 
@@ -294,7 +327,7 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
 | KPI line | Evidence |
 |---|---|
 | S1 one read-only command, writes only its mark | `command.py` (CLASS read, no ACT_PATHS); units `test_the_mark_holds_heads_sha_alone_and_nothing_else_is_written`, `test_a_mark_it_cannot_write_is_named_and_the_findings_stand`; accept success-1 4/4 |
-| S2 UNMARKED_CHANGE | `check.unmarked`; units `test_unmarked_change_…`, `test_archive_section_a_…`, `test_a_supersedes_followed_by_plain_text_…`; accept success-2 10/10 |
+| S2 UNMARKED_CHANGE | `check.unmarked` (a PROPOSED, REJECTED or WITHDRAWN changer skipped, §8); units `test_unmarked_change_…`, `test_archive_section_a_…`, `test_a_supersedes_followed_by_plain_text_…`, `test_a_proposed_rejected_or_withdrawn_entry_is_no_changer` (and its ACCEPTED control); accept success-2 10/10 |
 | S3 UNKNOWN_ID | `check.records`, `register_places`, `contract`, `texts`, `commits`; units `test_the_typed_places_of_tickets`, `test_records_contract_kernel_and_list_rows`, `test_commit_trailers`; accept success-3 22/22 |
 | S4 UNLINKED_ID | `check.records`, `commits`; units as S3; accept success-4 5/5 |
 | S5 STATUS_CONFLICT | `check.statuses`; unit `test_status_conflicts`; accept success-5 8/8 |
@@ -307,6 +340,24 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
 | S12 the two patches | `patch.py`; units `test_propose_marks_…`, `test_propose_sources_…`; accept success-12 5/5 |
 | S13 never a gate | nothing outside `src/gov/links` imports it; unit `test_never_a_gate_…`; accept success-13 2/2 |
 | S14 any repository | `check.not_applicable`; unit `test_a_repository_without_the_kinds_is_not_applicable`; accept success-14 2/2 |
-| S15 cheap, measured | §1 (the engineer's worktree run: 2.80 s and 2.83 s); the CTO's measured run on the main tree is still due |
-| S16 ticket changes | `check.ticket_changes`; units `test_a_closed_tickets_file_edited_…`, `test_reopening_a_closed_ticket_…`, `test_an_open_tickets_scope_changed_unmarked_…` (4 fields), `test_marked_or_unwatched_ticket_changes_…` (7 forms), `test_a_decision_in_a_removed_line_…`, `test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range`; accept success-16 32/32 |
+| S15 cheap, measured | §1a: the CTO's main-tree run at `416b59da1779`, `--all` 3.14 s and `--since HEAD~1` 2.94 s (median of five), 3,037 standing findings by code and role; §1 the engineer's worktree run (2.80 s and 2.83 s) |
+| S16 ticket changes | `check.ticket_changes`; units `test_a_closed_tickets_file_edited_…`, `test_reopening_a_closed_ticket_…`, `test_an_open_tickets_scope_changed_unmarked_…` (4 fields), `test_marked_or_unwatched_ticket_changes_…` (7 forms; the closing commit's status change alone), `test_the_closing_commit_is_judged_as_any_other` (open, in_progress), `test_a_closing_commit_marked_by_a_decision_is_not_a_finding` (Implements:, Decided-by:), `test_a_decision_in_a_removed_line_…`, `test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range`; accept success-16 (§8) |
 | F1 to F5 | accept failure-1 to failure-5: 1/1, 4/4, 2/2, 5/5, 2/2 |
+
+## 8. Review round 2 (`.gov-runtime/scratch/orchestrator/reviews/w2-129.md`, F1 to F3)
+
+- **F2 (S16, blocked):** `ticket_changes` no longer skips the commit that closes a ticket. Its eight watched fields
+  are judged as in any other commit against an open or in-progress ticket. An unmarked change is
+  TICKET_CHANGE_UNMARKED, one per field. The status change itself, `assignee` and `links` still give nothing.
+- **F1 (S2, failure-4):** `unmarked` skips a statement whose changer's status is PROPOSED, REJECTED or WITHDRAWN
+  (`NOT_A_CHANGER`), wherever the statement stands: entry label, free text, change log or ARCHIVE §A. With no
+  finding there is no mark, so `--propose-marks` prints none. A SUPERSEDED changer still counts, because its change
+  took effect before it was itself superseded.
+- **F3 (S15):** §1a holds the CTO's main-tree timing and baseline.
+- **On this worktree** (`--all`, the round-2 code, head `5b8e73055223`): 3,065 findings.
+  - UNMARKED_CHANGE is 187 (188 before). The one dropped is DEC-056 <- DEC-017, whose changer DEC-017 is PROPOSED.
+  - TICKET_CHANGE_UNMARKED is 93 (unchanged). No closing commit in this history changes a watched field unmarked,
+    as the review's probe found (0 of 152).
+- **Units:** `tests/unit/links` 61 passed (55 before; 6 new cases).
+- **`gov accept W2-129`** (HOME=/home/usain), on the round-2 code before the designer's F2 cases are merged:
+  **135 passed, 0 failed, 0 skipped**; success-16 included, so the status-only close still gives nothing.

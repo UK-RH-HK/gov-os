@@ -188,6 +188,62 @@ def test_the_status_line_is_the_findings_line(tmp_path, capsys):
     assert text[number - 1].startswith("**Status:** ACCEPTED") and text[number - 2].startswith("### DEC-101:")
 
 
+_NOT_CHANGERS = """
+### DEC-120: A rule a proposal would supersede
+**Status:** ACCEPTED
+
+x
+
+### DEC-121: A rule a withdrawn entry changed
+**Status:** ACCEPTED
+
+x
+
+### DEC-122: A rule a rejected entry superseded in free text
+**Status:** ACCEPTED
+
+x
+
+### DEC-123: The proposal
+**Status:** PROPOSED · **Supersedes:** DEC-120
+
+y
+
+### DEC-124: The withdrawn one
+**Status:** WITHDRAWN · **Changes:** DEC-121 (item 1)
+
+y
+
+### DEC-125: The rejected one
+**Status:** REJECTED
+
+DEC-122 is superseded by DEC-125.
+"""
+
+
+@pytest.mark.parametrize("statuses", [("PROPOSED", "WITHDRAWN", "REJECTED"), ("ACCEPTED", "ACCEPTED", "ACCEPTED")])
+def test_a_proposed_rejected_or_withdrawn_entry_is_no_changer(tmp_path, capsys, statuses):
+    """F1 (review round 1): no UNMARKED_CHANGE and no proposed mark for a changer not decided; the same entries
+    ACCEPTED give both (the control)."""
+    register = _NOT_CHANGERS
+    for old, new in zip(("PROPOSED", "WITHDRAWN", "REJECTED"), statuses):
+        register = register.replace(f"**Status:** {old}", f"**Status:** {new}")
+    archive = "# Archive\n\n## A. Superseded\n- DEC-121: amended by DEC-123 (its scope).\n\n## B. Spent\n"
+    root = _plant(tmp_path, {check.ARCHIVE_REL: archive}, register=ENTRIES + register)
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    named = {tuple(line.split()[1:4:2]) for line in _lines(out, "UNMARKED_CHANGE")}
+    pairs = {("DEC-120", "DEC-123"), ("DEC-121", "DEC-124"), ("DEC-122", "DEC-125"), ("DEC-121", "DEC-123")}
+    code, patch_text, _ = _run(root, "--propose-marks", capsys=capsys)
+    assert code == 0
+    if statuses[0] == "PROPOSED":
+        assert not named & pairs
+        assert ("DEC-101", "DEC-102") in named  # an accepted changer still is one
+        assert not any(source in patch_text for source in ("DEC-123", "DEC-124", "DEC-125"))
+    else:
+        assert pairs <= named
+        assert all(source in patch_text for source in ("DEC-123", "DEC-124", "DEC-125"))
+
+
 def test_archive_section_a_states_a_change(tmp_path, capsys):
     archive = "# Archive\n\n## A. Superseded\n- DEC-100: amended by DEC-104 (its scope).\n\n## B. Spent\n"
     root = _plant(tmp_path, {check.ARCHIVE_REL: archive})
@@ -358,15 +414,41 @@ def test_an_open_tickets_scope_changed_unmarked_names_ticket_commit_and_field(tm
     ("status: open", "status: in_progress", None),  # status, assignee and links alone are none
     ("assignee: engineer", "assignee: research", None),
     ("links: []", "links: [T-zzzz]", None),
-    ("status: open\n", "status: closed\n", None),  # the closing commit itself
+    ("status: open\n", "status: closed\n", None),  # the closing commit's status change alone
 ])
 def test_marked_or_unwatched_ticket_changes_are_not_findings(tmp_path, capsys, old, new, message):
     root = _s16(tmp_path)
-    if old == "status: open\n":  # a closing commit that also edits a KPI
-        text = (root / ".tickets/T-mmmm.md").read_text().replace(old, new).replace("A line", "Done line")
-        _commit(root, {".tickets/T-mmmm.md": text})
-    else:
-        _edit(root, old, new, *([message] if message else []))
+    _edit(root, old, new, *([message] if message else []))
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert _lines(out, "TICKET_CHANGE_UNMARKED") == [] and _lines(out, "CLOSED_TICKET_EDITED") == []
+
+
+@pytest.mark.parametrize("status", ["open", "in_progress"])
+def test_the_closing_commit_is_judged_as_any_other(tmp_path, capsys, status):
+    """F2 (review round 1): a commit that closes the ticket and also changes a watched field unmarked is
+    TICKET_CHANGE_UNMARKED for that field; the status change itself is none."""
+    root = _s16(tmp_path, status)
+    text = (root / ".tickets/T-mmmm.md").read_text()
+    closed = text.replace(f"status: {status}\n", "status: closed\n").replace("A line", "Done line") \
+        .replace("- src/a/**", "- src/a/**\n- src/b/**")
+    sha = _commit(root, {".tickets/T-mmmm.md": closed}, "e\n\nTask: decision-record\nRole: orchestrator")
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    found = _lines(out, "TICKET_CHANGE_UNMARKED")
+    assert sorted(line.split(" | ")[0].split(":")[0] for line in found) == [
+        f"TICKET_CHANGE_UNMARKED T-mmmm {sha[:12]} allowed_paths", f"TICKET_CHANGE_UNMARKED T-mmmm {sha[:12]} kpis"]
+    assert all(line.split(" | ")[2] == "orchestrator" for line in found)
+    assert _lines(out, "CLOSED_TICKET_EDITED") == []  # closed in the commit, not in its parent
+
+
+@pytest.mark.parametrize("message", [
+    "e\n\nTask: decision-record\nImplements: DEC-100\nRole: orchestrator",
+    "e\n\nTask: decision-record\nDecided-by: DEC-100\nRole: orchestrator",
+])
+def test_a_closing_commit_marked_by_a_decision_is_not_a_finding(tmp_path, capsys, message):
+    root = _s16(tmp_path)
+    text = (root / ".tickets/T-mmmm.md").read_text()
+    _commit(root, {".tickets/T-mmmm.md": text.replace("status: open\n", "status: closed\n")
+                   .replace("A line", "Done line")}, message)
     _, out, _ = _run(root, "--all", capsys=capsys)
     assert _lines(out, "TICKET_CHANGE_UNMARKED") == [] and _lines(out, "CLOSED_TICKET_EDITED") == []
 

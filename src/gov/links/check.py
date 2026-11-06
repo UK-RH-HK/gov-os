@@ -64,6 +64,7 @@ RULE_TEXTS = ("governance/project/briefs/", "governance/project/prompts/")
 TESTS = "tests/"
 
 NOT_IN_FORCE = ("PROPOSED", "REJECTED", "WITHDRAWN", "SUPERSEDED")
+NOT_A_CHANGER = ("PROPOSED", "REJECTED", "WITHDRAWN")  # its Supersedes: or change changed nothing
 OPEN = ("open", "in_progress")  # a ticket whose sources and KPI brackets bear a rule now
 ACCEPTANCE_JUDGED = ("in_progress", "closed")  # a ticket whose acceptance_tests.path must exist
 CLOSE_NOT_DONE = ("SUPERSEDED", "WITHDRAWN", "REJECTED", "REVOKED", "REFUSED")  # a close record that closed nothing
@@ -384,12 +385,15 @@ _WHERE_RANK = {"label": 0, "text": 1, "preamble": 2, "archive": 3}
 
 
 def unmarked(repo: _Repo, statements: list[dict]) -> list[dict]:
-    """UNMARKED_CHANGE: one per (changed entry, changer) whose status line does not name the changer."""
+    """UNMARKED_CHANGE: one per (changed entry, changer) whose status line does not name the changer. A source
+    that is PROPOSED, REJECTED or WITHDRAWN is no changer, wherever its statement stands (no finding, no mark)."""
     chosen: dict[tuple[str, str], dict] = {}
     from_archive: set[tuple[str, str]] = set()
     for statement in statements:
         target, source = statement["target"], statement["source"]
         if statement["cls"] not in CHANGE_CLASSES or target not in repo.entry or source == target:
+            continue
+        if repo.status.get(source) in NOT_A_CHANGER:
             continue
         key = (target, source)
         if statement["where"] == "archive":
@@ -747,8 +751,9 @@ def ticket_changes(repo: _Repo) -> list[dict]:
     - Closed means the ticket's status in the commit's parent; a decision id does not excuse the edit.
     - An open or in-progress ticket's ``WATCHED`` field changed, with no ``DEC-n`` in the changed lines (added or
       removed) nor in the commit's ``Implements:`` or ``Decided-by:``, is one finding per field.
-    - A change of any other field (``status``, ``assignee``, ``links``, …) is none; nor is the commit that closes
-      the ticket, nor a merge (its changes are its parents' commits'), nor the commit that adds the ticket."""
+    - A change of any other field (``status``, ``assignee``, ``links``, …) is none; nor is a merge (its changes are its parents' commits'), nor the commit that adds the ticket.
+    - The commit that closes the ticket is judged as any other: the status change gives nothing, an unmarked change
+      of a ``WATCHED`` field in the same commit is a finding."""
     from collections import Counter
 
     log = loader._git(repo.root, "-c", "core.quotePath=false", "log", "--full-history", "--raw", "--no-abbrev",
@@ -799,8 +804,9 @@ def ticket_changes(repo: _Repo) -> list[dict]:
                 f"{ticket} {short} {fields}: closed before the commit", role=ORCHESTRATOR, commit=sha)
                 | {"field": fields})
             continue
-        if deleted or status not in OPEN or str(now.get("status", "")).strip() == "closed":
-            continue  # the closing commit itself is not a finding
+        if deleted or status not in OPEN:
+            continue
+        # the closing commit is judged as any other: its status change is no finding, its watched fields are
         fields = [key for key in WATCHED if was.get(key) != now.get(key)]
         if not fields or marked:
             continue
