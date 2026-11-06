@@ -1,6 +1,6 @@
 ---
 id: DAEO-sg6x
-status: open
+status: closed
 deps: [DAEO-e8f0]
 links: []
 created: 2026-10-30T02:12:03Z
@@ -31,3 +31,5 @@ Findings of the refused close of DAEO-e8f0 (disposition: unclassed):
 
 - **W2-71's premise test:** `written_by_the_branch()` takes `git diff` from `merge-base(HEAD, w2/integrate)`, which is empty in the main tree once the ticket is merged, so the premise can pass only on the ticket's branch, never at its close; its sister test then checks nothing. The repair derives the ticket's files from its own commits (the `Task: DAEO-e8f0` trailer), with a `Rewrite-Reason:`, and lowers no expectation. Role and paths set to the independent test designer and W2-71's acceptance folder (MR-3), as for DAEO-2upp.
 - **W2-54's time-limit red** is a time limit missed under load (the close ran beside four leads; row W2-L429's family). It is re-run alone; if green alone, `load_sensitive` is the owner's list (DEC-757) and the morning package of 2026-10-30 asks. It is not this repair's work.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (8). Its parent is closed; its lines go with it, and D-10 catches any red it names that still stands.
