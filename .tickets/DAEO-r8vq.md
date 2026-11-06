@@ -61,3 +61,15 @@ priority fix, ahead of the levers' work, because an agent citing the wrong decis
   then the engineer. It lands on integrate and goes into re-pin window 4 with W2-92, W2-32 and W2-112. It holds
   `retrieve.py`, which W2-92 and W2-32 also hold: keep the change to `item()` and the map, and the merge order settles
   any overlap.
+
+**2026-11-06, merged into `w2/integrate` (`03336f19`).**
+- **The work:**
+  - tests `2d97295b` (29: 14 red on integrate for the mislabel, 15 guards);
+  - the fix `4a4f2f59` (`retrieve.py` +10/−5, 11 unit tests, the evidence record);
+  - `gov accept` 29/29;
+  - the independent review READY (57 tests passed).
+- **S4 is the CTO's** after re-pin window 4.
+- **The review's follow-up, outside this ticket's paths** (to the owner, as a ticket or a line):
+  - `src/gov/decisions/register.py:160-200` (`leave_out`) keeps a narrowed parent's `id`, `entry`, `status`,
+    `in_force` and `also`, so a multi-entry parent whose first entry is left out keeps a stale id;
+  - an item that starts in a gap takes the first entry it touches (`retrieve.py:581`), and no test plants one.
