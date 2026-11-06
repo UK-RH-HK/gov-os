@@ -131,6 +131,13 @@ The figures are hit@5. The 48-question set ran from m1 to m5 (24 visible + 24 hi
 | **The stated links** (ticket → decision, amends/supersedes, `Under:`, front-matter ids) + a bounded hop | g1 | 34/40 | 33/39 | **yes** | nothing falls; **drift 184 → 0 unjoined** |
 | The stated links + M5 | g2 | 33/40 | 34/39 | no | the gap widens |
 | **The measurement set, its single use, on v456 + the links** | verdict | — | — | — | **40/59 (67.8 %)** against 85.0 / 84.6: disagrees |
+| The 19 misses of the spent 60, by kind (an independent auditor, counts only) | D4B-MISSES | — | — | — | ranked below 5: 10, vocabulary 4, never retrieved 3, other 2 |
+| Reranker: Qwen3-Reranker-4B 8-bit, 40 reranked (the 138 = the 79 + the spent 59) | trial | 35/40 | 34/39 | no | 112/138 against 107; 11 gains, 6 losses, McNemar p 0.33; 3.89 s alone; over the GPU budget |
+| Reranker: mxbai-rerank-large-v2 (its own template, checked on a stand-in) | trial | 27/40 | 23/39 | no | 76/138 |
+| Reranker: the 4B at 24 reranked | trial | 36/40 | 32/39 | not yet (DEC-1079) | 112/138; 9 gains, 4 losses, p 0.27; 2.84 s alone, 33 s at 20 at once |
+| No reranker (the fused order alone) | trial | 35/40 | 28/39 | — | 95/138: the reranker is +12 net (21 lifted, 9 pushed out, p 0.04); without it the sets' spread is 33.3 against 17.2 |
+| **W2-92 built: the stated links in the product** | w4-92 | 33/40 | 34/39 | **yes**, merged | the 79 67 = the control 67, MRR 0.6306 against 0.6242; drift 0 → 190 of 190 |
+| W2-32 built: v456 as five pool settings, pool on / off | w4-32b / c | 34/40 / 36/40 | 32/39 / 30/39 | pending (wording) | 107 / 108 of 138; the halves' gap 2.9 / 13.1; 1.20 / 1.48 s a call |
 
 Night one's survey (63 variants on all 48) and night two's (32 on the visible half) also found:
 - **Losers:** pool quotas, a global pool, an embedder instruction, a reranker instruction, authority ×2.
@@ -187,13 +194,27 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
 7. **A question about something that does not exist** cannot be scored by hit@5 when the product rightly returns
    nothing. Score it apart.
 
+8. **Say whether a gain is more than chance.** On 138 questions one question is 0.7 points; the 4B's +5 came from 11
+   gains against 6 losses (exact McNemar p 0.33). **The practice:** every comparison reports its gains, its losses and
+   an exact McNemar test (DEC-1079).
+9. **Measure what each component adds.** The reranker against the fused order alone: +12 net (p 0.04), and it is what
+   makes the sets agree (spread 17.2 against 33.3). **The practice:** an ablation of each component before choosing its
+   model.
+10. **Check a model's input before judging it.** Render one pair through the loaded module (or a stand-in with the
+    model's own configuration and tiny weights) and compare it with the model card.
+11. **Labels must not chase copies.** A gold source and its generated twins (the Contract's Markdown and YAML, the
+    capability pages) are one source family, counted by the measure's code (DEC-1078 (4)); the cross-check lists every
+    other place that states an answer (DEC-1076 (5)).
+12. **Keep each measure's inputs fixed.** A script that copied a branch's re-labelled question into the shared sets
+    root broke the next runs; a measure checks the sets root against the integrated labels before it starts.
+
 ## 6. For an adopted repository's Wave 0 (the practice in order)
 1. Assess the repository, and plan its refactoring for full indexing (W2-88's KPIs).
 2. Census its stated links (records, front matter, trailers, text). Build the graph from them.
 3. Chunk by meaning (sections, answer units, code by definition), and give every reader the heading path.
 4. Write the three sets by independent writers under the rubric. Keep the hidden check and the measurement set outside
    every tree.
-5. Measure. Diagnose by stage and by structure. Fix the structure on all sets until they agree within 3 points.
+5. Measure. Diagnose by stage and by structure. Fix the structure on all sets until they agree within 5 points on sets of about 80 (DEC-1074 (4)).
    Confirm on the measurement set once.
 6. Then choose the models (reranker, embedder) on all three sets, with speed and GPU figures.
 7. Record every method and figure here, or in the repository's copy of this record.
