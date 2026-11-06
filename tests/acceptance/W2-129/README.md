@@ -7,7 +7,8 @@ the same loader, decisions, CLI and accept code, DEC-963).
 
 **The numbering.** The lines are numbered in the ticket's order: S1 to S15 for its fifteen success lines, F1 to F6
 for its failure lines. (The brief counted thirteen and called never-a-gate S11 and the timing S12; in the ticket's
-order they are **S13** and **S15**, and "any repository" is S14.)
+order they are **S13** and **S15**, and "any repository" is S14.) **S16** is the ticket-changes line DEC-1088 (6)
+added after them.
 
 ## How they run
 
@@ -167,6 +168,38 @@ cases, `there is no gov.links package`. The four greens are two premises and the
 | S13, F1 | `test_w2_129_sources.py::test_s13_no_close_queue_landing_launch_claim_readiness_or_hook_module_calls_gov_links` | green (guard) | none of them imports `gov.links` or runs `gov links`; red only if a gate takes it up |
 | S14 | `test_w2_129_command.py::test_s14_a_repository_with_no_register_tickets_or_contract_is_not_applicable` | red | no `gov links`; then (repository B): exit 0, 0 new, "not applicable" naming the register, tickets and contract |
 | S14 | `test_w2_129_command.py::test_s14_json_reports_not_applicable_never_an_error` | red | no `gov links`; then: `ok` true, no `error`, "not applicable" in the result |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_in_progress_ticket_is_ticket_change_unmarked[kpis]` | red | no `gov links`; then: a KPI line of DAEO-t005 re-worded, no decision id in the lines or trailers: TICKET_CHANGE_UNMARKED naming DAEO-t005, the commit and `kpis`, at its file, role orchestrator, exit 1 |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_in_progress_ticket_is_ticket_change_unmarked[allowed_paths]` | red | as above: a path added to `allowed_paths` |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_in_progress_ticket_is_ticket_change_unmarked[depends_on]` | red | as above: DAEO-t004 added to `depends_on` |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_in_progress_ticket_is_ticket_change_unmarked[title]` | red | as above: the `title` re-worded |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_in_progress_ticket_is_ticket_change_unmarked[acceptance_tests]` | red | as above: `acceptance_tests`' path changed |
+| S16 | `test_w2_129_tickets.py::test_s16_an_unmarked_change_to_an_open_ticket_is_ticket_change_unmarked` | red | no `gov links`; then: the open DAEO-t004's `title` re-worded, unmarked: the same finding |
+| S16 | `test_w2_129_tickets.py::test_s16_the_role_is_orchestrator_whatever_the_commit_s_role` | red | no `gov links`; then: the unmarked commit's `Role:` is engineer; the finding's role still names orchestrator |
+| S16 | `test_w2_129_tickets.py::test_s16_two_fields_in_one_commit_are_each_named` | red | no `gov links`; then: `title` and `depends_on` in one commit, both named |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[kpis-in-the-line]` | red | no `gov links`; then: the KPI line carries `[re-worded, DEC-113]`: no S16 finding for DAEO-t005; the unmarked control on DAEO-t004 is found |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[kpis-implements]` | red | as above: the commit carries `Implements: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[kpis-decided-by]` | red | as above: `Decided-by: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[allowed_paths-in-the-line]` | red | as above: `allowed_paths`, `# [added, DEC-113]` on the added line |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[allowed_paths-implements]` | red | as above: `Implements: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[allowed_paths-decided-by]` | red | as above: `Decided-by: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[depends_on-in-the-line]` | red | as above: `depends_on`, `# [added, DEC-113]` on the line |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[depends_on-implements]` | red | as above: `Implements: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[depends_on-decided-by]` | red | as above: `Decided-by: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[title-in-the-line]` | red | as above: `title`, `[re-worded, DEC-113]` in it |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[title-implements]` | red | as above: `Implements: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[title-decided-by]` | red | as above: `Decided-by: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[acceptance_tests-in-the-line]` | red | as above: `acceptance_tests`, `# [re-worded, DEC-113]` on the path line |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[acceptance_tests-implements]` | red | as above: `Implements: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_a_change_marked_with_its_decision_gives_no_finding[acceptance_tests-decided-by]` | red | as above: `Decided-by: DEC-113` |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_status_assignee_or_links_alone_give_no_finding[status]` | red | no `gov links`; then: DAEO-t005's `status` alone changed, unmarked: no S16 finding; the control is found |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_status_assignee_or_links_alone_give_no_finding[assignee]` | red | as above: `assignee` alone |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_status_assignee_or_links_alone_give_no_finding[links]` | red | as above: `links` alone |
+| S16 | `test_w2_129_tickets.py::test_s16_guard_status_assignee_or_links_alone_give_no_finding[all-three]` | red | as above: the three in one commit |
+| S16 | `test_w2_129_tickets.py::test_s16_a_commit_that_edits_a_closed_ticket_is_closed_ticket_edited[title-unmarked]` | red | no `gov links`; then: the closed DAEO-t002's `title` changed: CLOSED_TICKET_EDITED naming DAEO-t002, the commit and `title`, role orchestrator, exit 1 |
+| S16 | `test_w2_129_tickets.py::test_s16_a_commit_that_edits_a_closed_ticket_is_closed_ticket_edited[kpis-with-implements]` | red | as above: a KPI line added with `[added, DEC-113]` and `Implements: DEC-113`; a mark does not excuse it |
+| S16 | `test_w2_129_tickets.py::test_s16_a_commit_that_edits_a_closed_ticket_is_closed_ticket_edited[status-reopened]` | red | as above: `status` closed to in_progress; the status exemption is for open tickets only |
+| S16 | `test_w2_129_tickets.py::test_s16_a_ticket_closed_in_the_range_is_closed_ticket_edited_only_by_the_commits_after` | red | no `gov links`; then: DAEO-t005 closed in the range (no finding), then its `title` edited (CLOSED_TICKET_EDITED for that commit only) |
+| S16 | `test_w2_129_tickets.py::test_s16_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range` | red | no `gov links`; then: `--since <the commit>` lists no S16 finding; `--since <the commit>~1` lists it |
 | F1 | `test_w2_129_sources.py::test_s13_no_close_queue_landing_launch_claim_readiness_or_hook_module_calls_gov_links` | green (guard) | as S13 |
 | F2 | `test_w2_129_command.py::test_s1_writes_nothing_but_its_mark_the_head_it_judged` | red | as S1 |
 | F2 | `test_w2_129_command.py::test_s1_starts_only_git_opens_no_socket_and_writes_only_the_mark` | red | as S1 |
@@ -194,6 +227,14 @@ S9 and S11), the register treated as one record (1, S10), a PROPOSED decision co
 the role of `src/` changed (2, S9 and S10). The sketch printed the summary line before each patch; `git apply`
 accepted it.
 
+**S16, the second pass (DEC-1088 (6), standing; integrate merged at `87cadea15`).** 32 cases in
+`test_w2_129_tickets.py`, each on its own copy of repository A with planted commits; S1 to S15 are unchanged. Run in
+the launch sandbox through the heavy slot with the same options: **135 tests, 131 failed, 4 passed**; all 32 S16 cases
+fail on `there is no gov links command in the tree under test`, after their planted commits are made. A throwaway
+sketch of S16 (scratch only, never committed) passes all 32; six faults planted in it one at a time are each caught:
+the decision mark ignored (15 reds), status, assignee and links judged (5), the closed status read at HEAD instead
+of before the commit (2), the range ignored (1), the commit's `Role:` as the role (1), the field left out (13).
+
 ## The interface the tests assume
 
 - **The command:** `src/gov/links/command.py` (`gov.links.command`), a read command, options `--since <rev>`,
@@ -217,6 +258,14 @@ accepted it.
 - **The patches:** stdout that `git apply` accepts (a summary line before the patch is accepted by git); the marks
   patch changes the changed entry's status line (the first line under its heading that is not blank); the sources
   patch keeps the ticket's front matter valid YAML.
+- **S16's lines:** `CLOSED_TICKET_EDITED <ticket id> <commit sha, 7+> <field> ... | .tickets/<id>.md:<line> |
+  orchestrator | <fix>` and the same for `TICKET_CHANGE_UNMARKED`, in the same four ` | ` fields. The first field
+  names the ticket id and the field (`title`, `kpis`, `allowed_paths`, `depends_on`, `acceptance_tests`, `status`)
+  as whole words and the commit by a hex token of 7 or more that its sha starts with; the line is any line of the
+  ticket's file at HEAD; the role field contains `orchestrator` (whatever the commit's `Role:`); the fix is not
+  empty. Two fields in one commit may be one line naming both or a line each. A "decision id" is any `DEC-n` in a
+  changed line (added or removed, a YAML comment included) or in the `Implements:` or `Decided-by:` trailer. The
+  status before the commit (its parent's file) decides closed; a ticket the commit creates is not tested.
 
 ## Notes and limits
 
@@ -260,4 +309,5 @@ accepted it.
 - `w2_129_probe.py`: the audit-hook probe (S1, F2).
 - `conftest.py`: the session's repositories, a copy per test, and the three shared runs.
 - `test_w2_129_findings.py` (S2 to S8), `test_w2_129_command.py` (S1, S9, S11, S14),
-  `test_w2_129_incremental.py` (S10, F5), `test_w2_129_patches.py` (S12), `test_w2_129_sources.py` (S8, S13).
+  `test_w2_129_incremental.py` (S10, F5), `test_w2_129_patches.py` (S12), `test_w2_129_sources.py` (S8, S13),
+  `test_w2_129_tickets.py` (S16).
