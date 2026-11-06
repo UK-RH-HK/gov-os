@@ -91,3 +91,22 @@ The rules are fixed in code (`combine` in the score-once harness, tested 14 of 1
 
 **Basis:** question 1 (memory: the reranker chosen from every candidate that fits, with its cost) and question 4 (the
 GPU used once; every combination replayed from kept scores).
+
+## Version 2 (2026-11-06 ~11:50, before any run): the depth rerank is given the question
+- **The finding (L5, `a5c0c34f`, its check script):** on the measure clone (`routing.phrasings: true`), the
+  harness's global rerank of 40 (v456's `depth`) scores against `STATE["query"]`, which is set by every phrasing the
+  lexical route is asked. So the reranker was given the last phrasing (the question's content words, or the question
+  with its resolved ids appended), not the question: the question itself in 0 of 5 checks.
+  - **Every v456 figure was measured this way:** the trials, the 107 of 138, and the 60's 40 of 59.
+  - **The product does not do this:** its page rerank, and W2-32 S11's port of v456, give the question.
+- **The change (structural, never aimed at a question):** a variant key `"rq": "question"` gives the depth rerank
+  the question as `retrieve` was asked it. Unset, the text is as measured. A continuation call keeps the default.
+  Tested: 19 of 19 in the harness's test.
+- **The window, as amended:**
+  1. **q06f**, the 0.6B on v456 as every past figure was measured. It runs first, as the trial path's faithfulness
+     check: it must reproduce its kept 107 of 138, question for question.
+  2. **q06, q4b, gte and zer** on v456 with `"rq": "question"` (the product's form). q06's route answers come from
+     q06f; the others' come from q06, and are checked against it.
+- **The grid (§3) is judged on the version-2 runs only.** B0 is q06 on the question, after L3. q06f is recorded
+  beside it, so the size of the artefact is known. No cell is judged on the old text.
+- **Cost:** one more 0.6B pass, about 20 minutes of GPU.
