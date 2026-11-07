@@ -19,6 +19,15 @@ The CTO, 2026-11-07, about 19:05, session `ad44f5fe`.
 - **Within the burst itself** (the 1 s idle sampled before and after left out): the GPU runs a kernel in about **90 %** of samples, at about **65 %** mean utilization.
 - **The service's CPU:** about **0.8 of one core**, its one Python thread mostly busy feeding the GPU.
 
+## The second reading (DEC-1095 (2); about 20:30, a quiet GPU window; `~/gov-os-runs/PAT-1/profile-2.json`)
+| burst | wall | requests | s per request | GPU util mean (incl. margins) | GPU util median | samples with the GPU busy | service CPU mean / p90 | GPU peak |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 15.37 s | 63 | 0.244 | 59.7 % | 84 % | 72.5 % | 0.75 / 1.1 | 9,422 MiB |
+| 2 | 15.09 s | 63 | 0.240 | 59.7 % | 85 % | 82.6 % | 0.78 / 1.1 | 9,424 MiB |
+| 3 | 15.19 s | 63 | 0.241 | 59.8 % | 86 % | 80.4 % | 0.76 / 1.1 | 9,422 MiB |
+
+The same picture as the first: the GPU is busy most of the burst, with a median of 84 to 86 %, and about 68 % mean within the burst itself. The conclusion below holds.
+
 ## What it shows
 - **The GPU is not mostly idle between requests.** It is busy most of the burst. Batching queued requests (option (b)) could recover at most the remaining gaps: about 10 to 35 %, so 14.5 s might come down to about 10 to 13 s at best.
 - **Larger requests did not help** (W2-137's S5: 64 texts per request, 2.75 requests per search, 14.8 to 15.1 s). That fits a GPU bound by compute rather than by per-request overhead.
