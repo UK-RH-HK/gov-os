@@ -59,3 +59,31 @@ padding of the batch it lands in; S3's tolerance of 1e-3 and S5's live check cov
   the sandbox. `test_the_release_leaves_the_client_s_bounds_as_they_were` and the in-process release tests pass.
 - **`gov accept W2-137`:** pass, 37/37. success-1 18/18, success-2 9/9, success-3 5/5, success-4 5/5; 0 unmapped,
   0 skipped.
+- **`tests/unit/retrieval`, `tests/acceptance/W2-32`, `W2-112`, `W1-19` and `W1-21`** (`-n auto -m "not local_only"
+  -k "not real and not green_here and not time_limit"`, the opt-in rows left out as by default): 853 passed, 52 failed,
+  3 skipped, 1 xfailed, in 8 min 16 s. Every red, by cause:
+  - **The sandbox refuses Unix sockets (41):** 19 in `tests/unit/retrieval/test_w2_112_shared_reranker.py` and 22 in
+    `tests/acceptance/W2-112/` (`test_w2_112_answers.py` 3, `test_w2_112_service.py` 6, `test_w2_112_concurrency.py` 4,
+    `test_w2_112_gpu.py` 2, `test_w2_112_slots.py` 2, `test_w2_112_fallback.py` 5). No stand-in service can listen, so
+    each search falls back; W2-112's own support names the refusal in most of them. The CTO runs them outside the
+    sandbox.
+  - **They pin the old cap of 16 (D-2, an independent test designer's, not this ticket's paths) (9):**
+    `tests/acceptance/W2-32/test_w2_32_s11_pool.py::test_every_rerank_request_keeps_the_padded_bound[v456]` (22 texts),
+    `test_w2_32_s11_pool.py::test_v456_rerank_depth_reranks_the_first_40_once_and_cuts_the_pages_with_the_others_on`,
+    `test_w2_32_s7_dec1067.py::test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unbatched_one[fusion_search]`
+    (30) and `[retrieve]` (20),
+    `test_w2_32_s7_size_bound.py::test_a_pool_of_long_chunks_goes_in_the_fewest_requests_within_16_texts_and_24000_characters[fusion_search]`
+    (18), `test_w2_32_s8_phrasings.py::test_the_merged_pool_is_reranked_once_within_16_texts_and_24000_characters[content]`
+    (24) and `[record]` (31), `test_w2_32_s8_routing.py::test_the_16_text_cap_holds_with_routing_on` (20), and
+    `tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass`
+    (`RERANK_CAP`, 19 and 10).
+  - **A unit test that pins 16 outside D-1's list (1):**
+    `tests/unit/retrieval/test_w2_32_routing.py::test_routing_on_keeps_one_rerank_of_the_merged_set_in_full_requests_of_16`
+    (`[16] * (pool // 16) + ...`); its sibling `test_phrasings_on_rerank_the_merged_pool_once_within_the_bounds` also
+    reads `n <= 16` and passed here only because its pool is small. Neither is in `allowed_paths`; not changed.
+  - **Not this change (1):**
+    `tests/acceptance/W1-19/test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors`
+    (nothing sent to the embedding stand-in) passes alone (1 passed); it touches no rerank code.
+  - W1-21's cases all pass (its `RERANK_CAP` cases stay within the new cap).
+  - The skips: two W2-32 record cases with no baseline measure record under the scratch HOME, one W2-32 fusion case
+    whose limit above the cap does not arise.
