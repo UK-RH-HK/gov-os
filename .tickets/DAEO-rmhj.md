@@ -20,6 +20,9 @@ allowed_paths:
 - src/gov/retrieval/retrieve.py
 - src/gov/retrieval/validate.py
 - src/gov/cli/main.py  # [DEC-1090] point (1): the text form's store line only
+- tests/unit/retrieval/test_w2_131_register_ids.py  # [DEC-1090] the token's s key in the same-as-before guards
+- tests/unit/retrieval/test_w2_133_gap_label.py  # [DEC-1090] same
+- tests/unit/retrieval/test_w2_135_item_cap.py  # [DEC-1090] same
 - template/governance/kernel/skills/retrieval/SKILL.md
 - tests/unit/retrieve/test_w2_138*
 - tests/unit/retrieval/test_w2_138*
@@ -81,3 +84,10 @@ S4 1, S5 3), 5 green guards. The byte rule and the S2 seam are in the tests' REA
   (no commit in it) is refused `CONTINUATION_INVALID` as today, with "made before W2-138" in its message.
 - **(4)** the chunker's `str.splitlines` against the item's `bytes.splitlines` (line numbers drift in a file with form
   feed, `\x1c`-`\x1e`, `\x85`, U+2028 or U+2029): a Wave 3 row, not ordinary work here.
+
+**Built (engineer, 2026-11-07):** `w2/W2-138` at `dcda2701`; `gov accept W2-138` 18/18. The W2-112 socket cases pass
+outside the sandbox (CTO: 34 passed). Left before the review: the 6 unit "same as before" guards of W2-131, W2-133 and
+W2-135 compare decoded tokens without the new `s` key (the engineer, paths added); W2-133's acceptance
+`test_w2_133_unchanged.py` 4 rows the same, by a test designer (`Rewrite-Reason: DEC-1090 (3)`). The engineer reported
+seeing six call-site lines of its own acceptance tests through a repository-wide Grep after its build and accept: the
+guard let a Grep tool call into its own ticket's acceptance folder through (to the owner as a guard gap). [DEC-1090]

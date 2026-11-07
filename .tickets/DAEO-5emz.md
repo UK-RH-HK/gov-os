@@ -22,6 +22,7 @@ allowed_paths:
 - tests/unit/retrieval/test_w2_112_shared_reranker.py  # [DEC-1090] D-1
 - tests/unit/retrieval/test_w2_32_whole_chunk.py  # [DEC-1090] D-1
 - tests/unit/retrieval/test_w2_32_pool.py  # [DEC-1090] D-1
+- tests/unit/retrieval/test_w2_32_routing.py  # [DEC-1090] D-1, found by the engineer's regression run
 - docs/changes/W2-137-evidence.md
 kpis:
   success:
@@ -86,3 +87,7 @@ go in 16, 16, 7 rather than one request), the rest green guards (S2-S4).
   `test_w2_32_s8_routing.py`, `w2_32_pool.py`; W1-19's and W1-21's `RERANK_CAP`) are revised by an independent test
   designer with `Rewrite-Reason: DEC-1090 (2)`, merged with the engineer's change (the landing takes an acceptance change
   from the designer only, G-1). [DEC-1090]
+
+**Built (engineer, 2026-11-07):** `w2/W2-137` at `dba3fa54`: the cap 16 → 64; `gov accept W2-137` 37/37. The W2-112
+socket cases pass outside the sandbox (CTO: 85 passed). Left before the review: `test_w2_32_routing.py`'s cap (the
+engineer, added to D-1's paths), and D-2's 9 acceptance cases (W2-32 ×8, W1-19 ×1) by a test designer. [DEC-1090]
