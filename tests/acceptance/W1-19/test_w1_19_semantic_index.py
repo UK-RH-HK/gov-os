@@ -19,8 +19,35 @@ import pytest
 import w1_19_support as support
 
 ROOT = support.path_arg
-RERANK_CAP = 16  # DEC-1067 (f): no reranker request carries more than 16 texts
+# Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). The cap is no longer the
+# literal 16 (``RERANK_CAP``): it is read from the code under test (``rerank.MAX_REQUEST_TEXTS``, with the service's
+# ``rerank_service.MAX_TEXTS``) by ``_rerank_bounds``. The padded bound DEC-1067 (f) set beside the cap stays: a
+# request's texts times its longest pair (the question and the text) at most 24,000 characters.
+RERANK_CHARS = 24_000
 INDEX = pytest.mark.needs("gitleaks", "sqlite_vec")
+
+
+def _rerank_bounds(api):
+    """``(cap, service)``: the client's cap on texts per request and the service's own bound, from the ``gov`` the
+    driver runs (this worktree's ``src/``), read in a child process as every other call of this suite."""
+    source = ("import json\nfrom gov.retrieval import rerank, rerank_service\n"
+              "print(json.dumps([rerank.MAX_REQUEST_TEXTS, rerank_service.MAX_TEXTS]))\n")
+    done = subprocess.run([sys.executable, "-c", source], capture_output=True, text=True, env=api.scratch_env(),
+                          cwd=str(api.workdir / "elsewhere"))
+    assert done.returncode == 0, done.stderr
+    cap, service = json.loads(done.stdout)
+    return cap, service
+
+
+def _fewest(query, texts, cap):
+    """How many requests ``texts`` take under both bounds, grouped longest first (each request opens with its longest
+    text and takes the next while at most ``cap`` texts and ``RERANK_CHARS`` padded characters hold)."""
+    count, held, longest = 0, 0, 0
+    for size in sorted((len(query) + len(text) for text in texts), reverse=True):
+        if held and (held + 1 > cap or (held + 1) * longest > RERANK_CHARS):
+            count, held, longest = count + 1, 0, 0
+        held, longest = held + 1, max(longest, size)
+    return count + (1 if held else 0)
 
 
 @pytest.mark.needs("gitleaks")
@@ -194,15 +221,32 @@ def test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass(api, index
     # in requests of at most 16 texts, its scores combined in order. What the case guards stands: one reranker load
     # for one retrieval, and the requests together score the merged set once, each candidate once, in as few
     # requests as the cap allows; the first result is still the reranker's highest.
+    # Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). At 64 the padded bound,
+    # not the count, splits this merged set (29 texts in 19 and 10), so "requests of 16, every one but the last full"
+    # becomes its form under both bounds: every request within the cap, the service's bound and 24,000 padded
+    # characters; as few requests as both bounds allow; and the requests one grouping of the merged set, longest
+    # first (R2-F3's guard: two passes of their own, one per route, interleave the lengths).
     assert outcome.loads == 1, f"{outcome.loads} loads of the reranker for one retrieval; the KPI says one"
+    cap, service = _rerank_bounds(api)
     sizes = [len(rerank_pass["texts"]) for rerank_pass in outcome.passes]
     texts = [text for rerank_pass in outcome.passes for text in rerank_pass["texts"]]
-    assert sizes and max(sizes) <= RERANK_CAP, f"a rerank request carried more than {RERANK_CAP} texts: {sizes}"
-    assert len(sizes) == -(-len(texts) // RERANK_CAP), f"more rerank requests than the cap needs: {sizes}"
-    # The round-2 review's R2-F3: the merged set is cut into requests of 16, every one but the last full (two
-    # rerank passes of their own, one per route, would also pass a count of requests).
-    assert all(size == RERANK_CAP for size in sizes[:-1]) and sizes[-1] <= RERANK_CAP, \
-        f"the rerank requests are not the merged set cut into requests of {RERANK_CAP}: {sizes}"
+    queries = {rerank_pass["query"] for rerank_pass in outcome.passes}
+    assert sizes and len(queries) == 1, f"premise: one question in every rerank request: {queries}"
+    query = queries.pop()
+    assert max(sizes) <= cap, f"a rerank request carried more than the cap of {cap} texts: {sizes}"
+    assert max(sizes) <= service, f"a rerank request carried more texts than the service accepts ({service}): {sizes}"
+    for number, rerank_pass in enumerate(outcome.passes, 1):
+        padded = len(rerank_pass["texts"]) * max(len(query) + len(text) for text in rerank_pass["texts"])
+        assert padded <= RERANK_CHARS, f"rerank request {number}'s padded size is {padded}, above {RERANK_CHARS}"
+    assert len(sizes) == _fewest(query, texts, cap), \
+        f"more rerank requests than the cap of {cap} and {RERANK_CHARS} padded characters need: {sizes}"
+    # The round-2 review's R2-F3: the merged set is grouped once (two rerank passes of their own, one per route,
+    # would also pass a count of requests): taken longest first, each request's shortest text is no shorter than the
+    # next request's longest.
+    lengths = sorted(([len(text) for text in rerank_pass["texts"]] for rerank_pass in outcome.passes),
+                     key=max, reverse=True)
+    assert all(min(one) >= max(two) for one, two in zip(lengths, lengths[1:])), \
+        f"the rerank requests are not the merged set grouped once, longest first: {sizes}"
     assert len(set(texts)) == len(texts), "a candidate was scored twice: the rerank was not over the merged set once"
     assert len(texts) == len(answer["hits"]), "the rerank was not over the merged set"
     assert found[0] == support.ZETA, f"the first result is not the one the reranker scored highest: {found}"

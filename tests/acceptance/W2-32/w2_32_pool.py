@@ -19,6 +19,7 @@ import json
 from pathlib import Path
 
 import yaml
+from gov.retrieval import rerank, rerank_service
 
 import w2_32_methods as m
 import w2_32_routing as r
@@ -33,7 +34,13 @@ V456 = {"meaning_uncut": True, "route_depth": 60, "rerank_depth": 40, "per_file_
 OFF = {"meaning_uncut": False, "route_depth": 0, "rerank_depth": 0, "per_file_first10": 0, "drop_nested": False}
 TODAY_DEPTH = 30  # the keyword and meaning routes' depth today (S11's text)
 PAGE = 20  # today's page at radius 0 with the default batch: (1 round + 1) x 10 (DEC-422)
-CAP_TEXTS, CAP_CHARS = 16, 24_000  # the padded request bound (DEC-1067 (f), the engineer's b7085897)
+# The padded request bound (DEC-1067 (f), the engineer's b7085897): 24,000 padded characters, and the cap on texts per
+# request in force.
+# Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). The cap is read from
+# ``rerank.MAX_REQUEST_TEXTS`` (it was the literal 16); the character bound stays the literal 24,000; no request may
+# carry more texts than the service accepts (``rerank_service.MAX_TEXTS``).
+CAP_TEXTS, CAP_CHARS = rerank.MAX_REQUEST_TEXTS, 24_000
+SERVICE_TEXTS = rerank_service.MAX_TEXTS
 
 
 def key(name):
@@ -204,11 +211,13 @@ def capped(order, n, head=10):
 
 
 def within_bound(requests):
-    """Fails unless every request keeps the padded bound: at most 16 texts, its texts times its longest at most
-    24,000 characters (S11's second failure line)."""
+    """Fails unless every request keeps the padded bound: at most the cap's texts (``CAP_TEXTS``) and no more than the
+    service accepts, its texts times its longest at most 24,000 characters (S11's second failure line)."""
     for number, request in enumerate(requests, 1):
         padded = len(request) * max((len(text) for text in request), default=0)
-        assert len(request) <= CAP_TEXTS, f"rerank request {number} carries {len(request)} texts (at most 16)"
+        assert len(request) <= CAP_TEXTS, f"rerank request {number} carries {len(request)} texts (at most {CAP_TEXTS})"
+        assert len(request) <= SERVICE_TEXTS, \
+            f"rerank request {number} carries {len(request)} texts, more than the service accepts ({SERVICE_TEXTS})"
         assert padded <= CAP_CHARS, f"rerank request {number}'s padded size is {padded} characters " \
                                     f"({len(request)} texts): above {CAP_CHARS} (the padded bound)"
 
