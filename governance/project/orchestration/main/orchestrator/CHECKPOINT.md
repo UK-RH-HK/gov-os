@@ -1,10 +1,26 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-06: session `812bc5ce`, after DEC-1081 (score once, combine freely)
+## RESUME HERE — 2026-11-07: session `812bc5ce` hands over; the next session starts right after re-pin window 4
 
-**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-06: §3c what is done, §4
-what is live, §5 the order, §6 what waits on the owner). Next free id **DEC-1082**. The detail of 11-05 is in the block
-below (history), kept for its figures.
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-07: §0 whether the ACT
+ran, §3 what window 4 carries, §4 the steps after "done", §5 every watcher, loop and digest to re-arm, §6 what waits
+on the owner). Next free id **DEC-1089**. The blocks below are this session's, newest first; older ones are history,
+kept for their figures.
+- **~10:00 11-07, THE HAND-OVER.** The owner pushed (`w2/integrate` at `71b1f9b7`, `record/w2` at `74de225a`) and
+  checked the three script hashes. The owner closes this session before the re-pin; a new W2 orchestrator session
+  continues after it.
+  - **The hold stays:** `log/act-in-progress.txt` (ACT-REPIN-W4). Start nothing until the operator's "done".
+  - **After "done":** START-NEXT-SESSION §4:
+    1. end the hold;
+    2. switch the pool on;
+    3. check the hook refreshed the store, and the speed side by side;
+    4. the parallel-agents and memory test, with W2-112's live measure;
+    5. E0 and E0b;
+    6. E1 and its cost to the owner;
+    7. W2-136 beside.
+  - **The 09:00 digest was sent** (push and reply). The store was refreshed at 09:33 to `71b1f9b7` by the backstop
+    path. The one new guard refusal (W2-134's designer, its own ticket's code) is classified true.
+  - **The owner asked for the nine keystones' status** (answered in the hand-over reply).
 - **~00:30 11-07, RE-PIN READY; STAND-BY on the owner's push and the operator's ACT** (`log/act-in-progress.txt`,
   `log/cto-standby.txt`). Next free id **DEC-1089**.
   - **Merged** (each tests first, review READY by `verdict.py`):

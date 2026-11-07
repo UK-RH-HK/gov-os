@@ -39,8 +39,8 @@
     "D-10, the full suite and its red fixes, then the lift (your word). Est. 1 to 2 days: the lift about 11-15",
     "After the lift: the three-layer plan and Wave 2's streams (DEC-1087 (13)), then the remaining 40 not-started and 7 in-flight tickets under the three layers; EXAMIN's copy about 11-21"
   ],
-  "owner_action": "P1 ACT-REPIN-W4 - your push, then your operator runs pin/REPIN-COMMANDS-W4.sh in a plain terminal (packages/ACT-REPIN-W4.md; rehearsed, exit 0, 123 s); P2 ADR-0002 (PROPOSED, cited by W2-112); later: the pilot's cost before E2; M3's adoption after all the experiments; the 150-id sitting; the templates' approval",
-  "last_report": "2026-11-06 18:26:25",
+  "owner_action": "P1 ACT-REPIN-W4 - pushed (71b1f9b7, hashes checked); your operator runs pin/REPIN-COMMANDS-W4.sh in a plain terminal (packages/ACT-REPIN-W4.md), then a new CTO session follows START-NEXT-SESSION section 4; P2 ADR-0002 (PROPOSED, cited by W2-112); later: the pilot's cost before E2 (the cap); the E3-E5 design package; M3's adoption after all the experiments; the 150-id sitting; the templates' approval; the three layers' plan after the lift; whether to re-arm usage_watch.sh",
+  "last_report": "2026-11-07 09:34:11",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
