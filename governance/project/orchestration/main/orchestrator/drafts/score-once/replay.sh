@@ -9,6 +9,8 @@
 # newly scored texts are only there), e.g.
 #   REPLAY_ROUTES=$X/split REPLAY_Q06=$X/split replay.sh ext-split "$V" '{"kind":"alone","m":"q06"}'
 # Unset: the grid's q06 cache for both, as before.
+# E0b: the grid's and the extend window's caches were filled before rx.py keyed route answers by their store, so a
+# replay of them runs with GOV_RX_LEGACY_STORE=1 exported, on their own clone (g1); rx.py refuses them otherwise.
 set -uo pipefail
 NAME=$1 VARIANT=$2 RULE=$3
 S=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/score-once
@@ -24,7 +26,8 @@ echo "replay $NAME: route answers from $ROUTES; q06's scores from $Q06"
 python3 - "$ROUTES/cache.db" "$RC/cache.db" <<'EOF' || exit 1
 import shutil, sqlite3, sys
 shutil.copyfile(sys.argv[1], sys.argv[2])
-db = sqlite3.connect(sys.argv[2]); db.execute("DELETE FROM score"); db.execute("DELETE FROM meta"); db.commit()
+db = sqlite3.connect(sys.argv[2]); db.execute("DELETE FROM score")
+db.execute("DELETE FROM meta WHERE k IN ('rerank_model', 'rerank_model2')"); db.commit()  # E0b: key form, store kept
 EOF
 MODELS='{"q06":"Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473","q4b":"Qwen/Qwen3-Reranker-4B@22e683669bc0f0bd69640a1354a6d0aebcfeede5","gte":"Alibaba-NLP/gte-reranker-modernbert-base@f7481e6055501a30fb19d090657df9ec1f79ab2c","zer":"zeroentropy/zerank-1-small-reranker@a65fd51c450e9b47fdddab98e31166ecad21af8d"}'
 CACHES="{\"q06\":\"$Q06\",\"q4b\":\"$CA/q4b\",\"gte\":\"$CA/gte\",\"zer\":\"$CA/zer\"}"

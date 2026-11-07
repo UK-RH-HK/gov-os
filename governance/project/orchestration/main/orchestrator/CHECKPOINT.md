@@ -6,6 +6,15 @@
 ran, §3 what window 4 carries, §4 the steps after "done", §5 every watcher, loop and digest to re-arm, §6 what waits
 on the owner). Next free id **DEC-1089**. The blocks below are this session's, newest first; older ones are history,
 kept for their figures.
+- **~23:30 11-07, session `ad44f5fe`: EVERY EXPERIMENT DONE; the combined report to the owner (DEC-1095 (3)).** Next
+  free id DEC-1097. Records in `packages/LIFT-1/`: E0, E0B, E1-PILOT, E2, E2G, E3, E3-SA, E4, E5 RESULTs; G1-PROFILE
+  (two readings); FRESH-80-1, M3-ADOPTION-1 (its E4 rule committed before E4's figures, `e0c63aa4`), GLOSSARY-1
+  (W2-143/W2-144 proposed, NOT filed). Merged today: W2-136, W2-137, W2-138 (live at the lift). Filed: W2-139, W2-140,
+  W2-141, W2-142. Results: the 0.6B's bundle with search again once = 128/138 (92.8 %) is best; M3/M1 no end-to-end
+  gain (111, 113 vs 114); 12k tokens no gain; the glossary as consulted lowers (122 vs 128, p 0.031).
+  - **Waiting on the owner:** FRESH-80-1 §5 (7 questions), M3-ADOPTION-1 §6 (6), GLOSSARY-1 §9 (7), ADR-0002 later.
+  - **Nothing running.** Spend recorded: experiments $223.71, launched workers $47.50 (measured); in-session agents
+    ~2.9M tokens; plan usage 95 % of the week at 22:42 (resets 11-08 09:00), recorded only (DEC-1089 (3)).
 - **~18:45 11-07, session `ad44f5fe`: DEC-1092 (`df5a4534`). E2 DONE (`a6b7e735`: 83.3 % → 92.8 % right end to end).
   W2-137 and W2-138 MERGED (reviews READY, transcribed: the launched reviewer's record path is refused and its /tmp copy
   removed at session end; next time brief the record into the worker's own worktree). Next free id DEC-1093.**

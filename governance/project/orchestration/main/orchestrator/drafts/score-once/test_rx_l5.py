@@ -160,8 +160,29 @@ def check_diff() -> None:
         '-     STATE["query"], STATE["root"] = query, Path(root)',
         '- CUSTOM = bool(set(V) - {"exclude", "chars", "sem_k", "lex_k", "sem_uncut"}) or bool(EXCLUDE)',
     }
-    report("2b the port removed only the four lines L5 changes (docstring, _phrasings, _lex, CUSTOM)",
-           set(removed) <= allowed and len(removed) == 4, f"{removed}")
+    # E0b (E0-DECLARATION §E0b, test_rx_e0b.py): the 17 lines its three fixes replace (the memo key, the searches'
+    # top_k, _phrased_rx's depth, the semrank key, _kept's stop message), each named
+    e0b = {
+        "-         key = _key(name, *key_of(*a, **kw))",
+        '- _lex_memo = _memo("lex", _lex_search, lambda r, q, refresh=True: (q, lexical.TOP_K))',
+        '- _sem_memo = _memo("sem", _sem_search, lambda r, q, refresh=True: (q, semantic.TOP_K, semantic.INSTRUCTION))',
+        "- def _lex(root, query, refresh=True):",
+        "-         return _lex_memo(root, asked, refresh)",
+        "-     answers = [_lex_memo(root, p, refresh) for p in _phrasings(query)]",
+        "- def _sem(root, query, refresh=True):",
+        "-         return _sem_memo(root, asked, refresh)",
+        "-     answers = [_sem_memo(root, p, refresh) for p in _phrasings(query)]",
+        '-     return {**answers[0], "hits": _rrf_lists([a["hits"] for a in answers])[:semantic.TOP_K]}',
+        '-         sys.exit(f"rx: {missing} of {len(keys)} texts were not scored by {name} in the window: stopped")',
+        '-     key = _key("semrank", STATE["query"], tuple(ids))',
+        '-     row = _db.execute("SELECT v FROM memo WHERE k = ?", (key,)).fetchone()',
+        '-         _db.execute("INSERT OR REPLACE INTO memo VALUES (?, ?)", (key, pickle.dumps(dist)))',
+        "-         _db.commit()",
+        "- def _phrased_rx(search, root, asked, key, cut=None):",
+        '-     return _phrased(search, root, asked, key, cut=None if V.get("sem_uncut") else cut)',
+    }
+    report("2b the port removed only the four lines L5 changes (docstring, _phrasings, _lex, CUSTOM), and E0b's 17",
+           set(removed) <= allowed | e0b and len(removed) == 4 + len(e0b), f"{sorted(set(removed) - allowed)}")
     added = [line[2:] for line in difflib.ndiff(old, new) if line.startswith("+ ")]
     code = [line for line in added if re.search(r"^\s*SCORELOG\s*=|_scorelog|os\.environ.*SCORELOG", line)]
     report("2c no score log ported (no SCORELOG setting, no score-log writer)", not code, f"{code}")
@@ -461,13 +482,14 @@ def count(db: Path) -> int:
 
 
 def copy_kept(src: Path, dst: Path, keep_scores: bool) -> None:
-    """The extend window's copy (scores and meta kept) or replay.sh's (both removed), by sqlite's backup."""
+    """The extend window's copy (scores and meta kept) or replay.sh's (the scores and the model marks removed; since
+    E0b the cache's key form and store kept, as replay.sh now does), by sqlite's backup."""
     dst.mkdir(parents=True)
     a, b = sqlite3.connect(src / "cache.db"), sqlite3.connect(dst / "cache.db")
     a.backup(b)
     if not keep_scores:
         b.execute("DELETE FROM score")
-        b.execute("DELETE FROM meta")
+        b.execute("DELETE FROM meta WHERE k IN ('rerank_model', 'rerank_model2')")
         b.commit()
     a.close()
     b.close()

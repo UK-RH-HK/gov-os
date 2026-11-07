@@ -46,6 +46,10 @@ The variant's keys (all optional; ``{}`` is the shipped path, measured to reprod
 ``GOV_RX_LOG`` names a file that gets one line per rerank: who scored and how many texts were sent to the service.
 LIVE (D4B-SCORE-ONCE §4): ``GOV_RX_RERANK_DIR2``, ``GOV_RX_RERANK_MODEL2`` and ``GOV_RX_LIVE_RULE`` score each pass
 with two trial services at once, merged by a ``combine`` rule; see the block after ``combine``.
+E0b (re-pin window 4's code; E0-DECLARATION §E0b): the searches take window 4's ``depth``/``top_k`` (``_phrased_rx``,
+``_lex``, ``_sem``); the route answers are keyed by their store (``_store_of``; GOV_RX_LEGACY_STORE=1 for a cache
+filled before); GOV_RX_LIVE_MISSING=1 scores a replay's missing texts on the live service (``_kept``); a variant of
+its own on a clone with the product's pool on is refused unless GOV_RX_POOL_OFF=1 (``_pool_rx``). See E0B-READINESS.md.
 """
 import fnmatch
 import hashlib
@@ -79,6 +83,69 @@ def _key(*parts) -> str:
     return hashlib.sha256(repr(parts).encode()).hexdigest()
 
 
+# E0b (fault 2): a stored route answer is keyed by its store, the root (resolved) and the store's fingerprints head
+# (``.gov-runtime/store.db``'s ``fingerprints`` row, W2-68): on a new clone, or a store rebuilt at another commit, no
+# answer stored for another store is ever returned (its key differs), and a cache that holds another store's answers
+# is refused at the first route call (meta ``store``). A root with no store file stores nothing (each call is asked
+# afresh); a store with no fingerprints head stops the run. The scores stay keyed by (model, question, text): a
+# pointwise cross-encoder's score of a text is no store's answer. A cache filled before this key (route answers and no
+# meta ``memo_keys``) is refused; ``GOV_RX_LEGACY_STORE=1`` keys as before, for replaying such a cache on the clone it
+# was filled on (the g1 caches of the score-once grid).
+_db.execute("CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT)")
+MEMO_KEYS = "legacy" if os.environ.get("GOV_RX_LEGACY_STORE") == "1" else "store"
+_memo_keys = _db.execute("SELECT v FROM meta WHERE k = 'memo_keys'").fetchone()
+_memo_keys = _memo_keys[0] if _memo_keys else (
+    "legacy" if _db.execute("SELECT 1 FROM memo LIMIT 1").fetchone() else None)
+if _memo_keys is not None and _memo_keys != MEMO_KEYS:
+    sys.exit(f"rx: the cache {CACHE} holds route answers keyed {'without' if _memo_keys == 'legacy' else 'by'} their "
+             f"store, and this run keys them {'by' if MEMO_KEYS == 'store' else 'without'} it: refused (a fresh "
+             f"GOV_RX_CACHE, or one seeded with scores only by seed_scores.py; GOV_RX_LEGACY_STORE=1 replays a cache "
+             f"filled before the store key, on its own clone only)")
+_db.execute("INSERT OR REPLACE INTO meta VALUES ('memo_keys', ?)", (MEMO_KEYS,))
+_db.commit()
+STORES: dict = {}
+
+
+def _store_of(root):
+    """(resolved root, the store's fingerprints head) of ``root``, checked once per process against the cache's
+    meta ``store`` (claimed by the first); None where ``root`` holds no store file (nothing is stored then)."""
+    where = str(Path(root).resolve())
+    if where not in STORES:
+        path = Path(where) / ".gov-runtime" / "store.db"
+        if not path.is_file():
+            STORES[where] = None
+            return None
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        try:
+            table = conn.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'fingerprints'").fetchone()
+            rows = conn.execute("SELECT head FROM fingerprints").fetchall() if table else []
+        finally:
+            conn.close()
+        head = rows[0][0] if len(rows) == 1 else None
+        if not head:
+            sys.exit(f"rx: the store at {where} has no fingerprints head: its route answers cannot be keyed by it: "
+                     f"refused (rebuild the store with a gov that writes the fingerprints row)")
+        mine = json.dumps([where, head])
+        held = _db.execute("SELECT v FROM meta WHERE k = 'store'").fetchone()
+        if held is None:
+            _db.execute("INSERT INTO meta VALUES ('store', ?)", (mine,))
+            _db.commit()
+        elif held[0] != mine:
+            sys.exit(f"rx: the cache {CACHE} holds the route answers of the store {held[0]}, not {mine}: refused (a "
+                     f"fresh GOV_RX_CACHE, or one seeded with scores only by seed_scores.py)")
+        STORES[where] = (where, head)
+    return STORES[where]
+
+
+def _scoped(name, root, *parts):
+    """The memo key of a route answer: by its store (``_store_of``), or as before under GOV_RX_LEGACY_STORE=1; None
+    where the root holds no store (the answer is not stored)."""
+    if MEMO_KEYS == "legacy":
+        return _key(name, *parts)
+    store = _store_of(root)
+    return None if store is None else _key(name, store, *parts)
+
+
 def _answered(value) -> bool:
     """A route's answer worth keeping: never an unavailable facet (an embedder or index that did not answer)."""
     if isinstance(value, dict) and value.get("available") is False:
@@ -91,7 +158,9 @@ def _answered(value) -> bool:
 
 def _memo(name, fn, key_of):
     def wrapped(*a, **kw):
-        key = _key(name, *key_of(*a, **kw))
+        key = _scoped(name, a[0] if a else kw["root"], *key_of(*a, **kw))
+        if key is None:  # no store at the root: asked afresh, never stored
+            return fn(*a, **kw)
         row = _db.execute("SELECT v FROM memo WHERE k = ?", (key,)).fetchone()
         if row:
             return pickle.loads(row[0])
@@ -108,8 +177,25 @@ def _memo(name, fn, key_of):
 _lex_search, _sem_search = lexical.search, semantic.search
 
 
-_lex_memo = _memo("lex", _lex_search, lambda r, q, refresh=True: (q, lexical.TOP_K))
-_sem_memo = _memo("sem", _sem_search, lambda r, q, refresh=True: (q, semantic.TOP_K, semantic.INSTRUCTION))
+def _depth(top_k) -> dict:
+    """E0b (fault 1): a search's ``top_k`` passed on only when set (window 4's ``pool.route_depth``); a tree before
+    W2-32 S11 has searches without the argument, and is never given it (its retrieve never passes one)."""
+    return {"top_k": top_k} if top_k else {}
+
+
+def _lex_call(root, q, refresh=True, top_k=None):
+    return _lex_search(root, q, refresh, **_depth(top_k))
+
+
+def _sem_call(root, q, refresh=True, top_k=None):
+    return _sem_search(root, q, refresh, **_depth(top_k))
+
+
+# keyed by the depth the search used (``top_k`` or the module's TOP_K, as the product's searches read it): with no
+# ``top_k`` the key is the one before E0b
+_lex_memo = _memo("lex", _lex_call, lambda r, q, refresh=True, top_k=None: (q, top_k or lexical.TOP_K))
+_sem_memo = _memo("sem", _sem_call,
+                  lambda r, q, refresh=True, top_k=None: (q, top_k or semantic.TOP_K, semantic.INSTRUCTION))
 _STOP = frozenset("a an the of in on at to for by with from and or is are was were be been do does did which what who "
                   "whom whose where when why how may must can could should would will shall it its this that these "
                   "those there their they them as into about before after than then".split())
@@ -506,27 +592,27 @@ def _rrf_lists(lists: list[list[dict]], k: float = 60.0) -> list[dict]:
     return [first[c] for c in sorted(score, key=lambda c: -score[c])]
 
 
-def _lex(root, query, refresh=True):
+def _lex(root, query, refresh=True, top_k=None):
     if query not in STATE.get("extra", ()):  # L5: an extra phrasing never becomes the reranker's or sem's text
         STATE["query"] = query
     STATE["root"] = Path(root)
     asked = _expanded(root, query) if V.get("expand") in ("lex", "both") else query
     if not V.get("phrasings"):
-        return _lex_memo(root, asked, refresh)
-    answers = [_lex_memo(root, p, refresh) for p in _phrasings(query)]
+        return _lex_memo(root, asked, refresh, **_depth(top_k))
+    answers = [_lex_memo(root, p, refresh, **_depth(top_k)) for p in _phrasings(query)]
     if not all(a.get("available", True) for a in answers):
         return answers[0]
     return {**answers[0], "ranked": _rrf_lists([a.get("ranked", a["hits"]) for a in answers])}
 
 
-def _sem(root, query, refresh=True):
+def _sem(root, query, refresh=True, top_k=None):
     asked = _expanded(root, query) if V.get("expand") in ("sem", "both") else query
     if not V.get("phrasings"):
-        return _sem_memo(root, asked, refresh)
-    answers = [_sem_memo(root, p, refresh) for p in _phrasings(query)]
+        return _sem_memo(root, asked, refresh, **_depth(top_k))
+    answers = [_sem_memo(root, p, refresh, **_depth(top_k)) for p in _phrasings(query)]
     if not all(a.get("available", True) for a in answers):
         return answers[0]
-    return {**answers[0], "hits": _rrf_lists([a["hits"] for a in answers])[:semantic.TOP_K]}
+    return {**answers[0], "hits": _rrf_lists([a["hits"] for a in answers])[:top_k or semantic.TOP_K]}
 
 
 lexical.search = _lex
@@ -673,6 +759,21 @@ if COMBINE:
             sys.exit(f"rx: the cache for {_name} holds {_rows[0] if _rows else None}, not {COMBINE['models'][_name]}: "
                      f"refused")
 
+# E0b (fault 3): GOV_RX_LIVE_MISSING=1, in a replay only, scores a text no kept cache holds on the live reranker service
+# (the product's own client to the shared service, ``rr.default_reranker``: never a start, never a private reranker,
+# never a fallback; a pass it does not score stops the run), for a rule model that is the live service's model at this
+# gov (``rr.MODEL@rr.REVISION``) only; a missing text of any other model still stops the run. Each score is written
+# to the replay's own cache (GOV_RX_CACHE, never a kept one), which a later replay reads after the kept caches. Counts
+# in GOV_RX_LOG: ``LIVEMISS<TAB>n<TAB>name<TAB>texts`` per pass scored live, ``OWNCACHE<TAB>n<TAB>name`` per pass
+# read from the own cache. Unset (the default): a missing text stops the run, as before.
+LIVE_MODEL = f"{rr.MODEL}@{rr.REVISION}"
+LIVE_MISSING = os.environ.get("GOV_RX_LIVE_MISSING") == "1"
+if LIVE_MISSING and not COMBINE:
+    sys.exit("rx: GOV_RX_LIVE_MISSING acts in a replay (GOV_RX_COMBINE) only: refused")
+if LIVE_MISSING and LIVE_MODEL not in [COMBINE["models"][n] for n in rule_models(COMBINE["rule"])]:
+    sys.exit(f"rx: GOV_RX_LIVE_MISSING scores missing texts on the live service ({LIVE_MODEL}), and no model of the "
+             f"rule is it: refused")
+
 # LIVE (D4B-SCORE-ONCE §4: a two-model cell measured as it would run, both models loaded). GOV_RX_RERANK_DIR2 names a
 # second trial service's folder and GOV_RX_RERANK_MODEL2 its model; with GOV_RX_LIVE_RULE, a ``combine`` rule over
 # the names "one" (GOV_RX_RERANK_DIR's service, GOV_RX_RERANK_MODEL) and "two" (GOV_RX_RERANK_DIR2's), ``scores``
@@ -817,10 +918,54 @@ def _kept(name: str, query: str, texts: list[str]) -> list[float]:
         part = keys[i:i + 500]
         have.update(_combine_db[name].execute(f"SELECT k, s FROM score WHERE k IN ({','.join('?' * len(part))})",
                                               part).fetchall())
+    lacking = [k for k in keys if k not in have]
+    if lacking:  # E0b: then the replay's own cache (the scores a GOV_RX_LIVE_MISSING run wrote there)
+        own = {}
+        for i in range(0, len(lacking), 500):
+            part = lacking[i:i + 500]
+            own.update(_db.execute(f"SELECT k, s FROM score WHERE k IN ({','.join('?' * len(part))})", part).fetchall())
+        if own:
+            have.update(own)
+            _log(f"OWNCACHE\t{len(own)}\t{name}")
     missing = sum(1 for k in keys if k not in have)
+    if missing and LIVE_MISSING and COMBINE["models"][name] == LIVE_MODEL:
+        idx = [i for i, k in enumerate(keys) if k not in have]
+        for i, s in zip(idx, _live_missing(query, [texts[i] for i in idx])):
+            have[keys[i]] = s
+            _db.execute("INSERT OR REPLACE INTO score VALUES (?, ?)", (keys[i], s))
+        _db.commit()
+        _log(f"LIVEMISS\t{len(idx)}\t{name}\t{len(keys)}")
+        missing = 0
     if missing:
-        sys.exit(f"rx: {missing} of {len(keys)} texts were not scored by {name} in the window: stopped")
+        sys.exit(f"rx: {missing} of {len(keys)} texts were not scored by {name} in the window: stopped"
+                 + ("" if COMBINE["models"][name] == LIVE_MODEL else
+                    f" (GOV_RX_LIVE_MISSING scores the live service's model {LIVE_MODEL} only)" if LIVE_MISSING else ""))
     return [have[k] for k in keys]
+
+
+def _live_missing(query: str, texts: list[str]) -> list[float]:
+    """E0b (fault 3): the live service's scores of ``texts``, in their order, in the harness's request bounds, each
+    request after the GPU read (``_gpu_wait``); a request the service does not score stops the run, nothing kept."""
+    global _service
+    if _service is None:  # built only when a text is missing: a replay that needs none never makes a client
+        _service = rr.default_reranker()
+        if _service is None:
+            sys.exit(f"rx: GOV_RX_LIVE_MISSING: no live reranker ({rr.last_outcome().get('reason')}): stopped")
+    cut = sum(1 for t in texts if len(t) > REQUEST_CHARS)
+    if cut:
+        _log(f"TRUNC\t{cut}\t{REQUEST_CHARS}")
+    got: list = [None] * len(texts)
+    for order in _requests(texts):
+        _gpu_wait()
+        part = _service(query, [texts[j][:REQUEST_CHARS] for j in order])
+        by = rr.last_outcome()["by"]
+        if part is None or by != "service" or len(part) != len(order):
+            _log(f"LIVEMISSFAIL\t{by}\t{len(texts)}")
+            sys.exit(f"rx: GOV_RX_LIVE_MISSING: the live reranker service did not score ({by}: "
+                     f"{rr.last_outcome().get('reason')}): stopped")
+        for j, value in zip(order, part):
+            got[j] = float(value)
+    return got
 
 
 def scores(query: str, texts: list[str]) -> list[float] | None:
@@ -1036,8 +1181,8 @@ def _excluded(path: str) -> bool:
 def _sem_rank(hits: list[dict]) -> list[dict]:
     """``hits`` ranked by the cosine of their stored vectors to the question's (unembedded chunks last)."""
     ids = [h["chunk_id"] for h in hits]
-    key = _key("semrank", STATE["query"], tuple(ids))
-    row = _db.execute("SELECT v FROM memo WHERE k = ?", (key,)).fetchone()
+    key = _scoped("semrank", STATE["root"], STATE["query"], tuple(ids))  # E0b: by the store, as every route answer
+    row = _db.execute("SELECT v FROM memo WHERE k = ?", (key,)).fetchone() if key else None
     if row:
         dist = pickle.loads(row[0])
     else:
@@ -1057,8 +1202,9 @@ def _sem_rank(hits: list[dict]) -> list[dict]:
                         dist[cid] = 1.0 - sum(a * b for a, b in zip(q, v)) / (qn * vn)
             finally:
                 conn.close()
-        _db.execute("INSERT OR REPLACE INTO memo VALUES (?, ?)", (key, pickle.dumps(dist)))
-        _db.commit()
+        if key:
+            _db.execute("INSERT OR REPLACE INTO memo VALUES (?, ?)", (key, pickle.dumps(dist)))
+            _db.commit()
     ranked = sorted(hits, key=lambda h: (dist.get(h["chunk_id"], 9.0), ids.index(h["chunk_id"])))
     return [{**h, "distance": dist.get(h["chunk_id"])} for h in ranked]
 
@@ -1179,8 +1325,18 @@ CUSTOM = bool(set(V) - {"exclude", "chars", "sem_k", "lex_k", "sem_uncut", "spli
 _phrased = rt._phrased
 
 
-def _phrased_rx(search, root, asked, key, cut=None):
-    return _phrased(search, root, asked, key, cut=None if V.get("sem_uncut") else cut)
+_PHRASED_DEPTH = "depth" in __import__("inspect").signature(_phrased).parameters  # window 4 (W2-32 S11) and later
+
+
+def _phrased_rx(search, root, asked, key, cut=None, depth=0):
+    """E0b (fault 1): window 4's ``retrieve._phrased`` signature (``depth``, passed to each search as its ``top_k``),
+    honoured by passing it on; the older form (no ``depth``, the g1 clone's) is still taken and still called as
+    before, since its retrieve never passes one."""
+    if depth and not _PHRASED_DEPTH:
+        sys.exit("rx: a depth was passed to a retrieve._phrased that takes none: this tree's retrieve is not the one "
+                 "this harness was checked against: refused")
+    more = {"depth": depth} if depth else {}
+    return _phrased(search, root, asked, key, cut=None if V.get("sem_uncut") else cut, **more)
 
 
 rt._phrased = _phrased_rx
@@ -1371,6 +1527,34 @@ if "routing" in V:
     _routing.settings = lambda root: {**_settings(root), **_want}
 if "ahead_types" in V:
     rt.AHEAD_TYPES = frozenset(V["ahead_types"])
+
+# E0b (the pool, E0-DECLARATION plan step 2): window 4's retrieve reads ``retrieval.yaml``'s ``pool:`` (W2-32 S11), the
+# product's own port of v456. A variant with keys of its own (CUSTOM) applies its fusion, depth rerank, cap and dedup
+# here, so on a clone with the pool on the two would stack: refused, unless GOV_RX_POOL_OFF=1 gives retrieve the pool
+# off in this process (every key 0 or false; the file is still read and validated, so an invalid one is refused as
+# the product refuses it; the clone and its store are unchanged). ``{}`` (the shipped path) keeps the clone's pool.
+# A tree before S11 has no pool: nothing is patched, and GOV_RX_POOL_OFF changes nothing.
+POOL_OFF = os.environ.get("GOV_RX_POOL_OFF") == "1"
+try:
+    from gov.retrieval import pool as _pool
+except ImportError:
+    _pool = None
+if _pool is not None:
+    _pool_settings = _pool.settings
+
+    def _pool_rx(root):
+        got = _pool_settings(root)
+        if POOL_OFF:
+            if not STATE.get("pool_off_logged"):
+                _log("POOL\toff\t" + ",".join(f"{k}={v}" for k, v in got.items() if v))
+                STATE["pool_off_logged"] = True
+            return {k: (False if isinstance(v, bool) else 0) for k, v in got.items()}
+        if CUSTOM and any(got.values()):
+            sys.exit(f"rx: the product's pool is on at {root} ({', '.join(f'{k}: {v}' for k, v in got.items() if v)}) "
+                     f"and this variant applies its own fusion and rerank: the two would stack: refused (set "
+                     f"GOV_RX_POOL_OFF=1: the product's pool off in this process, the clone unchanged)")
+        return got
+    _pool.settings = _pool_rx
 
 # L5's switches extend the product's phrasings (routing.phrasings) where the tree has them. Not patched when off.
 if EXTRA:

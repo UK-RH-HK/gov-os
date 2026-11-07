@@ -9,7 +9,7 @@ export TMPDIR=${TMPDIR:-/tmp/gov-os-emg-e0b}
 mkdir -p "$TMPDIR"
 rc=0
 for t in test_rx_combine.py test_rx_l5.py test_rx_l6.py test_rx_live.py test_live_tools.py test_live_window.py \
-         test_yes_logit.py; do
+         test_yes_logit.py test_e4.py; do
   echo "=== $t"
   python3 "$HERE/$t" > "$TMPDIR/$t.out" 2>&1
   code=$?

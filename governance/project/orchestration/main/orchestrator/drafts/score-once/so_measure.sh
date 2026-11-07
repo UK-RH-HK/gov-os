@@ -4,7 +4,8 @@
 # search's ranked output kept in the sets root (mode 700), records in ~/gov-os-runs/D4B/<point>/<name>/. Counts only.
 #   so_measure.sh <point> <name> r80|r60 '<GOV_RX json>' <cache folder>
 # r80: memory-retrieval, all (the 79 and h24); r60: memory-verdict, hidden (the spent 59 and m60). GOV_RX_RERANK_DIR,
-# GOV_RX_RERANK_MODEL, GOV_RX_COMBINE, GOV_RX_BATCH, GOV_RX_REQUEST_CHARS and GOV_RX_GPU_LIMIT_MIB pass through.
+# GOV_RX_RERANK_MODEL, GOV_RX_COMBINE, GOV_RX_BATCH, GOV_RX_REQUEST_CHARS and GOV_RX_GPU_LIMIT_MIB pass through, and
+# (E0b) GOV_RX_LIVE_MISSING, GOV_RX_POOL_OFF and GOV_RX_LEGACY_STORE; CLONE names the clone (default: g1's).
 set -uo pipefail
 POINT=$1 NAME=$2 SET=$3 VARIANT=$4 CACHE=$5
 R=/home/usain/Dynamic-Agentic-Engineering-OS
@@ -43,5 +44,5 @@ env -u GOV_TICKET GOV_ROLE=orchestrator TMPDIR=$TMP PYTHONPATH="$CLONE/src" bash
 [ $rc -eq 0 ] || echo "MEASURE FAILED ($NAME $SET, rc $rc)"
 med=$(sort -n "$D/ms" | awk '{a[NR]=$1} END {if (NR) print a[int((NR+1)/2)]; else print "-"}')
 sum_of() { awk -F'\t' -v k="$1" '$1 == k {n += $2} END {print n + 0}' "$D/rx.log"; }
-echo "$NAME $SET: $(( $(date +%s) - t0 )) s; median search $med ms; unscored $(grep -c '^UNSCORED' "$D/rx.log"); texts cut at the request bound $(sum_of TRUNC); texts cut by the model $(sum_of MODELCUT); combined passes $(grep -c '^combine' "$D/rx.log")"
+echo "$NAME $SET: $(( $(date +%s) - t0 )) s; median search $med ms; unscored $(grep -c '^UNSCORED' "$D/rx.log"); texts cut at the request bound $(sum_of TRUNC); texts cut by the model $(sum_of MODELCUT); combined passes $(grep -c '^combine' "$D/rx.log"); texts scored live (GOV_RX_LIVE_MISSING) $(sum_of LIVEMISS); texts read from the replay's own cache $(sum_of OWNCACHE)"
 exit $rc

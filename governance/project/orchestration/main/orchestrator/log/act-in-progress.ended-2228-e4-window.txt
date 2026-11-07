@@ -1,0 +1,1 @@
+2026-11-07 22:17:22 E4 scoring window running (planned stop of the shared reranker, ~15-20 min, restore on every exit; pid in ~/gov-os-runs/D4B/e4/window.pid)
