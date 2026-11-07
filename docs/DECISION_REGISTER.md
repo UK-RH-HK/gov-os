@@ -13810,6 +13810,18 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** (1) question 4 (the fix chosen on a measured cause, not a guess); (2) questions 1, 3, 4 and 5 (the package's
   basis).
 
+### DEC-1095 — W2-137 goes live at the lift as it is; G1's profile repeated once and brought with E4; the harness fix, E0b, E4, then the fresh-80 package and the K9 bar
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1094 (1), DEC-1090 (2), DEC-1092 (4) · **Source:** `governance/project/orchestration/packages/LIFT-1/G1-PROFILE.md` (its W2-137 section), the CTO's two-line reasons (chat, 2026-11-07)
+- **Decision:**
+  - (1) **W2-137 goes live at the lift's re-pin as it is** (the cap of 64): its "slower" reading and its MRR dip are
+    within run-to-run noise (G1-PROFILE).
+  - (2) **G1's profiling burst** is run in the next quiet GPU window and its result brought with E4's. (The CTO notes:
+    the first burst already ran at about 19:05, `G1-PROFILE.md`, `30e75aa0`; the next window gives a second reading,
+    and both come with E4.)
+  - (3) **The order:** the harness fix, its review, E0b and E4; then the fresh-80 package and the K9 bar
+    (DEC-1092 (4)).
+- **Basis:** question 4 (no change without a measured gain) and question 1.
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13841,3 +13853,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.476 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1092. Next free id: DEC-1093. |
 | 0.477 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1093; W2-139, W2-140 and W2-141 filed. Next free id: DEC-1094. |
 | 0.478 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1094; W2-142 filed; W2-128 gains one KPI line. Next free id: DEC-1095. |
+| 0.479 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1095. Next free id: DEC-1096. |
