@@ -91,3 +91,11 @@ go in 16, 16, 7 rather than one request), the rest green guards (S2-S4).
 **Built (engineer, 2026-11-07):** `w2/W2-137` at `dba3fa54`: the cap 16 → 64; `gov accept W2-137` 37/37. The W2-112
 socket cases pass outside the sandbox (CTO: 85 passed). Left before the review: `test_w2_32_routing.py`'s cap (the
 engineer, added to D-1's paths), and D-2's 9 acceptance cases (W2-32 ×8, W1-19 ×1) by a test designer. [DEC-1090]
+
+**Merged (CTO, 2026-11-07):** the routing test (`ac5a8dae`, engineer) and D-2's nine cases (`0cb8ba99`, designer)
+revised; the scoped regression outside the sandbox 943 passed, 1 failed (the known parallel-run W1-19 red, which passes
+alone); review round 1 READY by `verdict.py` (`governance/project/orchestration/reviews/w2-137.md`; F1-F4 Wave 3 rows:
+W1-21's `RERANK_CAP = 16` premise, test names saying 16, count-splitting less exercised end to end, the comment's
+"80 characters" meaning 80 tokens). Merged into `w2/integrate`. **S5 next:** the CTO's GPU window, with the reviewer's
+two points: requests of 32 to 64 texts at the padded bound sampled, and S3 checked live by hit@5 and MRR within 1
+(bfloat16 rounding can move a raw score by about 1e-2). Live at the lift's re-pin. [DEC-1090]
