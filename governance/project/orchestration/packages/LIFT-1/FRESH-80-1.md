@@ -263,15 +263,16 @@ Each option reports every figure in §3.1 beside the line it judges.
 
 **Recommendation: B,** with A's figures reported beside it every time. 95 % stays the target. The owner decides before the 80 runs.
 
-## § E4's result (to be filled by the CTO)
-E4 is running. When it ends, the CTO writes here, in plain words:
-- what E4 measured: today's bundle as M3 (zerank with gte) and as M1 (the 0.6B with gte) build it through the harness at window 4's commit, one reader call each, against E3's bundle from the 0.6B;
-- the result for each, with gains, losses and the exact test, and whether either beats the 0.6B's bundle on the 138;
-- G1's second profile reading, which comes with E4 (DEC-1095 (2)), and what it means for speed if M3 were adopted;
-- the CTO's recommendation on M3's adoption (DEC-1087 (12));
-- what that changes in this package:
-  - **M3 not adopted:** §3 stands as written;
-  - **M3 adopted:** the 80 waits for M3's pin (item 10), the 138 is measured on that pin first, and the 0.6B's configuration becomes the free data condition.
+## § E4's result (filled by the CTO from `E4-RESULT.md`)
+- **What E4 measured:** today's bundle as M3 (zerank with gte) and as M1 (the 0.6B with gte) build it, through the harness at window 4's commit, one reader call each, against E3's bundle from the 0.6B.
+- **The result:**
+  - M3: 111 right end to end (3 gains, 6 losses, p 0.51);
+  - M1: 113 (3 gains, 4 losses, p 1.0);
+  - the 0.6B's bundle: 114.
+  - **Neither beats it.** M3's higher hit@5 (117 against 106) moves gold up inside a bundle that already holds it (123 in every cell), and the reader reads the whole bundle.
+- **G1's two profile readings** (19:05 and about 20:30, `G1-PROFILE.md`): the shared reranker's GPU is busy most of a 20-search burst (median 75 to 86 %). Two models (M3) would roughly double the scoring per search; 20 agents at once might wait about 26 to 30 s per search (an estimate, not measured).
+- **The CTO's recommendation on M3's adoption (DEC-1087 (12)):** **keep the 0.6B** (M3-ADOPTION-1 §5, branch (c)), under the rule fixed before E4's figures.
+- **What that changes in this package:** nothing. **§3 stands as written:** the 80 runs on window 4's pin with the 0.6B.
 
 ## 5. For the owner
 1. **The configuration judged on the 80?**

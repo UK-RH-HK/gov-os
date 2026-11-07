@@ -139,15 +139,16 @@ Holm over the two comparisons with the 0.6B gives 0.025 for each.
 - **The reader's own spread** is 1 to 3 answers between runs on the same bundles (E3 against E2 at one search; E3-SA's
   repeat).
 
-### § E4's end-to-end result (to be filled by the CTO)
-E4's reader runs are going now. This section is left for the CTO to fill when they end. It should say, in plain words:
-- how many questions agents answered right end to end from M3's bundles and from M1's, against today's bundle from the
-  0.6B (E3's run, shared), on the 138 and per set;
-- the wrong claims and the "not found" answers beside each;
-- the gains and losses against today's bundle, with the exact McNemar p and Holm over the two;
-- whether each difference is wider than the reader's own spread;
-- the cost of the runs;
-- and which branch of §5 applies.
+### § E4's end-to-end result (filled by the CTO from `E4-RESULT.md`)
+- **Right end to end, one reader call, on the 138:**
+  - today's bundle from the 0.6B: 114 (visible 37, hidden 32, spent 45), 3 wrong claims;
+  - **M3's bundle: 111** (34, 32, 45), 2 wrong claims;
+  - **M1's bundle: 113** (34, 33, 46), 4 wrong claims.
+- **Against today's bundle:** M3 has 3 gains and 6 losses (exact McNemar p 0.51; Holm over the two 1.0). M1 has 3 gains and 4 losses (p 1.0).
+- **Neither difference is wider than the reader's own spread** (1 to 3 between repeated runs on the same bundle: E2 against E3's one-call run, and E3-SA's A1 against E3).
+- **Cost:** $37.33 for the 280 reader runs.
+- **Branch of §5:** M3 is not 4 or more above today's bundle (it is 3 below), so the rule fixed before the figures says **(c): keep the 0.6B.** M1 is not above either.
+- **Why:** M3 ranks the gold higher (hit@5 117 against 106) but brings no new gold into the bundle (123 for every cell). The reader reads the whole bundle, so a higher rank inside it does not change the answer.
 
 ### 3.3 Speed, alone and with many agents at once
 | what ran | alone, median (p90) | 10 at once, median (slowest) | 20 at once, median | source |
