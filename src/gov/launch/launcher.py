@@ -41,6 +41,9 @@ WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", 
 # Open package DP-8: these roles need a ticket whose ``role`` is their own; the
 # two independent roles may be launched on any ``in_progress`` ticket.
 OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
+# W2-136 S9: a lead is a session of GOV_ROLE orchestrator with a GOV_TICKET: one launched as such (``lead`` is
+# W2-121's name for it), or one that calls gov launch from its own session.
+LEAD_ROLES = ("lead", "orchestrator")
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
@@ -276,6 +279,12 @@ def _check_cli_args(cli_args: list[str]) -> None:
                           "would have no guard hook")
 
 
+def check_lead(root: Path, ticket_id: str):
+    """The plan's check of a lead (W2-136 S9): ``gov.launch.plan_check.check_lead``, looked up when called."""
+    from gov.launch import plan_check
+    return plan_check.check_lead(root, ticket_id)
+
+
 def _say(line: str) -> None:
     """One line to stderr. A stderr that is closed or that nobody reads loses the line and nothing else (DEC-392):
     the line goes past the stream's buffer, since what stays in it changes the exit code when the interpreter ends."""
@@ -297,6 +306,17 @@ def _say(line: str) -> None:
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     """Start one worker session and return the CLI's exit code; raise ``GovError`` to refuse."""
     root = Path(os.path.realpath(root))
+    lead = ticket_id if role in LEAD_ROLES else (os.environ.get("GOV_TICKET", "").strip()
+                                                 if os.environ.get("GOV_ROLE") == "orchestrator" else "")
+    if lead:  # W2-136 S9 (DEC-1088 (5)(a)): a lead only for a planned ticket whose waits are met
+        verdict = check_lead(root, lead)
+        if isinstance(verdict, tuple) and len(verdict) == 3:
+            verdict = dict(zip(("admitted", "reason", "override"), verdict))
+        field = verdict.get if isinstance(verdict, dict) else lambda name: getattr(verdict, name, None)
+        if not field("admitted"):
+            raise _refuse(f"no lead for ticket '{lead}': {field('reason')} (DEC-1088 (5))")
+        if field("override"):
+            _say(f"gov launch: OVERRIDE {field('override')}: {field('reason')} (DEC-899)\n")
     if role not in WORKER_ROLES:
         raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)})")
     _check_cli_args(cli_args)
