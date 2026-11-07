@@ -54,11 +54,29 @@ lead outside the approved batches or with an unmet wait (DEC-1088 (5)(a)).
 | S6: `plan_override` shares a batch despite an overlap or a wait, shown as `OVERRIDE <DEC-id>` | `make_plan`'s overrides | `test_an_override_shares_a_batch_despite_an_overlap_and_a_wait` | 4/4 |
 | S7: `--ready` writes the list and nothing else; without it nothing is written | `render.write_ready` only under `--ready` | `test_without_ready_nothing_is_written` (tree hashed), `test_ready_writes_the_batches_in_the_dispatchers_form_and_nothing_else` | 5/5 |
 | S8: recomputed from the current tickets every run | `tickets.load` on every call; no file kept | `test_a_ticket_changed_between_two_runs_changes_the_plan` | 2/2 |
-| S9: `gov launch` refuses a lead not in the batches or with an unmet wait, naming it, starting nothing; an override admits and is logged | `plan_check.check_lead`; the launcher's one call | 22 cases: not in a batch, a wait met, `depends_on`/`needs`/`waits_on`/unknown unmet, the current tickets, an override, no ready list, the launcher's refusal (both lead forms), its override line, a lead calling `gov launch`, a stand-in verdict, a worker launch never checked | **12/14: 2 red** (below) |
+| S9: `gov launch` refuses a lead not in the batches or with an unmet wait, naming it, starting nothing; an override admits and is logged | `plan_check.check_lead`; the launcher's one call (`_admit_lead`), for the launched role only; an admitted lead starts with `build_lead_settings` (second pass, below) | 34 cases: not in a batch, a wait met, `depends_on`/`needs`/`waits_on`/unknown unmet, the current tickets, an override, no ready list, the launcher's refusal (both lead forms), an admitted lead's start and env (both forms), an override's start and log line, a refused lead starts nothing, a lead's guard-removing arguments and an unwired guard refused, a stand-in verdict, a worker launch from the CTO's or a lead's session never checked | 14/14 |
 | S10: no close, landing, claim, readiness or hook module imports `gov plan` | only `gov.launch.plan_check` imports it; the launcher reaches it only through that module | `test_no_module_but_launchs_check_imports_the_plan`, `test_the_launcher_reaches_the_plan_only_through_its_check` | 7/7 |
 | S11: under 5 s on this repository (the CTO's) | | the engineer's rough reading, not the measure: 76 open tickets, five runs 0.66-0.80 s, median 0.69 s | |
 
-## Test results (through the heavy slot; HOME a scratch folder whose `.local` links to the user site)
+## Second pass (DAEO-p3ln, the CTO's settlement under DEC-1088 (5)(a))
+
+- **A lead admitted by the check is started.** `gov launch orchestrator|lead <ticket>`: the plan's check, then the CLI
+  arguments check and the repository settings check (the guard wired: a lead has no sandbox, so the guard is its only
+  fence), then the session, with `{"env": {"GOV_ROLE": "orchestrator", "GOV_TICKET": <ticket>}}` and no sandbox block,
+  as the dispatcher starts a lead. No ticket status check (the plan's check already found the ticket), no own folder
+  (DEC-743 7), no temp folder. The lead's settings come from a separate `build_lead_settings`: `build_settings` always
+  yields the strict sandbox block and deny rules that `sandbox_faults` checks, and a lead branch in it would loosen that
+  shape. The session running and signal code moved unchanged into `_run`, shared; a worker launch is as before.
+- **The caller's environment is no longer read.** The clause that checked the calling session's own `GOV_TICKET` when
+  its `GOV_ROLE` was `orchestrator` is removed: only the launched `role` and `ticket_id` decide; a worker launch never
+  consults the plan (the CTO's session `DAEO-sdxk` launching any worker included).
+- **Results:** unit (`tests/unit/launch` and `tests/unit/plan/test_w2_136_*.py`, the heavy slot, `-m "not local_only"
+  -k "not real and not green_here and not time_limit"`, HOME an empty folder): 154 passed, run without `GOV_ROLE` and
+  `GOV_TICKET` and again with `GOV_ROLE=orchestrator GOV_TICKET=DAEO-sdxk`; the exclusion selected none of them, the 86
+  deselected are the project's opt-in lists (`tests/conftest.py`). **`gov accept W2-136`: pass, 76/76 (success-9 14/14),
+  both without and with the CTO's env.**
+
+## First pass test results (through the heavy slot; HOME a scratch folder whose `.local` links to the user site)
 
 - **Unit:** `tests/unit/plan tests/unit/launch/test_w2_136_plan_check.py`: 80 passed.
 - **`gov accept W2-136`:** fail, 74/76. success-1 6, success-2 7, success-3 13, success-4 13, success-5 5, success-6 4,

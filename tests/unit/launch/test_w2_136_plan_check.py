@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import os
 from pathlib import Path
 
 import pytest
@@ -10,6 +12,8 @@ import yaml
 from gov.cli.errors import GovError
 from gov.launch import launcher, plan_check
 from gov.launch.plan_check import check_lead
+
+REPOSITORY_CHECK = launcher._check_repository_settings
 
 
 def _plant(root: Path, *tickets: dict) -> Path:
@@ -122,22 +126,104 @@ def test_the_launcher_refuses_a_lead_naming_what_it_waits_for_and_starts_nothing
     assert started == []
 
 
-def test_the_launcher_writes_an_override_in_its_log(store, monkeypatch, capsys):
-    _no_session(monkeypatch)
+def _sessions(monkeypatch, tmp_path, *, caller=None, ticket=None):
+    """A CLI stand-in under a temporary HOME and a recording ``Popen``; the repository's settings check passes.
+    Returns the list of (argv, cwd, env) of the sessions started."""
+    for name, value in (("GOV_ROLE", caller), ("GOV_TICKET", ticket)):
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
+    home = tmp_path / "home"
+    (home / ".local" / "bin").mkdir(parents=True)
+    (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
+    started = []
+
+    class Session:
+        def __init__(self, argv, cwd, env):
+            started.append((argv, cwd, env))
+
+        def wait(self):
+            return 0
+
+        def poll(self):
+            return 0
+
+    monkeypatch.setattr(launcher.subprocess, "Popen", Session)
+    return started
+
+
+def _settings(argv) -> dict:
+    return json.loads(argv[argv.index("--settings") + 1])
+
+
+@pytest.mark.parametrize("role", ["orchestrator", "lead"])
+def test_an_admitted_lead_reaches_the_session_start_with_the_leads_env(store, monkeypatch, tmp_path, role):
+    started = _sessions(monkeypatch, tmp_path)
+    monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-4 T-4 a.md a.json")))
+    made = []
+    monkeypatch.setattr(launcher.tempfile, "mkdtemp", lambda **kw: made.append(kw) or pytest.fail("a temp folder"))
+    args = ["-p", "go", "--permission-mode", "acceptEdits"]
+    assert launcher.launch(store, role, "T-4", args) == 0
+    [(argv, cwd, env)] = started
+    settings = _settings(argv)
+    assert settings == {"env": {"GOV_ROLE": "orchestrator", "GOV_TICKET": "T-4"}}  # no sandbox, no deny rules
+    assert argv[-len(args):] == args and Path(cwd) == Path(os.path.realpath(store))
+    assert (env["GOV_ROLE"], env["GOV_TICKET"]) == ("orchestrator", "T-4")
+    assert made == []
+
+
+def test_a_lead_admitted_by_an_override_starts_and_logs_the_override(store, monkeypatch, tmp_path, capsys):
+    started = _sessions(monkeypatch, tmp_path)
     monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "# none")))
-    with pytest.raises(GovError) as raised:  # admitted by the plan; a lead's own start is not this launcher's yet
-        launcher.launch(store, "orchestrator", "T-5", [])
-    assert "not a worker role" in raised.value.message
+    assert launcher.launch(store, "orchestrator", "T-5", []) == 0
     assert "gov launch: OVERRIDE DEC-899: plan_override DEC-899 admits ticket T-5" in capsys.readouterr().err
+    assert _settings(started[0][0])["env"] == {"GOV_ROLE": "orchestrator", "GOV_TICKET": "T-5"}
 
 
-def test_a_lead_that_calls_gov_launch_is_checked_for_its_own_ticket(store, monkeypatch):
-    started = _no_session(monkeypatch, caller="orchestrator", ticket="T-2")
+@pytest.mark.parametrize("role", ["orchestrator", "lead"])
+def test_a_refused_lead_starts_nothing_even_with_the_cli_in_place(store, monkeypatch, tmp_path, role):
+    started = _sessions(monkeypatch, tmp_path)
     monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-2 T-2 a.md a.json")))
     with pytest.raises(GovError) as raised:
-        launcher.launch(store, "engineer", "T-2", [])
+        launcher.launch(store, role, "T-2", [])
     assert "no lead for ticket 'T-2'" in raised.value.message and "T-1 (DEPENDS_ON T-1)" in raised.value.message
     assert started == []
+
+
+@pytest.mark.parametrize("args", [["--dangerously-skip-permissions"], ["--settings", "{}"], ["--bare"]])
+def test_an_admitted_lead_still_refuses_arguments_that_take_the_guard_away(store, monkeypatch, tmp_path, args):
+    started = _sessions(monkeypatch, tmp_path)
+    monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-4 T-4 a.md a.json")))
+    with pytest.raises(GovError):
+        launcher.launch(store, "lead", "T-4", args)
+    assert started == []
+
+
+def test_an_admitted_lead_is_refused_without_the_guard_wired(store, monkeypatch, tmp_path):
+    """A lead has no sandbox: a project whose settings do not wire the guard starts no lead."""
+    started = _sessions(monkeypatch, tmp_path)
+    monkeypatch.setattr(launcher, "_check_repository_settings", REPOSITORY_CHECK)  # the planted project has none
+    monkeypatch.setenv(plan_check.READY_ENV, str(_ready(store, "W9-4 T-4 a.md a.json")))
+    with pytest.raises(GovError) as raised:
+        launcher.launch(store, "orchestrator", "T-4", [])
+    assert "does not register the guard" in raised.value.message
+    assert started == []
+
+
+@pytest.mark.parametrize("caller, ticket", [("orchestrator", "DAEO-sdxk"), ("orchestrator", "T-2"), ("lead", "T-2")])
+def test_a_worker_launch_from_a_lead_or_the_cto_never_consults_the_plan(store, monkeypatch, tmp_path, caller, ticket):
+    """The CTO's session (GOV_ROLE=orchestrator, GOV_TICKET=DAEO-sdxk) and a lead launch workers of tickets in no
+    batch: the plan is never asked, and the worker starts with its own sandboxed settings."""
+    started = _sessions(monkeypatch, tmp_path, caller=caller, ticket=ticket)
+    monkeypatch.setattr(plan_check, "check_lead", lambda *a, **k: pytest.fail("a worker was checked against the plan"))
+    monkeypatch.setattr(launcher, "check_lead", lambda *a, **k: pytest.fail("a worker was checked against the plan"))
+    assert launcher.launch(store, "engineer", "T-2", []) == 0
+    settings = _settings(started[0][0])
+    assert settings["env"]["GOV_ROLE"] == "engineer" and settings["env"]["GOV_TICKET"] == "T-2"
+    assert launcher.sandbox_faults(settings) == []
 
 
 @pytest.mark.parametrize("where", [plan_check, launcher])
