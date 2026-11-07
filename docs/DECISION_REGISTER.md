@@ -13775,6 +13775,24 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     layers start; W2-136 is built beside the experiments (DEC-1088 (4)).
 - **Basis:** question 1 (the verdict set judges one configuration chosen beforehand; agents' practice proven end to end).
 
+### DEC-1093 — The CAP-45.a note approved (4.3; CAP-45 to Wave 3; the clause withdrawn; W2-139 and W2-140 filed); the guard's own-acceptance search gap a ticket (W2-141); ADR-0002 refreshed after the experiments
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1090 (5), DEC-1089 (2), DEC-105, DEC-974, DEC-988, DEC-989, DEC-1056, DEC-1059, DEC-1088 (6), P-ACT-SPLIT · **Source:** `docs/changes/W2-27-CIT-P.md` (`33f72aab`, `w2/W2-27-citp`) and its review `governance/project/orchestration/reviews/w2-27-citp.md`; the CTO's report (chat, 2026-11-07) · **Changes:** the Contract (CAP-45, CAP-45.a) once W2-139 lands
+- **Decision:**
+  - (1) **The CAP-45.a note:** V (i), version 4.3; A (i), CAP-45 moves to Wave 3 with CAP-45.a; C (i), the "in Wave 2"
+    clause withdrawn, the manifest and file hashes kept beside the signed tag; R (a), a separate apply ticket
+    (**W2-139**, `DAEO-ongl`); T (i), a new test-revision ticket by an independent test designer (**W2-140**,
+    `DAEO-5ce2`); N (b), DEC-841's nine items left to P1-11, named as exceptions in the exit run's record if P1-11 is
+    not applied by then. Both tickets merge and close in one batch, on one green run, outside an experiment window.
+  - (2) **The guard gap: W2-141** (`DAEO-xwro`), tests first, built beside the experiments, applied with the guard's
+    operator ACT at the lift's re-pin: the guard refuses an engineer's Grep or Glob that can reach its own ticket's
+    acceptance folder unless the call excludes it, and the refusal says how; it covers Bash recursive searches too
+    (grep -r, rg, find and the like). Until then, every engineer brief carries the exclusion line.
+  - (3) **ADR-0002** is refreshed against the register by a product-spec agent, with one independent review, then to
+    the owner for acceptance; after the experiments, before the lift's re-pin.
+- **Basis:** (1) question 2 (the Contract matches the waves; no drift at the exit audit); (2) question 2 (role
+  separation holds in ordinary work: G-14 no longer fails open on a wide search); (3) question 2 (no stale record read as
+  current).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13804,3 +13822,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.474 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1090; W2-137 and W2-138 filed; DEC-1067 (f) to change by W2-137. Next free id: DEC-1091. |
 | 0.475 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1091 (items 1 and 2 standing for the experiments); DEC-1086 C changed. Next free id: DEC-1092. |
 | 0.476 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1092. Next free id: DEC-1093. |
+| 0.477 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1093; W2-139, W2-140 and W2-141 filed. Next free id: DEC-1094. |

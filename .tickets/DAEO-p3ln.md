@@ -1,6 +1,6 @@
 ---
 id: DAEO-p3ln
-status: open
+status: in_progress
 deps: [DAEO-t8mp, DAEO-r30l]
 links: [DAEO-cb2b, DAEO-q7lk]
 created: 2026-11-06T23:10:00Z
@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/plan/**
 - src/gov/launch/plan_check.py
+- src/gov/launch/launcher.py  # [DEC-1088 (5)(a)] the call to plan_check at the argument checks only (the designer's D-1)
 - tests/unit/plan/**
 - tests/unit/launch/test_w2_136*
 - docs/changes/W2-136-evidence.md
@@ -75,3 +76,10 @@ The owner's DEC-1088, from DEPENDENCY-MAP-1 (`governance/project/orchestration/p
   - W2-20 (the gate it lands with).
 - **Est.:** about 500 lines (the derivation 150, the overlap matcher 80, the batches 70, the command and output 70, the
   launch check 60, the fields' reading 70), about 1.5 days with its tests and one review.
+
+**TESTS-READY (built beside the experiments, DEC-1092 (5)):** `tests/acceptance/W2-136/` at `543b69540` on
+`w2/W2-136-tests`: 76 cases, 66 red on integrate for the right reason, 10 green guards; the interface in their README
+(the text lines, `--json`, exit codes, the `--ready` form, `plan_check.check_lead(root, ticket_id, *, ready=)`, the
+launcher's lead path). S3's matcher is `gov.guard.decide._match_pattern`. **The designer's D-1 settled (CTO, delegated
+under DEC-1088 (5)(a)):** `src/gov/launch/launcher.py` joins the paths for the one call to `plan_check` at the argument
+checks, as S9 already states; W2-20 (built and held) holds the launcher's gate line and lands with this ticket. [DEC-1088]

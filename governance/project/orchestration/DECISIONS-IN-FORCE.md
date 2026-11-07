@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1092 on 2026-11-07 (re-pin window 4 done at
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1093 on 2026-11-07 (re-pin window 4 done at
 14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
@@ -274,3 +274,10 @@ other restart is an ACT.
   see the hidden and spent sets). **The fresh 80 and the K9 bar wait for E3 to E5 on the 138:** the CTO brings the
   expectation, every gap or fix, and how the 80 runs; the configuration and the bar are chosen from the 138 before the
   80 runs; on the 80 every condition may be measured, only the one chosen beforehand is judged. Basis: 1.
+- DEC-1093 (2026-11-07): the CAP-45.a note approved (4.3; CAP-45 and CAP-45.a to Wave 3; the "in Wave 2" clause
+  withdrawn, hashes kept beside the signed tag); **W2-139** (`DAEO-ongl`, the apply) and **W2-140** (`DAEO-5ce2`, W2-49's
+  tests) merge and close in one batch, one green run, outside an experiment window; DEC-841's nine to P1-11, else
+  exceptions in W2-46's record. **W2-141** (`DAEO-xwro`): the guard refuses an engineer's Grep, Glob or recursive Bash
+  search that can reach its own acceptance folder unless excluded (saying how), at the lift's re-pin ACT; **until then
+  every engineer brief carries the exclusion line.** ADR-0002 refreshed, reviewed, to the owner, after the experiments.
+  Basis: 2.
