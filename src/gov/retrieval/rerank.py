@@ -35,9 +35,13 @@ CACHE_REL = ".cache/gov-os"  # the socket, its start lock and the logs, in the u
 SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "rerank-service.log"
 CONNECT_S = 2.0  # to connect and be accepted (DEC-1034 T3); the answer is bounded by GOV_RERANK_TIMEOUT_S
 START_S = 60.0  # the bound on a search's wait while the service starts and loads its model
-# The most texts one request to a reranker carries (DEC-1067 (f)): requests of 100 whole chunks held the shared
-# reranker at 15.75 GB (PyTorch keeps its peak), so a larger pool goes in batches of at most this many.
-MAX_REQUEST_TEXTS = 16
+# The most texts one request to a reranker carries (DEC-1067 (f), raised by DEC-1090 (2), W2-137). It was 16 when
+# requests of 100 whole chunks held the shared reranker at 15.75 GB (PyTorch kept its peak). Since W2-112's release
+# (DEC-1068) the service empties its GPU cache after every request, and a request's memory is set by its padded size,
+# which ``MAX_REQUEST_CHARS`` bounds whatever the count. So the count only has to let a search's candidates go in one
+# request when they are short: 64 holds the pool's ``rerank_depth`` (40) and a pool as deep as the routes (60), and
+# stays far under the service's own bound (``rerank_service.MAX_TEXTS``, 512).
+MAX_REQUEST_TEXTS = 64
 # And the most characters one request carries, padded (the CTO's bound after the GPU backstop of 2026-11-04 03:53 and
 # 05:37: the reranker pads every pair of a batch to the longest, so one 23,000-character chunk with 15 short ones is a
 # batch of 16 x 23,000). Counted as the service scores, by pair (each text with the question): a request's size is its
@@ -232,8 +236,8 @@ def requests(query: str, texts: list[str]) -> list[tuple[list[int], list[str]]]:
 
 def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     """``candidates`` in the order of the reranker's scores, each with ``rerank_score``; equal scores keep the order
-    given. ``score`` is called with the ``text`` of the candidates in requests of at most ``MAX_REQUEST_TEXTS`` (16,
-    DEC-1067 (f)) and at most ``MAX_REQUEST_CHARS`` padded characters (``requests``): no request to any reranker,
+    given. ``score`` is called with the ``text`` of the candidates in requests of at most ``MAX_REQUEST_TEXTS`` (64,
+    DEC-1090 (2)) and at most ``MAX_REQUEST_CHARS`` padded characters (``requests``): no request to any reranker,
     the shared service or a private one, carries more. Each score goes back to its candidate, so the order is the
     unbatched one;
     one request that scores nothing or fails leaves every candidate unscored. Without a reranker the candidates are

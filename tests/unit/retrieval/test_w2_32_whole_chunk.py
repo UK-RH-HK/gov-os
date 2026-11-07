@@ -227,7 +227,7 @@ def test_no_chunk_over_the_limit_is_reported_as_none(project):
     assert semantic.refresh(root)["cut"] == {"limit": 10_000, "count": 0, "paths": []}
 
 
-@pytest.mark.parametrize("pool", [1, 15, 16, 17, 30, 33, 100])
+@pytest.mark.parametrize("pool", [1, 15, 16, 17, 30, 33, 63, 64, 65, 100, 129])  # DEC-1090 (2): around 64 too
 def test_no_request_to_the_reranker_carries_more_than_16_texts(pool):
     from gov.retrieval import rerank
     sizes = []
@@ -238,8 +238,9 @@ def test_no_request_to_the_reranker_carries_more_than_16_texts(pool):
 
     given = [{"chunk_id": str(n), "text": str(n)} for n in range(pool)]
     ranked = rerank.rerank("q", given, lambda: score)
-    assert rerank.MAX_REQUEST_TEXTS == 16 and all(size <= 16 for size in sizes) and sum(sizes) == pool
-    assert len(sizes) == -(-pool // 16)
+    # DEC-1090 (2): the cap raised from 16 to 64
+    assert rerank.MAX_REQUEST_TEXTS == 64 and all(size <= 64 for size in sizes) and sum(sizes) == pool
+    assert len(sizes) == -(-pool // 64)
     assert [c["chunk_id"] for c in ranked] == [str(n) for n in reversed(range(pool))]  # combined in order
     assert [c["rerank_score"] for c in ranked] == [float(n) for n in reversed(range(pool))]
 
@@ -253,8 +254,8 @@ def test_the_shared_service_is_asked_at_most_16_texts_at_a_time(tmp_path, monkey
     asked = []
     monkeypatch.setattr(rerank, "_ask", lambda interpreter, query, texts: asked.append(len(texts))
                         or ([1.0] * len(texts), "cuda:0"))
-    rerank.rerank("q", [{"chunk_id": str(n), "text": str(n)} for n in range(40)])
-    assert asked == [16, 16, 8] and rerank.last_outcome()["by"] == "service"
+    rerank.rerank("q", [{"chunk_id": str(n), "text": str(n)} for n in range(100)])  # DEC-1090 (2): past the cap of 64
+    assert asked == [64, 36] and rerank.last_outcome()["by"] == "service"  # DEC-1090 (2): was 40 as [16, 16, 8]
 
 
 def test_one_batch_that_fails_leaves_every_candidate_unscored():
@@ -267,8 +268,9 @@ def test_one_batch_that_fails_leaves_every_candidate_unscored():
             raise BrokenPipeError("the reranker died")
         return [1.0] * len(texts)
 
-    given = [{"chunk_id": str(n), "text": str(n)} for n in range(20)]
+    given = [{"chunk_id": str(n), "text": str(n)} for n in range(100)]  # DEC-1090 (2): two requests at the cap of 64
     assert rerank.rerank("q", given, lambda: score) == given and rerank.last_outcome()["by"] == "unavailable"
+    assert calls == [64, 36]  # DEC-1090 (2): the second request is the one that fails
 
 
 @needs_gitleaks
@@ -430,7 +432,8 @@ def test_no_request_is_above_16_texts_or_24000_padded_characters_and_the_order_i
     query, log = "who fires the bowls", []
     given = [{"chunk_id": str(n), "text": "x" * length} for n, length in enumerate(lengths)]
     ranked = rerank.rerank(query, given, lambda: _recorder(log))
-    assert all(texts <= 16 and padded <= rerank.MAX_REQUEST_CHARS for texts, padded in log), log
+    assert all(texts <= rerank.MAX_REQUEST_TEXTS and padded <= rerank.MAX_REQUEST_CHARS  # DEC-1090 (2): was 16
+               for texts, padded in log), log
     assert sum(texts for texts, _ in log) == len(lengths)
     room = rerank.MAX_REQUEST_CHARS - len(query)
     expected = sorted(range(len(lengths)), key=lambda n: -min(lengths[n], room))  # one request, as if unbatched
@@ -454,7 +457,8 @@ def test_a_pool_is_split_into_the_fewest_requests_meeting_both_bounds_by_groupin
         groups = rerank.requests(query, ["x" * n for n in lengths])
         return [(len(indices), _padded(query, texts)) for indices, texts in groups]
 
-    assert shape([100] * 40) == [(16, 1760), (16, 1760), (8, 880)]  # the count binds
+    assert shape([100] * 40) == [(40, 4400)]  # DEC-1090 (2): the pool's 40 in one request (was 16, 16, 8)
+    assert shape([100] * 100) == [(64, 7040), (36, 3960)]  # DEC-1090 (2): the count binds at 64
     assert shape([9_000] * 5) == [(2, 18020), (2, 18020), (1, 9010)]  # the padded size binds
     # in the given order, pairs of 1,000 and 7,000 would make four requests; grouped by length, two
     assert shape([1_000, 7_000, 1_000, 7_000, 1_000, 7_000, 1_000]) == [(3, 21030), (4, 4040)]

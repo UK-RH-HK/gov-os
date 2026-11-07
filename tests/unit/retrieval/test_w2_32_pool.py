@@ -32,7 +32,7 @@ PHRASE = "heron ledger"
 _ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t.invalid",
         "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t.invalid"}
 NOTES = 48
-LONG_NOTES = 6  # notes of one 5,000-character line: the padded bound binds before the 16 texts do
+LONG_NOTES = 6  # notes of one 5,000-character line: the padded bound binds before the count does (DEC-1090 (2))
 
 
 def _git(root, *args):
@@ -66,7 +66,7 @@ def project(tmp_path, monkeypatch):
 
 @pytest.fixture()
 def short_project(tmp_path, monkeypatch):
-    """The same notes, none of them long: the pool's 40 go in three requests of at most 16."""
+    """The same notes, none of them long: the pool's 40 go in at most three requests (DEC-1090 (2): the cap of 64)."""
     return _project(tmp_path, monkeypatch, 0)
 
 
@@ -446,7 +446,7 @@ def test_a_question_with_three_continuations_sends_one_pass_and_writes_nothing(s
     first = _ask(root, reranker, batch_size=batch_size)
     after_first = list(reranker.requests)
     assert first["pool"]["order"] == "first" and first["pool"]["reranked"] == 40
-    assert len(after_first) <= 3 and len(reranker.texts()) == 40  # one pass: three requests of at most 16
+    assert len(after_first) <= 3 and len(reranker.texts()) == 40  # one pass, within both bounds (DEC-1090 (2))
     for query, texts in after_first:  # the padded bound on every request
         assert 0 < len(texts) <= rerank_module.MAX_REQUEST_TEXTS
         assert len(texts) * max(len(query) + len(text) for text in texts) <= rerank_module.MAX_REQUEST_CHARS
