@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 103
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01GUhutKFiqQGSuqavAF61vL", "time": "2026-11-04T03:26:13.442Z", "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-32-tests/71068009-4db8-4c4a-bdc3-24c168125c95.jsonl", "cwd": "/home/usain/gov-os-worktrees/W2-32-tests", "tool": "Bash", "form": "cd /home/usain/gov-os-worktrees/W2-32-tests; R=$TMPDIR/r12; cat > $R/probe8.py <<'EOF' import json, os, subprocess, sys from pathlib import Path import yaml sys.path.insert(0, \"tests/acceptance/W2-32\"", "rule": "the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, config/secrets*, a file under a .

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 98
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01AQXzwyDrpSBpyVMbCXaqmM", "time": "2026-11-03T16:05:13.839Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/33b3628c-7145-4e49-bfd8-2cfd894e92c4.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "S=.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py; E=~/gov-os-eval/rehearsal-repin; rm -rf $E; mkdir -p $E && chmod 700 $E && cp -a ~/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden", "rule": "a catastrophic delete: /home/usain/gov-os-eval/rehearsal-repin is outside the project (the main tree

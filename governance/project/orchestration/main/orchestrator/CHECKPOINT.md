@@ -6,6 +6,18 @@
 ran, §3 what window 4 carries, §4 the steps after "done", §5 every watcher, loop and digest to re-arm, §6 what waits
 on the owner). Next free id **DEC-1089**. The blocks below are this session's, newest first; older ones are history,
 kept for their figures.
+- **~18:45 11-07, session `ad44f5fe`: DEC-1092 (`df5a4534`). E2 DONE (`a6b7e735`: 83.3 % → 92.8 % right end to end).
+  W2-137 and W2-138 MERGED (reviews READY, transcribed: the launched reviewer's record path is refused and its /tmp copy
+  removed at session end; next time brief the record into the worker's own worktree). Next free id DEC-1093.**
+  - **Running:** E3's five conditions (`drafts/d4b/e3_run.py`, pgid in `~/gov-os-runs/PAT-1/e3.pid`, run folder
+    `~/gov-os-runs/D4B/e3/`, projection $150, brake $300; no GPU); W2-137's S5 GPU window (`drafts/d4b/w2_137_s5.sh`,
+    pgid in `PAT-1/s5.pid`, log `~/gov-os-runs/D4B/w2-137-s5/s5.log`); W2-136's designer (pgid 2261015, worktree
+    `W2-136-tests`, its in-progress status committed on `w2/W2-136-tests` only, to commit on integrate after the GPU
+    window); the search-again practice package (in-session product-spec, writes
+    `packages/LIFT-1/SEARCH-AGAIN-PRACTICE.md`, uncommitted).
+  - **No commit on integrate while S5 runs** (the hook's rebuild beside a GPU measure).
+  - **Next:** E3's search-again on the best two; E5 (12,000 tokens, live run); E0b's harness fix then E4; then the
+    fresh-80 package (expectation, gaps, how the 80 runs, the K9 bar) per DEC-1092 (4).
 - **~18:15 11-07, session `ad44f5fe`: E1's pilot DONE (`9409db97`; $1.11; 2 of 3 misses recovered; Q14 a wrong claim);
   STAND-BY on the owner's E2 cap ($40 recommended) and the instruction line.** The CAP-45.a note answered (`33f72aab`
   on `w2/W2-27-citp`; review `e64fbe21`); to the owner with V, A, C, R, T, N and two new tickets.

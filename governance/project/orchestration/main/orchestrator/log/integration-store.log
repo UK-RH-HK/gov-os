@@ -2299,3 +2299,3047 @@ fresh at 71b1f9b77a04 (/home/usain/gov-os-worktrees/W2-00-store-b)
     "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
   }
 }
+2026-11-07 17:22:33 rebuild --integration: building W2-00-store-b at 393305c36ab1, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 17:22:34 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 00b298db6ccbdddf233e815a9da8b8d9a0b780ba, behind this tree's head 393305c36ab15b5737184621b3d439ba933d2da0 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 17:22:40 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 17:23:03 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 17:23:03 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at 393305c36ab1
+{
+  "digest": "e984f95a7f2e826f600de3cd469489adaa12da11fe401681f7b8601367c9b87c",
+  "store": {
+    "digest": "e984f95a7f2e826f600de3cd469489adaa12da11fe401681f7b8601367c9b87c",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "00b298db6ccbdddf233e815a9da8b8d9a0b780ba",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 00b298db6ccbdddf233e815a9da8b8d9a0b780ba, behind this tree's head 393305c36ab15b5737184621b3d439ba933d2da0 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.7,
+    "lexical_s": 0.7,
+    "secrets_s": 2.6,
+    "semantic_s": 2.1,
+    "codeintel_s": 17.1,
+    "compaction_s": 1.7,
+    "total_s": 26.7
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T17:22:33.546788+00:00",
+    "released_at": "2026-11-07T17:23:00.255996+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "393305c36ab15b5737184621b3d439ba933d2da0",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 17:38:41 rebuild --integration: building W2-00-store-a at a6b7e735ab1e, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 17:38:42 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 393305c36ab15b5737184621b3d439ba933d2da0, behind this tree's head a6b7e735ab1ecf2fb730595969532502069eca83 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 17:38:48 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 17:39:10 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 17:39:11 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at a6b7e735ab1e
+{
+  "digest": "e09b291aaf05ffc7a37ada4888153e0e53a515984468ad509527290e593460e8",
+  "store": {
+    "digest": "e09b291aaf05ffc7a37ada4888153e0e53a515984468ad509527290e593460e8",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "393305c36ab15b5737184621b3d439ba933d2da0",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 393305c36ab15b5737184621b3d439ba933d2da0, behind this tree's head a6b7e735ab1ecf2fb730595969532502069eca83 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.8,
+    "lexical_s": 0.5,
+    "secrets_s": 2.7,
+    "semantic_s": 1.8,
+    "codeintel_s": 17.4,
+    "compaction_s": 1.5,
+    "total_s": 26.1
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T17:38:41.587210+00:00",
+    "released_at": "2026-11-07T17:39:07.681069+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "a6b7e735ab1ecf2fb730595969532502069eca83",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 17:59:13 rebuild --integration: building W2-00-store-b at 02ccb9543c96, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 17:59:14 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at a6b7e735ab1ecf2fb730595969532502069eca83, behind this tree's head 02ccb9543c968dacd0fb03ca991357b3dc11152f by 9 commit(s): only what changed since is re-embedded
+2026-11-07 17:59:20 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 17:59:44 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 17:59:45 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at 02ccb9543c96
+{
+  "digest": "5f93efcdda080c612b11f74d3186ca8cd60f36c95abd6fa2e566c6a3ae32fddb",
+  "store": {
+    "digest": "5f93efcdda080c612b11f74d3186ca8cd60f36c95abd6fa2e566c6a3ae32fddb",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "a6b7e735ab1ecf2fb730595969532502069eca83",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at a6b7e735ab1ecf2fb730595969532502069eca83, behind this tree's head 02ccb9543c968dacd0fb03ca991357b3dc11152f by 9 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.8,
+    "lexical_s": 0.6,
+    "secrets_s": 2.7,
+    "semantic_s": 2.6,
+    "codeintel_s": 18.4,
+    "compaction_s": 1.5,
+    "total_s": 28.2
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T17:59:13.771700+00:00",
+    "released_at": "2026-11-07T17:59:41.942321+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "02ccb9543c968dacd0fb03ca991357b3dc11152f",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 17:59:45 rebuild --integration: building W2-00-store-a at 9639682c7512, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 17:59:46 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 02ccb9543c968dacd0fb03ca991357b3dc11152f, behind this tree's head 9639682c75121009ad410cdf8cef5e743d547cde by 1 commit(s): only what changed since is re-embedded
+2026-11-07 17:59:52 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:00:14 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:00:15 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 9639682c7512
+{
+  "digest": "074f6f45533795da563a6250a45924cb220698f630f86c570e6b5ee95d24c478",
+  "store": {
+    "digest": "074f6f45533795da563a6250a45924cb220698f630f86c570e6b5ee95d24c478",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "02ccb9543c968dacd0fb03ca991357b3dc11152f",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 02ccb9543c968dacd0fb03ca991357b3dc11152f, behind this tree's head 9639682c75121009ad410cdf8cef5e743d547cde by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 4.0,
+    "lexical_s": 0.5,
+    "secrets_s": 2.6,
+    "semantic_s": 1.4,
+    "codeintel_s": 17.6,
+    "compaction_s": 1.4,
+    "total_s": 25.8
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T17:59:45.669227+00:00",
+    "released_at": "2026-11-07T18:00:11.451936+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "9639682c75121009ad410cdf8cef5e743d547cde",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 18:05:48 rebuild --integration: building W2-00-store-b at df5a453498a4, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 18:05:49 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 9639682c75121009ad410cdf8cef5e743d547cde, behind this tree's head df5a453498a4c4e6c7aa91e6da9d215d88007ecc by 1 commit(s): only what changed since is re-embedded
+2026-11-07 18:05:57 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:06:17 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:06:18 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at df5a453498a4
+{
+  "digest": "6223177bd1999fec01a5e2478afc884f5d9ed3d5282fa347d02ef29e0efb1f76",
+  "store": {
+    "digest": "6223177bd1999fec01a5e2478afc884f5d9ed3d5282fa347d02ef29e0efb1f76",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "9639682c75121009ad410cdf8cef5e743d547cde",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 9639682c75121009ad410cdf8cef5e743d547cde, behind this tree's head df5a453498a4c4e6c7aa91e6da9d215d88007ecc by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.8,
+    "lexical_s": 0.7,
+    "secrets_s": 2.6,
+    "semantic_s": 2.0,
+    "codeintel_s": 17.4,
+    "compaction_s": 1.6,
+    "total_s": 26.6
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:05:48.082120+00:00",
+    "released_at": "2026-11-07T18:06:14.723176+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "df5a453498a4c4e6c7aa91e6da9d215d88007ecc",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 18:06:32 rebuild --integration: building W2-00-store-a at 213abadc1446, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 18:06:33 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at df5a453498a4c4e6c7aa91e6da9d215d88007ecc, behind this tree's head 213abadc14469846446a43359fea8d40bff11e62 by 10 commit(s): only what changed since is re-embedded
+2026-11-07 18:06:38 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:06:58 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:06:58 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 213abadc1446
+{
+  "digest": "f60ae1b29bfb75461b607218a9206e069ed4282d21c12b395458f0572a8ff850",
+  "store": {
+    "digest": "f60ae1b29bfb75461b607218a9206e069ed4282d21c12b395458f0572a8ff850",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "df5a453498a4c4e6c7aa91e6da9d215d88007ecc",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at df5a453498a4c4e6c7aa91e6da9d215d88007ecc, behind this tree's head 213abadc14469846446a43359fea8d40bff11e62 by 10 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.7,
+    "lexical_s": 0.6,
+    "secrets_s": 2.6,
+    "semantic_s": 2.0,
+    "codeintel_s": 17.3,
+    "compaction_s": 1.3,
+    "total_s": 25.8
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:06:32.261710+00:00",
+    "released_at": "2026-11-07T18:06:58.037560+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "213abadc14469846446a43359fea8d40bff11e62",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 18:06:58 rebuild --integration: building W2-00-store-b at 50292d1b693c, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 18:06:59 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 213abadc14469846446a43359fea8d40bff11e62, behind this tree's head 50292d1b693ca2f5c1d186b17442b9853763d8f3 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 18:07:08 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:07:27 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:07:28 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at 50292d1b693c
+{
+  "digest": "61703c3e39972d11b5b4ac1d54e02e39b7fbb63c7a724ca7bb5ac7bb277b9b08",
+  "store": {
+    "digest": "61703c3e39972d11b5b4ac1d54e02e39b7fbb63c7a724ca7bb5ac7bb277b9b08",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "213abadc14469846446a43359fea8d40bff11e62",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 213abadc14469846446a43359fea8d40bff11e62, behind this tree's head 50292d1b693ca2f5c1d186b17442b9853763d8f3 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.7,
+    "lexical_s": 0.5,
+    "secrets_s": 2.6,
+    "semantic_s": 1.4,
+    "codeintel_s": 17.5,
+    "compaction_s": 1.4,
+    "total_s": 25.7
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:06:58.798355+00:00",
+    "released_at": "2026-11-07T18:07:24.540759+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "50292d1b693ca2f5c1d186b17442b9853763d8f3",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 18:07:54 rebuild --integration: building W2-00-store-a at 24e0e8b0f55d, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 18:07:55 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 50292d1b693ca2f5c1d186b17442b9853763d8f3, behind this tree's head 24e0e8b0f55d7c535ae61155cea3c9f282434c28 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 18:08:00 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:08:22 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:08:23 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 24e0e8b0f55d
+{
+  "digest": "7d6a08bd24d71ae007dbef857dd54521753da8a9f67b84a6ec30f3f5b0bf671e",
+  "store": {
+    "digest": "7d6a08bd24d71ae007dbef857dd54521753da8a9f67b84a6ec30f3f5b0bf671e",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "50292d1b693ca2f5c1d186b17442b9853763d8f3",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 50292d1b693ca2f5c1d186b17442b9853763d8f3, behind this tree's head 24e0e8b0f55d7c535ae61155cea3c9f282434c28 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.8,
+    "lexical_s": 0.5,
+    "secrets_s": 2.8,
+    "semantic_s": 1.4,
+    "codeintel_s": 17.8,
+    "compaction_s": 1.3,
+    "total_s": 25.7
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:07:54.484900+00:00",
+    "released_at": "2026-11-07T18:08:20.196898+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "24e0e8b0f55d7c535ae61155cea3c9f282434c28",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+fresh at 24e0e8b0f55d (/home/usain/gov-os-worktrees/W2-00-store-a)
+2026-11-07 18:47:38 rebuild --integration: building W2-00-store-b at 38dda3b270fd, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 18:47:39 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 24e0e8b0f55d7c535ae61155cea3c9f282434c28, behind this tree's head 38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf by 1 commit(s): only what changed since is re-embedded
+2026-11-07 18:47:45 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:48:11 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:48:11 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at 38dda3b270fd
+{
+  "digest": "71650ede8e257c0634cc351ae22764c3d60596af3ff80f955177f3ad9cde307a",
+  "store": {
+    "digest": "71650ede8e257c0634cc351ae22764c3d60596af3ff80f955177f3ad9cde307a",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "24e0e8b0f55d7c535ae61155cea3c9f282434c28",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 24e0e8b0f55d7c535ae61155cea3c9f282434c28, behind this tree's head 38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.9,
+    "lexical_s": 0.7,
+    "secrets_s": 2.8,
+    "semantic_s": 4.3,
+    "codeintel_s": 18.5,
+    "compaction_s": 1.8,
+    "total_s": 30.3
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:47:38.249913+00:00",
+    "released_at": "2026-11-07T18:48:08.500273+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 18:48:12 rebuild --integration: building W2-00-store-a at 26328bc17f8c, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 18:48:13 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf, behind this tree's head 26328bc17f8c128ec96dc42861ef300e5881adae by 1 commit(s): only what changed since is re-embedded
+2026-11-07 18:48:18 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 18:48:41 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 18:48:42 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 26328bc17f8c
+{
+  "digest": "f08913a7badc46b6bdff1112a50a3cd89c75f504a50ab8e7ba32057519d0db8f",
+  "store": {
+    "digest": "f08913a7badc46b6bdff1112a50a3cd89c75f504a50ab8e7ba32057519d0db8f",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 38dda3b270fd5dc64e28d80fa6fdbcf06a72b7cf, behind this tree's head 26328bc17f8c128ec96dc42861ef300e5881adae by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 4.0,
+    "lexical_s": 0.5,
+    "secrets_s": 2.7,
+    "semantic_s": 1.4,
+    "codeintel_s": 18.2,
+    "compaction_s": 1.4,
+    "total_s": 26.5
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T18:48:12.158940+00:00",
+    "released_at": "2026-11-07T18:48:38.662288+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "26328bc17f8c128ec96dc42861ef300e5881adae",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 19:02:34 rebuild --integration: building W2-00-store-b at 7a3befd920ed, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 19:02:35 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 26328bc17f8c128ec96dc42861ef300e5881adae, behind this tree's head 7a3befd920ed9419e45f25182380e7b9ad65a4c7 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 19:02:41 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:03:06 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:03:07 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at 7a3befd920ed
+{
+  "digest": "30d383da4a5353d87065b4214adfd242cde3d6675967f7566da592b32a7df0f1",
+  "store": {
+    "digest": "30d383da4a5353d87065b4214adfd242cde3d6675967f7566da592b32a7df0f1",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "26328bc17f8c128ec96dc42861ef300e5881adae",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 26328bc17f8c128ec96dc42861ef300e5881adae, behind this tree's head 7a3befd920ed9419e45f25182380e7b9ad65a4c7 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.9,
+    "lexical_s": 0.7,
+    "secrets_s": 2.8,
+    "semantic_s": 2.6,
+    "codeintel_s": 18.9,
+    "compaction_s": 1.9,
+    "total_s": 29.6
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:02:34.115057+00:00",
+    "released_at": "2026-11-07T19:03:03.686903+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "7a3befd920ed9419e45f25182380e7b9ad65a4c7",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 19:05:02 rebuild --integration: building W2-00-store-a at 30e75aa0d197, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 19:05:06 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 7a3befd920ed9419e45f25182380e7b9ad65a4c7, behind this tree's head 30e75aa0d197d2126edf85383ce07ffad4a8b4b9 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 19:05:12 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:05:33 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:05:34 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 30e75aa0d197
+{
+  "digest": "617756fc171797b53af2dd81c1949387baeba2bd54826422c450fb4ff41bdcef",
+  "store": {
+    "digest": "617756fc171797b53af2dd81c1949387baeba2bd54826422c450fb4ff41bdcef",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "7a3befd920ed9419e45f25182380e7b9ad65a4c7",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at 7a3befd920ed9419e45f25182380e7b9ad65a4c7, behind this tree's head 30e75aa0d197d2126edf85383ce07ffad4a8b4b9 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.9,
+    "lexical_s": 0.6,
+    "secrets_s": 2.6,
+    "semantic_s": 1.6,
+    "codeintel_s": 19.4,
+    "compaction_s": 1.4,
+    "total_s": 28.0
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:05:02.678423+00:00",
+    "released_at": "2026-11-07T19:05:30.686250+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "30e75aa0d197d2126edf85383ce07ffad4a8b4b9",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 19:10:16 rebuild --integration: building W2-00-store-b at f4fe768e3c1e, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 19:10:17 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 30e75aa0d197d2126edf85383ce07ffad4a8b4b9, behind this tree's head f4fe768e3c1e653437e462124a3fb078b5a03376 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 19:10:26 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:10:45 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:10:46 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at f4fe768e3c1e
+{
+  "digest": "60a385dc425a50f58619158f9afe02750087a2b61d7907ac1318e79c08f25fa9",
+  "store": {
+    "digest": "60a385dc425a50f58619158f9afe02750087a2b61d7907ac1318e79c08f25fa9",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "30e75aa0d197d2126edf85383ce07ffad4a8b4b9",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 30e75aa0d197d2126edf85383ce07ffad4a8b4b9, behind this tree's head f4fe768e3c1e653437e462124a3fb078b5a03376 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 3.7,
+    "lexical_s": 0.5,
+    "secrets_s": 2.6,
+    "semantic_s": 1.4,
+    "codeintel_s": 18.1,
+    "compaction_s": 1.4,
+    "total_s": 26.2
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:10:16.799638+00:00",
+    "released_at": "2026-11-07T19:10:42.986127+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "f4fe768e3c1e653437e462124a3fb078b5a03376",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 19:26:23 rebuild --integration: building W2-00-store-a at 8a646a8abc8a, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 19:26:24 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at f4fe768e3c1e653437e462124a3fb078b5a03376, behind this tree's head 8a646a8abc8a581a7f34e6c1fb382467523846bb by 7 commit(s): only what changed since is re-embedded
+2026-11-07 19:26:31 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:26:58 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:26:58 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 8a646a8abc8a
+{
+  "digest": "2bd58dc48f9198d61dfc6574011c084edbc46f1301c3fce5ceb329912c03c25f",
+  "store": {
+    "digest": "2bd58dc48f9198d61dfc6574011c084edbc46f1301c3fce5ceb329912c03c25f",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "f4fe768e3c1e653437e462124a3fb078b5a03376",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at f4fe768e3c1e653437e462124a3fb078b5a03376, behind this tree's head 8a646a8abc8a581a7f34e6c1fb382467523846bb by 7 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 4.3,
+    "lexical_s": 0.7,
+    "secrets_s": 3.0,
+    "semantic_s": 4.9,
+    "codeintel_s": 21.6,
+    "compaction_s": 1.7,
+    "total_s": 34.3
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:26:23.668235+00:00",
+    "released_at": "2026-11-07T19:26:58.016516+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "8a646a8abc8a581a7f34e6c1fb382467523846bb",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 19:26:58 rebuild --integration: building W2-00-store-b at f45055340a17, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 19:26:59 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 8a646a8abc8a581a7f34e6c1fb382467523846bb, behind this tree's head f45055340a177887925c0866e0b282e660d93078 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 19:27:06 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:27:28 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:27:29 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-b at f45055340a17
+{
+  "digest": "fc5cf60d70eacfed0234c32ce08fee6e1edffd6f5b20b406f87d1339796f0dd3",
+  "store": {
+    "digest": "fc5cf60d70eacfed0234c32ce08fee6e1edffd6f5b20b406f87d1339796f0dd3",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "8a646a8abc8a581a7f34e6c1fb382467523846bb",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 8a646a8abc8a581a7f34e6c1fb382467523846bb, behind this tree's head f45055340a177887925c0866e0b282e660d93078 by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 4.3,
+    "lexical_s": 0.6,
+    "secrets_s": 3.1,
+    "semantic_s": 1.7,
+    "codeintel_s": 20.5,
+    "compaction_s": 1.7,
+    "total_s": 29.9
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:26:58.885167+00:00",
+    "released_at": "2026-11-07T19:27:28.808315+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "f45055340a177887925c0866e0b282e660d93078",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-a"
+  }
+}
+2026-11-07 19:43:59 rebuild --integration: building W2-00-store-a at 22bea1d6842f, seeded from W2-00-store-b; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-b until it succeeds
+2026-11-07 19:44:00 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-b was built at f45055340a177887925c0866e0b282e660d93078, behind this tree's head 22bea1d6842f11ed19c3cdeae4c3cc8ffa05a51f by 1 commit(s): only what changed since is re-embedded
+2026-11-07 19:44:05 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json
+2026-11-07 19:44:27 rebuild: secrets scan: off by configuration (DEC-1045)
+2026-11-07 19:44:27 rebuild --integration: /home/usain/gov-os-worktrees/W2-00-store -> W2-00-store-a at 22bea1d6842f
+{
+  "digest": "7669435cc8c1df42a871ae5a35097cc3fc15fc69d5b38e275bd6fc2ff9a5b6e3",
+  "store": {
+    "digest": "7669435cc8c1df42a871ae5a35097cc3fc15fc69d5b38e275bd6fc2ff9a5b6e3",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated",
+      "kept_out": {
+        "evaluation-fixtures": [
+          "fixtures/evaluation/memory-retrieval/retired/README.md",
+          "fixtures/evaluation/memory-retrieval/retired/q02-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q03-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q04-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q07-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-lens-b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q09-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q10-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q11-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q12-pre-w2-32-r2.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q13-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q14-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q16-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q17-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1067.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q19-pre-dec1069b.yaml",
+          "fixtures/evaluation/memory-retrieval/retired/q23-pre-dec1069.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q01.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q02.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q03.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q04.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q05.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q06.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q07.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q08.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q09.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q10.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q11.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q12.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q13.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q14.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q15.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q16.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q17.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q18.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q19.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q20.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q21.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q22.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q23.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q24.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q25.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q26.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q27.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q28.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q29.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q30.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q31.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q32.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q33.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q34.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q35.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q36.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q37.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q38.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q39.yaml",
+          "fixtures/evaluation/memory-retrieval/visible/q40.yaml"
+        ],
+        "evaluation-sources": [
+          "docs/assessment/2026-10/B-memory-retrieval.md",
+          "docs/research/EXP-003/w2-15a/raw/embedded-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/goldpos-visible-misses.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-fused.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-lexical.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-rerank.txt",
+          "docs/research/EXP-003/w2-15a/raw/measure-semantic.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-incremental.out",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile-time.txt",
+          "docs/research/EXP-003/w2-15a/raw/rebuild-onefile.out",
+          "docs/research/EXP-003/w2-15a/raw/records-fused/measure-memory-retrieval-all-20261103T220952851326Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-lexical/measure-memory-retrieval-all-20261103T214050952372Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-rerank/measure-memory-retrieval-all-20261103T222922996731Z.json",
+          "docs/research/EXP-003/w2-15a/raw/records-semantic/measure-memory-retrieval-all-20261103T215033049996Z.json",
+          "docs/research/EXP-003/w2-15a/raw/rerank-rerank.log",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14-duplicates.txt",
+          "docs/research/EXP-003/w2-15a/raw/stack-q14.json",
+          "docs/research/EXP-003/w2-15a/raw/table.md",
+          "docs/research/EXP-003/w2-15a/raw/topk-visible-misses.txt",
+          "docs/research/memory-measure-audit/HIDDEN.md",
+          "docs/research/memory-measure-audit/NEW-VISIBLE.md",
+          "docs/research/memory-measure-audit/RETIRED-RESULTS.md",
+          "docs/research/memory-measure-audit/RUBRIC.md",
+          "docs/research/memory-measure-audit/VISIBLE.md"
+        ]
+      }
+    },
+    "semantic": {
+      "status": "recreated",
+      "cut": {
+        "limit": 10000,
+        "count": 10,
+        "paths": [
+          ".tickets/DAEO-2d6f.md",
+          "docs/changes/W2-32-evidence.md",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-b-dev.json",
+          "docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json",
+          "docs/plan/wave-1-exit/evidence/gov-check.json"
+        ]
+      }
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "secrets_counts": {
+    "content": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "path": {
+      "scanned": 0,
+      "remembered": 0
+    },
+    "scan": "secrets scan: off by configuration (DEC-1045)"
+  },
+  "seed": {
+    "status": "seeded",
+    "base": "/home/usain/gov-os-worktrees/W2-00-store-b",
+    "reason": null,
+    "copied": [
+      ".gov-runtime/store.db",
+      ".gov-runtime/codeintel/home"
+    ],
+    "base_head": "f45055340a177887925c0866e0b282e660d93078",
+    "relation": "behind",
+    "behind": "the base /home/usain/gov-os-worktrees/W2-00-store-b was built at f45055340a177887925c0866e0b282e660d93078, behind this tree's head 22bea1d6842f11ed19c3cdeae4c3cc8ffa05a51f by 1 commit(s): only what changed since is re-embedded"
+  },
+  "secrets_scan": "secrets scan: off by configuration (DEC-1045)",
+  "timing": {
+    "record_s": 4.0,
+    "lexical_s": 0.5,
+    "secrets_s": 2.8,
+    "semantic_s": 1.5,
+    "codeintel_s": 19.0,
+    "compaction_s": 1.8,
+    "total_s": 27.9
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild.lock",
+    "source": "default",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-07T19:43:59.140058+00:00",
+    "released_at": "2026-11-07T19:44:27.067483+00:00"
+  },
+  "slow": false,
+  "slow_after_s": 1800,
+  "record": ".gov-runtime/rebuild/record.json",
+  "watchdog_faults": [],
+  "integration": {
+    "branch": "w2/integrate",
+    "head": "22bea1d6842f11ed19c3cdeae4c3cc8ffa05a51f",
+    "link": "/home/usain/gov-os-worktrees/W2-00-store",
+    "ready": "/home/usain/gov-os-worktrees/W2-00-store-a",
+    "status": "switched",
+    "previous": "/home/usain/gov-os-worktrees/W2-00-store-b"
+  }
+}
+2026-11-07 20:18:57 rebuild --integration: building W2-00-store-b at bee20b020de7, seeded from W2-00-store-a; /home/usain/gov-os-worktrees/W2-00-store stays at W2-00-store-a until it succeeds
+2026-11-07 20:18:59 rebuild: seed: the base /home/usain/gov-os-worktrees/W2-00-store-a was built at 22bea1d6842f11ed19c3cdeae4c3cc8ffa05a51f, behind this tree's head bee20b020de76a65c0182d111ce85f966823eb76 by 1 commit(s): only what changed since is re-embedded
+2026-11-07 20:19:04 semantic: 10 file(s) hold a chunk over 10000 characters, embedded from its first 10000: .tickets/DAEO-2d6f.md, docs/changes/W2-32-evidence.md, docs/plan/wave-1-exit/evidence/gov-check-a-dev-before-close.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7-ci-head.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run7.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check-a-dev-run8.json, docs/plan/wave-1-exit/evidence/gov-check-b-dev.json, docs/plan/wave-1-exit/evidence/gov-check-run5-stale-store.json, docs/plan/wave-1-exit/evidence/gov-check.json

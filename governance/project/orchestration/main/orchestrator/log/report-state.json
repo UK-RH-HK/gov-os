@@ -17,7 +17,10 @@
     "W2-133",
     "W2-134",
     "W2-135",
-    "W2-129"
+    "W2-129",
+    "W2-138",
+    "W2-137",
+    "W2-136"
   ],
   "built_held": [
     "W2-20",
@@ -29,19 +32,19 @@
   ],
   "closes_next": "none: the refactoring (DEC-1052); D-1 and D-4b merges as built, formal closes at the lift (P1-13)",
   "examin": "AT RISK (re-estimated 11-06 20:00, DEC-1087 (9)): re-pin window 4 ready about 11-07 evening (range 11-07 to 11-08); the parallel-agents test and the experiments 11-08 to 11-10; the lift about 11-15 (range 11-14 to 11-18); EXAMIN's copy about 11-21 (range 11-20 to 11-26): the items before the re-pin (W2-116, W2-129, W2-135) and the experiments come first; memory 67.8 % on the blind 60, below the 85 % floor; K9 gates the start (DEC-954 Q1)",
-  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); re-pin window 4 DONE 11-07 14:22; the pool on (c00d525f); PAT-1 done 15:05; E0 done 16:33 (106/138); E1's pilot done 17:28 ($1.11; 2 of 3 misses recovered); next: E2 at your cap",
+  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); re-pin window 4 DONE 11-07 14:22; the pool on (c00d525f); PAT-1 done 15:05; E0 done 16:33 (106/138); E1's pilot done; E2 done 17:39 (right end to end 83.3 % at one search, 92.8 % at two; $21.95); E2 accepted (DEC-1092); E3 done 19:27 (today's bundle best: 114/138 in one call); E3 and its search-again done (bundle + search-again best, 128); E5 done (12,000 tokens = no gain); next: E0b harness fix (running), then E4, then the fresh-80 package",
   "countdown": [
     "Re-pin window 4: DONE 11-07 14:22 (pin-bcea09060ebc live; registry 20cea857; store at 20cea857 by W2-116's hook)",
     "The pool on, the store and speed check, the parallel-agents and memory test: DONE 11-07 15:05 (PAT-1-RESULT; gaps G1-G4 to you before E0)",
-    "E0: DONE 11-07 16:33 (106/138 hit@5; E0-RESULT). E0b after the harness fix (for E4 only)",
-    "E1 (the search-again pilot), its cost to you, your cap, then E2 to E5 (DEC-1087 (11)); W2-137 and W2-138 built beside. Est. 1.5 days with the checks: 11-08 to 11-10",
+    "E1 pilot and E2: DONE (E2: 83.3 % -> 92.8 % right end to end, DEC-1092 accepted)",
+    "E3, its search-again and E5 DONE (bundle 6,000 + search again once best: 128/138); E0b harness fix running, then E0b and E4. Est. 11-08",
     "Your decisions on the design and the agents' practices; the fresh 80, once. Est. 0.5 day: about 11-10 to 11-11",
     "D-6 part 2 and D-5 (the templates), together, on the CPU; the dependency tool if after the re-pin. Est. 2 days: 11-11 to 11-13",
     "D-10, the full suite and its red fixes, then the lift (your word). Est. 1 to 2 days: the lift about 11-15",
     "After the lift: the three-layer plan and Wave 2's streams (DEC-1087 (13)), then the remaining 40 not-started and 7 in-flight tickets under the three layers; EXAMIN's copy about 11-21"
   ],
-  "owner_action": "P1 E2's cap (recommended $40) and the instruction line (E1-PILOT-RESULT); P2 the CAP-45.a note (33f72aab on w2/W2-27-citp): V, A, C, R, T, N and two new tickets; P2 ADR-0002 (refresh then accept, after the experiments) (PROPOSED, cited by W2-112); later: the E3-E5 design package; M3's adoption after all the experiments; the 150-id sitting; the templates' approval; the three layers' plan after the lift",
-  "last_report": "2026-11-07 17:10:08",
+  "owner_action": "P2 W2-137 at the lift: as it is (recommended; G1-PROFILE) or set back; P2 ADR-0002 (after the experiments); after E3-E5: the fresh-80 package and the K9 bar, with G1's fewer-scored-pairs option (DEC-1094 (1)); later: M3's adoption, the 150-id sitting, the templates' approval, the three layers' plan",
+  "last_report": "2026-11-07 19:05:11",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -59,6 +62,9 @@
     "W2-126": "MERGED as built (D-1); formal close at the lift",
     "W2-122": "MERGED as built (D-1); formal close at the lift",
     "W2-123": "MERGED as built (D-1); formal close at the lift",
-    "W2-04": "MERGED as built (D-1, M-1); formal close at the lift"
+    "W2-04": "MERGED as built (D-1, M-1); formal close at the lift",
+    "W2-138": "MERGED (store commit in results, resolved once, CONTINUATION_INVALID names both commits, the skill line; review READY); live at the lift",
+    "W2-137": "MERGED (the reranker request cap 16 -> 64; review READY); S5 live measure next; live at the lift",
+    "W2-136": "MERGED (gov plan and the launch check; review READY; F2 an entry criterion of W2-20); live at the lift with W2-20"
   }
 }
