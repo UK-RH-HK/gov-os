@@ -83,3 +83,12 @@ The owner's DEC-1088, from DEPENDENCY-MAP-1 (`governance/project/orchestration/p
 launcher's lead path). S3's matcher is `gov.guard.decide._match_pattern`. **The designer's D-1 settled (CTO, delegated
 under DEC-1088 (5)(a)):** `src/gov/launch/launcher.py` joins the paths for the one call to `plan_check` at the argument
 checks, as S9 already states; W2-20 (built and held) holds the launcher's gate line and lands with this ticket. [DEC-1088]
+
+**Merged (CTO, 2026-11-07):** the second pass (`992af31c`, CTO's settlements under DEC-1088 (5)(a): the launcher never
+checks the calling session's `GOV_TICKET`; an admitted lead starts with `build_lead_settings`, as the dispatcher's lead
+line, workers unchanged); `gov accept W2-136` 76/76 with and without the CTO's lead environment; the scoped regression
+outside the sandbox 3,398 passed, 14 red, all 14 red on integrate too (D-10's list); S11 0.81 s median (`8245c1af`);
+review round 1 READY by `verdict.py` (`governance/project/orchestration/reviews/w2-136.md`): **F2** (the check reads the
+folder's own tickets and ready list, which can be stale; fails open once leads go through `gov launch`) is an entry
+criterion of W2-20, the ticket that routes leads through it (DEC-803); F1, F3-F7 Wave 3 rows. Merged into
+`w2/integrate`; live at the lift's re-pin with W2-20. Formal close at the lift. [DEC-1088]
