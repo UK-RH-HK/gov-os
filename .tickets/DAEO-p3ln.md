@@ -1,6 +1,6 @@
 ---
 id: DAEO-p3ln
-status: open
+status: in_progress
 deps: [DAEO-t8mp, DAEO-r30l]
 links: [DAEO-cb2b, DAEO-q7lk]
 created: 2026-11-06T23:10:00Z
