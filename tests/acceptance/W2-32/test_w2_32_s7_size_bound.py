@@ -1,10 +1,15 @@
 """S7 with DEC-1067 (f)'s size bound (the review's S7-F4; the CTO's bound after the GPU trip of 2026-11-04 03:53):
-every reranker request carries at most 16 texts **and at most 24,000 characters in total**; a pool of long chunks is
-split into the fewest requests meeting both; a single chunk above the budget is read up to it; the order is the
-unbatched one.
+every reranker request carries at most the cap's texts (``rerank.MAX_REQUEST_TEXTS``, 64 since DEC-1090 (2), 16
+before) **and at most 24,000 characters in total**; a pool of long chunks is split into the fewest requests meeting
+both; a single chunk above the budget is read up to it; the order is the unbatched one.
+
+Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). The cap is read from the code
+in force (it was the literal 16), and no request may carry more texts than the service accepts
+(``rerank_service.MAX_TEXTS``); the 24,000-character bound, the fewest requests and the order are unchanged. The test
+names keep "16" so the README's node ids hold.
 
 - **Ten long chunks:** ten notes, each one line of about 6,000 characters (so one chunk each), all answering the
-  question: no request above 16 texts or 24,000 characters, in total and padded (its texts times its longest, as
+  question: no request above the cap's texts or 24,000 characters, in total and padded (its texts times its longest, as
   the engineer's bound counts it; every text the reranker is given counted whole, its path line too); the requests
   are the fewest that meet both, grouped longest first; the order is the unbatched one.
 - **One chunk of 40,000 characters:** the reranker is given its first part, at most 24,000 characters, and no request
@@ -19,11 +24,13 @@ import json
 from pathlib import Path
 
 import pytest
+from gov.retrieval import rerank, rerank_service
 
 import w2_32_driver as driver
 import w2_32_support as s
 
-CAP_TEXTS, CAP_CHARS = 16, 24_000
+CAP_TEXTS, CAP_CHARS = rerank.MAX_REQUEST_TEXTS, 24_000  # Rewrite-Reason: DEC-1090 (2) (the cap was the literal 16)
+SERVICE_TEXTS = rerank_service.MAX_TEXTS
 QUESTION = "Which ledger entries record the harbour quorum?"
 
 
@@ -83,7 +90,10 @@ def _within_both_bounds(requests):
     for number, request in enumerate(requests, 1):
         chars = sum(len(text) for text in request)
         padded = len(request) * max((len(text) for text in request), default=0)
-        assert len(request) <= CAP_TEXTS, f"request {number} carries {len(request)} texts (DEC-1067 (f): at most 16)"
+        assert len(request) <= CAP_TEXTS, \
+            f"request {number} carries {len(request)} texts (DEC-1067 (f), DEC-1090 (2): at most {CAP_TEXTS})"
+        assert len(request) <= SERVICE_TEXTS, \
+            f"request {number} carries {len(request)} texts, more than the service accepts ({SERVICE_TEXTS})"
         assert chars <= CAP_CHARS, f"request {number} carries {chars} characters (S7-F4: at most {CAP_CHARS})"
         # Rewrite-Reason: the padded bound groups requests by length: the bound is the padded size (b7085897).
         assert padded <= CAP_CHARS, \

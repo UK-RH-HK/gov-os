@@ -219,7 +219,9 @@ def test_rerank_depth_reranks_the_first_n_fused_once_and_cuts_the_pages_from_tha
 @pytest.mark.parametrize("settings", ["rerank_depth", "v456"])
 def test_every_rerank_request_keeps_the_padded_bound(pool_store, box, standin, settings):
     """The second failure line: with 40 reranked in one pass, about half of them 2,400 characters long, no request
-    goes past 16 texts or 24,000 characters padded, on either page."""
+    goes past the cap's texts (``w2_32_pool.CAP_TEXTS``) or 24,000 characters padded, on either page.
+
+    Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137); the text said 16."""
     chosen = {"rerank_depth": 40} if settings == "rerank_depth" else p.V456
     (_, one_requests), (_, two_requests) = _pages(box, pool_store, p.POOL_QUESTION, chosen)
     sent = [text for request in one_requests for text in request]
