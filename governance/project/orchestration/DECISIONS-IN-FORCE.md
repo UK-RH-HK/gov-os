@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1091 on 2026-11-07 (re-pin window 4 done at
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1092 on 2026-11-07 (re-pin window 4 done at
 14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
@@ -269,3 +269,8 @@ other restart is an ACT.
   work; E2 now, E3 to E5 after it (their design package first, DEC-1085 (6)). **A runaway brake only:** an experiment
   stops when its spend passes twice its own projection, and the stop is reported with its cause. The "may be
   incomplete" instruction line in E2 to E5 (E1-DECLARATION's amendment). Basis: 1 and 2.
+- DEC-1092 (2026-11-07): **E2 accepted:** "search again once" a standing practice, as a package (skills, role templates
+  through W2-128, hooks if needed). **E3-E5-DESIGN approved** (brakes at twice each projection; the readers and graders
+  see the hidden and spent sets). **The fresh 80 and the K9 bar wait for E3 to E5 on the 138:** the CTO brings the
+  expectation, every gap or fix, and how the 80 runs; the configuration and the bar are chosen from the 138 before the
+  80 runs; on the 80 every condition may be measured, only the one chosen beforehand is judged. Basis: 1.

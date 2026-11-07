@@ -13755,6 +13755,26 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (the practice measured on the 138 without stopping for cost) and question 2 (a fault stops a run
   and is reported, a normal run is never cut).
 
+### DEC-1092 — E2 accepted: "search again once" a standing practice (a package); E3-E5-DESIGN approved; the fresh 80 and the K9 bar wait for E3 to E5's results, chosen from the 138 before the 80 runs
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1085 (5), (6), (7), DEC-1087 (11), (12), DEC-1078 (3), DEC-1086 C, DEC-1091, DEC-1088 (4) · **Source:** `governance/project/orchestration/packages/LIFT-1/E2-RESULT.md`, `E3-E5-DESIGN.md`
+- **Decision:**
+  - (1) **E2 accepted:** "search again once" becomes a standing practice for agents, brought to the owner as a package
+    (skills, the role templates through W2-128, hooks if needed), as DEC-1085 (5) set.
+  - (2) **E3-E5-DESIGN approved as written,** each run with its runaway brake at twice its projection: E3 gives the
+    agents the top 5, the top 10, the top 20, today's bundle and all 40 unranked to rank themselves, graded on the
+    answer and its citation, with search-again on the best two; then E4 (the other rerankers, after the harness fix)
+    and E5 (the 12,000-token bundle).
+  - (3) The readers and graders see the hidden and spent sets, as in E2.
+  - (4) **The fresh 80 and the K9 bar wait for E3 to E5's results on the 138.** From them the CTO brings: what to
+    expect on the fresh 80; every gap or fix needed so the experiments run correctly and the verdict is honest; and a
+    proposal for how the fresh 80 runs (possibly every experiment on it) and the K9 bar. The owner decides both before
+    the fresh 80 runs. **The configuration and the bar are chosen from the 138 before the 80 runs; on the 80 every
+    condition may be measured for data, but only the one chosen beforehand is judged.**
+  - (5) **What stands, restated:** the fresh 80 is used once (DEC-1078 (3), DEC-1085 (7)); M3's adoption is decided
+    only after all the experiments (DEC-1087 (12)); W2-137 and W2-138 land at the lift's re-pin, before the three
+    layers start; W2-136 is built beside the experiments (DEC-1088 (4)).
+- **Basis:** question 1 (the verdict set judges one configuration chosen beforehand; agents' practice proven end to end).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13783,3 +13803,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.473 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1089 (item 3 standing); DEC-942 item 6 and DEC-941 item 3 changed. Next free id: DEC-1090. |
 | 0.474 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1090; W2-137 and W2-138 filed; DEC-1067 (f) to change by W2-137. Next free id: DEC-1091. |
 | 0.475 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1091 (items 1 and 2 standing for the experiments); DEC-1086 C changed. Next free id: DEC-1092. |
+| 0.476 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1092. Next free id: DEC-1093. |
