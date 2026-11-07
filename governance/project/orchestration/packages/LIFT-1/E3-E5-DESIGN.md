@@ -70,3 +70,19 @@ As in E2, approved by DEC-1086 C for search-again: the readers and graders read 
 3. The K9 end-to-end bar (§5).
 
 **Basis:** question 1 (memory judged by what agents actually answer, against a bar declared before the figures).
+
+## As run (approved by DEC-1092; written before E3's run)
+- **How the conditions are built** (`drafts/d4b/e3_run.py`, run with the pin's python):
+  - **top 5, 10, 20:** the first call's ranked chunks with **their own spans**. Each chunk's span comes from the clone store's `lexical_chunk`, so an item the product expanded goes back to its chunk.
+  - **today's bundle:** the first call's evidence **exactly as sent**, its expansions included.
+  - **40 unranked:** the unique chunks of calls 1 and 2 (the pool's 40), with their own spans, shuffled with the question's id as the seed. The reader is told the items are in no particular order.
+- **Dry run, gold in the bundle before any reader** (of the 138):
+  - top 5: 100;
+  - top 10: 111;
+  - top 20: 117;
+  - today's bundle: 123 (E0's figure);
+  - 40 unranked: 118.
+
+  Median sizes: 4.6k, 9.0k, 16.3k, 21.8k and 29.6k characters. Today's bundle holds more gold than the plain top 20 because the product's expansions widen some items to their parent.
+- **The reader and grader** are E2's, with the "may be incomplete" line. A `search_again` verdict counts as not found here.
+- **E3's five conditions:** projection $150, brake $300. Search-again on the best two follows as its own run.
