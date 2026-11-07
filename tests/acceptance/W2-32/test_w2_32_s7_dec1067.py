@@ -1,9 +1,17 @@
 """S7 (G1) with its note under DEC-1067 (owner, 2026-11-04): the reranker's requests capped at 16 texts (f), parent
 expansion sending no span twice in either direction, and the embedder's limit named.
 
-- **The cap (DEC-1067 (f)):** a search whose rerank pool exceeds 16 sends the reranker no request of more than 16
-  texts, and the final order is the order the same scores give unbatched. The stand-in reranker keeps each request
-  (one per call) and scores each text by a hash of it, so no two texts tie.
+- **The cap (DEC-1067 (f), raised by DEC-1090 (2)):** a search whose rerank pool exceeds 16 (the pool DEC-1067 (f)'s
+  cap split) sends the reranker no request of more than the cap in force (``rerank.MAX_REQUEST_TEXTS``) and none of
+  more texts than the service accepts (``rerank_service.MAX_TEXTS``), and the final order is the order the same scores
+  give unbatched. The stand-in reranker keeps each request (one per call) and scores each text by a hash of it, so no
+  two texts tie.
+
+  Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). The bound was the literal
+  16; it is now the cap in force, with the service's bound beside it. The premise keeps 16 (``DEC_1067_CAP``): a
+  search's pool here (20 to 30 texts; the routes give at most 30 each) cannot exceed 64, so the case shows the pool
+  DEC-1067 (f) split still bounded and in the unbatched order; a split by count above the cap is W2-137's S1 guard
+  (pools of 90 and 200). The test name keeps "16" so the README's node id holds.
 - **No span twice, the converse (S7; the review's F-5):** a paged retrieval whose first call sends two chunks of a
   section alone (their parent does not fit the bundle budget there) and whose later call expands that section: the
   later call sends no span that contains a span an earlier call sent, and names what it left out. (The direction
@@ -19,15 +27,18 @@ import json
 from pathlib import Path
 
 import pytest
+from gov.retrieval import rerank, rerank_service
 
 import w2_32_driver as driver
 import w2_32_support as s
 
-CAP = 16
+CAP = rerank.MAX_REQUEST_TEXTS  # Rewrite-Reason: DEC-1090 (2) (it was the literal 16)
+SERVICE_TEXTS = rerank_service.MAX_TEXTS
+DEC_1067_CAP = 16  # the premise only: a pool DEC-1067 (f)'s cap of 16 would have split
 LIMIT_CHARS = 16_384  # 4,096 tokens at four characters each: no limit of the embedder's context lies above it
 
 
-# ---- the cap: at most 16 texts a request, the order unchanged ----------------------------------------------------
+# ---- the cap: at most the cap's texts a request, the order unchanged ---------------------------------------------
 
 WORDS = ("amber", "basalt", "cobalt", "dune", "ember", "fjord", "garnet", "heron", "indigo", "juniper")
 QUESTION = "Which notes mention the quorum of the harbour council?"
@@ -63,9 +74,11 @@ def test_no_reranker_request_carries_more_than_16_texts_and_the_order_is_the_unb
     answer = s.result(box.call(op, root=str(council), query=QUESTION, reranker=spec, **extra))
     requests = _requests(box)
     pool = [text for request in requests for text in request]
-    assert len(pool) > CAP, f"premise: the rerank pool holds more than {CAP} texts ({len(pool)})"
+    assert len(pool) > DEC_1067_CAP, f"premise: the rerank pool holds more than {DEC_1067_CAP} texts ({len(pool)})"
     sizes = [len(request) for request in requests]
-    assert max(sizes) <= CAP, f"a reranker request carried more than {CAP} texts (DEC-1067 (f)): {sizes}"
+    assert max(sizes) <= CAP, f"a reranker request carried more than {CAP} texts (DEC-1067 (f), DEC-1090 (2)): {sizes}"
+    assert max(sizes) <= SERVICE_TEXTS, \
+        f"a reranker request carried more texts than the service accepts ({SERVICE_TEXTS}): {sizes}"
     unbatched = [_path_of(text) for text in sorted(pool, key=driver.hashed_score, reverse=True)]
     assert None not in unbatched, "premise: every text the reranker read names its path"
     hits = answer["hits"] if op == "fusion_search" else answer["evidence"]

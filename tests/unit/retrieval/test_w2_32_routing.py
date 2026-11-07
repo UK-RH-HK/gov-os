@@ -22,7 +22,7 @@ sys.path.insert(0, str(REPO / "src"))
 
 from gov import store  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
-from gov.retrieval import lexical, retrieve as retrieve_module, routing, semantic  # noqa: E402
+from gov.retrieval import lexical, rerank, retrieve as retrieve_module, routing, semantic  # noqa: E402
 from gov.retrieval.retrieve import retrieve  # noqa: E402
 
 pytestmark = pytest.mark.skipif(shutil.which("gitleaks") is None, reason="gitleaks is not on PATH")
@@ -206,7 +206,7 @@ def lexical_text(root, chunk):
 def test_routing_on_keeps_one_rerank_of_the_merged_set_in_full_requests_of_16(project):
     """P-W2-32-9: the record half reuses the page's scores; no request of its own."""
     root, code, record, state = project
-    for number in range(3, 15):  # a pool above 16, so the requests are cut
+    for number in range(3, 15):  # a pool above the old cap of 16 (DEC-1090 (2): the cap in force splits it, if at all)
         (root / f"note{number}.md").write_text(f"# Note {number}\n\nThe {PHRASE} of pier {number}.\n")
     _git(root, "add", "-A")
     _git(root, "commit", "-q", "-m", "more notes")
@@ -232,8 +232,9 @@ def test_routing_on_keeps_one_rerank_of_the_merged_set_in_full_requests_of_16(pr
                                                                                          "named_first": 2}}))
     on, on_sizes = ask()
     pool = len(on["evidence"])
+    cap = rerank.MAX_REQUEST_TEXTS  # DEC-1090 (2): the cap in force, read from the client, not a literal
     assert pool > 16
-    assert on_sizes == off_sizes == [16] * (pool // 16) + ([pool % 16] if pool % 16 else [])
+    assert on_sizes == off_sizes == [cap] * (pool // cap) + ([pool % cap] if pool % cap else [])  # DEC-1090 (2)
     assert on["routing"]["named"] and on["routing"]["code"]
 
 
@@ -382,7 +383,7 @@ def test_phrasings_on_rerank_the_merged_pool_once_within_the_bounds(project, mon
         yaml.safe_dump({"routing": {"phrasings": True, "code_first": 2, "named_first": 2}}))
     bundle = retrieve(root, PHRASE, batch_size=30, bundle_budget=0, reranker=recording)
     assert sum(n for n, _ in sizes) == len(bundle["evidence"])  # each candidate scored once: one rerank
-    assert all(n <= 16 and chars <= 24_000 for n, chars in sizes)
+    assert all(n <= rerank.MAX_REQUEST_TEXTS and chars <= 24_000 for n, chars in sizes)  # DEC-1090 (2)
     assert bundle["routing"]["code"] and bundle["routing"]["named"]  # S8's halves after the phrasings
 
 

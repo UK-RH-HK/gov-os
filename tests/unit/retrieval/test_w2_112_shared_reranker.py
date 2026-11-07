@@ -389,7 +389,7 @@ def test_a_service_that_does_not_answer_in_time_is_left(home, monkeypatch):
 
 
 def test_a_request_over_the_cap_is_refused_and_the_search_falls_back(home):
-    # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (16, DEC-1067 (f)), so the service's own cap is
+    # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (64, DEC-1090 (2)), so the service's own cap is
     # reached only by a request made past rerank.rerank: the default reranker's scorer, asked directly. The guard
     # stays: the service refuses the over-cap request, and the scorer falls back to the private reranker, named.
     texts = ["x"] * (rerank_service.MAX_TEXTS + 1)
@@ -401,8 +401,8 @@ def test_a_request_over_the_cap_is_refused_and_the_search_falls_back(home):
 
 
 def test_a_search_s_requests_never_reach_the_service_s_cap(home):
-    # DEC-1067 (f): a pool larger than the service's cap goes in requests of at most 16, each under the cap
-    assert rerank.MAX_REQUEST_TEXTS == 16 < rerank_service.MAX_TEXTS
+    # DEC-1067 (f): a pool larger than the service's cap goes in requests of at most the client's cap, each under it
+    assert rerank.MAX_REQUEST_TEXTS == 64 < rerank_service.MAX_TEXTS  # DEC-1090 (2): the cap raised from 16
     texts = ["x" * (number % 7 + 1) for number in range(rerank_service.MAX_TEXTS + 1)]
     ranked, outcome = ask("q", texts)
     assert outcome["by"] == "service" and outcome["reason"] is None and not fallbacks(home)
@@ -552,7 +552,8 @@ def test_the_running_service_writes_one_memory_line_per_request(home):
 
 
 def test_the_release_leaves_the_client_s_bounds_as_they_were():
-    assert (rerank.MAX_REQUEST_TEXTS, rerank.MAX_REQUEST_CHARS, rerank_service.MAX_TEXTS) == (16, 24_000, 512)
+    # DEC-1090 (2): the texts' cap raised from 16 to 64; the padded bound and the service's bound as they were
+    assert (rerank.MAX_REQUEST_TEXTS, rerank.MAX_REQUEST_CHARS, rerank_service.MAX_TEXTS) == (64, 24_000, 512)
 
 
 def test_a_service_that_cannot_start_leaves_the_search_to_the_private_reranker(home, monkeypatch):

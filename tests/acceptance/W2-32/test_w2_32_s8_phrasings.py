@@ -14,7 +14,14 @@ false is today's order byte for byte; an invalid value is ``CONFIG_INVALID`` nam
   and the phrasing with ``CAP-88`` appended reaches ``CITING``, a note that names ``CAP-88`` and shares no word with
   the question (kept out of the vectors): in the pool with the setting on, not off.
 - **Reranked once:** with the setting on, the merged pool goes to the reranker once (each text once) in requests
-  within 16 texts and 24,000 characters, the fewest that meet both in the order sent.
+  within the cap's texts (``rerank.MAX_REQUEST_TEXTS``) and 24,000 characters, the fewest that meet both in the order
+  sent.
+
+Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). The bound is the cap in force
+(``test_w2_32_s7_size_bound``'s, read from the code; it was 16). The premise "the merged pool holds more than 16
+texts" keeps DEC-1067 (f)'s 16 as a number of its own: the merged pool (24 to 31 texts here) is one that cap would have
+split, so one request now, against three phrasings' requests, still shows one rerank of the merged pool. The test
+names keep "16" so the README's node ids hold.
 - **Off:** no setting, and ``phrasings: false``, give the same bundle, byte for byte.
 - **Invalid:** a word, a number, a list: ``CONFIG_INVALID`` naming ``routing.phrasings``.
 
@@ -32,9 +39,10 @@ import yaml
 
 import w2_32_routing as r
 import w2_32_support as s
-from test_w2_32_s7_size_bound import CAP_TEXTS, _fewest, _within_both_bounds
+from test_w2_32_s7_size_bound import _fewest, _within_both_bounds
 
 KEY = "routing.phrasings"
+DEC_1067_CAP = 16  # the premise only: a merged pool DEC-1067 (f)'s cap of 16 would have split (DEC-1090 (2))
 CONTENT_QUESTION = "Where is the tide ledger quorum kept?"
 CONTENT_WORDS = "tide ledger quorum kept"  # the question less its stopwords and its question mark
 LEDGER = "records/ledger-room.md"
@@ -126,9 +134,9 @@ def test_the_merged_pool_is_reranked_once_within_16_texts_and_24000_characters(p
     data, requests = _ask(box, phrased, question)
     s.result(data)
     pool = [text for request in requests for text in request]
-    assert len(pool) > CAP_TEXTS, f"premise: the merged pool holds more than {CAP_TEXTS} texts ({len(pool)})"
+    assert len(pool) > DEC_1067_CAP, f"premise: the merged pool holds more than {DEC_1067_CAP} texts ({len(pool)})"
     assert len(set(pool)) == len(pool), "a text was given to the reranker twice: the merged pool was not reranked once"
-    _within_both_bounds(requests)  # 16 texts; 24,000 characters in total and padded (the engineer's bound)
+    _within_both_bounds(requests)  # the cap's texts; 24,000 characters in total and padded (the engineer's bound)
     assert len(requests) == _fewest(pool), \
         f"{len(requests)} rerank requests where {_fewest(pool)} meet both bounds: not one rerank of the merged pool"
 

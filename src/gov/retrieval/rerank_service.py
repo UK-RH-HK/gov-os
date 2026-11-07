@@ -49,7 +49,9 @@ load, scores, device_of = _worker.load, _worker.scores, _worker.device_of
 NO_GPU_SHARE = 77  # holding a slot, the GPU has too little free memory, or none can be read
 GIB, MIB = 2 ** 30, 2 ** 20
 SHARE, HEADROOM = 3.5 * GIB, 2.0 * GIB  # DEC-1032: the reranker's share (2.5 to 3.5 GB, the top taken), 2 GB spare
-MAX_TEXTS = 512  # a search sends at most (rounds + 1) x batch size candidates: 90 at the defaults
+# The most texts one request may carry: at least the client's cap (``rerank.MAX_REQUEST_TEXTS``, 64, DEC-1090 (2)),
+# whose requests a search never exceeds. A request over it is refused with its count named, never cut.
+MAX_TEXTS = 512
 READ_S = 10.0  # a caller sends its request as soon as it connects
 
 
@@ -78,8 +80,11 @@ def note(log: str, kind: str, detail: str) -> None:
 def answer(encoder, device: str, line: bytes) -> dict:
     try:
         query, texts = json.loads(line)
-        if not isinstance(query, str) or not isinstance(texts, list) or len(texts) > MAX_TEXTS:
+        if not isinstance(query, str) or not isinstance(texts, list):
             raise ValueError(f"a request is a question and at most {MAX_TEXTS} texts")
+        if len(texts) > MAX_TEXTS:  # refused whole, never truncated (DEC-1090 (2))
+            raise ValueError(f"a request is a question and at most {MAX_TEXTS} texts: this one has {len(texts)}, "
+                             f"none scored")
         return {"scores": scores(encoder, query, texts), "device": device}
     except Exception as error:
         return {"error": f"{type(error).__name__}: {error}", "device": device}

@@ -24,12 +24,18 @@ import struct
 from pathlib import Path
 
 import pytest
+from gov.retrieval import rerank, rerank_service
 
 import w2_32_driver as driver
 import w2_32_routing as r
 import w2_32_support as s
 
-CAP = 16
+# Rewrite-Reason: DEC-1090 (2): the reranker's request cap raised from 16 to 64 (W2-137). ``CAP`` is the cap in force
+# (it was the literal 16); ``DEC_1067_CAP`` keeps 16 for the cap case's premise only: the routed pool (20 texts) is one
+# DEC-1067 (f) split, and cannot exceed 64 here. The cap case's name keeps "16" so the README's node id holds.
+CAP = rerank.MAX_REQUEST_TEXTS
+SERVICE_TEXTS = rerank_service.MAX_TEXTS
+DEC_1067_CAP = 16
 ROUTE_ORDER_AHEAD = {(path, r.rank_of(r.CODE_TEXT[path])) for path in r.CODE[:2]}  # the fallback: no vectors
 RECORD_AHEAD = {(r.RECORD_REL, rank) for rank in sorted(r.RECORD_RANKS, reverse=True)[:2]}
 
@@ -236,9 +242,12 @@ def test_the_16_text_cap_holds_with_routing_on(routed, box, standin):
     r.set_routing(routed, symbol=r.ON, record=r.ON)
     _, requests, _ = _ask(box, routed, r.BOTH_QUESTION)
     sizes = [len(request) for request in requests]
-    assert sum(sizes) > CAP, f"premise: the rerank pool holds more than {CAP} texts ({sum(sizes)})"
+    assert sum(sizes) > DEC_1067_CAP, f"premise: the rerank pool holds more than {DEC_1067_CAP} texts ({sum(sizes)})"
     assert all(size == CAP for size in sizes[:-1]) and sizes[-1] <= CAP, \
-        f"with routing on, the rerank requests are not the pool cut into requests of {CAP} (DEC-1067 (f)): {sizes}"
+        f"with routing on, the rerank requests are not the pool cut into requests of {CAP} (DEC-1067 (f), " \
+        f"DEC-1090 (2)): {sizes}"
+    assert max(sizes) <= SERVICE_TEXTS, \
+        f"with routing on, a rerank request carried more texts than the service accepts ({SERVICE_TEXTS}): {sizes}"
 
 
 # ---- an invalid setting --------------------------------------------------------------------------------------------
