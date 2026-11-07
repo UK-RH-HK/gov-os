@@ -100,6 +100,7 @@ sources:
 - DEC-772
 - DEC-1083
 - DEC-1089
+- DEC-1090
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -143,3 +144,7 @@ Wave 3. Two items are added here, as one package (`governance/project/orchestrat
 
 Neither touches EXAMIN's copy, so both run before K9's entry criteria are met (DEC-954 Q1 gates the adoption, not
 these two items). [DEC-1089]
+
+**DEC-1090 (5) (owner, 2026-11-07):** (b) takes option A, the CIT-P note moving CAP-45.a to Wave 3 (drafted by a
+product-spec agent, one independent review, then the owner). (a) The release is cut after the lift's re-pin and before
+W2-81's proving-ground run. [DEC-1090]

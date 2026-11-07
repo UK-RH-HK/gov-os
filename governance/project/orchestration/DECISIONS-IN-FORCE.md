@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1089 on 2026-11-07 (re-pin window 4 done at
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1090 on 2026-11-07 (re-pin window 4 done at
 14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
@@ -260,3 +260,8 @@ other restart is an ACT.
   hash-checked) and CAP-45.a's exit-criterion-7 paperwork are W2-27's (`packages/K7-W2-REMAINDER.md`). **Usage,
   standing: never pinged or alarmed** (DEC-942 item 6 ended); readings in `log/usage.txt`, each experiment's tokens and
   cost in `log/spend.jsonl`, shown in the digests. Basis: 1 and 4.
+- DEC-1090 (2026-11-07): PAT-1 read; **E0 and E0b go.** W2-137 (`DAEO-5emz`, the reranker's request cap raised, measured
+  20 and 10 at once in a GPU window between experiments) and W2-138 (`DAEO-rmhj`, the store's commit in every result;
+  the line-hash check in the worker brief) filed, tests first, beside the experiments, **live at the lift's re-pin**,
+  before the three layers. Overlapping slices decided after E0 on the 138. **CAP-45.a: option A** (a CIT-P note to Wave
+  3, in W2-27); the release cut after the lift's re-pin, before W2-81's run. Basis: 1 and 2.
