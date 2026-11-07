@@ -38,6 +38,7 @@ sources:
 - DEC-105
 - DEC-988
 - DEC-989
+- CAP-33
 est_loc: 0
 acceptance_tests:
   judged_by: 'tests/acceptance/W2-49/ as W2-140 leaves it, and the plan validator (docs/plan/tools/validate_w2.py)'

@@ -29,6 +29,7 @@ sources:
 - DEC-1093
 - DEC-1090
 - DEC-1088
+- MR-3
 est_loc: 0
 acceptance_tests:
   judged_by: 'W2-139''s candidate: tests/acceptance/W2-49/ green on it'
