@@ -19,6 +19,7 @@ allowed_paths:
 - src/gov/retrieve/command.py
 - src/gov/retrieval/retrieve.py
 - src/gov/retrieval/validate.py
+- src/gov/cli/main.py  # [DEC-1090] point (1): the text form's store line only
 - template/governance/kernel/skills/retrieval/SKILL.md
 - tests/unit/retrieve/test_w2_138*
 - tests/unit/retrieval/test_w2_138*
@@ -68,3 +69,15 @@ The owner's DEC-1090 (3), from PAT-1's gaps G2 and G4 (`governance/project/orche
 - **Est.:** about 150 lines with tests, half a day with its review.
 
 [DEC-1090]
+
+**TESTS-READY:** `tests/acceptance/W2-138/` at `999b12111` on `w2/W2-138-tests`: 18 cases, 13 red (S1 6, S2 1, S3 2,
+S4 1, S5 3), 5 green guards. The byte rule and the S2 seam are in the tests' README.
+
+**The designer's points settled (CTO, 2026-11-07, delegated, under DEC-1090 (3)):**
+- **(1)** the text form's `store:` line is printed by the command's output path: `src/gov/cli/main.py` joins
+  `allowed_paths` for that line only. [DEC-1090]
+- **(2)** "the commit the store was built at" is the store's own fingerprint `head`, not the folder's HEAD now. Confirmed.
+- **(3)** either commit in full or as 12 digits, in `message` or `details`: accepted; a token from before this change
+  (no commit in it) is refused `CONTINUATION_INVALID` as today, with "made before W2-138" in its message.
+- **(4)** the chunker's `str.splitlines` against the item's `bytes.splitlines` (line numbers drift in a file with form
+  feed, `\x1c`-`\x1e`, `\x85`, U+2028 or U+2029): a Wave 3 row, not ordinary work here.
