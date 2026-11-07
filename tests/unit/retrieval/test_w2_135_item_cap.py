@@ -14,8 +14,10 @@ reranker a stand-in.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -321,6 +323,20 @@ def _before(monkeypatch, seen):
     return module
 
 
+def _without_s(token):
+    """DEC-1090 (3): a continuation token decoded, without its ``s`` key (the store's commit, W2-138 S3)."""
+    if token is None:
+        return None
+    payload = json.loads(base64.urlsafe_b64decode(token))
+    payload.pop("s", None)
+    return payload
+
+
+def _without_token_s(bundle):
+    """DEC-1090 (3): a bundle without its evidence, its continuation token decoded without the ``s`` key."""
+    return {k: (_without_s(v) if k == "continuation" else v) for k, v in bundle.items() if k != "evidence"}
+
+
 CALLS = [("zephyrine", {}), ("quokkaline", {}), ("quokkaline", {"bundle_budget": 100}), ("marmoset", {}),
          ("marmoset", {"bundle_budget": 100}), ("ocelot", {}), ("pangolin", {}), ("kumquat", {}), ("heliotrope", {}),
          ("worker queue task", {"batch_size": 2}), ("zephyrine quokkaline marmoset kumquat", {"batch_size": 1}),
@@ -338,7 +354,10 @@ def test_the_bundle_is_the_same_before_and_after_but_for_the_cut_lines_and_key(p
         new = retrieve.retrieve(project, query, **kwargs)
         assert set(old) == set(new), (query, kwargs)
         for key in set(new) - {"evidence"}:  # the batches, budget (its used), gaps, continuation, expansions, repeats
-            assert old[key] == new[key], (query, kwargs, key)
+            if key == "continuation":  # DEC-1090 (3): the token compared decoded, without its s key
+                assert _without_s(old[key]) == _without_s(new[key]), (query, kwargs, key)
+            else:
+                assert old[key] == new[key], (query, kwargs, key)
         assert len(old["evidence"]) == len(new["evidence"]), (query, kwargs)
         for was, now in zip(old["evidence"], new["evidence"]):  # the same items in the same order
             text, lines = _sent(was["path"], was["start_line"], was["end_line"])
@@ -367,11 +386,13 @@ def test_the_continuation_carries_on_the_same_before_and_after(project, monkeypa
     query = "zephyrine quokkaline marmoset kumquat"
     old = before.retrieve(project, query, batch_size=1)
     new = retrieve.retrieve(project, query, batch_size=1)
-    assert new["continuation"] is not None and old["continuation"] == new["continuation"]
+    # DEC-1090 (3): the tokens compared decoded, without their s key
+    assert new["continuation"] is not None and _without_s(old["continuation"]) == _without_s(new["continuation"])
     while new["continuation"] is not None:
         old = before.retrieve(project, query, batch_size=1, continuation=old["continuation"])
         new = retrieve.retrieve(project, query, batch_size=1, continuation=new["continuation"])
         strip = lambda bundle: [{k: v for k, v in item.items() if k not in ("text", "cut")}  # noqa: E731
                                 for item in bundle["evidence"]]
-        assert strip(old) == strip(new) and old["continuation"] == new["continuation"]
-        assert {k: v for k, v in old.items() if k != "evidence"} == {k: v for k, v in new.items() if k != "evidence"}
+        assert strip(old) == strip(new) and \
+            _without_s(old["continuation"]) == _without_s(new["continuation"])  # DEC-1090 (3)
+        assert _without_token_s(old) == _without_token_s(new)  # DEC-1090 (3)

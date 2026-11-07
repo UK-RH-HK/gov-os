@@ -17,6 +17,9 @@ the closure reached (``graph_route.follow``), after today's closure chunks; the 
 the decisions in reach that others change. The links never change what is current, the edges or the authority order.
 Status (W2-92 S9, DEC-1073 (2)): every register evidence item names its entry's status word and changers, and whether
 it is in force; any other record's item that is not in force says so (``in_force``, ``not_in_force``).
+The store (W2-138, DEC-1090 (3)): ``root`` is resolved once (``resolved``), so every facet reads one folder; the token
+carries the store's commit (``store_of``), and a token made on another commit, or before W2-138, is refused. Each item's
+``sha256`` is the hash of exactly its lines in the store's folder, which the index holds at that commit (DEC-344).
 """
 
 from __future__ import annotations
@@ -24,6 +27,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import os
 import sqlite3
 from pathlib import Path
 
@@ -149,15 +153,60 @@ def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
 
 
+def resolved(root) -> Path:
+    """W2-138 S2 (W2-116's R2-F1): the folder ``root`` names, its links followed once, here, so every facet of one
+    search opens that folder even when a link is switched during the search; as given where it leads to no folder."""
+    real = Path(os.path.realpath(root))
+    return real if real.is_dir() else Path(root)
+
+
+def store_of(root) -> dict:
+    """W2-138 S1: the store a search answers from: ``commit``, the commit it was built at (its fingerprints row's
+    ``head``, never the folder's HEAD now; None for a store built before W2-68 or one that cannot be read), and
+    ``root``, its folder as given (``resolved`` first)."""
+    commit = None
+    try:
+        connection = loader.connect(root)
+        try:
+            commit = (loader.fingerprints(connection) or {}).get("head")
+        finally:
+            connection.close()
+    except (GovError, sqlite3.Error):
+        pass  # no store, or none that can be read: the search says so itself
+    return {"commit": commit, "root": str(root)}
+
+
+def _short(commit) -> str:
+    return str(commit)[:12] if commit else "unknown"
+
+
+_UNCHECKED = object()
+
+
+def _same_store(payload: dict, commit) -> None:
+    """W2-138 S3: refuses a token that names no store commit (made before W2-138) or another commit than ``commit``,
+    the store's now, naming both."""
+    if "s" not in payload:
+        raise GovError("CONTINUATION_INVALID", "the continuation was made before W2-138 and names no store commit: "
+                       "ask the first page again", {"store_commit": commit}) from None
+    if payload["s"] != commit:
+        raise GovError("CONTINUATION_INVALID",
+                       f"the continuation was made on the store at commit {_short(payload['s'])}, and the store is "
+                       f"now at commit {_short(commit)}: ask the first page again",
+                       {"token_commit": payload["s"], "store_commit": commit}) from None
+
+
 def _encode_continuation(query, ids, ticket, radius, batch_size, bundle_budget, offset, expanded=(), alone=(),
-                         pooled=None):
+                         pooled=None, commit=None):
     """The stateless token of the next call; ``x`` carries the parents already expanded and ``c`` the spans already
     sent as a child on its own (``[path, first, last]``), so a later call sends neither again (W2-32 S7, DEC-1067).
     ``p`` (W2-32 S11, only when the pool reranked: ``pool.carried``) is the first call's pool order, so a later call
-    cuts its page from it without a rerank request and without writing anything (DEC-782)."""
+    cuts its page from it without a rerank request and without writing anything (DEC-782). ``s`` (W2-138 S3) is the
+    store's commit."""
     payload = json.dumps({"q": query, "i": sorted(ids), "t": ticket, "r": radius,
                           "bs": batch_size, "bb": bundle_budget, "o": offset, "x": sorted(expanded),
-                          "c": sorted([list(item) for item in alone]), **({"p": pooled} if pooled is not None else {})},
+                          "c": sorted([list(item) for item in alone]), "s": commit,
+                          **({"p": pooled} if pooled is not None else {})},
                          separators=(",", ":"), sort_keys=True)
     return base64.urlsafe_b64encode(payload.encode()).decode()
 
@@ -208,14 +257,19 @@ def _without(first: int, last: int, sent: list[tuple[int, int]]) -> list[tuple[i
 
 
 def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None,
-                         carried=None):
+                         carried=None, commit=_UNCHECKED):
     """The offset of the next call; with ``expanded`` (a set), the parents the earlier calls expanded are added, with
     ``alone`` (a set), the spans they sent as a child on its own, and with ``carried`` (a dict), the first call's pool
-    (``carried["pool"]``, None when the token holds none; W2-32 S11)."""
+    (``carried["pool"]``, None when the token holds none; W2-32 S11). With ``commit``, the store's commit now, a token
+    made on another store commit is refused (W2-138 S3)."""
     try:
         payload = json.loads(base64.urlsafe_b64decode(token))
     except Exception:
         raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    if not isinstance(payload, dict):
+        raise GovError("CONTINUATION_INVALID", "the continuation is no token of an earlier bundle") from None
+    if commit is not _UNCHECKED:
+        _same_store(payload, commit)
     expected = {"q": query, "i": sorted(ids), "t": ticket, "r": radius, "bs": batch_size, "bb": bundle_budget}
     for key in expected:
         if payload.get(key) != expected[key]:
@@ -273,10 +327,13 @@ def role_filter(root, role=None):
 
 
 def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bundle_budget=None, continuation=None,
-             reranker=None, role=None) -> dict:
+             reranker=None, role=None, store=None) -> dict:
     """The evidence bundle for ``query``; ``ticket`` and ``ids`` are closed over to the depth of ``radius``. Every
     route's hits are filtered by the caller's role paths (``role_filter``; ``role`` is a ``--role`` given), and what
-    is withheld is counted in the bundle's ``role_filter``."""
+    is withheld is counted in the bundle's ``role_filter``. ``root`` is resolved once (W2-138 S2); ``store`` is its
+    ``store_of``, read here when not given, and its commit goes in the token (S3)."""
+    root = resolved(root)
+    store = store_of(root) if store is None else store
     if batch_size is None:
         batch_size = DEFAULT_BATCH_SIZE
     limit = BUNDLE_BUDGET if bundle_budget is None else bundle_budget
@@ -285,7 +342,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     carried = {"pool": None}  # W2-32 S11: the first call's pool order, from the token
     if continuation is not None:
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget,
-                                      earlier, alone, carried)
+                                      earlier, alone, carried, commit=store["commit"])
     sent_alone = set(alone)  # W2-32 S7, DEC-1067: and this call's, for the next
 
     withhold = role_filter(root, role)
@@ -667,7 +724,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     new_offset = offset + len(gathering)
     if remaining:
         token = _encode_continuation(query, tuple(ids), ticket, radius, batch_size, bundle_budget, new_offset,
-                                     expanded, sent_alone, pool_token)
+                                     expanded, sent_alone, pool_token, commit=store["commit"])
     else:
         token = None
 

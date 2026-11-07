@@ -25,6 +25,10 @@ The store it answers from (W2-116 S3, DEC-963): with no ``--root`` given on the 
 the working tree: nothing there falls back to the working tree's store (``STORE_MISSING`` names that folder). A
 ``GOV_STORE`` that is not an absolute path is ``STORE_ROOT_INVALID``. A ``--root`` given wins; a call that does not come
 through the command line (no ``root`` in its arguments) is answered from the ``root`` it is given.
+
+The store it names (W2-138, DEC-1090 (3)): every result carries ``store`` (``gov.retrieval.retrieve.store_of``): the
+commit the store was built at and its folder. The folder is resolved once, whichever form named it (``--root <link>``,
+``GOV_STORE``, a call's ``root``), and every facet of the search reads it, even when the link is switched meanwhile.
 """
 
 from __future__ import annotations
@@ -95,19 +99,21 @@ _NOT_GIVEN = object()
 
 def _store_root(root: Path, args) -> Path:
     """The folder the search answers from: ``GOV_STORE``'s where the command line gave no ``--root`` (W2-116 S3), its
-    link followed once here, so every facet of this search opens the same half (review F2)."""
+    link followed once here, so every facet of this search opens the same half (review F2); a ``--root`` given, or a
+    call's ``root``, is followed once here too (W2-138 S2)."""
     import os
 
     from gov.cli.errors import GovError
     from gov.launch.store import ENV, StoreSettingError, session_root
+    from gov.retrieval.retrieve import resolved
 
     if getattr(args, "root", _NOT_GIVEN) is not None:  # a --root given, or a call that did not parse the line
-        return root
+        return resolved(root)
     try:
         chosen = session_root(os.environ.get(ENV))
     except StoreSettingError as error:
         raise GovError("STORE_ROOT_INVALID", f"{error}: nothing is retrieved", {"variable": ENV}) from None
-    return root if chosen is None else chosen
+    return resolved(root) if chosen is None else chosen
 
 
 def run(root: Path, args, config: dict) -> dict:
@@ -115,9 +121,10 @@ def run(root: Path, args, config: dict) -> dict:
 
     from gov.cli.errors import GovError
     from gov.decisions.register import leave_out
-    from gov.retrieval.retrieve import retrieve, role_filter
+    from gov.retrieval.retrieve import retrieve, role_filter, store_of
 
     root = _store_root(root, args)
+    store = store_of(root)  # W2-138 S1: read once, named in the result and carried in the token
     role = getattr(args, "role", None)  # W2-13 S5: a --role given adds its filter beside GOV_ROLE's (DEC-1065 (2))
     if args.continuation is None:
         nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
@@ -126,11 +133,11 @@ def run(root: Path, args, config: dict) -> dict:
             withhold = role_filter(root, role)
             if withhold is not None:  # nothing is offered, so nothing is withheld; the filter is named all the same
                 bundle["role_filter"] = withhold.summary()
-            return bundle
+            return {"store": store, **bundle}
     try:
         bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
                           batch_size=args.batch_size, bundle_budget=args.bundle_budget,
-                          continuation=args.continuation, role=role)
+                          continuation=args.continuation, role=role, store=store)
     except sqlite3.DatabaseError as error:  # no bundle was made: the store itself cannot be read (W2-M071)
         raise GovError("STORE_UNREADABLE", f"the store at {root} cannot be read: {error}",
                        {"root": str(root), "error": str(error)}) from None
@@ -138,4 +145,4 @@ def run(root: Path, args, config: dict) -> dict:
     bundle["evidence"], left_out = leave_out(root, bundle["evidence"])
     if left_out:
         bundle["left_out"] = left_out
-    return bundle
+    return {"store": store, **bundle}

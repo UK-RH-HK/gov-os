@@ -19,6 +19,7 @@ A method for gathering evidence with `gov retrieve`. The guard and the role file
 4. **Stopping reasons.** Every bundle carries exactly one stopping reason from the fixed list: `CLOSURE_COMPLETE`, `SATURATED`, `DEPTH_LIMIT_REACHED`, `BUDGET_EXHAUSTED_WITH_GAPS`, `FACET_UNAVAILABLE` or `UNRESOLVED_IDS`. A batch-size limit is never reported as completeness (DEC-034).
 
 5. **Validate the bundle.** Before using evidence, check that the bundle has a stopping reason, that each citation has an `id` and `sha256`, and that no citation references a superseded record (CAP-16, DEC-032).
+   Before relying on an evidence item, compare its `sha256` with the sha256 of the same lines (`start_line` to `end_line`) in your own tree; if they differ, your tree is behind or ahead of the store at `result.store.commit`: read the store's text with `git show <commit>:<path>`, and never cite the store's line numbers as your tree's (DEC-1090 (3)).
 
 6. **Handle continuation.** If the bundle carries a continuation token and the stopping reason is not `CLOSURE_COMPLETE` or `SATURATED`, pass the token back with `--continue` to gather more evidence within the spend budget.
 

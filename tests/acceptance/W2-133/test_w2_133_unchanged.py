@@ -4,10 +4,16 @@ the gaps, ``left_out`` and the continuation, but for the ids and status fields S
 "Before the fix" is ``retrieve.py`` and ``register.py`` as ``w2/integrate`` held them (``w2_133_support.TODAY_BLOBS``),
 loaded from git beside the running tree's; both are asked on the same store, in the same process, with the same
 stand-ins, through the same pipeline (``retrieve``, then ``leave_out``, as ``gov retrieve`` runs them), and through
-``retrieve`` alone. The comparison takes off each register item's ``LABEL_FIELDS`` only.
+``retrieve`` alone. The comparison takes off each register item's ``LABEL_FIELDS`` only, and compares the
+continuation token decoded, without its ``s`` key: W2-138 S3 puts the store's commit there (DEC-1090 (3)), so a token
+the code before the fix made has none. Every other key of the token is compared, and so is whether a token is given.
 """
 
 from __future__ import annotations
+
+import base64
+import binascii
+import json
 
 import pytest
 
@@ -39,9 +45,33 @@ def _evidence(bundle):
             for item in bundle["evidence"]]
 
 
+STORE_COMMIT_KEY = "s"  # the token's key W2-138 S3 adds: the store's commit (DEC-1090 (3))
+
+
+def _token(token):
+    """A continuation token decoded (base64 of a JSON object), without the store's commit key; no token stays as it
+    is (None, or an empty string)."""
+    if not token:
+        return token
+    try:
+        payload = json.loads(base64.urlsafe_b64decode(token))
+    except (TypeError, ValueError, binascii.Error) as error:
+        raise AssertionError(f"the continuation token {token!r} is not base64 of JSON: {error}") from error
+    assert isinstance(payload, dict), f"the continuation token decodes to {payload!r}, not an object"
+    return {key: value for key, value in payload.items() if key != STORE_COMMIT_KEY}
+
+
+def _comparable(bundle):
+    """What S3 says the fix leaves unchanged: the bundle without the label fields, its token decoded without ``s``."""
+    bare = support.without_labels(bundle)
+    if "continuation" in bare:
+        bare["continuation"] = _token(bare["continuation"])
+    return bare
+
+
 def _same(before, after):
     assert _evidence(after) == _evidence(before), "the evidence set or its order changed"
-    old, new = support.without_labels(before), support.without_labels(after)
+    old, new = _comparable(before), _comparable(after)
     for field in FIELDS:
         assert new.get(field) == old.get(field), f"the bundle's {field!r} changed"
     assert new == old, "the bundle changed beside the register items' ids and status fields"
