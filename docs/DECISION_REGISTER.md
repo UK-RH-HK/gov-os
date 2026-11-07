@@ -13822,6 +13822,28 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     (DEC-1092 (4)).
 - **Basis:** question 4 (no change without a measured gain) and question 1.
 
+### DEC-1096 — A repository glossary as part of memory (Wave 2): generated and kept current with the store, consulted when a search does not answer; tested now on the 138 against E2 before the fresh 80; the package beside the test
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1092 (1), (4), DEC-1094 (2), DEC-1088 (6), DEC-954 Q9f, DEC-1072 (Wave 0 memory practice), DEC-1052 · **Source:** the owner's message (chat, 2026-11-07)
+- **Decision:**
+  - (1) **What it is:** the repository's own vocabulary and terminology, for searching and for asking: the terms it uses
+    for its concepts, the forms of its ids (DEC-, W2-, CAP- and the rest), its record kinds, its commands, its
+    namespaces, and a map of the code's names (modules, classes, functions), so agents phrase searches, and questions to
+    other agents or to the owner, in the repository's own words.
+  - (2) **Built and kept current automatically** as the repository and its code grow: generated from what the
+    repository already states (decision, ticket and capability titles, the path map's namespaces, the code's symbols),
+    refreshed with the store after every merge, like the decisions and their links. A few human-curated terms may be
+    added, each with its decision id, and `gov links` checks it.
+  - (3) **Used by every agent:** retrievable as a memory record and consulted when a search does not answer, not pasted
+    into every brief; the skills and role templates refer to it, beside the search-again practice.
+  - (4) **Tested now, before the fresh 80:** a prototype glossary and code-name map for this repository; E2's condition
+    (today's bundle, search again once) rerun with the agent allowed to consult them, on the 138, judged against E2 with
+    McNemar, the wrong claims and the cost beside it. If it helps, it is part of the configuration the owner decides for
+    the fresh 80.
+  - (5) **The package, beside the test:** the decision's wording, the spec, the KPI lines, the ticket or tickets (and
+    W2-88's line, so every adopted repository builds its glossary at Wave 0), the estimate, and the effect on the dates.
+    The product build follows the test's result and the owner's approval, tests first.
+- **Basis:** question 1 (agents search and ask in the repository's own words, so more questions are answered right).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13854,3 +13876,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.477 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1093; W2-139, W2-140 and W2-141 filed. Next free id: DEC-1094. |
 | 0.478 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1094; W2-142 filed; W2-128 gains one KPI line. Next free id: DEC-1095. |
 | 0.479 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1095. Next free id: DEC-1096. |
+| 0.480 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1096. Next free id: DEC-1097. |

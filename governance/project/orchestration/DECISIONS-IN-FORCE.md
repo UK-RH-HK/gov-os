@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1095 on 2026-11-07 (re-pin window 4 done at
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
 14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
@@ -289,3 +289,10 @@ other restart is an ACT.
 - DEC-1095 (2026-11-07): **W2-137 live at the lift as it is** (the cap of 64; its readings within noise). G1's profile
   repeated in the next quiet GPU window, both readings with E4's result. Then the harness fix, its review, E0b, E4, and
   the fresh-80 package with the K9 bar. Basis: 4 and 1.
+- DEC-1096 (2026-11-07): **a repository glossary as part of memory (Wave 2):** the repository's vocabulary (terms, id
+  forms, record kinds, commands, namespaces) and a code-name map, generated from what it states and refreshed with the
+  store after every merge; curated terms only with a decision id (`gov links` checks); a memory record consulted when a
+  search does not answer, referred to by the skills and templates. **Tested now** (E2's condition with the glossary
+  consultable, on the 138, McNemar against E2, wrong claims and cost beside); if it helps, it joins the fresh-80
+  configuration. The package (wording, spec, KPI lines, tickets, W2-88's Wave 0 line, estimate, dates) beside the test;
+  the build after the test and the owner's approval, tests first. Basis: 1.
