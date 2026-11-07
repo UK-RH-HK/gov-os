@@ -62,6 +62,7 @@ depends_on:
 - DAEO-k4wm
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
+- docs/changes/W2-27-CIT-P.md  # [DEC-1089]
 kpis:
   success:
   - 'The pinned, hash-verified release is installed: W2-16''s release only. [re-scoped, DEC-1083]'
@@ -82,6 +83,8 @@ kpis:
   - 'W2-16''s numbered, frozen release is the one installed, never this repository''s branch [DEC-954 Q8c]'
   - 'A clean gov close of the LITE ticket on the copy, at exit 0, on that release, is exit criterion 1''s proof; gov doctor green on the copy is exit criterion 3''s [DEC-953, DEC-954]'
   - 'W2-88''s tools run on the copy at adoption (the assessment, the refactoring plan as proposals, the full index and embeddings), and EXAMIN''s question set (W2-94) is measured with both figures, hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % [DEC-954 Q9f, DEC-957]'
+  - 'The first numbered, frozen release is cut by the owner and hash-checked (two builds give the same bytes; the wheel and every file match the manifest), recorded in docs/plan/wave-2/examin-copy/release-check.md, before W2-81''s proving-ground run and this ticket''s adoption [DEC-1089, DEC-954 Q8c, DEC-772]'
+  - 'Exit criterion 7: CAP-45.a moved to Wave 3 by an approved CIT-P note (docs/changes/W2-27-CIT-P.md), or named as an exception the owner accepts [DEC-1089]'
   failure: []
 profile: FULL
 sources:
@@ -94,6 +97,8 @@ sources:
 - DEC-953
 - DEC-954
 - DEC-957
+- DEC-772
+- DEC-1089
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -127,3 +132,13 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-27), as approved (DEC-729). The list row
   - EXAMIN's own `CLAUDE.md`, `AGENTS.md` and `.claude/commands/` are never silently overwritten. Their content is migrated into EXAMIN's rulesync sources or kept in place, and the A5 review checks that nothing of the owner's was lost [DEC-736].
 - **Correction (DEC-736):** DEC-735 item 2 said W2-19 does not join this ticket, because EXAMIN's tests are pytest. That was wrong. `gov close` runs its regression only over `tests/`, whatever the language, so W2-19 is now in `deps`.
 - **W2-52 (DEC-741 H, 2026-10-17):** the lite A7 and A10 stage records close before this ticket starts.
+
+**DEC-1089 (owner, 2026-11-07): K7's Wave 2 part is this ticket's.** K7 is done for Wave 2; W2-17 and W2-18 stay in
+Wave 3. Two items are added here, as one package (`governance/project/orchestration/packages/K7-W2-REMAINDER.md`):
+- (a) **the first numbered, frozen release,** cut by the owner (DEC-772) and hash-checked by the CTO, after the lift's
+  re-pin and before W2-81's proving-ground run and this ticket's adoption;
+- (b) **exit criterion 7's paperwork for CAP-45.a:** a CIT-P note moving it to Wave 3 (`docs/changes/W2-27-CIT-P.md`;
+  `docs/contract/**` joins the paths only once the owner approves its edit), or a named exception.
+
+Neither touches EXAMIN's copy, so both run before K9's entry criteria are met (DEC-954 Q1 gates the adoption, not
+these two items). [DEC-1089]

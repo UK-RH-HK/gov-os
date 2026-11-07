@@ -13700,6 +13700,30 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (6)'s flag is a line added to W2-129 (open, in flight).
 - **Basis:** question 2 (agents in parallel never collide in ordinary work: an order the tool proves, enforced at launch).
 
+### DEC-1089 — After re-pin window 4: the go for the steps after it (the pool on, the store and speed check, the parallel-agents test before E0); K7 done for Wave 2, its two remaining items in W2-27; usage recorded only, never pinged (standing)
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`; item (3) standing) · **Under:** DEC-1087 (8), (10), (11), DEC-1086 A, DEC-941 item 3, DEC-953, DEC-954 Q8c, DEC-772, DEC-1088 (6), DEC-1052 · **Source:** the CTO's start report after re-pin window 4 (chat, 2026-11-07); `governance/project/orchestration/packages/K7-W2-REMAINDER.md` · **Changes:** DEC-942 item 6 (the usage pings end; the readings are recorded only); DEC-941 item 3 (K7's Wave 2 part)
+- **Decision:**
+  - (1) **Go for START-NEXT-SESSION §4:** end the hold; switch the pool on; check the store and its speed against the old
+    pin; then the parallel-agents and memory test, including whether the overlapping slices of one decision go once
+    the pool's `drop_nested` is on, and the missing commit field in search results. **The test's result goes to the
+    owner before E0.**
+  - (2) **K7 is done for Wave 2.** The pin ladder stays by hand until Wave 3; W2-17 (`gov update`) and W2-18 (the pinned
+    install) stay in Wave 3. Two items stay in Wave 2, in an open ticket of a keystone still open, drafted there as
+    one package by the CTO:
+    - (a) the first numbered, frozen release, cut and hash-checked, for EXAMIN's copy (DEC-954 Q8c; the cut is the
+      owner's, DEC-772);
+    - (b) exit criterion 7's paperwork for CAP-45.a (a CIT-P note moving it to Wave 3, or a named exception).
+  - (3) **Usage, standing:** no ping and no alarm about usage at all; the owner manages the plan's limits. The CTO records
+    only: the usage readings (`tools/usage_log.sh`, to `log/usage.txt`) and each experiment's tokens and cost
+    (`log/spend.jsonl`), shown in the digests.
+  - (4) The session-start test push reached the owner's phone (O-5).
+- **Where (2) lives (the CTO):** W2-27 (`DAEO-h4rh`, EXAMIN adoption on a copy, K9 per D9-FATES §3): it already
+  installs W2-16's numbered, frozen release (its KPI lines on the release, DEC-954 Q8c), and DEC-941 item 3 puts the
+  release path in K9. Runner-up W2-46 (the exit run) checks criterion 7 but runs too late for the release.
+- **Basis:** (1) question 1 (the experiments measure the product as pinned, with the pool on); (2) question 4 (the
+  tickets would save only the install's two minutes; the rehearsal and the owner's steps stay) and question 1
+  (EXAMIN's copy runs one frozen, hash-checked release); (3) question 4 (no interruption the owner does not want).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13725,3 +13749,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.470 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1086. Next free id: DEC-1087. |
 | 0.471 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1087; DEC-1083/DEC-1084 (W2-33's layers to Wave 3) and DEC-1074 (7) O1 (A) changed. Next free id: DEC-1088. |
 | 0.472 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1088 (item 6 standing); DEC-936 item 3.4 changed. Next free id: DEC-1089. |
+| 0.473 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1089 (item 3 standing); DEC-942 item 6 and DEC-941 item 3 changed. Next free id: DEC-1090. |

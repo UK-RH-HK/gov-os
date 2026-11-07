@@ -1,7 +1,7 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1088 on 2026-11-07 (re-pin window 4 handed to
-the owner's operator; the live pin is `pin-8284fb408bd4` until it runs, then `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1089 on 2026-11-07 (re-pin window 4 done at
+14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -254,3 +254,9 @@ other restart is an ACT.
 
   **Standing:** a closed ticket is never edited (a fix or upgrade is a new ticket); an open ticket may change, marked
   with the decision that made it, and `gov links` flags a change without one. Basis: 2.
+- DEC-1089 (2026-11-07): re-pin window 4 done (`pin-bcea09060ebc` live; `pin-8284fb408bd4` kept for rollback); the
+  go for START-NEXT-SESSION §4, the parallel-agents test's result to the owner **before E0**. **K7 done for Wave 2**:
+  the pin ladder by hand until Wave 3 (W2-17, W2-18 Wave 3); the first numbered, frozen release (cut by the owner,
+  hash-checked) and CAP-45.a's exit-criterion-7 paperwork are W2-27's (`packages/K7-W2-REMAINDER.md`). **Usage,
+  standing: never pinged or alarmed** (DEC-942 item 6 ended); readings in `log/usage.txt`, each experiment's tokens and
+  cost in `log/spend.jsonl`, shown in the digests. Basis: 1 and 4.
