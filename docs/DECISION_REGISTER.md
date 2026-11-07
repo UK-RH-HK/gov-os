@@ -13793,6 +13793,23 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   separation holds in ordinary work: G-14 no longer fails open on a wide search); (3) question 2 (no stale record read as
   current).
 
+### DEC-1094 — G1: profile the shared reranker first, then batching (b) if the GPU idles; SEARCH-AGAIN-PRACTICE approved as recommended (the project layer now, W2-142 for the kernel skills, W2-128's line, no hook, the adoption count)
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`) · **Under:** DEC-1090 (2), DEC-1092 (1), DEC-1085 (5), DEC-1052, DEC-1088 (6), CAP-33 · **Source:** the CTO's report (chat, 2026-11-07): W2-137's S5 (`docs/changes/W2-137-evidence.md`) and G1's options; `governance/project/orchestration/packages/LIFT-1/SEARCH-AGAIN-PRACTICE.md`
+- **Decision:**
+  - (1) **G1:** profile first: one profiling burst (the GPU's utilization during a 20-search burst, and each request's
+    time split). If the GPU is mostly idle between requests, (b) is filed as a new ticket (the service scores queued
+    requests together), tests first, measured the same way, live at the lift's re-pin. If it is saturated, the CTO brings
+    the option of fewer scored pairs per search after E3 to E5. (a), the larger character bound, only as an add-on to
+    (b). The CTO says whether W2-137's cap of 64 (measured slightly slower, with a slightly lower MRR) goes live at the
+    lift as it is or is set back until (b) is measured.
+  - (2) **SEARCH-AGAIN-PRACTICE, all six as recommended:** (1) the practice, its "does not answer" list and the cap of
+    two searches, as written; (2) the project layer now (EMG-common, LEAD-w2-common, AUDITOR-common: applied with this
+    entry), the kernel layer after it is proven in use, through CAP-33; (3) a new small ticket, **W2-142**
+    (`DAEO-qskx`), for the two kernel skills, landing at the lift's re-pin; (4) the one line added to W2-128 so T-0
+    carries the practice, marked DEC-1092; (5) no hook now; (6) the adoption count, weekly in the digest, never a gate.
+- **Basis:** (1) question 4 (the fix chosen on a measured cause, not a guess); (2) questions 1, 3, 4 and 5 (the package's
+  basis).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13823,3 +13840,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.475 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1091 (items 1 and 2 standing for the experiments); DEC-1086 C changed. Next free id: DEC-1092. |
 | 0.476 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1092. Next free id: DEC-1093. |
 | 0.477 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1093; W2-139, W2-140 and W2-141 filed. Next free id: DEC-1094. |
+| 0.478 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1094; W2-142 filed; W2-128 gains one KPI line. Next free id: DEC-1095. |

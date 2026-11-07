@@ -1,6 +1,6 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1093 on 2026-11-07 (re-pin window 4 done at
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1094 on 2026-11-07 (re-pin window 4 done at
 14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
@@ -281,3 +281,8 @@ other restart is an ACT.
   search that can reach its own acceptance folder unless excluded (saying how), at the lift's re-pin ACT; **until then
   every engineer brief carries the exclusion line.** ADR-0002 refreshed, reviewed, to the owner, after the experiments.
   Basis: 2.
+- DEC-1094 (2026-11-07): **G1:** profile the shared reranker (GPU utilization in a 20-search burst, each request's time
+  split); if the GPU idles between requests, (b) batching as a new ticket, tests first, live at the lift; if saturated,
+  fewer scored pairs per search after E3 to E5; (a) only beside (b). **Search again once** is the standing practice
+  (SEARCH-AGAIN-PRACTICE as recommended): in the project briefs now; the kernel skills by **W2-142** (`DAEO-qskx`) at
+  the lift; W2-128's T-0 line; no hook; the adoption count weekly in the digest, never a gate. Basis: 1, 3, 4 and 5.
