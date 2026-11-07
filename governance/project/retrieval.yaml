@@ -4,3 +4,11 @@ routing:
   code_first: 2     # a question naming a symbol: the code route's first 2 hits (by stored-vector cosine) ahead
   named_first: 2    # a question naming a record: that record's 2 best chunks (by the pool's rerank scores) ahead
   phrasings: true   # the question, its content words, the question with the record route's ids: searched and fused
+# W2-32 S11, the candidate pool (DEC-1075, DEC-1086 A), switched on after re-pin window 4 (DEC-1087 (8)); the older
+# pins refuse this key.
+pool:
+  meaning_uncut: true
+  route_depth: 60
+  rerank_depth: 40
+  per_file_first10: 2
+  drop_nested: true
