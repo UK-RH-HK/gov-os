@@ -91,3 +91,10 @@ W2-135 compare decoded tokens without the new `s` key (the engineer, paths added
 `test_w2_133_unchanged.py` 4 rows the same, by a test designer (`Rewrite-Reason: DEC-1090 (3)`). The engineer reported
 seeing six call-site lines of its own acceptance tests through a repository-wide Grep after its build and accept: the
 guard let a Grep tool call into its own ticket's acceptance folder through (to the owner as a guard gap). [DEC-1090]
+
+**Merged (CTO, 2026-11-07):** the six unit guards (`0a20fdc1`) and W2-133's acceptance rows (`9a93f933`, designer)
+revised; the scoped regression outside the sandbox 850 passed, 0 failed; review round 1 READY by `verdict.py`
+(`governance/project/orchestration/reviews/w2-138.md`; F1-F4 Wave 3 rows: a store built from a dirty tree, two
+refreshes within one search, plain output no longer pure JSON, the skill line's byte rule). Merged into `w2/integrate`;
+live at the lift's re-pin (the pinned gov then prints the store's commit; the skill's generated `.claude` copy and the
+EMG-common brief line go with that ACT). Formal close at the lift. [DEC-1090]
