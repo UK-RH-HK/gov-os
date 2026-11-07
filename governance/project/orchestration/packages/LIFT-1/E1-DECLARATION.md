@@ -26,3 +26,26 @@ The CTO, 2026-11-07, session `ad44f5fe`. This record is committed before the pil
 - **What it decides:** nothing about the practice. It checks the schema and measures the cost, for **the owner's cap before E2** (DEC-1086 C).
 
 **Basis:** question 1 (the experiments measure the product as it ships).
+
+## Amendment after the pilot (DEC-1091, the owner, 2026-11-07), for E2 to E5
+1. **The instruction line.** The reader's instruction gains: "If you can tell your answer may be incomplete, search again
+   for what is missing." The pilot found this on the visible half: Q14 answered partially while saying its list "may
+   not be complete". The line is used in E2 to E5.
+2. **No budget cap.** The experiments run on the owner's plan usage, and usage is not a reason to stop or hold them.
+3. **A runaway brake only.** Each experiment stops if its measured spend passes **twice its own projection** (a fault,
+   such as an agent looping), never in a normal run. A stop is reported with its cause.
+   - Each call also keeps its own `--max-budget-usd` ($1.50 reader, $0.50 grader), more than ten times a normal
+     call's cost, as a per-call runaway guard.
+4. **E2 as run:**
+   - the 138, plus the two nonexistent-id questions (h24, m60) counted apart;
+   - each question's first bundle from E0's kept outputs, and later searches with the pinned gov on E0's clone;
+   - at most three attempts;
+   - the final answer graded by `claude-opus-5-5` (counts) and `claude-sonnet-5-5` (agreement);
+   - **the citation checked by the measure's own matcher** (`gov.retrieval.measure._match`: gold re-anchored at the
+     clone's commit, source families), replacing the pilot's heading match;
+   - four calls at once.
+
+   The dry run loaded 140 questions with no unresolved gold, and 123 have gold in the first bundle, as in E0.
+   - **Projection: $25. The brake is at $50.**
+   - **Script:** `drafts/d4b/e2_run.py`, run with the pin's python. Outputs go to `~/gov-os-runs/D4B/search-again/e2/`, and
+     stdout and the summary carry counts and ids only.

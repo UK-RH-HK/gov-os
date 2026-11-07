@@ -13593,7 +13593,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** DEC-1084's bundle figures (the first call sends 18 or 19 items, the top 10 always).
 
 ### DEC-1086 — S11 re-worded; W2-135, a cap per item; the search-again reader sees the 138; nothing acted on before the owner's go
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1085, DEC-1074 (5), DEC-105 · **Source:** `governance/project/orchestration/packages/LIFT-1/W2-32-S11-WORDING.md`, `packages/LIFT-1/BUNDLE-BUDGET-1.md`, `packages/LIFT-1/D4B-SEARCH-AGAIN.md`
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1085, DEC-1074 (5), DEC-105 · **Source:** `governance/project/orchestration/packages/LIFT-1/W2-32-S11-WORDING.md`, `packages/LIFT-1/BUNDLE-BUDGET-1.md`, `packages/LIFT-1/D4B-SEARCH-AGAIN.md` · **Changed by:** DEC-1091 (C: no cap before E2)
 - **Decision:**
   - **A. W2-32 S11's wording, option (a):** S11's equality line becomes "within 2 of the harness on the 138". Speed is
     checked against the pin, side by side, in re-pin window 4.
@@ -13741,6 +13741,20 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   and can tell when their tree differs from the store); (4) question 1 (decided on the measure, not on one example);
   (5) question 2 (the Contract matches the waves) and question 1.
 
+### DEC-1091 — E1's pilot decided: no budget cap (usage is no reason to stop); a runaway brake at twice each experiment's projection; the "may be incomplete" instruction line in E2 to E5 (standing for the experiments)
+- **Status:** ACCEPTED (owner, 2026-11-07, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-07)`; items (1) and (2) standing for the experiments) · **Under:** DEC-1086 C, DEC-1087 (11), DEC-1089 (3), DEC-1085 (4) · **Source:** `governance/project/orchestration/packages/LIFT-1/E1-PILOT-RESULT.md` · **Changes:** DEC-1086 C (the owner's cap before E2: there is none)
+- **Decision:**
+  - (1) **No budget cap.** The experiments run on the owner's plan usage, not money; usage is not a reason to stop or
+    hold the work. **E2 starts now, and E3 to E5 after it as planned.**
+  - (2) **A runaway brake only:** each experiment stops if its consumption passes twice its own projection (a fault,
+    such as an agent looping), never in a normal run. Any stop is reported with its cause.
+  - (3) **The instruction line** "If you can tell your answer may be incomplete, search again for what is missing" is
+    added before E2, recorded as an amendment to `E1-DECLARATION.md`, and used in E2 to E5.
+- **Note (the CTO):** E3 to E5 still need their design package (reader, grader, rubric, cost, a proposed K9 bar)
+  before any run (DEC-1085 (6)); the CTO writes it while E2 runs.
+- **Basis:** question 1 (the practice measured on the 138 without stopping for cost) and question 2 (a fault stops a run
+  and is reported, a normal run is never cut).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13768,3 +13782,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.472 | 2026-11-06 | Owner (recorded by the orchestrator, DEC-861): DEC-1088 (item 6 standing); DEC-936 item 3.4 changed. Next free id: DEC-1089. |
 | 0.473 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1089 (item 3 standing); DEC-942 item 6 and DEC-941 item 3 changed. Next free id: DEC-1090. |
 | 0.474 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1090; W2-137 and W2-138 filed; DEC-1067 (f) to change by W2-137. Next free id: DEC-1091. |
+| 0.475 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1091 (items 1 and 2 standing for the experiments); DEC-1086 C changed. Next free id: DEC-1092. |
