@@ -218,3 +218,38 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
    Confirm on the measurement set once.
 6. Then choose the models (reranker, embedder) on all three sets, with speed and GPU figures.
 7. Record every method and figure here, or in the repository's copy of this record.
+
+## 7. What changed on 2026-11-06 and 2026-11-07 (DEC-1084 to DEC-1088; re-pin window 4)
+- **Freshness is a practice, not an accident.** The live store had gone 201 commits stale (11-04 to 11-06): queries
+  never re-index, and every refresh path had stopped. Now:
+  - W2-116's `reference-transaction` hook refreshes the integration store after every update of the integration
+    branch, double-buffered (`gov rebuild --integration`);
+  - a daily backstop runs at 10:00 and 18:00;
+  - the store is always rebuilt **with the code that searches it** (the pin). A store built by newer code can read as
+    stale to older code, so check one search before switching the link (`tools/rebuild_pinned.sh`).
+- **Workers search the integration store, not their worktree:** `GOV_STORE` is set by `gov launch`, or
+  `gov retrieve --root <the store>`. A worktree has no store of its own. Line numbers are the integration head's:
+  read the file in the worktree before relying on a line.
+- **Bundle hygiene:** a line over 4,000 characters is cut in a bundle item, marked `cut` with its line numbers, and
+  its lines are cited unchanged (W2-135). An item of ordinary lines is never cut. One-line files (minified JSON) caused
+  every over-budget call (13 of 688).
+- **The measure:**
+  - it re-anchors line-cited gold in memory for the commit it measures, and never rewrites a label (W2-134);
+  - source families count a gold's official copies by text, at least 4 words and 24 characters on token edges (W2-61h
+    S7);
+  - on the 138 tuning questions, families changed no count.
+- **Levers measured and not kept:**
+  - a wider rerank pool (depth 80): 107 against 107, MRR down;
+  - question splitting and a term map: +2, not significant;
+  - records of work one tier lower: no change.
+- **The leading reranker:** M3 (zerank with gte, merged, L3's normalised lift): 118 against 107, eligible on speed
+  (2.84 s alone). Not significant after Holm. Adoption waits for the end-to-end experiments (DEC-1087 (12)).
+- **Link integrity:** `gov links` (W2-129) finds unlinked or contradicted records cheaply, in about 3 s, as a notice.
+  This repository's baseline is 3,037 standing findings.
+- **Next, for this record:**
+  - the parallel-agents test after window 4;
+  - search-again (E1, E2);
+  - end-to-end answering from the bundle (E3 to E5).
+
+  The question that matters is whether an agent reading its bundle answers right and cites the right source
+  (DEC-1085).

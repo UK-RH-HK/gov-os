@@ -1,6 +1,7 @@
 # Decisions in force
 
-The one list of what holds (DEC-1052 R-9), 2026-11-04. Where the prompt, a brief or RESUME HERE differs, it holds; a
+The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1088 on 2026-11-07 (re-pin window 4 handed to
+the owner's operator; the live pin is `pin-8284fb408bd4` until it runs, then `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
