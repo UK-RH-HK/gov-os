@@ -6,6 +6,23 @@
 ran, §3 what window 4 carries, §4 the steps after "done", §5 every watcher, loop and digest to re-arm, §6 what waits
 on the owner). Next free id **DEC-1089**. The blocks below are this session's, newest first; older ones are history,
 kept for their figures.
+- **~15:10 11-07, session `ad44f5fe`: PAT-1 DONE; STAND-BY on the owner before E0** (DEC-1089 (1)). Next free id
+  **DEC-1090**.
+  - Start checks all passed (report in chat ~14:31). The hold ended 14:43 (`act-in-progress.ended-1443-act-repin-w4.txt`).
+  - **Commits:** `c00d525f` the pool on; `84c4f92d` DEC-1089 (register, DECISIONS-IN-FORCE, `packages/K7-W2-REMAINDER.md`,
+    W2-27 `DAEO-h4rh` edited and marked DEC-1089); `dd1caaa0` PAT-1 (`packages/LIFT-1/PAT-1-RESULT.md`, `pat/`) and the
+    gov-links back-links. The hook refreshed the store after each; the store is at the head.
+  - **PAT-1's result:** no errors, fallbacks or mixed answers; page 2 after a switch fails closed
+    (`CONTINUATION_INVALID`); memory released. **Gaps:** G1, 20 at once at 13.4 s (the old pin 10.2 s; a serial service,
+    16 texts a request, 3 requests a search with the pool); G2, no commit in results; G3, overlapping slices partly
+    remain; G4, line numbers mislead a tree behind integrate. Proposals in PAT-1 §9; raw outputs in `~/gov-os-runs/PAT-1/`.
+  - **DEC-1089 (3):** `tools/usage_watch.sh` replaced by `tools/usage_log.sh` (record only; running in the background);
+    `log/spend.jsonl` holds each agent's and experiment's tokens; the digests (CronCreate `f975b05b` 09:02, `5d9af979`
+    18:02) show both. `/usage` no longer prints a session line, only the week (82 % at 14:47, resets 11-08 08:59).
+  - **Running (session background):** the inbox waiter, sentinel check, bare watch, the store backstop, usage_log.
+  - **Found:** the status block's keystones come from tags only; K9 shows "done" wrongly (K7-W2-REMAINDER §5).
+  - **Next, at the owner's word:** E0 and E0b on a measure clone at the window-4 commit; W2-136 beside (CPU).
+  - **Owner asked:** K7-W2-REMAINDER §6 (CAP-45.a option A or B; the release's timing); PAT-1 §9's proposals.
 - **~10:00 11-07, THE HAND-OVER.** The owner pushed (`w2/integrate` at `71b1f9b7`, `record/w2` at `74de225a`) and
   checked the three script hashes. The owner closes this session before the re-pin; a new W2 orchestrator session
   continues after it.

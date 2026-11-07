@@ -5,3 +5,4 @@
 {"at": "2026-11-06 12:18:19", "class": 3, "reason": "the score-once window ended (DEC-1081 (3))", "check": "rerank.by service"}
 {"at": "2026-11-06 14:20:50", "class": 3, "reason": "the live two-model window ended (D4B-SCORE-ONCE §4)", "check": "rerank.by service"}
 {"at": "2026-11-06 15:06:40", "class": 3, "reason": "the extend window ended (DEC-1084)", "check": "rerank.by service"}
+{"at": "2026-11-07 14:21:53", "class": 3, "reason": "re-pin window 4 (W2-112 changed the service)", "pid_before": "3997564", "pid_after": "1657369"}

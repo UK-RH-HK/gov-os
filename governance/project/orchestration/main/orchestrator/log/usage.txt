@@ -189,3 +189,4 @@
 2026-11-02 22:36:04 session unread week 36|Nov 8, 9am (Europe/London)
 2026-11-02 23:07:08 session unread week 37|Nov 8, 8:59am (Europe/London)
 2026-11-02 23:38:16 session unread week 37|Nov 8, 9am (Europe/London)
+2026-11-07 14:47:08 week (all models)=82% (resets Nov 8, 8:59am (Europe/London));week (Fable)=0% (resets Nov 8, 9am (Europe/London)); last 24h: 1945 requests · 22 sessions

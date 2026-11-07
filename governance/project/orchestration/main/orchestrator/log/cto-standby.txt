@@ -1,1 +1,1 @@
-2026-11-06 23:52:36 STAND-BY: every DEC-1087 item before the re-pin is done and tested; waiting on the owner's push and the operator's ACT-REPIN-W4 (hold in log/act-in-progress.txt). Watchers and the daily store refresh run.
+2026-11-07 15:05:15 STAND-BY: PAT-1 (the parallel-agents and memory test) done and committed (dd1caaa0); waiting on the owner's reading before E0 (DEC-1089 (1)). Watchers, store backstop, usage_log and digests armed.

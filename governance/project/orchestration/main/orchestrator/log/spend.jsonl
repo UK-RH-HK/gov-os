@@ -1,0 +1,3 @@
+{"at": "2026-11-07 14:52", "what": "K7 home-ticket research (Explore agent)", "kind": "agent", "tokens": 136162, "tool_uses": 44, "duration_s": 197, "cost": "not measured (subscription; no per-run price)"}
+{"at": "2026-11-07 15:03", "what": "PAT agent B (research, worktree 4 commits behind)", "kind": "agent", "experiment": "parallel-agents test (DEC-1087 (10))", "tokens": 86307, "tool_uses": 65, "duration_s": 308, "cost": "not measured (subscription; no per-run price)"}
+{"at": "2026-11-07 15:04", "what": "PAT agent A (research, worktree at head at its start)", "kind": "agent", "experiment": "parallel-agents test (DEC-1087 (10))", "tokens": 114556, "tool_uses": 72, "duration_s": 337, "cost": "not measured (subscription; no per-run price)"}

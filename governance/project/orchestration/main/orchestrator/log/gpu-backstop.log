@@ -328,3 +328,9 @@
 2026-11-06 15:00:55 start: limit 15872 MiB; groups 3898866 3899021 3974101; logs at lines 945254 258522
 2026-11-06 15:04:14 start: limit 15872 MiB; groups 3898866 3899021 3987761; logs at lines 945290 258784
 2026-11-06 15:06:25 start: limit 15872 MiB; groups 3898866 3899021; logs at lines 945315 258917
+2026-11-07 14:53:16 start: limit 15872 MiB; groups 1698629; logs at lines 954389 260885
+2026-11-07 14:55:11 end: every watched group has ended (1698629)
+2026-11-07 14:55:52 start: limit 15872 MiB; groups 1705898; logs at lines 954410 261298
+2026-11-07 14:57:04 end: every watched group has ended (1705898)
+2026-11-07 14:57:37 start: limit 15872 MiB; groups 1710662; logs at lines 954423 261581
+2026-11-07 15:01:37 end: every watched group has ended (1710662)

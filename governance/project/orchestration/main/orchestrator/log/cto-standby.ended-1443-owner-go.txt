@@ -1,0 +1,1 @@
+2026-11-07 14:31:09 STAND-BY: start checks done after re-pin window 4 (pin-bcea09060ebc live); waiting on the owner's go to start START-NEXT-SESSION §4 (end the ACT hold, switch the pool on) and the owner's K7 decision. Watchers and digests armed.

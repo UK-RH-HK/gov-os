@@ -1,0 +1,1 @@
+ACT-REPIN-W4 (DEC-1087 (8)): handed to the owner's operator at 2026-11-06 23:52:34; no CTO commit until the owner says done (DEC-1028 item 6). Script: .gov-runtime/scratch/orchestrator/pin/REPIN-COMMANDS-W4.sh (pin-bcea09060ebc).
