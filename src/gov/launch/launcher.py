@@ -9,6 +9,11 @@ profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
 (DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
 shape refuses the launch.
 
+A lead (``gov launch orchestrator|lead <ticket>``, W2-136 S9) is started only when
+the plan's check admits its ticket, with ``GOV_ROLE=orchestrator``, its
+``GOV_TICKET`` and no sandbox block, as the dispatcher starts a lead
+(``build_lead_settings``); a worker launch never consults the plan.
+
 No message of this module carries a held-out path.
 """
 
@@ -41,6 +46,11 @@ WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", 
 # Open package DP-8: these roles need a ticket whose ``role`` is their own; the
 # two independent roles may be launched on any ``in_progress`` ticket.
 OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
+# W2-136 S9: a lead is a session of GOV_ROLE orchestrator with a GOV_TICKET, launched as ``orchestrator`` or ``lead``
+# (W2-121's name for it). Only the launched role and ticket are checked against the plan, never the caller's own
+# environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
+LEAD_ROLES = ("lead", "orchestrator")
+LEAD_GOV_ROLE = "orchestrator"
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
@@ -181,6 +191,13 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     }
 
 
+def build_lead_settings(ticket_id: str) -> dict:
+    """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator`` and its ``GOV_TICKET``, no
+    sandbox block, as the dispatcher starts a lead. Kept apart from ``build_settings`` so that a worker's settings
+    never lose their sandbox block or deny rules on a lead's account."""
+    return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id}}
+
+
 def sandbox_faults(settings: dict) -> list[str]:
     """Why the settings are not on, strict and fail-closed (CAP-61.a); empty when they are."""
     block = settings.get("sandbox")
@@ -276,6 +293,12 @@ def _check_cli_args(cli_args: list[str]) -> None:
                           "would have no guard hook")
 
 
+def check_lead(root: Path, ticket_id: str):
+    """The plan's check of a lead (W2-136 S9): ``gov.launch.plan_check.check_lead``, looked up when called."""
+    from gov.launch import plan_check
+    return plan_check.check_lead(root, ticket_id)
+
+
 def _say(line: str) -> None:
     """One line to stderr. A stderr that is closed or that nobody reads loses the line and nothing else (DEC-392):
     the line goes past the stream's buffer, since what stays in it changes the exit code when the interpreter ends."""
@@ -294,17 +317,45 @@ def _say(line: str) -> None:
         pass
 
 
-def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
-    """Start one worker session and return the CLI's exit code; raise ``GovError`` to refuse."""
-    root = Path(os.path.realpath(root))
-    if role not in WORKER_ROLES:
-        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)})")
-    _check_cli_args(cli_args)
-    _check_ticket(root, role, ticket_id)
-    _check_repository_settings(root)
+def _admit_lead(root: Path, ticket_id: str) -> None:
+    """W2-136 S9 (DEC-1088 (5)(a)): a lead only for a planned ticket whose waits are met; an override is logged."""
+    verdict = check_lead(root, ticket_id)
+    if isinstance(verdict, tuple) and len(verdict) == 3:
+        verdict = dict(zip(("admitted", "reason", "override"), verdict))
+    field = verdict.get if isinstance(verdict, dict) else lambda name: getattr(verdict, name, None)
+    if not field("admitted"):
+        raise _refuse(f"no lead for ticket '{ticket_id}': {field('reason')} (DEC-1088 (5))")
+    if field("override"):
+        _say(f"gov launch: OVERRIDE {field('override')}: {field('reason')} (DEC-899)\n")
+
+
+def _cli() -> Path:
     cli = Path.home() / CLI_REL
     if not cli.is_file():
         raise _refuse(f"the CLI is not at ~/{CLI_REL} (DEC-205)")
+    return cli
+
+
+def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
+    """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
+
+    Only a lead (``role`` in ``LEAD_ROLES``) is checked against the plan; a worker launch never is, whoever calls.
+    """
+    root = Path(os.path.realpath(root))
+    if role in LEAD_ROLES:
+        _admit_lead(root, ticket_id)
+        _check_cli_args(cli_args)
+        _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
+        cli = _cli()
+        # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
+        return _run(root, cli, build_lead_settings(ticket_id), cli_args)
+    if role not in WORKER_ROLES:
+        raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
+                      f"or a lead role ({', '.join(LEAD_ROLES)})")
+    _check_cli_args(cli_args)
+    _check_ticket(root, role, ticket_id)
+    _check_repository_settings(root)
+    cli = _cli()
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
     if faults:
@@ -317,6 +368,13 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     if name is not None and not os.path.lexists(name):
         runs.make(name, str(root))
     own = runs.own_folder(str(root), ticket_id, role)
+    return _run(root, cli, settings, cli_args, temp_prefix=f"gov-launch-{role}-", own=own)
+
+
+def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_prefix: str | None = None,
+         own: str | None = None) -> int:
+    """Start the session and wait for it. With ``temp_prefix`` (a worker), the session gets a temp folder of its
+    own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386)."""
     state = {"session": None, "ended": False, "asked": False}
 
     def end(signum=None, frame=None):
@@ -336,10 +394,10 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
                 if signal.getsignal(number) is not signal.SIG_IGN}  # a signal the caller ignores stays ignored
     alarm, tmpdir, code = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT
     try:
-        # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
-        tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
-        settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-        settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
+        if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
+            tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
+            settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+            settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
         env = {**os.environ, **settings["env"]}
         if not state["ended"]:  # a signal that came first: no session is started
             try:
