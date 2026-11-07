@@ -334,3 +334,12 @@
 2026-11-07 14:57:04 end: every watched group has ended (1705898)
 2026-11-07 14:57:37 start: limit 15872 MiB; groups 1710662; logs at lines 954423 261581
 2026-11-07 15:01:37 end: every watched group has ended (1710662)
+2026-11-07 15:58:17 start: limit 15872 MiB; groups 1792197; logs at lines 955314 262554
+2026-11-07 16:03:46 ok: 7443 MiB
+2026-11-07 16:09:16 ok: 7446 MiB
+2026-11-07 16:14:44 ok: 7458 MiB
+2026-11-07 16:20:14 ok: 7459 MiB
+2026-11-07 16:25:49 ok: 8404 MiB
+2026-11-07 16:31:19 ok: 7459 MiB
+2026-11-07 16:51:11 start: limit 15872 MiB; groups 1899472; logs at lines 955826 265963
+2026-11-07 16:54:05 end: every watched group has ended (1899472)

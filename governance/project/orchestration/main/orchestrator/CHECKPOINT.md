@@ -6,6 +6,37 @@
 ran, §3 what window 4 carries, §4 the steps after "done", §5 every watcher, loop and digest to re-arm, §6 what waits
 on the owner). Next free id **DEC-1089**. The blocks below are this session's, newest first; older ones are history,
 kept for their figures.
+- **~18:15 11-07, session `ad44f5fe`: E1's pilot DONE (`9409db97`; $1.11; 2 of 3 misses recovered; Q14 a wrong claim);
+  STAND-BY on the owner's E2 cap ($40 recommended) and the instruction line.** The CAP-45.a note answered (`33f72aab`
+  on `w2/W2-27-citp`; review `e64fbe21`); to the owner with V, A, C, R, T, N and two new tickets.
+  - **W2-137** built (`dba3fa54`, cap 64, accept 37/37); **W2-138** built (`dcda2701`, accept 18/18); socket cases pass
+    outside the sandbox (CTO). **Second passes running** (pgids 2023264 W2-137 designer D-2, 2023640 W2-138 designer
+    W2-133 guard rows, 2024012 W2-137 engineer routing test, 2024451 W2-138 engineer six unit guards; one wait armed).
+    Then one review each, merge, W2-137's S5 GPU window between experiments.
+  - **To the owner:** W2-138's engineer saw six call-site lines of its own acceptance tests through a wide Grep (the
+    guard let a Grep into its own ticket's acceptance folder through): a guard gap.
+- **~16:50 11-07, session `ad44f5fe`: E0 DONE (`b741707e`, `packages/LIFT-1/E0-RESULT.md`): 106/138 hit@5, @10 118,
+  @20 124, in the bundle 123; within 2 of S11's check (0 gains, m20 and m36 lost, p 0.50).**
+  - **Running:** W2-137's engineer (pgid 1866639, `~/gov-os-worktrees/W2-137`, log `.gov-runtime/scratch/lead/log/W2-137-engineer.json`);
+    W2-138's engineer (pgid 1867002, `W2-138`); both waits armed (proc.sh). The CIT-P note's reviewer (in-session
+    independent-auditor; record to `reviews/w2-27-citp.md`).
+  - **Tests ready:** W2-137 `2a6ff10b` (37, 8 red), W2-138 `999b1211` (18, 13 red); merged into the engineers' branches.
+    W2-137's D-2: a designer must revise W2-32/W1-19/W1-21 acceptance tests pinning 16 (`Rewrite-Reason: DEC-1090 (2)`).
+  - **The CIT-P note:** `4bebfe6b` on `w2/W2-27-citp`; owner questions V, A, C, T; finding F-1 (DEC-841's nine items
+    still W2 in the Contract).
+  - **Next:** E1 (the search-again pilot, `D4B-SEARCH-AGAIN.md`), its cost to the owner before E2; E0b's harness fix.
+  - **Measured worker cost:** launched workers report `total_cost_usd` (designers $2.96 and $5.10): `log/spend.jsonl`.
+- **~16:00 11-07, session `ad44f5fe`: DEC-1090 (`95eec049`); E0 RUNNING.** Next free id **DEC-1091**.
+  - **E0:** declared `dc5f0de0` (`packages/LIFT-1/E0-DECLARATION.md`); `drafts/d4b/e0_run.sh` (pgid in
+    `~/gov-os-runs/PAT-1/e0.pid`; log `~/gov-os-runs/D4B/w4-e0/e0.log`; kept ranks `~/gov-os-eval/runs/w4-e0/`);
+    figures by `drafts/d4b/e0_figures.py`. The sets root's visible q12 synced to integrate's (`c48d7ce8`), old copy in
+    `~/gov-os-runs/PAT-1/`.
+  - **E0b blocked:** `rx.py` cannot run on window 4's code (depth/top_k; cache keyed without root; replay stops on an
+    unscored text). Plan in the declaration; needed only for E4.
+  - **Workers:** W2-137's designer (`~/gov-os-worktrees/W2-137-tests`, exit file `.gov-runtime/scratch/lead/log/W2-137-designer-2.exit`),
+    W2-138's designer (`W2-138-tests`, `W2-138-designer.exit`), both via `launch_worker.sh`, waits armed; the CAP-45.a
+    CIT-P product-spec agent (in-session, worktree `W2-27-citp`, branch `w2/W2-27-citp`).
+  - **ADR-0002:** answered (refresh then accept, after the experiments; P2).
 - **~15:10 11-07, session `ad44f5fe`: PAT-1 DONE; STAND-BY on the owner before E0** (DEC-1089 (1)). Next free id
   **DEC-1090**.
   - Start checks all passed (report in chat ~14:31). The hold ended 14:43 (`act-in-progress.ended-1443-act-repin-w4.txt`).

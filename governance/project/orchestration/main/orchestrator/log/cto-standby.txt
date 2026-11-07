@@ -1,1 +1,1 @@
-2026-11-07 15:05:15 STAND-BY: PAT-1 (the parallel-agents and memory test) done and committed (dd1caaa0); waiting on the owner's reading before E0 (DEC-1089 (1)). Watchers, store backstop, usage_log and digests armed.
+2026-11-07 16:55:04 STAND-BY: E1's pilot done (E1-PILOT-RESULT, 9409db97); E2 waits on the owner's cap and the instruction line (DEC-1086 C). Running meanwhile: W2-137 and W2-138 engineers; the CIT-P note's answer round.
