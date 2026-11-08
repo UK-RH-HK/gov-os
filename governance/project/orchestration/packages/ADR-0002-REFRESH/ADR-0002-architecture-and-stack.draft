@@ -131,7 +131,7 @@ wins. The 15 recorded conflicts are in `docs/spec/gov-os/READINESS.md` §3.
     fused order, named `rerank: unavailable` (DEC-1033 (2), DEC-1035 (2)). **No private reranker beside the running
     service** is decided (DEC-1046 (1), DEC-1048 (5)) but is not yet in the product: today only the CTO's interim
     slot-hold watcher enforces it on this machine (DEC-1043 (2)), and W2-112's own KPI still allows one private
-    reranker beside the service (DEC-1036 (2)). The product change is W2-145, tests first, built before the lift
+    reranker beside the service (DEC-1036 (2)). The product change is W2-145 (drafted, to be filed), tests first, built before the lift
     (DEC-1097 (8)); not yet built.
   - **The embedders:** `gov` never starts an embedder for a search, a rebuild, a close, a seed or the launch sandbox.
     When the shared GPU embedders cannot be reached, the result is `EMBEDDER_UNAVAILABLE` and retrieval answers by
