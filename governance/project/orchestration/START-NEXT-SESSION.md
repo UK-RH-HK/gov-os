@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1097.**
+the register and the owner's word hold over both. **Next free id: DEC-1098.**
 
 ## 0. Where things stand (2026-11-08)
 - **Re-pin window 4 is live** (`pin-bcea09060ebc`, 11-07 14:22); the pool is on (`c00d525f`); PAT-1 done.
@@ -15,15 +15,22 @@ the register and the owner's word hold over both. **Next free id: DEC-1097.**
   store's commit in results). **Filed, not started:** W2-139, W2-140, W2-141, W2-142.
 - **Nothing is running** but the session watchers (§6).
 
-## 1. The owner's word of 2026-11-08: HOLD
-- **The experiments' decisions are held** until the owner has read the details: FRESH-80-1 §5 (7 questions: the
-  configuration, the commit, the K9 bar, readers on the 80, the staleness pass, the fixes), M3-ADOPTION-1 §6 (keep the
-  0.6B recommended), GLOSSARY-1 §9 (park recommended). The owner decides them together.
-- **Start nothing on the fresh 80** until then: no pre-flight, no scripts against it, no checker's pass.
-- **What the owner is reading:** the report of 11-08, kept in full in `packages/LIFT-1/FRESH-80-1.md` (§2 the twenty
-  fixes, §3.5 the fault rule) and `packages/LIFT-1/FRESH-80-READINESS.md` (the checker's brief; ACT-GUARD-SETS-1's
-  state and the reader-folder gap; what a verdict at window 4 covers; the readiness review proposal; G3 and the rest).
-- While waiting, keep `log/cto-standby.txt`.
+## 1. DEC-1097 (2026-11-08): the experiments decided; the road to the fresh 80
+- **Decided:** the fresh 80 judges window 4's pin, pool on, today's bundle, search again once, at `c00d525f`, the
+  visible-40 control first; every experiment runs on the 80 for data, only that one judged; **K9's bar: right end to
+  end ≥ 85 % (≥ 68 of 79), wrong claims ≤ 5 % (≤ 3), target 95 %, hit@5 beside it**; keep the 0.6B (M3, M1 data
+  only); G3 no change; W2-139/W2-140 held until after the 80. **The glossary (item 6) is OPEN:** ask the owner.
+- **The order (DEC-1097):** ACT-GUARD-SETS-1 rebuilt; the fresh-80 scripts built and reviewed; the owner's checker's
+  pass and the seven-reviewer readiness review in parallel, W2-130 and P-SELECT-GRAPH beside; then the ACT applied
+  by the operator, the pre-flight and the control; then the 80. **Tell the owner when it is ready to launch.**
+- **Started 11-08 (agents, records uncommitted until reviewed):** the ACT's rebuild (`drafts/sets-root-guard/`); the
+  fresh-80 scripts (`drafts/fresh80/`, the declaration draft `packages/LIFT-1/FRESH-80-DECLARATION.md`); readiness
+  reviewers 1, 2, 3, 4, 6 (`reviews/readiness-<n>-*.md`; 5 and 7 after the ACT and the scripts); P-SELECT-GRAPH
+  (`packages/P-SELECT-GRAPH-RESULT.md`); W2-130 (`drafts/w2-130/`, `packages/W2-130-SITTING.md`); ADR-0002
+  (`drafts/adr-0002/`); W2-145's draft (no private reranker, `drafts/w2-145/`).
+- **Next wave (item 8, before the lift):** W2-141 (tests first), W2-20 rebuilt (its test designer for the new line),
+  W2-145 filed and built, ADR-0002 reviewed and to the owner.
+- **The owner's checker** has the brief (FRESH-80-READINESS §2); only counts and the new sha256 come back.
 
 ## 2. The emergency: in force
 - **What holds it:** DEC-1047 (the emergency); DEC-1049 (no nightly or full suite until the owner's word); DEC-1050
