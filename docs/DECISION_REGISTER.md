@@ -13844,6 +13844,60 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     The product build follows the test's result and the owner's approval, tests first.
 - **Basis:** question 1 (agents search and ask in the repository's own words, so more questions are answered right).
 
+### DEC-1097 — The experiments decided: the fresh 80 judges window 4's configuration (search again once) against K9's end-to-end bar; ACT-GUARD-SETS-1 rebuilt and applied before it; a seven-reviewer readiness review; keep the 0.6B; G3 no change; the overdue items given their fates
+- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) OPEN (the owner marked no option) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE
+- **Decision, the experiments:**
+  - (1) **FRESH-80-1:** (a) the configuration judged is window 4's pin (`pin-bcea09060ebc`), the pool on, today's
+    bundle (6,000 tokens), search again once (A2); (b) at window 4's commit `c00d525f`, with the visible-40 control
+    first (within 2 of E0's 34); (c) every experiment runs on the 80 for data, and only the configuration in (a) is
+    judged (FRESH-80-1 §3.4); (d) **the K9 bar:** right end to end at least 85 % with wrong claims at most 5 %, target
+    95 %, hit@5 reported beside it (on 79: at least 68 right, at most 3 wrong claims, FRESH-80-1 §4.3); (e) the readers
+    and graders read the 80; (f) the owner's checker's staleness pass first, with the CTO's brief
+    (FRESH-80-READINESS §2); (g) the twenty fixes and the fault rule as written (FRESH-80-1 §2, §3.5), including the
+    stricter grade as data, the nonexistent-id rule, and no commit, rebuild or GPU window during the run; the CTO's
+    hold on W2-139 and W2-140 until after the 80 confirmed.
+  - (2) **ACT-GUARD-SETS-1:** rebuilt against today's live files, with the 80's reader-run folder added to the hidden
+    globs, and W2-84's hidden-half test cases deleted with it (DEC-1061 (4)); rehearsed end to end (DEC-1057), then to
+    the owner's operator; applied before the 80's single use; the live worktrees get the merge the same day.
+  - (3) **The readiness review:** approved as proposed (FRESH-80-READINESS §5), seven independent read-only reviewers;
+    fixed before the 80 only what fails open or would make the verdict wrong, in at most two rounds; the rest become
+    rows (DEC-1010). If anything in retrieval changes, E0 and E2 rerun on the 138 before the 80.
+  - (4) **The release:** if retrieval changes after the verdict, the 138 are measured again at the release commit
+    before it is cut (E0's figures and E2's A2, McNemar against the verdict commit's), a fixed step in W2-27's item (a).
+  - (5) **M3-ADOPTION-1:** keep the 0.6B (branch (c)); M3 and M1 measured on the 80 for data only.
+  - (6) **GLOSSARY-1:** OPEN: (a) parked as a Wave 3 row, the prototype kept; (b) kept in Wave 2, redesigned beside
+    the agent's own words, ranked toward decisions and for asking, retested on the 138 after the 80, `gov glossary`
+    built only if it helps; (c) built now, for asking. The owner's message named the three without marking one.
+  - (7) **G3 (overlapping slices):** no change before the 80; a ticket after the lift if the review finds it worth it.
+- **Decision, the overdue items (DECIDED-NOT-DONE §2):**
+  - (8) **Before the lift's re-pin:** W2-141 (tests first, built, reviewed); W2-20 rebuilt to its launch line
+    (DEC-1088 (5)(b)) and W2-136's F2 entry criterion, reviewed and merged; ADR-0002 refreshed, reviewed and brought to
+    the owner (DEC-1093 (3)); a new ticket for "no private reranker beside the shared service" (DEC-1048 (5),
+    DEC-1046 (1)), tests first, built before the lift.
+  - (9) **Now, on the CPU, with no commit on integrate during the 80's run:** W2-130's link clean-up and the
+    110-decision list with the CTO's proposal per id, for the owner's sitting (DEC-1074 (7) O2); the P-SELECT-GRAPH
+    trial (DEC-1062), research only, its result to the owner.
+  - (10) **G1's "fewer scored pairs"** (DEC-1094 (1)): not before the 80; brought to the owner after the lift as an
+    option, the 138 re-measured if adopted.
+  - (11) **P-LB-PRODUCT-1** (DEC-1048 (3)): folded into the three-layer plan after the lift (DEC-1087 (13)).
+  - (12) **Q07 and Q14** (DEC-1070 (13)): re-worded by an independent session after the 80 and before any re-measure
+    of the 138; the visible 40's category gaps (DEC-1074 (8)) go to the next label audit.
+  - (13) **The label audit** (DEC-1070 (14), DEC-1076 (5), DEC-1078 (4)): at each release cut and before any new
+    verdict set is written; the rubric's next version (v3) written after the 80.
+  - (14) **The embedder trial** (DEC-1068 (b), DEC-1079 (d), DEC-1085 (4)): parked as a Wave 3 row.
+  - (15) **The keystone count:** computed from the plan's list, not from tags (K7-W2-REMAINDER §5). **The old window
+    scripts** with the F1 restore defect (`drafts/d4b/live_window.sh`, `score_once_window.sh`): fixed or retired,
+    never reused as they are.
+- **The order:** the guard ACT rebuilt, the fresh-80 scripts built and reviewed, the owner's checker's pass and the
+  readiness review in parallel, with item (9) beside them; then the ACT applied, the pre-flight and the control; then
+  the 80. The CTO tells the owner when it is ready to launch.
+- **Standing (from the audit):** every decided item with a stage trigger is entered in
+  `governance/project/orchestration/packages/DECIDED-NOT-DONE.md` when decided, and ticked off with its commit when
+  done; each session reads it at start.
+- **Basis:** question 1 (the verdict judges memory as agents use it, chosen beforehand, on a set used once) and
+  question 2 (the 80 protected by the guard, and the overdue items given an owner and a trigger, so nothing decided is
+  lost).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13877,3 +13931,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.478 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1094; W2-142 filed; W2-128 gains one KPI line. Next free id: DEC-1095. |
 | 0.479 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1095. Next free id: DEC-1096. |
 | 0.480 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1096. Next free id: DEC-1097. |
+| 0.481 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 (item 6 open; the DECIDED-NOT-DONE line standing). Next free id: DEC-1098. |

@@ -9,6 +9,29 @@ Evidence of done was taken from `git log w2/integrate`, the files and the ticket
 with the CTO's uncommitted edits of 11-08 (START-NEXT-SESSION, DECISIONS-IN-FORCE, P1-PLAN, W2-88 record,
 FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was opened.
 
+## 0. DEC-1097's fates (2026-11-08): the tracking table (tick with the commit when done)
+| # | item | fate (DEC-1097) | state |
+|---|---|---|---|
+| 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | IN PROGRESS: rebuild started 11-08 |
+| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | NOT STARTED |
+| 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)** |
+| 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
+| 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | IN PROGRESS: started 11-08 |
+| 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | IN PROGRESS: started 11-08 |
+| 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | IN PROGRESS: with the ACT's rebuild |
+| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
+| 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
+| 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | WAITS: after the 80 |
+| 12 | the status block's K9 | (15) computed from the plan's list | NOT STARTED |
+| 13 | ADR-0002 | (8) refreshed, reviewed, to the owner before the lift's re-pin | NOT STARTED |
+| 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; v3 WAITS: after the 80 |
+| 15 | the embedder trial | (14) a Wave 3 row | **DONE (parked)**: row to add with the Wave 3 list |
+| 16 | the old window scripts (F1) | (15) fixed or retired, never reused | NOT STARTED |
+| 17 | GLOSSARY-1 | (6) OPEN: the owner marked no option | WAITS: the owner |
+| 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | IN PROGRESS: scripts and review started 11-08 |
+| 19 | W2-139, W2-140 | (1)(g) held until after the 80 | WAITS: after the 80 |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms

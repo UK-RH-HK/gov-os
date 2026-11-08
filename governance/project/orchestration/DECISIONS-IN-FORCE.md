@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to the owner's word of 2026-11-08 (the last section). Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1097 on 2026-11-08. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -297,12 +297,18 @@ other restart is an ACT.
   configuration. The package (wording, spec, KPI lines, tickets, W2-88's Wave 0 line, estimate, dates) beside the test;
   the build after the test and the owner's approval, tests first. Basis: 1.
 
-## The owner's word of 2026-11-08, in force (not a register entry; next free id DEC-1097)
-- **The experiments' decisions are held:** FRESH-80-1, M3-ADOPTION-1 and GLOSSARY-1 are decided together by the owner
-  after reading `packages/LIFT-1/FRESH-80-READINESS.md`. **Start nothing on the fresh 80 until then** (no pre-flight,
-  no scripts run against it, no checker's pass started).
-- **Decided but not done, overdue:** ACT-GUARD-SETS-1 (DEC-1084: apply right after re-pin window 4) was not applied,
-  and its patch no longer matches the live files (`apply.sh check` exit 1). The full list of decided-but-not-done
-  items is in START-NEXT-SESSION §3 and RESUME HERE; read it at every session start.
-- **A CTO hold, for the owner to confirm:** W2-139 and W2-140 (Contract 4.3, DEC-1093) wait until after the fresh 80,
-  so nothing lands on integrate between the 80's pre-flight and its run.
+- DEC-1097 (2026-11-08): **the fresh 80** judges window 4's pin, pool on, today's bundle, search again once, at
+  `c00d525f` with the visible-40 control first; every experiment on the 80 for data, only that configuration judged;
+  **K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 % (on 79: ≥ 68 right, ≤ 3 wrong), target 95 %, hit@5
+  beside it**; readers and graders read the 80; the owner's checker's staleness pass first; FRESH-80-1's twenty fixes
+  and fault rule as written; no commit, rebuild or GPU window during the run; **W2-139 and W2-140 held until after the
+  80.** ACT-GUARD-SETS-1 rebuilt (the reader folder hidden, W2-84's hidden-half cases deleted), rehearsed, applied by
+  the operator before the 80. The seven-reviewer readiness review (fix only fail-open or verdict-breaking, two rounds;
+  any retrieval change reruns E0 and E2 on the 138 first). If retrieval changes after the verdict, the 138 re-measured
+  at the release commit (W2-27 item (a)). **Keep the 0.6B** (M3, M1 for data on the 80). G3 no change before the 80.
+  **The glossary (item 6) OPEN.** The overdue items' fates: W2-141, W2-20's rebuild, ADR-0002, a no-private-reranker
+  ticket before the lift; W2-130 and P-SELECT-GRAPH now on the CPU; G1's fewer pairs and P-LB-PRODUCT-1 after the lift;
+  Q07/Q14 after the 80; the label audit at each release cut and before a new verdict set (rubric v3 after the 80); the
+  embedder trial a Wave 3 row; the keystone count from the plan's list; the old window scripts fixed or retired.
+  **Standing:** every decided item with a stage trigger enters `packages/DECIDED-NOT-DONE.md` when decided, ticked off
+  with its commit when done. Basis: 1 and 2.
