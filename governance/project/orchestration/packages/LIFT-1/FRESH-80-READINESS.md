@@ -26,7 +26,8 @@ W2-137 to W2-142 matter only if the 80 is measured at a later commit.
     item 6 drops it from every figure, decided before the run).
 - **What the pre-flight checks, which the writer must respect:** no stray files (`*.yaml~`, swap files); the folder
   mode 700; unchanged files keep their modification times (edit in place, never copy the folder back); the number of
-  files changed equals the entries re-labelled plus any later anchor fixes.
+  files changed equals the entries re-labelled plus any later anchor fixes; **an ambiguous entry given an alternative
+  source counts as re-labelled.**
 - **To the CTO:** counts only (unchanged, changed, ambiguous, re-labelled, the nonexistent id flagged yes/no) and the
   new combined digest, computed exactly as: `cd <the set's folder> && LC_ALL=C sha256sum *.yaml | sha256sum`.
   (Corrected 2026-11-08 after readiness reviewer 7's F3 and F4.)
