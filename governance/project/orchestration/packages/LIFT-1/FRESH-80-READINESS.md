@@ -106,3 +106,18 @@ folder) and the fresh-80 scripts (FRESH-80-1 items 14 to 19). **Rows** (DEC-1010
   0.6B recommended), GLOSSARY-1 §9 (park recommended).
 - **ADR-0002:** refresh against the register before the lift's re-pin (DEC-1093); it belongs with §5's findings.
 - **The status block counts K9 as done** from stale tags (K7-W2-REMAINDER §5); a hand-kept fix is pending.
+
+## 7. Readiness state, 2026-11-08 (DEC-1097)
+| part | state | record |
+|---|---|---|
+| ACT-GUARD-SETS-1 | rebuilt (reader folder hidden, W2-84's cases deleted, the variable-path line rule), rehearsed 0 failures, `apply.sh check` exit 0; **waits on the owner's operator (§3)** | `packages/ACT-GUARD-SETS-1.md`; `drafts/sets-root-guard/REHEARSAL.md` |
+| the fresh-80 scripts | built; code review READY at round 2; 74 tests; **pinned** (`FRESH80-REVIEWED.sha256`, 13 files, sha256 `b9a729fa…`) | `drafts/fresh80/README.md`; `reviews/fresh80-scripts.md` |
+| readiness review (seven) | 1 store READY; 2 links READY (F3 mark committed `7a6dad58`); 3 ids READY; 4 chunking READY (G3: no ticket, fold into M5's retest); 5 roles READY but F2; 6 search-again READY; 7 the fresh 80 READY at round 2 | `reviews/readiness-<n>-*.md` |
+| readiness 5 F2 | the writer's and checker's transcripts (`~/.claude/projects/-home-usain-gov-os-writer/`, `-home-usain-gov-os-checker/`, and the checker pass's new one) moved into `~/gov-os-eval/transcripts/` (mode 700); **the owner's operator, after the checker's pass** | `reviews/readiness-5-roles.md` |
+| the checker's pass | **the owner's checker**, with §2 (corrected `a06dfa80`, `ada040dc`) | — |
+| the declaration | drafted, uncommitted until the pre-flight fills its blanks | `packages/LIFT-1/FRESH-80-DECLARATION.md` |
+| the cost | the judged run ~$15 (brake $30); every experiment for data ~$108 (brakes $216), after the judged run | `drafts/fresh80/README.md` |
+
+**Then, in order:** the ACT applied and the CTO's live guard check; the pre-flight (counts only); the declaration filled and
+committed; the hold; the visible-40 control; the measure on the 80; the judged reader run; the hold ends; the data
+conditions; the figures to the owner.
