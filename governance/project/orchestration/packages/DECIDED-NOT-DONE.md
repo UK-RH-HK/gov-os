@@ -18,7 +18,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
 | 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **List DONE 11-08** (`2f9c80b1`, `W2-130-SITTING.md`, 150 ids grouped); marks a1/a2 and sources b1 drafted, in independent audit; a3 and b2 after the sitting |
-| 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | IN PROGRESS: started 11-08 |
+| 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE 11-08**: `P-SELECT-GRAPH-RESULT.md` to the owner (recommendation: do not build); WAITS: the owner's word |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | IN PROGRESS: with the ACT's rebuild |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
