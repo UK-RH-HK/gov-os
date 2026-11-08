@@ -115,3 +115,25 @@ def test_refused_without_the_act_nothing_written(planted, monkeypatch, capsys): 
     out = capsys.readouterr().out
     assert rc == 2 and "ACT-GUARD-SETS-1 is not applied" in out and "lacks the run folder's glob" in out
     assert not (planted["root"] / "runs").exists()
+
+
+def _no_id_token(planted):
+    import os
+    f = planted["root"] / "fixtures/evaluation/memory-verdict-2/hidden/v80.yaml"
+    st = f.stat()
+    f.write_text(f.read_text().replace("DEC-99999", "the frobnicator ledger"))
+    os.utime(f, (st.st_atime, st.st_mtime))  # unchanged mtime, as the real set's
+
+
+def test_item6_no_id_token_stops_without_outside_confirmation(planted, capsys, monkeypatch):
+    _no_id_token(planted)
+    rc, out = run(planted, capsys, monkeypatch)
+    assert rc == 1 and "it names no id-shaped token" in out
+
+
+def test_item6_no_id_token_kept_with_the_checkers_confirmation(planted, capsys, monkeypatch):
+    _no_id_token(planted)
+    rc, out = run(planted, capsys, monkeypatch, "--item6-outside-nowhere")
+    assert rc == 0 and "outside confirmation, declared" in out
+    d = json.loads((planted["root"] / "runs/fresh-80/preflight.json").read_text())
+    assert d["item6"]["outside_confirmed"] is True and d["item6"]["dropped"] is False and d["all_ok"] is True

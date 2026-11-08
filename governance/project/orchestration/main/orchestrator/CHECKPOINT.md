@@ -5,6 +5,12 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-08: §0 the state, §1 the
 owner's hold, §2 the emergency, §3 decided but not done, §5 the order after the owner decides, §6 the watchers). Next
 free id **DEC-1098**. The blocks below are newest first; older ones are history, kept for their figures.
+- **11-08 18:20, session `ad44f5fe`: THE FRESH 80 READY TO LAUNCH, waiting on the owner's go.** The checker: unchanged
+  80; ACT-GUARD-SETS-1 applied `15952bbf` (guard check 453 PASS); the pre-flight every check as expected (item 6 kept
+  apart on the checker's whole-token confirmation, `--item6-outside-nowhere`, delta review READY); the declaration
+  `16d3d61b`; the scripts re-pinned `d621d58b`; the reranker restarted by a probe (READY 18:20, pid 840293, from the
+  pin; it exits after 12 h idle: probe again if the launch waits). DEC-1097 (6) decided (b). Launch: README steps 3-7.
+  Note: the CTO's own commands may no longer name the sets root with a hidden folder (the guard refuses, as designed).
 - **11-08 later, session `ad44f5fe`: THE FRESH 80 READY BUT FOR THE OWNER'S STEPS** (`packages/LIFT-1/FRESH-80-READINESS.md`
   §7). Scripts reviewed READY (round 2) and pinned `b9a729fa`; ACT-GUARD-SETS-1 rebuilt with the variable-path line
   rule, rehearsed 0 failures (`e6b220c7`); the seven readiness reviews done (records in `reviews/readiness-*.md`).

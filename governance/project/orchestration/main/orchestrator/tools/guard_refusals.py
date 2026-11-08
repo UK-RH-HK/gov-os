@@ -13,6 +13,7 @@ import argparse
 import glob
 import json
 import os
+import sys
 from pathlib import Path
 
 LOG = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/guard-refusals.jsonl")
@@ -134,6 +135,8 @@ def main():
     rows = load()
     if a.classify:
         key, verdict, cost, note = a.classify
+        if len(key.strip()) < 8:
+            sys.exit("--classify: refused: a key of at least 8 characters is needed (an empty key once matched every row, 2026-11-08)")
         for r in rows:
             if r.get("key", "").endswith(key):
                 r.update(verdict=verdict, cost=cost, note=note)

@@ -170,13 +170,17 @@ def nowhere(names, clone) -> bool:
     return True
 
 
-def item6(qs, clone):
+def item6(qs, clone, outside_nowhere=False):
     apart = [q for q in qs if q["apart"]]
     L.say(f"item 6: questions of category nonexistent-id {len(apart)} (1 expected)")
     if len(apart) != 1:
         return False, {"apart": len(apart), "nowhere": None}
     names = L.ids_named(apart[0]["question"])
     if not names:
+        if outside_nowhere:  # the owner's checker searched the tree at c00d525f for the whole token (DEC-1097 (1)(f))
+            L.say("item 6: it names no token the product reads as an id; the owner's checker's whole-token search at "
+                  "c00d525f: nowhere (outside confirmation, declared); kept, not dropped")
+            return True, {"apart": 1, "nowhere": True, "no_token": True, "outside_confirmed": True, "dropped": False}
         L.say("item 6: its id-shaped tokens exist nowhere in the clone: no (it names no id-shaped token)")
         return False, {"apart": 1, "nowhere": False, "no_token": True}
     yes = nowhere(names, clone)
@@ -219,6 +223,9 @@ def main(argv=None):
     ap.add_argument("--clone", default=str(L.CLONE))
     ap.add_argument("--expect-sha256")
     ap.add_argument("--expect-changed", type=int, default=0)
+    ap.add_argument("--item6-outside-nowhere", action="store_true",
+                    help="the owner's checker found the nonexistent id nowhere in the tree at c00d525f (whole token); "
+                         "used only when the question names no token the product reads as an id")
     a = ap.parse_args(argv)
     L.guard_root(a.sets_root)
     p, clone = L.paths(a.sets_root), Path(a.clone).resolve()
@@ -239,7 +246,7 @@ def main(argv=None):
         qs = None
         ok_all = False
     if qs is not None:
-        ok, data = item6(qs, clone)
+        ok, data = item6(qs, clone, a.item6_outside_nowhere)
         results["item6"] = {"ok": ok, **data}
         ok_all &= ok
     results["all_ok"] = ok_all

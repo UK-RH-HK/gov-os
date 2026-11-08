@@ -388,3 +388,68 @@ Rows R6, R7, R8 and R11 from round 1 stand as rows.
 
 **Verdict (round 2): READY.** The CTO may pin the files as README step 0 lists them, `hold.sh` included. The
 declaration's header sentence with `____` (N1) is reworded before it is committed.
+
+## Delta: item 6 (the nonexistent id in a form the product does not read as an id), 2026-11-08
+
+**Read:**
+- `diff preflight.py.pre-item6fix preflight.py`: the earlier copy is 53c5b44aff1f, the file I passed in round 2; the
+  new one is 38572166b5fc;
+- the last two tests of `tests/test_preflight.py`;
+- the consumers of item 6's answer: `f80lib.gap_names_ids`, `fresh80_reader.one`, and `fresh80_figures.main`,
+  `verdict` and `show`.
+
+Nothing under `~/gov-os-eval/` was opened.
+
+**Tests:** 76 passed.
+
+**The other files are unchanged:** `f80lib`, `f80_check`, `run_measure.sh`, the reader, the figures, the data tool and
+`hold.sh` hash as in round 2.
+
+### Is the change correct, and only where it should be?
+- **Yes, on both counts.** The flag acts only on the branch where `lexical.ids_in` finds no token, and only when the
+  operator passes it. Then item 6 passes with
+  `{"nowhere": true, "no_token": true, "outside_confirmed": true, "dropped": false}`.
+  - Without the flag, that branch still stops (the first new test).
+  - When the question does name an id the product reads, the flag is ignored: the whole-token check and the declared
+    drop run as before.
+  - The question stays counted apart by category. The 79 and the bar are untouched.
+- **The pin:** `FRESH80-REVIEWED.sha256` (07:34) no longer matches `preflight.py`, so `run_measure.sh` refuses until
+  the CTO pins again. This fails closed, and re-pinning is required.
+
+### What it means elsewhere
+- `gap_names_ids` is False for this question (`bool(named)` is false). This is right: the product cannot stop with
+  `UNRESOLVED_IDS` on a token it does not read as an id. It runs an ordinary search, so the measure records an ordinary
+  bundle.
+- The reader treats it as apart, as E2 did: right = settled not found, or answered and graded correct. The grader
+  instruction already reads "correct means the answer says it was not found or does not exist".
+- `fresh80_figures` reads only `item6.nowhere`. True means "not dropped", so the question is reported apart as right
+  or not, outside the bar. This is sane.
+
+### Findings (none blocks)
+- **D1 (row): the figures' line states the DEC-1071 (5) check without its reason.**
+  - `show()` prints "the product stopped with UNRESOLVED_IDS naming its id: no". That is true, but it reads as a stop
+    that failed. Here the product could not stop: it does not read the token as an id at all.
+  - Stated honestly, the line says: "not applicable: the question names no token the product reads as an id
+    (pre-flight item 6, the checker's outside confirmation); a gap in the product's id forms, reported".
+  - **Fix:** read `item6.no_token` from `preflight.json` in `fresh80_figures` and print that line.
+  - **Ordinary work:** yes. **Consequence:** other (a report line; the bar is not touched).
+- **D2 (row): the declaration's item 6 line has no room for this case.**
+  - It reads "its id-shaped tokens exist nowhere in the clone: ____ (yes/no)".
+  - **Fill it as:** "no token the product reads as an id; the owner's checker's whole-token search at c00d525f:
+    nowhere (outside confirmation); kept apart, not dropped; DEC-1071 (5)'s stop not applicable".
+  - **Ordinary work:** yes. **Consequence:** other.
+
+**Classification (DEC-809):** 0 blocking; 2 rows (D1, D2), both "other".
+
+```verdict
+{"kpis": [
+ {"kpi": "delta-a the item 6 flag is correct and confined (only the no-token branch, only with the flag, still stops without it)", "verdict": "pass", "findings": []},
+ {"kpi": "delta-b no other path changed; tests pass (76); the pin must be renewed", "verdict": "pass", "findings": []},
+ {"kpi": "delta-c gap_names_ids False handled sanely and stated honestly in the figures and the declaration", "verdict": "pass", "findings": [
+   {"id": "D1", "scope": "in", "ordinary_work": "yes", "consequence": "other"},
+   {"id": "D2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}
+]}
+```
+
+**Verdict (delta): READY.** The CTO pins again (`preflight.py` changed), fills the declaration's item 6 line as D2
+says, and preferably prints the D1 line.

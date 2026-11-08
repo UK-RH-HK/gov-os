@@ -31,20 +31,20 @@
     "W2-110"
   ],
   "closes_next": "none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13)",
-  "examin": "AT RISK (11-08): every experiment done (hit@5 76.8 % on the 138; agents right end to end 92.8 % with search again once); the owner holds the fresh-80, M3 and glossary decisions; before the 80: ACT-GUARD-SETS-1 rebuilt and applied (overdue), the fresh-80 scripts, the checker's pass; the lift about 11-15; EXAMIN's copy about 11-20; K9 gates the start (DEC-954 Q1)",
-  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); re-pin window 4 DONE 11-07 14:22; ALL experiments done (E0-E5, E0b, E2G); 11-08: the owner holds the decisions; nothing on the fresh 80 until then",
+  "examin": "AT RISK (11-08 09:30): DEC-1097 decided (K9's bar: right end to end >= 85 %, wrong claims <= 5 %); the fresh 80 ready on the CTO's side, waiting on the owner's checker and operator (the ACT, the transcripts); the 138: hit@5 76.8 %, right end to end 92.8 % with search again once; the lift about 11-15; EXAMIN's copy about 11-20; K9 gates the start (DEC-954 Q1)",
+  "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); DEC-1097 recorded 11-08; the fresh 80 ready on the CTO's side (scripts pinned, ACT rehearsed, readiness review done)",
   "countdown": [
     "Re-pin window 4, the pool on, PAT-1: DONE 11-07",
     "ALL experiments DONE 11-07 (best: the 0.6B bundle + search again once, 128/138)",
-    "Your decisions, held by you until read (FRESH-80-1 with FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1)",
-    "Before the 80: ACT-GUARD-SETS-1 rebuilt, rehearsed, applied by your operator (overdue since window 4); the fresh-80 scripts (one review); the checker's pass; the readiness review if approved. Est. 1 to 1.5 days after your word",
-    "The fresh 80 once",
-    "D-6 part 2 and D-5 (the templates), on the CPU. Est. 2 days",
+    "Your decisions: DONE 11-08 (DEC-1097; item 6, the glossary, open)",
+    "Before the 80: the scripts reviewed and pinned, the ACT rebuilt and rehearsed, the readiness review: DONE 11-08. Left: your checker's pass; your operator applies the ACT and moves the transcripts. Then the pre-flight, declaration and control: about half a day",
+    "The fresh 80 once (live part about 45 min; then the data conditions)",
+    "Beside, before the lift: W2-141, W2-20 rebuilt, W2-145 (tests first); D-6 part 2 and D-5 on the CPU. Est. 2 to 3 days",
     "D-10, the full suite and its red fixes, then the lift (your word). The lift about 11-15",
-    "After the lift: the three-layer plan and Wave 2's streams (DEC-1087 (13)); W2-139/W2-140 after the 80; EXAMIN's copy about 11-20"
+    "After the lift: the three-layer plan (with P-LB-PRODUCT-1, G1's fewer pairs); W2-139/W2-140; EXAMIN's copy about 11-20"
   ],
-  "owner_action": "P1 the experiments' decisions, held by you until read: FRESH-80-1 (with FRESH-80-READINESS: the checker's brief, the readiness review proposal), M3-ADOPTION-1, GLOSSARY-1; ACT-GUARD-SETS-1 to be rebuilt and rehearsed before the 80 (applied by your operator); P2 ADR-0002 (refresh before the lift); later: the 150-id sitting, the templates' approval, the three layers' plan",
-  "last_report": "2026-11-07 23:03:56",
+  "owner_action": "P1 the checker's pass (FRESH-80-READINESS \u00a72); the operator applies ACT-GUARD-SETS-1 (\u00a73) and moves the writer's and checker's transcripts into ~/gov-os-eval/transcripts/; DEC-1097 item 6 (the glossary); P2 ADR-0002's acceptance; P-SELECT-GRAPH 'do not build'; the 150-id sitting (W2-130-SITTING)",
+  "last_report": "2026-11-08 09:35:09",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -94,5 +94,5 @@
     ],
     "keystone-7": "done: DEC-1089"
   },
-  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+  "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

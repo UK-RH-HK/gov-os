@@ -5,7 +5,16 @@ ACT-GUARD-FIX-4 (DEC-1050 (8), (12)): four cases re-baselined to allow (a write 
 out, or that resolves outside every tree, is let through: G-1, G-2); added: a reviewer's record into the CTO's
 reviews/ (allowed), and rm: the catastrophic refused, an honest one passed.
 G-14 (DEC-1052, ACT-G14): five cases added; when the tested tree's path map holds role_paths:, W2-126's engineer is
-refused its own acceptance tests and the case revised for it, and reads the rest; the 65 cases above are unchanged."""
+refused its own acceptance tests and the case revised for it, and reads the rest; the 65 cases above are unchanged.
+DEC-1082 (3), the sets root outside the repository: the sets cases (SETS, kept apart from CASES, so the 70 above and
+the suites that read CASES are unchanged), run when the tested tree's path map holds sets_root_hidden:. L cases name
+paths that do not exist, or the root itself; R cases need the planted root (SETS_PLANTED=1); a case naming ~ or $HOME
+runs only when the block's root is ~/gov-os-eval as this HOME expands it. GUARD4_ONLY=sets runs the sets cases alone
+(with HOME substituted and GOV_PIN_PY set). A case's optional 6th element: cwd, project, agent, direct (the tested
+tree's hook run directly, not the registered line), why (a text the reason must hold).
+DEC-1097 (2), rebuilt 2026-11-08: the F cases, the fresh 80's reader run (runs/fresh-80) refused, every other runs/
+folder open, a fresh-80 line naming only the root allowed and one naming runs/fresh-80/... or memory-verdict-2/...
+refused."""
 import json
 import os
 import subprocess
@@ -35,6 +44,11 @@ for entry in sets.values():
 hidden_file = (hidden_glob or "fixtures/evaluation/x/hidden/**").replace("**", "q01.yaml").replace("*", "q01")
 held = yaml.safe_load(open(HELD)).get("held_out_paths") or []
 held_path = held[0] if held else None  # used only as an argument; never printed, never read
+BLOCK = yaml.safe_load(open(PROJECT + "/governance/project/path-map.yaml")).get("sets_root_hidden") or {}
+SR = os.path.realpath(os.path.expanduser(BLOCK.get("root", "~/gov-os-eval")))
+PLANTED = os.environ.get("SETS_PLANTED") == "1"
+NX = "zz-guard4-none.yaml"
+E = SR + "/fixtures/evaluation"
 
 CASES = [
     # (name, role, tool, input, expected: deny|ask|allow)
@@ -166,27 +180,306 @@ CASES += [("G-14 W2-126's engineer reads its own acceptance tests", "engineer@DA
            {"command": "grep -rn tests/acceptance/W2-126 " + ROOT + "/src/gov/guard/"}, "allow"),
           ("G-14 orchestrator reads the acceptance tests", "orchestrator", "Read",
            {"file_path": ROOT + "/tests/acceptance/W2-126/README.md"}, "allow")]
-ok = True
-for name, role, tool, tin, want in CASES:
-    agent = None
-    if "subagent" in name:
-        agent = "engineer" if "engineer subagent" in name else "general-purpose"
-    event = {"tool_name": tool, "tool_input": tin, "cwd": ROOT, "session_id": "guard4-check", "agent_type": agent}
+# DEC-1082 (3): the sets root's hidden folders (the build spec's section C). Each case: (name, role, tool, input, want,
+# {"tag": "L" | "R", "home": names ~ or $HOME, "agent", "cwd", "project", "direct", "why"}).
+NXD = "zz-guard4-none.d"  # NXdir: a folder that does not exist
+HOME_NOW = os.path.realpath(os.path.expanduser("~"))
+OLDMAP = os.environ.get("SETS_OLDMAP_TREE") or "/home/usain/gov-os-worktrees/W2-13"  # T3: a tree on an old-map branch
+M = [("engineer", "engineer", None), ("research", "research", None), ("orchestrator (the CTO)", "orchestrator", None),
+     ("lead", "orchestrator@DAEO-0uhh", None), ("product-spec", "product-spec", None),
+     ("test designer", "independent-test-designer", None), ("auditor", "independent-auditor", None),
+     ("CTO's engineer subagent", "orchestrator", "engineer"),
+     ("CTO's general-purpose subagent", "orchestrator", "general-purpose")]
+U = [("no GOV_ROLE", "", None), ("ticket-lead", "ticket-lead", None),
+     ("independent-reviewer", "independent-reviewer", None)]
+ERO = [r for r in M if r[0] in ("engineer", "research", "orchestrator (the CTO)")]
+EO = [r for r in M if r[0] in ("engineer", "orchestrator (the CTO)")]
+O = [r for r in M if r[0] == "orchestrator (the CTO)"]
+OL = [r for r in M if r[0] in ("orchestrator (the CTO)", "lead")]
+SETS = []
+
+
+def sets(cid, roles, tool, tins, want, tag, **extra):
+    for label, role, agent in roles:
+        for tin in tins:
+            form = tin.get("command") or tin.get("file_path") or f"{tin.get('path')} {tin.get('pattern', '')}"
+            SETS.append((f"sets {cid} {label} {tool}: {form}", role, tool, tin, want,
+                         dict(extra, tag=tag, agent=agent)))
+
+
+def R_(path):
+    return {"file_path": path}
+
+
+def B_(cmd):
+    return {"command": cmd}
+
+
+ENG_ONLY = [r for r in M if r[0] == "engineer"]
+sets("S1", M, "Read", [R_(f"{E}/memory-retrieval/hidden/{NX}")], "deny", "L")
+sets("S2", M, "Read", [R_(f"{E}/memory-verdict/hidden/{NX}")], "deny", "L")
+sets("S3", M, "Read", [R_(f"{E}/memory-verdict-2/hidden/{NX}")], "deny", "L")
+sets("S4", M, "Read", [R_(f"{E}/memory-verdict-2/retired/{NX}")], "deny", "L")
+sets("S5", M, "Read", [R_(f"{E}/memory-verdict/{NX}")], "deny", "L")
+sets("S6", M, "Read", [R_(f"{SR}/transcripts/{NX}")], "deny", "L")
+sets("S7", EO, "Read", [R_(f"{E}/memory-verdict-2/XCHECK.md")], "deny", "R")
+sets("S8", U, "Read", [R_(f"{E}/memory-verdict-2/hidden/{NX}")], "allow", "L")
+sets("S9", M, "Read", [R_(f"{E}/memory-retrieval/visible/{NX}"), R_(f"{SR}/runs/{NX}")], "allow", "L")
+sets("S10", O, "Read", [R_(f"{SR}/governance/project/path-map.yaml")], "allow", "R")
+sets("G1", ERO, "Grep", [{"pattern": "x", "path": f"{E}/memory-verdict-2/hidden/{NXD}"}], "deny", "L")
+sets("G2", ERO, "Grep", [{"pattern": "x", "path": SR}], "deny", "R")
+sets("G3", O, "Grep", [{"pattern": "x", "path": HOME_NOW}], "deny", "R", home=True)
+sets("G4", ERO, "Grep", [{"pattern": "x", "path": f"{E}/memory-retrieval/visible"}], "allow", "R")
+sets("G5", ERO, "Grep", [{"pattern": "x", "path": ROOT}], "allow", "L")
+sets("G6", ERO, "Glob", [{"path": f"{E}/memory-verdict-2/hidden/{NXD}", "pattern": "*"}], "deny", "L")
+sets("G7", ERO, "Glob", [{"path": SR, "pattern": "fixtures/evaluation/memory-verdict-2/hidden/*.yaml"}], "deny", "L")
+sets("G8", ERO, "Glob", [{"path": SR, "pattern": "**/*.yaml"}], "allow", "L")  # names only, by design
+sets("B1", ERO, "Bash", [B_(f"cat {E}/memory-retrieval/hidden/{NX}")], "deny", "L")
+sets("B2", ERO, "Bash", [B_(f"cat ~/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/{NX}")], "deny", "L",
+     home=True)
+sets("B3", ERO, "Bash", [B_(f'cat "$HOME/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/{NX}"')], "deny",
+     "L", home=True)
+sets("B4", ERO, "Bash", [B_(f"cd {SR} && cat fixtures/evaluation/memory-verdict-2/hidden/{NX}")], "deny", "L")
+sets("B5", ERO, "Bash", [B_(f"head -5 {E}/memory-verdict-2/retired/{NX}")], "deny", "L")
+sets("B6", ERO, "Bash", [B_(f"ls {E}/memory-verdict-2/hidden/{NXD}")], "deny", "L")
+sets("B7", ERO, "Bash", [B_(f"ls {E}/memory-verdict-2/hidden")], "deny", "R")
+sets("B8", ERO, "Bash", [B_(f"ls {SR}"), B_(f"ls {E}/memory-retrieval/visible")], "allow", "R")
+sets("B9", ERO, "Bash", [B_(f"grep -rn x {SR}")], "deny", "R")
+sets("B10", ERO, "Bash", [B_(f"grep -rn x {E}/memory-retrieval/visible")], "allow", "R")
+sets("B11", ERO, "Bash", [B_(f"find {SR} -name '*.yaml' -exec cat {{}} +")], "deny", "R")
+sets("B12", ERO, "Bash", [B_(f"sed -n 1,5p {E}/memory-verdict-2/XCHECK.md")], "deny", "R")
+sets("B13", ERO, "Bash", [B_(f"python3 -c \"print(open('{E}/memory-verdict/hidden/p01.yaml').read())\"")], "deny", "R")
+# was a known limit (code is checked only for paths that exist, reads.py:830-837); the line rule (DEC-1097 (2)) refuses it
+sets("B14", ERO, "Bash", [B_(f"python3 -c \"print(open('{E}/memory-verdict/hidden/{NX}').read())\"")], "deny", "L")
+sets("B15", U, "Bash", [B_(f"cat {E}/memory-verdict-2/hidden/{NX}")], "allow", "L")
+sets("M1", OL, "Bash", [B_("python3 -m gov.retrieval.measure memory-verdict-2 --sets-root ~/gov-os-eval --part hidden")],
+     "allow", "L", home=True)
+sets("M2", O, "Bash", [B_("env -u GOV_TICKET GOV_ROLE=orchestrator TMPDIR=/tmp/gov-guard4-t "
+                          "PYTHONPATH=/tmp/gov-guard4-clone/src python3 -m gov.retrieval.measure memory-verdict "
+                          "--root /tmp/gov-guard4-clone --sets-root \"$HOME/gov-os-eval\" --part hidden "
+                          "--out /tmp/gov-guard4-m --gov /tmp/gov-guard4-gov > /tmp/gov-guard4-m.txt "
+                          "2> /tmp/gov-guard4-m.err")], "allow", "L", home=True)
+sets("M3", O, "Bash", [B_(f"python3 -m gov.retrieval.measure memory-verdict --sets-root={SR} --part hidden")], "allow",
+     "L")
+# M4, M6, M7: refused since the line rule (DEC-1097 (2)): a cd to the root, a command substitution on a line naming it
+sets("M4", O, "Bash", [B_(f"cd {SR} && python3 -m gov.retrieval.measure memory-retrieval --root /tmp/gov-guard4-clone "
+                          "--sets-root . --part all")], "deny", "L")
+sets("M5", O, "Bash", [B_("bash .gov-runtime/scratch/orchestrator/drafts/score-once/so_measure.sh p n r60 '{}' "
+                          "/tmp/gov-guard4-c")], "allow", "L")
+sets("M6", O, "Bash", [B_("python3 -m gov.retrieval.measure memory-verdict-2 --sets-root ~/gov-os-eval --part hidden "
+                          "--out \"$(mktemp -d)\"")], "deny", "R", home=True)
+sets("M7", O, "Bash", [B_("python3 -m gov.retrieval.measure memory-verdict --sets-root ~/gov-os-eval --part hidden "
+                          "--gov \"$(command -v gov)\"")], "deny", "R", home=True)
+sets("X1", EO, "Bash", [B_("git diff --name-only w2/integrate | xargs grep -n TODO")], "allow", "R")  # the override
+sets("X2", EO, "Bash", [B_("cat $(git diff --name-only HEAD~1)")], "allow", "R")  # the override
+sets("X3", EO, "Bash", [B_(f"ls {E}/memory-verdict-2/hidden | xargs cat")], "deny", "R")
+sets("X4", EO, "Bash", [B_(f"cat $(find {SR} -name '*.yaml')")], "deny", "R")
+sets("X5", EO, "Bash", [B_("find ~ -name 'p01.yaml' | xargs cat")], "deny", "R", home=True)
+sets("X6", EO, "Bash", [B_(f"cd {SR} && git diff --name-only | xargs cat")], "deny", "R")  # starts in the sets root
+sets("X7", EO, "Bash", [B_(f"xargs -a {SR}/runs/list cat")], "deny", "R")  # names read from a file
+sets("X8", EO, "Bash", [B_('while read f; do cat "$f"; done < /tmp/gov-guard4-list')], "deny", "R")
+sets("W1", M, "Write", [{"file_path": f"{E}/memory-verdict-2/hidden/{NX}", "content": "x"}], "deny", "L")
+sets("W2", ENG_ONLY, "Bash", [B_(f"echo x > {E}/memory-retrieval/hidden/{NX}")], "deny", "L")
+sets("W3", O, "Bash", [B_(f"cp /tmp/gov-guard4-a {E}/memory-verdict/hidden/{NX}")], "deny", "L")
+sets("W4", O, "Write", [{"file_path": f"{ROOT}/fixtures/evaluation/memory-verdict-2/hidden/{NX}", "content": "x"}],
+     "deny", "L")
+sets("W5", O, "Write", [{"file_path": f"{SR}/runs/zz-guard4/.n", "content": "x"}], "allow", "L")
+sets("W6", O, "Bash", [B_(f"mkdir -p {SR}/runs/zz-guard4 && : > {SR}/runs/zz-guard4/.n")], "allow", "L")
+sets("W7", O, "Edit", [{"file_path": f"{SR}/governance/project/path-map.yaml", "old_string": "a", "new_string": "b"}],
+     "allow", "L")
+# W8: the reviewer is refused by rule 5 (it writes only its records, its scratch or /tmp), not by this rule
+sets("W8", U[:2], "Write", [{"file_path": f"{E}/memory-verdict-2/hidden/{NX}", "content": "x"}], "allow", "L")
+sets("W8", U[2:], "Write", [{"file_path": f"{E}/memory-verdict-2/hidden/{NX}", "content": "x"}], "deny", "L",
+     why="a reviewer or auditor writes only")
+sets("W9", O, "Bash", [B_("mkdir -p $D/t")], "allow", "L")  # target not resolved
+sets("T1", O, "Read", [R_(f"{ROOT}/fixtures/evaluation/memory-retrieval/hidden/{NX}")], "deny", "L")  # new
+sets("T2", O, "Read", [R_(f"/home/usain/gov-os-worktrees/W2-13/fixtures/evaluation/memory-verdict-2/hidden/{NX}")],
+     "deny", "L")
+# T3: the main tree's block holds in a tree whose own map is older (a branch cannot weaken it)
+sets("T3", ENG_ONLY, "Read", [R_(f"{E}/memory-verdict-2/hidden/{NX}")], "deny", "L", cwd=OLDMAP, project=OLDMAP,
+     direct=True)
+
+# DEC-1097 (2), the rebuild of 2026-11-08: the fresh 80's reader run, runs/fresh-80 under the sets root (its questions,
+# gold answers, answers and kept outputs; FRESH-80-1 §2 item 7). Every other folder under runs/ stays open. The CTO
+# runs the fresh-80 scripts with only --sets-root on the line; they derive memory-verdict-2 and runs/fresh-80 in their
+# own code (the judge reads a command's words and inline code, never a script file's text), so that line is allowed
+# and a line naming runs/fresh-80/... or memory-verdict-2/... is refused. F80PY is a stand-in name that need not exist.
+F80 = f"{SR}/runs/fresh-80"
+F80PY = ".gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py"
+KZ = "kept-zz-guard4"  # a kept folder that does not exist
+sets("F1", M, "Read", [R_(f"{F80}/{NX}"), R_(f"{F80}/rows/{NX}"), R_(f"{F80}/{KZ}/{NX}")], "deny", "L")
+sets("F2", ERO, "Bash", [B_(f"cat {F80}/{NX}"), B_(f"ls {F80}/{NXD}"), B_(f"head -3 {F80}/rows/{NX}"),
+                         B_(f"cd {SR}/runs && cat fresh-80/{NX}")], "deny", "L")
+sets("F3", ERO, "Grep", [{"pattern": "x", "path": f"{F80}/{NXD}"}], "deny", "L")
+sets("F4", ERO, "Glob", [{"path": f"{SR}/runs", "pattern": "fresh-80/*"}], "deny", "L")
+sets("F5", EO, "Bash", [B_(f"ls {F80}"), B_(f"cat {F80}/USED"), B_(f"grep -rn x {SR}/runs"),
+                        B_(f"cat {F80}/rows/q01.json")], "deny", "R")
+sets("F6", M, "Read", [R_(f"{F80}/USED"), R_(f"{F80}/rows/q01.json"), R_(f"{F80}/kept-1/k01.json")], "deny", "R")
+sets("F7", ERO, "Grep", [{"pattern": "x", "path": f"{SR}/runs"}], "deny", "R")  # runs/ now holds a hidden folder
+sets("F8", M, "Write", [{"file_path": f"{F80}/{NX}", "content": "x"}], "deny", "L")
+sets("F9", O, "Bash", [B_(f"mkdir -p {F80}/{KZ} && : > {F80}/{KZ}/.n"), B_(f"cp /tmp/gov-guard4-a {F80}/{NX}"),
+                       B_(f"echo x > {F80}/{NX}")], "deny", "L")
+# every other runs/ folder stays open (a sibling whose name starts the same included)
+sets("F10", M, "Read", [R_(f"{SR}/runs/fresh-80b/{NX}"), R_(f"{SR}/runs/e0/{NX}"), R_(f"{SR}/runs/fresh-80.txt"),
+                        R_(f"{SR}/runs/{NX}")], "allow", "L")
+sets("F11", EO, "Bash", [B_(f"ls {SR}/runs"), B_(f"cat {SR}/runs/e0/counts.txt"), B_(f"ls {SR}/runs/e0")], "allow", "R")
+sets("F12", EO, "Read", [R_(f"{SR}/runs/e0/counts.txt")], "allow", "R")
+sets("F13", EO, "Grep", [{"pattern": "x", "path": f"{SR}/runs/e0"}], "allow", "R")
+sets("F14", O, "Write", [{"file_path": f"{SR}/runs/zz-guard4-e0/.n", "content": "x"}], "allow", "L")
+sets("F15", U, "Read", [R_(f"{F80}/{NX}")], "allow", "L")  # the sessions no rule names, as S8
+# the CTO's fresh-80 lines: only the root named, allowed (the CTO and a lead)
+sets("F16", OL, "Bash", [B_(f"python3 {F80PY} --sets-root ~/gov-os-eval"),
+                         B_(f"python3 {F80PY} --sets-root ~/gov-os-eval --dry"),
+                         B_(f'python3 {F80PY} --sets-root "$HOME/gov-os-eval" > /tmp/gov-guard4-f80.txt 2>&1'),
+                         B_(f"env -u GOV_TICKET GOV_ROLE=orchestrator python3 {F80PY} --sets-root ~/gov-os-eval "
+                            "--clone /tmp/gov-guard4-clone")], "allow", "L", home=True)
+sets("F17", OL, "Bash", [B_(f"python3 {F80PY} --sets-root {SR}"), B_(f"python3 {F80PY} --sets-root={SR} --dry"),
+                         B_(f"python3 -m gov.retrieval.measure memory-verdict-2 --sets-root {SR} --part hidden")],
+     "allow", "L")
+sets("F18", O, "Bash", [B_(f"python3 {F80PY} --sets-root {SR}")], "allow", "R")  # with the planted 80 present
+# a line naming runs/fresh-80/... or memory-verdict-2/... refused (the CTO)
+sets("F19", O, "Bash", [B_(f"python3 {F80PY} --sets-root ~/gov-os-eval --rows ~/gov-os-eval/runs/fresh-80/rows"),
+                        B_("python3 -m gov.retrieval.measure memory-verdict-2 --sets-root ~/gov-os-eval --part hidden "
+                           f"--out ~/gov-os-eval/runs/fresh-80/{KZ}"),
+                        B_(f"python3 {F80PY} --set ~/gov-os-eval/fixtures/evaluation/memory-verdict-2/{NXD}")],
+     "deny", "L", home=True)
+sets("F20", O, "Bash", [B_(f"python3 {F80PY} --sets-root {SR} --out {F80}/{KZ}"),
+                        B_(f"python3 {F80PY} --questions {E}/memory-verdict-2/hidden/{NXD}"),
+                        B_(f"python3 {F80PY} --sets-root {SR} && ls {F80}/{NXD}")], "deny", "L")
+sets("F21", O, "Bash", [B_(f"python3 {F80PY} --set {E}/memory-verdict-2"), B_(f"test -e {F80}/USED && echo used"),
+                        B_(f"python3 {F80PY} --rows {F80}/rows")], "deny", "R")
+# F22, F23: GOV_KEEP naming the 80's folder on the line, refused since the line rule (DEC-1097 (2); review 5 R1)
+sets("F22", O, "Bash", [B_(f'GOV_KEEP="$HOME/gov-os-eval/runs/fresh-80/{KZ}" python3 {F80PY} --sets-root ~/gov-os-eval')],
+     "deny", "L", home=True)
+sets("F23", O, "Bash", [B_(f"GOV_KEEP={F80}/{KZ} python3 {F80PY} --sets-root {SR}")], "deny", "L")
+
+# DEC-1097 (2), readiness review 5 F1: a path carried by a shell variable, a substitution, a glob or a cd, on a line that
+# names the sets root, refused to the refused roles (the engineer and the CTO here; the rule is the same for the six).
+V = [
+    ("V1", f"D={SR}; cat $D/runs/fresh-80/rows/{NX}", "L", False),
+    ("V2", f'D={F80}; cat "$D/rows/{NX}"', "L", False),
+    ("V3", f"R={SR}; cat $R/runs/fresh-80/USED", "R", False),
+    ("V4", f"R={SR}; ls $R/runs/fresh-80", "R", False),
+    ("V5", f"R={SR}; grep -r x $R/runs", "R", False),
+    ("V6", f'D={F80}; cd "$D" && cat rows/q01.json', "R", False),
+    ("V7", f"R={SR}; find $R -name '*.json' -exec cat {{}} +", "R", False),
+    ("V8", f"python3 -c \"import os;print(open(os.path.join('{SR}','runs','fresh-80','rows','q01.json')).read())\"", "R", False),
+    ("V9", f"cd {SR}/runs && cat fresh-80/rows/q01.json", "R", False),
+    ("V10", f"cat {SR}/runs/*/rows/q01.json", "R", False),
+    ("V11", f"cat $(echo {SR}/runs)/fresh-80/USED", "R", False),
+    ("V12", f"cat {{{SR}/runs,/tmp}}/fresh-80/USED", "R", False),
+    ("V13", f"env -C {SR}/runs cat fresh-80/USED", "R", False),
+    ("V14", f"HOME={SR}/runs; cat $HOME/fresh-80/USED", "R", False),
+    ("V15", f"ls {SR}/runs && cat $_/fresh-80/USED", "R", False),
+    ("V16", f"export D={SR}; head $D/runs/fresh-80/USED", "R", False),
+    ("V17", f"R={SR}/runs; for f in $R/fresh-80/rows/*; do cat $f; done", "R", False),
+    ("V18", f"D={SR}/runs; cat `echo $D`/fresh-80/USED", "R", False),
+    ("V19", f"D=~/gov-os-eval; cat $D/runs/fresh-80/rows/{NX}", "L", True),
+    ("V20", f'D="$HOME/gov-os-eval/runs"; head -3 "$D/fresh-80/rows/{NX}"', "L", True),
+    ("V21", f"cd ~/gov-os-eval && cat runs/fresh-80/rows/{NX}", "L", True),
+    ("V22", "R=~/gov-os-eval; ls $R/runs/fresh-80", "R", True),
+    ("V23", "ls ~/gov-os-eval/runs/*", "R", True),
+    ("V24", f"D=~/gov-os-eval/fixtures/evaluation; cat $D/memory-verdict-2/hidden/{NX}", "R", True),
+    ("V25", f"cd ~/gov-os-eval/fixtures/evaluation && cat memory-verdict-2/hidden/{NX}", "R", True),
+]
+for cid, cmd, tag, home in V:
+    sets(cid, EO, "Bash", [B_(cmd)], "deny", tag, home=home)
+
+# Every command the CTO types from drafts/fresh80/README.md (steps 0 to 8), allowed to the CTO and a lead: each names
+# only the root (variables only before it, $! after it). Then the same lines with the root and HOME spelled absolute.
+HEX = "0" * 64
+FR = [
+    "F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=~/.local/share/gov-os/pin-bcea09060ebc/bin/python; "
+    "mkdir -p ~/gov-os-runs/fresh-80",
+    "cd $F && python3 make_f80_e4.py --check && sha256sum f80lib.py preflight.py f80_check.py run_measure.sh "
+    "fresh80_reader.py fresh80_figures.py fresh80_data.py f80_e5_live.sh f80_so_measure.sh f80_e4_prep.sh "
+    "f80_e4_window.sh f80_e4_replays.sh > FRESH80-REVIEWED.sha256",
+    f"$PY $F/preflight.py --sets-root ~/gov-os-eval --expect-sha256 {HEX} --expect-changed 0",
+    "F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=~/.local/share/gov-os/pin-bcea09060ebc/bin/python; "
+    f"$PY $F/preflight.py --sets-root ~/gov-os-eval --expect-sha256 {HEX} --expect-changed 0",
+    "echo \"FRESH-80 HOLD: no commit on w2/integrate, no store rebuild, no GPU window (FRESH-80-1 item 13) from "
+    "$(date '+%F %T')\" > .gov-runtime/scratch/orchestrator/log/act-in-progress.txt",
+    "setsid bash $F/run_measure.sh --sets-root ~/gov-os-eval > ~/gov-os-runs/fresh-80/measure.out 2>&1 < /dev/null & "
+    "echo $! > ~/gov-os-runs/fresh-80/measure.pid",
+    "bash tools/proc.sh wait --max 3600 $(cat ~/gov-os-runs/fresh-80/measure.pid)",
+    "setsid bash $F/run_measure.sh --sets-root ~/gov-os-eval --restart > ~/gov-os-runs/fresh-80/measure.out 2>&1 "
+    "< /dev/null & echo $! > ~/gov-os-runs/fresh-80/measure.pid",
+    "$PY $F/fresh80_reader.py --sets-root ~/gov-os-eval --dry",
+    "$PY $F/fresh80_reader.py --sets-root ~/gov-os-eval > ~/gov-os-runs/fresh-80/reader.out 2>&1",
+    "mv .gov-runtime/scratch/orchestrator/log/act-in-progress.txt "
+    ".gov-runtime/scratch/orchestrator/log/act-in-progress.ended-$(date +%H%M)-fresh80.txt",
+    "python3 $F/fresh80_figures.py --sets-root ~/gov-os-eval",
+] + [f"$PY $F/fresh80_data.py {c} --sets-root ~/gov-os-eval{d}" for c in ("e3", "e3sa", "e2g", "e5", "e4")
+     for d in ("", " --dry")] + [
+    "setsid bash $F/f80_e5_live.sh --sets-root ~/gov-os-eval > ~/gov-os-runs/fresh-80/e5-live.out 2>&1 < /dev/null &",
+    "DRY=1 bash $F/f80_e4_prep.sh --sets-root ~/gov-os-eval",
+    "setsid bash $F/f80_e4_prep.sh --sets-root ~/gov-os-eval > ~/gov-os-runs/fresh-80/e4-prep.out 2>&1 < /dev/null &",
+    "DRY=1 bash $F/f80_e4_window.sh --sets-root ~/gov-os-eval",
+    "setsid bash $F/f80_e4_window.sh --sets-root ~/gov-os-eval > ~/gov-os-runs/fresh-80/e4-window.out 2>&1 &",
+    "bash $F/f80_e4_replays.sh --sets-root ~/gov-os-eval",
+]
+for i, cmd in enumerate(FR, 1):
+    sets(f"A{i}", OL, "Bash", [B_(cmd)], "allow", "L", home=True)
+    sets(f"A{i}abs", OL, "Bash", [B_(cmd.replace("~/gov-os-eval", SR).replace("~/", HOME_NOW + "/"))], "allow", "L")
+
+
+def decide(role, tool, tin, agent=None, cwd=None, project=None, direct=False):
+    """The hook's answer and reason for one event."""
+    event = {"tool_name": tool, "tool_input": tin, "cwd": cwd or ROOT, "session_id": "guard4-check",
+             "agent_type": agent}
     role, _, ticket = role.partition("@")
-    env = dict(os.environ, GOV_ROLE=role, GOV_TICKET=ticket or "DAEO-sdxk", CLAUDE_PROJECT_DIR=ROOT)
-    if LINE:  # the registered hook line itself, as Claude Code runs it, from a settings file
-        env["CLAUDE_PROJECT_DIR"] = PROJECT
+    env = dict(os.environ, GOV_ROLE=role, GOV_TICKET=ticket or "DAEO-sdxk", CLAUDE_PROJECT_DIR=project or ROOT)
+    if not role:
+        env.pop("GOV_ROLE")  # no GOV_ROLE at all
+    if LINE and not direct:  # the registered hook line itself, as Claude Code runs it, from a settings file
+        env["CLAUDE_PROJECT_DIR"] = project or PROJECT
         p = subprocess.run(["sh", "-c", LINE], input=json.dumps(event), capture_output=True, text=True, env=env,
                            timeout=60)
     else:
-        p = subprocess.run([PY, "-E", HOOK], input=json.dumps(event), capture_output=True, text=True, env=env,
+        hook = PROJECT + "/.claude/hooks/pretooluse.py" if LINE else HOOK
+        p = subprocess.run([PY, "-E", hook], input=json.dumps(event), capture_output=True, text=True, env=env,
                            timeout=60)
-    got = "allow"
     if p.returncode == 2:
-        got = "deny(exit 2)"
-    elif p.stdout.strip():
-        got = json.loads(p.stdout)["hookSpecificOutput"]["permissionDecision"]
-    good = got == want or (want == "deny" and got.startswith("deny"))
+        return "deny(exit 2)", p.stderr
+    if p.stdout.strip():
+        out = json.loads(p.stdout)["hookSpecificOutput"]
+        return out["permissionDecision"], out["permissionDecisionReason"]
+    return "allow", p.stderr
+
+
+ok = True
+ONLY = os.environ.get("GUARD4_ONLY", "")
+runs = []
+if ONLY != "sets":
+    for name, role, tool, tin, want in CASES:
+        agent = None
+        if "subagent" in name:
+            agent = "engineer" if "engineer subagent" in name else "general-purpose"
+        runs.append((name, role, tool, tin, want, {"agent": agent}))
+skipped = {}
+if not BLOCK:
+    skipped["no sets_root_hidden block in the tested tree's map"] = len(SETS)
+else:
+    same_home = SR == os.path.realpath(os.path.expanduser("~/gov-os-eval"))
+    for case in SETS:
+        x = case[5]
+        if x["tag"] == "R" and not PLANTED:
+            skipped["R (SETS_PLANTED unset)"] = skipped.get("R (SETS_PLANTED unset)", 0) + 1
+        elif x.get("home") and not same_home:
+            skipped["names ~ or $HOME, and the root is not ~/gov-os-eval"] = skipped.get(
+                "names ~ or $HOME, and the root is not ~/gov-os-eval", 0) + 1
+        elif x.get("project") and not os.path.isdir(x["project"]):
+            skipped["its tree is absent"] = skipped.get("its tree is absent", 0) + 1
+        else:
+            runs.append(case)
+fails = 0
+for name, role, tool, tin, want, x in runs:
+    got, why = decide(role, tool, tin, x.get("agent"), x.get("cwd"), x.get("project"), x.get("direct", False))
+    good = (got == want or (want == "deny" and got.startswith("deny"))) and x.get("why", "") in why
     ok &= good
-    print(("ok   " if good else "FAIL ") + f"{name}: want {want}, got {got}" + ("" if good else f" | {p.stderr[-200:]}"))
+    fails += not good
+    tag = f"[{x['tag']}] " if "tag" in x else ""
+    print(("ok   " if good else "FAIL ") + f"{tag}{name}: want {want}, got {got}" + ("" if good else f" | {why[-240:]}"))
+print(f"cases run: {len(runs)}, failed: {fails}, sets cases: {len(SETS)}, skipped: "
+      + (", ".join(f"{k}: {v}" for k, v in skipped.items()) or "none"))
 print("PASS" if ok else "FAIL")
