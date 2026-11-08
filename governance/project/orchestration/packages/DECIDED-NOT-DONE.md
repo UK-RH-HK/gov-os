@@ -22,15 +22,15 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
-| 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | WAITS: after the 80 |
+| 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | **DUE NOW** (after the 80): an independent session re-words Q07, Q14 before any re-measure of the 138 |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
 | 13 | ADR-0002 | (8) refreshed, reviewed, to the owner before the lift's re-pin | **Refreshed and reviewed (READY round 2), to the owner 11-08** (`packages/ADR-0002-REFRESH/`, `3454d9db`); WAITS: the owner's acceptance, then `docs/adr/` replaced |
-| 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; v3 WAITS: after the 80 |
+| 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; rubric v3 **DUE NOW** (after the 80) |
 | 15 | the embedder trial | (14) a Wave 3 row | **DONE (parked)**: row to add with the Wave 3 list |
 | 16 | the old window scripts (F1) | (15) fixed or retired, never reused | **DONE 11-08**: `live_window.sh`, `score_once_window.sh` and `extend_window.sh` (same defect) moved to `drafts/score-once/retired/` with a README (scratch, untracked) |
-| 17 | GLOSSARY-1 | (6) (b): redesign beside the agent's words, toward decisions, for asking; retest on the 138 after the 80; build only if it helps | **DECIDED 11-08**; WAITS: after the 80 (the redesign's declaration first) |
-| 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | **READY TO LAUNCH 11-08 18:20**: the checker's pass unchanged 80; the ACT applied `15952bbf` (453 PASS); the pre-flight every check as expected (item 6 kept apart on the checker's whole-token confirmation, delta review READY); the declaration `16d3d61b`; the scripts re-pinned `d621d58b`. WAITS: the owner's go |
-| 19 | W2-139, W2-140 | (1)(g) held until after the 80 | WAITS: after the 80 |
+| 17 | GLOSSARY-1 | (6) (b): redesign beside the agent's words, toward decisions, for asking; retest on the 138 after the 80; build only if it helps | **DECIDED 11-08**; **DUE NOW** (after the 80): the redesign and its declaration, then the retest on the 138 |
+| 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | **DONE 11-08 21:46**: K9's bar PASSES, right end to end 78/79 (98.7 %), wrong claims 0 (`FRESH-80-RESULT.md`); every data condition run, all below the judged one; spent $109.05 |
+| 19 | W2-139, W2-140 | (1)(g) held until after the 80 | **DUE NOW** (the 80 ran 11-08): one batch, one green run, outside a GPU window (DEC-1093 (1)) |
 | 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |
 
 ## 1. Every item not done, partly done or waiting
