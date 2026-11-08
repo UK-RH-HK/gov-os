@@ -28,7 +28,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; v3 WAITS: after the 80 |
 | 15 | the embedder trial | (14) a Wave 3 row | **DONE (parked)**: row to add with the Wave 3 list |
 | 16 | the old window scripts (F1) | (15) fixed or retired, never reused | **DONE 11-08**: `live_window.sh`, `score_once_window.sh` and `extend_window.sh` (same defect) moved to `drafts/score-once/retired/` with a README (scratch, untracked) |
-| 17 | GLOSSARY-1 | (6) OPEN: the owner marked no option | WAITS: the owner |
+| 17 | GLOSSARY-1 | (6) (b): redesign beside the agent's words, toward decisions, for asking; retest on the 138 after the 80; build only if it helps | **DECIDED 11-08**; WAITS: after the 80 (the redesign's declaration first) |
 | 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | Scripts **built, reviewed READY, pinned 11-08** (`b9a729fa`); readiness review done (7 of 7, F2 to the operator); WAITS: the checker's pass, the ACT applied, the transcripts moved; then pre-flight, declaration, control, the 80 |
 | 19 | W2-139, W2-140 | (1)(g) held until after the 80 | WAITS: after the 80 |
 | 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |

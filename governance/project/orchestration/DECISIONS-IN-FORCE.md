@@ -306,7 +306,8 @@ other restart is an ACT.
   the operator before the 80. The seven-reviewer readiness review (fix only fail-open or verdict-breaking, two rounds;
   any retrieval change reruns E0 and E2 on the 138 first). If retrieval changes after the verdict, the 138 re-measured
   at the release commit (W2-27 item (a)). **Keep the 0.6B** (M3, M1 for data on the 80). G3 no change before the 80.
-  **The glossary (item 6) OPEN.** The overdue items' fates: W2-141, W2-20's rebuild, ADR-0002, a no-private-reranker
+  **The glossary (item 6): (b)**, redesigned beside the agent's own words, ranked toward decisions, for asking,
+  retested on the 138 after the 80; `gov glossary` built only if it helps. The overdue items' fates: W2-141, W2-20's rebuild, ADR-0002, a no-private-reranker
   ticket before the lift; W2-130 and P-SELECT-GRAPH now on the CPU; G1's fewer pairs and P-LB-PRODUCT-1 after the lift;
   Q07/Q14 after the 80; the label audit at each release cut and before a new verdict set (rubric v3 after the 80); the
   embedder trial a Wave 3 row; the keystone count from the plan's list; the old window scripts fixed or retired.

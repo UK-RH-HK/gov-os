@@ -13845,7 +13845,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (agents search and ask in the repository's own words, so more questions are answered right).
 
 ### DEC-1097 — The experiments decided: the fresh 80 judges window 4's configuration (search again once) against K9's end-to-end bar; ACT-GUARD-SETS-1 rebuilt and applied before it; a seven-reviewer readiness review; keep the 0.6B; G3 no change; the overdue items given their fates
-- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) OPEN (the owner marked no option) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE
+- **Status:** ACCEPTED (owner, 2026-11-08, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-08)`), item (6) decided (b) by the owner (chat, 2026-11-08, after the 09:00 digest) · **Under:** DEC-1092 (4), DEC-1095 (3), DEC-1087 (12), DEC-1083 (2), DEC-1084, DEC-1082 (3), DEC-1090 (4), DEC-1093, DEC-1094 (1), DEC-1096, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-08), after reading FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, ACT-GUARD-SETS-1 and DECIDED-NOT-DONE
 - **Decision, the experiments:**
   - (1) **FRESH-80-1:** (a) the configuration judged is window 4's pin (`pin-bcea09060ebc`), the pool on, today's
     bundle (6,000 tokens), search again once (A2); (b) at window 4's commit `c00d525f`, with the visible-40 control
@@ -13865,9 +13865,10 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (4) **The release:** if retrieval changes after the verdict, the 138 are measured again at the release commit
     before it is cut (E0's figures and E2's A2, McNemar against the verdict commit's), a fixed step in W2-27's item (a).
   - (5) **M3-ADOPTION-1:** keep the 0.6B (branch (c)); M3 and M1 measured on the 80 for data only.
-  - (6) **GLOSSARY-1:** OPEN: (a) parked as a Wave 3 row, the prototype kept; (b) kept in Wave 2, redesigned beside
-    the agent's own words, ranked toward decisions and for asking, retested on the 138 after the 80, `gov glossary`
-    built only if it helps; (c) built now, for asking. The owner's message named the three without marking one.
+  - (6) **GLOSSARY-1: (b)** (the owner, 2026-11-08, after the 09:00 digest): kept in Wave 2; redesigned beside the
+    agent's own words (never in place of them), ranked toward decisions and ticket titles and definitions, and for
+    asking; retested on the 138 after the 80, declared first, against E2; `gov glossary` (W2-143, W2-144) built only
+    if the retest helps. Not in the fresh-80 configuration; the prototype's figure on the 80 is data only.
   - (7) **G3 (overlapping slices):** no change before the 80; a ticket after the lift if the review finds it worth it.
 - **Decision, the overdue items (DECIDED-NOT-DONE §2):**
   - (8) **Before the lift's re-pin:** W2-141 (tests first, built, reviewed); W2-20 rebuilt to its launch line
@@ -13932,3 +13933,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.479 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1095. Next free id: DEC-1096. |
 | 0.480 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1096. Next free id: DEC-1097. |
 | 0.481 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 (item 6 open; the DECIDED-NOT-DONE line standing). Next free id: DEC-1098. |
+| 0.482 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 item (6) decided (b). Next free id: DEC-1098. |
