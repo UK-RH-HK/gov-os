@@ -12,14 +12,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0. DEC-1097's fates (2026-11-08): the tracking table (tick with the commit when done)
 | # | item | fate (DEC-1097) | state |
 |---|---|---|---|
-| 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | IN PROGRESS: rebuild started 11-08 |
+| 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | **Rebuilt and rehearsed 11-08** (`232efc47`, line rule `e6b220c7`; readiness 5 round 2: F1 closed); `apply.sh check` exit 0. WAITS: the owner's operator applies (§3), then the CTO's live guard check (about 453, PASS); the writer's and checker's transcripts moved into `~/gov-os-eval/transcripts/` (readiness 5 F2) |
 | 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | NOT STARTED |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)** |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
 | 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **List DONE 11-08** (`2f9c80b1`, `W2-130-SITTING.md`, 150 ids grouped); marks a1/a2 and sources b1 drafted, in independent audit; a3 and b2 after the sitting |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE 11-08**: `P-SELECT-GRAPH-RESULT.md` to the owner (recommendation: do not build); WAITS: the owner's word |
-| 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | IN PROGRESS: with the ACT's rebuild |
+| 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | In the ACT (its `apply` deletes them); WAITS: the operator. Its three support files stay, a row for W2-84's close |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | WAITS: after the 80 |
