@@ -1,29 +1,33 @@
 # The fresh 80, declared before any search (FRESH-80-1 §3.4; DEC-1097 (1))
 
-DRAFT for the CTO (session `ad44f5fe`), 2026-11-08. **Committed before any search of the 80**, after the pre-flight;
+Declared by the CTO (session `ad44f5fe`), 2026-11-08, after the pre-flight (every check as expected) and before any search of the 80; the scripts pinned `FRESH80-REVIEWED.sha256` = `d621d58bc697…`. **Committed before any search of the 80**, after the pre-flight;
 the blanks (four underscores) are filled from the pre-flight's output. Counts only: no question, label or answer of the 80 is
 named here.
 
 ## 1. The set
 - **The set:** `memory-verdict-2`, part hidden, 80 questions (DEC-1078), in the sets root (`~/gov-os-eval`).
-- **ACT-GUARD-SETS-1 applied** (DEC-1097 (2)) at commit `____`; the guard check ____; the live worktrees merged
-  ____. The tools refuse to write anything unless the main tree's `sets_root_hidden` block (with the run folder's and
+- **ACT-GUARD-SETS-1 applied** (DEC-1097 (2)) at commit `15952bbfa` (the owner's operator, 2026-11-08); the guard check 453 run, 0 failed, PASS (live hook
+  `bd545af83198`); the live worktrees merged: none live (no worker or lead running; a reused worktree merges integrate
+  before its next launch). The tools refuse to write anything unless the main tree's `sets_root_hidden` block (with the run folder's and
   the 80's globs) and the live hook's sets-root rule are in place (checked by content).
-- **Its digest** (`LC_ALL=C sha256sum *.yaml | sha256sum` in its folder, `preflight.py` item 1): `____`. It is
+- **Its digest** (`LC_ALL=C sha256sum *.yaml | sha256sum` in its folder, `preflight.py` item 1): `c4668b57b32f4ce8c8a46d073b5cee35faf5dc17942a14d4a5347da783ccc60c`. It is
   recomputed by `run_measure.sh` before USED and before each attempt, by the reader at its start, and by the figures,
   against this line and the pre-flight's. The checker's
-  digest after its staleness pass matches: ____ (yes/no). Files changed since DEC-1078's close: ____ (the checker's
-  re-labelled count: ____).
-- **Anchors at the measured commit** (item 2, the measure's own loader): found once ____; found more than once ____;
-  missing and re-anchored by commit ____; missing with lines unchecked ____; unresolved ____. Any source not found
+  digest after its staleness pass matches: yes. Files changed since DEC-1078's close: 0 (the checker's re-labelled
+  count: 0: unchanged 80, changed 0, ambiguous 0; the writer's step skipped).
+- **Anchors at the measured commit** (item 2, the measure's own loader): found once 179; found more than once 0;
+  missing and re-anchored by commit 0; missing with lines unchecked 0; unresolved 0 (of 179 source alternatives). Any source not found
   once was fixed by the writer and checker before this record, or stays as the measure scores it (not found), named:
-  ____.
-- **The nonexistent-id question** (item 6): 1 by category; its id-shaped tokens exist nowhere in the clone: ____
-  (yes/no). If no, it is dropped from every figure and the drop reported (decided in FRESH-80-1 item 6): the declared
+  none.
+- **The nonexistent-id question** (item 6): 1 by category; it names no token the product reads as an id
+  (`lexical.ids_in`), so the product's check cannot run; the owner's checker searched the tree at `c00d525f` for the
+  whole token: nowhere. **Kept apart, not dropped** (`--item6-outside-nowhere`, reviewed READY); DEC-1071 (5)'s
+  `UNRESOLVED_IDS` stop is **not applicable** to it (the product cannot stop on a token it does not read as an id), so
+  it is reported apart on the reader's answer alone, outside the bar. If no, it is dropped from every figure and the drop reported (decided in FRESH-80-1 item 6): the declared
   drop, not a stop.
-- **The families line** (item 5): `families: contract (4 members), kernel (3 members), agents (2 members)`: ____.
-- **The clone** (item 12): clean ____; HEAD `c00d525fd420` ____; the pool's lines as window 4 ____; gov at
-  `pin-bcea09060ebc` ____; store sha256 `____` (recorded again before and after the run).
+- **The families line** (item 5): `families: contract (4 members), kernel (3 members), agents (2 members)`: as required.
+- **The clone** (item 12): clean yes; HEAD `c00d525fd420` yes; the pool's lines as window 4 yes; gov at
+  `pin-bcea09060ebc` yes; store sha256 `60ea492753004905…` (recorded again before and after the run).
 
 ## 2. The judged condition (one only; DEC-1097 (1)(a))
 - **Retrieval:** window 4's pin `pin-bcea09060ebc` (`~/.local/bin/gov`), the pool on, on E0's clone
@@ -38,7 +42,7 @@ named here.
   `f0099fd67ef0cb6d9f6f296a86dc4893a1fe15f3110e30074397d7cbcab9d60a`); search again in its own words, later searches
   live with the pinned gov on the same clone; at most three attempts; **A2 is the A3 run cut at two**, computed as in
   E2 (a request for one more search at the cut counts as not found).
-- **The labelling rubric:** `docs/research/memory-measure-audit/RUBRIC.md` version ____ (the 80's writer's).
+- **The labelling rubric:** `docs/research/memory-measure-audit/RUBRIC.md` version 2 (`cc9c94d42a54`; the 80's writer's).
 - **Grading:** `claude-opus-5-5`'s grade counts; `claude-sonnet-5-5`'s agreement reported; E2's grader instruction. A
   grade that never comes fails closed (a wrong claim) and is counted. No re-grading after the run.
 - **The citation:** the measure's matcher (`_match`), source families on; right end to end = the answer graded
@@ -51,7 +55,7 @@ named here.
 - **The bar (K9), on the observed figure:** right end to end at A2 **at least 85 %** (at least **68 of 79**; 67 is
   84.8 % and misses) **and** wrong claims **at most 5 %** (at most **3 of 79**; 4 is 5.1 % and misses). **Target 95 %**
   (at least 76 of 79).
-- **Beside it, never in it:** the 95 % interval (____: the exact Clopper-Pearson interval, or Wilson's as in
+- **Beside it, never in it:** the 95 % interval (the exact Clopper-Pearson interval named, Wilson's beside it; the exact Clopper-Pearson interval, or Wilson's as in
   FRESH-80-1 §4.3's example; both are printed); hit@5 (and hit@10, hit@20, MRR, in the bundle, full evidence); "answer
   correct, citation aside"; the stricter of the two grades; grader agreement; A1 and A3; the nonexistent-id question
   (right or not, and whether the product stopped with `UNRESOLVED_IDS` naming its id, DEC-1071 (5)); the failed later
