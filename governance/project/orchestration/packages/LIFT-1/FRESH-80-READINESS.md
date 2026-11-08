@@ -17,9 +17,19 @@ W2-137 to W2-142 matter only if the 80 is measured at a later commit.
   fact with new source and lines); *ambiguous* (the repository states it two ways).
 - **Check above all:** ticket and decision statuses; anything superseded or amended (a decision's *Changed by* line);
   counts and figures; paths and function names that moved; the nonexistent-id question (its id exists nowhere).
-- **The writer** updates only *changed* entries, one round, keeping question, category and commit field; a changed
-  entry is re-labelled to `c00d525f`, the old label kept in `retired/`.
-- **To the CTO:** counts only (unchanged, changed, ambiguous, re-labelled) and the new combined sha256 of the 80.
+- **The writer** updates only *changed* and *ambiguous* entries, one round, keeping the question and its category:
+  - a *changed* entry gets the corrected fact and its new source, and **its commit field set to `c00d525fd420`**; the
+    old label is kept in `memory-verdict-2/retired/` (never inside `hidden/`);
+  - an *ambiguous* entry gets the second place as an alternative source, so the gold accepts either (as DEC-1078 (2)'s
+    cross-check added whole places that also state an answer);
+  - **the nonexistent-id question:** if its id now exists, flag it only and never change the question (FRESH-80-1
+    item 6 drops it from every figure, decided before the run).
+- **What the pre-flight checks, which the writer must respect:** no stray files (`*.yaml~`, swap files); the folder
+  mode 700; unchanged files keep their modification times (edit in place, never copy the folder back); the number of
+  files changed equals the entries re-labelled plus any later anchor fixes.
+- **To the CTO:** counts only (unchanged, changed, ambiguous, re-labelled, the nonexistent id flagged yes/no) and the
+  new combined digest, computed exactly as: `cd <the set's folder> && LC_ALL=C sha256sum *.yaml | sha256sum`.
+  (Corrected 2026-11-08 after readiness reviewer 7's F3 and F4.)
 - **Cost:** about 1 to 2 hours.
 - **What could have changed (11-05 to `c00d525f`):** DEC-1079 (mxbai dropped), DEC-1080 (the CTO's command rule),
   DEC-1081 (W2-128 filed), DEC-1082 (permissions), DEC-1083 (K9 bar 85 % on the fresh 80, W2-32 S6 dropped, W2-15b out
