@@ -17,7 +17,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)** |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
 | 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
-| 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | IN PROGRESS: started 11-08 |
+| 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **List DONE 11-08** (`2f9c80b1`, `W2-130-SITTING.md`, 150 ids grouped); marks a1/a2 and sources b1 drafted, in independent audit; a3 and b2 after the sitting |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | IN PROGRESS: started 11-08 |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | IN PROGRESS: with the ACT's rebuild |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
@@ -31,6 +31,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 17 | GLOSSARY-1 | (6) OPEN: the owner marked no option | WAITS: the owner |
 | 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | IN PROGRESS: scripts and review started 11-08 |
 | 19 | W2-139, W2-140 | (1)(g) held until after the 80 | WAITS: after the 80 |
+| 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |
 
 ## 1. Every item not done, partly done or waiting
 

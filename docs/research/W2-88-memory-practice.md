@@ -259,8 +259,8 @@ Records in `governance/project/orchestration/packages/LIFT-1/` (E0 to E5, E0B, E
 - **Judge memory by what an agent answers, not by rank alone.** hit@5 is 106/138, but the gold is in the first bundle
   for 123, and a reader answering from the bundle alone was right end to end (answer correct, citation right) on
   83.3 % at one search.
-- **Search again once** when the first bundle does not answer: 92.8 % (128/138), wrong claims unchanged (E2,
-  DEC-1092). This is the standing practice (DEC-1094): in the briefs now, the kernel skills by W2-142.
+- **Search again once** when the first bundle does not answer: 92.8 % (128/138); wrong claims 3 against 2 at one
+  search, all on the hidden set (E2, DEC-1092). This is the standing practice (DEC-1094): in the briefs now, the kernel skills by W2-142.
 - **A bigger bundle does not help:** 12,000 tokens against 6,000 gave no gain (E5); today's bundle was best of five
   shapes (E3).
 - **A better reranker does not help end to end:** M3 and M1 lift hit@5 to 117 and 114, but agents answered 111 and 113
