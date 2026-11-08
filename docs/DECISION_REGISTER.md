@@ -13495,7 +13495,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   drift) and question 4 (prompts only where they carry a decision).
 
 ### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar)
 - **Decision:**
   - **D9-FATES:**
     - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
