@@ -24,7 +24,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | WAITS: after the 80 |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
-| 13 | ADR-0002 | (8) refreshed, reviewed, to the owner before the lift's re-pin | NOT STARTED |
+| 13 | ADR-0002 | (8) refreshed, reviewed, to the owner before the lift's re-pin | **Refreshed and reviewed (READY round 2), to the owner 11-08** (`packages/ADR-0002-REFRESH/`, `3454d9db`); WAITS: the owner's acceptance, then `docs/adr/` replaced |
 | 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; v3 WAITS: after the 80 |
 | 15 | the embedder trial | (14) a Wave 3 row | **DONE (parked)**: row to add with the Wave 3 list |
 | 16 | the old window scripts (F1) | (15) fixed or retired, never reused | **DONE 11-08**: `live_window.sh`, `score_once_window.sh` and `extend_window.sh` (same defect) moved to `drafts/score-once/retired/` with a README (scratch, untracked) |
