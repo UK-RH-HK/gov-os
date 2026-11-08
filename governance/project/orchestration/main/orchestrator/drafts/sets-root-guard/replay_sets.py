@@ -1,4 +1,4 @@
-"""DEC-1082 (3)'s replay: recent tool calls through the hook before and after the change, in the rehearsal clone.
+"""DEC-1082 (3)'s replay (DEC-1097 (2): runs/fresh-80 added to the hidden folders, 2026-11-08): recent tool calls through the hook before and after the change, in the rehearsal clone.
 
 Reads only the tool calls' inputs (tool name, input, cwd) of assistant records in the transcripts of the main tree's
 and the worktrees' sessions, and the first user message's first 300 characters to tell the session's role (as G-14's
@@ -94,7 +94,7 @@ def calls(path, since):
 
 
 HIDDEN = ("/fixtures/evaluation/memory-retrieval/hidden", "/fixtures/evaluation/memory-verdict/",
-          "/fixtures/evaluation/memory-verdict-2/", "/transcripts")
+          "/fixtures/evaluation/memory-verdict-2/", "/transcripts", "/runs/fresh-80")  # DEC-1097 (2): runs/fresh-80
 
 
 def kind(p):

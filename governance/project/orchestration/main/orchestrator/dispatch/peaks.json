@@ -1,95 +1,88 @@
 {
- "computed": "2026-11-08 00:11:04",
+ "computed": "2026-11-08 07:15:07",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 7.48,
+   "cpu_p95": 7.06,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 8893552,
+   "rss_kb_p95": 8895892,
    "rss_kb_max": 13410904,
    "samples": 8512
   },
-  "test_run": {
-   "cpu_p95": 16.24,
-   "cpu_max": 294.7,
-   "rss_kb_p95": 3297608,
-   "rss_kb_max": 6002916,
-   "samples": 3189
-  },
-  "reranker": {
-   "cpu_p95": 6.8,
-   "cpu_max": 13.9,
-   "rss_kb_p95": 9661408,
-   "rss_kb_max": 14331404,
-   "samples": 1931
-  },
   "embedding": {
-   "cpu_p95": 7.63,
+   "cpu_p95": 7.6,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2205984,
+   "rss_kb_p95": 2188180,
    "rss_kb_max": 8676476,
    "samples": 8512
   },
-  "rebuild": {
-   "cpu_p95": 0.44,
-   "cpu_max": 126.32,
-   "rss_kb_p95": 415388,
-   "rss_kb_max": 637492,
-   "samples": 3348
+  "test_run": {
+   "cpu_p95": 15.99,
+   "cpu_max": 294.7,
+   "rss_kb_p95": 3257228,
+   "rss_kb_max": 6002916,
+   "samples": 2844
   },
-  "claude": {
-   "cpu_p95": 0.29,
-   "cpu_max": 543.86,
-   "rss_kb_p95": 1723120,
-   "rss_kb_max": 3632804,
-   "samples": 8187
-  },
-  "codegraph": {
-   "cpu_p95": 0.22,
-   "cpu_max": 1.21,
-   "rss_kb_p95": 308532,
-   "rss_kb_max": 1169916,
-   "samples": 1359
+  "reranker": {
+   "cpu_p95": 7.38,
+   "cpu_max": 13.9,
+   "rss_kb_p95": 10008168,
+   "rss_kb_max": 14331404,
+   "samples": 1629
   },
   "gitleaks": {
-   "cpu_p95": 0.29,
+   "cpu_p95": 0.27,
    "cpu_max": 0.89,
-   "rss_kb_p95": 1903852,
+   "rss_kb_p95": 1848420,
    "rss_kb_max": 5162396,
-   "samples": 1641
+   "samples": 1422
+  },
+  "rebuild": {
+   "cpu_p95": 0.2,
+   "cpu_max": 20.13,
+   "rss_kb_p95": 413668,
+   "rss_kb_max": 637492,
+   "samples": 3473
+  },
+  "codegraph": {
+   "cpu_p95": 0.23,
+   "cpu_max": 1.04,
+   "rss_kb_p95": 331636,
+   "rss_kb_max": 1169916,
+   "samples": 1183
+  },
+  "claude": {
+   "cpu_p95": 0.21,
+   "cpu_max": 543.86,
+   "rss_kb_p95": 1629284,
+   "rss_kb_max": 3632804,
+   "samples": 8224
   },
   "git": {
    "cpu_p95": 0.01,
    "cpu_max": 0.02,
-   "rss_kb_p95": 117720,
+   "rss_kb_p95": 103276,
    "rss_kb_max": 164968,
-   "samples": 133
+   "samples": 116
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 9.870000000000001,
-   "cpu_max": 126.32,
-   "rss_kb_p95": 2910416,
+   "cpu_p95": 8.21,
+   "cpu_max": 20.13,
+   "rss_kb_p95": 2898036,
    "rss_kb_max": 9074876,
-   "samples": 3348
+   "samples": 3473
   }
  },
  "lead": {
-  "rss_kb_p95": 3930644,
-  "rss_kb_max": 7859056,
-  "samples": 6798
+  "rss_kb_p95": 3692092,
+  "rss_kb_max": 6669940,
+  "samples": 5307
  },
  "lead_own_max_kb": {
-  "DAEO-0z8c": 6946292,
-  "DAEO-jsg1": 4054080,
-  "DAEO-ouet": 4876140,
-  "DAEO-wq2b": 7553184,
-  "DAEO-l78m": 5165320,
-  "DAEO-k7hz": 5971732,
-  "DAEO-3r1j": 5904760,
-  "DAEO-4eux": 3432036,
-  "DAEO-arrl": 7859056,
   "DAEO-n0wb": 5147624,
   "DAEO-zqvn": 5729456,
+  "DAEO-l78m": 5165320,
+  "DAEO-k7hz": 5971732,
   "DAEO-zpdj": 4910660,
   "DAEO-nqa2": 6338316,
   "DAEO-a3u2": 4893032,
@@ -102,13 +95,11 @@
   "DAEO-jpr0": 6669940
  },
  "lead_outside": {
-  "rss_kb_p95": 2173028,
+  "rss_kb_p95": 2097448,
   "rss_kb_max": 5042316,
-  "samples": 393
+  "samples": 383
  },
  "lead_own_outside_max_kb": {
-  "DAEO-ouet": 2521636,
-  "DAEO-arrl": 263644,
   "DAEO-n0wb": 2296324,
   "DAEO-zqvn": 5042316,
   "DAEO-l78m": 1140652,
@@ -125,14 +116,14 @@
   "DAEO-jpr0": 458740
  },
  "lead_inside": {
-  "rss_kb_p95": 4016360,
-  "rss_kb_max": 7859056,
-  "samples": 6065
+  "rss_kb_p95": 3821664,
+  "rss_kb_max": 6669940,
+  "samples": 4669
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 614644.0,
+  "rss_kb_p95": 609566.0,
   "rss_kb_max": 1464452.0,
-  "samples": 3189
+  "samples": 2844
  },
- "slot_run_kb": 1843332
+ "slot_run_kb": 1724216
 }

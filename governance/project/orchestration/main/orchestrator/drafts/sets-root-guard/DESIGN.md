@@ -286,3 +286,60 @@ It relies on these pin lines: `RUNTIME_REFUSAL` (`reads.py:101`), the `[["cat", 
   directory. Its Read of a planted hidden file must be allowed.
 - **Safety:** never point the hook at the real `~/gov-os-eval`. After the ACT is applied, only the L cases run on the
   live tree.
+
+## E. The rebuild of 2026-11-08 (DEC-1097 (2))
+- **Why:** `apply.sh check` stopped on 11-08. Only the map had moved: W2-61h's `evaluation_families` (9 lines, before
+  `role_paths:`) took it from `cc8139a1c8f4` to `6d79946fdbbd`. The live hook is still `e406653ef6c9`, as built. The
+  pin moved to `pin-bcea09060ebc` (window 4), but its `gov/guard/` is byte for byte the old pin's (`reads.py`
+  `0d67b0f94f17`, `heldout.py`, `decide.py` the same), so every name in B is where B says.
+- **A, changed:** the block now goes after line 553 (the end of `role_paths:`), and its hidden list gains
+  `runs/fresh-80/**`: the fresh 80's reader run (questions, gold answers, answers) and kept outputs (FRESH-80-1 §2
+  item 7). Every other folder under `runs/` stays open (W5, W6, S9 and F10 to F14 hold it). The comment says so.
+- **B, unchanged:** the candidate hook is the same file (`42749e673c50`). It reads the globs from the block, so the new
+  glob needs no code.
+- **The fresh-80 lines:** the CTO (orchestrator, a refused role) runs the fresh-80 scripts with only `--sets-root
+  ~/gov-os-eval` on the line; they derive `memory-verdict-2` and `runs/fresh-80` in their own code. The judge reads a
+  command's words, the paths glued into them and its inline code (`-c`, heredocs), never a script file's text
+  (`reads.py` `word()`, 819-838), so the line is allowed and a script that names those folders inside is not refused
+  for it. A line that names `runs/fresh-80/...` or `memory-verdict-2/...` (an `--out`, a `GOV_KEEP=`, a `--set`, a
+  `test -e .../USED`) is refused. So: the runner checks `USED` itself, and every count the CTO reads must be printed by
+  a script, not read from `runs/fresh-80/` (FRESH-80-1 §2 items 14 and 20).
+- **The walk bound:** the guard walks a hidden part for names when a search starts at or above it, and refuses (fails
+  closed) when a part holds more than 10,000 files (`reads.py` `_MOST_FILES`). The 80's folder holds far fewer.
+- **DEC-1061 (4), W2-84's hidden-half cases deleted with the ACT:** the six files under `tests/acceptance/W2-84/`
+  that `tests/optin-lifted-guard.txt` lists under "Decision 4", and `tests/unit/guard/test_w2_84_trees.py`. Every one
+  of the latter's 13 test functions (34 cases) tests the old hidden-half rule under every tree (trees, links, the
+  shared store, fail closed, the unmeasured session's cost), so the whole file goes. `optin-lifted-guard.patch` takes
+  out their 7 lines, the "Decision 4" header and the `hidden-half` tag line (no entry carries the tag after). No other
+  test, list or tool names them (`git grep`, docs, tickets and orchestration records aside). `apply.sh` checks their
+  hashes, backs them up, deletes them, and `undo` restores them byte for byte with their modes.
+- **Left in `tests/acceptance/W2-84/`:** `README.md` (the KPI map), `conftest.py` and `w2_84_support.py`. They are not
+  cases; they serve only the deleted ones. For the CTO to decide: delete them in the same commit, or leave them.
+- **C, added:** the F cases (F1 to F23, 171 over the roles) in `guard4_check.candidate.py`; the existing 70 and the 194
+  S/G/B/M/X/W/T cases are unchanged. F22 and F23 state a known limit as allow: `GOV_KEEP=<root>/runs/fresh-80/...` on
+  the line is not refused (an assignment's value is not read as a path, and the write it leads to is not resolved).
+
+## F. The line rule (readiness review 5 F1; the CTO's option A, within DEC-1097 (2)/(3)), 2026-11-08
+- **The gap:** a path the shell builds at run time passes the judge. `D=~/gov-os-eval; cat $D/runs/fresh-80/rows/q01.json`,
+  `cd "$D" && cat …`, `grep -r`, `find` and `ls` with `$D` were allowed, because `decide._expand_token` expands only
+  the hook's own environment. The in-repo hidden rule has the same limit; this change covers the sets root only.
+- **The rule** (`sets_line_refusal`, after the judge, for the six refused roles, Bash only, on the judge's own view of
+  the line with cat/tee heredocs as data): a line that names the sets root (its real path, `~/…`, `$HOME/…`,
+  `${HOME}/…`, an assignment's value included) is refused when it also
+  - (a) names a hidden folder as a path: a block glob's literal head with `fixtures/evaluation/` dropped
+    (`memory-retrieval/hidden`, `memory-verdict`, `memory-verdict-2`, `transcripts`, `runs/fresh-80`, and each
+    measured set's), with a `/` beside it and whole names only (`~/gov-os-runs/fresh-80` and the set name
+    `memory-verdict-2` as a bare argument do not match); or that folder's last name as a quoted string (`'fresh-80'`,
+    the `os.path.join` form);
+  - (b) holds a command substitution anywhere (`$(`, a backtick, `<(`, `>(`, `$'`), a change of folder aimed at the
+    root (`cd`/`pushd` to it, `-C`, `--chdir`, `--directory`, `chdir(`), or, from the word that names the root on, a
+    shell variable (`$!`, `$?`, `$$`, `$#`, `$-`, `$0` aside, and `$HOME` unless the line assigns `HOME=`), a glob or
+    brace (`* ? [ {`), or a `cd`/`pushd`.
+- **Stays allowed:** a plain `--sets-root <root>` with variables only before it and `$!` after it: every command of
+  `drafts/fresh80/README.md` (A1–A23, in `~` and absolute forms); `ls <root>/runs`, `cat <root>/runs/e0/counts.txt`.
+- **Changes to the earlier cases:** M4 (a `cd` to the root), M6 and M7 (a substitution), B14 (inline code naming a
+  hidden folder) and F22/F23 (`GOV_KEEP=` naming the 80's folder) were allow and are now deny. The override now
+  serves X1, X2 and the README's `proc.sh wait $(cat …/measure.pid)` (A7).
+- **Known limits:** a root spelled in pieces (`A=~; $A/gov-os-eval`, `expanduser('~')+'/gov-os-eval'`), a positional
+  parameter before the root (`bash -c '… $1/…' _ <root>`), and the in-repo hidden folders, which keep the judge's
+  limit.

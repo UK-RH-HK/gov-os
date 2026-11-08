@@ -66,5 +66,33 @@
     "W2-138": "MERGED (store commit in results, resolved once, CONTINUATION_INVALID names both commits, the skill line; review READY); live at the lift",
     "W2-137": "MERGED (the reranker request cap 16 -> 64; review READY); S5 live measure next; live at the lift",
     "W2-136": "MERGED (gov plan and the launch check; review READY; F2 an entry criterion of W2-20); live at the lift with W2-20"
-  }
+  },
+  "keystone_lists": {
+    "keystone-9": [
+      "W2-32",
+      "W2-11",
+      "W2-33",
+      "W2-60a",
+      "W2-60b",
+      "W2-128",
+      "W2-81",
+      "W2-93",
+      "W2-121",
+      "W2-115",
+      "W2-56",
+      "W2-20",
+      "W2-88",
+      "W2-129",
+      "W2-124",
+      "W2-94",
+      "W2-16",
+      "W2-23",
+      "W2-52",
+      "W2-105",
+      "W2-110",
+      "W2-90b"
+    ],
+    "keystone-7": "done: DEC-1089"
+  },
+  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

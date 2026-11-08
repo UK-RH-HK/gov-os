@@ -1,0 +1,30 @@
+--- a/tests/optin-lifted-guard.txt
++++ b/tests/optin-lifted-guard.txt
+@@ -10,7 +10,6 @@
+ #                files' reads, root searches, unknown tools; G-6: the freeze's lift refusal, mirror and ancestry)
+ #   containment  the post-command check, commit judging, its records, the template's post-tool lines (G-5)
+ #   lifted-hooks the Stop hook's line (R-7)
+-#   hidden-half  the guard's hidden-half rule under every tree (G-3, ACT-D8): deleted with the rule at D-9 (decision 4)
+ #   cap-62       CAP-62's dangerouslyDisableSandbox escape hatch, beyond the five rules (decision 7)
+ 
+ # ---- Decision 3a: the full guard's cases, moved now (the product's switches G-4 to G-6 bring their own) ----
+@@ -429,19 +428,6 @@
+ tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[stop[0]]  # the Stop hook's line (R-7; DEC-1061 (3a))
+ tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[stop[0]]  # the Stop hook's line (R-7; DEC-1061 (3a))
+ 
+-# ---- Decision 4: W2-84's hidden-half cases (opt-in now; deleted with the guard's rule at D-9) ----
+-
+-# W2-84
+-tests/acceptance/W2-84/test_w2_84_code_under_test.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-tests/acceptance/W2-84/test_w2_84_every_tree.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-tests/acceptance/W2-84/test_w2_84_fails_closed.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-tests/acceptance/W2-84/test_w2_84_git_store.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-tests/acceptance/W2-84/test_w2_84_links.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-tests/acceptance/W2-84/test_w2_84_unchanged.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-
+-# unit/guard
+-tests/unit/guard/test_w2_84_trees.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted at D-9)
+-
+ # ---- Decision 7: CAP-62's escape hatch (opt-in; the five-rule profile does not refuse it) ----
+ 
+ # W1-47

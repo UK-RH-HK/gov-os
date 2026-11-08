@@ -4,7 +4,19 @@
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-08: §0 the state, §1 the
 owner's hold, §2 the emergency, §3 decided but not done, §5 the order after the owner decides, §6 the watchers). Next
-free id **DEC-1097**. The blocks below are newest first; older ones are history, kept for their figures.
+free id **DEC-1098**. The blocks below are newest first; older ones are history, kept for their figures.
+- **11-08 later, session `ad44f5fe`: THE FRESH 80 READY BUT FOR THE OWNER'S STEPS** (`packages/LIFT-1/FRESH-80-READINESS.md`
+  §7). Scripts reviewed READY (round 2) and pinned `b9a729fa`; ACT-GUARD-SETS-1 rebuilt with the variable-path line
+  rule, rehearsed 0 failures (`e6b220c7`); the seven readiness reviews done (records in `reviews/readiness-*.md`).
+  **Waits on the owner:** the checker's pass (brief §2), the operator applies the ACT (§3) and moves the writer's and
+  checker's transcripts into `~/gov-os-eval/transcripts/`, item 6 (the glossary). Committed today: W2-130 a1/a2/a0/b1
+  (`e12f8a30`), the sitting list (`2f9c80b1`), P-SELECT-GRAPH-RESULT (`91cf43d9`, do not build), ADR-0002-REFRESH
+  (`3454d9db`, READY round 2), the register marks (`7a6dad58`, `3552f0f5`). Next: item 8 (W2-141, W2-20 rebuilt with
+  DEC-1037's line, W2-145 filed from `drafts/w2-145/`, all tests first). Nothing running.
+- **11-08, session `ad44f5fe` (after compaction): DEC-1097 recorded (`e66f2a69`); work started.** The experiments
+  decided (START-NEXT-SESSION §1); item 6 (the glossary) OPEN. Agents running: the ACT rebuild, the fresh-80 scripts,
+  readiness reviewers 1-4 and 6, P-SELECT-GRAPH, W2-130, ADR-0002, W2-145's draft. Done: the old window scripts
+  retired; the keystone count from the plan's list (K9 in progress). DECIDED-NOT-DONE §0 tracks DEC-1097's fates.
 - **11-08, session `ad44f5fe`: HAND-OVER BEFORE COMPACTION.** The owner: "Hold the experiments' decisions … Start
   nothing on the fresh 80 until then." The six items the owner asked for were pasted in chat and are kept in
   `packages/LIFT-1/FRESH-80-1.md` (§2, §3.5) and `packages/LIFT-1/FRESH-80-READINESS.md` (new).

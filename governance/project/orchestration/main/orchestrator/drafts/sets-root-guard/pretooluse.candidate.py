@@ -10,7 +10,9 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
   2b (DEC-1082 (3)). no reads, and no writes the guard resolves, of the sets root's hidden folders (the hidden halves
      kept outside the repository, the measure's --sets-root): the main tree's path-map.yaml sets_root_hidden: names the
      root, its hidden globs and the roles refused them; each role a set in evaluation_sets measures is refused that
-     set's hidden globs too; under the sets root and in every tree. No block, no check;
+     set's hidden globs too; under the sets root and in every tree. No block, no check. For those roles a Bash line
+     that names the sets root is refused when it also names a hidden folder, or builds a path after it (a variable,
+     a substitution, a glob, a cd; DEC-1097 (2), readiness review 5 F1): a plain --sets-root <root> stays allowed;
   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
      docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
      own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
@@ -232,6 +234,70 @@ def sets_root_rule(main):
             or not isinstance(roles, list) or not roles or not all(isinstance(r, str) and r for r in roles)):
         raise RuntimeError(f"{PATH_MAP}: {SETS_BLOCK} is not a root, a list of hidden globs and a list of roles")
     return os.path.realpath(top), list(globs), list(roles)
+
+
+SETS_LINE_REFUSAL = ("the command names the sets root together with {what}, which is refused to this session "
+                     "(DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own "
+                     "code open its files")
+_ROOT_MARK = "\x00SETSROOT\x00"
+
+
+def sets_root_spellings(top):
+    """The sets root as a command line spells it: its real path and, under HOME, ~/..., $HOME/... and ${HOME}/...."""
+    out = [top]
+    if top.startswith(HOME + "/"):
+        rel = top[len(HOME) + 1:]
+        out += ["~/" + rel, "$HOME/" + rel, "${HOME}/" + rel]
+    return out
+
+
+def sets_line_refusal(text, top, globs):
+    """DEC-1097 (2), readiness review 5 F1: the judge cannot place a path the shell builds at run time (a variable set
+    on the line stays literal, decide._expand_token reads only the hook's own environment). So a Bash line that names
+    the sets root (any spelling, an assignment's value included) is refused when it also
+      (a) names a hidden folder as a path (a block glob's literal head, fixtures/evaluation/ dropped: runs/fresh-80,
+          memory-verdict-2, ... with a / beside it), or that folder's last name as a quoted string ('fresh-80');
+      (b) holds a command substitution ($(...), `...`, <(...), >(...), $'...'), a change of folder aimed at the root
+          (cd or pushd to it, -C, --chdir, --directory, chdir), or, from the word that names the root on, a shell
+          variable ($!, $?, $$, $#, $-, $0 and an unassigned $HOME aside), a glob or brace (* ? [ {), or a cd or pushd.
+    A plain --sets-root <root> with no variable, glob or cd after it stays allowed. The empty text: no refusal."""
+    rx = "|".join(re.escape(s) for s in sorted(sets_root_spellings(top), key=len, reverse=True))
+    marked = re.sub(r"(?<![\w.-])(?:%s)(?![\w.-])" % rx, _ROOT_MARK, text or "")
+    at = marked.find(_ROOT_MARK)
+    if at < 0:
+        return ""
+    mark = re.escape(_ROOT_MARK)
+    keys = []
+    for g in globs:
+        parts = g.split("/")
+        n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
+        head = "/".join(parts[:n])
+        head = head[len("fixtures/evaluation/"):] if head.startswith("fixtures/evaluation/") else head
+        if head:
+            keys.append(head)
+    for k in dict.fromkeys(keys):
+        e = re.escape(k)
+        if re.search(r"(?<=/)%s(?![\w.-])|(?<![\w.-])%s(?=/)" % (e, e), marked):
+            return SETS_LINE_REFUSAL.format(what="a hidden folder")
+        if re.search(r"(['\"])%s\1" % re.escape(k.rsplit("/", 1)[-1]), marked):
+            return SETS_LINE_REFUSAL.format(what="a hidden folder's name")
+    if re.search(r"\$\(|`|[<>]\(|\$'", marked):
+        return SETS_LINE_REFUSAL.format(what="a command substitution")
+    if re.search(r"(?:^|[\s;&|(){}])(?:cd|pushd)\s+[^\s;&|]*" + mark, marked) or \
+            re.search(r"(?:-C|--chdir|--directory)[=\s]*['\"]?" + mark, marked) or re.search(r"chdir\s*\(", marked):
+        return SETS_LINE_REFUSAL.format(what="a change of folder")
+    start = max(marked.rfind(c, 0, at) for c in " \t\n;&|") + 1
+    tail = marked[start:]
+    home_set = re.search(r"(?:^|[\s;&|(])(?:export\s+)?HOME=", marked)
+    for m in re.finditer(r"\$(\{[^}]*\}?|[A-Za-z_][A-Za-z0-9_]*|[1-9@*_])", tail):
+        if m.group(1) in ("HOME", "{HOME}") and not home_set:
+            continue
+        return SETS_LINE_REFUSAL.format(what="a shell variable after it")
+    if re.search(r"[*?\[{]", tail):
+        return SETS_LINE_REFUSAL.format(what="a glob after it")
+    if re.search(r"(?:^|[\s;&|(){}])(?:cd|pushd)(?=[\s;&|)]|$)", tail):
+        return SETS_LINE_REFUSAL.format(what="a change of folder after it")
+    return ""
 
 
 _CLASSES = []
@@ -471,6 +537,14 @@ def main():
     why = Judge(root, parts).tool(tool, seen, cwd)
     if why:
         answer("deny", why)
+
+    # DEC-1097 (2), readiness review 5 F1: for the roles the block refuses, a Bash line that names the sets root and
+    # also names a hidden folder, or builds a path after it (a variable, a substitution, a glob, a cd), is refused: the
+    # judge above cannot place a path the shell makes at run time.
+    if rule and command is not None and any(r in refused for r in mine if r):
+        why = sets_line_refusal(seen["command"], top, outside)
+        if why:
+            answer("deny", why)
 
     # DEC-1082 (3): no write into those hidden folders by the roles refused them. Only a write whose target the guard
     # works out is judged; one it cannot work out is let through, as for rules 1 and 5 (G-1, G-2).

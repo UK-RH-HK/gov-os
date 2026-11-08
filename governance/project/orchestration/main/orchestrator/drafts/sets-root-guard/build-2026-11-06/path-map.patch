@@ -1,0 +1,20 @@
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -542,6 +542,17 @@
+     reads_denied: ["{ticket_tests}"]
+   independent-test-designer:
+     reads_denied: ["{ticket_impl}"]
++# DEC-1082 (3): the sets root outside the repository, where the hidden halves are kept since ACT-D8 (the measure's
++# --sets-root). The guard (.claude/hooks/pretooluse.py) refuses these globs, under the root and in every tree, to the
++# roles named here, and to each role a set in evaluation_sets measures (that set's hidden globs). It reads this block
++# from the main tree's copy only. Reads and the writes the guard can resolve are refused alike. The measure is
++# unaffected: its command names only the root, and it reads the sets root's own map, which does not change. The
++# writer, checker and operator sessions run outside this guard (ACT-MSET-3, ACT-MSET-4, ACT-HLABEL-2, ACT-HNEW-1).
++sets_root_hidden:
++  root: "~/gov-os-eval"
++  hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
++           "fixtures/evaluation/memory-verdict-2/**", "transcripts/**"]
++  refused_roles: [orchestrator, engineer, research, product-spec, independent-test-designer, independent-auditor]
+ # The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
+ # a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
+ retrieval_authority:

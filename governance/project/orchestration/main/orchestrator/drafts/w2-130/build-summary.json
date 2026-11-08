@@ -1,0 +1,170 @@
+{
+ "head": "232efc47dd707dd76038cf8211842d9b4472473c",
+ "drift": {
+  "drifted_current": 195,
+  "drifted_no_hint": 82,
+  "census_drifted_current_with_spent": 226
+ },
+ "unmarked_findings": 185,
+ "unmarked_entries": 149,
+ "marked_pairs": 168,
+ "dropped_pairs": 17,
+ "a1": {
+  "pairs": 99,
+  "entries": 81,
+  "free_text_pairs": 4,
+  "whole_supersessions": 0,
+  "no_hint_entries_today": 82,
+  "no_hint_entries_all_changers_proposed": [
+   "DEC-1050"
+  ]
+ },
+ "a2": {
+  "pairs": 40,
+  "entries": 35,
+  "free_text_pairs": 4,
+  "whole_supersessions": 0
+ },
+ "a3": {
+  "pairs": 29,
+  "entries": 22,
+  "free_text_pairs": 5,
+  "whole_supersessions": 5
+ },
+ "dropped_certainly_wrong": [
+  {
+   "entry": "DEC-072",
+   "changer": "DEC-064",
+   "mark": "**Changed by:** DEC-064",
+   "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+  },
+  {
+   "entry": "DEC-120",
+   "changer": "DEC-173",
+   "mark": "**Changed by:** DEC-173",
+   "why": "the independent audit's F2: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-162",
+   "changer": "DEC-156",
+   "mark": "**Changed by:** DEC-156",
+   "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+  },
+  {
+   "entry": "DEC-454",
+   "changer": "DEC-904",
+   "mark": "**Changed by:** DEC-904",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-455",
+   "changer": "DEC-904",
+   "mark": "**Changed by:** DEC-904",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-480",
+   "changer": "DEC-899",
+   "mark": "**Changed by:** DEC-899",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-480",
+   "changer": "DEC-904",
+   "mark": "**Changed by:** DEC-904",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-490",
+   "changer": "DEC-868",
+   "mark": "**Changed by:** DEC-868",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-490",
+   "changer": "DEC-899",
+   "mark": "**Changed by:** DEC-899",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-490",
+   "changer": "DEC-908",
+   "mark": "**Changed by:** DEC-908",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-492",
+   "changer": "DEC-904",
+   "mark": "**Changed by:** DEC-904",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-492",
+   "changer": "DEC-908",
+   "mark": "**Changed by:** DEC-908",
+   "why": "the independent audit's F4: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-501",
+   "changer": "DEC-512",
+   "mark": "**Changed by:** DEC-512",
+   "why": "the ARCHIVE \u00a7A line's second sentence: this changer changes the other entry"
+  },
+  {
+   "entry": "DEC-724",
+   "changer": "DEC-860",
+   "mark": "**Changed by:** DEC-860",
+   "why": "the independent audit's F3: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-780",
+   "changer": "DEC-775",
+   "mark": "**Changed by:** DEC-775",
+   "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+  },
+  {
+   "entry": "DEC-1050",
+   "changer": "DEC-1057",
+   "mark": "**Changed by:** DEC-1057 (8)",
+   "why": "the independent audit's F1: the register's text does not support it"
+  },
+  {
+   "entry": "DEC-1053",
+   "changer": "DEC-880",
+   "mark": "**Changed by:** DEC-880",
+   "why": "the changer is older than the entry (reviewer 2 F2): a pattern misread, not a change"
+  }
+ ],
+ "audited_rewrites": [
+  "DEC-1032 <- DEC-1033",
+  "DEC-1084 <- DEC-1087",
+  "DEC-454 <- DEC-868",
+  "DEC-454 <- DEC-899",
+  "DEC-455 <- DEC-899",
+  "DEC-941 <- DEC-946",
+  "DEC-988 <- DEC-989"
+ ],
+ "b1": {
+  "tickets": 50,
+  "ids_added": 394,
+  "findings": 780,
+  "ids_not_in_force_added_to_open_tickets": [
+   "DEC-016",
+   "DEC-798"
+  ]
+ },
+ "b2": {
+  "tickets": 104,
+  "ids_added": 481,
+  "findings": 1097
+ },
+ "e": {
+  "older_changer_links": 11,
+  "multi_id_no_verb_values": 13
+ },
+ "audit": {
+  "free_text_marks": 13,
+  "labelled_sample": 20,
+  "pre_check_flags": 15
+ }
+}

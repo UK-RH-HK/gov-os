@@ -1,0 +1,160 @@
+sets-root guard rehearsal: 2026-11-06 12:03:36 GMT, steps: prepare plant live_before suites_before apply r2 r1_root r1 override_off suites_after replay measure writer undo live_after
+inherited GOV_, CLAUDE_PROJECT_DIR, D, T variables: 0
+
+== prepare: the clone (12:03:36)
+clone /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS at aa999aa607ce on sets-rehearsal; branches 66; root mentions left: 0; old-map worktree /home/usain/gov-os-runs/SETS-rehearsal/wt-oldmap on sets-oldmap
+old-map worktree: block lines 0
+
+== plant: the dummy sets root /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval (12:03:37)
+planted files: 10
+  fixtures/evaluation/memory-retrieval/hidden/q01.yaml
+  fixtures/evaluation/memory-retrieval/visible/v01.yaml
+  fixtures/evaluation/memory-verdict-2/XCHECK.md
+  fixtures/evaluation/memory-verdict-2/hidden/p01.yaml
+  fixtures/evaluation/memory-verdict-2/hidden/p02.yaml
+  fixtures/evaluation/memory-verdict-2/retired/r01.yaml
+  fixtures/evaluation/memory-verdict/hidden/p01.yaml
+  governance/project/path-map.yaml
+  runs/list
+  transcripts/t01.md
+
+== live_before: the live files and the real sets root's own entry (12:03:37)
+e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  /home/usain/Dynamic-Agentic-Engineering-OS/.claude/hooks/pretooluse.py
+cc8139a1c8f4a267ba55272361006cb7c742b2b671485bc32f7f50d5741ad5c5  /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/path-map.yaml
+/home/usain/gov-os-eval: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+
+== suites_before: the two suites on the clone's hook as it is (the baseline) (12:03:37)
+before test_guard_fix_4: 467 passed in 18.56s
+before test_g14: 151 passed, 1 skipped in 4.70s
+
+== apply: apply.sh in the clone (12:04:01)
+apply.sh check: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+now: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+now: cc8139a1c8f4a267ba55272361006cb7c742b2b671485bc32f7f50d5741ad5c5  governance/project/path-map.yaml
+now: state before
+candidate hook: ok (42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511)
+candidate hook: parses
+patch: applies, gives da095dce9171221df5602f31208176e684f3ace731b1953658e8c198b3c6d559
+check: ready to apply
+apply.sh apply: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+before: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+before: cc8139a1c8f4a267ba55272361006cb7c742b2b671485bc32f7f50d5741ad5c5  governance/project/path-map.yaml
+before: state before
+backup: /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/sets-root-guard/backup (SHA256SUMS written)
+after: 42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511  .claude/hooks/pretooluse.py
+after: da095dce9171221df5602f31208176e684f3ace731b1953658e8c198b3c6d559  governance/project/path-map.yaml
+after: state applied
+apply: done
+ M .claude/hooks/pretooluse.py
+ M governance/project/path-map.yaml
+?? .claude/hooks/pretooluse.before.py
+patched map: load_config ok; evaluation_sets ['memory-retrieval', 'memory-verdict', 'memory-verdict-2'] ; role_paths ['engineer', 'independent-test-designer']
+
+== r2: HOME=/home/usain/gov-os-runs/SETS-rehearsal/home (the block as applied, root ~/gov-os-eval), GOV_PIN_PY, GUARD4_ONLY=sets (12:04:01)
+552:  root: "~/gov-os-eval"
+cases run: 194, failed: 0, sets cases: 194, skipped: none
+PASS
+
+== r1_root: the block's root set to the planted absolute path (12:04:17)
+block root: root: "/home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval"
+
+== r1: the registered hook line (--settings), the block's root /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval, SETS_PLANTED=1 (12:04:17)
+cases run: 250, failed: 0, sets cases: 194, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 14
+PASS
+
+== r1 (L cases only: what the live tree runs after the ACT) (12:04:35)
+cases run: 203, failed: 0, sets cases: 194, skipped: R (SETS_PLANTED unset): 52, names ~ or $HOME, and the root is not ~/gov-os-eval: 9
+PASS
+
+== override_off: the sets cases on the candidate with Judge.listing's override switched off (HOME=/home/usain/gov-os-runs/SETS-rehearsal/home) (12:04:52)
+override switched off: 1
+FAIL [R] sets M6 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict-2 --sets-root ~/gov-os-eval --part hidden --out "$(mktem
+FAIL [R] sets M7 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict --sets-root ~/gov-os-eval --part hidden --gov "$(command
+FAIL [R] sets X1 engineer Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got deny |  call reads files whose names another c
+FAIL [R] sets X1 orchestrator (the CTO) Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got deny |  call reads files whose n
+FAIL [R] sets X2 engineer Bash: cat $(git diff --name-only HEAD~1): want allow, got deny |  call reads files whose names another command gives at run 
+FAIL [R] sets X2 orchestrator (the CTO) Bash: cat $(git diff --name-only HEAD~1): want allow, got deny |  call reads files whose names another command
+cases run: 194, failed: 6, sets cases: 194, skipped: none
+FAIL
+override_off: exactly M6, M7, X1 and X2 need the override
+
+== suites_after: the two suites on the candidate hook, with the block (12:05:03)
+after test_guard_fix_4: 467 passed in 18.97s
+after test_g14: 151 passed, 1 skipped in 4.13s
+
+== replay: the last 48 hours of tool calls, before and after, the sets root rewritten to /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval (12:05:29)
+{
+ "since": "2026-11-04T12:05:29",
+ "counts": {
+  "calls": 3724,
+  "skipped: names the real sets root in a form not rewritten": 28,
+  "duplicates": 84,
+  "unique judged": 3612,
+  "unique naming the sets root": 154
+ },
+ "answers": {
+  "allow->allow": 3582,
+  "allow->deny": 25,
+  "deny->deny": 5
+ }
+}
+differences: 25
+differences by where their sets-root paths lie: {'hidden': 19, 'above-hidden+hidden': 1, 'hidden+other:/governance/project/path-map.yaml': 2, 'above-hidden': 1, 'hidden+other:/governance/project/path-map.yaml`': 1, 'hidden+other:/runs/verdict/v-run1': 1}
+differences by cause: {'shell words': 21, 'heredoc body only': 4}
+  allow->deny orchestrator/None Bash kinds=hidden cause=shell words | O=<repo>/.gov-runtime/scratch/orchestrator/log; mv $O/cto-standby.txt $O/cto-standby.ended-$(date +% | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/None Bash kinds=hidden cause=shell words | O=.gov-runtime/scratch/orchestrator/log; mv $O/cto-standby.txt $O/cto-standby.ended-$(date +%H%M).tx | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/None Bash kinds=above-hidden+hidden cause=heredoc body only | python3 - <<'EOF' | after: the call reads files whose names another com | bodies naming the root opened by: ["python3 - <<'EOF'"]
+  allow->deny orchestrator/None Bash kinds=hidden+other:/governance/project/path-map.yaml cause=shell words | cat <SR>/governance/project/path-map.yaml; ls <SR>/fixtures/evaluation/memory-verdict/; ls <SR>/fixt | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/None Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/None Bash kinds=hidden cause=shell words | ls -la ~/gov-os-runs/D4B/diag/drift-g1.json 2>&1; PYTHONPATH=$HOME/gov-os-runs/D4B/g1/repo/src timeo | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=above-hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/; ls retired-hidden/ | head -50; for f in h26 h28 h29;  | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | ls ~/gov-os-runs/D4B/diag/; cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for i in h02 h05 | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | mkdir -p /tmp/gov-os-emg-xcheck-h && chmod 700 /tmp/gov-os-emg-xcheck-h && ls -la <SR>/fixtures/eval | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for f in h25 h26 h27 h28 h29 h30 h31 h32; do | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for f in h33 h34 h35 h36 h37 h38 h39 h40; do | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | mkdir -p /tmp/gov-os-emg-hdom && chmod 700 /tmp/gov-os-emg-hdom; cd <repo>; grep -n "R5" docs/resear | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for f in h0*.yaml h10.yaml h11.yaml h12.yaml | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for f in h1[3-9].yaml h2[0-4].yaml; do echo  | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-auditor Bash kinds=hidden cause=shell words | cd <SR>/fixtures/evaluation/memory-retrieval/hidden/ && for f in h2[5-9].yaml h3*.yaml h40.yaml; do  | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/independent-test-designer Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | ls -la ~/gov-os-writer ~/gov-os-writer/.claude ~/gov-os-checker/.claude; cat ~/gov-os-writer/.claude | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=heredoc body only | mkdir -p <repo>/governance/project/orchestration/packages/ACT-MSET-3 && cd <repo>/governance/project | after: the call reads the hidden part of an evaluat | bodies naming the root opened by: ['mkdir -p <repo>/governance/project/orchestration/packages/ACT-MSET-3 && cd <repo>/governance/project']
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | python3 -I .gov-runtime/scratch/orchestrator/drafts/d4b/leak_check.py <SR>/fixtures/evaluation/memor | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=heredoc body only | git status --porcelain; cd governance/project/orchestration/packages/ACT-MSET-3 && python3 - <<'EOF' | after: the call reads the hidden part of an evaluat | bodies naming the root opened by: ["git status --porcelain; cd governance/project/orchestration/packages/ACT-MSET-3 && python3 - <<'EOF'"]
+  allow->deny engineer/None Bash kinds=hidden+other:/governance/project/path-map.yaml` cause=heredoc body only | cd <repo> && python3 - <<'EOF' | after: the call reads the hidden part of an evaluat | bodies naming the root opened by: ["cd <repo> && python3 - <<'EOF'"]
+  allow->deny engineer/None Bash kinds=hidden+other:/governance/project/path-map.yaml cause=shell words | stat -c '%y %n' <SR>/fixtures/evaluation/memory-retrieval/hidden/h23.yaml <SR>/governance/project/pa | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/independent-auditor Bash kinds=hidden+other:/runs/verdict/v-run1 cause=shell words | ls ~/gov-os-runs/D4B/diag/ <SR>/fixtures/evaluation/memory-verdict/ <SR>/fixtures/evaluation/memory- | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/independent-auditor Bash kinds=hidden cause=shell words | cd ~/gov-os-runs/D4B/diag/ && wc -l stage1-verdict.txt && head -30 stage1-verdict.txt; cat <SR>/fixt | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/independent-auditor Bash kinds=hidden cause=shell words | python3 -I <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/leak_check.py <SR>/fixtures/evaluatio | after: the call reads the hidden part of an evaluat
+
+== measure: _measured(entry, planted root) per set of the planted map (12:07:59)
+GOV_ROLE=orchestrator: {'memory-retrieval': False, 'memory-verdict': False, 'memory-verdict-2': False}
+GOV_ROLE=engineer: {'memory-retrieval': True, 'memory-verdict': True, 'memory-verdict-2': True}
+
+== writer: a headless claude -p session on Haiku in /home/usain/gov-os-runs/SETS-rehearsal/writer, the clone and the planted root as added directories (12:07:59)
+writer exit 0
+records 9 | hook events 0 []
+tool results 1 | an error: False
+the read returned the planted line: True
+final: id: planted-memory-verdict-2-hidden-p01
+
+== undo: the block's root back as applied, then apply.sh undo (12:08:03)
+block root: root: "~/gov-os-eval"
+check: already applied
+apply.sh undo: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511  .claude/hooks/pretooluse.py
+before-undo: da095dce9171221df5602f31208176e684f3ace731b1953658e8c198b3c6d559  governance/project/path-map.yaml
+before-undo: state applied
+after-undo: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+after-undo: cc8139a1c8f4a267ba55272361006cb7c742b2b671485bc32f7f50d5741ad5c5  governance/project/path-map.yaml
+after-undo: state before
+undo: done; both files are byte for byte as before the apply
+git diff: both files as committed
+
+== live_after: the live files and the real sets root's own entry, against before (12:08:03)
+e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  /home/usain/Dynamic-Agentic-Engineering-OS/.claude/hooks/pretooluse.py
+cc8139a1c8f4a267ba55272361006cb7c742b2b671485bc32f7f50d5741ad5c5  /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/path-map.yaml
+/home/usain/gov-os-eval: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+live: unchanged
+
+rehearsal done: 2026-11-06 12:08:03 GMT, failures: 0

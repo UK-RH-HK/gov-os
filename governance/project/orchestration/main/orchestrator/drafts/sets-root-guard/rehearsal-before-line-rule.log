@@ -1,0 +1,267 @@
+sets-root guard rehearsal: 2026-11-08 01:19:47 GMT, steps: prepare plant live_before suites_before w2_84_before apply r2 r1_root r1 override_off suites_after w2_84_after replay measure undo live_after
+inherited GOV_, CLAUDE_PROJECT_DIR, D, T variables: 0
+
+== prepare: the clone (01:19:47)
+clone /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS at 3552f0f59bb7 on sets-rehearsal; branches 86; root mentions left: 0; old-map worktree /home/usain/gov-os-runs/SETS-rehearsal/wt-oldmap on sets-oldmap
+old-map worktree: block lines 0
+
+== plant: the dummy sets root /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval (01:19:48)
+planted files: 14
+  fixtures/evaluation/memory-retrieval/hidden/q01.yaml
+  fixtures/evaluation/memory-retrieval/visible/v01.yaml
+  fixtures/evaluation/memory-verdict-2/XCHECK.md
+  fixtures/evaluation/memory-verdict-2/hidden/p01.yaml
+  fixtures/evaluation/memory-verdict-2/hidden/p02.yaml
+  fixtures/evaluation/memory-verdict-2/retired/r01.yaml
+  fixtures/evaluation/memory-verdict/hidden/p01.yaml
+  governance/project/path-map.yaml
+  runs/e0/counts.txt
+  runs/fresh-80/USED
+  runs/fresh-80/kept-1/k01.json
+  runs/fresh-80/rows/q01.json
+  runs/list
+  transcripts/t01.md
+
+== live_before: the live files (hook, map, list, W2-84's seven, settings) and the real sets root's own entry (01:19:48)
+e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+6d79946fdbbd10e3095d99d13c216f475144b6330cfd8695cfd69bf839cf940b  governance/project/path-map.yaml
+98f3b69a8ed96889272256afcd932b6a56a82cf25cd3dfb7048586291da0dde3  tests/optin-lifted-guard.txt
+5c30ab77becbebf7c34119fa93701dbc78ac05e9e00c27e0e3242a6b5c000922  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+0c6b02904b8905736ac5071bf9b9758634607ee599404f65060e96562d8de1eb  tests/acceptance/W2-84/test_w2_84_every_tree.py
+ef6c3dcb0f3e591cd0134ade3b51d1cee9efe136e39288366de695dd32482092  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+789d7f76826794bc48ea07708d2fb09ec1e75a44d21b079053896bf1cd48aaef  tests/acceptance/W2-84/test_w2_84_git_store.py
+e268aba3aadd9f5c000b9667e982a1f760dd295ff60a6a4f007f273962544554  tests/acceptance/W2-84/test_w2_84_links.py
+54ffe77873568d619b58e3cb433ce173a83ca9a2c6b4240bdcf5efafab4f4478  tests/acceptance/W2-84/test_w2_84_unchanged.py
+ac2dbd7398a60a28cca4c18f7a363353330efcf9cdee51052af1a5b52a8d274f  tests/unit/guard/test_w2_84_trees.py
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+/home/usain/gov-os-eval: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+
+== suites_before: the two suites on the clone's hook as it is (the baseline) (01:19:48)
+before test_guard_fix_4: 467 passed in 16.59s
+before test_g14: 151 passed, 1 skipped in 3.82s
+
+== w2_84_before: W2-84's seven files present; who names them; the list's check (01:20:10)
+present: 7 of 7
+tracked files naming the seven (docs, tickets and orchestration records aside):
+tests/optin-lifted-guard.txt:435:tests/acceptance/W2-84/test_w2_84_code_under_test.py  # the hidden-half rule under every tree (G-3; DEC-106
+tests/optin-lifted-guard.txt:436:tests/acceptance/W2-84/test_w2_84_every_tree.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4)
+tests/optin-lifted-guard.txt:437:tests/acceptance/W2-84/test_w2_84_fails_closed.py  # the hidden-half rule under every tree (G-3; DEC-1061 (
+tests/optin-lifted-guard.txt:438:tests/acceptance/W2-84/test_w2_84_git_store.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4),
+tests/optin-lifted-guard.txt:439:tests/acceptance/W2-84/test_w2_84_links.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), del
+tests/optin-lifted-guard.txt:440:tests/acceptance/W2-84/test_w2_84_unchanged.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4),
+tests/optin-lifted-guard.txt:443:tests/unit/guard/test_w2_84_trees.py  # the hidden-half rule under every tree (G-3; DEC-1061 (4), deleted a
+before test_optin_lifted: 16 passed in 6.43s
+before collect W2-84 + unit/guard (--optin=lifted): 1253/1448 tests collected (195 deselected) in 0.61s
+before W2-84 or hidden-half lines in the list: 9
+
+== apply: apply.sh in the clone (01:20:18)
+apply.sh check: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+now: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+now: 6d79946fdbbd10e3095d99d13c216f475144b6330cfd8695cfd69bf839cf940b  governance/project/path-map.yaml
+now: 98f3b69a8ed96889272256afcd932b6a56a82cf25cd3dfb7048586291da0dde3  tests/optin-lifted-guard.txt
+now: 5c30ab77becbebf7c34119fa93701dbc78ac05e9e00c27e0e3242a6b5c000922  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+now: 0c6b02904b8905736ac5071bf9b9758634607ee599404f65060e96562d8de1eb  tests/acceptance/W2-84/test_w2_84_every_tree.py
+now: ef6c3dcb0f3e591cd0134ade3b51d1cee9efe136e39288366de695dd32482092  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+now: 789d7f76826794bc48ea07708d2fb09ec1e75a44d21b079053896bf1cd48aaef  tests/acceptance/W2-84/test_w2_84_git_store.py
+now: e268aba3aadd9f5c000b9667e982a1f760dd295ff60a6a4f007f273962544554  tests/acceptance/W2-84/test_w2_84_links.py
+now: 54ffe77873568d619b58e3cb433ce173a83ca9a2c6b4240bdcf5efafab4f4478  tests/acceptance/W2-84/test_w2_84_unchanged.py
+now: ac2dbd7398a60a28cca4c18f7a363353330efcf9cdee51052af1a5b52a8d274f  tests/unit/guard/test_w2_84_trees.py
+now: state before
+candidate hook: ok (42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511)
+candidate hook: parses
+map patch: applies, gives a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22
+list patch: applies, gives 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02
+W2-84's seven files: present, each as built
+check: ready to apply
+apply.sh apply: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+before: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+before: 6d79946fdbbd10e3095d99d13c216f475144b6330cfd8695cfd69bf839cf940b  governance/project/path-map.yaml
+before: 98f3b69a8ed96889272256afcd932b6a56a82cf25cd3dfb7048586291da0dde3  tests/optin-lifted-guard.txt
+before: 5c30ab77becbebf7c34119fa93701dbc78ac05e9e00c27e0e3242a6b5c000922  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+before: 0c6b02904b8905736ac5071bf9b9758634607ee599404f65060e96562d8de1eb  tests/acceptance/W2-84/test_w2_84_every_tree.py
+before: ef6c3dcb0f3e591cd0134ade3b51d1cee9efe136e39288366de695dd32482092  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+before: 789d7f76826794bc48ea07708d2fb09ec1e75a44d21b079053896bf1cd48aaef  tests/acceptance/W2-84/test_w2_84_git_store.py
+before: e268aba3aadd9f5c000b9667e982a1f760dd295ff60a6a4f007f273962544554  tests/acceptance/W2-84/test_w2_84_links.py
+before: 54ffe77873568d619b58e3cb433ce173a83ca9a2c6b4240bdcf5efafab4f4478  tests/acceptance/W2-84/test_w2_84_unchanged.py
+before: ac2dbd7398a60a28cca4c18f7a363353330efcf9cdee51052af1a5b52a8d274f  tests/unit/guard/test_w2_84_trees.py
+before: state before
+backup: /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/sets-root-guard/backup (SHA256SUMS written, 10 files)
+after: 42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511  .claude/hooks/pretooluse.py
+after: a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+after: 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+after: (absent)  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+after: (absent)  tests/acceptance/W2-84/test_w2_84_every_tree.py
+after: (absent)  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+after: (absent)  tests/acceptance/W2-84/test_w2_84_git_store.py
+after: (absent)  tests/acceptance/W2-84/test_w2_84_links.py
+after: (absent)  tests/acceptance/W2-84/test_w2_84_unchanged.py
+after: (absent)  tests/unit/guard/test_w2_84_trees.py
+after: state applied
+apply: done. The operator's commit stages the three files and the seven deletions:
+  git add .claude/hooks/pretooluse.py governance/project/path-map.yaml tests/optin-lifted-guard.txt
+  git rm -q -- tests/acceptance/W2-84/test_w2_84_code_under_test.py tests/acceptance/W2-84/test_w2_84_every_tree.py tests/acceptance/W2-84/test_w2_84_fails_closed.py tests/acceptance/W2-84/test_w2_84_git_store.py tests/acceptance/W2-84/test_w2_84_links.py tests/acceptance/W2-84/test_w2_84_unchanged.py tests/unit/guard/test_w2_84_trees.py
+ M .claude/hooks/pretooluse.py
+ M governance/project/path-map.yaml
+ D tests/acceptance/W2-84/test_w2_84_code_under_test.py
+ D tests/acceptance/W2-84/test_w2_84_every_tree.py
+ D tests/acceptance/W2-84/test_w2_84_fails_closed.py
+ D tests/acceptance/W2-84/test_w2_84_git_store.py
+ D tests/acceptance/W2-84/test_w2_84_links.py
+ D tests/acceptance/W2-84/test_w2_84_unchanged.py
+ M tests/optin-lifted-guard.txt
+ D tests/unit/guard/test_w2_84_trees.py
+?? .claude/hooks/pretooluse.before.py
+patched map: load_config ok; evaluation_sets ['memory-retrieval', 'memory-verdict', 'memory-verdict-2'] ; role_paths ['engineer', 'independent-test-designer']
+
+== r2: HOME=/home/usain/gov-os-runs/SETS-rehearsal/home (the block as applied, root ~/gov-os-eval), GOV_PIN_PY, GUARD4_ONLY=sets (01:20:18)
+563:  root: "~/gov-os-eval"
+cases run: 365, failed: 0, sets cases: 365, skipped: none
+PASS
+
+== r1_root: the block's root set to the planted absolute path (01:20:43)
+block root: root: "/home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval"
+
+== r1: the registered hook line (--settings), the block's root /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval, SETS_PLANTED=1 (01:20:43)
+cases run: 409, failed: 0, sets cases: 365, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 26
+PASS
+
+== r1 (L cases only: what the live tree runs after the ACT) (01:21:14)
+cases run: 310, failed: 0, sets cases: 365, skipped: R (SETS_PLANTED unset): 104, names ~ or $HOME, and the root is not ~/gov-os-eval: 21
+PASS
+
+== override_off: the sets cases on the candidate with Judge.listing's override switched off (HOME=/home/usain/gov-os-runs/SETS-rehearsal/home) (01:21:39)
+override switched off: 1
+FAIL [R] sets M6 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict-2 --sets-root ~/gov-os-eval --part hidden --out "$(mktem
+FAIL [R] sets M7 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict --sets-root ~/gov-os-eval --part hidden --gov "$(command
+FAIL [R] sets X1 engineer Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got deny |  call reads files whose names another c
+FAIL [R] sets X1 orchestrator (the CTO) Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got deny |  call reads files whose n
+FAIL [R] sets X2 engineer Bash: cat $(git diff --name-only HEAD~1): want allow, got deny |  call reads files whose names another command gives at run 
+FAIL [R] sets X2 orchestrator (the CTO) Bash: cat $(git diff --name-only HEAD~1): want allow, got deny |  call reads files whose names another command
+cases run: 365, failed: 6, sets cases: 365, skipped: none
+FAIL
+override_off: exactly M6, M7, X1 and X2 need the override
+
+== suites_after: the two suites on the candidate hook, with the block (01:22:02)
+after test_guard_fix_4: 467 passed in 22.80s
+after test_g14: 151 passed, 1 skipped in 4.85s
+
+== w2_84_after: the seven gone, the list without them, nothing left naming them; the list's check (01:22:31)
+present: 0 of 7
+ D tests/acceptance/W2-84/test_w2_84_code_under_test.py
+ D tests/acceptance/W2-84/test_w2_84_every_tree.py
+ D tests/acceptance/W2-84/test_w2_84_fails_closed.py
+ D tests/acceptance/W2-84/test_w2_84_git_store.py
+ D tests/acceptance/W2-84/test_w2_84_links.py
+ D tests/acceptance/W2-84/test_w2_84_unchanged.py
+ M tests/optin-lifted-guard.txt
+ D tests/unit/guard/test_w2_84_trees.py
+tracked files naming the seven (docs, tickets and orchestration records aside), the W2-84 folder's leftovers aside:
+  none
+W2-84's folder after (on disk, tracked files): README.md conftest.py w2_84_support.py 
+after test_optin_lifted: 16 passed in 8.09s
+after collect W2-84 + unit/guard (--optin=lifted): 890/1085 tests collected (195 deselected) in 0.31s
+after W2-84 or hidden-half lines in the list: 0
+
+== w2_84_after: the operator's staging lines (§3), then unstaged again (no commit in the rehearsal) (01:22:42)
+ .claude/hooks/pretooluse.py                        | 119 ++++++++++++-
+ governance/project/path-map.yaml                   |  13 ++
+ .../acceptance/W2-84/test_w2_84_code_under_test.py |  27 ---
+ tests/acceptance/W2-84/test_w2_84_every_tree.py    | 142 ---------------
+ tests/acceptance/W2-84/test_w2_84_fails_closed.py  | 164 -----------------
+ tests/acceptance/W2-84/test_w2_84_git_store.py     |  90 ----------
+ tests/acceptance/W2-84/test_w2_84_links.py         |  81 ---------
+ tests/acceptance/W2-84/test_w2_84_unchanged.py     | 171 ------------------
+ tests/optin-lifted-guard.txt                       |  14 --
+ tests/unit/guard/test_w2_84_trees.py               | 197 ---------------------
+ 10 files changed, 129 insertions(+), 889 deletions(-)
+  staged: M	.claude/hooks/pretooluse.py
+  staged: M	governance/project/path-map.yaml
+  staged: D	tests/acceptance/W2-84/test_w2_84_code_under_test.py
+  staged: D	tests/acceptance/W2-84/test_w2_84_every_tree.py
+  staged: D	tests/acceptance/W2-84/test_w2_84_fails_closed.py
+  staged: D	tests/acceptance/W2-84/test_w2_84_git_store.py
+  staged: D	tests/acceptance/W2-84/test_w2_84_links.py
+  staged: D	tests/acceptance/W2-84/test_w2_84_unchanged.py
+  staged: M	tests/optin-lifted-guard.txt
+  staged: D	tests/unit/guard/test_w2_84_trees.py
+
+== replay: the last 48 hours of tool calls, before and after, the sets root rewritten to /home/usain/gov-os-runs/SETS-rehearsal/home/gov-os-eval (01:22:42)
+{
+ "since": "2026-11-06T01:22:42",
+ "counts": {
+  "calls": 9518,
+  "duplicates": 366,
+  "skipped: names the real sets root in a form not rewritten": 36,
+  "unique judged": 9116,
+  "unique naming the sets root": 151
+ },
+ "answers": {
+  "allow->allow": 9098,
+  "allow->deny": 9,
+  "deny->deny": 9
+ }
+}
+differences: 9
+differences by where their sets-root paths lie: {'hidden+other:/governance/project/path-map.yaml': 1, 'hidden': 5, 'none': 1, 'above-hidden': 1, 'above-hidden+hidden': 1}
+differences by cause: {'shell words': 7, 'heredoc body only': 2}
+  allow->deny engineer/None Bash kinds=hidden+other:/governance/project/path-map.yaml cause=shell words | stat -c '%y %n' <SR>/fixtures/evaluation/memory-retrieval/hidden/h23.yaml <SR>/governance/project/pa | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny engineer/None Bash kinds=hidden cause=shell words | python3 <repo>/.gov-runtime/scratch/orchestrator/drafts/d4b/repin_gold.py <SR>/fixtures/evaluation/m | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/general-purpose Bash kinds= cause=shell words | ls -d runs transcripts 2>&1; git ls-files 'runs/*' 'transcripts/*' | head -3; for w in /home/usain/g | after: the call reads the hidden part of an evaluat
+  allow->deny orchestrator/general-purpose Bash kinds=above-hidden cause=heredoc body only | set -e; M=<repo>; SP=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7- | after: the call reads the hidden part of an evaluat | bodies naming the root opened by: ["cat > $SP/block.yaml <<'EOF'"]
+  allow->deny orchestrator/general-purpose Bash kinds=above-hidden+hidden cause=heredoc body only | cd <repo>/.gov-runtime/scratch/orchestrator/drafts/sets-root-guard && python3 - <<'EOF' | after: the call reads the hidden part of an evaluat | bodies naming the root opened by: ["cd <repo>/.gov-runtime/scratch/orchestrator/drafts/sets-root-guard && python3 - <<'EOF'"]
+  allow->deny orchestrator/product-spec Bash kinds=hidden cause=shell words | find <SR>/fixtures/evaluation/memory-verdict-2 -maxdepth 2 -type f -printf '%h %TY-%Tm-%Td\n' | sort | after: the call reads the hidden part of an evaluat
+
+== measure: _measured(entry, planted root) per set of the planted map (01:29:12)
+GOV_ROLE=orchestrator: {'memory-retrieval': False, 'memory-verdict': False, 'memory-verdict-2': False}
+GOV_ROLE=engineer: {'memory-retrieval': True, 'memory-verdict': True, 'memory-verdict-2': True}
+
+== undo: the block's root back as applied, then apply.sh undo (01:29:12)
+block root: root: "~/gov-os-eval"
+check: already applied
+apply.sh undo: tree /home/usain/gov-os-runs/SETS-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 42749e673c50e02c66cd89a5f17ca7faa98cafd32dff341c2617af71989c1511  .claude/hooks/pretooluse.py
+before-undo: a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+before-undo: 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_every_tree.py
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_git_store.py
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_links.py
+before-undo: (absent)  tests/acceptance/W2-84/test_w2_84_unchanged.py
+before-undo: (absent)  tests/unit/guard/test_w2_84_trees.py
+before-undo: state applied
+after-undo: e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+after-undo: 6d79946fdbbd10e3095d99d13c216f475144b6330cfd8695cfd69bf839cf940b  governance/project/path-map.yaml
+after-undo: 98f3b69a8ed96889272256afcd932b6a56a82cf25cd3dfb7048586291da0dde3  tests/optin-lifted-guard.txt
+after-undo: 5c30ab77becbebf7c34119fa93701dbc78ac05e9e00c27e0e3242a6b5c000922  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+after-undo: 0c6b02904b8905736ac5071bf9b9758634607ee599404f65060e96562d8de1eb  tests/acceptance/W2-84/test_w2_84_every_tree.py
+after-undo: ef6c3dcb0f3e591cd0134ade3b51d1cee9efe136e39288366de695dd32482092  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+after-undo: 789d7f76826794bc48ea07708d2fb09ec1e75a44d21b079053896bf1cd48aaef  tests/acceptance/W2-84/test_w2_84_git_store.py
+after-undo: e268aba3aadd9f5c000b9667e982a1f760dd295ff60a6a4f007f273962544554  tests/acceptance/W2-84/test_w2_84_links.py
+after-undo: 54ffe77873568d619b58e3cb433ce173a83ca9a2c6b4240bdcf5efafab4f4478  tests/acceptance/W2-84/test_w2_84_unchanged.py
+after-undo: ac2dbd7398a60a28cca4c18f7a363353330efcf9cdee51052af1a5b52a8d274f  tests/unit/guard/test_w2_84_trees.py
+after-undo: state before
+undo: done; every file is byte for byte as before the apply (the seven deleted files restored, modes kept)
+git diff: the hook, the map, the list and the seven as committed
+
+== live_after: the live files and the real sets root's own entry, against before (01:29:13)
+e406653ef6c92f014a6b874598b6a3e03fbc270310ecbfdd9c7b079ca43f7cc3  .claude/hooks/pretooluse.py
+6d79946fdbbd10e3095d99d13c216f475144b6330cfd8695cfd69bf839cf940b  governance/project/path-map.yaml
+98f3b69a8ed96889272256afcd932b6a56a82cf25cd3dfb7048586291da0dde3  tests/optin-lifted-guard.txt
+5c30ab77becbebf7c34119fa93701dbc78ac05e9e00c27e0e3242a6b5c000922  tests/acceptance/W2-84/test_w2_84_code_under_test.py
+0c6b02904b8905736ac5071bf9b9758634607ee599404f65060e96562d8de1eb  tests/acceptance/W2-84/test_w2_84_every_tree.py
+ef6c3dcb0f3e591cd0134ade3b51d1cee9efe136e39288366de695dd32482092  tests/acceptance/W2-84/test_w2_84_fails_closed.py
+789d7f76826794bc48ea07708d2fb09ec1e75a44d21b079053896bf1cd48aaef  tests/acceptance/W2-84/test_w2_84_git_store.py
+e268aba3aadd9f5c000b9667e982a1f760dd295ff60a6a4f007f273962544554  tests/acceptance/W2-84/test_w2_84_links.py
+54ffe77873568d619b58e3cb433ce173a83ca9a2c6b4240bdcf5efafab4f4478  tests/acceptance/W2-84/test_w2_84_unchanged.py
+ac2dbd7398a60a28cca4c18f7a363353330efcf9cdee51052af1a5b52a8d274f  tests/unit/guard/test_w2_84_trees.py
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+/home/usain/gov-os-eval: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+live: unchanged
+
+rehearsal done: 2026-11-08 01:29:13 GMT, failures: 0

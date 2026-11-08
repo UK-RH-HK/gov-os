@@ -32,6 +32,13 @@ for path in glob.glob(ROOT + "/.tickets/*.md"):
         for k in re.findall(r"keystone-\d+", tags.group(1) if tags else ""):
             keystones.setdefault(k, []).append(s.group(1))
 by_id = {tid: w2 for w2, (tid, _) in tickets.items()}
+# DEC-1097 (15): a keystone with a list in the plan is computed from that list, not from tags (report-state.json's
+# "keystone_lists": W2 ids, or "done: <DEC>" for a keystone done by decision); the rest still from keystone-N tags
+for k, lst in st.get("keystone_lists", {}).items():
+    if isinstance(lst, str):
+        keystones[k] = ["closed"]
+    else:
+        keystones[k] = [tickets[w][1] if w in tickets else "open" for w in lst]
 
 running = []
 for pid in os.listdir("/proc"):

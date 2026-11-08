@@ -44,6 +44,8 @@ def form(inp):
 def harvest(since):
     found = []
     for path in glob.glob(os.path.expanduser("~/.claude/projects/**/*.jsonl"), recursive=True):
+        if "-gov-os-writer" in path or "-gov-os-checker" in path or "gov-os-eval" in path:
+            continue  # the 80's writer and checker transcripts hold its questions (readiness review 5 F2, DEC-1097)
         try:
             if os.path.getmtime(path) < 0:
                 continue

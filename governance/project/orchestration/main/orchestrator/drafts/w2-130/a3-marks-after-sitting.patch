@@ -1,0 +1,194 @@
+diff --git a/docs/DECISION_REGISTER.md b/docs/DECISION_REGISTER.md
+--- a/docs/DECISION_REGISTER.md
++++ b/docs/DECISION_REGISTER.md
+@@ -48,7 +48,7 @@
+ - **Revisit trigger:** Assembled version fails a Solo Core gate that no tool can cover, or glue exceeds ~3k lines.
+ 
+ ### DEC-002 — Contract v3 retained as normative property spec; add a "Solo Core" profile
+-- **Status:** PROPOSED · **Basis:** SUGGESTION
++- **Status:** PROPOSED · **Basis:** SUGGESTION · SUPERSEDED by DEC-058, DEC-064
+ - **Decision:** Keep Contract v3 unchanged as the full specification. Add a profile layer (§6) marking each capability `CORE` / `DEFERRED` / `DROPPED_FOR_SOLO` with the implementing tool.
+ - **Rationale:** The contract's properties are sound; its implied implementation scope is enterprise/multi-tenant.
+ 
+@@ -64,7 +64,7 @@
+ - **Measurement:** telemetry (DEC-026) tagged by task ID.
+ 
+ ### DEC-005 — Proportionality profiles keyed to impact radius
+-- **Status:** PROPOSED · **Basis:** SUGGESTION
++- **Status:** PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-085 (readiness reduction)
+ - **Decision:** Three ceremony profiles: `LITE` (R0–R1), `STANDARD` (R2), `FULL` (R3+). Profile controls: readiness dimensions required, independent test author/verifier, retrieval budget, human gate.
+ - **Readiness (H2) reduction:** 8 mandatory dimensions always (intent, actor, scenarios, inputs/outputs, data, success+failure criteria, acceptance tests, security); remaining 18 conditional by capability type and profile, with `N/A_WITH_REASON` auto-default.
+ 
+@@ -73,7 +73,7 @@
+ - **Decision:** A repo is governable from day one (hooks + `gov check` + task tracker) while A1–A11 path migration proceeds in background batches. Full A0–A11 remains the target for `ADOPTED_HEALTHY`.
+ 
+ ### DEC-007 — Native harness features first; CI is the enforcement boundary
+-- **Status:** PROPOSED · **Basis:** ESTABLISHED + SUGGESTION
++- **Status:** PROPOSED · **Basis:** ESTABLISHED + SUGGESTION · **Changed by:** DEC-075
+ - **Decision:** Use harness-native hooks, subagents, skills and LSP where they exist. Treat hooks as guardrails, never as the security/enforcement boundary. Every hook check is re-run in git hooks (lefthook) and CI, which are authoritative for merge.
+ - **Evidence:**
+   - Claude Code hook docs note a stalled hook does not act as a gate — the call continues through the normal permission flow. [E-HOOK-CC]
+@@ -205,7 +205,7 @@
+ - **Gates:** S1, S2 (partial), S3, S5, S6
+ 
+ ### DEC-024 — Method skills: Superpowers, selectively
+-- **Status:** PROPOSED · **Basis:** ESTABLISHED
++- **Status:** PROPOSED · **Basis:** ESTABLISHED · **Changed by:** DEC-074
+ - **Decision:** Adopt selected Superpowers skills (test-driven development, systematic debugging, verification-before-completion, subagent-driven development with two-stage review). OpenSpec (DEC-011) remains owner of planning/spec artefacts — do not run Superpowers' brainstorm/plan workflow in parallel with OpenSpec proposals.
+ - **Evidence:** 14 SKILL.md files plus a session-start bootstrap reportedly under ~2k tokens; multi-host; listed in Anthropic's official plugin marketplace. [E-SUPERPOWERS][E-SP-MKT]
+ - **Gates:** F1, O3 (two-stage independent review)
+@@ -250,7 +250,7 @@
+ - **Decision:** `gov retrieve` resolves referenced IDs (spec, ADR, task, symbol) through the frontmatter graph and codebase-memory callers/callees to a radius-scaled depth at T0 (no LLM). LLM judgement only for the semantic facet. Completeness for deterministic facets = dependency closure to depth N; for semantic facets = saturation.
+ 
+ ### DEC-034 — Stopping reasons (enumerated)
+-- **Status:** PROPOSED · **Basis:** SUGGESTION
++- **Status:** PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-396
+ ```text
+ CLOSURE_COMPLETE             # no unresolved referenced IDs within depth limit
+ SATURATED                    # follow-up batch added < ~10% novel sources after dedup
+@@ -275,7 +275,7 @@
+ - **Decision:** Notes stored in `.gov-runtime/` (derived); invalidated when any cited `source_sha256` changes. G2 verifies every cited source ID exists at the cited hash and every quoted span appears in the source.
+ 
+ ### DEC-037 — Zero-result canaries on every index
+-- **Status:** PROPOSED · **Basis:** SUGGESTION, motivated by ESTABLISHED evidence
++- **Status:** PROPOSED · **Basis:** SUGGESTION, motivated by ESTABLISHED evidence · **Changed by:** DEC-080
+ - **Decision:** Each derived index (FTS/vector, codebase-memory, RAGFlow if adopted) has a small set of canary queries with known expected hits, run at G1 after reindex and at G4/G5. A canary miss marks the facet `FACET_UNAVAILABLE`, never "no evidence exists".
+ - **Motivation:** 2026 silent-zero defects in RAGFlow retrieval and connectors [E-RF-ZERO][E-RF-GH]; Contract rule "NOT_FOUND is never proof of absence".
+ 
+@@ -293,7 +293,7 @@
+ - The repository's own records already reached the key conclusions: the T2 HMAC seal is not proof-grade authority because a process with the owner's OS privileges can read the key; the recurring defect is the confused-deputy / ambient-authority problem; builder-authored property tests are not independent evidence; independence requires complete relevant context; optional features that repeatedly produce HIGH findings should be deleted, not wrapped.
+ 
+ ### DEC-038 — Freeze and archive the Rust repository; do not delete it
+-- **Status:** SUPERSEDED by DEC-048 · **Basis:** SUGGESTION
++- **Status:** SUPERSEDED by DEC-048 · **Basis:** SUGGESTION · **Changed by:** DEC-051
+ - **Decision:** Stop all Phase-2 work (do not start the Context/Retrieval Bridge session). Commit or record any dirty worktree, tag the final state, create a verified `git bundle --all`, push to the private remote, then reclaim disk (remove worktrees, `cargo clean`). Keep the repository read-only as an asset.
+ - **Rationale:** Deletion is irreversible and the records hold real IP (trust research, root-cause analyses, the SRR implementation). Archiving costs only disk once `target/` and worktrees are removed.
+ - **Revisit trigger:** the assembled Gov OS needs a component the Rust code already provides (e.g. SRR release signing at R2, a `gov` binary behind API-0002).
+@@ -305,7 +305,7 @@
+ - **Consequence:** No in-process trust classes beyond the simple rule inherited from D-0007 (DEC-046).
+ 
+ ### DEC-040 — The Gov OS never executes install commands; tools are installed by the owner and pinned
+-- **Status:** PROPOSED · **Basis:** ESTABLISHED (Phase-2 evidence)
++- **Status:** PROPOSED · **Basis:** ESTABLISHED (Phase-2 evidence) · **Changed by:** DEC-083
+ - **Decision:** No `gov tools install` equivalent and no argv classification. Third-party tools (DEC-011…DEC-026) are installed by the owner with a version pin recorded in `governance/project/tool-registry.yaml`; `gov doctor` only verifies presence and version.
+ - **Rationale:** The tool-install surface produced HIGH findings in every Phase-2 review round; "reading argv" cannot determine what executes.
+ 
+@@ -320,16 +320,16 @@
+ - **Rationale:** Phase 2 showed builder property tests quantify over the implementation's own domain; the owner's OD-P2-10 recorded that independence without relevant context produces architectural ignorance.
+ 
+ ### DEC-043 — Products resume immediately; the glue is built from real friction
+-- **Status:** PROPOSED · **Basis:** SUGGESTION
++- **Status:** PROPOSED · **Basis:** SUGGESTION · SUPERSEDED by DEC-064
+ - **Decision:** Product A work restarts as soon as the off-the-shelf layer is installed (short CLAUDE.md/AGENTS.md, `br`, OpenSpec, codebase-memory-mcp, gitleaks). `gov` commands are added only when a real product task shows the need. Product B follows once Product A has run one real feature end to end.
+ - **Rationale:** The Rust Gov OS was never exercised on real work, including its own orchestration (which ran on Python scripts and an HTML panel). Dogfooding from day one prevents speculative scope.
+ 
+ ### DEC-044 — Hard loop budget per surface
+-- **Status:** PROPOSED · **Basis:** ESTABLISHED (OD-P2-09 simplification principle) + SUGGESTION (numbers)
++- **Status:** PROPOSED · **Basis:** ESTABLISHED (OD-P2-09 simplification principle) + SUGGESTION (numbers) · **Changed by:** DEC-096
+ - **Decision:** At most two review→repair rounds on any one surface. If the second round still finds a blocking defect, the default disposition is DELETE, NARROW or DEFER; continuing requires an explicit owner decision recorded as an ADR.
+ 
+ ### DEC-045 — Original governance documents preserved unchanged; lean successors authored
+-- **Status:** PROPOSED, amended by DEC-049 (location of the originals) · **Basis:** SUGGESTION
++- **Status:** PROPOSED, amended by DEC-049 (location of the originals) · **Basis:** SUGGESTION · SUPERSEDED by DEC-058 · **Changed by:** DEC-053
+ - **Decision:** Framework v4.1.2, the two protocols and Contract v3 are copied unchanged (with SHA-256 sums) into `docs/source/originals/` of the new repository as owner reference. No agent reads them by default. Lean successors are authored with the owner: Framework v5 (short operating model), a Solo Core acceptance profile derived from §6 of this register, and a new control panel.
+ 
+ ### DEC-046 — Assets carried from the Rust repository
+@@ -339,7 +339,7 @@
+ - **Leave behind:** D-0008 / ARCH-0002 (CP-1), D-0010/D-0011 plugin and tool-install machinery, the 61-prompt V8.x control panel.
+ 
+ ### DEC-047 — New control panel: small, repository-backed
+-- **Status:** PROPOSED · **Basis:** SUGGESTION
++- **Status:** PROPOSED · **Basis:** SUGGESTION · SUPERSEDED by DEC-058
+ - **Decision:** A single-file HTML panel with five phases — P0 Archive, P1 Gov OS v0.1 (assembled), P2 Adopt Product A, P3 Adopt Product B, P4 Operate and improve — each with its stages, prompts and exit checks. State is exported/imported as a JSON file committed to the repository so the panel is never the only copy.
+ 
+ ---
+@@ -7680,7 +7680,7 @@
+   5. At Wave 2's exit the owner fast-forwards `main` to the exit tag again.
+ 
+ ### DEC-721 — The adoption-readiness block is built with W2-01 first and shown to pass in order (P-W2-2 (a))
+-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-522 · **Basis:** DEC-718 says AR-1 to AR-10 pass "in this order". The owner's Wave 2 exit criterion 1 needs every Wave 2 close to be a clean `gov close`, which needs AR-8's close fixes first.
++- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-522 · **Basis:** DEC-718 says AR-1 to AR-10 pass "in this order". The owner's Wave 2 exit criterion 1 needs every Wave 2 close to be a clean `gov close`, which needs AR-8's close fixes first. · **Changed by:** DEC-953
+ - **Decision:** DEC-718's order is the order in which AR-1 to AR-10 are shown to pass, at the Track A gate run (W2-24). The build order is W2-01 (AR-8's close fixes) first and alone; the rest of the block runs in parallel by its dependencies.
+ 
+ ### DEC-722 — Contract v4.2 brings two Wave 3 items into Wave 2, lite; signed release tags stay in Wave 3 (P-W2-3, in part)
+@@ -8336,7 +8336,7 @@
+ The owner committed DEC-757 to DEC-760 as `078d9553` (`Role: owner`), with the first `accepted_reds` (2) and `load_sensitive` (26) entries. P-W2-21 was open: W2-16's last review (probed `eda494ae`) failed on R2-F1 (`gov release --lock-from <folder with no release records>` rewrites `governance/framework.lock` from the installed, edited kernel, turning doctor's DRIFT into MATCH, and the guard allows the command to engineer and auditor), R2-F2 (a deleted release block passes) and R2-F3 (a source with no records installs any ref unverified).
+ 
+ ### DEC-761 — W2-16's last round, tests first; `gov release` only for the orchestrator or the owner (P-W2-21 (a))
+-- **Status:** ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-722, DEC-413, DEC-752, DEC-753, DEC-737 · **Basis:** P-W2-21; W2-16's run-1 return (head `ee557d02`).
++- **Status:** ACCEPTED (owner, 2026-10-17; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-722, DEC-413, DEC-752, DEC-753, DEC-737 · **Basis:** P-W2-21; W2-16's run-1 return (head `ee557d02`). · **Changed by:** DEC-772 (item 1)
+ - **Decision:**
+   1. **One more round for W2-16, tests first:**
+      - `gov release --lock-from` refuses once the project's lock records a release, and when the source holds no release record;
+@@ -9274,7 +9274,7 @@
+ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two packages of that report, the notification test and the rebuild's cost. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
+ 
+ ### DEC-853 — P-W2-49 (a): the secrets scan's time limit and pool are fixed in W2-50's resume; a store unchanged since its last clean scan is not re-scanned
+-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the change to a hard-block check's mechanics is approved here, CAP-33) · **Under:** DEC-802, DEC-780, CAP-38.b · **Basis:** P-W2-49 (`governance/project/orchestration/packages/P-W2-49.md`): `secrets-indexing` timed out (60 s per gitleaks run, about 24 at a time) on `store.db` (250 MB) and `code.db` (210 MB), so every close would be refused.
++- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the change to a hard-block check's mechanics is approved here, CAP-33) · **Under:** DEC-802, DEC-780, CAP-38.b · **Basis:** P-W2-49 (`governance/project/orchestration/packages/P-W2-49.md`): `secrets-indexing` timed out (60 s per gitleaks run, about 24 at a time) on `store.db` (250 MB) and `code.db` (210 MB), so every close would be refused. · **Changed by:** DEC-884 (item 4)
+ - **Decision:**
+   1. **(a):** the fix rides in W2-50's resume, which already rewrites `stores_with_secrets` in `src/gov/secrets/__init__.py`: the time limit grows with the content's size (or a large store is scanned in bounded chunks, each within the limit), and the pool is bounded so that large files are not starved. Every file is still scanned with every rule set, and a scan that cannot finish still fails closed.
+   2. **Added by the owner:** a store whose hash has not changed since its last clean scan is not re-scanned; the clean result is reused, keyed on the store's hash. A changed store is always scanned in full. **A finding is never reused.**
+@@ -9776,7 +9776,7 @@
+ ## 272. The owner's order of 2026-10-21 after the close queue: W2-66 first, one combined re-pin (register v0.272, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-884 — W2-66 takes the first slot; no re-pin until it is built, reviewed, merged and trialled; W2-59 and W2-65 merge together just before one combined re-pin
+-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-880, DEC-881, DEC-883, DEC-879, DEC-822, DEC-853 item 4, DEC-786, DEC-861 · **Basis:** the owner's order of 2026-10-21. Today's pin (`fecb870c`) predates W2-58. W2-59 makes the hooks and the declared checks call the pinned judge, so merged before a re-pin it would bring the old read refusals back. · **Changed by:** DEC-889 items 14 and 15: W2-66, W2-67 and W2-68 wait for the review point; two re-pins (after W2-66's ladder, then after W2-68) are planned for the owner's review; until confirmed, this entry's text stands · **Changed by:** DEC-896 item 3: W2-07 comes forward to sit with W2-66, and the first re-pin carries W2-58, W2-59, W2-65, W2-66 and W2-07. · **Changed by:** DEC-899 items 2 and 4: two re-pins as drafted; W2-66 and W2-07 built in parallel, W2-07 merging first, W2-66 merging back with a fresh FULL probe before the first re-pin. · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product
++- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-880, DEC-881, DEC-883, DEC-879, DEC-822, DEC-853 item 4, DEC-786, DEC-861 · **Basis:** the owner's order of 2026-10-21. Today's pin (`fecb870c`) predates W2-58. W2-59 makes the hooks and the declared checks call the pinned judge, so merged before a re-pin it would bring the old read refusals back. · **Changed by:** DEC-889 items 14 and 15: W2-66, W2-67 and W2-68 wait for the review point; two re-pins (after W2-66's ladder, then after W2-68) are planned for the owner's review; until confirmed, this entry's text stands · **Changed by:** DEC-896 item 3: W2-07 comes forward to sit with W2-66, and the first re-pin carries W2-58, W2-59, W2-65, W2-66 and W2-07. · **Changed by:** DEC-899 items 2 and 4: two re-pins as drafted; W2-66 and W2-07 built in parallel, W2-07 merging first, W2-66 merging back with a fresh FULL probe before the first re-pin. · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product · **Changed by:** DEC-918, DEC-921 (item 3)
+ - **Decision:**
+   1. **W2-66 comes first.** After lens H reports and its findings go into W2-66's card (DEC-881), W2-66 takes the first slot, ahead of every other ticket.
+   2. **No re-pin and no install of judge updates until W2-66 is built, reviewed and merged.** Then one combined re-pin carries:
+@@ -10052,7 +10052,7 @@
+ ## 278. The owner's answer of 2026-10-21 on P-W2-62-H, and a standing rule on accepted history (register v0.278, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-891 — W2-62's claim commit 162f17ea9caf accepted as history; accepted-history entries for record-only commits recorded by the orchestrator, entries for code, test or kernel commits stay the owner's own commits
+-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-734, DEC-487, DEC-436, DEC-871, DEC-861, DEC-862 (a), DEC-851 · **Basis:** package P-W2-62-H (`governance/project/orchestration/packages/P-W2-62-H.md`). On 2026-10-21 at 22:39 the queue's gate (e) stopped W2-62 before its close: its claim commit `162f17ea9caf` ("W2-62 (DAEO-juee): claimed", 2026-10-19), the orchestrator's, carries `Task:` and `Role:` but no `Implements:`. It changes only `.tickets/DAEO-juee.md` (one line). · **Changed by:** DEC-906: beside `accepted_history`, the path map's `acceptance_exemptions` lists exact commits W1-01's history case accepts (owner commits only). · **Lifted by:** DEC-953 (items 1, 4) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product
++- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-734, DEC-487, DEC-436, DEC-871, DEC-861, DEC-862 (a), DEC-851 · **Basis:** package P-W2-62-H (`governance/project/orchestration/packages/P-W2-62-H.md`). On 2026-10-21 at 22:39 the queue's gate (e) stopped W2-62 before its close: its claim commit `162f17ea9caf` ("W2-62 (DAEO-juee): claimed", 2026-10-19), the orchestrator's, carries `Task:` and `Role:` but no `Implements:`. It changes only `.tickets/DAEO-juee.md` (one line). · **Changed by:** DEC-906: beside `accepted_history`, the path map's `acceptance_exemptions` lists exact commits W1-01's history case accepts (owner commits only). · **Lifted by:** DEC-953 (items 1, 4) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product · **Changed by:** DEC-924
+ - **Decision:**
+   1. **P-W2-62-H (a).** The commit `162f17ea9caf` (full id `162f17ea9cafeec96687d2a83c43c060c08d3e1b`) is accepted as history. The path map's `accepted_history` gains `{commit: 162f17ea9cafeec96687d2a83c43c060c08d3e1b, decision: DEC-891}`, committed by the orchestrator: the close reads the entry under this ACCEPTED owner decision, which names the commit (`gov/close/history.py`, DEC-734). W2-62 closes after queue run 6.
+   2. **The standing rule (owner, standing):**
+@@ -10187,7 +10187,7 @@
+ ## 283. The owner's answer of 2026-10-22 on P-W2-58-C1 (register v0.283, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-896 — Decision records measured by their decision (a W2-07 KPI); the test-selection lists in their own file; W2-07 before the first re-pin; no close unless every pre-close gate predicts a pass
+-- **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-490, DEC-500, DEC-734, DEC-891, DEC-892, DEC-894, DEC-889, DEC-890, DEC-884, DEC-861 · **Basis:** package P-W2-58-C1 (`governance/project/orchestration/packages/P-W2-58-C1.md`). W2-58's close was refused on WORK_WITHOUT_TASK for seven `Task: decision-record` commits that changed its paths (the path map) or its ticket file; W2-63's range holds one such commit. · **Changed by:** DEC-923: item 1's records are DEC-891's (ticket files included) and its "ACCEPTED decision" is the owner's or a delegated one, also when later superseded; a `Role: owner` trailer alone measures nothing, and gate (h) reads the owner-committed lists (`acceptance_exemptions`, `accepted_history`); W2-07's round 2, carried by the second re-pin. · **Changed by:** DEC-953 (item 1)
++- **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-490, DEC-500, DEC-734, DEC-891, DEC-892, DEC-894, DEC-889, DEC-890, DEC-884, DEC-861 · **Basis:** package P-W2-58-C1 (`governance/project/orchestration/packages/P-W2-58-C1.md`). W2-58's close was refused on WORK_WITHOUT_TASK for seven `Task: decision-record` commits that changed its paths (the path map) or its ticket file; W2-63's range holds one such commit. · **Changed by:** DEC-923: item 1's records are DEC-891's (ticket files included) and its "ACCEPTED decision" is the owner's or a delegated one, also when later superseded; a `Role: owner` trailer alone measures nothing, and gate (h) reads the owner-committed lists (`acceptance_exemptions`, `accepted_history`); W2-07's round 2, carried by the second re-pin. · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1057 (item 2)
+ - **Decision:**
+   1. **(a), a W2-07 KPI, rule-based:** a decision-record commit that changes only governance records, under an ACCEPTED decision, counts as measured for the work-without-a-task gate. **Not (c):** a decision-close would hide the gap.
+   2. **(d), corrected.**
+@@ -10229,7 +10229,7 @@
+ ## 284. The owner's answer of 2026-10-22 on P-W2-62-G1 (register v0.284, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-897 — The secrets check's chance red: W2-69 (FULL) in the first re-pin, with a widened design question; one proven re-run of a close's queue, written and narrow
+-- **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-868, DEC-780, DEC-896, DEC-889 item 15, DEC-801, DEC-861 · **Basis:** package P-W2-62-G1 (`governance/project/orchestration/packages/P-W2-62-G1.md`).
++- **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-868, DEC-780, DEC-896, DEC-889 item 15, DEC-801, DEC-861 · **Basis:** package P-W2-62-G1 (`governance/project/orchestration/packages/P-W2-62-G1.md`). · **Changed by:** DEC-909 (item 1)
+   - W2-62's queue stopped at gate (b) at 13:56: secrets-indexing RED on the code-graph store, rebuilt at 13:44.
+   - The orchestrator's diagnosis printed positions, rule ids and exit codes only:
+     - one `gov-token-lower` hit, 62 bytes inside an 84-character identifier, in no tracked file;
+@@ -10313,7 +10313,7 @@
+ ## 286. The owner's answers of 2026-10-23 at the review point (register v0.286, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-899 — The review point: W2-66, W2-07, W2-68, W2-67, W2-57 and W2-70 confirmed; lens I's P-IS-1 to P-IS-7 (a); W2-07 merges before W2-66; the p95 entries removed; two re-pins; DEC-898's figures confirmed; the interim skip guard
+-- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-880, DEC-883, DEC-884, DEC-889 items 7 and 14 to 16, DEC-890, DEC-892, DEC-895, DEC-896, DEC-897, DEC-898, DEC-813, DEC-757, DEC-762, DEC-766, DEC-866, DEC-861 · **Basis:** · **Changed by:** DEC-915 item 1: item 7's guard reads the close's skip reasons, not a count · **Changed by:** DEC-953 (item 1)
++- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-880, DEC-883, DEC-884, DEC-889 items 7 and 14 to 16, DEC-890, DEC-892, DEC-895, DEC-896, DEC-897, DEC-898, DEC-813, DEC-757, DEC-762, DEC-766, DEC-866, DEC-861 · **Basis:** · **Changed by:** DEC-915 item 1: item 7's guard reads the close's skip reasons, not a count · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-902 (items), DEC-912 (item 2), DEC-918 (item 4), DEC-924, DEC-925 (item 4)
+   - the review bundle, filed as `governance/project/orchestration/packages/REVIEW-BUNDLE-2026-10-22.md` (its combined file, `ALL-DRAFTS-AND-PACKAGES.md`, as the owner read it);
+   - lens I's synthesis (`docs/assessment/2026-10/I-SYNTHESIS.md`) and its four area reports.
+ - **Decision:**
+@@ -10779,7 +10779,7 @@
+ ## 299. W2-67's rounds 2 and 3 (register v0.300, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+ 
+ ### DEC-914 — W2-67's rounds 2 and 3 run together as its run 3, with round 1's ride-alongs; its review waits for the owner's answer on DEC-413
+-- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; item 4 is the owner's, asked in package P-W2-67-R23) · **Under:** DEC-904 item 5, DEC-907, DEC-802, DEC-413, DEC-906, DEC-866 · **Basis:** W2-67's ticket (rounds 2 and 3 wait for W2-07 and W2-66, and for W2-69); all three are merged (`2a9d1a11`, `c60c9704`, `2d5a829a`). W2-67's run 2 return (round 1, merged `4da40b60`) proposed the ride-alongs below and used both of DEC-413's reviews (`docs/probes/DAEO-9nys/PR-DAEO-9nys.md`: the second and last passed).
++- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; item 4 is the owner's, asked in package P-W2-67-R23) · **Under:** DEC-904 item 5, DEC-907, DEC-802, DEC-413, DEC-906, DEC-866 · **Basis:** W2-67's ticket (rounds 2 and 3 wait for W2-07 and W2-66, and for W2-69); all three are merged (`2a9d1a11`, `c60c9704`, `2d5a829a`). W2-67's run 2 return (round 1, merged `4da40b60`) proposed the ride-alongs below and used both of DEC-413's reviews (`docs/probes/DAEO-9nys/PR-DAEO-9nys.md`: the second and last passed). · **Changed by:** DEC-916 (item 4)
+ - **Decision:**
+   1. **Rounds 2 and 3 run together, as W2-67's run 3,** since no ticket in flight holds their folders: W1-30's 13 first-round cases and row W2-L420 (W1-30's context-failures case and two docstrings follow DEC-868 and DEC-908); the 15 nested-run unit close functions (`tests/unit/close/**`); W2-50's large-store and hang cases (`tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`), on W2-69's merged code.
+   2. **Round 1's ride-alongs (DEC-802), accepted:** P-W2-67-TD4-A (the root conftest's static guard also catches an f-string `--basetemp=`); the engineer's P1, option A (the time-limit case in `tests/unit/close` gets a `TMPDIR` of its own); TD1C-A (the fixtures remove the code-graph folders they make); review F3 (ordinary yes / other). The next test designer removes the inert untracked `tests/acceptance/W1-27/w2_67_td4_plant.py`.
+@@ -11115,7 +11115,7 @@
+ | 0.312 | 2026-10-27 | Delegated (orchestrator): DEC-926 (after W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path; W2-69 out of the queue for a re-probe; W2-07's round 2 merges after the queue). Next free id: DEC-927. |
+ 
+ ### DEC-927 — P-TRACE-IMPL-1 (a) with two conditions: the 39 commits whose `Implements:` names a role are accepted as history as corrections, by the owner's own commit; a wrong `Implements:` is caught within the ticket (standing)
+-- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-734, DEC-891, DEC-895, DEC-862 (a), DEC-925 item 2, DEC-851, DEC-861 · **Basis:** package P-TRACE-IMPL-1 (`governance/project/orchestration/packages/P-TRACE-IMPL-1.md`). After W2-70's close (2026-10-27, exit 0), gate (b) went red on product traceability: a closed ticket's commits must name ids the store resolves, and seven of W2-70's carry `Implements: independent-test-designer`. The lead briefs' `IMPL` slot had been filled with a role, so leads and their workers wrote a role there in 39 commits of six tickets on `w2/integrate` (and two on W2-57's branch). · **Changed by:** DEC-928: the CAP-n reading of item 2 is accepted by the owner; the entries are committed (`e95d3520`). · **Changed by:** DEC-953 (item 1)
++- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-734, DEC-891, DEC-895, DEC-862 (a), DEC-925 item 2, DEC-851, DEC-861 · **Basis:** package P-TRACE-IMPL-1 (`governance/project/orchestration/packages/P-TRACE-IMPL-1.md`). After W2-70's close (2026-10-27, exit 0), gate (b) went red on product traceability: a closed ticket's commits must name ids the store resolves, and seven of W2-70's carry `Implements: independent-test-designer`. The lead briefs' `IMPL` slot had been filled with a role, so leads and their workers wrote a role there in 39 commits of six tickets on `w2/integrate` (and two on W2-57's branch). · **Changed by:** DEC-928: the CAP-n reading of item 2 is accepted by the owner; the entries are committed (`e95d3520`). · **Changed by:** DEC-953 (item 1) · **Changed by:** DEC-1057 (item 2)
+ - **Decision:**
+   1. **(a), one `Role: owner` commit of all 39 entries, each a correction, not a bare exemption.** Each entry in the path map's `accepted_history` is `{commit: <full id>, decision: DEC-927, should_implement: [<ids>]}`. `should_implement` holds the decision ids the commit should have named in `Implements:`, taken from its Task ticket's `sources` that the register holds.
+      - 26 of the commits change only records, and 13 change code, tests or notes (DEC-891).
