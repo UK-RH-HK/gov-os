@@ -31,6 +31,8 @@ the register and the owner's word hold over both. **Next free id: DEC-1098.**
 - **Next wave (item 8, before the lift):** W2-141 (tests first), W2-20 rebuilt (its test designer for the new line),
   W2-145 filed and built, ADR-0002 reviewed and to the owner.
 - **The owner's checker** has the brief (FRESH-80-READINESS §2); only counts and the new sha256 come back.
+- **State at 11-08 evening:** FRESH-80-READINESS §7: everything on the CTO's side is ready and pinned; the owner's
+  checker, operator (the ACT, the transcripts) and item 6 remain. Then the pre-flight, declaration, control, the 80.
 
 ## 2. The emergency: in force
 - **What holds it:** DEC-1047 (the emergency); DEC-1049 (no nightly or full suite until the owner's word); DEC-1050
