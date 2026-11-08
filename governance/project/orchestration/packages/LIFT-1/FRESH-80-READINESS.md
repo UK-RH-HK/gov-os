@@ -121,3 +121,16 @@ folder) and the fresh-80 scripts (FRESH-80-1 items 14 to 19). **Rows** (DEC-1010
 **Then, in order:** the ACT applied and the CTO's live guard check; the pre-flight (counts only); the declaration filled and
 committed; the hold; the visible-40 control; the measure on the 80; the judged reader run; the hold ends; the data
 conditions; the figures to the owner.
+
+## 8. The owner's run sheet (2026-11-08), paths only
+- **The checker's and writer's tree at `c00d525f`:** `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/tree-c00d525f/`
+  (`git archive`, no history; the paths both sessions' settings deny removed), readable by both (their settings'
+  `additionalDirectories`), protected by the ACT's `fixtures/evaluation/memory-verdict-2/**` once applied; removed
+  after the writer.
+- **The checker's report:** `memory-verdict-2/STALENESS-CHECK.md` (beside `hidden/`, never inside it). **The writer's:**
+  `memory-verdict-2/WRITER-REPORT.md`; old labels in `memory-verdict-2/retired/`.
+- **Back to the CTO:** counts only; the digest computed by the operator after the writer
+  (`cd .../memory-verdict-2/hidden && LC_ALL=C sha256sum *.yaml | sha256sum`), the files count and the folder mode.
+- **Then:** the transcripts moved, the ACT applied; the CTO's live guard check, the worktree merges, the pre-flight
+  (`--expect-sha256`, `--expect-changed`), the declaration committed; "ready to launch" to the owner; the run on the
+  owner's word.
