@@ -65,6 +65,18 @@ sources:
 - DEC-968
 - DEC-966
 - DEC-953
+- DEC-1001
+- DEC-1002
+- DEC-1003
+- DEC-1010
+- DEC-1014
+- DEC-1015
+- DEC-1050
+- DEC-1083
+- DEC-959
+- DEC-988
+- DEC-989
+- W2-117
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-115/

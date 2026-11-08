@@ -36,6 +36,23 @@ profile: FULL
 sources:
 - DEC-710
 - DEC-971
+- DEC-580
+- DEC-712
+- DEC-777
+- DEC-783
+- DEC-802
+- DEC-804
+- DEC-805
+- DEC-807
+- DEC-906
+- DEC-951
+- DEC-953
+- DEC-970
+- DEC-980
+- W2-L160
+- W2-M105
+- W2-M113
+- W2-M161
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-05/

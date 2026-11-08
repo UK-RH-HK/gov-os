@@ -36,6 +36,20 @@ kpis:
 profile: FULL
 sources:
 - DEC-729
+- W2-H006
+- W2-H007
+- W2-H009
+- W2-H010
+- W2-H011
+- W2-H013
+- W2-H031
+- W2-L216
+- W2-M019
+- W2-M031
+- W2-M047
+- W2-M061
+- W2-M067
+- W2-M173
 est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W2-42/

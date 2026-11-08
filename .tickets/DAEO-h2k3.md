@@ -51,6 +51,17 @@ sources:
 - DEC-954
 - DEC-957
 - DEC-950
+- DEC-1052
+- DEC-1055
+- DEC-1068
+- DEC-1069
+- DEC-1070
+- DEC-1074
+- DEC-1078
+- DEC-1079
+- DEC-1083
+- DEC-1084
+- DEC-866
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-61h/

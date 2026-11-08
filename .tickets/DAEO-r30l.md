@@ -66,6 +66,22 @@ sources:
 - DEC-950
 - DEC-954
 - DEC-983
+- DEC-1001
+- DEC-1003
+- DEC-1010
+- DEC-1017
+- DEC-1030
+- DEC-1031
+- DEC-1038
+- DEC-1039
+- DEC-1088
+- DEC-899
+- DEC-961
+- DEC-979
+- DEC-982
+- W2-M188
+- W2-M244
+- W2-M262
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-20/

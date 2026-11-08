@@ -47,6 +47,11 @@ sources:
 - DEC-833
 - DEC-941
 - DEC-983
+- DEC-1028
+- DEC-1083
+- DEC-1084
+- DEC-953
+- DEC-982
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-55/

@@ -51,6 +51,10 @@ sources:
 - DEC-966
 - DEC-953
 - DEC-906
+- DEC-1016
+- DEC-999
+- MR-3
+- W2-106
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-90b/

@@ -51,6 +51,22 @@ profile: FULL
 sources:
 - DEC-725
 - DEC-900
+- DEC-1052
+- DEC-1055
+- DEC-1056
+- DEC-1063
+- DEC-1065
+- DEC-1066
+- DEC-419
+- DEC-802
+- DEC-860
+- W2-L233
+- W2-M071
+- W2-M072
+- W2-M100
+- W2-M102
+- W2-M292
+- W2-M296
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-13/

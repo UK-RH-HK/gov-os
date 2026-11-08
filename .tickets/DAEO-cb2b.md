@@ -55,6 +55,26 @@ sources:
 - DEC-1003
 - DEC-979
 - DEC-998
+- DEC-1009
+- DEC-1010
+- DEC-1014
+- DEC-1015
+- DEC-1018
+- DEC-1030
+- DEC-1031
+- DEC-1083
+- DEC-1084
+- DEC-1088
+- DEC-715
+- DEC-944
+- DEC-952
+- DEC-982
+- DEC-983
+- DEC-989
+- DEC-995
+- W2-118
+- W2-21
+- W2-H046
 est_loc: 500
 acceptance_tests:
   path: tests/acceptance/W2-121/

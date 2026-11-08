@@ -51,6 +51,10 @@ sources:
 - DEC-801
 - DEC-786
 - DEC-941
+- CAP-35.c
+- CAP-36.a
+- DEC-1014
+- DEC-1015
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-60a/

@@ -33,6 +33,7 @@ kpis:
 profile: FULL
 sources:
 - CAP-45.a
+- W2-M176
 est_loc: 260
 acceptance_tests:
   path: tests/acceptance/W2-17/

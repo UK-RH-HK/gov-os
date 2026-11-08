@@ -57,6 +57,9 @@ sources:
 - DEC-1072
 - DEC-1073
 - DEC-1074
+- DEC-1055
+- DEC-1065
+- DEC-423
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-92/

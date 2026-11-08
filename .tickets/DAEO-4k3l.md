@@ -59,6 +59,12 @@ sources:
 - CAP-31.d
 - CAP-33.a
 - DEC-983
+- CAP-44.a
+- DEC-1052
+- DEC-1083
+- DEC-968
+- DEC-982
+- W2-128
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-82/

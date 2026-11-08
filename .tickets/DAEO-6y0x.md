@@ -36,6 +36,7 @@ sources:
 - DEC-820
 - DEC-845
 - DEC-873
+- DEC-1010
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-93/

@@ -39,6 +39,9 @@ sources:
 - DEC-820
 - DEC-317
 - MR-3
+- DEC-911
+- DEC-970
+- DEC-987
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-96/

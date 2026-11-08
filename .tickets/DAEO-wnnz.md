@@ -63,6 +63,25 @@ sources:
 - DEC-784
 - DEC-877
 - DEC-941
+- DEC-1010
+- DEC-1035
+- DEC-1052
+- DEC-1083
+- DEC-715
+- DEC-902
+- W2-112
+- W2-127
+- W2-21
+- W2-I012
+- W2-L105
+- W2-M094
+- W2-M095
+- W2-M097
+- W2-M181
+- W2-M187
+- W2-M275
+- W2-M393
+- W2-M405
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-56/

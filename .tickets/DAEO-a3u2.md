@@ -45,6 +45,11 @@ sources:
 - DEC-833
 - DEC-860
 - CAP-10.a
+- DEC-1013
+- DEC-1055
+- DEC-1084
+- DEC-968
+- DEC-996
 est_loc: 30
 acceptance_tests:
   path: tests/acceptance/W2-91/

@@ -34,6 +34,9 @@ sources:
 - CAP-33.b
 - CAP-33.g
 - DEC-167
+- DEC-1083
+- W2-L319
+- W2-M285
 est_loc: 280
 acceptance_tests:
   path: tests/acceptance/W2-37/

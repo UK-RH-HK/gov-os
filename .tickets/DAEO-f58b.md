@@ -43,6 +43,13 @@ sources:
 - DEC-982
 - DEC-963
 - DEC-966
+- DEC-1014
+- DEC-1015
+- DEC-1083
+- DEC-1087
+- DEC-719
+- W2-06
+- W2-M088
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-116/

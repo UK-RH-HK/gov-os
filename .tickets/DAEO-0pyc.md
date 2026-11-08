@@ -49,6 +49,23 @@ sources:
 - DEC-725
 - DEC-954
 - DEC-957
+- DEC-1031
+- DEC-1055
+- DEC-1064
+- DEC-1065
+- DEC-1066
+- DEC-1067
+- DEC-1068
+- DEC-1069
+- DEC-1071
+- DEC-1074
+- DEC-1083
+- DEC-1086
+- W2-L065
+- W2-M073
+- W2-M103
+- W2-M104
+- W2-M191
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-32/

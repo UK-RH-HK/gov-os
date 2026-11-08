@@ -37,6 +37,11 @@ sources:
 - DEC-1027
 - DEC-1015
 - DEC-1014
+- DEC-1083
+- DEC-530
+- DEC-954
+- W2-26
+- W2-88
 est_loc: 80
 acceptance_tests:
   path: tests/acceptance/W2-124/

@@ -54,6 +54,12 @@ sources:
 - DEC-957
 - DEC-959
 - DEC-983
+- CAP-36.a
+- DEC-847
+- DEC-953
+- DEC-963
+- DEC-982
+- W3-P09
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/

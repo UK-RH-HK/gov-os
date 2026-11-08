@@ -31,7 +31,11 @@ How the sorting works:
 - DEC-365, DEC-407: their ancestry rule replaced by DEC-409.
 - DEC-410: changed by DEC-918.
 - DEC-448: its one-off limit superseded by DEC-477.
-- DEC-454, DEC-455, DEC-480, DEC-490, DEC-492: changed by DEC-868, DEC-899, DEC-904 and DEC-908. Their close parts are now lifted (LIFTED §A).
+- DEC-454: changed by DEC-868, DEC-899 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-455: changed by DEC-868, DEC-899 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-480: changed by DEC-868 and DEC-908. Its close parts are now lifted (LIFTED §A).
+- DEC-490: changed by DEC-904. Its close parts are now lifted (LIFTED §A).
+- DEC-492: changed by DEC-868 and DEC-899. Its close parts are now lifted (LIFTED §A).
 - DEC-460: its cause corrected by DEC-840, and its model replaced by DEC-839.
 - DEC-466: every close through `gov close` and `gov check` as a blocking gate. SUPERSEDED by DEC-953 item 1 (LIFTED §A).
 - DEC-493: changed by DEC-896 item 2 and DEC-903 (the overlay holds the test map).

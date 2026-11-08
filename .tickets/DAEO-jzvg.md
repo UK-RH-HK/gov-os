@@ -46,6 +46,15 @@ sources:
 - DEC-736
 - DEC-757
 - DEC-762
+- DEC-1083
+- DEC-890
+- W2-H026
+- W2-H042
+- W2-L119
+- W2-M159
+- W2-M160
+- W2-M162
+- W2-M253
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-19/

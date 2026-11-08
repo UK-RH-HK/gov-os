@@ -84,6 +84,14 @@ sources:
 - CAP-10
 - CAP-19
 - DEC-957
+- CAP-44.b
+- CAP-44.f
+- CAP-44.g
+- DEC-016
+- DEC-1083
+- DEC-1084
+- W2-124
+- W2-26
 est_loc: 500
 acceptance_tests:
   path: tests/acceptance/W2-88/

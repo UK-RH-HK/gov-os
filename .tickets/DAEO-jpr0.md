@@ -48,6 +48,13 @@ sources:
 - DEC-1031
 - DEC-1015
 - DEC-374
+- DEC-1026
+- DEC-1033
+- DEC-1039
+- DEC-1042
+- DEC-1046
+- DEC-1052
+- W2-123
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-126/

@@ -108,6 +108,9 @@ sources:
 - DEC-729
 - DEC-953
 - DEC-954
+- DEC-1083
+- DEC-1084
+- W2-24
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'

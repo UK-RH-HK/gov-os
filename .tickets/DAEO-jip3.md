@@ -33,6 +33,8 @@ sources:
 - CAP-59.b
 - CAP-56
 - DEC-096
+- DEC-1083
+- W2-25
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-47/

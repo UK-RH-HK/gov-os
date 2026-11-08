@@ -51,6 +51,7 @@ sources:
 - DEC-1048
 - DEC-1068
 - ADR-0002
+- DEC-1034
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-112/

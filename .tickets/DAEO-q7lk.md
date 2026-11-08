@@ -56,6 +56,7 @@ sources:
 - DEC-861
 - DEC-182
 - CAP-27
+- DEC-1088
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-129/

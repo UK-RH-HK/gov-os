@@ -39,6 +39,10 @@ sources:
 - DEC-1084
 - DEC-1083
 - DEC-820
+- DEC-1052
+- DEC-1078
+- DEC-1079
+- W2-61h
 est_loc: 60
 acceptance_tests:
   path: tests/acceptance/W2-134/

@@ -46,6 +46,15 @@ sources:
 - DEC-957
 - DEC-959
 - DEC-983
+- DEC-1010
+- DEC-1083
+- DEC-236
+- DEC-839
+- DEC-847
+- DEC-963
+- DEC-982
+- DEC-991
+- DEC-994
 est_loc: 260
 acceptance_tests:
   path: tests/acceptance/W2-33/

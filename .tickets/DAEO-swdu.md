@@ -54,6 +54,20 @@ sources:
 - DEC-860
 - DEC-954
 - DEC-957
+- DEC-1083
+- DEC-798
+- W2-15a
+- W2-61
+- W2-L102
+- W2-L317
+- W2-L320
+- W2-L321
+- W2-L322
+- W2-M017
+- W2-M089
+- W2-M340
+- W2-M342
+- W2-M351
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'

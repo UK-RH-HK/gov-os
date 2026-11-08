@@ -80,6 +80,14 @@ sources:
 - DEC-793
 - DEC-943
 - CAP-33
+- DEC-1014
+- DEC-1084
+- DEC-1085
+- DEC-1087
+- DEC-1088
+- DEC-1092
+- DEC-1094
+- W2-11b
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-128/

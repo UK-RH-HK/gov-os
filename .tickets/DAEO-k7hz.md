@@ -85,6 +85,21 @@ sources:
 - DEC-957
 - DEC-959
 - DEC-983
+- DEC-1083
+- DEC-951
+- DEC-952
+- DEC-953
+- DEC-974
+- DEC-979
+- DEC-982
+- DEC-991
+- DEC-994
+- DEC-995
+- DEC-996
+- W2-L256
+- W2-L257
+- W2-L258
+- W2-L268
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/
