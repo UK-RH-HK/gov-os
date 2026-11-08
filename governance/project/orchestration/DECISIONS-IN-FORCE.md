@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`). Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to the owner's word of 2026-11-08 (the last section). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -296,3 +296,13 @@ other restart is an ACT.
   consultable, on the 138, McNemar against E2, wrong claims and cost beside); if it helps, it joins the fresh-80
   configuration. The package (wording, spec, KPI lines, tickets, W2-88's Wave 0 line, estimate, dates) beside the test;
   the build after the test and the owner's approval, tests first. Basis: 1.
+
+## The owner's word of 2026-11-08, in force (not a register entry; next free id DEC-1097)
+- **The experiments' decisions are held:** FRESH-80-1, M3-ADOPTION-1 and GLOSSARY-1 are decided together by the owner
+  after reading `packages/LIFT-1/FRESH-80-READINESS.md`. **Start nothing on the fresh 80 until then** (no pre-flight,
+  no scripts run against it, no checker's pass started).
+- **Decided but not done, overdue:** ACT-GUARD-SETS-1 (DEC-1084: apply right after re-pin window 4) was not applied,
+  and its patch no longer matches the live files (`apply.sh check` exit 1). The full list of decided-but-not-done
+  items is in START-NEXT-SESSION §3 and RESUME HERE; read it at every session start.
+- **A CTO hold, for the owner to confirm:** W2-139 and W2-140 (Contract 4.3, DEC-1093) wait until after the fresh 80,
+  so nothing lands on integrate between the 80's pre-flight and its run.

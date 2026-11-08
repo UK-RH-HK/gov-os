@@ -1,192 +1,137 @@
-# Start here — the next CTO session (written 2026-11-07 by session 812bc5ce, for the session that starts right after re-pin window 4)
+# Start here — the next CTO session (written 2026-11-08 by session ad44f5fe, before its compaction)
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1089.**
+the register and the owner's word hold over both. **Next free id: DEC-1097.**
 
-## 0. First: has the owner's operator run re-pin window 4?
-- **The hold:** `log/act-in-progress.txt` (ACT-REPIN-W4, written 2026-11-06 23:5x). While it exists, make no main-tree
-  commit (DEC-1028 item 6).
-- **Done when:**
-  - `readlink -f ~/.local/bin/gov` = `/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov`;
-  - the operator's log `~/repin-w4.log` ends `RE-PIN DONE: pin-bcea09060ebc is live ...`;
-  - the owner says "done".
-- **If it is not done:** write `log/cto-standby.txt` with the reason and wait. Start nothing (the owner: "start nothing
-  else; the hold stays").
-- **If it printed `STOP` or `ROLLED BACK`:** read `~/repin-w4.log`, find the cause, and tell the owner. The old pin
-  `pin-8284fb408bd4` is then live.
+## 0. Where things stand (2026-11-08)
+- **Re-pin window 4 is live** (`pin-bcea09060ebc`, 11-07 14:22); the pool is on (`c00d525f`); PAT-1 done.
+- **Every experiment is done** (records in `packages/LIFT-1/`): E0 (106/138 hit@5; gold in the first bundle 123),
+  E0b, E1's pilot, E2 (search again once: 83.3 % → 92.8 % right end to end), E2G (the glossary as consulted lowers:
+  122 vs 128), E3 (today's 6,000-token bundle best of five), E3-SA, E4 (M3/M1 rank higher, answer no better: 111, 113
+  vs 114), E5 (12,000 tokens no gain), G1's profile (the reranker's GPU saturated). Best: **the 0.6B's bundle with
+  search again once, 128/138**.
+- **Merged since window 4, live at the lift:** W2-136 (`gov plan`), W2-137 (the reranker's cap 64), W2-138 (the
+  store's commit in results). **Filed, not started:** W2-139, W2-140, W2-141, W2-142.
+- **Nothing is running** but the session watchers (§6).
 
-## 1. The emergency: in force
-- **What holds it:**
-  - DEC-1047: the emergency;
-  - DEC-1049: no nightly full suite until the owner's word;
-  - DEC-1050 and DEC-1051: everything stopped until the refactoring and the re-pins;
-  - DEC-1052: the basis, the plan D-0 to D-11, and the basis as a standing practice.
+## 1. The owner's word of 2026-11-08: HOLD
+- **The experiments' decisions are held** until the owner has read the details: FRESH-80-1 §5 (7 questions: the
+  configuration, the commit, the K9 bar, readers on the 80, the staleness pass, the fixes), M3-ADOPTION-1 §6 (keep the
+  0.6B recommended), GLOSSARY-1 §9 (park recommended). The owner decides them together.
+- **Start nothing on the fresh 80** until then: no pre-flight, no scripts against it, no checker's pass.
+- **What the owner is reading:** the report of 11-08, kept in full in `packages/LIFT-1/FRESH-80-1.md` (§2 the twenty
+  fixes, §3.5 the fault rule) and `packages/LIFT-1/FRESH-80-READINESS.md` (the checker's brief; ACT-GUARD-SETS-1's
+  state and the reader-folder gap; what a verdict at window 4 covers; the readiness review proposal; G3 and the rest).
+- While waiting, keep `log/cto-standby.txt`.
 
-  DEC-1045 (no gitleaks scan) stands.
-- **Allowed:**
-  - the steps below, in order, with engineers, test designers, reviewers and research as agents of their role;
-  - scoped test runs through `tools/heavy_slot.sh`;
-  - record commits;
-  - the repository's own servers restarted from committed configs;
-  - one GPU job at a time under the GPU rules.
-- **Not allowed (must not start):**
-  - any lead (the dispatcher's ready list stays empty) and any landing or queue run, until after D-10 and the lift;
-  - the nightly;
-  - the runs sweep;
-  - `tools/bench_loop.sh`;
-  - the guard-refusal harvest's schedule (run `tools/guard_refusals.py` by hand for the digest);
-  - any full suite (D-10 only, on the owner's word);
-  - any `gov close`;
-  - any gitleaks scan;
-  - any machine change outside the repository except by an owner ACT.
-  - **`tools/usage_watch.sh` is off:** the digest says "usage: no measured source". Ask the owner whether to re-arm it.
+## 2. The emergency: in force
+- **What holds it:** DEC-1047 (the emergency); DEC-1049 (no nightly or full suite until the owner's word); DEC-1050
+  and DEC-1051 (everything stopped until the refactoring and the re-pins); DEC-1052 (the basis, D-0 to D-11). DEC-1045
+  (no gitleaks scan) stands; DEC-1091 (no budget cap; a runaway brake at twice each projection); DEC-1089 (3) (usage is
+  never pinged or alarmed, only recorded).
+- **Allowed:** record commits; scoped test runs through `tools/heavy_slot.sh`; agents of their role for decided work;
+  the repository's own servers restarted from committed configs; one GPU job at a time under the GPU rules.
+- **Not allowed:** any lead or landing or queue run until after D-10 and the lift; the nightly; the runs sweep;
+  `tools/bench_loop.sh`; any full suite (D-10 only, on the owner's word); any `gov close`; any gitleaks scan; any
+  machine change outside the repository except by an owner ACT; **any commit on `w2/integrate` during a GPU measure**
+  (its hook rebuilds the store).
 
-## 2. The reading list, in order
-1. `governance/project/prompts/w2-orchestrator.md`: §0, §1, §8 (the countdown) and §15 (the reports, the block, the
-   digests).
-2. **This file.**
-3. `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`, its **RESUME HERE**: its first block is the state at the
-   hand-over.
-4. `governance/project/orchestration/DECISIONS-IN-FORCE.md`, to DEC-1088. Above all DEC-1085 to DEC-1088:
-   - the order: the build, then search-again, then end-to-end, then the fresh 80;
-   - window 4 and its first test;
-   - `gov plan`;
-   - the standing rule that a closed ticket is never edited.
-5. `docs/DECISION_REGISTER.md`: DEC-1085 to DEC-1088 in full.
-6. The packages of the last two days, `governance/project/orchestration/packages/`:
-   - `ACT-REPIN-W4.md` (what the re-pin carries);
-   - `LIFT-1/SEVEN-ANSWERS.md` (the full picture the owner decided on);
-   - `LIFT-1/DEPENDENCY-MAP-1.md` (W2-136);
-   - `LIFT-1/D4B-SEARCH-AGAIN.md` (E1 and E2, declared before any run);
-   - `LIFT-1/D4B-SCORE-ONCE.md` (the grid and every lever's result);
-   - `LIFT-1/BUNDLE-BUDGET-1.md`; `LIFT-1/W2-32-S11-WORDING.md`.
-7. `packages/LIFT-1/P1-PLAN.md`, the status table (D-0 to D-11).
-8. `docs/research/W2-88-memory-practice.md`: how memory is built and used now.
-9. The agents' common rules `.gov-runtime/scratch/orchestrator/briefs/EMG-common.md`; reviewers
-   `governance/project/briefs/JUDGEMENT.md`.
+## 3. Decided but not done — read at every session start
+The full audit (251 action items in DEC-1047 to DEC-1096 and the owner actions since: 193 done, 15 not done, 36
+waiting on a trigger, 7 superseded) is `packages/DECIDED-NOT-DONE.md`. **Keep it current:** tick an item off with its
+commit when done; add every new decided item with its trigger the moment it is decided; raise any item whose trigger
+has passed in the next report. A decision whose trigger is a stage ("after X", "beside X", "with X") is lost when
+nothing notes it as X ends: check this list whenever a stage ends.
 
-## 3. What re-pin window 4 carries (`pin-bcea09060ebc`)
-- **The builds:**
-  - W2-92: the stated links (one bounded hop; each register item's status in the bundle);
-  - W2-32 S11: the candidate pool, **not yet switched on** (§4 step 2);
-  - W2-131 and W2-133: register items carry their own entry's id, not DEC-999;
-  - W2-112's memory release: the shared reranker empties its GPU cache after each request and logs MiB;
-  - W2-134 and W2-61h S7: the measure re-anchors gold in memory per commit, and source families;
-  - W2-135: a line over 4,000 characters cut in a bundle item, marked `cut`;
-  - W2-116 pass 1: `gov rebuild --integration`, the double-buffered integration store, and `GOV_STORE` set by
-    `gov launch` for every worker;
-  - W2-129: `gov links`;
-  - D-6 part 1; D-9's records.
-- **The ACT also:**
-  - rebuilt the store at the commit;
-  - restarted the shared reranker from the new pin (class 3);
-  - installed W2-116's `reference-transaction` hook (`.git/hooks/`), so every update of `w2/integrate` refreshes the
-    store in the background (`log/integration-store.log`).
-- **Rollback:** one command, in ACT-REPIN-W4.md. `pin-8284fb408bd4` stays.
+**Overdue (should already have happened by its own terms):**
+1. **ACT-GUARD-SETS-1** (DEC-1084, DEC-1082 (3)): due right after window 4. Not applied; patch stale (`apply.sh check`
+   exit 1); add the 80's reader folder. **Before the 80.**
+2. **W2-141** (DEC-1093 (2), `DAEO-xwro`): to be built beside the experiments. Not started. Ready before the lift.
+3. **G3, overlapping slices** (DEC-1090 (4)): to be decided after E0. Undecided; recommendation in FRESH-80-READINESS §6.
+4. **G1's "fewer scored pairs" option** (DEC-1094 (1)): to be brought after E3 to E5. Never brought; any ranking
+   change means re-measuring the 138 (FRESH-80-READINESS §4).
+5. **W2-20's launch line** (DEC-1088 (5)(b)): to land with W2-136. W2-136 merged without it; W2-20 not rebuilt (branch
+   of 10-17). Rebuild to the line and W2-136's F2 entry criterion; review; merge before the lift.
+6. **W2-130's link cleanup and the 110-decision reconciliation list** (DEC-1074 (7), DEC-1073 (2), (5)(a)): due right
+   after window 4. Not started (`DAEO-q8cl`). Feeds the 150-id sitting.
+7. **The P-SELECT-GRAPH trial** (DEC-1062): a D-9 step. Not run (research, CPU only).
+8. **W2-84's hidden-half cases deleted** (DEC-1061 (4)): due at D-9. Still in `tests/optin-lifted-guard.txt` and
+   `tests/unit/guard/test_w2_84_trees.py`; with ACT-GUARD-SETS-1's rebuild.
+9. **No private reranker beside the shared service** (DEC-1048 (5), DEC-1046 (1)): a follow-up after W2-112 landed.
+   In no ticket; W2-112's KPI still falls back to a private reranker.
+10. **P-LB-PRODUCT-1** (DEC-1048 (3)): to be decided after the investigation (done 11-03). Never brought back.
+11. **Q07 and Q14 re-worded to stable facts** (DEC-1070 (13), DEC-1074 (8)) and **the visible 40's category
+    shortfalls** (DEC-1074 (8)): open since 11-05; an independent writer.
+12. **The status block counts K9 as done** from stale tags (DEC-948, DEC-1087 (6)): fix the source or keep it by hand.
+13. **ADR-0002** (DEC-1093 (3)): refresh, one review, to the owner. Due now; deadline the lift's re-pin.
+14. **The label audit** (DEC-1070 (14), DEC-1076 (5), DEC-1078 (4)): no cadence set; RUBRIC.md still v2. Needs a
+    trigger from the owner.
 
-## 4. The steps after "done", in order
-1. **End the hold:** `mv log/act-in-progress.txt log/act-in-progress.ended-<HHMM>-act-repin-w4.txt` (never `rm`). End
-   `log/cto-standby.txt` the same way. Confirm the pin, the reranker (`tail -2 ~/.cache/gov-os/rerank.log`: READY
-   from `pin-bcea09060ebc`, with MEMORY lines after requests) and the hook (`.git/hooks/reference-transaction`,
-   executable).
-2. **Switch the pool on** (W2-32 S11; DEC-1086 A). One commit to `governance/project/retrieval.yaml`, adding beside
-   `routing:`:
-   ```yaml
-   pool:
-     meaning_uncut: true
-     route_depth: 60
-     rerank_depth: 40
-     per_file_first10: 2
-     drop_nested: true
-   ```
-   Never before the switch: the old pin refuses the key.
-3. **Check the hook refreshed the store:**
-   - a new line in `log/integration-store.log` at the new head, from `gov rebuild --integration`;
-   - `git -C "$(readlink -f ~/gov-os-worktrees/W2-00-store)" rev-parse HEAD` equals integrate's head;
-   - a `gov retrieve` from the store has both facets, `rerank.by` service, and register items with their own ids.
-   - **The speed check (DEC-1086 A):** time a plain search's median, the pin against the candidate, side by side.
-   - **If the hook did not fire,** run `gov rebuild --integration w2/integrate` by hand and record why.
-4. **The parallel-agents and memory test, before any experiment (DEC-1087 (10)).** Explain, then test:
-   - agents in two worktrees search the shared integration store (`GOV_STORE` from `gov launch`, or `--root`), and read
-     and edit their own worktree;
-   - whether results carry their commit, or line numbers mislead an agent whose branch is behind;
-   - what a search does during a refresh, and a continuation after the switch (W2-116's R2-F3: page 2 after a switch
-     pages the other half);
-   - the link graph and the dependency gating used (today: `depends_on` and the READY rule; `gov plan` comes with
-     W2-136);
-   - the search time with 10 and 20 agents at once;
-   - **W2-112's live measure** (its review F1): the 20-search p50, p95 and max against 2.32, 3.82 and 4.01 s; the
-     MEMORY lines against `nvidia-smi`; error answers and fallbacks counted.
-   - **The test itself:** two agents in two worktrees searching while a merge refreshes the store. Report every gap to
-     the owner before the experiments.
-5. **Then the experiments (DEC-1087 (11)):**
-   - E0 (the 138 through the live product: hit@5, @10, @20, in the bundle) and E0b (the same through the harness at
-     the same commit), on a measure clone at window 4's commit;
-   - E1, the search-again pilot (5 questions; `D4B-SEARCH-AGAIN.md`); **the pilot's cost to the owner, who sets the
-     cap before E2**;
-   - then E2, E3, E4, E5 (SEVEN-ANSWERS §7); the owner's decisions; the fresh 80, once.
-   - E3 to E5 need their design package (reader, grader, rubric, cost, a proposed K9 bar) approved before any run
-     (DEC-1085 (6)).
-6. **Beside the experiments (CPU): W2-136** (`DAEO-p3ln`, `gov plan`, DEC-1088): tests first, the engineer, one review.
-   It lands with W2-20's launch line (DEC-1088 (5)(b)), live at the lift's re-pin.
+**Waiting on the owner's word:** FRESH-80-1 §5; M3-ADOPTION-1 §6; GLOSSARY-1 §9 (W2-143 and W2-144 not filed);
+the readiness review (FRESH-80-READINESS §5); the hold on W2-139 and W2-140 until after the 80; the verdict-transfer
+check (FRESH-80-READINESS §4); the deferred embedder trial (DEC-1079 (d), DEC-1085 (4): no trigger).
 
-## 5. Watchers, loops and digests to re-arm (each session; with the new pin)
-- **The inbox waiter:** `tools/inbox_wait_quiet.sh` (a Bash background run). Read and file each item to
-  `dispatch/inbox/read/`, then re-arm. It fires on any item left in the inbox.
+**Before the 80 (after the owner's word):** the fresh-80 scripts (FRESH-80-1 items 14 to 19); the checker's pass.
+
+**Before or at the lift's re-pin:** W2-142 (`DAEO-qskx`) built; W2-20 rebuilt; W2-141 and the guard ACT; the re-pin
+carries W2-136, W2-137, W2-138, W2-20, W2-141, W2-142; D-5 (the templates, W2-128, the owner's approval and the
+`.claude/` copies ACT); D-6 part 2; D-10 on the owner's word (with `lifted` once, `core.bare`'s half, W1-01b, W2-66b,
+W2-90c).
+
+**After the lift:** the 21 formal closes (W2-55 among them); the first numbered release (W2-27, before W2-81's run);
+the three-layer plan (DEC-1087 (13)); D-11; W2-88 as a kernel skill; G-4 to G-6 re-scoped; W2-15a/b's corpora; W2-42a
+resumed; the spill floor re-read about 11-13; the search-again adoption count weekly from about 11-21.
+
+## 4. The reading list, in order
+1. `governance/project/prompts/w2-orchestrator.md`: §0, §1, §8 and §15.
+2. **This file**, then `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`'s RESUME HERE (its first block).
+3. `governance/project/orchestration/DECISIONS-IN-FORCE.md` to DEC-1096 and the owner's word of 11-08.
+4. `docs/DECISION_REGISTER.md`: DEC-1089 to DEC-1096 in full.
+5. `packages/LIFT-1/`: FRESH-80-1, FRESH-80-READINESS, M3-ADOPTION-1, GLOSSARY-1, SEARCH-AGAIN-PRACTICE, then the
+   RESULTs (E0 … E5, E0B, E2G, G1-PROFILE, PAT-1); `packages/ACT-GUARD-SETS-1.md`; `packages/K7-W2-REMAINDER.md`.
+6. `packages/LIFT-1/P1-PLAN.md`'s status table; `docs/research/W2-88-memory-practice.md` §7 and §8.
+7. Briefs: `governance/project/briefs/LEAD-w2-common.md`, `AUDITOR-common.md`, `JUDGEMENT.md`;
+   `.gov-runtime/scratch/orchestrator/briefs/EMG-common.md` (each carries the search-again line and the exclusion line).
+
+## 5. After the owner decides (the order, if approved as recommended)
+1. Record the decision (DEC-1097) with every item; bring DECISIONS-IN-FORCE, this file and RESUME HERE to it.
+2. **ACT-GUARD-SETS-1:** an engineer rebuilds the patch against today's `.claude/hooks/pretooluse.py` and
+   `governance/project/path-map.yaml`, adding the 80's reader-run folder to the hidden globs; rehearsal end to end;
+   the CTO's review; the owner's operator applies; the guard check; live worktrees merge integrate. **Before the 80.**
+3. The readiness review, if approved (seven read-only reviewers; FRESH-80-READINESS §5).
+4. The fresh-80 scripts (FRESH-80-1 items 14 to 19), one review, pinned; the checker's pass (FRESH-80-READINESS §2).
+5. The pre-flight and the visible-40 control, then **the fresh 80 once** under the fault rule (FRESH-80-1 §3.5).
+6. Then W2-139 and W2-140 in one batch (held until after the 80); D-6 part 2 and D-5 on the CPU; ADR-0002's refresh;
+   D-10 on the owner's word; the lift.
+
+## 6. Watchers, loops and digests to re-arm (each session)
+- **The inbox waiter:** `tools/inbox_wait_quiet.sh` (background). File each item to `dispatch/inbox/read/`, re-arm.
 - **The sentinel check:** `tools/sentinel_check.sh` (background). Push the owner at once on a `*-sentinel-down.txt`.
 - **`core.bare`:** `tools/bare_watch.sh` (background).
-- **The daily store backstop:**
-  `env SEED_REBUILD_CMD="bash .../tools/rebuild_pinned.sh" bash .../tools/store_refresh_daily.sh` (background; 10:00
-  and 18:00). W2-116's hook is the primary refresh; this is the backstop until W2-116's S2 lands.
-- **By hand after a merge,** if the hook did not run: the same `refresh_integration_store.sh` with `SEED_REBUILD_CMD`.
-- **The digests (R-11):** CronCreate `2 9 * * *` and `2 18 * * *`. Each builds the digest per prompt §15, ends with
-  `status_block.py --mark` (which writes `log/status-latest.txt`), and pushes its three most important lines. Session
-  jobs: re-create them each session (7-day expiry).
-- **Reports (DEC-878, DEC-948, DEC-1087 (6)):**
-  - every report opens with `status_block.py --countdown` and ends with `status_block.py` (`--mark` after sending);
-  - every message, the short ones included, ends with the block;
-  - the hand-kept facts are in `log/report-state.json`;
-  - a push on entering stand-by or starting a background job over 30 minutes, except in quiet hours.
-- **The GPU backstop** (`tools/gpu_backstop.sh <pgid>...`, `arm` checks it is alive) is armed per GPU job.
-- **The structural pass after every record commit:** `tools/structural_pass.py <repo> HEAD~1`. It now has a `links`
-  family (`gov links --since <base>`, a notice). When it names new findings, fix those the commit made, such as a
-  missing `sources:` entry.
-- **Keep:**
-  - `~/gov-os-worktrees/EMG-queue`, the guard suite's fixture (`test_guard_fix_4.py` writes a planted path into it);
-  - `~/gov-os-runs/D4B/g1-fam`, the families re-score root.
+- **The store backstop:** `env SEED_REBUILD_CMD="bash .../tools/rebuild_pinned.sh" bash .../tools/store_refresh_daily.sh`
+  (background; 10:00 and 18:00). W2-116's hook is the primary refresh.
+- **Usage, record only:** `tools/usage_log.sh` (background; `log/usage.txt`); spend in `log/spend.jsonl`.
+- **The digests (R-11):** CronCreate `2 9 * * *` and `2 18 * * *`, per prompt §15, ending `status_block.py --mark`.
+- **Reports:** open with `status_block.py --countdown`, end with `status_block.py`; hand-kept facts in
+  `log/report-state.json`. The block counts K9 as done from stale tags: correct it by hand (K7-W2-REMAINDER §5).
+- **The GPU backstop** (`tools/gpu_backstop.sh <pgid>...`) per GPU job; processes in their own group
+  (`run_group.sh`); every wait and stop by pid only (`tools/proc.sh`).
+- **After every record commit:** `tools/structural_pass.py <repo> HEAD~1`; fix what the commit made.
+- **The record branch:** `python3 governance/project/orchestration/sync_context.py --commit "<subject>"` hourly and at
+  session end.
+- **Keep:** `~/gov-os-worktrees/EMG-queue` (the guard suite's fixture); `~/gov-os-runs/D4B/` (the experiments' runs).
 
-## 6. Waiting on the owner
-- **P1 now:** the operator's ACT-REPIN-W4, after the owner's push (pushed 2026-11-07: `w2/integrate` at `71b1f9b7`,
-  `record/w2` at `74de225a`; the three script hashes checked).
-- **P2:** ADR-0002, PROPOSED and cited by W2-112 (a `gov links` notice).
-- **Later:**
-  - the pilot's cost before E2 (the cap);
-  - the E3 to E5 design package;
-  - M3's adoption (DEC-1043), after all the experiments;
-  - the 150-id sitting (DEC-1074 (7) O2);
-  - the templates' approval and their `.claude/` copies (an ACT);
-  - after the lift, the three layers' plan as a package (DEC-1087 (13));
-  - whether to re-arm `usage_watch.sh`.
-
-## 7. The checks at start (after the prompt's §1)
-1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
-2. Register: your session id into `log/cto-session.txt`; arm §5's background runs; one test push; the sentinel's last
-   line in `log/deadman.log` under 10 minutes old.
-3. **Holds:** §0. While you wait on the owner or the operator, keep `log/cto-standby.txt`. **Every wait and stop is by
-   pid only (`tools/proc.sh`).**
-4. **The pin** after the act: `readlink -f ~/.local/bin/gov` = `.../pin-bcea09060ebc/bin/gov`. The guard:
+## 7. The checks at start
+1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` empty.
+2. Your session id into `log/cto-session.txt`; arm §6; one test push; `log/deadman.log`'s last line under 10 minutes.
+3. The pin: `readlink -f ~/.local/bin/gov` = `/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/gov`. The guard:
    `python3 .gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS`
    = `PASS`.
-5. **The servers on the GPU:** both embedders 29/29 layers; the reranker READY on `cuda:0` from the new pin; a
-   `gov retrieve` from `~/gov-os-worktrees/W2-00-store` gives `rerank.by` = `service`.
-6. **`core.bare`:** `git --git-dir=.git config --get core.bare` = `false`.
-7. **The inbox:** read and file each item.
+4. The GPU servers: both embedders 29/29 layers; the reranker READY on `cuda:0` from the pin; a `gov retrieve` from
+   `~/gov-os-worktrees/W2-00-store` gives `rerank.by` = `service`.
+5. `git --git-dir=.git config --get core.bare` = `false`. The inbox read and filed.
+6. **§3's list read; anything whose trigger has passed is raised with the owner in the first report.**
 
 ## History
-The dated blocks of every earlier session are in CHECKPOINT.md below RESUME HERE, and in this file's git history.
-- the score-once grid and the levers;
-- the trials;
-- D-0 to D-9;
-- the measure's audit;
-- the night records `drafts/d4b/NIGHT*.md`.
+Earlier sessions' dated blocks are in CHECKPOINT.md below RESUME HERE and in this file's git history.

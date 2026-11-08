@@ -253,3 +253,23 @@ the 79 do not fall and the halves' gap does not widen, then by MRR over the 79.
 
   The question that matters is whether an agent reading its bundle answers right and cites the right source
   (DEC-1085).
+
+## 8. What the end-to-end experiments found (2026-11-07, window 4's commit `c00d525f`, the 138)
+Records in `governance/project/orchestration/packages/LIFT-1/` (E0 to E5, E0B, E2G, G1-PROFILE, PAT-1).
+- **Judge memory by what an agent answers, not by rank alone.** hit@5 is 106/138, but the gold is in the first bundle
+  for 123, and a reader answering from the bundle alone was right end to end (answer correct, citation right) on
+  83.3 % at one search.
+- **Search again once** when the first bundle does not answer: 92.8 % (128/138), wrong claims unchanged (E2,
+  DEC-1092). This is the standing practice (DEC-1094): in the briefs now, the kernel skills by W2-142.
+- **A bigger bundle does not help:** 12,000 tokens against 6,000 gave no gain (E5); today's bundle was best of five
+  shapes (E3).
+- **A better reranker does not help end to end:** M3 and M1 lift hit@5 to 117 and 114, but agents answered 111 and 113
+  against 114 (E4). The gold moves up inside a bundle the reader reads whole. The 0.6B stays.
+- **A glossary consulted at search-again lowers answers:** 122 against 128 (E2G, p 0.031). Keep a glossary out of the
+  search path.
+- **Most remaining misses are correct answers citing a place the label does not list** (7 of 10 at two searches):
+  strict grading understates. Report "answer correct, citation aside" beside the strict figure.
+- **The shared reranker's GPU is saturated** under a 20-search burst (G1): batching would not help; fewer scored pairs
+  per search would, and changes ranking (re-measure the 138 if it lands).
+- **Next:** the owner's decisions (the fresh 80's configuration and the K9 bar, M3, the glossary), then the fresh 80
+  once (`FRESH-80-1.md`, `FRESH-80-READINESS.md`).
