@@ -5,6 +5,10 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-08: §0 the state, §1 the
 owner's hold, §2 the emergency, §3 decided but not done, §5 the order after the owner decides, §6 the watchers). Next
 free id **DEC-1098**. The blocks below are newest first; older ones are history, kept for their figures.
+- **11-08 21:46, session `ad44f5fe`: THE FRESH 80 RAN; K9'S MEMORY BAR PASSES** (`a35c7807`,
+  `packages/LIFT-1/FRESH-80-RESULT.md`): right end to end 78/79 (98.7 %), wrong claims 0, target reached; hit@5 84.8 %;
+  every data condition below the judged one; $109.05. The 80 are spent. Due now (DECIDED-NOT-DONE): W2-139/W2-140;
+  Q07/Q14 re-worded; rubric v3; the glossary redesign; item 8 (W2-141, W2-20, W2-145); the P2 items to the owner.
 - **11-08 18:20, session `ad44f5fe`: THE FRESH 80 READY TO LAUNCH, waiting on the owner's go.** The checker: unchanged
   80; ACT-GUARD-SETS-1 applied `15952bbf` (guard check 453 PASS); the pre-flight every check as expected (item 6 kept
   apart on the checker's whole-token confirmation, `--item6-outside-nowhere`, delta review READY); the declaration
@@ -979,8 +983,8 @@ W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance confli
 Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-11-08T00:31:41Z 4991b568efcf430c176d70cd5a80351c23005cd052d62c21ef305429f6cd1af1
-git head: 1fcd6ad5974e72543c780fb93962429cc36b025d
+generated: 2026-11-08T20:34:53Z 6a95e780e2614588867950f8b5c0e712902439e0efee94daf648b1b1ba06473c
+git head: 895169fb64e99ce5727a5765ddfe9935fba8a28a
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-03ub [in_progress] - W2-42a The product's guard reads what a Bash command writes
   DAEO-0pyc [in_progress] - W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row <- [DAEO-g0ip, DAEO-rd0g]
@@ -1018,11 +1022,11 @@ tickets in progress (`tk ls --status=in_progress`):
   DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS       1fcd6ad59 [w2/integrate]
+  /home/usain/Dynamic-Agentic-Engineering-OS       895169fb6 [w2/integrate]
   /home/usain/gov-os-worktrees/EMG-queue           04568e140 [emg/queue]
-  /home/usain/gov-os-worktrees/W2-00-record        f339e94da [record/w2]
-  /home/usain/gov-os-worktrees/W2-00-store-a       1fcd6ad59 (detached HEAD)
-  /home/usain/gov-os-worktrees/W2-00-store-b       6310ef76c (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-record        6eb317511 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a       895169fb6 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b       16d3d61bb (detached HEAD)
   /home/usain/gov-os-worktrees/W2-104              909d7ff0a [w2/W2-104]
   /home/usain/gov-os-worktrees/W2-105              fa653609c [w2/W2-105]
   /home/usain/gov-os-worktrees/W2-11               c9f99b28b [w2/W2-11]

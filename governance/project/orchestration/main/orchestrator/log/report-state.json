@@ -31,20 +31,20 @@
     "W2-110"
   ],
   "closes_next": "none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13)",
-  "examin": "AT RISK (11-08 09:30): DEC-1097 decided (K9's bar: right end to end >= 85 %, wrong claims <= 5 %); the fresh 80 ready on the CTO's side, waiting on the owner's checker and operator (the ACT, the transcripts); the 138: hit@5 76.8 %, right end to end 92.8 % with search again once; the lift about 11-15; EXAMIN's copy about 11-20; K9 gates the start (DEC-954 Q1)",
+  "examin": "AT RISK (11-08 22:00): K9's memory bar MET on the fresh 80 (78/79 right end to end, 0 wrong claims); K9's other lines and D-5, D-6, D-10 remain; the lift about 11-15; EXAMIN's copy about 11-20",
   "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); DEC-1097 recorded 11-08; the fresh 80 ready on the CTO's side (scripts pinned, ACT rehearsed, readiness review done)",
   "countdown": [
     "Re-pin window 4, the pool on, PAT-1: DONE 11-07",
     "ALL experiments DONE 11-07 (best: the 0.6B bundle + search again once, 128/138)",
     "Your decisions: DONE 11-08 (DEC-1097; item 6, the glossary, open)",
-    "Before the 80: the scripts reviewed and pinned, the ACT rebuilt and rehearsed, the readiness review: DONE 11-08. Left: your checker's pass; your operator applies the ACT and moves the transcripts. Then the pre-flight, declaration and control: about half a day",
-    "The fresh 80 once (live part about 45 min; then the data conditions)",
+    "Before the 80: DONE 11-08 18:20 (checker unchanged 80; ACT applied 15952bbf, 453 PASS; pre-flight as expected; declaration 16d3d61b; scripts pinned d621d58b)",
+    "The fresh 80 once: DONE 11-08 21:46. K9's memory bar PASSES: right end to end 78/79 (98.7 %), wrong claims 0; hit@5 84.8 % beside; data conditions all below the judged (FRESH-80-RESULT)",
     "Beside, before the lift: W2-141, W2-20 rebuilt, W2-145 (tests first); D-6 part 2 and D-5 on the CPU. Est. 2 to 3 days",
     "D-10, the full suite and its red fixes, then the lift (your word). The lift about 11-15",
     "After the lift: the three-layer plan (with P-LB-PRODUCT-1, G1's fewer pairs); W2-139/W2-140; EXAMIN's copy about 11-20"
   ],
-  "owner_action": "P1 the checker's pass (FRESH-80-READINESS \u00a72); the operator applies ACT-GUARD-SETS-1 (\u00a73) and moves the writer's and checker's transcripts into ~/gov-os-eval/transcripts/; DEC-1097 item 6 (the glossary); P2 ADR-0002's acceptance; P-SELECT-GRAPH 'do not build'; the 150-id sitting (W2-130-SITTING)",
-  "last_report": "2026-11-08 09:35:09",
+  "owner_action": "P2 (now the 80 has run): ADR-0002's acceptance; P-SELECT-GRAPH 'do not build'; the 150-id sitting (W2-130-SITTING)",
+  "last_report": "2026-11-08 18:32:52",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -94,5 +94,5 @@
     ],
     "keystone-7": "done: DEC-1089"
   },
-  "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

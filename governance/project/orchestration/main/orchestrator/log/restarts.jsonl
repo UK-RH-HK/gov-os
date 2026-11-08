@@ -7,3 +7,5 @@
 {"at": "2026-11-06 15:06:40", "class": 3, "reason": "the extend window ended (DEC-1084)", "check": "rerank.by service"}
 {"at": "2026-11-07 14:21:53", "class": 3, "reason": "re-pin window 4 (W2-112 changed the service)", "pid_before": "3997564", "pid_after": "1657369"}
 {"at": "2026-11-07 22:28:14", "class": 3, "reason": "the E4 scoring window ended (E3-E5-DESIGN §1)", "check": "rerank.by service"}
+{"at": "2026-11-08 18:20:07", "class": "on-demand", "reason": "the shared reranker exited after 12 h idle (14:13:08); started by one probe search before the fresh 80", "check": "rerank.by service", "pid_after": "840293"}
+{"at": "2026-11-08 21:25:10", "class": 3, "reason": "the fresh 80 E4 scoring window ended (data only, DEC-1097 (1)(c))", "check": "rerank.by service"}
