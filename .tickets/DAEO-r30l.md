@@ -134,3 +134,10 @@ Now a KPI line, with `plan_check.py` in the paths [added, DEC-1088 (5)(b); DEC-1
   `rebuild`; a rebuild does not hold the verification lock.
 - **P-6:** confirmed: a start check without a declared need never runs `nvidia-smi`; the reading and a start with a
   need read the GPU once.
+- **P-7 (round 2):** `rebuild_peak_bytes` is required, dated and sourced like every value (S8: a missing value shuts the
+  gate, named; due for re-measure after seven days), and counted by the gate like the verification peak.
+- **P-8 (round 2):** kept: the plan override's line goes to the machine-wide `~/.gov-os/machine/launch.log` (P-1's log)
+  and to standard error; a relative `GOV_PLAN_READY` is read against the main tree.
+- **W2-136's launcher cases** (`tests/acceptance/W2-136/test_w2_136_launch_check.py`) plant no gate configuration, so
+  once every launch runs the gate they would be refused by it (S8, S19): a test designer revises their fixture to plant
+  an open gate, landing with this ticket's change (G-1).
