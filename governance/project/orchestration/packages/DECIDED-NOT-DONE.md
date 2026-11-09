@@ -18,13 +18,13 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
 | 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **List DONE 11-08** (`2f9c80b1`, `W2-130-SITTING.md`, 150 ids grouped); marks a1/a2 and sources b1 drafted, in independent audit; a3 and b2 after the sitting |
-| 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE 11-08**: `P-SELECT-GRAPH-RESULT.md` to the owner (recommendation: do not build); WAITS: the owner's word |
+| 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | **DUE NOW** (after the 80): an independent session re-words Q07, Q14 before any re-measure of the 138 |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
-| 13 | ADR-0002 | (8) refreshed, reviewed, to the owner before the lift's re-pin | **Refreshed and reviewed (READY round 2), to the owner 11-08** (`packages/ADR-0002-REFRESH/`, `3454d9db`); WAITS: the owner's acceptance, then `docs/adr/` replaced |
+| 13 | ADR-0002 | (8) refreshed, reviewed, to the owner; DEC-1098 (5) accepted | **DONE 11-09**: `docs/adr/ADR-0002-architecture-and-stack.md` ACCEPTED; WAITS: re-read at the lift's re-pin |
 | 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; rubric v3 **DUE NOW** (after the 80) |
 | 15 | the embedder trial | (14) a Wave 3 row | **DONE (parked)**: row to add with the Wave 3 list |
 | 16 | the old window scripts (F1) | (15) fixed or retired, never reused | **DONE 11-08**: `live_window.sh`, `score_once_window.sh` and `extend_window.sh` (same defect) moved to `drafts/score-once/retired/` with a README (scratch, untracked) |
@@ -32,6 +32,17 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | **DONE 11-08 21:46**: K9's bar PASSES, right end to end 78/79 (98.7 %), wrong claims 0 (`FRESH-80-RESULT.md`); every data condition run, all below the judged one; spent $109.05 |
 | 19 | W2-139, W2-140 | (1)(g) held until after the 80 | **DUE NOW** (the 80 ran 11-08): one batch, one green run, outside a GPU window (DEC-1093 (1)) |
 | 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |
+
+## 0b. DEC-1098's items (2026-11-09)
+| # | item | fate (DEC-1098) | state |
+|---|---|---|---|
+| 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | IN PROGRESS 11-09 |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | IN PROGRESS 11-09 |
+| 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | IN PROGRESS 11-09 |
+| 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | IN PROGRESS 11-09 |
+| 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | IN PROGRESS 11-09 (design) |
+| 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
+| 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
 
 ## 1. Every item not done, partly done or waiting
 

@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1097 on 2026-11-08. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1098 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -313,3 +313,13 @@ other restart is an ACT.
   embedder trial a Wave 3 row; the keystone count from the plan's list; the old window scripts fixed or retired.
   **Standing:** every decided item with a stage trigger enters `packages/DECIDED-NOT-DONE.md` when decided, ticked off
   with its commit when done. Basis: 1 and 2.
+- DEC-1098 (2026-11-09): **the fresh 80 accepted; K9's memory line met.** **Standing: Gov OS's memory standard** is
+  the measured configuration (the 0.6B reranker, the pool on, today's 6,000-token bundle widened to sections, agents
+  searching again once), and every adopted repository builds it at Wave 0 by W2-88's practice and proves it with its
+  own tuning set and a fresh verdict set, measured once (W2-88's lines to the owner as a package). P-SELECT-GRAPH: do
+  not build (DEC-1062 closed); three cheaper fixes as proposals; the code route stays, confirmed with figures. W2-130's
+  sitting accepted (A-G; H1 (b): open and in-progress tickets only, KPI 4 changed; H2 as recommended). **A
+  sandbox-and-guard experiment before W2-56 builds** (bar: every action judged right, 100 %; path-map guard alone
+  against guard plus generated sandbox; the guard alone kept if the pair cannot reach it; the design to the owner
+  first). ADR-0002 accepted, re-read at the lift's re-pin. The work in order: item 8, Q07/Q14, W2-139/W2-140, the
+  sitting, D-5 and D-6 part 2, D-10 on the owner's word, the lift. Basis: 1, 2 and 4.

@@ -13495,7 +13495,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   drift) and question 4 (prompts only where they carry a decision).
 
 ### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1098 (1) (K9's memory line met); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2)
 - **Decision:**
   - **D9-FATES:**
     - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
@@ -13899,6 +13899,35 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   question 2 (the 80 protected by the guard, and the overdue items given an owner and a trigger, so nothing decided is
   lost).
 
+### DEC-1098 — The fresh 80 accepted and the measured configuration made Gov OS's memory standard; P-SELECT-GRAPH closed (do not build) with three cheaper fixes to propose; W2-130's sitting accepted; a sandbox-and-guard experiment before W2-56; ADR-0002 accepted; the work restarts in order
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (1) standing · **Under:** DEC-1097, DEC-1083 (2), DEC-1062, DEC-1073 (5)(a), DEC-1074 (7) O2, DEC-1093 (3), DEC-1072 (2), DEC-799, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after FRESH-80-RESULT, P-SELECT-GRAPH-RESULT, W2-130-SITTING and ADR-0002-REFRESH
+- **Decision:**
+  - (1) **The fresh 80 accepted; K9's memory line is met** (FRESH-80-RESULT: right end to end 78 of 79, wrong claims
+    0). **Standing:** the measured configuration (the 0.6B reranker, the pool on, today's 6,000-token bundle widened to
+    sections, and agents searching again once) is Gov OS's memory standard, and the memory-building practice for every
+    adopted repository: built at its Wave 0 as W2-88's practice record describes, and proven there with its own tuning
+    set and a fresh verdict set, measured once. The CTO brings W2-88's lines for it as a package.
+  - (2) **P-SELECT-GRAPH:** (a) "do not build" accepted for test selection; DEC-1062's trial is closed. (b) The CTO
+    drafts its three cheaper fixes as proposals: the test-map couplings; W2-66's record-only case in the always-run set;
+    a scoped selection on every commit outside a ticket that touches settings, the registry or the test map. The code
+    graph stays in memory as the code route (definitions, callers, callees), unchanged: the CTO confirms it, with the
+    code route's figures on the 138 and the 80 (the callers questions and any question where it supplied the gold).
+  - (3) **W2-130's sitting accepted as proposed:** groups A to G; H1 (b), open and in-progress tickets only, W2-130's
+    KPI 4 changed to say so (marked DEC-1098, DEC-1088 (6)); H2 as recommended. Applied as the record describes.
+  - (4) **Sandboxing and the guard (K6, W2-56): an experiment before the leads are sandboxed.** The bar: every agent
+    action judged right, no false refusal and no wrong allow, 100 %. Two set-ups measured against it: the path-map
+    guard alone, and the guard with the sandbox generated from the same path map; both tuned. If the guard with the
+    sandbox cannot reach the bar, the path-map guard alone is kept. Designed as a package for the owner first (what it
+    measures, on which actions, and how), then run, both results to the owner before W2-56 builds anything.
+  - (5) **ADR-0002 accepted now** (`packages/ADR-0002-REFRESH/`), re-read at the lift's re-pin.
+  - (6) **The work restarts in the CTO's order:** item 8 (W2-141, W2-20 rebuilt, W2-142 and W2-145, tests first);
+    Q07 and Q14 re-worded; W2-139 and W2-140 in one batch; the sitting applied; then D-5 and D-6 part 2; then D-10 on
+    the owner's word, and the lift. Each item ticked off DECIDED-NOT-DONE when done; each new decided item added with
+    its trigger.
+- **Basis:** question 1 (the memory standard proven end to end on a set used once, carried to every adopted
+  repository), question 2 (the guard proven at 100 % before it is widened) and question 4 (no test selector built
+  without a measured gain).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13934,3 +13963,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.480 | 2026-11-07 | Owner (recorded by the orchestrator, DEC-861): DEC-1096. Next free id: DEC-1097. |
 | 0.481 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 (item 6 open; the DECIDED-NOT-DONE line standing). Next free id: DEC-1098. |
 | 0.482 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 item (6) decided (b). Next free id: DEC-1098. |
+| 0.483 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1098 (item 1 standing). Next free id: DEC-1099. |
