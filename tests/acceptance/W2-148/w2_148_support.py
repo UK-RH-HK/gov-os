@@ -22,6 +22,7 @@ import site
 import subprocess
 import sys
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import NamedTuple
 
@@ -504,6 +505,7 @@ class World:
         self.claude_log = base / "claude-calls.jsonl"
         self.crontab_store = base / "crontab.txt"
         self.calls = base / "calls.jsonl"
+        self.guard_calls = base / "guard-calls"  # the guard's call log (DEC-1108 (2)); planted only by the cases
         self.close_flag = base / "close-queue.running"
         self.config = base / "config.json"
         self.tmp = base / "tmp"
@@ -537,6 +539,7 @@ class World:
             "operator_root": str(self.op), "repo": str(self.repo), "home": str(self.home),
             "scratch": str(self.scratch), "transcripts": str(self.transcripts), "clock": str(self.clock),
             "pings_log": str(self.pings), "push_cmd": str(self.stubs / "push"), "calls": str(self.calls),
+            "guard_calls": str(self.guard_calls),
             "close_flag": str(self.close_flag), "nightly_window": "21:00-22:00", "poll_s": 0.2,
         }
         cfg.update(over)
@@ -921,6 +924,142 @@ def wait_for(predicate, timeout=30.0, step=0.1) -> bool:
             return True
         time.sleep(step)
     return predicate()
+
+
+# --- DEC-1108 (2): S15's call set, checked against the guard's call log by sha256 both ways ------------------------
+
+LIVE_SID = "0c3d9a52-7e41-4b8f-a1d2-6f5e4c3b2a10"   # a live session: a UUID, in a worktree
+OTHER_SID = "9e8d7c6b-5a49-4f3e-8d2c-1b0a9f8e7d6c"  # another live session
+NEW_HIDDEN = "fixtures/evaluation/new-set/hidden"   # the folder of the glob pathmap_addition() adds
+WINDOW_H = 48.5                                     # the planted window: 48.5 hours ending at the clock
+
+# The phrases the check's own refusals carry in their reason (README, "The replay (S15)").
+CHECK_PHRASES = ("no header", "window short", "window stale", "log capped", "log malformed", "log missing")
+
+
+def action_sha(tool_name: str, tool_input) -> str:
+    """The guard's hash of a call (ACT-GUARD-CALLLOG-1 §2): the canonical JSON of {tool, input}."""
+    return sha256_bytes(json.dumps({"tool": tool_name, "input": tool_input}, sort_keys=True, separators=(",", ":"),
+                                   ensure_ascii=False).encode("utf-8"))
+
+
+def ago(hours: float) -> datetime:
+    return datetime.fromisoformat(NOW) - timedelta(hours=hours)
+
+
+def log_time(at: datetime) -> str:
+    """The log's time form: UTC to the millisecond with a Z."""
+    u = at.astimezone(timezone.utc)
+    return u.strftime("%Y-%m-%dT%H:%M:%S.") + f"{u.microsecond // 1000:03d}Z"
+
+
+def set_header(since_h: float = WINDOW_H, until_h: float = 0.0) -> dict:
+    return {"v": 1, "window": {"since": ago(since_h).isoformat(), "until": ago(until_h).isoformat()},
+            "built_by": "planted (W2-148 acceptance)", "dropped_counts": {"sets root named": 1}}
+
+
+def set_call(cid: str, hours: float, path: str, *, session=LIVE_SID, role="engineer", ticket="W2-999",
+             tool="Read") -> dict:
+    inp = {"file_path": path}
+    return {"id": cid, "time": ago(hours).isoformat(), "session": session, "role": role, "ticket": ticket,
+            "agent": "", "sha256": action_sha(tool, inp), "event": {"tool_name": tool, "tool_input": inp, "cwd": "."}}
+
+
+def set_dropped(cid: str, hours: float, sha: str, *, session=LIVE_SID, reason="sets root named") -> dict:
+    return {"id": cid, "time": ago(hours).isoformat(), "session": session, "sha256": sha, "dropped": reason}
+
+
+def line_sha(line: dict) -> str:
+    """A set line's hash as the agent must take it: recomputed from a call's event; a dropped call's own."""
+    ev = line.get("event")
+    return action_sha(ev["tool_name"], ev["tool_input"]) if ev else line["sha256"]
+
+
+def log_line(at: datetime, sha, *, session=LIVE_SID, role="engineer", ticket="W2-999", tree="worktree",
+             tool="Read", decision="allow", rule="none") -> dict:
+    return {"v": 1, "time": log_time(at), "session": session, "role": role, "agent": "", "ticket": ticket,
+            "tool": tool, "decision": decision, "rule": rule, "tree": tree, "ms": 71, "sha256": sha, "keyed": None}
+
+
+def logged(line: dict, **over) -> dict:
+    """The guard's log line for a set line: the same session, sha256, time, role and ticket (``over`` changes any)."""
+    kw = {"session": line["session"], "role": line.get("role", "engineer"), "ticket": line.get("ticket", "W2-999"),
+          "tool": (line.get("event") or {}).get("tool_name", "Read")}
+    kw.update(over)
+    return log_line(datetime.fromisoformat(line["time"]), line_sha(line), **kw)
+
+
+def replay_set() -> list:
+    """The planted 48-hour call set (fresh dicts): three calls and a dropped one in the window, one call before it."""
+    return [set_call("call-q1", 1, f"{NEW_HIDDEN}/q.txt"),        # newly refused by the addition; the review lists it
+            set_call("call-notes", 2, "docs/notes.md"),           # stays allowed
+            set_call("call-readme", 40, "README.md"),             # stays allowed (the 2026-11-08 day file)
+            set_dropped("call-dropped", 30, action_sha("Read", {"file_path": "~/gov-os-eval/transcripts/t.jsonl"})),
+            set_call("call-old", 72, f"{NEW_HIDDEN}/old.txt")]    # before the window: neither checked nor re-judged
+
+
+def in_base_window(line: dict) -> bool:
+    t = datetime.fromisoformat(line["time"])
+    return ago(WINDOW_H) <= t <= ago(0)
+
+
+def write_set(w: "World", lines, header="default"):
+    """The ``calls`` file: the header (``None``: no header) then one JSON line per set line."""
+    rows = ([] if header is None else [set_header() if header == "default" else header]) + list(lines)
+    w.calls.write_text("".join(json.dumps(r) + "\n" for r in rows))
+
+
+def write_log(w: "World", lines):
+    """The guard's log under ``w.guard_calls``: one ``<UTC day>.jsonl`` per day, the lines in time order."""
+    w.guard_calls.mkdir(parents=True, exist_ok=True)
+    for line in sorted(lines, key=lambda x: x["time"]):
+        with open(w.guard_calls / f"{line['time'][:10]}.jsonl", "a") as f:
+            f.write(json.dumps(line, separators=(",", ":")) + "\n")
+
+
+def plant_replay(w: "World", lines, *, header="default", log=None, extra_log=()):
+    """The set and the log; by default the log holds one matching line per set line in the planted window."""
+    write_set(w, lines, header)
+    write_log(w, (log if log is not None else [logged(x) for x in lines if in_base_window(x)]) + list(extra_log))
+
+
+def told(w: "World", b: Bundle, r: Result) -> str:
+    """What the run told: the result line's reason and every P1's text for the ACT."""
+    return "\n".join([str(r.out.get("reason", "")), *(str(n.get("text", "")) for n in w.p1s(b.act))])
+
+
+GUARD_RUNS = "guard-runs.jsonl"  # in w.marks: one line per run of the recording guard
+
+
+def plant_guard(w: "World", *, record=False, role_aware=False):
+    """Commit a variant of the planted guard into the live repository before the ACT is built. ``record``: each run
+    appends {dir: GOV_GUARD_CALLS_DIR, role: GOV_ROLE, path} to ``marks/guard-runs.jsonl``. ``role_aware``: a Read
+    under a hidden glob is denied only when ``GOV_ROLE`` is in ``sets_root_hidden.refused_roles`` (the live guard
+    reads the session's role from ``GOV_ROLE``)."""
+    text = PLANTED_GUARD
+    anchor = 'path = (event.get("tool_input") or {}).get("file_path") or ""\n'
+    cond = 'if event.get("tool_name") == "Read" and any(fnmatch.fnmatch(path, g) for g in globs):'
+    assert anchor in text and cond in text
+    add = ""
+    if record:
+        add += (f"with open({str(w.marks / GUARD_RUNS)!r}, 'a') as _f:\n"
+                "    _f.write(json.dumps({'dir': os.environ.get('GOV_GUARD_CALLS_DIR'), "
+                "'role': os.environ.get('GOV_ROLE'), 'path': path}) + '\\n')\n")
+    if role_aware:
+        add += (r"_m = re.search(r'^\s*refused_roles:\s*\[(.*?)\]', block, re.M)" "\n"
+                "roles = [x.strip().strip('\"') for x in _m.group(1).split(',')] if _m else []\n")
+        text = text.replace(cond, cond[:-1] + ' and os.environ.get("GOV_ROLE", "") in roles:')
+    text = text.replace(anchor, anchor + add)
+    p = w.repo / ".claude/hooks/pretooluse.py"
+    p.write_text(text)
+    p.chmod(0o755)
+    w.git("add", ".claude/hooks/pretooluse.py")
+    w.git("commit", "-q", "-m", "planted guard variant", "-m", f"Task: {CTO_TASK}\nRole: orchestrator", "--",
+          ".claude/hooks/pretooluse.py")
+
+
+def guard_runs(w: "World") -> list:
+    return read_jsonl(w.marks / GUARD_RUNS)
 
 
 def evidence_tables(text: str) -> list:
