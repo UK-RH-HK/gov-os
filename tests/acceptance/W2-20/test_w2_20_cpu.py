@@ -107,3 +107,19 @@ def test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added(ma
         assert set(reasons) == {"cpu"}, reasons
         assert support.close_to(reasons["cpu"]["reading"], shut_at) and reasons["cpu"]["threshold"] == 20, (
             reasons["cpu"])
+
+
+def test_s12_f5_the_servers_current_use_unreadable_shuts_on_cpu(machine, repo):
+    """F5: the servers' current use is a reading like their p95; when it cannot be taken it is ``null`` and shuts the
+    gate on ``cpu`` with ``reading`` ``null`` (never taken as 0.0 or as their p95), every other reading within."""
+    env_extra = {"GOV_RESOURCES_EMBEDDING_CPU_NOW": str(machine.base / "no-such-embedding-cpu-now.json")}
+
+    code, envelope, out, err = machine.gov(repo, env_extra=env_extra)
+    reading = support.reading_of(code, envelope, out, err)
+    reasons = support.reasons_by_condition(reading)
+    assert reading.get("embedding_cpu_now") is None, f"an unreadable current use is shown as {reading}"
+    assert support.gate_of(reading)["open"] is False, f"an unreadable current use opened the gate: {reading}"
+    assert set(reasons) == {"cpu"} and reasons["cpu"]["reading"] is None, reasons
+
+    refused = support.refusal_of(*machine.check(repo, env_extra=env_extra))
+    assert "cpu" in support.reasons_by_condition(refused), refused
