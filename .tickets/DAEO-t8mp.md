@@ -27,6 +27,7 @@ allowed_paths:
 - template/governance/kernel/skills/orchestration/SKILL.md
 - .rulesync/subagents/*.md
 - template/.rulesync/subagents/*.md
+- template/.rulesync/skills/*/SKILL.md
 - governance/project/facts.yaml
 - governance/project/orchestration/brief-gaps.md
 - tests/unit/templates/test_w2_128*
@@ -152,3 +153,16 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
   is two engineer tickets, W2-152 (`DAEO-o5x1`: `gov brief`, TPL-2 S3, the ready check and the dependency refusals) and
   W2-153 (`DAEO-8s85`: TPL-4, delivery at launch). This ticket keeps the templates' text, TPL-6, TPL-7, TPL-8 and the
   CIT-P, and closes after both (`depends_on`).
+- **Round 2a (text, product-spec; stated 2026-11-09, DEC-1112 (3)):**
+  - TPL-6 S3: the test-design skill's read rule matches DEC-963 (it reads the integrated code on `w2/integrate`, never
+    this ticket's implementation); the orchestration skill's "Briefs" points to the templates; K-4's two lines (the
+    orchestration skill's "no glob over the governance folder" (DEC-508) and "the settings file … never read"
+    (DEC-525's settings half)) restated per DEC-820, where reads are open but for secrets and the held-out contents.
+  - Review F6: the orchestration skill's lines on the retired brief texts, and `roles/orchestrator.md`'s, point to the
+    templates.
+  - TPL-6 S4's kernel half: JUDGEMENT's rules only in T-6.
+  - `checkpoint.md`'s example id: a placeholder, not `DAEO-0000`.
+  - `template/.rulesync/skills/*/SKILL.md`: byte copies of the kernel skills (the operator's rule gives that folder no
+    row, so it is a ticket path, not the ACT's; path added, DEC-1112 (3)).
+  - Each changed skill's version raised one minor; the skills validator passes.
+  - The generated `.claude/` and `.rulesync/` copies are the ACT's (`ACT-CLAUDE-COPIES-1`).
