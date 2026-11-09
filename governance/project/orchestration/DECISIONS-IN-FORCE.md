@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1109 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1112 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -375,3 +375,15 @@ other restart is an ACT.
   program's final result line asks for it"; the rest of the work restarted in parallel. **Standing: while an item waits
   on the owner, every unblocked item keeps moving in parallel within the machine's limits; never "nothing is running"
   while unblocked work remains.** Basis: 2 and 4.
+- DEC-1110 (2026-11-09, standing): the standing operating rules at the top of the CTO's prompt and in START-NEXT-SESSION
+  §2; a stop-hook check (an ACT) that blocks the CTO ending a turn idle while unblocked items remain, letting a named
+  legitimate wait through; a fresh CTO session after the seven helpers report and before D-10; after the lift, each
+  ready list covers several of `gov plan`'s batches ahead. Basis: 4 and 2.
+- DEC-1111 (2026-11-09): W1-33's auditor case and W1-05's install case report-only until their features return (each
+  out of the opt-in list by the switch that turns it back on); W1-46's research-install case OPEN. Basis: 2.
+- DEC-1112 (2026-11-09): the sandbox experiment narrowed to set-up A beside D-10 (set-up B a Wave 3 row); W2-56 builds
+  on the path-map guard alone with today's launcher sandbox; A's result and Q8's tuned ACT to the owner. W1-46's case a
+  delegated P2. **Standing: the CTO brings the owner only P1s; re-pins, pushes and sudo; class (b) yeses; fixed briefs
+  to approve once; changes to the owner's standing decisions; steps only the owner can do physically.** Basis: 4 and 2.
+- Delegated (CTO, 2026-11-09, under DEC-1112 (2) and DEC-936 item 2.5): **W1-46's research-install case stays
+  report-only permanently** (D10-REDS.md: the feature it tests is gone for good; a rewrite would test nothing today).

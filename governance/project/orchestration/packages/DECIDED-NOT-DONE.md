@@ -50,7 +50,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
-| 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
+| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | IN PROGRESS: the second half's tests and the engineer (the first half's 157 tests done) |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
 | 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
@@ -92,22 +92,30 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
 | 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | **MERGED 11-09** (`511a4a17`, review READY, accept 166/166); F21 fixed and merged (DEC-1107, review READY, accept 169/169) |
 | 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **APPLIED 11-09** (`b7a373cf`; the hook a7981319); the first day's file validates PASS; W2-56's worktree merged |
-| 59 | W2-148's replay corpus | DEC-1108 (2): the CTO's builder, the agent's sha256 check both ways; tests first | WAITS: before the first path-map ACT through the agent |
+| 59 | W2-148's replay corpus | DEC-1108 (2) | **MERGED 11-09** (see 68) |
 | 60 | the live-hook suites' temporary folder | DEC-1108 (5): GOV_GUARD_CALLS_DIR set in the suites (W2-141's acceptance file by its designer) | NOT STARTED (follow-up) |
 | 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
-| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file, rule 2d (the operator's folder and the call log refused to every session's writes), F26, F7 kept | **Rehearsed 11-09** (0 failures; review READY round 2); WAITS: the owner's approval of the two fixed briefs, then the operator |
+| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5), DEC-1109 (1): the install, rule 2d, the freeze, F26, the cron | **APPLIED 11-09** (`2a646265`; APPROVED 157a9dc0; the crontab loaded by stdin after Debian's path cut; apply.sh fixed `babf768e`); queue empty; nothing queued until an eligible (a) ACT (not path-map until the replay builder) |
 
 ## 0h. DEC-1109's items (2026-11-09; item 3 standing)
 | # | item | state |
 |---|---|---|
-| 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | IN PROGRESS |
+| 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | **DONE 11-09** (`0240833b`, `5f7641e6`); applied `2a646265` |
 | 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
 | 64 | D-5 (the templates) | IN PROGRESS |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
-| 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
+| 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
-| 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
-| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | IN PROGRESS |
+| 68 | the replay set builder (DEC-1108 (2)) | **MERGED 11-09**; the installed agent needs a re-install ACT (ACT-OPERATOR-2) to carry it; the replay refuses until the log has 48 h of history (about 11-11 18:16Z); path-map ACTs through the agent after both |
+| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
+
+## 0i. DEC-1110's items (2026-11-09)
+| # | item | state |
+|---|---|---|
+| 70 | the standing-rules list at the top of the prompt and in START-NEXT-SESSION §2 | **DONE 11-09** |
+| 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | IN PROGRESS |
+| 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
+| 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
 
 ## 1. Every item not done, partly done or waiting
 

@@ -14,7 +14,8 @@ Every case builds its own planted world under `tmp_path` (`w2_148_support.World`
 `~/.claude`, crontab, git hook, push channel, `claude`, network, GPU or model. Each subprocess gets the world's `HOME`
 and a `PATH` that starts with the world's stubs (`claude`, `crontab`, `sudo`, `pkill`, `killall`), plus
 `PYTHONUSERBASE` (the real user site, for PyYAML) and `PYTHONDONTWRITEBYTECODE=1`. Nothing needs a live session; the
-`live` marker is registered and no case carries it. About 169 cases (166, and DEC-1107's three), most of them a full planted run of a few seconds.
+`live` marker is registered and no case carries it. 183 cases (169 before DEC-1108 (2), whose round changed two and
+added fourteen, N-11), most of them a full planted run of a few seconds.
 
 ## The interface the tests call (the engineer builds to it)
 
@@ -45,9 +46,11 @@ the control files under it), `scratch` (the CTO's scratch: bundles at `<scratch>
 `<scratch>/log/cto-session.txt`, the CTO's hold `<scratch>/log/act-in-progress.txt`), `transcripts` (the folder holding
 `<session id>.jsonl`), `clock` (a file holding one ISO-8601 time with its offset, read each time the code needs the
 time; default the system clock; the quiet hours and the nightly window compare against that time's own wall clock),
-`pings_log`, `push_cmd`, `calls` (the guard's call log for the replay), `close_flag` (exists while a close queue
-runs), `nightly_window` (`HH:MM-HH:MM`), `poll_s` (a hold's poll interval, seconds), `freeze` (the commit freeze's
-file; default `<operator_root>/install/act-in-progress.txt`, DEC-1106 (3)).
+`pings_log`, `push_cmd`, `calls` (the CTO's call set for the replay, DEC-1108 (2)), `guard_calls` (the guard's call
+log, a folder; default `<home>/.gov-os/guard-calls`, DEC-1108 (2)), `replay_stale_h` (how old the set's `until` may
+be, hours; default 12, DEC-1108 (2)), `close_flag` (exists while a close queue runs), `nightly_window`
+(`HH:MM-HH:MM`), `poll_s` (a hold's poll interval, seconds), `freeze` (the commit freeze's file; default
+`<operator_root>/install/act-in-progress.txt`, DEC-1106 (3)).
 
 **Commands:**
 - `python3 install/operator_run.py --config C run <ACT> <manifest sha>`: G1 to G9, the recompute, the apply, the
@@ -136,10 +139,51 @@ digest (JSON) holds `approved_sha256`, `applied` (`[{act, class, votes, touched,
 `Class: a|b`, `Review: <sha256 of review.md>`, and for (b) `Approved-by: owner (chat, <time>)`; never `Role: owner`,
 never a push or a tag (the bare remote and the tag list are checked).
 
-**The replay (S15):** `calls` holds JSON lines `{id, time, role, ticket, event: {tool_name, tool_input, cwd}}`, the
-event's paths relative to the repository. The planted guard `.claude/hooks/pretooluse.py` reads
-`<CLAUDE_PROJECT_DIR or cwd>/governance/project/path-map.yaml` and the event on stdin and denies a Read under a
-`sets_root_hidden` glob. Calls older than 48 hours by the clock are not replayed.
+**The replay (S15), checked against the guard's call log (DEC-1108 (2)):** the replay runs when an (a) ACT touches
+the path map or a deny list, as before; until a set is configured such an ACT is refused at its after-check.
+- **The call set** (the `calls` setting's file), JSON lines, the events' paths relative to the repository:
+  - line 1, the header: `{"v": 1, "window": {"since": ISO, "until": ISO}, ...}` (other keys ignored);
+  - a call: `{"id", "time", "session", "role", "ticket", "agent", "sha256", "event": {"tool_name", "tool_input",
+    "cwd"}}` (the line's own `sha256` is ignored: the agent recomputes it from the event);
+  - a dropped call: `{"id", "time", "session", "sha256", "dropped": "<reason>"}`, no `event` (a call the CTO's tool
+    may not copy, such as one naming the sets root): checked against the log, never re-judged.
+- **The guard's log:** setting `guard_calls` (a folder; default `<home>/.gov-os/guard-calls`). One file per UTC day,
+  `<YYYY-MM-DD>.jsonl`; each line `{"v": 1, "time": ISO ms "Z", "session", "role", "agent", "ticket", "tool",
+  "decision", "rule", "tree", "ms", "sha256", "keyed"}`; a marker file `<day>.jsonl.capped` means that day was cut
+  short.
+- **The hash:** `sha256(json.dumps({"tool": tool_name, "input": tool_input}, sort_keys=True, separators=(",", ":"),
+  ensure_ascii=False).encode("utf-8"))`, hex.
+- **Before anything is re-judged** (no run of the guard hook before), the replay refuses (so the after-check undoes
+  the ACT and pushes a P1, as any replay refusal does) unless all hold:
+  1. **The window:** the first line is the header; `until` is no later than the clock plus 5 minutes and no older
+     than the clock minus `replay_stale_h` hours; `until - since` is at least 48 hours.
+  2. **Well formed:** every other line is a call (an `event` object) or a dropped call (a 64-hex `sha256` and a
+     non-empty `dropped`); anything else is malformed (fail closed).
+  3. **The log readable and whole:** the folder exists; no day file from `since - 2 min` to `until + 2 min` has a
+     `.capped` marker; no line in those files is malformed.
+  4. **Set to log:** every set line whose `time` lies in `[since, until]` has a log line with the **same session**
+     and the same sha256 (a call's recomputed from its event; a dropped call's from its line), the log line's time
+     within `[since - 2 min, until + 2 min]`.
+  5. **Log to set:** every log line whose time lies in `[since + 2 min, until - 2 min]`, whose `session` is a UUID
+     (lower-case 8-4-4-4-12 hex) and whose `tree` is `main` or `worktree`, has a set line (call or dropped) with the
+     same session and sha256; a null `sha256` counts as missing. Other sessions (the suites' fixed names) and trees
+     (`run`, `scratch`, `other`) are not required.
+  - **The refusal's reason** (the result line's `reason` or a P1's `text`) names the mismatches (at most 5 of each
+    kind): a set call by its `id`, a logged call by its session's first 8 characters, its sha256's first 12 and its
+    time as the log line writes it (at least to the minute); never an input's text. The check's other refusals carry
+    a fixed phrase: `no header`; `window short`; `window stale` (an `until` older than the clock minus
+    `replay_stale_h`); `log capped` and `log malformed`, each with the day `YYYY-MM-DD`; `log missing`. A refusal by
+    the re-judging carries none of these phrases and not the word `malformed`.
+- **Then the re-judging, as today,** over the set's calls (not the dropped ones) in the window, each with the **role
+  and ticket of its matching log line** (they win over the set's), given to the hook as `GOV_ROLE` and `GOV_TICKET`
+  (as the live guard reads them); the dropped calls are counted by reason. The replay's own runs of the hook never
+  write the live log: each is run with `GOV_GUARD_CALLS_DIR` set to an absolute folder inside the replay's own
+  temporary folder, never in `guard_calls` or `<home>/.gov-os/guard-calls`; no file in `guard_calls` changes.
+- The planted guard `.claude/hooks/pretooluse.py` reads `<CLAUDE_PROJECT_DIR or cwd>/governance/project/path-map.yaml`
+  and the event on stdin and denies a Read under a `sets_root_hidden` glob. Calls outside the header's window are
+  neither checked nor re-judged. The DEC-1108 cases commit a variant of it before the ACT is built
+  (`plant_guard`): `record` appends `{dir: GOV_GUARD_CALLS_DIR, role: GOV_ROLE, path}` per run to a file of the
+  world; `role_aware` denies only when `GOV_ROLE` is in the path map's `sets_root_hidden.refused_roles`.
 
 **The control files (S15), as planted:** the hook folder `.claude/hooks/**`, `.claude/settings*.json`, the rest of
 `.claude/**`, `<repo>/.git/hooks/**`, `crontab -l`, the pin `<home>/.local/bin/gov`, the dead-man's and the
@@ -217,8 +261,21 @@ integrate; the cases marked "guard" are green once the code is built and fail an
 | S13 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | as above: a hold, never a refusal |
 | S15 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | no code; eight families (hooks, settings, `.claude/**`, git hooks, crontab by a stub, the pin, the dead-man's code, the install): the ACT's file undone, the control file left as the apply wrote it, lock held, P1 naming it (DEC-1106 (1)) |
 | S15 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | no code; DEC-1106 (1): at `in-apply-checks` the hook file written, a `.claude/agents/` file committed, the crontab by its store: left as written (the commit kept in HEAD's history), the ACT's file undone, not applied, lock held, P1 naming the file |
-| S15 | `test_w2_148_apply.py::test_s15_guard_a_path_map_addition_whose_replay_refuses_only_listed_calls_stays` | red | no code; guard: a listed newly refused call and an older one leave it applied |
-| S15 | `test_w2_148_apply.py::test_s15_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone` | red | no code; one unlisted call within 48 hours turned to refused: undone, P1 |
+| S15 | `test_w2_148_apply.py::test_s15_guard_a_path_map_addition_whose_replay_refuses_only_listed_calls_stays` | red at `7438f7e91` | guard, changed by DEC-1108 (2): a header and a log agreeing both ways (three calls, one dropped call); the listed newly refused call and one before the window leave it applied. Today: undone, the header and the dropped call read as "a malformed line (fail closed)" |
+| S15 | `test_w2_148_apply.py::test_s15_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone` | red at `7438f7e91` | changed by DEC-1108 (2): the check passes; call-r2, not listed, turned to refused: undone, P1, the reason the re-judging's (no check phrase, not `malformed`). Today: undone, but at the check ("malformed line") |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_call_with_no_log_line_is_refused_and_named` | red at `7438f7e91` | an invented call: undone, P1, the reason naming `call-invented`, no input's text, the guard never re-run. Today: undone for "malformed line", the id not named |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_call_whose_input_was_altered_by_one_character_is_refused_and_named` | red at `7438f7e91` | `docs/notes.md` → `docs/notez.md` in the event, the line's own `sha256` left at the logged hash: undone, P1, naming `call-notes`, neither path quoted. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_hash_logged_only_under_another_session_is_refused_and_named` | red at `7438f7e91` | call-notes' hash logged only under another UUID session: undone, P1, naming `call-notes`. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_logged_live_call_missing_from_the_set_is_refused_and_named` | red at `7438f7e91` | the CTO dropped a logged live call: undone, P1, naming its session's first 8, its sha256's first 12 and its time to the minute. Today: as above |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_window_shorter_than_48_hours_is_refused` | red at `7438f7e91` | 47 hours: undone, P1, `window short`, the guard never re-run. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_stale_window_is_refused` | red at `7438f7e91` | `until` 13 hours old, `replay_stale_h` at its default 12: undone, P1, `window stale`. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_with_no_header_is_refused` | red at `7438f7e91` | the set's calls with no header line: undone, P1, `no header`. Today: "malformed line" (the dropped call) |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_capped_day_in_the_window_is_refused` | red at `7438f7e91` | `2026-11-09.jsonl.capped`: undone, P1, `log capped` and the day. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_malformed_log_line_is_refused` | red at `7438f7e91` | a cut line in `2026-11-09.jsonl`: undone, P1, `log malformed` and the day. Today: "malformed line" of the set, not the log's phrase |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_a_missing_log_folder_is_refused` | red at `7438f7e91` | `guard_calls` absent: undone, P1, `log missing`. Today: "malformed line" |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_guard_suite_sessions_other_trees_and_the_window_s_edge_are_not_required` | red at `7438f7e91` | guard: logged calls absent from the set by `guard4-check` (main), a UUID in `run`, `scratch` and `other` trees, and a live call one minute after `since`: applied, the guard re-run. Today: undone ("malformed line") |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_the_log_s_role_wins_over_the_set_s_when_re_judging` | red at `7438f7e91` | a role-aware planted guard; call-role's set line and log line disagree on the role: `[log-refuses]` (set research, log engineer) undone, P1, the re-judging's reason; `[log-allows]` (set engineer, log research) applied; both: every hook run on call-role had `GOV_ROLE` the log's. Today: undone at the check, call-role never re-judged |
+| S15 | `test_w2_148_replay_check.py::test_s15_dec1108_the_replay_s_hook_runs_never_name_or_change_the_live_log` | red at `7438f7e91` | applied; every hook run had an absolute `GOV_GUARD_CALLS_DIR` outside `guard_calls` and `<home>/.gov-os/guard-calls`; no file in `guard_calls` changed. Today: undone at the check, the hook never run |
 | S16 | `test_w2_148_apply.py::test_s16_the_landing_check_flags_control_commits_outside_a_ticket_without_the_trailers` | red | no `landing_check.py`; flags the CTO's and the operator-without-`Act:` commits only |
 | S17 | `test_w2_148_launch.py::test_s17_the_launcher_starts_the_walled_session_for_the_oldest_request_clean_and_by_pid` | red | no code; oldest request, canary then session, flags, cwd the wall, clean environment, pgid recorded |
 | S17 | `test_w2_148_launch.py::test_s17_a_malformed_request_line_is_refused_and_moved_aside` | red | no code; five malformed lines |
@@ -274,6 +331,13 @@ The failure lines, by the cases that would catch each:
 | F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_owner_s_undo_leaving_another_s_file_exits_non_zero_refused_held` | red at `b134a760b` | DEC-1107: in the owner's undo, another's file left as written, never a success code (`refused`, non-zero) |
 | F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_crash_recovery_leaving_another_s_file_is_refused_non_zero_held` | red at `b134a760b` | DEC-1107: as above, in the crash recovery |
 | F5 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | a dry run that changed a live file is refused, the file restored |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_malformed_log_line_is_refused` | red at `7438f7e91` | DEC-1108 (2): an unreadable log is never a pass (fail closed) |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_capped_day_in_the_window_is_refused` | red at `7438f7e91` | as above: a log cut short is never a pass |
+| F1 | `test_w2_148_replay_check.py::test_s15_dec1108_a_missing_log_folder_is_refused` | red at `7438f7e91` | as above: no log is never a pass |
+| F6 | `test_w2_148_replay_check.py::test_s15_dec1108_a_set_call_with_no_log_line_is_refused_and_named` | red at `7438f7e91` | a path-map change kept on a replay of a call set the log does not show: undone with a P1 |
+| F6 | `test_w2_148_replay_check.py::test_s15_dec1108_a_logged_live_call_missing_from_the_set_is_refused_and_named` | red at `7438f7e91` | as above, a call left out of the set |
+| F12 | `test_w2_148_replay_check.py::test_s15_dec1108_a_call_whose_input_was_altered_by_one_character_is_refused_and_named` | red at `7438f7e91` | the CTO's set cannot shape the replay: an altered input refused |
+| F12 | `test_w2_148_replay_check.py::test_s15_dec1108_a_hash_logged_only_under_another_session_is_refused_and_named` | red at `7438f7e91` | as above, a call moved to another session |
 | F7 | `test_w2_148_apply.py::test_s16_the_landing_check_flags_control_commits_outside_a_ticket_without_the_trailers` | red | flagged |
 | F8 | `test_w2_148_launch.py::test_s17_the_launcher_starts_the_walled_session_for_the_oldest_request_clean_and_by_pid` | red | the wall's settings, cwd, clean environment |
 | F8 | `test_w2_148_launch.py::test_s18_settings_that_did_not_load_fail_the_canary_and_no_real_session_starts` | red | settings not loaded |
@@ -335,6 +399,22 @@ The failure lines, by the cases that would catch each:
   `b134a760b`, run only through the cases (G-14). The owner's undo case trips today on a different path from the one
   the review reported: it already refuses (`moved since the apply`) but undoes nothing, so it is red on the ACT's own
   file. The 166 earlier cases are unchanged. Nothing of the engineer's work was read for this round.
+- **N-11. DEC-1108 (2) (the owner, 2026-11-09), round 4 of this design (ACT-GUARD-CALLLOG-1 §2, §3 (a), §7 item 2).**
+  S15's replay no longer trusts the `calls` file: the CTO's tool builds the 48-hour call set and the agent checks it
+  against the guard's call log by sha256 both ways before it re-judges anything (the interface under "The replay
+  (S15)"; the settings `guard_calls` and `replay_stale_h`). The two earlier replay cases now plant a header and a
+  matching log so they test the re-judging (`Rewrite-Reason: DEC-1108 (2)`); fourteen new cases in
+  `test_w2_148_replay_check.py` refuse each break of the check on its own (an invented, an altered, a dropped and a
+  moved call; a short, a stale and a missing window header; a capped, a malformed and a missing log), pass what the
+  check does not require, judge with the log's role, and keep the replay's hook runs off the live log. Readings the
+  tests fix (N-1): the check's phrases (`no header`, `window short`, `window stale`, `log capped`, `log malformed`,
+  `log missing`); the reason's place (the result line's `reason` or a P1's `text`); the role and ticket given to the
+  hook as `GOV_ROLE` and `GOV_TICKET`; no guard hook run before the check passes. Not covered by a case: an `until`
+  later than the clock plus 5 minutes, a null `sha256` in a live log line, a non-UUID-shaped session in a live tree,
+  the five-per-kind cap. The world's config now carries `guard_calls` (a folder under the world, planted only by these
+  cases). The reds were seen on `7438f7e91` (the merged agent), run only through the cases (G-14): today's replay
+  reads the header and the dropped call as "a malformed line (fail closed)". The 167 other cases are unchanged and
+  pass there (`gov accept`: 167 passed, 16 failed, all 16 these). Nothing of the engineer's work was read for this round.
 
 ## Files
 
@@ -345,4 +425,5 @@ The failure lines, by the cases that would catch each:
   S10), `test_w2_148_apply.py` (S14-S16), `test_w2_148_launch.py` (S17-S19, S24), `test_w2_148_notices_undo.py`
   (S20-S22), `test_w2_148_trial.py` (S23), `test_w2_148_restore_freeze.py` (DEC-1106: F15 in S12 and S15, the freeze
   in S14 and S13), `test_w2_148_undo_refused.py` (DEC-1107: the owner's undo and the crash recovery leaving another's
-  file, S22 and F15).
+  file, S22 and F15), `test_w2_148_replay_check.py` (DEC-1108 (2): S15's call set checked against the guard's call
+  log both ways before the re-judging).

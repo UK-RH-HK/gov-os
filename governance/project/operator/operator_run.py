@@ -16,13 +16,14 @@ The gates, in order; each passes or refuses, and every gate fails closed (an err
   equal to the touched list; then the live files re-hashed); G9 the holds (it waits; it never refuses for a hold).
 Then the apply: the commit freeze (install/act-in-progress.txt, DEC-1106 (3)), a journal, apply.sh apply, the checks,
 the touched-file check, the staged list, the commit with its trailers, the after-checks for (a) (the control files,
-the guard replay); any failure undoes.
+the guard replay, its call set first checked against the guard's call log both ways, DEC-1108 (2)); any failure undoes.
 The restore rule (F15, DEC-1106 (1)): the agent writes back only a live file it can show is its own change (a touched
 file at the frozen after-copy). Anything else that differs is left exactly as it is, the lock held, a P1 naming it.
 Test hook points (GOV_OPERATOR_TEST_HOOK <point> <frozen>): after-G1, after-G6, in-G8, in-apply-checks.
 The result is the last line of stdout, one JSON object; exit 0 when applied, undone (the undo step) or digested.
 The undo step and the journal's recovery that leave a file not the ACT's own say "refused" and exit 1 (DEC-1107).
 """
+import hashlib
 import json
 import os
 import re
@@ -30,6 +31,7 @@ import shutil
 import sys
 import tempfile
 import time
+from datetime import timedelta
 
 sys.dont_write_bytecode = True
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -54,6 +56,9 @@ CONTROL_RUNTIME_SKIP = frozenset({".claude/scheduled_tasks.lock"})
 REPLAY_FILES = ("governance/project/path-map.yaml",)
 DENY_LIST_FILE = re.compile(r"^(\.claude/settings[^/]*\.json|\.rulesync/permissions\.jsonc)$")
 REPLAY_WINDOW_H = 48
+LOG_SLACK = timedelta(minutes=2)    # the set's and the log's clocks may differ by this much (DEC-1108 (2))
+LIVE_SESSION = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+LIVE_TREES = ("main", "worktree")
 UNDO_DAYS = 7
 
 
@@ -724,8 +729,9 @@ class Run:
                                    + ", ".join(f"{r}:{p}" for r, p in stray[:5]))
 
     def record_call(self, command):
+        # the agent's own dry-run commands, in its own file: never in the CTO's call set (DEC-1108 (2))
         try:
-            oc.append_jsonl(os.path.join(self.s["log_dir"], "calls.jsonl"), {
+            oc.append_jsonl(os.path.join(self.s["log_dir"], "operator-calls.jsonl"), {
                 "id": oc.uuid.uuid4().hex, "time": oc.iso(oc.now(self.s)), "role": "operator", "ticket": self.act,
                 "event": {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": "."}})
         except (OSError, ValueError, IndexError):
@@ -1142,30 +1148,141 @@ def after_checks(run, st, env):
     return None
 
 
-def replay(run, st, lists, env):
-    """The ids of calls allowed by the old map and the old deny lists that the new ones refuse."""
-    s = run.s
-    calls_path = s["calls"]
-    if not os.path.isfile(calls_path):
-        raise oc.Refused("after-check", "the guard's call log cannot be read for the replay")
-    cutoff = oc.now(s) - oc.timedelta(hours=REPLAY_WINDOW_H)
-    calls = []
-    with open(calls_path, encoding="utf-8", errors="replace") as f:
-        for ln in f:
-            if not ln.strip():
-                continue
+def action_sha(tool, tin):
+    """The guard's sha256 of a call (its action_bytes, .claude/hooks/pretooluse.py; read there, not imported)."""
+    return hashlib.sha256(json.dumps({"tool": tool if isinstance(tool, str) else None, "input": tin}, sort_keys=True,
+                                     separators=(",", ":"), ensure_ascii=False).encode("utf-8", "surrogatepass")).hexdigest()
+
+
+def _refuse(why):
+    raise oc.Refused("after-check", "the guard replay refused: " + why)
+
+
+def _dict_line(text):
+    try:
+        d = json.loads(text)
+    except ValueError:
+        return None
+    return d if isinstance(d, dict) else None
+
+
+def read_call_set(s):
+    """The CTO's call set (DEC-1108 (2)): (since, until, the calls and dropped calls in the window), each line with its
+    recomputed `_sha`. Refuses on no header, a window ahead of the clock, stale or short, and a malformed line."""
+    if not os.path.isfile(s["calls"]):
+        _refuse("no call set is configured (the calls setting's file does not exist)")
+    try:
+        with open(s["calls"], encoding="utf-8") as f:
+            rows = [ln for ln in f.read().splitlines() if ln.strip()]
+    except (OSError, UnicodeDecodeError):
+        _refuse("the call set cannot be read")
+    head = _dict_line(rows[0]) if rows else None
+    w = head.get("window") if head else None
+    since, until = (oc.parse_iso(w.get("since")), oc.parse_iso(w.get("until"))) if isinstance(w, dict) else (None, None)
+    if since is None or until is None:
+        _refuse("no header (the set's first line must give its window)")
+    clock = oc.now(s)
+    if until > clock + oc.timedelta(minutes=5):
+        _refuse(f"the window's until ({w['until']}) is ahead of the clock")
+    if until < clock - oc.timedelta(hours=s["replay_stale_h"]):
+        _refuse(f"window stale (until {w['until']}, more than {s['replay_stale_h']:g} hours ago)")
+    if until - since < oc.timedelta(hours=REPLAY_WINDOW_H):
+        _refuse(f"window short (since {w['since']} to until {w['until']}, under {REPLAY_WINDOW_H} hours)")
+    out = []
+    for n, ln in enumerate(rows[1:], start=2):
+        c = _dict_line(ln)
+        if c is not None and isinstance(c.get("event"), dict):
+            c["_sha"] = action_sha(c["event"].get("tool_name"), c["event"].get("tool_input"))
+        elif c is not None and isinstance(c.get("sha256"), str) and oc.SHA_RE.match(c["sha256"]) \
+                and isinstance(c.get("dropped"), str) and c["dropped"].strip():
+            c["_sha"] = c["sha256"]
+        else:
+            _refuse(f"the call set has a malformed line (line {n}; fail closed)")
+        c["_session"] = c.get("session") if isinstance(c.get("session"), str) else None
+        t = c["_t"] = oc.parse_iso(c.get("time"))
+        if t is None or since <= t <= until:          # outside the window: neither checked nor re-judged
+            out.append(c)
+    return since, until, out
+
+
+def read_guard_log(s, since, until):
+    """The guard's call log's lines on the UTC days from since - 2 min to until + 2 min, each with its parsed `_t`."""
+    where = s["guard_calls"]
+    if not os.path.isdir(where):
+        _refuse(f"log missing ({where} is not a folder)")
+    day, last = (since - LOG_SLACK).astimezone(oc.timezone.utc).date(), (until + LOG_SLACK).astimezone(oc.timezone.utc).date()
+    out = []
+    while day <= last:
+        p = os.path.join(where, f"{day.isoformat()}.jsonl")
+        if os.path.lexists(p + ".capped"):
+            _refuse(f"log capped ({day.isoformat()}: the guard stopped writing that day)")
+        if os.path.lexists(p):
             try:
-                c = json.loads(ln)
-                assert isinstance(c, dict) and isinstance(c.get("event"), dict)
-            except (ValueError, AssertionError):
-                raise oc.Refused("after-check", "the guard's call log has a malformed line (fail closed)")
-            t = oc.parse_iso(c.get("time"))
-            if t is not None and t < cutoff:
-                continue
-            calls.append(c)
+                with open(p, encoding="utf-8") as f:
+                    rows = [ln for ln in f.read().splitlines() if ln.strip()]
+            except (OSError, UnicodeDecodeError):
+                rows = ["\0"]
+            for ln in rows:
+                r = _dict_line(ln)
+                t = oc.parse_iso(r.get("time")) if r else None
+                if t is None or not isinstance(r.get("session"), str) or not (
+                        r.get("sha256") is None or (isinstance(r["sha256"], str) and oc.SHA_RE.match(r["sha256"]))):
+                    _refuse(f"log malformed ({day.isoformat()}; fail closed)")
+                r["_t"] = t
+                out.append(r)
+        day += oc.timedelta(days=1)
+    return out
+
+
+def check_against_log(s, since, until, lines):
+    """DEC-1108 (2), both ways by sha256 before anything is re-judged. Returns {id(call line): its log lines}."""
+    log = read_guard_log(s, since, until)
+    by_key = {}
+    for r in log:
+        if since - LOG_SLACK <= r["_t"] <= until + LOG_SLACK and r["sha256"]:
+            by_key.setdefault((r["session"], r["sha256"]), []).append(r)
+    no_log = [str(c.get("id")) for c in lines if (c["_session"], c["_sha"]) not in by_key]
+    have = {(c["_session"], c["_sha"]) for c in lines}
+    missing = list(dict.fromkeys(
+        f"{r['session'][:8]} {(r['sha256'] or 'null')[:12]} {r['time']}" for r in log
+        if since + LOG_SLACK <= r["_t"] <= until - LOG_SLACK and LIVE_SESSION.match(r["session"])
+        and r.get("tree") in LIVE_TREES and (not r["sha256"] or (r["session"], r["sha256"]) not in have)))
+    parts = []
+    if no_log:
+        parts.append(f"{len(no_log)} set call(s) with no line in the guard's log: " + ", ".join(no_log[:5]))
+    if missing:
+        parts.append(f"{len(missing)} logged live call(s) missing from the set (session, sha256, time): "
+                     + ", ".join(missing[:5]))
+    if parts:
+        _refuse("the call set does not match the guard's call log by sha256 (DEC-1108 (2)): " + "; ".join(parts))
+    return {id(c): by_key[(c["_session"], c["_sha"])] for c in lines}
+
+
+def with_log_role(call, rows):
+    """The call as the guard ran it: the role and ticket of its matching log line (the nearest in time) win."""
+    t = call["_t"]
+    r = min(rows, key=lambda x: abs((x["_t"] - t).total_seconds())) if t is not None else rows[0]
+    return dict(call, role=r.get("role") or None, ticket=r.get("ticket") or None)
+
+
+def replay(run, st, lists, env):
+    """The ids of calls allowed by the old map and the old deny lists that the new ones refuse; first the call set
+    is checked against the guard's call log both ways (DEC-1108 (2)), and refused on any mismatch."""
+    s = run.s
+    since, until, lines = read_call_set(s)
+    matched = check_against_log(s, since, until, lines)
+    dropped = {}
+    for c in lines:
+        if "event" not in c:
+            dropped[c["dropped"]] = dropped.get(c["dropped"], 0) + 1
+    calls = [with_log_role(c, matched[id(c)]) for c in lines if "event" in c]
+    run.replay_detail = {"calls": len(calls), "turned": [], "dropped": dropped,
+                         "window": [oc.iso(since), oc.iso(until)]}
     if not calls:
         return []
-    tmp = tempfile.mkdtemp(prefix="gov-operator-replay-")
+    tmp = os.path.abspath(tempfile.mkdtemp(prefix="gov-operator-replay-"))
+    calls_dir = os.path.join(tmp, "guard-calls")      # the replay's own hook runs never write the live log
+    os.makedirs(calls_dir, mode=0o700)
     try:
         # One tree: the repository at the head before the apply (a clone outside the live tree), with the live
         # .claude/ as it was before (untracked files too); the lists written before, the calls replayed; then the
@@ -1190,7 +1307,7 @@ def replay(run, st, lists, env):
                 write_file(os.path.join(tree, t["path"]), data)
 
         put("before")
-        old = {i: guard_decision(s, tree, c) for i, c in enumerate(calls)}
+        old = {i: guard_decision(s, tree, c, calls_dir) for i, c in enumerate(calls)}
         put("after")
         added = added_deny_rules(run, lists)
         turned, detail = [], []
@@ -1202,13 +1319,13 @@ def replay(run, st, lists, env):
             if old[i] != "allow":
                 detail.append(dict(what, old=old[i]))
                 continue
-            new = guard_decision(s, tree, c)
+            new = guard_decision(s, tree, c, calls_dir)
             if new == "allow" and any(rule_matches(r, c, tree, s["home"]) for r in added):
                 new = "refuse (an added deny rule)"
             detail.append(dict(what, old=old[i], new=new))
             if new != "allow":
                 turned.append(str(c.get("id")))
-        run.replay_detail = {"calls": len(calls), "turned": turned, "decisions": detail[:50]}
+        run.replay_detail.update(turned=turned, decisions=detail[:50])
         return turned
     finally:
         oc.remove_tree(tmp)
@@ -1220,9 +1337,9 @@ def write_file(path, data):
         f.write(data)
 
 
-def guard_decision(s, tree, call):
+def guard_decision(s, tree, call, calls_dir):
     """The guard's decision on one call, run on a tree as Claude Code runs it: allow, or refuse (exit 2, a deny,
-    or any error: fail closed)."""
+    or any error: fail closed). The hook logs to calls_dir, the replay's own folder, never the live log."""
     hook = os.path.join(tree, ".claude/hooks/pretooluse.py")
     if not os.path.isfile(hook):
         return "refuse"
@@ -1231,6 +1348,7 @@ def guard_decision(s, tree, call):
     ev["cwd"] = os.path.normpath(os.path.join(tree, cwd)) if not str(cwd).startswith("/") else cwd
     env = oc.clean_env(s, s["home"], extra={"CLAUDE_PROJECT_DIR": tree, "PYTHONPATH": os.path.join(s["repo"], "src")})
     env["CLAUDE_PROJECT_DIR"] = tree
+    env["GOV_GUARD_CALLS_DIR"] = calls_dir
     if call.get("role"):
         env["GOV_ROLE"] = str(call["role"])
     if call.get("ticket"):

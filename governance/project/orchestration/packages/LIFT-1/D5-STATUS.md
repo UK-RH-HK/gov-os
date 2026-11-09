@@ -35,7 +35,8 @@ change exists on `w2/integrate` at `0240833b`.
 
 **Moved out of D-5:** W2-130's sitting (DECIDED-NOT-DONE row 24) settled it as "regenerate the six
 `docs/contract/master-rules/MR-n.md` from `contract.yaml`", and row 65 carries it in **D-6 part 2** (another agent's
-lane). Today the six files still say `PROPOSED` against `contract.yaml`'s ACCEPTED. Not touched here.
+lane), now filed as **W2-151** (`DAEO-qzca`, `56ad463a`). Today the six files still say `PROPOSED` against
+`contract.yaml`'s ACCEPTED. Not touched here.
 
 ## W2-128's KPI lines (21 success, 7 failure)
 
@@ -74,3 +75,7 @@ lane). Today the six files still say `PROPOSED` against `contract.yaml`'s ACCEPT
 
 - 2026-11-09: status written; D5 rows 10-17 entered; W2-128 `in_progress` with its interface, rounds and the D5-ROWS 1-9
   line; round 1's independent test designer launched in `/home/usain/gov-os-worktrees/W2-128-tests` (`w2/W2-128-tests`).
+- 2026-11-09: round 1's designer done: `w2/W2-128-tests` **TESTS-READY `97489c19d283`** (S1-S6, S8, S10, S14-S21, F1,
+  F7; red on integrate but the green guards: existing tickets and records valid, the record templates' `gov links`);
+  tripwire changes all other lanes'. The CTO's P1 (b) (`waits_on` items keyed `ref`, not `on`) and P2 (a) (a string
+  or `{ref, reason}`) in the ticket's interface; the designer's revision for `ref` next, then the product-spec worker.
