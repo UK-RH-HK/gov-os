@@ -22,7 +22,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
-| 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | **DUE NOW** (after the 80): an independent session re-words Q07, Q14 before any re-measure of the 138 |
+| 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | Q07/Q14 **DONE 11-09** (`55d1c029`, the sets root's visible copy synced); the gaps WAIT: the next label audit |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
 | 13 | ADR-0002 | (8) refreshed, reviewed, to the owner; DEC-1098 (5) accepted | **DONE 11-09**: `docs/adr/ADR-0002-architecture-and-stack.md` ACCEPTED; WAITS: re-read at the lift's re-pin |
 | 14 | the label audit | (13) at each release cut and before any new verdict set; rubric v3 after the 80 | **DONE (trigger set)**; rubric v3 **DUE NOW** (after the 80) |
