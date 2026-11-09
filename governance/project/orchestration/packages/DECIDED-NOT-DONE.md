@@ -37,8 +37,8 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
 | 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | **Package to the owner 11-09** (`W2-88-STANDARD-1.md`, S10-S17); WAITS: the owner's six answers, then W2-88's test designer applies the lines |
-| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | IN PROGRESS 11-09 |
-| 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | IN PROGRESS 11-09 |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | **Proposals to the owner 11-09** (`P-SELECT-FIXES-1.md` §5); WAITS: the owner's word |
+| 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | **DONE 11-09** (`P-SELECT-FIXES-1.md` §6: first gold by code for 9 of 12 callers on the 138, 3 of 8 on the 80; ~2 % of bundle items) |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
