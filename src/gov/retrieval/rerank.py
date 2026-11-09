@@ -7,15 +7,16 @@ returns None says the reranker cannot be loaded: the order given is kept and no 
 
 The default reranker (W2-112; DEC-979 item 4, DEC-1032, DEC-1033) asks the user's one shared reranker service
 (``rerank_service.py``, on ``~/.cache/gov-os/rerank.sock``), starting it under ``rerank.lock`` when none listens.
-When the service cannot be reached, started, or does not answer, the search falls back to a private reranker
-(``rerank_worker.py``, which holds a GPU slot or ends named), and where that cannot load either, the order given is
-kept. Each fallback is a FALLBACK line in ``~/.cache/gov-os/rerank.log``; ``last_outcome`` names who answered.
+No private reranker runs beside it (W2-145; DEC-1048 (5), DEC-1046 (1)): a client cannot tell a service that is down
+from one it cannot reach, so when the service cannot be reached, started, or does not answer, in any way, the search
+keeps the order given, unranked and named, at once (no second wait, no other process, no model in this process, on
+the GPU or the CPU). Each such search is one FALLBACK line in ``~/.cache/gov-os/rerank.log`` (the service's failure,
+then ``unranked``); ``last_outcome`` names who answered.
 """
 
 from __future__ import annotations
 
 import fcntl
-import functools
 import json
 import os
 import socket
@@ -29,7 +30,6 @@ MODEL = "Qwen/Qwen3-Reranker-0.6B"
 REVISION = "e61197ed45024b0ed8a2d74b80b4d909f1255473"
 # The interpreter of the reranker environment, under the home folder (DEC-397).
 PYTHON_REL = ".local/share/gov-os/reranker-venv/bin/python"
-_WORKER = Path(__file__).with_name("rerank_worker.py")
 _SERVICE = Path(__file__).with_name("rerank_service.py")
 CACHE_REL = ".cache/gov-os"  # the socket, its start lock and the logs, in the user's own folder (0700)
 SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "rerank-service.log"
@@ -50,7 +50,16 @@ MAX_REQUEST_TEXTS = 64
 MAX_REQUEST_CHARS = 24_000
 _ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
           77: "the GPU has too little free memory for its share", 78: "no GPU is available to it"}
+# How long this process remembers the service's failure for the same question (W2-145, the review's F1). One search
+# can ask twice: the pool's rerank, then, when that came back unscored, the page's own (retrieve.py). The second ask
+# comes after the rest of that one search (reading the page's spans and frontmatter: well under a second, a few on a
+# cold disk), so 10 s covers one search's span and no more. Within it, the same question to the same socket gets the
+# same reason at once: no second FALLBACK line, no second start, no second wait (P-1). A new question, a service that
+# has since come up on a new socket, or any ask after the window asks the service again.
+RECALL_S = 10.0
 _last = threading.local()
+_failed: dict = {}  # (socket path, interpreter, question) -> (when it failed, the socket as it was, the reason)
+_failed_lock = threading.Lock()
 
 
 def _cache() -> Path:
@@ -62,8 +71,8 @@ def _note(by: str, device, reason) -> None:
 
 
 def last_outcome() -> dict:
-    """This thread's last rerank: ``by`` is ``service``, ``private``, ``given`` or ``unavailable`` (the order kept),
-    with the device that scored and the reason for a fallback."""
+    """This thread's last rerank: ``by`` is ``service``, ``given`` or ``unavailable`` (the order kept), never
+    ``private`` (W2-145), with the device that scored and the reason the order was kept."""
     return dict(getattr(_last, "outcome", {"by": "unavailable", "device": None, "reason": "no rerank was asked"}))
 
 
@@ -89,38 +98,20 @@ def fallback_count() -> int:
     return status()["fallbacks"]
 
 
-@functools.lru_cache(maxsize=None)
-def _started(interpreter: str):
-    """``(score, device, None)`` of a private reranker process started with ``interpreter``, or ``(None, None,
-    reason)`` when it ends without the model.
-
-    The process is a child of this one, isolated from this one's Python paths and offline whatever the caller's
-    environment says. It is started once and stays loaded until this process ends, which closes its input.
-    """
-    env = {key: value for key, value in os.environ.items() if key != "GOV_RERANK_GPU_SLOT"}
+def _refusal(folder: Path) -> str:
+    """The detail of the last REFUSED line the service wrote in ``rerank.log``, or the log's name."""
     try:
-        process = subprocess.Popen([interpreter, "-I", str(_WORKER), MODEL, REVISION], text=True,
-                                   env={**env, "HF_HUB_OFFLINE": "1"}, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    except OSError as error:
-        return None, None, f"the private reranker could not start ({error})"
-    first = process.stdout.readline()
-    if not first:  # it ended before it had the model: no slot, no snapshot, or a library absent
-        code = process.wait()
-        return None, None, f"the private reranker ended without the model ({_ENDED.get(code, f'exit {code}')})"
-    loaded = json.loads(first)
-
-    def score(query: str, texts: list[str]) -> list[float]:
-        process.stdin.write(json.dumps([query, texts]) + "\n")
-        process.stdin.flush()
-        return json.loads(process.stdout.readline())
-
-    return score, loaded.get("device") if isinstance(loaded, dict) else None, None
+        lines = (folder / LOG).read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        lines = []
+    refused = [line.split("\t", 2)[2] for line in lines if line.count("\t") >= 2 and line.split("\t")[1] == "REFUSED"]
+    return refused[-1] if refused else LOG
 
 
 def _start(folder: Path, interpreter: str, path: str, waited: bool):
     """The service just started, or None when the start lock is held (another search starting it, or it runs).
-    A search that ``waited`` for a service which then ended without listening does not start another: it falls back
-    (that service's refusal, a missing slot or GPU memory, holds for this search too)."""
+    A search that ``waited`` for a service which then ended without listening does not start another: it goes on
+    unranked (that service's refusal, a missing slot or GPU memory, holds for this search too)."""
     fd = os.open(folder / LOCK, os.O_CREAT | os.O_RDWR, 0o600)
     try:
         try:
@@ -128,7 +119,7 @@ def _start(folder: Path, interpreter: str, path: str, waited: bool):
         except BlockingIOError:
             return None
         if waited:
-            raise ConnectionError(f"the service this search waited for ended before it listened ({LOG})")
+            raise ConnectionError(f"the service this search waited for ended before it listened ({_refusal(folder)})")
         if os.path.lexists(path):
             os.unlink(path)  # a dead service's socket: a live service holds the lock
         env = {key: value for key, value in os.environ.items() if key != "GOV_RERANK_GPU_SLOT"}
@@ -141,11 +132,14 @@ def _start(folder: Path, interpreter: str, path: str, waited: bool):
 
 
 def _connect(interpreter: str) -> socket.socket:
-    """A connection to the service, starting it when none listens; raises when it cannot be had within the bounds."""
+    """A connection to the service, starting it when none listens; raises when it cannot be had within the bounds.
+    A listener that does not take the connection (its queue full: EAGAIN, asked again until ``CONNECT_S`` has passed;
+    or no accept within ``CONNECT_S``) is named as such: no connection within ``CONNECT_S`` (W2-145 S1, S4)."""
     folder = _cache()
     folder.mkdir(parents=True, exist_ok=True)
     folder.chmod(0o700)
     path, deadline, started, waited = str(folder / SOCKET), time.monotonic() + START_S, None, False
+    busy = None  # when the listener first left the connection waiting (EAGAIN)
     while True:
         connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # a sandbox refuses this at once (EPERM)
         connection.settimeout(CONNECT_S)
@@ -154,6 +148,14 @@ def _connect(interpreter: str) -> socket.socket:
             return connection
         except (FileNotFoundError, ConnectionRefusedError):
             connection.close()
+        except (BlockingIOError, TimeoutError) as error:  # a listener, but no connection: never a start beside it
+            connection.close()
+            busy = busy or time.monotonic()
+            if isinstance(error, TimeoutError) or time.monotonic() - busy >= CONNECT_S:
+                raise ConnectionError(f"no connection to the shared reranker within CONNECT_S ({CONNECT_S:g} s): "
+                                      f"{type(error).__name__}: {error}") from error
+            time.sleep(0.05)
+            continue
         except BaseException:
             connection.close()
             raise
@@ -166,6 +168,40 @@ def _connect(interpreter: str) -> socket.socket:
             started = _start(folder, interpreter, path, waited)
             waited = started is None
         time.sleep(0.05)
+
+
+def _socket_seen(path: str):
+    """The socket file as it is now (its inode and change time), or None when there is none: a service that came up
+    since a failure has a new one."""
+    try:
+        seen = os.lstat(path)
+    except OSError:
+        return None
+    return seen.st_ino, seen.st_mtime_ns
+
+
+def _recalled(key: tuple) -> str | None:
+    """The reason the service failed this same ask within ``RECALL_S``, its socket unchanged since; else None."""
+    with _failed_lock:
+        entry = _failed.get(key)
+    if entry is None:
+        return None
+    at, seen, why = entry
+    if time.monotonic() - at >= RECALL_S or _socket_seen(key[0]) != seen:
+        return None
+    return why
+
+
+def _remember(key: tuple, why: str | None) -> None:
+    """Keep the service's failure for ``key`` (or forget it, ``why`` None); entries past ``RECALL_S`` go."""
+    now = time.monotonic()
+    with _failed_lock:
+        for old in [old for old, entry in _failed.items() if now - entry[0] >= RECALL_S]:
+            del _failed[old]
+        if why is None:
+            _failed.pop(key, None)
+        else:
+            _failed[key] = (now, _socket_seen(key[0]), why)
 
 
 def _ask(interpreter: str, query: str, texts: list[str]):
@@ -185,32 +221,36 @@ def _ask(interpreter: str, query: str, texts: list[str]):
 
 
 def default_reranker():
-    """The loader of the pinned reranker, which runs in its own pinned process (ADR-0002 §2): the shared service,
-    else a private one. Both start from ``~/.local/share/gov-os/reranker-venv`` (DEC-397), ``~`` being the folder
-    ``HOME`` names. None when the environment is absent (DEC-374)."""
+    """The loader of the pinned reranker, which runs in its own pinned process (ADR-0002 §2): the shared service
+    alone, started from ``~/.local/share/gov-os/reranker-venv`` (DEC-397), ``~`` being the folder ``HOME`` names.
+    None when the environment is absent (DEC-374).
+
+    The scorer returns None when the service does not answer, in any way (DEC-1048 (5)): the search keeps the order
+    given, ``last_outcome`` is ``unavailable`` with the service's failure, and one FALLBACK line is logged. Nothing
+    else is started and nothing is waited for (W2-145 S1, S4). The same search asking again (the page's rerank after
+    the pool's) within ``RECALL_S`` gets the same reason at once, with no second line, start or wait (the review's F1)."""
     interpreter = Path(os.environ.get("HOME") or Path.home()) / PYTHON_REL
     if not interpreter.is_file():
         _note("unavailable", None, f"no reranker environment at {interpreter}")
         return None
 
     def score(query: str, texts: list[str]):
+        key = (str(_cache() / SOCKET), str(interpreter), query)
+        why = _recalled(key)
+        if why is not None:  # this search's service already failed: unranked at once, already logged
+            _note("unavailable", None, why)
+            return None
         try:
             values, device = _ask(str(interpreter), query, texts)
-            _note("service", device, None)
-            return values
-        except Exception as error:  # the service down, in any way: this search falls back, never fails
+        except Exception as error:  # the service unreachable, in any way: this search goes on unranked, never fails
             why = f"the shared reranker did not answer ({type(error).__name__}: {error})"
-        private, device, failed = _started(str(interpreter))
-        _log("FALLBACK", f"{why}\t{'private' if private else 'unavailable: ' + failed}")
-        if private is None:
-            _note("unavailable", None, f"{why}; {failed}")
+            _log("FALLBACK", f"{why}\tunranked")
+            _note("unavailable", None, why)
+            _remember(key, why)
             return None
-        _note("private", device, why)
-        try:
-            return private(query, texts)
-        except Exception:  # it died after loading: the next search starts another (W2-32 S4)
-            _started.cache_clear()
-            raise
+        _remember(key, None)
+        _note("service", device, None)
+        return values
 
     return score
 
@@ -238,7 +278,7 @@ def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     """``candidates`` in the order of the reranker's scores, each with ``rerank_score``; equal scores keep the order
     given. ``score`` is called with the ``text`` of the candidates in requests of at most ``MAX_REQUEST_TEXTS`` (64,
     DEC-1090 (2)) and at most ``MAX_REQUEST_CHARS`` padded characters (``requests``): no request to any reranker,
-    the shared service or a private one, carries more. Each score goes back to its candidate, so the order is the
+    the shared service or one given, carries more. Each score goes back to its candidate, so the order is the
     unbatched one;
     one request that scores nothing or fails leaves every candidate unscored. Without a reranker the candidates are
     returned as given.

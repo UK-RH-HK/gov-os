@@ -1,5 +1,7 @@
-"""Builder tests for the shared reranker service and its fallbacks (W2-112; DEC-979 item 4, DEC-374, DEC-1032,
-DEC-1033).
+"""Builder tests for the shared reranker service and what a search does without it (W2-112; DEC-979 item 4, DEC-374,
+DEC-1032, DEC-1033). DEC-1048 (5) (W2-145): no private reranker runs beside the service; a search it cannot answer
+stays unranked and named, and the service holds every GPU slot for its life. The cases that assumed a private
+fallback are revised to W2-145's S1-S4, each marked ``DEC-1048 (5)``.
 
 Regression evidence only (DEC-136). Hermetic: a throwaway venv (``--without-pip``) stands at the reranker
 environment's path in a temporary HOME, with a stand-in ``torch`` (its free GPU memory read from
@@ -137,9 +139,7 @@ def home(standin, tmp_path_factory, monkeypatch):
     monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "2")
     monkeypatch.setenv("GOV_RERANK_IDLE_S", "60")
     monkeypatch.setenv("STANDIN_GPU_FREE", str(12 * GIB))
-    rerank._started.cache_clear()
-    yield home
-    rerank._started.cache_clear()
+    yield home  # DEC-1048 (5): no private reranker's cache to clear (rerank._started is gone)
     for pid in _pids(home):
         os.kill(pid, signal.SIGKILL)
     assert _wait_until(lambda: not _pids(home), 10), "a process of this test is still running"
@@ -214,13 +214,13 @@ def test_the_socket_is_the_users_alone(home):
     assert stat.S_IMODE(folder.stat().st_mode) == 0o700
 
 
-def test_ties_keep_the_given_order_and_the_answers_match_a_private_reranker(home):
+def test_ties_keep_the_given_order_and_the_answers_match_the_reference(home):
+    # DEC-1048 (5): compared with the stand-in model's own scores (the reference), no longer a private reranker's
     texts = ["same", "four", "a longer text", "tied"]
     ranked, outcome = ask("q", texts)
     assert outcome["by"] == "service"
     assert [entry["n"] for entry in ranked] == [2, 0, 1, 3]
-    private, _, _ = rerank._started(str(home / rerank.PYTHON_REL))
-    assert private("q", texts) == [entry["rerank_score"] for entry in sorted(ranked, key=lambda e: e["n"])]
+    assert pairs(ranked) == expected("q", texts)
 
 
 def test_the_service_ends_after_its_idle_time_and_removes_its_socket(home, monkeypatch):
@@ -257,13 +257,17 @@ def _service_never_loaded(home: Path) -> bool:
     return not list((home / "marks").glob(f"model-{SERVICE}-*")) and "READY" not in kinds(home)
 
 
-def test_below_its_gpu_share_the_service_does_not_start_and_the_search_falls_back(home, monkeypatch):
+def test_below_its_gpu_share_the_service_does_not_start_and_the_search_goes_on_unranked(home, monkeypatch):
+    # DEC-1048 (5): no private reranker follows the refusal; the order given, named
     monkeypatch.setenv("STANDIN_GPU_FREE", str(4 * GIB))
-    ranked, outcome = ask("q", ["a", "bb"])
-    assert outcome["by"] == "private" and "too little free memory" in outcome["reason"]
-    assert pairs(ranked) == expected("q", ["a", "bb"]) and _service_never_loaded(home)
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+    assert rerank.rerank("q", candidates) == candidates
+    outcome = rerank.last_outcome()
+    assert outcome["by"] == "unavailable" and "too little free memory" in outcome["reason"]
+    assert _service_never_loaded(home) and not _pids(home, WORKER, alive=False)
     log = (home / rerank.CACHE_REL / rerank.LOG).read_text()
     assert "\tREFUSED\tthe shared reranker does not start: the GPU" in log and rerank.status()["service_refusals"] == 1
+    assert fallbacks(home)[-1][3] == "unranked"
 
 
 def test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named(home, monkeypatch):
@@ -273,23 +277,23 @@ def test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named(h
     outcome = rerank.last_outcome()
     assert outcome["by"] == "unavailable" and outcome["device"] is None
     assert "could not be read" in (home / rerank.CACHE_REL / rerank.LOG).read_text()  # the service's refusal
-    assert outcome["reason"].endswith("the private reranker ended without the model (no GPU is available to it)")
-    assert not list((home / "marks").glob("model-*"))  # no model loaded, on any device
+    # DEC-1048 (5): the service's failure named; no private reranker is started after it
+    assert outcome["reason"].startswith("the shared reranker did not answer") and "ended before it listened" in \
+        outcome["reason"]
+    assert not list((home / "marks").glob("model-*")) and not _pids(home, WORKER, alive=False)
 
 
 @pytest.mark.parametrize("allow_cpu", [False, True])
 def test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu(home, monkeypatch, allow_cpu):
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "-1")
-    if allow_cpu:  # the tests' opt-out reaches the private worker only, never the service
+    if allow_cpu:  # DEC-1048 (5): the old opt-out opens no CPU path anywhere
         monkeypatch.setenv("GOV_RERANK_ALLOW_CPU", "1")
     candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
     ranked = rerank.rerank("q", candidates)
     outcome = rerank.last_outcome()
     assert "the GPU is hidden from it" in outcome["reason"] and _service_never_loaded(home)
-    if allow_cpu:
-        assert outcome["by"] == "private" and pairs(ranked) == expected("q", ["a", "bbb"])
-    else:
-        assert outcome["by"] == "unavailable" and ranked == candidates
+    assert outcome["by"] == "unavailable" and ranked == candidates
+    assert not list((home / "marks").glob("model-*")) and not _pids(home, WORKER, alive=False)
 
 
 def _held_slots(home: Path) -> list[int]:
@@ -313,24 +317,29 @@ def _hold_slots(home: Path) -> list[int]:
     return fds
 
 
-def test_the_service_holds_one_gpu_slot_for_its_life(home):
-    assert ask("q", ["a"])[1]["by"] == "service" and _held_slots(home) == [0]
+def test_the_service_holds_every_gpu_slot_for_its_life(home):
+    # DEC-1048 (5), W2-145 S3: the first slot by the slot rule, then every other one; all go with the process
+    assert ask("q", ["a"])[1]["by"] == "service"
+    assert _wait_until(lambda: _held_slots(home) == [0, 1], 3)
     ask("q2", ["a"])
-    assert _held_slots(home) == [0]  # one slot, held between requests, none for the requests
+    assert _held_slots(home) == [0, 1]  # held between requests, for the service's life
     [pid] = _pids(home, SERVICE)
     os.kill(pid, signal.SIGKILL)
     assert _wait_until(lambda: not _alive(pid), 5) and _wait_until(lambda: _held_slots(home) == [], 5)
 
 
-def test_the_service_waits_for_a_slot(home, monkeypatch):
+def test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release(home, monkeypatch):
     monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "10")
     fds = _hold_slots(home)
-    threading.Timer(1.0, os.close, (fds[1],)).start()  # a private reranker's session ends
+    threading.Timer(1.0, os.close, (fds[1],)).start()  # an older tree's private reranker ends
     try:
         ranked, outcome = ask("q", ["a", "bb"])
     finally:
-        os.close(fds[0])
+        os.close(fds[0])  # the other ends too
+    released = time.monotonic()
     assert outcome["by"] == "service" and pairs(ranked) == expected("q", ["a", "bb"])
+    # DEC-1048 (5), W2-145 S3: a slot another process held is the service's within 2 s of its release
+    assert _wait_until(lambda: _held_slots(home) == [0, 1], 3) and time.monotonic() - released <= 3
 
 
 def test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked(home, monkeypatch):
@@ -346,15 +355,17 @@ def test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked(home,
             os.close(fd)
     for ranked, outcome in results:
         assert ranked == [{"n": 0, "text": "a"}] and outcome["by"] == "unavailable"
-        assert "no GPU slot freed within its wait" in outcome["reason"]
+        # DEC-1048 (5): the service's refusal named, by the search that started it ("no GPU slot freed within its
+        # wait") and by those that waited for it (its REFUSED line, "no GPU slot free within 1 s")
+        assert "no GPU slot free" in outcome["reason"]
     assert took < 15, took
     assert len(_pids(home, SERVICE, alive=False)) == 1  # the searches that waited for it did not start another
-    assert _service_never_loaded(home) and not list((home / "marks").glob(f"model-{WORKER}-*"))
+    assert _service_never_loaded(home) and not _pids(home, WORKER, alive=False)
     assert "\tREFUSED\tthe shared reranker does not start: no GPU slot free within 1 s" in \
         (home / rerank.CACHE_REL / rerank.LOG).read_text()
 
 
-# --- the fallbacks (DEC-374, DEC-1033) ---
+# --- a search without the service: unranked and named, never a private reranker (DEC-374, DEC-1048 (5)) ---
 
 def test_a_killed_service_is_replaced_by_the_next_search(home):
     ask("q", ["a"])
@@ -366,37 +377,42 @@ def test_a_killed_service_is_replaced_by_the_next_search(home):
     assert len(_pids(home, SERVICE)) == 1 and _pids(home, SERVICE) != [first]
 
 
-def test_a_service_killed_mid_request_leaves_the_search_to_the_private_reranker(home):
+def test_a_service_killed_mid_request_leaves_the_search_unranked_and_named(home):
+    # DEC-1048 (5): the order given, never a private reranker's scores
     ask("warm", ["a"])
     [pid] = _pids(home, SERVICE)
     threading.Timer(1.0, os.kill, (pid, signal.SIGKILL)).start()
     began = time.monotonic()
-    ranked, outcome = ask("hang", ["a", "bb"])
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+    ranked = rerank.rerank("hang", candidates)
+    outcome = rerank.last_outcome()
     assert time.monotonic() - began < 10
-    assert outcome["by"] == "private" and outcome["reason"].startswith("the shared reranker did not answer")
-    assert pairs(ranked) == expected("hang", ["a", "bb"])
-    assert fallbacks(home)[-1][-1] == "private"
+    assert outcome["by"] == "unavailable" and outcome["reason"].startswith("the shared reranker did not answer")
+    assert ranked == candidates and not _pids(home, WORKER, alive=False)
+    assert fallbacks(home)[-1][-1] == "unranked"
 
 
 def test_a_service_that_does_not_answer_in_time_is_left(home, monkeypatch):
     monkeypatch.setenv("GOV_RERANK_TIMEOUT_S", "1")
     ask("warm", ["a"])
     began = time.monotonic()
-    ranked, outcome = ask("hang", ["a", "bb"])
-    assert time.monotonic() - began < 8
-    assert outcome["by"] == "private" and "timed out" in outcome["reason"]
-    assert pairs(ranked) == expected("hang", ["a", "bb"])
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+    ranked = rerank.rerank("hang", candidates)
+    outcome = rerank.last_outcome()
+    assert time.monotonic() - began < 1 + 1  # DEC-1048 (5), W2-145 S4: the time limit plus 1 s, no other wait
+    assert outcome["by"] == "unavailable" and "timed out" in outcome["reason"]
+    assert ranked == candidates and not _pids(home, WORKER, alive=False)
 
 
-def test_a_request_over_the_cap_is_refused_and_the_search_falls_back(home):
+def test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked(home):
     # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (64, DEC-1090 (2)), so the service's own cap is
     # reached only by a request made past rerank.rerank: the default reranker's scorer, asked directly. The guard
-    # stays: the service refuses the over-cap request, and the scorer falls back to the private reranker, named.
+    # stays: the service refuses the over-cap request, and (DEC-1048 (5)) the scorer scores nothing, named.
     texts = ["x"] * (rerank_service.MAX_TEXTS + 1)
     values = rerank.default_reranker()("q", texts)
     outcome = rerank.last_outcome()
-    assert outcome["by"] == "private" and "refused the request" in outcome["reason"]
-    assert values is not None and len(values) == len(texts)
+    assert outcome["by"] == "unavailable" and "refused the request" in outcome["reason"]
+    assert values is None and not _pids(home, WORKER, alive=False)
     assert len(_pids(home, SERVICE)) == 1  # the service stays up for the next search
 
 
@@ -556,41 +572,40 @@ def test_the_release_leaves_the_client_s_bounds_as_they_were():
     assert (rerank.MAX_REQUEST_TEXTS, rerank.MAX_REQUEST_CHARS, rerank_service.MAX_TEXTS) == (64, 24_000, 512)
 
 
-def test_a_service_that_cannot_start_leaves_the_search_to_the_private_reranker(home, monkeypatch):
+def test_a_service_that_cannot_start_leaves_the_search_unranked_and_named(home, monkeypatch):
+    # DEC-1048 (5): no private reranker after the service's failure; one FALLBACK line, "unranked"
     monkeypatch.setenv("STANDIN_FAIL", SERVICE)
-    ranked, outcome = ask("q", ["a", "bb"])
-    assert outcome["by"] == "private" and outcome["device"] == "cuda:0"
-    assert "ended before it listened (exit 1)" in outcome["reason"] and pairs(ranked) == expected("q", ["a", "bb"])
-    assert _held_slots(home) == [0]  # the service's slot freed with it; the private reranker holds one
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+    assert rerank.rerank("q", candidates) == candidates
+    outcome = rerank.last_outcome()
+    assert outcome["by"] == "unavailable" and outcome["device"] is None
+    assert "ended before it listened (exit 1)" in outcome["reason"]
+    assert _wait_until(lambda: _held_slots(home) == [], 5)  # the service's slots freed with it; nobody else holds one
+    assert not _pids(home, WORKER, alive=False)
     [line] = fallbacks(home)
-    assert line[2].startswith("the shared reranker did not answer") and line[3] == "private"
+    assert line[2] == outcome["reason"] and line[3] == "unranked"
     assert rerank.fallback_count() == 1 and rerank.status()["fallbacks"] == 1
 
 
-def test_without_service_or_private_reranker_the_order_is_kept_and_named(home, monkeypatch):
-    monkeypatch.setenv("STANDIN_FAIL", "all")
-    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
-    assert rerank.rerank("q", candidates) == candidates
-    outcome = rerank.last_outcome()
-    assert outcome["by"] == "unavailable" and "ended without the model" in outcome["reason"]
-    assert fallbacks(home)[-1][3].startswith("unavailable: the private reranker ended without the model")
-
-
-def test_a_session_that_cannot_make_a_socket_falls_back_at_once(home, monkeypatch):
+def test_a_session_that_cannot_make_a_socket_goes_on_unranked_at_once(home, monkeypatch):
+    # DEC-1048 (5): a sandbox's EPERM is the service unreachable: the order given, named, within CONNECT_S + 1 s
     def refused(*_args, **_kwargs):
         raise PermissionError(1, "Operation not permitted")
     monkeypatch.setattr(rerank.socket, "socket", refused)
     began = time.monotonic()
-    ranked, outcome = ask("q", ["a", "bb"])
-    assert time.monotonic() - began < 5 and outcome["by"] == "private" and "PermissionError" in outcome["reason"]
-    assert pairs(ranked) == expected("q", ["a", "bb"]) and not _pids(home, SERVICE, alive=False)
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+    ranked = rerank.rerank("q", candidates)
+    outcome = rerank.last_outcome()
+    assert time.monotonic() - began < rerank.CONNECT_S + 1
+    assert outcome["by"] == "unavailable" and "PermissionError" in outcome["reason"] and ranked == candidates
+    assert not _pids(home, alive=False)  # nothing started: no service, no private reranker
 
 
 def test_a_search_that_cannot_write_the_log_still_searches(home, monkeypatch):
     monkeypatch.setenv("STANDIN_FAIL", SERVICE)
     (home / rerank.CACHE_REL).mkdir(parents=True)
     (home / rerank.CACHE_REL / rerank.LOG).mkdir()  # the log's path is not writable as a file
-    assert ask("q", ["a"])[1]["by"] == "private"
+    assert ask("q", ["a"])[1]["by"] == "unavailable"  # DEC-1048 (5): unranked and named, never private
 
 
 def test_no_environment_is_unavailable_and_starts_nothing(home):
@@ -601,47 +616,23 @@ def test_no_environment_is_unavailable_and_starts_nothing(home):
     assert not _pids(home, alive=False)
 
 
-# --- the private worker's GPU slot rule (DEC-1033, without the interim module) ---
+# --- the worker run as a program: no private reranker runs (DEC-1048 (5), W2-145 S2) ---
 
-def _worker(home: Path, **extra) -> subprocess.Popen:
-    env = {**os.environ, **extra}
-    return subprocess.Popen([str(home / rerank.PYTHON_REL), "-I", str(rerank._WORKER), rerank.MODEL, rerank.REVISION],
-                            env=env, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+WORKER_PATH = Path(rerank.__file__).with_name(WORKER)
 
 
-def test_the_private_worker_holds_a_slot_or_waits_then_ends_named(home):
-    holders = [_worker(home) for _ in range(2)]
-    try:
-        assert [json.loads(process.stdout.readline()) for process in holders] == [{"device": "cuda:0"}] * 2
-        third = _worker(home, GOV_RERANK_GPU_WAIT_S="1")
-        out, err = third.communicate(timeout=10)
-        assert third.returncode == 75 and out == ""
-        assert err.strip() == "gov reranker: no GPU slot free within 1 s; this search goes without reranking"
-        assert not (home / "marks" / f"model-{WORKER}-{third.pid}").exists()
-        hidden = _worker(home, CUDA_VISIBLE_DEVICES="-1")
-        out, err = hidden.communicate(timeout=10)
-        assert hidden.returncode == 76 and out == "" and "the GPU is hidden" in err
-        holders[1].stdin.close()  # a slot frees: the next worker takes it, then finds no GPU
-        holders[1].wait(timeout=10)
-        no_gpu = {key: value for key, value in os.environ.items() if key != "STANDIN_GPU_FREE"}
-        without = subprocess.run([str(home / rerank.PYTHON_REL), "-I", str(rerank._WORKER), rerank.MODEL,
-                                  rerank.REVISION], env=no_gpu, input="", text=True, capture_output=True, timeout=10)
-        assert without.returncode == 78 and without.stdout == ""
-        assert without.stderr.strip() == ("gov reranker: no GPU is available to it, and no reranker runs on the CPU; "
-                                          "this search goes without reranking")
-        on_cpu = subprocess.run([str(home / rerank.PYTHON_REL), "-I", str(rerank._WORKER), rerank.MODEL,
-                                 rerank.REVISION], env={**no_gpu, "GOV_RERANK_ALLOW_CPU": "1"}, input="", text=True,
-                                capture_output=True, timeout=10)
-        assert on_cpu.returncode == 0 and json.loads(on_cpu.stdout.splitlines()[0]) == {"device": "cuda:0"}
-        for extra in ({"GOV_RERANK_GPU_SLOT": "0"}, {"GOV_RERANK_ALLOW_CPU": "1"}):  # the interim module's slot; tests
-            allowed = _worker(home, **extra)
-            assert json.loads(allowed.stdout.readline()) == {"device": "cuda:0"}
-            allowed.stdin.close()
-            allowed.wait(timeout=10)
-    finally:
-        for process in holders:
-            process.stdin.close()
-            process.wait(timeout=10)
+def test_the_worker_run_as_a_program_ends_at_once_named_whatever_its_settings(home):
+    # DEC-1048 (5): formerly the private worker's slot rule; now it ends named before torch or the model, holding no
+    # slot, whether a slot is free, the GPU hidden or absent, the interim module's slot set, or the CPU asked for
+    no_gpu = {key: value for key, value in os.environ.items() if key != "STANDIN_GPU_FREE"}
+    for env in ({**os.environ}, {**os.environ, "CUDA_VISIBLE_DEVICES": "-1"}, no_gpu,
+                {**no_gpu, "GOV_RERANK_ALLOW_CPU": "1"}, {**os.environ, "GOV_RERANK_GPU_SLOT": "0"}):
+        done = subprocess.run([str(home / rerank.PYTHON_REL), "-I", str(WORKER_PATH), rerank.MODEL, rerank.REVISION],
+                              env=env, input="", text=True, capture_output=True, timeout=10)
+        assert done.returncode != 0 and done.stdout == ""
+        assert done.stderr.strip() == "no private reranker runs: the shared service reranks"
+        assert _held_slots(home) == []
+    assert not list((home / "marks").glob("model-*"))
 
 
 # --- what gov status and the bundle report ---
@@ -684,7 +675,7 @@ def test_the_bundle_names_who_reranked(home, tmp_path, monkeypatch):
     for pid in _pids(home, SERVICE):
         os.kill(pid, signal.SIGKILL)
     assert _wait_until(lambda: not _pids(home, SERVICE), 5)
-    rerank._started.cache_clear()
     bundle = retrieve(tmp_path, "heron ledger")
     assert not bundle["merge"]["reranked"] and bundle["rerank"]["by"] == "unavailable"
-    assert "ended without the model" in bundle["rerank"]["reason"]
+    # DEC-1048 (5): the bundle names the service's failure; no private reranker was tried
+    assert "ended before it listened" in bundle["rerank"]["reason"] and not _pids(home, WORKER, alive=False)

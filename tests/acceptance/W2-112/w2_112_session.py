@@ -3,8 +3,9 @@
 ``python3 w2_112_session.py <request.json> <result.json>``. The request names what to do:
 
 - ``"rerank"`` (default): ``gov.retrieval.rerank.rerank(query, candidates)`` with no reranker given, as a search
-  does; with ``"private"``, also the same call with a private, in-process reranker of the stand-in model, as the
-  reference a private reranker gives on the same inputs;
+  does, and its ``last_outcome()`` (``"outcome"``: who scored, or ``unavailable`` with its reason; W2-145); with
+  ``"private"``, also the same call with a private, in-process reranker of the stand-in model, as the reference a
+  private reranker gives on the same inputs (a reference, never a fallback: W2-145, DEC-1048 (5));
 - ``"retrieve"``: ``gov.retrieval.retrieve.retrieve(root, query)``, the bundle.
 
 With ``"barrier"`` it imports first, says it is ready, and waits for the go file, so that many sessions call at
@@ -76,6 +77,11 @@ try:
 except BaseException as error:  # noqa: BLE001 - a search that raises is what the tests look for
     out["error"] = failure(error)
 out["ended"] = time.time()
+if request.get("mode", "rerank") != "retrieve":
+    try:
+        out["outcome"] = module.last_outcome()
+    except BaseException as error:  # noqa: BLE001
+        out["outcome_error"] = failure(error)
 
 if request.get("private"):
     sys.path.insert(0, request["private"])
