@@ -394,3 +394,6 @@ other restart is an ACT.
   ticket's allowed_paths (write scope cannot be judged without them); rule 2c and the walls under class 7, rule 2d under
   class 11; the call log and DEC-1108 (4) outside the bar (the log decides nothing; it began after the window); writer
   2's brief self-contained (restates writer 1's output schema).
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): the overlap auditor runs on at most 40 disagreements a run, the launch
+  script splitting larger sets, so each run keeps within the approved brief's budget ($10, 3,600 s) and the brief is
+  unchanged.
