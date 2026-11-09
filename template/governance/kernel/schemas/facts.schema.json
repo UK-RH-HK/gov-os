@@ -3,7 +3,7 @@
   "title": "facts",
   "description": "The project facts file (governance/project/facts.yaml) the kernel templates are filled from (DEC-1050 TPL-2): named paths, named commands each with a check form, the Definition of Done (at most six lines, quoted by id), the step switches with the M3 match pattern of each, the prose budgets per template, and the commands the harness allows headless. A `paths` name upper-cased is a template key ({TREE} is paths.tree).",
   "type": "object",
-  "required": ["paths", "commands", "dod", "steps", "budgets", "harness_allowed"],
+  "required": ["paths", "commands", "dod", "steps", "budgets", "harness_allowed", "ready"],
   "additionalProperties": false,
   "properties": {
     "paths": {
@@ -68,6 +68,20 @@
       "description": "The commands the harness runs headless without asking (from the settings' allow list).",
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "ready": {
+      "description": "The ready check inside gov brief (W2-152, DEC-1088 (3)): a ticket created on or after `new_since` must declare reads:, needs: and waits_on:; an older ticket is not refused for them.",
+      "type": "object",
+      "required": ["new_since"],
+      "additionalProperties": false,
+      "properties": {
+        "new_since": {
+          "description": "An ISO date as a quoted string (\"2026-11-10\"): the day W2-152 lands.",
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+        }
+      }
     }
   }
 }
