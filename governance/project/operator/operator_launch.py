@@ -79,9 +79,10 @@ def read_request(entry):
 
 
 def move(path, folder, s):
-    dst_dir = oc.ensure_dir(os.path.join(s["operator_root"], "queue", folder))
+    """Moved under queue/<folder>/<stamp>-<pid>/, keeping its own name (never the queue's top level)."""
     stamp = time.strftime("%Y%m%dT%H%M%S")
-    dst = os.path.join(dst_dir, f"{os.path.basename(path)}.{stamp}-{os.getpid()}")
+    dst_dir = oc.ensure_dir(os.path.join(s["operator_root"], "queue", folder, f"{stamp}-{os.getpid()}"))
+    dst = os.path.join(dst_dir, os.path.basename(path))
     os.rename(path, dst)
     return dst
 
@@ -280,8 +281,7 @@ def main(argv):
     except OSError:
         pass
     try:
-        os.rename(taken, os.path.join(oc.ensure_dir(os.path.join(s["operator_root"], "queue", "done")),
-                                      os.path.basename(taken)))
+        move(taken, "done", s)
     except OSError:
         pass
     session = {"pid": p.pid, "pgid": pgid, "exit": rc}

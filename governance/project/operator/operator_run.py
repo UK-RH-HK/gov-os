@@ -72,7 +72,7 @@ def validate_manifest(m):
     """The manifest's form (the interface's fields); raises ValueError on anything else."""
     if not isinstance(m, dict):
         raise ValueError("the manifest is not a JSON object")
-    for k in ("act", "dec", "author", "claimed_class", "touched", "files", "rehearsal", "checks"):
+    for k in ("touched", "files", "checks"):          # dec is G2's, rehearsal G3's, the class G6's
         if k not in m:
             raise ValueError(f"the manifest has no {k}")
     if not isinstance(m["touched"], list):
@@ -104,8 +104,6 @@ def validate_manifest(m):
                 or isinstance(c.get("exit"), bool) or not (c.get("count") is None or
                                                             (isinstance(c["count"], int) and not isinstance(c["count"], bool))):
             raise ValueError("a check is not {cmd, exit, count}")
-    if not isinstance(m.get("rehearsal"), dict):
-        raise ValueError("rehearsal is not an object")
     if m.get("commands") is not None and not isinstance(m["commands"], list):
         raise ValueError("commands is not a list")
 
@@ -204,7 +202,8 @@ class Run:
                         raise oc.Refused("G1", f"the bundle holds a file the manifest does not list ({rel})")
                     if oc.sha256_file(os.path.join(tmp, rel)) != listed[rel]:
                         raise oc.Refused("G1", f"{rel} does not hash as the manifest says: changed after review")
-            missing = sorted(set(listed) - found)
+            reh = m.get("rehearsal") if isinstance(m.get("rehearsal"), dict) else {}
+            missing = sorted(set(listed) - found - {reh.get("log")})   # a missing rehearsal log is G3's
             if missing:
                 raise oc.Refused("G1", f"the manifest lists a file the bundle does not hold ({missing[0]})")
             if "apply.sh" not in listed:
@@ -272,7 +271,9 @@ class Run:
 
     # ---------------------------------------------------------------------------------------------------------- G3
     def g3(self):
-        r = self.manifest["rehearsal"]
+        r = self.manifest.get("rehearsal")
+        if not isinstance(r, dict):
+            raise oc.Refused("G3", "the manifest names no rehearsal")
         log, want = r.get("log"), r.get("sha256")
         if oc.safe_rel(log) is None or not (isinstance(want, str) and oc.SHA_RE.match(want)):
             raise oc.Refused("G3", "the manifest's rehearsal names no log and sha256")
@@ -447,6 +448,15 @@ class Run:
             raise oc.Refused("G8", "the clone's checkout failed")
         env0 = self.live_env()
         for t in self.manifest["touched"]:
+            if t["root"] == "repo" and t["before"] is not None:
+                # a listed file the clone does not hold as stated (an untracked or ignored file, a git hook): the
+                # live bytes, when they are as stated, are copied in
+                dst = os.path.join(clone, t["path"])
+                have = read_bytes(dst)
+                if have is None or oc.sha256_bytes(have) != t["before"]:
+                    live = oc.live_file(s, "repo", t["path"], env0)
+                    if live is not None and oc.sha256_bytes(live) == t["before"]:
+                        write_file(dst, live)
             if t["root"] == "home" and t["before"] is not None:
                 b = oc.live_file(s, "home", t["path"], env0)
                 dst = os.path.join(home, t["path"])
@@ -466,6 +476,11 @@ class Run:
 
         def state():
             st = {("repo", p): h for p, h in tree_state(clone)[0].items()}
+            st.update({("repo", ".git/hooks/" + p): h for p, h in walk_state(os.path.join(clone, ".git/hooks")).items()})
+            for r, p in listed:
+                if r == "repo":
+                    b = read_bytes(os.path.join(clone, p))
+                    st[(r, p)] = None if b is None else oc.sha256_bytes(b)
             st.update({("home", p): h for p, h in walk_state(home).items()})
             st[("crontab", "crontab")] = oc.sha256_file(cronf) if os.path.isfile(cronf) else None
             return st
@@ -548,6 +563,7 @@ class Run:
         st = UndoState(self, head)
         st.controls = control_snapshot(s, env)
         st.tree_before = tree_state(repo, ignored=False, keep=True)
+        hooks_before = walk_state(os.path.join(repo, ".git/hooks"))
         oc.write_atomic(journal_path(s), json.dumps({
             "act": self.act, "manifest_sha256": self.sha, "frozen": self.frozen, "class": self.cls,
             "stage": "applying", "head": head, "commit": None, "time": oc.iso(oc.now(s))}))
@@ -561,9 +577,13 @@ class Run:
                     return st.fail("apply", f"{t['root']}:{t['path']} is not as the manifest states it after the "
                                             "apply; undone", "refused")
             after_tree = tree_state(repo, ignored=False, keep=False)
+            mine = {("repo", t["path"]) for t in self.repo_touched()}
             extra = sorted(p for p in diff_states({("repo", k): v for k, v in st.tree_before[0].items()},
                                                   {("repo", k): v for k, v in after_tree[0].items()}, CLEAN)
-                           if p not in {("repo", t["path"]) for t in self.repo_touched()})
+                           if p not in mine)
+            hooks_after = walk_state(os.path.join(repo, ".git/hooks"))
+            extra += sorted(("repo", ".git/hooks/" + p) for p in set(hooks_before) | set(hooks_after)
+                            if hooks_before.get(p) != hooks_after.get(p) and ("repo", ".git/hooks/" + p) not in mine)
             self.checks = []
             red = None
             for c in self.manifest["checks"]:
@@ -579,13 +599,14 @@ class Run:
             if red is not None:
                 return st.fail("checks", f"a check is red after the apply ({red[:120]}); undone", "undone",
                                kind="red")
-            paths = [t["path"] for t in self.repo_touched()]
+            committed = stageable(repo, self.repo_touched(), env)
+            paths = [t["path"] for t in committed]
             if paths:
                 rc, _, err = oc.git(repo, "add", "-A", "--", *paths, env=env)
                 if rc != 0:
                     return st.fail("staged", "git add failed; undone", "refused")
                 st.staged = True
-                if staged_list(repo, env) != expected_staged(self.repo_touched()):
+                if staged_list(repo, env) != expected_staged(committed):
                     return st.fail("staged", "git diff --cached --name-status is not the touched list; undone",
                                    "refused")
                 rc, commit = self.git_commit(env, undo=False)
@@ -609,7 +630,7 @@ class Run:
         if self.cls == "b" or oc.within_first_14_days(s, when):
             notice = "applied"
         self.line("apply", "applied", undo="ready", notice=notice, touched=self.manifest["touched"],
-                  review_sha256=self.review_sha)
+                  review_sha256=self.review_sha, replay=getattr(self, "replay_detail", None))
         if notice:
             green = "checks green" if self.checks is not None else "no checks"
             oc.notify(s, self.act, "info", "applied",
@@ -768,6 +789,20 @@ def expected_staged(touched, reverse=False):
     return rows
 
 
+def stageable(repo, touched, env):
+    """The listed repository files a commit can hold: never a path under .git/, never an ignored untracked file
+    (`.claude/settings.local.json`): those are applied and checked, not committed."""
+    out = []
+    for t in touched:
+        if t["path"].startswith(".git/"):
+            continue
+        rc, _, _ = oc.git(repo, "check-ignore", "-q", "--", t["path"], env=env)
+        if rc == 0:
+            continue
+        out.append(t)
+    return out
+
+
 def journal_path(s):
     return os.path.join(s["log_dir"], "journal.json")
 
@@ -866,25 +901,48 @@ def replay(run, st, lists, env):
         return []
     tmp = tempfile.mkdtemp(prefix="gov-operator-replay-")
     try:
-        old_tree, new_tree = os.path.join(tmp, "old"), os.path.join(tmp, "new")
-        for tree, side in ((old_tree, "before"), (new_tree, "after")):
-            for key, data in st.controls.items():
-                if key[0] == "repo" and (key[1].startswith(".claude/") or key[1] in REPLAY_FILES) and data is not None:
-                    write_file(os.path.join(tree, key[1]), data)
+        # One tree: the repository at the head before the apply (a clone outside the live tree), with the live
+        # .claude/ as it was before (untracked files too); the lists written before, the calls replayed; then the
+        # lists written after, the calls replayed again.
+        tree = os.path.join(tmp, "tree")
+        if st.head:
+            rc, _, _ = oc.run(["git", "clone", "-q", "--no-checkout", s["repo"], tree], timeout=1800)
+            rc = rc or oc.git(tree, "checkout", "-q", "--detach", st.head, timeout=1800)[0]
+            if rc != 0:
+                raise oc.Refused("after-check", "the replay's tree cannot be built")
+        else:
+            os.makedirs(tree)
+        for key, data in st.controls.items():
+            if key[0] == "repo" and key[1].startswith(".claude/") and data is not None:
+                write_file(os.path.join(tree, key[1]), data)
+
+        def put(side):
             for t in lists:
                 data = read_bytes(os.path.join(run.frozen, side, "repo", t["path"]))
                 if data is None:
                     raise oc.Refused("after-check", f"the bundle does not hold {t['path']} {side} for the replay")
                 write_file(os.path.join(tree, t["path"]), data)
+
+        put("before")
+        old = {i: guard_decision(s, tree, c) for i, c in enumerate(calls)}
+        put("after")
         added = added_deny_rules(run, lists)
-        turned = []
-        for c in calls:
-            old = guard_decision(s, old_tree, c)
-            if old != "allow":
+        turned, detail = [], []
+        for i, c in enumerate(calls):
+            ev = c.get("event") or {}
+            tin = ev.get("tool_input") or {}
+            what = {"id": c.get("id"), "role": c.get("role"), "tool": ev.get("tool_name"),
+                    "target": str(tin.get("file_path") or tin.get("path") or tin.get("command") or "")[:160]}
+            if old[i] != "allow":
+                detail.append(dict(what, old=old[i]))
                 continue
-            new = guard_decision(s, new_tree, c)
-            if new != "allow" or any(rule_matches(r, c, new_tree, s["home"]) for r in added):
+            new = guard_decision(s, tree, c)
+            if new == "allow" and any(rule_matches(r, c, tree, s["home"]) for r in added):
+                new = "refuse (an added deny rule)"
+            detail.append(dict(what, old=old[i], new=new))
+            if new != "allow":
                 turned.append(str(c.get("id")))
+        run.replay_detail = {"calls": len(calls), "turned": turned, "decisions": detail[:50]}
         return turned
     finally:
         oc.remove_tree(tmp)
@@ -902,13 +960,7 @@ def guard_decision(s, tree, call):
     hook = os.path.join(tree, ".claude/hooks/pretooluse.py")
     if not os.path.isfile(hook):
         return "refuse"
-    ev = dict(call["event"])
-    tin = dict(ev.get("tool_input") or {})
-    for k in ("file_path", "path", "notebook_path"):
-        v = tin.get(k)
-        if isinstance(v, str) and v and not v.startswith(("/", "~")):
-            tin[k] = os.path.join(tree, v)
-    ev["tool_input"] = tin
+    ev = dict(call["event"])        # the call's paths stay as logged (relative to the repository); its cwd is the tree's
     cwd = ev.get("cwd") or "."
     ev["cwd"] = os.path.normpath(os.path.join(tree, cwd)) if not str(cwd).startswith("/") else cwd
     env = oc.clean_env(s, s["home"], extra={"CLAUDE_PROJECT_DIR": tree, "PYTHONPATH": os.path.join(s["repo"], "src")})
@@ -1007,7 +1059,7 @@ class UndoState:
                                                 "else is applied", manifest_sha256=run.sha)
             return run.result("refused", gate, f"{reason}; the undo failed ({why}): lock held", undo="failed",
                               checks=run.checks), 1
-        run.line(gate, result, undo="done", reason=reason, notice=kind)
+        run.line(gate, result, undo="done", reason=reason, notice=kind, replay=getattr(run, "replay_detail", None))
         oc.notify(s, run.act, "P1", kind, f"{run.act}: {reason}", manifest_sha256=run.sha)
         return run.result(result, gate, reason, undo="done", checks=run.checks), 1
 
@@ -1035,10 +1087,11 @@ def undo_live(run, st):
         restore_tree(repo, st, touched, env)
     except Exception as exc:  # fail closed
         return False, f"a control or tree file could not be restored ({exc})"
-    paths = [t["path"] for t in run.repo_touched()]
+    committed = stageable(repo, run.repo_touched(), env)
+    paths = [t["path"] for t in committed]
     if paths and st.committed:
         rc, _, _ = oc.git(repo, "add", "-A", "--", *paths, env=env)
-        if rc != 0 or staged_list(repo, env) != expected_staged(run.repo_touched(), reverse=True):
+        if rc != 0 or staged_list(repo, env) != expected_staged(committed, reverse=True):
             return False, "the undo's staged list is not the touched list"
         rc, commit = run.git_commit(env, undo=True, extra_trailers=("Undo: yes",))
         if rc != 0:
