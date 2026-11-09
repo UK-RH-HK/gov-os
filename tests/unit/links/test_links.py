@@ -252,6 +252,64 @@ def test_archive_section_a_states_a_change(tmp_path, capsys):
     assert "ARCHIVE-SUPERSEDED §A" in line and "(text)" in line
 
 
+_SETTLES = """
+### DEC-130: A rule a later entry settles
+**Status:** ACCEPTED
+
+x
+
+### DEC-131: A rule settled and marked
+**Status:** ACCEPTED · **Changed by:** settled by DEC-133
+
+x
+
+### DEC-132: The settler
+**Status:** ACCEPTED · **Settles:** DEC-130
+
+y
+
+### DEC-133: It settles DEC-131
+**Status:** ACCEPTED · **Settles:** DEC-131 item 2
+
+y
+
+### DEC-134: A free-text settlement
+**Status:** ACCEPTED
+
+P-4 is settled by DEC-132 item 3.
+"""
+
+
+@pytest.mark.parametrize("status", ["ACCEPTED", "PROPOSED", "REJECTED", "WITHDRAWN"])
+def test_s18_a_settles_label_is_a_change_as_an_amendment(tmp_path, capsys, status):
+    """S18 (DEC-866 (1), DEC-1109 (2)): a ``**Settles:**`` label gives UNMARKED_CHANGE (changed, changer), a part,
+    marked by ``**Changed by:**``; none when the target's status line names the settler, when the settler is not
+    decided, or when "settled by" stands only in free text."""
+    register = _SETTLES.replace("**Status:** ACCEPTED · **Settles:** DEC-130", f"**Status:** {status} · **Settles:** DEC-130")
+    root = _plant(tmp_path, register=ENTRIES + register)
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    found = [line for line in _lines(out, "UNMARKED_CHANGE") if " DEC-13" in line.split(" | ")[0]]
+    (root / check.MARK_REL).unlink()
+    _, js, _ = _run(root, "--all", "--json", capsys=capsys)
+    settled = [f for f in json.loads(js)["result"]["findings"]
+               if f["code"] == "UNMARKED_CHANGE" and f["ids"][0].startswith("DEC-13")]
+    _, patch_text, _ = _run(root, "--propose-marks", capsys=capsys)
+    if status != "ACCEPTED":
+        assert found == [] and settled == [] and "DEC-132" not in patch_text
+        return
+    assert len(found) == 1 and found[0].startswith("UNMARKED_CHANGE DEC-130 <- DEC-132 (**Settles:**; part)")
+    assert '"**Changed by:** DEC-132"' in found[0] and "(text)" not in found[0]
+    assert [f["ids"] for f in settled] == [["DEC-130", "DEC-132"]] and not settled[0]["whole"]
+    amended = next(f for f in json.loads(js)["result"]["findings"] if f["ids"] == ["DEC-101", "DEC-102"])
+    assert amended["code"] == "UNMARKED_CHANGE"  # the same (changed, changer) order as an amendment's
+    assert "+**Status:** ACCEPTED · **Changed by:** DEC-132" in patch_text
+    (tmp_path / "marks.patch").write_text(patch_text)
+    _git(root, "apply", str(tmp_path / "marks.patch"))
+    _commit(root, {})
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert _lines(out, "UNMARKED_CHANGE") == []
+
+
 # ---------------------------------------------------------------- UNKNOWN_ID, UNLINKED_ID, NOT_IN_FORCE_AS_RULE
 
 def test_the_typed_places_of_tickets(tmp_path, capsys):
