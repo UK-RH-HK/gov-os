@@ -23,6 +23,7 @@ allowed_paths:
 - tests/unit/launch/**
 - tests/unit/codeintel/**
 - docs/changes/W2-56-CIT-E.md
+- template/governance/kernel/settings.json  # S14's one allow rule, Bash(gov launch:*) (DEC-715), moved here from W2-21 S7 without its path [added, DEC-1083]
 - tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]
 kpis:
   success:
