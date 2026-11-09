@@ -118,3 +118,9 @@ its §6 is these KPI lines), copied into the worktrees as `.gov-runtime/scratch/
 - **Est.:** about 700 lines with the engineer's tests; about two working days with its review.
 
 [DEC-1101 (2)-(3); DEC-1109 (2)]
+
+## Notes
+
+**2026-11-09T20:54:38Z**
+
+READY (verdict.py) at w2/W2-149 a929356ea after review round 2 of 2 (records: orchestrator reviews/W2-149-review-r1.md, -r2.md). gov accept W2-149 77 passed, 0 failed, 3 live skipped; the 3 live cases (S9 live canary both ways, S11, S12) passed outside the sandbox at a929356ea. Rows carried: F3, F4, F7, F8, F9, F10, F12, F13, F14, F15 (in, none ordinary-work fails-open). To the owner: F2 (the path map's sets_root_hidden does not cover a new set's hidden/, XCHECK notes or runs/<audit>/miss-classes.json: an ACT, an entry criterion before the first real writer run) and F11. Not merged.
