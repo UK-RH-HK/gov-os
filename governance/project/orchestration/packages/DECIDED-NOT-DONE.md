@@ -91,11 +91,23 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
 | 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | **MERGED 11-09** (`511a4a17`, review READY, accept 166/166); F21 fixed and merged (DEC-1107, review READY, accept 169/169) |
-| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **Rehearsed; §7 answered** (DEC-1108); WAITS: the operator |
+| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **APPLIED 11-09** (`b7a373cf`; the hook a7981319); the first day's file validates PASS; W2-56's worktree merged |
 | 59 | W2-148's replay corpus | DEC-1108 (2): the CTO's builder, the agent's sha256 check both ways; tests first | WAITS: before the first path-map ACT through the agent |
 | 60 | the live-hook suites' temporary folder | DEC-1108 (5): GOV_GUARD_CALLS_DIR set in the suites (W2-141's acceptance file by its designer) | NOT STARTED (follow-up) |
 | 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
-| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept; F26 (Claude Code's own `.claude/**` runtime writes in a dry run) settled in it | WAITS: F21, then preparation |
+| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file, rule 2d (the operator's folder and the call log refused to every session's writes), F26, F7 kept | **Rehearsed 11-09** (0 failures; review READY round 2); WAITS: the owner's approval of the two fixed briefs, then the operator |
+
+## 0h. DEC-1109's items (2026-11-09; item 3 standing)
+| # | item | state |
+|---|---|---|
+| 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | IN PROGRESS |
+| 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
+| 64 | D-5 (the templates) | IN PROGRESS |
+| 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
+| 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
+| 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
+| 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
+| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | IN PROGRESS |
 
 ## 1. Every item not done, partly done or waiting
 

@@ -1,6 +1,6 @@
 ---
 id: DAEO-t8mp
-status: open
+status: in_progress
 deps: []
 links: [DAEO-k7hz, DAEO-lrre, DAEO-wnnz]
 created: 2026-11-06T09:58:49Z
@@ -53,6 +53,7 @@ kpis:
   - 'The reviewer states, per finding, what evidence would reverse it [DEC-1014, SMART-WORK-4 line 4] [moved from W2-11b S2, DEC-1083]'
   - 'Dependency fields (DEC-1088 (3)): the ticket template (T-1) sets reads: (the paths the ticket reads, wide, path patterns as the guard reads them; information and the plan''s READS_WIDE warning), needs: (the paths whose finished state the ticket depends on) and waits_on: (the research, specs or tickets it waits on, ids or record paths, each with a one-line reason), beside allowed_paths: (its writes, strict). The ready check refuses a new ticket without reads: or needs: or waits_on: (an empty list is a declared none), by name (READS_MISSING, NEEDS_MISSING, WAITS_ON_MISSING), and checks each waits_on id exists. The guard reads reads: as information only; reads stay open (DEC-820). Verify: string tests on the template; the ready check on planted tickets [DEC-1088, DEC-1087 (5), DEC-1052] [added, DEC-1088]'
   - 'Search again once (DEC-1092 (1)): T-0''s Commands block carries, right after its "Ask memory first" line, "Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read."; T-8''s Start line names it. TPL-7''s M3 reports this line''s use but sets it no target (it applies only on a miss). Verify: a string test on T-0 and T-8 for "search again once", "own, different words", "not found" and "two searches" [DEC-1092, DEC-1085 (5)] [added, DEC-1092; approved by DEC-1094]'
+  - 'D5-ROWS rows 1 to 9 (governance/project/orchestration/packages/LIFT-1/D5-ROWS.md): rows 1 and 7 in T-4, row 2 in T-5, rows 3, 4, 8 and 9 in T-7 and T-8, rows 5 and 6 in T-0 (row 6''s pytest form also a facts command); each an imperative ending with its decision id. Verify: a string test per row [DEC-1052, DEC-1059] [added, DEC-1109 (2)]'
   failure:
   - 'A template names a path or command that is not in facts.yaml (TPL-1 F1, TPL-2 F1).'
   - 'Two runs of gov brief on the same inputs differ (TPL-3 F1).'
@@ -88,6 +89,8 @@ sources:
 - DEC-1092
 - DEC-1094
 - W2-11b
+- DEC-1059
+- DEC-1109
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-128/
@@ -114,3 +117,33 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
 - **Unchanged:** W2-11 and W2-11b land as built and W2-128's lines replace theirs; W2-33's role files get the lines
   through these templates (TPL-4).
 - **Estimate:** about 4 to 5 working days in all, parts in parallel (R3 §D, est.).
+
+## Interface and rounds (D5 row 9; stated 2026-11-09 by the CTO before the pair starts, DEC-1109 (2))
+
+- **Round 1, the text half (product-spec, now):** TPL-1 S1-S5 and F1; TPL-2 S1, S2, S4; TPL-3 S5's facts part;
+  TPL-5 S1-S2; the link lines; the facts' `links` command; the three schemas' `sources`/`decisions`; the reviewer's
+  reversal line; the dependency fields' template part; search again once; D5-ROWS 1-9; the CIT-P record's draft.
+  **Round 2, the code half (after the owner's split into an engineer's ticket):** TPL-2 S3, TPL-3 S1-S4, S6, S7,
+  TPL-4, TPL-5 S3 and the dependency fields' refusals (the ready check lives in `gov brief`), then TPL-6, TPL-7, TPL-8.
+- **Files:** `template/governance/kernel/templates/` holds `brief.md` (T-0), `ticket.md` (T-1, replacing today's),
+  `role-research.md`, `role-product-spec.md`, `role-test-designer.md`, `role-engineer.md`, `role-reviewer.md`,
+  `role-lead.md`, `role-cto.md` (T-2 to T-8). Each opens with front matter holding `name` (the file's stem),
+  `version` (semver) and `role`; T-1's ticket skeleton follows in its body as one fenced `yaml` block. The record
+  templates `checkpoint.md`, `decision-record.md`, `decision-package.md`, `failure.md`, `lesson.md`, `research.md` stay
+  and gain the link lines. `brief-*.md` become one-line pointers to the template that replaces each.
+- **Placeholders:** `{KEY}` or `{KEY: description}` with KEY in `[A-Z][A-Z0-9_]*`, plus `{CMD:name}` (a key of
+  facts.yaml's `commands`) and `{STEP:name}` (a key of its `steps`); lower-case braces such as `{path: …}` are not
+  placeholders. **The key list** TPL-3's generator will read is `template/governance/kernel/templates/keys.yaml`, one
+  top-level `keys:` list of KEY names (the Appendix's, and any the templates add).
+- **The facts file** `governance/project/facts.yaml` validates against `template/governance/kernel/schemas/facts.schema.json`
+  (JSON Schema 2020-12, as the other schemas). Top-level keys: `paths` (name → path), `commands` (name →
+  `{run: <form with {placeholders}>, check: <a --help, dry-run or no-op form>}`; at least `retrieve`, `lead_verify`,
+  `launch_worker`, `wait_for`, `links` = `gov links --since {BASE}`, `accept`, `pytest_folder`), `dod` (at most six
+  items `{id: DOD-n, line: <text>}`, quoted by id in T-1 and T-7), `steps` (name → `{on: true|false, line: <text>,
+  match: <regex for M3>}`), `budgets` (template stem → prose characters, R3 §C), `harness_allowed` (a list).
+- **Prose size (TPL-1 S2):** the body after the front matter, less fenced code blocks and table lines (lines starting
+  `|`), in characters; T-0 measured unfilled.
+- **The ticket schema:** `non_goals: [str]`; a KPI line either a string or `{line: str, verify: str}`; `reads: [str]`,
+  `needs: [str]`, `waits_on: [{on: <id or record path>, reason: <one line>}]`, all optional in the schema (the old
+  tickets stay valid; the ready check, round 2, requires them on new tickets). **The lesson, failure and research
+  schemas:** optional `sources: [str]`; research also optional `decisions: [str]`.
