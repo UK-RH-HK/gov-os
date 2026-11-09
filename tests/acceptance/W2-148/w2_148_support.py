@@ -10,6 +10,7 @@ crontab, push channel or ``claude`` is reached. The interface these helpers call
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -822,6 +823,90 @@ class World:
         assert old in text
         return self.change("repo", "governance/project/path-map.yaml",
                            text.replace(old, f'"transcripts/**", "{glob}"]').encode())
+
+
+# --- DEC-1106 (1): concurrent changes at a test hook point, the lock, the P1's names ------------------------------
+
+CONCURRENT_HOOK = r'''#!@PY@
+"""A planted concurrent change (W2-148 acceptance, DEC-1106 (1)): at one point of GOV_OPERATOR_TEST_HOOK it writes
+files and makes commits in the live planted repository, as the CTO's session might while the operator runs, then
+records that it ran and the live HEAD. Absolute paths and its own git environment: the cwd it is run with is free.
+A commit names its paths (git commit's --only form), so anything the operator has staged stays staged and uncommitted."""
+import base64, json, os, subprocess, sys
+POINT, MARKS, REPO = @POINT@, @MARKS@, @REPO@
+ACTIONS, ENV = json.loads(@ACTIONS@), json.loads(@ENV@)
+if len(sys.argv) < 2 or sys.argv[1] != POINT:
+    sys.exit(0)
+for kind, target, arg in ACTIONS:
+    if kind == "write":
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "wb") as f:
+            f.write(base64.b64decode(arg))
+    elif kind == "commit":
+        subprocess.run(["git", "add", "--", *target], cwd=REPO, env=ENV, check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-q", "-m", arg, "-m", "Task: @TASK@\nRole: orchestrator", "--", *target],
+                       cwd=REPO, env=ENV, check=True, capture_output=True)
+head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO, env=ENV, capture_output=True, text=True).stdout.strip()
+with open(os.path.join(MARKS, "hook-head"), "w") as f:
+    f.write(head)
+with open(os.path.join(MARKS, "hook-" + POINT), "w") as f:
+    f.write(sys.argv[2] if len(sys.argv) > 2 else "")
+'''
+
+
+def concurrent_hook(w: "World", path: Path, point: str, actions) -> Path:
+    """Write a GOV_OPERATOR_TEST_HOOK executable that, at ``point`` only, performs ``actions`` in order:
+    ``("write", <absolute path>, <bytes>)`` or ``("commit", [<repo-relative paths>], <subject>)``."""
+    enc = []
+    for kind, target, arg in actions:
+        if kind == "write":
+            enc.append([kind, str(target), base64.b64encode(arg).decode()])
+        else:
+            enc.append([kind, list(target), arg])
+    text = (CONCURRENT_HOOK.replace("@PY@", PY).replace("@POINT@", repr(point)).replace("@MARKS@", repr(str(w.marks)))
+            .replace("@REPO@", repr(str(w.repo))).replace("@ACTIONS@", repr(json.dumps(enc)))
+            .replace("@ENV@", repr(json.dumps(w.env()))).replace("@TASK@", CTO_TASK))
+    path = Path(path)
+    path.write_text(text)
+    path.chmod(0o755)
+    return path
+
+
+def hook_ran(w: "World", point: str) -> bool:
+    return (w.marks / f"hook-{point}").exists()
+
+
+def hook_head(w: "World") -> str:
+    p = w.marks / "hook-head"
+    return p.read_text().strip() if p.exists() else ""
+
+
+def assert_touched(w: "World", b: Bundle, side: str):
+    """Every touched file of ``b`` at its ``before`` or ``after`` hash (a missing file is the null hash)."""
+    for t in b.manifest["touched"]:
+        data = w.read(t["root"], t["path"])
+        assert (None if data is None else sha256_bytes(data)) == t[side], f"{t['path']} is not at its {side} bytes"
+
+
+def p1_missing(w: "World", act: str, *paths: str, phrase: str | None = None) -> list:
+    """The paths (and the phrase) that no P1 notice's ``text`` for ``act`` names; empty when every one is named."""
+    texts = [str(n.get("text", "")) for n in w.p1s(act)]
+    missing = [p for p in paths if not any(p in t for t in texts)]
+    if phrase and not any(phrase in t for t in texts):
+        missing.append(phrase)
+    return missing
+
+
+def assert_lock_held(w: "World", act: str = "ACT-T-NEXT"):
+    """The lock is held: a next ACT, ready on its own and queued, is not launched and changes nothing (S22's form:
+    the launcher refuses, at most the canary's one stub call, the next ACT's file still at its before bytes)."""
+    calls = len(w.claude_calls())
+    nxt = w.ready(act, [w.optin_removal("tests/optin-lifted-breadth.txt")])
+    w.queue(f"{nxt.act} {nxt.sha}\n")
+    r = w.launch()
+    assert r.out.get("result") != "launched", ("the lock was not held: the next queued ACT was launched", r.out)
+    assert len(w.claude_calls()) - calls <= 1, "a real session started while the lock was held"
+    assert_touched(w, nxt, "before")
 
 
 def names(act: str, text: str) -> bool:

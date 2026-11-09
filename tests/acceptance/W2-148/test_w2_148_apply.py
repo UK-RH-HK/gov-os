@@ -4,6 +4,7 @@ landing check on a planted range of first-parent commits)."""
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 from datetime import datetime, timedelta
 
@@ -22,10 +23,12 @@ def restored(w, b):
 
 def test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers(world):
     freeze = world.marks / "freeze-seen"
-    holds = " || ".join(f"[ -e {p} ]" for p in (world.op / "log/act-in-progress.txt",
-                                                 world.scratch / "log/act-in-progress.txt"))
+    install_freeze = world.install / "act-in-progress.txt"  # DEC-1106 (3): in the install folder, in neither log/
+    logs = (world.op / "log/act-in-progress.txt", world.scratch / "log/act-in-progress.txt")
+    holds = " && ".join([f"[ -e {shlex.quote(str(install_freeze))} ]",
+                         *(f"[ ! -e {shlex.quote(str(p))} ]" for p in logs)])
     b = world.ready("ACT-T-AP", [world.optin_removal(), world.optin_removal("tests/optin-lifted-guard.txt")],
-                    live_apply=f"if {holds}; then echo seen > {freeze}; fi")
+                    live_apply=f"if {holds}; then echo seen > {shlex.quote(str(freeze))}; fi")
     head, remote = world.head(), world.snapshot()["remote"]
     r = world.run(b)
     assert r.out.get("result") == "applied" and r.code == 0, (r.out, r.stderr[-3000:])
@@ -37,8 +40,9 @@ def test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers(world
         assert pair in t, (pair, t)
     assert [v for k, v in t if k == "Role"] == ["operator"]
     assert not [k for k, _ in t if k == "Approved-by"]
-    assert freeze.exists(), "log/act-in-progress.txt (the commit freeze) was not there during the apply"
-    assert not (world.op / "log/act-in-progress.txt").exists() and not (world.scratch / "log/act-in-progress.txt").exists()
+    assert freeze.exists(), "install/act-in-progress.txt (the commit freeze) was not there during the apply, or a " \
+                            "freeze was in a log/"
+    assert not install_freeze.exists() and not any(p.exists() for p in logs), "a freeze was left after the run"
     snap = world.snapshot()
     assert snap["remote"] == remote and snap["tags"] == "", "a push or a tag"
     assert world.forbidden_calls() == ""
@@ -71,16 +75,30 @@ FAMILIES = {
                  "sed -i 's/\"Bash(git status)\"/\"Bash(git status)\", \"Bash(git push *)\"/' .claude/settings.json"),
     "claude-folder": ("repo", ".claude/agents/engineer.md", "echo changed >> .claude/agents/engineer.md"),
     "git-hooks": ("repo", ".git/hooks/reference-transaction", "echo '# changed' >> .git/hooks/reference-transaction"),
-    "crontab": ("crontab", "crontab", "{ crontab -l; echo '*/5 * * * * /bin/true # added'; } | crontab -"),
+    "crontab": ("crontab", "crontab",  # read whole before writing: a pipe into `crontab -` can truncate first
+                "c=\"$(crontab -l)\"; printf '%s\\n%s\\n' \"$c\" '*/5 * * * * /bin/true # added' | crontab -"),
     "pin": ("home", ".local/bin/gov", "echo '# changed' >> \"$HOME/.local/bin/gov\""),
     "dead-man-code": ("repo", "governance/project/orchestration/tools/deadman.py",
                       "echo '# changed' >> governance/project/orchestration/tools/deadman.py"),
     "operator-install": ("install", "brief.md", None),
 }
 
+APPENDED = {"hook-folder": b"# changed\n", "claude-folder": b"changed\n", "git-hooks": b"# changed\n",
+            "crontab": b"*/5 * * * * /bin/true # added\n", "pin": b"# changed\n", "dead-man-code": b"# changed\n",
+            "operator-install": b"changed\n"}
+
+
+def written(family, before: bytes) -> bytes:
+    """The bytes the family's line leaves in the control file."""
+    if family == "settings":
+        return before.replace(b'"Bash(git status)"', b'"Bash(git status)", "Bash(git push *)"', 1)
+    return before + APPENDED[family]
+
 
 @pytest.mark.parametrize("family", list(FAMILIES))
 def test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1(world, family):
+    """DEC-1106 (1): the agent cannot tell an unlisted control file's change from someone else's, so it leaves it
+    exactly as it is, holds the lock and names it in a P1; the ACT's own touched files are undone."""
     root, path, line = FAMILIES[family]
     if root == "install":
         target = world.install / path
@@ -93,10 +111,14 @@ def test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1(world
     assert before is not None
     b = world.ready("ACT-T-CF", [world.optin_removal()], live_apply=line)
     r = world.run(b)
-    assert state() == before, f"the {family} control file was left changed"
+    expected = written(family, before)
+    assert state() == expected, f"the {family} control file was not left exactly as the apply wrote it"
     restored(world, b)
-    assert r.out.get("result") == "undone", (r.out, r.stderr[-3000:])
-    assert world.p1s(b.act), "no P1 for a control file changed by an (a) ACT"
+    assert r.out.get("result") in ("undone", "refused"), (r.out, r.stderr[-3000:])
+    missing = support.p1_missing(world, b.act, path)
+    assert not missing, ("no P1 names the control file left changed", missing, world.p1s(b.act))
+    support.assert_lock_held(world)
+    assert state() == expected, f"the next launch changed the {family} control file"
 
 
 def _calls(w, rows):
