@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1108 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1109 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -371,3 +371,7 @@ other restart is an ACT.
   CTO's tool builds, checked against the log by sha256 both ways (tests first, before the first path-map ACT through the
   agent); the plain sha256 kept; the log hidden from the W2-56 tuner in a fresh window; every session refused writes
   into the log folder (in ACT-OPERATOR-1); the live-hook suites to a temporary folder (follow-up). Basis: 2.
+- DEC-1109 (2026-11-09): the operator agent's reviewer brief approved; its operator brief approved with "unless the
+  program's final result line asks for it"; the rest of the work restarted in parallel. **Standing: while an item waits
+  on the owner, every unblocked item keeps moving in parallel within the machine's limits; never "nothing is running"
+  while unblocked work remains.** Basis: 2 and 4.

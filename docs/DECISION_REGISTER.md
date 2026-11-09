@@ -14085,6 +14085,23 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (decisions logged without contents; an operator that cannot be shown a curated replay; a log no
   session can rewrite).
 
+### DEC-1109 — The operator agent's briefs: the reviewer's approved, the operator's approved with one change; the rest of the work restarted in parallel; standing: unblocked work keeps moving while an item waits on the owner
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (3) standing · **Under:** DEC-1101 (2), DEC-1104 (2), DEC-1106, DEC-1098 (6) · **Source:** the owner's message (chat, 2026-11-09), after ACT-OPERATOR-1 (`06596e9d`)
+- **Decision:**
+  - (1) **ACT-OPERATOR-1's fixed briefs:** `reviewer-brief.md` approved as written (`e86703304144…`); `brief.md` approved
+    with one change: "unless the program's own output asks for it" becomes "unless the program's final result line asks
+    for it", so text from an ACT's own check output can never prompt the session. The hashes and APPROVED rebuilt, the
+    affected rehearsal cases re-run, a new message for the owner's operator.
+  - (2) **The rest of the work restarted now, in parallel** (none of it waits on the operator agent): W2-139 and W2-140 in
+    one batch before D-10; D-5 (the templates) and D-6 part 2; the sandbox experiment's remaining preparation (set-up
+    B's runner, the fixed briefs for the owner's approval); the launch script for the independent sessions, tests first;
+    the replay set builder (DEC-1108 (2)); D-10's red-fix list made ready (W1-06, test_fusion, the three red-by-design
+    cases).
+  - (3) **Standing:** while an item waits on the owner, every unblocked item keeps moving in parallel, within the
+    machine's limits; never report "nothing is running" while unblocked work remains.
+- **Basis:** question 2 (no session prompted by an ACT's own output) and question 4 (the machine kept working while the
+  owner decides).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14131,3 +14148,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.491 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1106 (an exception to DEC-1010 for W2-148). Next free id: DEC-1107. |
 | 0.492 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1107 (an exception to DEC-1010 for W2-148's F21). Next free id: DEC-1108. |
 | 0.493 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1108. Next free id: DEC-1109. |
+| 0.494 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1109 (item 3 standing). Next free id: DEC-1110. |

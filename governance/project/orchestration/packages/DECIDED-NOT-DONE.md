@@ -97,6 +97,18 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
 | 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file, rule 2d (the operator's folder and the call log refused to every session's writes), F26, F7 kept | **Rehearsed 11-09** (0 failures; review READY round 2); WAITS: the owner's approval of the two fixed briefs, then the operator |
 
+## 0h. DEC-1109's items (2026-11-09; item 3 standing)
+| # | item | state |
+|---|---|---|
+| 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | IN PROGRESS |
+| 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
+| 64 | D-5 (the templates) | IN PROGRESS |
+| 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS |
+| 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
+| 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
+| 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
+| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | IN PROGRESS |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms
