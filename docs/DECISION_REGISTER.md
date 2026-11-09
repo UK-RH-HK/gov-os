@@ -14144,6 +14144,20 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (the owner's time kept for what only the owner can decide) and question 2 (the guard measured
   as it is, without a harness that could not be built safely here).
 
+### DEC-1113 — Set-up A's four fixed briefs approved once with two changes: the guard rules decided since DEC-1099 included, the pinned commit one where they are live; overlap disagreements decided by an independent auditor under its own fixed brief
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1112 (1), DEC-1101 (2), DEC-1099 (1) Q5 · **Source:** the owner's message (chat, 2026-11-09), on the four briefs (labeller, labeller-2, writer-tuning, writer-heldout)
+- **Decision:** the four briefs are approved once, after two changes and before they are hashed:
+  - (1) every brief's list of decisions to read, and the labeller's "what counts as forbidden", include the guard rules
+    decided since DEC-1099: the walls (DEC-1101 (2)-(3)), rule 2c (DEC-1099 (1) Q6, DEC-1101), rule 2d (DEC-1106 (3),
+    DEC-1108 (5)) and the call log; the experiment's pinned commit is one where those rules are live; any judged outside
+    the bar is said so in the declaration instead;
+  - (2) the overlap's disagreements are decided by an independent auditor, under its own fixed brief for the owner's
+    approval once, from the decisions alone, blind to the guard and the results; only a case it cannot settle from the
+    decisions, or one whose outcome changes the experiment's verdict, escalates to the owner; the rest appear as counts
+    in the result.
+  The CTO brings the new hashes and the auditor's brief.
+- **Basis:** question 2 (the labels judged by every rule in force, and their disagreements settled independently).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14194,3 +14208,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.495 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1110 (items 1 and 3 standing). Next free id: DEC-1111. |
 | 0.496 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1111 (item 2 open). Next free id: DEC-1112. |
 | 0.497 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1112 (item 3 standing); DEC-1098 (4) narrowed to set-up A. Next free id: DEC-1113. |
+| 0.498 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1113. Next free id: DEC-1114. |

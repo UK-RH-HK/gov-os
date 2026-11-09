@@ -13,7 +13,8 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
    DEC-1109 (3)). A stop-hook check enforces it once its ACT is applied.
 2. **Decided but not done.** Every decision with a stage trigger enters
    `governance/project/orchestration/packages/DECIDED-NOT-DONE.md` the moment it is decided, and is ticked off with its
-   commit when done; read it at session start and whenever a stage ends (DEC-1097).
+   commit when done; read it at session start and whenever a stage ends (DEC-1097). A row's state begins DONE, MERGED,
+   APPLIED, IN PROGRESS, NOT STARTED or WAITS, and any pending step is written `next: …` (the idle check reads these).
 3. **ACTs.** Given to the owner as a message for the owner's operator, never as terminal commands; the owner does only
    re-pins, pushes and sudo (DEC-1104 (4)). Once the operator agent is live (ACT-OPERATOR-1): class (a) ACTs go to its
    queue after rehearsal, a READY review and matching hashes; class (b) need the owner's `yes ACT-<id> <sha8>`. The CTO
@@ -26,8 +27,9 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
    DEC-1091).
 7. **Faults:** any fault, or any stop outside the planned windows, goes to the owner at once; P1s always to the owner;
    P2s delegated and listed in the next digest (DEC-936 item 2.5).
-8. **Waits and holds:** every wait and stop by pid only (`tools/proc.sh`); no commit on `w2/integrate` during a GPU
-   measure or a hold.
+8. **Waits and holds:** every wait and stop by pid only (`tools/proc.sh wait` in a background Bash run, or
+   `wait_for.sh` on an exit file; never the Monitor tool, which asks the owner each time, and never a name match); no
+   commit on `w2/integrate` during a GPU measure or a hold. Every helper's brief says so.
 9. **After the lift:** each ready list the CTO commits covers several of `gov plan`'s batches ahead (DEC-1110 (3)).
 10. **What goes to the owner:** only P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs; fixed briefs to
     approve once; anything that changes one of the owner's standing decisions; steps only the owner can do physically.

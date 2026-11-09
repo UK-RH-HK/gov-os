@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "checker-result.schema.json",
+  "title": "The independent checker's out/result.json (first version, W2-149; a brief may revise it with its own approval)",
+  "type": "object",
+  "required": ["checked", "accepted", "revise", "rejected"],
+  "properties": {
+    "checked": {"type": "integer", "minimum": 0},
+    "accepted": {"type": "integer", "minimum": 0},
+    "revise": {"type": "integer", "minimum": 0},
+    "rejected": {"type": "integer", "minimum": 0}
+  }
+}

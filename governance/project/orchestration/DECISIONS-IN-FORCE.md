@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1112 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1113 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -387,3 +387,20 @@ other restart is an ACT.
   to approve once; changes to the owner's standing decisions; steps only the owner can do physically.** Basis: 4 and 2.
 - Delegated (CTO, 2026-11-09, under DEC-1112 (2) and DEC-936 item 2.5): **W1-46's research-install case stays
   report-only permanently** (D10-REDS.md: the feature it tests is gone for good; a rewrite would test nothing today).
+- DEC-1113 (2026-11-09): set-up A's four briefs approved once after two changes (the guard rules since DEC-1099
+  included, the pinned commit one where they are live; overlap disagreements decided by an independent auditor under its
+  own fixed brief, escalating only unsettleable or verdict-changing cases). Basis: 2.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): set-up A's overlap auditor also gets the disputed actions and each named
+  ticket's allowed_paths (write scope cannot be judged without them); rule 2c and the walls under class 7, rule 2d under
+  class 11; the call log and DEC-1108 (4) outside the bar (the log decides nothing; it began after the window); writer
+  2's brief self-contained (restates writer 1's output schema).
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): the overlap auditor runs on at most 40 disagreements a run, the launch
+  script splitting larger sets, so each run keeps within the approved brief's budget ($10, 3,600 s) and the brief is
+  unchanged.
+- Owner, 2026-11-09 (under DEC-1113): set-up A's five fixed briefs approved once at labeller v3 bbff1249953b…,
+  labeller-2 v3 e13b5f96d0e0…, writer-tuning v3 82134b3dd6b5…, writer-heldout v3 137a73d1df4c…, overlap-auditor v1
+  b212a424062e… (full hashes in SANDBOX-GUARD-EXP-DECLARATION §12); the declaration's scorer escalates any settled case
+  whose other label would change the verdict (§ A3). The approved list the launch script checks is written by the
+  launch script's install ACT.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): W2-139's S3 ("a green validator") judged against integrate: the batch adds
+  no new FAIL; the 5 FAIL already on integrate go onto D-10's red-fix list.

@@ -37,7 +37,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
 | 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | ANSWERED 11-09 (DEC-1099 (2)); next: the lines into W2-88 (marked), its allowed paths, the nonexistent-id ticket filed |
-| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | ANSWERED 11-09 (DEC-1100): see rows 37-40 |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | DONE 11-09: answered by DEC-1100; its work tracked in rows 37-40 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | **DONE 11-09** (`P-SELECT-FIXES-1.md` §6: first gold by code for 9 of 12 callers on the 138, 3 of 8 on the 80; ~2 % of bundle items) |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
@@ -48,7 +48,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0c. DEC-1099's items (2026-11-09)
 | # | item | fate (DEC-1099) | state |
 |---|---|---|---|
-| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
+| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | DONE 11-09: applied inside ACT-INDEP-WALLS-1 (`147706ae`) |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
 | 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | IN PROGRESS: the second half's tests and the engineer (the first half's 157 tests done) |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
@@ -56,7 +56,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
 | 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
 | 35 | W2-15a with W2-32 | (3) closed together at the lift | Noted in P1-13 (`741faf90`); WAITS: the lift |
-| 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
+| 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | **MERGED 11-09** (see 63) |
 
 ## 0d. DEC-1100's items (2026-11-09)
 | # | item | fate (DEC-1100) | state |
@@ -70,7 +70,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0e. DEC-1101's items (2026-11-09; standing)
 | # | item | fate (DEC-1101) | state |
 |---|---|---|---|
-| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **APPLIED 11-09** by the operator (`147706ae`); the CTO merges the live worktrees, W2-56's first, and runs walls_check.py repo |
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **DONE 11-09**: applied by the operator (`147706ae`); W2-56's worktree merged; walls_check.py repo PASS (245 run, 0 failed) |
 | 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
 | 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
 | 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
@@ -101,19 +101,22 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | state |
 |---|---|---|
 | 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | **DONE 11-09** (`0240833b`, `5f7641e6`); applied `2a646265` |
-| 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
-| 64 | D-5 (the templates) | IN PROGRESS |
+| 63 | W2-139 and W2-140, one batch, before D-10 | **MERGED 11-09** (one batch; accept 160/160; review READY); close at the lift; the queue run sets GOV_TESTS_OPTIN=breadth,lifted |
+| 64 | D-5 (the templates) | IN PROGRESS: W2-128 round 1 merged 11-09 (`c6aefae9`, accept 92/92, review READY; the lead brief pointed at the role templates); next: round 2 (TPL-4, TPL-6, review F6-F8); WAITS: the owner on the templates' approval, the `.claude/` copies ACT and TPL-6's Appendix A |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
-| 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
-| 68 | the replay set builder (DEC-1108 (2)) | **MERGED 11-09**; the installed agent needs a re-install ACT (ACT-OPERATOR-2) to carry it; the replay refuses until the log has 48 h of history (about 11-11 18:16Z); path-map ACTs through the agent after both |
+| 67 | the launch script for the independent sessions, tests first | **MERGED 11-09** W2-149 (`b4de529b`, accept 77/77, review READY round 2) |
+| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | IN PROGRESS: preparing; next: the operator applies; WAITS: before the first real writer run |
+| 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | NOT STARTED: next after ACT-SETS-GLOBS-1 |
+| 76 | ACT-OPERATOR-2 | the operator agent re-installed to carry the replay check (`a170641e`) | NOT STARTED |
+| 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS: merged 11-09 (`a170641e`); next: ACT-OPERATOR-2 re-installs the agent to carry it; WAITS: the call log's 48 h of history (about 11-11 18:16Z) before path-map ACTs go through the agent |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
 ## 0i. DEC-1110's items (2026-11-09)
 | # | item | state |
 |---|---|---|
 | 70 | the standing-rules list at the top of the prompt and in START-NEXT-SESSION §2 | **DONE 11-09** |
-| 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | IN PROGRESS |
+| 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | **APPLIED 11-09** (`115be191`; review READY round 2); live at the fresh session's start |
 | 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
 | 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
 

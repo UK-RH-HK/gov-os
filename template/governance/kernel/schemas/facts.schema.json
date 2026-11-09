@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "facts",
+  "description": "The project facts file (governance/project/facts.yaml) the kernel templates are filled from (DEC-1050 TPL-2): named paths, named commands each with a check form, the Definition of Done (at most six lines, quoted by id), the step switches with the M3 match pattern of each, the prose budgets per template, and the commands the harness allows headless. A `paths` name upper-cased is a template key ({TREE} is paths.tree).",
+  "type": "object",
+  "required": ["paths", "commands", "dod", "steps", "budgets", "harness_allowed"],
+  "additionalProperties": false,
+  "properties": {
+    "paths": {
+      "description": "name -> path; a path may hold {placeholders}.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "commands": {
+      "description": "name -> {run, check}: `run` is the exact form a template names as {CMD:name}; `check` is a --help, dry-run or no-op form that exits 0 in a temporary repository with no model, network or GPU.",
+      "type": "object",
+      "required": ["retrieve", "lead_verify", "launch_worker", "wait_for", "links", "accept", "pytest_folder"],
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["run", "check"],
+        "additionalProperties": false,
+        "properties": {
+          "run": { "type": "string", "minLength": 1 },
+          "check": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "dod": {
+      "description": "The Definition of Done: at most six lines, quoted by id in the ticket and lead templates.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["id", "line"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^DOD-[0-9]+$" },
+          "line": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "steps": {
+      "description": "name -> {on, line, match}: a conditional template line ({STEP:name}) appears only when `on` is true; `match` is the regular expression M3 counts in transcripts. Write the key quoted (\"on\"): YAML 1.1 reads a bare on as true.",
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["on", "line", "match"],
+        "additionalProperties": false,
+        "properties": {
+          "on": { "type": "boolean" },
+          "line": { "type": "string", "minLength": 1 },
+          "match": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "budgets": {
+      "description": "template stem -> prose characters (R3 §C): the body after the front matter, less fenced code blocks and table lines.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "harness_allowed": {
+      "description": "The commands the harness runs headless without asking (from the settings' allow list).",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

@@ -23,6 +23,9 @@ allowed_paths:
 - tests/unit/launch/**
 - tests/unit/codeintel/**
 - docs/changes/W2-56-CIT-E.md
+- tests/unit/resources/test_w2_20_round3.py  # its stand-in CLI reads MARKS from the environment S5 now cleans: the value written into the stand-in (the engineer's P-2) [added, DEC-1112 (3)]
+- template/.rulesync/permissions.jsonc  # the rulesync source of S14's allow rule, so a regeneration keeps it (the engineer's P-3) [added, DEC-1112 (3)]
+- template/governance/kernel/settings.json  # S14's one allow rule, Bash(gov launch:*) (DEC-715), moved here from W2-21 S7 without its path [added, DEC-1083]
 - tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]
 kpis:
   success:
@@ -38,7 +41,7 @@ kpis:
   - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035] [moved from W2-127 S3, DEC-1083]'
   - 'A sandboxed session''s search that the shared service does not answer (W2-145: the order kept, named unavailable, one FALLBACK line, unranked) is counted where the service''s other FALLBACK lines are, so `gov status` shows it (today a sandboxed session cannot write that log and it shows 0); the sandbox''s write list widens by at most that one log file, named in the CIT-E, or the CIT-E shows another way [W2-112 review round 1, F3; the CTO as moderator, DEC-1010; W2-145] [moved from W2-127 S4, DEC-1083] [changed, DEC-1097 (8)]'
   - 'Signals reach the session''s process group, and temporary folders are removed on every ending [W2-M187, W2-M095, W2-L105]. [moved from W2-21 S5, DEC-1083]'
-  - 'Launched sessions can run gov check, gov rebuild and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181]. [moved from W2-21 S6, DEC-1083]'
+  - 'Launched sessions can run gov check and their own suite inside the sandbox; gov rebuild inside the sandbox (it writes .gov-runtime/rebuild/ and codeintel/, which S2''s literal deny rules keep read-only, DEC-180) is a Wave 3 row with set-up B [W2-M275, W2-M094, W2-M097, W2-M181]. [moved from W2-21 S6, DEC-1083] [changed, DEC-1112 (3): the engineer''s P-1 (b)]'
   - 'The kernel template''s settings carry one narrow allow rule, Bash(gov launch:*) [DEC-715]. [moved from W2-21 S7, DEC-1083]'
   - 'A sandboxed worker''s temp folder is removed when the worker ends, whatever its exit, and a test shows none left under /tmp after a worker''s run [W2-M405, DEC-902] [moved from W2-21 S8, DEC-1083]'
   failure:
@@ -128,3 +131,30 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
   close; the engineer leaves its section in `docs/changes/W2-127-evidence.md` to the CTO.
 - The second half's tests: the independent test designer on `w2/W2-56-tests`, then the engineer with the tests'
   interface section in its brief.
+
+**The second half's points settled (the CTO, 2026-11-09; delegated, DEC-1112 (3)):** tests `w2/W2-56-tests`
+(`72f2433f0`, the designer's D-11 to D-14).
+- **D-11 (a):** S11's count by `~/.cache/gov-os/rerank.log` on the write list, made by the launcher if missing, never
+  a link; the one widening S11 allows.
+- **D-12:** a shorter launcher temp folder (the `gov-launch-` prefix kept) and the daemon folders at the launcher's
+  folder, found from `CLAUDE_CODE_TMPDIR`, so every role's folder fits the tool's 107-byte socket.
+- **D-13, measured (a real `claude -p` session, a planted socket):** on Linux `network.allowUnixSockets` with the one
+  path leaves the connect refused (EPERM), as with none; only `allowAllUnixSockets` connects, which S9 and F4 refuse.
+  S8's settings-level form (the one path, nothing wider) is built, inert on Linux; S8's reach and S10 on Linux go to
+  the owner as a DEC-105 choice (against DEC-1035 (2)). Until then a sandboxed search on Linux stays unranked, named
+  and counted (S11).
+- **D-14** (`rerank.py`'s chmod before connect) waits with D-13; not in W2-56's paths.
+- **Outside the sandbox (the CTO's run, integrate's code):** the S2 real case passes; S7's is red on the sandbox's
+  placeholder character devices (`git add -A` fails: S4's work); S13's is red on `gov rebuild` writing
+  `.gov-runtime/rebuild/` under the literal deny rules (the engineer reconciles S13 with S2 or names the conflict).
+  W1-27's revised W2-67 cases (D-2) are green, 5 of 5.
+
+**The engineer's round-1 points settled (the CTO, 2026-11-09; delegated, DEC-1112 (3), listed in the digest):** head
+`8eb7a39aa`, `gov accept W2-56` 255/0/5 in the sandbox.
+- **P-1 (b):** S13's `gov rebuild` inside the sandbox deferred (Wave 3, with set-up B); no deny rule dropped, DEC-180
+  kept; gov check and the suite stay in S13. (a) would widen today's sandbox into `.gov-runtime/`, against DEC-1112
+  (1) and DEC-180; (c) needs the rebuild's and the code index's working folders moved, outside these paths.
+- **P-2, P-3:** `tests/unit/resources/test_w2_20_round3.py` and `template/.rulesync/permissions.jsonc` added to the
+  paths, one line each.
+- `gov accept W1-27` stops on its README map (`ACCEPT_MAP_UNREADABLE`, as on integrate); its W2-67 cases are run
+  directly outside the sandbox by the CTO.
