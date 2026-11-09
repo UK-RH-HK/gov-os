@@ -1,4 +1,4 @@
-"""The gate's readings of the machine (W2-20 S1, S2, S4, S5, S11, S13).
+"""The gate's readings of the machine (W2-20 S1, S2, S4, S5, S12, S13).
 
 Each reader returns ``(value, why)``: the value, or None with why it cannot be read. A reading that cannot be taken
 is never a default: the gate shuts on it, naming it.
@@ -10,8 +10,8 @@ Sources, each replaceable for a planted machine:
   laid out as ``/proc``), the processor count (``GOV_RESOURCES_NPROC``, else the machine's online CPUs), the GPU
   ``nvidia-smi`` on ``PATH`` (``GOV_RESOURCES_NVIDIA_SMI`` names another).
 - Busy cores over the last minute: two readings of the CPU counters; the earlier one is the newest sample at least a
-  minute old in ``~/.gov-os/machine/cpu-stat.json`` (each reading adds one), else the oldest at least a second old,
-  else a reading one second before. Counters that do not advance cannot be read.
+  minute old in ``~/.gov-os/machine/cpu-stat.json`` (each reading adds one), else the oldest at least a quarter of a
+  second old, else a reading a quarter of a second before. Counters that do not advance cannot be read.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ from pathlib import Path
 PAGE = os.sysconf("SC_PAGE_SIZE") if hasattr(os, "sysconf") else 4096
 TICKS = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
 CPU_HISTORY = "cpu-stat.json"
-WINDOW_S, KEEP_S, SHORT_S = 60.0, 600.0, 1.0
+WINDOW_S, KEEP_S, SHORT_S = 60.0, 600.0, 0.25  # the last minute; a week's samples; the window with no history
 SMI_TIMEOUT_S = 10.0
 
 

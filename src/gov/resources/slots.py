@@ -1,4 +1,4 @@
-"""Heavy-job slots, their CPU sets and thread budgets, and the out-of-memory trip-wire (W2-20 S7, S10b, S15, S17).
+"""Heavy-job slots, their CPU sets and thread budgets, and the out-of-memory trip-wire (W2-20 S7, S11, S15, S17).
 
 - **Slots (S7):** a test run or a rebuild (``gov resources --slot test|rebuild -- <command>``) waits for one of the
   configuration's ``heavy_slots`` machine-wide slots, then for the gate's memory room for its own measured peak (the
@@ -15,7 +15,7 @@
   the configuration's ``thread_budget`` replaces it where set. A larger value inherited from the caller never raises
   it. The job's environment also carries ``GOV_HEAVY_THREAD_BUDGET``, ``GOV_HEAVY_CPUS``, ``GOV_HEAVY_SLOT`` and
   ``PYTEST_XDIST_AUTO_NUM_WORKERS`` (its workers).
-- **The trip-wire (S10b):** while a slot's job runs, its runner checks memory every few seconds; below the
+- **The trip-wire (S11):** while a slot's job runs, its runner checks memory every few seconds; below the
   configuration's ``trip_floor_bytes`` the largest heavy job on the machine (by its process tree's memory) is named
   and stopped (its process group: SIGTERM, then SIGKILL), and the stop is a finding in
   ``~/.gov-os/machine/findings.jsonl``. Nothing else is ever stopped.

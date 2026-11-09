@@ -1,4 +1,4 @@
-"""Unit tests for the gate's configuration, readings, registry and conditions (W2-20 S1-S8, S11, failure lines 2-6).
+"""Unit tests for the gate's configuration, readings, registry and conditions (W2-20 S1-S8, S12, failure lines 2-6).
 
 Planted machines only (the ``planted`` fixture): a temporary HOME, planted /proc files and process table."""
 from __future__ import annotations
@@ -147,7 +147,7 @@ def test_an_unreadable_load_shuts_the_gate(planted, monkeypatch):
     assert reasons(gate.read("session"))["load"]["reading"] is None
 
 
-# --- S2, S11: busy cores and the servers ----------------------------------------------------------------------------
+# --- S2, S12: busy cores and the servers ----------------------------------------------------------------------------
 
 def test_busy_cores_over_the_last_minute_shut_the_gate_and_both_figures_are_shown(planted):
     planted.config()

@@ -8,7 +8,7 @@ condition holds, and it never opens on what it cannot read:
 - **config:** every value from the one configuration file (``gov.resources.config``); each fault is a reason.
 - **sessions:** the registry can be read (an unreadable entry shuts it); stale entries are cleared.
 - **load (S5):** ``min(load1, load15) < nproc``: a short peak does not shut it; both at or above ``nproc`` do.
-- **cpu (S2, S11):** the busy cores over the last minute, with the embedding servers counted at their CPU p95 in
+- **cpu (S2, S12):** the busy cores over the last minute, with the embedding servers counted at their CPU p95 in
   place of their current use, below ``nproc``. Both the load and the busy cores are shown.
 - **memory (S6, S7):** ``MemAvailable`` plus the running sessions' live memory at least the floor, plus each running
   session at what it uses (at least its working size, DEC-961), plus the newcomer: a working size for a session, the

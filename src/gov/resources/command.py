@@ -6,7 +6,7 @@
 - ``--register PID --ticket ID --session-role ROLE``: enter a session in the registry.
 - ``--init-config``: write this machine's dated, sourced configuration file, never over an existing one (P-3).
 - ``--sample`` / ``--remeasure``: record a sample; write the measured figures into the configuration file (S9).
-- ``--trip-wire``: one check of the out-of-memory trip-wire (S10b).
+- ``--trip-wire``: one check of the out-of-memory trip-wire (S11).
 - ``--slot test|rebuild [--workers N] -- <command>``: run a heavy job in a slot (S7, S15, S17); its exit code.
 
 It writes only under ``~/.gov-os/machine/``, never the project.

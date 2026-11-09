@@ -77,7 +77,7 @@ def _shares(value):
 # Every value the gate uses, with its check. ``thread_budget`` alone may be absent (S15: "may set it").
 VALUES = {
     "floor_bytes": _int(0),                 # S6: the memory floor
-    "trip_floor_bytes": _int(0),            # S10b: the out-of-memory trip-wire's lower floor
+    "trip_floor_bytes": _int(0),            # S11: the out-of-memory trip-wire's lower floor
     "working_size_bytes": _int(1),          # S6, S9: a running session's working size (measured)
     "verification_peak_bytes": _int(1),     # S9: a verification run's peak (measured)
     "rebuild_peak_bytes": _int(1),          # S7, S9, P-7: a rebuild's peak (measured)

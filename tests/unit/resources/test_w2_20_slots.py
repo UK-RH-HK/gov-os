@@ -1,5 +1,5 @@
 """Unit tests for the heavy-job slots, their CPU sets and thread budgets, the trip-wire and the re-measure (W2-20 S7,
-S9, S10b, S15, S17; P-5, P-7). Planted machines; the jobs are stand-in programs that record their CPUs and
+S9, S11, S15, S17; P-5, P-7). Planted machines; the jobs are stand-in programs that record their CPUs and
 environment (and a grandchild's); every process a test starts is stopped by it."""
 from __future__ import annotations
 
