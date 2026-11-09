@@ -50,7 +50,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
-| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | first half's tests DONE (157); the second half's tests and the engineer next |
+| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | IN PROGRESS: the second half's tests and the engineer (the first half's 157 tests done) |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
 | 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
@@ -104,7 +104,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
 | 64 | D-5 (the templates) | IN PROGRESS |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
-| 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | Set-up A: corpus, labels (outside labellers via the launch script and their approved briefs), tuning, held-out run; WAITS: W2-149 and the labeller briefs' approval |
+| 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
