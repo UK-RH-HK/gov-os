@@ -120,28 +120,40 @@ def test_with_no_configuration_file_the_gate_is_shut_and_names_it(machine, repo)
     assert support.config_reasons(refused), refused
 
 
-@pytest.mark.parametrize("missing", ["memory", "load"])
+@pytest.mark.parametrize("missing", ["memory", "load", "busy cores", "embedding p95", "disk"])
 def test_a_reading_that_cannot_be_taken_never_opens_the_gate(machine, repo, missing):
-    """Fail closed: even with thresholds any reading would pass, an unreadable reading shuts the gate, named."""
-    machine.open_config(min_available_memory_bytes=0, max_load_1m=1000000.0, max_weighted_sessions=100)
+    """Fail closed (F5): with every other reading far within its limit, an unreadable reading is ``null`` and shuts
+    the gate, named with its condition. DEC-1097 (8): the current readings (S2, S4, S5, S6, S12)."""
+    machine.open_config(memory_floor_bytes=1 * GIB, working_size_bytes=1 * GIB, disk_floor_bytes=1,
+                        inode_floor=1)
+    env_extra: dict = {}
     if missing == "memory":
         env_extra = {"GOV_RESOURCES_MEMINFO": str(machine.base / "no-such-meminfo")}
-        field = "available_memory_bytes"
-    else:
+        field, condition = "available_memory_bytes", "memory"
+    elif missing == "load":
         machine.loadavg.write_text("not a load average\n")
-        env_extra = {}
-        field = "load_1m"
+        field, condition = "load_1m", "load"
+    elif missing == "busy cores":
+        machine.busy.write_text("many\n")
+        field, condition = "busy_cores_1m", "cpu"
+    elif missing == "embedding p95":
+        env_extra = {"GOV_RESOURCES_EMBEDDING_CPU": str(machine.base / "no-such-embedding-cpu.json")}
+        field, condition = "embedding_cpu_p95", "cpu"
+    else:
+        env_extra = {"GOV_RESOURCES_DISK": str(machine.base / "no-such-disk.json")}
+        field, condition = "disk", "disk"
 
     code, envelope, out, err = machine.gov(repo, env_extra=env_extra)
     reading = support.reading_of(code, envelope, out, err)
     reasons = support.reasons_by_condition(reading)
     assert reading.get(field) is None, f"an unreadable {missing} reading is reported as {reading.get(field)!r}"
     assert support.gate_of(reading)["open"] is False, f"an unreadable {missing} reading opened the gate: {reading}"
-    assert set(reasons) == {missing}, reasons
-    assert reasons[missing]["reading"] is None, reasons[missing]
+    assert condition in reasons, reasons
+    assert set(reasons) <= {condition, "inodes"}, reasons  # an unreadable disk leaves the inodes unread too
+    assert reasons[condition]["reading"] is None, reasons[condition]
 
     refused = support.refusal_of(*machine.check(repo, env_extra=env_extra))
-    assert missing in support.reasons_by_condition(refused), refused
+    assert condition in support.reasons_by_condition(refused), refused
 
 
 @pytest.mark.parametrize("weighted, start", [(7, "light"), (7, "heavy"), (8, "light")],
