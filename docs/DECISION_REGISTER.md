@@ -13952,6 +13952,18 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the guard proven before it is widened, the held-out halves sealed) and question 1 (the memory
   standard carried to EXAMIN as the practice's first full run).
 
+### DEC-1100 — P-SELECT-FIXES-1: the test-map couplings and W2-66's record-only case as ACT-SELECT-FIXES-1, pinned by W2-66c; a scoped selection after landings outside a ticket on settings, the registry or the test map, from one hook line, in the CTO's tools first
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (2), DEC-1062, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after P-SELECT-FIXES-1 §5
+- **Decision:**
+  - (1) Proposals (i) the test-map couplings and (ii) W2-66's record-only case in the always-run set accepted as
+    **ACT-SELECT-FIXES-1**, with **W2-66c**, tests first, to pin them.
+  - (2) Proposal (iii)'s trigger (a): a scoped selection after every landing outside a ticket that touches settings,
+    the tool registry or the test map; **widened if an emergency merge reds again.**
+  - (3) (iii)'s mechanism (a): one line in the `reference-transaction` hook, as an ACT for the owner's operator.
+  - (4) (iii) runs in the CTO's tools first; its product line goes into W2-115 only once it has proven itself in use.
+- **Basis:** question 4 (the cheaper fixes that caught all 34 traced reds in the replay, no selector built) and
+  question 5 (proven in use before it enters the product).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13989,3 +14001,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.482 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 item (6) decided (b). Next free id: DEC-1098. |
 | 0.483 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1098 (item 1 standing). Next free id: DEC-1099. |
 | 0.484 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1099. Next free id: DEC-1100. |
+| 0.485 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1100. Next free id: DEC-1101. |

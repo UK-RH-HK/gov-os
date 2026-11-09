@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1099 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1100 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -331,3 +331,7 @@ other restart is an ACT.
   full run** (no separate proof repository; later adoptions follow it as fixed); tuning set 80 in two halves; outside
   writers; the nonexistent-id row a ticket now. W2-82 after W2-27; G1's fewer pairs after EXAMIN's copy; W2-15a closes
   with W2-32; **W2-139 and W2-140 merged before D-10.** Basis: 1 and 2.
+- DEC-1100 (2026-11-09): **ACT-SELECT-FIXES-1** (the test-map couplings; W2-66's record-only case always run), pinned by
+  **W2-66c**, tests first; a scoped selection after every landing outside a ticket that touches settings, the registry
+  or the test map (widened if an emergency merge reds again), from one line in the `reference-transaction` hook (an
+  ACT for the operator), in the CTO's tools first; into W2-115 only once proven in use. Basis: 4 and 5.

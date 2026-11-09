@@ -37,7 +37,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
 | 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | ANSWERED 11-09 (DEC-1099 (2)); next: the lines into W2-88 (marked), its allowed paths, the nonexistent-id ticket filed |
-| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | **Proposals to the owner 11-09** (`P-SELECT-FIXES-1.md` §5); WAITS: the owner's three answers |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | ANSWERED 11-09 (DEC-1100): see rows 37-40 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | **DONE 11-09** (`P-SELECT-FIXES-1.md` §6: first gold by code for 9 of 12 callers on the 138, 3 of 8 on the 80; ~2 % of bundle items) |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
@@ -56,6 +56,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
 | 35 | W2-15a with W2-32 | (3) closed together at the lift | WAITS: the lift |
 | 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
+
+## 0d. DEC-1100's items (2026-11-09)
+| # | item | fate (DEC-1100) | state |
+|---|---|---|---|
+| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | NOT STARTED |
+| 38 | W2-66c | (1) tests first, pins (i) and (ii) | NOT STARTED |
+| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | NOT STARTED |
+| 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
 ## 1. Every item not done, partly done or waiting
 
