@@ -7,7 +7,8 @@ of every heavy-job slot holder's process tree with its ``kind`` (P-5 (a)); it re
 ``~/.gov-os/machine/samples.jsonl``.
 
 ``remeasure()`` (``gov resources --remeasure``) writes three figures into the configuration file, each dated today
-with a source naming the samples, and returns ``{"old": {key: entry}, "new": {key: entry}}``:
+with a source naming the samples, and returns ``{"old": {key: value}, "new": {key: value}}`` (and the entries
+written, ``written``):
 
 - ``verification_peak_bytes``: the largest session sample;
 - ``working_size_bytes``: the largest session sample taken while no verification run held the lock;
@@ -123,14 +124,16 @@ def remeasure(today: datetime.date | None = None) -> dict:
     except (OSError, ValueError) as error:
         raise GovError("RESOURCE_CONFIG_INVALID", f"{configuration.path()} cannot be read: {error}") from None
     span = f"{lines[0].get('time')} to {lines[-1].get('time')}" if lines else "none"
-    old, new = {}, {}
+    old, new, entries = {}, {}, {}
     for key, (value, count) in figures(lines).items():
-        old[key] = data.get(key)
-        if value is None:
-            new[key] = data.get(key)
+        before = data.get(key)
+        old[key] = before.get("value") if isinstance(before, dict) else before
+        if value is None:  # no sample measures it: kept as it is
+            new[key] = old[key]
             continue
-        data[key] = new[key] = {"value": value, "date": today.isoformat(),
-                                "source": f"gov resources --remeasure: the largest of {count} sample(s), {span} "
-                                          f"({samples_path()})"}
+        data[key] = entries[key] = {"value": value, "date": today.isoformat(),
+                                    "source": f"gov resources --remeasure: the largest of {count} sample(s), {span} "
+                                              f"({samples_path()})"}
+        new[key] = value
     configuration.write(data)
-    return {"config": str(configuration.path()), "samples": len(lines), "old": old, "new": new}
+    return {"config": str(configuration.path()), "samples": len(lines), "old": old, "new": new, "written": entries}

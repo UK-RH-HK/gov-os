@@ -283,12 +283,11 @@ def test_the_remeasure_writes_the_three_figures_dated_with_old_and_new_side_by_s
         (70, GIB, False, None), (71, 2 * GIB, False, "rebuild")}
     old = json.loads((planted.dir / "gate.json").read_text())
     result = measure.remeasure(today=datetime.date(2026, 11, 9))
-    assert result["new"]["verification_peak_bytes"]["value"] == 3 * GIB
-    assert result["new"]["working_size_bytes"]["value"] == GIB  # the slot holder's 2 GiB is no working size
-    assert result["new"]["rebuild_peak_bytes"]["value"] == 2 * GIB
+    assert result["new"] == {"verification_peak_bytes": 3 * GIB, "working_size_bytes": GIB,  # the slot holder's 2 GiB
+                             "rebuild_peak_bytes": 2 * GIB}                                   # is no working size
     for key in configuration.MEASURED:
-        assert result["old"][key] == old[key]
-        assert result["new"][key]["date"] == "2026-11-09" and "sample" in result["new"][key]["source"]
+        assert result["old"][key] == old[key]["value"]
+        assert result["written"][key]["date"] == "2026-11-09" and "sample" in result["written"][key]["source"]
     stored = json.loads((planted.dir / "gate.json").read_text())
     assert stored["rebuild_peak_bytes"]["value"] == 2 * GIB and stored["memory_floor_bytes"] == old["memory_floor_bytes"]
 

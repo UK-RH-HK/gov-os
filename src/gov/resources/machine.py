@@ -89,14 +89,30 @@ def nproc():
     return None, f"GOV_RESOURCES_NPROC={given!r} is not a positive count"
 
 
+def _planted_text(name: str, env=None):
+    """``(text, None)`` of a planted reading: the file the variable names (as ``GOV_RESOURCES_MEMINFO`` names one),
+    or the value itself when it is no path; ``(None, why)`` when the file cannot be read."""
+    given = (os.environ if env is None else env).get(name)
+    if given is None:
+        return None, f"{name} is not set"
+    if os.sep in given and not given.lstrip().startswith(("{", "[")):
+        try:
+            return Path(given).read_text(encoding="utf-8"), None
+        except (OSError, UnicodeDecodeError) as error:
+            return None, f"{name}: {given}: {error}"
+    return given, None
+
+
 def _planted_number(name: str):
-    given = os.environ.get(name)
+    text, why = _planted_text(name)
+    if why:
+        return None, why
     try:
-        value = float(given)
+        value = float(text.split()[0])
         if not math.isfinite(value) or value < 0:
             raise ValueError
-    except (TypeError, ValueError):
-        return None, f"{name}={given!r} is not a non-negative number"
+    except (IndexError, ValueError):
+        return None, f"{name}: {text.strip()[:80]!r} is not a non-negative number"
     return value, None
 
 
@@ -197,8 +213,10 @@ def embedding_cpu(folder: Path, values: dict):
     """``({"shared": p95 cores, "query": p95 cores}, None)``: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else one
     sample of each server's process tree per reading, kept for a week in ``server-cpu.json``. A server that is not
     listening uses no CPU now."""
-    given = os.environ.get("GOV_RESOURCES_EMBEDDING_CPU")
-    if given is not None:
+    if os.environ.get("GOV_RESOURCES_EMBEDDING_CPU") is not None:
+        given, why = _planted_text("GOV_RESOURCES_EMBEDDING_CPU")
+        if why:
+            return None, why
         try:
             data = json.loads(given)
             out = {name: float(data[name]) for name in ("shared", "query")}
@@ -251,8 +269,10 @@ def embedding_cpu(folder: Path, values: dict):
 def disk(env=None):
     """``({"free_bytes", "free_inodes"}, None)`` of the shared disk (HOME's): ``GOV_RESOURCES_DISK`` where set."""
     env = os.environ if env is None else env
-    given = env.get("GOV_RESOURCES_DISK")
-    if given is not None:
+    if env.get("GOV_RESOURCES_DISK") is not None:
+        given, why = _planted_text("GOV_RESOURCES_DISK", env)
+        if why:
+            return None, why
         try:
             data = json.loads(given)
             out = {key: data[key] for key in ("free_bytes", "free_inodes")}

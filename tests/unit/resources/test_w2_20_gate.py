@@ -226,6 +226,23 @@ def test_an_unreadable_cpu_reading_shuts_the_gate(planted, monkeypatch, variable
     assert reasons(gate.read(True))["cpu"]["reading"] is None
 
 
+def test_the_planted_readings_may_be_files_as_meminfo_is(planted, monkeypatch):
+    planted.config()
+    files = {"GOV_RESOURCES_BUSY_CORES": "1.25\n", "GOV_RESOURCES_EMBEDDING_CPU": '{"shared": 2.0, "query": 1.0}',
+             "GOV_RESOURCES_DISK": '{"free_bytes": 200000000000, "free_inodes": 20000000}'}
+    for name, text in files.items():
+        path = planted.root / name.lower()
+        path.write_text(text)
+        monkeypatch.setenv(name, str(path))
+    reading = gate.read(True)
+    assert reading["busy_cores_1m"] == 1.25 and reading["embedding_cpu_p95"] == {"shared": 2.0, "query": 1.0}
+    assert reading["disk"] == {"free_bytes": 200000000000, "free_inodes": 20000000} and reading["gate"]["open"]
+    for name in files:
+        monkeypatch.setenv(name, str(planted.root / "no-such-file"))
+    shut = reasons(gate.read(True))
+    assert shut["cpu"]["reading"] is None and shut["disk"]["reading"] is None and shut["inodes"]["reading"] is None
+
+
 def test_the_own_busy_sampling_counts_the_last_minute(planted, monkeypatch):
     import time
     planted.config()
