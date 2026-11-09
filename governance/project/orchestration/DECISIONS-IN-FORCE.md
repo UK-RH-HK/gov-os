@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1110 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1111 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -379,3 +379,5 @@ other restart is an ACT.
   §2; a stop-hook check (an ACT) that blocks the CTO ending a turn idle while unblocked items remain, letting a named
   legitimate wait through; a fresh CTO session after the seven helpers report and before D-10; after the lift, each
   ready list covers several of `gov plan`'s batches ahead. Basis: 4 and 2.
+- DEC-1111 (2026-11-09): W1-33's auditor case and W1-05's install case report-only until their features return (each
+  out of the opt-in list by the switch that turns it back on); W1-46's research-install case OPEN. Basis: 2.

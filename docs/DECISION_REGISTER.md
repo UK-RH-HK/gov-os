@@ -14118,6 +14118,16 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (the machine kept full while the owner decides) and question 2 (a rule that a long session's
   compactions cannot erase is enforced by a check, not by memory).
 
+### DEC-1111 — D-10's red-by-design cases: W1-33's auditor case and W1-05's install case report-only until their features return; W1-46's research-install case open
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (2) OPEN (the owner marked no option) · **Under:** DEC-1104 (1), DEC-1061 (3a), DEC-953 · **Source:** the owner's message (chat, 2026-11-09), after `packages/LIFT-1/D10-REDS.md`
+- **Decision:**
+  - (1) **W1-33's auditor case and W1-05's install case stay report-only until their features return,** each taken out
+    of the opt-in list by the switch that turns its feature back on (DEC-953).
+  - (2) **W1-46's research-install case: OPEN:** (a) report-only permanently, as recommended; or (b) rewritten by a test
+    designer to today's rule and gated, or retired with a record if no rule remains to test. The owner's message named
+    both without marking one.
+- **Basis:** question 2 (no gate that reports a known switch over and over).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14166,3 +14176,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.493 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1108. Next free id: DEC-1109. |
 | 0.494 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1109 (item 3 standing). Next free id: DEC-1110. |
 | 0.495 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1110 (items 1 and 3 standing). Next free id: DEC-1111. |
+| 0.496 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1111 (item 2 open). Next free id: DEC-1112. |
