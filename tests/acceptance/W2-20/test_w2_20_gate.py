@@ -74,24 +74,33 @@ def test_several_broken_conditions_are_all_named(machine, repo):
     assert (reasons["inodes"]["reading"], reasons["inodes"]["threshold"]) == (1_000, 10_000_000)
 
 
-@pytest.mark.parametrize("condition", ["memory", "load"])
+@pytest.mark.parametrize("condition", ["memory", "load", "cpu", "disk", "inodes"])
 def test_exactly_at_a_threshold(machine, repo, condition):
-    """Memory exactly at the minimum opens ("at least"); load exactly at the limit shuts ("below")."""
-    machine.open_config(min_available_memory_bytes=2 * GIB, max_load_1m=3.0)
+    """DEC-1097 (8). "At least" opens at the value: memory (MemAvailable equal to the floor plus the new session's
+    working size, no session running, S6), disk and inodes (S4 "shuts below a floor"). "Below" shuts at the value:
+    load (both loads equal to nproc, S5) and CPU (busy cores plus the servers' p95 equal to nproc, S2)."""
+    machine.open_config(memory_floor_bytes=2 * GIB, working_size_bytes=1 * GIB)
+    machine.set_readings(nproc=3)
     if condition == "memory":
-        machine.set_readings(available_bytes=2 * GIB, load=0.5)
+        machine.set_readings(available_bytes=3 * GIB)
+    elif condition == "load":
+        machine.set_readings(load=3.0, load_15=3.0)
+    elif condition == "cpu":
+        machine.set_readings(busy_cores=2.5, embedding_p95=(0.25, 0.25))
+    elif condition == "disk":
+        machine.set_readings(free_bytes=100 * GIB)
     else:
-        machine.set_readings(available_bytes=16 * GIB, load=3.0)
+        machine.set_readings(free_inodes=10_000_000)
 
     reading = machine.read(repo)
     reasons = support.reasons_by_condition(reading)
-    if condition == "memory":
-        assert support.gate_of(reading)["open"] is True, f"memory equal to the minimum must open: {reading}"
+    if condition in ("memory", "disk", "inodes"):
+        assert support.gate_of(reading)["open"] is True, f"{condition} equal to its floor must open: {reading}"
         assert reasons == {}, reasons
     else:
-        assert support.gate_of(reading)["open"] is False, f"load equal to the limit must shut: {reading}"
-        assert set(reasons) == {"load"}, reasons
-        assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (3.0, 3.0)
+        assert support.gate_of(reading)["open"] is False, f"{condition} equal to nproc must shut: {reading}"
+        assert set(reasons) == {condition}, reasons
+        assert (reasons[condition]["reading"], reasons[condition]["threshold"]) == (3.0, 3)
 
 
 @pytest.mark.parametrize("heavy", [False, True], ids=["two light", "two heavy"])
