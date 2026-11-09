@@ -110,3 +110,22 @@ when the lift's re-pin and every live worktree carry this ticket, by these steps
   the sandbox refuses the client's Unix socket (`PermissionError: [Errno 1] Operation not permitted`), so no stand-in
   service starts. They are the CTO's to run outside the sandbox.
 - `gov accept`: see the engineer's return; the socket cases are the CTO's, outside the sandbox.
+
+## Round 2: a failed connect names itself (S1's "no connection within CONNECT_S")
+
+- **What the CTO found outside the sandbox (145 passed, 3 failed):** when the service's listen queue is full, a
+  non-blocking connect on a Unix socket fails with EAGAIN (`BlockingIOError`), not a timeout, and the reason read
+  `the shared reranker did not answer (BlockingIOError: [Errno 11] Resource temporarily unavailable)`. That did not
+  say no connection was made within `CONNECT_S`.
+- **The change (`rerank._connect`):** a listener that does not take the connection (`BlockingIOError`, EAGAIN) is
+  asked again every 0.05 s until `CONNECT_S` has passed since the first EAGAIN. A connect that does not complete within
+  `CONNECT_S` (`TimeoutError`) is not asked again. Either way it raises
+  `ConnectionError("no connection to the shared reranker within CONNECT_S (2 s): <kind>: <error>")`. So
+  `last_outcome()`'s reason, the bundle's rerank entry and the `FALLBACK` line all read
+  `the shared reranker did not answer (ConnectionError: no connection to the shared reranker within CONNECT_S (2 s):
+  BlockingIOError: [Errno 11] Resource temporarily unavailable)`. Nothing is started (a listener is there), and the
+  wait stays within S4's `CONNECT_S` + 1 s. Every other failure kind's reason is unchanged: EPERM, an absent or refused
+  socket (which leads to a start), a start refused, and every failure of the answer phase.
+- **Unit cases:** `test_s1_a_connect_that_fails_names_no_connection_within_connect_s_alike_everywhere[EAGAIN|timeout]`
+  (a stand-in socket whose connect raises `BlockingIOError` or times out; it runs in the sandbox), and a new
+  `KINDS` row `the listen queue full (EAGAIN on connect)` in the per-kind S1 case.

@@ -123,11 +123,14 @@ def _start(folder: Path, interpreter: str, path: str, waited: bool):
 
 
 def _connect(interpreter: str) -> socket.socket:
-    """A connection to the service, starting it when none listens; raises when it cannot be had within the bounds."""
+    """A connection to the service, starting it when none listens; raises when it cannot be had within the bounds.
+    A listener that does not take the connection (its queue full: EAGAIN, asked again until ``CONNECT_S`` has passed;
+    or no accept within ``CONNECT_S``) is named as such: no connection within ``CONNECT_S`` (W2-145 S1, S4)."""
     folder = _cache()
     folder.mkdir(parents=True, exist_ok=True)
     folder.chmod(0o700)
     path, deadline, started, waited = str(folder / SOCKET), time.monotonic() + START_S, None, False
+    busy = None  # when the listener first left the connection waiting (EAGAIN)
     while True:
         connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # a sandbox refuses this at once (EPERM)
         connection.settimeout(CONNECT_S)
@@ -136,6 +139,14 @@ def _connect(interpreter: str) -> socket.socket:
             return connection
         except (FileNotFoundError, ConnectionRefusedError):
             connection.close()
+        except (BlockingIOError, TimeoutError) as error:  # a listener, but no connection: never a start beside it
+            connection.close()
+            busy = busy or time.monotonic()
+            if isinstance(error, TimeoutError) or time.monotonic() - busy >= CONNECT_S:
+                raise ConnectionError(f"no connection to the shared reranker within CONNECT_S ({CONNECT_S:g} s): "
+                                      f"{type(error).__name__}: {error}") from error
+            time.sleep(0.05)
+            continue
         except BaseException:
             connection.close()
             raise

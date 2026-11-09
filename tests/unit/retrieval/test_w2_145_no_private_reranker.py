@@ -141,6 +141,10 @@ def _times_out(sock):
     raise socket.timeout("timed out")
 
 
+def _queue_full(_sock):
+    raise BlockingIOError(errno.EAGAIN, "Resource temporarily unavailable")
+
+
 def _answer(payload):
     return lambda sock: payload
 
@@ -158,6 +162,7 @@ KINDS = {
     "no listener and its start refused (no GPU slot)": ({"connect": _no_listener},
                                                         "no GPU slot freed within its wait", rerank.CONNECT_S + 1),
     "no connection within CONNECT_S": ({"connect": _times_out}, "timed out", rerank.CONNECT_S + 1),
+    "the listen queue full (EAGAIN on connect)": ({"connect": _queue_full}, "BlockingIOError", rerank.CONNECT_S + 1),
     "no answer within the request's time limit": ({"answer": _times_out}, "timed out", 1 + 1),
     "an error answer": ({"answer": _answer(b'{"error": "ValueError: stand-in", "device": "cuda:0"}\n')},
                         "refused the request", 1),
@@ -201,6 +206,36 @@ def test_s1_each_service_failure_keeps_the_order_given_and_names_it(home, standi
     assert took <= bound, took  # S4: no wait for anything else
     [line] = fallbacks(home)  # one FALLBACK line per search: the service's failure, then "unranked"
     assert line[2] == outcome["reason"] and line[3] == "unranked" and "private" not in "\t".join(line)
+
+
+@pytest.mark.parametrize("connect, original", [(_queue_full, "BlockingIOError: [Errno 11] Resource temporarily "
+                                                             "unavailable"), (_times_out, "TimeoutError: timed out")],
+                         ids=["EAGAIN", "timeout"])
+def test_s1_a_connect_that_fails_names_no_connection_within_connect_s_alike_everywhere(home, standin, monkeypatch,
+                                                                                         connect, original):
+    """The connect phase's failure (the listen queue full: EAGAIN; no accept within CONNECT_S) says no connection was
+    made within CONNECT_S, with the error itself, the same in last_outcome, the FALLBACK line and the bundle; EAGAIN
+    is asked again only until CONNECT_S has passed, and nothing is started (a listener is there)."""
+    tries = []
+    monkeypatch.setattr(_Socket, "kind", {"connect": lambda sock: tries.append(1) or connect(sock)})
+    began = time.monotonic()
+    assert rerank.rerank("q", GIVEN) == GIVEN
+    took = time.monotonic() - began
+    reason = rerank.last_outcome()["reason"]
+    assert reason == (f"the shared reranker did not answer (ConnectionError: no connection to the shared reranker "
+                      f"within CONNECT_S ({rerank.CONNECT_S:g} s): {original})")
+    assert took <= rerank.CONNECT_S + 1, took
+    assert len(tries) >= (2 if connect is _queue_full else 1) and standin == []
+    [line] = fallbacks(home)
+    assert line[2] == reason and line[3] == "unranked"
+    hits = [{"chunk_id": f"c{n}", "path": f"notes/{n}.md", "start_line": 1, "end_line": 2, "parent_id": "p"}
+            for n in range(3)]
+    monkeypatch.setattr(fusion.lexical, "search", lambda root, query, refresh: {"available": True, "hits": hits})
+    monkeypatch.setattr(fusion.semantic, "search", lambda root, query, refresh: {"available": False, "hits": []})
+    monkeypatch.setattr(fusion, "_records", lambda root, fused: [{**hit, "text": hit["chunk_id"]} for hit in fused])
+    answer = fusion.search(Path("unused"), "q", limit=None)
+    assert answer["reranked"] is False and answer["rerank"]["by"] == "unavailable"
+    assert answer["rerank"]["reason"] == reason
 
 
 def test_s1_a_start_refused_after_its_own_wait_is_not_followed_by_another_wait(home, standin, monkeypatch):
