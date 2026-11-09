@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Wave 2 plan validator (W2-51, DEC-744). Run: python3 docs/plan/tools/validate_w2.py [--root <tree root>].
 
-Reads only files inside the tree root: docs/plan/WAVE_2_WBS.md (§1 ticket table and its baseline paragraph),
+Reads only files inside the tree root: docs/plan/WAVE_2_WBS.md (§1 ticket table and its baseline paragraph, §2's card headings),
 .tickets/*.md (a Wave 2 ticket by wbs_id, or external-ref when it has none; DEC-730), docs/plan/WAVE_2_LIST.md,
 docs/plan/WAVE_2_TRIAGE.md, docs/contract/contract.yaml, docs/changes/*-CIT-P.md and the files under tests/acceptance/.
 Each check prints one line, `<PASS|FAIL|NOT RUN> <name> — <reason>`; an input it cannot read is a FAIL naming it.
@@ -18,7 +18,9 @@ from pathlib import Path
 import yaml
 
 W2_ID = re.compile(r"W2-[0-9]{2}[a-z]?")
-CAP = re.compile(r"(?<![A-Za-z0-9])CAP-\d+(?:\.[a-z]+)?(?![A-Za-z0-9])")
+# A Contract id is a whole token: one preceded by a hyphen is part of a longer name (ACT-OLLAMA-CAP-1), not a Contract id.
+CAP = re.compile(r"(?<![A-Za-z0-9-])CAP-\d+(?:\.[a-z]+)?(?![A-Za-z0-9])")
+CARD = re.compile(r"^#### (W2-[0-9]{2}[a-z]?) ")  # a §2 card heading: `#### W2-59 The pinned judge: …`
 ROW = re.compile(r"^\| W2-[HMLI]\d+ \|")
 SEVERITIES = ("high", "medium", "low", "info")
 NOT_RUN = (  # Wave 1's validator checks whose inputs live outside the tree (validate_s1.py)
@@ -120,6 +122,12 @@ def wbs():
 
 
 @functools.lru_cache(None)
+def wbs_cards():
+    """The W2 ids of §2's card headings (`#### W2-<id> <title>`): the later tickets (W2-59 onwards) are there only."""
+    return {m.group(1) for m in map(CARD.match, section(read("docs/plan/WAVE_2_WBS.md"), "## 2.") or []) if m}
+
+
+@functools.lru_cache(None)
 def cit_p_lines():
     """Every CIT-P line: (file, covers id, wave) for a `- id:` entry of a ```yaml block that carries `wave:`."""
     if not (ROOT / "docs/changes").is_dir():
@@ -160,10 +168,12 @@ def result(bad, ok, what):
 
 
 def check_wave2_tickets():
-    table, files = wbs()[0], {w2 for w2, _, _ in tickets()}
-    bad = [f"{i} (WBS table only)" for i in sorted(table - files)]
-    bad += [f"{i} (.tickets/ only)" for i in sorted(files - table)]
-    return result(bad, f"{len(table)} W2 ids agree between the WBS §1 table and .tickets/", "ids on one side only")
+    table, cards, files = wbs()[0], wbs_cards(), {w2 for w2, _, _ in tickets()}
+    plan = table | cards
+    bad = [f"{i} ({'WBS table' if i in table else 'WBS §2 card'} only)" for i in sorted(plan - files)]
+    bad += [f"{i} (.tickets/ only)" for i in sorted(files - plan)]
+    return result(bad, f"{len(plan)} W2 ids agree between the WBS ({len(table)} in the §1 table, {len(plan - table)} "
+                       f"in §2's cards only) and .tickets/", "ids on one side only")
 
 
 def check_delivered():
