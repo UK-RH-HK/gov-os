@@ -168,3 +168,16 @@ marked on W2-128.
 - 2026-11-10: **the ACT builder v2** finds drifted sources from the portability check; on round 2a's head it carries
   19 files, rehearsal `failures: 0`. The bundle to queue is rebuilt once the CTO merges round 2a.
 - 2026-11-10: **W2-152's engineer launched** in `w2/W2-152` (integrate `61231e61` plus the cases `b08ede68`).
+- 2026-11-10: **W2-152's engineer done**: `w2/W2-152` `16d052d2fda7`. The CTO's runs: `gov accept W2-152` 56/56,
+  W2-128 92/92, unit tests 12/12. **Review round 1 NOT READY** (`reviews/w2-152-r1.md`):
+  - F1 (S5, blocks): the role templates' "until <ticket>" lines are not checked (T-7's "until W2-56").
+  - Also F3 (no `ready` key turns the dependency check off), F4 (a ticket with no readable KPI lines is READY) and F6
+    (unreadable front matter misnamed). These fail open but are not reachable in ordinary work, so they do not block.
+  - Fix round, tests first: the designer adds F1, F3, F4 and F6 as cases; then the engineer; then review round 2, the
+    last.
+- **Delegated decision (the CTO, DEC-1112 (3)), on the review's F2:** today `gov brief` refuses all 87 open and
+  in-progress tickets for KPI lines without a verify; 15 of them only for their failure lines. Option (a), applying
+  DEC-1083 as written: each in-flight ticket gets its `Verify:` lines, marked with the decision, before its first
+  `gov brief`. A failure line may take `Verify: S<n>`. W2-153's were added today. Options (b) (date-gate the verify
+  rule) and (c) (failure lines exempt) would change DEC-1052 and DEC-1083, so they are the owner's, and are not
+  taken.
