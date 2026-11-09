@@ -32,6 +32,14 @@ p95 above its current use is added, and the reading shows their current use (`em
 background** is sampled once, before the plain run, and its median nets both runs. No implementation of W2-20 was
 read.
 
+**Round 8 (2026-11-09, DEC-1105: one exception round to DEC-1010).** Before the engineer's pass, a fresh test designer:
+(1) **S16** measured per CPU (the slot's own `cpuN` lines, and the CPUs outside its set against their background:
+"S16, measured", round 8; `Rewrite-Reason: DEC-1105`); (2) **review R2-F1**, a new case first: the servers' kept CPU
+samples all expired must not shut the gate on cpu at the first reading (`test_w2_20_stale_samples.py`). The interface
+gains the form of the servers' samples file and how the gate finds the servers ("The servers' CPU samples"), stated
+from the KPI lines, round 7's interface and the review's words. The configuration format is unchanged (frozen). No
+implementation of W2-20 was read.
+
 ## Run
 
 ```sh
@@ -135,13 +143,35 @@ no ceiling on leads or sessions** (DEC-983); heavy jobs wait for slots instead, 
 | `GOV_RESOURCES_LOADAVG` | `/proc/loadavg` | fields 1 and 3 (1- and 15-minute) |
 | `GOV_RESOURCES_NPROC` | the processor count | an integer (the gate's nproc; CPU sets use the real affinity) |
 | `GOV_RESOURCES_BUSY_CORES` | the gate's own sampling of `/proc/stat` | one number: busy cores over the last minute |
-| `GOV_RESOURCES_EMBEDDING_CPU` | the gate's own sampling of the two servers | JSON `{"shared": p95 cores, "query": p95 cores}` |
-| `GOV_RESOURCES_EMBEDDING_CPU_NOW` | the gate's own sampling of the two servers over the busy cores' last minute | JSON `{"shared": cores, "query": cores}` (round 7) |
+| `GOV_RESOURCES_EMBEDDING_CPU` | the gate's own sampling of the two servers ("The servers' CPU samples") | JSON `{"shared": p95 cores, "query": p95 cores}` |
+| `GOV_RESOURCES_EMBEDDING_CPU_NOW` | the gate's own sampling of the two servers over the busy cores' last minute ("The servers' CPU samples") | JSON `{"shared": cores, "query": cores}` (round 7) |
 | `GOV_RESOURCES_DISK` | `statvfs` of the shared disk | JSON `{"free_bytes": N, "free_inodes": N}` |
 | `nvidia-smi` on `PATH` | | read with `--query-gpu=<fields>` and `--query-compute-apps=<fields>`, `--format=csv[,noheader][,nounits]`; fields `memory.total`, `memory.used`, `memory.free`, `utilization.gpu`; `pid`, `process_name`, `used_memory`. Exit 6 with "No devices were found" is no GPU. |
 
 A process's GPU kind is read from its command line *(choice)*: a word whose file name begins with `ollama` is an
 `embedder`; `rerank` anywhere a `reranker`; anything else `other`.
+
+### The servers' CPU samples (round 8, review R2-F1, DEC-1105)
+
+When `GOV_RESOURCES_EMBEDDING_CPU` and `GOV_RESOURCES_EMBEDDING_CPU_NOW` are not set, the gate takes the two servers'
+p95 and current use itself:
+
+- **The servers** are the processes that listen on their addresses, as `gov.retrieval.ollama` reads them:
+  `OLLAMA_HOST` (default `127.0.0.1:11434`) for `shared`, `GOV_QUERY_OLLAMA_HOST` (default `127.0.0.1:11435`) for
+  `query`; each server's use is that process and its descendants (its runners).
+- **The samples file** *(choice)*: `$HOME/.gov-os/machine/embedding-cpu.jsonl`, one JSON object per line, one line
+  per server per sample: `{"time": seconds since the epoch, "server": "shared"|"query", "pid": the listening
+  process's pid, "cpu_seconds": the user + system CPU time of that process and its descendants, in seconds}`. The p95
+  and the current use are computed from the samples **kept**: those of the server's current pid not older than the
+  **keep window, 600 s** (the review's `KEEP_S`). A reading appends the samples it takes; it may drop expired lines.
+- **Expired is unknown (DEC-1105):** a server whose kept samples have all expired (or that has none under its current
+  pid) is **sampled afresh before the cpu rule reads it**, so a reading never shows `embedding_cpu_now` (or the p95)
+  `null` for a server that is listening, and the gate never refuses a start for stale samples. How a fresh figure is
+  taken (for example two samples a short interval apart) is the engineer's; the fresh sample is written to the file.
+
+`test_w2_20_stale_samples.py` plants this file under the test's HOME with a history of each server, at the live
+stand-in's pid and CPU time, all three hours old; the two stand-in servers (a script named `ollama`, run as
+`ollama serve`, listening on a free local port named by the two variables) sit idle.
 
 ### The configuration file: `$HOME/.gov-os/machine/gate.json`
 
@@ -286,6 +316,28 @@ p95 and its sample count; the third each run's gross and net p95 against share +
 CPU-set check, the time-bound design (P-4) and the 20 % check are unchanged. **On a quiet machine** is the CTO's run
 condition: the case does not judge quietness itself; a busy background shows in the printed median and p95.
 
+**Round 8 (2026-11-09, DEC-1105, `Rewrite-Reason: DEC-1105`): a per-CPU measure.** The CTO's two runs on round 3's code:
+run 1 passed (net 2.86), run 2 failed by 0.003 (net 3.003 against 2 + 1) with the slot's programs held to exactly 2
+CPUs: the whole machine's busy cores less the background's median kept the background's tail in the figure (review
+R2-F2). The case now samples **every `cpuN` line of `/proc/stat`** every 0.2 s (each CPU's busy fraction), the
+background once before the plain run as in round 7, and judges:
+
+- **without the slot** (unchanged): the whole machine's p95 less the background's whole-machine median must exceed the
+  share + 1 (else no measure);
+- **with the slot:** the busy cores **on the slot's own CPUs** (the union of the CPU sets the planted programs recorded
+  inside the slot, which the CPU-set check pins to the share), p95, at most the share + 1; the rest of the machine,
+  background included, does not enter it;
+- **no program escaped the set:** the CPUs outside the slot's set, median busy cores during the slot's run, at most
+  their own median in the background (the same CPUs) **plus one core**; an escaped program would put most of its
+  `os.cpu_count()` spinning processes there;
+- **the suite loaded its slot:** the slot's CPUs' p95 at least half the share (else nothing was measured).
+
+The bar is unchanged (share + 1; at most 20 % slower). Busy cores on a set of CPUs cannot exceed the set's size, so
+once the CPU-set check holds the "with" bar holds by construction: the escape check and the CPU-set check carry the
+evidence that the planted suite's whole load stayed in the slot. Six `S16 evidence:` lines: the share and the set; the
+background per region (whole machine, outside the set, the set); the plain run; the slot's CPUs; the CPUs outside the
+set with their gain (and the whole machine's p95 for the record, not judged); the two times.
+
 ## KPI lines
 
 Ids in the ticket's order (`.tickets/DAEO-r30l.md`, 2026-11-09). "New/changed" from the ticket's history
@@ -412,6 +464,16 @@ the user site, so pytest is found): **159 failed, 9 passed, 1 deselected** (169 
 new cases, all red because the product is missing (`gov resources`: `invalid choice: 'resources'`, exit 2, no JSON
 envelope); the nine greens are the same guards; the deselected one is S16 (`local_only`), which collects and skips
 without `GOV_W2_20_MEASURE=1`.
+
+## Round 8's changes (2026-11-09, DEC-1105)
+
+| Point | Case | Change | Commit |
+|---|---|---|---|
+| S16 per CPU (review R2-F2) | `test_w2_20_measured.py::test_s16_one_slot_holds_a_cpu_hungry_suite_to_its_share_plus_one_within_20_percent_of_the_time` | "with the slot" is the busy cores on the slot's own CPUs (p95); the CPUs outside its set may gain at most one core over their own background median; the slot's CPUs must carry at least half the share; "without" unchanged; six evidence lines (`Rewrite-Reason: DEC-1105`) | `bdc5e0525` |
+| R2-F1, a case first | `test_w2_20_stale_samples.py::test_r2_f1_expired_server_samples_are_taken_afresh_so_the_first_reading_opens_on_cpu` (new, 2 cases: `[gov resources --check]`, `[a launch]`) | two idle stand-in servers listening on planted addresses; a samples history at their live pids, all three hours old; the first start check opens with both servers' `embedding_cpu_now` a number (≤ 0.5 cores) and the p95 a number; the first launch starts; each leaves a fresh sample of each server in the file | this round's second commit |
+
+Run on this branch (no product), the new file with an empty `HOME`: **2 failed**, both for the missing product
+(`invalid choice: 'resources'`, in the suite's location check). S16 collects and skips without `GOV_W2_20_MEASURE=1`.
 
 ## KPI line → tests → state on integrate
 
@@ -618,10 +680,15 @@ and one green guard (S21's main-tree case).
 | S2 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added[a store rebuild: the shared server busy now near its p95 opens]` | red | `gov resources` does not exist; round 7 (the cpu rule) |
 | F5 | `test_w2_20_cpu.py::test_s12_f5_the_servers_current_use_unreadable_shuts_on_cpu` | red | `gov resources` does not exist; round 7 |
 | S8 | `test_w2_20_config.py::test_s8_init_config_writes_exactly_the_frozen_configuration_format` | red | `gov resources` does not exist (`invalid choice: 'resources'`); round 7 |
+| S2 | `test_w2_20_stale_samples.py::test_r2_f1_expired_server_samples_are_taken_afresh_so_the_first_reading_opens_on_cpu[gov resources --check]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, the location check); round 8 (R2-F1) |
+| S12 | `test_w2_20_stale_samples.py::test_r2_f1_expired_server_samples_are_taken_afresh_so_the_first_reading_opens_on_cpu[gov resources --check]` | red | `gov resources` does not exist; round 8 (R2-F1) |
+| S12 | `test_w2_20_stale_samples.py::test_r2_f1_expired_server_samples_are_taken_afresh_so_the_first_reading_opens_on_cpu[a launch]` | red | `gov resources` does not exist (the location check before the launch); round 8 (R2-F1) |
+| S19 | `test_w2_20_stale_samples.py::test_r2_f1_expired_server_samples_are_taken_afresh_so_the_first_reading_opens_on_cpu[a launch]` | red | `gov resources` does not exist (the location check before the launch); round 8 (R2-F1) |
 
-**Count.** KPI lines with tests: 27 of 27 (21 success, 6 failure); S16 by its `local_only` case only. Round 7: 170
-cases in 82 test functions (round 2: 164 in 79; round 1: 146 in 66); 190 map rows (a case that proves two lines is
-listed under each; round 7's seven rows at the end of the table).
+**Count.** KPI lines with tests: 27 of 27 (21 success, 6 failure); S16 by its `local_only` case only. Round 8: 171
+cases collected, S16 included (`--collect-only`: 170 selected, 1 deselected under the exclusion), two of them new
+(round 7's count line said 170; its own run line, 169, was right; round 2: 164; round 1: 146); 194 map rows (a case
+that proves two lines is listed under each; round 7's seven rows and round 8's four at the end of the table).
 
 **Not tested (and why), after round 2:** S4's literal floors are now checked in `--init-config`'s template (P-3);
 elsewhere they stay planted (no default may stand, S8). S7's "the rebuild's peak ... counted by the gate like a test

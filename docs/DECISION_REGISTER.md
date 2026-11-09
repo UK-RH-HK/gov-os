@@ -14037,6 +14037,15 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no gate that reports a known switch over and over; a red that means a red) and question 4 (the
   owner's time kept for re-pins, pushes and sudo).
 
+### DEC-1105 — W2-20: one exception round to DEC-1010's two-round rule (S16's per-CPU measure, R2-F1's stale readings), then the merge and the re-measure
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1010, DEC-1097 (8), DEC-1103 (1) · **Source:** the owner's message (chat, 2026-11-09), after W2-20's review round 2 (READY at `2bb6f70b`; S16 run 2 net 3.003 against 3; R2-F1)
+- **Decision:** (b): one exception round to DEC-1010's two-round rule for W2-20 only: the designer first revises S16 to a
+  per-CPU measure (the slot's own CPUs read, so the machine's background does not enter the figure); then one engineer
+  pass fixes R2-F1 (a server whose kept readings have all expired is resampled, so the gate never refuses a launch for
+  stale readings); then one narrow review of those two points only. Then the CTO merges W2-20, runs
+  `gov resources --sample` over a working day and then `--remeasure`.
+- **Basis:** question 2 (no false refusal of honest work; evidence that measures the slot, not the machine).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14079,3 +14088,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.487 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1102. Next free id: DEC-1103. |
 | 0.488 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1103; DEC-1061 amended for ten cases. Next free id: DEC-1104. |
 | 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |
+| 0.490 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1105 (an exception to DEC-1010 for W2-20). Next free id: DEC-1106. |

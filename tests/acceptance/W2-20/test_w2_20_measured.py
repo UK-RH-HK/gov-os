@@ -9,17 +9,31 @@ How: the planted suite is ``TESTS`` small pytest tests, each starting a program 
 it believes the machine has (``os.cpu_count()``, ignoring its CPU set) for ``SPIN_S`` seconds, run with ``-n WORKERS``
 when pytest-xdist is there, else serially. It is run twice, once through ``gov resources --slot test`` and once
 plainly, under the real gate configuration (``~/.gov-os/machine/gate.json``, read, never written). Busy cores are
-sampled from ``/proc/stat`` every 0.2 s during each run; the 95th percentile is compared.
+sampled per CPU, from the ``cpuN`` lines of ``/proc/stat``, every 0.2 s during each run; the 95th percentile is
+compared.
 
 The share is the slot's real one, by S17's rule in the README's interface (round 6, the review's F3): the slots' CPUs
 are this process's CPUs (``os.sched_getaffinity``, which ``gov resources`` inherits) less every CPU the file's
 ``embedding_servers`` section names, and the share is ``max(1, len(slots' CPUs) // heavy_slots)``. Each planted program
-records the CPU set it ran on, and the case checks that inside the slot it was the share. Busy cores count the whole
-machine, so each run is measured net of the machine's background (round 7, the CTO's ruling under DEC-1097 (8)): the
-background is sampled once, before the plain run, on a quiet machine (after a settle, for ``BACKGROUND_S`` seconds with
-nothing of the case running), and its median is subtracted from each run's p95. A background taken after the plain run
-would hold that run's tail and flatter the net figure. The case prints each run's gross and net p95 and the
-background's median and p95. Run:
+records the CPU set it ran on, and the case checks that inside the slot it was the share.
+
+The measure is per CPU (round 8, DEC-1105, the review's R2-F2): the background is sampled once, before the plain run,
+on a quiet machine (after a settle, for ``BACKGROUND_S`` seconds with nothing of the case running), per CPU.
+
+- **Without the slot** (unchanged): the whole machine's busy cores, the run's p95 less the background's median, must
+  exceed the share + 1 (else there is no measure).
+- **With the slot:** the busy cores **on the slot's own CPUs** only (the CPU set the planted programs recorded), the
+  run's p95, at most the share + 1. The rest of the machine does not enter this figure, so its background cannot
+  push it over (run 2 of round 3's code failed by 0.003 on the whole machine's background tail).
+- **No program escaped the set:** the CPUs outside the slot's set gained no more than the background during the
+  slot's run: their median busy cores in the slot's run is at most their own median in the background (the same
+  CPUs) plus one core. A program that escaped would put most of its ``os.cpu_count()`` spinning processes there.
+- **The suite loaded its slot:** the slot's CPUs' p95 is at least half the share (else the slot ran nothing to
+  measure).
+
+The busy cores on a set of CPUs can never exceed the set's size, so the "with the slot" bar alone holds by
+construction once the set is the share; the CPU-set check and the escape check carry the evidence that the whole load
+stayed in the slot. The case prints every figure. Run:
 
     GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py \
         -m local_only -p no:cacheprovider -s
@@ -73,11 +87,20 @@ for pid in children:
 '''
 
 
-def _cpu_times():
-    fields = Path("/proc/stat").read_text().splitlines()[0].split()[1:]
-    values = [int(v) for v in fields]
-    idle = values[3] + values[4]
-    return sum(values), idle
+def _cpu_times() -> dict[int, tuple[int, int]]:
+    """``{cpu: (total, idle)}`` from the ``cpuN`` lines of ``/proc/stat`` (idle counts iowait), one entry per CPU."""
+    times = {}
+    for line in Path("/proc/stat").read_text().splitlines():
+        name, *fields = line.split()
+        if name.startswith("cpu") and name[3:].isdigit():
+            values = [int(v) for v in fields]
+            times[int(name[3:])] = (sum(values), values[3] + values[4])
+    return times
+
+
+def _cores(samples: list[dict[int, float]], cpus=None) -> list[float]:
+    """Each sample's busy cores on ``cpus`` (every CPU when None): the sum of those CPUs' busy fractions."""
+    return [sum(busy for cpu, busy in sample.items() if cpus is None or cpu in cpus) for sample in samples]
 
 
 def _p95(samples: list[float]) -> float:
@@ -111,14 +134,15 @@ def _real_share(config: dict, slots: int) -> tuple[int, set[int], set[int]]:
     return max(1, len(pool) // slots), pool, servers
 
 
-def _background() -> list[float]:
-    """The machine's busy cores with nothing of the case running: taken once, before the plain run."""
+def _background() -> list[dict[int, float]]:
+    """The machine's busy fraction per CPU with nothing of the case running: taken once, before the plain run."""
     time.sleep(SETTLE_S)
     samples, _ = _busy(lambda: time.sleep(BACKGROUND_S))
     return samples
 
 
-def _busy(run) -> tuple[list[float], float]:
+def _busy(run) -> tuple[list[dict[int, float]], float]:
+    """Run ``run`` while sampling every 0.2 s each CPU's busy fraction over the interval: ``{cpu: 0.0 to 1.0}``."""
     samples, stop = [], threading.Event()
 
     def watch():
@@ -126,9 +150,14 @@ def _busy(run) -> tuple[list[float], float]:
         while not stop.is_set():
             time.sleep(0.2)
             now = _cpu_times()
-            total, idle = now[0] - last[0], now[1] - last[1]
-            if total:
-                samples.append((total - idle) / total * os.cpu_count())
+            sample = {}
+            for cpu, (total, idle) in now.items():
+                if cpu in last:
+                    d_total, d_idle = total - last[cpu][0], idle - last[cpu][1]
+                    if d_total > 0:
+                        sample[cpu] = (d_total - d_idle) / d_total
+            if sample:
+                samples.append(sample)
             last = now
     watcher = threading.Thread(target=watch)
     began = time.monotonic()
@@ -189,23 +218,50 @@ def test_s16_one_slot_holds_a_cpu_hungry_suite_to_its_share_plus_one_within_20_p
     run_with, with_s = _busy(in_slot)
     seen_in_slot = _seen(suite)
 
-    base = _median(background)
-    without_net = _p95(run_without) - base
-    with_net = _p95(run_with) - base
     sizes = sorted({len(cpus) for cpus in seen_in_slot})
-    print(f"\nS16 evidence: share {share} = {len(pool)} CPUs outside the servers' {len(servers)} of {mine} // "
-          f"{slots} slots; the slot's programs ran on {sizes} CPUs ({len(seen_in_slot)} programs)")
-    print(f"S16 evidence: background, sampled once before the plain run for {BACKGROUND_S:.0f} s: median "
-          f"{base:.2f}, p95 {_p95(background):.2f} ({len(background)} samples); the median is subtracted from both runs")
-    print(f"S16 evidence: busy cores p95 without the slot {_p95(run_without):.2f} gross, {without_net:.2f} net; "
-          f"with the slot {_p95(run_with):.2f} gross, {with_net:.2f} net; limit share + 1 = {share + 1}")
+    slot_set = set().union(*(set(cpus) for cpus in seen_in_slot)) if seen_in_slot else set()
+    every_cpu = set().union(*(set(sample) for sample in background + run_without + run_with))
+    outside = every_cpu - slot_set
+
+    # Without the slot (unchanged): the whole machine, net of the background's median.
+    base = _median(_cores(background))
+    without_gross = _p95(_cores(run_without))
+    without_net = without_gross - base
+    # With the slot (round 8): the slot's own CPUs only; the rest of the machine does not enter it.
+    with_slot = _p95(_cores(run_with, slot_set))
+    # No program escaped: the CPUs outside the slot's set against their own background.
+    outside_run = _median(_cores(run_with, outside))
+    outside_base = _median(_cores(background, outside))
+    outside_gain = outside_run - outside_base
+    whole_with = _p95(_cores(run_with))
     slower = (with_s / without_s - 1) * 100
+
+    print(f"\nS16 evidence: share {share} = {len(pool)} CPUs outside the servers' {len(servers)} of {mine} // "
+          f"{slots} slots; the slot's programs ran on {sizes} CPUs ({len(seen_in_slot)} programs), the set "
+          f"{support.cpu_list(slot_set) or '-'}; {len(outside)} of the machine's {len(every_cpu)} CPUs outside it")
+    print(f"S16 evidence: background, sampled once before the plain run for {BACKGROUND_S:.0f} s per CPU "
+          f"({len(background)} samples): whole machine median {base:.2f}, p95 {_p95(_cores(background)):.2f}; on the "
+          f"CPUs outside the slot's set median {outside_base:.2f}, p95 {_p95(_cores(background, outside)):.2f}; on the "
+          f"slot's set median {_median(_cores(background, slot_set)):.2f}")
+    print(f"S16 evidence: without the slot, whole machine busy cores p95 {without_gross:.2f} gross, "
+          f"{without_net:.2f} net of the background's median; must exceed share + 1 = {share + 1}")
+    print(f"S16 evidence: with the slot, busy cores on the slot's own {len(slot_set)} CPUs p95 {with_slot:.2f} "
+          f"(median {_median(_cores(run_with, slot_set)):.2f}); limit share + 1 = {share + 1}")
+    print(f"S16 evidence: with the slot, the CPUs outside its set median {outside_run:.2f} "
+          f"(p95 {_p95(_cores(run_with, outside)):.2f}) against their background median {outside_base:.2f}: gained "
+          f"{outside_gain:+.2f}, limit +1; the whole machine p95 {whole_with:.2f} (for the record, not judged)")
     print(f"S16 evidence: time with {with_s:.1f} s, without {without_s:.1f} s ({slower:+.0f} %)")
     assert seen_in_slot, "no planted program recorded its CPU set inside the slot"
     assert sizes == [share], f"inside the slot the programs ran on {sizes} CPUs, not S17's share {share}"
     assert without_net > share + 1, (
         f"net of the background the planted suite reached {without_net:.2f} without the slot, not above the share "
         f"{share} + 1: no measure")
-    assert with_net <= share + 1, (
-        f"net of the background, in one slot the busy cores reached {with_net:.2f}, above the share {share} + 1")
+    assert with_slot >= share / 2, (
+        f"the slot's own CPUs reached only {with_slot:.2f} busy cores (p95) of the share {share}: the suite did not "
+        f"load its slot, no measure")
+    assert with_slot <= share + 1, (
+        f"in one slot the busy cores on the slot's own CPUs reached {with_slot:.2f}, above the share {share} + 1")
+    assert outside_gain <= 1.0, (
+        f"during the slot's run the CPUs outside its set reached a median of {outside_run:.2f} busy cores against "
+        f"{outside_base:.2f} in the background ({outside_gain:+.2f}): a program escaped the slot's CPU set")
     assert with_s <= 1.2 * without_s, f"the slot made the suite {slower:.0f} % slower"
