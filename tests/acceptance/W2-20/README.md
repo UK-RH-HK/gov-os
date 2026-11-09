@@ -221,7 +221,7 @@ the tests do not apply them.
 
 ### S16, measured (`local_only`)
 
-`test_w2_20_measured.py` runs a planted suite (8 tests, each starting a program that spins one thread per
+`test_w2_20_measured.py` runs a planted suite (8 tests, each starting a program that forks one spinning process per
 `os.cpu_count()` CPU for 3 s, ignoring its CPU set; `-n 2` when pytest-xdist is there) twice: plainly and through
 `gov resources --slot test`, under the real `~/.gov-os/machine/gate.json` (read, never written). It samples busy cores
 from `/proc/stat` every 0.2 s and asserts: without the slot the p95 exceeds the share + 1 (else there is no measure);
@@ -230,6 +230,13 @@ CTO runs it outside the sandbox**, on the real machine, not inside another heavy
 `GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py -m local_only -p no:cacheprovider -s`.
 The planted programs spin until a deadline, so the time compares the slot's overhead, not a fixed amount of work
 (P-4, confirmed by the CTO 2026-11-09: the 20 % is measured on time-bound programs; the case is unchanged).
+
+**Round 5 (2026-11-09, `Rewrite-Reason: DEC-1097 (8)`).** The CTO's run outside the sandbox (20 CPUs, share 6) failed
+the first assert: without the slot the busy cores' p95 was 3.65, not above 7, so there was no measure. The cause was in
+the case: `spin.py` spun `os.cpu_count()` Python threads, which the GIL holds to about one core per program, so 8 tests
+on 2 workers never loaded more than three or four cores. `spin.py` now forks one process per `os.cpu_count()` CPU, each
+spinning until the same deadline, and the parent waits for them (it prints `spin: N processes for N CPUs`, which the
+planted suite's capture swallows). The time-bound design (P-4), the sampling and the three assertions are unchanged.
 
 ## KPI lines
 

@@ -5,8 +5,8 @@ keeps the machine's busy cores within the slot's share plus one, where without t
 not; and its time with them against without (no more than 20 % slower on the planted suite)
 [DEC-1038 (4), P-W2-20-THREAD-BUDGET (a)].
 
-How: the planted suite is ``TESTS`` small pytest tests, each starting a program that spins one thread per CPU it
-believes the machine has (``os.cpu_count()``, ignoring its CPU set) for ``SPIN_S`` seconds, run with ``-n WORKERS``
+How: the planted suite is ``TESTS`` small pytest tests, each starting a program that forks one spinning process per CPU
+it believes the machine has (``os.cpu_count()``, ignoring its CPU set) for ``SPIN_S`` seconds, run with ``-n WORKERS``
 when pytest-xdist is there, else serially. It is run twice, once through ``gov resources --slot test`` and once
 plainly, under the real gate configuration (``~/.gov-os/machine/gate.json``, read, never written). Busy cores are
 sampled from ``/proc/stat`` every 0.2 s during each run; the 95th percentile is compared. Run:
@@ -39,15 +39,21 @@ pytestmark = [
 
 TESTS, WORKERS, SPIN_S = 8, 2, 3.0
 
+# One forked process per CPU, not threads: the GIL holds a program's threads to about one core (round 5).
 SPIN = r'''
-import os, sys, threading, time
+import os, sys, time
 end = time.monotonic() + float(sys.argv[1])
-def spin():
-    while time.monotonic() < end:
-        pass
-threads = [threading.Thread(target=spin) for _ in range(os.cpu_count() or 1)]
-[t.start() for t in threads]
-[t.join() for t in threads]
+children = []
+for _ in range(os.cpu_count() or 1):
+    pid = os.fork()
+    if pid == 0:
+        while time.monotonic() < end:
+            pass
+        os._exit(0)
+    children.append(pid)
+print(f"spin: {len(children)} processes for {os.cpu_count()} CPUs", flush=True)
+for pid in children:
+    os.waitpid(pid, 0)
 '''
 
 
