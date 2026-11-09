@@ -74,22 +74,33 @@ def _shares(value):
     return None
 
 
-# Every value the gate uses, with its check. ``thread_budget`` alone may be absent (S15: "may set it").
+# Every value the gate's opening uses (S8's list, the slots of S7 and the rebuild peak of P-7), with its check.
 VALUES = {
     "floor_bytes": _int(0),                 # S6: the memory floor
-    "trip_floor_bytes": _int(0),            # S11: the out-of-memory trip-wire's lower floor
     "working_size_bytes": _int(1),          # S6, S9: a running session's working size (measured)
     "verification_peak_bytes": _int(1),     # S9: a verification run's peak (measured)
     "rebuild_peak_bytes": _int(1),          # S7, S9, P-7: a rebuild's peak (measured)
-    "disk_path": _abs_path,                 # S4: a path on the shared disk
     "disk_floor_bytes": _int(0),            # S4: 100 GiB
     "inode_floor": _int(0),                 # S4: 10,000,000
     "verification_lock": _abs_path,         # S9: the lock a verification run holds
     "gpu_margin": _fraction,                # S10: 10 %
-    "gpu_shares": _shares,                  # S14: the embedder first, then one reranker, then the rest
     "heavy_slots": _int(1),                 # S7: the machine-wide heavy-job slots
 }
-OPTIONAL = {"thread_budget": _int(1)}       # S15: the slot's thread budget, when the file sets it
+# Values the file may set, each dated and sourced when set, malformed a fault like any other. Absent: the trip-wire
+# does not act (it needs its floor) and the embedding servers' p95 is not counted (nothing configured to count);
+# the GPU shares are DEC-1032's default (S14 states it); the disk is the one holding HOME (the shared disk, S4).
+OPTIONAL = {
+    "trip_floor_bytes": _int(0),            # S11: the out-of-memory trip-wire's lower floor
+    "gpu_shares": _shares,                  # S14: the embedder first, then one reranker, then the rest
+    "disk_path": _abs_path,                 # S4: a path on the shared disk
+    "thread_budget": _int(1),               # S15: the slot's thread budget, when the file sets it
+}
+
+
+def default_shares() -> list[dict]:
+    """DEC-1032 item 1's GPU budget: the embedder first, the shared reranker second, at least 2 GB headroom."""
+    return [{"kind": "embedder", "bytes": int(3.5 * GIB)}, {"kind": "reranker", "bytes": int(3.5 * GIB)},
+            {"kind": "headroom", "bytes": 2 * GIB}]
 
 
 def _date(value) -> datetime.date | None:
@@ -170,11 +181,18 @@ def load(today: datetime.date | None = None) -> dict:
     if "trip_floor_bytes" in values and "floor_bytes" in values and values["trip_floor_bytes"] >= values["floor_bytes"]:
         out["faults"].append("trip_floor_bytes: must be below floor_bytes")
         del values["trip_floor_bytes"]
-    servers = data.get(SERVERS_KEY)
-    faults = _server_faults(servers)
-    out["faults"] += faults
-    if not faults:
-        values[SERVERS_KEY] = servers
+    if "gpu_shares" not in values and "gpu_shares" not in data:
+        values["gpu_shares"] = default_shares()
+        out["sources"]["gpu_shares"] = "default: DEC-1032 item 1"
+    if "disk_path" not in values and "disk_path" not in data:
+        values["disk_path"] = os.environ.get("HOME") or str(Path.home())
+        out["sources"]["disk_path"] = "default: the disk holding HOME"
+    if SERVERS_KEY in data:
+        servers = data[SERVERS_KEY]
+        faults = _server_faults(servers)
+        out["faults"] += faults
+        if not faults:
+            values[SERVERS_KEY] = servers
     return out
 
 

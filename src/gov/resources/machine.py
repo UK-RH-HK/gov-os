@@ -11,7 +11,8 @@ Sources, each replaceable for a planted machine:
   ``nvidia-smi`` on ``PATH`` (``GOV_RESOURCES_NVIDIA_SMI`` names another).
 - Busy cores over the last minute: two readings of the CPU counters; the earlier one is the newest sample at least a
   minute old in ``~/.gov-os/machine/cpu-stat.json`` (each reading adds one), else the oldest at least a quarter of a
-  second old, else a reading a quarter of a second before. Counters that do not advance cannot be read.
+  second old, else a reading a quarter of a second before. Counters that do not advance (a planted, still snapshot)
+  give their own share of busy time; counters that go back or hold no time cannot be read.
 """
 
 from __future__ import annotations
@@ -145,9 +146,14 @@ def busy_cores(folder: Path, processors: int | None):
     history.append({"t": now, "busy": now_counters[0], "total": now_counters[1]})
     _write_history(folder, history[-64:])
     busy, total = now_counters[0] - base["busy"], now_counters[1] - base["total"]
-    if total <= 0 or busy < 0:
-        return None, "the CPU counters did not advance, so busy cores cannot be counted"
-    return {"cores": round(processors * busy / total, 2), "window_s": round(now - base["t"], 1)}, None
+    if total > 0 and busy >= 0:
+        return {"cores": round(processors * busy / total, 2), "window_s": round(now - base["t"], 1)}, None
+    # Counters that did not advance (a planted, still snapshot: the kernel's always do): the snapshot's own share of
+    # busy time, since its counters began. Counters that hold no time at all, or went back, cannot be read.
+    if total == 0 and busy == 0 and now_counters[1] > 0:
+        return {"cores": round(processors * now_counters[0] / now_counters[1], 2), "window_s": None,
+                "since": "the counters' start (they did not advance)"}, None
+    return None, "the CPU counters went back or hold no time, so busy cores cannot be counted"
 
 
 def disk(place: str):

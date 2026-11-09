@@ -166,12 +166,38 @@ def test_idle_cores_with_a_high_load_shut_on_load_alone(planted):
     assert set(reasons(gate.read("session"))) == {"load"}
 
 
-def test_cpu_counters_that_do_not_advance_shut_the_gate(planted):
+@pytest.mark.parametrize("ticks,cores", [("19 0 0 1", 19.0), ("1 0 0 19", 1.0)])
+def test_a_still_snapshot_gives_its_own_share_of_busy_time(planted, ticks, cores):
     planted.config()
     (planted.dir / "cpu-stat.json").write_text("[]")
-    (planted.root / "stat").write_text("cpu  5 0 0 5 0 0 0 0 0 0\n")
+    (planted.root / "stat").write_text(f"cpu  {ticks} 0 0 0 0 0 0\n")
     reading = gate.read("session")
-    assert reasons(reading)["cpu"]["reading"] is None
+    assert reading["busy_cores"] == cores and reading["busy_window_s"] is None
+    assert ("cpu" in reasons(reading)) is (cores >= 20)
+    assert gate.read("session")["busy_cores"] == cores  # the same with its own history
+
+
+@pytest.mark.parametrize("stat", ["cpu  0 0 0 0 0 0 0 0\n", "cpu  1 0 0 1 0 0 0 0\n"])
+def test_counters_that_hold_no_time_or_go_back_shut_the_gate(planted, stat):
+    planted.config()
+    (planted.dir / "cpu-stat.json").write_text(json.dumps([{"t": __import__("time").time() - 61, "busy": 50,
+                                                           "total": 100}]))
+    (planted.root / "stat").write_text(stat)
+    assert reasons(gate.read("session"))["cpu"]["reading"] is None
+
+
+@pytest.mark.parametrize("key", ["trip_floor_bytes", "gpu_shares", "disk_path", "embedding_servers"])
+def test_a_value_the_file_may_leave_out_does_not_shut_the_gate(planted, key):
+    planted.config(**{key: None})
+    reading = gate.read("session")
+    assert reading["gate"]["open"], reading["gate"]
+    values = reading["config"]["values"]
+    if key == "gpu_shares":
+        assert values["gpu_shares"] == configuration.default_shares()
+    if key == "disk_path":
+        assert values["disk_path"] == str(planted.home) and reading["disk"]["path"] == str(planted.home)
+    if key == "embedding_servers":
+        assert reading["servers"] == {}
 
 
 def test_the_servers_p95_is_counted_in_place_of_their_current_use(planted, monkeypatch):
