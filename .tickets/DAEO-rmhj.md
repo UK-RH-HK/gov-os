@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
+- tests/acceptance/W2-54/test_w2_54_query_cache.py  # its one-answer case compares two stores' answers whole, and S1's result.store.root names each folder (D-10's red-fix list) [DEC-1090 (3), DEC-1109 (2)]
 - src/gov/retrieve/command.py
 - src/gov/retrieval/retrieve.py
 - src/gov/retrieval/validate.py
