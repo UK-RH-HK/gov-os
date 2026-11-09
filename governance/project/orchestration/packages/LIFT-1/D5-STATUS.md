@@ -130,3 +130,25 @@ marked on W2-128.
 
 **Order:** W2-152's test designer first, then W2-128 round 2a (text: review F6 and F7 through TPL-6 S3, and the
 `DAEO-0000` example), then W2-152's engineer, then W2-153. One launched worker at a time.
+
+## For the owner, prepared, not applied (2026-11-09 night)
+1. **The templates' approval:** `TEMPLATES-APPROVAL-1.md`, the kernel set at integrate `97f39dc4` with sha256 per
+   file. The CTO recommends one approval after round 2a merges, with the table refreshed.
+2. **The `.claude/` copies ACT:** `../ACT-CLAUDE-COPIES-1.md`; bundle `.gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-1/`.
+   - 13 files: W2-142's two skills (source and generated copy), W2-128's engineer agent, and the eight template
+     copies.
+   - Class (b) by the operator's own code; the path rule passes.
+   - Rehearsed in a clone: `failures: 0`, portability clean after the apply. Manifest `980e03eaffb9…`.
+   - Before it is queued: rebuilt if round 2a lands first (F6 and F7 change two skills and a role); then the ACT
+     review (the operator's fixed reviewer brief, G4); then the owner's yes.
+3. **TPL-6 S1, Appendix A:** `TPL6-APPENDIX-A.md`, a 466-character pointer replacing 9,234 characters. Recommended
+   after W2-152.
+
+## Round 2 state
+- **W2-152** (`DAEO-o5x1`, in progress): the test designer is running in `w2/W2-152-tests`; the engineer comes next,
+  after round 2a's text.
+- **W2-128 round 2a** (text, stated in the ticket, path added): the designer's brief is ready
+  (`briefs/W2-128-designer-r2a.md`); next after W2-152's designer.
+- **W2-153** (`DAEO-8s85`, open): its tests after W2-152's engineer. It goes live with the copies ACT.
+- **Review F8** (the scripts' syntax-only checks): no change. The KPI allows a no-op check; dry-run modes for the
+  three scripts are an item for the CTO's tools.
