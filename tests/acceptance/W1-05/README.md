@@ -233,3 +233,5 @@ not changed and still run in every close. The other case of `test_w1_05_switch_o
 - **`governance/project/roster.yaml`.** It is in the ticket's `allowed_paths`; no KPI names it.
 - **`.claude/settings.local.json`.** Git ignores it, and it belongs to the operator.
 - **What a role definition says** beyond its name and description. W1-33 replaces the minimal definitions (DEC-119).
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_05_support.command_environment` (also W1-38's, W1-46's and W1-47's hook runs) carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

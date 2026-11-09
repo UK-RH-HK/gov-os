@@ -259,3 +259,5 @@ Run from this worktree with `PYTHONPATH` set per command:
 Every child process (the guard, `gov launch`, the helper) gets `PYTHONPATH` from `w2_58_support.python_path()`: the
 runner's own value, else the `src/` of the worktree that holds this suite (DEC-732). The guard file run is the
 kernel template's, copied from this worktree. `test_w2_58_code_under_test.py` shows which `gov` a child imports.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_58_support.base_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
