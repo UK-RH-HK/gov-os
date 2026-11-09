@@ -13992,6 +13992,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 1 (memory kept right as the repository grows, judged on fresh questions) and question 2 (the
   sets' independence enforced by walls, not by trust).
 
+### DEC-1102 — `gov plan`'s cycle break fixed before the lift's re-pin, tests first: a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1088, DEC-1099 (3), DEC-1088 (6) · **Source:** the owner's message (chat, 2026-11-09), on the defect found while applying DEC-1099 (3)
+- **Decision:** the defect (W2-136's `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle) is not a row: `gov plan` decides launches from the lift, so it is fixed before the lift's re-pin, tests first: **a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits.** A new ticket (W2-136 is merged; DEC-1088 (6)), an independent test designer first, one review, merged before the re-pin.
+- **Basis:** question 2 (a plan that silently drops a real wait would launch work out of order).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14031,3 +14036,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.484 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1099. Next free id: DEC-1100. |
 | 0.485 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1100. Next free id: DEC-1101. |
 | 0.486 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1101 (items 1 and 2 standing). Next free id: DEC-1102. |
+| 0.487 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1102. Next free id: DEC-1103. |

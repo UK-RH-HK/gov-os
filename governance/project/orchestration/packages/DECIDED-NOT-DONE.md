@@ -63,7 +63,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | NOT STARTED |
 | 38 | W2-66c | (1) tests first, pins (i) and (ii) | NOT STARTED |
 | 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | NOT STARTED |
-| 41 | a `gov plan` defect (W2-136) | found 11-09: on a cycle, `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle | a row: break a cycle only at a ticket in it (D-6 part 2 or W2-136's follow-up) |
+| 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first: broken only at a ticket inside the cycle; a ticket outside every cycle keeps its waits | NOT STARTED: W2-147 to file, its test designer first |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
 ## 0e. DEC-1101's items (2026-11-09; standing)

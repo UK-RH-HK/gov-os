@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1101 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1102 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -345,3 +345,5 @@ other restart is an ACT.
   changed by the CTO), content chosen by rule (git changes plus a seeded sample), memory's search, run outputs, the
   CTO's scratch and other sessions' folders denied, only counts to the CTO. Order: the ACT (path map, guard, folder
   settings), the launch script (tests first, one review), the briefs to the owner, then default. Basis: 1 and 2.
+- DEC-1102 (2026-11-09): **`gov plan`'s cycle break fixed before the lift's re-pin,** tests first: a cycle broken only
+  at a ticket inside it; a ticket outside every cycle keeps all its waits (a new ticket, one review). Basis: 2.
