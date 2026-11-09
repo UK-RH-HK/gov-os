@@ -390,3 +390,7 @@ other restart is an ACT.
 - DEC-1113 (2026-11-09): set-up A's four briefs approved once after two changes (the guard rules since DEC-1099
   included, the pinned commit one where they are live; overlap disagreements decided by an independent auditor under its
   own fixed brief, escalating only unsettleable or verdict-changing cases). Basis: 2.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): set-up A's overlap auditor also gets the disputed actions and each named
+  ticket's allowed_paths (write scope cannot be judged without them); rule 2c and the walls under class 7, rule 2d under
+  class 11; the call log and DEC-1108 (4) outside the bar (the log decides nothing; it began after the window); writer
+  2's brief self-contained (restates writer 1's output schema).
