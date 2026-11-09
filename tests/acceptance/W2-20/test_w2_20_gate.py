@@ -26,21 +26,28 @@ def test_the_gate_is_open_when_every_condition_holds(machine, repo):
     assert gate["reasons"] == [], reading
 
 
-@pytest.mark.parametrize("condition", ["memory", "load", "sessions"],
-                         ids=["memory", "load [W2-M262]", "sessions"])
+@pytest.mark.parametrize("condition", ["memory", "load", "cpu", "disk", "inodes"],
+                         ids=["memory", "load [W2-M262]", "cpu", "disk", "inodes"])
 def test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_threshold(machine, repo, condition):
+    """DEC-1097 (8): the current conditions (S2, S4, S5, S6); no sessions condition (DEC-983). Memory: 64 GiB
+    against the floor 70 GiB plus the new session's 1 GiB; load: min(9, 9) against nproc 4; CPU: 3.5 busy cores plus
+    the servers' p95 0.25 + 0.25 against nproc 4; disk: 50 GiB against 100 GiB; inodes: 5,000,000 against 10,000,000."""
+    machine.open_config()
     if condition == "memory":
-        machine.open_config(min_available_memory_bytes=128 * GIB)
-        expected = (64 * GIB, 128 * GIB)
+        machine.open_config(memory_floor_bytes=70 * GIB, working_size_bytes=1 * GIB)
+        expected = (64 * GIB, 71 * GIB)
     elif condition == "load":
-        machine.open_config(max_load_1m=8.0)
-        machine.set_readings(load=9.0)
-        expected = (9.0, 8.0)
+        machine.set_readings(load=9.0, load_15=9.0)
+        expected = (9.0, 4)
+    elif condition == "cpu":
+        machine.set_readings(busy_cores=3.5, embedding_p95=(0.25, 0.25))
+        expected = (4.0, 4)
+    elif condition == "disk":
+        machine.set_readings(free_bytes=50 * GIB)
+        expected = (50 * GIB, 100 * GIB)
     else:
-        machine.open_config(max_weighted_sessions=1)
-        for n in range(3):
-            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-s{n}")
-        expected = (3, 1)
+        machine.set_readings(free_inodes=5_000_000)
+        expected = (5_000_000, 10_000_000)
 
     reading = machine.read(repo)
     gate = support.gate_of(reading)
