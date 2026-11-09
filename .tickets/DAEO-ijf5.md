@@ -34,6 +34,9 @@ allowed_paths:
 - src/gov/retrieval/retrieve.py  # the fifth edge, retrieve.py -> guard.role_paths (W2-13 S5's role filter, after E-2 was measured); P1-PLAN's D-6 row names retrieve.py [changed, DEC-1109 (2)]
 - src/gov/retrieval/supplementary.py  # its role_paths and decisions.register imports, the same edges [changed, DEC-1109 (2)]
 - src/gov/guard/role_paths.py  # re-imports what moves out of it, as the other guard modules do [changed, DEC-1109 (2)]
+- src/gov/guard/protected.py  # the follow-up: _Glob imported from its new home, the copy gone (the review's R1) [changed, DEC-1109 (2)]
+- src/gov/guard/heldout.py  # the follow-up: load_yaml_unique imported from its new home, the copy gone (R1) [changed, DEC-1109 (2)]
+- src/gov/close/repo.py  # the follow-up: git imported from its new home, the copy gone (R2) [changed, DEC-1109 (2)]
 kpis:
   success:
   - 'S1 Memory''s static import closure holds none of the gates: following every import statement (module level and inside functions) from the memory modules (every module of gov.retrieval, gov.retrieve, gov.store and gov.secrets) through src/gov reaches no module of gov.close or gov.guard and not gov.decisions.checker. Verify: a static walk of src/gov''s imports on the branch [DEC-1039 (2), DEC-1040 (1), P1-PLAN P1-6 item 1]'
@@ -41,6 +44,7 @@ kpis:
   - 'S3 Public calls unchanged: every moved name stays importable from its old module with the same behaviour (gov.close.fingerprint.of_commit, gov.guard.decide._match_pattern, gov.tasks.tickets.TICKETS_REL, gov.guard.runs.root, gov.decisions.register.leave_out, gov.guard.reads.evaluation_sets and the names measure.py used); no acceptance test changes. Verify: the touched packages'' existing unit and acceptance suites pass unchanged, scoped (no full suite) [DEC-1040 (1)]'
   - 'S4 The guard''s hot path no slower and no different: the guard''s decisions on its own unit suite are unchanged, and the hook''s import of gov.guard.decide pulls no new module beyond gov.util. Verify: tests/unit/guard scoped; the CTO''s hook_timing.py before and after, median of five [DEC-1052 basis (3)]'
   - 'S5 The unit tests move with their helpers: each moved helper has its unit cases under tests/unit/util/ (the old ones stay where they test the old name) [DEC-136, P1-PLAN P1-6]'
+  - 'S6 One source each (the follow-up; DEC-1109 (2)): `_Glob`, `load_yaml_unique` and the git runner the close and the store use are each defined once in src/gov, in their new homes; guard/protected.py, guard/heldout.py and close/repo.py import them from there (the old names still importable, S3); no module of src/gov defines a second copy. Verify: a static scan of src/gov for each definition [DEC-1109 (2)]'
   failure:
   - 'A gate (close, guard, decisions.checker) still reached from memory''s closure.'
   - 'A moved name no longer importable from its old module, or a behaviour change in any guard decision, close fingerprint or selection.'
@@ -83,3 +87,5 @@ close and guard suites (the CTO checks `select_tests.py` on a `src/gov/retrieval
 **Filed 2026-11-09 by the CTO (DEC-1109 (2)).**
 
 **The test designer's discoveries placed here (CTO, 2026-11-09; DEC-1109 (2)):** a fifth edge, `retrieval/retrieve.py:39` and `supplementary.py:135` -> `gov.guard.role_paths` -> `guard.reads` -> `guard.decide` (W2-13 S5's role filter, `5b42e981`, a day after E-2's measure), and a second route to `decisions.checker` through `supplementary.py:56` -> `gov.decisions.register` -> `gov/decisions/__init__`. The three paths are added; S1 stands as written (no exception for the role filter). The untangling moves names (the role filter's path rules, `leave_out`) into `gov.util` or `gov.store`; it never hides an import from the walk (no `importlib` in place of an import statement).
+
+**The follow-up placed here (CTO, 2026-11-09; DEC-1109 (2)):** the review's R1 and R2 (copies of `_Glob`, `load_yaml_unique` and `close.repo.git` in `gov.util.parts` and `gov.store.loader`): W2-150 merges only together with this follow-up, so no copy can diverge. S6 and the three paths added; tests first, one engineer pass, one narrow review, on `w2/W2-150`.

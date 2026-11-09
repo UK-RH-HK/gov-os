@@ -199,11 +199,27 @@ def test_the_planted_registers_statements_are_the_censuss_one_for_one():
     assert census and loader.register_statements(REGISTER_TEXT) == census
 
 
+_VERBLESS = {f"**{name}:**" for name in loader._IN_LABELS}  # S11 (DEC-1109 (2)): these name their clauses' heads only
+
+
 @_NO_CENSUS
 def test_this_repositorys_register_statements_are_the_censuss_one_for_one():
+    """The census's statements one for one, but for S11's verbless change labels: those are the census's, fewer."""
     text = (REPO / REGISTER).read_text(encoding="utf-8")
     census = _census_statements(REPO, text)
-    assert len(census) > 1000 and loader.register_statements(text) == census
+    found = loader.register_statements(text)
+    assert len(census) > 1000
+    assert [s for s in found if s["form"] not in _VERBLESS] == [s for s in census if s["form"] not in _VERBLESS]
+    verbless = [s for s in found if s["form"] in _VERBLESS]
+    assert verbless == [s for s in census if s["form"] in _VERBLESS and s in verbless]  # only taken away
+    pairs = {(s["source"], s["target"]) for s in verbless}
+    wrong = {("DEC-208", "DEC-281"), ("DEC-237", "DEC-281"), ("DEC-838", "DEC-281"), ("DEC-880", "DEC-608"),
+             ("DEC-913", "DEC-608"), ("DEC-843", "DEC-880"), ("DEC-891", "DEC-896"), ("DEC-866", "DEC-492"),
+             ("DEC-723", "DEC-728"), ("DEC-775", "DEC-780")}  # the CTO's probe (S11): prose and sub-item ids
+    heads = {("DEC-900", "DEC-757"), ("DEC-899", "DEC-757"), ("DEC-882", "DEC-880"), ("DEC-884", "DEC-880"),
+             ("DEC-889", "DEC-880"), ("DEC-868", "DEC-455"), ("DEC-908", "DEC-455"), ("DEC-1057", "DEC-511"),
+             ("DEC-522", "DEC-511")}
+    assert not pairs & wrong and heads <= pairs
 
 
 def test_the_load_is_the_same_twice(repo):

@@ -295,6 +295,35 @@ def _alone(value: str) -> bool:
     return re.sub(r"\b(and|by)\b|[,.;\s]", "", rest) == ""
 
 
+_LIST_ITEM = re.compile(r"\n[ \t]*(?:[-*+]|\d+[.)])[ \t]")  # a line break that starts a list item, at any indentation
+
+
+def _clause_heads(value: str) -> list[str]:
+    """The changers a verbless change label names (S11, DEC-1109 (2)): the ids at the head of its clauses.
+
+    (1) the value ends at " · " and at a line break that starts a list item, at any indentation; (2) it splits into
+    clauses at each ";" outside parentheses; (3) a clause's head is its text before its first ":" outside parentheses,
+    or the whole clause when it has none; (4) the changers are the ids in a head that stand outside parentheses.
+    """
+    value = _LIST_ITEM.split(value.split(" · ")[0])[0]
+    heads, head, depth, in_head = [], [], 0, True
+    for char in value:
+        if char in "()":
+            depth = depth + 1 if char == "(" else max(0, depth - 1)
+            head.append(" ")  # "DEC-1(x)DEC-2" stays two ids
+        elif depth:
+            continue  # inside parentheses: never a changer, never a clause's end
+        elif char == ";":
+            heads.append("".join(head))
+            head, in_head = [], True
+        elif char == ":":
+            in_head = False
+        elif in_head:
+            head.append(char)
+    heads.append("".join(head))
+    return [target for text in heads for target in _DEC.findall(text)]
+
+
 def _entry_statements(entry: dict) -> list[dict]:
     """One entry's statements, in the census's order (its labels, then its free text)."""
     me, span, found = entry["id"], entry["span"], []
@@ -323,8 +352,8 @@ def _entry_statements(entry: dict) -> list[dict]:
             by = [(b.group(1), t) for b in _BY.finditer(line) for t in _DEC.findall(b.group(2))]
             for verb, target in by:
                 said("DEC-" + target, me, _verb_class(verb), f"**{name}:** {verb} by", whole, "label")
-            if not by:  # "**Changed by:** DEC-953 (item 3)": a change with no verb
-                for target in _DEC.findall(line):
+            if not by:  # "**Changed by:** DEC-953 (item 3)": a change with no verb: its clauses' heads (S11)
+                for target in _clause_heads(line):
                     said("DEC-" + target, me, "supersede" if name == "Superseded by" else "amend", f"**{name}:**",
                          False, "label")
         elif name == "Superseded":  # "**Superseded:** DEC-002 (by DEC-058, DEC-064); ..."

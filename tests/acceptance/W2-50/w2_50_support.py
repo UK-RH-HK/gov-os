@@ -217,6 +217,7 @@ def base_environment(sandbox, role=None, ticket=None, project=None):
         "GIT_AUTHOR_NAME": "W2-50 acceptance", "GIT_AUTHOR_EMAIL": "w2-50@example.invalid",
         "GIT_COMMITTER_NAME": "W2-50 acceptance", "GIT_COMMITTER_EMAIL": "w2-50@example.invalid",
         **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     if project is not None:
         env["CLAUDE_PROJECT_DIR"] = str(project)

@@ -670,3 +670,5 @@ from. Left open on purpose; the tests take no side:
 - **An ignored path** outside the ticket paths; git does not show it.
 - **A directory that is not a repository,** a failure of the PreToolUse hook (DEC-110, W1-02's), and the time the two
   hooks take. No KPI names them.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_03_support.hook_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

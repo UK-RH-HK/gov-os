@@ -78,4 +78,13 @@ refusals are built here; W2-128 closes after both.
   `{code, detail}`; nothing on stdout.
 - **facts.yaml** gains `ready: {new_since: <ISO date>}`; nothing else in it changes here.
 
+- **Clarified after the test design (2026-11-09, the designer's discoveries 1-3 and 7; DEC-1112 (3)):**
+  - a placeholder whose key is in `keys.yaml` but has no value from the ticket, the facts or the flags is a form key
+    the session fills itself (`{SUBJECT}`, `{COMMIT_PATHS}`, `{QUESTION}`, `{FOLDER}`, `{EXIT_FILE}` …) and is left
+    as written; `PLACEHOLDER_LEFT` names a key not in `keys.yaml`, or a `CMD:`/`STEP:` name not in facts.yaml;
+  - a lead's run block is appended after the filled T-0 body as one contiguous block;
+  - T-0's front matter may be printed filled or left out (the cases ignore a leading front-matter block);
+  - `ready.new_since` is a quoted string (`"2026-11-10"`), and the schema requires the date form (`format: date` or a
+    pattern), so `"soon"` is refused.
+
 **Not here:** the launcher flag and the generated copies (W2-153); the templates' text (W2-128).

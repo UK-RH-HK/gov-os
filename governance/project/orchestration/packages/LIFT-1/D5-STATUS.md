@@ -130,3 +130,41 @@ marked on W2-128.
 
 **Order:** W2-152's test designer first, then W2-128 round 2a (text: review F6 and F7 through TPL-6 S3, and the
 `DAEO-0000` example), then W2-152's engineer, then W2-153. One launched worker at a time.
+
+## For the owner, prepared, not applied (2026-11-09 night)
+1. **The templates' approval:** `TEMPLATES-APPROVAL-1.md`, the kernel set at integrate `97f39dc4` with sha256 per
+   file. The CTO recommends one approval after round 2a merges, with the table refreshed.
+2. **The `.claude/` copies ACT:** `../ACT-CLAUDE-COPIES-1.md`; bundle `.gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-1/`.
+   - 13 files: W2-142's two skills (source and generated copy), W2-128's engineer agent, and the eight template
+     copies.
+   - Class (b) by the operator's own code; the path rule passes.
+   - Rehearsed in a clone: `failures: 0`, portability clean after the apply. Manifest `980e03eaffb9…`.
+   - Before it is queued: rebuilt if round 2a lands first (F6 and F7 change two skills and a role); then the ACT
+     review (the operator's fixed reviewer brief, G4); then the owner's yes.
+3. **TPL-6 S1, Appendix A:** `TPL6-APPENDIX-A.md`, a 466-character pointer replacing 9,234 characters. Recommended
+   after W2-152.
+
+## Round 2 state
+- **W2-152** (`DAEO-o5x1`, in progress): the test designer is running in `w2/W2-152-tests`; the engineer comes next,
+  after round 2a's text.
+- **W2-128 round 2a** (text, stated in the ticket, path added): the designer's brief is ready
+  (`briefs/W2-128-designer-r2a.md`); next after W2-152's designer.
+- **W2-153** (`DAEO-8s85`, open): its tests after W2-152's engineer. It goes live with the copies ACT.
+- **Review F8** (the scripts' syntax-only checks): no change. The KPI allows a no-op check; dry-run modes for the
+  three scripts are an item for the CTO's tools.
+- 2026-11-10: **W2-128 round 2a READY, not merged:** `w2/W2-128` **`5c494e255960`** (tests `f3e2a55accd4`, 21 new
+  cases; the designer pinned the comparisons to `61231e61`, accepted by the CTO).
+  - Changes: the test-design read rule per DEC-963; the orchestration skill's "Briefs" points to the templates and
+    K-4's two lines follow DEC-820; the orchestrator role line; `checkpoint.md`'s example `{ID}`;
+    `template/.rulesync/skills` copies; both skills at 1.1.0; CIT-P rows.
+  - Runs: `gov accept` 113/113; W1-35 27/27; validator clean. Review READY (`reviews/w2-128-r2a.md`).
+  - Its five findings are all `other`:
+    - F1 (in): `template/.rulesync/subagents/orchestrator.md` still names `brief-lead.md`. A ticket path; the
+      `.rulesync/` copy is the ACT builder's.
+    - F3 (in): two cases prove a line only by a name being present.
+    - F2 and F4 (out): lifted or miscited rules left in the two skills, beside the lines round 2a changed.
+    - F5 (out): `gov links` reads the templates' example front matter (a `gov links` row).
+  - F1 to F4 go to a small round 2b (a designer and a product-spec), after W2-152's engineer.
+- 2026-11-10: **the ACT builder v2** finds drifted sources from the portability check; on round 2a's head it carries
+  19 files, rehearsal `failures: 0`. The bundle to queue is rebuilt once the CTO merges round 2a.
+- 2026-11-10: **W2-152's engineer launched** in `w2/W2-152` (integrate `61231e61` plus the cases `b08ede68`).

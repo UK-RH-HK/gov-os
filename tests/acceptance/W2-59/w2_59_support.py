@@ -428,6 +428,7 @@ def session_env(project: Path, box: Box, *, path: str | None = None, inherited: 
     session inherited from its launch (``inherited``, for example a worker's ``PYTHONPATH``)."""
     env = base_env(box.home, path or f"{box.local_bin}:{box.decoy_bin}:{SYSTEM_PATH}")
     env.update({"CLAUDE_PROJECT_DIR": str(project), "GOV_ROLE": "engineer", "GOV_TICKET": TICKET})
+    env.update({k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"})  # DEC-1108 (5): the test's own log
     env.update(inherited or {})
     return env
 
