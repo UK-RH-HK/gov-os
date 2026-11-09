@@ -118,8 +118,8 @@ fails the test (Claude Code would let the call through). Allowed forms tested: `
 **The log** `<operator root>/log/operator.jsonl`: one JSON line per gate reached per ACT with the keys `time`, `act`,
 `manifest_sha256`, `votes` (`{code, claim, review}`; null before G6), `gate`, `result` (`pass`, `refused`, `held`,
 ...), `commit`, `checks`, `undo`. A hold writes a `G9` line with result `held`. The yes is copied verbatim into
-`<operator root>/log/act-approvals.jsonl`. The commit freeze `log/act-in-progress.txt` may be written in the operator
-root's log or the scratch's (N-4); it must exist during the apply and be gone after.
+`<operator root>/log/act-approvals.jsonl`. The commit freeze is `<operator root>/install/act-in-progress.txt`, never
+in either log (DEC-1106 (3), above); it must exist during the apply and be gone after.
 
 **Notices:** each one is sent as `<push_cmd> <notice JSON>` and appended to `pings_log` as one JSON line. Notice keys:
 `time`, `act`, `priority` (`P1` or another word), `kind` (the tests read `applied` and `disagreement`), `text`. The
@@ -204,7 +204,7 @@ integrate; the cases marked "guard" are green once the code is built and fail an
 | S12 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | no code; DEC-1106 (1): the live touched file at the after-copy at `in-G8`: restored, live state as before the run, refused at G8, P1 "live files changed" naming it |
 | S12 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | no code; DEC-1106 (1): its own file restored, the pin re-written in HOME left, lock held, P1 naming the pin |
 | S13 | `test_w2_148_gates.py::test_s13_g9_a_hold_waits_then_proceeds_once_cleared` | red | no code; quiet hours (02:00, cleared at 07:30), the nightly window, a close queue, the CTO's `act-in-progress.txt` |
-| S14 | `test_w2_148_apply.py::test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers` | red | no code; files, trailers, the freeze during the apply, no push, tag or sudo |
+| S14 | `test_w2_148_apply.py::test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers` | red | no code; files, trailers, the freeze in `install/` (in neither `log/`) during the apply and gone after (DEC-1106 (3)), no push, tag or sudo |
 | S14 | `test_w2_148_apply.py::test_s14_an_extra_staged_file_refuses_and_undoes` | red | no code; `git diff --cached` differs: no commit, undone, P1 |
 | S14 | `test_w2_148_apply.py::test_s14_a_check_whose_count_differs_from_the_rehearsal_is_red_and_undone` | red | no code; count 3 against 2: undone, P1 |
 | S14 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | no code; DEC-1106 (3): a stale `install/act-in-progress.txt`: G9 held (not an APPROVED refusal), the freeze kept, then applied once it is gone, same `approved_sha256` |
@@ -292,8 +292,10 @@ The failure lines, by the cases that would catch each:
   accept either gate, and S5's cases want `changed after review` in the reason whichever gate refuses.
 - **N-4. Where the freeze and the approvals go.** DEC-1028 (6)'s `log/act-in-progress.txt` and DEC-1058's
   `log/act-approvals.jsonl` live in the CTO's scratch today; S24 puts the agent's files under its own `log/`. The tests
-  read the yes copy under the operator root, accept the freeze in either log, and hold G9 on the scratch's file (the
-  CTO's hand ACTs and FRESH-80's hold write it there). Wiring the freeze to the CTO's checkpoint tool is ACT-OPERATOR-1's.
+  read the yes copy under the operator root and hold G9 on the scratch's file (the CTO's hand ACTs and FRESH-80's hold
+  write it there). The agent's own freeze is `install/act-in-progress.txt` by DEC-1106 (3) (round 1 accepted it in
+  either log; revised). Wiring the CTO's tools and the landing hook to read it, and the guard's deny of the CTO's
+  writes to it, are ACT-OPERATOR-1's.
 - **N-5. The landing check's "control path".** A CTO commit on its records (`CHECKPOINT.md`) is not flagged: the (O)
   catch-all for a path no rule names is not a control path; only the named (b) and (O) rows' paths are.
 - **N-6. S23's pinned subset.** Every ACT the §2 table names in its example column, at its row's class: (b) for

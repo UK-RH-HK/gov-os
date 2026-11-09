@@ -4,6 +4,7 @@ landing check on a planted range of first-parent commits)."""
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 from datetime import datetime, timedelta
 
@@ -22,10 +23,12 @@ def restored(w, b):
 
 def test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers(world):
     freeze = world.marks / "freeze-seen"
-    holds = " || ".join(f"[ -e {p} ]" for p in (world.op / "log/act-in-progress.txt",
-                                                 world.scratch / "log/act-in-progress.txt"))
+    install_freeze = world.install / "act-in-progress.txt"  # DEC-1106 (3): in the install folder, in neither log/
+    logs = (world.op / "log/act-in-progress.txt", world.scratch / "log/act-in-progress.txt")
+    holds = " && ".join([f"[ -e {shlex.quote(str(install_freeze))} ]",
+                         *(f"[ ! -e {shlex.quote(str(p))} ]" for p in logs)])
     b = world.ready("ACT-T-AP", [world.optin_removal(), world.optin_removal("tests/optin-lifted-guard.txt")],
-                    live_apply=f"if {holds}; then echo seen > {freeze}; fi")
+                    live_apply=f"if {holds}; then echo seen > {shlex.quote(str(freeze))}; fi")
     head, remote = world.head(), world.snapshot()["remote"]
     r = world.run(b)
     assert r.out.get("result") == "applied" and r.code == 0, (r.out, r.stderr[-3000:])
@@ -37,8 +40,9 @@ def test_s14_the_commit_holds_only_the_listed_files_and_the_fixed_trailers(world
         assert pair in t, (pair, t)
     assert [v for k, v in t if k == "Role"] == ["operator"]
     assert not [k for k, _ in t if k == "Approved-by"]
-    assert freeze.exists(), "log/act-in-progress.txt (the commit freeze) was not there during the apply"
-    assert not (world.op / "log/act-in-progress.txt").exists() and not (world.scratch / "log/act-in-progress.txt").exists()
+    assert freeze.exists(), "install/act-in-progress.txt (the commit freeze) was not there during the apply, or a " \
+                            "freeze was in a log/"
+    assert not install_freeze.exists() and not any(p.exists() for p in logs), "a freeze was left after the run"
     snap = world.snapshot()
     assert snap["remote"] == remote and snap["tags"] == "", "a push or a tag"
     assert world.forbidden_calls() == ""
