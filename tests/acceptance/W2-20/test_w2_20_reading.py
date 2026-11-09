@@ -21,18 +21,21 @@ def test_the_suite_runs_this_worktrees_code():
 
 
 def test_the_reading_reports_memory_load_processors_and_the_registry_folder(machine, repo):
+    """DEC-1097 (8): no weighted session count any more (DEC-983); the reading shows the 15-minute load and the busy
+    cores beside the 1-minute load (S2, S5)."""
     machine.open_config()
-    machine.set_readings(available_bytes=16 * GIB, load=0.5, nproc=4)
+    machine.set_readings(available_bytes=16 * GIB, load=0.5, load_15=0.75, nproc=4, busy_cores=1.25)
 
     reading = machine.read(repo)
 
     assert reading.get("available_memory_bytes") == 16 * GIB, reading
     assert reading.get("load_1m") == 0.5, reading
+    assert reading.get("load_15m") == 0.75, reading
+    assert reading.get("busy_cores_1m") == 1.25, reading
     assert reading.get("nproc") == 4, reading
     assert support.same_path(reading["registry"], machine.registry) or os.path.realpath(
         reading["registry"]).startswith(os.path.realpath(machine.registry) + os.sep), reading
     assert reading.get("sessions") == [], f"an empty registry lists sessions: {reading}"
-    assert reading.get("weighted_sessions") == 0, reading
     gate = support.gate_of(reading)
     assert gate["open"] is True and gate["reasons"] == [], reading
 
