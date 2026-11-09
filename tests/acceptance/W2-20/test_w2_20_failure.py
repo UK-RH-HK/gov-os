@@ -14,27 +14,30 @@ from w2_20_support import GIB
 
 
 def test_a_session_entered_from_another_repository_counts_against_this_ones_gate(machine):
+    """DEC-1097 (8): the other repository's session counts through the memory rule (S6), not a session weight:
+    floor 1 GiB + 10 GiB for the new session fits in 12 GiB; with the other's live session it needs 21 GiB."""
     this = machine.repo("this-repo")
     other = machine.repo("other-repo")
-    machine.open_config(max_weighted_sessions=1)
+    machine.open_config(memory_floor_bytes=1 * GIB, working_size_bytes=10 * GIB)
+    machine.set_readings(available_bytes=12 * GIB)
 
     code, envelope, out, err = machine.check(this)
     assert code == 0 and envelope is not None and envelope.get("ok") is True, (
         f"the start check refused with an empty registry: exit {code}\n{out}\n{err}")
 
     proc = machine.live_process()
-    machine.register(other, proc.pid, ticket="DAEO-othr", role="engineer", heavy=True)
+    machine.register(other, proc.pid, ticket="DAEO-othr", role="engineer")
 
     reading = machine.read(this)
     assert support.session_pids(reading) == [proc.pid], f"this repository does not see the other's session: {reading}"
     assert support.same_path(reading["sessions"][0]["repository"], other), reading["sessions"][0]
-    assert reading.get("weighted_sessions") == 2, reading
     assert support.gate_of(reading)["open"] is False, reading
     reasons = support.reasons_by_condition(reading)
-    assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (2, 1), reasons
+    assert set(reasons) == {"memory"}, reasons
+    assert reasons["memory"]["threshold"] == 21 * GIB, reasons["memory"]
 
     refused = support.refusal_of(*machine.check(this))
-    assert "sessions" in support.reasons_by_condition(refused), refused
+    assert "memory" in support.reasons_by_condition(refused), refused
     assert [int(s["pid"]) for s in refused.get("sessions", [])] == [proc.pid], refused
 
 
