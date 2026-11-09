@@ -343,6 +343,7 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
 | S15 cheap, measured | §1a: the CTO's main-tree run at `416b59da1779`, `--all` 3.14 s and `--since HEAD~1` 2.94 s (median of five), 3,037 standing findings by code and role; §1 the engineer's worktree run (2.80 s and 2.83 s) |
 | S16 ticket changes | `check.ticket_changes`; units `test_a_closed_tickets_file_edited_…`, `test_reopening_a_closed_ticket_…`, `test_an_open_tickets_scope_changed_unmarked_…` (4 fields), `test_marked_or_unwatched_ticket_changes_…` (7 forms; the closing commit's status change alone), `test_the_closing_commit_is_judged_as_any_other` (open, in_progress), `test_a_closing_commit_marked_by_a_decision_is_not_a_finding` (Implements:, Decided-by:), `test_a_decision_in_a_removed_line_…`, `test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range`; accept success-16 (§8) |
 | S17 planted ids in test fixtures | `check.planted_spans`, `_Repo.planted`, `_planted_cite`; units `test_s17_*` (5); accept success-17 8/8, failure-7 7/7 (§9) |
+| S18 a settlement is a change | `check.CHANGE_CLASSES` (`settle` added), `SETTLES_FORM`, `unmarked`; unit `test_s18_a_settles_label_is_a_change_as_an_amendment` (4 cases); accept success-18 6/6 (§10) |
 | F1 to F5 | accept failure-1 to failure-5: 1/1, 4/4, 2/2, 5/5, 2/2 |
 
 ## 8. Review round 2 (`.gov-runtime/scratch/orchestrator/reviews/w2-129.md`, F1 to F3)
@@ -419,3 +420,44 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
   later string; a line outside `tests/` unchanged; `planted_spans` per line.
 - **`gov accept W2-129`** (`99d54ecee95a`, HOME a scratch folder): **150 passed, 0 failed, 0 skipped**; success-17
   8/8 and failure-7 7/7 (both red before).
+
+## 10. S18 (D-6 part 2 item F2, round 2; DEC-866 (1), DEC-1109 (2)): a settlement is a change
+
+- **Why:** W2-55 S9 removed `tags.py`'s relation check. That check caught a `**Settles:**`, which DEC-866 (1) counts
+  as a change; UNMARKED_CHANGE counted supersede and amend only, so S9 would have lost it.
+- **The change** (`check.py` only):
+  - `CHANGE_CLASSES` gains `settle`, the class the loader's `register_statements` gives `**Settles:** DEC-x`. There is
+    still one pattern set (S8).
+  - **Only the label counts** (`SETTLES_FORM`, `**Settles:**`). The loader also gives `settle` to a free "settled by"
+    and to a `**Changed by:** settled by`. On this register:
+    - the free form adds one pair, DEC-763 <- DEC-762. It comes from DEC-763's body, "P-4 is settled by DEC-762
+      item 3", which settles a package item, not the entry;
+    - the `**Changed by:**` form stands on the settled entry's own status line, so it never gives a finding.
+
+    The brief asks that only `**Settles:**` pairs be added, so the free form is left out.
+  - A settlement is never whole. Its finding is a part, `DEC-x <- DEC-y (**Settles:**; part)`, with `ids` (changed,
+    changer) as for an amendment. Its mark is `**Changed by:** DEC-y (the part)`, so `--propose-marks` writes it.
+  - A PROPOSED, REJECTED or WITHDRAWN settler gives nothing (`NOT_A_CHANGER`), as for the other forms.
+- **On this worktree** (`gov links --all --json`, HOME a scratch folder; before `b4b4b18cb`, after this commit):
+
+  | Code | Role | Before | After |
+  |---|---|---|---|
+  | UNMARKED_CHANGE | orchestrator | 8 | **9** |
+  | UNLINKED_ID | orchestrator | 1,106 | 1,106 |
+  | CLOSED_TICKET_EDITED | orchestrator | 117 | 117 |
+  | TICKET_CHANGE_UNMARKED | orchestrator | 93 | 93 |
+  | UNKNOWN_ID | orchestrator / owner / product-spec | 54 / 1 / 1 | 54 / 1 / 1 |
+  | NOT_IN_FORCE_AS_RULE | orchestrator | 20 | 20 |
+  | ENFORCES_SUPERSEDED | independent-test-designer | 4 | 4 |
+  | **All** | | **1,404** | **1,405** |
+
+  - **The one added:** `DEC-026 <- DEC-086 (**Settles:**; part)`. DEC-086's `**Settles:**` names DEC-004 and
+    DEC-026, and DEC-026's status line names neither DEC-086 nor any changer.
+  - **The register's 4 `**Settles:**` labels** give 5 statements: DEC-086 settles DEC-004 and DEC-026, DEC-377
+    settles DEC-361, DEC-381 settles DEC-289 and DEC-833 settles DEC-828. The other 4 targets already carry
+    `**Changed by:** settled by DEC-y` on their status lines, so they give nothing.
+  - The other 8 UNMARKED_CHANGE pairs are unchanged, and so is every other code.
+- **Units:** `tests/unit/links` 70 passed (66 before; 4 new parametrised cases). The ACCEPTED case is red with the old
+  `CHANGE_CLASSES`.
+- **`gov accept W2-129`** (HOME a scratch folder with `.local` linked in): **156 passed, 0 failed, 0 skipped**;
+  success-18 6/6.
