@@ -53,7 +53,7 @@ median worker brief about 12.6k to 12.9k characters, R3's header).
 | `template/governance/kernel/schemas/lesson.schema.json`, `failure.schema.json`, `research.schema.json` | Optional `sources`; research also optional `decisions` |
 | `governance/project/facts.yaml` | New (project-owned): `paths`, `commands` (each with `run` and `check`), `dod` (six), `steps` (eight switches, on), `budgets`, `harness_allowed` |
 
-Every existing record stays valid: `python3 -m gov.check.schema` validates 969 records with no finding after the change.
+Every existing record stays valid: `python3 -m gov.check.schema` validates 970 records with no finding after the change (fresh run, 2026-11-09, round 1 fixes).
 
 ## 3. The three options (DEC-105)
 

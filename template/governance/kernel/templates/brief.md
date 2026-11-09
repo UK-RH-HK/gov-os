@@ -28,7 +28,7 @@ Done when: the DoD lines {DOD_REFS} hold for your part.
 
 ## Commands (copy them as they are)
 {COMMANDS_TABLE: | name | command | for this role, from facts.yaml}
-Ask memory first: {CMD:retrieve} "<which decision governs X | where is Y implemented>"; grep the register only by id.
+Ask memory first: outside the sandbox {CMD:retrieve} "<which decision governs X | where is Y implemented>"; inside it, the Read and Grep tools [DEC-1065]; grep the register only by id.
 Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read.
 No `gov retrieve` in the sandbox, and no `gov context`: a launched worker searches with the Read and Grep tools, and searches again once the same way [DEC-1065].
 Every whole-folder pytest run adds `-m "not local_only" -k "not real and not green_here and not time_limit"` and an empty `HOME`: run it as {CMD:pytest_folder} [DEC-1065].

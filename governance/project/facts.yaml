@@ -19,7 +19,7 @@ paths:
   logs: '{TREE}/.gov-runtime/scratch/lead/log'
   checkpoint_file: '{TREE}/.gov-runtime/scratch/lead/CHECKPOINT.md'
   tests_ready: '{TREE}/.gov-runtime/scratch/lead/TESTS-READY'
-  empty_home: '{TREE}/.gov-runtime/scratch/empty-home'
+  empty_home: '{WRITE_TREE}/.gov-runtime/scratch/empty-home'
   acceptance_root: 'tests/acceptance/'
   acceptance: 'tests/acceptance/{W2}'
   acceptance_readme: 'tests/acceptance/{W2}/README.md'
@@ -29,11 +29,13 @@ paths:
   contract: 'docs/contract/contract.yaml'
 
 commands:
+  # where, accept, pytest_folder and unit_tests run in the session's own tree, {WRITE_TREE}: {TESTS_TREE} for a test
+  # designer, {TREE} for every other role (DEC-963 item 1), so a designer's red is taken on its own tree.
   identity:
     run: 'printenv GOV_ROLE GOV_TICKET'
     check: 'printenv --version'
   where:
-    run: 'git -C {TREE} rev-parse --show-toplevel --abbrev-ref HEAD'
+    run: 'git -C {WRITE_TREE} rev-parse --show-toplevel --abbrev-ref HEAD'
     check: 'git rev-parse --show-toplevel'
   retrieve:
     run: 'gov retrieve --root {STORE_TREE} "{QUESTION}"'
@@ -45,13 +47,13 @@ commands:
     run: 'gov links --since {BASE}'
     check: 'gov links --help'
   accept:
-    run: 'gov accept {W2} --root {TREE}'
+    run: 'gov accept {W2} --root {WRITE_TREE}'
     check: 'gov accept --help'
   pytest_folder:
-    run: 'env HOME={EMPTY_HOME} PYTHONPATH={TREE}/src python3 -m pytest {FOLDER} -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"'
+    run: 'env HOME={EMPTY_HOME} PYTHONPATH={WRITE_TREE}/src python3 -m pytest {FOLDER} -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit"'
     check: 'python3 -m pytest --version'
   unit_tests:
-    run: 'env HOME={EMPTY_HOME} PYTHONPATH={TREE}/src python3 -m pytest {UNIT_TEST_PATH} -q -p no:cacheprovider -o tmp_path_retention_policy=failed'
+    run: 'env HOME={EMPTY_HOME} PYTHONPATH={WRITE_TREE}/src python3 -m pytest {UNIT_TEST_PATH} -q -p no:cacheprovider -o tmp_path_retention_policy=failed'
     check: 'python3 -m pytest --version'
   schema_check:
     run: 'env PYTHONPATH={TREE}/src python3 -m gov.check.schema'
@@ -123,19 +125,22 @@ dod:
 - id: DOD-6
   line: 'The return carries the twelve fields, the template receipt, brief_gaps and guard_refusals.'
 
-# Conditional lines (R3 §B′, R2-5): on by default while the owner's rows (P1-PLAN R-4, R-5, R-6, M-1) keep today's
-# practice; a switch turned off removes its one line and nothing else. `match` is the pattern M3 counts.
+# Conditional lines (R3 §B′, R2-5): on while an ACCEPTED rule in force keeps the step; off where the owner lifted it
+# (DEC-1052's R-6 and R-12 by DEC-1057, DEC-868 by DEC-953 item 1). A switch turned off removes its one line and
+# nothing else. `match` is the pattern M3 counts.
 steps:
   keyword_warn:
     "on": true
     line: 'Before verification, run {CMD:keyword_warn} and fix each path it lists [DEC-911].'
     match: 'keyword_warn\.py'
   trailer_gate:
-    "on": true
-    line: 'Before you return, run {CMD:trailer_gate} and quote its first line in `evidence` [DEC-927].'
+    # off: DEC-927 item 2 lifted by DEC-1057 (R-12); `gov links`' first line is the one `evidence` quote (LINK-INTEGRITY §5).
+    "on": false
+    line: 'Before you return, run {CMD:trailer_gate} [DEC-927].'
     match: 'trailer_gate\.py'
   collect_only:
-    "on": true
+    # off: DEC-868 lifted by DEC-953 item 1 as a gate on this repository's own development.
+    "on": false
     line: 'Before DONE, run {CMD:collect_only}: it ends with no collection error; quote its last line [DEC-868].'
     match: '--collect-only'
   hooks_check:
@@ -151,7 +156,8 @@ steps:
     line: 'Before DONE, run {CMD:context_ceiling} once; on CONTEXT_OVER_CEILING return the figures and a package naming what to trim [DEC-1027].'
     match: 'gov(\.cli\.main)? context \S+ --json'
   checkpoint_record:
-    "on": true
+    # off: DEC-511 lifted by DEC-1057 (no committed `gov checkpoint` record per round, R-6).
+    "on": false
     line: 'At the end, before the final probe, record {CMD:checkpoint} with the next step [DEC-511].'
     match: 'gov(\.cli\.main)? checkpoint'
   guard_refusal_lines:

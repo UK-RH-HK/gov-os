@@ -25,6 +25,8 @@ keys:
 - WORKER_ROLE
 - IMPL_ROLE
 - RUN_KIND
+# the session's own tree: {TESTS_TREE} for a test designer, {TREE} for every other role (DEC-963 item 1); the
+# designer's command forms (where, accept, pytest_folder, unit_tests, EMPTY_HOME) are filled with it, never {TREE}
 - WRITE_TREE
 - BRANCH
 - HEAD

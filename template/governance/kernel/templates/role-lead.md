@@ -25,7 +25,7 @@ You run this one ticket's loop to the Definition of Done (DOD-1 to DOD-6 in the 
 - Run a pair (a test designer and an engineer) under its ticket's own id, never a coordination ticket's [DEC-1063].
 - Check that the ticket's interface (where config lives, error names, function signatures) is stated in the ticket before the pair starts; if it is not, return PACKAGES [DEC-1052].
 - Run `gov accept` for a ticket whose suites need the code index outside the sandbox, until W2-56 [DEC-1052].
-- Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-254].
+- Launch every worker with {CMD:launch_worker} and wait with {CMD:wait_for}; one writer per worktree, and never edit while a worker runs [DEC-963].
 - Check each worker commit's `Task: {ID}` and `Implements:` against the ticket's `sources:` the moment it exists [DEC-927].
 
 ## Your run: {RUN_KIND} (only this section is in your brief)
@@ -69,7 +69,7 @@ Workers: <name, session id, status> · Rounds: converged or in progress (no coun
 Give your checkpoint and close records `task: {ID}` and `decisions_applied:` (the ids the work applied) [DEC-1073].
 
 ## Return
-- Before you return, run {CMD:links} (`gov links --since {BASE}`) in your worktree; quote its first line in `evidence`, and name in `discoveries` any id the ticket should cite [DEC-1073].
+- Before you return, run {CMD:links} (`gov links --since {BASE}`) in your worktree; quote its first line in `evidence` (the one quote there, in place of `trailer_gate.py`'s), and name in `discoveries` any id the ticket should cite [DEC-1073].
 - Status is one of DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED, AUTH_REQUIRED, in T-0's form.
 - DONE adds: the verified head; each suite's counts and JUnit paths; the `gov.__file__` line; the reviewer's verdict path; residuals; lines against {EST}.
 - PACKAGES: each as question, options with cost, recommendation, confidence, what it blocks.
