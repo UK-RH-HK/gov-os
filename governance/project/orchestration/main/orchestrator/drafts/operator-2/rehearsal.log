@@ -1,0 +1,92 @@
+
+== prepare: the clone, the planted HOME, the install copied from the live one (read only) (23:23:30)
+start 2026-11-09T23:23:30Z
+clone at adec4718a0fc; the tree's operator code: e392d8a0e177 fe2e2f424616 
+planted install: 14 entries, APPROVED 02304c0b6981; live install APPROVED 157a9dc01fca
+
+== suites on the clone (the code the install will carry): W2-148 acceptance, tests/unit/operator (23:23:30)
+183 passed in 37.49s
+ok: W2-148 acceptance ran
+220 passed in 38.82s
+
+== apply.sh: check, apply, a second apply, check, undo, check, apply again (23:24:50)
+install: other (APPROVED 02304c0b6981)
+apply.sh: the install is neither as ACT-OPERATOR-1 left it nor as this ACT leaves it: the CTO rebuilds; nothing changed
+REHEARSAL FAIL: check: ready (wanted /check: ready to apply/ in ap-check1.txt)
+apply.sh: the install is not in its before state (other); nothing changed
+REHEARSAL FAIL: applied (wanted /^state applied/ in ap-apply1.txt)
+REHEARSAL FAIL: the install's own APPROVED check (wanted /own APPROVED check: ok/ in ap-apply1.txt)
+a second apply: refused (apply.sh: the install is not in its before state (other); nothing changed)
+apply.sh: the install is neither as ACT-OPERATOR-1 left it nor as this ACT leaves it: the CTO rebuilds; nothing changed
+install: other (APPROVED 02304c0b6981)
+REHEARSAL FAIL: check: already applied (wanted /already applied/ in ap-check2.txt)
+1c6946921290  opcommon.py
+41271992b637  operator_run.py
+3bf898b0deeb  operator-settings.json
+02304c0b6981  APPROVED
+apply.sh: the install is not as this ACT left it (other); nothing changed
+REHEARSAL FAIL: undone (wanted /state before/ in ap-undo1.txt)
+apply.sh: the install is neither as ACT-OPERATOR-1 left it nor as this ACT leaves it: the CTO rebuilds; nothing changed
+install: other (APPROVED 02304c0b6981)
+REHEARSAL FAIL: check: ready again (wanted /ready to apply/ in ap-check3.txt)
+sha256sum: APPROVED.new: No such file or directory
+APPROVED.new: FAILED open or read
+sha256sum: WARNING: 1 listed file could not be read
+a request waiting: refused (apply.sh: the install is not in its before state (other); nothing changed)
+the freeze held: refused (apply.sh: the install is not in its before state (other); nothing changed)
+apply.sh: the install is not in its before state (other); nothing changed
+REHEARSAL FAIL: applied again (wanted /^state applied/ in ap-apply3.txt)
+
+== the launcher as the cron runs it, nothing queued: the re-installed APPROVED holds (23:24:51)
+launch: exit 1 in 0 s
+{"approved_sha256": "02304c0b698163968846c763c1dc54b028b42054443bb44cb1caf482448d058f", "result": "refused", "gate": "approved", "reason": "APPROVED mismatch: install/APPROVED.new is named in APPROVED but missing"}
+REHEARSAL FAIL: the launcher: idle, its APPROVED check passed (wanted /"result": "idle"/ in launch-idle.txt)
+
+== a class-(a) path-map ACT through every gate, the call set and the guard's log agreeing (the replay check) (23:24:51)
+{"mode": "agree", "set_lines": 4, "log_lines": 4, "log_days": ["2026-11-08.jsonl", "2026-11-09.jsonl"], "calls": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/replay/calls.jsonl"}
+{"act": "ACT-OPR2-PATHMAP-1", "manifest_sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620", "bundle": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-OPR2-PATHMAP-1", "touched": ["repo:governance/project/path-map.yaml"]}
+{"queued": "20261109T232451-ACT-OPR2-PATHMAP-1.req", "line": "ACT-OPR2-PATHMAP-1 8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620"}
+launch: exit 1 in 0 s
+{"approved_sha256": "02304c0b698163968846c763c1dc54b028b42054443bb44cb1caf482448d058f", "result": "refused", "gate": "approved", "reason": "APPROVED mismatch: install/APPROVED.new is named in APPROVED but missing"}
+REHEARSAL FAIL: ACT-OPR2-PATHMAP-1 applied (wanted /"result": "applied"/ in launch-1.txt)
+the clone map holds the new glob: 0
+adec4718a W2-128 (DAEO-t8mp): round 2b stated (round 2a's review F1-F4 and the checkpoint example's link notice), DEC-1112 (3)
+Task: DAEO-sdxk
+Role: orchestrator
+Implements: DEC-1112
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+{"owner_line": "undo ACT-OPR2-PATHMAP-1 8653a32d"}
+undo: exit 1 in 0 s
+{"approved_sha256": "02304c0b698163968846c763c1dc54b028b42054443bb44cb1caf482448d058f", "result": "refused", "gate": "approved", "reason": "APPROVED mismatch: install/APPROVED.new is named in APPROVED but missing"}
+REHEARSAL FAIL: ACT-OPR2-PATHMAP-1 undone by the owner's line (wanted /"result": "undone"/ in undo-1.txt)
+
+== the same kind of ACT with a logged live call the call set does not hold: refused at the after-check, undone (23:24:51)
+{"mode": "missing", "set_lines": 4, "log_lines": 5, "log_days": ["2026-11-08.jsonl", "2026-11-09.jsonl"], "calls": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/replay/calls.jsonl"}
+{"act": "ACT-OPR2-PATHMAP-2", "manifest_sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72", "bundle": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-OPR2-PATHMAP-2", "touched": ["repo:governance/project/path-map.yaml"]}
+{"queued": "20261109T232452-ACT-OPR2-PATHMAP-2.req", "line": "ACT-OPR2-PATHMAP-2 b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72"}
+launch: exit 1 in 0 s
+{"approved_sha256": "02304c0b698163968846c763c1dc54b028b42054443bb44cb1caf482448d058f", "result": "refused", "gate": "approved", "reason": "APPROVED mismatch: install/APPROVED.new is named in APPROVED but missing"}
+ok: the mismatch named
+the clone map holds the second glob: 0
+ok: the refused ACT left the map as before
+
+== the real call set (the CTO's builder over the real transcripts) against the real guard log, by the installed check (23:24:52)
+no set line: session ad44f5fe Monitor 2026-11-09T20:03:44.464Z rule none sha256 a35b5a5a8932
+{"calls in the window": 14451, "calls written": 7275, "dropped: names the sets root": 105, "left out: no log line": 7071, "logged replayable calls in the window": 7231, "logged replayable calls with no set line": 1, "reconciled with the log": 17, "window": {"since": "2026-11-07T23:24:52.772Z", "until": "2026-11-09T23:24:52.772Z"}, "file": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/real-calls.jsonl", "sha256": "e85c104e56e48001e955845840b964602143ff711150e8824e319546b3eb4b80"}
+{"result": "refused", "reason": "module 'operator_run' has no attribute 'read_call_set'", "kind": "AttributeError"}
+
+== apply.sh undo, then check: the planted install as before (23:25:06)
+apply.sh: the install is not as this ACT left it (other); nothing changed
+REHEARSAL FAIL: undone at the end (wanted /state before/ in ap-undo2.txt)
+apply.sh: the install is neither as ACT-OPERATOR-1 left it nor as this ACT leaves it: the CTO rebuilds; nothing changed
+install: other (APPROVED 02304c0b6981)
+REHEARSAL FAIL: check: ready to apply at the end (wanted /ready to apply/ in ap-check4.txt)
+ok: the owner's planted files unchanged
+
+== live files: unchanged (23:25:06)
+ok: live files unchanged (32 lines hashed)
+scratch: 142M	/home/usain/gov-os-runs/OPERATOR2-rehearsal
+scratch: 14M	/tmp/gov-os-op2-rehearsal
+end 2026-11-09T23:25:06Z
+failures: 12
