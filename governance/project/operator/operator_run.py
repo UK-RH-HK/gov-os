@@ -45,6 +45,12 @@ CONTROL_REPO_FILES = ("governance/project/orchestration/tools/deadman.py",
                       "governance/project/orchestration/tools/sentinel-brief.md",
                       "governance/project/path-map.yaml")
 CONTROL_HOME_FILES = (".local/bin/gov",)
+# ACT-OPERATOR-1 (F26, W2-148 review r3): the one file Claude Code itself rewrites under .claude/** in ordinary use that
+# governs no agent: its scheduled tasks' lock (the session id, pid and time of whichever session holds the scheduler).
+# Left out of the control files (the snapshot, so the G8 re-hash, the (a) after-check and the undo's foreign check).
+# Only this one: .claude/settings.local.json, which Claude Code also writes (a "don't ask again" answer), holds
+# permissions and hooks, so it stays a control file.
+CONTROL_RUNTIME_SKIP = frozenset({".claude/scheduled_tasks.lock"})
 REPLAY_FILES = ("governance/project/path-map.yaml",)
 DENY_LIST_FILE = re.compile(r"^(\.claude/settings[^/]*\.json|\.rulesync/permissions\.jsonc)$")
 REPLAY_WINDOW_H = 48
@@ -1044,6 +1050,8 @@ def control_snapshot(s, env):
                 for fn in files:
                     full = os.path.join(top, fn)
                     rel = os.path.relpath(full, repo).replace(os.sep, "/")
+                    if rel in CONTROL_RUNTIME_SKIP:
+                        continue           # F26: Claude Code's own runtime lock, not a control (ACT-OPERATOR-1)
                     snap[("repo", rel)] = read_bytes(full)
     for rel in CONTROL_REPO_FILES:
         snap[("repo", rel)] = read_bytes(os.path.join(repo, rel))

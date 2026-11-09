@@ -594,6 +594,17 @@ session_hidden:
     roles: [engineer]
     tickets: [W2-56]
     why: "SANDBOX-GUARD-EXP-1's tuner: the raw transcripts, from which the held-out half of the action corpus could be rebuilt"
+# write_refused (ACT-OPERATOR-1, rule 2d; DEC-1106 (3), DEC-1104 (2), DEC-1108 (5)): folders outside every tree that no
+# session the guard judges writes into, every role: a file tool by the path it names (links followed), a Bash line by
+# the writes the guard resolves. `except` names the folders directly under the root that stay writable. The operator
+# agent's walled session runs outside this guard. Read from the main tree's copy only.
+write_refused:
+  - root: "~/gov-os-operator"
+    except: [queue]
+    why: "the operator agent's folder (its install and commit freeze, its frozen ACTs, log and wall); the CTO writes only queue/ (DEC-1106 (3), OPERATOR-AGENT-1 §1)"
+  - root: "~/.gov-os/guard-calls"
+    except: []
+    why: "the guard's call log, which no session rewrites (DEC-1108 (5))"
 # The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
 # a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
 retrieval_authority:

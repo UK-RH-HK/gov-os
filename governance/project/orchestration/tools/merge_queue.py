@@ -61,6 +61,10 @@ GOVERNANCE = [  # select_tests.py's governance paths, left out of the skip's com
 HEAD_TRIES = 3  # re-merges onto a moved head before the run stops (entries kept)
 LOAD_ROUNDS = 3  # Q-1 (DEC-1050): the rounds of a case the load-sensitive list names
 RESULT_REF = "refs/heads/merge-queue-result"  # in the clone only: how the repository fetches the tested commit
+# ACT-OPERATOR-1 (DEC-1106 (3)): the operator agent's commit freeze; while it exists no landing moves the branch (the
+# reference-transaction hook's gate would refuse it only after the main tree's files had moved)
+OPERATOR_FREEZE = Path(os.environ.get("MERGE_QUEUE_OPERATOR_FREEZE")
+                       or "/home/usain/gov-os-operator/install/act-in-progress.txt")
 
 
 # ---- close_build.py's reviewed functions (2026-10-31), copied; their cases are in the unit tests -------------------
@@ -1146,6 +1150,9 @@ class Queue:
 
     def advance(self, head, result):
         """KPI 1: the branch moves by fast-forward only, to exactly the tested commit; any failure leaves it."""
+        if os.path.lexists(OPERATOR_FREEZE):  # ACT-OPERATOR-1: wait for the operator's apply; entries kept
+            raise Stop(f"the operator agent's commit freeze holds ({OPERATOR_FREEZE}); nothing advanced, the landing "
+                       "waits for the next run")
         self.git(self.clone, "update-ref", RESULT_REF, result)
         self.git(self.repo, "fetch", "-q", "--no-tags", "--no-write-fetch-head", str(self.clone), RESULT_REF)
         wt, cur = None, None
