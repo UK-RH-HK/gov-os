@@ -24,6 +24,7 @@ allowed_paths:
 - tests/unit/retrieval/test_w2_32_pool.py  # [DEC-1090] D-1
 - tests/unit/retrieval/test_w2_32_routing.py  # [DEC-1090] D-1, found by the engineer's regression run
 - docs/changes/W2-137-evidence.md
+- tests/unit/semantic/test_fusion.py  # [DEC-1109 (2)] D-10's red-fix list: pinned requests of 16 texts (DEC-1090 (2))
 kpis:
   success:
   - 'S1 The cap on texts per request (rerank.MAX_REQUEST_TEXTS, 16 today, DEC-1067 (f)) is raised so that a search at the pool''s rerank_depth (40) sends its candidates in one request when they fit the padded-character bound; the bound on padded characters per request (MAX_REQUEST_CHARS) stays, and still splits a request whose texts are long. Verify: unit tests on requests() with 40 short texts (one request), 40 long texts (split by characters, never by count alone), and one text over the bound (read up to it) [DEC-1090 (2), DEC-1067 (f)]'
