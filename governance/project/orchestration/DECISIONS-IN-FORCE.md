@@ -397,3 +397,8 @@ other restart is an ACT.
 - Delegated (CTO, 2026-11-09, DEC-1112 (3)): the overlap auditor runs on at most 40 disagreements a run, the launch
   script splitting larger sets, so each run keeps within the approved brief's budget ($10, 3,600 s) and the brief is
   unchanged.
+- Owner, 2026-11-09 (under DEC-1113): set-up A's five fixed briefs approved once at labeller v3 bbff1249953b…,
+  labeller-2 v3 e13b5f96d0e0…, writer-tuning v3 82134b3dd6b5…, writer-heldout v3 137a73d1df4c…, overlap-auditor v1
+  b212a424062e… (full hashes in SANDBOX-GUARD-EXP-DECLARATION §12); the declaration's scorer escalates any settled case
+  whose other label would change the verdict (§ A3). The approved list the launch script checks is written by the
+  launch script's install ACT.
