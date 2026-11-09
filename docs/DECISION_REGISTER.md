@@ -14070,6 +14070,21 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   "refused" whenever they leave another's files untouched (the P1 and the held lock as before).
 - **Basis:** question 2 (no success code that could hide someone else's change).
 
+### DEC-1108 — ACT-GUARD-CALLLOG-1's five answers: the location, fields and limits; W2-148's replay from a corpus checked against the log by sha256 both ways; the plain sha256 kept; the log hidden from the W2-56 tuner in a fresh window; every session refused writes into the log folder
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (2)-(3), DEC-1104 (2), DEC-1099 (1) · **Source:** the owner's message (chat, 2026-11-09), after ACT-GUARD-CALLLOG-1 §7
+- **Decision:**
+  - (1) The log's location (`~/.gov-os/guard-calls/<UTC day>.jsonl`), fields and limits approved.
+  - (2) **Option 1:** the CTO's tool builds the 48-hour set of actions in the form W2-148's replay reads, and the
+    operator agent checks each against the log's sha256 both ways before re-judging; built, tests first, before the first
+    path-map ACT goes through the agent.
+  - (3) The plain sha256 kept beside the keyed hash.
+  - (4) `~/.gov-os/guard-calls` added to the W2-56 tuner's hidden paths when a fresh experiment window opens.
+  - (5) The guard refuses every session's writes into `~/.gov-os/guard-calls`, included in ACT-OPERATOR-1 with the
+    freeze file's rule; the suites that run the live hook pointed at a temporary folder as a follow-up.
+  - (6) ACT-GUARD-CALLLOG-1 given as a message for the owner's operator.
+- **Basis:** question 2 (decisions logged without contents; an operator that cannot be shown a curated replay; a log no
+  session can rewrite).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14115,3 +14130,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.490 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1105 (an exception to DEC-1010 for W2-20). Next free id: DEC-1106. |
 | 0.491 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1106 (an exception to DEC-1010 for W2-148). Next free id: DEC-1107. |
 | 0.492 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1107 (an exception to DEC-1010 for W2-148's F21). Next free id: DEC-1108. |
+| 0.493 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1108. Next free id: DEC-1109. |
