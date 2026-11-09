@@ -238,6 +238,21 @@ on 2 workers never loaded more than three or four cores. `spin.py` now forks one
 spinning until the same deadline, and the parent waits for them (it prints `spin: N processes for N CPUs`, which the
 planted suite's capture swallows). The time-bound design (P-4), the sampling and the three assertions are unchanged.
 
+**Round 6 (2026-11-09, `Rewrite-Reason: DEC-1097 (8)`).** The CTO's run outside the sandbox passed (`share 6 of 20 CPUs
+(3 slots); busy cores p95 with the slot 3.13, without 20.00`), but the independent review's F3 found it judged against
+the wrong share: `affinity // slots` (6), where the slot's real set is the CPUs outside the servers' sets divided by
+the slots (8 // 3 = 2 on that machine), and the busy cores counted the whole machine, other sessions included. The
+case now (1) takes the share by S17's rule in this README's interface: the case's CPUs (`os.sched_getaffinity`, which
+`gov resources` inherits) less every CPU in `embedding_servers.shared.cpus` and `.query.cpus` of the real `gate.json`,
+`max(1, len(pool) // heavy_slots)`; (2) checks that the slot really gave its programs that many CPUs (each planted
+program writes its CPU set to `seen/<pid>.json` beside it; inside the slot every set must have `share` CPUs); (3)
+measures each run net of the machine's background: after a 1 s settle, busy cores are sampled for 3 s with nothing of
+the case running, just before each run, and that p95 is subtracted from the run's p95 (the background's median is
+printed too). The assertions compare the net figures: without the slot, net above share + 1; with it, net at most
+share + 1. The time-bound design (P-4) and the 20 % check are unchanged. It prints four `S16 evidence:` lines: the
+share and how it was reached, the CPU sets seen in the slot; the two backgrounds (p95 and median); the gross and net
+p95 of each run against share + 1; the two times.
+
 ## KPI lines
 
 Ids in the ticket's order (`.tickets/DAEO-r30l.md`, 2026-11-09). "New/changed" from the ticket's history
