@@ -8,7 +8,8 @@ the same loader, decisions, CLI and accept code, DEC-963).
 **The numbering.** The lines are numbered in the ticket's order: S1 to S15 for its fifteen success lines, F1 to F6
 for its failure lines. (The brief counted thirteen and called never-a-gate S11 and the timing S12; in the ticket's
 order they are **S13** and **S15**, and "any repository" is S14.) **S16** is the ticket-changes line DEC-1088 (6)
-added after them.
+added after them. **S17** (planted ids in test fixtures) and its failure line **F7** are D-6 part 2's (DEC-1109 (2),
+DEC-1098 (3) row 24).
 
 ## How they run
 
@@ -207,6 +208,14 @@ cases, `there is no gov.links package`. The four greens are two premises and the
 | S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[status]` | red | no `gov links`; then: DAEO-t005 closed, `status` alone, unmarked: no S16 finding for it; the control on DAEO-t004 is found |
 | S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[status-and-assignee]` | red | as above: `status` and `assignee` in the closing commit |
 | S16 | `test_w2_129_tickets.py::test_s16_guard_a_closing_commit_with_status_assignee_or_a_marked_change_gives_no_finding[kpis-marked-in-the-line]` | red | as above: the closing commit's KPI line carries `[re-worded, DEC-113]` |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_an_unknown_id_in_a_non_docstring_literal_of_a_python_test_file_gives_no_unknown_id` | red | today: UNKNOWN_ID for DEC-981 (planted register string), DEC-982 (record path) and W1-90 (f-string path) in `tests/unit/test_s17_planted.py`; after: none there, none for DEC-983's literal, while the control DEC-984 in a comment of the same run is found |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_a_superseded_id_only_inside_a_planted_literal_is_not_carried` | red | today: DEC-107 inside the planted register string is carried as ENFORCES_SUPERSEDED; after: W2-55 still names it and `OLD = "DEC-107"` (premise), neither is carried, the comment `# DEC-107` of the same file is |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_ids_in_comments_are_judged` | green (guard) | DEC-984 in a comment gives UNKNOWN_ID; DEC-107 in a comment is carried; the file's other lines hold planted literals |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_ids_in_module_and_function_docstrings_are_judged` | green (guard) | DEC-985 (module docstring) and DEC-986 (a function's multi-line docstring) give UNKNOWN_ID at their lines |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_non_python_test_files_are_judged` | green (guard) | DEC-107 in `tests/unit/README.md` and in a JSON fixture's string is carried (W2-55 names both) |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_a_python_test_file_that_does_not_parse_is_judged_as_today` | green (guard) | a syntax error in the file: DEC-988 in its "literal" gives UNKNOWN_ID, DEC-107 there is carried |
+| S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_a_line_with_the_id_in_a_literal_and_in_a_trailing_comment_is_judged` | green (guard) | `WINDOW = "DEC-107"  # DEC-107 ...` is carried; `RECORD = "...DEC-989.md"  # DEC-989 ...` gives UNKNOWN_ID |
+| S17 | `test_w2_129_fixtures.py::test_s17_w2_55_propagation_still_names_the_planted_literal_lines` | green (guard) | `python3 -m gov.decisions.propagation` in the planted repository exits 1 and still names both literal lines |
 | F1 | `test_w2_129_sources.py::test_s13_no_close_queue_landing_launch_claim_readiness_or_hook_module_calls_gov_links` | green (guard) | as S13 |
 | F2 | `test_w2_129_command.py::test_s1_writes_nothing_but_its_mark_the_head_it_judged` | red | as S1 |
 | F2 | `test_w2_129_command.py::test_s1_starts_only_git_opens_no_socket_and_writes_only_the_mark` | red | as S1 |
@@ -248,6 +257,16 @@ all): a commit that closes an open or in-progress ticket is judged by the status
 open); the closing commit's `status` alone, `status` with `assignee`, or a KPI change marked in the line, is no finding
 (3 guards, each with the unmarked control on DAEO-t004). Every other case is unchanged.
 
+**S17, the fourth pass (D-6 part 2; DEC-1109 (2) restarted it, DEC-1098 (3) row 24).** 8 cases in
+`test_w2_129_fixtures.py`, written on `w2/W2-129-d6-tests` from `w2/integrate` at `d48639954`, where `gov links` is
+merged. One planted commit on a copy of repository A adds seven test files (`tests/unit/test_s17_*.py`,
+`tests/unit/README.md`, `tests/unit/fixtures/planted.json`); none cites DEC-108, so W2-55 names every line citing the
+superseded DEC-107; each unknown id (DEC-981 to DEC-989) is used once. One `gov links --all` run on it. Run in the
+launch sandbox through the heavy slot with the same options: the 8 cases give **2 failed, 6 passed**; the two reds
+fail on the planted literal ids still reported (UNKNOWN_ID at `test_s17_planted.py:8` and `:18`, ENFORCES_SUPERSEDED
+at `:11`), each after its control in the same run is found. S1 to S16 are unchanged; repository A itself is unchanged,
+so S7's "no other ENFORCES_SUPERSEDED" holds as before.
+
 ## The interface the tests assume
 
 - **The command:** `src/gov/links/command.py` (`gov.links.command`), a read command, options `--since <rev>`,
@@ -279,6 +298,15 @@ open); the closing commit's `status` alone, `status` with `assignee`, or a KPI c
   empty. Two fields in one commit may be one line naming both or a line each. A "decision id" is any `DEC-n` in a
   changed line (added or removed, a YAML comment included) or in the `Implements:` or `Decided-by:` trailer. The
   status before the commit (its parent's file) decides closed; a ticket the commit creates is not tested.
+- **S17's places (DEC-1109 (2)):** in a `tests/**/*.py` file that parses, an id inside a string literal that is not a
+  docstring (a plain, triple-quoted or f-string, assigned or not) gives no UNKNOWN_ID line, and an ENFORCES_SUPERSEDED
+  line at `<path>:<line>` is printed only when the old id also stands on that line outside such a literal (a comment,
+  a docstring, code); "a docstring" is the first statement's string of a module, class or function. Ids in comments
+  and docstrings, every non-Python file under `tests/` (`README.md`, `*.json`, `*.yaml`, `*.txt`) and a `.py` file
+  that does not parse give the same lines as before, in the same four ` | ` fields (`UNKNOWN_ID <id> ... | <path>:<line>
+  | independent-test-designer | <fix>`); the first field holds the id. `python3 -m gov.decisions.propagation`, run in
+  the repository, still prints every line it printed before (W2-55's module is not changed; the filter is in
+  `gov links`' carrying).
 
 ## Notes and limits
 
@@ -323,4 +351,4 @@ open); the closing commit's `status` alone, `status` with `assignee`, or a KPI c
 - `conftest.py`: the session's repositories, a copy per test, and the three shared runs.
 - `test_w2_129_findings.py` (S2 to S8), `test_w2_129_command.py` (S1, S9, S11, S14),
   `test_w2_129_incremental.py` (S10, F5), `test_w2_129_patches.py` (S12), `test_w2_129_sources.py` (S8, S13),
-  `test_w2_129_tickets.py` (S16).
+  `test_w2_129_tickets.py` (S16), `test_w2_129_fixtures.py` (S17, F7).
