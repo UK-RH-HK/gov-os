@@ -39,6 +39,7 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-1090
+- DEC-1109
 - DEC-1087
 - DEC-1068
 - DEC-1067
