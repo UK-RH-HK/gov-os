@@ -172,7 +172,8 @@ arrives only after the session, and is lost when the launcher is killed.
   the session's process where the variable is set, removed `<session folder>/<hash>`. Integrate had no session folder,
   so both sides named `/tmp/gov-cbm-<uid>/<hash>`. The fix: each test process writes a mark, `.gov-cbm-base` (the
   folder's path and the writer's pid), in its pytest temp base. `daemon_dir(root)` follows the nearest mark above the
-  repository when the variable is absent. Only a mark that is a regular file of the user's own, names an absolute
+  repository when neither the variable nor a launched session's temp folder (`CLAUDE_CODE_TMPDIR`) names a place, so
+  a launched session's daemon folder stays under its own temp folder. Only a mark that is a regular file of the user's own, names an absolute
   folder, and was written by another process counts: a case that removes the variable in the session's own process
   still gets the default place. The conftest also makes the folder when `gov` cannot be imported at configure time.
   Beside it, a daemon folder made for a tool that cannot be started (off `PATH`) is removed again. Unit cases:

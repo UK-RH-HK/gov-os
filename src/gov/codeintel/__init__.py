@@ -112,18 +112,19 @@ def marked_base(root) -> Path | None:
 
 
 def daemon_base(env=None, root=None) -> Path:
-    """Where the daemon directories of this process stand: the test session's own folder (``CODEINTEL_DAEMON_BASE``, or
-    for a repository ``root`` under a test process's temp base, the folder its mark names: ``marked_base``), else the
-    launched session's temp folder (``launch_folder``), else ``DAEMON_BASE``."""
+    """Where the daemon directories of this process stand: the test session's own folder (``CODEINTEL_DAEMON_BASE``),
+    else the launched session's temp folder (``launch_folder``), else, for a repository ``root`` under a test process's
+    temp base, the folder its mark names (``marked_base``: the shared place is never used during a test session), else
+    ``DAEMON_BASE``."""
     env = os.environ if env is None else env
     given = env.get(BASE_ENV) or ""
     if os.path.isabs(given):
         return Path(os.path.normpath(given))
-    marked = marked_base(root) if root is not None else None
-    if marked is not None:
-        return marked
     launched = launch_folder(env)
-    return launched / LAUNCH_SUB if launched is not None else DAEMON_BASE
+    if launched is not None:
+        return launched / LAUNCH_SUB
+    marked = marked_base(root) if root is not None else None
+    return marked if marked is not None else DAEMON_BASE
 
 
 def make_session_base(env=None) -> Path:

@@ -123,12 +123,16 @@ def test_a_mark_that_is_no_users_regular_file_naming_an_absolute_folder_is_not_f
     assert codeintel.marked_base(tmp_path / "deeper" / "repo") is None
 
 
-def test_the_variable_comes_before_a_mark(tmp_path, monkeypatch):
+def test_the_variable_and_a_launched_sessions_folder_come_before_a_mark(tmp_path, monkeypatch):
+    """S1: inside a launched session the daemon folder is under the session's own temp folder, mark or none."""
     mark = tmp_path / codeintel.MARK
     mark.write_text(json.dumps({"base": str(tmp_path / "marked"), "pid": os.getpid() + 1}), encoding="utf-8")
     monkeypatch.setenv(codeintel.BASE_ENV, str(tmp_path / "given"))
+    monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, "/tmp/gov-launch-abcd1234/claude-1000")
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "given"
     monkeypatch.delenv(codeintel.BASE_ENV)
+    assert codeintel.daemon_dir(tmp_path / "repo").parent == Path("/tmp/gov-launch-abcd1234") / codeintel.LAUNCH_SUB
+    monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV)
     assert codeintel.daemon_dir(tmp_path / "repo").parent == tmp_path / "marked"
 
 
