@@ -4,8 +4,8 @@ stand-ins, and no reranker process is started.
 """
 from __future__ import annotations
 
-import functools
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -72,29 +72,34 @@ def test_fusion_search_says_reranked_false_and_names_the_failure(routes, death):
     assert not any("rerank_score" in hit for hit in answer["hits"])
 
 
-def test_a_private_reranker_that_dies_is_reported_and_started_again_next_time(tmp_path, monkeypatch):
-    """The default reranker: the shared service does not answer, the private one loads, then dies mid-search."""
+def test_a_shared_reranker_that_dies_is_reported_and_asked_again_next_time(tmp_path, monkeypatch):
+    """The default reranker: the shared service dies mid-search (a broken pipe). DEC-1048 (5): formerly a private
+    reranker that died and was started again; now no private reranker is started, the search is reported unranked,
+    and the next search asks the service again. W2-145 round 3 (the review's F1): an ask of the same question within
+    ``rerank.RECALL_S`` is the same search (the page's rerank after the pool's) and gets the first failure at once;
+    the next search, after the window, asks again."""
+    monkeypatch.setattr(rerank, "RECALL_S", 0.2)
     interpreter = tmp_path / rerank.PYTHON_REL
     interpreter.parent.mkdir(parents=True)
     interpreter.write_text("")
     monkeypatch.setenv("HOME", str(tmp_path))
-    starts = []
+    asked, started = [], []
 
-    def no_service(interpreter, query, texts):
-        raise ConnectionError("no service")
+    def dies(interpreter, query, texts):
+        asked.append(query)
+        raise BrokenPipeError(32, "Broken pipe")
 
-    @functools.lru_cache(maxsize=None)
-    def started(interpreter):
-        starts.append(interpreter)
-        return DEATHS["a broken pipe"], "cpu", None
-
-    monkeypatch.setattr(rerank, "_ask", no_service)
-    monkeypatch.setattr(rerank, "_started", started)
+    monkeypatch.setattr(rerank, "_ask", dies)
+    monkeypatch.setattr(rerank.subprocess, "Popen", lambda *args, **kwargs: started.append(args))
     given = [{"chunk_id": "a", "text": "a"}, {"chunk_id": "b", "text": "b"}]
     assert rerank.rerank("q", given) == given
     assert rerank.last_outcome()["by"] == "unavailable" and "BrokenPipeError" in rerank.last_outcome()["reason"]
-    rerank.rerank("q", given)
-    assert len(starts) == 2  # the dead one was not kept: the next search started another
+    reason = rerank.last_outcome()["reason"]
+    assert rerank.rerank("q", given) == given  # the same search's second ask: not asked, the same reason
+    assert len(asked) == 1 and rerank.last_outcome()["reason"] == reason
+    time.sleep(0.3)  # the next search, past the window
+    assert rerank.rerank("q", given) == given
+    assert len(asked) == 2 and started == []  # the service asked again; nothing else started
 
 
 # --- S5 ------------------------------------------------------------------------------------------------------------

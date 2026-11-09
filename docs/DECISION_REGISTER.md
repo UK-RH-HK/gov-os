@@ -13997,6 +13997,46 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Decision:** the defect (W2-136's `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle) is not a row: `gov plan` decides launches from the lift, so it is fixed before the lift's re-pin, tests first: **a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits.** A new ticket (W2-136 is merged; DEC-1088 (6)), an independent test designer first, one review, merged before the re-pin.
 - **Basis:** question 2 (a plan that silently drops a real wait would launch work out of order).
 
+### DEC-1103 — W2-20's machine gate file by an ACT; D-4's 3 capped and 7 lifted cases back into the gates by an ACT; ACT-INDEP-WALLS-1's four answers; an operator-agent package requested
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1100, DEC-1101 (3), DEC-1098 (6), DEC-1061, DEC-1088 (5)(b), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after the selection ACTs were applied (`8038e0ee`; the hook 6fbbf312…) and the push (`795d97c7`, `3ce6394f`)
+- **Decision:**
+  - (1) **W2-20's gate file, option (a):** `~/.gov-os/machine/gate.json` created by `gov resources --init-config`
+    from W2-20's code, as an ACT for the owner's operator, rehearsed, with the exact commands.
+  - (2) **D-4's 3 capped and 7 lifted cases go back into the gates** (amending DEC-1061's cut for these ten), rehearsed,
+    as one more ACT.
+  - (3) **ACT-INDEP-WALLS-1, all four as recommended:** the layout and the three layers, the sandbox added once
+    proven; rule 2c for the tuner on W2-56; `~/gov-os-writer` and `~/gov-os-checker` left as they are until the launch
+    script is the default, then retired; the budgets and timeouts decided with the fixed briefs. The CTO says when it is
+    ready for the operator.
+  - (4) **Requested: an operator-agent package** so that ACTs no longer need the owner at the terminal: classes by
+    effect: (a) ACTs that only add checks, tighten a control, or change nothing that governs agents, applied by an
+    independent operator agent in its own walled folder, only after the rehearsal passes, an independent review says
+    READY and the hashes match what was reviewed; logged, undo ready, the owner notified; (b) anything that loosens or
+    alters a control (the guard, permissions, settings, pins, installs) or needs sudo: the owner's one-line "yes" in the
+    chat, then the operator agent runs it, except sudo, which stays the owner's. The CTO never changes an ACT after its
+    review and cannot apply one; P1 issues always come to the owner. The package says who classifies each ACT and how a
+    misclassification is caught. Not decided until the owner approves the package.
+- **Basis:** question 2 (the gates restored where the trial showed misses; the walls' controls as recommended) and
+  question 4 (the owner's time kept for what loosens a control).
+
+### DEC-1104 — D-4's ten cases by option C; the operator agent approved as recommended; the landing selection's environment fixed before its results are relied on; ACTs given as messages for the owner's operator
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing · **Under:** DEC-1103, DEC-1100, DEC-1101, DEC-1061, DEC-1058, DEC-928 (3), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after ACT-INDEP-WALLS-1 (`147706ae`) and ACT-GATE-CONFIG-1 (`d7490945`) were applied by the owner's operator
+- **Decision:**
+  - (1) **ACT-D4-RESTORE-1: option C.** The seven green cases into the gates now (the ACT's form B); D-10 decides each
+    of the three red-by-design cases (W1-33's auditor, W1-05's install, W1-46's research install): rewrite it for
+    today's hook and gate it, or keep it report-only. DEC-1103 (2) is narrowed accordingly.
+  - (2) **OPERATOR-AGENT-1, all seven as recommended:** the classes and the table, tightening-only edits as (a), guard
+    code always (b); the owner's yes typed as `yes ACT-<id> <sha8>`, read from the CTO session's transcript; the shared
+    servers' settings become (a) (amending DEC-1058 (b) for them); re-pins stay the owner's for now (DEC-928 (3)),
+    decided again after one rehearsed re-pin in the agent's form; the dispatcher's cron launches it from a queue, the
+    CTO only queues; a push for every (a) ACT for the first two weeks, then the digest only, failures always pushed;
+    built after the walls ACT, tests first, one review, a trial on past ACTs replayed.
+  - (3) **The landing selection's environment row fixed before its results are relied on,** so a red means a red.
+  - (4) **Standing:** each ACT is given to the owner as a message for the owner's operator, not as terminal commands;
+    the owner does only the re-pins, the pushes and sudo personally.
+- **Basis:** question 2 (no gate that reports a known switch over and over; a red that means a red) and question 4 (the
+  owner's time kept for re-pins, pushes and sudo).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14037,3 +14077,5 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.485 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1100. Next free id: DEC-1101. |
 | 0.486 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1101 (items 1 and 2 standing). Next free id: DEC-1102. |
 | 0.487 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1102. Next free id: DEC-1103. |
+| 0.488 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1103; DEC-1061 amended for ten cases. Next free id: DEC-1104. |
+| 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |

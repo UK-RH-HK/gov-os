@@ -555,7 +555,9 @@ def parts(root: str, role: str, ticket_id: str | None,
     if role in ("engineer", "independent-test-designer"):
         wbs = _ticket(root, ticket_id)[1]
         if role == "engineer" and wbs:
-            out.append(_Part(root, [f"{ACCEPTANCE}/{wbs}/**"], TESTS_REFUSAL))
+            own = _Part(root, [f"{ACCEPTANCE}/{wbs}/**"], TESTS_REFUSAL)
+            own.wbs = wbs  # W2-141: a search that can reach it is told how to keep it out
+            out.append(own)
         changed = _changed(root) if role == "independent-test-designer" else None
         if changed:
             base, names = changed
@@ -713,6 +715,566 @@ def _set_aside(command: str) -> tuple[str, list[str]]:
     return "".join(text) + command[at:], subs
 
 
+# -- W2-141: what a search keeps out (DEC-1093 (2), DEC-1102) ------------------
+# An engineer's search that can reach its own ticket's acceptance folder is
+# refused unless the call keeps the folder out, and the refusal says how.  A
+# file is taken in or kept out as the tool itself would: rg's globs (the Grep
+# tool's too) as gitignore lines from the session's folder, the last that
+# matches winning; grep's --exclude-dir (a folder's base name), --include and
+# --exclude; ag's --ignore; ack's --ignore-dir; find's -prune and its negated
+# -path and -name tests, -maxdepth; Glob's pattern; git grep's and git
+# ls-files's pathspecs, their exclusions (:!, :^, :(exclude)) too.  An option
+# word with braces is read as the words Bash makes of it.  The same block is
+# in the hook's role_reads.py, which does not import it from the pinned product.
+# BEGIN W2-141 BLOCK
+
+SEARCH_REFUSAL = ("the search can reach {folder}, the ticket's own acceptance tests, the "
+                  "counterpart's work, which is refused to the ticket's engineer (DEC-820 "
+                  "(c), DEC-1093 (2)): {how}")
+X_HOW = {
+    "Grep": ("exclude it with the glob !tests/acceptance/{w}/** (Grep's glob, from the "
+             "session's folder; !**/{w}/** from any folder), or search a path that does "
+             "not hold it"),
+    "grep": ("exclude it with --exclude-dir={w} (grep matches a folder's base name, never "
+             "a path), or search a folder that does not hold it"),
+    "rg": ("exclude it with -g '!tests/acceptance/{w}/**' (from the session's folder; "
+           "-g '!**/{w}/**' from any folder), or search a folder that does not hold it"),
+    "ag": "exclude it with --ignore-dir={w}, or search a folder that does not hold it",
+    "ack": "exclude it with --ignore-dir={w}, or search a folder that does not hold it",
+    "find": ("exclude it with -name {w} -prune -o ... (or -not -path '*/{w}/*'), or "
+             "start from a folder that does not hold it"),
+    "Glob": ("Glob has no exclusion: give a path or a pattern that cannot reach it (src/, "
+             "or a pattern under another folder)"),
+    "git": ("exclude it with the pathspec ':!tests/acceptance/{w}' after -- (git grep "
+            "PATTERN -- . ':!tests/acceptance/{w}', from the repository's root), or give "
+            "pathspecs that do not hold it"),
+}
+_X_GIT_VALUED = {
+    "grep": frozenset("-e -f -m -A -B -C --max-count --context --after-context "
+                      "--before-context --max-depth --threads".split()),
+    "ls-files": frozenset("-x -X --exclude --exclude-from --exclude-per-directory "
+                          "--format --with-tree".split()),
+}
+_X_BRACE = re.compile(r"\{([^{},]*,[^{}]*)\}")
+_X_GREP_VALUED = frozenset(
+    "-e -f -m -A -B -C -d -D --regexp --file --include --exclude --exclude-dir "
+    "--exclude-from --max-count --context --after-context --before-context "
+    "--directories --devices --label --binary-files --group-separator".split())
+_X_RG_VALUED = frozenset(
+    "-e -f -g -t -T -m -A -B -C -j -M -d -E -r --regexp --file --glob --iglob --type "
+    "--type-not --type-add --type-clear --max-count --context --after-context "
+    "--before-context --threads --max-columns --max-depth --maxdepth --encoding --sort "
+    "--sortr --replace --ignore-file --pre --pre-glob --max-filesize "
+    "--path-separator --context-separator --field-match-separator --engine".split())
+_X_AG_VALUED = frozenset(
+    "-A -B -C -G -g -m -p -W --after --before --context --file-search-regex --ignore "
+    "--ignore-dir --max-count --depth --path-to-ignore --pager --workers "
+    "--width".split())
+_X_ACK_VALUED = frozenset(
+    "-A -B -C -m -g --after-context --before-context --context --max-count "
+    "--ignore-dir --ignore-directory --noignore-dir --noignore-directory --ignore-file "
+    "--type --type-add --type-set --type-del --output --pager --match "
+    "--files-from".split())
+_X_PATTERN = frozenset({"-e", "-f", "--regexp", "--file"})
+# The readers a find's action or an xargs runs: they print or copy what they open.
+X_READERS = frozenset(
+    "cat tac nl less more bat batcat head tail cmp diff colordiff od xxd hexdump "
+    "strings base64 uniq sort cut fold fmt paste column expand unexpand rev iconv "
+    "grep egrep fgrep zgrep rg ag ack sed awk gawk mawk nawk jq yq cp".split())
+_X_FIND_PATHS = frozenset("-path -wholename -ipath -iwholename".split())
+_X_FIND_NAMES = frozenset("-name -iname".split())
+_X_FIND_OPENS = frozenset("-exec -execdir -ok -okdir".split())
+
+
+def x_glob(pattern: str) -> "re.Pattern[str]":
+    """A glob as a whole-path matcher: ``**`` crosses folders, ``*`` and
+    ``?`` stay in one name, ``[...]`` one character, ``{a,b}`` either."""
+    def part(p: str) -> str:
+        out, i = [], 0
+        while i < len(p):
+            if p.startswith("**/", i):
+                out.append("(?:.*/)?")
+                i += 3
+            elif p.startswith("**", i):
+                out.append(".*")
+                i += 2
+            elif p[i] == "*":
+                out.append("[^/]*")
+                i += 1
+            elif p[i] == "?":
+                out.append("[^/]")
+                i += 1
+            elif p[i] == "[" and p.find("]", i + 2) > 0:
+                j = p.find("]", i + 2)
+                body = p[i + 1:j]
+                body = "^" + body[1:] if body[:1] in "!^" else body
+                out.append("[" + body.replace("\\", "\\\\") + "]")
+                i = j + 1
+            elif p[i] == "{" and p.find("}", i) > 0 and "," in p[i:p.find("}", i)]:
+                j = p.find("}", i)
+                out.append("(?:" + "|".join(part(a) for a in p[i + 1:j].split(",")) + ")")
+                i = j + 1
+            else:
+                out.append(re.escape(p[i]))
+                i += 1
+        return "".join(out)
+    return re.compile("(?s)" + part(pattern) + r"\Z")
+
+
+def _x_parse(args: list[str], valued: frozenset):
+    """(operands, [(option, value)], short flag letters): a value glued, after
+    ``=``, or the next word; after ``--`` every word is an operand."""
+    operands, options, letters = [], [], set()
+    i = 0
+    while i < len(args):
+        a = args[i]
+        i += 1
+        if a == "--":
+            operands += args[i:]
+            break
+        if not a.startswith("-") or a == "-":
+            operands.append(a)
+        elif a.startswith("--"):
+            opt, eq, val = a.partition("=")
+            if opt in valued and not eq and i < len(args):
+                val, i = args[i], i + 1
+            options.append((opt, val))
+        else:
+            for j in range(1, len(a)):
+                opt = "-" + a[j]
+                if opt in valued:
+                    val = a[j + 1:]
+                    if not val and i < len(args):
+                        val, i = args[i], i + 1
+                    options.append((opt, val))
+                    break
+                letters.add(a[j])
+                options.append((opt, ""))
+    return operands, options, letters
+
+
+def _x_rel(f: str, start: str) -> list[str]:
+    return f[len(start.rstrip("/")) + 1:].split("/")
+
+
+def _x_depth(keep, depth):
+    try:
+        most = int(depth)
+    except (TypeError, ValueError):
+        return keep
+    return lambda f, start, word, cwd: (len(_x_rel(f, start)) <= most
+                                        and keep(f, start, word, cwd))
+
+
+def _x_rg(globs: list[tuple[str, bool]]):
+    """rg's -g/--iglob (and the Grep tool's globs): gitignore lines matched
+    against the path from the session's folder; the last that matches wins; a
+    folder kept out is not walked; with a positive glob, a file no glob
+    matches is not searched."""
+    rules = []
+    for g, fold in globs:
+        neg = g.startswith("!")
+        body = g[1:] if neg else g
+        body = body.lower() if fold else body
+        only_dir = body.endswith("/")
+        body = body.rstrip("/")
+        if body.startswith("/"):
+            body = body[1:]
+        elif "/" not in body:
+            body = "**/" + body
+        if body:
+            rules.append((x_glob(body), only_dir, neg, fold))
+    white = any(not neg for _rx, _d, neg, _f in rules)
+
+    def verdict(path: str, is_dir: bool):
+        last = None
+        for rx, only_dir, neg, fold in rules:
+            if (is_dir or not only_dir) and rx.match(path.lower() if fold else path):
+                last = neg
+        return last
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        def view(p: str) -> str:
+            if cwd and p.startswith(cwd.rstrip("/") + "/"):
+                return p[len(cwd.rstrip("/")) + 1:]
+            return p
+        at = start.rstrip("/")
+        for name in _x_rel(f, start)[:-1]:
+            at += "/" + name
+            if verdict(view(at), True) is True:
+                return False
+        found = verdict(view(f), False)
+        return not (found is True or (found is None and white))
+    return keep
+
+
+def _x_grep(rules: list[tuple[str, str]]):
+    """grep -r's --exclude-dir (a folder's base name), --include and
+    --exclude (a file's base name: the last that matches wins; none, and the
+    file is searched unless the first is --include)."""
+    import fnmatch as fm
+    dirs = [g.rstrip("/") for k, g in rules if k == "exclude-dir"]
+    files = [(k, g) for k, g in rules if k in ("include", "exclude")]
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        rel = _x_rel(f, start)
+        if any(fm.fnmatchcase(d, g) for d in rel[:-1] for g in dirs):
+            return False
+        last = None
+        for k, g in files:
+            if fm.fnmatchcase(rel[-1], g):
+                last = k
+        return (not files or files[0][0] != "include") if last is None else last == "include"
+    return keep
+
+
+def _x_ag(pats: list[str]):
+    """ag's --ignore and --ignore-dir: a name at any depth, or a path from
+    where the search starts."""
+    import fnmatch as fm
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        rel = _x_rel(f, start)
+        for p in pats:
+            q = p.strip("/") or p
+            if "/" in q:
+                rx = x_glob(q)
+                if any(rx.match("/".join(rel[:k])) for k in range(1, len(rel) + 1)):
+                    return False
+            elif any(fm.fnmatchcase(n, q) for n in rel):
+                return False
+        return True
+    return keep
+
+
+def _x_ack(rules: list[tuple[bool, str]]):
+    """ack's --ignore-dir (NAME, is:NAME, match:REGEX), undone by a later
+    --noignore-dir."""
+    def gone(d: str) -> bool:
+        out = False
+        for add, spec in rules:
+            if spec.startswith("match:"):
+                try:
+                    hit = bool(re.search(spec[6:], d))
+                except re.error:
+                    hit = False
+            else:
+                hit = (spec[3:] if spec.startswith("is:") else spec).rstrip("/") == d
+            out = add if hit else out
+        return out
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        return not any(gone(d) for d in _x_rel(f, start)[:-1])
+    return keep
+
+
+def _x_test(t: str, v: str, printed: str, name: str) -> bool:
+    import fnmatch as fm
+    s = printed if t in _X_FIND_PATHS else name
+    if t.startswith("-i"):
+        s, v = s.lower(), v.lower()
+    return fm.fnmatchcase(s, v)
+
+
+def _x_find(expr: list[str]):
+    """find's expression: TEST -prune -o ... and ( TEST -o TEST ) -prune -o
+    ... keep a folder out (not under -depth); with no -o after them, a
+    negated -path or -name keeps a file out and a positive one must hold;
+    -maxdepth bounds the depth."""
+    pruned: list[tuple[str, str]] = []
+    rest = list(expr)
+    tests = _X_FIND_PATHS | _X_FIND_NAMES
+    harmless = {"-type": "d", "-maxdepth": None, "-mindepth": None, "-xdev": "",
+                "-mount": ""}
+    while "-prune" in rest and "-depth" not in expr:
+        k = rest.index("-prune")
+        if rest[k + 1:k + 2] not in (["-o"], ["-or"]):
+            break
+        head = rest[:k]
+        if head[-1:] == [")"] and "(" in head:
+            m = len(head) - 1 - head[::-1].index("(")
+            inner, pre, group = head[m + 1:-1], head[:m], []
+            alts = [[]]
+            for a in inner:
+                if a in ("-o", "-or"):
+                    alts.append([])
+                else:
+                    alts[-1].append(a)
+            if not all(len(x) == 2 and x[0] in tests for x in alts):
+                break
+            group = [(x[0], x[1]) for x in alts]
+        elif len(head) >= 2 and head[-2] in tests:
+            group, pre = [(head[-2], head[-1])], head[:-2]
+        else:
+            break
+        i, ok = 0, True
+        while i < len(pre):  # only -type d and the global options before it
+            a = pre[i]
+            if a in ("-a", "-and"):
+                i += 1
+            elif a in harmless and harmless[a] == "":
+                i += 1
+            elif a in harmless and i + 1 < len(pre) and (harmless[a] is None
+                                                         or pre[i + 1] == harmless[a]):
+                i += 2
+            else:
+                ok = False
+                break
+        if not ok:
+            break
+        pruned += group
+        rest = rest[k + 2:]
+    negated: list[tuple[str, str]] = []
+    positive: list[tuple[str, str]] | None = []
+    if any(a in ("-o", "-or", ",") for a in rest):
+        positive = None  # an alternative: no test on the file is trusted
+    else:
+        i = 0
+        while i < len(rest):
+            a = rest[i]
+            if a in ("!", "-not") and i + 2 < len(rest) and rest[i + 1] in tests:
+                negated.append((rest[i + 1], rest[i + 2]))
+                i += 3
+            elif a in tests and i + 1 < len(rest):
+                positive.append((a, rest[i + 1]))
+                i += 2
+            else:
+                i += 1
+    depth = next((expr[k + 1] for k, a in enumerate(expr[:-1]) if a == "-maxdepth"), None)
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        rel = _x_rel(f, start)
+        base = word.rstrip("/")
+        for k in range(1, len(rel) + 1):
+            printed = base + "/" + "/".join(rel[:k])
+            if any(_x_test(t, v, printed, rel[k - 1]) for t, v in pruned):
+                return False
+        printed = base + "/" + "/".join(rel)
+        if any(_x_test(t, v, printed, rel[-1]) for t, v in negated):
+            return False
+        return positive is None or all(_x_test(t, v, printed, rel[-1]) for t, v in positive)
+    return _x_depth(keep, depth)
+
+
+def x_glob_tool(pattern: str):
+    """The Glob tool's pattern, from its path (a pattern with no folder in it
+    at any depth, as rg's --files reads it) or from the session's folder."""
+    rx = x_glob(pattern.lstrip("/"))
+
+    def keep(f: str, start: str, word: str, cwd: str | None) -> bool:
+        rel = "/".join(_x_rel(f, start))
+        if rx.match(rel) or ("/" not in pattern and rx.match(os.path.basename(f))):
+            return True
+        return bool(cwd) and f.startswith(cwd.rstrip("/") + "/") and bool(
+            rx.match(f[len(cwd.rstrip("/")) + 1:]))
+    return keep
+
+
+def x_grep_tool_globs(glob: str) -> list[tuple[str, bool]]:
+    """The Grep tool's glob parameter as the globs it gives rg: split on
+    whitespace, and on commas outside braces."""
+    out: list[tuple[str, bool]] = []
+    for g in (glob or "").split():
+        out += [(g, False)] if "{" in g and "}" in g else [(p, False) for p in g.split(",") if p]
+    return out
+
+
+def _x_braces(word: str) -> list[str]:
+    """The words Bash makes of *word*'s braces ({a,b}), at most 256."""
+    out, todo = [], [word]
+    while todo and len(out) + len(todo) <= 256:
+        w = todo.pop(0)
+        m = _X_BRACE.search(w)
+        if m:
+            todo += [w[:m.start()] + alt + w[m.end():] for alt in m.group(1).split(",")]
+        else:
+            out.append(w)
+    return out + todo
+
+
+def _x_top(cwd: str | None) -> str | None:
+    """The tree that holds *cwd*: the nearest folder at or above it with a .git."""
+    at = cwd
+    while at and at != "/":
+        if os.path.lexists(os.path.join(at, ".git")):
+            return at
+        at = os.path.dirname(at)
+    return None
+
+
+def _x_pathspec(spec: str):
+    """A git pathspec as (exclude, top, icase, glob, pattern): its long magic
+    :(exclude,top,icase,glob) or its short magic :! :^ :/."""
+    ex = top = fold = glob = False
+    if spec.startswith(":(") and ")" in spec:
+        magic = spec[2:spec.index(")")].split(",")
+        ex, top = "exclude" in magic, "top" in magic
+        fold, glob = "icase" in magic, "glob" in magic
+        spec = spec[spec.index(")") + 1:]
+    elif spec.startswith(":"):
+        i = 1
+        while i < len(spec) and spec[i] in "/!^":
+            ex, top = ex or spec[i] in "!^", top or spec[i] == "/"
+            i += 1
+        spec = spec[i + 1:] if spec[i:i + 1] == ":" else spec[i:]
+    return ex, top, fold, glob, spec
+
+
+def _x_spec_hit(rel: str, pattern: str, fold: bool, glob: bool, wide: bool) -> bool:
+    """Whether a path (from where the pathspec is read) matches it: a plain
+    pathspec names a path and what is below it; with a wildcard, ``*``
+    crosses folders (``:(glob)``: ``**`` only).  *wide*: a leading folder
+    that matches takes the path in too (a positive pathspec, read wide)."""
+    import fnmatch as fm
+    if fold:
+        rel, pattern = rel.lower(), pattern.lower()
+    if not any(c in pattern for c in "*?["):
+        p = os.path.normpath(pattern) if pattern else "."
+        return p == "." or rel == p or rel.startswith(p + "/")
+    names = rel.split("/")
+    tries = ["/".join(names[:k]) for k in range(1, len(names) + 1)] if wide else [rel]
+    if glob:
+        rx = x_glob(pattern.rstrip("/"))
+        return any(rx.match(t) for t in tries)
+    return any(fm.fnmatchcase(t, pattern.rstrip("/")) for t in tries)
+
+
+def _x_git(sub: str, rest: list[str], cwd: str | None):
+    """git grep's or git ls-files's (starts, keep): its pathspecs (after --;
+    before it, ls-files's operands, and git grep's words that are magic,
+    wildcards or paths from *cwd*, the folder git runs in; another word is a
+    revision, which leaves the start at *cwd*); a file is taken in when a
+    positive pathspec (or none) takes it and no exclusion does."""
+    dd = rest.index("--") if "--" in rest else len(rest)
+    operands, options, _letters = _x_parse(rest[:dd], _X_GIT_VALUED[sub])
+    if sub == "grep" and _X_PATTERN.isdisjoint(o for o, _ in options):
+        operands = operands[1:]
+    base = os.path.realpath(cwd) if cwd else None
+    specs = [o for o in operands if sub == "ls-files" or o.startswith(":") or any(
+        c in o for c in "*?[") or (base and os.path.lexists(os.path.join(base, o)))]
+    specs += rest[dd + 1:]
+    pos, neg, starts = [], [], []
+    for s in specs:
+        ex, top, fold, glob, pat = _x_pathspec(s)
+        (neg if ex else pos).append((top, fold, glob, pat))
+        if ex:
+            continue
+        lead = []
+        for seg in pat.split("/"):
+            if any(c in seg for c in "*?["):
+                break
+            lead.append(seg)
+        lead = "." if fold else "/".join(lead) or "."
+        if top:
+            t = _x_top(base)
+            lead = os.path.join(t, lead) if t else "/"
+        starts.append(lead)
+
+    def keep(f: str, start: str, word: str, here: str | None) -> bool:
+        at = base or here
+
+        def hit(item, wide: bool) -> bool:
+            top, fold, glob, pat = item
+            frm = _x_top(at) if top else at
+            if not frm:
+                return wide  # not placed: taken in, never kept out
+            return _x_spec_hit(os.path.relpath(f, frm), pat, fold, glob, wide)
+        if pos and not any(hit(i, True) for i in pos):
+            return False
+        return not any(hit(i, False) for i in neg)
+    return starts or ["."], keep
+
+
+def x_search(name: str, args: list[str], cwd: str | None = None):
+    """A recursive search's (start operands, keep, how, names only), or None:
+    keep(f, start, word, cwd) says whether it takes in the file ``f`` (real
+    paths; ``word``: the start as written).  Names only: a listing (rg
+    --files, ag -g, ack -f/-g, a find with no action that reads, git
+    ls-files), a search only when its names go to a reader.  git: *args*
+    from its subcommand on (grep or ls-files), *cwd* the folder it runs in."""
+    name = os.path.basename(name)
+    # An option word with braces is the options Bash makes of it
+    # (--exclude-dir={.git,W2-1} is --exclude-dir=.git --exclude-dir=W2-1).
+    args = [b for a in args for b in (_x_braces(a) if a.startswith("-") else [a])]
+    if name == "git":
+        if not args or args[0] not in _X_GIT_VALUED:
+            return None
+        starts, keep = _x_git(args[0], args[1:], cwd)
+        return starts, keep, "git", args[0] == "ls-files"
+    if name in ("grep", "egrep", "fgrep", "zgrep"):
+        operands, options, letters = _x_parse(args, _X_GREP_VALUED)
+        if not (letters & {"r", "R"} or any(
+                o in ("--recursive", "--dereference-recursive")
+                or (o in ("-d", "--directories") and v == "recurse") for o, v in options)):
+            return None
+        if _X_PATTERN.isdisjoint(o for o, _ in options):
+            operands = operands[1:]
+        rules = [(o[2:], v) for o, v in options if o in ("--include", "--exclude", "--exclude-dir")]
+        return ["." if p in ("*", "./*") else p for p in operands] or ["."], _x_grep(rules), "grep", False
+    if name == "rg":
+        operands, options, letters = _x_parse(args, _X_RG_VALUED)
+        files = any(o == "--files" for o, _ in options)
+        if not files and _X_PATTERN.isdisjoint(o for o, _ in options):
+            operands = operands[1:]
+        fold = any(o == "--glob-case-insensitive" for o, _ in options)
+        globs = [(v, fold or o == "--iglob") for o, v in options if o in ("-g", "--glob", "--iglob")]
+        depth = next((v for o, v in options if o in ("-d", "--max-depth", "--maxdepth")), None)
+        return operands, _x_depth(_x_rg(globs), depth), "rg", files
+    if name == "ag":
+        operands, options, letters = _x_parse(args, _X_AG_VALUED)
+        names = any(o == "-g" for o, _ in options) or "--list-file-types" in args
+        if not names:
+            operands = operands[1:]
+        pats = [v for o, v in options if o in ("--ignore", "--ignore-dir")]
+        depth = next((v for o, v in options if o == "--depth"), None)
+        return operands, _x_depth(_x_ag(pats), depth), "ag", names
+    if name == "ack":
+        operands, options, letters = _x_parse(args, _X_ACK_VALUED)
+        names = "f" in letters or any(o == "-g" for o, _ in options)
+        if not names and not any(o == "--match" for o, _ in options):
+            operands = operands[1:]
+        rules = [(o.startswith("--ignore"), v) for o, v in options if o in (
+            "--ignore-dir", "--ignore-directory", "--noignore-dir", "--noignore-directory")]
+        return operands, _x_ack(rules), "ack", names
+    if name == "find":
+        i = 0
+        while i < len(args) and args[i] in ("-H", "-L", "-P"):
+            i += 1
+        j = i
+        while j < len(args) and not (args[j].startswith("-") or args[j] in ("!", "(", ")", ",")):
+            j += 1
+        expr = args[j:]
+        reads = any(a in _X_FIND_OPENS and k + 1 < len(expr)
+                    and os.path.basename(expr[k + 1]) in X_READERS for k, a in enumerate(expr))
+        return args[i:j] or ["."], _x_find(expr), "find", not reads
+    return None
+
+
+def x_how(wbs: str, how: str) -> str:
+    """The refusal of a search that can reach the folder, saying how to keep it out."""
+    return SEARCH_REFUSAL.format(folder=f"tests/acceptance/{wbs}/",
+                                 how=X_HOW[how].format(w=wbs))
+
+# END W2-141 BLOCK
+
+
+def x_spread(word: str, keep):
+    """W2-141 (F4): a search start the shell expands, as (its literal folder,
+    keep): a file is taken in when a leading part of its path from that
+    folder matches the glob (``**`` read as crossing folders, the wider
+    reading) and *keep* takes it."""
+    segs = word.split("/")
+    n = next(i for i, p in enumerate(segs) if _has_glob(p))
+    lead = "/".join(segs[:n]) or ("/" if word.startswith("/") else ".")
+    rx = x_glob("/".join(segs[n:]).rstrip("/"))
+
+    def spread(f: str, start: str, w: str, cwd: str | None) -> bool:
+        names = _x_rel(f, start)
+        return any(rx.match("/".join(names[:k])) for k in range(1, len(names) + 1)) and (
+            keep(f, start, w, cwd))
+    return lead, spread
+
+
 # -- the judge -----------------------------------------------------------------
 
 class _Judge:
@@ -768,18 +1330,37 @@ class _Judge:
         return ""
 
     def above(self, text: str, cwd: str, globs: list[str] = (),
-              names: list[str] | None = None, fold: bool = False) -> str:
+              names: list[str] | None = None, fold: bool = False,
+              searched=None, how: str = "", word: str | None = None,
+              only_own: bool = False) -> str:
         """Why a search or listing from *text* takes a part's files in: no
         positive glob keeps them out (a glob with no slash is a name at any
-        depth), nor any of *names* (find's tests on a name)."""
+        depth), nor any of *names* (find's tests on a name).  The engineer's
+        own acceptance folder (W2-141): *searched* (``x_search``'s keep) says
+        what the call takes in, and with *how* the refusal says how to keep
+        the folder out; *only_own*: no other part is judged."""
         real = (self.spellings(text, cwd) or [None])[-1]
         keep = [b for g in globs if not g.startswith("!") for b in _braces(g)]
+        here = os.path.realpath(cwd) if cwd else None
+        # W2-141 (F4): a start the shell expands (*/, tests/*, tests/acc*) is,
+        # for the engineer's own folder, a search from its literal folder of
+        # what lies at or below a path the glob matches.
+        mine, spread, said = real, searched, (text if word is None else word)
+        if searched is not None and _has_glob(text):
+            said, spread = x_spread(text, searched)
+            mine = (self.spellings(said, cwd) or [None])[-1]
         for part in self.parts:
-            for f in part.below(real):
-                rel = f[len(real.rstrip("/")) + 1:]
+            own = getattr(part, "wbs", None)
+            if only_own and not own:
+                continue
+            base = mine if own and searched is not None else real
+            for f in part.below(base):
+                rel = f[len(base.rstrip("/")) + 1:]
                 name = os.path.basename(f)
                 cased = (lambda s: s.lower()) if fold else (lambda s: s)
-                if names is not None:
+                if own and searched is not None:
+                    hit = spread(f, base, said, here)
+                elif names is not None:
                     hit = any(fnmatch.fnmatchcase(cased(name), cased(n)) for n in names)
                 elif keep:
                     hit = any(_Glob(cased(g.lstrip("/"))).match(
@@ -787,7 +1368,34 @@ class _Judge:
                 else:
                     hit = True
                 if hit:
-                    return part.reason
+                    return x_how(own, how) if own and how else part.reason
+        return ""
+
+    def _wide(self, name: str, args: list[str], cwd: str | None = None):
+        """``x_search`` for a session with its own acceptance folder, else None."""
+        if not any(getattr(p, "wbs", None) for p in self.parts):
+            return None
+        return x_search(name, list(args), cwd)
+
+    def _not_own(self) -> "_Judge":
+        """This judge without the engineer's own part (judged on its own)."""
+        others = copy.copy(self)
+        others.parts = [p for p in self.parts if not getattr(p, "wbs", None)]
+        return others
+
+    def _own_git(self, sub: str, rest: list[str], cwd: str) -> str:
+        """W2-141: why git grep or git ls-files from *cwd* takes in the
+        engineer's own folder (its pathspec exclusions honoured)."""
+        wide = self._wide("git", [sub, *rest], cwd)
+        own = [p for p in self.parts if getattr(p, "wbs", None)]
+        for s in (wide[0] if wide else ()):
+            exp = _expand_token(s) or s
+            # a pathspec in the folder names it: its own refusal, as a direct read
+            why = next((p.reason for p in own for q in self.spellings(exp, cwd)
+                        if p.inside(q)), "") or self.above(
+                exp, cwd, searched=wide[1], how="git", word=exp, only_own=True)
+            if why:
+                return why
         return ""
 
     def glob_word(self, word: str, cwd: str, secrets: bool = True) -> str:
@@ -854,7 +1462,9 @@ class _Judge:
             return self.at(text("file_path"), cwd) if text("file_path") else ""
         if tool_name == "Grep":
             path = text("path") or "."
-            return self.at(path, cwd) or self.above(path, cwd, text("glob").split())
+            return self.at(path, cwd) or self.above(
+                path, cwd, text("glob").split(),
+                searched=_x_rg(x_grep_tool_globs(text("glob"))), how="Grep")
         if tool_name == "Glob":
             base, pattern = text("path") or ".", text("pattern")
             if pattern.startswith("/"):
@@ -865,10 +1475,20 @@ class _Judge:
             why = self.at(base, cwd, False) or (
                 self.glob_lead(pattern, start) if _has_glob(pattern)
                 else self.at(pattern, start, False))
-            if why or "**" in pattern:
-                return why  # with **, a listing from above, which shows names
-            # Without **, the pattern names the files it lists: aimed at them.
+            if why:
+                return why
+            here = os.path.realpath(cwd) if cwd else None
             for part in self.parts:
+                if getattr(part, "wbs", None):
+                    # W2-141: the engineer's own folder, with ** too: refused
+                    # when the pattern can reach one of its files.
+                    reach = x_glob_tool(pattern)
+                    if any(reach(f, start, base, here) for f in part.below(start)):
+                        return x_how(part.wbs, "Glob")
+                    continue
+                if "**" in pattern:
+                    continue  # with **, a listing from above, which shows names
+                # Without **, the pattern names the files it lists: aimed at them.
                 for f in part.below(start):
                     rel = f[len(start.rstrip("/")) + 1:]
                     if any(_Glob(p).match(rel) for p in _braces(pattern)):
@@ -1003,6 +1623,21 @@ class _Judge:
 
     def reads(self, name: str, args: list[str], cwd: str, fed: bool = False) -> str:
         name = "grep" if name in ("egrep", "fgrep") else name
+        # W2-141: what the search keeps out of the engineer's own folder.
+        wide = self._wide(name, args) if name in (
+            "grep", "zgrep", "rg", "find", "ag", "ack") else None
+        kept, how = (wide[1], wide[2]) if wide else (None, "")
+        # Not judged here before, so only its own folder: ag, ack, zgrep -r and
+        # a grep recursive by a form the search rule does not read (-d recurse).
+        alone = name in ("ag", "ack", "zgrep") or (
+            name == "grep" and _shell_search(name, list(args), False) is None)
+        if wide and alone and not wide[3] and (wide[0] or not fed):
+            for path in wide[0] or ["."]:
+                exp = _expand_token(path) or path
+                why = self.at(exp, cwd) or self.above(exp, cwd, searched=kept, how=how,
+                                                      word=exp, only_own=True)
+                if why:
+                    return why
         named = not _FIND_NAMED.isdisjoint(args)
         search = _shell_search(name, list(args), named)
         if name == "rg" and fed and "--files" not in args:
@@ -1017,7 +1652,8 @@ class _Judge:
         for path in (search[0] if search else ()):
             exp = _expand_token(path) or path
             why = self.at(exp, cwd) or (not listing and self.above(
-                exp, cwd, search[1] + search[2], fold=bool(search[2])))
+                exp, cwd, search[1] + search[2], fold=bool(search[2]),
+                searched=kept, how=how, word=exp))
             if why:
                 return why
         if name == "find" and named:
@@ -1028,7 +1664,8 @@ class _Judge:
             names = names if not (_FIND_NAMED - {"-name", "-iname"}).intersection(args) else None
             for s in starts:
                 s = _expand_token(s) or s
-                why = (self.above(s, cwd, names=names, fold="-iname" in args) if opens
+                why = (self.above(s, cwd, names=names, fold="-iname" in args,
+                                  searched=kept, how=how, word=s) if opens
                        else self.listed(s, cwd, names, "-iname" in args))
                 if why:
                     return why
@@ -1072,14 +1709,19 @@ class _Judge:
                                          else _RG_VALUED)
             if operands and _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
                 skip = operands[0]  # the text looked for
-        for w in args:
+        # W2-141: a find's test on a name or a path (-path ./tests/acceptance/<T>
+        # -prune) holds a pattern it matches, not a file it opens: the
+        # engineer's own folder named there is no read (a secret or a hidden
+        # part named there still refuses, as before).
+        tested = {k + 1 for k, a in enumerate(args) if name == "find" and a in _FIND_NAMED}
+        for k, w in enumerate(args):
             if w is skip:
                 skip = None
                 continue
             if theirs(w):
                 continue
             why = self.word(w, cwd)
-            if why:
+            if why and not (k in tested and why == TESTS_REFUSAL):
                 return why
         return ""
 
@@ -1103,12 +1745,18 @@ class _Judge:
         before, specs = rest[:dd], rest[dd + 1:]
         operands = [a for a in before if not a.startswith("-")]
         if sub == "grep":
+            # W2-141 (F1): the engineer's own folder, with the pathspecs'
+            # exclusions; the other parts as before.
+            why = self._own_git(sub, rest, cwd)
+            if why:
+                return why
+            others = self._not_own()
             operands, options = _options(before, _GIT_GREP_VALUED)
             if _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
                 operands = operands[1:]
             specs = [o for o in operands if os.path.lexists(os.path.join(cwd, o))] + specs
             for s in specs or ["."]:
-                why = self.spec(s, cwd, True)
+                why = others.spec(s, cwd, True)
                 if why:
                     return why
             revs = [o for o in operands if not os.path.lexists(os.path.join(cwd, o))]
@@ -1401,8 +2049,11 @@ class _Judge:
                     _FIND_NAMED - {"-name", "-iname"}) & set(tests):
                 names = None  # only a positive test on the name narrows it
             fold = "-iname" in tests
+            wide = self._wide("find", args)
+            kept, how = (wide[1], "find") if wide else (None, "")
             return True, next((why for s in args[:n] or ["."] for why in [
-                self.at(s, cwd, False) or self.above(s, cwd, names=names, fold=fold)]
+                self.at(s, cwd, False) or self.above(s, cwd, names=names, fold=fold,
+                                                     searched=kept, how=how, word=s)]
                 if why), "")
         if name == "git":
             i = 0
@@ -1422,9 +2073,15 @@ class _Judge:
                 specs += rest[dd + 1:]
             else:
                 return None, ""
+            # W2-141 (F2): the engineer's own folder, with the pathspecs'
+            # exclusions; the other parts as before.
+            why = self._own_git(sub, rest, cwd)
+            if why:
+                return True, why
             if not specs or any(s.startswith(":") for s in specs):
                 specs = ["."]  # a magic pathspec is not read: the whole tree
-            return True, next((why for s in specs for why in [self.spec(s, cwd, False)]
+            others = self._not_own()
+            return True, next((why for s in specs for why in [others.spec(s, cwd, False)]
                                if why), "")
         if name in ("grep", "rg"):
             listed = name == "rg" and not {"--files", "-l", "--files-with-matches", "-L",
@@ -1439,9 +2096,12 @@ class _Judge:
                 search = (operands, [], [])
             elif name == "rg" and not listed:
                 return False, ""
+            wide = self._wide(name, args)
+            kept, how = (wide[1], wide[2]) if wide else (None, "")
             for p in search[0]:
                 why = self.at(p, cwd) or self.above(p, cwd, search[1] + search[2],
-                                                    fold=bool(search[2]))
+                                                    fold=bool(search[2]),
+                                                    searched=kept, how=how, word=p)
                 if why:
                     return True, why
             return True, ""

@@ -7,16 +7,18 @@ slot rule or go unranked, named (no reranker on the CPU anywhere, DEC-1033)".
 
 The GPU is the stand-in's: ``torch.cuda`` and ``nvidia-smi`` in the box report its memory, and the stand-in model
 records the device it was loaded on. The figures are far from the share's edges (14 GiB free, or 1 GiB), so no
-exact share is assumed. Below its share (1 GiB free) a search may still be answered by a private reranker on a
-free GPU slot, or go on unranked: whether a private reranker also weighs the GPU's free memory is not stated, so
-either is taken; with no GPU at all the search goes on unranked. The reason reaches the fallback log under
-``~/.cache/gov-os/`` (DEC-1034 item 3) and the bundle (``test_w2_112_bundle.py``); nothing more specific is held.
-The service's GPU slot (DEC-1036 T6 (b)) and the fallback's slot rule (KPI 7) are in ``test_w2_112_slots.py``; the
-real GPU's memory is the research document's.
+exact share is assumed. Below its share (1 GiB free) or with no GPU the search goes on unranked, named (W2-145,
+DEC-1048 (5): no private reranker is started in the service's place, on a free GPU slot or anywhere). The reason
+reaches the log under ``~/.cache/gov-os/`` (DEC-1034 item 3) and the bundle (``test_w2_112_bundle.py``); nothing more
+specific is held. The service's GPU slots (every one, W2-145 S3) are in ``test_w2_112_slots.py``; the real GPU's
+memory is the research document's.
 
 "Never more than one copy on the GPU" is held as the service's: one service loads one copy, however many searches
-start it (also in the 20-concurrent case). The slot rule bounds the rest: the service holds one of the two slots,
-so at most one private reranker beside it.
+start it (also in the 20-concurrent case); no private reranker runs beside it (W2-145).
+
+Rewrite-Reason: DEC-1048 (5) (W2-145's test designer, DAEO-2tfd): the two below-share cases took a private
+reranker's answer on a free slot; they now take only the order given, named, with no model loaded and no private
+named in the log.
 """
 
 from __future__ import annotations
@@ -27,11 +29,12 @@ import time
 import pytest
 
 import w2_112_support as support
-from w2_112_support import candidates, check_scored, check_scored_or_unranked, check_unranked, query_of, raised
+from w2_112_support import candidates, check_named_unavailable, check_scored, check_unranked, query_of, raised
 
 BELOW = [support.SHORT, support.NO_GPU]
 BELOW_IDS = ["less-than-its-share-free", "no-gpu"]
-FALLBACK = re.compile(r"rerank|fall|fell|unavailable|private", re.IGNORECASE)
+FALLBACK = re.compile(r"unranked|unavailable|refused|does not start", re.IGNORECASE)
+PRIVATE = re.compile(r"\bprivate\b", re.IGNORECASE)
 REASON = re.compile(r"gpu|cuda|share|memory", re.IGNORECASE)
 
 
@@ -57,18 +60,15 @@ def test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing
         report = box.search(query, given)
         who = f"search {number} with {gpu}"
         assert raised(report) is None, f"{who} raised: {raised(report)}"
-        assert report["seconds"] <= support.SLOT_WAIT_S + support.FALLBACK_S, f"{who} took {report['seconds']:.1f} s"
+        assert report["seconds"] <= support.UNRANKED_S, f"{who} took {report['seconds']:.1f} s"
         on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
         assert on_cpu == [], \
             f"{who}: a model was loaded on the CPU ({on_cpu}): no reranker runs on the CPU anywhere (DEC-1036, DEC-1033)"
         live = [record["pid"] for record in box.live_loads()]
         assert live == [], f"{who}: a service holds the model ({live}) although its share of the GPU is not free"
-        if gpu is support.NO_GPU:
-            check_unranked(report["result"], given, who)
-        elif check_scored_or_unranked(report["result"], query, given, who) == "scored":
-            scorers = [record for record in box.loads() if record["pid"] in box.scorers_of(query)]
-            assert scorers and all(record["device"] == "cuda" for record in scorers), \
-                f"{who} was answered, but not by a private reranker on the GPU: {scorers}"
+        check_unranked(report["result"], given, who)
+        check_named_unavailable(report, who, r"gpu|share|memory")
+        assert box.loads() == [], f"{who}: a private reranker loaded the model (W2-145 forbids any): {box.loads()}"
 
 
 @pytest.mark.parametrize("gpu", BELOW, ids=BELOW_IDS)
@@ -80,8 +80,10 @@ def test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_
     assert raised(report) is None, f"the search raised with {gpu}: {raised(report)}"
     found = box.cache_texts(since)
     assert any(FALLBACK.search(text) and REASON.search(text) for text in found), \
-        (f"with {gpu} the service does not start, and no file under ~/{support.CACHE_REL}/ logs the fallback with "
-         f"its reason (the GPU, its share or its memory; DEC-1034 item 3, DEC-1036): {found!r}")[:1500]
+        (f"with {gpu} the service does not start, and no file under ~/{support.CACHE_REL}/ logs the unranked search "
+         f"with its reason (the GPU, its share or its memory; DEC-1034 item 3, DEC-1036): {found!r}")[:1500]
+    assert not any(PRIVATE.search(text) for text in found), \
+        f"with {gpu} the log names a private reranker (W2-145: there is none): {found!r}"[:1500]
 
 
 def test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu(boxes):

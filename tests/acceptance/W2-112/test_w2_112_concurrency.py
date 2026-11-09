@@ -17,8 +17,8 @@ import threading
 import time
 
 import w2_112_support as support
-from w2_112_support import (ask, candidates, check_scored, check_scored_or_unranked, is_scores, query_of, raised,
-                            score, scores_in)
+from w2_112_support import (ask, candidates, check_named_unavailable, check_scored, check_scored_or_unranked,
+                            check_unranked, is_scores, query_of, raised, score, scores_in)
 
 GPU_ROOM = {"present": True, "total": 16 * support.GIB, "free": 14 * support.GIB, "name": "Stand-in GPU"}
 
@@ -111,6 +111,8 @@ def test_a_search_with_more_texts_than_the_cap_still_answers(box):
 
 
 def test_a_request_past_its_time_limit_does_not_hold_the_search(boxes):
+    # Rewrite-Reason: DEC-1048 (5) (W2-145's test designer): the search past its time limit used to fall back to a
+    # private reranker that scored it; there is none now: it goes on unranked, named, within the limit plus 1 s.
     limit = 3.0
     box = boxes(settings={support.TIMEOUT_SETTING: limit})
     service = box.warm()
@@ -118,10 +120,11 @@ def test_a_request_past_its_time_limit_does_not_hold_the_search(boxes):
     query, given = query_of("slow"), candidates("slow", 5)
     report = box.search(query, given)
     assert raised(report) is None, f"a search whose request ran past its time limit raised: {raised(report)}"
-    assert report["seconds"] <= limit + support.FALLBACK_S, \
+    assert report["seconds"] <= limit + 1.0, \
         (f"a search whose request ran past its time limit ({support.TIMEOUT_SETTING}={limit:g}) took "
-         f"{report['seconds']:.1f} s")
-    # The service did not answer in time, and a private reranker can start here: the search falls back to it.
-    check_scored(report["result"], query, given, "the search past its time limit")
-    assert box.scorers_of(query) - {service}, \
-        "no private reranker scored the search's texts, yet the slow service had not finished scoring them"
+         f"{report['seconds']:.1f} s: within the limit plus 1 s (W2-145 S4)")
+    check_unranked(report["result"], given, "the search past its time limit")
+    check_named_unavailable(report, "the search past its time limit")
+    assert box.scorers_of(query) <= {service}, \
+        f"the search's texts were scored by {box.scorers_of(query) - {service}}: a private reranker (W2-145)"
+    assert support.strays(box, [service]) == [], f"a private reranker loaded the model: {support.strays(box, [service])}"

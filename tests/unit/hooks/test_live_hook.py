@@ -494,8 +494,9 @@ G14_PASSED = {
         ("another ticket's test", E, "Read", {"file_path": f"{P}/tests/acceptance/W1-01/test_x.py"}, "allow"),
         ("it lists and runs its tests", E, "Bash", b("ls tests/acceptance/W2-G14T && pytest -q "
                                                      "tests/acceptance/W2-G14T"), "allow"),
+        # DEC-1093 (2) (W2-141's S1): a search from above that can reach the engineer's own folder keeps it out
         ("a pattern naming the tests, a search from above", E, "Bash",
-         b("grep -rn tests/acceptance/W2-G14T src/; grep -r foo tests/"), "allow"),
+         b("grep -rn tests/acceptance/W2-G14T src/; grep -r --exclude-dir=W2-G14T foo tests/"), "allow"),
         ("inline code is not guessed at", E, "Bash", b(f"python3 -c \"print(open('{T}').read())\""), "allow"),
     ],
     "the test designer's near misses and the other roles": [

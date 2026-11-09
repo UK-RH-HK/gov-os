@@ -1,0 +1,18 @@
+# ACT-INDEP-WALLS-1: paths left out of every wall's plain tree (repository-relative globs, the path map's language).
+# The union of: the path map's evaluation-sources namespace, every evaluation set's visible and hidden globs, and the
+# repository paths the operator's writer and checker folders deny today (ACT-MSET-3/4), so a wall is blind to the
+# tuning questions and to every search or measure result. A change to this file is a change to the walls: it needs the
+# owner's approval (its sha256 is in walls/APPROVED).
+fixtures/evaluation/**
+docs/assessment/2026-10/B-memory-retrieval.md
+docs/research/EXP-003/**
+docs/research/memory-measure-audit/**
+docs/research/W2-61-baseline.md
+docs/research/W2-88-memory-practice.md
+docs/audit/memory-measure-*
+docs/audit/memory-measure-*/**
+docs/audit/memory-verdict-*
+docs/audit/memory-recall-diagnosis-*
+governance/project/orchestration/packages/LIFT-1/D4B-*
+tests/acceptance/W2-61*/**
+.gov-runtime/**

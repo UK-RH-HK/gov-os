@@ -1,49 +1,39 @@
-"""The reranker's own process (W1-19; ADR-0002 §2, DEC-397). Started by ``gov.retrieval.rerank``, never imported
-except by ``rerank_service.py``, which shares ``take_slot``, ``load`` and ``scores``.
+"""The reranker's model call and GPU slot rule, shared with the one shared reranker service (W1-19, W2-112, W2-145;
+ADR-0002 §2, DEC-397). Never imported except by ``rerank_service.py``, which loads it by its file and shares
+``take_slot``, ``load``, ``scores`` and ``device_of``.
 
-It runs in the reranker environment, loads the pinned model once, and then answers one line with one line until
-its caller closes the pipe: ``[query, [text, …]]`` in, ``[score, …]`` out, as JSON. The first line it writes says
-the model is loaded and on which device (``{"device": ...}``); a process that ends without it has no model, and its
-reason is on standard error.
+No private reranker runs (W2-145; DEC-1048 (5), DEC-1046 (1)): run as a program, this file ends at once, named
+("no private reranker runs: the shared service reranks", exit 69), before torch or the model loads. A search the
+shared service cannot answer stays unranked and named (``gov.retrieval.rerank``).
 
-The GPU slot rule (DEC-1033, W2-112): before torch or the model loads, the worker holds one of
+The GPU slot rule (DEC-1033, DEC-1036 T6): before torch or the model loads, the service holds one of
 ``GOV_RERANK_GPU_SLOTS`` (default 2) lock files ``gov-os-rerank-gpu-<n>.lock`` in ``GOV_RERANK_GPU_LOCK_DIR`` (default
 /tmp) for its life, waiting for one up to ``GOV_RERANK_GPU_WAIT_S`` (default 20) seconds; without one it ends named
-(exit 75). It never hides the GPU to run on the CPU: a GPU already hidden ends it named (exit 76), and so does a
-machine where torch sees no GPU at all (exit 78, after the slot, before the model loads), unless
-``GOV_RERANK_ALLOW_CPU=1`` (tests and measurements only). While the interim module ``gov_reranker_gpu_slot`` is
-installed it has already taken a slot in this process (``GOV_RERANK_GPU_SLOT``), and the worker takes nothing more.
+(exit 75). It never hides the GPU to run on the CPU: a GPU already hidden ends it named (exit 76). No setting opens a
+CPU path (W2-145 S2).
 """
 
-import json
 import os
 import sys
 import time
 
 NO_SLOT, GPU_HIDDEN, NO_GPU = 75, 76, 78
+NO_PRIVATE = 69  # run as a program: no private reranker runs (EX_UNAVAILABLE)
+ENDED = "no private reranker runs: the shared service reranks"
 _HELD = []  # the slot's lock file, open for the process's life
 
 
-def gpu_present() -> bool:
-    """True when torch sees a CUDA GPU; any failure to ask is no GPU."""
-    try:
-        import torch
-
-        return bool(torch.cuda.is_available())
-    except Exception:
-        return False
-
-
-def take_slot(allow_cpu: bool):
-    """None when this process may load its model, holding a GPU slot for its life (or, with ``allow_cpu``, on the
-    CPU); otherwise ``(exit code, reason)``. The shared service calls it too, never allowing the CPU (DEC-1036)."""
+def take_slot(allow_cpu: bool = False):
+    """None when this process may load its model, holding a GPU slot for its life; otherwise ``(exit code,
+    reason)``. ``allow_cpu`` is kept for the callers' signature and opens nothing: no reranker runs on the CPU
+    (DEC-1036, DEC-1048 (5))."""
     import fcntl
 
+    del allow_cpu  # W2-145 S2: never the CPU, whatever the caller asks
     if os.environ.get("GOV_RERANK_GPU_SLOT"):
         return None  # the interim module holds one for this process
     if os.environ.get("CUDA_VISIBLE_DEVICES") in ("-1", ""):
-        return None if allow_cpu else (GPU_HIDDEN, "the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no "
-                                                   "reranker runs on the CPU")
+        return GPU_HIDDEN, "the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no reranker runs on the CPU"
     slots, wait = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2")), float(os.environ.get("GOV_RERANK_GPU_WAIT_S", "20"))
     if not 0 <= wait < float("inf"):
         raise ValueError("GOV_RERANK_GPU_WAIT_S must be a finite number of seconds")
@@ -58,9 +48,6 @@ def take_slot(allow_cpu: bool):
                 continue
             _HELD.append(fd)
             os.environ["GOV_RERANK_GPU_SLOT"] = str(i)
-            return None
-        if allow_cpu:  # the old fallback, for tests only
-            os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
             return None
         if time.monotonic() >= deadline:
             return NO_SLOT, f"no GPU slot free within {wait:g} s"
@@ -83,21 +70,11 @@ def device_of(encoder) -> str | None:
     return str(getattr(encoder, "device", "") or "") or None
 
 
-def main(model: str, revision: str) -> None:
-    answers, sys.stdout = sys.stdout, sys.stderr  # whatever the libraries print stays out of the answers
-    allow_cpu = os.environ.get("GOV_RERANK_ALLOW_CPU") == "1"
-    refused = take_slot(allow_cpu)
-    if not refused and not allow_cpu and not gpu_present():  # no GPU at all: never the CPU (DEC-1033, DEC-1036)
-        refused = NO_GPU, "no GPU is available to it, and no reranker runs on the CPU"
-    if refused:
-        print(f"gov reranker: {refused[1]}; this search goes without reranking", file=sys.stderr, flush=True)
-        sys.exit(refused[0])
-    encoder = load(model, revision)
-    print(json.dumps({"device": device_of(encoder)}), file=answers, flush=True)
-    for line in sys.stdin:
-        query, texts = json.loads(line)
-        print(json.dumps(scores(encoder, query, texts)), file=answers, flush=True)
+def main(*_args) -> None:
+    """Run as a program (an older caller's private reranker): ends at once, named, before anything loads."""
+    print(ENDED, file=sys.stderr, flush=True)
+    sys.exit(NO_PRIVATE)
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:])

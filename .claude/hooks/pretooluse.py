@@ -13,6 +13,12 @@ It keeps exactly five rules, and the catastrophic deletes (DEC-953 item 2, DEC-9
      set's hidden globs too; under the sets root and in every tree. No block, no check. For those roles a Bash line
      that names the sets root is refused when it also names a hidden folder, or builds a path after it (a variable,
      a substitution, a glob, a cd; DEC-1097 (2), readiness review 5 F1): a plain --sets-root <root> stays allowed;
+  2c (ACT-INDEP-WALLS-1). no reads, and no writes, of a folder outside every tree that the main tree's path-map.yaml
+     session_hidden: refuses to named sessions only (a role, and the tickets it runs on): SANDBOX-GUARD-EXP-1's tuner
+     (an engineer on W2-56) is refused ~/.claude/projects, the raw transcripts. File tools by the path they name (a
+     search that starts at or above the folder too); a Bash line that names the folder, or names its parent with the
+     folder's name, a substitution, or a variable, glob or cd after it (the line rule of 2b). Every other session,
+     the CTO's tools included, is untouched. No block, no check;
   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
      docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
      own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
@@ -300,6 +306,108 @@ def sets_line_refusal(text, top, globs):
     return ""
 
 
+SESSION_BLOCK = "session_hidden"  # ACT-INDEP-WALLS-1
+SESSION_REFUSAL = ("the call reaches {root}, which is refused to this session (ACT-INDEP-WALLS-1, path-map.yaml "
+                   "session_hidden: {why})")
+PATH_KEYS = ("file_path", "notebook_path", "path")
+
+
+def session_rules(main):
+    """ACT-INDEP-WALLS-1: the main tree's session_hidden block (a branch cannot weaken it): a list of entries, each a
+    root outside every tree (a real path; not / or HOME), the roles refused it and the tickets (any name a ticket goes
+    by; an empty list is every ticket), and why. [] with no block. A block not of that shape raises (fail closed)."""
+    try:
+        with open(os.path.join(main, PATH_MAP), encoding="utf-8") as f:
+            lines = f.read().splitlines(keepends=True)
+    except FileNotFoundError:
+        return []
+    at = [i for i, line in enumerate(lines) if re.match(SESSION_BLOCK + r"\s*:", line)]
+    if not at:
+        return []
+    if len(at) > 1:
+        raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK} is written more than once")
+    end = next((j for j in range(at[0] + 1, len(lines))
+                if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
+    from gov.guard.heldout import load_yaml_unique
+    data = load_yaml_unique("".join(lines[at[0]:end]))
+    block = data.get(SESSION_BLOCK) if isinstance(data, dict) else None
+    if not isinstance(block, list) or not block:
+        raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK} is not a list of entries")
+    out = []
+    for e in block:
+        top = os.path.expanduser(e.get("root")) if isinstance(e, dict) and isinstance(e.get("root"), str) else ""
+        roles, tickets = (e.get("roles"), e.get("tickets")) if isinstance(e, dict) else (None, None)
+        why = e.get("why") if isinstance(e, dict) else None
+        if (not os.path.isabs(top) or os.path.realpath(top) in ("/", HOME)
+                or not isinstance(roles, list) or not roles or not all(isinstance(r, str) and r for r in roles)
+                or not isinstance(tickets, list) or not all(isinstance(t, str) and t for t in tickets)
+                or not isinstance(why, str) or not why):
+            raise RuntimeError(f"{PATH_MAP}: {SESSION_BLOCK}: an entry is not a root, roles, tickets and why")
+        out.append((os.path.realpath(top), list(roles), list(tickets), why))
+    return out
+
+
+def session_applies(entry, mine, root, main, ticket):
+    """Whether the entry names this session: one of its roles (the session's or the acting role), and, when the
+    entry lists tickets, a name the session's ticket goes by (its id, file name or WBS id, in this tree or the main
+    tree's .tickets). A ticket the guard cannot read raises (fail closed)."""
+    _top, roles, tickets, _why = entry
+    if not any(r in roles for r in mine if r):
+        return False
+    if not tickets:
+        return True
+    if not ticket:
+        return False
+    from gov.guard import reads
+    names = set(reads._ticket(root, ticket)[0]) | set(reads._ticket(main, ticket)[0]) | {ticket}
+    return bool(names & set(tickets))
+
+
+def session_refusal(entry, tool, tin, seen_command, cwd):
+    """Why this call reaches the entry's root, or "". File tools: a path they name (file_path, notebook_path, path,
+    and a Glob pattern's literal head), real, at or under the root, or a Grep or Glob whose start is at or above it.
+    Bash: the line rule of 2b with the root's parent as the root and the root's name as the hidden folder (a root
+    whose parent is HOME: the root itself, no folder name), so a line naming the root, or its parent with the root's
+    name, a substitution, a cd to it, or a variable, glob or cd after it, is refused; and the writes the guard
+    resolves into it. A recursive search from HOME or /, and a script that opens the root in its own code, are let
+    through (the limits of 2b; the sandbox's job)."""
+    top, _roles, _tickets, why = entry
+    msg = SESSION_REFUSAL.format(root=top, why=why)
+
+    def real(p):
+        return os.path.realpath(os.path.join(cwd or "/", os.path.expanduser(p)))
+
+    if seen_command is not None:
+        parent, name = os.path.dirname(top), os.path.basename(top)
+        line = (sets_line_refusal(seen_command, parent, [name + "/**"]) if parent != HOME
+                else sets_line_refusal(seen_command, top, ["**"]))
+        if line:
+            return msg
+        shell, code = bash_writes_of(tin.get("command") or "", cwd)
+        if any(isinstance(t, str) and t and inside(real(t), top) for t in shell + code):
+            return msg
+        return ""
+    for k in PATH_KEYS:
+        v = tin.get(k)
+        if isinstance(v, str) and v:
+            full = real(v)
+            if inside(full, top):
+                return msg
+            if tool in ("Grep", "Glob") and k == "path" and inside(top, full):
+                return msg
+    if tool == "Glob":
+        pat = tin.get("pattern")
+        if isinstance(pat, str) and pat:
+            parts = pat.split("/")
+            n = next((i for i, p in enumerate(parts) if any(c in p for c in "*?[{")), len(parts))
+            head = "/".join(parts[:n]) or "."
+            base = tin.get("path") if isinstance(tin.get("path"), str) and tin.get("path") else cwd
+            full = os.path.realpath(os.path.join(real(base or "/"), os.path.expanduser(head)))
+            if inside(full, top) or inside(top, full):
+                return msg
+    return ""
+
+
 _CLASSES = []
 
 
@@ -560,6 +668,14 @@ def main():
                 full = os.path.realpath(os.path.join(cwd, os.path.expanduser(t)))
                 if any(p.inside(full) for p in sets_parts):
                     answer("deny", SETS_WRITE_REFUSAL)
+
+    # ACT-INDEP-WALLS-1 (2c): a folder outside every tree refused to named sessions only (SANDBOX-GUARD-EXP-1's tuner:
+    # ~/.claude/projects). The ticket is read only when a role matches, so no other session pays for it.
+    for entry in session_rules(main):
+        if session_applies(entry, mine, root, main, ticket):
+            why = session_refusal(entry, tool, tin, seen["command"] if command is not None else None, cwd)
+            if why:
+                answer("deny", why)
 
     # G-14 (DEC-1052), role separation: what the main tree's path map's role_paths: denies the session's role and
     # the acting role to read, by simple path checks (role_reads.py beside this file). No section, no check.

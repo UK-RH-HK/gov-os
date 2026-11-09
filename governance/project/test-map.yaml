@@ -57,6 +57,11 @@ record_only:
   - "governance/project/orchestration/packages/*.patch"
   - "governance/project/orchestration/packages/*.diff"
   - "governance/project/orchestration/tools/win_toast.ps1"
+  # DEC-1100 (1), ACT-SELECT-FIXES-1 F1 (a): the records W2-66's whole record-only case found unplaced (2026-11-09)
+  - "governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json"
+  - "governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json"
+  - "governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service"
+  - "governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft"
 
 # DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
 # every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
@@ -99,6 +104,8 @@ record_reading:
   - "tests/acceptance/W1-27/test_w1_27_doctor_r6.py"
   - "tests/acceptance/W1-27/test_w1_27_doctor_r7.py"
   - "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py"
+  # P-SELECT-FIXES-1 (ii): reads every tracked record of DEC-891's places (K3a, K4, K13; DEC-1100 (1))
+  - "tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only"
 
 # P-IS-1 (a): W1-07's three contract files run every command; since DEC-1050 (T-4), on a close whose change holds a
 # record-only path (and in the full suite).
@@ -160,11 +167,24 @@ couplings:
     suites: ["tests/acceptance/W1-38/"]
     why: "W1-38's fixture copies the kernel's roles and skills into every generated project (I4 §4.1 item 3)"
   - paths: ["tests/acceptance/**.py"]
-    suites: ["tests/acceptance/W1-28/test_w1_28_fixture_copies.py"]
-    why: "file scan: W1-28's held-out copy check reads every Python source under tests/acceptance/ and runs the copying fixtures it finds (I1 §4.1, DEC-385, DEC-912 item 3)"
+    suites: ["tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+             "tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_two_whole_tree_fixtures_are_found"]
+    why: "file scan: W1-28's held-out copy check and W1-50's whole-tree fixture count read every Python source under tests/acceptance/ (I1 §4.1, DEC-385, DEC-912 item 3; P-SELECT-FIXES-1 (i), K10, DEC-1100 (1))"
   - paths: ["tests/acceptance/W1-07/conftest.py", "tests/acceptance/W1-25/conftest.py"]
     suites: ["tests/acceptance/W1-27/test_w2_67_copies.py"]
     why: "loaded by file path: test_w2_67_copies.py loads these suites' conftests with spec_from_file_location (W1-27's own reaches it through its suite folder)"
+  # P-SELECT-FIXES-1 (i), DEC-1100 (1): the couplings for the miss kinds the P-SELECT-GRAPH trial saw
+  - paths: [".claude/settings.json", ".rulesync/hooks.jsonc", ".rulesync/permissions.jsonc"]
+    suites: ["tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+             "tests/acceptance/W1-46/test_w1_46_research_installs.py",
+             "tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py"]
+    why: "settings and hook wiring: these suites copy or read the live settings and the hook lines (P-SELECT-FIXES-1 (i), K2)"
+  - paths: ["template/governance/kernel/checks/**"]
+    suites: ["tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened"]
+    why: "text read: W2-54's no-weakening case compares each declared check with its base (P-SELECT-FIXES-1 (i), K16)"
+  - paths: ["tests/acceptance/**"]
+    suites: ["tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass"]
+    why: "history rule: W1-01 judges every merge that touches tests/acceptance/ (DEC-253, DEC-912; P-SELECT-FIXES-1 (i), K6)"
 
 # Moved from the path map (DEC-876 item 2, DEC-896 item 2).
 test_inputs:
