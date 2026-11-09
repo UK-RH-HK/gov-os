@@ -55,7 +55,11 @@
 - The code graph (W2-56 S1, DEC-799 item 1, T-8): the controlling process of a
   run makes one folder for the run's code-graph daemon folders
   (``gov.codeintel.make_session_base``), names it in ``CODEINTEL_DAEMON_BASE`` before
-  xdist starts its workers, and removes it at the end. The real tool
+  xdist starts its workers, and removes it at the end (made under ``/tmp``
+  when ``gov`` cannot be imported yet). Each process of the run also names it
+  in a mark in its pytest temp base (``gov.codeintel.MARK``, removed at its
+  end), so a ``gov`` process a case starts with an environment built anew, on
+  a repository under that base, lands its daemon folder there too. The real tool
   (``codebase-memory-mcp``) is on ``PATH`` only while a case of W1-16 or W1-20
   runs; for every other case each ``PATH`` folder that held it when the
   outermost run started (``CODEINTEL_OFF_PATH``, kept by a run started inside
@@ -69,6 +73,7 @@ from __future__ import annotations
 
 import fcntl
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -240,21 +245,55 @@ def pytest_collection_modifyitems(config, items):
 
 
 _CBM_TOOL = "codebase-memory-mcp"
+_CBM_MARK = ".gov-cbm-base"  # gov.codeintel.MARK
 _CBM_SUITES = frozenset({"W1-16", "W1-20"})  # the suites that run the real code-graph tool (T-8)
 _cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
 _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
 
 
 def _own_cbm_base():
-    """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``CODEINTEL_DAEMON_BASE``; None without one."""
+    """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``CODEINTEL_DAEMON_BASE``; None without one.
+    A run whose ``gov`` cannot be imported at configure time (a nested run whose environment has no ``PYTHONPATH``,
+    whose cases put ``src`` on ``sys.path`` themselves) makes the folder under ``/tmp`` all the same."""
     try:
         from gov import codeintel
         made = codeintel.make_session_base()
-    except Exception:  # noqa: BLE001 -- no gov here, or no place: the code index keeps its own default
+    except ImportError:
+        made = None
+        for place in ("/tmp", tempfile.gettempdir()):
+            try:
+                made = Path(tempfile.mkdtemp(prefix=f"gov-cbm-{os.getuid()}-", dir=place))
+                break
+            except OSError:
+                continue
+        if made is None:
+            return None
+    except Exception:  # noqa: BLE001 -- no place: the code index keeps its own default
         return None
     former = os.environ.get("CODEINTEL_DAEMON_BASE")
     os.environ["CODEINTEL_DAEMON_BASE"] = str(made)
     return made, former
+
+
+_cbm_marks: list = []  # the marks this process wrote (W2-56 S1), removed at its end
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _cbm_mark(tmp_path_factory):
+    """W2-56 S1: the mark naming this run's daemon folder in this process's pytest temp base (``gov.codeintel.MARK``),
+    so a ``gov`` process a case starts with an environment built anew, on a repository under that base, finds the
+    run's folder too (where the case's own clean-up, in this process, looks for it)."""
+    base = os.environ.get("CODEINTEL_DAEMON_BASE") or ""
+    if os.path.isabs(base):  # written here, not by gov.codeintel.write_mark: gov may not be importable yet
+        try:
+            mark = tmp_path_factory.getbasetemp() / _CBM_MARK
+            staged = mark.with_name(f"{_CBM_MARK}.{os.getpid()}")
+            staged.write_text(json.dumps({"base": base, "pid": os.getpid()}), encoding="utf-8")
+            os.replace(staged, mark)
+            _cbm_marks.append(mark)
+        except OSError:  # no base folder: the variable alone names the folder
+            pass
+    yield
 
 
 def _drop_cbm_base(made: Path, former: str | None) -> None:
@@ -470,6 +509,11 @@ def pytest_unconfigure(config):
     if _rebuild_lock is not None:
         _drop_rebuild_lock(*_rebuild_lock)
         _rebuild_lock = None
+    while _cbm_marks:
+        try:
+            _cbm_marks.pop().unlink()
+        except OSError:
+            pass
     if _cbm_base is not None:
         _drop_cbm_base(*_cbm_base)
         _cbm_base = None
