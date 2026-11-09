@@ -15,9 +15,11 @@ import pytest
 import w2_20_support as support
 
 
-@pytest.mark.parametrize("busy, load, shut", [(3.9, 0.1, "cpu"), (0.5, 9.0, "load")],
+@pytest.mark.parametrize("busy, load, shut", [(4.0, 0.1, "cpu"), (0.5, 9.0, "load")],
                          ids=["busy cores high, load low", "load high, busy cores low"])
 def test_s2_the_gate_judges_busy_cores_and_load_each_on_its_own_and_shows_both(machine, repo, busy, load, shut):
+    """Busy cores high: all 4 of 4 busy with the servers' p95 at 0.0, so the cpu sum is 4.0, not below nproc (the
+    README's cpu rule: equal shuts), while the load (0.1) is far below it. Load high: 9.0 of 4, busy cores 0.5."""
     machine.set_readings(nproc=4, busy_cores=busy, load=load, load_15=load, embedding_p95=(0.0, 0.0))
 
     reading = machine.read(repo)

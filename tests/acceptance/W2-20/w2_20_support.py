@@ -539,6 +539,15 @@ class Machine:
             self._check_location(repo)
         return self._run(repo, *args, json_output=json_output, env_extra=env_extra)
 
+    def located(self, repo: Path) -> int:
+        """Run the location check now (a plain reading, which may itself read the GPU) if it has not run, and
+        return how many ``nvidia-smi`` calls are logged so far: a case that counts one call's GPU reads counts
+        only those after this number."""
+        if not self._location_checked:
+            self._location_checked = True
+            self._check_location(repo)
+        return len(self.gpu_call_list())
+
     def _run(self, repo: Path, *args: str, json_output: bool = True, env_extra: dict | None = None):
         proc = subprocess.run(self.argv(repo, *args, json_output=json_output), cwd=str(repo),
                               env=self.env(**(env_extra or {})), capture_output=True, text=True,

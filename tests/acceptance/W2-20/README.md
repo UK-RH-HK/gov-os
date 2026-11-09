@@ -19,6 +19,11 @@ today's versions of those files, keeping `accept` (DEC-970) and the `release` ex
 W2-20 was read; only `w2/integrate`'s code (`gov.launch.plan_check`, `launcher`, `command`, `store.main_root`,
 `gov.plan.tickets`) and W2-136's suite for how a lead check is driven.
 
+**Round 4 (2026-11-09, DEC-1097 (8)).** Against the engineer's round 2, built to the interface below, the suite
+passed 160 of 164; three cases disagreed with this README's own interface or with P-6, and a fresh test designer
+revised each one (table "Round 4's changes"). The interface did not change. Only the S2 example and the GPU counting
+note were made explicit. No implementation of W2-20 was read.
+
 ## Run
 
 ```sh
@@ -55,7 +60,7 @@ The engineer builds to this; where the ticket left a form open, the choice is th
 | Invocation | What it does | Exit |
 |---|---|---|
 | `gov resources [--json] [--root R]` | The reading (below) and the gate. Clears stale entries. Applies nothing else. | 0, open or shut |
-| `gov resources --check [--gpu-need-mib N] [--gpu-kind embedder\|reranker\|other] [--json]` | **The start check** for one new session (or a job that declares a GPU need). Without `--gpu-need-mib` it never runs `nvidia-smi` (S10). `--gpu-kind` defaults to `other`. | 0 and `ok: true` (the reading as `result`) when open; when shut, `ok: false`, `error.code` `RESOURCE_GATE_SHUT`, the reading in `error.details`, an exit code other than 0 and 2 (the same without `--json`, and the text names the broken condition) |
+| `gov resources --check [--gpu-need-mib N] [--gpu-kind embedder\|reranker\|other] [--json]` | **The start check** for one new session (or a job that declares a GPU need). Without `--gpu-need-mib` it never runs `nvidia-smi` (S10); a plain reading and a start check with a need read the GPU once each (S13, P-6). The cases count only the `nvidia-smi` calls of the command under test, never those of the suite's location check (a plain reading run before a test's first command). `--gpu-kind` defaults to `other`. | 0 and `ok: true` (the reading as `result`) when open; when shut, `ok: false`, `error.code` `RESOURCE_GATE_SHUT`, the reading in `error.details`, an exit code other than 0 and 2 (the same without `--json`, and the text names the broken condition) |
 | `gov resources --register PID --ticket ID --session-role ROLE` | Enters a session in the machine-wide registry (its pid, repository, ticket, role). `--heavy` is no longer part of the interface (no weights, DEC-983). | 0, `ok: true` |
 | `gov resources --slot test\|rebuild [--tree T] [--workers N] -- CMD...` | **A heavy job.** Waits for one of the configured machine-wide slots (a rebuild also for its tree's lock, `--tree` default the root), then runs `CMD` confined to the slot's CPU set with the slot's thread budget, and gives the slot back when `CMD` ends. *(choice)* | `CMD`'s exit code; `CMD`'s output passes through |
 | `gov resources --sample [--json]` | Takes one sample of every live session's process-tree memory, noting whether a verification run holds the lock, and (P-5 (a)) one of every heavy-job slot holder's process tree, with its `kind`. Result `samples`: `[{pid, tree_memory_bytes, verification}]`, a slot holder's sample also `kind: "test"\|"rebuild"`. *(choice)* | 0 |
@@ -94,7 +99,8 @@ no ceiling on leads or sessions** (DEC-983); heavy jobs wait for slots instead, 
   for a run that has not started).
 - **load (S5):** `min(load_1m, load_15m) < nproc`. Reading: the min; threshold: nproc. Equal shuts.
 - **cpu (S2, S12):** `busy_cores_1m + p95(shared) + p95(query) < nproc`. Reading: the sum; threshold: nproc. Equal
-  shuts. *(choice: how the servers' p95 is counted)*
+  shuts. *(choice: how the servers' p95 is counted)* Busy cores alone shut it only at nproc or above: 4.0 busy of 4
+  with both p95 at 0.0 shuts (S2's case); 3.9 opens.
 - **disk, inodes (S4):** `free_bytes ≥ disk_floor_bytes`, `free_inodes ≥ inode_floor`. Equal opens.
 - **config (S8):** one reason per value missing or malformed, naming its key (or the file, when it is missing or not
   JSON); `reading` the raw value or `null`.
@@ -215,7 +221,7 @@ the tests do not apply them.
 
 ### S16, measured (`local_only`)
 
-`test_w2_20_measured.py` runs a planted suite (8 tests, each starting a program that spins one thread per
+`test_w2_20_measured.py` runs a planted suite (8 tests, each starting a program that forks one spinning process per
 `os.cpu_count()` CPU for 3 s, ignoring its CPU set; `-n 2` when pytest-xdist is there) twice: plainly and through
 `gov resources --slot test`, under the real `~/.gov-os/machine/gate.json` (read, never written). It samples busy cores
 from `/proc/stat` every 0.2 s and asserts: without the slot the p95 exceeds the share + 1 (else there is no measure);
@@ -224,6 +230,13 @@ CTO runs it outside the sandbox**, on the real machine, not inside another heavy
 `GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py -m local_only -p no:cacheprovider -s`.
 The planted programs spin until a deadline, so the time compares the slot's overhead, not a fixed amount of work
 (P-4, confirmed by the CTO 2026-11-09: the 20 % is measured on time-bound programs; the case is unchanged).
+
+**Round 5 (2026-11-09, `Rewrite-Reason: DEC-1097 (8)`).** The CTO's run outside the sandbox (20 CPUs, share 6) failed
+the first assert: without the slot the busy cores' p95 was 3.65, not above 7, so there was no measure. The cause was in
+the case: `spin.py` spun `os.cpu_count()` Python threads, which the GIL holds to about one core per program, so 8 tests
+on 2 workers never loaded more than three or four cores. `spin.py` now forks one process per `os.cpu_count()` CPU, each
+spinning until the same deadline, and the parent waits for them (it prints `spin: N processes for N CPUs`, which the
+planted suite's capture swallows). The time-bound design (P-4), the sampling and the three assertions are unchanged.
 
 ## KPI lines
 
@@ -299,6 +312,21 @@ removal below is its own commit with `Rewrite-Reason: DEC-1097 (8)`.
 | none: the override already a launch option logged to `launch.log` and stderr | P-1 (a) | round 1's four override and command-line cases, unchanged | — |
 | none: the measured case already uses time-bound programs | P-4 | S16's case, unchanged | — |
 | none: no `nvidia-smi` without a declared need; once with one | P-6 | round 1's S10/S13 cases, unchanged | — |
+
+## Round 4's changes (2026-11-09)
+
+Each case below disagreed with this README's interface or with P-6, the cause was in the case, and each was revised
+in its own commit (`Rewrite-Reason: DEC-1097 (8)`). The interface did not change.
+
+| Case | Disagreement | Revision | Commit |
+|---|---|---|---|
+| `test_w2_20_cpu.py::test_s2_the_gate_judges_busy_cores_and_load_each_on_its_own_and_shows_both[busy cores high, load low]` | planted busy cores 3.9 of 4, both p95 0.0: the cpu rule's sum 3.9 < 4 opens, yet the case expected shut on cpu. S2's line ("judges real CPU use ... as well as the load, and shows both") names no threshold, so the README's rule stands | busy cores 4.0 of 4 (sum 4.0, equal shuts); load 0.1 still far below nproc | `8616cb090` |
+| `test_w2_20_gpu.py::test_s10_a_start_with_no_declared_need_never_reads_the_gpu[a GPU planted]` | the GPU was planted before the test's first command, so the suite's location check (a plain reading, which reads the GPU once under S13/P-6) logged an `nvidia-smi` call that the case blamed on the start check | the support's new `located(repo)` runs the location check first and returns the calls so far; the case counts only the start check's calls | `4d3ddbbea` |
+| `test_w2_20_gpu.py::test_s13_the_reading_measures_gpu_memory_utilisation_and_which_processes_hold_it` | the location check's reading and the reading under test were counted as one check, two reads of each query | counts only the reading under test's calls (after `located`) | `42bd8e2b1` |
+
+Run on this branch (no product; integrate's code), same command as round 2 with an empty `HOME`: **154 failed, 9
+passed, 1 deselected**, as in round 2. The three revised cases fail because the product is missing (`invalid choice:
+'resources'`), and the nine greens are the same guards.
 
 **The port (part 3)**, each file its own commit with `Rewrite-Reason: DEC-1097 (8)`: `w1_07_support.py`
 (`b393e2ddd`: `resources` added after `accept`), `test_w1_07_recorded_commands.py` (`c4b57a5af`: six recorded),
