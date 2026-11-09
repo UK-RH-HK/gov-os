@@ -93,7 +93,7 @@ when the lift's re-pin and every live worktree carry this ticket, by these steps
 | S1: the service unreachable in any way: the order given, no `rerank_score`, `unavailable` with the service's failure, the bundle unranked and named; no other reranker process, no model in the caller | `default_reranker`'s scorer: any exception from `_ask` → None, `unavailable`, reason `the shared reranker did not answer (…)`; `_started` gone | unit `tests/unit/retrieval/test_w2_145_no_private_reranker.py`: `test_s1_each_service_failure_keeps_the_order_given_and_names_it[…]` (8 kinds: EPERM, no listener with its start refused, no connection within `CONNECT_S`, no answer in the time limit, an error answer, closed without an answer, the wrong length, not JSON; every process start recorded: only `rerank_service.py`; no torch or sentence_transformers imported), `test_s1_a_search_that_waited_for_a_refused_service_names_its_refusal`, `test_s1_the_bundle_says_unranked_and_names_the_service_s_failure`, `test_s1_an_answering_service_still_ranks`; over a stand-in socket server (sockets): `test_s1_a_stand_in_server_s_failures_keep_the_order_and_start_nothing[…]` (4), `test_s1_no_listener_and_a_refused_start_runs_the_service_alone` (the stand-in interpreter records the programs it runs) |
 | S2: no private reranker as a mode; `by` never `private`; the worker run as a program ends at once, named, non-zero, before torch; keeps `take_slot`, `load`, `scores`, `device_of`; `GOV_RERANK_ALLOW_CPU` opens no CPU path | `rerank_worker.main` prints the named line and exits 69; `take_slot` never hides the GPU | unit `test_s2_rerank_holds_no_path_that_starts_a_private_reranker` (no `_started`/`_WORKER`; only `rerank_service.py` names the worker, by `spec_from_file_location`, no `Popen`; `GOV_RERANK_ALLOW_CPU` nowhere in `src/gov/`), `test_s2_the_worker_run_as_a_program_ends_at_once_named_before_torch[…]` (5 settings, stand-in torch and sentence_transformers that record imports: none; no lock file made), `test_s2_the_worker_keeps_only_what_the_service_shares`, `test_s2_the_slot_rule_opens_no_cpu_path` |
 | S3: the service holds every slot for its life; one held elsewhere taken within 2 s of release; a slot-rule worker beside it ends 75; all free after it ends | `hold_every_slot` / `take_free_slots`, started in `main` after the share check, before the load | unit `test_s3_one_pass_takes_every_free_slot_but_the_first`, `test_s3_a_slot_held_elsewhere_is_taken_within_2_s_of_its_release`, `test_s3_beside_a_running_service_a_slot_rule_worker_waits_then_ends_75_and_the_slots_go_with_it` (a stand-in service process: slot 1 released after 1 s, held within 3 s; a slot-rule worker ends 75 after its 1 s wait; SIGKILL frees every slot), `test_s3_main_holds_every_slot_after_its_share_check_and_before_the_load`; W2-112's `test_the_service_holds_every_gpu_slot_for_its_life`, `test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release` (sockets) |
-| S4: no wait for anything else (within `CONNECT_S` + 1 s, or the time limit + 1 s; P-1: from the refused start's end); one `FALLBACK` line, its detail the failure and `unranked`, never `private`; a search that cannot write the log still searches | no second wait and no second process after `_ask` fails; `_log` swallows `OSError` | unit: the bound in each `test_s1_each_service_failure_…` row, `test_s1_a_start_refused_after_its_own_wait_is_not_followed_by_another_wait` (P-1), `test_s4_a_search_of_several_requests_writes_one_line_and_stays_unranked`, `test_s4_a_search_that_cannot_write_the_log_still_searches`, `test_s4_gov_status_counts_the_unranked_searches_as_before` (`gov status`'s reranker part over a planted log) |
+| S4: no wait for anything else (within `CONNECT_S` + 1 s, or the time limit + 1 s; P-1: from the refused start's end); one `FALLBACK` line, its detail the failure and `unranked`, never `private`; a search that cannot write the log still searches | no second wait and no second process after `_ask` fails; `_log` swallows `OSError`; round 3 (the review's F1): the same search asking again (the page's rerank after the pool's came back unscored, `retrieve.py`) within `RECALL_S` (10 s) gets the first failure's reason at once, with no second `FALLBACK` line, start or wait | unit: the bound in each `test_s1_each_service_failure_…` row, `test_s1_a_start_refused_after_its_own_wait_is_not_followed_by_another_wait` (P-1), `test_s4_a_search_of_several_requests_writes_one_line_and_stays_unranked`, `test_s4_the_same_search_asking_again_within_the_window_gets_the_same_reason_at_once[…]` (2), `test_s4_an_ask_after_the_window_asks_the_service_again`, `test_s4_within_the_window_a_new_question_or_a_service_come_up_since_is_asked`, `test_s4_a_search_that_cannot_write_the_log_still_searches`, `test_s4_gov_status_counts_the_unranked_searches_as_before` (`gov status`'s reranker part over a planted log) |
 | S5: the interim guards stated, none changed | this file's section S5; the ticket's commits touch only its `allowed_paths` | `git diff --stat` of `86f1af6e586f` and this file's commit: only `src/gov/retrieval/rerank*.py`, the named unit tests and this file |
 | S6: the tests that assume a private fallback revised, the acceptance ones never by the engineer | acceptance: the designer's `aadce89d67c5` with `Rewrite-Reason: DEC-1048 (5)`; unit: `86f1af6e586f` | section S5 (c); `gov accept W2-145, W2-112, W2-32, W1-19, W2-137` outside the sandbox (the CTO) |
 | S7: seen live after the lift's re-pin | **the CTO's, after the lift's re-pin** (the ps samples, `rerank.log`'s lines and the lock holders by pid through `/proc`, recorded here) | — |
@@ -129,3 +129,47 @@ when the lift's re-pin and every live worktree carry this ticket, by these steps
 - **Unit cases:** `test_s1_a_connect_that_fails_names_no_connection_within_connect_s_alike_everywhere[EAGAIN|timeout]`
   (a stand-in socket whose connect raises `BlockingIOError` or times out; it runs in the sandbox), and a new
   `KINDS` row `the listen queue full (EAGAIN on connect)` in the per-kind S1 case.
+
+## Round 3: one search, one ask of a failed service (the review's F1, S4 and P-1)
+
+- **What the review found:** with the pool on (`governance/project/retrieval.yaml`, `rerank_depth: 40`),
+  `retrieve.py` asks `rerank()` for the pool's head; when that comes back unscored it asks again for the page
+  (`retrieve.py`, the per-page path). Each ask ran `default_reranker` → `_ask`, so one `gov retrieve` wrote two
+  `FALLBACK` lines and waited twice: about 2 × 30 s when the service did not answer in time; when its start was
+  refused, a second start (and a second `REFUSED` line, and for "no GPU slot" a second 20 s wait, which P-1 forbids).
+- **The change (`rerank.py` only; `retrieve.py` is outside the ticket's paths):** the default reranker's scorer
+  remembers the service's failure for this process, keyed by the socket's path, the interpreter and the question,
+  with the socket file as it was (its inode and change time, or none). An ask of the same question within
+  `RECALL_S` whose socket is unchanged gets the same reason at once: `last_outcome()` `unavailable` with the first
+  failure's reason (so the bundle names it alike), no `FALLBACK` line, no connect, no start, no wait. A success
+  forgets the failure; entries past the window are dropped as new ones come.
+- **The window, `RECALL_S = 10.0` s, and why:** it has to cover one search's span after the failure, no more. The
+  second ask follows the rest of that search (reading the page's spans and frontmatter after the pool's failed
+  rerank): well under a second, a few on a cold disk; 10 s holds that with margin and stays far under the gap
+  between searches. It is measured from the failure's end, so the first ask's own wait (up to the time limit, or
+  the refused start's own wait) does not use it up. Bounded three ways, so a long-lived process asks a recovered
+  service again on its next search: any ask after 10 s asks again; a different question (another search) asks at
+  once; and a service that has come up since (a new socket file) is asked at once.
+- **Unit cases (`tests/unit/retrieval/test_w2_145_no_private_reranker.py`, stand-in socket, no Unix socket):**
+  `test_s4_the_same_search_asking_again_within_the_window_gets_the_same_reason_at_once[no listener and its start
+  refused | no answer within the request's time limit]` (the pool's ask fails; the page's ask, other candidates,
+  returns in under 0.1 s, the same `last_outcome()`, no new connect, no new start, one `FALLBACK` line in all);
+  `test_s4_an_ask_after_the_window_asks_the_service_again` (`RECALL_S` 0.2 s: past it, asked again, a second start
+  and a second line; a recovered service then ranks); `test_s4_within_the_window_a_new_question_or_a_service_come_up_since_is_asked`.
+- **A unit case revised (in the ticket's paths):** `tests/unit/retrieval/test_w2_32_rerank_fusion.py::
+  test_a_shared_reranker_that_dies_is_reported_and_asked_again_next_time` asked the same question twice within
+  milliseconds and expected two asks. Inside `rerank.py` that is the same as the F1 double ask (with a small result set
+  the pool's head and the page's candidates are the very same texts, so the texts cannot tell them apart). Revised:
+  within the window the second ask is not made and gets the same reason; after the window (`RECALL_S` 0.2 s) the
+  service is asked again, and nothing else is started.
+- **What the window costs:** a second search of the very same question, to the same unchanged socket, within 10 s of
+  a failure, is not asked and comes back unranked with the first failure's reason. A different question, a service
+  come up on a new socket, or any search after 10 s asks the service.
+- **Results in the launch sandbox (2026-11-09; Unix sockets refused there, so the socket cases are the CTO's):**
+  unit `test_w2_145_no_private_reranker.py`, every row: 34 passed, 5 skipped (sockets); the ticket's other unit files
+  with W2-32's pool, routing and W2-137 files (every row, the real-model cases left out): 219 passed, 22 failed, the 21
+  of `test_w2_112_shared_reranker.py` (EPERM, as in round 1) and the W2-32 case revised above, which then passed (its
+  file 26/26). `gov accept` in the sandbox: W2-145 37 passed / 42 failed, W2-112 27 / 25, W2-32 253 / 2; against
+  round 2's head (`e6f9bbaff`) run the same way, every behaviour line (S1, S3, S4, failure-1/2/3 of W2-145, and every
+  line of W2-112 and W2-32) has the same counts: this round changes no acceptance result the sandbox can see. The
+  CTO's outside runs decide.

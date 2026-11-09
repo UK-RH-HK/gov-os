@@ -50,7 +50,16 @@ MAX_REQUEST_TEXTS = 64
 MAX_REQUEST_CHARS = 24_000
 _ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
           77: "the GPU has too little free memory for its share", 78: "no GPU is available to it"}
+# How long this process remembers the service's failure for the same question (W2-145, the review's F1). One search
+# can ask twice: the pool's rerank, then, when that came back unscored, the page's own (retrieve.py). The second ask
+# comes after the rest of that one search (reading the page's spans and frontmatter: well under a second, a few on a
+# cold disk), so 10 s covers one search's span and no more. Within it, the same question to the same socket gets the
+# same reason at once: no second FALLBACK line, no second start, no second wait (P-1). A new question, a service that
+# has since come up on a new socket, or any ask after the window asks the service again.
+RECALL_S = 10.0
 _last = threading.local()
+_failed: dict = {}  # (socket path, interpreter, question) -> (when it failed, the socket as it was, the reason)
+_failed_lock = threading.Lock()
 
 
 def _cache() -> Path:
@@ -161,6 +170,40 @@ def _connect(interpreter: str) -> socket.socket:
         time.sleep(0.05)
 
 
+def _socket_seen(path: str):
+    """The socket file as it is now (its inode and change time), or None when there is none: a service that came up
+    since a failure has a new one."""
+    try:
+        seen = os.lstat(path)
+    except OSError:
+        return None
+    return seen.st_ino, seen.st_mtime_ns
+
+
+def _recalled(key: tuple) -> str | None:
+    """The reason the service failed this same ask within ``RECALL_S``, its socket unchanged since; else None."""
+    with _failed_lock:
+        entry = _failed.get(key)
+    if entry is None:
+        return None
+    at, seen, why = entry
+    if time.monotonic() - at >= RECALL_S or _socket_seen(key[0]) != seen:
+        return None
+    return why
+
+
+def _remember(key: tuple, why: str | None) -> None:
+    """Keep the service's failure for ``key`` (or forget it, ``why`` None); entries past ``RECALL_S`` go."""
+    now = time.monotonic()
+    with _failed_lock:
+        for old in [old for old, entry in _failed.items() if now - entry[0] >= RECALL_S]:
+            del _failed[old]
+        if why is None:
+            _failed.pop(key, None)
+        else:
+            _failed[key] = (now, _socket_seen(key[0]), why)
+
+
 def _ask(interpreter: str, query: str, texts: list[str]):
     """The service's scores for ``texts`` and its device; raises naming why there are none."""
     with _connect(interpreter) as connection:
@@ -184,20 +227,28 @@ def default_reranker():
 
     The scorer returns None when the service does not answer, in any way (DEC-1048 (5)): the search keeps the order
     given, ``last_outcome`` is ``unavailable`` with the service's failure, and one FALLBACK line is logged. Nothing
-    else is started and nothing is waited for (W2-145 S1, S4)."""
+    else is started and nothing is waited for (W2-145 S1, S4). The same search asking again (the page's rerank after
+    the pool's) within ``RECALL_S`` gets the same reason at once, with no second line, start or wait (the review's F1)."""
     interpreter = Path(os.environ.get("HOME") or Path.home()) / PYTHON_REL
     if not interpreter.is_file():
         _note("unavailable", None, f"no reranker environment at {interpreter}")
         return None
 
     def score(query: str, texts: list[str]):
+        key = (str(_cache() / SOCKET), str(interpreter), query)
+        why = _recalled(key)
+        if why is not None:  # this search's service already failed: unranked at once, already logged
+            _note("unavailable", None, why)
+            return None
         try:
             values, device = _ask(str(interpreter), query, texts)
         except Exception as error:  # the service unreachable, in any way: this search goes on unranked, never fails
             why = f"the shared reranker did not answer ({type(error).__name__}: {error})"
             _log("FALLBACK", f"{why}\tunranked")
             _note("unavailable", None, why)
+            _remember(key, why)
             return None
+        _remember(key, None)
         _note("service", device, None)
         return values
 

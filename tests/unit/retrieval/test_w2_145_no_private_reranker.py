@@ -317,6 +317,70 @@ def test_s4_a_search_of_several_requests_writes_one_line_and_stays_unranked(home
     assert rerank.last_outcome()["by"] == "unavailable" and len(fallbacks(home)) == 1
 
 
+RECALLED = {  # kind: (the stand-in's behaviour, the most service starts the first ask makes)
+    "no listener and its start refused": ({"connect": _no_listener}, 1),
+    "no answer within the request's time limit": ({"answer": _times_out}, 0),
+}
+
+
+def _counted(behaviour: dict, asks: list) -> dict:
+    """``behaviour`` with every connect counted in ``asks``."""
+    connect = behaviour.get("connect", lambda sock: None)
+    return {**behaviour, "connect": lambda sock: asks.append(1) or connect(sock)}
+
+
+@pytest.mark.parametrize("kind", RECALLED, ids=list(RECALLED))
+def test_s4_the_same_search_asking_again_within_the_window_gets_the_same_reason_at_once(home, standin, monkeypatch,
+                                                                                        kind):
+    """The review's F1: the pool's rerank comes back unscored, then the page's asks again (retrieve.py). The second
+    ask is answered from the first's failure: unranked at once, the same reason, no second line, start or wait."""
+    behaviour, starts = RECALLED[kind]
+    asks: list = []
+    monkeypatch.setattr(_Socket, "kind", _counted(behaviour, asks))
+    pool = [{"n": n, "text": f"pool {n}"} for n in range(5)]
+    assert rerank.rerank("q", pool) == pool
+    first = rerank.last_outcome()
+    connects, started = len(asks), len(standin)
+    assert first["by"] == "unavailable" and started == starts and connects >= 1
+    began = time.monotonic()
+    assert rerank.rerank("q", GIVEN) == GIVEN  # the page's own rerank, other candidates, the same question
+    took = time.monotonic() - began
+    assert took < 0.1, took  # nothing waited for
+    assert rerank.last_outcome() == first  # the same reason, named alike
+    assert len(asks) == connects and len(standin) == started  # the service not asked, nothing started
+    [line] = fallbacks(home)  # one line for the one search
+    assert line[2] == first["reason"] and line[3] == "unranked"
+
+
+def test_s4_an_ask_after_the_window_asks_the_service_again(home, standin, monkeypatch):
+    monkeypatch.setattr(rerank, "RECALL_S", 0.2)
+    asks: list = []
+    monkeypatch.setattr(_Socket, "kind", _counted({"connect": _no_listener}, asks))
+    rerank.rerank("q", GIVEN)
+    connects = len(asks)
+    assert len(standin) == 1
+    time.sleep(0.3)  # past the window: the next search asks the service again
+    rerank.rerank("q", GIVEN)
+    assert len(asks) > connects and len(standin) == 2 and len(fallbacks(home)) == 2
+    monkeypatch.setattr(_Socket, "kind", {"answer": _scores(0)})  # and a recovered service ranks it
+    time.sleep(0.3)
+    assert all("rerank_score" in entry for entry in rerank.rerank("q", GIVEN))
+    assert rerank.last_outcome()["by"] == "service"
+
+
+def test_s4_within_the_window_a_new_question_or_a_service_come_up_since_is_asked(home, standin, monkeypatch):
+    asks: list = []
+    monkeypatch.setattr(_Socket, "kind", _counted({"connect": _no_listener}, asks))
+    rerank.rerank("q", GIVEN)
+    connects = len(asks)
+    rerank.rerank("another question", GIVEN)  # another search: asked, and its own line
+    assert len(asks) > connects and len(standin) == 2 and len(fallbacks(home)) == 2
+    (home / rerank.CACHE_REL / rerank.SOCKET).write_text("")  # a service has come up since: its socket is new
+    monkeypatch.setattr(_Socket, "kind", {"answer": _scores(0)})
+    assert all("rerank_score" in entry for entry in rerank.rerank("q", GIVEN))
+    assert rerank.last_outcome()["by"] == "service" and len(fallbacks(home)) == 2
+
+
 def test_s4_a_search_that_cannot_write_the_log_still_searches(home, standin, monkeypatch):
     monkeypatch.setattr(_Socket, "kind", {"make": _eperm})
     (home / rerank.CACHE_REL / rerank.LOG).mkdir(parents=True)  # the log's path is not writable as a file
