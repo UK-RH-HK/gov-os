@@ -38,6 +38,10 @@ sources:
 - DEC-253
 - DEC-968
 - DEC-1061
+- DEC-896
+- DEC-912
+- DEC-1045
+- DEC-906
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-66/
