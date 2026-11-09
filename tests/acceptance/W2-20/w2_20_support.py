@@ -52,6 +52,7 @@ THREAD_VARS = RUNTIME_THREAD_VARS + (BUDGET_VAR,)
 GATE_KEYS = ("memory_floor_bytes", "verification_peak_bytes", "working_size_bytes", "disk_floor_bytes",
              "inode_floor", "verification_lock", "gpu_margin", "oom_floor_bytes", "heavy_slots", "gpu_shares")
 MEASURED_KEYS = ("verification_peak_bytes", "working_size_bytes")
+REBUILD_PEAK_KEY = "rebuild_peak_bytes"  # P-5 (a): the re-measure's third figure, from rebuild slot holders' samples
 
 
 def today() -> str:
@@ -365,6 +366,9 @@ class Machine:
             "memory_floor_bytes": dated(3 * GIB, source="DEC-942 item 2 (planted)"),
             "verification_peak_bytes": dated(4 * GIB, source="measured (planted)"),
             "working_size_bytes": dated(1 * GIB, source="measured (planted)"),
+            # P-5 (a), settled (DEC-1097 (8)): the re-measure's third figure. Planted, so a gate that requires it
+            # and one that does not both read a whole file; whether it is required is not tested (README, P-5).
+            "rebuild_peak_bytes": dated(2 * GIB, source="measured (planted)"),
             "disk_floor_bytes": dated(100 * GIB, source="DEC-898 item 1 (planted)"),
             "inode_floor": dated(10_000_000, source="DEC-898 item 1 (planted)"),
             "verification_lock": dated(str(self.verification_lock), source="planted"),
