@@ -223,9 +223,18 @@ def test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left(ki
 def test_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone(kit):
     pm = (kit.repo / "governance/project/path-map.yaml").read_text()
     new = pm.replace('hidden: ["fixtures/a/**"]', 'hidden: ["fixtures/a/**", "fixtures/b/**"]')
-    write(kit.root / "log/calls.jsonl", json.dumps({"id": "c1", "time": f"{DAY}T11:00:00+01:00", "role": "engineer",
-                                                    "ticket": "W2-1", "event": {"tool_name": "Read", "tool_input": {
-                                                        "file_path": "fixtures/b/q.md"}, "cwd": "."}}) + "\n")
+    # the CTO's set and the guard's log agreeing both ways (DEC-1108 (2)); the log's role is the one re-judged
+    session = "0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0"
+    tin = {"file_path": "fixtures/b/q.md"}
+    digest = sha(json.dumps({"tool": "Read", "input": tin}, sort_keys=True, separators=(",", ":")).encode())
+    head = {"v": 1, "window": {"since": "2026-11-08T10:00:00+00:00", "until": f"{DAY}T10:30:00+00:00"}}
+    c1 = {"id": "c1", "time": f"{DAY}T10:00:00+00:00", "session": session, "role": "engineer", "ticket": "W2-1",
+          "event": {"tool_name": "Read", "tool_input": tin, "cwd": "."}}
+    write(kit.root / "log/calls.jsonl", json.dumps(head) + "\n" + json.dumps(c1) + "\n")
+    write(kit.home / f".gov-os/guard-calls/{DAY}.jsonl", json.dumps({
+        "v": 1, "time": f"{DAY}T10:00:00.250Z", "session": session, "role": "engineer", "agent": "", "ticket": "W2-1",
+        "tool": "Read", "decision": "allow", "rule": "", "tree": "worktree", "ms": 2, "sha256": digest,
+        "keyed": None}) + "\n")
     msha = kit.bundle("ACT-P1", {("repo", "governance/project/path-map.yaml"): new.encode()})
     rc, res, _ = kit.run("run", "ACT-P1", msha)
     assert res["result"] == "undone" and res["gate"] == "after-check", res

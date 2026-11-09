@@ -223,8 +223,25 @@ esac
 """
 
 
+def plant_calls(calls, guard_calls):
+    """S15's replay inputs (DEC-1108 (2)): the CTO's call set (a header with a 48.5-hour window ending 30 minutes
+    before the trial's clock, one call) and the guard's call log (that call's line), agreeing both ways."""
+    session, tin = "7d3c2b1a-0f9e-4d8c-b7a6-958473625140", {"file_path": "README.md"}
+    digest = sha(json.dumps({"tool": "Read", "input": tin}, sort_keys=True, separators=(",", ":"),
+                            ensure_ascii=False).encode())
+    head = {"v": 1, "window": {"since": "2026-11-08T10:00:00+00:00", "until": "2026-11-10T10:30:00+00:00"}}
+    call = {"id": "trial-c1", "time": "2026-11-10T09:00:00+00:00", "session": session, "role": "engineer",
+            "ticket": "W2-1", "agent": "", "sha256": digest, "event": {"tool_name": "Read", "tool_input": tin, "cwd": "."}}
+    write(calls, json.dumps(head) + "\n" + json.dumps(call) + "\n")
+    write(Path(guard_calls) / "2026-11-10.jsonl", json.dumps({
+        "v": 1, "time": "2026-11-10T09:00:00.200Z", "session": session, "role": "engineer", "agent": "",
+        "ticket": "W2-1", "tool": "Read", "decision": "allow", "rule": "", "tree": "main", "ms": 2, "sha256": digest,
+        "keyed": None}) + "\n")
+
+
 class Planted:
-    """One planted world: an operator root with the install, a repository clone at a commit, HOME, scratch."""
+    """One planted world: an operator root with the install, a repository clone at a commit, HOME, scratch, and
+    S15's replay inputs (the CTO's call set, the guard's call log)."""
 
     def __init__(self, base, commit):
         self.base = Path(base)
@@ -258,11 +275,14 @@ class Planted:
         self.pushes = self.base / "pushes.log"
         write(self.base / "push.sh", f'#!/bin/bash\necho "$1" >> {self.pushes}\n', 0o755)
         self.clock = write(self.base / "clock.txt", CLOCK + "\n")
+        self.calls, self.guard_calls = self.base / "calls.jsonl", self.base / "guard-calls"
+        plant_calls(self.calls, self.guard_calls)
         self.config = write(self.base / "config.json", json.dumps({
             "operator_root": str(self.root), "repo": str(self.repo), "home": str(self.home),
             "scratch": str(self.scratch), "transcripts": str(self.tx), "clock": str(self.clock),
             "pings_log": str(self.base / "pings.log"), "push_cmd": [str(self.base / "push.sh")], "poll_s": 0.2,
-            "close_flag": str(self.scratch / "CLOSE-RUNNING")}))
+            "close_flag": str(self.scratch / "CLOSE-RUNNING"), "calls": str(self.calls),
+            "guard_calls": str(self.guard_calls)}))
 
     def env(self):
         e = {k: v for k, v in os.environ.items() if not k.startswith("GOV_") and k != "CLAUDE_PROJECT_DIR"}
