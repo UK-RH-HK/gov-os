@@ -222,6 +222,55 @@ marked. The planted texts hold none of these words.
 - **S9-P1. The form of the mark.** A per-item field is recommended: a new top-level key of every bundle would change
   `test_w2_92_unchanged.py`'s pinned bundles (`test_u1`, `test_u3`), which include register chunks. Confidence medium.
 
+## KPI line S11 (D-6 part 2; DEC-1109 (2)), tests and red reasons on the integrated code `2a64626532cb`
+
+Added under DEC-1109 (2) by the test designer (`DAEO-n0wb`, D-6 part 2, plan item B of
+`governance/project/orchestration/packages/LIFT-1/D6-PART2.md`), from S11, its failure line ("a verbless change
+label's prose id counted as a changer, or a clause-head changer lost"), the brief and the register's text, never
+from the implementation. The row is DECIDED-NOT-DONE row 24, "the loader's 8 wrong pairs" (DEC-1098 (3)). "Today" is
+`w2/integrate` `2a64626532cb` (`support.D6_BASE`), the head of `w2/W2-92-d6-tests` when the cases were written.
+
+- **The public function** is `gov.store.loader.register_statements(text, entries=None)`, whose statements are
+  `{source, target, cls, form, whole, where}`. Each case reads it two ways, each in a new process with this
+  worktree's `src/`: the planted register's text whole, and each entry of `register_entries(text)` alone, as
+  `gov links` (W2-129) reads it.
+- **S11's register** (`test_w2_92_verbless_labels.py::s11_register`) holds the shapes the W2-130 sitting found in
+  this repository's register, renumbered: prose after a clause's colon (DEC-901 → DEC-281), a `;` in that prose
+  (DEC-917 → DEC-608), several heads with prose in one clause (DEC-882, DEC-884, DEC-889 → DEC-880), an id in
+  parentheses after a `;` inside quotes (DEC-868, DEC-899 → DEC-492), sub-items directly below the status line
+  (DEC-953 → DEC-728), the four heads that stay, each other verbless label (`**Amended by:**`, `**Lifted by:**`,
+  `**Superseded by:**`, `**Amended:**`), a label on its own line, and a value ending at ` · `. One plain entry
+  stands for every other id named, so each is a known entry.
+- **The guard's register** (`others_register`): labels with a verb (`amended by`, `superseded by`, `superseded in
+  part by`, `amended in its item 2 by`, one with prose after a colon), `**Changes:**` with prose after a colon,
+  `**Amends:**`, `**Supersedes:**` on the status line and on a later line, `**Replaces:**`, free text and a change
+  log, then the marina's register (`support.links_register`). Its one verbless label, the marina's `**Changed by:**
+  DEC-433 (item 3's wording)`, gives the same under S11 (its head is its one id).
+- **`gov links --all --json`** runs on a planted git repository holding S11's register and the path map.
+- No store, index, vector, code-graph tool or `gitleaks`: runs inside a worker's sandbox, about 1 s.
+
+Red run on `2a64626532cb` (this branch's `src/`), in the sandbox through the heavy slot, with the exclusions of
+`EMG-d4b-launched.md` (they leave none of these out): **28 tests, 14 failed, 14 passed** (about 1 s). Every red
+fails on its own assertion, none on a premise.
+
+| KPI line | Tests | Red on the integrated code because |
+|---|---|---|
+| **S11 and failure 6.** A verbless change label names as changers only the ids at the head of its clauses: an id in the prose after a clause's colon, inside parentheses, or on a sub-item below the label is not a changer | `test_w2_92_verbless_labels.py::test_s11_a_verbless_labels_prose_parenthesis_or_sub_item_id_is_no_changer` (cases: prose after a colon; prose after a colon, a ';' inside it; prose after one of several heads' colons; an id inside parentheses; an id inside parentheses, after a ';' inside quotes; a sub-item below the label, indented 2; indented 3; sub-items indented 4 and 2; a label on its own line: prose and a parenthesis; Amended by, Lifted by, Superseded by and Amended prose; guard: the value ends at the middle dot) · `test_w2_92_verbless_labels.py::test_s11_gov_links_reports_no_unmarked_change_made_only_by_a_sub_item_or_prose_id` | Today every id in a verbless value is a changer, read either way: e.g. "prose after a colon: ['DEC-513', 'DEC-514', 'DEC-515'] counted as changers of DEC-511 (its changers: ['DEC-512', 'DEC-513', 'DEC-514', 'DEC-515'])"; the sub-items' ids too ("['DEC-563'] counted as changers of DEC-561"). `gov links` reports UNMARKED_CHANGE for the six pairs only a sub-item or prose id makes (DEC-561 ← DEC-563, DEC-571 ← DEC-573, DEC-576 ← DEC-578 and DEC-579, DEC-581 ← DEC-583 and DEC-584); its premise holds (DEC-581 ← DEC-582, a head on a label's own line, and DEC-682 ← DEC-681, a `**Changes:**`, are reported). **The middle-dot guard passes** (DEC-673 after ` · **Basis of the rule:**` is no changer today). |
+| **S11 and failure 6**, "a clause-head changer lost"; each head an amend, a supersede for `**Superseded by:**` | `test_w2_92_verbless_labels.py::test_s11_each_clause_head_of_a_verbless_label_stays_a_changer` (cases: heads split by ';', one clause's prose naming an id; heads joined by 'and', a parenthesis before the colon; a head above its sub-items; a head on a label's own line; heads joined by ',', a colon inside a parenthesis; heads split by ';', each before its colon; heads joined by 'and' before a colon; heads split by ';', no colon, W2 ids in parentheses; each other label's head) | **Passes on the integrated code** (guards: today every id is a changer, the heads among them, each of the class named). |
+| **S11**, "labels with a verb, and every other statement form, give what they give today" | `test_w2_92_verbless_labels.py::test_s11_a_verb_label_and_every_other_form_give_what_they_give_today` | **Passes on the integrated code** (a guard, by construction: this worktree's statements are `D6_BASE`'s). |
+| S11, "on this repository's register no longer gives the wrong pairs the sitting found, and every head pair stays" | none: the CTO's probe on this repository's register, **verified by the evidence file** | n/a |
+
+- **S11-P1. Where it shows in `gov links`.** `gov links` counts a change as marked when the changed entry's status
+  line names the changer anywhere, so a prose id on the status line itself is never reported, today or after. The
+  case uses the pairs that do show: an id on a sub-item below the status line (the DEC-728 ← DEC-723 shape) and a
+  prose or parenthesised id on a label's own line. Confidence high.
+- **S11-P2. "What they give today".** The guard compares the six keys of each statement as a multiset, read both
+  ways; a key the implementation adds is not compared. A change to the guard's register outside the verbless labels
+  (a statement gained, lost or re-classed) fails it. Today the change-log lines give no statement; the guard keeps
+  them so. Confidence medium-high.
+- **S11-P3. Not tested:** `whole` of a `**Superseded by:**` head (today `false`; S11 does not say), and the order of
+  the statements. Confidence medium.
+
 ## Packages (the KPI lines were not clear; the tests follow the recommendation)
 
 - **P-1. A missing record store and a question that names no record.** Today such a project refuses every question
@@ -259,3 +308,5 @@ marked. The planted texts hold none of these words.
   and by the integrated code; the store's tables read with sqlite; the readers of register chunks.
 - `test_w2_92_stated_links.py` (S7), `test_w2_92_hop.py` (S8), `test_w2_92_status.py` (S9), `test_w2_92_drift.py`
   (S10).
+- `test_w2_92_verbless_labels.py` (S11, DEC-1109 (2)): its two planted registers, the planted repository for
+  `gov links`, and its fixtures; `w2_92_support.D6_BASE` and `base_src(place, commit)` name its base.

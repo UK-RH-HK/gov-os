@@ -35,7 +35,7 @@ kpis:
   - 'No placeholder file that the sandbox makes (.bashrc, .gitconfig, .mcp.json and the others, in the worktree or at a denied name) can reach a commit: a test plants each name the sandbox makes and shows it neither staged nor committed by an ordinary git add and git commit [DEC-799 item 1, DEC-402, row W2-I012]'
   - 'A launched session gets a cleaned process environment: PATH, HOME, the locale, what the CLI needs to sign in, its identity and the launcher''s own values (TMPDIR, CLAUDE_CODE_TMPDIR); none of the parent''s CLAUDE* and GOV* variables (its session id, messaging socket and token, child-session mark, effort, compaction window, subagent model, GOV_DEV_TIERS) and no PYTHONPATH reach it, shown by a test that starts the launcher with each set [DEC-826 Q5, lens E F13, DEC-784, DEC-877 item 4, row W2-M393]'
   - 'The remaining arguments that drop the guard or add context are refused after --, beside DEC-313''s: --restricted, --safe-mode, --agents, --plugin-dir, --plugin-url, --mcp-config and --system-prompt, each in its spaced and = forms; the CIT-E weighs an accepted-arguments list against this refusal list (lens E R6) [DEC-826 Q5, DEC-313]'
-  - 'Sandboxed sessions started together in worktrees that share one .git do not fail on a missing .git/*.lock source path: the launcher starts sessions one at a time per repository (a short start lock), or the CIT-E shows another way; a test starts at least three launches at once [lens E F17]'
+  - 'Sandboxed sessions started together in worktrees that share one .git do not fail on a missing .git/*.lock source path: the launcher starts sessions one at a time per repository (a short start lock), or the CIT-E shows another way; a test starts at least three launches at once; the same fault arising per command inside running sessions, from the CLI''s own config.lock placeholders under the common .git (CIT-E section 4), is a Wave 3 row (a clone per concurrently sandboxed worker, or the CLI fixed upstream) [lens E F17] [changed, DEC-1112 (3): the engineer''s P-S7]'
   - 'A session started by `gov launch` (sandboxed) can connect to the shared reranker service''s socket (W2-112: one path in the user''s own folder, mode 0600) and gets its answers: the sandbox block allows that one Unix socket path and no other; the path comes from the same setting the service uses, never a pattern wider than it [DEC-1035, P-W2-112-T2 (a)] [moved from W2-127 S1, DEC-1083]'
   - 'Nothing else in the sandbox widens: no other Unix socket, no network port, `allowUnsandboxedCommands` false and `strictAllowlist` as today; `sandbox_faults` still refuses any other change; a planted sandboxed session that opens another Unix socket is refused [DEC-1035] [moved from W2-127 S2, DEC-1083]'
   - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035] [moved from W2-127 S3, DEC-1083]'
@@ -158,3 +158,13 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
   paths, one line each.
 - `gov accept W1-27` stops on its README map (`ACCEPT_MAP_UNREADABLE`, as on integrate); its W2-67 cases are run
   directly outside the sandbox by the CTO.
+
+**The engineer's round-2 points settled (the CTO, 2026-11-09; delegated, DEC-1112 (3), listed in the digest):** head
+`466e279fb`.
+- **P-S7:** the per-command `.git/config.lock` fault is the CLI 2.1.318's own git-folder protection (a placeholder on
+  the host for a missing deny path, bound by another session's sandbox after it is removed), not the launcher's; the
+  launcher names no path under any `.git`. S7 changed to say so; the rest a Wave 3 row ((a) a clone per concurrently
+  sandboxed worker; (b) the CLI fixed upstream). Ordinary work today does not reach it: the CTO launches workers one at
+  a time (emergency mode). The S7 real case is intermittent until then (red once, green twice outside the sandbox).
+- **Outside the sandbox on `466e279fb`:** `gov accept W2-56` with the real cases 260/0/0; `gov accept W1-20` 35/35;
+  W1-27's W2-67 cases and `test_w2_20_round3.py` 41/41.

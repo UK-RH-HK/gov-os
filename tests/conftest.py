@@ -106,6 +106,13 @@ def _own_vector_cache(request, tmp_path_factory, monkeypatch):
     monkeypatch.setenv(_VECTOR_CACHE, str(tmp_path_factory.getbasetemp() / "vector-cache" / name))
 
 
+@pytest.fixture(autouse=True)
+def _own_guard_calls(request, tmp_path_factory, monkeypatch):
+    """Each test's own guard call-log folder (ACT-GUARD-CALLLOG-1; DEC-1108 (5), DEC-1109 (2)); made only when used."""
+    name = hashlib.sha256(request.node.nodeid.encode()).hexdigest()[:16]
+    monkeypatch.setenv("GOV_GUARD_CALLS_DIR", str(tmp_path_factory.getbasetemp() / "guard-calls" / name))
+
+
 def _own_rebuild_lock() -> tuple[str, str | None]:
     """Point ``GOV_REBUILD_LOCK`` at a new lock file of this process's own; return it and the former value."""
     fd, path = tempfile.mkstemp(prefix=f"gov-rebuild-{os.getpid()}-", suffix=".lock", dir=tempfile.gettempdir())

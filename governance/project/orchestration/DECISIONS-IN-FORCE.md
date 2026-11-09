@@ -404,3 +404,5 @@ other restart is an ACT.
   launch script's install ACT.
 - Delegated (CTO, 2026-11-09, DEC-1112 (3)): W2-139's S3 ("a green validator") judged against integrate: the batch adds
   no new FAIL; the 5 FAIL already on integrate go onto D-10's red-fix list.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): ACT-SETS-GLOBS-1 also hides `runs/*/misses.jsonl`; W2-149's launch
+  script passes `--setting-sources project` (F11, defence in depth) as a follow-up, tests first.

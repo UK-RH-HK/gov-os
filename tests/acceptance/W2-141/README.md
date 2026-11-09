@@ -189,6 +189,51 @@ success-2 9 and 52, success-3 81 and 0, failure-1 11 and 71, failure-2 0 and 71,
   `Task:` trailer, it needs commits) and the `git show w2/<T>-tests:…` read (it needs the branch); both are in
   `test_live_hook.py`, which the CTO runs on the live hook after the re-pin with `guard4_check.py`.
 
+## D-6 part 2: S4, the suites' own call-log folder (DEC-1108 (5), DEC-1109 (2))
+
+Written by the independent test designer on `w2/W2-141-d6-tests` (from `w2/integrate`), from S4 and its failure line.
+The owner's DEC-1108 (5) asked for "the suites that run the live hook pointed at a temporary folder" as a follow-up
+to ACT-GUARD-CALLLOG-1 (DEC-1106 (2)); DEC-1109 (2) restarted it within D-6 part 2 (DECIDED-NOT-DONE row 60). Tests
+only: no engineer, no product code (the hook already reads `GOV_GUARD_CALLS_DIR`, its `CALLS_ENV`).
+
+- **`tests/conftest.py`:** the autouse fixture `_own_guard_calls`, beside `_own_vector_cache`, sets
+  `GOV_GUARD_CALLS_DIR` for every test to `<base temp>/guard-calls/<16 hex of the test's node id>` (made only when a
+  hook writes). A suite whose hook runs inherit the environment (`tests/unit/hooks/test_live_hook.py`) needs nothing
+  more.
+- **The suites that build a hook's environment themselves** carry the variable from the test's environment, one line
+  each (`Rewrite-Reason: DEC-1108 (5)`, a note in each README): W1-02, W1-03, W1-04, W1-05 (its builder serves W1-38,
+  W1-46 and W1-47 too; W1-46's hook runs are the live hook's), W1-49, W2-50, W2-58, W2-59 (the live hook's copy),
+  W2-61, W2-65, W2-84, W2-106. The template's hook (`template/governance/kernel/hooks/pretooluse.py`) keeps no call
+  log today; those suites carry the variable as S4 names the template's copy too.
+- **Not changed:** the operator suites (`tests/unit/operator/`, `tests/acceptance/W2-148/`) run planted stand-in
+  guards, and the operator's replay sets its own `GOV_GUARD_CALLS_DIR`; W1-28 and W1-50's freeze lift run `gov`, not
+  the hook; W2-72's own builder is the PostToolUse hook's (its guard runs go through W1-03's). Unit files outside
+  W2-141's paths that build a template hook's environment are the return's discoveries, not edited.
+
+    env HOME=<empty scratch> PYTHONUSERBASE=$HOME/.local PYTHONPATH=<worktree>/src TMPDIR=<scratch> \
+      python3 -m pytest tests/acceptance/W2-141/test_w2_141_calls_dir.py -q -p no:cacheprovider \
+      -o tmp_path_retention_policy=failed
+
+One hook process, one `git init`; under 1 s.
+
+| KPI line | Test (node id) | Without the fixture | Why |
+|---|---|---|---|
+| S4, F4 | `tests/acceptance/W2-141/test_w2_141_calls_dir.py::test_s4_a_live_hook_call_s_line_lands_in_the_test_s_own_folder` | red | the tree's live hook, run once (a Read, as the orchestrator) on a planted project with a planted `HOME` and the test's own environment: the line went to `<planted HOME>/.gov-os/guard-calls`; with the fixture, one line in the test's own folder and no `.gov-os/guard-calls` under the planted `HOME` |
+| S4 | `tests/acceptance/W2-141/test_w2_141_calls_dir.py::test_s4_guard_the_conftest_gives_each_test_an_absolute_folder_under_the_base_temp` | red | `GOV_GUARD_CALLS_DIR` unset; with the fixture, an absolute path under the base temp, never the real log folder |
+
+"Without the fixture" is `--confcutdir=tests/acceptance/W2-141` (only this folder's conftest loaded), integrate's
+state. The scoped runs (scratch `HOME`, heavy slot) and the scratch `HOME` before and after are in the return of
+this round; the verification is S4's own: no `<scratch HOME>/.gov-os/guard-calls` after the run.
+
+- **N-8. Two reds of a scratch `HOME` under `/tmp`.** `tests/unit/hooks/test_live_hook.py`'s
+  `test_a_catastrophic_rm_is_refused[outside the project]` and `test_the_reason_is_plain` expect `rm -f ~/.bashrc`
+  refused as outside the project; with `HOME` under `/tmp` the hook takes `~` as scratch and allows it. They fail
+  the same with no conftest at all (`--noconftest`): the run's `HOME`, not S4.
+- **N-9. A fixture's hook run.** A hook run made in a module- or session-scoped fixture runs before the autouse
+  fixture sets the variable. Such a run with an inherited environment would show as a `.gov-os/guard-calls`
+  folder under the scratch `HOME` (S4's verification); one with a built environment writes under that suite's own
+  temporary `HOME`, never the real one, as before this round.
+
 ## Notes and limits
 
 - **D-1. grep's `--exclude-dir` takes a base name.** GNU grep 3.11 (here) skips a subfolder when its *base name*
@@ -223,3 +268,4 @@ success-2 9 and 52, success-3 81 and 0, failure-1 11 and 71, failure-2 0 and 71,
 - `test_w2_141_grep_glob.py` (S1), `test_w2_141_bash.py` (S2), `test_w2_141_unchanged.py` (S3, the failure lines).
 - Round 2: `w2_141_hook_support.py` (which hook file, its loader, the call as `pretooluse.py` makes it) and
   `test_w2_141_hook.py` (S1, S2, S3 and the failure lines through the hook).
+- D-6 part 2: `test_w2_141_calls_dir.py` (S4 and its failure line; DEC-1108 (5), DEC-1109 (2)).

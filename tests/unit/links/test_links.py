@@ -690,3 +690,100 @@ def test_propose_sources_applies_and_clears_the_findings(tmp_path, capsys):
     assert _lines(out, "UNLINKED_ID") == []
     assert "- DEC-100\n- DEC-102\n- DEC-104\nkpis:" in (root / ".tickets/T-iiii.md").read_text()
     assert "sources:\n- DEC-100\n---" in (root / ".tickets/T-jjjj.md").read_text()
+
+
+# ---------------------------------------------------------------- S17: planted ids in test fixtures (DEC-1109 (2))
+
+_FIXTURE = '''"""The module's docstring cites DEC-998."""
+# a comment cites DEC-997
+REGISTER = """
+### DEC-996: a planted entry
+"""
+PATH = "records/decisions/DEC-995.md"
+NAME = f"{ROOT}/W1-90/test_fixture.py"
+call(f'DEC-994 {x!r} W2-993', b"DEC-985")
+BLOCK = f"""
+### DEC-986 {ROOT}
+"""
+
+
+class Case:
+    """The class's docstring cites DEC-992."""
+
+    def test_it(self):
+        """The function's docstring cites DEC-991."""
+        value = "DEC-990"  # the comment beside it cites DEC-989
+        """A later string is no docstring: DEC-988."""
+        return value
+'''
+_CITED = ("DEC-998", "DEC-997", "DEC-992", "DEC-991", "DEC-989")  # comments and docstrings: judged as today
+_PLANTED = ("DEC-996", "DEC-995", "W1-90", "DEC-994", "W2-993", "DEC-985", "DEC-986", "DEC-990", "DEC-988")
+
+
+def _unknown_at(out: str) -> dict[str, list[str]]:
+    """``id -> [path:line, ...]`` of the UNKNOWN_ID lines in the test files."""
+    found: dict[str, list[str]] = {}
+    for line in _lines(out, "UNKNOWN_ID"):
+        if " in a test file | " in line:
+            found.setdefault(line.split()[1], []).append(line.split(" | ")[1])
+    return found
+
+
+def test_s17_a_planted_id_in_a_test_files_literal_gives_no_unknown_id(tmp_path, capsys):
+    root = _plant(tmp_path, {"tests/test_fixture.py": _FIXTURE})
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    found = _unknown_at(out)
+    assert found == {"DEC-998": ["tests/test_fixture.py:1"], "DEC-997": ["tests/test_fixture.py:2"],
+                     "DEC-992": ["tests/test_fixture.py:15"], "DEC-991": ["tests/test_fixture.py:18"],
+                     "DEC-989": ["tests/test_fixture.py:19"]}
+    assert not set(found) & set(_PLANTED)
+
+
+def test_s17_a_python_test_file_that_does_not_parse_is_judged_as_today(tmp_path, capsys):
+    root = _plant(tmp_path, {"tests/test_broken.py": 'X = "DEC-987"\ndef (:\n'})
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert _unknown_at(out) == {"DEC-987": ["tests/test_broken.py:1"]}
+
+
+_OLD_IN = '''"""DEC-103 in the module's docstring."""
+REGISTER = """
+### DEC-103: a planted old entry
+"""
+X = "DEC-103"  # DEC-103 in the comment
+Y = "DEC-103"
+Z = f"{ROOT}/DEC-103"
+W = DEC-103
+
+
+def f():
+    """DEC-103 in the function's docstring."""
+    "DEC-103 in a later string"
+'''
+
+
+def test_s17_enforces_superseded_is_carried_only_where_the_old_id_stands_outside_a_literal(tmp_path, capsys):
+    from gov.decisions.propagation import check_propagation
+
+    root = _plant(tmp_path, {"tests/test_old.py": _OLD_IN, "tests/README.md": "History: DEC-103.\n",
+                             "tests/data.json": '{"rule": "DEC-103"}\n', "tests/notes.txt": "DEC-103\n",
+                             "tests/broken.py": 'X = "DEC-103"\ndef (:\n'})
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    carried = sorted(line.split(" | ")[1] for line in _lines(out, "ENFORCES_SUPERSEDED"))
+    assert carried == ["tests/README.md:1", "tests/broken.py:1", "tests/data.json:1", "tests/notes.txt:1",
+                       "tests/test_old.py:1", "tests/test_old.py:12", "tests/test_old.py:5", "tests/test_old.py:8"]
+    assert all(" | independent-test-designer | " in line for line in _lines(out, "ENFORCES_SUPERSEDED"))
+    # W2-55's module is unchanged: it still gives every line, the planted ones among them
+    given = sorted(f["message"].split(" ", 1)[0] for f in check_propagation(root) if "test_old.py" in f["message"])
+    assert given == [f"tests/test_old.py:{n}" for n in (1, 12, 13, 3, 5, 6, 7, 8)]
+
+
+def test_s17_a_carried_line_outside_tests_is_unchanged(tmp_path, capsys):
+    root = _plant(tmp_path, {"src/rule.py": 'X = "DEC-103"\n'})
+    _, out, _ = _run(root, "--all", capsys=capsys)
+    assert [line.split(" | ")[1] for line in _lines(out, "ENFORCES_SUPERSEDED")] == ["src/rule.py:1"]
+
+
+def test_s17_planted_spans_are_per_line_and_none_when_the_file_does_not_parse():
+    spans = check.planted_spans('"""doc DEC-1"""\nA = """x\nDEC-2\ny"""  # DEC-3\n')
+    assert 1 not in spans and spans[2] == [(4, 1 << 30)] and spans[3] == [(0, 1 << 30)] and spans[4] == [(0, 4)]
+    assert check.planted_spans("def (:\n") is None

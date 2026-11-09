@@ -342,6 +342,7 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
 | S14 any repository | `check.not_applicable`; unit `test_a_repository_without_the_kinds_is_not_applicable`; accept success-14 2/2 |
 | S15 cheap, measured | §1a: the CTO's main-tree run at `416b59da1779`, `--all` 3.14 s and `--since HEAD~1` 2.94 s (median of five), 3,037 standing findings by code and role; §1 the engineer's worktree run (2.80 s and 2.83 s) |
 | S16 ticket changes | `check.ticket_changes`; units `test_a_closed_tickets_file_edited_…`, `test_reopening_a_closed_ticket_…`, `test_an_open_tickets_scope_changed_unmarked_…` (4 fields), `test_marked_or_unwatched_ticket_changes_…` (7 forms; the closing commit's status change alone), `test_the_closing_commit_is_judged_as_any_other` (open, in_progress), `test_a_closing_commit_marked_by_a_decision_is_not_a_finding` (Implements:, Decided-by:), `test_a_decision_in_a_removed_line_…`, `test_a_ticket_change_is_listed_only_when_its_commit_is_in_the_range`; accept success-16 (§8) |
+| S17 planted ids in test fixtures | `check.planted_spans`, `_Repo.planted`, `_planted_cite`; units `test_s17_*` (5); accept success-17 8/8, failure-7 7/7 (§9) |
 | F1 to F5 | accept failure-1 to failure-5: 1/1, 4/4, 2/2, 5/5, 2/2 |
 
 ## 8. Review round 2 (`.gov-runtime/scratch/orchestrator/reviews/w2-129.md`, F1 to F3)
@@ -361,3 +362,60 @@ The S9 role, probed through `gov accept` (counts only; the engineer does not rea
 - **Units:** `tests/unit/links` 61 passed (55 before; 6 new cases).
 - **`gov accept W2-129`** (HOME=/home/usain), on the round-2 code before the designer's F2 cases are merged:
   **135 passed, 0 failed, 0 skipped**; success-16 included, so the status-only close still gives nothing.
+
+## 9. S17 (D-6 part 2, DEC-1109 (2)): planted ids in test fixtures
+
+- **The change** (`check.py`, `src/gov/links/**` only; W2-55's `gov.decisions.propagation` is unchanged):
+  - `planted_spans(text)` gives, per line, the character columns of a Python file that stand inside a string
+    literal that is not a docstring: plain, triple-quoted, raw, bytes or f-string, assigned or not. The strings come
+    from `tokenize`; on 3.12 an f-string is one span from `FSTRING_START` to its `FSTRING_END`, its `{...}` parts
+    within. Docstrings come from `ast`: the first statement's string of a module, class or function (ast's byte
+    columns turned into characters). A file that does not parse gives `None` and is judged as before. So does a file
+    with a lone carriage return, where ast's line numbers and `str.split("\n")`'s differ.
+  - `_Repo.planted(path, line, column)` parses each `tests/**/*.py` file at most once per run, and only when a
+    finding asks.
+  - UNKNOWN_ID (`texts`): a test-file id inside a planted span gives no line.
+  - ENFORCES_SUPERSEDED (`enforces`, `_planted_cite`): a propagation finding on a line of a `tests/**/*.py` file
+    that parses is dropped when it only *cites* its old id ("cites DEC-x") and every place of that id on the line is
+    inside a planted span. Comments, docstrings and code keep it. Non-Python files and files that do not parse keep
+    it too.
+- **A reading:** a propagation hit on a recorded value (`holds '…'`) is about a value, not an id, so S17 does not
+  filter it. It is carried as before. The register holds no `**Values:**` line today, so this changes no count.
+- **On this worktree** (`gov links --all --json`, five runs each; HOME a scratch folder):
+
+  | | before (`7940fad46619`) | after (`99d54ecee95a`) |
+  |---|---|---|
+  | all findings | 2,041 | 1,513 |
+  | UNKNOWN_ID, independent-test-designer | 560 | 60 |
+  | ENFORCES_SUPERSEDED, independent-test-designer | 73 | 45 |
+  | every other code and role | unchanged | unchanged (117 CLOSED_TICKET_EDITED, 20 NOT_IN_FORCE_AS_RULE, 6 STATUS_CONFLICT, 93 TICKET_CHANGE_UNMARKED, 55 + 1 + 3 other UNKNOWN_ID, 1,104 UNLINKED_ID, 9 UNMARKED_CHANGE) |
+  | `--all`, median of five | 3.15 s (3.03 to 3.33) | 3.84 s (3.77 to 4.03) |
+
+  - No finding was added. No finding outside `tests/` changed.
+  - The 560 UNKNOWN_IDs before are 3 more than the brief's 557. The extra 3 come from the designer's S17 cases,
+    merged at `7940fad46619`.
+  - Of the 60 UNKNOWN_IDs left, 58 are in comments and docstrings, judged as before; the other 2 are in the
+    designer's W2-129 folder, which the engineer does not read. Examples: W1-90 in `W1-02`'s docstrings,
+    W2-911 in a table in `W2-20`'s module docstring, DEC-9999 and DEC-000 in docstrings. These are F's (row 23).
+  - **ENFORCES_SUPERSEDED, 28 dropped:**
+    - 27 cite DEC-002 or DEC-013 inside planted registers and records: `W1-10` 10, `test_store.py` 5,
+      `test_w2_92_record_files.py` 5, `test_w2_32_index_methods.py` 3, `test_w2_87_register.py` 3,
+      `W2-03`'s grammar 1.
+    - The sitting counted 29 such places. The other 2 (`test_w1_10_register.py:292` and `:415`) are in function
+      docstrings, so the KPI keeps them: "ids in comments and docstrings … are judged as today".
+    - The 28th is DEC-798 at `tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py:87`. That line is a `#`
+      comment inside `_READER = r'''…'''`, a program embedded as a raw string. To Python it is a string literal, not
+      a comment, so S17 counts it as planted.
+  - **ENFORCES_SUPERSEDED, 45 kept:** DEC-798 39 and DEC-876 4 (43 of the "44 README citations"; the 44th is the
+    embedded-program line above), plus the 2 DEC-002 docstrings. 23 are in `README.md` files. 22 are in `.py`
+    comments, docstrings and code.
+  - Timing: 0.7 s more, from parsing the test files that hold an unresolved id or a carried finding. That is well
+    under S15's 10 s. The CTO's main-tree measure stays the S15 record.
+- **`python3 -m gov.decisions.propagation`** is unchanged (no diff under `src/gov/decisions/`). `check_propagation`
+  on this worktree still gives all 73 test-file lines. The unit case checks the same on a planted repository.
+- **Units:** `tests/unit/links` 66 passed (61 before; 5 new `test_s17_*` cases): literals of each form against
+  comments and docstrings; a file that does not parse; ENFORCES_SUPERSEDED carried for a docstring, a comment, code,
+  README, JSON, text and a file that does not parse, and dropped for a planted register, plain and f-strings and a
+  later string; a line outside `tests/` unchanged; `planted_spans` per line.
+- **`gov accept W2-129`** (`99d54ecee95a`, HOME a scratch folder): **150 passed, 0 failed, 0 skipped**; success-17
+  8/8 and failure-7 7/7 (both red before).
