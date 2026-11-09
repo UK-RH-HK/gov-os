@@ -5,20 +5,22 @@ Under DEC-1052 (templates; READY and DONE by code), DEC-1079 (D-5 starts), DEC-1
 its interface and its two rounds stated in the ticket's body (D5 row 9). Sources: `P1-PLAN.md` D-5 row and §E,
 `R3-TEMPLATES.md` §D, `D5-ROWS.md`, `LINK-INTEGRITY.md` §5.
 
-**Counts:** 1 done in part (TPL-3 S5's scripts), 1 moved out (the MR row, to D-6 part 2), round 1 started (tests
-first), everything else not started. Nothing of D-5 is DONE by code yet: no T-0 to T-8, no `facts.yaml`, no schema
-change exists on `w2/integrate` at `0240833b`.
+**Counts (21:50):** round 1 **READY, not merged** (`w2/W2-128` `a6c83d497035`, tests `bd7732def530`; `gov accept` 92/92;
+review READY by `verdict.py`, `reviews/w2-128-r1.md`): 14 of W2-128's 21 success lines and F1, F7 met on the branch in
+their round-1 parts; TPL-3 S5's scripts done; D5 rows 1-17 carried; the MR row moved out (W2-151). Not started: the
+round-2 code half (TPL-2 S3, TPL-3, TPL-4, TPL-5 S3), TPL-6, TPL-7, TPL-8. Before the merge: four W1-35 cases
+revised (below).
 
 ## The eight packages
 
 | item | state | what it waits on |
 |---|---|---|
-| TPL-1 the kernel template set (T-0 to T-8, S1-S5, F1) | **in progress: round 1**, the test designer first | nothing; the kernel part's CIT-P review and the owner's approval at the end (CAP-33) |
-| TPL-2 the facts file and its schema (S1, S2, S4) | **in progress: round 1** | nothing; S3 (a switch flipped in a filled brief) waits on TPL-3's generator |
+| TPL-1 the kernel template set (T-0 to T-8, S1-S5, F1) | **READY on `w2/W2-128`** (round 1) | nothing; the kernel part's CIT-P review and the owner's approval at the end (CAP-33) |
+| TPL-2 the facts file and its schema (S1, S2, S4) | **READY on `w2/W2-128`** | nothing; S3 (a switch flipped in a filled brief) waits on TPL-3's generator |
 | TPL-3 S5 the three scripts | **done** 2026-11-06 (`launch_worker.sh`, `lead_verify.sh`, `wait_for.sh` with their shell tests, the CTO's tools) | the facts naming them: round 1 |
 | TPL-3 S1-S4, S6, S7 `gov brief` | not started | **the owner:** the split into an engineer's ticket (W2-128's body: its paths hold no `src/`); then TPL-1 and TPL-2 |
 | TPL-4 delivery (the launcher flag, the dispatcher, rulesync, `.claude/` copies) | not started | the same split; after TPL-3; **the owner:** the `.claude/` copies ACT |
-| TPL-5 S1-S2 the ticket schema and T-1 | **in progress: round 1** | nothing |
+| TPL-5 S1-S2 the ticket schema and T-1 | **READY on `w2/W2-128`** | nothing |
 | TPL-5 S3 the ready check (refuses missing fields, DEC-1083; `READS_MISSING`, `NEEDS_MISSING`, `WAITS_ON_MISSING`, DEC-1088 (3)) | not started | inside `gov brief`: the split (round 2) |
 | TPL-6 retire the contradicting layers | not started | after TPL-4 and the owner's row decisions (the `steps` switches); **the owner:** Appendix A of the CTO prompt (S1); S2 (LEAD-w2-common, `build_lead_brief.py`, DEC-1057 item 9) after `gov brief`; S3's two skills in the CIT-P |
 | TPL-7 measures (`check_return.py`, `template_report.py`) | not started | the T-0 return form (TPL-1, round 1); the CTO's tools lane; one worker at a time |
@@ -28,8 +30,8 @@ change exists on `w2/integrate` at `0240833b`.
 
 | rows | state | where it lands |
 |---|---|---|
-| 1-9 (the CTO's lines from 2026-11-03) | **in progress: round 1**; added to W2-128 as one KPI line (string test per row; marked DEC-1109 (2)) | T-4 (1, 7), T-5 (2), T-7 and T-8 (3, 4, 8, 9), T-0 (5, 6) |
-| 10-17 (LINK-INTEGRITY §5, the lines per recording role) | **entered** in `D5-ROWS.md` today (the CTO's step); **in progress: round 1** under W2-128's link-lines KPI line | T-0 to T-8, T-1, the record templates; the skills' halves (orchestration, test-design, audit) in TPL-6 S3's CIT-P |
+| 1-9 (the CTO's lines from 2026-11-03) | **READY on `w2/W2-128`**; added to W2-128 as one KPI line (string test per row; marked DEC-1109 (2)) | T-4 (1, 7), T-5 (2), T-7 and T-8 (3, 4, 8, 9), T-0 (5, 6) |
+| 10-17 (LINK-INTEGRITY §5, the lines per recording role) | **entered** in `D5-ROWS.md` today (the CTO's step); **READY on `w2/W2-128`** under W2-128's link-lines KPI line | T-0 to T-8, T-1, the record templates; the skills' halves (orchestration, test-design, audit) in TPL-6 S3's CIT-P |
 
 ## The MR-1..MR-6 status row (DEC-1074 (8))
 
@@ -79,3 +81,14 @@ lane), now filed as **W2-151** (`DAEO-qzca`, `56ad463a`). Today the six files st
   F7; red on integrate but the green guards: existing tickets and records valid, the record templates' `gov links`);
   tripwire changes all other lanes'. The CTO's P1 (b) (`waits_on` items keyed `ref`, not `on`) and P2 (a) (a string
   or `{ref, reason}`) in the ticket's interface; the designer's revision for `ref` next, then the product-spec worker.
+- 2026-11-09: designer revision 2 **TESTS-READY `bd7732def530`** (92 cases); product-spec round 1 `w2/W2-128`
+  **`a6c83d497035`** (31 files: T-0 to T-8, `keys.yaml`, `facts.yaml` and its schema, four schemas, record templates'
+  link lines, `brief-*.md` pointers, `roles/engineer.md` line 5 and its `.rulesync` copies, the CIT-P draft); the CTO's
+  `gov accept W2-128` outside the sandbox 92/92; review **READY** (`reviews/w2-128-r1.md`): F1-F5, F9 in scope but
+  `other` (the designer's commands bound to `{TREE}`, two step lines citing lifted rules, `[DEC-254]` to `[DEC-963]`,
+  "Ask memory first" against the sandbox, a double evidence quote, a count); F6-F8 out (TPL-6, round 2).
+- **Before the merge (the CTO):** (1) four W1-35 cases on `brief-*.md` red by TPL-1 S4 (confirmed by the CTO): a test
+  designer's revision under DEC-866 with `Rewrite-Reason:`; (2) F1-F5 and F9 as one small product-spec fix round, or
+  carried into round 2 as the reviewer allows (DEC-802); (3) at the merge, `LEAD-w2-common.md` lines 87, 149, 163
+  (F6) pointed to the templates; (4) W1-30's template-ticket cases (`test_w1_30_r16_context_own_tickets.py`) run
+  outside the sandbox (they build a store; not run here).
