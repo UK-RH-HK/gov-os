@@ -153,8 +153,11 @@ def test_s19_t1_sets_reads_needs_and_waits_on_beside_allowed_paths_with_their_me
         assert key in skeleton, f"ticket.md's skeleton lacks {key}:"
     waits = skeleton["waits_on"]
     assert isinstance(waits, list), f"waits_on is not a list: {waits!r}"
-    assert all(isinstance(item, dict) and {"on", "reason"} <= set(item) for item in waits), \
-        f"waits_on items are not {{on, reason}} as YAML reads them (an unquoted on: is read as true): {waits!r}"
+    # An item is a string or {ref, reason} (the CTO's P1 (b), P2 (a)); an object without reason fails.
+    wrong = [item for item in waits
+             if not (isinstance(item, str) and item.strip())
+             and not (isinstance(item, dict) and {"ref", "reason"} <= set(item))]
+    assert not wrong, f"waits_on items are neither a string nor {{ref, reason}} as YAML reads them: {wrong!r}"
     raw = blocks[0].split("\n")
     outside = s.units(s.prose(body))
     for key in ("reads", "needs", "waits_on"):

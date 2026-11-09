@@ -66,15 +66,26 @@ def test_s10_ticket_schema_declares_reads_and_needs_as_lists_of_strings(field):
         f"ticket.schema.json does not declare {field}: a bare string passes"
 
 
-def test_s10_ticket_schema_declares_waits_on_as_on_and_reason():
+def test_s10_ticket_schema_declares_waits_on_as_a_string_or_ref_and_reason():
+    # The CTO's P1 (b) and P2 (a), 2026-11-09: an item is a string or {ref, reason}; the key is ref, never on.
     base = _ticket()
-    good = [{"on": "DAEO-k7hz", "reason": "the store's statements first"},
-            {"on": "docs/research/W2-92-memory-measure.md", "reason": "the measure decides the hop"}]
+    good = [{"ref": "DAEO-k7hz", "reason": "the store's statements first"},
+            {"ref": "docs/research/W2-92-memory-measure.md", "reason": "the measure decides the hop"}]
     errors = _accepts("ticket.schema.json", _with(base, waits_on=good))
-    assert not errors, f"ticket.schema.json refuses waits_on: [{{on, reason}}]: {errors[:3]}"
+    assert not errors, f"ticket.schema.json refuses waits_on: [{{ref, reason}}]: {errors[:3]}"
+    strings = ["DAEO-qskx — W2-142: the guard first"]
+    errors = _accepts("ticket.schema.json", _with(base, waits_on=strings))
+    assert not errors, f"ticket.schema.json refuses waits_on: [str] (DAEO-2bdu's form): {errors[:3]}"
+    mixed = strings + good[:1]
+    errors = _accepts("ticket.schema.json", _with(base, waits_on=mixed))
+    assert not errors, f"ticket.schema.json refuses a string item beside a {{ref, reason}} item: {errors[:3]}"
     assert not _accepts("ticket.schema.json", _with(base, waits_on=[])), "ticket.schema.json refuses waits_on: []"
     assert _accepts("ticket.schema.json", _with(base, waits_on="DAEO-k7hz")), \
         "ticket.schema.json does not declare waits_on: a bare string passes"
+    assert _accepts("ticket.schema.json", _with(base, waits_on=[{"reason": "the store's statements first"}])), \
+        "ticket.schema.json accepts a waits_on object without ref"
+    assert _accepts("ticket.schema.json", _with(base, waits_on=[{"on": "DAEO-k7hz", "reason": "the store first"}])), \
+        "ticket.schema.json accepts a waits_on object keyed on instead of ref"
 
 
 def test_s10_every_existing_ticket_stays_valid():

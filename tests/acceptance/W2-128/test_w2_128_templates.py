@@ -29,10 +29,12 @@ def test_s1_front_matter_holds_name_version_and_role(stem):
     assert front.get("name") == stem, f"{stem}.md: name is {front.get('name')!r}, not the file's stem"
     version = front.get("version")
     assert isinstance(version, str) and s.SEMVER.match(version), f"{stem}.md: version {version!r} is not semver"
+    # role: a plain string, `any` for T-0 and T-1, never a placeholder (the ticket's "Files").
     role = front.get("role")
-    assert (isinstance(role, str) and role.strip()) or (
-        isinstance(role, list) and role and all(isinstance(r, str) and r.strip() for r in role)), \
-        f"{stem}.md: role {role!r} is missing or empty"
+    assert isinstance(role, str) and role.strip(), f"{stem}.md: role {role!r} is not a plain non-empty string"
+    assert "{" not in role and "}" not in role, f"{stem}.md: role {role!r} is a placeholder"
+    if stem in ("brief", "ticket"):
+        assert role.strip() == "any", f"{stem}.md: role is {role!r}, not any"
 
 
 # --- S2: the prose budget ------------------------------------------------------------------------------------------
@@ -120,7 +122,12 @@ def _all_template_texts() -> dict[str, str]:
 
 def test_s5_every_key_placeholder_is_in_keys_yaml():
     known = _keys()
-    unknown = {name: sorted(s.keys_of(text) - known) for name, text in _all_template_texts().items()
+    texts = _all_template_texts()
+    # No placeholder family beside CMD: and STEP: (R3's {FACT:…} is not used: a fact is a KEY or a CMD:).
+    families = {name: sorted(set(found)) for name, text in texts.items()
+                if (found := [f for f in s.FAMILY_PLACEHOLDER.findall(text) if f not in ("CMD", "STEP")])}
+    assert not families, f"placeholder families outside {{CMD:}} and {{STEP:}}: {families}"
+    unknown = {name: sorted(s.keys_of(text) - known) for name, text in texts.items()
                if s.keys_of(text) - known}
     assert not unknown, f"placeholders no key in keys.yaml names: {unknown}"
 

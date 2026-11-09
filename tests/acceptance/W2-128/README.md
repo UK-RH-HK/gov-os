@@ -5,6 +5,10 @@ implementation, from the ticket's KPI lines and its body's "Interface and rounds
 `R3-TEMPLATES.md` §B, §C, §D and the Appendix, `LINK-INTEGRITY.md` §5, `D5-ROWS.md` rows 1-17 and today's
 integrated text (`w2/integrate` at `75a29ff64`). Nothing of this ticket's implementation was read.
 
+**Revision 2 (2026-11-09, a fresh designer):** the CTO's P1 (b) and P2 (a) on D1 and D2 (ticket `d1f50e2f`):
+`waits_on` items are a string or `{ref, reason}` (S10, S19); `role` a plain string, `any` for T-0 and T-1 (S1); no
+`{FACT:…}` family (S5). Counts unchanged; S10's waits_on case renamed (map below).
+
 KPI cells use positions in the ticket: `S<n>` is the n-th success line, `F<n>` the n-th failure line (the ticket's
 lines begin with TPL labels). S1-S5 are TPL-1 S1-S5; S6 is TPL-2; S8 is TPL-3 S5; S10 is TPL-5; S14 the link
 lines; S15 the links command; S16 the three schemas; S17 the CIT-P; S18 the reviewer's reversal line; S19 the
@@ -23,14 +27,17 @@ the check forms they run. The cases need `git`, the `jsonschema` package (4.x, D
 
 - **The nine templates** are `template/governance/kernel/templates/{brief,ticket,role-research,role-product-spec,
   role-test-designer,role-engineer,role-reviewer,role-lead,role-cto}.md` (the ticket's "Files"). Front matter:
-  `name` equal to the stem, `version` semver (`1.2.3`, a string), `role` a non-empty string or list.
+  `name` equal to the stem, `version` semver (`1.2.3`, a string), `role` a plain non-empty string with no brace
+  (never a placeholder), `any` for T-0 and T-1 (revision 2, the ticket's "Files").
 - **The prose measure (S2)** is the ticket's: the body after the front matter, less fenced code blocks and lines
   starting `|` (indented ones too), counted in characters with the kept lines joined by newlines; T-0 unfilled.
   Budgets are R3 §C's (T-0 and T-1 4,000; T-2 to T-6 3,500; T-7 8,000; T-8 6,000); `facts.yaml`'s `budgets`
   must name each stem at or under them.
 - **Placeholders (S5, F1)**: `{KEY}` or `{KEY: description}` with KEY in `[A-Z][A-Z0-9_]*`; `{CMD:name …}` (the
   name runs to the first space or brace, so `{CMD:commit role=x}` names `commit`); `{STEP:name}`. A brace a shell's
-  `$` opens (`${HOME}`) and lower-case braces are not placeholders. The scan covers the nine templates and the
+  `$` opens (`${HOME}`) and lower-case braces are not placeholders. No other family: an upper-case name and a colon
+  with no space after it (`{FACT:x}`) fails S5 unless it is `CMD:` or `STEP:`, so a key's description needs the
+  space (`{KEY: description}`). The scan covers the nine templates and the
   record templates (`checkpoint`, `decision-record`, `decision-package`, `failure`, `lesson`, `research`), front
   matter included. `keys.yaml` must also list the Appendix's keys `ID W2 PROFILE IMPL EST TREE TESTS_TREE MAIN TOOLS
   STORE_TREE` and `BASE` (LINK-INTEGRITY §5 names `{BASE}` a generator key).
@@ -120,7 +127,7 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_accepts_a_kpi_line_as_line_and_verify_beside_the_string_form` | red | KPI items must be strings today |
 | S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_reads_and_needs_as_lists_of_strings[reads]` | red | `reads` not declared: a bare string passes |
 | S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_reads_and_needs_as_lists_of_strings[needs]` | red | `needs` not declared: a bare string passes |
-| S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_waits_on_as_on_and_reason` | red | `waits_on` not declared: a bare string passes |
+| S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_waits_on_as_a_string_or_ref_and_reason` | red | `waits_on` not declared: a bare string passes, and an object without `ref` passes |
 | S10 | `test_w2_128_schemas.py::test_s10_every_existing_ticket_stays_valid` | green (guard) | all 213 tickets validate today; they must after the change (see N-2: `DAEO-2bdu`) |
 | S10 | `test_w2_128_schemas.py::test_s10_t1_is_the_ticket_template_with_its_skeleton_in_one_yaml_block` | red | today's `ticket.md` is front matter, with no `name: ticket` and no yaml block |
 | S11 | round 2: not mapped | none | TPL-6, after TPL-4 and the owner's row decisions |
@@ -200,18 +207,19 @@ schema losing the `{line, verify}` form, `non_goals` or `waits_on`; the lesson s
 
 ## Notes and limits
 
-- **N-1. `on:` in YAML.** PyYAML (YAML 1.1), which gov's front-matter reader uses, reads an unquoted key `on` as the
-  boolean `true`. A ticket written `waits_on: [{on: DAEO-x, reason: …}]` has no `on` key once read, so a schema
-  requiring `on` refuses it. The S19 case reads T-1's skeleton as YAML and asks for the keys `on` and `reason`: the
-  template must quote `"on":` (or the interface rename the key). Returned to the CTO as a discovery.
-- **N-2. `DAEO-2bdu` already has `waits_on:`** as a list of strings (`"DAEO-qskx — W2-142: …"`). A schema allowing
-  only `{on, reason}` items turns it invalid, which the S10 guard catches (shown in the self-check). The S10 cases
-  ask that objects are accepted and a bare string (not a list) is refused; they leave string items open, so an
-  `anyOf` of string and `{on, reason}` items satisfies both. Returned as a discovery.
+- **N-1 (D1). `on:` in YAML: decided.** PyYAML (YAML 1.1) reads an unquoted key `on` as the boolean `true`. The
+  CTO's P1 (b) (2026-11-09, DEC-1109 (2), in the ticket's "Interface and rounds"): the object's key is `ref`, never
+  `on`. S19 reads T-1's skeleton as YAML and takes an item that is a non-empty string or an object with `ref` and
+  `reason`; an object without `reason` (or keyed `on`) fails it. S10 refuses an object without `ref`, `{on, reason}`
+  among them.
+- **N-2 (D2). String items: decided.** `DAEO-2bdu` has `waits_on:` as a list of strings. The CTO's P2 (a): an item
+  is a string or `{ref, reason}`, so DAEO-2bdu stays valid. S10 now asks the schema to accept string items,
+  `{ref, reason}` items and both mixed, and to refuse a bare string (not a list); the guard on every existing ticket
+  stays.
 - **N-3. F7's rule** is the brief's: a bracketed id must be ACCEPTED. The register's 108 `DONE` entries (records of
   fact) fail it as rules too.
-- **N-4. Placeholders outside the interface.** R3's T-7 uses `{FACT:accepted_reds}`, which these cases read as the
-  KEY `FACT` with a description; it passes only if `keys.yaml` lists `FACT`.
+- **N-4. Placeholders outside the interface: decided.** R3's T-7 uses `{FACT:accepted_reds}`; the ticket now says no
+  `{FACT:…}` family (a fact is a KEY or a `CMD:`), so S5 fails any such family whatever `keys.yaml` lists.
 - **N-5. dod quoting** asks T-1 and T-7 each to hold at least one literal `DOD-n` that `facts.yaml` holds, and to copy
   no dod line of 30 characters or more word for word.
 - **N-6. The `.claude/` copies** and the `.rulesync/` sources are not read here (TPL-4, round 2).

@@ -74,6 +74,8 @@ KEY_NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
 KEY_PLACEHOLDER = re.compile(r"(?<!\$)\{([A-Z][A-Z0-9_]*)(?=[}:])")
 CMD_PLACEHOLDER = re.compile(r"(?<!\$)\{CMD:([^\s{}]+)")
 STEP_PLACEHOLDER = re.compile(r"(?<!\$)\{STEP:([^\s{}]+)")
+# A family is an upper-case name and a colon with no space after it ({FACT:x}); {KEY: description} has the space.
+FAMILY_PLACEHOLDER = re.compile(r"(?<!\$)\{([A-Z][A-Z0-9_]*):(?=[^\s}])")
 BRACKET = re.compile(r"\[([^\[\]]*)\]")
 DEC_ID = re.compile(r"\bDEC-\d{3,}\b")
 DEC_IN_BRACKETS = re.compile(r"\[[^\[\]]*\bDEC-\d{3,}\b[^\[\]]*\]")
