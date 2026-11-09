@@ -39,6 +39,11 @@ Result: **`failures: 0`**. The operator's `validate_manifest`, `act_class.classi
 path) pass on the bundle.
 
 ## Before it is queued
+0. **The builder now finds the drifted sources itself** (from the portability check). A role source is rebuilt as its
+   rulesync front matter plus the kernel role's body. On round 2a's head (`w2/W2-128` `5c494e25`) it gives
+   **19 files**: the 13 above, plus the orchestrator agent, the orchestration and test-design skills (source and
+   copy). Rehearsal `failures: 0`, portability clean after the apply (scratch run, manifest `8e13c8136377…`). The
+   bundle to queue is built once more, on integrate after the CTO merges round 2a.
 1. **Rebuild if the touched files moved.** W2-128's round 2a may change the orchestration skill and the orchestrator
    role (review F6) and the test-design skill (F7). If it lands first, the builder is re-run with those sources and
    copies added, so one ACT carries all of them, and the manifest sha changes. If it lands after, a second run of the
