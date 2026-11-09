@@ -58,18 +58,20 @@ def test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_t
 
 
 def test_several_broken_conditions_are_all_named(machine, repo):
-    machine.open_config(min_available_memory_bytes=1 * GIB, max_load_1m=8.0, max_weighted_sessions=1)
-    machine.set_readings(available_bytes=512 * 1024 * 1024, load=12.0)
-    for n in range(3):
-        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-m{n}")
+    """DEC-1097 (8): every current condition broken at once is named (no sessions condition, DEC-983)."""
+    machine.open_config(memory_floor_bytes=1 * GIB, working_size_bytes=1 * GIB)
+    machine.set_readings(available_bytes=512 * 1024 * 1024, load=12.0, load_15=12.0, nproc=8, busy_cores=9.0,
+                         embedding_p95=(0.5, 0.5), free_bytes=10 * GIB, free_inodes=1_000)
 
     reading = machine.read(repo)
     reasons = support.reasons_by_condition(reading)
     assert support.gate_of(reading)["open"] is False, reading
-    assert set(reasons) == {"memory", "load", "sessions"}, reasons
-    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (512 * 1024 * 1024, 1 * GIB)
-    assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (12.0, 8.0)
-    assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (3, 1)
+    assert set(reasons) == {"memory", "load", "cpu", "disk", "inodes"}, reasons
+    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (512 * 1024 * 1024, 2 * GIB)
+    assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (12.0, 8)
+    assert (reasons["cpu"]["reading"], reasons["cpu"]["threshold"]) == (10.0, 8)
+    assert (reasons["disk"]["reading"], reasons["disk"]["threshold"]) == (10 * GIB, 100 * GIB)
+    assert (reasons["inodes"]["reading"], reasons["inodes"]["threshold"]) == (1_000, 10_000_000)
 
 
 @pytest.mark.parametrize("condition", ["memory", "load"])
