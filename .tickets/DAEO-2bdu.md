@@ -114,6 +114,13 @@ sources:
 - DEC-1074
 - DEC-1092
 - DEC-1094
+- CAP-33
+- DEC-1010
+- DEC-1046
+- DEC-1069
+- DEC-1076
+- DEC-1078
+- DEC-1079
 est_loc: 750  # [changed, DEC-1099 (2)] was 500 (W2-88-STANDARD-1 §4)
 acceptance_tests:
   path: tests/acceptance/W2-88/
