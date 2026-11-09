@@ -40,27 +40,30 @@ def test_the_reading_reports_memory_load_processors_and_the_registry_folder(mach
     assert gate["open"] is True and gate["reasons"] == [], reading
 
 
-def test_every_live_session_is_read_with_its_pid_repository_ticket_role_and_weight(machine, repo):
+def test_every_live_session_is_read_with_its_pid_repository_ticket_role_and_live_memory(machine, repo):
+    """DEC-1097 (8): sessions carry no weight any more (DEC-983); each carries its live memory, which the memory
+    rule adds (S6)."""
     machine.open_config()
-    light = machine.live_process()
-    heavy = machine.live_process()
+    small = machine.live_process()
+    large = machine.live_process(memory_mib=128)
 
-    machine.register(repo, light.pid, ticket="DAEO-lite", role="engineer")
-    machine.register(repo, heavy.pid, ticket="DAEO-hevy", role="independent-auditor", heavy=True)
+    machine.register(repo, small.pid, ticket="DAEO-lite", role="engineer")
+    machine.register(repo, large.pid, ticket="DAEO-hevy", role="independent-auditor")
 
     reading = machine.read(repo)
-    assert support.session_pids(reading) == sorted([light.pid, heavy.pid]), reading
+    assert support.session_pids(reading) == sorted([small.pid, large.pid]), reading
     by_pid = {int(s["pid"]): s for s in reading["sessions"]}
-    for pid, ticket, role, is_heavy in ((light.pid, "DAEO-lite", "engineer", False),
-                                        (heavy.pid, "DAEO-hevy", "independent-auditor", True)):
+    for pid, ticket, role in ((small.pid, "DAEO-lite", "engineer"), (large.pid, "DAEO-hevy", "independent-auditor")):
         entry = by_pid[pid]
         assert support.same_path(entry.get("repository"), repo), entry
         assert entry.get("ticket") == ticket, entry
         assert entry.get("role") == role, entry
-        assert entry.get("heavy") is is_heavy, entry
-    assert reading.get("weighted_sessions") == 3, f"one light and one heavy session weigh 1 + 2: {reading}"
+        assert isinstance(entry.get("live_memory_bytes"), int), f"a session without its live memory: {entry}"
+    assert by_pid[large.pid]["live_memory_bytes"] >= 128 * support.MIB, by_pid[large.pid]
+    assert by_pid[small.pid]["live_memory_bytes"] < 128 * support.MIB, by_pid[small.pid]
 
-    assert machine.registry.is_dir() and any(p.is_file() for p in machine.registry.rglob("*")), (
+    assert machine.registry.is_dir() and any(p.is_file() and p.name != "gate.json"
+                                             for p in machine.registry.rglob("*")), (
         f"nothing was written under $HOME/.gov-os/machine/ ({machine.registry})")
 
 
