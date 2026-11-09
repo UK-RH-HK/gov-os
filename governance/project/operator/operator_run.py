@@ -21,6 +21,7 @@ The restore rule (F15, DEC-1106 (1)): the agent writes back only a live file it 
 file at the frozen after-copy). Anything else that differs is left exactly as it is, the lock held, a P1 naming it.
 Test hook points (GOV_OPERATOR_TEST_HOOK <point> <frozen>): after-G1, after-G6, in-G8, in-apply-checks.
 The result is the last line of stdout, one JSON object; exit 0 when applied, undone (the undo step) or digested.
+The undo step and the journal's recovery that leave a file not the ACT's own say "refused" and exit 1 (DEC-1107).
 """
 import json
 import os
@@ -1457,7 +1458,9 @@ def undo_step(s, act, sha, approved):
     last = applied[-1]
     at = oc.parse_iso(last.get("time"))
     later = events[events.index(last) + 1:]
-    if any(e.get("act") == act and e.get("manifest_sha256") == sha and e.get("result") == "undone" for e in later):
+    # an undo that left another's file says "refused" (DEC-1107) but its line still carries undo "done"
+    if any(e.get("act") == act and e.get("manifest_sha256") == sha
+           and (e.get("result") == "undone" or e.get("undo") == "done") for e in later):
         raise oc.Refused("undo", "already undone")
     run.cls = last.get("class")
     run.votes = last.get("votes")
@@ -1488,9 +1491,14 @@ def undo_step(s, act, sha, approved):
     run.review_sha = last.get("review_sha256") or (oc.sha256_file(os.path.join(frozen, "review.md"))
                                                    if os.path.isfile(os.path.join(frozen, "review.md")) else None)
     env = run.live_env()
-    for t in run.manifest["touched"]:
-        if oc.live_hash(s, t["root"], t["path"], env) != t["after"]:
-            raise oc.Refused("undo", f"{t['root']}:{t['path']} moved since the apply")
+    # a touched file at third bytes is someone else's: undo_live leaves it as written and undoes the ACT's own files
+    # (DEC-1106 (1)); with none at third bytes, a file back at its before-copy still refuses here, nothing written
+    states = [(t, oc.live_file(s, t["root"], t["path"], env)) for t in run.manifest["touched"]]
+    third = [t for t, data in states if not is_after(t, data) and not is_before(t, data)]
+    if not third:
+        for t, data in states:
+            if not is_after(t, data):
+                raise oc.Refused("undo", f"{t['root']}:{t['path']} moved since the apply")
     rc, head, _ = oc.git(s["repo"], "rev-parse", "HEAD")
     st = UndoState(run, head.decode().strip() if rc == 0 else None)
     st.controls = control_snapshot(s, env)
@@ -1517,15 +1525,23 @@ def undo_step(s, act, sha, approved):
         return run.result("refused", "undo", f"the undo failed ({why}){left}: lock held", undo="failed",
                           left=st.left), 1
     run.commit = getattr(run, "undo_commit", None) or run.commit
-    text = f"Undone {act} on the owner's line ({oc.iso(found[2])})"
     if st.left:
-        text += f"{left}; lock held, nothing else is applied"
+        # DEC-1107: another's file left untouched is never reported as a success: "refused", exit 1, the P1 naming
+        # each file and the lock held; the ACT's own touched files are undone all the same
+        text = (f"{act}: refused: the owner's undo ({oc.iso(found[2])}) undid the ACT's own touched files only{left}; "
+                "lock held, nothing else is applied")
         hold_lock(s, act, sha, text)
-    run.line("undo", "undone", undo="done", notice="undo", typed=oc.iso(found[2]), left=st.left, lock=bool(st.left))
+        run.line("undo", "refused", undo="done", notice="undo", typed=oc.iso(found[2]), reason=text,
+                 left=st.left, lock=True)
+        oc.notify(s, act, "P1", "undo", text, manifest_sha256=sha,
+                  short=f"undo refused: others left ({oc.iso(found[2])})",
+                  undo="own files undone; others left: lock held")
+        return run.result("refused", "undo", text[len(act) + 2:], undo="done", left=st.left, lock=True), 1
+    text = f"Undone {act} on the owner's line ({oc.iso(found[2])})"
+    run.line("undo", "undone", undo="done", notice="undo", typed=oc.iso(found[2]), left=[], lock=False)
     oc.notify(s, act, "P1", "undo", text, manifest_sha256=sha,
-              short=f"undone on the owner's line ({oc.iso(found[2])})",
-              undo="others left: lock held" if st.left else "undone byte for byte")
-    return run.result("undone", undo="done", left=st.left, lock=bool(st.left)), 0
+              short=f"undone on the owner's line ({oc.iso(found[2])})", undo="undone byte for byte")
+    return run.result("undone", undo="done", left=[], lock=False), 0
 
 
 # ================================================================================================= the journal's undo
@@ -1583,14 +1599,18 @@ def recover(s, approved):
                   manifest_sha256=sha)
         return run.result("refused", "journal", f"the journal's undo failed ({why}){left}: lock held",
                           undo="failed", left=st.left), 1
-    text = f"{act}: a session died mid-apply; undone at the next launch"
     if st.left:
-        text += f"{left}; lock held, nothing else is applied"
+        # DEC-1107: as the owner's undo: "refused", exit 1, the P1 naming each file left, the lock held
+        text = (f"{act}: refused: a session died mid-apply; the ACT's own touched files undone at the next launch"
+                f"{left}; lock held, nothing else is applied")
         hold_lock(s, act, sha, text)
-    run.line("journal", "undone", undo="done", notice="recovered", left=st.left, lock=bool(st.left))
+        run.line("journal", "refused", undo="done", notice="recovered", reason=text, left=st.left, lock=True)
+        oc.notify(s, act, "P1", "recovered", text, manifest_sha256=sha)
+        return run.result("refused", "journal", text[len(act) + 2:], undo="done", left=st.left, lock=True), 1
+    text = f"{act}: a session died mid-apply; undone at the next launch"
+    run.line("journal", "undone", undo="done", notice="recovered", left=st.left, lock=False)
     oc.notify(s, act, "P1", "recovered", text, manifest_sha256=sha)
-    return run.result("undone", "journal", text[len(act) + 2:], undo="done", left=st.left,
-                      lock=bool(st.left)), (1 if st.left else 0)
+    return run.result("undone", "journal", text[len(act) + 2:], undo="done", left=st.left, lock=False), 0
 
 
 # ========================================================================================================= the digest
