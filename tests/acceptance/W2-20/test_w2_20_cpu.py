@@ -68,3 +68,42 @@ def test_s12_both_servers_cpu_p95_count_when_a_session_is_admitted(machine, repo
         reasons = support.reasons_by_condition(refused)
         assert set(reasons) == {"cpu"}, reasons
         assert support.close_to(reasons["cpu"]["reading"], 4.0) and reasons["cpu"]["threshold"] == 4, reasons["cpu"]
+
+
+# Round 7 (the CTO's ruling under DEC-1097 (8) on review F2, a false refusal): the busy cores already hold the servers'
+# current use, so only the part of each server's p95 above its current use is added:
+# busy + max(0, p95(shared) - now(shared)) + max(0, p95(query) - now(query)) < nproc. A machine of 20 CPUs, as the
+# review's: (busy, p95 (shared, query), now (shared, query), the cpu reading when shut or None when open).
+SERVERS_NOW = {
+    "a store rebuild: the shared server busy now near its p95 opens": (12.0, (8.0, 0.5), (7.5, 0.5), None),
+    "the same p95 with both servers idle now counts its headroom: equal shuts": (11.5, (8.0, 0.5), (0.0, 0.0), 20.0),
+    "a server busier now than its p95 subtracts nothing: equal shuts": (19.5, (1.0, 0.5), (3.0, 0.0), 20.0),
+}
+
+
+@pytest.mark.parametrize("case", list(SERVERS_NOW))
+def test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added(machine, repo, case):
+    """A store rebuild: 12 busy cores of 20, 8.0 of them the shared server's now, its p95 8.0: the sum is
+    12 + 0.5 + 0 = 12.5, open (counted twice it would be 20.5 and shut). The same p95 with the servers idle now: all
+    of it is headroom, 11.5 + 8.0 + 0.5 = 20.0, shut. A server using 3.0 now against a p95 of 1.0 adds nothing and
+    takes nothing away: 19.5 + 0 + 0.5 = 20.0, shut (with the difference subtracted it would be 18.0 and open)."""
+    busy, p95, now, shut_at = SERVERS_NOW[case]
+    machine.set_readings(nproc=20, busy_cores=busy, embedding_p95=p95, embedding_now=now)
+
+    reading = machine.read(repo)
+    shown_p95, shown_now = reading.get("embedding_cpu_p95"), reading.get("embedding_cpu_now")
+    assert isinstance(shown_p95, dict) and isinstance(shown_now, dict), (
+        f"the reading does not show the servers' p95 and current use side by side: {reading}")
+    for name, i in (("shared", 0), ("query", 1)):
+        assert support.close_to(shown_p95.get(name), p95[i]) and support.close_to(shown_now.get(name), now[i]), (
+            f"the {name} server's p95 or current use is not the planted one: {shown_p95}, {shown_now}")
+    code, envelope, out, err = machine.check(repo)
+    if shut_at is None:
+        support.opened_of(code, envelope, out, err)
+        assert support.gate_of(reading)["open"] is True, f"the servers' current use was counted twice: {reading}"
+    else:
+        refused = support.refusal_of(code, envelope, out, err)
+        reasons = support.reasons_by_condition(refused)
+        assert set(reasons) == {"cpu"}, reasons
+        assert support.close_to(reasons["cpu"]["reading"], shut_at) and reasons["cpu"]["threshold"] == 20, (
+            reasons["cpu"])
