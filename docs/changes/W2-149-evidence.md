@@ -12,7 +12,7 @@
 | `governance/project/orchestration/tools/indep_launch.py` | The launch script: standard library, PyYAML and `git`; no `gov` import. |
 | `governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json` | The counts schema: every object closed, every string a const, an enum or an anchored pattern. |
 | `governance/project/orchestration/tools/indep-schemas/{writer,checker,auditor,labeller}-result.schema.json` | The four kinds' first result schemas (top level open; the counted objects closed). |
-| `tests/unit/orchestration/test_w2_149_indep_launch.py` | The engineer's unit tests (64), on planted roots with a stub `claude`. |
+| `tests/unit/orchestration/test_w2_149_indep_launch.py` | The engineer's unit tests (64 in round 1, 74 after round 2), on planted roots with a stub `claude`. |
 
 The order of one launch: the argument checks (17) first; then the repository, the commit and the main line (14);
 the template against `APPROVED` and `kinds.yaml`'s tools (11); the brief's bytes, hash and `APPROVED` line, its front
@@ -105,6 +105,29 @@ green. No place was found where the interface and a KPI line disagree.
 The 3 skipped acceptance cases are these. No real `claude` was started here, and no real `~/gov-os-eval`,
 `~/gov-os-runs`, `~/gov-os-wall-trees` or `~/.claude` was opened by this work: every unit test and every acceptance
 case ran on planted roots.
+
+## Round 2: the review's findings (DEC-1010 round 1 of 2; the CTO's brief, DEC-1101 (2)-(3))
+
+The engineer, 2026-11-09, from head `8d4569bfef3c`. Only the findings below were changed; F4, F7, F9, F10, F12 (the
+CTO's rows) and F2, F11 (outside this ticket) were left as they were. Lines are `indep_launch.py`'s after the change.
+
+| Finding | The fix | Lines | Unit tests |
+|---|---|---|---|
+| **F1** (blocks; S12, 22): a stopped session's trace check returned 0 without running (no output, so no session id). | The script draws the session's id (`str(uuid.uuid4())`) and passes it as the closing flag `--session-id <uuid>`; the id is kept only in memory as a trace check key (never printed, logged or written to `WALL.json`). `traces` = the entries named by the drawn id plus those named by the id the session reports when it reports a valid one, each entry counted once (`count_traces` takes a set of keys and counts entry paths). The check always runs after the session and logs `traces checked <n>`. | `session_flags` 721-728, `draw_session_id` 731, `reported_id` 738, `check_traces` 743, the session's id 838, `count_traces` 895-917, after the session 1535-1539 | `test_f1_a_timed_out_session_with_a_trace_under_the_drawn_id_22` (22, `traces` 1, `stopped`); `test_f1_a_timed_out_session_without_traces_is_checked_0` (21, `traces` 0, two `traces checked 0` log lines); `test_f1_the_reported_and_the_drawn_id_count_each_entry_once`; `test_count_traces_counts_each_entry_once_over_every_key`; `test_writer_session_is_closed_and_delivers_counts_only` (the closing `--session-id` flag, a uuid4, not in stdout, stderr, the log or `counts.json`) |
+| **F6** (S12): the canary's own traces were never counted. | The canary draws its own id, passes `--session-id`, and adds the id it reports; its traces are counted when it ends, passed or not, into the same `traces`. A canary trace makes a run that reaches the end return 22; a failing canary keeps its 16 (with `traces` set). | 800-801, 816-819, 832-834; an unexpected error after the canary counts too, 1615-1619 | `test_f6_a_canary_trace_is_counted_22`; `test_f6_a_failed_canary_keeps_its_16_and_counts_its_trace`; `test_canary_runs_with_the_session_flags_plus_its_folder` (the same flags but each its own id) |
+| **F3** (S4/S5): `GOV_INDEP_TEST_HOOK` ran in real runs and left no record. | Recorded, not refused: `WALL.json` `"test_hook": true\|false`; `launch.log` `test_hook set` when it is set. | 1385-1387, 1515 | `test_f3_the_test_hook_is_recorded` |
+| **F5** (S14/S16): a rejected run could leave an empty folder. | The labeller's `labels/` is made only after the result file and the sealed folder are checked, and removed if the copy fails; writer round 1 finds its nearest existing ancestor, checks it (a plain folder under the root, no link on the way) and only then makes the missing folders and `hidden/`, removing every one of them on a failed copy. | writer 1003-1033, labeller 1079-1101 | `test_f5_a_rejected_labeller_leaves_no_labels_folder`; `test_f5_a_rejected_writer_round_one_leaves_no_set_folder` (the evaluation folder reached through a link: rejected, nothing made) |
+| **F8**: the result and counts schemas were read from the working tree, more than once. | `read_schema` reads each schema once (a plain file, no link followed) and returns its sha256 and the object parsed from those bytes; the counts schema at start (used by every check of the counts and by `--counts-only`), the brief's result schema at the brief's check. `WALL.json` `schema_sha256: {"indep-counts.schema.json": ..., "<result schema>": ...}`. | `read_schema` 230-243, 376, 1347, 1516, 1572, 1590 | `test_f8_the_schemas_hashes_are_in_the_wall` |
+
+- **The stand-in:** the unit tests' stub `claude` parses `--session-id` as a value flag; `trace_drawn` and `canary_trace`
+  make it write a trace under the passed id; `report_drawn` makes it report that id. The acceptance cases' stub reports
+  its own id, so their planted-trace case is counted through the reported id (still 1).
+- **`gov accept W2-149`** (head `7bdb6374ae26`): **pass; 77 passed, 0 failed, 3 skipped** (the same per-line counts as
+  round 1; the 3 skipped are the live cases S9, S11, S12). No red in round 2.
+- **Unit tests:** 74 passed (64 + 10 new), `--optin=lifted --optin=breadth`, through the heavy slot, with
+  `-m "not local_only" -k "not real and not green_here and not time_limit"` (it leaves out none of the 74).
+- **For the CTO's live run:** S12 live now searches under the drawn id as well; the live session's command line ends
+  with `--session-id <uuid>` before the prompt.
 
 ## Notes on the runs
 
