@@ -155,7 +155,9 @@ def test_a_test_sessions_folder_is_short_and_made_in_the_launched_sessions_folde
     launched.mkdir()
     monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, str(launched / "claude-1000"))
     made = codeintel.make_session_base()
-    assert made.parent == launched and made.is_dir() and len(made.name) <= 9
+    assert made.parent == launched and made.is_dir() and len(made.name) == 4
+    older = "/tmp/gov-launch-engineer-abcd1234"  # an engineer's folder of the older name (role and 8 letters)
+    assert len(older) + len("/cxyz") + 17 + SOCKET_TAIL <= 107
 
 
 def test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path(monkeypatch):

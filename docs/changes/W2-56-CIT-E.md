@@ -114,7 +114,8 @@ arrives only after the session, and is lost when the launcher is killed.
   `tests/conftest.py`), else in the launched session's temp folder (`<gov-launch-…>/cbm`, found from
   `CLAUDE_CODE_TMPDIR`), else in `/tmp/gov-cbm-<uid>`. The worker's temp folder is `gov-launch-` and 8 letters
   (D-12): with the temp root `/tmp`, a daemon folder plus the tool's 50-byte socket tail is 95 bytes (a test
-  session's: 101), under 107. The real tool is off `PATH` for every case but W1-16's and W1-20's.
+  session's, in a 4-letter folder of its own: 96), under 107; a test session in an engineer's folder of the older
+  name (`gov-launch-engineer-` and 8 letters) still fits (105). The real tool is off `PATH` for every case but W1-16's and W1-20's.
 - **S8 on Linux (D-13)**: the one-path `network.allowUnixSockets` is built from the service's own setting and is inert
   on Linux (the CTO's measure); its reach and S10 are the owner's DEC-105 choice.
 

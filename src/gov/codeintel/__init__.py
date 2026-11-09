@@ -86,14 +86,23 @@ def daemon_base(env=None) -> Path:
 def make_session_base(env=None) -> Path:
     """A new folder for one test session's daemon directories (W2-56 S1), short enough for the tool's socket: in the
     launched session's temp folder, else under ``/tmp``, else under the temp folder. The caller removes it."""
+    import secrets
     import tempfile
 
     launched = launch_folder(env)
-    places = [launched] if launched is not None else [Path("/tmp"), Path(tempfile.gettempdir())]
-    for place in places:
+    if launched is not None:  # four letters: a launcher's folder of the older, longer name still fits (D-12)
+        for _ in range(100):
+            made = launched / ("c" + "".join(secrets.choice("abcdefghijklmnopqrstuvwxyz0123456789") for _ in "xyz"))
+            try:
+                made.mkdir(mode=0o700)
+                return made
+            except FileExistsError:
+                continue
+            except OSError:
+                break
+    for place in (Path("/tmp"), Path(tempfile.gettempdir())):
         try:
-            return Path(tempfile.mkdtemp(prefix="c" if launched is not None else f"gov-cbm-{os.getuid()}-",
-                                         dir=place))
+            return Path(tempfile.mkdtemp(prefix=f"gov-cbm-{os.getuid()}-", dir=place))
         except OSError:
             continue
     raise OSError("no folder for the test session's daemon directories can be made")
