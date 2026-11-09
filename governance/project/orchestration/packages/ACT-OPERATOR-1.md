@@ -40,13 +40,14 @@ the dated `log/*.log`; rehearsed unchanged):
   log/operator.jsonl act-approvals.jsonl journal.json operator.lock session.json session-output.json launch.lock
       calls.jsonl operator-launch.out      the agent's own named files, beside the owner's dated logs
 ```
-- **`APPROVED`'s sha256, live:** `c2a640e4225504e2ef6941fc13233d63bd1095c07d855a55d3238ca4dea3b546` (computed from
+- **`APPROVED`'s sha256, live:** `157a9dc01fcaab78b04dc78f153df8b077460a33ffaa9027cb05bc4b8e474ad7` (computed from
   `install.sums` and the built settings; every result and the digest print it).
 - **`operator-settings.json`** (`a7d6dcbf40be`): `repo` the main tree, `home` `/home/usain`, `claude`
   `/home/usain/.local/bin/claude` (cron's PATH has no `~/.local/bin`). Every other key takes the merged default.
-- **The two briefs, for your approval with this ACT** (OPERATOR-AGENT-1 §7 step 2): `brief.md`
-  `ff00b6da67f26f150207f08f7c67dfc369d5b0a64c08eb54226528efc2211b7a`, `reviewer-brief.md`
-  `e86703304144f7d0c3f48332478f696d8f704c540f5ecf6c0551f6bd761ff81a`; the rule table `class-rules.yaml`
+- **The two briefs, approved by you (DEC-1109 (1)):** `brief.md`
+  `51c459cfbcfec47652df455844480a56a5bc91b5fba3bcf57dc807c5dbf08cc2` (with your one change, committed at `0240833b4`:
+  "unless the program's final result line asks for it"), `reviewer-brief.md`
+  `e86703304144f7d0c3f48332478f696d8f704c540f5ecf6c0551f6bd761ff81a` as written; the rule table `class-rules.yaml`
   `0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1`.
 
 ## 2. The guard rule (2d) and the freeze
@@ -103,8 +104,8 @@ W2-148's review r3 names two files Claude Code writes under `.claude/**` during 
 | `code/operator_run.py`, `code/freeze_gate.py`, `code/merge_queue.py`, `code/test_act_operator_1.py` | `41271992b637`, `00e8ce13249e`, `1f3b1d44f507`, `5ced364cdf06` |
 | `reference-transaction.candidate` | `099de326c45b` |
 | `landing_select.candidate.sh`, `test_landing_select.candidate.sh` | `9e55c0b88032`, `16aa390131c6` |
-| `operator-settings.json`, `crontab.line`, `install.sums` | `a7d6dcbf40be`, `77dcf4661777`, `ee7bd3c26a5b` |
-| `apply.sh` (check, apply, undo) | `7e9398ad91ca` |
+| `operator-settings.json`, `crontab.line`, `install.sums` | `a7d6dcbf40be`, `77dcf4661777`, `29ea26233916` |
+| `apply.sh` (check, apply, undo) | `6bcdcf2f6ca8` (DEC-1109: only its `SUMS` line changed from `7e9398ad91ca`, the reviewed one) |
 | `build.py`, `freeze.py` (the builders), `op_cases.py`, `op_rehearsal.py`, `rehearse.sh` | the rehearsal's own |
 | `rehearsal-pre.log`, `rehearsal-post.log`, `REHEARSAL.md` | §6 |
 
@@ -150,6 +151,15 @@ install), F9 (the cron's hours). In this package: F6 (§3), F7, F10, F11, F12 (�
 `7e9398ad91ca`): **READY** by `verdict.py`, every fix confirmed; two new findings, neither ordinary work, both failing
 closed (§7 items 9 and 10).
 
+**After DEC-1109 (1)** (the brief's one change, `0240833b4`): `install.sums`, the expected `APPROVED` and `apply.sh`'s
+`SUMS` line rebuilt (nothing else in `apply.sh` changed). Re-run in a fresh clone at `0240833b4` (`rehearsal-dec1109.log`,
+18:52–18:53, **0 failures**) the steps the brief touches: `apply.sh` check and apply (the install's own APPROVED check
+ok), the commit (4 M, 2 A), the (a) ACT through the real walled session (its wall holding the new brief, `51c459cf…`):
+applied, undone; the (b) ACT: refused at G6 without the yes, applied and committed with it, undone; the freeze's
+commit cases; the owner's files unchanged; `apply.sh undo` then "ready to apply"; live files unchanged. W2-148's
+acceptance tests 169/169 and `tests/unit/operator` 184/184 on `0240833b4`. `apply.sh check` on the live main tree:
+"ready to apply (the hook is post-calllog)".
+
 ## 7. Residuals, and what follows
 1. **Order with ACT-GUARD-CALLLOG-1 (review F7):** met: CALLLOG-1 is live (`b7a373cf9`), so this ACT lands on the
    post-calllog hook. Undo in reverse (this ACT's undo first, if both are ever undone).
@@ -182,8 +192,8 @@ closed (§7 items 9 and 10).
 
 ## 8. The operator's steps: the message
 > **ACT-OPERATOR-1 (DEC-1104 (2), DEC-1106, DEC-1107, DEC-1108 (5)): install the operator agent.** In the main tree,
-> about two minutes. ACT-GUARD-CALLLOG-1 is already applied, so `check` says "post-calllog". With this ACT you also
-> approve the two fixed briefs: `brief.md` `ff00b6da…211b7a`, `reviewer-brief.md` `e8670330…61ff81a`.
+> about two minutes. ACT-GUARD-CALLLOG-1 is already applied, so `check` says "post-calllog". The install carries the
+> two briefs you approved (DEC-1109 (1)): `brief.md` `51c459cf…f08cc2`, `reviewer-brief.md` `e8670330…61ff81a`.
 > ```
 > cd /home/usain/Dynamic-Agentic-Engineering-OS
 > G=.gov-runtime/scratch/orchestrator/drafts/operator-1
@@ -192,7 +202,7 @@ closed (§7 items 9 and 10).
 > git add .claude/hooks/pretooluse.py governance/project/path-map.yaml governance/project/operator/operator_run.py governance/project/operator/freeze_gate.py governance/project/orchestration/tools/merge_queue.py tests/unit/operator/test_act_operator_1.py
 > git diff --cached --name-status    # expect exactly 4 M and 2 A: those six files
 > git commit -m "ACT-OPERATOR-1: the operator agent installed in ~/gov-os-operator/install (APPROVED), launched by the cron from its queue; the guard refuses every session's writes into the operator's folder but queue/ and into ~/.gov-os/guard-calls (rule 2d); the commit freeze in the commit path and the CTO's tools; F26" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1104, DEC-1106" --trailer "Role: owner"
-> sha256sum ~/gov-os-operator/install/APPROVED    # expect c2a640e4225504e2ef6941fc13233d63bd1095c07d855a55d3238ca4dea3b546
+> sha256sum ~/gov-os-operator/install/APPROVED    # expect 157a9dc01fcaab78b04dc78f153df8b077460a33ffaa9027cb05bc4b8e474ad7
 > crontab -l | tail -1                            # the operator's line, */10 0,8-23
 > ```
 > **Undo:** `bash $G/apply.sh undo`, then commit the six restored files the same way, subject "ACT-OPERATOR-1 undone".
