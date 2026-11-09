@@ -104,7 +104,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
 | 64 | D-5 (the templates) | IN PROGRESS |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
-| 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
+| 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | Built (45 tests, a real 3-action wiring run); review round 1 NOT READY (F1-F8: a refusal credited while the effect happened, shared state, an uncontained control, the control gated by the live hook); fixing; review round 2 next; the four briefs and the operator's sign-in item after READY |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
