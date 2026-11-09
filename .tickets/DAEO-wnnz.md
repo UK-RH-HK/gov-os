@@ -87,6 +87,8 @@ sources:
 - DEC-1097
 - DEC-1098
 - DEC-1112
+- DEC-820
+- W2-145
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-56/
