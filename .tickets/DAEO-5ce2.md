@@ -1,6 +1,6 @@
 ---
 id: DAEO-5ce2
-status: open
+status: in_progress
 deps: []
 links: [DAEO-ongl, DAEO-h4rh]
 created: 2026-11-07T18:26:34Z
@@ -32,7 +32,8 @@ sources:
 - MR-3
 est_loc: 0
 acceptance_tests:
-  judged_by: 'W2-139''s candidate: tests/acceptance/W2-49/ green on it'
+  path: tests/acceptance/W2-49/
+  judged_by: 'W2-139''s candidate: tests/acceptance/W2-49/ green on it (the path added for gov accept, DEC-1093, DEC-1109 (2))'
 track: B
 list_rows: []
 needs:

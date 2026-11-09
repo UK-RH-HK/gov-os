@@ -41,7 +41,8 @@ sources:
 - CAP-33
 est_loc: 0
 acceptance_tests:
-  judged_by: 'tests/acceptance/W2-49/ as W2-140 leaves it, and the plan validator (docs/plan/tools/validate_w2.py)'
+  path: tests/acceptance/W2-49/
+  judged_by: 'tests/acceptance/W2-49/ as W2-140 leaves it, and the plan validator (docs/plan/tools/validate_w2.py) (the path added for gov accept, DEC-1093, DEC-1109 (2))'
 track: B
 list_rows: []
 needs:
