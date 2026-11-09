@@ -4,6 +4,9 @@ Ticket DAEO-xwro (W2-141), profile STANDARD, DEC-1093 (2). Written by the indepe
 ticket's KPI lines S1 to S3 and its three failure lines, before any implementation, reading only the integrated code
 (`w2/integrate` at `8bb10a683` on this branch's base, DEC-963). No implementation of this ticket was read (G-14).
 
+Two rounds: round 1 (`c3e0e16bc`) drives the guard's decide function; round 2 (the ticket's "The hook side",
+DEC-1102) drives the live G-14 hook module `role_reads`, where W2-138's search went through (section "Round 2" below).
+
 ## How they run
 
     env PYTHONPATH=<worktree>/src TMPDIR=<scratch> \
@@ -93,6 +96,99 @@ and 28, success-3 30 and 0, failure-1 5 and 34, failure-2 0 and 34, failure-3 33
 | F3 | `tests/acceptance/W2-141/test_w2_141_unchanged.py::test_s3_guard_g14_cases_answer_as_before` | green (guard, 4) | as S3 |
 | F3 | `tests/acceptance/W2-141/test_w2_141_grep_glob.py::test_s1_guard_a_glob_call_that_cannot_reach_the_folder_is_allowed` | green (guard, 3) | as S1 |
 
+## Round 2: the hook side (DEC-1093 (2), DEC-1102)
+
+Written by a fresh independent test designer on `w2/W2-141-tests` with integrate merged (`2a49d031b`), from the KPI
+lines, round 1's cases and today's integrate code (`.claude/hooks/role_reads.py`, `pretooluse.py`, `bash_writes.py`,
+`src/gov/guard/`); no implementation of this ticket was read, and `docs/changes/W2-141-hook/` does not exist in this
+tree.
+
+    env HOME=<empty scratch> PYTHONUSERBASE=$HOME/.local PYTHONPATH=<worktree>/src TMPDIR=<scratch> \
+      python3 -m pytest tests/acceptance/W2-141/test_w2_141_hook.py -q -p no:cacheprovider \
+      -o tmp_path_retention_policy=failed
+
+In process, under 1 s; no hook process, no network, no model; one `git init` of the planted project.
+(`PYTHONUSERBASE` only where pytest is installed in the user's site and `HOME` is emptied.)
+
+### Which hook the cases load
+
+`w2_141_hook_support.hook_file`: **`docs/changes/W2-141-hook/role_reads.py` when it exists in the tree under test,
+else `.claude/hooks/role_reads.py`**, loaded by file path (importlib) under the module name
+`w2_141_role_reads_under_test`. The tree under test is the parent of the first `src` folder `PYTHONPATH` names when it
+holds either file, else the worktree that holds the tests. Every failure message starts with `[hook <path>]`, naming
+the file the case ran on. **The outcome below ran on `.claude/hooks/role_reads.py`** (integrate's live hook; no staged
+copy here). `bash_writes` is imported from the tree's `.claude/hooks/`.
+
+### The interface the hook cases assume
+
+- **The call, as `.claude/hooks/pretooluse.py` makes it (lines 566-573):**
+  `role_reads.refusal(main, os.path.realpath(root), tool, seen, cwd, roles, ticket, trees, expand_token)` returns the
+  refusal's reason (a string) or None. The cases pass `main` and `root` the planted project (a git repository with no
+  commits, its own path map with the `role_paths:` section round 1 plants: never the main tree's), `cwd` its root,
+  `seen` the tool input (for Bash, `bash_writes.reads_view(command)`), `roles` the session's role and
+  `gov.guard.reads.acting_role(role, agent_type)` deduplicated, `ticket` `DAEO-zz41` or `W2-941`,
+  `trees` `lambda: [root]`, `expand_token` `gov.guard.decide._expand_token`. `HOME` is the module's temporary folder
+  when the module loads, so `~/gov-os-worktrees` names nothing real. The staged copy keeps this signature.
+- **Glob is passed to `refusal` too** (tool `Glob`, input `pattern` and `path`): S1 names Glob. Today's
+  `pretooluse.py` sends only Read, NotebookRead, Grep and Bash to `role_reads` (D-2).
+- **The refusal** holds the folder `tests/acceptance/W2-941` and one of its kind's exclusion forms (round 1's `HOW`),
+  matched as a whole word: a hook reason also names `role_paths` and the path map, so `path` inside `role_paths` or
+  `path-map` does not count as saying how. A G-14 true read keeps its reason (`role_paths.engineer.reads_denied`,
+  `DEC-1052 G-14`).
+- **Allowed exclusion forms, refused near-exclusions and still-refused calls:** round 1's list, with three more
+  allowed forms (`grep -rn --exclude-dir W2-941 …`, the option's value as its own word; `--exclude-dir=W2-941` from
+  the absolute root; `find . -type f ! -path './tests/acceptance/W2-941/*' -exec cat {} +`), and three more reaching
+  forms (`grep -rn … . | head -n 50`, `cd tests && grep -rn … .`, `find tests -type f -exec grep -Hn … {} \;`).
+- **The oracle:** each grep and find command was run for real in a copy of the planted project (GNU grep 3.11,
+  findutils): every reaching command printed lines from `tests/acceptance/W2-941/`, every excluded and every S3 one
+  printed none, the names-only listings printed no content. rg, ag and ack are not installed (N-5).
+
+### KPI lines, hook cases, and the outcome on `w2/integrate`
+
+Run in the launch sandbox through the heavy slot on `2a49d031b`, hook `.claude/hooks/role_reads.py`: **94 tests, 42
+failed, 52 passed** (0.31 s). Every red fails on "was not refused: decision=allow": today's hook lets the search
+through, from the root, `tests/`, `tests/acceptance/`, a `cd`, or as a Glob (which it never judges). The whole
+folder (rounds 1 and 2): 182 tests, 92 failed, 90 passed; round 1's outcome is unchanged. `gov accept W2-141` (the same
+tree, heavy slot, `HOME` an empty folder with only the user's site-packages linked in): success-1 9 passed 40 failed,
+success-2 9 and 52, success-3 81 and 0, failure-1 11 and 71, failure-2 0 and 71, failure-3 79 and 0; none unmapped;
+90 passed, 92 failed.
+
+| KPI line | Test (node id) | On integrate | Why |
+|---|---|---|---|
+| S1, F1, F2 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_a_grep_reaching_the_own_acceptance_folder_is_refused_saying_how` | red (9) | Grep with no path, `.`, the absolute root, `tests/`, `tests/acceptance`, the absolute `tests/acceptance/`, glob `**/*.py`, type py, another ticket excluded: allowed by the hook |
+| S1, F1, F2 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_a_glob_reaching_the_own_acceptance_folder_is_refused_saying_how` | red (5) | Glob `**/*.py` (no path, absolute root), `**/*` from `tests`, `**/test_*.py` from `tests/acceptance`, `tests/**`: allowed (the hook reads no Glob) |
+| S1 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_the_same_when_the_ticket_is_named_by_its_wbs_id` | red (2) | `GOV_TICKET` W2-941: the Grep and the Glob allowed |
+| S1 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_the_same_for_an_engineer_subagent_of_an_orchestrator_session` | red (2) | an engineer subagent of an orchestrator session: allowed |
+| S1, S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_guard_the_grep_with_the_exclusion_is_allowed` | green (guard, 4) | Grep with `!tests/acceptance/W2-941/**` (no path, `.`, the absolute root, names only), by id and by WBS id: allowed |
+| S1, F1 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s1_hook_guard_the_exclusion_does_not_open_a_call_aimed_inside_the_folder` | green (guard) | Grep from the own folder with the exclusion glob: refused |
+| S2, F1, F2 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s2_hook_a_recursive_search_reaching_the_own_acceptance_folder_is_refused_saying_how` | red (23) | grep -r/-R from `.`, none, `tests/`, `tests/acceptance`, the absolute root, `--include=*.py`, `--exclude-dir=W2-942`, the path form `--exclude-dir=tests/acceptance/W2-941`, piped into head, after `cd tests`; rg with no path, `tests`, `-g '*.py'`, another ticket excluded; ag and ack with and without `.`; find `-exec cat`, `-exec grep` (from `.` and `tests`), piped into `xargs grep`, `-print0` into `xargs -0 cat`: allowed |
+| S2 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s2_hook_the_same_when_the_ticket_is_named_by_its_wbs_id` | red | `GOV_TICKET` W2-941: `grep -rn … .` allowed |
+| S2, S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s2_hook_guard_the_search_with_the_exclusion_is_allowed` | green (guard, 9) | grep `--exclude-dir=W2-941` (two orders, the value as its own word, from the absolute root), rg `-g '!tests/acceptance/W2-941/**'`, find `-prune -exec`, `-not -path -exec`, `! -path -exec cat`, `-prune -print \| xargs grep`: allowed |
+| S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s3_hook_guard_an_engineer_search_that_cannot_reach_its_folder_is_allowed` | green (guard, 22) | Grep from `src`, glob `src/**/*.py`, from W2-942, the folder's name as the pattern from `src`; Glob from `src`, `src/**/*.py`, from W2-942; grep -rn for the folder's name and for `test_feature` in `src/` (by pattern, G-14); grep/rg/find in `src`, grep in W2-942; names-only listings (`find . -name '*.py'`, `find tests -type f`, `ls -R tests`, `git log --stat`); `ls` and pytest on the folder; a plain grep of `README.md`; Read and cat of W2-942's test; Read of `README.md` |
+| S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s3_hook_guard_other_roles_are_unaffected` | green (guard, 6) | orchestrator, independent-auditor, independent-test-designer (same ticket), product-spec, ticket-lead, research: the broad Grep, Glob, grep -r, rg, ag, find searches and a Read and cat of the folder allowed |
+| S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s3_hook_guard_another_ticket_s_engineer_reads_this_ticket_s_tests` | green (guard) | W2-942's engineer: grep -rn, Grep and Read of W2-941's folder allowed (DEC-963) |
+| S3, F1 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s3_hook_guard_g14_true_reads_stay_refused_as_before` | green (guard, 5) | G-14's true reads (`test_live_hook.py`'s G14_REFUSED for the engineer): Read, cat, Grep of the folder, `cd tests/acceptance && sed …`, grep -rn of the folder: refused with the G-14 reason, also for an engineer subagent |
+| S3, F3 | `tests/acceptance/W2-141/test_w2_141_hook.py::test_s3_hook_guard_g14_near_misses_still_pass` | green (guard, 4) | G-14's near misses (G14_PASSED for the engineer): another ticket's test, `ls` and pytest on the folder, grep by pattern from `src/`, inline Python: allowed |
+
+### Round 2's notes
+
+- **D-2. `pretooluse.py` never sends a Glob call to `role_reads`.** Its line 566 calls `role_reads.refusal` only for
+  Read, NotebookRead, Grep and Bash. The Glob cases call `refusal` directly, so a staged copy can pass them while the
+  live hook still lets every Glob through: the Glob half of S1 is live only when that line also names `Glob`. That
+  file is not in the ticket's paths (a proposal to the CTO; the return's P-1).
+- **D-3. One existing G-14 near miss contradicts S2.** `tests/unit/hooks/test_live_hook.py` (`G14_PASSED`, "a pattern
+  naming the tests, a search from above") expects `grep -r foo tests/` allowed in a planted project whose
+  `tests/acceptance/W2-G14T/` holds a test: S2 refuses it. These cases keep that row's first command (the grep by
+  pattern from `src/`) and refuse the second. The unit case runs the live hook, so it turns red at the operator's
+  copy; it is outside the ticket's paths (the return's P-2).
+- **D-4. The hook's note lists Glob as a names-only listing let through;** S1 names Glob among the calls refused.
+  The cases follow S1; the other names-only listings (`ls`, `find` without a reader, `git log --stat`) stay allowed.
+  Its note also lets through names a command gets at run time (xargs); S2 names find "piped into a reader", so
+  `find … | xargs grep` and `find … -print0 | xargs -0 cat` are refused unless the find prunes the folder.
+- **N-7. Not reproduced here:** G-14's case of another folder's case revised for the ticket (linked by a designer's
+  `Task:` trailer, it needs commits) and the `git show w2/<T>-tests:…` read (it needs the branch); both are in
+  `test_live_hook.py`, which the CTO runs on the live hook after the re-pin with `guard4_check.py`.
+
 ## Notes and limits
 
 - **D-1. grep's `--exclude-dir` takes a base name.** GNU grep 3.11 (here) skips a subfolder when its *base name*
@@ -125,3 +221,5 @@ and 28, success-3 30 and 0, failure-1 5 and 34, failure-2 0 and 34, failure-3 33
 - `w2_141_support.py`: the planted project, the calls, the decide wrapper, the refusal checks (`HOW`).
 - `conftest.py`: the module's planted project and guard, with a temporary `HOME`.
 - `test_w2_141_grep_glob.py` (S1), `test_w2_141_bash.py` (S2), `test_w2_141_unchanged.py` (S3, the failure lines).
+- Round 2: `w2_141_hook_support.py` (which hook file, its loader, the call as `pretooluse.py` makes it) and
+  `test_w2_141_hook.py` (S1, S2, S3 and the failure lines through the hook).
