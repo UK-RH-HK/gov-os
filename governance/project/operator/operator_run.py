@@ -108,6 +108,70 @@ def validate_manifest(m):
         raise ValueError("commands is not a list")
 
 
+# ===================================================================================================== the path rule
+PATH_RULE = ("the frozen script must work relative to its cwd and HOME: no live repository path or real HOME named "
+             "literally (absolute, ~, $HOME or ${HOME} form), no cd to either")
+_CD = re.compile(r"(?:^|[\s;&|(`\"'{])(?:builtin\s+)?(?:cd|pushd)(?=$|[\s;&|)`\"'])(?:[ \t]+(?:-[LPe@]+[ \t]+)*"
+                 r"(?P<t>[^\s;&|)`]*))?")
+HOME_WORDS = ("~", "$HOME", "${HOME}")
+
+
+def _literal(path):
+    return re.compile(r"(?<![\w.\-/])" + re.escape(path) + r"(?![\w.\-])")
+
+
+def live_path_refs(text, s):
+    """Why a shell text breaks the path rule (F2), or None: it names the live repository's path or the real HOME
+    literally (absolute, or the repository as ~/<rel>, $HOME/<rel>, ${HOME}/<rel>), or cds to either (a bare cd,
+    cd ~, cd $HOME). The dry run plants HOME and clones the repository, so a script that reaches either by name would
+    act on the live files during the dry run."""
+    if not isinstance(text, str) or not text:
+        return None
+    lines = [ln for ln in re.sub(r"\\\n", " ", text).splitlines() if not ln.lstrip().startswith("#")]
+    body = "\n".join(lines)
+    repo, home = s["repo"], s["home"]
+    repos = list(dict.fromkeys(p.rstrip("/") for p in (repo, os.path.realpath(repo)) if p.rstrip("/")))
+    homes = list(dict.fromkeys(p.rstrip("/") for p in (home, os.path.realpath(home)) if p.rstrip("/")))
+    for r in repos:
+        if _literal(r).search(body):
+            return f"it names the live repository's path ({r})"
+    rels = []
+    for h in homes:
+        for r in repos:
+            if r.startswith(h + "/"):
+                rels.append(r[len(h) + 1:])
+    for rel in dict.fromkeys(rels):
+        rx = re.compile(r"(?:~|\$HOME|\$\{HOME\}|\"\$HOME\"|\"\$\{HOME\}\")/" + re.escape(rel) + r"(?![\w.\-])")
+        if rx.search(body):
+            return f"it names the live repository through HOME (~/{rel})"
+    for h in homes:
+        if _literal(h).search(body):
+            return f"it names the real HOME's path ({h})"
+        user = os.path.basename(h)
+        if user and re.search(r"(?<![\w$])~" + re.escape(user) + r"(?![\w.\-])", body):
+            return f"it names the real HOME as ~{user}"
+    for m in _CD.finditer(body):
+        t = (m.group("t") or "").strip("\"'")
+        if t in ("",) or t.rstrip("/") in HOME_WORDS:
+            return f"it cds to HOME ({m.group(0).strip()[:40]})"
+    return None
+
+
+def path_rule(frozen, manifest, s):
+    """The path rule over apply.sh, the manifest's commands and its checks; raises Refused at G1 on a break."""
+    try:
+        with open(os.path.join(frozen, "apply.sh"), encoding="utf-8", errors="replace") as f:
+            texts = [("apply.sh", f.read())]
+    except OSError:
+        raise oc.Refused("G1", "apply.sh cannot be read")
+    texts += [("a manifest command", c) for c in manifest.get("commands") or [] if isinstance(c, str)]
+    texts += [("a check", c["cmd"]) for c in manifest.get("checks") or [] if isinstance(c, dict)]
+    for where, text in texts:
+        why = live_path_refs(text, s)
+        if why:
+            raise oc.Refused("G1", f"the path rule: {where} breaks it, {why}; {PATH_RULE}")
+
+
 # =========================================================================================================== the run
 class Run:
     def __init__(self, s, act, sha, approved):
@@ -125,6 +189,7 @@ class Run:
         self.commit = None
         self.checks = None
         self.disagreement = False
+        self.at = None                     # the gate being run (F10: an error at G7 or later is pushed)
 
     # ----------------------------------------------------------------------------------------------------- helpers
     def line(self, gate, result, **extra):
@@ -171,6 +236,9 @@ class Run:
             raise oc.Refused("G1", f"no bundle at <scratch>/acts/{self.act}/")
         acts = oc.ensure_dir(os.path.join(s["operator_root"], "acts"))
         final = os.path.join(acts, f"{self.act}-{self.sha[:12]}")
+        if os.path.lexists(final):
+            self.g1_reuse(src, final)
+            return
         tmp = os.path.join(acts, f".{self.act}-{self.sha[:12]}.tmp-{os.getpid()}")
         oc.remove_tree(tmp)
         try:
@@ -208,17 +276,74 @@ class Run:
                 raise oc.Refused("G1", f"the manifest lists a file the bundle does not hold ({missing[0]})")
             if "apply.sh" not in listed:
                 raise oc.Refused("G1", "the bundle has no apply.sh")
-            oc.remove_tree(final)
-            os.rename(tmp, final)
+            os.rename(tmp, final)          # never over an existing copy (F8): g1_reuse handles that
             oc.make_read_only(final)
         finally:
             oc.remove_tree(tmp)
+        self.g1_done(final, m)
+
+    def g1_done(self, final, m, **extra):
         self.frozen = final
         self.manifest = m
         rp = os.path.join(final, "review.md")
         self.review_sha = oc.sha256_file(rp) if os.path.isfile(rp) else None
-        self.line("G1", "pass", frozen=os.path.relpath(final, s["operator_root"]))
+        path_rule(final, m, self.s)
+        self.line("G1", "pass", frozen=os.path.relpath(final, self.s["operator_root"]), **extra)
         self.hook("after-G1")
+
+    def g1_reuse(self, src, final):
+        """A second request for a sha already frozen (F8): the existing copy is never removed or replaced. It is reused
+        only when it hashes as its manifest says (and its manifest as the request); otherwise the run refuses and leaves
+        it as it is (an applied ACT's undo needs it). Only the review record, which the manifest does not hash, is
+        taken afresh from the bundle, so a later review round on the same manifest is read."""
+        if os.path.islink(final) or not os.path.isdir(final):
+            raise oc.Refused("G1", "the frozen copy is not a folder: changed after review")
+        try:
+            raw = open(os.path.join(final, "manifest.json"), "rb").read()
+            m = json.loads(raw.decode("utf-8"))
+            validate_manifest(m)
+        except (OSError, ValueError, UnicodeDecodeError):
+            raise oc.Refused("G1", "the existing frozen copy's manifest cannot be read: changed after review")
+        self.msha = oc.sha256_bytes(raw)
+        if self.msha != self.sha:
+            raise oc.Refused("G1", "the existing frozen copy's manifest is not the requested sha: changed after review")
+        listed = m["files"]
+        reh = m.get("rehearsal") if isinstance(m.get("rehearsal"), dict) else {}
+        found = set()
+        for top, dirs, files in os.walk(final):
+            for n in dirs + files:
+                p = os.path.join(top, n)
+                if os.path.islink(p) or not (os.path.isdir(p) or os.path.isfile(p)):
+                    raise oc.Refused("G1", "the existing frozen copy holds a link or a special file: changed after review")
+            for fn in files:
+                rel = os.path.relpath(os.path.join(top, fn), final).replace(os.sep, "/")
+                if rel in ("manifest.json", "review.md"):
+                    continue
+                found.add(rel)
+                if rel not in listed or oc.sha256_file(os.path.join(top, fn)) != listed[rel]:
+                    raise oc.Refused("G1", f"the existing frozen copy's {rel} does not hash as its manifest says: "
+                                           "changed after review")
+        if set(listed) - found - {reh.get("log")}:
+            raise oc.Refused("G1", "the existing frozen copy lacks a file its manifest lists: changed after review")
+        rp_src, rp = os.path.join(src, "review.md"), os.path.join(final, "review.md")
+        new = None
+        if os.path.isfile(rp_src) and not os.path.islink(rp_src):
+            with open(rp_src, "rb") as f:
+                new = f.read()
+        old = open(rp, "rb").read() if os.path.isfile(rp) else None
+        if new != old:
+            os.chmod(final, 0o755)
+            try:
+                if old is not None:
+                    os.chmod(rp, 0o644)
+                    os.unlink(rp)
+                if new is not None:
+                    with open(rp, "wb") as f:
+                        f.write(new)
+                    os.chmod(rp, 0o444)
+            finally:
+                os.chmod(final, 0o555)
+        self.g1_done(final, m, reused=True)
 
     # ---------------------------------------------------------------------------------------------------------- G2
     def g2(self):
@@ -329,7 +454,9 @@ class Run:
         if not isinstance(reviewer, str) or not reviewer.strip():
             raise oc.Refused("G4", "the verdict block names no reviewer")
         author = self.manifest.get("author")
-        if isinstance(author, str) and reviewer.strip().casefold() == author.strip().casefold():
+        if not isinstance(author, str) or not author.strip():
+            raise oc.Refused("G4", "the manifest names no author, so the reviewer cannot be shown not to be the author")
+        if reviewer.strip().casefold() == author.strip().casefold():
             raise oc.Refused("G4", "the reviewer is the ACT's author")
         want = self.approved_lines.get("reviewer-brief.md")
         if not want or v.get("reviewer_brief_sha256") != want:
@@ -366,7 +493,9 @@ class Run:
             self.disagreement = True
             oc.notify(self.s, self.act, "P1", "disagreement",
                       f"{self.act}: the votes disagree (code {self.code_vote}, claim {claim}, review {review}); "
-                      f"the highest, ({self.cls}), applies", manifest_sha256=self.sha, votes=self.votes)
+                      f"the highest, ({self.cls}), applies", manifest_sha256=self.sha, votes=self.votes,
+                      short=f"G6 votes disagree: code {self.code_vote}, claim {claim}, review {review}; "
+                            f"({self.cls}) applies")
         if self.cls == "O":
             raise oc.Refused("G6", f"class (O): yours, not the operator's ({code.get('why')})")
         if self.cls == "b":
@@ -422,13 +551,66 @@ class Run:
             self.line("G7", "pass")
 
     # ---------------------------------------------------------------------------------------------------------- G8
+    def live_snapshot(self, env):
+        """The live touched files' and the control files' bytes (§3's list), to prove the dry run left them alone."""
+        snap = control_snapshot(self.s, env)
+        for t in self.manifest["touched"]:
+            snap[(t["root"], t["path"])] = oc.live_file(self.s, t["root"], t["path"], env)
+        return snap
+
     def g8(self):
+        env = self.live_env()
+        before = self.live_snapshot(env)
         tmp = tempfile.mkdtemp(prefix="gov-operator-dry-")
         try:
             self._g8(tmp)
         finally:
             oc.remove_tree(tmp)
+            # F2: whatever the dry run's outcome, the live files must be as they were before it
+            after = self.live_snapshot(env)
+            changed = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
+            if changed:
+                self.live_changed(before, changed, env)
         self.line("G8", "pass")
+
+    def live_changed(self, before, changed, env):
+        """The dry run changed live files: restore the touched ones from the frozen before/ copies and the control
+        files from the bytes read just before the dry run; refuse with a reason that says live files changed (the P1
+        follows from the refusal after G7). A restore that does not bring every file back holds the lock."""
+        s = self.s
+        names = [f"{r}:{p}" for r, p in changed]
+        touched = {(t["root"], t["path"]): t for t in self.manifest["touched"]}
+        problems = []
+        for key in changed:
+            t = touched.get(key)
+            if t is None:
+                continue
+            data = None
+            if t["before"] is not None:
+                data = read_bytes(os.path.join(self.frozen, "before", t["root"], t["path"]))
+                if data is None or oc.sha256_bytes(data) != t["before"]:
+                    data = before.get(key)
+            try:
+                restore_live_file(s, t["root"], t["path"], data, env)
+            except OSError as exc:
+                problems.append(f"{key[0]}:{key[1]} ({exc.__class__.__name__})")
+        try:
+            restore_controls(s, {k: v for k, v in before.items() if k[0] in ("repo", "home", "install", "crontab",
+                                                                             "path") and k not in touched},
+                             set(touched), env)
+        except Exception as exc:  # fail closed
+            problems.append(f"the control files ({exc.__class__.__name__}: {exc})")
+        now = self.live_snapshot(env)
+        left = [f"{r}:{p}" for r, p in changed if now.get((r, p)) != before.get((r, p))]
+        restored = not left and not problems
+        reason = (f"LIVE FILES CHANGED during the dry run ({', '.join(names[:5])}"
+                  f"{', ...' if len(names) > 5 else ''}): "
+                  + ("restored from the frozen before/ copies and the bytes read before the dry run"
+                     if restored else "NOT ALL RESTORED (" + ", ".join((left + problems)[:5]) + "): lock held")
+                  + f"; {PATH_RULE}")
+        if not restored:
+            hold_lock(s, self.act, self.sha, reason)
+        raise oc.Refused("G8", reason, live_changed=names, restored=restored)
 
     def _g8(self, tmp):
         s = self.s
@@ -477,6 +659,8 @@ class Run:
         def state():
             st = {("repo", p): h for p, h in tree_state(clone)[0].items()}
             st.update({("repo", ".git/hooks/" + p): h for p, h in walk_state(os.path.join(clone, ".git/hooks")).items()})
+            cfg = read_bytes(os.path.join(clone, ".git/config"))            # F11: core.hooksPath and the rest
+            st[("repo", ".git/config")] = None if cfg is None else oc.sha256_bytes(cfg)
             for r, p in listed:
                 if r == "repo":
                     b = read_bytes(os.path.join(clone, p))
@@ -563,7 +747,7 @@ class Run:
         st = UndoState(self, head)
         st.controls = control_snapshot(s, env)
         st.tree_before = tree_state(repo, ignored=False, keep=True)
-        hooks_before = walk_state(os.path.join(repo, ".git/hooks"))
+        hooks_before = git_controls(repo)
         oc.write_atomic(journal_path(s), json.dumps({
             "act": self.act, "manifest_sha256": self.sha, "frozen": self.frozen, "class": self.cls,
             "stage": "applying", "head": head, "commit": None, "time": oc.iso(oc.now(s))}))
@@ -581,9 +765,9 @@ class Run:
             extra = sorted(p for p in diff_states({("repo", k): v for k, v in st.tree_before[0].items()},
                                                   {("repo", k): v for k, v in after_tree[0].items()}, CLEAN)
                            if p not in mine)
-            hooks_after = walk_state(os.path.join(repo, ".git/hooks"))
-            extra += sorted(("repo", ".git/hooks/" + p) for p in set(hooks_before) | set(hooks_after)
-                            if hooks_before.get(p) != hooks_after.get(p) and ("repo", ".git/hooks/" + p) not in mine)
+            hooks_after = git_controls(repo)
+            extra += sorted(("repo", p) for p in set(hooks_before) | set(hooks_after)
+                            if hooks_before.get(p) != hooks_after.get(p) and ("repo", p) not in mine)
             self.checks = []
             red = None
             for c in self.manifest["checks"]:
@@ -635,7 +819,9 @@ class Run:
             green = "checks green" if self.checks is not None else "no checks"
             oc.notify(s, self.act, "info", "applied",
                       f"Applied {self.act} ({self.cls}) {when.strftime('%H:%M')}, {green}; to undo, say "
-                      f"`undo {self.act} {self.sha[:8]}`", manifest_sha256=self.sha, commit=self.commit)
+                      f"`undo {self.act} {self.sha[:8]}`", manifest_sha256=self.sha, commit=self.commit,
+                      short=f"applied ({self.cls}) {when.strftime('%H:%M')}, {green}, commit {(self.commit or '-')[:12]}",
+                      undo=f"to undo, say: undo {self.act} {self.sha[:8]}")
         return self.result("applied", undo=f"undo {self.act} {self.sha[:8]}", checks=self.checks), 0
 
     def git_commit(self, env, undo=False, extra_trailers=()):
@@ -660,21 +846,18 @@ class Run:
 
     # -------------------------------------------------------------------------------------------------------- run
     def go(self):
-        self.g1()
-        self.g2()
-        self.g3()
-        self.g4()
-        self.g5()
-        self.g6()
-        self.recompute()
-        self.g7()
-        self.g8()
+        for name, step in (("G1", self.g1), ("G2", self.g2), ("G3", self.g3), ("G4", self.g4), ("G5", self.g5),
+                           ("G6", self.g6), ("recompute", self.recompute), ("G7", self.g7), ("G8", self.g8)):
+            self.at = name
+            step()
+        self.at = "G9"
         held = self.g9()
         if held == "timeout":
             raise oc.Refused("G9", "the hold outlasted hold_max_s")
         self.recompute(log_pass=False)
         if held == "held":
             self.g7(log_pass=False)
+        self.at = "apply"
         return self.apply()
 
 
@@ -746,6 +929,14 @@ def tree_state(repo, ignored=True, keep=False):
         else:
             st[path] = None
     return st, contents
+
+
+def git_controls(repo):
+    """{repo-relative path: sha256} for the git hooks and the git config (F11), for the live unlisted-file check."""
+    out = {".git/hooks/" + p: h for p, h in walk_state(os.path.join(repo, ".git/hooks")).items()}
+    cfg = read_bytes(os.path.join(repo, ".git/config"))
+    out[".git/config"] = None if cfg is None else oc.sha256_bytes(cfg)
+    return out
 
 
 def walk_state(folder):
@@ -828,6 +1019,14 @@ def control_snapshot(s, env):
                     snap[("repo", rel)] = read_bytes(full)
     for rel in CONTROL_REPO_FILES:
         snap[("repo", rel)] = read_bytes(os.path.join(repo, rel))
+    # F11: the repository's git config (core.hooksPath lives there) and the folder core.hooksPath names, wherever
+    snap[("repo", ".git/config")] = read_bytes(os.path.join(repo, ".git/config"))
+    hp = hooks_path(repo, env)
+    if hp:
+        rel_hp = os.path.relpath(hp, repo)
+        if not (rel_hp == ".git/hooks" or rel_hp.startswith(".git/hooks/")):
+            for p, data in walk_bytes(hp).items():
+                snap[("path", os.path.join(hp, p))] = data
     for rel in CONTROL_HOME_FILES:
         snap[("home", rel)] = read_bytes(os.path.join(s["home"], rel))
     snap[("crontab", "crontab")] = oc.crontab_bytes(env)
@@ -838,6 +1037,30 @@ def control_snapshot(s, env):
             full = os.path.join(top, fn)
             snap[("install", os.path.relpath(full, inst).replace(os.sep, "/"))] = read_bytes(full)
     return snap
+
+
+def hooks_path(repo, env=None):
+    """The absolute folder git's core.hooksPath names for a repository, or None when it is not set."""
+    try:
+        rc, out, _ = oc.git(repo, "config", "--get", "core.hooksPath", env=env, timeout=60)
+    except OSError:
+        return None
+    if rc != 0 or not out.strip():
+        return None
+    p = os.path.expanduser(out.decode("utf-8", "replace").strip())
+    return os.path.normpath(p if os.path.isabs(p) else os.path.join(repo, p))
+
+
+def walk_bytes(folder):
+    out = {}
+    if not os.path.isdir(folder):
+        return out
+    for top, dirs, files in os.walk(folder):
+        dirs[:] = [d for d in dirs if not os.path.islink(os.path.join(top, d))]
+        for fn in files:
+            full = os.path.join(top, fn)
+            out[os.path.relpath(full, folder).replace(os.sep, "/")] = read_bytes(full)
+    return out
 
 
 def read_bytes(path):
@@ -1056,11 +1279,13 @@ class UndoState:
             hold_lock(s, run.act, run.sha, f"{reason}; the undo failed too: {why}")
             run.line(gate, "refused", undo="failed", reason=reason, notice="lock")
             oc.notify(s, run.act, "P1", "lock", f"{run.act}: {reason}; the UNDO FAILED ({why}): lock held, nothing "
-                                                "else is applied", manifest_sha256=run.sha)
+                                                "else is applied", manifest_sha256=run.sha,
+                      short=f"{gate}: {reason}", undo=f"UNDO FAILED ({why[:40]}): lock held")
             return run.result("refused", gate, f"{reason}; the undo failed ({why}): lock held", undo="failed",
                               checks=run.checks), 1
         run.line(gate, result, undo="done", reason=reason, notice=kind, replay=getattr(run, "replay_detail", None))
-        oc.notify(s, run.act, "P1", kind, f"{run.act}: {reason}", manifest_sha256=run.sha)
+        oc.notify(s, run.act, "P1", kind, f"{run.act}: {reason}", manifest_sha256=run.sha, short=f"{gate}: {reason}",
+                  undo="undone byte for byte")
         return run.result(result, gate, reason, undo="done", checks=run.checks), 1
 
 
@@ -1104,6 +1329,31 @@ def undo_live(run, st):
     return True, ""
 
 
+def root_base(s, root):
+    """The folder a snapshot key's root names; the root "path" keys carry an absolute path (core.hooksPath's)."""
+    return {"repo": s["repo"], "home": s["home"], "install": s["install"], "path": "/"}[root]
+
+
+def restore_live_file(s, root, rel, data, env):
+    """One live touched file put back to `data` (None: absent)."""
+    if root == "crontab":
+        if data is None:
+            oc.run(["crontab", "-r"], env=env, timeout=60)
+        else:
+            oc.run(["crontab", "-"], env=env, timeout=60, input_bytes=data)
+        return
+    full = os.path.join(root_base(s, root), rel)
+    if data is None:
+        if os.path.lexists(full):
+            os.unlink(full)
+        return
+    mode = os.stat(full).st_mode & 0o7777 if os.path.isfile(full) and not os.path.islink(full) else 0o644
+    if os.path.lexists(full):
+        os.unlink(full)
+    write_file(full, data)
+    os.chmod(full, mode)
+
+
 def restore_controls(s, snap, touched, env):
     now_snap = control_snapshot(s, env)
     for key, data in snap.items():
@@ -1116,7 +1366,7 @@ def restore_controls(s, snap, touched, env):
             else:
                 oc.run(["crontab", "-"], env=env, timeout=60, input_bytes=data)
             continue
-        base = {"repo": s["repo"], "home": s["home"], "install": s["install"]}[root]
+        base = root_base(s, root)
         full = os.path.join(base, rel)
         if data is None:
             if os.path.lexists(full):
@@ -1132,9 +1382,8 @@ def restore_controls(s, snap, touched, env):
                 f.write(data)
             os.chmod(full, mode)
     for key in now_snap:
-        if key not in snap and key not in touched and key[0] in ("repo", "home", "install"):
-            base = {"repo": s["repo"], "home": s["home"], "install": s["install"]}[key[0]]
-            full = os.path.join(base, key[1])
+        if key not in snap and key not in touched and key[0] in ("repo", "home", "install", "path"):
+            full = os.path.join(root_base(s, key[0]), key[1])
             if os.path.lexists(full):
                 os.unlink(full)
 
@@ -1223,7 +1472,8 @@ def undo_step(s, act, sha, approved):
         return run.result("refused", "undo", f"the undo failed ({why}): lock held", undo="failed"), 1
     run.commit = getattr(run, "undo_commit", None) or run.commit
     run.line("undo", "undone", undo="done", notice="undo", typed=oc.iso(found[2]))
-    oc.notify(s, act, "P1", "undo", f"Undone {act} on the owner's line ({oc.iso(found[2])})", manifest_sha256=sha)
+    oc.notify(s, act, "P1", "undo", f"Undone {act} on the owner's line ({oc.iso(found[2])})", manifest_sha256=sha,
+              short=f"undone on the owner's line ({oc.iso(found[2])})", undo="undone byte for byte")
     return run.result("undone", undo="done"), 0
 
 
@@ -1408,18 +1658,27 @@ def main(argv):
         res, code = run.go()
     except oc.Refused as r:
         notice = "refused" if r.gate in oc.AFTER_G7 else None
-        extra = {}
+        extra = dict(r.extra)
         if r.gate == "G6":
-            extra = {"disagreement": run.disagreement, "why": getattr(run, "code_why", None)}
+            extra.update(disagreement=run.disagreement, why=getattr(run, "code_why", None))
             notice = "disagreement" if run.disagreement else None
         run.line(r.gate, "refused", reason=r.reason, notice=notice, **extra)
         if notice:
-            oc.notify(s, act, "P1", "refused", f"{act}: refused at {r.gate}: {r.reason}", manifest_sha256=sha)
-        res, code = run.result("refused", r.gate, r.reason), 1
+            oc.notify(s, act, "P1", "refused", f"{act}: refused at {r.gate}: {r.reason}", manifest_sha256=sha,
+                      short=f"refused at {r.gate}: {r.reason}")
+        res, code = run.result("refused", r.gate, r.reason, **r.extra), 1
     except Exception as exc:  # fail closed: a gate that errors refuses
         gate = "error"
-        run.line(gate, "refused", reason=f"{exc.__class__.__name__}: {exc}")
-        res, code = run.result("refused", gate, f"an error ({exc.__class__.__name__}: {exc}): refused"), 1
+        why = f"{exc.__class__.__name__}: {exc}"
+        # F10: an error at G7 or later (the live state has been read or touched) is pushed as a P1, and the log
+        # line names the notice so the digest counts it when it is missing
+        after_g7 = run.at in oc.AFTER_G7
+        notice = "refused" if after_g7 else None
+        run.line(gate, "refused", reason=why, notice=notice, at=run.at)
+        if after_g7:
+            oc.notify(s, act, "P1", "refused", f"{act}: an unexpected error at {run.at}: {why}; refused",
+                      manifest_sha256=sha, short=f"error at {run.at}: {why}")
+        res, code = run.result("refused", gate, f"an error ({why}): refused"), 1
     oc.finish(res, code)
 
 

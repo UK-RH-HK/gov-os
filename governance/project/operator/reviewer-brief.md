@@ -8,8 +8,15 @@ the bundle as the CTO handed it in: `manifest.json`, `apply.sh`, the rehearsal l
 copies of every touched file.
 
 ## What you check
-1. **The touched list is complete and exact.** Every file `apply.sh apply` changes, in the repository, in HOME and in
-   `crontab -l`, is in `touched`, with the sha256 before and after. Nothing else changes.
+1. **The touched list is complete and exact, and the script is relative.** Every file `apply.sh apply` changes, in the
+   repository, in HOME and in `crontab -l`, is in `touched`, with the sha256 before and after. Nothing else changes.
+   The path rule: `apply.sh`, every manifest command and every check work relative to their cwd (the repository) and
+   `$HOME`, and reach the bundle through the script's own folder. None names the live repository's path or the real
+   HOME literally (an absolute path, or the repository as `~/…`, `$HOME/…` or `${HOME}/…`), and none `cd`s to either
+   (a bare `cd`, `cd ~`, `cd $HOME`). The operator's dry run runs the script in a clone with a planted HOME; a script
+   that names the live paths would change live files during it. The operator refuses such a bundle at G1 and, if a
+   live file still changes during the dry run, restores it and refuses; a review that passes such a script fails this
+   check.
 2. **The undo is tested.** `apply.sh undo` restores every touched file byte for byte, and the rehearsal log shows it.
 3. **The rehearsal is real.** The log is the run of this `apply.sh`, in a clone, and ends with `failures: 0`.
 4. **The checks are right.** Each check in `checks` runs from the repository and its exit code and count are what the

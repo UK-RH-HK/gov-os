@@ -96,6 +96,12 @@ def fill(template, values):
     return out
 
 
+def bash_timeout_ms(s):
+    """The Bash tool's timeout in the wall (F6): the program may run as long as the session does, less a minute for
+    the session to report; Claude Code's own default (2 minutes) would stop it mid-gate or mid-apply."""
+    return int(max(120.0, s["session_timeout_s"] - 60) * 1000)
+
+
 def build_wall(s, act, sha):
     """The wall: <operator root>/wall/, its .claude/settings.json (a non-empty deny list and the PreToolUse hook), the
     hook, wall.json, the brief and the request; read-only. Never the operator root itself."""
@@ -109,7 +115,8 @@ def build_wall(s, act, sha):
     frozen = os.path.join(root, "acts", f"{act}-{sha[:12]}")
     sid, transcript = oc.transcript_path(s)
     values = {"MODEL": s["model"], "INSTALL": inst, "ACT": act, "SHA": sha, "FROZEN": frozen, "WALL": wall,
-              "TRANSCRIPT": transcript or os.path.join(wall, "no-transcript"), "HOME": s["home"], "REPO": s["repo"]}
+              "TRANSCRIPT": transcript or os.path.join(wall, "no-transcript"), "HOME": s["home"], "REPO": s["repo"],
+              "BASH_TIMEOUT_MS": bash_timeout_ms(s)}
     with open(os.path.join(inst, "wall", "settings.json.tmpl"), encoding="utf-8") as f:
         settings = fill(f.read(), values)
     parsed = json.loads(settings)
@@ -125,7 +132,8 @@ def build_wall(s, act, sha):
             "session": sid}, indent=1).encode("utf-8"),
         os.path.join(wall, "brief.md"): open(os.path.join(inst, "brief.md"), "rb").read(),
         os.path.join(wall, "request.txt"): (
-            f"{act} {sha}\ninstall {inst}\ncommand: python3 {inst}/operator_run.py run {act} {sha}\n").encode(),
+            f"{act} {sha}\ninstall {inst}\ncommand: python3 {inst}/operator_run.py run {act} {sha}\n"
+            f"timeout_ms: {bash_timeout_ms(s)}\n").encode(),
         os.path.join(wall, "CLAUDE.md"): (
             "This session is the Gov OS operator agent (OPERATOR-AGENT-1, DEC-1104 (2)), in its own walled folder.\n"
             "It follows brief.md in this folder exactly; the brief is fixed and approved by the owner (sha256 "

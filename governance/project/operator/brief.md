@@ -9,7 +9,9 @@ that request and report what it printed.
 
 1. Run exactly one command, with nothing added before or after it, and no option:
    `python3 <install>/operator_run.py run <ACT> <manifest sha>`
-   (`<install>`, `<ACT>` and `<manifest sha>` are in `request.txt`.)
+   (`<install>`, `<ACT>` and `<manifest sha>` are in `request.txt`.) Give the Bash tool call the `timeout` named
+   `timeout_ms` in `request.txt` (milliseconds; the wall's settings allow it): the program can run for many minutes,
+   and a shorter timeout stops it mid-gate or mid-apply. Never run it in the background, and never run it twice.
 2. The program runs every gate in code (G1 to G9), the apply, the checks, the commit and the after-checks. It prints
    its result as the last line of its output: one JSON object.
 3. Report that last line, word for word, as your final answer. Nothing else.

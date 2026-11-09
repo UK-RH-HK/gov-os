@@ -33,9 +33,9 @@ AFTER_G7 = ("G7", "G8", "G9", "recompute", "apply", "checks", "unlisted", "stage
 class Refused(Exception):
     """A gate refused: (gate, reason). Every gate fails closed by raising it."""
 
-    def __init__(self, gate, reason):
+    def __init__(self, gate, reason, **extra):
         super().__init__(f"{gate}: {reason}")
-        self.gate, self.reason = gate, reason
+        self.gate, self.reason, self.extra = gate, reason, extra
 
 
 # ---------------------------------------------------------------------------------------------------------- settings
@@ -68,16 +68,27 @@ def load_settings(config_path=None):
     s["pings_log"] = os.path.abspath(os.path.expanduser(
         conf.get("pings_log") or os.path.join(s["home"], ".config/gov-os-notify/pings.log")))
     push = conf.get("push_cmd")
-    if push is None:
-        push = ["python3", os.path.join(s["repo"], "governance/project/orchestration/tools/deadman.py"),
-                "--channel", "push", "--test"]
-    s["push_cmd"] = shlex.split(push) if isinstance(push, str) else [str(x) for x in push]
+    # push_cmd overrides the default channels: `<push_cmd> <notice JSON>`. Without it (today's default), a notice goes
+    # through the dead-man's three channels from the install's own code (F4): pings_log, the Windows toast and a
+    # headless `claude -p` PushNotification, as one line of at most 190 characters.
+    s["push_cmd"] = None if push is None else (shlex.split(push) if isinstance(push, str) else [str(x) for x in push])
+    chans = conf.get("channels")
+    s["channels"] = [str(c) for c in chans] if isinstance(chans, list) else ["log", "toast", "push"]
+    s["push_claude"] = os.path.expanduser(conf.get("push_claude") or os.path.join(s["home"], ".local/bin/claude"))
+    s["push_model"] = conf.get("push_model") or "claude-haiku-5-5"
+    s["powershell"] = conf.get("powershell") or "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    s["wslpath"] = conf.get("wslpath") or "wslpath"
     log = os.path.join(s["operator_root"], "log")
     s["log_dir"] = log
     s["calls"] = os.path.abspath(os.path.expanduser(conf.get("calls") or os.path.join(log, "calls.jsonl")))
     s["close_flag"] = os.path.abspath(os.path.expanduser(
         conf.get("close_flag") or os.path.join(s["scratch"], "CLOSE-RUNNING")))
     s["nightly_window"] = conf.get("nightly_window") or DEFAULT_NIGHTLY
+    # F12: the flag the nightly writes while it runs (nightly.sh: $ORCH/NIGHTLY-RUNNING, ORCH the CTO's scratch), so a
+    # nightly that overruns its window still holds; older than nightly.sh's own 6 hours it is a dead run's leftover
+    s["nightly_flag"] = os.path.abspath(os.path.expanduser(
+        conf.get("nightly_flag") or os.path.join(s["scratch"], "NIGHTLY-RUNNING")))
+    s["nightly_flag_max_age_s"] = float(conf.get("nightly_flag_max_age_s") or 6 * 3600)
     s["poll_s"] = float(conf.get("poll_s") if conf.get("poll_s") is not None else 60)
     s["freeze"] = os.path.abspath(os.path.expanduser(conf.get("freeze") or os.path.join(log, "act-in-progress.txt")))
     s["approvals"] = os.path.abspath(os.path.expanduser(
@@ -155,6 +166,14 @@ def holds(s):
             out.append(f"the nightly's window ({s['nightly_window']})")
     except ValueError as exc:
         out.append(str(exc))
+    try:
+        age = time.time() - os.lstat(s["nightly_flag"]).st_mtime
+        if age < s["nightly_flag_max_age_s"]:
+            out.append("the nightly runs (NIGHTLY-RUNNING)")
+    except FileNotFoundError:
+        pass
+    except OSError as exc:
+        out.append(f"NIGHTLY-RUNNING cannot be read ({exc.__class__.__name__})")
     if os.path.lexists(s["close_flag"]):
         out.append("a close queue runs")
     if os.path.lexists(s["cto_freeze"]):
@@ -308,14 +327,61 @@ def log_event(s, act, sha, gate, result, votes=None, commit=None, checks=None, u
 
 
 # ---------------------------------------------------------------------------------------------------------- notices
-def notify(s, act, priority, kind, text, **extra):
-    """A notice through the dead-man's channels: `<push_cmd> <notice JSON>`, and one JSON line in pings_log. A push
-    that fails still leaves the pings line (the digest compares the log with the notices sent)."""
+LINE_MAX = 190      # the phone's PushNotification keeps 190 characters (deadman.py's send())
+TOAST_TITLE = "Gov OS operator"
+PUSH_PROMPT = ("Load the PushNotification tool (ToolSearch select:PushNotification if deferred) and call it once, status "
+               "proactive, with exactly this message: {line} . Then reply with only the tool's result text.")
+
+
+def notice_line(priority, act, short, undo=None):
+    """One notice line of at most 190 characters: the priority and the ACT first, then the gate or the result, then
+    the undo line; the middle is cut when it is too long, never the head or the undo line."""
+    head = f"{priority} {act or 'operator'}"
+    tail = f" | {' '.join(str(undo).split())}" if undo else ""
+    body = " ".join(str(short or "").split())
+    room = LINE_MAX - len(head) - len(" | ") - len(tail)
+    if room < 8:
+        tail, room = "", LINE_MAX - len(head) - len(" | ")
+    if len(body) > room:
+        body = body[:max(0, room - 1)].rstrip() + "…"
+    return f"{head} | {body}{tail}"[:LINE_MAX]
+
+
+def send_channels(s, line):
+    """The dead-man's channels, copied in form (deadman.py's send(); the install never imports the repository): the
+    Windows toast through the install's own win_toast.ps1, and a headless `claude -p` asked to call PushNotification
+    with the line. The log channel is the pings_log line notify() writes. Returns {channel: result}."""
+    out = {}
+    env = clean_env(s, s["home"])
+    for ch in s.get("channels") or []:
+        try:
+            if ch == "toast":
+                rc, win, _ = run([s["wslpath"], "-w", os.path.join(HERE, "win_toast.ps1")], env=env, timeout=30)
+                rc, _, _ = run([s["powershell"], "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                                win.decode("utf-8", "replace").strip(), "-Title", TOAST_TITLE, "-Body", line],
+                               env=env, timeout=60)
+                out["toast"] = rc
+            elif ch == "push":
+                rc, _, _ = run([s["push_claude"], "-p", "--model", s["push_model"], "--output-format", "json",
+                                PUSH_PROMPT.format(line=line)], cwd=env.get("TMPDIR") or "/tmp", env=env, timeout=300)
+                out["push"] = rc
+        except (OSError, ValueError) as exc:
+            out[ch] = f"failed {exc.__class__.__name__}"
+    return out
+
+
+def notify(s, act, priority, kind, text, short=None, undo=None, **extra):
+    """A notice: with push_cmd set, `<push_cmd> <notice JSON>`; otherwise the dead-man's channels (the toast and the
+    headless push) with the notice's one line. Always one JSON line in pings_log, the log channel. A push that fails
+    still leaves the pings line (the digest compares the log with the notices sent)."""
     try:
         t = iso(now(s))
     except (OSError, ValueError, IndexError):
         t = iso(datetime.now(timezone.utc).astimezone())
-    notice = {"time": t, "act": act, "priority": priority, "kind": kind, "text": text}
+    if short is None:
+        short = text[len(f"{act}: "):] if act and text.startswith(f"{act}: ") else text
+    notice = {"time": t, "act": act, "priority": priority, "kind": kind, "text": text,
+              "line": notice_line(priority, act, short, undo)}
     notice.update(extra)
     payload = json.dumps(notice, sort_keys=False)
     rc = None
@@ -326,6 +392,8 @@ def notify(s, act, priority, kind, text, **extra):
             rc = r.returncode
         except (OSError, subprocess.SubprocessError):
             rc = -1
+    else:
+        rc = send_channels(s, notice["line"])
     try:
         append_jsonl(s["pings_log"], notice)
     except OSError:
@@ -336,15 +404,15 @@ def notify(s, act, priority, kind, text, **extra):
 # --------------------------------------------------------------------------------------------- the owner's lines (S10)
 def owner_text(entry):
     """The text of a transcript line typed by the owner, or None. Counts only a `type: user` line marked human
-    (origin.kind human), not isMeta, not a sidechain, its content a string or text blocks; never a tool result, a task
+    (origin.kind human), not isMeta, not isCompactSummary, not a sidechain, its content a string or text blocks; never a tool result, a task
     notification or an assistant line (the CTO's settled reading, 2026-11-09). A line without the mark never counts."""
     if not isinstance(entry, dict) or entry.get("type") != "user":
         return None
     origin = entry.get("origin")
     if not isinstance(origin, dict) or origin.get("kind") != "human":
         return None
-    if entry.get("isMeta") or entry.get("isSidechain") or "toolUseResult" in entry:
-        return None
+    if entry.get("isMeta") or entry.get("isSidechain") or entry.get("isCompactSummary") or "toolUseResult" in entry:
+        return None                        # a compact summary quotes old turns afresh (F13): never the owner's
     msg = entry.get("message")
     if not isinstance(msg, dict) or msg.get("role", "user") != "user":
         return None
