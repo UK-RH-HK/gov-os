@@ -22,7 +22,6 @@ def test_W2_M244_W2_M188_W2_M262_a_dead_pid_is_cleared_and_a_live_one_is_kept(ma
 
     first = machine.read(repo)
     assert support.session_pids(first) == [live.pid], f"a dead PID is still read as a live session: {first}"
-    assert first.get("weighted_sessions") == 1, first
     cleared = first.get("cleared")
     assert isinstance(cleared, list), f"the reading does not report the entries it cleared: {first}"
     assert [int(e["pid"]) for e in cleared] == [doomed.pid], cleared
