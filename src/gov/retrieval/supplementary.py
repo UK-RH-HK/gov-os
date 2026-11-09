@@ -53,8 +53,8 @@ def _ranked(root: Path, words: list[str], skip_paths: set, skip_entries: set,
     role may not be handed (``withhold``, which counts them), of a record that no longer stands, or of a register
     entry that is in ``skip_entries`` or is not current; and W2-55's ``left_out``."""
     from gov import records
-    from gov.decisions.register import leave_out
     from gov.retrieval import authority, lexical
+    from gov.util.register import leave_out
 
     holders: dict[str, set] = {}
     where: dict[str, tuple] = {}  # chunk id -> its path and the first line a word was found on
@@ -127,7 +127,7 @@ def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), 
     "supplementary_batches", "left_out"}``, each batch the ranked items it read and its limit, in the order taken.
     ``Unavailable`` where the lexical index does not answer."""
     from gov.context import _tokens
-    from gov.guard import role_paths
+    from gov.util import role_paths
 
     asked = query(title, kpis)
     # W2-13 S5: GOV_ROLE, a --role beside it (``role``: adds, never lifts) and GOV_TICKET; RolePathsError when unreadable

@@ -120,8 +120,8 @@ def run(root: Path, args, config: dict) -> dict:
     import sqlite3
 
     from gov.cli.errors import GovError
-    from gov.decisions.register import leave_out
     from gov.retrieval.retrieve import retrieve, role_filter, store_of
+    from gov.util.register import leave_out
 
     root = _store_root(root, args)
     store = store_of(root)  # W2-138 S1: read once, named in the result and carried in the token

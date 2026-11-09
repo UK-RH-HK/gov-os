@@ -71,7 +71,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.guard.reads import PATH_MAP_REL, SETS_KEY, PolicyError, _Part, _ticket, evaluation_sets, set_fault
+from gov.util.parts import PATH_MAP_REL, SETS_KEY, PolicyError, _Part, _ticket, evaluation_sets, set_fault
 
 EVALUATION = "fixtures/evaluation"
 FAMILIES_KEY = "evaluation_families"
