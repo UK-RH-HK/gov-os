@@ -5,11 +5,12 @@ Under DEC-1052 (templates; READY and DONE by code), DEC-1079 (D-5 starts), DEC-1
 its interface and its two rounds stated in the ticket's body (D5 row 9). Sources: `P1-PLAN.md` D-5 row and §E,
 `R3-TEMPLATES.md` §D, `D5-ROWS.md`, `LINK-INTEGRITY.md` §5.
 
-**Counts (21:50):** round 1 **READY, not merged** (`w2/W2-128` `a6c83d497035`, tests `bd7732def530`; `gov accept` 92/92;
+**Counts (22:40):** round 1 **READY, not merged** (`w2/W2-128` **`baa2696f713f`**, tests `bd7732def530` and the
+W1-35 revision `7f65bf5a82c7`; `gov accept` 92/92;
 review READY by `verdict.py`, `reviews/w2-128-r1.md`): 14 of W2-128's 21 success lines and F1, F7 met on the branch in
 their round-1 parts; TPL-3 S5's scripts done; D5 rows 1-17 carried; the MR row moved out (W2-151). Not started: the
 round-2 code half (TPL-2 S3, TPL-3, TPL-4, TPL-5 S3), TPL-6, TPL-7, TPL-8. Before the merge: four W1-35 cases
-revised (below).
+revised and the review's F1-F5, F9 fixed (done, below).
 
 ## The eight packages
 
@@ -92,3 +93,15 @@ lane), now filed as **W2-151** (`DAEO-qzca`, `56ad463a`). Today the six files st
   carried into round 2 as the reviewer allows (DEC-802); (3) at the merge, `LEAD-w2-common.md` lines 87, 149, 163
   (F6) pointed to the templates; (4) W1-30's template-ticket cases (`test_w1_30_r16_context_own_tickets.py`) run
   outside the sandbox (they build a store; not run here).
+- 2026-11-09 22:40: **the before-merge items (1) and (2) done.** W1-35's four cases revised by a test designer under
+  W2-128 (`w2/W2-128-tests` **`7f65bf5a82c7`**, `Rewrite-Reason:`, DEC-866: each follows a retired `brief-*.md` to its
+  replacement; DEC-462's case wanted one line in T-4), merged into `w2/W2-128` by the CTO (`71817b01`); one product-spec
+  fix round **`baa2696f713f`**: F1 (the designer's forms on `{WRITE_TREE}`), F2 and F5 (`checkpoint_record`,
+  `collect_only`, `trailer_gate` off: lifted by DEC-1057 and DEC-953), F3 (`[DEC-963]`), F4 ("Ask memory first"
+  qualified for the sandbox, DEC-1065), F9, and the DEC-462 line. The CTO's runs outside the sandbox: `gov accept
+  W2-128` 92/92; W1-35's brief cases 7/7 (all of W1-35 was 124 passed on the tests branch, the designer's run); schema
+  ok. Structural pass on the branch against integrate: 8 of 10 ok; portability NOTICE (the W2-142 skills' and the
+  engineer role's `.claude/` copies, regenerated at the ACT, expected); links NOTICE: `DAEO-0000` in
+  `templates/checkpoint.md:7`'s example (W2-128's; a placeholder for round 2), the other two other lanes'.
+  **Still before the merge (the CTO's):** (3) `LEAD-w2-common.md` lines 87, 149, 163 pointed to the templates; (4) W1-30's
+  template-ticket cases outside the sandbox. Review F6-F8 go to round 2 (TPL-6, TPL-4).
