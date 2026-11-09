@@ -1,7 +1,7 @@
 """S1: an engineer's Grep or Glob tool call that can reach its own ticket's acceptance folder is refused unless the
 call excludes it, and the refusal names the folder and says how; the same calls with the exclusion are allowed.
 
-The planted engineer is on DAEO-zz41 (WBS id W2-941); its folder is tests/acceptance/W2-941/ (w2_141_support).
+The planted engineer is on DAEO-zz41 (WBS id ``WBS``); its folder is ``OWN`` (w2_141_support).
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ import pytest
 
 import w2_141_support as s
 
-# Calls whose path and pattern can reach tests/acceptance/W2-941/.
+# Calls whose path and pattern can reach the planted ``s.OWN``.
 REACHING = [
     s.grep("Grep with no path (the session's root)"),
     s.grep("Grep from '.'", path="."),

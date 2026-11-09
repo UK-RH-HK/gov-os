@@ -797,3 +797,5 @@ Cases: 100 in the full run, 142 in `breadth`, 0 in `lifted`.
 | F2: A move runs without an A5 verdict [CAP-44.c] | `test_w1_41_verdict.py::test_a6_without_any_verdict_moves_nothing`, `test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing` (1 of 3) | designer |
 | F3: A legacy rule file stays loaded after retirement | `test_w1_41_legacy.py::test_no_legacy_rule_file_stays_where_an_agent_tool_loads_instructions` | designer |
 | F4: An unknown material artefact is moved or deleted [CAP-06.c] | `test_w1_41_unknown.py::test_a_path_map_that_moves_or_deletes_the_unknown_artefact_is_refused` (4 of 4), `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration`, `test_w1_41_unknown.py::test_an_unknown_artefact_blocks_retirement_too` | the ticket's words |
+
+**Citations (DEC-1109 (2), 2026-11-09):** `w1_41_support.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
