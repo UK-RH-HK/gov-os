@@ -14,6 +14,11 @@ admits), and ``subprocess.Popen`` of the CLI is a stub: no session ever starts. 
 DEC-NNN [--gpu-need-mib N]``. A refusal is ``GovError("LAUNCH_REFUSED", ...)`` whose message names each broken
 condition and its reading. An override writes one line to ``$HOME/.gov-os/machine/launch.log`` and one line to
 standard error, each holding ``gate_override: <DEC-id>``, the role, the ticket and the conditions it passed over.
+
+Settled (the CTO, delegated, 2026-11-09; DEC-1097 (8)): P-1 (a), the override is this launch option, written to
+``~/.gov-os/machine/launch.log`` and to standard error; P-2 (a) with (c), "a heavy-job slot" in the line refuses a
+launch only when the slots' reading cannot be taken: a full set of slots never refuses a session (S7, DEC-983);
+``gpu_need_mib`` stays for a start that declares a GPU need.
 """
 
 from __future__ import annotations
@@ -131,6 +136,45 @@ def test_s19_a_launch_that_declares_a_gpu_need_is_refused_without_the_room(machi
         launch(role, ticket, gpu_need_mib=1000)
     assert refused.value.code == "LAUNCH_REFUSED" and "gpu" in refused.value.message.lower(), refused.value
     assert "500" in refused.value.message, f"the refusal does not give the free GPU memory: {refused.value.message}"
+    assert launch.started == []
+
+
+@pytest.mark.parametrize("role, ticket", ROLES, ids=ROLE_IDS)
+def test_s19_s7_a_full_set_of_heavy_slots_never_refuses_a_launch(machine, launch, repo, role, ticket):
+    """P-2 (a), settled (DEC-1097 (8)): S7 holds (DEC-983): a session takes no slot, so every slot held by a test
+    run refuses no launch."""
+    machine.open_config(heavy_slots=1)
+    machine.slot_job(repo, "test", "holder")
+    machine.wait_started("holder")
+    assert launch(role, ticket) == 0
+    assert len(launch.started) == 1, "a full set of heavy-job slots refused a session"
+    machine.release("holder")
+
+
+SLOTS_UNREADABLE = {
+    "heavy_slots missing": None,
+    "heavy_slots malformed": support.dated("two"),
+}
+
+
+@pytest.mark.parametrize("role, ticket", ROLES, ids=ROLE_IDS)
+@pytest.mark.parametrize("planted", list(SLOTS_UNREADABLE))
+def test_s19_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken(machine, launch, role, ticket,
+                                                                                planted):
+    """P-2 (c), settled (DEC-1097 (8)): a launch is refused on the slots only when their reading cannot be taken;
+    the refusal names ``heavy_slots``."""
+    from gov.cli.errors import GovError
+
+    values = machine.config_values()
+    if SLOTS_UNREADABLE[planted] is None:
+        del values["heavy_slots"]
+    else:
+        values["heavy_slots"] = SLOTS_UNREADABLE[planted]
+    machine.write_config(values)
+    with pytest.raises(GovError) as refused:
+        launch(role, ticket)
+    assert refused.value.code == "LAUNCH_REFUSED", refused.value
+    assert "heavy_slots" in refused.value.message, f"the refusal does not name heavy_slots: {refused.value.message}"
     assert launch.started == []
 
 
