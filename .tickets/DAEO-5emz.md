@@ -48,9 +48,7 @@ acceptance_tests:
   author: independent-test-designer (MR-3), from these KPI lines, before the engineer; a stub encoder, no real model and no GPU
 track: B
 list_rows: []
-needs:
-- src/gov/retrieval/rerank.py
-- src/gov/retrieval/rerank_service.py
+needs: []  # [changed, DEC-1099 (3)]: W2-137 is merged; its files no longer wait (this broke a cycle with W2-145)
 waits_on: []
 ---
 # W2-137 The shared reranker's request cap raised

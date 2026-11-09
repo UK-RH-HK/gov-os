@@ -50,11 +50,11 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | NOT STARTED |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
 | 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
-| 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | NOT STARTED |
-| 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | NOT STARTED |
-| 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | NOT STARTED |
+| 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
+| 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
+| 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
 | 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
-| 35 | W2-15a with W2-32 | (3) closed together at the lift | WAITS: the lift |
+| 35 | W2-15a with W2-32 | (3) closed together at the lift | Noted in P1-13 (`741faf90`); WAITS: the lift |
 | 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
 
 ## 0d. DEC-1100's items (2026-11-09)
@@ -63,6 +63,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | NOT STARTED |
 | 38 | W2-66c | (1) tests first, pins (i) and (ii) | NOT STARTED |
 | 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | NOT STARTED |
+| 41 | a `gov plan` defect (W2-136) | found 11-09: on a cycle, `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle | a row: break a cycle only at a ticket in it (D-6 part 2 or W2-136's follow-up) |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
 ## 1. Every item not done, partly done or waiting

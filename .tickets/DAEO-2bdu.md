@@ -131,6 +131,7 @@ waits_on:
 - 'DAEO-qskx — W2-142: S15 copies the retrieval skill''s step 7 and the discovery skill''s line [added, DEC-1099 (2)]'
 - 'DAEO-t8mp — W2-128: S15 copies T-0''s and T-8''s "Search again once" line [added, DEC-1099 (2)]'
 - 'DAEO-f58b — W2-116: S11''s refresh after every merge, double-buffered [added, DEC-1099 (2)]'
+- 'DAEO-2tfd — W2-145: S10 needs no private reranker beside the shared service [added, DEC-1099 (2)]'
 ---
 # W2-88 Memory for any repository
 
