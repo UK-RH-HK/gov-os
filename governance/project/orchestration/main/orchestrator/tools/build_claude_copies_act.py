@@ -85,20 +85,41 @@ def portability(tree):
 
 code, found = portability(gen)
 say(f"portability at HEAD: exit {code}; {len(found)} findings: " + "; ".join(f"{f['code']} {f.get('file')}" for f in found))
+def body_of(text):
+    """A Markdown file's body after its front matter (portability's _split rule)."""
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end >= 0:
+            return text[end + 4:].partition("\n")[2].lstrip("\n")
+    return text.lstrip("\n")
+
+
+def front_of(text):
+    end = text.find("\n---", 3) if text.startswith("---") else -1
+    if end < 0:
+        raise SystemExit("a rulesync role source without front matter")
+    return text[:end + 4].rstrip("\n") + "\n"
+
+
 for f in found:
-    if f["code"] == "SOURCE_DIFFERS":
-        origin, src = f["message"].split("differs from ", 1)[1], f["file"]
-        kernel = (gen / origin).read_text(encoding="utf-8")
-        if "/roles/" in origin:
-            text = (gen / src).read_text(encoding="utf-8")
-            end = text.find("\n---", 3)
-            front = text[:end + 4].rstrip("\n") + "\n"
-            body = kernel.split("\n---", 1)[1].partition("\n")[2] if kernel.startswith("---") else kernel
-            (gen / src).write_text(front + "\n" + body.lstrip("\n"), encoding="utf-8")
-        else:
+    code, msg, src = f["code"], f.get("message", ""), f.get("file")
+    if code in ("GENERATED_DIFFERS", "TEMPLATE_COPY_MISSING", "TEMPLATE_COPY_DIFFERS"):
+        continue  # the generation and copy steps below write these
+    if code == "SOURCE_DIFFERS" and "differs from " in msg:
+        origin = msg.split("differs from ", 1)[1]
+        if "/skills/" in origin:
             (gen / src).write_bytes((gen / origin).read_bytes())
-    elif f["code"] != "GENERATED_DIFFERS":
-        raise SystemExit(f"a finding this builder does not handle: {f}")
+        elif "/roles/" in origin or "/templates/role-" in origin:
+            # a role source keeps its own rulesync front matter (tools, and claudecode.skills after W2-153) and takes
+            # the body of what the check compares it with: the kernel role (before W2-153) or its role template
+            # (after); a template's own front matter is never copied in (review R2)
+            text = (gen / src).read_text(encoding="utf-8")
+            (gen / src).write_text(front_of(text) + "\n" + body_of((gen / origin).read_text(encoding="utf-8")),
+                                   encoding="utf-8")
+        else:
+            raise SystemExit(f"a SOURCE_DIFFERS this builder does not repair: {f}")
+        continue
+    raise SystemExit(f"a finding this builder does not repair (a ticket's to fix, not an ACT's): {f}")
 with tempfile.TemporaryDirectory() as fresh:
     code, out = run([RULESYNC, *GENERATE, str((gen / ".rulesync").resolve())], fresh)
     assert code == 0, out
@@ -152,9 +173,12 @@ checks = [{"cmd": CHECK_COPIES, "exit": 0, "count": None}]
 reh = SCRATCH / "rehearsal-clone"
 clone(reh)
 fails = 0
+planted = Path(tempfile.mkdtemp(prefix="planted-home-", dir=SCRATCH))  # the operator's G8 plants HOME the same way
+live_before = {rel: (sha((LIVE / rel).read_bytes()) if (LIVE / rel).is_file() else None) for rel in TOUCHED}
+say(f"rehearsal clone at the live HEAD; HOME planted at a fresh empty folder")
 def step(name, cmd):
     global fails
-    code, out = run(["bash", "-c", cmd], reh)
+    code, out = run(["bash", "-c", cmd], reh, dict(os.environ, HOME=str(planted)))
     ok = code == 0
     fails += 0 if ok else 1
     say(f"{'ok  ' if ok else 'FAIL'} {name}: exit {code}{(' ' + out[-300:]) if out and not ok else ''}")
@@ -178,6 +202,10 @@ back = all(((reh / rel).read_bytes() if (reh / rel).is_file() else None) == befo
 clean = run(["git", "status", "--porcelain", "--untracked-files=all"], reh)[1] == ""
 fails += 0 if (back and clean) else 1
 say(f"{'ok  ' if back and clean else 'FAIL'} undo: every file byte for byte back, the tree clean")
+live_after = {rel: (sha((LIVE / rel).read_bytes()) if (LIVE / rel).is_file() else None) for rel in TOUCHED}
+untouched = live_after == live_before and not any(planted.iterdir())
+fails += 0 if untouched else 1
+say(f"{'ok  ' if untouched else 'FAIL'} the live files unchanged by the rehearsal, and nothing written to the planted HOME")
 say(f"failures: {fails}")
 put("rehearsal.log", ("\n".join(log) + "\n").encode())
 m = {"act": ACT, "dec": "DEC-1109", "author": "cto", "claimed_class": "b", "touched": touched, "files": files,

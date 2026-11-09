@@ -1,11 +1,14 @@
-ACT-CLAUDE-COPIES-1 rehearsal; live HEAD 97f39dc4e73e; rulesync 24.0.0
-generation clone: changed or new files 13 (expected 13)
+ACT-CLAUDE-COPIES-1 rehearsal; live HEAD b0bbd373f349; rulesync 24.0.0
+portability at HEAD: exit 1; 6 findings: SOURCE_DIFFERS .rulesync/subagents/orchestrator.md; SOURCE_DIFFERS .rulesync/skills/discovery/SKILL.md; SOURCE_DIFFERS .rulesync/skills/orchestration/SKILL.md; SOURCE_DIFFERS .rulesync/skills/retrieval/SKILL.md; SOURCE_DIFFERS .rulesync/skills/test-design/SKILL.md; GENERATED_DIFFERS .claude/agents/engineer.md
+portability in the generation clone after the copies: exit 0; findings []
+generation clone: 19 files changed or new: .claude/agents/engineer.md, .claude/agents/orchestrator.md, .claude/skills/discovery/SKILL.md, .claude/skills/orchestration/SKILL.md, .claude/skills/retrieval/SKILL.md, .claude/skills/test-design/SKILL.md, .claude/templates/brief.md, .claude/templates/role-cto.md, .claude/templates/role-engineer.md, .claude/templates/role-lead.md, .claude/templates/role-product-spec.md, .claude/templates/role-research.md, .claude/templates/role-reviewer.md, .claude/templates/role-test-designer.md, .rulesync/skills/discovery/SKILL.md, .rulesync/skills/orchestration/SKILL.md, .rulesync/skills/retrieval/SKILL.md, .rulesync/skills/test-design/SKILL.md, .rulesync/subagents/orchestrator.md
+rehearsal clone at the live HEAD; HOME planted at a fresh empty folder
 ok   apply.sh check (the live state as stated): exit 0
 ok   apply.sh apply: exit 0
 ok   check 1: exit 0
-ok   check 2: exit 0
 ok   portability after the apply: exit 0; findings []
-ok   the changed set equals the touched list (13 files)
+ok   the changed set equals the touched list (19 files)
 ok   apply.sh undo: exit 0
 ok   undo: every file byte for byte back, the tree clean
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
 failures: 0

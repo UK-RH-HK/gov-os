@@ -6,15 +6,15 @@
  "touched": [
   {
    "root": "repo",
-   "path": ".rulesync/skills/discovery/SKILL.md",
-   "before": "0d187935d64bbd64fd1d928fad360d1a659b3319da7f3cc23c3c8acdea588212",
-   "after": "9807e8bdc42607fc77e3115bfc9dcdbe11b178612cad76b64adc9d3bdae97a35"
+   "path": ".claude/agents/engineer.md",
+   "before": "8b58a8b6490826fec23d70bae841d62ebfaaf42db048bb866bea857d592919d2",
+   "after": "4b5c033ca8ea5d5a70c8760d0a73af50ab2ae80e43add94e9c5ca91b0736b5b8"
   },
   {
    "root": "repo",
-   "path": ".rulesync/skills/retrieval/SKILL.md",
-   "before": "a588eec7bc8409f940d18c35f7559ac0ed731bcaffafbf0c1fb686aa2b81e9eb",
-   "after": "f10ca3c3fe5f960df8d7138dbeb5b7785d57925fc4d528a8ad53dd7d444aa683"
+   "path": ".claude/agents/orchestrator.md",
+   "before": "ef2468e4e88c37adf9a691e10ec50eb6528c3b4ee96c9e43029d984a890e6b07",
+   "after": "851351b4c73cfdd1ea4b0186d185b81136c57dc68136ef4f43f713c2d136f9f8"
   },
   {
    "root": "repo",
@@ -24,15 +24,21 @@
   },
   {
    "root": "repo",
+   "path": ".claude/skills/orchestration/SKILL.md",
+   "before": "0556631d81b312a4e26890442c2fff6603d772a186e082b6e23b31626b30fe03",
+   "after": "7c7c24872d3a4d15ac0cf063b0a2832ffab969674e8a50d2438948897c164a40"
+  },
+  {
+   "root": "repo",
    "path": ".claude/skills/retrieval/SKILL.md",
    "before": "3a25020c79d550a6638ed57c9179d21b4dcb873c20e41de780ae04571cfc6848",
    "after": "c1a20a9d98e0e6d25047c75e386a14f3e71de5538cc78442d2a9e62aa17144f7"
   },
   {
    "root": "repo",
-   "path": ".claude/agents/engineer.md",
-   "before": "8b58a8b6490826fec23d70bae841d62ebfaaf42db048bb866bea857d592919d2",
-   "after": "4b5c033ca8ea5d5a70c8760d0a73af50ab2ae80e43add94e9c5ca91b0736b5b8"
+   "path": ".claude/skills/test-design/SKILL.md",
+   "before": "cea11dc2c8f15186746fddb3acfd2a1b2ed03788ec7e325f1289542b48ee7454",
+   "after": "d3a19c6b24b253659167df303b806f1da3b6823a569321c2e59142c88c446fe8"
   },
   {
    "root": "repo",
@@ -42,21 +48,9 @@
   },
   {
    "root": "repo",
-   "path": ".claude/templates/role-research.md",
+   "path": ".claude/templates/role-cto.md",
    "before": null,
-   "after": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b"
-  },
-  {
-   "root": "repo",
-   "path": ".claude/templates/role-product-spec.md",
-   "before": null,
-   "after": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10"
-  },
-  {
-   "root": "repo",
-   "path": ".claude/templates/role-test-designer.md",
-   "before": null,
-   "after": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3"
+   "after": "1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8"
   },
   {
    "root": "repo",
@@ -66,58 +60,107 @@
   },
   {
    "root": "repo",
-   "path": ".claude/templates/role-reviewer.md",
-   "before": null,
-   "after": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0"
-  },
-  {
-   "root": "repo",
    "path": ".claude/templates/role-lead.md",
    "before": null,
    "after": "8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e"
   },
   {
    "root": "repo",
-   "path": ".claude/templates/role-cto.md",
+   "path": ".claude/templates/role-product-spec.md",
    "before": null,
-   "after": "1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8"
+   "after": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-research.md",
+   "before": null,
+   "after": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-reviewer.md",
+   "before": null,
+   "after": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0"
+  },
+  {
+   "root": "repo",
+   "path": ".claude/templates/role-test-designer.md",
+   "before": null,
+   "after": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/skills/discovery/SKILL.md",
+   "before": "0d187935d64bbd64fd1d928fad360d1a659b3319da7f3cc23c3c8acdea588212",
+   "after": "9807e8bdc42607fc77e3115bfc9dcdbe11b178612cad76b64adc9d3bdae97a35"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/skills/orchestration/SKILL.md",
+   "before": "48c40b31b459ba3d394caa9bd47c42dd4acdf5b9dfc892211658c0018edf1ab0",
+   "after": "bfdc799bbad7efab7facffd1c7b463c2565603648cdd23e9f65149fc893acd8d"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/skills/retrieval/SKILL.md",
+   "before": "a588eec7bc8409f940d18c35f7559ac0ed731bcaffafbf0c1fb686aa2b81e9eb",
+   "after": "f10ca3c3fe5f960df8d7138dbeb5b7785d57925fc4d528a8ad53dd7d444aa683"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/skills/test-design/SKILL.md",
+   "before": "4307a3ec464e71d7ef40fab548c18a245f47b9043453dfc3ef826935861aff14",
+   "after": "5296424d37127487c5be78261ce9d15868b3d5862d67ef9d6c0a379b9f9408c8"
+  },
+  {
+   "root": "repo",
+   "path": ".rulesync/subagents/orchestrator.md",
+   "before": "c375d06fb47b9216eee5c32cb3fed32a5b598e0b3db9e283554a7e85caf5f16a",
+   "after": "c514b243f593348529b372586a6681b55812258597fc77220784eb8de839d9b7"
   }
  ],
  "files": {
-  "before/repo/.rulesync/skills/discovery/SKILL.md": "0d187935d64bbd64fd1d928fad360d1a659b3319da7f3cc23c3c8acdea588212",
-  "after/repo/.rulesync/skills/discovery/SKILL.md": "9807e8bdc42607fc77e3115bfc9dcdbe11b178612cad76b64adc9d3bdae97a35",
-  "before/repo/.rulesync/skills/retrieval/SKILL.md": "a588eec7bc8409f940d18c35f7559ac0ed731bcaffafbf0c1fb686aa2b81e9eb",
-  "after/repo/.rulesync/skills/retrieval/SKILL.md": "f10ca3c3fe5f960df8d7138dbeb5b7785d57925fc4d528a8ad53dd7d444aa683",
-  "before/repo/.claude/skills/discovery/SKILL.md": "22ef3f713a5c08f408a661128b1e7040dec4fa38b2b495220bf634fdf89a6241",
-  "after/repo/.claude/skills/discovery/SKILL.md": "0c83b3ff90ae59030abfa25a754f11459ac369b93b3d1b831a162331a2484e0d",
-  "before/repo/.claude/skills/retrieval/SKILL.md": "3a25020c79d550a6638ed57c9179d21b4dcb873c20e41de780ae04571cfc6848",
-  "after/repo/.claude/skills/retrieval/SKILL.md": "c1a20a9d98e0e6d25047c75e386a14f3e71de5538cc78442d2a9e62aa17144f7",
   "before/repo/.claude/agents/engineer.md": "8b58a8b6490826fec23d70bae841d62ebfaaf42db048bb866bea857d592919d2",
   "after/repo/.claude/agents/engineer.md": "4b5c033ca8ea5d5a70c8760d0a73af50ab2ae80e43add94e9c5ca91b0736b5b8",
+  "before/repo/.claude/agents/orchestrator.md": "ef2468e4e88c37adf9a691e10ec50eb6528c3b4ee96c9e43029d984a890e6b07",
+  "after/repo/.claude/agents/orchestrator.md": "851351b4c73cfdd1ea4b0186d185b81136c57dc68136ef4f43f713c2d136f9f8",
+  "before/repo/.claude/skills/discovery/SKILL.md": "22ef3f713a5c08f408a661128b1e7040dec4fa38b2b495220bf634fdf89a6241",
+  "after/repo/.claude/skills/discovery/SKILL.md": "0c83b3ff90ae59030abfa25a754f11459ac369b93b3d1b831a162331a2484e0d",
+  "before/repo/.claude/skills/orchestration/SKILL.md": "0556631d81b312a4e26890442c2fff6603d772a186e082b6e23b31626b30fe03",
+  "after/repo/.claude/skills/orchestration/SKILL.md": "7c7c24872d3a4d15ac0cf063b0a2832ffab969674e8a50d2438948897c164a40",
+  "before/repo/.claude/skills/retrieval/SKILL.md": "3a25020c79d550a6638ed57c9179d21b4dcb873c20e41de780ae04571cfc6848",
+  "after/repo/.claude/skills/retrieval/SKILL.md": "c1a20a9d98e0e6d25047c75e386a14f3e71de5538cc78442d2a9e62aa17144f7",
+  "before/repo/.claude/skills/test-design/SKILL.md": "cea11dc2c8f15186746fddb3acfd2a1b2ed03788ec7e325f1289542b48ee7454",
+  "after/repo/.claude/skills/test-design/SKILL.md": "d3a19c6b24b253659167df303b806f1da3b6823a569321c2e59142c88c446fe8",
   "after/repo/.claude/templates/brief.md": "004ce0fc8f09dcc89a8ecda0b0a0ef813737323719aac3e469a1eac6ee4cfe6d",
-  "after/repo/.claude/templates/role-research.md": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b",
-  "after/repo/.claude/templates/role-product-spec.md": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10",
-  "after/repo/.claude/templates/role-test-designer.md": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3",
-  "after/repo/.claude/templates/role-engineer.md": "7f18eebbe71129b504b51e01c921f9a2ca125e157db9fbdbae7bc56d738622b3",
-  "after/repo/.claude/templates/role-reviewer.md": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0",
-  "after/repo/.claude/templates/role-lead.md": "8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e",
   "after/repo/.claude/templates/role-cto.md": "1b1745571c511037bf12cd3b5ddfe246606963a4216a58044855ddf349198ce8",
-  "list.txt": "dd0b10012db177e124f53022184c5cd080a2639cc99bdd35562867529b05a3d7",
+  "after/repo/.claude/templates/role-engineer.md": "7f18eebbe71129b504b51e01c921f9a2ca125e157db9fbdbae7bc56d738622b3",
+  "after/repo/.claude/templates/role-lead.md": "8279168522102c64a9f4b4ef5b7f4abe489499adcb34c43403a98e7fc0ce6c7e",
+  "after/repo/.claude/templates/role-product-spec.md": "66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10",
+  "after/repo/.claude/templates/role-research.md": "6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b",
+  "after/repo/.claude/templates/role-reviewer.md": "bec50839cad9cea5f5470f52d6b4856ea0d28c080810dbf6beff0c82e94e19f0",
+  "after/repo/.claude/templates/role-test-designer.md": "3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3",
+  "before/repo/.rulesync/skills/discovery/SKILL.md": "0d187935d64bbd64fd1d928fad360d1a659b3319da7f3cc23c3c8acdea588212",
+  "after/repo/.rulesync/skills/discovery/SKILL.md": "9807e8bdc42607fc77e3115bfc9dcdbe11b178612cad76b64adc9d3bdae97a35",
+  "before/repo/.rulesync/skills/orchestration/SKILL.md": "48c40b31b459ba3d394caa9bd47c42dd4acdf5b9dfc892211658c0018edf1ab0",
+  "after/repo/.rulesync/skills/orchestration/SKILL.md": "bfdc799bbad7efab7facffd1c7b463c2565603648cdd23e9f65149fc893acd8d",
+  "before/repo/.rulesync/skills/retrieval/SKILL.md": "a588eec7bc8409f940d18c35f7559ac0ed731bcaffafbf0c1fb686aa2b81e9eb",
+  "after/repo/.rulesync/skills/retrieval/SKILL.md": "f10ca3c3fe5f960df8d7138dbeb5b7785d57925fc4d528a8ad53dd7d444aa683",
+  "before/repo/.rulesync/skills/test-design/SKILL.md": "4307a3ec464e71d7ef40fab548c18a245f47b9043453dfc3ef826935861aff14",
+  "after/repo/.rulesync/skills/test-design/SKILL.md": "5296424d37127487c5be78261ce9d15868b3d5862d67ef9d6c0a379b9f9408c8",
+  "before/repo/.rulesync/subagents/orchestrator.md": "c375d06fb47b9216eee5c32cb3fed32a5b598e0b3db9e283554a7e85caf5f16a",
+  "after/repo/.rulesync/subagents/orchestrator.md": "c514b243f593348529b372586a6681b55812258597fc77220784eb8de839d9b7",
+  "list.txt": "3ee561276fa81bc4319313e2aa7779f45bfaed18ac9f094168528955e31b63e8",
   "apply.sh": "91c41ea2facda51c14c30d08b88d0c05fc4f35cfccff109a6269c227337e86ce",
-  "rehearsal.log": "81544b97789df50d83d53d5c3bcf8838b2d6edeaec105f476754f3b61a25a9d7"
+  "rehearsal.log": "4c85b9ac84aedd0d82249c7ef8cbc75c6af929ee893bccc85c5eba541702b5bb"
  },
  "rehearsal": {
   "log": "rehearsal.log",
-  "sha256": "81544b97789df50d83d53d5c3bcf8838b2d6edeaec105f476754f3b61a25a9d7"
+  "sha256": "4c85b9ac84aedd0d82249c7ef8cbc75c6af929ee893bccc85c5eba541702b5bb"
  },
  "checks": [
   {
-   "cmd": "for s in discovery retrieval; do cmp -s template/governance/kernel/skills/$s/SKILL.md .rulesync/skills/$s/SKILL.md || exit 1; done; for t in brief role-research role-product-spec role-test-designer role-engineer role-reviewer role-lead role-cto; do cmp -s template/governance/kernel/templates/$t.md .claude/templates/$t.md || exit 1; done",
-   "exit": 0,
-   "count": null
-  },
-  {
-   "cmd": "grep -q 'Search again once' .claude/skills/retrieval/SKILL.md && grep -q 'searches once more' .claude/skills/discovery/SKILL.md && grep -q 'to fulfil the spec and its KPIs' .claude/agents/engineer.md",
+   "cmd": "cmp -s template/governance/kernel/templates/brief.md .claude/templates/brief.md && cmp -s template/governance/kernel/templates/role-research.md .claude/templates/role-research.md && cmp -s template/governance/kernel/templates/role-product-spec.md .claude/templates/role-product-spec.md && cmp -s template/governance/kernel/templates/role-test-designer.md .claude/templates/role-test-designer.md && cmp -s template/governance/kernel/templates/role-engineer.md .claude/templates/role-engineer.md && cmp -s template/governance/kernel/templates/role-reviewer.md .claude/templates/role-reviewer.md && cmp -s template/governance/kernel/templates/role-lead.md .claude/templates/role-lead.md && cmp -s template/governance/kernel/templates/role-cto.md .claude/templates/role-cto.md && cmp -s template/governance/kernel/skills/discovery/SKILL.md .rulesync/skills/discovery/SKILL.md && cmp -s template/governance/kernel/skills/orchestration/SKILL.md .rulesync/skills/orchestration/SKILL.md && cmp -s template/governance/kernel/skills/retrieval/SKILL.md .rulesync/skills/retrieval/SKILL.md && cmp -s template/governance/kernel/skills/test-design/SKILL.md .rulesync/skills/test-design/SKILL.md",
    "exit": 0,
    "count": null
   }

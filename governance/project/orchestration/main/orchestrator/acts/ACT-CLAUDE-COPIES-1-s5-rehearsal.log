@@ -1,0 +1,52 @@
+$ test -z 
+exit 0
+$ test ! -e .git/MERGE_HEAD
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-1/apply.sh check
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-1/apply.sh apply
+exit 0
+$ bash -c cmp -s template/governance/kernel/templates/brief.md .claude/templates/brief.md && cmp -s template/governance/kernel/templates/role-research.md .claude/templates/role-research.md && cmp -s template/governance/kernel/templates/role-product-spec.md .claude/templates/role-product-spec.md && cmp -s template/governance/kernel/templates/role-test-designer.md .claude/templates/role-test-designer.md && cmp -s template/governance/kernel/templates/role-engineer.md .claude/templates/role-engineer.md && cmp -s template/governance/kernel/templates/role-reviewer.md .claude/templates/role-reviewer.md && cmp -s template/governance/kernel/templates/role-lead.md .claude/templates/role-lead.md && cmp -s template/governance/kernel/templates/role-cto.md .claude/templates/role-cto.md && cmp -s template/governance/kernel/skills/discovery/SKILL.md .rulesync/skills/discovery/SKILL.md && cmp -s template/governance/kernel/skills/orchestration/SKILL.md .rulesync/skills/orchestration/SKILL.md && cmp -s template/governance/kernel/skills/retrieval/SKILL.md .rulesync/skills/retrieval/SKILL.md && cmp -s template/governance/kernel/skills/test-design/SKILL.md .rulesync/skills/test-design/SKILL.md
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/orchestrator.md .claude/skills/discovery/SKILL.md .claude/skills/orchestration/SKILL.md .claude/skills/retrieval/SKILL.md .claude/skills/test-design/SKILL.md .claude/templates/brief.md .claude/templates/role-cto.md .claude/templates/role-engineer.md .claude/templates/role-lead.md .claude/templates/role-product-spec.md .claude/templates/role-research.md .claude/templates/role-reviewer.md .claude/templates/role-test-designer.md .rulesync/skills/discovery/SKILL.md .rulesync/skills/orchestration/SKILL.md .rulesync/skills/retrieval/SKILL.md .rulesync/skills/test-design/SKILL.md .rulesync/subagents/orchestrator.md
+exit 0
+staged 19 files
+$ git commit -q -m ACT-CLAUDE-COPIES-1: the generated .claude/ and .rulesync/ copies of W2-128's templates and skills and W2-142's skills (19 files) --trailer Task: DAEO-sdxk --trailer Implements: DEC-1109, DEC-1050 --trailer Role: owner
+exit 0
+$ test -z 
+exit 0
+Task: DAEO-sdxk
+Implements: DEC-1109, DEC-1050
+Role: owner
+
+
+ .claude/agents/engineer.md              |  2 +-
+ .claude/agents/orchestrator.md          |  4 +-
+ .claude/skills/discovery/SKILL.md       |  2 +-
+ .claude/skills/orchestration/SKILL.md   | 10 ++---
+ .claude/skills/retrieval/SKILL.md       |  3 ++
+ .claude/skills/test-design/SKILL.md     |  2 +-
+ .claude/templates/brief.md              | 62 +++++++++++++++++++++++++++
+ .claude/templates/role-cto.md           | 36 ++++++++++++++++
+ .claude/templates/role-engineer.md      | 20 +++++++++
+ .claude/templates/role-lead.md          | 75 +++++++++++++++++++++++++++++++++
+ .claude/templates/role-product-spec.md  | 21 +++++++++
+ .claude/templates/role-research.md      | 19 +++++++++
+ .claude/templates/role-reviewer.md      | 35 +++++++++++++++
+ .claude/templates/role-test-designer.md | 23 ++++++++++
+ .rulesync/skills/discovery/SKILL.md     |  4 +-
+ .rulesync/skills/orchestration/SKILL.md | 12 +++---
+ .rulesync/skills/retrieval/SKILL.md     |  5 ++-
+ .rulesync/skills/test-design/SKILL.md   |  4 +-
+ .rulesync/subagents/orchestrator.md     |  4 +-
+ 19 files changed, 320 insertions(+), 23 deletions(-)
+portability after the commit: []
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-1/apply.sh undo
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/orchestrator.md .claude/skills/discovery/SKILL.md .claude/skills/orchestration/SKILL.md .claude/skills/retrieval/SKILL.md .claude/skills/test-design/SKILL.md .claude/templates/brief.md .claude/templates/role-cto.md .claude/templates/role-engineer.md .claude/templates/role-lead.md .claude/templates/role-product-spec.md .claude/templates/role-research.md .claude/templates/role-reviewer.md .claude/templates/role-test-designer.md .rulesync/skills/discovery/SKILL.md .rulesync/skills/orchestration/SKILL.md .rulesync/skills/retrieval/SKILL.md .rulesync/skills/test-design/SKILL.md .rulesync/subagents/orchestrator.md
+exit 0
+$ git commit -q -m ACT-CLAUDE-COPIES-1 undone --trailer Task: DAEO-sdxk --trailer Role: owner
+exit 0
+$ test 0 = 0
+exit 0
+failures: 0
