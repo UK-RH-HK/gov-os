@@ -131,7 +131,6 @@ waits_on:
 - 'DAEO-qskx — W2-142: S15 copies the retrieval skill''s step 7 and the discovery skill''s line [added, DEC-1099 (2)]'
 - 'DAEO-t8mp — W2-128: S15 copies T-0''s and T-8''s "Search again once" line [added, DEC-1099 (2)]'
 - 'DAEO-f58b — W2-116: S11''s refresh after every merge, double-buffered [added, DEC-1099 (2)]'
-- 'DAEO-2tfd — W2-145: S10''s one shared reranker, no private reranker [added, DEC-1099 (2)]'
 ---
 # W2-88 Memory for any repository
 
@@ -222,7 +221,10 @@ Card: from the owner's DEC-954 Q9f (2026-10-30): "Memory for any repository, not
     (`docs/research/W2-88-memory-practice.md`) are in this ticket's `allowed_paths`.
   - (6) The nonexistent-id row is its own ticket (W2-146). Until it lands, S12 and S14 score that question on the
     reader's "not found", apart from the bar (W2-88-STANDARD-1 §5).
-- **Waits:** W2-142 and W2-128 (S15), W2-116 (S11), W2-145 (S10), in `waits_on`.
+- **Waits:** W2-142 and W2-128 (S15) and W2-116 (S11), in `waits_on`. S10 also waits on W2-145 (`DAEO-2tfd`, no
+  private reranker), which is kept out of `waits_on` for now: W2-145 and W2-137 (`DAEO-5emz`) each need a file the
+  other writes (`src/gov/retrieval/rerank.py`), `gov plan`'s one cycle, and with W2-145 in `waits_on` the plan's
+  tiebreak orders W2-27 before W2-88 (measured 2026-11-09). It goes into `waits_on` when that cycle is gone.
 - **Est.:** about 750 LOC (+250: the set tools, S10's check, the skill step). W2-88-STANDARD-1 §4 gave 30 to 38
   lead-hours with one full practice run; under answer (2)(c) that run is W2-27's, so this ticket's share is less by it.
 
