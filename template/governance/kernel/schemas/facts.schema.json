@@ -68,6 +68,20 @@
       "description": "The commands the harness runs headless without asking (from the settings' allow list).",
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
+    },
+    "ready": {
+      "description": "The ready check inside gov brief (W2-152, DEC-1088 (3)): a ticket created on or after `new_since` must declare reads:, needs: and waits_on:; an older ticket is not refused for them.",
+      "type": "object",
+      "required": ["new_since"],
+      "additionalProperties": false,
+      "properties": {
+        "new_since": {
+          "description": "An ISO date as a quoted string (\"2026-11-10\"): the day W2-152 lands.",
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+        }
+      }
     }
   }
 }
