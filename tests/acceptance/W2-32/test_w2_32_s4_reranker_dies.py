@@ -6,12 +6,26 @@ unavailable and why (``last_outcome()``; ``rerank`` in a bundle; ``reranked`` fa
 
 The dying rerankers load and then die at the first score: a real child process that prints its "loaded" line and
 exits (a closed pipe, an empty answer), the same failure raised directly in each form a dead process gives, and the
-default reranker started from a fake reranker environment in the scratch ``HOME`` whose worker does the same. No
-model is loaded.
+default reranker started from a fake reranker environment in the scratch ``HOME``. No model is loaded.
+
+Rewrite-Reason: DEC-1048 (5) (W2-145, DAEO-2tfd). The default reranker has no private worker any more: a search the
+shared service cannot answer stays unranked, named, and never starts ``rerank_worker.py``. So the default reranker
+that "dies after loading" is now the shared service that dies after accepting: the fake environment's interpreter,
+asked to run ``rerank_service.py``, listens at the socket it is given, accepts the search's connection, reads its
+request and dies without an answer. Its interpreter records every program it is asked to run: the cases also hold
+that ``rerank_worker.py`` (the old dying worker, still planted) is never started. The scratch ``HOME`` of these cases
+is a short folder of its own, as a Unix socket's path is at most 108 bytes; they need Unix sockets (outside the
+launch sandbox).
 """
 
 from __future__ import annotations
 
+import json
+import os
+import shutil
+import socket
+import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -24,15 +38,31 @@ CANDIDATES = [{"chunk_id": f"c{i}", "path": f"docs/{name}.md", "text": f"[path: 
               for i, name in enumerate(("harbour", "bakery", "orchard"))]
 NOT_A_REASON = {None, "", "no rerank was asked", "nothing to rerank"}
 
-# The fake reranker environment (DEC-397's path under HOME): the service ends at once without listening; the private
-# worker prints its "loaded" line and exits, so the search falls back to a reranker that is dead after loading.
-FAKE_PYTHON = """#!/bin/sh
-for arg in "$@"; do
-  case "$arg" in
-    *rerank_worker.py) echo '{"device": "cpu"}'; exit 0 ;;
-  esac
-done
-exit 1
+# The fake reranker environment (DEC-397's path under HOME). Asked to run the shared service, it listens at the
+# socket it is given (the third argument after the script), accepts one connection, reads the request and dies
+# without answering. Asked to run the old private worker, it prints its "loaded" line and exits (a reranker dead
+# after loading), which no search may start any more. Every program it is asked to run is one line of RECORD.
+FAKE_PYTHON = """#!{python} -I
+import json, os, socket, sys
+args = sys.argv[1:]
+with open({record}, "a", encoding="utf-8") as out:
+    out.write(json.dumps(args) + "\\n")
+script = next((arg for arg in args if arg.endswith(".py")), "")
+if script.endswith("rerank_worker.py"):
+    print('{{"device": "cpu"}}', flush=True)
+    sys.exit(0)
+if script.endswith("rerank_service.py"):
+    path = args[args.index(script) + 3]
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server.bind(path)
+    server.listen(8)
+    server.settimeout(20)
+    connection, _ = server.accept()
+    connection.makefile("rb").readline()
+    with open({record}, "a", encoding="utf-8") as out:
+        out.write(json.dumps(["accepted and died"]) + "\\n")
+    os._exit(1)
+sys.exit(1)
 """
 
 
@@ -41,11 +71,52 @@ def _reported(outcome):
     assert outcome.get("reason") not in NOT_A_REASON, f"the outcome says why the rerank was unavailable: {outcome}"
 
 
+def _short_home(box):
+    """A scratch ``HOME`` short enough for the service's socket path under it (108 bytes), for this case alone."""
+    starts = [Path(start) for start in (os.environ.get("TMPDIR"), tempfile.gettempdir()) if start]
+    for start in [folder for path in starts for folder in (path, *path.parents) if len(folder.parts) >= 3]:
+        if len(str(start)) + 60 > 104 or start == s.ROOT or s.ROOT in start.parents:
+            continue
+        try:
+            home = Path(tempfile.mkdtemp(prefix="w32h-", dir=start))
+        except OSError:
+            continue
+        box.home = home
+        return home
+    pytest.fail("no temporary folder is short enough for a Unix socket's path under it: set TMPDIR shorter",
+                pytrace=False)
+
+
 def _fake_reranker_environment(box):
-    python = Path(box.home) / ".local/share/gov-os/reranker-venv/bin/python"
+    """The fake environment in a short scratch ``HOME``; the file that records the programs it is asked to run."""
+    home = _short_home(box)
+    record = box.workdir / "reranker-programs.jsonl"
+    python = home / ".local/share/gov-os/reranker-venv/bin/python"
     python.parent.mkdir(parents=True, exist_ok=True)
-    python.write_text(FAKE_PYTHON, encoding="utf-8")
+    python.write_text(FAKE_PYTHON.format(python=sys.executable, record=json.dumps(str(record))), encoding="utf-8")
     python.chmod(0o755)
+    return record
+
+
+def _programs(record):
+    try:
+        return [json.loads(line) for line in record.read_text(encoding="utf-8").splitlines() if line.strip()]
+    except FileNotFoundError:
+        return []
+
+
+def _no_private_and_the_service_died_after_accepting(record):
+    programs = _programs(record)
+    workers = [args for args in programs if any(str(arg).endswith("rerank_worker.py") for arg in args)]
+    assert workers == [], f"a private reranker (rerank_worker.py) was started: {workers} (DEC-1048 (5), W2-145)"
+    try:
+        socket.socket(socket.AF_UNIX, socket.SOCK_STREAM).close()
+        refused = None
+    except OSError as error:
+        refused = f"this sandbox refuses Unix sockets ({error}): run these cases where they are allowed"
+    assert ["accepted and died"] in programs, \
+        (f"premise: the planted shared service never accepted the search's connection (programs: {programs})"
+         + (f" [NOTE: {refused}]" if refused else ""))
 
 
 @pytest.mark.parametrize("dying", DYING)
@@ -59,13 +130,18 @@ def test_rerank_with_a_reranker_that_dies_after_loading_keeps_the_order_and_repo
         _reported(answer["outcome"])
 
 
-def test_the_default_reranker_that_dies_after_loading_is_reported_not_raised(box):
-    _fake_reranker_environment(box)
-    data = box.call("rerank", query="tide tables", candidates=CANDIDATES, reranker=None, times=2)
-    for answer in s.result(data):
-        assert [c["chunk_id"] for c in answer["ranked"]] == [c["chunk_id"] for c in CANDIDATES]
-        assert not any("rerank_score" in c for c in answer["ranked"])
-        _reported(answer["outcome"])
+def test_the_default_reranker_whose_shared_service_dies_after_accepting_is_reported_not_raised(box):
+    record = _fake_reranker_environment(box)
+    try:
+        data = box.call("rerank", query="tide tables", candidates=CANDIDATES, reranker=None, times=2)
+        for answer in s.result(data):  # the second search meets a dead service again: it starts one, which dies
+            assert [c["chunk_id"] for c in answer["ranked"]] == [c["chunk_id"] for c in CANDIDATES]
+            assert not any("rerank_score" in c for c in answer["ranked"])
+            _reported(answer["outcome"])
+            assert "private" not in str(answer["outcome"].get("by")), answer["outcome"]
+        _no_private_and_the_service_died_after_accepting(record)
+    finally:
+        shutil.rmtree(box.home, ignore_errors=True)
 
 
 @pytest.mark.parametrize("dying", ["dies-process", "dies:EOFError"])
@@ -82,13 +158,18 @@ def test_the_fusion_with_a_dying_reranker_answers_unreranked_and_reports_it(proj
 @pytest.mark.parametrize("dying", ["dies-process", "dies:EOFError", None])
 def test_retrieve_with_a_dying_reranker_cites_its_evidence_and_reports_the_rerank_unavailable(
         project, box, standin, dying):
-    if dying is None:
-        _fake_reranker_environment(box)
     box.built(project)
-    question, gold = s.QUESTIONS[0]
-    data = box.call("retrieve", root=str(project), query=question, reranker=dying)
-    bundle = s.result(data)
-    assert gold in s.first_paths(bundle["evidence"]), "the evidence is still cited"
-    assert bundle["merge"]["reranked"] is False
-    _reported(bundle["rerank"])
-    s.no_traceback(data)
+    record = _fake_reranker_environment(box) if dying is None else None  # the default: a service that dies
+    try:
+        question, gold = s.QUESTIONS[0]
+        data = box.call("retrieve", root=str(project), query=question, reranker=dying)
+        bundle = s.result(data)
+        assert gold in s.first_paths(bundle["evidence"]), "the evidence is still cited"
+        assert bundle["merge"]["reranked"] is False
+        _reported(bundle["rerank"])
+        s.no_traceback(data)
+        if record is not None:
+            _no_private_and_the_service_died_after_accepting(record)
+    finally:
+        if record is not None:
+            shutil.rmtree(box.home, ignore_errors=True)
