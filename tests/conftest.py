@@ -52,6 +52,14 @@
   reported as deselected; nothing is skipped or deleted, and a run that opts
   in to both suites collects every case as before.
 
+- The code graph (W2-56 S1, DEC-799 item 1, T-8): the controlling process of a
+  run makes one folder for the run's code-graph daemon folders
+  (``gov.codeintel.make_session_base``), names it in ``GOV_CBM_BASE`` before
+  xdist starts its workers, and removes it at the end. The real tool
+  (``codebase-memory-mcp``) is on ``PATH`` only while a case of W1-16 or W1-20
+  runs; for every other case each ``PATH`` folder that holds it is replaced by
+  a folder of this process's own with links to the rest of its entries.
+
 The conftest sets no base folder and changes no retention count or policy.
 """
 
@@ -61,6 +69,7 @@ import fcntl
 import hashlib
 import os
 import re
+import shutil
 import stat
 import tempfile
 from pathlib import Path
@@ -228,11 +237,79 @@ def pytest_collection_modifyitems(config, items):
         config.hook.pytest_deselected(items=left)
 
 
+_CBM_TOOL = "codebase-memory-mcp"
+_CBM_SUITES = frozenset({"W1-16", "W1-20"})  # the suites that run the real code-graph tool (T-8)
+_cbm_base = None  # this run's daemon folder and GOV_CBM_BASE's former value (the controlling process only)
+_off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
+
+
+def _own_cbm_base():
+    """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``GOV_CBM_BASE``; None without one."""
+    try:
+        from gov import codeintel
+        made = codeintel.make_session_base()
+    except Exception:  # noqa: BLE001 -- no gov here, or no place: the code index keeps its own default
+        return None
+    former = os.environ.get("GOV_CBM_BASE")
+    os.environ["GOV_CBM_BASE"] = str(made)
+    return made, former
+
+
+def _drop_cbm_base(made: Path, former: str | None) -> None:
+    if former is None:
+        os.environ.pop("GOV_CBM_BASE", None)
+    else:
+        os.environ["GOV_CBM_BASE"] = former
+    shutil.rmtree(made, ignore_errors=True)
+
+
+def _without_tool(value: str) -> str | None:
+    """``value`` (a PATH) with each folder that holds the code-graph tool replaced by a folder of links to the rest of
+    its entries; None when no folder holds it."""
+    parts, changed = value.split(os.pathsep), False
+    for i, part in enumerate(parts):
+        tool = os.path.join(part, _CBM_TOOL) if part else ""
+        if not (tool and os.path.isfile(tool) and os.access(tool, os.X_OK)):
+            continue
+        links = _off_path["links"].get(part)
+        if links is None:
+            if _off_path["folder"] is None:
+                _off_path["folder"] = tempfile.mkdtemp(prefix="gov-path-")
+            links = tempfile.mkdtemp(dir=_off_path["folder"])
+            for name in os.listdir(part):
+                if name != _CBM_TOOL:
+                    os.symlink(os.path.join(part, name), os.path.join(links, name))
+            _off_path["links"][part] = links
+        parts[i], changed = links, True
+    return os.pathsep.join(parts) if changed else None
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_protocol(item, nextitem):
+    """The code-graph tool off PATH for every case but W1-16's and W1-20's, fixtures included (W2-56 S1)."""
+    before = os.environ.get("PATH")
+    without = None
+    if before and _CBM_SUITES.isdisjoint(Path(str(item.path)).parts):
+        try:
+            without = _without_tool(before)
+        except OSError:
+            without = None
+    if without is not None:
+        os.environ["PATH"] = without
+    try:
+        yield
+    finally:
+        if without is not None and os.environ.get("PATH") == without:
+            os.environ["PATH"] = before
+
+
 def pytest_configure(config):
-    global _rebuild_lock
+    global _rebuild_lock, _cbm_base
     _refuse_basetemp(config)
     if _rebuild_lock is None:
         _rebuild_lock = _own_rebuild_lock()
+    if _cbm_base is None and not _is_worker(config):
+        _cbm_base = _own_cbm_base()
 
 
 def _refuse_basetemp(config) -> None:
@@ -361,10 +438,16 @@ def _sweep(config) -> None:
 
 
 def pytest_unconfigure(config):
-    global _rebuild_lock
+    global _rebuild_lock, _cbm_base
     if _rebuild_lock is not None:
         _drop_rebuild_lock(*_rebuild_lock)
         _rebuild_lock = None
+    if _cbm_base is not None:
+        _drop_cbm_base(*_cbm_base)
+        _cbm_base = None
+    if _off_path["folder"] is not None:
+        shutil.rmtree(_off_path["folder"], ignore_errors=True)
+        _off_path["folder"], _off_path["links"] = None, {}
     if _refused or _is_worker(config):
         return
     _sweep(config)

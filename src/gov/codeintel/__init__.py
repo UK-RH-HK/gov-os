@@ -9,7 +9,8 @@ cannot decide, there is no index. The answers are read from the graph the tool b
 The root must be the top level of a git repository whose ``.gov-runtime/`` is no link:
 any other root is refused before anything is written or deleted. The tool's daemon keeps
 its lock and socket files in ``daemon_dir(root)``, never in the tool's shared default
-(DEC-338), and does not serve the tool's loopback UI: every start of the tool sets ``ui_enabled``
+(DEC-338): in a test session under that session's own folder, in a session ``gov launch``
+started under its own temp folder (W2-56 S1, ``daemon_base``), and does not serve the tool's loopback UI: every start of the tool sets ``ui_enabled``
 to ``false`` in the home first (DEC-362). The graph is read in one session of the tool, so that
 its daemon starts once for it (DEC-561).
 """
@@ -32,8 +33,15 @@ from gov.util.gitenv import git_env
 
 TOOL = "codebase-memory-mcp"
 BASE_REL = ".gov-runtime/codeintel"
-# Where the daemon directories stand: short, because a socket path holds at most 107 bytes (DEC-338).
+# Where the daemon directories stand: short, because a socket path holds at most 107 bytes (DEC-338). This is the
+# place outside a test session and outside a launched session (``daemon_base``).
 DAEMON_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
+# W2-56 S1 (DEC-799 item 1): a test session's own folder for its daemon directories (``tests/conftest.py`` makes it,
+# sets this variable and removes the folder when the session ends) ...
+BASE_ENV = "GOV_CBM_BASE"
+# ... and, in a session ``gov launch`` started, its own temp folder (``gov-launch-`` and a few letters, DEC-159),
+# found from ``CLAUDE_CODE_TMPDIR``: the launcher's folder itself, or the CLI's ``claude-<uid>`` folder in it.
+LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
 # Seconds a session of the tool has for one answer, and for its end once its input is closed; then it is killed.
@@ -43,8 +51,8 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callees", "callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects",
-           "references"]
+__all__ = ["callees", "callers", "daemon_base", "daemon_dir", "dead_code", "definitions", "home", "impact", "index",
+           "launch_folder", "make_session_base", "projects", "references"]
 
 
 def home(root: Path) -> Path:
@@ -52,9 +60,49 @@ def home(root: Path) -> Path:
     return Path(root).resolve() / BASE_REL / "home"
 
 
+def launch_folder(env=None) -> Path | None:
+    """The temp folder of the ``gov launch`` session this process runs in (W2-56, D-12), or None outside one."""
+    given = (os.environ if env is None else env).get(LAUNCH_TMP_ENV) or ""
+    if not os.path.isabs(given):
+        return None
+    place = Path(os.path.normpath(given))
+    for folder in (place, place.parent):
+        if folder.name.startswith(LAUNCH_PREFIX) and folder.parent != folder:
+            return folder
+    return None
+
+
+def daemon_base(env=None) -> Path:
+    """Where the daemon directories of this process stand: the test session's own folder (``GOV_CBM_BASE``), else
+    the launched session's temp folder (``launch_folder``), else ``DAEMON_BASE``."""
+    env = os.environ if env is None else env
+    given = env.get(BASE_ENV) or ""
+    if os.path.isabs(given):
+        return Path(os.path.normpath(given))
+    launched = launch_folder(env)
+    return launched / LAUNCH_SUB if launched is not None else DAEMON_BASE
+
+
+def make_session_base(env=None) -> Path:
+    """A new folder for one test session's daemon directories (W2-56 S1), short enough for the tool's socket: in the
+    launched session's temp folder, else under ``/tmp``, else under the temp folder. The caller removes it."""
+    import tempfile
+
+    launched = launch_folder(env)
+    places = [launched] if launched is not None else [Path("/tmp"), Path(tempfile.gettempdir())]
+    for place in places:
+        try:
+            return Path(tempfile.mkdtemp(prefix="c" if launched is not None else f"gov-cbm-{os.getuid()}-",
+                                         dir=place))
+        except OSError:
+            continue
+    raise OSError("no folder for the test session's daemon directories can be made")
+
+
 def daemon_dir(root: Path) -> Path:
-    """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository."""
-    return DAEMON_BASE / hashlib.sha256(os.fsencode(Path(root).resolve())).hexdigest()[:16]
+    """The tool's runtime directory for the repository at ``root`` (its ``CBM_RUNTIME_DIR``), outside the repository,
+    as this process sees it (``daemon_base``)."""
+    return daemon_base() / hashlib.sha256(os.fsencode(Path(root).resolve())).hexdigest()[:16]
 
 
 def _daemon_dir(root: Path) -> Path:
