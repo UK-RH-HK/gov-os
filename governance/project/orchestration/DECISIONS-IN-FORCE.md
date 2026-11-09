@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1112 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1113 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -387,3 +387,6 @@ other restart is an ACT.
   to approve once; changes to the owner's standing decisions; steps only the owner can do physically.** Basis: 4 and 2.
 - Delegated (CTO, 2026-11-09, under DEC-1112 (2) and DEC-936 item 2.5): **W1-46's research-install case stays
   report-only permanently** (D10-REDS.md: the feature it tests is gone for good; a rewrite would test nothing today).
+- DEC-1113 (2026-11-09): set-up A's four briefs approved once after two changes (the guard rules since DEC-1099
+  included, the pinned commit one where they are live; overlap disagreements decided by an independent auditor under its
+  own fixed brief, escalating only unsettleable or verdict-changing cases). Basis: 2.
