@@ -163,3 +163,20 @@ question before 2026-11-04 are the old label's.
   (the rubric's R1 item 2). The cross-check of DEC-1069 (8) (`docs/audit/memory-measure-new-visible.md`) found it,
   and it was confirmed blind at 0255bba3. That alternative is removed. MR-3 in `contract.yaml` and in
   `CONTRACT_v4.md`, the Charter and the two role files are kept, with the question and the gold answer.
+
+## The questions re-worded 2026-11-09 under DEC-1070 (13) (`<id>-pre-reword-2026-11-09.yaml`)
+
+The owner's DEC-1070 (13) (kept by DEC-1074 (8), DEC-1097 (12) and DEC-1098 (6)) re-words Q07 and Q14, marked
+volatile by DEC-1069 (6), to stable facts (the rubric's R11), after the fresh 80 and before any re-measure. A session
+independent of the retrieval work wrote them blind at 8bb10a68366c, from the rubric, the two files and the
+repository, with no search and no result read. Each file here is the label as it stood before, byte for byte; its
+replacement is `visible/<id>.yaml`, whose header comment gives the detail
+(`governance/project/orchestration/packages/Q07-Q14-REWORD.md`). Figures for these questions before 2026-11-09 are
+the old questions'.
+
+- **q07-pre-reword-2026-11-09.yaml** (the DEC-1069 label, cc9c94d42a54): it asked for the list of tickets the Track A
+  gate run waits on, which moved with re-scoping. It now asks the rule behind the list (DEC-954: the Track A tickets
+  that stayed in Wave 2, never those moved to Wave 3). Category `ticket` and ticket kept.
+- **q14-pre-reword-2026-11-09.yaml** (the DEC-1069 label, cc9c94d42a54): it asked for W2-03's dependents, a list
+  that grows with every ticket filed against it. It now asks what W2-03 had to show about decision hashes (its
+  KPIs, in the closed ticket and the WBS card). Category `ticket`, ticket and radius kept.

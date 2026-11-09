@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1098 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1102 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -323,3 +323,27 @@ other restart is an ACT.
   against guard plus generated sandbox; the guard alone kept if the pair cannot reach it; the design to the owner
   first). ADR-0002 accepted, re-read at the lift's re-pin. The work in order: item 8, Q07/Q14, W2-139/W2-140, the
   sitting, D-5 and D-6 part 2, D-10 on the owner's word, the lift. Basis: 1, 2 and 4.
+- DEC-1099 (2026-11-09): **the sandbox-and-guard experiment approved** (write scope in the bar; names-only listings of
+  held-out material allowed; the CTO's session unsandboxed; an outside labeller, a second on 10 %; the held-out halves
+  sealed by a path-map ACT; three rounds; a held-out failure reported, not fixed; if both miss, tuned A as an ACT only
+  if it cuts false refusals with no new wrong allow; no cap, the brake at twice the projection), **run beside D-10**,
+  W2-56's result-independent tests meanwhile. **W2-88's lines S10-S17 adopted; EXAMIN's copy is the practice's first
+  full run** (no separate proof repository; later adoptions follow it as fixed); tuning set 80 in two halves; outside
+  writers; the nonexistent-id row a ticket now. W2-82 after W2-27; G1's fewer pairs after EXAMIN's copy; W2-15a closes
+  with W2-32; **W2-139 and W2-140 merged before D-10.** Basis: 1 and 2.
+- DEC-1100 (2026-11-09): **ACT-SELECT-FIXES-1** (the test-map couplings; W2-66's record-only case always run), pinned by
+  **W2-66c**, tests first; a scoped selection after every landing outside a ticket that touches settings, the registry
+  or the test map (widened if an emergency merge reds again), from one line in the `reference-transaction` hook (an
+  ACT for the operator), in the CTO's tools first; into W2-115 only once proven in use. Basis: 4 and 5.
+- DEC-1101 (2026-11-09, standing): **memory audited periodically with fresh questions** (Gov OS and every adopted
+  repository via W2-88): a fresh set weighted to what changed plus older areas, cross-checked in at most two rounds,
+  measured once against the bar (85 %, target 95 %), misses classified by an independent auditor, structural fixes only
+  (to the owner, judged on earlier sets), the spent set into a regression pool re-run each audit, the next fresh set
+  the verdict on the fixes; every two weeks while active, monthly once stable; "not found" and "may be incomplete"
+  counted weekly in the digest; an unindexed-path notice resolved within a day. **Automated independent sessions:**
+  writers, checkers, labellers launched headless in walled folders, fixed briefs the owner approves once (hashed, not
+  changed by the CTO), content chosen by rule (git changes plus a seeded sample), memory's search, run outputs, the
+  CTO's scratch and other sessions' folders denied, only counts to the CTO. Order: the ACT (path map, guard, folder
+  settings), the launch script (tests first, one review), the briefs to the owner, then default. Basis: 1 and 2.
+- DEC-1102 (2026-11-09): **`gov plan`'s cycle break fixed before the lift's re-pin,** tests first: a cycle broken only
+  at a ticket inside it; a ticket outside every cycle keeps all its waits (a new ticket, one review). Basis: 2.
