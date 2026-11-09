@@ -13964,6 +13964,34 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (the cheaper fixes that caught all 34 traced reds in the replay, no selector built) and
   question 5 (proven in use before it enters the product).
 
+### DEC-1101 — Memory quality audited periodically with fresh questions, for Gov OS and every adopted repository; the "not found" and "may be incomplete" answers counted weekly; independent writers, checkers and labellers launched automatically in walled folders, with fixed briefs the owner approves once
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`)
+- **Decision:**
+  - (1) **Standing: memory quality is audited periodically with new questions,** for Gov OS and for every adopted
+    repository (through W2-88). Each audit: an independent writer writes a fresh set, weighted toward what was added or
+    changed since the last audit plus a sample of older areas, cross-checked in at most two rounds; measured once
+    (retrieval figures, and agents right end to end with search again once) against the bar (85 %, target 95 %); an
+    independent auditor classifies the misses by kind; structural fixes only, brought to the owner and judged on the
+    earlier sets; the spent set joins a growing pool of earlier questions, re-run at every audit as a regression check;
+    the next audit's fresh set is the verdict on the fixes. Every two weeks while development is active, monthly once
+    stable. **Beside it:** agents' "not found" and "may be incomplete" answers counted from their returns and shown
+    weekly in the digest; a structural-pass notice of an unindexed path resolved within a day.
+  - (2) **Standing: automated independent sessions, a priority now.** Every question writer, checker and labeller is
+    launched automatically, without the owner opening sessions: headless sessions in their own walled folders. From now
+    for the periodic audits, the sandbox experiment's labellers (DEC-1099 (1) Q5) and the sets W2-88 needs for
+    EXAMIN's copy. Independence: a fixed brief per job that the owner approves once, hashed, which the CTO may not
+    change without the owner's approval; the writer chooses its content by rule (what changed since the last audit,
+    from git, plus a random sample of older areas from a seed recorded before writing), not by the CTO; memory's own
+    search, run outputs, the CTO's scratch and the other sessions' folders denied to them by their settings, the guard,
+    and the sandbox once proven; only counts reach the CTO.
+  - (3) **The order:** first what must land in the path map, the guard and the folders' settings, as one ACT for the
+    owner's operator, rehearsed; then the launch script, tests first, with one review; then the fixed briefs for writer,
+    checker, auditor and labeller, to the owner for approval; then it becomes the default. With the briefs: the set
+    size per audit, how each wall is enforced and tested, the costs per audit (tokens, GPU, the owner's time), the home
+    tickets for Gov OS and the lines for W2-88, and when the first audit runs.
+- **Basis:** question 1 (memory kept right as the repository grows, judged on fresh questions) and question 2 (the
+  sets' independence enforced by walls, not by trust).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14002,3 +14030,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.483 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1098 (item 1 standing). Next free id: DEC-1099. |
 | 0.484 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1099. Next free id: DEC-1100. |
 | 0.485 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1100. Next free id: DEC-1101. |
+| 0.486 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1101 (items 1 and 2 standing). Next free id: DEC-1102. |

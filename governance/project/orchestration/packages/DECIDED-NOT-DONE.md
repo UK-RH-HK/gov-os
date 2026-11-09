@@ -66,6 +66,17 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 41 | a `gov plan` defect (W2-136) | found 11-09: on a cycle, `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle | a row: break a cycle only at a ticket in it (D-6 part 2 or W2-136's follow-up) |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
+## 0e. DEC-1101's items (2026-11-09; standing)
+| # | item | fate (DEC-1101) | state |
+|---|---|---|---|
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | IN PROGRESS 11-09 (design) |
+| 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
+| 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
+| 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
+| 46 | the weekly counts | (1) "not found" and "may be incomplete" from agents' returns, in the digest | NOT STARTED |
+| 47 | unindexed-path notices | (1) resolved within a day | STANDING (from now) |
+| 48 | the sandbox labellers automated | (2) DEC-1099 (1) Q5 by the automated sessions | IN PROGRESS (the experiment's prep told) |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms
