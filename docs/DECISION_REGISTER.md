@@ -14161,6 +14161,21 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   The CTO brings the new hashes and the auditor's brief.
 - **Basis:** question 2 (the labels judged by every rule in force, and their disagreements settled independently).
 
+### DEC-1114 — W2-56's S8 on Linux (DEC-105, against DEC-1035 (2)): (b), S8's reach and S10 deferred to Wave 3 as a ticket; the rest of W2-56 merged now; a re-estimate at today's measured pace
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse)
+- **Decision:**
+  - (1) **(b).** S8's reach (a sandboxed session connecting to the shared reranker's one socket) and S10 (its
+    measurement) are deferred to Wave 3, as a ticket to give sandboxed workers ranked search without opening every Unix
+    socket (`docs/plan/WAVE_3_PARKING.md` W3-P28). S8's settings-level form (the one path, nothing wider) stays built,
+    inert on Linux. Until then a sandboxed worker's search is unranked, named and counted (S11). S9 and F4 stand
+    unchanged. The rest of W2-56 merges now; leads and in-session agents, which are not sandboxed, keep ranked search.
+  - (2) **A re-estimate** as a short package (FORECAST-W2-2): for the lift, EXAMIN's copy and Wave 2's end, both (a)
+    elapsed time from today's measured agent pace and (b) FORECAST-W2-1's lead-hour method, with which the CTO trusts
+    and why; the share done by tickets and by what the lift needs; what remains before the lift, item by item, with its
+    critical path; and how much of each date waits on the owner rather than on agents.
+- **Basis:** question 2 (containment kept: S9 forbids opening every socket) and question 4 (the dates told from what
+  is measured now).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14212,3 +14227,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.496 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1111 (item 2 open). Next free id: DEC-1112. |
 | 0.497 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1112 (item 3 standing); DEC-1098 (4) narrowed to set-up A. Next free id: DEC-1113. |
 | 0.498 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1113. Next free id: DEC-1114. |
+| 0.499 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1114. Next free id: DEC-1115. |

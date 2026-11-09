@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1113 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1114 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -406,3 +406,11 @@ other restart is an ACT.
   no new FAIL; the 5 FAIL already on integrate go onto D-10's red-fix list.
 - Delegated (CTO, 2026-11-09, DEC-1112 (3)): ACT-SETS-GLOBS-1 also hides `runs/*/misses.jsonl`; W2-149's launch
   script passes `--setting-sources project` (F11, defence in depth) as a follow-up, tests first.
+- DEC-1114 (2026-11-09): W2-56's S8 on Linux, (b): S8's reach and S10 deferred to Wave 3 as a ticket (W3-P28: ranked
+  search for sandboxed workers without opening every Unix socket); S8's one-path form stays built, inert on Linux;
+  sandboxed searches unranked, named and counted (S11); S9 and F4 unchanged; the rest of W2-56 merged now. A
+  re-estimate package (FORECAST-W2-2) at today's measured pace beside the lead-hour method. Basis: 2 and 4.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): W2-56's review rows: R3 (a killed run's daemon folder outside the sweep)
+  and R5 (leads lose GOV_STORE, TERM, TMPDIR) are follow-ups before W2-56 closes, tests first; R1 (the main
+  repository's settings.local.json in worktree sessions) is W2-60a's; R2 and R4 are rows for W2-56's close review; R6
+  (the CLI's config.lock placeholders, P-S7) is W3-P29.

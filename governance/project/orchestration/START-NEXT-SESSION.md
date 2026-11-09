@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1114.**
+the register and the owner's word hold over both. **Next free id: DEC-1115.**
 
 ## 0. Where things stand (2026-11-08)
 - **Re-pin window 4 is live** (`pin-bcea09060ebc`, 11-07 14:22); the pool is on (`c00d525f`); PAT-1 done.

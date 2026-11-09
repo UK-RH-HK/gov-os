@@ -50,7 +50,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | DONE 11-09: applied inside ACT-INDEP-WALLS-1 (`147706ae`) |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
-| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | IN PROGRESS: the second half's tests and the engineer (the first half's 157 tests done) |
+| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone; DEC-1114 (1): S8's reach and S10 to Wave 3 | IN PROGRESS: READY 11-09 (`befa57695`, accept 260/0/0, review READY round 1); merged on DEC-1114 (row 79); next: R3 and R5 follow-ups, then the close at the lift |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
 | 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
@@ -121,6 +121,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | **APPLIED 11-09** (`115be191`; review READY round 2); live at the fresh session's start |
 | 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
 | 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
+
+## 0j. DEC-1114's items (2026-11-09)
+| # | item | state |
+|---|---|---|
+| 79 | W2-56 merged without S8's reach and S10 | IN PROGRESS: next: merge `w2/W2-56` into integrate (this commit's follow-up) |
+| 80 | W3-P28: ranked search for sandboxed workers without opening every Unix socket | DONE (parked) 11-09: `docs/plan/WAVE_3_PARKING.md` W3-P28; a ticket in Wave 3 |
+| 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3, R5 follow-ups before the close, tests first (NOT STARTED); R1 to W2-60a's rows (NOT STARTED); R2, R4 rows for the close review; R6 parked as W3-P29 (DONE) |
+| 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | IN PROGRESS: a read-only helper drafting; next: the CTO checks it, commits it and sends it to the owner |
 
 ## 1. Every item not done, partly done or waiting
 
