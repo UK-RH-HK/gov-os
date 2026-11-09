@@ -24,17 +24,22 @@ allowed_paths:
 - docs/changes/W2-141-hook/**  # the hook as built, staged for the operator's ACT (a launched worker cannot edit .claude/, DEC-315) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/hooks/test_live_hook.py  # its one G14_PASSED case that S1 now refuses (the designer's round-2 P-2) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/guard/test_reads.py  # its rows that expect the old refusal of a search into the own acceptance folder (the engineer's round-1 report) [changed, DEC-1093 (2); DEC-1102]
+- tests/conftest.py  # the live-hook suites' temporary call-log folder (GOV_GUARD_CALLS_DIR) [changed, DEC-1108 (5); DEC-1109 (2)]
 kpis:
   success:
   - 'S1 For an engineer on ticket T, a Grep or Glob tool call whose path and pattern can reach tests/acceptance/<T>/ (the repository root, tests/, tests/acceptance/, a pattern such as **/*.py) is refused unless the call excludes that folder; the refusal names the folder and says how to exclude it (for Grep a glob such as !tests/acceptance/<T>/**). Verify: planted calls, each refused or allowed as stated [DEC-1093 (2), DEC-1056, DEC-1059]'
   - 'S2 The same for Bash recursive searches: grep -r / -R, rg, ag, ack, find (with a reading action or piped into a reader) and the like, started at a folder that holds tests/acceptance/<T>/, refused unless the command excludes it (grep --exclude-dir, rg -g ''!…'', find -not -path / -prune); the refusal says how. Verify: planted commands [DEC-1093 (2)]'
   - 'S3 Nothing else changes: an engineer''s search that cannot reach its own acceptance folder, or that excludes it, is allowed; other tickets'' acceptance tests stay readable (DEC-963); the test designer, reviewer, auditor and orchestrator are unaffected; a grep for the tests'' names by pattern only stays allowed (guard4_check''s G-14 cases). Verify: the existing G-14 cases and guard4_check.py pass unchanged, plus planted allowed calls [DEC-1093 (2), DEC-963]'
+  - 'S4 The suites write no real call log (DEC-1108 (5); DEC-1109 (2)): every test that runs the guard hook (the live `.claude/hooks/pretooluse.py` or the template''s copy) runs it with GOV_GUARD_CALLS_DIR set to a folder of its own under the test''s temporary folder, set once for the whole suite in tests/conftest.py (autouse, as the vector cache''s folder is) and carried by every suite that builds the hook''s environment itself; no test reads or writes ~/.gov-os/guard-calls. Verify: a scoped run of the suites that run the hook, with a scratch HOME, leaves no <scratch HOME>/.gov-os/guard-calls folder, and one planted case shows a hook call''s line lands in the temporary folder [DEC-1108 (5), DEC-1109 (2)]'
   failure:
   - 'An engineer''s search reaching its own acceptance folder allowed without an exclusion.'
   - 'A refusal that does not say how to exclude the folder.'
   - 'Any role or call other than S1 and S2 newly refused.'
+  - 'A test run that appends to, creates or reads the real ~/.gov-os/guard-calls (S4) [DEC-1108 (5)]'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1108
 - DEC-1093
 - DEC-1056
 - DEC-1059
@@ -83,3 +88,5 @@ copy), applied in the same operator ACT. P-2: `tests/unit/hooks/test_live_hook.p
 `guard4_check.py`'s cases against S1 when preparing the ACT.
 
 [DEC-1093]
+
+**D-6 part 2 placed here (CTO, 2026-11-09; DEC-1108 (5), DEC-1109 (2)):** S4, its failure line and the `tests/conftest.py` path are DECIDED-NOT-DONE row 60 ("the live-hook suites' temporary folder ... W2-141's acceptance file by its designer"). Tests only: W2-141's test designer on `w2/W2-141-d6-tests`, one review; plan item D in `governance/project/orchestration/packages/LIFT-1/D6-PART2.md`. No product code changes (the hook already reads GOV_GUARD_CALLS_DIR, ACT-GUARD-CALLLOG-1).

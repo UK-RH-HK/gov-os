@@ -103,7 +103,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | IN PROGRESS |
 | 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
 | 64 | D-5 (the templates) | IN PROGRESS |
-| 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS |
+| 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |

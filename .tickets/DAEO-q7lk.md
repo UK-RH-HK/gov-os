@@ -37,6 +37,7 @@ kpis:
   - 'Any repository: it reads the register''s place and the record places from the project''s path map, and a kind the repository does not have (no register, no contract.yaml, no .tickets/) is reported "not applicable", never an error [DEC-1072 (2), DEC-1073 (5)]'
   - 'Cheap, measured: on this repository''s main tree gov links --all finishes in under 10 s and gov links --since HEAD~1 in under 5 s, the median of five runs measured by the CTO and recorded with the head in docs/research/W2-129-links.md, beside the first --all run''s counts by code and role (the clean-up''s baseline). The estimate from today''s parts is about 3 s [DEC-1052 basis (3)]'
   - 'S16 Ticket changes (DEC-1088 (6), standing): a commit in the range that changes a closed ticket''s file (its status closed before the commit) is CLOSED_TICKET_EDITED; a commit that changes an open or in-progress ticket''s title, kpis, allowed_paths, reads, needs, waits_on, depends_on or acceptance_tests with no decision id in the changed lines nor in the commit''s Implements: or Decided-by: trailers is TICKET_CHANGE_UNMARKED; a change of status, assignee or links alone is not a finding. Each names the ticket, the commit and the field, the role orchestrator. Verify: planted commits of each kind [DEC-1088 (6)] [added, DEC-1088]'
+  - 'S17 Planted ids in test fixtures (D-6 part 2; DEC-1109 (2), DEC-1098 (3) row 24): in a Python test file (tests/**/*.py), an id that stands inside a string literal that is not a docstring (a fixture''s planted register, ticket, record or path, e.g. REGISTER = """... ### DEC-002 ...""", "records/decisions/DEC-013.md", f"{ACCEPTANCE}/W1-90/test_fixture.py") is a planted id: it gives no UNKNOWN_ID, and an ENFORCES_SUPERSEDED that W2-55''s propagation gives for a test-file line is carried only when the old id also stands on that line outside such a literal (a comment, a docstring, code). Ids in comments and docstrings, and every test file that is not Python (README.md, *.json, *.yaml, *.txt), are judged as today; a Python test file that does not parse is judged as today. W2-55''s module is unchanged (the carrying is the filter). On this repository''s head the 29 ENFORCES_SUPERSEDED places citing DEC-002 and DEC-013 (planted registers and records) leave the standing count, as do the UNKNOWN_IDs on made-up ids inside literals; the README citations of DEC-798 and DEC-876 stay [DEC-1109 (2), DEC-1098 (3), DEC-1073 (5)(b)]'
   failure:
   - 'A finding that refuses or stops a commit, a close, a landing, a launch or an adoption.'
   - 'Any file written other than the mark; a record changed by the tool; a model, network or GPU call.'
@@ -44,8 +45,10 @@ kpis:
   - 'A second pattern set for the register''s statements; a PROPOSED decision counted as current or as in force.'
   - 'A finding older than the mark lost: neither listed nor counted.'
   - 'gov links --all over 10 s on this repository.'
+  - 'A real citation in a test file''s comment, docstring or non-Python file dropped as planted, or a planted literal id still reported (S17) [DEC-1109 (2)]'
 profile: STANDARD
 sources:
+- DEC-1109
 - DEC-1073
 - DEC-1072
 - DEC-1071
@@ -126,3 +129,5 @@ never-a-gate is S13 and the timing S15. The interface the tests assume is in the
 - **(6) `depends_on`** is not a typed place for UNKNOWN_ID (LINK-INTEGRITY §4.1); the store's graph check covers it.
 - **(10) MR-1 to MR-6** PROPOSED against `contract.yaml` ACCEPTED: six STATUS_CONFLICTs expected on the first `--all`
   run. They are findings, not a fault of the tool.
+
+**D-6 part 2 placed here (CTO, 2026-11-09; DEC-1109 (2)):** S17 and its failure line are DECIDED-NOT-DONE row 24's "the check to skip test fixtures" (the W2-130 sitting, DEC-1098 (3)). Built as a follow-up on `w2/W2-129-d6` (engineer) after `w2/W2-129-d6-tests` (its test designer, `tests/acceptance/W2-129/`), one review; the plan is `governance/project/orchestration/packages/LIFT-1/D6-PART2.md` item A. `src/gov/links/**` only.
