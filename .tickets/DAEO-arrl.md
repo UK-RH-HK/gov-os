@@ -40,6 +40,7 @@ kpis:
   - A backfill tag written to the register before the owner accepts it.
 profile: STANDARD
 sources:
+- DEC-1073
 - DEC-1109
 - DEC-791
 - DEC-825
