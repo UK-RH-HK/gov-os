@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1103 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1104 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -352,3 +352,9 @@ other restart is an ACT.
   answers as recommended. Requested: an operator-agent package (class (a) checks-only ACTs applied by an independent
   operator agent after rehearsal, a READY review and matching hashes; class (b) loosening ACTs on the owner's one-line
   yes; sudo the owner's; the CTO never changes a reviewed ACT nor applies one). Basis: 2 and 4.
+- DEC-1104 (2026-11-09): D-4's ten cases by option C (the seven green into the gates now; D-10 decides each of the
+  three red by design); **the operator agent approved as recommended** (classes (a)/(b), the owner's `yes ACT-<id>
+  <sha8>` read from the transcript, the shared servers' settings (a), re-pins the owner's for now, the cron launches it
+  from a queue, pushes for (a) for two weeks, built after the walls tests first); the landing selection's environment
+  fixed before its results are relied on. **Standing: each ACT given as a message for the owner's operator;** the owner
+  does only re-pins, pushes and sudo. Basis: 2 and 4.
