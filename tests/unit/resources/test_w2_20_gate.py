@@ -265,9 +265,11 @@ def test_a_servers_p95_is_measured_from_its_process_tree(planted, monkeypatch):
     values = configuration.load()["values"]
     first, why = machine.embedding_cpu(planted.dir, values)
     assert why is None and first == {"shared": 0.0, "query": 0.0}
-    history = json.loads((planted.dir / machine.SERVER_HISTORY).read_text())
-    history["shared"]["last"][0] -= 10  # ten seconds ago, at 0 ticks
-    (planted.dir / machine.SERVER_HISTORY).write_text(json.dumps(history))
+    path = planted.dir / machine.SERVER_HISTORY
+    lines = [json.loads(line) for line in path.read_text().splitlines()]
+    assert lines and all(line["server"] == "shared" and line["pid"] == 900 for line in lines)
+    # the kept samples moved ten seconds back, at 0 s of CPU
+    path.write_text("".join(json.dumps({**line, "time": line["time"] - 10}) + "\n" for line in lines))
     planted.process(901, ppid=900, ticks=machine.TICKS * 20, cmdline="ollama runner")  # 20 s of CPU in 10 s
     second, _ = machine.embedding_cpu(planted.dir, values)
     assert 1.9 <= second["shared"] <= 2.1 and second["query"] == 0.0

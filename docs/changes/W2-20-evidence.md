@@ -13,6 +13,26 @@ launch's enforcement and F2); `rebuild/watch.py` (each tree its own lock); `secr
 `retrieval/ollama.py` (DEC-1037). Unit tests: `tests/unit/resources/` (150 cases), `tests/unit/rebuild/test_w2_20_*`,
 `tests/unit/secrets_check/test_w2_20_*`; planted machines only.
 
+## Round 4: DEC-1105's exception round, R2-F1 only
+
+The configuration format is unchanged (frozen from `28fbcfebf`); `src/gov/resources/config.py` and `gate.json` are
+untouched. Only the servers' CPU samples changed: they are a cache, moved to the designer's round-8 interface.
+
+| Finding | Ruling | What changed | Unit evidence (`tests/unit/resources/test_w2_20_round3.py`) |
+|---|---|---|---|
+| **R2-F1**: the first reading after ten quiet minutes shut the gate on cpu (a server with only expired samples was not resampled, so `embedding_cpu_now` read `null`) | fix (DEC-1105) | `machine._sample_servers`: the samples live in `~/.gov-os/machine/embedding-cpu.jsonl`, one line per server per sample, `{"time", "server", "pid", "cpu_seconds"}`. A server's **kept** samples are those of its current pid at most `KEEP_S` (600 s) old. A listening, readable server with none kept (a new process, or every sample expired) is sampled afresh first (a sample, a quarter of a second, the reading), and both samples are written; so stale samples never shut the gate. `now` is the window rate over the kept samples (unchanged rule). The p95 keeps round 7's span: the rates between a server's consecutive samples of one process over the last week (at most 500). An unreadable server still reads `null` and shuts on `cpu` (F5). Round 3's `server-cpu.json` is never read and is removed at the next reading. | `test_r2_f1_a_history_older_than_the_keep_window_is_sampled_afresh_and_the_gate_opens` (both servers' histories three hours old: `now` and p95 0.0, the gate open, a fresh pending sample and the reading's own written for each), `test_r2_f1_a_history_inside_the_keep_window_is_read_without_a_fresh_sample` (300 s: no pending sample), `test_r2_f1_expired_lines_of_another_pid_never_count`, `test_r2_f1_an_unreadable_server_with_an_expired_history_still_shuts_on_cpu`, `test_f2_a_kept_history_written_before_round_4_still_reads` (2: rounds 2 and 3's file dropped) |
+
+**The interface's one disagreement, named:** the round-8 README computes the p95 from the kept (600 s) samples; S12
+and round 7 keep it over a week. As the brief rules, the p95 keeps round 7's week; the expiry rule applies to the
+current use (and to when a server is sampled afresh).
+
+**Round 4's runs (inside the sandbox; `HOME` an empty scratch folder with only the user site's `lib` linked in):**
+
+- `gov accept W2-20`: **170 passed, 0 failed, 1 skipped (171)**; every line passes but S16, whose one case skips (the
+  CTO's run outside the sandbox).
+- Unit tests, `tests/unit/resources tests/unit/launch` with `-m "not local_only" -k "not real and not green_here and
+  not time_limit"`: **287 passed, 86 deselected**.
+
 ## Round 3: the independent review's findings (round 1, NOT READY on F1) and the CTO's rulings
 
 The configuration format is unchanged (frozen from `28fbcfebf`): no key of `gate.json` is renamed, added or given
@@ -99,7 +119,7 @@ the user site's `lib` linked in, since `gov accept` drops `PYTHON*` variables):*
 | S9 | Samples with the verification lock's state; the re-measure writes the figures dated, old and new side by side | `--sample`, `--remeasure` (three figures, P-5) | `test_the_remeasure_writes_the_three_figures_dated_with_old_and_new_side_by_side`, `test_a_figure_with_no_sample_is_kept` |
 | S10 | A declared need opens only with need + margin on one GPU; no `nvidia-smi` or no GPU shuts it; no need never reads the GPU | `--gpu-need-mib`; `gpu` condition | `test_a_need_opens_only_with_the_need_plus_the_margin_on_one_gpu` (2), `test_room_only_across_two_gpus_shuts`, `test_a_start_check_with_no_need_never_runs_nvidia_smi`, launch's GPU cases (3) |
 | S11 | The trip-wire stops the largest heavy job below the lower floor, a finding; nothing else | `slots.tripwire` | `test_below_the_trip_floor_the_largest_heavy_job_is_stopped_and_the_stop_is_a_finding` (real processes) |
-| S12 | Both servers' CPUs and priority in the file; the gate counts both p95 | `embedding_servers`; `machine.embedding_cpu` | `test_a_servers_p95_is_measured_from_its_process_tree`, the cpu cases; W2-123's restart cap unchanged |
+| S12 | Both servers' CPUs and priority in the file; the gate counts both p95 | `embedding_servers`; `machine.embedding_cpu` (samples in `embedding-cpu.jsonl`, round 4) | `test_a_servers_p95_is_measured_from_its_process_tree`, the cpu cases, the R2-F1 cases; W2-123's restart cap unchanged |
 | S13 | The GPU measured once per check; no GPU named, never an error | `machine.gpu()` | `test_the_reading_measures_the_gpu_and_its_processes_once`, `test_no_gpu_or_an_unreadable_one_is_named_never_an_error` (3) |
 | S14 | GPU shares by kind; a job that would push the embedder off waits; the room stated | `gate.gpu_room`, `gpu_room_mib` | `test_a_job_that_would_push_the_embedder_off_waits_and_the_room_is_stated` (5), the `[N/A]` case |
 | S15 | A slot's thread budget for every program the job starts; the file may set it | `slots.job_env`, `budget` | `test_a_job_runs_in_its_slot_confined_with_its_budget_and_every_child_inherits_both`, `test_the_configured_thread_budget_replaces_the_derived_one`, `test_the_callers_value_never_stands` |

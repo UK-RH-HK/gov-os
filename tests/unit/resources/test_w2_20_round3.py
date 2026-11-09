@@ -281,11 +281,10 @@ def test_f2_the_own_current_use_is_the_servers_cpu_over_the_last_minute(planted,
     (_, _), (first, why) = machine.servers_cpu(planted.dir, values)
     assert why is None and first == {"shared": 0.0, "query": 0.0}  # a new process: a short window
     path = planted.dir / machine.SERVER_HISTORY
-    history = json.loads(path.read_text())
     now = time.time()
-    # a sample a minute old at 0 ticks, and one ten seconds old at 29 s: the minute-old one is the window's start
-    history["shared"]["window"] = [[now - 60.5, 900, 0], [now - 10, 900, machine.TICKS * 29]]
-    path.write_text(json.dumps(history))
+    # a sample a minute old at 0 s of CPU, and one ten seconds old at 29 s: the minute-old one is the window's start
+    path.write_text("".join(json.dumps({"time": t, "server": "shared", "pid": 900, "cpu_seconds": c}) + "\n"
+                            for t, c in ((now - 60.5, 0.0), (now - 10, 29.0))))
     planted.process(901, ppid=900, ticks=machine.TICKS * 30, cmdline="ollama runner")  # 30 s of CPU in the minute
     (_, _), (second, _) = machine.servers_cpu(planted.dir, values)
     assert 0.45 <= second["shared"] <= 0.55 and second["query"] == 0.0
@@ -298,17 +297,89 @@ def test_f2_the_own_current_use_is_the_servers_cpu_over_the_last_minute(planted,
     assert why is None and third["shared"] == 0.0
 
 
-def test_f2_a_kept_history_written_before_round_3_still_reads(planted, monkeypatch):
-    """A ``server-cpu.json`` with no window (written by round 2) gives a short window at once, never a null."""
+@pytest.mark.parametrize("old", [
+    {"shared": {"rates": [[0, 1.0]], "last": [0, 900, 0]}},  # round 2's: no window
+    {"shared": {"rates": [[0, 1.0]], "last": [0, 900, 0], "window": [[0, 900, 0]]}},  # round 3's
+])
+def test_f2_a_kept_history_written_before_round_4_still_reads(planted, monkeypatch, old):
+    """An old ``server-cpu.json`` (rounds 2 and 3) is never read, and is dropped: a short window, never a null."""
     planted.config()
     monkeypatch.delenv("GOV_RESOURCES_EMBEDDING_CPU_NOW")
     planted.process(900, ticks=0, cmdline="ollama serve")
     monkeypatch.setattr(machine, "listener", lambda port, table=None: 900 if port == 11434 else None)
     planted.dir.mkdir(parents=True, exist_ok=True)
-    (planted.dir / machine.SERVER_HISTORY).write_text(json.dumps(
-        {"shared": {"rates": [[time.time() - 5, 1.0]], "last": [time.time() - 5, 900, 0]}}))
+    for server in old.values():  # five seconds ago
+        server["rates"][0][0] = server["last"][0] = time.time() - 5
+        for sample in server.get("window", []):
+            sample[0] = time.time() - 5
+    (planted.dir / machine.OLD_SERVER_HISTORY).write_text(json.dumps(old))
     reading = gate.read(True)
     assert reading["embedding_cpu_now"] == {"shared": 0.0, "query": 0.0} and "cpu" not in reasons(reading)
+    assert not (planted.dir / machine.OLD_SERVER_HISTORY).exists()
+
+
+# --- R2-F1 (round 4, DEC-1105): expired samples are taken afresh -----------------------------------------------------
+
+def _two_servers(planted, monkeypatch, shared_pid=900, query_pid=910):
+    """Both servers listening (planted pids), each at 5 s of CPU, sitting idle; the samples file's path."""
+    planted.config()
+    monkeypatch.delenv("GOV_RESOURCES_EMBEDDING_CPU")
+    monkeypatch.delenv("GOV_RESOURCES_EMBEDDING_CPU_NOW")
+    planted.process(900, ticks=machine.TICKS * 5, cmdline="ollama serve")
+    planted.process(910, ticks=machine.TICKS * 5, cmdline="ollama serve")
+    ports = {11434: shared_pid, 11435: query_pid}
+    monkeypatch.setattr(machine, "listener", lambda port, table=None: ports.get(port))
+    return planted.dir / machine.SERVER_HISTORY
+
+
+def _plant_history(path, age_s, pids=(("shared", 900), ("query", 910))):
+    """A history of each server at its pid and today's CPU time, the newest line ``age_s`` old."""
+    now = time.time()
+    path.write_text("".join(json.dumps({"time": now - age_s - 60 * k, "server": server, "pid": pid,
+                                        "cpu_seconds": 5.0}) + "\n" for k in range(5) for server, pid in pids))
+
+
+def _lines(path):
+    return [json.loads(line) for line in path.read_text().splitlines()]
+
+
+def test_r2_f1_a_history_older_than_the_keep_window_is_sampled_afresh_and_the_gate_opens(planted, monkeypatch):
+    path = _two_servers(planted, monkeypatch)
+    _plant_history(path, 3 * 3600)  # every line three hours old: none kept
+    assert 3 * 3600 > machine.KEEP_S
+    started = time.time()
+    reading = gate.read(True)
+    assert reading["embedding_cpu_now"] == {"shared": 0.0, "query": 0.0}
+    assert reading["embedding_cpu_p95"] == {"shared": 0.0, "query": 0.0}
+    assert "cpu" not in reasons(reading) and reading["gate"]["open"]
+    fresh = [line for line in _lines(path) if line["time"] >= started]
+    for server, pid in (("shared", 900), ("query", 910)):  # a short pending sample and the reading's own, written
+        assert len([line for line in fresh if line["server"] == server and line["pid"] == pid]) == 2
+
+
+def test_r2_f1_a_history_inside_the_keep_window_is_read_without_a_fresh_sample(planted, monkeypatch):
+    path = _two_servers(planted, monkeypatch)
+    _plant_history(path, 300)  # the newest line five minutes old: kept
+    started = time.time()
+    reading = gate.read(True)
+    assert reading["embedding_cpu_now"] == {"shared": 0.0, "query": 0.0} and "cpu" not in reasons(reading)
+    fresh = [line for line in _lines(path) if line["time"] >= started]
+    assert sorted(line["server"] for line in fresh) == ["query", "shared"]  # the reading's own sample only
+
+
+def test_r2_f1_expired_lines_of_another_pid_never_count(planted, monkeypatch):
+    path = _two_servers(planted, monkeypatch)
+    _plant_history(path, 30, pids=(("shared", 4242), ("query", 4243)))  # recent, but of earlier processes
+    reading = gate.read(True)
+    assert reading["embedding_cpu_now"] == {"shared": 0.0, "query": 0.0} and "cpu" not in reasons(reading)
+
+
+def test_r2_f1_an_unreadable_server_with_an_expired_history_still_shuts_on_cpu(planted, monkeypatch):
+    """F5 holds: only expiry changed. A listening pid the gate cannot read is null, and the gate shuts on cpu."""
+    path = _two_servers(planted, monkeypatch, shared_pid=999)  # 999 is in no process table
+    _plant_history(path, 3 * 3600, pids=(("shared", 999), ("query", 910)))
+    reading = gate.read(True)
+    assert reading["embedding_cpu_now"] is None and reasons(reading)["cpu"]["reading"] is None
 
 
 # --- F4: the trip-wire's floor named --------------------------------------------------------------------------------

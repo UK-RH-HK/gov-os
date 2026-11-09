@@ -33,7 +33,9 @@ from pathlib import Path
 PAGE = os.sysconf("SC_PAGE_SIZE") if hasattr(os, "sysconf") else 4096
 TICKS = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
 CPU_HISTORY = "cpu-stat.json"
-SERVER_HISTORY = "server-cpu.json"
+SERVER_HISTORY = "embedding-cpu.jsonl"  # the servers' CPU samples, one JSON line per server per sample (review R2-F1)
+OLD_SERVER_HISTORY = "server-cpu.json"  # round 3's history: dropped at the next reading, never read
+SERVER_LINES = 600  # the lines kept of each server
 WINDOW_S, KEEP_S, SHORT_S = 60.0, 600.0, 0.25  # the last minute; the history kept; the window with no history
 SERVER_KEEP_S, SERVER_SAMPLES, P95 = 7 * 24 * 3600, 500, 0.95
 SMI_TIMEOUT_S = 10.0
@@ -253,13 +255,16 @@ def embedding_cpu(folder: Path, values: dict):
 def servers_cpu(folder: Path, values: dict):
     """``((p95, why), (now, why))``, each ``{"shared": cores, "query": cores}`` or None (round 7, review F2).
 
-    - p95: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else one sample of each server's process tree per reading, kept
-      for a week in ``server-cpu.json``.
+    - p95: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else the p95 of each server's rates between its consecutive
+      samples of one process over the last week (one sample of each server's process tree per reading, in
+      ``embedding-cpu.jsonl``: ``{"time", "server", "pid", "cpu_seconds"}``).
     - now: ``GOV_RESOURCES_EMBEDDING_CPU_NOW`` where set, else each server's CPU use over the busy cores' last minute
-      (the same window rule: the newest kept sample of the same process at least a minute old, else the oldest at
-      least a quarter of a second old). It is the servers' part of the busy cores.
+      from its kept samples, those of its current pid at most ``KEEP_S`` old (the same window rule: the newest kept
+      sample at least a minute old, else the oldest). It is the servers' part of the busy cores.
 
-    A server that is not listening uses no CPU now."""
+    A listening server with no kept sample (a new process, or every sample expired) is sampled afresh first, a quarter
+    of a second apart, so stale samples never shut the gate (review R2-F1, DEC-1105). A server that is not listening
+    uses no CPU now."""
     planted = {}
     for key, name in (("p95", "GOV_RESOURCES_EMBEDDING_CPU"), ("now", "GOV_RESOURCES_EMBEDDING_CPU_NOW")):
         if os.environ.get(name) is not None:
@@ -271,14 +276,54 @@ def servers_cpu(folder: Path, values: dict):
     return planted["p95"], planted["now"]
 
 
-def _window_rate(window: list, at: float, pid: int, ticks: int) -> float | None:
-    """A server's cores over the last minute from its kept ``[t, pid, ticks]`` samples (the same process only)."""
-    same = [w for w in window if w[1] == pid and isinstance(w[2], int) and w[2] <= ticks and at > w[0]]
-    older = [w for w in same if at - w[0] >= WINDOW_S]
-    base = max(older, key=lambda w: w[0]) if older else (min(same, key=lambda w: w[0]) if same else None)
+def _number(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _read_samples(path: Path) -> list[dict]:
+    """The servers' kept samples, oldest first; a line that is not ``{"time", "server", "pid", "cpu_seconds"}`` is
+    skipped (a sample only lengthens the window)."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return []
+    out = []
+    for line in text.splitlines():
+        try:
+            item = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(item, dict) and item.get("server") in ("shared", "query") and _number(item.get("time")) \
+                and isinstance(item.get("pid"), int) and not isinstance(item["pid"], bool) \
+                and _number(item.get("cpu_seconds")) and item["cpu_seconds"] >= 0:
+            out.append({key: item[key] for key in ("time", "server", "pid", "cpu_seconds")})
+    return sorted(out, key=lambda s: s["time"])
+
+
+def _write_samples(path: Path, samples: list[dict]) -> None:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile("w", dir=path.parent, prefix=".hist-", suffix=".tmp", delete=False) as out:
+            out.writelines(json.dumps(sample) + "\n" for sample in samples)
+        os.replace(out.name, path)
+    except OSError:
+        pass  # a history only lengthens the window
+
+
+def _window_rate(kept: list[dict], at: float, cpu: float) -> float | None:
+    """A server's cores over the last minute from its kept samples (its current pid, at most ``KEEP_S`` old)."""
+    same = [s for s in kept if s["cpu_seconds"] <= cpu and at > s["time"]]
+    older = [s for s in same if at - s["time"] >= WINDOW_S]
+    base = max(older, key=lambda s: s["time"]) if older else (min(same, key=lambda s: s["time"]) if same else None)
     if base is None:
         return None
-    return round(max(0.0, (ticks - base[2]) / TICKS / (at - base[0])), 2)
+    return round(max(0.0, (cpu - base["cpu_seconds"]) / (at - base["time"])), 2)
+
+
+def _rates(samples: list[dict]) -> list[float]:
+    """The rates between one server's consecutive samples of one process (oldest first)."""
+    return [(b["cpu_seconds"] - a["cpu_seconds"]) / (b["time"] - a["time"]) for a, b in zip(samples, samples[1:])
+            if a["pid"] == b["pid"] and b["time"] > a["time"] and b["cpu_seconds"] >= a["cpu_seconds"]]
 
 
 def _sample_servers(folder: Path, values: dict):
@@ -287,61 +332,39 @@ def _sample_servers(folder: Path, values: dict):
     if ports is None:
         why = "the embedding servers' section cannot be read, so their CPU cannot be measured"
         return (None, why), (None, why)
-    path, history = folder / SERVER_HISTORY, _read_json(folder / SERVER_HISTORY, dict)
+    path, samples = folder / SERVER_HISTORY, _read_samples(folder / SERVER_HISTORY)
+    try:
+        (folder / OLD_SERVER_HISTORY).unlink(missing_ok=True)  # round 3's history is never read
+    except OSError:
+        pass
 
-    def ticks_now():
+    def cpu_now():
         table = processes()
         pids = {name: listener(port, table) for name, port in ports.items()}
-        return {name: (pid, sum(table[p]["ticks"] for p in tree(table, pid)) if pid in table else None)
-                for name, pid in pids.items()}, time.time()
+        return {name: (pid, round(sum(table[p]["ticks"] for p in tree(table, pid)) / TICKS, 3)
+                       if pid in table else None) for name, pid in pids.items()}, time.time()
 
-    first, at = ticks_now()
-    for name in list(history):
-        if not isinstance(history[name], dict):
-            del history[name]
+    def kept(name, pid, at) -> list[dict]:
+        """The server's kept samples: of its current pid, earlier than ``at`` and at most ``KEEP_S`` old."""
+        return [s for s in samples if s["server"] == name and s["pid"] == pid and 0 < at - s["time"] <= KEEP_S]
 
-    def known(name, pid) -> tuple[bool, bool]:
-        """Whether an earlier sample of this server's process is kept: as its last, and in its window."""
-        kept = history.get(name) or {}
-        last = isinstance(kept.get("last"), list) and kept["last"][1:2] == [pid]
-        window = isinstance(kept.get("window"), list) and any(
-            isinstance(w, list) and len(w) == 3 and w[1] == pid and isinstance(w[0], (int, float)) and w[0] < at
-            for w in kept["window"])
-        return last, window
-
-    pending = [n for n, (pid, t) in first.items() if pid is not None and t is not None and not all(known(n, pid))]
-    if pending:  # no earlier sample of this server's process: a short second one
+    first, at = cpu_now()
+    pending = [n for n, (pid, cpu) in first.items() if pid is not None and cpu is not None and not kept(n, pid, at)]
+    if pending:  # no kept sample of this server's process (new, or every one expired): a short fresh one first
         time.sleep(SHORT_S)
-        second, later = ticks_now()
-        for name in pending:
-            pid, ticks = first[name]
-            had_last, _ = known(name, pid)
-            history.setdefault(name, {})
-            if not had_last:
-                history[name]["last"] = [at, pid, ticks]
-            if not isinstance(history[name].get("window"), list):
-                history[name]["window"] = []
-            history[name]["window"].append([at, pid, ticks])
+        second, later = cpu_now()
+        samples += [{"time": at, "server": n, "pid": first[n][0], "cpu_seconds": first[n][1]} for n in pending]
         first, at = second, later
     out, now = {}, {}
-    for name, (pid, ticks) in first.items():
-        kept = history.get(name) if isinstance(history.get(name), dict) else {}
-        rates = [r for r in kept.get("rates", []) if isinstance(r, list) and len(r) == 2 and at - r[0] <= SERVER_KEEP_S]
-        window = [w for w in kept.get("window", []) if isinstance(w, list) and len(w) == 3
-                  and isinstance(w[0], (int, float)) and 0 <= at - w[0] <= KEEP_S]
-        last, current = kept.get("last"), (0.0 if pid is None else None)
-        if ticks is not None and isinstance(last, list) and len(last) == 3 and last[1] == pid and at > last[0] \
-                and isinstance(last[2], int):
-            current = max(0.0, (ticks - last[2]) / TICKS / (at - last[0]))
-        if current is not None:
-            rates.append([at, round(current, 3)])
-        now[name] = 0.0 if pid is None else (None if ticks is None else _window_rate(window, at, pid, ticks))
-        if ticks is not None:
-            window.append([at, pid, ticks])
-        history[name] = {"rates": rates[-SERVER_SAMPLES:], "last": [at, pid, ticks] if ticks is not None else None,
-                         "window": window[-64:]}
-        out[name] = round(_p95([r[1] for r in rates]), 2) if rates else None
-    _write_json(path, history)
+    for name, (pid, cpu) in first.items():
+        mine = [s for s in samples if s["server"] == name and 0 <= at - s["time"] <= SERVER_KEEP_S]
+        if cpu is not None:
+            mine.append({"time": at, "server": name, "pid": pid, "cpu_seconds": cpu})
+        rates = _rates(mine)[-SERVER_SAMPLES:] + ([0.0] if pid is None else [])
+        out[name] = round(_p95(rates), 2) if rates else None
+        now[name] = 0.0 if pid is None else (None if cpu is None else _window_rate(kept(name, pid, at), at, cpu))
+        samples = [s for s in samples if s["server"] != name] + mine[-SERVER_LINES:]
+    _write_samples(path, sorted(samples, key=lambda s: s["time"]))
     p95 = (None, "an embedding server's CPU could not be sampled") if None in out.values() else (out, None)
     current = (None, "an embedding server's CPU use over the last minute could not be sampled") \
         if None in now.values() else (now, None)
