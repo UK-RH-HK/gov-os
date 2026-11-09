@@ -1,0 +1,60 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "d1e53016e86f",
+   "after": "1c5966ac153d"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/packages/ACT-CLAUDE-COPIES-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "b9d949344013",
+   "after": "e0e7e3c6c58f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "5f8c85733377",
+   "after": "1c5966ac153d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "5f8c85733377",
+   "after": "f8b242dc97fc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "d1e53016e86f",
+   "after": "1c5966ac153d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-f11-tests",
+   "change": "head",
+   "before": "d1e53016e86f",
+   "after": "8bb4d9726aef"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-f11-tests",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-56/w2_56_sweep_probe.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  }
+ ]
+}

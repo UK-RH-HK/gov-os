@@ -1,0 +1,6 @@
+{
+ "repo": "/home/usain/Dynamic-Agentic-Engineering-OS",
+ "home": "/home/usain",
+ "claude": "/home/usain/.local/bin/claude",
+ "calls": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/replay/calls.jsonl"
+}
