@@ -81,7 +81,13 @@ def load_settings(config_path=None):
     s["wslpath"] = conf.get("wslpath") or "wslpath"
     log = os.path.join(s["operator_root"], "log")
     s["log_dir"] = log
+    # S15's replay (DEC-1108 (2)): the CTO's call set (header line, then calls and dropped calls), checked against the
+    # guard's own call log (one file per UTC day) both ways before anything is re-judged; the set's `until` may be at
+    # most replay_stale_h hours old
     s["calls"] = os.path.abspath(os.path.expanduser(conf.get("calls") or os.path.join(log, "calls.jsonl")))
+    s["guard_calls"] = os.path.abspath(os.path.expanduser(
+        conf.get("guard_calls") or os.path.join(s["home"], ".gov-os", "guard-calls")))
+    s["replay_stale_h"] = float(conf.get("replay_stale_h") if conf.get("replay_stale_h") is not None else 12)
     s["close_flag"] = os.path.abspath(os.path.expanduser(
         conf.get("close_flag") or os.path.join(s["scratch"], "CLOSE-RUNNING")))
     s["nightly_window"] = conf.get("nightly_window") or DEFAULT_NIGHTLY

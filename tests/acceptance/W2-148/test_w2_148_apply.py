@@ -121,35 +121,32 @@ def test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1(world
     assert state() == expected, f"the next launch changed the {family} control file"
 
 
-def _calls(w, rows):
-    now = datetime.fromisoformat(support.NOW)
-    with open(w.calls, "w") as f:
-        for cid, hours, path in rows:
-            f.write(json.dumps({"id": cid, "time": (now - timedelta(hours=hours)).isoformat(), "role": "engineer",
-                                "ticket": None, "event": {"tool_name": "Read", "tool_input": {"file_path": path},
-                                                          "cwd": "."}}) + "\n")
-
-
-CALLS = [("c1", 1, "fixtures/evaluation/new-set/hidden/q.txt"),     # newly refused, listed by the review
-         ("c3", 2, "docs/notes.md"),                                 # stays allowed
-         ("c-old", 72, "fixtures/evaluation/new-set/hidden/old.txt")]  # newly refused, older than 48 hours
-
+# DEC-1108 (2): the call set carries its header and every call in its window has its line in the guard's log, both
+# ways (w2_148_support.replay_set: call-q1 newly refused and listed, call-notes and call-readme allowed, one dropped
+# call, call-old before the window), so these two cases test the re-judging, not the check.
 
 def test_s15_guard_a_path_map_addition_whose_replay_refuses_only_listed_calls_stays(world):
-    _calls(world, CALLS)
-    b = world.ready("ACT-T-PM", [world.pathmap_addition()], review_kw={"extra": {"replay_refused": ["c1"]}})
+    """Rewrite-Reason: DEC-1108 (2). A set and a log that agree both ways (calls and a dropped call): checked, then
+    re-judged; the listed call turned to refused and the one before the window leave the ACT applied."""
+    support.plant_replay(world, support.replay_set())
+    b = world.ready("ACT-T-PM", [world.pathmap_addition()], review_kw={"extra": {"replay_refused": ["call-q1"]}})
     r = world.run(b)
     assert r.out.get("result") == "applied", (r.out, r.stderr[-3000:])
     assert support.sha256_bytes(world.read("repo", "governance/project/path-map.yaml")) == b.manifest["touched"][0]["after"]
 
 
 def test_s15_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone(world):
-    _calls(world, CALLS + [("c2", 3, "fixtures/evaluation/new-set/hidden/r.txt")])
-    b = world.ready("ACT-T-PM", [world.pathmap_addition()], review_kw={"extra": {"replay_refused": ["c1"]}})
+    """Rewrite-Reason: DEC-1108 (2). The check passes (header, log both ways); the re-judging turns call-r2, not
+    listed, to refused: undone, P1, and the refusal is the re-judging's, not the check's."""
+    support.plant_replay(world, support.replay_set() + [support.set_call("call-r2", 3, f"{support.NEW_HIDDEN}/r.txt")])
+    b = world.ready("ACT-T-PM", [world.pathmap_addition()], review_kw={"extra": {"replay_refused": ["call-q1"]}})
     r = world.run(b)
     assert r.out.get("result") == "undone", (r.out, r.stderr[-3000:])
     restored(world, b)
     assert world.p1s(b.act)
+    text = support.told(world, b, r)
+    wrong = [p for p in ("malformed",) + support.CHECK_PHRASES if p in text]
+    assert not wrong, ("the replay refused at the check, not at the re-judging", wrong, text)
 
 
 # --- S16 the landing check ------------------------------------------------------------------------------------------
