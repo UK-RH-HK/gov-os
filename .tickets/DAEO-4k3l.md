@@ -1,7 +1,7 @@
 ---
 id: DAEO-4k3l
 status: open
-deps: []
+deps: [DAEO-h4rh]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task
@@ -14,7 +14,8 @@ title: 'A Definition of Ready: gov claim checks it, and gov launch refuses a lea
 class: implementation
 state_class: AUTHORITATIVE
 role: engineer
-depends_on: []
+depends_on:
+- DAEO-h4rh  # W2-27 first: W2-82 after EXAMIN's copy (FORECAST-W2-1) [changed, DEC-1099 (3)]
 allowed_paths:
 - src/gov/tasks/dor.py
 - src/gov/claim/__init__.py
@@ -65,6 +66,7 @@ sources:
 - DEC-968
 - DEC-982
 - W2-128
+- DEC-1099
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-82/
@@ -93,3 +95,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-82), from the owner's decision of 2026-1
 - **The test designer's files:** `tests/acceptance/W2-82/`. The planted repository holds one ticket per failing condition, a fully ready ticket, a stacked ticket with and without its decision, and a launch of a lead on each.
 
 **D9-FATES (DEC-1083):** Re-scoped to a light readiness check the dispatcher calls, which calls W2-128 S10's check, the one home of a ticket's readiness (W-2); it leaves K9. The full `gov claim` Definition of Ready (S1, S2, F1, F4), the `gov launch` refusal (S3, F2), the kernel template and schema (S5) and their CIT-P (S6) are under `kpis.lifted` with their old positions; S4, S7, F3 and F5 stay, and the light check is a new success line.
+
+**After W2-27 (DEC-1099 (3), 2026-11-09):** the owner took FORECAST-W2-1's proposal: W2-82 waits on W2-27 (`DAEO-h4rh`), EXAMIN's copy, in `depends_on` and `deps`. [changed, DEC-1099 (3)]
