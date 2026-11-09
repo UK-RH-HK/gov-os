@@ -44,6 +44,13 @@ the register and the owner's word hold over both. **Next free id: DEC-1111.**
 - **State at 11-08 evening:** FRESH-80-READINESS §7: everything on the CTO's side is ready and pinned; the owner's
   checker, operator (the ACT, the transcripts) and item 6 remain. Then the pre-flight, declaration, control, the 80.
 
+## 1b. The standing operating rules (DEC-1110 (1))
+The same list as the top of `governance/project/prompts/w2-orchestrator.md`: read it there first. In short: never idle
+while unblocked work remains; DECIDED-NOT-DONE kept current; ACTs as messages for the owner's operator (the owner does
+only re-pins, pushes, sudo); fixed briefs never changed without the owner; memory audited, notices resolved in a day;
+usage recorded only, the brake at twice each projection; faults to the owner at once; waits by pid; after the lift,
+ready lists several batches deep.
+
 ## 2. The emergency: in force
 - **What holds it:** DEC-1047 (the emergency); DEC-1049 (no nightly or full suite until the owner's word); DEC-1050
   and DEC-1051 (everything stopped until the refactoring and the re-pins); DEC-1052 (the basis, D-0 to D-11). DEC-1045
