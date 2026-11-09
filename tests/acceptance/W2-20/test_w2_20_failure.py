@@ -58,8 +58,9 @@ def test_W2_M244_W2_M188_a_start_while_the_gate_is_shut_is_refused_with_the_read
 
 
 def test_W2_M244_the_refusal_without_json_has_the_same_exit_code_and_names_the_reason(machine, repo):
-    machine.open_config(max_load_1m=2.0)
-    machine.set_readings(load=5.0)
+    """DEC-1097 (8): the load rule of S5 (both loads at or above the processor count) in place of max_load_1m."""
+    machine.open_config()
+    machine.set_readings(load=5.0, load_15=5.0, nproc=2)
 
     json_code = machine.check(repo)[0]
     code, _, out, err = machine.check(repo, json_output=False)
