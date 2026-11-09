@@ -22,6 +22,13 @@ from gov.launch import launcher  # noqa: E402
 TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: engineer\nallowed_paths:\n- src/**\n---\n"
 
 
+def _plant_template(project: Path, role: str = "engineer") -> None:
+    """The role's template copy every session starts with (W2-153 S1, DEC-1112 (3))."""
+    path = project / launcher.TEMPLATES_REL / f"{launcher.ROLE_TEMPLATES[role]}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(f"# {role}\n", encoding="utf-8")
+
+
 def _open_gate(home: Path, monkeypatch) -> None:
     """An open resource gate under this HOME (W2-20 S19: every launch runs the start check): the gate file and its
     readings planted, nothing of the real machine's gate read."""
@@ -47,6 +54,7 @@ def started(tmp_path, monkeypatch):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    _plant_template(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
@@ -114,6 +122,7 @@ def test_a_project_under_the_root_gets_no_folder_made_or_added(tmp_path, monkeyp
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    _plant_template(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))

@@ -89,6 +89,9 @@ def launch(tmp_path, monkeypatch):
     for folder in (home / ".local" / "bin", temp, project):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    template = project / launcher.TEMPLATES_REL / f"{launcher.ROLE_TEMPLATES['engineer']}.md"  # W2-153 S1
+    template.parent.mkdir(parents=True)
+    template.write_text("# engineer\n", encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
