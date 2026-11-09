@@ -1,0 +1,64 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "20db5820a150",
+   "after": "3d8649502b18"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "20db5820a150",
+   "after": "3d8649502b18"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "a46d4517a1a0",
+   "after": "3d8649502b18"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "head",
+   "before": "a1e048461953",
+   "after": "69d750e5c4c6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": " M governance/project/operator/act_class.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": " M governance/project/operator/class-rules.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": "?? tests/unit/operator/test_w2_148_trial.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": "?? tests/unit/operator/test_w2_148_trial_acts.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line gone",
+   "line": "?? tests/unit/operator/test_w2_148_parts.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "head",
+   "before": "18fac5929881",
+   "after": "7bd792e6e07e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "acceptance folder",
+   "folder": "W2-20"
+  }
+ ]
+}

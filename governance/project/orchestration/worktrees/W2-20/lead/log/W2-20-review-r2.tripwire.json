@@ -1,0 +1,40 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "head",
+   "before": "45dd9e2dcfb9",
+   "after": "f680fc5aea81"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": " M governance/project/operator/opcommon.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": " M governance/project/operator/operator_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": "?? governance/project/operator/win_toast.ps1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line gone",
+   "line": " M governance/project/operator/act_class.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line gone",
+   "line": " M governance/project/operator/class-rules.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line gone",
+   "line": " M tests/unit/operator/test_w2_148_parts.py"
+  }
+ ]
+}

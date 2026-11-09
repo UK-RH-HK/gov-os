@@ -1,0 +1,191 @@
+rehearse.sh: 2026-11-09 14:56:00; W2-20 at 28fbcfebf900
+
+== live_before: the real machine folder (14:56:00)
+total 28
+drwxr-xr-x 4 usain usain 4096 Nov  9 14:46 .
+drwxr-xr-x 3 usain usain 4096 Nov  9 04:41 ..
+-rw------- 1 usain usain   64 Nov  9 14:46 cpu-stat.json
+-rw------- 1 usain usain 2594 Nov  9 13:06 gate.json
+-rw------- 1 usain usain  362 Nov  9 14:46 server-cpu.json
+drwxr-xr-x 2 usain usain 4096 Nov  9 14:24 sessions
+drwxr-xr-x 2 usain usain 4096 Nov  9 14:51 slots
+real gate.json sha256 de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457
+
+== prepare: the throwaway HOME (14:56:00)
+HOME=/home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home; its machine folder: cpu-stat.json gate.json server-cpu.json sessions slots; gate.json de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457
+
+== before: W2-20's gate (28fbcfebf) on ACT-1's file (round 1's key names) (14:56:00)
+gov launch's gate (engineer, GPU need None): REFUSED LAUNCH_REFUSED, exit 1: the resource gate is shut: config: memory_floor_bytes: missing (an object with its value, date and source is needed); config: oom_floor_bytes: missing (an object with its value, date and source is needed); config: gpu_shares: {"embedder_mib": <integer>, "reranker_mib": <integer>} is needed; memory: reading 15014797312, limit null (DEC-1088 (5))
+-> refused (LAUNCH_REFUSED, exit 1) on the old file's key names: what blocks round 3's launch today
+
+== check (14:56:00)
+apply.sh check: HOME /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home; file /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json
+W2-20: /home/usain/gov-os-worktrees/W2-20 at 28fbcfebf900; config.py 560c8d58d35a001dc083a980720e4dfd3a36b3e4ac5ad8525dabb80d6803bcad; interpreter /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python (Python 3.12.3)
+expected: init writes 52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034 (the reviewed bytes)
+now: state old; de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457
+check: ready to apply (ACT-GATE-CONFIG-1's file is there; apply moves it aside and keeps it)
+
+== apply (14:56:00)
+apply.sh apply: HOME /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home; file /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json
+W2-20: /home/usain/gov-os-worktrees/W2-20 at 28fbcfebf900; config.py 560c8d58d35a001dc083a980720e4dfd3a36b3e4ac5ad8525dabb80d6803bcad; interpreter /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python (Python 3.12.3)
+the machine folder before: cpu-stat.json gate.json server-cpu.json sessions slots
+moved aside: ACT-GATE-CONFIG-1's file to /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/backup/gate.json.act1 (de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457)
+written: /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json (52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034, 2082 bytes, mode 600)
+gate: a session start is admitted (exit 0)
+gate: a start declaring 20000 MiB of GPU (above the card) is refused (exit 3)
+apply: done. Side files the gate's own reading made: 
+--- the file written (/home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json):
+{
+  "memory_floor_bytes": {
+    "value": 3221225472,
+    "date": "2026-10-29",
+    "source": "DEC-942 item 2: the memory floor 3 GiB"
+  },
+  "oom_floor_bytes": {
+    "value": 2147483648,
+    "date": "2026-10-29",
+    "source": "DEC-947 item 5: the trip-wire below 2 GiB available"
+  },
+  "working_size_bytes": {
+    "value": 2191601664,
+    "date": "2026-10-29",
+    "source": "DEC-947 item 2: a lead's working size outside verification, 2,140,236 kB"
+  },
+  "verification_peak_bytes": {
+    "value": 7582199808,
+    "date": "2026-10-29",
+    "source": "DEC-947 item 1: a verification run's peak, 7,404,492 kB"
+  },
+  "rebuild_peak_bytes": {
+    "value": 7582199808,
+    "date": "2026-11-01",
+    "source": "DEC-1001 (d), P-7: not yet measured; the verification peak until the re-measure"
+  },
+  "disk_floor_bytes": {
+    "value": 107374182400,
+    "date": "2026-10-28",
+    "source": "DEC-898 item 1: 100 GiB free on the shared disk"
+  },
+  "inode_floor": {
+    "value": 10000000,
+    "date": "2026-10-28",
+    "source": "DEC-898 item 1: 10,000,000 free inodes"
+  },
+  "verification_lock": {
+    "value": "/tmp/gov-os-verify.lock",
+    "date": "2026-10-29",
+    "source": "DEC-947 item 1: the verification lock"
+  },
+  "gpu_margin": {
+    "value": 0.1,
+    "date": "2026-10-29",
+    "source": "DEC-950 item 2: the declared need plus 10 %"
+  },
+  "gpu_shares": {
+    "value": {
+      "embedder_mib": 3584,
+      "reranker_mib": 3584
+    },
+    "date": "2026-11-02",
+    "source": "DEC-1032 item 1: the embedder first (about 3.5 GB), then the shared reranker (2.5 to 3.5 GB)"
+  },
+  "heavy_slots": {
+    "value": 3,
+    "date": "2026-10-31",
+    "source": "DEC-979 item 1 D1: 3 slots (heavy_slots.conf), re-sized at the re-measure"
+  },
+  "embedding_servers": {
+    "shared": {
+      "cpus": "12-19",
+      "nice": 10
+    },
+    "query": {
+      "cpus": "8-11",
+      "nice": 0,
+      "device": "gpu"
+    },
+    "date": "2026-11-02",
+    "source": "ACT-OLLAMA-CAP-1 (shared 12-19, nice 10), ACT-QUERY-CPUS-1 (query 8-11, nice 0); ACT-QUERY-GPU-2 (the query server on the GPU)"
+  }
+}
+-> the written bytes are the rehearsed ones (52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034)
+-> ACT-1's file kept at backup/gate.json.act1 (de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457)
+config.load(): {'faults': [], 'due': ['verification_peak_bytes', 'working_size_bytes', 'rebuild_peak_bytes']}
+
+== idempotent: apply again, and init-config again (14:56:00)
+apply.sh apply: HOME /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home; file /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json
+W2-20: /home/usain/gov-os-worktrees/W2-20 at 28fbcfebf900; config.py 560c8d58d35a001dc083a980720e4dfd3a36b3e4ac5ad8525dabb80d6803bcad; interpreter /home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python (Python 3.12.3)
+apply: already applied (52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034); nothing to do
+gov resources --init-config again: exit 1: gov resources: RESOURCE_CONFIG_EXISTS: gate.json already exists at /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json: it is never overwritten
+the file is unchanged by both
+
+== admits: W2-20's gate on the new file (14:56:01)
+gov launch's gate (engineer, GPU need None): ADMITTED
+gov launch's gate (engineer, GPU need 1024): ADMITTED
+-> a launch declaring 1024 MiB (kind other) is admitted with the GPU's free memory (round 2's [N/A] handling)
+gov resources --check (the start check): exit 0
+--- the session reading (first 1500 characters):
+{
+  "registry": "/home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine",
+  "config": "/home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json",
+  "available_memory_bytes": 14943731712,
+  "sessions_live_memory_bytes": 0,
+  "load_1m": 0.68,
+  "load_15m": 2.51,
+  "busy_cores_1m": 1.57,
+  "embedding_cpu_p95": {
+    "shared": 0.01,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 888764952576,
+    "free_inodes": 64888111
+  },
+  "sessions": [],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "working_size_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}
+
+
+== refuses over the limits (14:56:01)
+gov launch's gate (engineer, GPU need 20000): REFUSED LAUNCH_REFUSED, exit 1: the resource gate is shut: gpu: reading 2152, limit 22000 (DEC-1088 (5))
+-> refused (LAUNCH_REFUSED, exit 1): 20000 MiB is above the card's 16303 MiB
+gov resources --check, a planted load of 5.0 on 4 processors (GOV_RESOURCES_LOADAVG, GOV_RESOURCES_NPROC): exit 3
+
+== undo (14:56:01)
+apply.sh undo: HOME /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home; file /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json
+undo: removed /home/usain/gov-os-runs/GATE-CONFIG-2-rehearsal/home/.gov-os/machine/gate.json (52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034)
+undo: ACT-GATE-CONFIG-1's file put back (de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457)
+undo: the machine folder holds what it held before the apply
+undo: done
+-> ACT-1's file is back (de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457)
+gov launch's gate (engineer, GPU need None): REFUSED LAUNCH_REFUSED, exit 1: the resource gate is shut: config: memory_floor_bytes: missing (an object with its value, date and source is needed); config: oom_floor_bytes: missing (an object with its value, date and source is needed); config: gpu_shares: {"embedder_mib": <integer>, "reranker_mib": <integer>} is needed; memory: reading 14905237504, limit null (DEC-1088 (5))
+-> refused again on the old file (undo restores the state before)
+the throwaway machine folder holds the same names as the real one
+
+== live_after: the real machine folder (14:56:01)
+total 28
+drwxr-xr-x 4 usain usain 4096 Nov  9 14:46 .
+drwxr-xr-x 3 usain usain 4096 Nov  9 04:41 ..
+-rw------- 1 usain usain   64 Nov  9 14:46 cpu-stat.json
+-rw------- 1 usain usain 2594 Nov  9 13:06 gate.json
+-rw------- 1 usain usain  362 Nov  9 14:46 server-cpu.json
+drwxr-xr-x 2 usain usain 4096 Nov  9 14:24 sessions
+drwxr-xr-x 2 usain usain 4096 Nov  9 14:51 slots
+real gate.json sha256 de4fb326288d80d9d627ad910542ae5d86834c98a3d8895c0e16b9ece2fcd457
+the real machine folder: the same names before and after, gate.json unchanged
+
+rehearse.sh: done 2026-11-09 14:56:01: 0 failure(s)

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 127
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01KFWf8BaUzPGb5KHz1Boavd", "time": "2026-11-09T16:11:51.045Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a6880e89edf72b2cf.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/scratchpad; L=$S/smoke-log; rm -rf $L; mkdir -m 700 $L; python3 -c \"import secrets;print(secrets.toke", "rule": "the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.k

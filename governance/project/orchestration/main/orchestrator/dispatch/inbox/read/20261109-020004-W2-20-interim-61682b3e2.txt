@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result 61682b3e2: W2-20 tests: the README (the interface the cases assume, the KPI ids S1-S20 and F1-F6, the old cases' fates, the map, packages P-1 to P-6, discoveries); S16's measured case skips unless GOV_W2_20_MEAS

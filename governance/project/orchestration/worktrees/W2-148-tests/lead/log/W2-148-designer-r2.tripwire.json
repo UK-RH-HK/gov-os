@@ -1,0 +1,36 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-tests",
+   "change": "head",
+   "before": "49eb5d66d98d",
+   "after": "fab2be2a2791"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-tests",
+   "change": "acceptance folder",
+   "folder": "W2-148"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "head",
+   "before": "105699f8d69f",
+   "after": "057926aa3ca4"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/machine.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M tests/unit/resources/test_w2_20_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M tests/unit/resources/test_w2_20_round3.py"
+  }
+ ]
+}

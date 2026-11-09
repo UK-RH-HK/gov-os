@@ -296,3 +296,128 @@ mark.
   `b1-added.json`, `b1sample.txt`, `b1kpi.txt`, `rebuild/` (the patches rebuilt at today's head) and the scripts.
 - **Disk:** before the heavy runs the disk gate was open (839 GiB free) and the folder held 2 inodes and 8 KB. At the
   end it held 4,255 inodes and 59 MB; the clone was removed after this record.
+
+---
+
+## Final patches (after the owner's sitting, DEC-1098 (3)): audit of 2026-11-09
+
+Same auditor and the same rules: read-only on the repository, a throwaway `git clone --shared` in my scratch folder, no
+commit in the repository.
+
+**Head:** `w2/integrate` at `ce7f10eb8a2a`. The patches were built at `d4463749610c`; the two commits since then touch
+only evaluation files and DECIDED-NOT-DONE, not the register, the archive or the tickets.
+
+**Verdict: READY to commit f1, f2, f3 and f5 once one f5 mark is dropped: DEC-853 ← DEC-884 (F14).**
+
+### What I checked
+
+- **Apply:** `git apply --check` passes for f1, f2 and f3 at today's head. Applied in order, f5 applies on top.
+  f4-in-force.patch is empty, which matches `in_force_clashes: []`.
+- **The 150 rulings, all of them:** I parsed each row of W2-130-SITTING.md, groups A to F, then read the first status
+  word of each entry from the patched register.
+  - All 150 match: ACCEPTED 32, SUPERSEDED 5, WITHDRAWN 1, DEFERRED 2, DONE 103, and group F's 7 stay ACCEPTED.
+  - Each SUPERSEDED, WITHDRAWN and DEFERRED names the settler the sitting names: DEC-002 by DEC-058 and DEC-064; DEC-043
+    by DEC-064; DEC-045 and DEC-047 by DEC-058; DEC-013 by DEC-074; DEC-062 by DEC-842; DEC-018 and DEC-019 to Wave 3.
+- **No substance changed:** 145 register lines changed, all of them `**Status:**` lines, and the line count is the same.
+  - 143 lines carry the new word first, then the old status text whole after "; it was". Some add only the
+    `· **Changed by:**` mark the ruling names, at the end.
+  - The 13 marks the group B rulings name were applied as the rulings name them.
+  - DEC-786 (DEC-942; DEC-847 is already on its line) and DEC-927 (DEC-1057 (item 2)) are pure appends.
+- **f2, 7 archive lines:**
+  - group F's three lines now agree with the rulings (DEC-729, DEC-786; DEC-912 and DEC-918; DEC-924, DEC-927, DEC-928);
+  - DEC-501 and DEC-502 are split (H2);
+  - the chain lines for DEC-038 and DEC-045 no longer read as changing their first id, and the facts are kept (each
+    successor is on its own line).
+- **f3 is marked as DEC-1088 (6) requires:** the changed KPI 4 line carries "[changed, DEC-1098 (3); DEC-1088 (6)]".
+  - A DEC id in the changed lines marks the change even without a trailer. TICKET_CHANGE_UNMARKED stayed 93 in my clone,
+    whose commit had no trailers.
+  - DAEO-q8cl is open, so this is not a closed-ticket edit.
+  - Its sources gain DEC-1098 and DEC-1088, the ids its bracket names.
+- **f5, all 17 marks** checked against each changer's label or text (findings below).
+- **Tests:** I ran the tests that read the real register on the patched clone: links, the store's links, retrieval,
+  W2-55, W2-87, W2-129, W1-26 and the decisions unit tests. 377 pass and 4 fail.
+  - 3 of the 4 fail the same way at today's head without the patches.
+  - The 4th, `test_the_branch_changes_nothing_in_the_register_against_its_base`, compares HEAD with
+    `merge-base(HEAD, w2/integrate)`. It fails only because my clone's commits sit ahead of w2/integrate. On
+    w2/integrate itself the merge base is HEAD, so it passes.
+- **Guard refusals:** 1. A piped `git diff` between two of my clone's commits got "could not decide". I took the
+  refusal and read the patch file and the clone's working file instead.
+
+### `gov links --all` at today's head (my clone)
+
+| Code | before | f1 | f2 | f3 | f5 |
+|---|---|---|---|---|---|
+| ENFORCES_SUPERSEDED | 44 | 73 | 73 | 73 | 73 |
+| NOT_IN_FORCE_AS_RULE | 142 | 20 | 20 | 20 | 20 |
+| STATUS_CONFLICT | 116 | 13 | 6 | 6 | 6 |
+| UNMARKED_CHANGE | 37 | 28 | 25 | 25 | 8 |
+| UNLINKED_ID / UNKNOWN_ID / CLOSED_TICKET_EDITED / TICKET_CHANGE_UNMARKED | 1097 / 558 / 117 / 93 | same | same | same | same |
+| **total** | 2204 | 1999 | 1989 | 1989 | 1972 |
+
+- **The claim holds:** these are exactly final-check-report.md's figures.
+- **What is left:**
+  - STATUS_CONFLICT 6 is MR-1 to MR-6 (group G, for product-spec to regenerate).
+  - UNMARKED_CHANGE 8 is the 3 pairs the audit dropped and the 5 misreads whose changer is older than its entry.
+- **Once F14 is dropped,** UNMARKED_CHANGE after f5 is 9 and the total is 1973.
+
+### Findings
+
+**F13: The rise in ENFORCES_SUPERSEDED (44 → 73) is expected, but none of the 29 new findings is a real enforcement.**
+- **Expected:** W2-55's `check_propagation` reports any line under `tests/` or `src/` that cites a superseded id in a
+  file that cites none of its successors. Once DEC-002 and DEC-013 are SUPERSEDED, every such citation is reported.
+  These are the 29: DEC-002 23, DEC-013 6. DEC-043, DEC-045 and DEC-047 are cited nowhere it searches.
+- **Not real:** I read each of the 29 lines. All are synthetic fixture ids in test registers and records, for example:
+  - `### DEC-002: The second decision` (W1-10);
+  - `"### DEC-001 — The first\n- **Status:** SUPERSEDED by DEC-002"` (store);
+  - `records/decisions/DEC-013.md` (W2-92);
+  - `"DEC-013"` as an id shape in the W2-03 grammar.
+
+  No test enforces Contract v3 or the old task DAG.
+- **Why it is safe:** propagation is a notice, not a gate. It is outside `gov check`'s list, and the tests that run it
+  use `tmp_path`.
+- **The fix:** a `**Kept:**` reason on DEC-002 and DEC-013 ("fixture ids in tests, not citations"), or a W2-55 row that
+  skips fixture literals. The CTO decides; it does not block.
+- **Scope:** in.
+- `Ordinary work: yes, because the notice shows 29 lines to anyone who reads it.`
+- `Consequence: other (noise in a notice; nothing fails open).`
+
+**F14: f5's DEC-853 ← DEC-884 (item 4) is wrong.**
+- **The text:** DEC-884's `**Changes:**` reads "DEC-853 item 4 (the re-pin at a commit holding W2-50's fix): still
+  holds, since the combined re-pin's commit holds it". DEC-884 confirms DEC-853 item 4; it does not change it.
+- **Why it was proposed:** the label lists the id, so `--propose-marks` took it.
+- **The fix:** drop this one mark from f5. DEC-853 is DONE now, so the cost is small.
+- **Scope:** in.
+- `Ordinary work: yes.`
+- `Consequence: other.`
+
+**The other 16 f5 marks are supported by their changer's own text:**
+- DEC-005←085 (Amends, "readiness reduction")
+- DEC-044←096 (Amends)
+- DEC-034←396 (Amends)
+- DEC-721←953 (Changes: exit criterion 1)
+- DEC-761←772 (item 1). The free-text one: "This replaces DEC-761 item 1's line".
+- DEC-884←918 and DEC-884←921 (item 3)
+- DEC-891←924
+- DEC-896←1057 (item 2)
+- DEC-897←909 (item 1)
+- DEC-899←902, 912 (item 2), 918 (item 4), 924 and 925 (item 4)
+- DEC-914←916 (item 4, "answered")
+
+**DEC-902's part, "(item 10: the proposal decided)",** is supported: DEC-902's `**Changes:**` reads "DEC-899 item 10
+(the proposal decided)". As in F6, the item number is DEC-899's, but the words make that plain.
+
+```verdict
+{"kpis": [
+ {"kpi": "f1 statuses: all 150 as ruled (DEC-1098 (3)); new word first, old status kept whole; no substance changed", "verdict": "pass", "findings": [
+   {"id": "F13", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]},
+ {"kpi": "f2 archive lines agree with the rulings and H2", "verdict": "pass", "findings": []},
+ {"kpi": "f3 KPI 4 changed and marked under DEC-1088 (6)", "verdict": "pass", "findings": []},
+ {"kpi": "f5 marks supported by the register's text (with DEC-853<-DEC-884 dropped)", "verdict": "pass", "findings": [
+   {"id": "F14", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]},
+ {"kpi": "clean apply at ce7f10eb8a2a; gov links 2204 -> 1972 as claimed", "verdict": "pass", "findings": []}
+]}
+```
+
+**Evidence:** the scratch folder is `scratchpad/w2-130-audit/` (`links-*.json` for each stage, `fcheck.py` and
+`fcheck.txt`, `reg2.py`). The disk gate was open (830 GiB free). The folder peaked at 36,002 inodes and 209 MB; after
+the clone was removed it held 54 inodes and 12 MB.

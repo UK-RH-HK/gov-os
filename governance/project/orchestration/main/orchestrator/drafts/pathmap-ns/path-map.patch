@@ -1,0 +1,14 @@
+diff --git a/governance/project/path-map.yaml b/governance/project/path-map.yaml
+index dd958cbd6..116e3cfc5 100644
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -129,6 +129,9 @@ namespaces:
+       - "governance/project/*"
+       - "governance/project/briefs/**"
+       - "governance/project/prompts/**"
++      # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1) and the operator agent's install (W2-148)
++      - "governance/project/indep-walls/**"
++      - "governance/project/operator/**"
+       - "governance/project/orchestration/*"
+       - "governance/project/orchestration/packages/**"
+       # DEC-953 items 1 and 5: the build-phase close records

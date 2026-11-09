@@ -20,10 +20,15 @@
     "W2-129",
     "W2-138",
     "W2-137",
-    "W2-136"
+    "W2-136",
+    "W2-147",
+    "W2-142",
+    "W2-141",
+    "W2-145",
+    "W2-20",
+    "W2-148"
   ],
   "built_held": [
-    "W2-20",
     "W2-52",
     "W2-37",
     "W2-60a",
@@ -31,20 +36,19 @@
     "W2-110"
   ],
   "closes_next": "none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13)",
-  "examin": "AT RISK (11-08 22:00): K9's memory bar MET on the fresh 80 (78/79 right end to end, 0 wrong claims); K9's other lines and D-5, D-6, D-10 remain; the lift about 11-15; EXAMIN's copy about 11-20",
+  "examin": "AT RISK (11-09 18:30): item 8 complete; the operator agent merged; the lift about 11-15; EXAMIN's copy about 11-21 (FORECAST-W2-1)",
   "emergency": "7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); DEC-1097 recorded 11-08; the fresh 80 ready on the CTO's side (scripts pinned, ACT rehearsed, readiness review done)",
   "countdown": [
-    "Re-pin window 4, the pool on, PAT-1: DONE 11-07",
-    "ALL experiments DONE 11-07 (best: the 0.6B bundle + search again once, 128/138)",
-    "Your decisions: DONE 11-08 (DEC-1097; item 6, the glossary, open)",
-    "Before the 80: DONE 11-08 18:20 (checker unchanged 80; ACT applied 15952bbf, 453 PASS; pre-flight as expected; declaration 16d3d61b; scripts pinned d621d58b)",
-    "The fresh 80 once: DONE 11-08 21:46. K9's memory bar PASSES: right end to end 78/79 (98.7 %), wrong claims 0; hit@5 84.8 % beside; data conditions all below the judged (FRESH-80-RESULT)",
-    "Beside, before the lift: W2-141, W2-20 rebuilt, W2-145 (tests first); D-6 part 2 and D-5 on the CPU. Est. 2 to 3 days",
-    "D-10, the full suite and its red fixes, then the lift (your word). The lift about 11-15",
-    "After the lift: the three-layer plan (with P-LB-PRODUCT-1, G1's fewer pairs); W2-139/W2-140; EXAMIN's copy about 11-20"
+    "Re-pin window 4, the experiments, the fresh 80 (K9's memory line met): DONE 11-07/08",
+    "Item 8: W2-141, W2-142, W2-145, W2-147, W2-20 MERGED 11-09; live at the lift's re-pin",
+    "The operator agent W2-148 MERGED 11-09 (with F21); ACT-OPERATOR-1 being prepared, then to your operator",
+    "ACTs applied today: the walls, the gate file (twice), the selection fixes and hook, D-4's seven cases, the path-map namespaces, the guard's call log",
+    "Next: W2-139/W2-140 before D-10; D-5 (templates) and D-6 part 2; the sandbox experiment beside D-10; the launch script for the independent sessions",
+    "D-10, the full suite and its red fixes, on your word; then the lift and its re-pin ACT. The lift about 11-15",
+    "After the lift: W2-20's sample day and --remeasure; the three layers' plan; EXAMIN's copy about 11-21; Wave 2's end about 11-28"
   ],
-  "owner_action": "P2 (now the 80 has run): ADR-0002's acceptance; P-SELECT-GRAPH 'do not build'; the 150-id sitting (W2-130-SITTING)",
-  "last_report": "2026-11-08 18:32:52",
+  "owner_action": "none blocking now; next: ACT-OPERATOR-1 as a message for your operator",
+  "last_report": "2026-11-09 18:33:38",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
@@ -65,7 +69,13 @@
     "W2-04": "MERGED as built (D-1, M-1); formal close at the lift",
     "W2-138": "MERGED (store commit in results, resolved once, CONTINUATION_INVALID names both commits, the skill line; review READY); live at the lift",
     "W2-137": "MERGED (the reranker request cap 16 -> 64; review READY); S5 live measure next; live at the lift",
-    "W2-136": "MERGED (gov plan and the launch check; review READY; F2 an entry criterion of W2-20); live at the lift with W2-20"
+    "W2-136": "MERGED (gov plan and the launch check; review READY; F2 an entry criterion of W2-20); live at the lift with W2-20",
+    "W2-147": "MERGED 7ed72a1e (gov plan's cycle break; review READY); live at the lift",
+    "W2-142": "MERGED 984a3ba9 (search again in the kernel skills); live at the lift",
+    "W2-141": "MERGED b1e2c3b9 (the guard's wide-search refusal; hook via the lift's ACT)",
+    "W2-145": "MERGED 22b734cb (no private reranker); live at the lift",
+    "W2-20": "MERGED 686c594f (the resource gate); live at the lift",
+    "W2-148": "MERGED 511a4a17 + F21 ddc3414b (the operator agent); installed by ACT-OPERATOR-1"
   },
   "keystone_lists": {
     "keystone-9": [
@@ -94,5 +104,5 @@
     ],
     "keystone-7": "done: DEC-1089"
   },
-  "keystone_lists_source": "K9: D9-FATES §3 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
+  "keystone_lists_source": "K9: D9-FATES \u00a73 (DEC-1083, DEC-1084); K7: done by DEC-1089; DEC-1097 (15)"
 }

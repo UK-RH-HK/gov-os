@@ -1,0 +1,10 @@
+**F15 (S12, S15), scope: in. Blocking.**
+- **What:** the round-2 live re-hash around G8 (`operator_run.py:561-613`) cannot tell whether the script or someone else changed a file.
+  - It takes `control_snapshot` plus the touched files before the dry run and again after it, and treats every difference as the dry run's.
+  - `live_changed` then calls `restore_controls` (`:1357-1388`), which writes the pre-dry-run bytes and unlinks any file created in the meantime under `.claude/**`, `.rulesync/**`, `.git/hooks`, `.git/config`, core.hooksPath's folder, the path map, the dead-man's and sentinel's files, the pin and the crontab.
+- **Where it bites:** the live tree is `w2/integrate`, where the CTO merges and commits, and nothing holds those commits during G8. A ticket merge or CTO commit landing in the dry run's minutes (the clone, the checks, the undo) is reverted in the working tree. So are the owner's "don't ask again" rule in `.claude/settings.local.json` and Claude Code's `.claude/scheduled_tasks.lock`.
+- **Shown by:** my planted probe. A committed path-map hidden glob was removed from the working tree and a committed new skill deleted, while the P1 said the dry run changed them and they were "restored".
+- **Same defect, older site:** the (a) after-check's undo (`after_checks` → `undo_live` → `restore_controls`, round-1 code now also covering `.git/config` and core.hooksPath's folder) reverts a commit that races the apply and checks (F5's race).
+- Ordinary work: yes, because the CTO commits and merges control files in the live tree several times a day (25 commits in 10 days, 3 on 11-09; the trial itself saw the path map change between rounds "by others' work"), the cron launch comes at any 10-minute mark, and no freeze the CTO reads is held during G8.
+- Consequence: fails open. The live guard reads `path-map.yaml`, the settings and the hooks from the working tree, so a tightening merged during the dry run (for example a new hidden set, as in `3d8f2c67a` and `efcd91a22`) stops being enforced. It also loses work: a later `add -A` or `commit -a` commits the reversion, and new files are deleted.
+

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result 6b2a8f9a2: W2-20 round 2 (DAEO-r30l): the planted readings GOV_RESOURCES_BUSY_CORES, _EMBEDDING_CPU and _DISK name a file, as _MEMINFO does; the re-measure shows old and new values side by side

@@ -1,0 +1,30 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "head",
+   "before": "20cd694dffb1",
+   "after": "e6f9bbaff929"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line added",
+   "line": "?? src/gov/resources/config.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line added",
+   "line": "?? src/gov/resources/machine.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line added",
+   "line": "?? src/gov/resources/registry.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line added",
+   "line": "?? src/gov/resources/slots.py"
+  }
+ ]
+}

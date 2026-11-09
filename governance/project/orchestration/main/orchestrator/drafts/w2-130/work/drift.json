@@ -2,159 +2,62 @@
  "summary": {
   "store": "HEAD by the loader (--from-head)",
   "links_by_type": {
-   "CITES": 2035,
-   "UNDER": 2595,
+   "UNDER": 2605,
+   "CITES": 2119,
+   "AMENDS": 416,
    "OF_TASK": 381,
-   "AMENDS": 407,
    "SUPERSEDES": 7
   },
-  "census_drifted_current_with_spent": 226,
-  "drifted_current": 195,
+  "census_drifted_current_with_spent": 214,
+  "drifted_current": 214,
   "drifted_no_hint": 1,
   "spent_for_status_reconciliation": {
-   "count": 110,
-   "ids": [
-    "DEC-063",
-    "DEC-721",
-    "DEC-729",
-    "DEC-738",
-    "DEC-739",
-    "DEC-743",
-    "DEC-746",
-    "DEC-747",
-    "DEC-748",
-    "DEC-749",
-    "DEC-750",
-    "DEC-751",
-    "DEC-752",
-    "DEC-753",
-    "DEC-754",
-    "DEC-755",
-    "DEC-756",
-    "DEC-757",
-    "DEC-758",
-    "DEC-761",
-    "DEC-763",
-    "DEC-764",
-    "DEC-765",
-    "DEC-767",
-    "DEC-768",
-    "DEC-771",
-    "DEC-773",
-    "DEC-774",
-    "DEC-775",
-    "DEC-776",
-    "DEC-777",
-    "DEC-779",
-    "DEC-781",
-    "DEC-783",
-    "DEC-784",
-    "DEC-785",
-    "DEC-786",
-    "DEC-790",
-    "DEC-794",
-    "DEC-800",
-    "DEC-804",
-    "DEC-805",
-    "DEC-807",
-    "DEC-811",
-    "DEC-812",
-    "DEC-813",
-    "DEC-814",
-    "DEC-817",
-    "DEC-821",
-    "DEC-823",
-    "DEC-824",
-    "DEC-834",
-    "DEC-835",
-    "DEC-840",
-    "DEC-842",
-    "DEC-853",
-    "DEC-854",
-    "DEC-856",
-    "DEC-857",
-    "DEC-858",
-    "DEC-863",
-    "DEC-864",
-    "DEC-865",
-    "DEC-867",
-    "DEC-870",
-    "DEC-871",
-    "DEC-872",
-    "DEC-874",
-    "DEC-877",
-    "DEC-879",
-    "DEC-882",
-    "DEC-884",
-    "DEC-885",
-    "DEC-886",
-    "DEC-888",
-    "DEC-890",
-    "DEC-891",
-    "DEC-892",
-    "DEC-894",
-    "DEC-895",
-    "DEC-896",
-    "DEC-897",
-    "DEC-899",
-    "DEC-900",
-    "DEC-903",
-    "DEC-904",
-    "DEC-907",
-    "DEC-908",
-    "DEC-909",
-    "DEC-910",
-    "DEC-912",
-    "DEC-913",
-    "DEC-914",
-    "DEC-915",
-    "DEC-917",
-    "DEC-918",
-    "DEC-919",
-    "DEC-920",
-    "DEC-921",
-    "DEC-922",
-    "DEC-923",
-    "DEC-924",
-    "DEC-926",
-    "DEC-927",
-    "DEC-928",
-    "DEC-931",
-    "DEC-932",
-    "DEC-935",
-    "DEC-937",
-    "DEC-940"
-   ],
-   "of_them_stated_changed": 31
+   "count": 0,
+   "ids": [],
+   "of_them_stated_changed": 0
   },
   "stated_changed_not_accepted": {
    "DONE": {
-    "count": 1,
+    "count": 28,
     "ids": [
-     "DEC-056"
-    ]
-   },
-   "PROPOSED": {
-    "count": 12,
-    "ids": [
-     "DEC-002",
-     "DEC-005",
-     "DEC-007",
-     "DEC-024",
-     "DEC-034",
-     "DEC-037",
-     "DEC-040",
-     "DEC-043",
-     "DEC-044",
-     "DEC-045",
-     "DEC-047",
-     "DEC-062"
+     "DEC-056",
+     "DEC-721",
+     "DEC-757",
+     "DEC-761",
+     "DEC-776",
+     "DEC-804",
+     "DEC-805",
+     "DEC-813",
+     "DEC-821",
+     "DEC-823",
+     "DEC-853",
+     "DEC-856",
+     "DEC-879",
+     "DEC-884",
+     "DEC-890",
+     "DEC-891",
+     "DEC-892",
+     "DEC-895",
+     "DEC-896",
+     "DEC-897",
+     "DEC-899",
+     "DEC-900",
+     "DEC-904",
+     "DEC-910",
+     "DEC-914",
+     "DEC-915",
+     "DEC-923",
+     "DEC-926"
     ]
    },
    "SUPERSEDED": {
-    "count": 7,
+    "count": 11,
     "ids": [
+     "DEC-002",
      "DEC-038",
+     "DEC-043",
+     "DEC-045",
+     "DEC-047",
      "DEC-048",
      "DEC-636",
      "DEC-798",
@@ -162,28 +65,290 @@
      "DEC-875",
      "DEC-876"
     ]
+   },
+   "WITHDRAWN": {
+    "count": 1,
+    "ids": [
+     "DEC-062"
+    ]
    }
   },
-  "proposed_decisions_in_all": 42,
-  "superseded_in_part_current": 37,
+  "proposed_decisions_in_all": 1,
+  "superseded_in_part_current": 38,
   "before": {
    "one_hop_edge_to_a_changer": 0
   },
   "after": {
-   "one_hop_edge_to_a_changer": 195,
-   "one_hop_edge_to_every_changer": 194,
+   "one_hop_edge_to_a_changer": 214,
+   "one_hop_edge_to_every_changer": 214,
    "of_the_no_hint": 1,
-   "reached_by_follow_a_changer": 195,
-   "reached_by_follow_every_changer": 194,
-   "named_in_changed_by": 195
+   "reached_by_follow_a_changer": 214,
+   "reached_by_follow_every_changer": 214,
+   "named_in_changed_by": 214
   },
   "not_joined": [],
-  "changer_pairs": 330,
-  "changer_pairs_joined_after": 329
+  "changer_pairs": 354,
+  "changer_pairs_joined_after": 354
  },
  "rows": [
   {
+   "id": "DEC-005",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-085"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-085"
+   ],
+   "reached_by_follow": [
+    "DEC-085"
+   ],
+   "named_in_changed_by": [
+    "DEC-085"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-007",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-075"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-075"
+   ],
+   "reached_by_follow": [
+    "DEC-075"
+   ],
+   "named_in_changed_by": [
+    "DEC-075"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-016",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-074"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-074"
+   ],
+   "reached_by_follow": [
+    "DEC-074"
+   ],
+   "named_in_changed_by": [
+    "DEC-074"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-017",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-074"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-074"
+   ],
+   "reached_by_follow": [
+    "DEC-074"
+   ],
+   "named_in_changed_by": [
+    "DEC-074"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-024",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-074"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-074"
+   ],
+   "reached_by_follow": [
+    "DEC-074"
+   ],
+   "named_in_changed_by": [
+    "DEC-074"
+   ],
+   "only_in_archive": []
+  },
+  {
    "id": "DEC-030",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-031",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-032",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-033",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-034",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080",
+    "DEC-396"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080",
+    "DEC-396"
+   ],
+   "reached_by_follow": [
+    "DEC-080",
+    "DEC-396"
+   ],
+   "named_in_changed_by": [
+    "DEC-080",
+    "DEC-396"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-035",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-036",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-080"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-080"
+   ],
+   "reached_by_follow": [
+    "DEC-080"
+   ],
+   "named_in_changed_by": [
+    "DEC-080"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-037",
    "classes": [
     "amend"
    ],
@@ -221,6 +386,69 @@
    ],
    "named_in_changed_by": [
     "DEC-075"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-040",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-083"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-083"
+   ],
+   "reached_by_follow": [
+    "DEC-083"
+   ],
+   "named_in_changed_by": [
+    "DEC-083"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-042",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-083"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-083"
+   ],
+   "reached_by_follow": [
+    "DEC-083"
+   ],
+   "named_in_changed_by": [
+    "DEC-083"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-044",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-096"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-096"
+   ],
+   "reached_by_follow": [
+    "DEC-096"
+   ],
+   "named_in_changed_by": [
+    "DEC-096"
    ],
    "only_in_archive": []
   },
@@ -1857,7 +2085,6 @@
    ],
    "changers": [
     "DEC-502",
-    "DEC-512",
     "DEC-825"
    ],
    "hint_in_own_entry": true,
@@ -1874,9 +2101,7 @@
     "DEC-502",
     "DEC-825"
    ],
-   "only_in_archive": [
-    "DEC-512"
-   ]
+   "only_in_archive": []
   },
   {
    "id": "DEC-502",
@@ -2429,6 +2654,32 @@
    "named_in_changed_by": [
     "DEC-775",
     "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-786",
+   "classes": [
+    "amend",
+    "supersede"
+   ],
+   "changers": [
+    "DEC-847",
+    "DEC-942"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-847",
+    "DEC-942"
+   ],
+   "reached_by_follow": [
+    "DEC-847",
+    "DEC-942"
+   ],
+   "named_in_changed_by": [
+    "DEC-847",
+    "DEC-942"
    ],
    "only_in_archive": []
   },
@@ -3269,6 +3520,31 @@
    "only_in_archive": []
   },
   {
+   "id": "DEC-924",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-925",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
    "id": "DEC-925",
    "classes": [
     "amend"
@@ -3286,6 +3562,56 @@
    ],
    "named_in_changed_by": [
     "DEC-1057"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-927",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-928",
+    "DEC-953",
+    "DEC-1057"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-928",
+    "DEC-953",
+    "DEC-1057"
+   ],
+   "reached_by_follow": [
+    "DEC-928",
+    "DEC-953",
+    "DEC-1057"
+   ],
+   "named_in_changed_by": [
+    "DEC-1057",
+    "DEC-928",
+    "DEC-953"
+   ],
+   "only_in_archive": []
+  },
+  {
+   "id": "DEC-928",
+   "classes": [
+    "amend"
+   ],
+   "changers": [
+    "DEC-953"
+   ],
+   "hint_in_own_entry": true,
+   "edge_before": [],
+   "edge_after": [
+    "DEC-953"
+   ],
+   "reached_by_follow": [
+    "DEC-953"
+   ],
+   "named_in_changed_by": [
+    "DEC-953"
    ],
    "only_in_archive": []
   },
@@ -4778,24 +5104,28 @@
    "changers": [
     "DEC-1084",
     "DEC-1087",
-    "DEC-1097"
+    "DEC-1097",
+    "DEC-1098"
    ],
    "hint_in_own_entry": true,
    "edge_before": [],
    "edge_after": [
     "DEC-1084",
     "DEC-1087",
-    "DEC-1097"
+    "DEC-1097",
+    "DEC-1098"
    ],
    "reached_by_follow": [
     "DEC-1084",
     "DEC-1087",
-    "DEC-1097"
+    "DEC-1097",
+    "DEC-1098"
    ],
    "named_in_changed_by": [
     "DEC-1084",
     "DEC-1087",
-    "DEC-1097"
+    "DEC-1097",
+    "DEC-1098"
    ],
    "only_in_archive": []
   },

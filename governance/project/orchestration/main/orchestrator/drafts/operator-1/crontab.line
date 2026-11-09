@@ -1,0 +1,1 @@
+*/10 0,8-23 * * * /usr/bin/python3 -I /home/usain/gov-os-operator/install/operator_launch.py >> /home/usain/gov-os-operator/log/operator-launch.out 2>&1  # DEC-1104 (2) (5), ACT-OPERATOR-1: the operator agent launched from its queue (the CTO only queues)

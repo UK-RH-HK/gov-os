@@ -1,0 +1,76 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "f2751cfa01ef",
+   "after": "94277c0b4ea5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "head",
+   "before": "92ab223363c5",
+   "after": "784833517d24"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "acceptance folder",
+   "folder": "W2-136"
+  }
+ ]
+}

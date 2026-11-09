@@ -1,0 +1,138 @@
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "kind": "session",
+  "available_memory_bytes": 16490536960,
+  "load_1m": 0.41,
+  "load_15m": 1.02,
+  "nproc": 20,
+  "busy_cores": 1.04,
+  "busy_window_s": 0.3,
+  "cpu_demand_cores": 1.04,
+  "servers": {
+    "shared": {
+      "host": "127.0.0.1:11434",
+      "pid": 6627,
+      "cores_now": null,
+      "cores_p95": null,
+      "samples": 0
+    },
+    "query": {
+      "host": "127.0.0.1:11435",
+      "pid": 7034,
+      "cores_now": null,
+      "cores_p95": null,
+      "samples": 0
+    }
+  },
+  "memory": {
+    "have_bytes": 16490536960,
+    "need_bytes": 5412827136
+  },
+  "disk": {
+    "path": "/home/usain",
+    "free_bytes": 888424476672,
+    "free_inodes": 64887698
+  },
+  "sessions": [],
+  "cleared": [],
+  "slots": {
+    "count": 3,
+    "held": 0,
+    "holders": [],
+    "full": false
+  },
+  "gpu": null,
+  "thresholds": {
+    "nproc": 20,
+    "floor_bytes": 3221225472,
+    "working_size_bytes": 2191601664,
+    "newcomer_bytes": 2191601664,
+    "disk_floor_bytes": 107374182400,
+    "inode_floor": 10000000,
+    "heavy_slots": 3
+  },
+  "config": {
+    "path": "/home/usain/.gov-os/machine/gate.json",
+    "values": {
+      "floor_bytes": 3221225472,
+      "working_size_bytes": 2191601664,
+      "verification_peak_bytes": 7582199808,
+      "rebuild_peak_bytes": 7582199808,
+      "disk_floor_bytes": 107374182400,
+      "inode_floor": 10000000,
+      "verification_lock": "/tmp/gov-os-verify.lock",
+      "gpu_margin": 0.1,
+      "heavy_slots": 3,
+      "trip_floor_bytes": 2147483648,
+      "gpu_shares": [
+        {
+          "kind": "embedder",
+          "bytes": 3758096384
+        },
+        {
+          "kind": "reranker",
+          "bytes": 3758096384
+        },
+        {
+          "kind": "headroom",
+          "bytes": 2147483648
+        }
+      ],
+      "disk_path": "/home/usain",
+      "embedding_servers": {
+        "shared": {
+          "host": "127.0.0.1:11434",
+          "cpus": "12-19",
+          "nice": 10,
+          "date": "2026-11-01",
+          "source": "ACT-OLLAMA-CAP-1 (shared 12-19, nice 10), ACT-QUERY-CPUS-1 (query 8-11, nice 0)"
+        },
+        "query": {
+          "host": "127.0.0.1:11435",
+          "cpus": "8-11",
+          "nice": 0,
+          "device": "gpu",
+          "date": "2026-11-02",
+          "source": "ACT-OLLAMA-CAP-1 (shared 12-19, nice 10), ACT-QUERY-CPUS-1 (query 8-11, nice 0); ACT-QUERY-GPU-2 (the query server on the GPU)"
+        }
+      }
+    },
+    "dates": {
+      "floor_bytes": "2026-10-29",
+      "working_size_bytes": "2026-10-29",
+      "verification_peak_bytes": "2026-10-29",
+      "rebuild_peak_bytes": "2026-11-01",
+      "disk_floor_bytes": "2026-10-28",
+      "inode_floor": "2026-10-28",
+      "verification_lock": "2026-10-29",
+      "gpu_margin": "2026-10-29",
+      "heavy_slots": "2026-10-31",
+      "trip_floor_bytes": "2026-10-29",
+      "gpu_shares": "2026-11-02",
+      "disk_path": "2026-10-28"
+    },
+    "sources": {
+      "floor_bytes": "DEC-947 item 5: the floor 3 GiB",
+      "working_size_bytes": "DEC-947 item 2: a lead's working size outside verification, 2,140,236 kB",
+      "verification_peak_bytes": "DEC-947 item 1: a verification run's peak, 7,404,492 kB",
+      "rebuild_peak_bytes": "DEC-1001 (d), P-7: not yet measured; the verification peak until the re-measure",
+      "disk_floor_bytes": "DEC-898 item 1: 100 GiB free",
+      "inode_floor": "DEC-898 item 1: 10,000,000 free inodes",
+      "verification_lock": "DEC-947 item 1: the verification lock",
+      "gpu_margin": "DEC-950 item 2: the declared need plus 10 %",
+      "heavy_slots": "DEC-979 item 1 D1: 3 slots (heavy_slots.conf), re-sized at the re-measure",
+      "trip_floor_bytes": "DEC-947 item 5: the trip-wire below 2 GiB available",
+      "gpu_shares": "DEC-1032 item 1: the embedder first (about 3.5 GB), the shared reranker second (2.5 to 3.5 GB), at least 2 GB headroom, nothing else by default",
+      "disk_path": "DEC-898 item 1: the shared disk (HOME's)"
+    },
+    "due_for_remeasure": [
+      "working_size_bytes measured 2026-10-29, more than 7 days ago: due for re-measure",
+      "verification_peak_bytes measured 2026-10-29, more than 7 days ago: due for re-measure",
+      "rebuild_peak_bytes measured 2026-11-01, more than 7 days ago: due for re-measure"
+    ]
+  },
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result bdc5e0525: W2-20 tests: S16 measured per CPU, the slot's own CPUs and an escape check outside its set (DEC-1105)

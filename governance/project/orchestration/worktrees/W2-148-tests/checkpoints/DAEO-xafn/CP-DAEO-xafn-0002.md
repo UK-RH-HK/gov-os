@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-xafn-0002
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-xafn at stop
+task: DAEO-xafn
+task_status: in_progress
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-09T16:17:47Z'
+inputs:
+- id: DAEO-xafn
+  version: 5f015c990
+  hash: sha256:bc825bc0f747c7dcd1e5fe86dfaa4db23634cabd703c2b3c6e5d6abec89f9a72
+head_commit: fab2be2a27914ba1163c2fb932edddccfa82fb67
+---
+
+# CP-DAEO-xafn-0002 — DAEO-xafn at stop
+
+## Next action
+
+Resume after stop

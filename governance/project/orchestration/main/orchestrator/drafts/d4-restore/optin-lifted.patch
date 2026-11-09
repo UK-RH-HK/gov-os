@@ -1,0 +1,40 @@
+--- a/tests/optin-lifted.txt
++++ b/tests/optin-lifted.txt
+@@ -12,7 +12,16 @@
+ tests/acceptance/W2-53/  # the probe gate's merge measure and the ratchet (Q-10, Q-11)
+ tests/acceptance/W2-68/  # batched closes and reuse (T-10, Q-2)
+ tests/acceptance/W2-69/  # the secrets check over stores, the real gitleaks (DEC-1045; was nightly_only.txt)
+-tests/acceptance/W2-71/  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt)
++# DEC-1103 (2): back in the gates (un-lifted for tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files alone: K1 of the P-SELECT-GRAPH trial reded it; the suite's other parts stay lifted, one line each below); was: tests/acceptance/W2-71/  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt)
++tests/acceptance/W2-71/test_w2_71_exemption.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_lazy_fetch_guard.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_only_that_rule_and_match.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_partial_clone.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_promisor_config.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_real_tokens_still_fail.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_verification_cannot_run.py  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
++tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_no_file_the_branch_writes_holds_a_keyword_of_row_w2_l423s_rule_whole  # row W2-L423's rule on gitleaks findings (DEC-1045; was nightly_only.txt); split from the suite's line, DEC-1103 (2)
+ tests/acceptance/W2-107/  # gitleaks verdicts by content hash (DEC-1045; was nightly_only.txt)
+ 
+ # W1-15: secret rules and the pre-index filter through gitleaks (DEC-1045; was nightly_only.txt)
+@@ -35,7 +44,18 @@
+ tests/acceptance/W1-26/test_w1_26_skill.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+ tests/acceptance/W1-26/test_w1_26_decision_citations.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+ tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
+-tests/acceptance/W1-26/test_w1_26_probe_records.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
++# DEC-1103 (2): back in the gates (un-lifted for ::test_this_repository_s_probe_records_are_well_formed and ::test_no_finding_of_the_check_on_this_repository_names_a_probe_record alone: K8 of the P-SELECT-GRAPH trial reded them; the file's other cases stay lifted, one line each below); was: tests/acceptance/W1-26/test_w1_26_probe_records.py  # a lifted family (S6 skill version, S9 citations, the probe-record form)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_well_formed_probe_record_gives_no_finding  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_each_judgement_word_is_well_formed  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_that_states_the_shared_fields_is_well_formed_too  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_is_known_by_its_type_not_by_where_it_lies  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_two_records_of_one_ticket_are_each_judged  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_probe_record_without_a_field_the_probe_gate_asks_for_is_a_finding  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_field_of_a_wrong_type_or_value_is_a_finding  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_the_codes_of_a_probe_record_s_findings  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_an_unknown_type_is_still_a_finding  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_of_another_type_still_owes_the_shared_fields  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
++tests/acceptance/W1-26/test_w1_26_probe_records.py::test_a_record_whose_type_is_no_text_is_still_a_finding  # a lifted family (S6 skill version, S9 citations, the probe-record form); split from the file's line, DEC-1103 (2)
+ 
+ # W1-30: the strict close's gates (DEC-953, Q-2..Q-11); the 7 core cases of close and receipt stay in the full run
+ tests/acceptance/W1-30/test_w1_30_check_blocks.py  # a lifted gate of the strict close (home: W2-115, D-9)

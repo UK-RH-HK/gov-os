@@ -1,0 +1,293 @@
+bringing up nodes...
+bringing up nodes...
+
+....................................................................F... [  2%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+..............................................................s......... [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+............sss......................................................... [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+......F.FFFFFF......F.F................................................. [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+.........FF............................................................. [ 88%]
+........................................................................ [ 91%]
+...........................................................F............ [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+____________ test_every_approving_decision_is_accepted_by_the_owner ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+registry = {'tools': [{'approved_by': 'DEC-074', 'date': '2026-09-30', 'install': "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23....proved_by': 'DEC-074', 'date': '2026-09-30', 'install': 'uv tool install copier==9.18.2', 'name': 'copier', ...}, ...]}
+decisions = {'DEC-001': Decision(id='DEC-001', title='Assemble first; Rust kernel becomes the later replacement', status='ACCEPTED...is a health finding (Gate U), not a silent cost.\n- **Measurement:** telemetry (DEC-026) tagged by task ID.\n\n'), ...}
+
+    def test_every_approving_decision_is_accepted_by_the_owner(registry, decisions):
+        assert support.entries(registry), f"{support.REGISTRY_REL} records no tool"
+        wrong = []
+        for name, approved_by in _approvals(registry):
+            decision = decisions.get(approved_by)
+            if decision is not None and not decision.accepted_by_owner:
+                wrong.append(f"{name}: {approved_by} has status {decision.status!r}")
+>       assert wrong == [], f"entries of {support.REGISTRY_REL} whose approving decision is not ACCEPTED (owner): {wrong}"
+E       AssertionError: entries of governance/project/tool-registry.yaml whose approving decision is not ACCEPTED (owner): ['pytest-timeout: DEC-892 has status "DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-871, DEC-883, DEC-889, DEC-890, DEC-866, DEC-861 · **Basis:** package P-W2-63-C1 (`governance/project/orchestration/packages/P-W2-63-C1.md`) and the tool trials\' report (`governance/project/orchestration/packages/TOOL-TRIALS-2026-10-22.md`). · **Changed by:** DEC-896 item 3: W2-07\'s KPIs gathered (the decision-record rule, test-revision tickets on their declared `acceptance_tests.path`, a stale probe named before the run). · **Changed by:** DEC-899 item 1: worksteal\'s condition (a) is met through W2-70 (the two acceptance reruns retired) and W2-67 (the unit nested runs bounded), then a re-measure in the nightly."']
+E       assert ['pytest-time...he nightly."'] == []
+E         
+E         Left contains one more item: 'pytest-timeout: DEC-892 has status "DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-22, in th...W2-70 (the two acceptance reruns retired) and W2-67 (the unit nested runs bounded), then a re-measure in the nightly."'
+E         Use -v to get more diff
+
+tests/acceptance/W1-06/test_w1_06_approvals.py:47: AssertionError
+____ test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7316a33f3950>
+
+    def test_the_service_waits_for_a_slot_then_takes_the_other_on_its_release(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "10")
+        fds = _hold_slots(home)
+        threading.Timer(1.0, os.close, (fds[1],)).start()  # an older tree's private reranker ends
+        try:
+            ranked, outcome = ask("q", ["a", "bb"])
+        finally:
+            os.close(fds[0])  # the other ends too
+        released = time.monotonic()
+>       assert outcome["by"] == "service" and pairs(ranked) == expected("q", ["a", "bb"])
+E       AssertionError: assert ('unavailable' == 'service'
+E         
+E         - service
+E         + unavailable)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:340: AssertionError
+____ test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked ____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h11')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7316a253fb60>
+
+    def test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
+        fds = _hold_slots(home)
+        try:
+            began = time.monotonic()
+            results = in_threads(4, lambda number: (rerank.rerank(f"q{number}", [{"n": 0, "text": "a"}]),
+                                                    rerank.last_outcome()))
+            took = time.monotonic() - began
+        finally:
+            for fd in fds:
+                os.close(fd)
+        for ranked, outcome in results:
+            assert ranked == [{"n": 0, "text": "a"}] and outcome["by"] == "unavailable"
+            # DEC-1048 (5): the service's refusal named, by the search that started it ("no GPU slot freed within its
+            # wait") and by those that waited for it (its REFUSED line, "no GPU slot free within 1 s")
+>           assert "no GPU slot free" in outcome["reason"]
+E           AssertionError: assert 'no GPU slot free' in 'the shared reranker did not answer (OSError: AF_UNIX path too long)'
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:360: AssertionError
+_____________ test_a_killed_service_is_replaced_by_the_next_search _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h12')
+
+    def test_a_killed_service_is_replaced_by_the_next_search(home):
+        ask("q", ["a"])
+>       [first] = _pids(home, SERVICE)
+        ^^^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:372: ValueError
+____ test_a_service_killed_mid_request_leaves_the_search_unranked_and_named ____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h13')
+
+    def test_a_service_killed_mid_request_leaves_the_search_unranked_and_named(home):
+        # DEC-1048 (5): the order given, never a private reranker's scores
+        ask("warm", ["a"])
+>       [pid] = _pids(home, SERVICE)
+        ^^^^^
+E       ValueError: not enough values to unpack (expected 1, got 0)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:383: ValueError
+_____________ test_a_service_that_does_not_answer_in_time_is_left ______________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h14')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7316a2519c40>
+
+    def test_a_service_that_does_not_answer_in_time_is_left(home, monkeypatch):
+        monkeypatch.setenv("GOV_RERANK_TIMEOUT_S", "1")
+        ask("warm", ["a"])
+        began = time.monotonic()
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+        ranked = rerank.rerank("hang", candidates)
+        outcome = rerank.last_outcome()
+        assert time.monotonic() - began < 1 + 1  # DEC-1048 (5), W2-145 S4: the time limit plus 1 s, no other wait
+>       assert outcome["by"] == "unavailable" and "timed out" in outcome["reason"]
+E       AssertionError: assert ('unavailable' == 'unavailable'
+E         
+E           unavailable and 'timed out' in 'the shared reranker did not answer (OSError: AF_UNIX path too long)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:403: AssertionError
+____ test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked ____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h15')
+
+    def test_a_request_over_the_cap_is_refused_and_the_search_goes_on_unranked(home):
+        # A search's requests carry at most rerank.MAX_REQUEST_TEXTS (64, DEC-1090 (2)), so the service's own cap is
+        # reached only by a request made past rerank.rerank: the default reranker's scorer, asked directly. The guard
+        # stays: the service refuses the over-cap request, and (DEC-1048 (5)) the scorer scores nothing, named.
+        texts = ["x"] * (rerank_service.MAX_TEXTS + 1)
+        values = rerank.default_reranker()("q", texts)
+        outcome = rerank.last_outcome()
+>       assert outcome["by"] == "unavailable" and "refused the request" in outcome["reason"]
+E       AssertionError: assert ('unavailable' == 'unavailable'
+E         
+E           unavailable and 'refused the request' in 'the shared reranker did not answer (OSError: AF_UNIX path too long)')
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:414: AssertionError
+____________ test_a_search_s_requests_never_reach_the_service_s_cap ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h16')
+
+    def test_a_search_s_requests_never_reach_the_service_s_cap(home):
+        # DEC-1067 (f): a pool larger than the service's cap goes in requests of at most the client's cap, each under it
+        assert rerank.MAX_REQUEST_TEXTS == 64 < rerank_service.MAX_TEXTS  # DEC-1090 (2): the cap raised from 16
+        texts = ["x" * (number % 7 + 1) for number in range(rerank_service.MAX_TEXTS + 1)]
+        ranked, outcome = ask("q", texts)
+>       assert outcome["by"] == "service" and outcome["reason"] is None and not fallbacks(home)
+E       AssertionError: assert ('unavailable' == 'service'
+E         
+E         - service
+E         + unavailable)
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:424: AssertionError
+_________ test_the_running_service_writes_one_memory_line_per_request __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h17')
+
+    def test_the_running_service_writes_one_memory_line_per_request(home):
+        for number in range(3):
+>           assert ask(f"q{number}", ["a", "bb"])[1]["by"] == "service"
+E           AssertionError: assert 'unavailable' == 'service'
+E             
+E             - service
+E             + unavailable
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:563: AssertionError
+____ test_a_service_that_cannot_start_leaves_the_search_unranked_and_named _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h18')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7316a253e510>
+
+    def test_a_service_that_cannot_start_leaves_the_search_unranked_and_named(home, monkeypatch):
+        # DEC-1048 (5): no private reranker after the service's failure; one FALLBACK line, "unranked"
+        monkeypatch.setenv("STANDIN_FAIL", SERVICE)
+        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bb"}]
+        assert rerank.rerank("q", candidates) == candidates
+        outcome = rerank.last_outcome()
+        assert outcome["by"] == "unavailable" and outcome["device"] is None
+>       assert "ended before it listened (exit 1)" in outcome["reason"]
+E       AssertionError: assert 'ended before it listened (exit 1)' in 'the shared reranker did not answer (OSError: AF_UNIX path too long)'
+
+tests/unit/retrieval/test_w2_112_shared_reranker.py:582: AssertionError
+_ test_s1_a_stand_in_server_s_failures_keep_the_order_and_start_nothing[an error answer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h27')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7316a240c4d0>
+kind = 'an error answer'
+
+    @needs_sockets
+    @pytest.mark.parametrize("kind", SERVED, ids=list(SERVED))
+    def test_s1_a_stand_in_server_s_failures_keep_the_order_and_start_nothing(home, monkeypatch, kind):
+        reply, named = SERVED[kind]
+        monkeypatch.setenv("GOV_RERANK_TIMEOUT_S", "1")
+>       listener = _server(home, reply)
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/retrieval/test_w2_145_no_private_reranker.py:655: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h27')
+reply = <function <lambda> at 0x7316a8216700>
+
+    def _server(home: Path, reply):
+        """A stand-in service listening on the planted HOME's socket, answering each request with ``reply(request)``."""
+        folder = home / rerank.CACHE_REL
+        folder.mkdir(parents=True, exist_ok=True)
+        listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+>       listener.bind(str(folder / rerank.SOCKET))
+E       OSError: AF_UNIX path too long
+
+tests/unit/retrieval/test_w2_145_no_private_reranker.py:621: OSError
+________ test_s1_no_listener_and_a_refused_start_runs_the_service_alone ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+home = PosixPath('/tmp/gov-os-landing-20261109-121831-3373092/pytest-of-usain/pytest-0/popen-gw1/h28')
+
+    @needs_sockets
+    def test_s1_no_listener_and_a_refused_start_runs_the_service_alone(home):
+        began = time.monotonic()
+        ranked = rerank.rerank("q", GIVEN)
+        took = time.monotonic() - began
+        outcome = rerank.last_outcome()
+        assert ranked == GIVEN and outcome["by"] == "unavailable"
+>       assert "no GPU slot freed within its wait" in outcome["reason"]
+E       AssertionError: assert 'no GPU slot freed within its wait' in 'the shared reranker did not answer (OSError: AF_UNIX path too long)'
+
+tests/unit/retrieval/test_w2_145_no_private_reranker.py:676: AssertionError
+_________ test_only_the_first_30_fused_chunks_are_scored_and_returned __________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+passes = ([['[path: notes/chunk-00.md]\nchunk-00 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', ...]], <function passes.<locals>.<lambda> at 0x7316a2977b00>)
+
+    def test_only_the_first_30_fused_chunks_are_scored_and_returned(passes):
+        seen, reranker = passes
+        answer = fusion.search(Path("unused"), "a question", limit=None, reranker=reranker)
+        # one rerank of the first 30, in requests of at most 16 texts (DEC-1067 (f))
+>       assert fusion.RERANK_TOP == 30 and [len(texts) for texts in seen] == [16, 14]
+E       assert (30 == 30 and [30] == [16, 14]
+E        +  where 30 = fusion.RERANK_TOP
+E         
+E         At index 0 diff: 30 != 16
+E         Right contains one more item: 14
+E         Use -v to get more diff)
+
+tests/unit/semantic/test_fusion.py:48: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+13 failed, 2824 passed, 4 skipped in 611.61s (0:10:11)

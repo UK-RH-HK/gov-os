@@ -1,0 +1,252 @@
+calllog rehearsal: 2026-11-09 16:59:11 GMT, replay window 2026-11-07T16:59:11 .. 2026-11-09T16:59:11 UTC, steps: prepare plant live_before root_planted suites_before guard4_before replay_before apply suites_after guard4_after replay_after planted faults prune concurrent latency micro live_session root_back undo live_after
+inherited GOV_ and CLAUDE_PROJECT_DIR variables: 0
+
+== prepare: the clone (16:59:11)
+clone /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS at b134a760b93c on calllog-rehearsal; branches 101; root mentions left: 0
+d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+a7981319f877  pretooluse.candidate.py
+1e0d09b74cc9  apply.sh
+282f7eb974eb  calllog_check.py
+527781ee0b7b  rehearse.sh
+
+== plant: the dummy sets root /home/usain/gov-os-runs/CALLLOG-rehearsal/home/gov-os-eval (names only, dummy text) (16:59:12)
+planted files: 10
+
+== live_before: the live files (16:59:12)
+d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+3f7ae7f83d998c4036e015f9f1b6b8a8c321af2762267ed9d32c524eab81d397  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/.gov-os: drwxr-xr-x usain
+live ~/.gov-os/guard-calls: absent
+live tracked .claude/ and governance/ edits: 0
+info: live main tree at b134a760b93c (other sessions commit during the run; the files above are what must not change)
+
+== root_planted: the block's root set to the planted absolute path (16:59:12)
+block root: root: "/home/usain/gov-os-runs/CALLLOG-rehearsal/home/gov-os-eval"
+
+== suites_before: the suites on the clone as it is (the baseline; the hook writes no log) (16:59:12)
+before test_guard_fix_4: 467 passed in 19.30s
+before test_g14: 151 passed, 1 skipped in 3.88s
+before W2-58 sets, launcher, live hook, reads: FAILED tests/acceptance/W2-58/test_w2_58_evaluation_sets.py::test_the_launch_of_a_measured_session_adds_no_read_denial_for_the_set_and_keeps_the_held_out_rules[by-role]
+before W2-58 sets, launcher, live hook, reads: FAILED tests/acceptance/W2-58/test_w2_58_evaluation_sets.py::test_the_launch_of_an_unmeasured_session_leaves_the_hidden_part_to_the_read_tool
+before W2-58 sets, launcher, live hook, reads: 2 failed, 109 passed in 13.46s
+/tmp/gov-os-calllog-rehearsal/suites-before: 0 lines; by decision and rule: {}; trees {}; keyed null 0
+PASS
+
+== guard4_before: guard4_check.py --settings <clone> (the registered line), root planted (16:59:53)
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
+guard4 before: 501 ok, last line PASS
+/tmp/gov-os-calllog-rehearsal/guard4-before: 0 lines; by decision and rule: {}; trees {}; keyed null 0
+PASS
+
+== replay_before: the calls of 2026-11-07T16:59:11 .. 2026-11-09T16:59:11 UTC, the hook before (17:00:36)
+  "calls in the window, to the start": 8531,
+  "duplicates": 343,
+  "skipped: names the real sets root in a form not rewritten": 46,
+  "unique judged": 8142
+ },
+ "decisions": {
+  "allow": 8103,
+  "deny": 39
+ }
+}
+replay: 8142 calls judged and recorded (sha256, decision)
+PASS
+lines written by the hook before: 0
+
+== apply: apply.sh check, apply in the clone, log folder /tmp/gov-os-calllog-rehearsal/calls (17:03:03)
+apply.sh check: tree /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS, log folder /tmp/gov-os-calllog-rehearsal/calls
+now: d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+now: log folder /tmp/gov-os-calllog-rehearsal/calls: absent (0 day files)
+now: state before
+drafts: pretooluse.candidate.py as built
+check: ready to apply
+apply.sh apply: tree /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS, log folder /tmp/gov-os-calllog-rehearsal/calls
+before: d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+before: log folder /tmp/gov-os-calllog-rehearsal/calls: absent (0 day files)
+before: state before
+backup: /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/guard-calllog/backup (SHA256SUMS written)
+log folder: made (0700), salt written (0400; never shown)
+after: a7981319f877846d6a62a6768ca036a5014dc7d9f8aadd09e54e61af8251d7d0  .claude/hooks/pretooluse.py
+after: log folder /tmp/gov-os-calllog-rehearsal/calls: ready (0 day files)
+after: state applied
+apply: done. The operator's commit stages:
+  git add .claude/hooks/pretooluse.py
+a second apply: refused
+check: already applied
+a log folder inside the tree: refused
+ M .claude/hooks/pretooluse.py
+ M governance/project/path-map.yaml
+ .claude/hooks/pretooluse.py      | 190 ++++++++++++++++++++++++++++++++++++---
+ governance/project/path-map.yaml |   2 +-
+ 2 files changed, 177 insertions(+), 15 deletions(-)
+drwx------ .
+drwxr-xr-x ..
+-r-------- salt.key
+
+== suites_after: the suites with the ACT applied (each hook run logs to its step folder) (17:03:03)
+after test_guard_fix_4: 467 passed in 20.66s
+after test_g14: 151 passed, 1 skipped in 4.22s
+after W2-58 sets, launcher, live hook, reads: FAILED tests/acceptance/W2-58/test_w2_58_evaluation_sets.py::test_the_launch_of_a_measured_session_adds_no_read_denial_for_the_set_and_keeps_the_held_out_rules[by-role]
+after W2-58 sets, launcher, live hook, reads: FAILED tests/acceptance/W2-58/test_w2_58_evaluation_sets.py::test_the_launch_of_an_unmeasured_session_leaves_the_hidden_part_to_the_read_tool
+after W2-58 sets, launcher, live hook, reads: 2 failed, 109 passed in 14.77s
+/tmp/gov-os-calllog-rehearsal/suites-after: 923 lines; by decision and rule: {('allow', 'none'): 520, ('ask', '4-ask'): 2, ('deny', '1'): 107, ('deny', '2-heldout'): 3, ('deny', '2-hidden'): 8, ('deny', '3-secret'): 6, ('deny', '4-install'): 7, ('deny', '4-sudo'): 5, ('deny', '5'): 46, ('deny', 'error'): 6, ('deny', 'g14'): 68, ('deny', 'rm'): 145}; trees {'run': 533, 'worktree': 104, 'scratch': 286}; keyed null 0
+PASS
+
+== guard4_after: the same, the ACT applied (17:03:47)
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
+guard4 after: 501 ok, last line PASS
+/tmp/gov-os-calllog-rehearsal/guard4-after: 501 lines; by decision and rule: {('allow', 'none'): 202, ('ask', '4-ask'): 1, ('deny', '1'): 7, ('deny', '2-heldout'): 1, ('deny', '2-hidden'): 201, ('deny', '2-listing'): 6, ('deny', '2b-line'): 40, ('deny', '2b-write'): 19, ('deny', '3-secret'): 2, ('deny', '4-install'): 4, ('deny', '4-sudo'): 1, ('deny', '5'): 9, ('deny', 'g14'): 2, ('deny', 'rm'): 6}; trees {'run': 501}; keyed null 0
+PASS
+
+== replay_after: the same calls, the hook after; then before against after, and the log against the calls (17:04:35)
+  "calls in the window, to the start": 8531,
+  "duplicates": 343,
+  "skipped: names the real sets root in a form not rewritten": 46,
+  "unique judged": 8142
+ },
+ "decisions": {
+  "allow": 8103,
+  "deny": 39
+ }
+}
+replay: 8142 calls judged and recorded (sha256, decision)
+PASS
+window 2026-11-07T16:59:11 .. 2026-11-09T16:59:11; calls judged before 8142, after 8142, in both 8142
+answers: {'allow->allow': 8103, 'deny->deny': 39}
+differences: 0
+/tmp/gov-os-calllog-rehearsal/replay-after: 8142 lines; by decision and rule: {('allow', 'none'): 8103, ('deny', '1'): 1, ('deny', '2-hidden'): 11, ('deny', '2-listing'): 6, ('deny', '2b-line'): 16, ('deny', '3-secret'): 1, ('deny', '5'): 2, ('deny', 'error'): 2}; trees {'run': 8142}; keyed null 0
+replaymatch: 8142 calls judged, 8142 lines; (sha256, decision) pairs equal: True; judged not logged 0, logged not judged 0
+PASS
+
+== planted: a planted session's allowed, refused and asked calls: the expected lines and nothing else (17:07:10)
+ok  A1 Read, allowed: before allow, after allow
+ok  A2 Bash ls, allowed: before allow, after allow
+ok  A3 Bash with marker, allowed: before allow, after allow
+ok  A4 Write to /tmp with marker, allowed: before allow, after allow
+ok  A5 Glob, allowed: before allow, after allow
+ok  A6 Edit docs by the CTO, allowed: before allow, after allow
+ok  A7 TodoWrite, allowed: before allow, after allow
+ok  A8 Grep by a subagent, allowed: before allow, after allow
+ok  D1 a secret, refused: before deny, after deny
+ok  D2 sudo, refused: before deny, after deny
+ok  D3 an install, refused: before deny, after deny
+ok  D4 the acceptance tests by an engineer, refused: before deny, after deny
+ok  D5 a reviewer's write outside its records, refused: before deny, after deny
+ok  D6 a catastrophic rm, refused: before deny, after deny
+ok  D7 an in-tree hidden half, refused: before deny, after deny
+ok  D8 the held-out material, refused: before deny, after deny
+ok  D9 the sets root with a variable after it, refused: before deny, after deny
+ok  D10 a write into the planted sets root's hidden part, refused: before deny, after deny
+ok  D11 the tuner's transcripts, refused: before deny, after deny
+ok  D12 the engineer's own acceptance tests, refused: before deny, after deny
+ok  K1 an install in the CTO's session, asked: before ask, after ask
+ok  E1 input that is not JSON, refused (fail closed): before deny, after deny
+/tmp/gov-os-calllog-rehearsal/planted: 22 lines; by decision and rule: {('allow', 'none'): 8, ('ask', '4-ask'): 1, ('deny', '1'): 1, ('deny', '2-heldout'): 1, ('deny', '2-hidden'): 1, ('deny', '2b-line'): 1, ('deny', '2b-write'): 1, ('deny', '2c'): 1, ('deny', '3-secret'): 1, ('deny', '4-install'): 1, ('deny', '4-sudo'): 1, ('deny', '5'): 1, ('deny', 'error'): 1, ('deny', 'g14'): 1, ('deny', 'rm'): 1}; trees {'run': 22}; keyed null 1
+log folder holds: ['2026-11-09.jsonl', 'salt.key']
+planted: 22 calls, 22 lines; decisions unchanged 22/22; one more call (another session, same action): same sha256 and keyed hash
+PASS
+
+== faults: a log folder that cannot be written never changes a decision (17:07:13)
+F1 a read-only folder and day file: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.01 s
+F1b a read-only folder, no day file yet: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.01 s
+F2 a full disk (the file size limit, EFBIG): 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.05 s
+F3 the day's cap reached: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.04 s
+F4 the folder is a file: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.01 s
+F5 the day file is a link: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.01 s
+F6 the folder is a link: 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.01 s
+F7 a write that hangs (a FIFO): 22 calls, decisions changed 0, call-log warnings 22, slowest extra 2.01 s
+F8 no salt: 22 calls, decisions changed 0, call-log warnings 0, slowest extra 0.00 s
+F9 a relative GOV_GUARD_CALLS_DIR (ignored: the default under HOME, planted): 22 calls, decisions changed 0, call-log warnings 0, slowest extra 0.10 s
+F10 the default folder cannot be made (HOME read-only, planted): 22 calls, decisions changed 0, call-log warnings 22, slowest extra 0.11 s
+faults: every decision as with a working log: True
+PASS
+
+== prune: the day files past 92 days, by name only (17:08:27)
+prune: left ['1999-01-01.json', '2026-04-23.jsonl.bak', '2026-08-10.jsonl', '2026-11-08.jsonl', '2026-11-09.jsonl', 'notes.txt']
+PASS
+
+== concurrent: 8 sessions at once into one day file (17:08:27)
+/tmp/gov-os-calllog-rehearsal/conc: 200 lines; by decision and rule: {('allow', 'none'): 200}; trees {'run': 200}; keyed null 200
+concurrent: 8 at once, 200 calls in 3.7 s, 200 whole lines
+PASS
+
+== latency: the hook before and after, alternated, 3 calls x 40 (17:08:31)
+latency before: 120 calls, median 71.0 ms, p95 128.4 ms
+latency after: 120 calls, median 73.0 ms, p95 123.3 ms
+  A1 Read, allowed: median before 67.7 ms, after 70.5 ms
+  A2 Bash ls, allowed: median before 117.9 ms, after 118.2 ms
+  D2 sudo, refused: median before 70.4 ms, after 72.5 ms
+latency added (median of all): +2.0 ms
+/tmp/gov-os-calllog-rehearsal/latency: 120 lines; by decision and rule: {('allow', 'none'): 80, ('deny', '4-sudo'): 40}; trees {'run': 120}; keyed null 0
+PASS
+
+== micro: the log's own cost in the process (17:08:56)
+micro: _calls_write 2000 times, 43 us each
+PASS
+
+== live_session: a headless session (haiku) in the clone, as an engineer: its calls matched to the log by sha256 (17:08:56)
+live session: exit 0 in 13 s; cost 0.00578233
+/tmp/gov-os-calllog-rehearsal/live: 6 lines; by decision and rule: {('allow', 'none'): 3, ('deny', '1'): 1, ('deny', '3-secret'): 1, ('deny', '4-sudo'): 1}; trees {'run': 6}; keyed null 0
+live: session 47ca310c-ca6b-47a5-b4be-fb1e33f02b7a: 6 tool calls in the stream, 6 lines for the session
+  ok  Read: line allow none (the stream's result: allow)
+  ok  Bash: line allow none (the stream's result: allow)
+  ok  Bash: line deny 4-sudo (the stream's result: deny)
+  ok  Read: line deny 3-secret (the stream's result: deny)
+  ok  Write: line deny 1 (the stream's result: deny)
+  ok  Glob: line allow none (the stream's result: allow)
+live: matched 6 of 6 by sha256; lines with no call 0; roles ['engineer'], tickets ['DAEO-sdxk']
+PASS
+marker lines in the log (expect 0): 0
+
+== root_back: the block's root back to ~/gov-os-eval (17:09:09)
+block root: root: "~/gov-os-eval"
+
+== undo: apply.sh undo (17:09:09)
+apply.sh undo: tree /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS, log folder /tmp/gov-os-calllog-rehearsal/calls
+before-undo: a7981319f877846d6a62a6768ca036a5014dc7d9f8aadd09e54e61af8251d7d0  .claude/hooks/pretooluse.py
+before-undo: log folder /tmp/gov-os-calllog-rehearsal/calls: ready (0 day files)
+before-undo: state applied
+hook: restored byte for byte
+log folder: removed (it held only this apply's salt)
+after-undo: d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+after-undo: log folder /tmp/gov-os-calllog-rehearsal/calls: absent (0 day files)
+after-undo: state before
+undo: done; the hook byte for byte as before
+git diff: the hook as committed
+git status: clean
+an apply then an undo with nothing logged (a fresh folder):
+apply.sh undo: tree /home/usain/gov-os-runs/CALLLOG-rehearsal/Dynamic-Agentic-Engineering-OS, log folder /tmp/gov-os-calllog-rehearsal/fresh
+before-undo: a7981319f877846d6a62a6768ca036a5014dc7d9f8aadd09e54e61af8251d7d0  .claude/hooks/pretooluse.py
+before-undo: log folder /tmp/gov-os-calllog-rehearsal/fresh: ready (0 day files)
+before-undo: state applied
+log folder: removed (it held only this apply's salt)
+after-undo: d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+after-undo: log folder /tmp/gov-os-calllog-rehearsal/fresh: absent (0 day files)
+after-undo: state before
+undo: done; the hook byte for byte as before
+the fresh log folder: removed
+
+== live_after: the live files against before (17:09:09)
+d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+3f7ae7f83d998c4036e015f9f1b6b8a8c321af2762267ed9d32c524eab81d397  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/.gov-os: drwxr-xr-x usain
+live ~/.gov-os/guard-calls: absent
+live tracked .claude/ and governance/ edits: 0
+info: live main tree at b134a760b93c (other sessions commit during the run; the files above are what must not change)
+live: unchanged
+
+rehearsal done: 2026-11-09 17:09:09 GMT, failures: 0

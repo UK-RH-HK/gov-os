@@ -1,8 +1,8 @@
-Status at 2026-11-08 18:32:52 (the last report's block)
-- Progress: 74 closed / 21 merged-not-closed / 5 built-and-held / 8 in flight / 42 not started, of 150.
+Status at 2026-11-09 18:33:38 (the last report's block)
+- Progress: 74 closed / 27 merged-not-closed / 4 built-and-held / 9 in flight / 41 not started, of 155.
 - Leads: 0 running (none); queued next: none; the gate: open.
 - Closes: none running; next: none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13); refused since the last report: none.
 - Memory chain: W2-61 closed; W2-61h MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 merged, closing; W2-55 merged, closing; W2-64 closed; W2-04 MERGED as built (D-1, M-1); formal close at the lift; W2-06 closed; W2-13 MERGED in D-4b; formal close at the lift; W2-15a not started.
-- Toward EXAMIN's copy: AT RISK (11-08 18:30): the fresh 80 ready to launch on the owner's go (K9's bar: right end to end >= 85 %, wrong claims <= 5 %); the 138: hit@5 76.8 %, right end to end 92.8 % with search again once; the lift about 11-15; EXAMIN's copy about 11-20; K9 gates the start (DEC-954 Q1).
+- Toward EXAMIN's copy: AT RISK (11-09 18:30): item 8 complete; the operator agent merged; the lift about 11-15; EXAMIN's copy about 11-21 (FORECAST-W2-1).
 - Emergency plan: 7 done (D-0 to D-4, D-7, D-8) / 4 in flight (D-4b, D-5, D-6, D-9) / 2 not started (D-10, D-11); DEC-1097 recorded 11-08; the fresh 80 ready on the CTO's side (scripts pinned, ACT rehearsed, readiness review done).
-- OWNER_ACTION: P1 your go for the fresh 80; P2 (after the 80) ADR-0002's acceptance; P-SELECT-GRAPH 'do not build'; the 150-id sitting (W2-130-SITTING)
+- OWNER_ACTION: none blocking now; next: ACT-OPERATOR-1 as a message for your operator

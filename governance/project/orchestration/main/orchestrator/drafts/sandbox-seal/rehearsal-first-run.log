@@ -1,0 +1,226 @@
+seal rehearsal: 2026-11-09 01:14:22 GMT, replay window 2026-11-07T01:14:22 .. 2026-11-09T01:14:22 UTC, steps: prepare plant live_before gap root_planted suites_before replay_before root_back apply r2 root_planted r1 suites_after replay_after compare measure root_back undo live_after
+inherited GOV_ and CLAUDE_PROJECT_DIR variables: 0
+
+== prepare: the clone (01:14:22)
+clone /home/usain/gov-os-runs/SEAL-rehearsal/Dynamic-Agentic-Engineering-OS at 6fe66d7994f4 on seal-rehearsal; branches 91; root mentions left: 0; worktree /home/usain/gov-os-runs/SEAL-rehearsal/wt on seal-wt
+bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+
+== plant: the dummy sets root /home/usain/gov-os-runs/SEAL-rehearsal/home/gov-os-eval (ACT-GUARD-SETS-1's layout, plus the sealed folder) (01:14:23)
+planted files: 18
+  fixtures/evaluation/memory-retrieval/hidden/q01.yaml
+  fixtures/evaluation/memory-retrieval/visible/v01.yaml
+  fixtures/evaluation/memory-verdict-2/XCHECK.md
+  fixtures/evaluation/memory-verdict-2/hidden/p01.yaml
+  fixtures/evaluation/memory-verdict-2/hidden/p02.yaml
+  fixtures/evaluation/memory-verdict-2/retired/r01.yaml
+  fixtures/evaluation/memory-verdict/hidden/p01.yaml
+  fixtures/evaluation/sandbox-guard-exp-1/README.txt
+  fixtures/evaluation/sandbox-guard-exp-1/hidden/corpus/actions.jsonl
+  fixtures/evaluation/sandbox-guard-exp-1/hidden/labels/labels.jsonl
+  fixtures/evaluation/sandbox-guard-exp-1/hidden/planted/cases.jsonl
+  governance/project/path-map.yaml
+  runs/e0/counts.txt
+  runs/fresh-80/USED
+  runs/fresh-80/kept-1/k01.json
+  runs/fresh-80/rows/q01.json
+  runs/list
+  transcripts/t01.md
+
+== live_before: the live files and the real sets root's own entry (01:14:23)
+bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+real sets root: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+
+== gap: the seal's cases on the clone as it is (no patch), HOME=/home/usain/gov-os-runs/SEAL-rehearsal/home: every case the seal adds is an allow (01:14:23)
+seal cases: 179, run: 179, failed: 0, expect: before, skipped: none
+PASS
+gap: cases that deny after the seal and allow before: 126
+cases run: 527, failed: 0, sets cases: 527, skipped: none
+PASS
+
+== root_planted: the block's root set to the planted absolute path (01:15:12)
+block root: root: "/home/usain/gov-os-runs/SEAL-rehearsal/home/gov-os-eval"
+
+== suites_before: the suites on the clone as it is (the baseline) (01:15:12)
+before test_guard_fix_4: 467 passed in 20.52s
+before test_g14: 151 passed, 1 skipped in 5.50s
+before W2-58 sets, launcher, live hook, reads: 105 passed in 18.07s
+
+== replay_before: the calls of 2026-11-07T01:14:22 .. 2026-11-09T01:14:22 UTC, judged with the map before the seal (01:15:59)
+{
+ "since": "2026-11-07T01:14:22",
+ "until": "2026-11-09T01:14:22",
+ "counts": {
+  "calls in the window, to the start": 5600,
+  "duplicates": 165,
+  "skipped: names the real sets root in a form not rewritten": 33,
+  "unique judged": 5402
+ },
+ "decisions": {
+  "allow": 5365,
+  "deny": 37
+ }
+}
+
+== root_back: the block's root back to ~/gov-os-eval (01:17:55)
+block root: root: "~/gov-os-eval"
+
+== apply: apply.sh in the clone (01:17:55)
+apply.sh check: tree /home/usain/gov-os-runs/SEAL-rehearsal/Dynamic-Agentic-Engineering-OS
+now: bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+now: a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+now: state before
+patch: ok (906544ac4afb3543414e44d01b5a06e356ca0a9b9476b912134c0146965a2df6)
+hook: as built (bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449), unchanged by the seal
+map patch: applies, gives ef9952e9ea4f4b88cd44fbb5a2d91e519fb01fc58e213fedb3d7d8bbb3638661
+check: ready to apply
+apply.sh apply: tree /home/usain/gov-os-runs/SEAL-rehearsal/Dynamic-Agentic-Engineering-OS
+before: bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+before: a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+before: state before
+backup: /home/usain/gov-os-runs/SEAL-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/sandbox-seal/backup (SHA256SUMS written)
+after: bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+after: ef9952e9ea4f4b88cd44fbb5a2d91e519fb01fc58e213fedb3d7d8bbb3638661  governance/project/path-map.yaml
+after: state applied
+apply: done. The operator's commit stages the one file:
+  git add governance/project/path-map.yaml
+ M governance/project/path-map.yaml
+ governance/project/path-map.yaml | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 869, in resolve_from_url
+    document = self.store[url]
+               ~~~~~~~~~~^^^^^
+  File "/usr/lib/python3/dist-packages/jsonschema/_utils.py", line 28, in __getitem__
+    return self.store[self.normalize(uri)]
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'common.schema.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 872, in resolve_from_url
+    document = self.resolve_remote(url)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 980, in resolve_remote
+    with urlopen(uri) as url:
+         ^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 499, in open
+    req = Request(fullurl, data)
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 318, in __init__
+    self.full_url = url
+    ^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/urllib/request.py", line 344, in full_url
+    self._parse()
+  File "/usr/lib/python3.12/urllib/request.py", line 373, in _parse
+    raise ValueError("unknown url type: %r" % self.full_url)
+ValueError: unknown url type: 'common.schema.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 16, in <module>
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 261, in iter_errors
+    for error in errors:
+  File "/usr/lib/python3/dist-packages/jsonschema/_validators.py", line 332, in properties
+    yield from validator.descend(
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 278, in descend
+    for error in self.evolve(schema=schema).iter_errors(instance):
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 261, in iter_errors
+    for error in errors:
+  File "/usr/lib/python3/dist-packages/jsonschema/_validators.py", line 294, in ref
+    scope, resolved = validator.resolver.resolve(ref)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 860, in resolve
+    return url, self._remote_cache(url)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/jsonschema/validators.py", line 874, in resolve_from_url
+    raise exceptions.RefResolutionError(exc)
+jsonschema.exceptions.RefResolutionError: unknown url type: 'common.schema.json'
+REHEARSAL FAIL: the patched map does not load
+
+== r2: HOME=/home/usain/gov-os-runs/SEAL-rehearsal/home (the block as applied, root ~/gov-os-eval): guard4's sets cases and the seal's cases (01:17:55)
+574:  root: "~/gov-os-eval"
+cases run: 527, failed: 0, sets cases: 527, skipped: none
+PASS
+seal cases: 179, run: 179, failed: 0, expect: after, skipped: none
+PASS
+
+== root_planted: the block's root set to the planted absolute path (01:18:44)
+block root: root: "/home/usain/gov-os-runs/SEAL-rehearsal/home/gov-os-eval"
+
+== r1: the registered hook line (--settings), the block's root /home/usain/gov-os-runs/SEAL-rehearsal/home/gov-os-eval, SETS_PLANTED=1 (01:18:44)
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
+seal cases: 179, run: 165, failed: 0, expect: after, skipped: names ~ or $HOME, root not ~/gov-os-eval: 14
+PASS
+
+== suites_after: the suites with the seal applied (01:19:40)
+after test_guard_fix_4: 467 passed in 19.62s
+after test_g14: 151 passed, 1 skipped in 4.24s
+after W2-58 sets, launcher, live hook, reads: 105 passed in 13.75s
+
+== replay_after: the same calls, judged with the map after the seal (01:20:20)
+{
+ "since": "2026-11-07T01:14:22",
+ "until": "2026-11-09T01:14:22",
+ "counts": {
+  "calls in the window, to the start": 5600,
+  "duplicates": 165,
+  "skipped: names the real sets root in a form not rewritten": 33,
+  "unique judged": 5402
+ },
+ "decisions": {
+  "allow": 5365,
+  "deny": 37
+ }
+}
+
+== compare: before against after (the seal only adds refusals of the sealed folder) (01:22:08)
+window 2026-11-07T01:14:22 .. 2026-11-09T01:14:22; calls judged before 5402, after 5402, in both 5402
+answers: {'allow->allow': 5365, 'deny->deny': 37}
+differences: 0
+
+== measure: _measured for the seal's set: the orchestrator not measured, the engineer measured (01:22:08)
+GOV_ROLE=orchestrator: measured False
+GOV_ROLE=engineer: measured True
+GOV_ROLE=research: measured True
+GOV_ROLE=ticket-lead: measured False
+
+== root_back: the block's root back to ~/gov-os-eval (01:22:09)
+block root: root: "~/gov-os-eval"
+
+== undo: apply.sh undo (the block's root back as applied first) (01:22:09)
+check: already applied
+apply.sh undo: tree /home/usain/gov-os-runs/SEAL-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+before-undo: ef9952e9ea4f4b88cd44fbb5a2d91e519fb01fc58e213fedb3d7d8bbb3638661  governance/project/path-map.yaml
+before-undo: state applied
+after-undo: bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+after-undo: a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+after-undo: state before
+undo: done; the map is byte for byte as before the apply
+git diff: the hook and the map as committed
+
+== live_after: the live files and the real sets root's own entry, against before (01:22:09)
+bd545af83198962e6c8ecff59afbf86519ae5f201d6660a34941d6aaaa584449  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+a9d8b97267c44f519cef37d4b5b702bbb9f2a696a17fa26f68147d2851f04b22  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+real sets root: inode 387302 size 4096 mtime 1793812020 ctime 1793812020
+live: unchanged
+
+rehearsal done: 2026-11-09 01:22:09 GMT, failures: 1

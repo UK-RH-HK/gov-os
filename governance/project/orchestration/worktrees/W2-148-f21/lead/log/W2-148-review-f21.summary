@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-xafn: session exit 0; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-148-f21/.gov-runtime/scratch/lead/log/W2-148-review-f21.json

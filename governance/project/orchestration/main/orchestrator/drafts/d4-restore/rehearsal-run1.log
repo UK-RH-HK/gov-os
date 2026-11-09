@@ -1,0 +1,163 @@
+rehearse.sh: 2026-11-09 12:46:00; steps: live_before prepare optin_before count_before rows_before check apply collect_ten run_ten rows_after optin_after count_after undo live_after
+
+== live_before: the live files' hashes (12:46:00)
+332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+bc67a6f3fe5fa670139aac8649eaf23d49bdb51858ed49a93ec5b4b900191ce1  tests/optin-lifted.txt
+9816e7a47b27b9250b00e8b428a184edde9f633d9dc081c4ba9d1a78ff94b205  tests/optin-lifted-guard-breadth.txt
+92e124cd53110d08b8740cf03a7c47613bdcd3557fcd3279e05a4314e48840fc  tests/conftest.py
+42e22dd70a05546e99fd7f2503c109a417ee6d1c11ebfddc42dfee5ff8f1a665  governance/project/test-map.yaml
+6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+the live map is ACT-SELECT-FIXES-1's (the replay's i+ii column)
+
+== prepare: the clone (12:46:00)
+clone /home/usain/gov-os-runs/D4-RESTORE-rehearsal/Dynamic-Agentic-Engineering-OS at 8b7bfe867bb3 on d4-restore-rehearsal
+
+== optin_before: the opt-in lists' own tests, scoped (12:46:01)
+16 passed in 11.88s
+
+== count_before: the full run's collection (no opt-in) and with both suites, before (12:46:13)
+full run (no opt-in): 7620 cases
+both suites opted in: 21990 cases
+
+== rows_before: of the trial's 34 reds, those today's selection names AND runs, today's lists (rows_run.py) (12:47:05)
+  K1 tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files: report-only
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: report-only
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: report-only
+  K2 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner: report-only
+  K2 tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through: report-only
+  K8 tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records: not run (a breadth case (left out of every run that does not opt in))
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed: report-only
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record: report-only
+  K9 tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime: not run (a breadth case (left out of every run that does not opt in))
+  K18a tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_docs_source_deny_rules_survive_the_change: not run (not in today's tree)
+  K18c tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool: not run (a breadth case (left out of every run that does not opt in))
+rows_run --sel i+ii on Dynamic-Agentic-Engineering-OS at 8b7bfe867bb3: 34 red cases; gate 23, report-only 7, not run 4; run (gate or report-only) 30 of 34
+
+== check: apply.sh check in the clone (12:47:28)
+apply.sh check: tree /home/usain/gov-os-runs/D4-RESTORE-rehearsal/Dynamic-Agentic-Engineering-OS
+now: 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+now: 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+now: bc67a6f3fe5fa670139aac8649eaf23d49bdb51858ed49a93ec5b4b900191ce1  tests/optin-lifted.txt
+now: state before
+optin-lifted-breadth.patch: applies, gives 3528cd1ffbb07d1f7ea0d4a50bfe400f937d7702dc60af0718b6a184f6d1ad8b
+optin-lifted-guard.patch: applies, gives dfdef9b085417a7d8bf4a14439f2f69c0c11cb4d171b5c812a71bca0e9c63610
+optin-lifted.patch: applies, gives 29a2cc1033b9466a9c54cf8f51de211b5928d6f69c994f6ae1ddef1227223e01
+check: ready to apply
+
+== apply: apply.sh apply in the clone (12:47:28)
+apply.sh apply: tree /home/usain/gov-os-runs/D4-RESTORE-rehearsal/Dynamic-Agentic-Engineering-OS
+before: 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+before: 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+before: bc67a6f3fe5fa670139aac8649eaf23d49bdb51858ed49a93ec5b4b900191ce1  tests/optin-lifted.txt
+before: state before
+backup: /home/usain/gov-os-runs/D4-RESTORE-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/d4-restore/backup (SHA256SUMS written, 3 files)
+after: 3528cd1ffbb07d1f7ea0d4a50bfe400f937d7702dc60af0718b6a184f6d1ad8b  tests/optin-lifted-breadth.txt
+after: dfdef9b085417a7d8bf4a14439f2f69c0c11cb4d171b5c812a71bca0e9c63610  tests/optin-lifted-guard.txt
+after: 29a2cc1033b9466a9c54cf8f51de211b5928d6f69c994f6ae1ddef1227223e01  tests/optin-lifted.txt
+after: state applied
+apply: done. The operator's commit stages the three lists:
+  git add tests/optin-lifted-breadth.txt tests/optin-lifted-guard.txt tests/optin-lifted.txt
+ tests/optin-lifted-breadth.txt |  6 +++---
+ tests/optin-lifted-guard.txt   |  8 ++++----
+ tests/optin-lifted.txt         | 24 ++++++++++++++++++++++--
+ 3 files changed, 29 insertions(+), 9 deletions(-)
+the clone's ACT commit: f8fad9d90508
+
+== collect_ten: each restored case collected by its file alone, as the full run and a selection collect (no opt-in, no node id) (12:47:28)
+sed: -e expression #1, char 13: unterminated `s' command
+  K8 tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K9 tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K18c tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K1 tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K2 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K2 tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed: collected (1 row(s))
+sed: -e expression #1, char 13: unterminated `s' command
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record: collected (1 row(s))
+
+== run_ten: the ten cases at today's head, by node id, scoped, in a heavy slot (12:47:29)
+pytest: exit 1: 2 failed, 7 passed, 2 errors in 10.15s
+        1 ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+        1 ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+        1 FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+        1 FAILED tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+        1 PASSED tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool
+        1 PASSED tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records
+        1 PASSED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record
+        1 PASSED tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed
+        1 PASSED tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime
+        1 PASSED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+        1 PASSED tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files
+  green  tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records (1 row(s))
+  green  tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime (1 row(s))
+  green  tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool (1 row(s))
+  green  tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files (1 row(s))
+  green  tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository (1 row(s))
+  RED    tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket (1 row(s))
+  RED    tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner (2 row(s))
+  RED    tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through (1 row(s))
+  green  tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed (1 row(s))
+  green  tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record (1 row(s))
+
+== rows_after: the same count with the restored lists (rows_run.py) (12:47:46)
+  K18a tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_docs_source_deny_rules_survive_the_change: not run (not in today's tree)
+rows_run --sel i+ii on Dynamic-Agentic-Engineering-OS at f8fad9d90508: 34 red cases; gate 33, report-only 0, not run 1; run (gate or report-only) 33 of 34
+rows after: {'gate': 33, 'report-only': 0, 'not run': 1} ; not a gate: [('K18a', 'tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_docs_source_deny_rules_survive_the_change', 'not run', "not in today's tree")] -> as expected (33 of 34; K18a gone from the tree)
+
+== optin_after: the opt-in lists' own tests, scoped, on the restored lists (12:48:13)
+16 passed in 6.16s
+
+== count_after: the full run's collection after; it rises by the rows restored, and nothing else moves (12:48:19)
+full run (no opt-in): 7620 -> 7631 cases (+11)
+both suites opted in: 21990 -> 21990 (unchanged expected)
+added to the full run: 11 case(s); removed: 0
+  +1 tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records
+  +1 tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime
+  +1 tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool
+  +1 tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files
+  +1 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+  +1 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+  +2 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner
+  +1 tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through
+  +1 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed
+  +1 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record
+every added case is one of the ten's rows: False ['install', '-g', 'ccusage]', 'install', 'requests]']
+REHEARSAL FAIL: the full run gained a case outside the ten
+
+== undo: apply.sh undo in the clone (12:49:10)
+apply.sh undo: tree /home/usain/gov-os-runs/D4-RESTORE-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 3528cd1ffbb07d1f7ea0d4a50bfe400f937d7702dc60af0718b6a184f6d1ad8b  tests/optin-lifted-breadth.txt
+before-undo: dfdef9b085417a7d8bf4a14439f2f69c0c11cb4d171b5c812a71bca0e9c63610  tests/optin-lifted-guard.txt
+before-undo: 29a2cc1033b9466a9c54cf8f51de211b5928d6f69c994f6ae1ddef1227223e01  tests/optin-lifted.txt
+before-undo: state applied
+after-undo: 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+after-undo: 868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+after-undo: bc67a6f3fe5fa670139aac8649eaf23d49bdb51858ed49a93ec5b4b900191ce1  tests/optin-lifted.txt
+after-undo: state before
+undo: done; every file is byte for byte as before the apply
+git: the three lists clean against HEAD (byte for byte)
+
+== live_after: the live files' hashes (12:49:10)
+332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+868b6e1c84642fee84811affa285ab42dab2c42a6de428975768ae0a0c810a02  tests/optin-lifted-guard.txt
+bc67a6f3fe5fa670139aac8649eaf23d49bdb51858ed49a93ec5b4b900191ce1  tests/optin-lifted.txt
+9816e7a47b27b9250b00e8b428a184edde9f633d9dc081c4ba9d1a78ff94b205  tests/optin-lifted-guard-breadth.txt
+92e124cd53110d08b8740cf03a7c47613bdcd3557fcd3279e05a4314e48840fc  tests/conftest.py
+42e22dd70a05546e99fd7f2503c109a417ee6d1c11ebfddc42dfee5ff8f1a665  governance/project/test-map.yaml
+6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+live files: unchanged
+
+rehearse.sh: done 2026-11-09 12:49:10: 1 failure(s)

@@ -1,0 +1,56 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "head",
+   "before": "e6f9bbaff929",
+   "after": "1be3e47debb4"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "head",
+   "before": "1a8c27f3629f",
+   "after": "9d1737b25132"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/config.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/machine.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M src/gov/resources/slots.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M tests/unit/resources/test_w2_20_gate.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": " M tests/unit/resources/test_w2_20_slots.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20",
+   "change": "status line gone",
+   "line": "?? docs/changes/W2-20-evidence.md"
+  }
+ ]
+}

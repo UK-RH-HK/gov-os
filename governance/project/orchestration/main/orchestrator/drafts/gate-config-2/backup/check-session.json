@@ -1,0 +1,33 @@
+{
+  "registry": "/home/usain/.gov-os/machine",
+  "config": "/home/usain/.gov-os/machine/gate.json",
+  "available_memory_bytes": 16638906368,
+  "sessions_live_memory_bytes": 0,
+  "load_1m": 2.21,
+  "load_15m": 4.12,
+  "busy_cores_1m": 0.08,
+  "embedding_cpu_p95": {
+    "shared": 0.01,
+    "query": 0.0
+  },
+  "nproc": 20,
+  "disk": {
+    "free_bytes": 888792195072,
+    "free_inodes": 64895582
+  },
+  "sessions": [],
+  "cleared": [],
+  "slots": {
+    "total": 3,
+    "held": []
+  },
+  "due_for_remeasure": [
+    "verification_peak_bytes",
+    "working_size_bytes",
+    "rebuild_peak_bytes"
+  ],
+  "gate": {
+    "open": true,
+    "reasons": []
+  }
+}

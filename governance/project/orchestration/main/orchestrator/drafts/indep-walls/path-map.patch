@@ -1,0 +1,51 @@
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -526,6 +526,16 @@
+     hidden: ["fixtures/evaluation/memory-verdict-2/hidden/**"]
+     measures:
+       roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
++  # sandbox-guard-exp-1, the held-out halves of SANDBOX-GUARD-EXP-1 (DEC-1098 (4); DEC-1099 (1) Q6, ACT-SANDBOX-SEAL-1):
++  # the real replay's held-out half, the second planted writer's cases, their labels, the control run's effects on
++  # them and the one held-out run's results, kept under the sets root (the harness's --sets-root), never in a tree.
++  # Written by the sessions outside the guard (the second writer, the labellers) and by the harness's own code; the
++  # tuner (an engineer) and every role named here are refused it, and the CTO and leads by sets_root_hidden below.
++  sandbox-guard-exp-1:
++    visible: []
++    hidden: ["fixtures/evaluation/sandbox-guard-exp-1/hidden/**"]
++    measures:
++      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]
+ # The source families (DEC-1078 (4), DEC-1079; W2-61h S7): a gold source and its official copies, each family a list
+ # of member path globs. The memory measure (gov.retrieval.measure) counts an evidence item in another member of a gold
+ # source's family as a hit on that source only when the item's text holds the gold span's text (whitespace and
+@@ -558,12 +568,29 @@
+ # reads this block from the main tree's copy only. Reads and the writes the guard can resolve are refused alike. Every
+ # other folder under runs/ stays open. The measure and the fresh-80 scripts are unaffected: their commands name only
+ # the root, their own code opens the files, and the sets root's own map does not change. The writer, checker and
+-# operator sessions run outside this guard (ACT-MSET-3, ACT-MSET-4, ACT-HLABEL-2, ACT-HNEW-1).
++# operator sessions run outside this guard (ACT-MSET-3, ACT-MSET-4, ACT-HLABEL-2, ACT-HNEW-1). The sandbox experiment's
++# held-out halves (DEC-1099 (1) Q6, ACT-SANDBOX-SEAL-1) are refused here too, so the CTO and leads never see them.
+ sets_root_hidden:
+   root: "~/gov-os-eval"
+   hidden: ["fixtures/evaluation/memory-retrieval/hidden/**", "fixtures/evaluation/memory-verdict/**",
+-           "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**"]
++           "fixtures/evaluation/memory-verdict-2/**", "transcripts/**", "runs/fresh-80/**",
++           "fixtures/evaluation/sandbox-guard-exp-1/hidden/**", "indep-walls/**"]
+   refused_roles: [orchestrator, engineer, research, product-spec, independent-test-designer, independent-auditor]
++# ACT-INDEP-WALLS-1 (DEC-1101 (2)): indep-walls/** above holds the independent sessions' walled folders (writer, checker,
++# auditor, labeller; one folder per job kind and run, indep-walls/<kind>/<run>/) and the owner's approved list
++# (indep-walls/APPROVED). The six roles never read or write them; only the launch script's own code opens them, its line names
++# only --sets-root <root>, and only counts leave a wall. The wall sessions do not run this guard: each runs its own
++# wall hook (governance/project/indep-walls/wall_hook.py, reads and writes closed to its own folder) under Claude Code's
++# restricted mode, so the walls cannot read each other.
++# session_hidden (ACT-INDEP-WALLS-1, 2c): folders outside every tree refused to named sessions only, a role and the
++# tickets it runs on (an empty list: every ticket), never to every session: the CTO's own tools read the transcripts
++# (tools/guard_refusals.py, the replays). File tools by the path they name; a Bash line by the line rule of
++# sets_root_hidden. Read from the main tree's copy only.
++session_hidden:
++  - root: "~/.claude/projects"
++    roles: [engineer]
++    tickets: [W2-56]
++    why: "SANDBOX-GUARD-EXP-1's tuner: the raw transcripts, from which the held-out half of the action corpus could be rebuilt"
+ # The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
+ # a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
+ retrieval_authority:

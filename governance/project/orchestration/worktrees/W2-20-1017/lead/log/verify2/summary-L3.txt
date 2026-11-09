@@ -1,0 +1,15 @@
+W1-01 exit=0 49 passed, 28 skipped in 14.67s
+W1-02 exit=0 3653 passed in 570.64s (0:09:30)
+W1-03 exit=0 363 passed, 1 skipped in 183.04s (0:03:03)
+W1-04 exit=0 336 passed in 196.73s (0:03:16)
+W1-05 exit=1 1 failed, 98 passed in 869.45s (0:14:29)
+W1-06 exit=0 96 passed in 0.72s
+W1-07 exit=0 224 passed in 356.25s (0:05:56)
+W1-08 exit=0 235 passed in 85.21s (0:01:25)
+W1-09 exit=0 87 passed in 35.48s
+W1-10 exit=0 101 passed in 11.47s
+W1-11 exit=0 142 passed in 21.61s
+W1-12 exit=0 21 passed in 4.68s
+W1-13 exit=0 110 passed in 43.05s
+W1-14 exit=0 63 passed in 10.63s
+W1-15 exit=0 124 passed in 125.91s (0:02:05)

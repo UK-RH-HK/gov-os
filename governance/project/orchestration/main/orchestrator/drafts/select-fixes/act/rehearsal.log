@@ -1,0 +1,213 @@
+rehearse.sh: 2026-11-09 02:01:40; steps: live_before prepare suites_before check apply select_cases replay rows record_checks suites_after undo rows_undone live_after
+
+== live_before: the live files' hashes (02:01:40)
+2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+240bc62a826ddfc1e8dd270b84994f402c4033c97b8242604685613f1c46fd66  tests/optin-lifted-breadth.txt
+81b758648843e6093f45b91f705e7d110e1125bc3dfce65ccdd47181aaebb0a6  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+
+== prepare: the clone (02:01:40)
+clone /home/usain/gov-os-runs/SELECT-FIXES-rehearsal/Dynamic-Agentic-Engineering-OS at 94277c0b4ea5 on select-fixes-rehearsal
+
+== suites_before: the selection's own tests, scoped (02:01:41)
+pytest before: exit 0: 143 passed in 57.79s
+
+== check: apply.sh check in the clone (02:02:43)
+apply.sh check: tree /home/usain/gov-os-runs/SELECT-FIXES-rehearsal/Dynamic-Agentic-Engineering-OS
+now: 2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+now: 240bc62a826ddfc1e8dd270b84994f402c4033c97b8242604685613f1c46fd66  tests/optin-lifted-breadth.txt
+now: 81b758648843e6093f45b91f705e7d110e1125bc3dfce65ccdd47181aaebb0a6  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+now: state before
+test-map.patch: applies, gives 42e22dd70a05546e99fd7f2503c109a417ee6d1c11ebfddc42dfee5ff8f1a665
+optin-lifted-breadth.patch: applies, gives 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502
+record_checks.patch: applies, gives d80b4eae5c56c066cc5e9b0c327b230390f03766962a566ebf66f2fe427cf14c
+check: ready to apply
+
+== apply: apply.sh apply in the clone (02:02:43)
+apply.sh apply: tree /home/usain/gov-os-runs/SELECT-FIXES-rehearsal/Dynamic-Agentic-Engineering-OS
+before: 2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+before: 240bc62a826ddfc1e8dd270b84994f402c4033c97b8242604685613f1c46fd66  tests/optin-lifted-breadth.txt
+before: 81b758648843e6093f45b91f705e7d110e1125bc3dfce65ccdd47181aaebb0a6  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+before: state before
+backup: /home/usain/gov-os-runs/SELECT-FIXES-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/select-fixes/act/backup (SHA256SUMS written, 3 files)
+after: 42e22dd70a05546e99fd7f2503c109a417ee6d1c11ebfddc42dfee5ff8f1a665  governance/project/test-map.yaml
+after: 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+after: d80b4eae5c56c066cc5e9b0c327b230390f03766962a566ebf66f2fe427cf14c  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+after: state applied
+apply: done. The operator's commit stages the map and the breadth list (record_checks.sh is the CTO's untracked tool):
+  git add governance/project/test-map.yaml tests/optin-lifted-breadth.txt
+ governance/project/test-map.yaml | 24 ++++++++++++++++++++++--
+ tests/optin-lifted-breadth.txt   |  1 -
+ 2 files changed, 22 insertions(+), 3 deletions(-)
+the patched map loads: 19 couplings, 31 record_reading entries
+the clone's ACT commit: 0bd39ffee694
+
+== select_cases: today's tree, planted changes, the CTO's selection tool (selection only, nothing run) (02:02:44)
+S1 settings: selected 159 targets; the three files all reached
+S1 lifted_reached: 108 entries; of the three files: ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository', 'tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket', 'tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]', 'tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through', 'tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through_by_the_kernel_s_wiring']
+S2 kernel check: the no-weakening case selected alone of its file: True
+S3 acceptance .py: W1-01 case True ; W1-50 case True
+S5 records-only change: W2-66 record-only case selected: True ; targets 107
+rows collected (no opt-in, as a selection runs): 112/240 tests collected (128 deselected) in 4.82s
+  dec_891_s_places_is_record_only: [.tickets/] [docs/checkpoints/] [docs/close/] [docs/probes/] [docs/DECISION_REGISTER.md] [docs/plan/] [governance/project/orchestration/] (7 rows)
+  test_the_orchestrator_may_write_anywhere_else:  (0 rows)
+  test_the_auditor_writes_only_the_report_path:  (0 rows)
+  test_an_install_asks_for_the_orchestrator: [product-spec] [independent-test-designer] [engineer] [independent-auditor] (4 rows)
+  test_a_research_install_inside_the_experiment_folder_is_let_through:  (0 rows)
+  test_only_the_test_designer_may_write: [orchestrator] [product-spec] [independent-test-designer] [engineer] [independent-auditor] (5 rows)
+  test_inside_a_launched_sandboxed_worker:  (1 rows)
+  test_no_hard_block_check_is_weakened:  (1 rows)
+  test_the_integration_merges_of_this_repository_pass:  (1 rows)
+  test_the_two_whole_tree_fixtures_are_found:  (1 rows)
+rows collected --optin=breadth,lifted: 240 tests collected in 5.11s
+  dec_891_s_places_is_record_only: [.tickets/] [docs/checkpoints/] [docs/close/] [docs/probes/] [docs/DECISION_REGISTER.md] [docs/plan/] [governance/project/orchestration/] (7 rows)
+  test_the_orchestrator_may_write_anywhere_else:  (1 rows)
+  test_the_auditor_writes_only_the_report_path:  (1 rows)
+  test_an_install_asks_for_the_orchestrator: [orchestrator] [product-spec] [independent-test-designer] [engineer] [independent-auditor] (5 rows)
+  test_a_research_install_inside_the_experiment_folder_is_let_through: [npm-install] [cache-dir-sync] [config-file-add] [python-m-pip-install] [run-w] [uv-add] [uv-pip-install] [uv-run-with] [uv-sync] [uvx] [venv-pip-install] (11 rows)
+  test_only_the_test_designer_may_write: [orchestrator] [product-spec] [independent-test-designer] [engineer] [independent-auditor] (5 rows)
+  test_inside_a_launched_sandboxed_worker:  (1 rows)
+  test_no_hard_block_check_is_weakened:  (1 rows)
+  test_the_integration_merges_of_this_repository_pass:  (1 rows)
+  test_the_two_whole_tree_fixtures_are_found:  (1 rows)
+
+== replay: the 18 culprit trees, the ACT's own lines (replay_act.py) (02:03:10)
+the ACT's lines: (i) extends [(['tests/acceptance/**.py'], ['tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_two_whole_tree_fixtures_are_found'])] ; new couplings [['.claude/settings.json', '.rulesync/hooks.jsonc', '.rulesync/permissions.jsonc'], ['template/governance/kernel/checks/**'], ['tests/acceptance/**']] ; (ii) record_reading + ['tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only'] ; F1 (a) record_only + ['governance/project/orchestration/packages/ACT-MSET-3/checker-settings.json', 'governance/project/orchestration/packages/ACT-MSET-3/writer-settings.json', 'governance/project/orchestration/packages/ACT-WSL-INTEROP-1/wsl-interop-binfmt.service', 'governance/project/orchestration/packages/ADR-0002-REFRESH/ADR-0002-architecture-and-stack.draft']
+K1: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K2: reds 10; caught base 4, (i) 10, (ii) 4, (i)+(ii) 10; scopes scoped/scoped; added 4 targets, 105 cases, 61.8 s
+K3a: reds 1; caught base 0, (i) 0, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K3b: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K4: reds 1; caught base 0, (i) 0, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K5: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K6: reds 1; caught base 0, (i) 1, (ii) 0, (i)+(ii) 1; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K7: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K8: reds 5; caught base 5, (i) 5, (ii) 5, (i)+(ii) 5; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K9: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K10: reds 2; caught base 1, (i) 2, (ii) 1, (i)+(ii) 2; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K12: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 3 targets, 9 cases, 33.2 s
+K13: reds 1; caught base 0, (i) 0, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K14: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K15: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+K16: reds 1; caught base 0, (i) 1, (ii) 0, (i)+(ii) 1; scopes scoped/scoped; added 2 targets, 8 cases, 0.1 s
+K18a: reds 3; caught base 3, (i) 3, (ii) 3, (i)+(ii) 3; scopes scoped/scoped; added 4 targets, 105 cases, 61.8 s
+K18c: reds 1; caught base 1, (i) 1, (ii) 1, (i)+(ii) 1; scopes scoped/scoped; added 1 targets, 7 cases, 0.0 s
+total reds 34 caught: {'base': 22, 'i': 31, 'ii': 25, 'i+ii': 34}
+replay: 18 trees, 34 red cases; caught base 22, (i) 31, (ii) 25, (i)+(ii) 34; refused none; added median 8.5 cases, 16.650000000000002 s; largest 105 cases, 61.8 s
+
+== rows: of the 34 reds, those the patched selection names AND runs today, after the opt-in lists (rows_run.py) (02:06:13)
+  K1 tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files: report-only
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: report-only
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: report-only
+  K2 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner: report-only
+  K2 tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through: report-only
+  K8 tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records: not run (a breadth case (left out of every run that does not opt in))
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed: report-only
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record: report-only
+  K9 tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime: not run (a breadth case (left out of every run that does not opt in))
+  K18a tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_docs_source_deny_rules_survive_the_change: not run (not in today's tree)
+  K18c tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool: not run (a breadth case (left out of every run that does not opt in))
+rows_run --sel i+ii on Dynamic-Agentic-Engineering-OS at 0bd39ffee694: 34 red cases; gate 23, report-only 7, not run 4; run (gate or report-only) 30 of 34
+K3a, K4, K13 (W2-66's orchestration row): gate in all three
+
+== record_checks: record_checks.sh on the clone, before and after the patch, after a record commit, with a planted record (S6) (02:06:41)
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 1
+record-reading suites exit 1: 1 failed, 104 passed, 25 deselected in 142.63s (0:02:22)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 1: keyword-warn: 13 file(s) hold a keyword of row W2-L423's rule; 0 not read
+record_checks (before): exit 1
+  FAILED tests/acceptance/W1-06/test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 1
+record-reading suites exit 1: 1 failed, 111 passed, 25 deselected in 151.28s (0:02:31)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 1: keyword-warn: 13 file(s) hold a keyword of row W2-L423's rule; 0 not read
+record_checks (after): exit 1
+  FAILED tests/acceptance/W1-06/test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner
+S6 after the patch: the patch adds no failure (W2-66's case runs whole and is green)
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 1
+record-reading suites exit 1: 1 failed, 111 passed, 25 deselected in 122.62s (0:02:02)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 1: keyword-warn: 13 file(s) hold a keyword of row W2-L423's rule; 0 not read
+record_checks (record-commit): exit 1
+  FAILED tests/acceptance/W1-06/test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner
+S6 record commit: W2-66's case green; the record-reading line's only failure is W1-06's, red on w2/integrate before the ACT (the CTO's)
+the case by its file (as a selection names it, the rep line gone): 7 passed, 82 deselected in 0.14s
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 1
+record-reading suites exit 1: 2 failed, 110 passed, 25 deselected in 129.47s (0:02:09)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 1: keyword-warn: 13 file(s) hold a keyword of row W2-L423's rule; 0 not read
+record_checks (planted): exit 1
+  FAILED tests/acceptance/W1-06/test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner
+  FAILED tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]
+  E       AssertionError: records of governance/project/orchestration/ the record-only list leaves out: ['governance/project/orchestration/planted-rehearsal.foo']
+S6 planted .foo: record_checks exits non-zero and names the case and the planted record
+
+== suites_after: the selection's own tests, scoped, on the patched map (02:17:53)
+pytest after: exit 0: 149 passed in 50.79s
+
+== undo: apply.sh undo in the clone (02:18:48)
+apply.sh undo: tree /home/usain/gov-os-runs/SELECT-FIXES-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 42e22dd70a05546e99fd7f2503c109a417ee6d1c11ebfddc42dfee5ff8f1a665  governance/project/test-map.yaml
+before-undo: 332f0a676f0587e5cc3693eb7da09b8655eeb9d963ac88e058e0a1b57d868502  tests/optin-lifted-breadth.txt
+before-undo: d80b4eae5c56c066cc5e9b0c327b230390f03766962a566ebf66f2fe427cf14c  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+before-undo: state applied
+after-undo: 2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+after-undo: 240bc62a826ddfc1e8dd270b84994f402c4033c97b8242604685613f1c46fd66  tests/optin-lifted-breadth.txt
+after-undo: 81b758648843e6093f45b91f705e7d110e1125bc3dfce65ccdd47181aaebb0a6  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+after-undo: state before
+undo: done; every file is byte for byte as before the apply
+git: the map and the breadth list clean against HEAD
+record_checks.sh: byte for byte the live one
+
+== rows_undone: the same count on today's map (after undo), the selection as the map names it today (02:18:48)
+  K1 tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files: report-only
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests: not run (not named by the selection)
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: not run (not named by the selection)
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: not run (not named by the selection)
+  K2 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role: not run (not named by the selection)
+  K2 tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written: not run (not named by the selection)
+  K2 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner: report-only
+  K2 tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through: not run (not named by the selection)
+  K3a tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only: not run (not named by the selection)
+  K4 tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only: not run (not named by the selection)
+  K6 tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass: not run (not named by the selection)
+  K8 tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records: not run (a breadth case (left out of every run that does not opt in))
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_this_repository_s_probe_records_are_well_formed: report-only
+  K8 tests/acceptance/W1-26/test_w1_26_probe_records.py::test_no_finding_of_the_check_on_this_repository_names_a_probe_record: report-only
+  K9 tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime: not run (a breadth case (left out of every run that does not opt in))
+  K10 tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_two_whole_tree_fixtures_are_found: not run (not named by the selection)
+  K13 tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only: not run (not named by the selection)
+  K16 tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened: not run (not named by the selection)
+  K18a tests/acceptance/W1-01/test_w1_01_settings_deny.py::test_docs_source_deny_rules_survive_the_change: not run (not in today's tree)
+  K18c tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool: not run (a breadth case (left out of every run that does not opt in))
+rows_run --sel base on Dynamic-Agentic-Engineering-OS at 94277c0b4ea5: 34 red cases; gate 14, report-only 4, not run 16; run (gate or report-only) 18 of 34
+
+== live_after: the live files' hashes (02:19:14)
+2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+240bc62a826ddfc1e8dd270b84994f402c4033c97b8242604685613f1c46fd66  tests/optin-lifted-breadth.txt
+81b758648843e6093f45b91f705e7d110e1125bc3dfce65ccdd47181aaebb0a6  .gov-runtime/scratch/orchestrator/tools/record_checks.sh
+7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+live files: unchanged
+
+rehearse.sh: done 2026-11-09 02:19:14: 0 failure(s)

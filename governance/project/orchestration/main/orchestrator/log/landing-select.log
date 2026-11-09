@@ -1,0 +1,43 @@
+2026-11-09 12:16:14 landing 795d97c7cd44..8038e0ee648c: 1 commit(s); outside a ticket on the trigger paths: 8038e0ee648c (governance/project/test-map.yaml) 
+2026-11-09 12:16:14 run 20261109-121614-3367610: started detached, pid 3367663 (its own session); folder /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261109-121614-3367610
+2026-11-09 12:17:00 run 20261109-121614-3367610 (795d97c7cd44..8038e0ee648c): REFUSED: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh: line 39: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261109-121614-3367610/verify/verify.exit.tmp: No such file or directory
+2026-11-09 12:18:31 landing 795d97c7cd44..8038e0ee648c: 1 commit(s); outside a ticket on the trigger paths: 8038e0ee648c (governance/project/test-map.yaml) 
+2026-11-09 12:18:31 run 20261109-121831-3373092: in the foreground
+2026-11-09 12:30:31 run 20261109-121831-3373092 (795d97c7cd44..8038e0ee648c): RED: lead_verify W2-00 DAEO-sdxk head 8038e0ee648c: RED parallel exit 1 in 675 s (2841 tests 13 failed 0 errors 4 skipped); serial exit 0 in 0 s, 0 entries (0 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261109-121831-3373092 (DEC-968: fix at once or revert)
+2026-11-09 12:31:47 landing 8038e0ee648c..31a4cc3dcfdd: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 12:40:32 landing 31a4cc3dcfdd..8b7bfe867bb3: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 12:48:55 landing 8b7bfe867bb3..116c2b413b28: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 12:56:31 landing 116c2b413b28..d69cd0c811fc: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:06:16 landing d69cd0c811fc..147706ae443b: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:06:36 landing 147706ae443b..d7490945f232: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:42:27 landing d7490945f232..d3e5f83949ef: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:49:46 landing d3e5f83949ef..eed59b752a26: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:50:10 landing eed59b752a26..5f015c990338: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:51:47 landing 795d97c7cd44..8038e0ee648c: 1 commit(s); outside a ticket on the trigger paths: 8038e0ee648c (governance/project/test-map.yaml) 
+2026-11-09 13:51:47 run 20261109-135147-3576766: in the foreground
+2026-11-09 13:57:18 landing 5f015c990338..b9be6ba64c37: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 13:57:43 landing b9be6ba64c37..a46d4517a1a0: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 14:01:18 run 20261109-135147-3576766 (795d97c7cd44..8038e0ee648c): RED: lead_verify W2-00 DAEO-sdxk head 8038e0ee648c: RED parallel exit 1 in 525 s (2841 tests 2 failed 0 errors 4 skipped); serial exit 0 in 0 s, 0 entries (0 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261109-135147-3576766 (DEC-968: fix at once or revert)
+2026-11-09 14:02:17 landing a46d4517a1a0..20db5820a150: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 14:56:49 landing 20db5820a150..3d8649502b18: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 15:05:04 landing 3d8649502b18..ff1eac379151: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 15:06:28 landing ff1eac379151..d0c2590111fa: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 15:08:34 landing d0c2590111fa..0fcd02b0ff59: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 15:09:34 landing 0fcd02b0ff59..1ad2c0e0e49a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 15:53:44 landing 1ad2c0e0e49a..acfdf8f95995: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:04:32 landing acfdf8f95995..e46729de3649: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:19:16 landing e46729de3649..e53f997d584f: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:23:11 landing e53f997d584f..686c594f3997: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:24:36 landing 686c594f3997..ca36190efc5d: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:48:02 landing ca36190efc5d..511a4a17dddd: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:48:27 landing 511a4a17dddd..c40ecf091c1e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 16:51:51 landing c40ecf091c1e..b134a760b93c: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 17:11:32 landing b134a760b93c..a3eb98e1db79: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 17:12:11 landing a3eb98e1db79..ddc3414ba866: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 17:12:23 landing ddc3414ba866..ce093cf81b58: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 17:17:24 landing ce093cf81b58..baebd4fa564e: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 18:13:39 landing baebd4fa564e..b7a373cf99a0: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 18:17:19 landing b7a373cf99a0..010e1f0c0842: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 18:39:31 landing 010e1f0c0842..06596e9d17d9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 18:50:59 landing 06596e9d17d9..a3301d99b9bd: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-09 18:51:47 landing a3301d99b9bd..0240833b4eed: 1 commit(s); none outside a ticket on the trigger paths

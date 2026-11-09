@@ -1,0 +1,1 @@
+gov launch: LAUNCH_REFUSED: the resource gate is shut: config: memory_floor_bytes: missing (an object with its value, date and source is needed); config: oom_floor_bytes: missing (an object with its value, date and source is needed); config: gpu_shares: {"embedder_mib": <integer>, "reranker_mib": <integer>} is needed; memory: reading 16337666048, limit null (DEC-1088 (5))

@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result 7f42f4116: W2-20 (DAEO-r30l): heavy-job slots with their CPU sets and thread budgets, the trip-wire, the re-measure with the rebuild peak, pools sized to the CPU set, each tree its own rebuild lock (S7, S9, S10b

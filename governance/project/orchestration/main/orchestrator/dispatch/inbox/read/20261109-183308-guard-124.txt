@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 125
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_015bRtefetTmGifNUxQ6D5ch", "time": "2026-11-09T12:44:18.990Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-a6cd7782c803e6c43.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "D=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/d4-restore; python3 - \"$D\" <<'EOF' import sys, re from pathlib import Path d = Path(sys.argv[1]) src = Path('/home", "rule": "the call reads files whose names another command gives at run ti

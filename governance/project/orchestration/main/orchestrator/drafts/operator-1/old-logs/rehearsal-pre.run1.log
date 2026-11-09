@@ -1,0 +1,404 @@
+ACT-OPERATOR-1 rehearsal (pre-calllog): 2026-11-09 17:40:58 GMT; replay window 2026-11-07T17:40:58 .. 2026-11-09T17:40:58 UTC; steps: prepare plant live_before root_planted suites_before guard4_before walls_before opcases_before units_before landing_before replay_before root_back apply commit root_planted suites_after guard4_after walls_after opcases_after units_after landing_after replay_after cto_session operator_a operator_b freeze_commit owner_files root_back undo live_after
+inherited GOV_ROLE, GOV_TICKET and CLAUDE_PROJECT_DIR: 0
+
+== prepare: the clone (pre-calllog), the planted HOME, the stubs (17:40:58)
+clone /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS at baebd4fa564e on w2/integrate; hooksPath /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/hooks-safe
+d5be03dbb48e  .claude/hooks/pretooluse.py
+bc8f23b083b0  apply.sh
+e4fb3d18b677  build.py
+f588ae924fa7  freeze.py
+48a766f4ba4b  op_cases.py
+db9a3358cb58  op_rehearsal.py
+b8dc4a90d936  rehearse.sh
+
+== plant: the planted HOME (17:40:59)
+planted: 7 files; the owner's operator files: 4
+
+== live_before: the live files (17:40:59)
+d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+3f7ae7f83d998c4036e015f9f1b6b8a8c321af2762267ed9d32c524eab81d397  governance/project/path-map.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction
+c8ce4308aaf7a94975ea872d8eb4cb7bd045ef6415dc5e8c9f286cc63bbcc523  governance/project/operator/act_class.py
+a0687ebde2365fb2d7b1b63a50cef2c3da94f2d56a4a01eede287e7d9f5afd32  governance/project/operator/landing_check.py
+1c694692129069cb3c5cb8b31bbcb93f464b528d567b01b2c46830c7f2f5c714  governance/project/operator/opcommon.py
+5bdcfc9bbc9c9707dab7a217a0c4ed6f561c76fcf4d2c1049853a4fd342fbf69  governance/project/operator/operator_launch.py
+fb6092758b0168712d96b01d09dc2f1f7a74e3e0cdc6f1b6a208fb1fac38ecff  governance/project/operator/operator_run.py
+277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378  governance/project/operator/verdict.py
+d1f7b23c1c2dd8f7390f4be97508a7e5ac222729a332634199a8bd17230b02da  governance/project/operator/wall/operator_wall_hook.py
+09fcd4239da357c0d0bb54cb95f64968458d550541ba55841c5dcb63736f0cf6  governance/project/operator/wall/settings.json.tmpl
+984d4dfc7f828ac0c89766252a1ef5e0dac768ac93dd887e547e6fe105446f6a  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+50515591ffcef813d3b1adead323bbc5ec495bc80558221bd0a8c3c8cecc3028  .gov-runtime/scratch/orchestrator/tools/test_landing_select.sh
+listing: ls: cannot access '/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/operator/freeze_gate.py': No such file or directory
+listing: ls: cannot access '/home/usain/Dynamic-Agentic-Engineering-OS/tests/unit/operator/test_act_operator_1.py': No such file or directory
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/gov-os-operator: a997addb92ef (all but log/), entries .claude CLAUDE.md hooks log 
+live crontab: 99605037b635
+info: live hook now d5be03dbb48e; ~/.gov-os/guard-calls absent; head baebd4fa564e
+
+== root_planted (17:40:59)
+sets block root: "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval"
+
+== suites_before (17:40:59)
+before test_guard_fix_4: 467 passed in 20.92s
+before test_g14: FAILED .gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py::test_w2_91_tests_today
+before test_g14: 1 failed, 150 passed, 1 skipped in 3.93s
+before live hook, reads: 85 passed in 14.48s
+
+== guard4_before (the registered line, root planted) (17:41:42)
+FAIL [R] sets F7 engineer Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+FAIL [R] sets F7 research Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+FAIL [R] sets F7 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+cases run: 501, failed: 5, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+FAIL
+guard4 before: 496 ok, last line FAIL
+REHEARSAL FAIL: guard4 before
+
+== walls_before: walls_check.py repo <clone>, HOME planted (17:42:29)
+walls
+EOF: want allow, got allow
+repo cases: 331, run: 331, failed: 0, expect: after, skipped: none
+PASS
+
+== opcases_before: rule 2d's cases on the hook before (each R case allowed: the gap) (17:42:49)
+cases: 403; A ok 144, L ok 16, R ok 243
+
+== units_before: the merged operator's suites (17:43:23)
+before W2-148 and tests/unit/operator: 352 passed, 1 error in 13.12s
+
+== landing_before: test_landing_select.sh as live (17:43:40)
+test_landing_select: 0 failure(s)
+landing before: 49 ok
+
+== replay_before: the real calls of 2026-11-07T17:40:58 .. 2026-11-09T17:40:58 UTC, the hook and map before (17:44:09)
+  "allow": 8013,
+  "deny": 40
+ }
+}
+
+== root_back (17:47:21)
+sets block root: "~/gov-os-eval"
+
+== apply: apply.sh check, apply (HOME planted, the crontab stub, the rehearsal's settings) (17:47:21)
+now: tree /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS; operator folder /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator
+now: code operator_run.py: before
+now: code freeze_gate.py: before
+now: code test_act_operator_1.py: before
+now: install: absent
+now: queue: absent
+now: map: before
+now: hook: before-pre
+now: githook: before
+now: tools landing_select.sh: before
+now: tools test_landing_select.sh: before
+now: cron: before
+now: d5be03dbb48e  .claude/hooks/pretooluse.py
+now: 3f7ae7f83d99  governance/project/path-map.yaml
+now: fb6092758b01  governance/project/operator/operator_run.py
+now: 6fbbf312bacd  .git/hooks/reference-transaction
+now: 984d4dfc7f82  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+now: 99605037b635  crontab -l
+now: state before
+drafts: every file as built (settings 2a927149c300)
+check: ready to apply (the hook is pre-calllog)
+before: tree /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS; operator folder /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator
+before: code operator_run.py: before
+before: code freeze_gate.py: before
+before: code test_act_operator_1.py: before
+before: install: absent
+before: queue: absent
+before: map: before
+before: hook: before-pre
+before: githook: before
+before: tools landing_select.sh: before
+before: tools test_landing_select.sh: before
+before: cron: before
+before: d5be03dbb48e  .claude/hooks/pretooluse.py
+before: 3f7ae7f83d99  governance/project/path-map.yaml
+before: fb6092758b01  governance/project/operator/operator_run.py
+before: 6fbbf312bacd  .git/hooks/reference-transaction
+before: 984d4dfc7f82  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+before: 99605037b635  crontab -l
+before: state before
+backup: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/operator-1/backup (SHA256SUMS written; the crontab 99605037b635)
+install: 14 files, APPROVED 236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9; the install's own check: ok
+after: tree /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS; operator folder /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator
+after: code operator_run.py: applied
+after: code freeze_gate.py: applied
+after: code test_act_operator_1.py: applied
+after: install: applied
+after: queue: present
+after: map: applied
+after: hook: applied-pre
+after: githook: applied
+after: tools landing_select.sh: applied
+after: tools test_landing_select.sh: applied
+after: cron: applied
+after: 4b528eb87118  .claude/hooks/pretooluse.py
+after: 40085090306e  governance/project/path-map.yaml
+after: 41271992b637  governance/project/operator/operator_run.py
+after: 099de326c45b  .git/hooks/reference-transaction
+after: 9e55c0b88032  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+after: 236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9  install/APPROVED
+after: acc0f89f1da2  crontab -l
+after: state applied
+apply: done (the pre-calllog hook). The operator's commit stages:
+  git add .claude/hooks/pretooluse.py governance/project/path-map.yaml governance/project/operator/operator_run.py governance/project/operator/freeze_gate.py tests/unit/operator/test_act_operator_1.py
+a second apply: refused
+check: already applied
+*/10 0-1,8-23 * * * /usr/bin/python3 -I /home/usain/gov-os-operator/install/operator_launch.py >> /home/usain/gov-os-operator/log/operator-launch.out 2>&1  # DEC-1104 (2) (5), ACT-OPERATOR-1: the operator agent launched from its queue (the CTO only queues)
+drwxr-xr-x .
+drwxr-xr-x ..
+drwxr-xr-x .claude
+-rw-r--r-- CLAUDE.md
+drwxr-xr-x hooks
+drwxr-xr-x install
+drwxr-xr-x log
+drwx------ queue
+the clone's safe hook against the applied one:
+<   f=/home/usain/gov-os-operator/install/act-in-progress.txt
+>   f=/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/install/act-in-progress.txt
+<   exec env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP /usr/bin/python3 -I /home/usain/gov-os-operator/install/freeze_gate.py "$f"
+>   exec env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP /usr/bin/python3 -I /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/ins
+< setsid -f env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u GOV_REBUILD_LOCK sh -c 'cd /home/usain/Dynamic-Agentic-Engineering-OS && exec flock -o
+< setsid -f env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP bash /home/usain/Dynamic-Agentic-Engineerin
+
+== commit: the operator's commit, as the message gives it (17:47:21)
+M	.claude/hooks/pretooluse.py
+A	governance/project/operator/freeze_gate.py
+M	governance/project/operator/operator_run.py
+M	governance/project/path-map.yaml
+A	tests/unit/operator/test_act_operator_1.py
+703dd6e1b ACT-OPERATOR-1: the operator agent installed (~/gov-os-operator/install, APPROVED), launched by the cron from its queue; the guard
+Task: DAEO-sdxk
+Implements: DEC-1104, DEC-1106
+Role: owner
+
+
+== root_planted (17:47:21)
+sets block root: "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval"
+
+== suites_after (17:47:21)
+after test_guard_fix_4: 467 passed in 20.73s
+after test_g14: FAILED .gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py::test_w2_91_tests_today
+after test_g14: 1 failed, 150 passed, 1 skipped in 3.98s
+after live hook, reads: 85 passed in 13.50s
+
+== guard4_after (17:48:04)
+FAIL [R] sets F7 engineer Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+FAIL [R] sets F7 research Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+FAIL [R] sets F7 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-eval/runs x: want deny, got allow | 
+cases run: 501, failed: 5, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+FAIL
+guard4 after: 496 ok, last line FAIL
+REHEARSAL FAIL: guard4 after
+
+== walls_after (17:48:48)
+walls
+EOF: want allow, got allow
+repo cases: 331, run: 331, failed: 0, expect: after, skipped: none
+PASS
+
+== opcases_after: rule 2d's cases with the ACT applied (17:49:11)
+cases: 412; A ok 144, L ok 16, R ok 252
+
+== units_after: with F26, the freeze gate and their tests (17:49:46)
+after W2-148 and tests/unit/operator: 366 passed, 1 error in 16.33s
+
+== landing_after: the candidate and its new cases (17:50:03)
+test_landing_select: 0 failure(s)
+landing after: 54 ok
+
+== replay_after: the same calls, the hook and map after; before against after (17:50:41)
+  "allow": 8013,
+  "deny": 40
+ }
+}
+window 2026-11-07T17:40:58 .. 2026-11-09T17:40:58; calls judged before 8053, after 8053, in both 8053
+answers: {'allow->allow': 8013, 'deny->deny': 40}
+differences: 0
+
+== cto_session: a headless session (haiku) as the CTO in the clone, the write_refused roots planted absolute (17:53:40)
+write_refused roots: planted
+session exit 0; cost 0.00557968
+  Write {"file_path": "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/install/act-in-progress.tx -> ERROR PreToolUse:Write hook error: the call writes into /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator, which no session writes (ACT-O
+  Bash {"command": "echo MARK-OP1-72 > /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/install/A -> ERROR PreToolUse:Bash hook error: the call writes into /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator, which no session writes (ACT-OP
+  Write {"file_path": "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/queue/20261109-ACT-REHEARS -> File created successfully at: /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/queue/20261109-ACT-REHEARSAL-1.req (file state is c
+  Bash {"command": "echo MARK-OP1-74 >> /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/.gov-os/guard-calls/2026 -> ERROR PreToolUse:Bash hook error: the call writes into /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/.gov-os/guard-calls, which no session writes (AC
+  Read {"file_path": "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator/install/brief.md", "limit" -> 1	# The operator agent's brief (OPERATOR-AGENT-1 §1, DEC-1104 (2)) 2	 3	This brief is fixed. The owner approves it once; its sha256 is in `install/APP
+install/act-in-progress.txt: absent (refused)
+install/APPROVED.new: absent (refused)
+queue/ request: written (allowed)
+guard-calls: not written (refused)
+write_refused roots: home
+
+== operator_a: a past class-(a) ACT (ACT-RERANK-GPU-SLOTS-1) queued, launched as the cron would, applied, logged, undone (17:53:51)
+{"act": "ACT-RERANK-GPU-SLOTS-1", "manifest_sha256": "7be0374cc54a62aa06ebfe7ac4d9ce120c138b4ee618418e1775234876965812", "bundle": "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-RERANK-GPU-SLOTS-1", "touched": ["home:.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov_reranker_gpu_slot.py", "home:.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov-reranker-gpu-slot.pth"]}
+{"queued": "20261109T175351-ACT-RERANK-GPU-SLOTS-1.req", "line": "ACT-RERANK-GPU-SLOTS-1 7be0374cc54a62aa06ebfe7ac4d9ce120c138b4ee618418e1775234876965812"}
+launch: exit 0 in 18 s
+{"approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "result": "launched", "request": {"act": "ACT-RERANK-GPU-SLOTS-1", "sha256": "7be0374cc54a62aa06ebfe7ac4d9ce120c138b4ee618418e1775234876965812"}, "session": {"pid": 497291, "pgid": 497291, "exit": 0}}
+session result:  "checks": [{"cmd": "python3 -c \"import ast, os; ast.parse(open(os.path.expanduser('~/.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov_reranker_gpu_slot.py')).read()); print(open(os.path.expanduser('~/.local/share/gov-os/reranker-venv/lib/python3.12/site-packages/gov-reranker-gpu-slot.pth')).read().count('import gov_reranker_gpu_slot'))\"", "exit": 0, "count": "1", "ok": true}]}
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log recompute pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G7 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G8 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G9 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log apply applied votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=ready 
+  log launch launched votes=None commit= undo=None 
+  notice info applied: info ACT-RERANK-GPU-SLOTS-1 | applied (a) 17:54, checks green, commit - | to undo, say: undo ACT-RERANK-GPU-SLOTS-1 7be0374c
+applied: both files in the planted HOME as the ACT's after-copies
+{"owner_line": "undo ACT-RERANK-GPU-SLOTS-1 7be0374c"}
+undo: exit 0 in 0 s
+{"result": "undone", "act": "ACT-RERANK-GPU-SLOTS-1", "manifest_sha256": "7be0374cc54a62aa06ebfe7ac4d9ce120c138b4ee618418e1775234876965812", "class": "a", "votes": {"code": "a", "claim": "a", "review": "a"}, "commit": null, "approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "undo": "done", "left": [], "lock": false}
+undone: both files gone
+
+== operator_b: a class-(b) ACT refused without the owner's yes, then run with it, logged, undone (17:54:09)
+{"act": "ACT-SELECT-FIXES-1R", "manifest_sha256": "546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325", "bundle": "/home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-SELECT-FIXES-1R", "touched": ["repo:governance/project/test-map.yaml"]}
+{"queued": "20261109T175409-ACT-SELECT-FIXES-1R.req", "line": "ACT-SELECT-FIXES-1R 546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325"}
+launch: exit 0 in 12 s
+{"approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "result": "launched", "request": {"act": "ACT-SELECT-FIXES-1R", "sha256": "546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325"}, "session": {"pid": 498004, "pgid": 498004, "exit": 0}}
+session result: -1R", "manifest_sha256": "546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325", "gate": "G6", "reason": "class (b): no owner's line 'yes ACT-SELECT-FIXES-1R 546f2e6c' after the review in the CTO session's transcript", "class": "b", "votes": {"code": "b", "claim": "b", "review": "b"}, "commit": null, "approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9"}
+no yes: refused at G6 (logged; no push: a refusal before G7)
+HEAD unchanged
+{"owner_line": "yes ACT-SELECT-FIXES-1R 546f2e6c"}
+{"queued": "20261109T175421-ACT-SELECT-FIXES-1R.req", "line": "ACT-SELECT-FIXES-1R 546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325"}
+launch: exit 0 in 17 s
+{"approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "result": "launched", "request": {"act": "ACT-SELECT-FIXES-1R", "sha256": "546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325"}, "session": {"pid": 498343, "pgid": 498343, "exit": 0}}
+session result: b", "claim": "b", "review": "b"}, "commit": "0e0445910bd3162d49ecdf815b1c1b60f8a1ea24", "approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "undo": "undo ACT-SELECT-FIXES-1R 546f2e6c", "checks": [{"cmd": "python3 -c \"import yaml; d = yaml.safe_load(open('governance/project/test-map.yaml')); print(len(d['record_only']))\"", "exit": 0, "count": "18", "ok": true}]}
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 refused votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None class (b): no owner's line 'yes ACT-SELECT-FIXES-1R 546f2e6c' after the review in the CTO session's transcript
+  log launch launched votes=None commit= undo=None 
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None 
+  log recompute pass votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None 
+  log G7 pass votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None 
+  log G8 pass votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None 
+  log G9 pass votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit= undo=None 
+  log apply applied votes={'code': 'b', 'claim': 'b', 'review': 'b'} commit=0e0445910bd3 undo=ready 
+  log launch launched votes=None commit= undo=None 
+  notice info applied: info ACT-SELECT-FIXES-1R | applied (b) 17:54, checks green, commit 0e0445910bd3 | to undo, say: undo ACT-SELECT-FIXES-1R 546f2e6c
+0e0445910 ACT-SELECT-FIXES-1R: applied by the operator agent, class (b)
+Role: operator
+Act: ACT-SELECT-FIXES-1R
+Act-sha: 546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325
+Class: b
+Review: 27ec576ce77209ab7a6ea4b517e9a0ede45248becf598ddcd428c405dfebdd65
+Approved-by: owner (chat, 2026-11-09T17:54:21+00:00)
+
+applied and committed through the commit path (the freeze gate let the operator's own trailers through)
+the freeze: removed by the run that wrote it
+{"owner_line": "undo ACT-SELECT-FIXES-1R 546f2e6c"}
+undo: exit 0 in 0 s
+{"result": "undone", "act": "ACT-SELECT-FIXES-1R", "manifest_sha256": "546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325", "class": "b", "votes": {"code": "b", "claim": "b", "review": "b"}, "commit": "449137eaffd0058d21599dfdae9c69522b68305c", "approved_sha256": "236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9", "undo": "done", "left": [], "lock": false}
+undone: the test map as before
+449137eaf ACT-SELECT-FIXES-1R: undone by the operator
+
+== freeze_commit: a CTO commit in the clone while the operator's freeze holds (the commit path, prepared state) (17:54:38)
+the CTO on the ACT's own path: refused (want refused) the commit freeze (DEC-1106 (3)): the operator agent is applying ACT-SELECT-FIXES-1R (ACT-SELECT-FIXES-1R 546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325 2026-11-09T17:54:38+00:00 ope
+the CTO on a control path: refused (want refused) the commit freeze (DEC-1106 (3)): the operator agent is applying ACT-SELECT-FIXES-1R (ACT-SELECT-FIXES-1R 546f2e6c7d722dc11e2945851679bed0530f811e53f360c45fcab52ebc93d325 2026-11-09T17:54:38+00:00 ope
+the CTO on another path: ok (want ok) 
+the CTO on a control path, the freeze gone: ok (want ok) 
+01a4d97b5 rehearsal: the CTO on a control path, the freeze gone
+c7f0d98b6 rehearsal: the CTO on another path
+449137eaf ACT-SELECT-FIXES-1R: undone by the operator
+
+== owner_files: the owner's operator files in the planted root, and the root's entries (17:54:38)
+the owner's files: unchanged
+entries: .claude CLAUDE.md acts hooks install log queue wall 
+pushes: 4 notices; P1: 2
+APPROVED: ok 236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9
+
+== root_back (17:54:39)
+sets block root: "~/gov-os-eval"
+
+== undo: apply.sh undo (17:54:39)
+before-undo: tree /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS; operator folder /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator
+before-undo: code operator_run.py: applied
+before-undo: code freeze_gate.py: applied
+before-undo: code test_act_operator_1.py: applied
+before-undo: install: applied
+before-undo: queue: present
+before-undo: map: applied
+before-undo: hook: applied-pre
+before-undo: githook: applied
+before-undo: tools landing_select.sh: applied
+before-undo: tools test_landing_select.sh: applied
+before-undo: cron: applied
+before-undo: 4b528eb87118  .claude/hooks/pretooluse.py
+before-undo: 40085090306e  governance/project/path-map.yaml
+before-undo: 41271992b637  governance/project/operator/operator_run.py
+before-undo: 099de326c45b  .git/hooks/reference-transaction
+before-undo: 9e55c0b88032  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+before-undo: 236e0d51b20b9f402ef6113e83c437d3903b91cf23854abc9c7ea989014597b9  install/APPROVED
+before-undo: acc0f89f1da2  crontab -l
+before-undo: state applied
+undo: queue/ kept: it holds the record of past requests (taken/, done/, rejected/)
+after-undo: tree /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/Dynamic-Agentic-Engineering-OS; operator folder /home/usain/gov-os-runs/OPERATOR1-rehearsal-pre/home/gov-os-operator
+after-undo: code operator_run.py: before
+after-undo: code freeze_gate.py: before
+after-undo: code test_act_operator_1.py: before
+after-undo: install: absent
+after-undo: queue: present
+after-undo: map: before
+after-undo: hook: before-pre
+after-undo: githook: before
+after-undo: tools landing_select.sh: before
+after-undo: tools test_landing_select.sh: before
+after-undo: cron: before
+after-undo: d5be03dbb48e  .claude/hooks/pretooluse.py
+after-undo: 3f7ae7f83d99  governance/project/path-map.yaml
+after-undo: fb6092758b01  governance/project/operator/operator_run.py
+after-undo: 6fbbf312bacd  .git/hooks/reference-transaction
+after-undo: 984d4dfc7f82  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+after-undo: 99605037b635  crontab -l
+after-undo: state other
+apply.sh: the tree after the undo is not as before; nothing more is done
+REHEARSAL FAIL: apply.sh undo
+the ACT's tracked files: byte for byte as before the ACT's commit
+the new files: gone
+the git hook: as live
+landing_select.sh: as live
+the crontab: as before
+operator folder: .claude CLAUDE.md acts hooks log queue wall 
+
+== live_after: the live files against before (17:54:39)
+d5be03dbb48ed6b9a3b60364afc39c61db11cac65a1b93c0889f5999aa6ef74c  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+3f7ae7f83d998c4036e015f9f1b6b8a8c321af2762267ed9d32c524eab81d397  governance/project/path-map.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction
+c8ce4308aaf7a94975ea872d8eb4cb7bd045ef6415dc5e8c9f286cc63bbcc523  governance/project/operator/act_class.py
+a0687ebde2365fb2d7b1b63a50cef2c3da94f2d56a4a01eede287e7d9f5afd32  governance/project/operator/landing_check.py
+1c694692129069cb3c5cb8b31bbcb93f464b528d567b01b2c46830c7f2f5c714  governance/project/operator/opcommon.py
+5bdcfc9bbc9c9707dab7a217a0c4ed6f561c76fcf4d2c1049853a4fd342fbf69  governance/project/operator/operator_launch.py
+fb6092758b0168712d96b01d09dc2f1f7a74e3e0cdc6f1b6a208fb1fac38ecff  governance/project/operator/operator_run.py
+277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378  governance/project/operator/verdict.py
+d1f7b23c1c2dd8f7390f4be97508a7e5ac222729a332634199a8bd17230b02da  governance/project/operator/wall/operator_wall_hook.py
+09fcd4239da357c0d0bb54cb95f64968458d550541ba55841c5dcb63736f0cf6  governance/project/operator/wall/settings.json.tmpl
+984d4dfc7f828ac0c89766252a1ef5e0dac768ac93dd887e547e6fe105446f6a  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+50515591ffcef813d3b1adead323bbc5ec495bc80558221bd0a8c3c8cecc3028  .gov-runtime/scratch/orchestrator/tools/test_landing_select.sh
+listing: ls: cannot access '/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/operator/freeze_gate.py': No such file or directory
+listing: ls: cannot access '/home/usain/Dynamic-Agentic-Engineering-OS/tests/unit/operator/test_act_operator_1.py': No such file or directory
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/gov-os-operator: a997addb92ef (all but log/), entries .claude CLAUDE.md hooks log 
+live crontab: 99605037b635
+info: live hook now d5be03dbb48e; ~/.gov-os/guard-calls absent; head baebd4fa564e
+live: unchanged
+
+rehearsal done (pre): 2026-11-09 17:54:39 GMT, failures: 3

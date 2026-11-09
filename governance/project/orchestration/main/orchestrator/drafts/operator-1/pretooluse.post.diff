@@ -1,0 +1,101 @@
+--- a/.claude/hooks/pretooluse.py (a7981319f877)
++++ b/.claude/hooks/pretooluse.py (+ rule 2d)
+@@ -19,6 +19,13 @@
+      search that starts at or above the folder too); a Bash line that names the folder, or names its parent with the
+      folder's name, a substitution, or a variable, glob or cd after it (the line rule of 2b). Every other session,
+      the CTO's tools included, is untouched. No block, no check;
++  2d (ACT-OPERATOR-1, DEC-1106 (3), DEC-1108 (5)). no writes, by any session this guard judges, into a folder
++     outside every tree that the main tree's path-map.yaml write_refused: names, but for the folders directly under
++     it that its entry keeps open: the operator agent's folder ~/gov-os-operator (its install and commit freeze, its
++     frozen ACTs, log and wall; the CTO writes only queue/) and the guard's call log ~/.gov-os/guard-calls. A file
++     tool by the path it names, links followed; a Bash line by the writes the guard resolves (one it cannot work out
++     is let through, as for rules 1 and 5; deletions there are already the catastrophic rule's). The operator agent's
++     walled session runs outside this guard. No block, no check;
+   5. independent reviewers and auditors write only their own outcomes: review and audit records under docs/probes/,
+      docs/audit/, docs/assessment/ and the CTO's .gov-runtime/scratch/orchestrator/reviews/ (ACT-GUARD-FIX-4), their
+      own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
+@@ -565,6 +572,68 @@
+     return ""
+ 
+ 
++WRITE_BLOCK = "write_refused"  # ACT-OPERATOR-1 (2d)
++WRITE_REFUSAL = ("the call writes into {root}, which no session writes (ACT-OPERATOR-1, path-map.yaml write_refused: "
++                 "{why})")
++
++
++def write_rules(main):
++    """ACT-OPERATOR-1 (2d): the main tree's write_refused block (a branch cannot weaken it): a list of entries, each a
++    root outside every tree (a real path; not / or HOME), the names directly under it that stay writable (except),
++    and why. [] with no block. A block not of that shape raises (fail closed)."""
++    try:
++        with open(os.path.join(main, PATH_MAP), encoding="utf-8") as f:
++            lines = f.read().splitlines(keepends=True)
++    except FileNotFoundError:
++        return []
++    at = [i for i, line in enumerate(lines) if re.match(WRITE_BLOCK + r"\s*:", line)]
++    if not at:
++        return []
++    if len(at) > 1:
++        raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK} is written more than once")
++    end = next((j for j in range(at[0] + 1, len(lines))
++                if lines[j][:1] not in ("", " ", "\t", "#", "\n", "\r")), len(lines))
++    from gov.guard.heldout import load_yaml_unique
++    data = load_yaml_unique("".join(lines[at[0]:end]))
++    block = data.get(WRITE_BLOCK) if isinstance(data, dict) else None
++    if not isinstance(block, list) or not block:
++        raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK} is not a list of entries")
++    out = []
++    for e in block:
++        top = os.path.expanduser(e.get("root")) if isinstance(e, dict) and isinstance(e.get("root"), str) else ""
++        keep = e.get("except") if isinstance(e, dict) else None
++        why = e.get("why") if isinstance(e, dict) else None
++        if (not os.path.isabs(top) or os.path.realpath(top) in ("/", HOME)
++                or not isinstance(keep, list)
++                or not all(isinstance(k, str) and k and "/" not in k and k not in (".", "..") for k in keep)
++                or not isinstance(why, str) or not why):
++            raise RuntimeError(f"{PATH_MAP}: {WRITE_BLOCK}: an entry is not a root, its open folders and why")
++        real = os.path.realpath(top)
++        # an open folder by its own name under the real root, never followed: a link there to the rest of the
++        # root resolves outside it and stays refused
++        out.append((real, [os.path.join(real, k) for k in keep], why))
++    return out
++
++
++def write_refusal(entries, tool, tin, command, cwd):
++    """Why this call writes into an entry's root outside its open folders, or "". A file tool by the path it names,
++    real (links followed); a Bash line by the writes the guard resolves, the shell's own and its inline code's."""
++    targets = []
++    if tool in WRITE_TOOLS:
++        targets = [tin.get("file_path") or tin.get("notebook_path")]
++    elif command is not None:
++        shell, code = bash_writes_of(command, cwd)
++        targets = shell + code
++    for t in targets:
++        if not isinstance(t, str) or not t:
++            continue
++        full = os.path.realpath(os.path.join(cwd or "/", os.path.expanduser(t)))
++        for top, keep, why in entries:
++            if inside(full, top) and not any(inside(full, k) for k in keep):
++                return WRITE_REFUSAL.format(root=top, why=why)
++    return ""
++
++
+ _CLASSES = []
+ 
+ 
+@@ -837,6 +906,15 @@
+             if why:
+                 answer("deny", why, "2c")
+ 
++    # ACT-OPERATOR-1 (2d): folders outside every tree that no session writes (the operator agent's folder but its
++    # queue/, the guard's call log), every role, by the writes the guard resolves. Read only for a write tool or Bash.
++    if tool in WRITE_TOOLS or command is not None:
++        rules_w = write_rules(main)
++        if rules_w:
++            why = write_refusal(rules_w, tool, tin, command, cwd)
++            if why:
++                answer("deny", why, "2d")
++
+     # G-14 (DEC-1052), role separation: what the main tree's path map's role_paths: denies the session's role and
+     # the acting role to read, by simple path checks (role_reads.py beside this file). No section, no check.
+     if tool in ("Read", "NotebookRead", "Grep", "Bash"):

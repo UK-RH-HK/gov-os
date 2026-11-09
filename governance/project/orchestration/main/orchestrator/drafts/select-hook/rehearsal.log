@@ -1,0 +1,106 @@
+rehearse.sh: 2026-11-09 01:27:54; steps: live_before prepare check apply undo reapply behaviour faults hook_direct final_undo live_after
+
+== live_before: the live files' hashes (01:27:54)
+7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction
+18c454cf6681e826b06959619afdbec379a57c00aa10f3ca50f743c798735242  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+
+== prepare: the clone, the stubs, the live hook's exact bytes (01:27:54)
+clone /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS at 003f0bc23d47 on w2/integrate; worktree /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/wt
+the clone's hook: the live hook's exact bytes
+
+== check: apply.sh check (01:27:55)
+apply.sh check: tree /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS
+now: 7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction (mode 755)
+now: state before
+candidate: ok (6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc)
+candidate: parses (sh -n)
+candidate: the hook plus one line, before its final exit 0
+tool: .gov-runtime/scratch/orchestrator/tools/landing_select.sh present, parses (a4a7c2ee2f7148d9e362f5e7730d0d132899164168fe977548f300e891332b5c)
+check: ready to apply
+
+== apply: apply.sh apply (01:27:55)
+apply.sh apply: tree /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS
+before: 7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction (mode 755)
+before: state before
+backup: /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/select-hook/backup (SHA256SUMS written, mode 755)
+after: 6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction (mode 755)
+after: state applied
+apply: done. Nothing to commit (the hook is not tracked).
+the hook is the candidate
+7a8
+> setsid -f env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/landing_select.sh --hook >> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log 2>&1 </dev/null  # DEC-1100 (2)-(3), ACT-SELECT-HOOK-1: the scoped selection after a landing outside a ticket
+
+== undo: apply.sh undo (01:27:55)
+apply.sh undo: tree /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction (mode 755)
+before-undo: state applied
+after-undo: 7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction (mode 755)
+after-undo: state before
+undo: done; the hook is byte for byte as before the apply, its mode kept
+undo: byte for byte the live hook, mode 755
+
+== reapply: the backup moved aside, apply again (for the landings) (01:27:55)
+applied again: 6fbbf312bacd
+
+== behaviour: landings through the hook, before the line and with it (01:27:55)
+the substitutions (before -> run copy):
+  7c7
+  < setsid -f env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u GOV_REBUILD_LOCK sh -c 'cd /home/usain/Dynamic-Agentic-Engineering-OS && exec flock -o /home/usain/gov-os-worktrees/W2-00-store.refresh.lock bash .gov-runtime/scratch/orchestrator/tools/heavy_slot.sh /home/usain/.local/bin/gov rebuild --integration w2/integrate' >> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/integration-store.log 2>&1 </dev/null
+  ---
+  > setsid -f env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u GOV_REBUILD_LOCK sh -c 'cd /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS && exec flock -o /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/refresh.lock bash .gov-runtime/scratch/orchestrator/tools/heavy_slot.sh /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/stub_gov.sh rebuild --integration w2/integrate' >> /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/integration-store.log 2>&1 </dev/null
+the run copies differ by the one line only:
+  7a8
+  > setsid -f env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP bash /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/landing_select.sh --hook >> /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log 2>&1 </dev/null  # DEC-1100 (2)-(3), ACT-SELECT-HOOK-1: the scoped selection after a landing outside a ticket
+before the line: 10 landings, store refreshes started: 10
+before the line: the tool never ran
+with the line: 10 landings, store refreshes started: 10
+commit time, median of 10: before the line 14 ms (max 15), with it 14 ms (max 15); each: 14 14 15 14 14 13 13 13 13 14 / 14 15 14 14 14 14 14 15 14 15
+-- a settings commit by the owner (an ACT): a run starts, on that commit
+settings landing (12 ms): run on 6acd29a5fd84, GREEN, the stub saw --merge 6acd29a5fd842963da6008db984339023fd05a1a
+one inbox item: 20261109-012759-landing-select.txt
+the store refresh started too: gov rebuild --integration w2/integrate cwd=/home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS 
+-- a ticket's merge touching settings: no run
+ticket merge db37056eca19: none outside a ticket
+-- a commit on another branch: the hook fires neither line
+another branch: nothing
+-- a landing made from a worktree (git exports GIT_DIR=<clone>/.git/worktrees/wt to the hook)
+worktree landing d5af64af37c2: the run's clone at it; the worktree's HEAD untouched
+note (W2-116's own line, unchanged): its refresh ran with GIT_DIR=/home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS/.git/worktrees/wt
+-- a FRESH-80 hold: the landing deferred, the refresh line unchanged
+hold: DEFERRED logged
+
+== faults: the tool slow, failing or missing never delays or fails the transaction (01:28:04)
+the tool sleeping 30 s: commit rc 0 in 12 ms
+the tool exiting 1: commit rc 0 in 13 ms
+the tool missing: commit rc 0 in 13 ms
+  a522d546c rehearsal: governance/project/orchestration/fault-missing.md
+  7644120ce rehearsal: governance/project/orchestration/fault-exit.md
+  357bda185 rehearsal: governance/project/orchestration/fault-slow.md
+
+== hook_direct: the hook run by hand, every state, exit always 0 (01:28:04)
+  prepared: exit 0
+  aborted: exit 0
+  committed: exit 0
+  committed, another ref: exit 0
+  committed, empty input: exit 0
+
+== final_undo: the applied hook back, then apply.sh undo (01:28:04)
+apply.sh undo: tree /home/usain/gov-os-runs/SELECT-HOOK-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 6fbbf312bacde210d376575f17ad556d65d30c192d3f79f23622ac0650b361cc  .git/hooks/reference-transaction (mode 755)
+before-undo: state applied
+after-undo: 7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction (mode 755)
+after-undo: state before
+undo: done; the hook is byte for byte as before the apply, its mode kept
+the clone's hook: byte for byte the live hook again
+
+== live_after: the live files' hashes (01:28:04)
+7a21de6dfc51a5d5fa4a5ca56f998e48cb998bdcf577d7ed58156ed3738b0a3e  .git/hooks/reference-transaction
+18c454cf6681e826b06959619afdbec379a57c00aa10f3ca50f743c798735242  .gov-runtime/scratch/orchestrator/tools/landing_select.sh
+2001c392a3fbb516d00b01d51e277e137b7becd9df735557c61d12ffce86ba57  governance/project/test-map.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+live files: unchanged
+the live tool log: not written
+
+rehearse.sh: done 2026-11-09 01:28:04: 0 failure(s)

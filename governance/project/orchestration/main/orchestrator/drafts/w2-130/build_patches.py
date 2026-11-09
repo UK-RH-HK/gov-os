@@ -24,6 +24,7 @@ a status line, so no line number moves. The sources are gov.links.patch.sources'
 from __future__ import annotations
 
 import json
+import os
 import random
 import re
 import subprocess
@@ -171,7 +172,9 @@ AUDIT_MARK = {("DEC-1084", "DEC-1087"): "DEC-1087 (13) (W2-33's layer lines back
               ("DEC-1032", "DEC-1033"): "DEC-1033 (items 2 and 3)",
               ("DEC-454", "DEC-868"): "DEC-868 (items 1 (b) and 3)",
               ("DEC-454", "DEC-899"): "DEC-899 (P-IS-4 (a))",
-              ("DEC-455", "DEC-899"): "DEC-899 (P-IS-4 (a))"}
+              ("DEC-455", "DEC-899"): "DEC-899 (P-IS-4 (a))",
+              # not the audit's: the drafter's, from DEC-902's "**Changes:** DEC-899 item 10 (the proposal decided)"
+              ("DEC-899", "DEC-902"): "DEC-902 (item 10: the proposal decided)"}
 
 
 def audit_drop(f: dict) -> str:
@@ -189,7 +192,7 @@ for f in unmarked_all:
     unmarked.append({**f, "mark": "**Changed by:** " + AUDIT_MARK[key], "audited_rewrite": True}
                     if key in AUDIT_MARK else f)
 missing = (set(AUDIT_DROP) | set(AUDIT_MARK)) - {(f["ids"][0], f["ids"][1]) for f in unmarked_all}
-if missing:
+if missing and not os.environ.get("W2130_AFTER_APPLY"):  # once a1/a2 are applied their audited pairs are gone
     sys.exit(f"the audit names pairs gov links no longer finds: {sorted(missing)}; re-read the audit")
 
 summary = {"head": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True,
@@ -223,10 +226,13 @@ ARCHIVE_NEW = [  # the changers each entry's own text supports (the audit's F4)
     "- DEC-490: changed by DEC-904. Its close parts are now lifted (LIFTED §A).",
     "- DEC-492: changed by DEC-868 and DEC-899. Its close parts are now lifted (LIFTED §A)."]
 archive_text = repo.files[check.ARCHIVE_REL]
-if archive_text.count(ARCHIVE_OLD + "\n") != 1:
+if archive_text.count(ARCHIVE_OLD + "\n") == 1:
+    (OUT / "a0-archive-one-per-line.patch").write_text(
+        patch._diff(check.ARCHIVE_REL, archive_text, archive_text.replace(ARCHIVE_OLD, "\n".join(ARCHIVE_NEW))))
+elif not all(line in archive_text for line in ARCHIVE_NEW):
     sys.exit("ARCHIVE-SUPERSEDED.md's collective §A line has changed; re-read the audit's F4")
-(OUT / "a0-archive-one-per-line.patch").write_text(
-    patch._diff(check.ARCHIVE_REL, archive_text, archive_text.replace(ARCHIVE_OLD, "\n".join(ARCHIVE_NEW))))
+else:  # a0 is applied (e12f8a30)
+    (OUT / "a0-archive-one-per-line.patch").write_text("")
 summary["a1"]["no_hint_entries_today"] = len(no_hint)
 summary["a1"]["no_hint_entries_all_changers_proposed"] = sorted(
     no_hint - {f["ids"][0] for f in unmarked if tranche(f["ids"][0]) == "a1"})

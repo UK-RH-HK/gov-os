@@ -1,0 +1,33 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "ad04ee16cab2",
+   "after": "bc7eae930197"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/packages/ACT-SELECT-FIXES-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "ad04ee16cab2",
+   "after": "bc7eae930197"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "226e8b6e20b6",
+   "after": "bc7eae930197"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-141",
+   "change": "head",
+   "before": "c8e01591f7c2",
+   "after": "c853fbc7e1c5"
+  }
+ ]
+}

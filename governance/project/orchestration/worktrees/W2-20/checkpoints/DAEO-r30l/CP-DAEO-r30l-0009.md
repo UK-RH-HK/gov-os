@@ -8,12 +8,12 @@ task: DAEO-r30l
 task_status: in_progress
 trigger: stop
 next_action: Resume after stop
-created: '2026-10-17T04:19:19Z'
+created: '2026-11-09T04:00:41Z'
 inputs:
 - id: DAEO-r30l
-  version: 5bc27b7c
-  hash: sha256:ca78ea4520e16c9bc5314e90e39c46c326decfe6cca1782d07bf217e0e230d0c
-head_commit: 19010dca17dc96a3bf62ea73af8c6c83acb4249c
+  version: 94277c0b4
+  hash: sha256:33699f25d353607c8c41394412d09e065baec5f65f74501866280da3ff9acb3e
+head_commit: 8985180a339c127b0b64303a9950062b68136636
 ---
 
 # CP-DAEO-r30l-0009 — DAEO-r30l at stop

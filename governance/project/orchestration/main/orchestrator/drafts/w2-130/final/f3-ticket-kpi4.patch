@@ -1,0 +1,21 @@
+diff --git a/.tickets/DAEO-q8cl.md b/.tickets/DAEO-q8cl.md
+--- a/.tickets/DAEO-q8cl.md
++++ b/.tickets/DAEO-q8cl.md
+@@ -28,7 +28,7 @@
+   - 'The 87 first: every decision the census found current, stated changed and with no hint in its own entry names each of its changers on its own status line (**Changed by:** DEC-n (the part), or SUPERSEDED by DEC-n for a whole supersession by ids alone), applied from gov links --propose-marks in a commit of its own [DEC-1073 (5)(a), DEC-866, DEC-825 item 4]'
+   - 'Then the rest: after the clean-up, gov links --all reports no UNMARKED_CHANGE on this repository, so each of the census''s 215 drifting decisions names every changer the register or ARCHIVE-SUPERSEDED §A states, the 13 pairs stated only in the archive included; the drift count by docs/research/W2-92-proto-drift.py''s definitions, read from the entries'' own text, is 0 [DEC-1073 (5)(a), DEC-1072 (1)]'
+   - 'Checked where the patterns guess: before each marks commit, an independent auditor checks every mark derived from free text, and 20 labelled marks drawn at random, against both entries; a wrong mark is corrected or dropped, never committed; the check is in the record [DEC-1073, DEC-1010]'
+-  - 'Tickets linked: every id a ticket''s KPI brackets name and every Implements: id of its worker commits is in its sources:, from gov links --propose-sources, in one commit that changes no other field; gov links --all then reports no UNLINKED_ID. Ids that name no record are listed per ticket in the record, for D-9 [DEC-1073 (5)(a)]'
++  - 'Tickets linked, open and in-progress tickets only: every id an open or in-progress ticket''s KPI brackets name and every Implements: id of its worker commits is in its sources:, from gov links --propose-sources, in one commit that changes no other field; gov links --all then reports no UNLINKED_ID on an open or in-progress ticket. A closed ticket is not edited: its missing ids are listed per ticket in the record. Ids that name no record are listed per ticket in the record, for D-9 [DEC-1073 (5)(a)] [changed, DEC-1098 (3); DEC-1088 (6)]'
+   - 'Commit trailers: history is not rewritten. Every Task: and Implements: value that names no record (the census counted 3,053 of 3,561 Task: values resolving, 496 of the rest decision-record, which is valid under DEC-861; and 4,187 of 4,246 Implements: values) is listed once in the record, with its ticket and the ids it should have named, as DEC-927 did for its 39 [DEC-927, DEC-861, DEC-1073]'
+   - 'Status reconciliation, apart from drift: LINK-RECONCILIATION.md lists, for the owner, the 110 decisions ARCHIVE-SUPERSEDED §B calls spent while the register lists them current, the 40 PROPOSED entries, and every STATUS_CONFLICT gov links --all finds. Per id it gives the CTO''s proposal (done, in force, superseded by, accepted or rejected) with its reason. Nothing is applied before the owner decides; then the register carries each decided status (W2-55''s `· done` tag or the status word), and ARCHIVE-SUPERSEDED and DECISIONS-IN-FORCE agree with the register, so gov links --all reports no STATUS_CONFLICT on them [DEC-1073 (2), DEC-953 item 7]'
+   - 'Lessons: each lesson in docs/lessons/ names the decision or failure it came from in a sources: key [DEC-1073 (5)(c)]'
+@@ -48,6 +48,8 @@
+ - DEC-861
+ - DEC-953
+ - DEC-1010
++- DEC-1098
++- DEC-1088
+ est_loc: 0
+ acceptance_tests:
+   path: tests/acceptance/W2-130/

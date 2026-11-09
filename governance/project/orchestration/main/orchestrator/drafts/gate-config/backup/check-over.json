@@ -1,0 +1,1 @@
+gov resources: RESOURCE_GATE_SHUT: the resource gate is shut, no session starts: gpu 407896064 against the threshold 23068672000 (the GPU room it saw: free 10071572480 B, room 407896064 B after 9663676416 B kept for higher shares and headroom: the job waits, or runs its model on the CPU)

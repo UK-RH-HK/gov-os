@@ -1,0 +1,89 @@
+bringing up nodes...
+bringing up nodes...
+
+....................................................................F... [  2%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+...............................................................s........ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+...................sss.................................................. [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+......................................................F................. [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+____________ test_every_approving_decision_is_accepted_by_the_owner ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+registry = {'tools': [{'approved_by': 'DEC-074', 'date': '2026-09-30', 'install': "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23....proved_by': 'DEC-074', 'date': '2026-09-30', 'install': 'uv tool install copier==9.18.2', 'name': 'copier', ...}, ...]}
+decisions = {'DEC-001': Decision(id='DEC-001', title='Assemble first; Rust kernel becomes the later replacement', status='ACCEPTED...is a health finding (Gate U), not a silent cost.\n- **Measurement:** telemetry (DEC-026) tagged by task ID.\n\n'), ...}
+
+    def test_every_approving_decision_is_accepted_by_the_owner(registry, decisions):
+        assert support.entries(registry), f"{support.REGISTRY_REL} records no tool"
+        wrong = []
+        for name, approved_by in _approvals(registry):
+            decision = decisions.get(approved_by)
+            if decision is not None and not decision.accepted_by_owner:
+                wrong.append(f"{name}: {approved_by} has status {decision.status!r}")
+>       assert wrong == [], f"entries of {support.REGISTRY_REL} whose approving decision is not ACCEPTED (owner): {wrong}"
+E       AssertionError: entries of governance/project/tool-registry.yaml whose approving decision is not ACCEPTED (owner): ['pytest-timeout: DEC-892 has status "DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-871, DEC-883, DEC-889, DEC-890, DEC-866, DEC-861 · **Basis:** package P-W2-63-C1 (`governance/project/orchestration/packages/P-W2-63-C1.md`) and the tool trials\' report (`governance/project/orchestration/packages/TOOL-TRIALS-2026-10-22.md`). · **Changed by:** DEC-896 item 3: W2-07\'s KPIs gathered (the decision-record rule, test-revision tickets on their declared `acceptance_tests.path`, a stale probe named before the run). · **Changed by:** DEC-899 item 1: worksteal\'s condition (a) is met through W2-70 (the two acceptance reruns retired) and W2-67 (the unit nested runs bounded), then a re-measure in the nightly."']
+E       assert ['pytest-time...he nightly."'] == []
+E         
+E         Left contains one more item: 'pytest-timeout: DEC-892 has status "DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (owner, 2026-10-22, in th...W2-70 (the two acceptance reruns retired) and W2-67 (the unit nested runs bounded), then a re-measure in the nightly."'
+E         Use -v to get more diff
+
+tests/acceptance/W1-06/test_w1_06_approvals.py:47: AssertionError
+_________ test_only_the_first_30_fused_chunks_are_scored_and_returned __________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+passes = ([['[path: notes/chunk-00.md]\nchunk-00 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', ...]], <function passes.<locals>.<lambda> at 0x79efc6ed1b20>)
+
+    def test_only_the_first_30_fused_chunks_are_scored_and_returned(passes):
+        seen, reranker = passes
+        answer = fusion.search(Path("unused"), "a question", limit=None, reranker=reranker)
+        # one rerank of the first 30, in requests of at most 16 texts (DEC-1067 (f))
+>       assert fusion.RERANK_TOP == 30 and [len(texts) for texts in seen] == [16, 14]
+E       assert (30 == 30 and [30] == [16, 14]
+E        +  where 30 = fusion.RERANK_TOP
+E         
+E         At index 0 diff: 30 != 16
+E         Right contains one more item: 14
+E         Use -v to get more diff)
+
+tests/unit/semantic/test_fusion.py:48: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+2 failed, 2835 passed, 4 skipped in 477.90s (0:07:57)

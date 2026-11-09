@@ -334,3 +334,10 @@
 2026-11-06 23:25:03 interim result: W2-129 2481feedd W2-129 review round 2: F2 the closing commit's watched fields are judged (TICKET
 2026-11-07 09:33:07 guard refusals: 1 new
 2026-11-07 18:50:08 guard refusals: 8 new
+2026-11-09 02:00:04 interim result: W2-20 3418453fc W2-20 (DAEO-r30l): S7/S9, the re-measure's rebuild peak from rebuild slot holder
+2026-11-09 02:00:04 interim result: W2-20 61682b3e2 W2-20 tests: the README (the interface the cases assume, the KPI ids S1-S20 and 
+2026-11-09 02:00:04 interim result: W2-20 31bfce81f W2-20 tests: new cases for the new and changed KPI lines (CPU, load, memory, dis
+2026-11-09 02:46:06 interim result: W2-20 7f42f4116 W2-20 (DAEO-r30l): heavy-job slots with their CPU sets and thread budgets, the t
+2026-11-09 14:15:09 interim result: W2-20 6b2a8f9a2 W2-20 round 2 (DAEO-r30l): the planted readings GOV_RESOURCES_BUSY_CORES, _EMBED
+2026-11-09 16:03:08 interim result: W2-20 bdc5e0525 W2-20 tests: S16 measured per CPU, the slot's own CPUs and an escape check outsi
+2026-11-09 18:33:08 guard refusals: 4 new

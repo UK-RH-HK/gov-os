@@ -1,0 +1,12 @@
+diff --git a/docs/DECISION_REGISTER.md b/docs/DECISION_REGISTER.md
+--- a/docs/DECISION_REGISTER.md
++++ b/docs/DECISION_REGISTER.md
+@@ -250,7 +250,7 @@
+ - **Decision:** `gov retrieve` resolves referenced IDs (spec, ADR, task, symbol) through the frontmatter graph and codebase-memory callers/callees to a radius-scaled depth at T0 (no LLM). LLM judgement only for the semantic facet. Completeness for deterministic facets = dependency closure to depth N; for semantic facets = saturation.
+ 
+ ### DEC-034 — Stopping reasons (enumerated)
+-- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080
++- **Status:** ACCEPTED (owner, 2026-09-30, DEC-083, as realised by later decisions; recorded by DEC-1098 (3)); it was PROPOSED · **Basis:** SUGGESTION · **Changed by:** DEC-080 · **Changed by:** DEC-396
+ ```text
+ CLOSURE_COMPLETE             # no unresolved referenced IDs within depth limit
+ SATURATED                    # follow-up batch added < ~10% novel sources after dedup

@@ -1,0 +1,17 @@
+#!/bin/sh
+# W2-116 (DEC-1087 (3)), installed by re-pin window 4: refresh the integration store after every landing on
+# w2/integrate (does nothing at an unchanged head). F5: no inherited Python setting; F6: the refresh lock before the
+# heavy slot; R2-F2: flock -o, so no child keeps the lock.
+# ACT-OPERATOR-1 (DEC-1106 (3), DEC-1028 (6)): the commit freeze. While the operator agent applies an ACT (its freeze
+# file exists), an update of the live branch that touches the ACT's paths or the operator's control paths is refused in
+# the prepared state, unless its commits carry the operator's own Act:/Act-sha: trailers. No freeze: nothing runs.
+if [ "$1" = prepared ]; then
+  f=/home/usain/gov-os-operator/install/act-in-progress.txt
+  { [ -e "$f" ] || [ -L "$f" ]; } || exit 0
+  exec env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP /usr/bin/python3 -I /home/usain/gov-os-operator/install/freeze_gate.py "$f"
+fi
+[ "$1" = committed ] || exit 0
+grep -q ' refs/heads/w2/integrate$' || exit 0
+setsid -f env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u GOV_REBUILD_LOCK sh -c 'cd /home/usain/Dynamic-Agentic-Engineering-OS && exec flock -o /home/usain/gov-os-worktrees/W2-00-store.refresh.lock bash .gov-runtime/scratch/orchestrator/tools/heavy_slot.sh /home/usain/.local/bin/gov rebuild --integration w2/integrate' >> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/integration-store.log 2>&1 </dev/null
+setsid -f env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/landing_select.sh --hook >> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log 2>&1 </dev/null  # DEC-1100 (2)-(3), ACT-SELECT-HOOK-1: the scoped selection after a landing outside a ticket
+exit 0

@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148",
+   "change": "status line added",
+   "line": "?? governance/project/operator/verdict.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "head",
+   "before": "dd30240956c7",
+   "after": "eea72ae5079d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "acceptance folder",
+   "folder": "W2-20"
+  }
+ ]
+}

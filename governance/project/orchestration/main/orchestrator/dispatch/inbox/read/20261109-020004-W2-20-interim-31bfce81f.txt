@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result 31bfce81f: W2-20 tests: new cases for the new and changed KPI lines (CPU, load, memory, disk, configuration, slots, re-measure, trip-wire, GPU, the servers' cap, thread budget and CPU set, measured (local_only),

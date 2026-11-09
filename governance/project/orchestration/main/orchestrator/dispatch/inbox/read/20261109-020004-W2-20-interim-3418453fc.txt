@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-20
+status: interim result 3418453fc: W2-20 (DAEO-r30l): S7/S9, the re-measure's rebuild peak from rebuild slot holders, no verification lock held (P-5 (a) settled)

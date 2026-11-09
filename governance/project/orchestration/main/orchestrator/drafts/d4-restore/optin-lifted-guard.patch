@@ -1,0 +1,31 @@
+--- a/tests/optin-lifted-guard.txt
++++ b/tests/optin-lifted-guard.txt
+@@ -78,8 +78,8 @@
+ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_engineer_writes_only_inside_the_ticket_paths  # the full guard (G-4/G-6; DEC-1061 (3a))
+ 
+ # W1-33
+-tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository  # the full guard (G-4/G-6; DEC-1061 (3a))
+-tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket  # the full guard (G-4/G-6; DEC-1061 (3a))
++# DEC-1103 (2): back in the gates (un-lifted: K2 of the P-SELECT-GRAPH trial reded it); was: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository  # the full guard (G-4/G-6; DEC-1061 (3a))
++# DEC-1103 (2): back in the gates (un-lifted: K2 of the P-SELECT-GRAPH trial reded it); was: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]  # the full guard (G-4/G-6; DEC-1061 (3a))
+ 
+ # W1-45
+@@ -121,7 +121,7 @@
+ tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder  # the full guard (G-4/G-6; DEC-1061 (3a))
+-tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through  # the full guard (G-4/G-6; DEC-1061 (3a))
++# DEC-1103 (2): back in the gates (un-lifted: K2 of the P-SELECT-GRAPH trial reded it); was: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through_by_the_kernel_s_wiring  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied  # the full guard (G-4/G-6; DEC-1061 (3a))
+ tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_bash_write_outside_its_experiment_folder_is_denied  # the full guard (G-4/G-6; DEC-1061 (3a))
+@@ -272,7 +272,7 @@
+ tests/acceptance/W1-03/test_w1_03_test_independence.py  # post-command containment (G-5; DEC-1061 (3a))
+ 
+ # W1-05
+-tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner  # post-command containment (G-5; DEC-1061 (3a))
++# DEC-1103 (2): back in the gates (un-lifted: K2 of the P-SELECT-GRAPH trial reded it); was: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner  # post-command containment (G-5; DEC-1061 (3a))
+ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_reports_a_change_outside_the_ticket_paths  # post-command containment (G-5; DEC-1061 (3a))
+ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_restores_an_acceptance_test  # post-command containment (G-5; DEC-1061 (3a))
+ tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_runs_after_a_failed_call  # post-command containment (G-5; DEC-1061 (3a))

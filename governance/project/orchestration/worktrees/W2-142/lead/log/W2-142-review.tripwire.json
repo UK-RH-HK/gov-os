@@ -1,0 +1,71 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "head",
+   "before": "872ce9713140",
+   "after": "86f1af6e586f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M src/gov/retrieval/rerank.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M src/gov/retrieval/rerank_service.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M src/gov/retrieval/rerank_worker.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M tests/unit/orchestration/test_gov_reranker_gpu_slot.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M tests/unit/retrieval/test_w2_112_shared_reranker.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M tests/unit/retrieval/test_w2_32_rerank_fusion.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M tests/unit/retrieval/test_w2_32_whole_chunk.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": " M tests/unit/semantic/test_rerank_process.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-145",
+   "change": "status line gone",
+   "line": "?? tests/unit/retrieval/test_w2_145_no_private_reranker.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "head",
+   "before": "1562a461e798",
+   "after": "92ab223363c5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-20/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-tests",
+   "change": "acceptance folder",
+   "folder": "W2-20"
+  }
+ ]
+}

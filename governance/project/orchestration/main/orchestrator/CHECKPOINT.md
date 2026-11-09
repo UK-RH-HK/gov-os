@@ -5,6 +5,13 @@
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-08: §0 the state, §1 the
 owner's hold, §2 the emergency, §3 decided but not done, §5 the order after the owner decides, §6 the watchers). Next
 free id **DEC-1098**. The blocks below are newest first; older ones are history, kept for their figures.
+- **11-09 evening, session `ad44f5fe`: DEC-1098 to DEC-1109 recorded; item 8 merged (W2-141, W2-142, W2-145, W2-147,
+  W2-20); W2-148 (the operator agent) merged with F21; ACTs applied by the operator: walls `147706ae`, gate file
+  `d7490945` then `0fcd02b0`, selection fixes `8038e0ee` + hook, D-4 form B `a46d4517`, path-map namespaces `ff1eac37`,
+  call log `b7a373cf`. ACT-OPERATOR-1 rehearsed; its operator brief being changed (DEC-1109 (1)). Running in parallel
+  (DEC-1109 (2), standing (3)): W2-139/W2-140 batch; D-5; D-6 part 2; the launch script (W2-149); the replay builder
+  (DEC-1108 (2)); D-10's red-fix list; the sandbox set-up B and briefs. Next free id DEC-1110. Every item in
+  DECIDED-NOT-DONE §0 to §0h.
 - **11-08 21:46, session `ad44f5fe`: THE FRESH 80 RAN; K9'S MEMORY BAR PASSES** (`a35c7807`,
   `packages/LIFT-1/FRESH-80-RESULT.md`): right end to end 78/79 (98.7 %), wrong claims 0, target reached; hit@5 84.8 %;
   every data condition below the judged one; $109.05. The 80 are spent. Due now (DECIDED-NOT-DONE): W2-139/W2-140;

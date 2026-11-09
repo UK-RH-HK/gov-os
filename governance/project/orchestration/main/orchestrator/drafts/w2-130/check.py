@@ -32,14 +32,25 @@ from pathlib import Path
 
 import yaml
 
-ROOT = Path(sys.argv[1]).resolve()
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+FINAL = "--final" in sys.argv  # after the owner's sitting (DEC-1098 (3)): final/f1 to f5, built by final_build.py
+ROOT = Path(ARGS[0]).resolve()
 HERE = Path(__file__).resolve().parent
-WORK = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else HERE / "work"
-CLONE = WORK / "clone"
+WORK = Path(ARGS[1]).resolve() if len(ARGS) > 1 else HERE / "work"
+CLONE = WORK / ("final-check-clone" if FINAL else "clone")
 GOV = Path.home() / ".local/bin/gov"
+PATCHES = HERE / "final" if FINAL else HERE
+BUILD = PATCHES / ("final-summary.json" if FINAL else "build-summary.json")
+REPORT = "final-check-report" if FINAL else "check-report"
 STAGES = [("a1", "a1-marks-no-hint.patch"), ("a2", "a2-marks-rest.patch"), ("a0", "a0-archive-one-per-line.patch"),
           ("b1", "b1-sources-open.patch"),
           ("a3", "a3-marks-after-sitting.patch"), ("b2", "b2-sources-closed.patch")]
+if FINAL:
+    STAGES = [(n, f"{n}-{rest}") for n, rest in (("f1", "statuses.patch"), ("f2", "archive.patch"),
+                                                 ("f3", "ticket-kpi4.patch"), ("f4", "in-force.patch"),
+                                                 ("f5", "marks.patch"))]
+    STAGES = [(n, p) for n, p in STAGES if (PATCHES / p).read_text().strip()]  # f4 is empty when nothing clashes
+IN_ORDER_ONLY = ("f5",) if FINAL else ("a2", "a3")  # taken against the text the earlier stages leave
 REGISTER = "docs/DECISION_REGISTER.md"
 failures: list[str] = []
 
@@ -59,7 +70,11 @@ def links(root: Path) -> dict:
         counts[key] = counts.get(key, 0) + 1
         by_code[finding["code"]] = by_code.get(finding["code"], 0) + 1
     return {"summary": result.get("summary"), "new": result.get("new"), "by_code_role": counts,
-            "by_code": by_code, "total": len(result["findings"]), "exit": out.returncode}
+            "by_code": by_code, "total": len(result["findings"]), "exit": out.returncode,
+            "not_in_force": sorted(f["subject"] for f in result["findings"] if f["code"] == "NOT_IN_FORCE_AS_RULE"),
+            "status_conflict": sorted(f["subject"] for f in result["findings"] if f["code"] == "STATUS_CONFLICT"),
+            "enforces": sorted(f"{f['subject']} | {f['path']}:{f['line']}" for f in result["findings"]
+                               if f["code"] == "ENFORCES_SUPERSEDED")}
 
 
 def drift(root: Path) -> dict:
@@ -85,18 +100,18 @@ def commit(message: str) -> None:
 
 
 report = {"head": run("git", "rev-parse", "HEAD", cwd=ROOT).stdout.strip(), "apply_check_on_repo": {},
-          "built_at": json.loads((HERE / "build-summary.json").read_text())["head"],
+          "built_at": json.loads(BUILD.read_text())["head"], "mode": "final" if FINAL else "drafts",
           "stages": [], "drift": {}}
 
 if report["built_at"] != report["head"]:
     failures.append(f"the patches were built at {report['built_at'][:12]}, HEAD is {report['head'][:12]}: "
-                    "rerun build_patches.py first")
+                    f"rerun {'final_build.py' if FINAL else 'build_patches.py'} first")
 
 # ---------------------------------------------------------------- 1. read-only: each patch against today's tree
 for name, path in STAGES:
-    if name in ("a2", "a3"):
-        continue  # a2 and a3 are taken against the text a1 (and a2) leave; checked in order on the clone
-    out = run("git", "apply", "--check", "-v", str(HERE / path), cwd=ROOT, check=False)
+    if name in IN_ORDER_ONLY:
+        continue  # taken against the text the earlier stages leave; checked in order on the clone
+    out = run("git", "apply", "--check", "-v", str(PATCHES / path), cwd=ROOT, check=False)
     report["apply_check_on_repo"][name] = out.returncode == 0
     if out.returncode:
         failures.append(f"{path} does not apply to {ROOT} at HEAD: {out.stderr.strip()[:300]}")
@@ -114,21 +129,22 @@ state = links(CLONE)
 report["stages"].append({"stage": "before", **state})
 report["drift"]["before"] = drift(CLONE)
 for name, path in STAGES:
-    out = run("git", "apply", "--check", str(HERE / path), cwd=CLONE, check=False)
+    out = run("git", "apply", "--check", str(PATCHES / path), cwd=CLONE, check=False)
     if out.returncode:
         failures.append(f"{path} does not apply in order on the clone: {out.stderr.strip()[:300]}")
         break
-    run("git", "apply", str(HERE / path), cwd=CLONE)
+    run("git", "apply", str(PATCHES / path), cwd=CLONE)
     commit(f"W2-130 check: {path}")
     state = links(CLONE)
     report["stages"].append({"stage": name, **state})
-    if name in ("a2", "a3"):
+    if name in ("a2", "a3", "f1", "f5"):
         report["drift"][f"after {name}"] = drift(CLONE)
 
 # ---------------------------------------------------------------- 3. the expectations
-build = json.loads((HERE / "build-summary.json").read_text())
+build = json.loads(BUILD.read_text())
 got = {s["stage"]: s["by_code"] for s in report["stages"]}
 before = got.get("before", {})
+roles = {s["stage"]: s["by_code_role"] for s in report["stages"]}
 
 
 def expect(stage, code, value, why):
@@ -139,26 +155,95 @@ def expect(stage, code, value, why):
         failures.append(f"after {stage}: {code} {have}, expected {value} ({why})")
 
 
-expect("a1", "UNMARKED_CHANGE", before.get("UNMARKED_CHANGE", 0) - build["a1"]["pairs"], "a1's pairs marked")
-expect("a2", "UNMARKED_CHANGE", build["a3"]["pairs"] + build["dropped_pairs"], "a3's pairs and the dropped left")
-AUDIT_CLEARS = 9  # the archive rewrite clears the 9 pairs only ARCHIVE §A's collective line stated (audit F4)
-expect("a0", "UNMARKED_CHANGE", build["a3"]["pairs"] + build["dropped_pairs"] - AUDIT_CLEARS,
-       "the archive one decision a line: its 9 unsupported pairs gone")
-for stage, value in (("a1", 86), ("a2", 46), ("a0", 37)):  # the independent audit's figures (w2-130-marks.md)
-    expect(stage, "UNMARKED_CHANGE", value, "the independent audit's figure")
-expect("b1", "UNLINKED_ID", build["b2"]["findings"], "only closed tickets' findings left")
-expect("a3", "UNMARKED_CHANGE", build["dropped_pairs"] - AUDIT_CLEARS,
-       "only the dropped pairs the archive rewrite does not clear (the loader row)")
-expect("b2", "UNLINKED_ID", 0, "every ticket linked")
-expect("b2", "CLOSED_TICKET_EDITED", before.get("CLOSED_TICKET_EDITED", 0) + build["b2"]["tickets"],
-       "each closed ticket b2 edits is one S16 finding (DEC-1088 (6))")
-expect("a2", "STATUS_CONFLICT", before.get("STATUS_CONFLICT", 0), "marks change no status")
+def expect_role(stage, key, value, why):
+    have = roles.get(stage, {}).get(key, 0)
+    report.setdefault("expectations", []).append({"stage": stage, "code": key, "expected": value, "got": have,
+                                                  "why": why, "ok": have == value})
+    if have != value:
+        failures.append(f"after {stage}: {key} {have}, expected {value} ({why})")
+
+
+def final_expectations():
+    last = report["stages"][-1]["stage"]
+    expect_role("before", "STATUS_CONFLICT orchestrator", 110, "the 110 spent-but-current ids, as the sitting found")
+    expect_role("f1", "STATUS_CONFLICT orchestrator", 7,
+                "after the statuses only group F's seven stay ACCEPTED while the archive still says spent")
+    expect_role("f2", "STATUS_CONFLICT orchestrator", 0, "the archive agrees with the register (KPI 6)")
+    expect("f2", "STATUS_CONFLICT", before.get("STATUS_CONFLICT", 0) - 110,
+           "only MR-1..MR-6 left (group G: product-spec regenerates them)")
+    expect(last, "UNMARKED_CHANGE", len(build["f5"]["dropped"]),
+           "only the dropped wrong pairs left (the audit's 3 and the 5 older-changer misreads; the loader row)")
+    for code in ("UNLINKED_ID", "CLOSED_TICKET_EDITED", "TICKET_CHANGE_UNMARKED", "UNKNOWN_ID"):
+        expect(last, code, before.get(code, 0), "the final patches leave it as it was")
+    # ENFORCES_SUPERSEDED rises only by places citing an id the rulings made SUPERSEDED or WITHDRAWN (D-6's to fix)
+    newly = {i for i, w in build["status_changes_by_id"].items() if w in ("SUPERSEDED", "WITHDRAWN")}
+    added = sorted(set(report["stages"][-1]["enforces"]) - set(report["stages"][0]["enforces"]))
+    gone = sorted(set(report["stages"][0]["enforces"]) - set(report["stages"][-1]["enforces"]))
+    stray = [x for x in added if re.findall(r"DEC-\d+", x.split(" | ")[0])[0] not in newly]
+    report["enforces_added"] = {"count": len(added), "by_id": {i: sum(1 for x in added if f"cites {i}:" in x)
+                                                               for i in sorted(newly)}, "stray": stray,
+                                "gone": gone}
+    ok = not stray and not gone
+    report.setdefault("expectations", []).append(
+        {"stage": last, "code": "ENFORCES_SUPERSEDED", "expected": f"{before.get('ENFORCES_SUPERSEDED', 0)} + new "
+         "ones naming only ids the rulings superseded or withdrew", "got": got[last].get("ENFORCES_SUPERSEDED", 0),
+         "why": f"{len(added)} new: " + ", ".join(f"{i} {n}" for i, n in report["enforces_added"]["by_id"].items()
+                                                  if n), "ok": ok})
+    if not ok:
+        failures.append(f"ENFORCES_SUPERSEDED changed other than by the new supersessions: {(stray + gone)[:5]}")
+    proposed = [x for x in report["stages"][-1]["not_in_force"] if "(PROPOSED)" in x and re.match(r"DEC-\d+ ", x)]
+    report["proposed_still_cited"] = proposed
+    if proposed:
+        failures.append(f"a register decision is still PROPOSED where it is cited as a rule: {proposed[:5]}")
+    sys.path.insert(0, str(CLONE / "src"))
+    from gov.store.loader import register_entries
+    status = {e["id"]: e["status"] for e in register_entries((CLONE / REGISTER).read_text())[0]}
+    sitting = (CLONE / "governance/project/orchestration/packages/W2-130-SITTING.md").read_text()
+    wrong = []
+    for i, prop in re.findall(r"^\| (DEC-\d+) \| [^|]* \| [^|]* \| \*\*(.+?)\*\* \|", sitting, re.M):
+        want = "ACCEPTED" if prop.startswith(("ACCEPTED", "In force", "Stays ACCEPTED")) else prop.split(" ")[0]
+        if status.get(i) != want:
+            wrong.append(f"{i}: {status.get(i)} (ruled {want})")
+    report["rulings_read_back"] = {"checked": len(re.findall(r"^\| DEC-\d+ \|", sitting, re.M)), "wrong": wrong}
+    if wrong:
+        failures.append(f"statuses not as ruled: {wrong[:5]}")
+
+
+if FINAL:
+    final_expectations()
+else:
+  expect("a1", "UNMARKED_CHANGE", before.get("UNMARKED_CHANGE", 0) - build["a1"]["pairs"], "a1's pairs marked")
+  expect("a2", "UNMARKED_CHANGE", build["a3"]["pairs"] + build["dropped_pairs"], "a3's pairs and the dropped left")
+  AUDIT_CLEARS = 9  # the archive rewrite clears the 9 pairs only ARCHIVE §A's collective line stated (audit F4)
+  expect("a0", "UNMARKED_CHANGE", build["a3"]["pairs"] + build["dropped_pairs"] - AUDIT_CLEARS,
+         "the archive one decision a line: its 9 unsupported pairs gone")
+  for stage, value in (("a1", 86), ("a2", 46), ("a0", 37)):  # the independent audit's figures (w2-130-marks.md)
+      expect(stage, "UNMARKED_CHANGE", value, "the independent audit's figure")
+  expect("b1", "UNLINKED_ID", build["b2"]["findings"], "only closed tickets' findings left")
+  expect("a3", "UNMARKED_CHANGE", build["dropped_pairs"] - AUDIT_CLEARS,
+         "only the dropped pairs the archive rewrite does not clear (the loader row)")
+  expect("b2", "UNLINKED_ID", 0, "every ticket linked")
+  expect("b2", "CLOSED_TICKET_EDITED", before.get("CLOSED_TICKET_EDITED", 0) + build["b2"]["tickets"],
+         "each closed ticket b2 edits is one S16 finding (DEC-1088 (6))")
+  expect("a2", "STATUS_CONFLICT", before.get("STATUS_CONFLICT", 0), "marks change no status")
 
 # ---------------------------------------------------------------- 4. the failure lines' guards
 after_register = (CLONE / REGISTER).read_text()
 old, new = before_register.split("\n"), after_register.split("\n")
 changed = [i for i, (a, b) in enumerate(zip(old, new)) if a != b]
-bad = [i + 1 for i in changed if not (new[i].startswith(old[i].rstrip()) and old[i].lstrip().startswith("- **Status:**"))]
+def kept_whole(a: str, b: str) -> bool:
+    """The old status line is in the new one whole: an append at the end, or (final) a status word inserted right
+    after `**Status:** ` with the old text following it unchanged."""
+    if not a.lstrip().startswith("- **Status:**"):
+        return False
+    if b.startswith(a.rstrip()):
+        return True
+    cut = a.index("**Status:**") + len("**Status:**")
+    rest = a[cut:].lstrip(" ").rstrip()
+    return FINAL and b.startswith(a[:cut] + " ") and re.search(r"; it was " + re.escape(rest), b) is not None
+
+
+bad = [i + 1 for i in changed if not kept_whole(old[i], new[i])]
 report["register"] = {"lines_changed": len(changed), "same_line_count": len(old) == len(new),
                       "not_an_append_to_a_status_line": bad[:20]}
 if bad or len(old) != len(new):
@@ -178,6 +263,19 @@ for name, text in before_tickets.items():
     if now == text:
         continue
     (fa, ba), (fb, bb) = split(text), split(now)
+    if FINAL:  # only W2-130's KPI 4 (H1 (b)), marked with the deciding ids
+        ka, kb = fa.get("kpis", {}).get("success", []), fb.get("kpis", {}).get("success", [])
+        diff_at = [n for n, (x, y) in enumerate(zip(ka, kb)) if x != y]
+        added_sources = [x for x in (fb.get("sources") or []) if x not in (fa.get("sources") or [])]
+        ok = (name == "DAEO-q8cl.md" and {k: v for k, v in fa.items() if k not in ("kpis", "sources")} ==
+              {k: v for k, v in fb.items() if k not in ("kpis", "sources")} and ba == bb
+              and (fb.get("sources") or [])[:len(fa.get("sources") or [])] == (fa.get("sources") or [])
+              and set(added_sources) <= {"DEC-1098", "DEC-1088"} and len(ka) == len(kb) and diff_at == [3]
+              and kb[3].endswith("[changed, DEC-1098 (3); DEC-1088 (6)]") and fa["kpis"].get("failure") ==
+              fb["kpis"].get("failure"))
+        if not ok:
+            ticket_bad.append(name)
+        continue
     others_same = {k: v for k, v in fa.items() if k != "sources"} == {k: v for k, v in fb.items() if k != "sources"}
     kept = set(map(str, fa.get("sources") or [])) <= set(map(str, fb.get("sources") or []))
     if not (others_same and ba == bb and kept):
@@ -188,13 +286,13 @@ if ticket_bad:
     failures.append(f"tickets changed other than sources: {ticket_bad[:10]}")
 
 report["failures"] = failures
-(HERE / "check-report.json").write_text(json.dumps(report, indent=1))
+(HERE / f"{REPORT}.json").write_text(json.dumps(report, indent=1))
 codes = sorted({c for s in report["stages"] for c in s["by_code"]})
-md = ["# W2-130 check report (generated by check.py)", "",
+md = [f"# W2-130 check report ({report['mode']}; generated by check.py)", "",
       f"HEAD `{report['head'][:12]}`; scratch clone `{CLONE}` (`git clone --shared`, nothing written to the repo).",
       "", "## `git apply --check` against the repository's HEAD (read-only)", ""]
 md += [f"- {k}: {'applies' if v else 'FAILS'}" for k, v in report["apply_check_on_repo"].items()]
-md += ["- a2 and a3: taken against the text a1 (and a2) leave; checked in order on the clone below", "",
+md += [f"- {', '.join(IN_ORDER_ONLY)}: taken against the text the earlier stages leave; checked in order on the clone below", "",
        "## `gov links --root <clone> --all`, by code, after each stage (cumulative)", "",
        "| Code | " + " | ".join(s["stage"] for s in report["stages"]) + " |",
        "|---|" + "---|" * len(report["stages"])]
@@ -212,9 +310,18 @@ md += [f"- {'ok' if e['ok'] else 'FAIL'}: after {e['stage']}, {e['code']} {e['go
 md += ["", "## Guards", "",
        f"- Register: {report['register']['lines_changed']} lines changed, each an append to a status line; line count "
        f"unchanged: {report['register']['same_line_count']}; other changes: {report['register']['not_an_append_to_a_status_line'] or 'none'}",
-       f"- Tickets: {report['tickets']['changed']} changed; changed other than `sources:`: "
-       f"{report['tickets']['changed_other_than_sources'] or 'none'}", "",
+       f"- Tickets: {report['tickets']['changed']} changed; changed other than "
+       f"{'W2-130 KPI 4 and its two new sources' if FINAL else '`sources:`'}: {report['tickets']['changed_other_than_sources'] or 'none'}"]
+if FINAL:
+    rb = report.get("rulings_read_back", {})
+    md += [f"- Rulings read back from the clone's register: {rb.get('checked')} checked, not as ruled: "
+           f"{rb.get('wrong') or 'none'}",
+           f"- PROPOSED register decisions still cited as a rule: {report.get('proposed_still_cited') or 'none'}",
+           "- NOT_IN_FORCE_AS_RULE, before → after: " + str(report["stages"][0]["by_code"].get("NOT_IN_FORCE_AS_RULE", 0))
+           + " → " + str(report["stages"][-1]["by_code"].get("NOT_IN_FORCE_AS_RULE", 0)) + "; new ones: "
+           + "; ".join(sorted(set(report["stages"][-1]["not_in_force"]) - set(report["stages"][0]["not_in_force"])))[:900]]
+md += ["",
        f"## Result: {'PASS' if not failures else 'FAIL'}", ""] + [f"- {f}" for f in failures]
-(HERE / "check-report.md").write_text("\n".join(md) + "\n")
+(HERE / f"{REPORT}.md").write_text("\n".join(md) + "\n")
 print("\n".join(md))
 sys.exit(1 if failures else 0)

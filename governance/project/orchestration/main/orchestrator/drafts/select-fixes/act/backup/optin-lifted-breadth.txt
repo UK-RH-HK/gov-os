@@ -1,0 +1,1252 @@
+# The opt-in suite `breadth`, part B (DEC-1061, tier 2; D4-LIST-B §2-§3; the CTO's P-1 (b)): cases kept built and
+# run with --optin=breadth or GOV_TESTS_OPTIN=breadth (both suites: lifted,breadth), left out of the full run and of
+# D-10's report-only `lifted` window. Two kinds:
+#   <file>::<function>   a function past tier 2's cap of 6 per KPI line (each line's own case was kept first)
+#   rep: <file or function>   only the first row of each parametrised function runs in the full run; a KPI line's
+#                             own case keeps every row (each class a KPI line names stays)
+# Each suite's README holds its KPI map after the cut (every kept line names the case that covers it).
+# Written by the cut's designer (part B); regenerate rather than edit by hand. Never delete these cases (DEC-953).
+
+# acceptance/W1-06
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_an_install_of_this_ticket_is_not_dated_before_its_approval  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_install_command_is_the_approved_one  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_the_ccusage_uninstall_command_uses_the_same_npm  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_a_stack_pin_cites_dec_074  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_pyyaml_cites_dec_191  # cap
+tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool  # cap
+tests/acceptance/W1-06/test_w1_06_pins.py::test_superpowers_is_recorded_at_v6_4_2  # cap
+tests/acceptance/W1-06/test_w1_06_pins.py::test_pyyaml_is_recorded_at_6_0_1  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_is_committed  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_is_valid_against_the_committed_schema  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_the_registry_records_at_least_one_tool  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_entry_states_all_seven_facts  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_each_tool_is_recorded_once  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_sha256_is_a_sha256_digest  # cap
+tests/acceptance/W1-06/test_w1_06_registry.py::test_every_date_is_a_calendar_date  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_vendor_folder_is_committed  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_a_skill_folder_is_there_with_its_skill_md  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_a_skill_md_declares_the_skill_of_its_folder  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_upstream_licence_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_other_skill_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_plugin_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_no_hook_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_nothing_but_the_three_skills_and_the_licence_is_there  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_excluded_parts_are_nowhere_in_the_repository  # cap
+tests/acceptance/W1-06/test_w1_06_vendor.py::test_the_scratch_clone_is_deleted  # cap
+tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_digest_rule_gives_the_value_worked_out_by_hand  # cap
+tests/acceptance/W1-06/test_w1_06_vendor_digest.py::test_the_superpowers_sha256_is_the_digest_of_the_committed_vendor_folder  # cap
+rep: tests/acceptance/W1-06/test_w1_06_digests.py  # one row per parametrised function
+rep: tests/acceptance/W1-06/test_w1_06_install_approvals.py  # one row per parametrised function
+
+# acceptance/W1-07
+tests/acceptance/W1-07/test_w1_07_recorded_commands.py::test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve  # cap
+tests/acceptance/W1-07/test_w1_07_recorded_commands.py::test_a_recorded_gov_command_is_offered_and_answers_its_help  # cap
+tests/acceptance/W1-07/test_w1_07_recorded_commands.py::test_lock_is_recorded_as_the_module_command_and_is_no_gov_command  # cap
+tests/acceptance/W1-07/test_w1_07_registry.py::test_closure_without_its_arguments_is_a_usage_error  # cap
+tests/acceptance/W1-07/test_w1_07_registry.py::test_a_name_outside_the_registry_is_not_answered_as_not_implemented  # cap
+rep: tests/acceptance/W1-07/test_w1_07_config.py::test_an_invalid_path_map_gives_config_invalid_on_every_command  # one row
+rep: tests/acceptance/W1-07/test_w1_07_config_details.py  # one row per parametrised function
+rep: tests/acceptance/W1-07/test_w1_07_envelope.py::test_the_exit_code_is_the_same_without_json  # one row
+rep: tests/acceptance/W1-07/test_w1_07_read_act.py::test_a_read_command_leaves_uncommitted_work_as_it_was  # one row
+rep: tests/acceptance/W1-07/test_w1_07_read_act.py::test_a_read_command_leaves_a_dev_tier_clone_clean  # one row
+
+# acceptance/W1-08
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_the_gov_cli_loads_the_committed_path_map  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_the_path_map_schema_names_the_optional_key  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_an_optional_key_in_a_wrong_shape_is_refused  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_path_map_without_the_optional_keys_validates_as_before  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_an_optional_key_in_a_valid_shape_validates  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_path_map_with_all_five_keys_validates  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_no_optional_key_is_required  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_top_level_key_the_schema_does_not_know_is_no_finding_as_before  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_kernel_has_one_schema_for_the_probe_record  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_names_no_path_of_a_project  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_is_a_valid_json_schema  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_a_well_formed_record  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_refuses_a_record_without_a_required_field  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_refuses_a_field_of_a_wrong_type_or_value  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_each_record_type_has_its_own_schema_file  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_a_committed_shared_definitions_file_exists  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_the_shared_definitions_file_is_a_valid_json_schema  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_template_validates_against_its_schema  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_template_validates_as_it_is_written  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_schema_refuses_a_record_that_is_not_a_map  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_ticket_template_carries_the_nine_fields  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_ticket_schema_defines_the_field  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_three_profiles_are_accepted_and_no_other  # cap
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_path_map_without_the_floor_key_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_strength_below_the_kernel_minimum_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_policy_value_that_is_not_a_strength_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_system_without_one_of_the_three_statuses_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_the_six_state_classes_are_accepted_and_no_other  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_a_record_without_id_type_or_status_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_the_optional_identity_fields_are_defined_and_optional  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_no_template_stores_what_gov_derives  # one row
+rep: tests/acceptance/W1-08/test_w1_08_id_grammar.py::test_the_id_of_the_record_is_governed_by_the_shared_grammar  # one row
+rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_scope_outside_the_three_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_severity_outside_the_four_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_whose_paths_are_not_a_list_of_patterns_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_that_declares_nothing_is_refused  # one row
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither[governance,product]  # fold (round 2: a row past the line's named classes)
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither[None]  # fold (round 2: a row past the line's named classes)
+
+# acceptance/W1-09
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_ticket_that_names_no_folder_needs_the_folder_of_its_own_id  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_the_ticket_becomes_ready_when_its_specification_closes  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_a_specification_that_is_no_record_is_not_closed  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_every_reason_that_holds_a_ticket_is_reported  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_every_open_ticket_is_either_ready_or_blocked  # cap
+tests/acceptance/W1-09/test_w1_09_ready.py::test_reading_the_queue_changes_nothing_in_the_project  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_named_folder_below_the_projects_acceptance_tests_counts  # cap
+tests/acceptance/W1-09/test_w1_09_review.py::test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_the_store_could_not_load_blocks_the_ticket_it_names  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_whose_frontmatter_cannot_be_read_holds_every_ticket  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_the_ticket_is_ready_again_when_the_package_loads_and_is_closed  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_that_loads_and_is_open_gives_the_reason_of_today  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_package_that_loads_and_is_closed_does_not_block  # cap
+tests/acceptance/W1-09/test_w1_09_unloaded_package.py::test_a_file_the_store_could_not_load_that_constrains_nothing_blocks_nothing  # cap
+tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_is_executable  # cap
+tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_works_without_the_installed_one  # cap
+rep: tests/acceptance/W1-09/test_w1_09_claims.py  # one row per parametrised function
+
+# acceptance/W1-10
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_before_2026_10_03_falls_back_to_the_message_body  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_from_2026_10_03_is_read_from_the_final_block_only  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_without_trailers_has_none  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_changed_file_returns_its_commits_with_their_trailers  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_the_trailers_of_a_file_resolve_to_records  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_file_no_commit_changed_has_no_commits  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_record_that_names_its_own_successor_is_not_active  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_active_set_without_a_type_covers_every_record_type  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_active_set_of_a_type_without_active_records_is_empty  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_type_and_status_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_type_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_status_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_query_that_matches_nothing_returns_nothing  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_edges_of_a_type_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_edges_of_one_source_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_record_without_links_has_no_edges  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_link_named_from_both_sides_is_one_edge  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_superseded_by_gives_a_supersedes_edge_from_the_successor  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_dangling_references_are_reported_by_id  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_dangling_reference_is_still_an_edge  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_reference_that_resolves_is_not_dangling  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_dangling_reference_goes_once_its_target_is_committed  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_trailer_that_names_no_record_is_reported_by_id  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_without_a_named_register_the_store_is_what_it_is_today  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_each_entry_of_the_named_register_is_a_decision_record  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_record_answers_the_filters_of_the_record_query  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_heading_that_is_no_entry_is_no_record  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_the_register_is_read_from_the_commit  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_named_only_in_the_working_tree_is_not_loaded  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_that_supersedes_decisions_gives_the_edge  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_partial_supersession_and_the_other_relations_give_no_edge  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_with_no_readable_status_is_no_record_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot_be_read_refuses_the_load  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails  # cap
+rep: tests/acceptance/W1-10/test_w1_10_determinism.py  # one row per parametrised function
+
+# acceptance/W1-11
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_active_over_a_concurrent_owner_demotion_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_active_over_a_concurrent_demotion_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_the_owner_file_over_an_agent_file_at_the_same_path_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_active_fails_although_the_demoted_line_merged_an_old_branch  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_the_same_merge_fails_without_the_old_branch  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_a_moved_active_file_over_a_demotion_at_the_old_path_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_a_second_merge_that_keeps_the_owner_file_does_not_hide_an_agent_reactivation  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_active_over_the_demoted_line_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_the_moved_file_over_the_demotion_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_of_a_branch_that_only_moved_an_approved_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_integration_merge_of_a_branch_where_the_owner_added_a_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_brings_nothing_about_decisions_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_old_branch_merged_late_into_a_line_where_the_owner_approved_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_the_main_line_merged_back_into_a_ticket_branch_and_the_branch_merged_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_agent_merge_that_sets_active_again_a_decision_the_owner_demoted_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_owner_merge_that_sets_active_again_a_demoted_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_agent_merge_that_brings_in_the_owner_commit_that_set_active_again_passes  # cap
+tests/acceptance/W1-11/test_w1_11_b_dev.py::test_one_id_in_both_decision_directories_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_citing_file_without_an_id_is_not_authorised_by_a_declined_gate  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_citing_ticket_whose_frontmatter_cannot_be_read_does_not_pass  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_second_empty_approval_key_does_not_take_the_first_out_of_the_check  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_gate_answered_for_the_same_cit_authorises  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_an_open_gate_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_one_dead_gate_among_the_cited_gates_fails_the_ticket  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_only_the_record_that_cites_the_dead_gate_fails  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_cited_id_that_is_no_record_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_cited_record_that_is_no_decision_package_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_citing_record_without_a_cit_is_not_authorised  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_gate_without_a_cit_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_two_missing_cits_are_not_the_same_cit  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_record_without_approval_is_not_checked  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_ticket_that_waits_on_an_open_or_answered_package_is_not_failed_by_the_checker  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_closed_ticket_named_by_a_dead_package_is_not_failed  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_naming_another_repository_does_not_hide_the_findings_of_the_root  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_does_not_make_a_folder_that_is_no_repository_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_does_not_make_a_subfolder_of_a_repository_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_grafts_file_does_not_turn_a_flagged_agent_merge_into_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_file_that_hides_a_parent_does_not_turn_a_flagged_agent_merge_into_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_an_owner_merge_passes_with_a_grafts_file_in_place  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_an_owner_merge_passes_with_a_commit_graph_git_wrote  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_git_setting_does_not_make_another_line_the_owner_trailer  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_the_owner_trailer_still_approves_with_the_setting_in_place  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_register_without_a_hazard_raises_no_hazard_finding  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_recorded_on_both_sides_is_not_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_an_active_decision_that_another_supersedes_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_an_active_decision_that_names_its_own_successor_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_stated_only_in_prose_is_not_read  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_one_id_in_two_files_of_one_directory_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_one_id_in_two_directories_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_ids_with_one_number_in_two_directories_are_flagged_as_overlapping  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_cycle_is_flagged_with_its_members  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_cycle_closed_through_superseded_by_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_the_same_tree_gives_the_same_findings_twice  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_folder_that_is_no_git_repository_is_an_error_not_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_no_id_and_replace_refs.py::test_an_active_decision_without_an_id_set_by_an_agent_fails  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_leaves_every_file_under_git_as_it_was  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_of_a_partial_clone_fetches_nothing_and_writes_nothing  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_of_a_partial_clone_whose_remote_is_out_of_reach_does_not_pass  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_decision_files_a_rewrite_would_not_reproduce_stay_byte_identical  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_uncommitted_work_in_the_tree_is_left_as_it_is  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_a_second_check_leaves_every_file_byte_identical_too  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_a_decision_file_that_cannot_be_read_does_not_pass_in_silence  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_a_markdown_file_without_frontmatter_is_not_unreadable  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_an_ordinary_file_is_not_unreadable  # cap
+rep: tests/acceptance/W1-11/test_w1_11_approval.py  # one row per parametrised function
+rep: tests/acceptance/W1-11/test_w1_11_approval_fail_closed.py  # one row per parametrised function
+rep: tests/acceptance/W1-11/test_w1_11_approval_history.py  # one row per parametrised function
+
+# acceptance/W1-13
+tests/acceptance/W1-13/test_w1_13_report.py::test_each_open_row_carries_its_number_key_and_state  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_required_row_in_a_state_that_does_not_satisfy_is_open  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_row_that_is_not_applicable_with_its_reason_is_satisfied  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_standard_specification_holds_only_the_rows_of_its_declared_types  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_the_open_cells_of_a_tickets_specification_are_named  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_ticket_whose_specification_is_complete_passes  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_specification_with_no_profile_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_report.py::test_a_capability_type_outside_the_taxonomy_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_schema.py::test_a_weakened_schema_does_not_let_a_specification_pass  # cap
+tests/acceptance/W1-13/test_w1_13_schema.py::test_a_weakened_schema_does_not_let_a_specification_be_closed  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_with_no_frontmatter_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_that_is_not_of_type_specification_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_with_no_id_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_proposal_whose_frontmatter_is_not_yaml_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_change_with_a_readiness_record_and_no_proposal_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_one_unreadable_change_beside_a_complete_specification_does_not_pass  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_a_project_with_no_change_passes  # cap
+tests/acceptance/W1-13/test_w1_13_unreadable.py::test_the_archive_folder_is_not_a_change  # cap
+rep: tests/acceptance/W1-13/test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed  # one row
+rep: tests/acceptance/W1-13/test_w1_13_gate.py  # one row per parametrised function
+rep: tests/acceptance/W1-13/test_w1_13_na.py::test_a_silent_na_on_a_row_the_profile_does_not_require_is_rejected  # one row
+
+# acceptance/W1-14
+tests/acceptance/W1-14/test_w1_14_refusals.py::test_a_change_without_a_specification_record_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_second_run_creates_no_duplicate_ticket  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_second_run_does_not_reopen_work_and_derives_only_the_new_task  # cap
+tests/acceptance/W1-14/test_w1_14_rerun.py::test_a_refused_second_run_leaves_the_first_runs_tickets_alone  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_task_dependencies_become_ticket_dependencies  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_task_may_depend_on_a_ticket_that_already_exists  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_cycle_between_tasks_is_refused_and_no_ticket_is_written  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_cycle_through_tickets_that_already_exist_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_dependency_that_names_nothing_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_a_task_number_written_as_a_yaml_number_is_refused  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_derived_tickets_move_through_the_ready_rule  # cap
+tests/acceptance/W1-14/test_w1_14_schema_and_dag.py::test_derived_tickets_are_held_when_their_specification_is_reopened  # cap
+rep: tests/acceptance/W1-14/test_w1_14_refusals.py::test_no_ticket_is_derived_without_a_profile_or_a_class  # one row
+rep: tests/acceptance/W1-14/test_w1_14_refusals.py::test_a_specification_that_is_not_closed_gives_no_ticket  # one row
+
+# acceptance/W1-15
+rep: tests/acceptance/W1-15/test_w1_15_check_time_limit.py  # one row per parametrised function
+rep: tests/acceptance/W1-15/test_w1_15_product_data.py  # one row per parametrised function
+
+# acceptance/W1-16
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_the_clean_files_are_in_the_code_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_the_secrets_indexing_check_of_w1_15_is_green_on_the_index  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_a_file_the_path_map_classes_as_product_data_is_not_in_the_code_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_a_secret_added_after_the_first_index_leaves_the_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_no_dev_canary_reaches_the_code_index  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_the_tool_alone_serves_its_ui_unless_the_setting_of_its_home_says_false  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_call_of_the_wrapper_leaves_the_ui_off  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_second_index_keeps_the_ui_off  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_first_call_that_builds_no_index_does_not_serve_the_ui  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_setting_left_in_the_home_is_turned_off_by_the_next_call  # cap
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_callers_and_impact_are_answered_in_every_language  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_a_renamed_symbol_is_answered_under_its_new_name_only  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_definitions_name_every_file_that_defines_the_symbol  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_references_name_every_file_with_a_call_site  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_dead_code_names_the_unreferenced_functions_and_no_live_one  # one row
+rep: tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py  # one row per parametrised function
+rep: tests/acceptance/W1-16/test_w1_16_paths_and_roots.py  # one row per parametrised function
+
+# acceptance/W1-17
+tests/acceptance/W1-17/test_w1_17_incremental.py::test_an_index_brought_up_to_date_equals_one_built_from_nothing  # cap
+tests/acceptance/W1-17/test_w1_17_incremental.py::test_building_the_index_changes_no_tracked_file  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_the_chunks_of_one_file_are_listed_by_its_path  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_a_chunk_of_a_document_has_its_section_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_two_sections_of_one_document_are_two_parents  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_a_chunk_inside_a_python_function_has_that_function_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_python_code_outside_any_function_has_the_module_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_chunk_and_parent_ids_are_the_same_in_a_second_build  # cap
+rep: tests/acceptance/W1-17/test_w1_17_corpus.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_digest.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_exact_query.py::test_a_string_with_query_syntax_characters_is_read_as_the_string_it_is  # one row
+rep: tests/acceptance/W1-17/test_w1_17_family_check.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_freshness.py  # one row per parametrised function
+
+# acceptance/W1-19
+tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_no_text_the_secret_filter_refuses_is_embedded_or_returned  # cap
+tests/acceptance/W1-19/test_w1_19_semantic_index.py::test_a_changed_file_is_embedded_before_the_next_retrieval_and_stale_vectors_are_reported  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_the_semantic_route_says_unavailable_when_ollama_is_absent  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_building_the_vectors_says_unavailable_when_ollama_is_absent  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_search_that_may_not_write_reports_a_missing_index_and_writes_nothing  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_without_ollama_the_fused_list_is_the_lexical_routes_reranked_in_one_pass  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_limit_cuts_the_list_after_the_rerank_not_before  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises  # cap
+tests/acceptance/W1-19/test_w1_19_unavailable.py::test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises  # cap
+
+# acceptance/W1-20
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_a_closure_does_not_build_the_store  # cap
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_an_uncommitted_edit_of_a_record_is_not_in_the_closure  # cap
+tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py::test_the_result_names_the_files_that_differ_from_head  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_a_gap_beyond_the_depth_says_so  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_an_id_already_in_the_closure_is_no_gap  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_only_unresolved_start_ids_give_an_answer_with_gaps  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_an_unresolved_id_is_told_from_one_beyond_the_depth  # cap
+tests/acceptance/W1-20/test_w1_20_gaps.py::test_a_depth_cut_together_with_an_unresolved_id_stops_on_the_depth  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_a_cycle_ends_and_is_complete  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_several_start_ids_give_the_closure_of_all_of_them  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_the_result_names_the_depth_it_ran_at  # cap
+tests/acceptance/W1-20/test_w1_20_records.py::test_a_record_that_names_the_start_record_is_in_its_closure  # cap
+rep: tests/acceptance/W1-20/test_w1_20_records.py::test_the_depth_scales_with_the_impact_radius  # one row (round 2: the function is a KPI line's case)
+rep: tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py  # one row per parametrised function
+
+# acceptance/W1-21
+tests/acceptance/W1-21/test_w1_21_command.py::test_in_a_project_without_an_index_the_command_answers_and_builds_nothing  # cap
+tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_retr_x_02_a_record_that_does_not_exist_is_a_stated_gap  # cap
+tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_retr_x_02_a_question_spanning_three_locations_shows_batches_merge_and_reason  # cap
+rep: tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_no_file_whose_frontmatter_says_superseded_is_cited_on_a_dev_tier  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_retr_a_04_finds_and_cites_both_implementations  # cap
+tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line  # cap
+tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_every_measured_bundle_was_reranked_from_both_routes  # cap
+tests/acceptance/W1-21/test_w1_21_expansion.py::test_a_bundle_budget_of_nothing_expands_nothing  # cap
+tests/acceptance/W1-21/test_w1_21_expansion.py::test_every_span_wider_than_its_chunk_is_a_named_expansion  # cap
+tests/acceptance/W1-21/test_w1_21_failure_memory.py::test_a_record_out_of_scope_is_not_returned  # cap
+tests/acceptance/W1-21/test_w1_21_failure_memory.py::test_the_records_come_ahead_in_a_small_first_batch_too  # cap
+tests/acceptance/W1-21/test_w1_21_family_check.py::test_the_check_is_red_when_the_dev_tiers_fail_the_baselines  # cap
+tests/acceptance/W1-21/test_w1_21_family_check.py::test_without_dev_tiers_the_check_reports_unmeasured_and_is_not_green  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_a_chunk_both_routes_return_is_cited_once_and_names_both  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_small_batches_cite_no_chunk_twice  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_several_batches_are_reranked_in_one_pass_over_the_merged_set  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_a_continued_bundle_is_reranked_once_too  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_without_a_reranker_the_bundle_says_nothing_was_reranked  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_a_reranker_that_dies_after_loading_does_not_end_the_retrieval  # cap
+tests/acceptance/W1-21/test_w1_21_merge.py::test_a_rerank_over_more_than_thirty_candidates  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_a_small_batch_size_gives_several_batches_and_everything_is_gathered  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_the_default_batch_size_is_ten  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_the_batch_size_does_not_change_what_is_gathered  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_the_continuation_neither_skips_nor_repeats  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_every_bundle_of_a_continuation_is_checked_against_the_bytes  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_a_continuation_that_is_no_token_is_refused  # cap
+tests/acceptance/W1-21/test_w1_21_paging.py::test_a_continuation_of_another_question_is_refused  # cap
+rep: tests/acceptance/W1-21/test_w1_21_paging.py::test_reaching_the_spend_budget_ends_with_the_reason_and_the_gap_list  # one row (round 2: the function is a KPI line's case)
+rep: tests/acceptance/W1-21/test_w1_21_paging.py::test_the_spend_budget_is_separate_from_the_bundle_budget  # one row (round 2: the function is a KPI line's case)
+rep: tests/acceptance/W1-21/test_w1_21_authority.py  # one row per parametrised function
+rep: tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py  # one row per parametrised function
+rep: tests/acceptance/W1-21/test_w1_21_command.py  # one row per parametrised function
+
+# acceptance/W1-22
+tests/acceptance/W1-22/test_w1_22_validator.py::TestValidatorRejects::test_validator_reports_multiple_errors  # cap
+
+# acceptance/W1-24
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_mandatory_record_that_is_read_has_the_hash_of_its_file  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_lookup_that_fails_on_a_file_it_cannot_read_says_so_and_not_that_the_index_is_unavailable  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_a_lookup_that_fails_on_a_damaged_index_says_that_the_index_is_unavailable  # cap
+tests/acceptance/W1-24/test_w1_24_standing_sources.py::test_the_two_failures_give_two_packets  # cap
+tests/acceptance/W1-24/test_w1_24_supplementary.py::test_supplementary_context_is_non_empty_with_a_built_index  # cap
+tests/acceptance/W1-24/test_w1_24_supplementary.py::test_the_packet_indicates_supplementary_is_unavailable_when_the_index_is_down  # cap
+rep: tests/acceptance/W1-24/test_w1_24_standing_sources.py  # one row per parametrised function
+
+# acceptance/W1-25
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_a_trigger_outside_the_list_is_refused  # cap
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_a_checkpoint_at_the_transition_clears_it  # cap
+tests/acceptance/W1-25/test_w1_25_triggers.py::test_another_tickets_checkpoint_does_not_cover_the_transition  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_new_checkpoint_is_fresh_under_the_default_policy  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_within_every_threshold_is_fresh  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_an_old_checkpoint_is_stale_by_age  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_is_stale_by_the_commits_since  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_a_checkpoint_is_stale_by_context_utilisation  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_every_violated_threshold_is_reported  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_the_watchdog_only_reads  # cap
+tests/acceptance/W1-25/test_w1_25_watch.py::test_without_json_the_exit_code_and_one_message_carry_the_verdict  # cap
+rep: tests/acceptance/W1-25/test_w1_25_record.py  # one row per parametrised function
+
+# acceptance/W1-26
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_reported_in_json  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_unknown_family_in_text_output  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_name_normalisation_retrieval_regression  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_family_name_normalisation_mixed_case_and_punctuation  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_in_nested_path_discovered_by_graph_check  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_record_with_unknown_type_not_silently_skipped  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_new_command_module_discovered_by_commands_check  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_new_pathmap_namespace_picked_up  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_check_declaration_for_unregistered_family_runs  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_readiness_check_all_return_value_not_ignored  # cap
+tests/acceptance/W1-26/test_w1_26_dec436.py::test_readiness_check_all_exception_caught  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_not_green_json  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_no_check_family_not_green_text  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_present_for_every_family  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_zero_for_uncovered_families  # cap
+tests/acceptance/W1-26/test_w1_26_dec438.py::test_check_count_positive_for_covered_families  # cap
+tests/acceptance/W1-26/test_w1_26_derived.py::test_removing_a_defective_record_clears_the_finding  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_gap_ticket_naming_closed_ticket_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_gap_ticket_naming_nonexistent_ticket_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_gap_tickets.py::test_complete_specification_no_gap_finding  # cap
+tests/acceptance/W1-26/test_w1_26_green_base.py::test_the_base_project_is_green_before_any_defect  # cap
+tests/acceptance/W1-26/test_w1_26_green_base.py::test_the_checks_left_out_of_the_base_are_the_only_red_checks_of_the_full_base  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_project_lists_its_declarations  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_project_is_answered_as_the_same_kernel_in_the_template_layout  # cap
+rep: tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_the_declared_command_of_an_installed_check_is_started_and_its_result_reported  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_kernel_declaration_whose_command_names_template_paths_measures_the_installed_kernel  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_in_an_installed_project_a_record_that_breaks_its_schema_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_in_an_installed_project_records_that_keep_their_schemas_give_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_gov_check_in_an_installed_project_is_red_on_a_record_that_breaks_its_schema  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_an_installed_kernel_without_a_record_s_schema_is_never_silent_about_it  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_project_with_neither_layout_answers_as_today  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_alike_every_check_runs_once_as_with_the_template_alone  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_this_repository_s_own_list_holds_each_declaration_of_its_template_once  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_declaration_in_one_layout_only_is_run  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_one_check_id_declared_differently_in_the_two_layouts_is_refused  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_record_is_held_to_the_schemas_of_both  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_declaration_that_is_not_valid_is_refused_under_the_installed_layout_as_under_the_template  # cap
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_with_both_layouts_a_declaration_that_is_not_valid_in_the_installed_one_is_refused  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_folder_exists_no_reports_says_not_applicable  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_folder_does_not_exist_says_not_applicable  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_not_applicable_exit_code_is_2  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorNotApplicable::test_not_applicable_exit_code_distinct_from_findings_and_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_no_args_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_file_does_not_exist_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorUnmeasuredUnchanged::test_outside_git_repo_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorFolderWithReports::test_folder_valid_report  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestValidatorFolderWithReports::test_folder_broken_report  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_check_is_yellow  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_family_is_yellow  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedIn::test_opted_in_reason_in_json  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerNotOptedIn::test_not_opted_in_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_findings_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_unmeasured_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_crash_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_other_exit_code_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestRunnerOptedInOtherFailures::test_marker_with_exit_0_not_green  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestLifecycle::test_lifecycle  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestNeverGreen::test_not_applicable_never_green_json  # cap
+tests/acceptance/W1-26/test_w1_26_not_applicable.py::TestNeverGreen::test_not_applicable_never_green_text  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_reported_by_name  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_absent_no_exception  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_present_and_passing  # cap
+tests/acceptance/W1-26/test_w1_26_openspec.py::test_openspec_present_and_failing_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_provenance_commit_is_head  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_two_runs_same_commit_same_provenance  # cap
+tests/acceptance/W1-26/test_w1_26_provenance.py::test_provenance_changes_with_a_new_commit  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_gov_check_runs_readiness  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_readiness_invalid_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_complete_specification_no_readiness_finding  # cap
+tests/acceptance/W1-26/test_w1_26_readiness.py::test_no_specifications_no_readiness_finding  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_with_every_module_present_the_check_has_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_a_skill_may_name_a_recorded_gov_command  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_gov_lock_in_a_skill_stays_an_unknown_command  # cap
+tests/acceptance/W1-26/test_w1_26_recorded_commands.py::test_the_module_command_of_lock_in_a_skill_is_not_flagged  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_absent_family_reported_by_name  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_core_check_declared  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_already_declared_check_is_listed  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_declared_checks_are_run  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_a_new_check_added_to_the_folder_is_picked_up  # cap
+tests/acceptance/W1-26/test_w1_26_registry.py::test_misspelled_family_name_not_silently_dropped  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_the_check_measures_and_is_green_on_well_formed_skills  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_a_planted_defect_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_an_installed_project_an_absent_skill_is_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_the_check_is_green_on_well_formed_skills  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_a_planted_defect_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_the_template_layout_an_absent_skill_is_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_with_both_layouts_well_formed_the_check_is_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_with_both_layouts_a_defect_in_either_is_a_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_in_a_project_with_neither_layout_the_check_is_unmeasured_and_never_green  # cap
+tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py::test_a_skills_folder_without_the_check_s_skills_is_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestValidSkillFile::test_valid_skill_file_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestValidSkillFile::test_valid_skill_folder_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingFrontmatter::test_no_frontmatter_delimiters  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingFrontmatter::test_unclosed_frontmatter  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingVersion::test_no_version_field  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestMissingVersion::test_empty_version_field  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDescriptionTooLong::test_description_over_60_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDescriptionTooLong::test_description_at_60_tokens_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestBodyTooLong::test_body_over_2500_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestBodyTooLong::test_body_at_2500_tokens_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnknownGovCommand::test_unknown_gov_command_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnknownGovCommand::test_multiple_unknown_commands  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestKnownGovCommand::test_known_gov_command_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNoArguments::test_no_args_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestEmptyFolder::test_empty_folder_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestEmptyFolder::test_folder_with_non_frontmatter_md  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnreadableFile::test_nonexistent_path_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnreadableFile::test_nonexistent_folder_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDeepFolderSearch::test_deep_folder_all_valid  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestDeepFolderSearch::test_deep_folder_one_broken  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNoFrontmatterIsFinding::test_skill_with_no_frontmatter_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_misspelt_command_with_args  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_valid_command_with_args_passes  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_fenced_code_block_misspelt_command  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestCommandRefsWithArgs::test_bare_gov_command_still_works  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_version_integer_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_name_integer_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_description_list_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_name_empty_string_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestNonTextFields::test_description_empty_string_is_finding  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestTokenCountFormula::test_body_10001_chars_is_2501_tokens  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnmeasuredEdgeCases::test_valid_folder_plus_missing_path  # cap
+tests/acceptance/W1-26/test_w1_26_skill_validator.py::TestUnmeasuredEdgeCases::test_binary_file_unmeasured  # cap
+tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_taxonomy_field_changed_without_cite_is_red  # cap
+tests/acceptance/W1-26/test_w1_26_taxonomy.py::test_no_change_to_dimensions_no_finding  # cap
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_ticket_missing_kpis  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_decision_missing_status  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_dangling_depends_on  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_duplicate_id  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_graph_defect_id_outside_grammar  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_active_while_superseded  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_mutation_defect_implementer_covers_acceptance  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_mutation_defect_implementer_covers_acceptance_subpath  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_pathmap_defect_file_matches_no_namespace  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_pathmap_defect_file_matches_two_namespaces  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_ticket_dag_cycle  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_ticket_missing_required_field  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_commands_defect_reserved_command_no_module  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_missing_type  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_type_null  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_schema_defect_record_type_non_string  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_decision_checker_exception_not_swallowed  # folded into test_a_planted_defect_of_every_family_is_found
+tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id  # folded into test_a_planted_defect_of_every_family_is_found
+rep: tests/acceptance/W1-26/test_w1_26_audit_validator.py  # one row per parametrised function
+
+# acceptance/W1-27
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_registered_location_passes  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_registered_location_wrong_version_fails  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_at_empty_registered_location_fails  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_tool_without_registered_location_found_on_path  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_doctor_does_not_modify_path  # cap
+rep: tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_stale_path_in_historical_record_is_not_reported  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-27/test_w1_27_doctor_r5.py::test_stale_path_section_counts_excluded_historical  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_found_under_another_entrys_prefix  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_absent_from_all_prefixes_found_on_path  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_own_prefix_wins_over_other_entrys_prefix  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_no_version_no_hash_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_no_version_hash_match_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_version_raises_no_hash_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r6.py::test_tool_version_mismatch_fails_despite_hash_match  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_wrong_content_sha256_match_false  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_wrong_content_has_reason  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_right_content_passes  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_vendored_folder_absent_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_python_package_wrong_version_not_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_python_package_right_version_ok  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_distribution_package_sha256_match_not_true  # cap
+rep: tests/acceptance/W1-27/test_w1_27_doctor_r7.py::test_home_tool_wrong_sha256_not_ok  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_index_freshness_error_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_canary_error_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_doctor_isolation_broken_git_is_fail  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_unmeasured_absence_prevents_adopted_healthy  # cap
+tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py::test_healthy_false_when_measurement_error  # cap
+tests/acceptance/W1-27/test_w1_27_isolation_r2.py::test_doctor_isolation_is_measured_not_constant  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_sources_md_is_not_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_stale_path_in_old_cli_tree_is_not_reported  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_inside_its_new_path_is_not_stale  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_old_path_standalone_is_stale_when_new_path_elsewhere  # cap
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py::test_historical_excluded_nonzero_when_historical_holds_old_path  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_recreates_lexical_index  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_does_not_silently_drop_lexical_tables  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py::test_rebuild_result_names_unreconstructed_stores  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_lexical_index_is_fresh  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_lexical_search_finds_tracked_text  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_result_names_derived_stores_with_measured_status  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py::test_rebuild_does_not_hold_lexical_schema_copy  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_secret_file_not_in_lexical_index  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_lexical_digest_matches_owner_refresh  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_stores_hold_no_secret  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_codeintel_reason_is_measured  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r4.py::test_rebuild_codeintel_is_recreated_when_tool_answers  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_returns_envelope  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_lexical_not_built  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_no_traceback  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_record_store_outcome  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_idempotent_digest  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_no_path_map_writes_only_act_paths  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_gives_error_envelope  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_no_traceback  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_not_complete  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r5.py::test_rebuild_owner_raises_writes_only_act_paths  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_rebuild_without_the_argument_asks_the_endpoint_as_today  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_asks_the_endpoint_nothing_and_starts_no_program  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_starts_no_program_when_the_endpoint_is_down  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_builds_everything_else_a_rebuild_builds  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_two_rebuilds_in_the_mode_give_the_same_digest  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_retrieval_on_a_store_whose_vectors_could_not_be_built_says_so  # cap
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_a_retrieval_on_a_store_rebuilt_without_embeddings_says_so  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_not_unconditionally_exit_zero  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_exits_nonzero_on_tampered_store  # cap
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_check_reports_unmeasured_when_no_store  # cap
+tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py::test_doctor_does_not_crash_on_minimal_path_map  # cap
+tests/acceptance/W1-27/test_w2_67_copies.py::test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs  # cap
+tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py::test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace  # cap
+tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py::test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_the_pytest_configuration_passes_no_basetemp_and_keeps_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_run_after_older_runs_leaves_at_most_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_run_after_killed_runs_leaves_at_most_three_base_folders  # cap
+tests/acceptance/W1-27/test_w2_67_temp_folders.py::test_a_base_folder_of_a_run_still_going_is_kept  # cap
+rep: tests/acceptance/W1-27/test_w1_27_schema.py::test_missing_required_top_level_key_names_the_key  # one row
+rep: tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py  # one row per parametrised function
+rep: tests/acceptance/W1-27/test_w2_67_codegraph_folders.py  # one row per parametrised function
+
+# acceptance/W1-29
+rep: tests/acceptance/W1-29/test_session_hooks.py::TestSubagentStop::test_malformed_input_fails_closed  # one row
+rep: tests/acceptance/W1-29/test_session_hooks.py::TestHookCopiesIdentical::test_hook_copies_identical  # one row
+
+# acceptance/W1-31
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_commits_that_cannot_be_read_are_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_kpi_disputes_are_read_from_the_orchestrators_record  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_kpi_disputes_are_not_measured_without_a_readable_record  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_an_empty_checkpoint_folder_counts_zero_and_an_absent_one_is_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py::test_the_close_record_is_not_measured_before_the_close  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_hook_run_without_added_context_counts_zero  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_sessionstart_packet_is_counted_each_time_it_is_given  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_added_context_of_any_other_event_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_text_of_a_blocking_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_text_of_a_failing_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_blocked_gov_command_is_counted_once_as_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_gov_result_marked_as_an_error_is_counted  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_gov_beside_other_commands_is_counted_whole_and_the_record_says_so  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_subagents_file_that_ccusage_reads_otherwise_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_subagent_of_a_session_that_was_not_named_is_never_counted  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_latency_is_the_api_duration_of_each_sessions_last_totals_line  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_a_session_without_a_totals_line_has_no_latency  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_agent_is_the_harness_and_its_version  # cap
+tests/acceptance/W1-31/test_w1_31_second_specimen.py::test_the_precompact_gap_is_named_and_is_no_entry_of_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_the_counter_is_a_command_of_gov  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_automatic_checkpoints_are_checkpoint_records  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_record_names_every_p1_field_and_invents_none  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_sessions_carry_what_ccusage_measured_for_each  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_cost_is_ccusages  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_record_is_plain_data_a_close_record_can_carry  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_the_counter_writes_nothing  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_named_session_without_a_log_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_absent_log_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_empty_log_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_absent_ccusage_refuses  # cap
+tests/acceptance/W1-31/test_w1_31_share_counter.py::test_ccusage_that_cannot_be_read_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_sessionstart_hooks_plain_output_is_the_packet_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_failing_sessionstart_hook_is_hook_output_by_the_larger_reading  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_plain_output_of_a_hook_of_any_other_event_counts_zero  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_added_context_after_a_failed_tool_call_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_gov_called_by_a_path_is_gov_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_gov_result_by_a_path_marked_as_an_error_is_counted  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_gov_through_another_runner_is_not_measured_by_name  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_shortened_result_is_counted_as_logged_and_tool_results_is_passed_over  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_any_other_content_of_a_sessions_folder_gives_no_figure  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_call_a_hook_denies_by_its_answer_is_hook_output  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_call_a_permission_rule_denies_counts_nothing  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_denial_in_a_form_no_specimen_shows_is_not_measured  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_the_feedback_of_a_blocking_stop_hook_is_hook_output_counted_once  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_the_feedback_of_a_blocking_subagentstop_hook_is_counted_once_with_the_session  # cap
+tests/acceptance/W1-31/test_w1_31_third_specimen.py::test_a_stop_hooks_block_in_a_form_no_specimen_shows_is_not_measured  # cap
+rep: tests/acceptance/W1-31/test_w1_31_fourth_specimen.py  # one row per parametrised function
+rep: tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py  # one row per parametrised function
+
+# acceptance/W1-32
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_an_open_package_names_the_tickets_that_wait_on_it  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_every_specification_is_listed_with_its_verdict  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_verdict_is_the_readiness_checkers  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_governance_share_is_not_measured_and_says_why  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_doctor_summary_gives_doctors_verdict  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_doctor_summary_names_every_part_that_did_not_pass  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_an_unhealthy_doctor_is_shown_with_the_part_that_failed  # cap
+tests/acceptance/W1-32/test_w1_32_status_parts.py::test_the_plain_form_shows_the_same_parts  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_project_that_is_not_paused_says_so  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_says_so  # cap
+rep: tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_names_who_paused_it  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_paused_project_still_reports_its_other_parts  # cap
+tests/acceptance/W1-32/test_w1_32_status_pause.py::test_a_flag_removed_by_hand_with_its_mirror_left_is_not_reported_as_not_paused  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_leaves_uncommitted_work_as_it_was  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_writes_no_store_where_none_is  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_with_root_writes_neither_in_the_project_nor_where_it_runs  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_repeated_status_gives_the_same_answer_and_writes_nothing  # cap
+tests/acceptance/W1-32/test_w1_32_status_read_only.py::test_status_leaves_a_dev_tier_clone_clean  # cap
+rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_record_the_load_cannot_take_is_not_hidden_behind_a_clean_list_of_packages  # one row
+rep: tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written  # one row
+rep: tests/acceptance/W1-32/test_w1_32_launch.py::test_a_failed_removal_keeps_the_sessions_exit_code  # one row per parametrised function
+rep: tests/acceptance/W1-32/test_w1_32_launch.py::test_a_failed_removal_writes_one_line_to_stderr_that_names_the_folder  # one row per parametrised function
+rep: tests/acceptance/W1-32/test_w1_32_status_not_read.py  # one row per parametrised function
+
+# acceptance/W1-35
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_the_route_names_the_parts_the_answer_is_given_from  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_a_part_marked_not_read_is_said_not_to_be_read  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestStatusRoute::test_the_answer_is_never_given_from_recall  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_declaration_has_the_form_of_the_existing_one  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_declared_command_runs_the_generic_validator_over_the_new_skill  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_delivered_skill_passes_the_generic_validator  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationCheck::test_gov_check_runs_the_check_under_the_skill_regression_family  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRulesyncSources::test_the_skills_rulesync_source_is_the_kernel_skill  # cap
+tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRulesyncSources::test_the_orchestrator_roles_rulesync_source_carries_the_role_files_body  # cap
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_version_is_present_and_nonempty  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_description_within_60_tokens  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestFrontmatterAndSize::test_body_within_2500_tokens  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestReferencedCommands::test_referenced_commands_are_known  # one row
+rep: tests/acceptance/W1-35/test_w1_35.py::TestCitations::test_skill_cites_at_least_one_reference  # one row
+rep: tests/acceptance/W1-35/test_w1_35_orchestration.py  # one row per parametrised function
+
+# acceptance/W1-36
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_references_cap_16  # cap
+tests/acceptance/W1-36/test_w1_36_retrieval_skill.py::TestRetrievalSubagents::test_the_skill_references_cap_56  # cap
+tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillFrontmatter::test_has_version_in_frontmatter  # cap
+tests/acceptance/W1-36/test_w1_36_skill_form.py::TestSkillTokenLimit::test_body_at_most_2500_tokens  # cap
+
+# acceptance/W1-38
+tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::test_the_source_s_command_line_is_the_kernel_template_s_form  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_the_fixture_holds_a_product_package_and_the_installed_governance_package  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_call_the_guard_lets_through_is_let_through_by_its_own_answer  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_command_line.py::TestAProductPackageNamedGov::test_a_call_the_guard_refuses_is_refused_by_its_written_refusal  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_every_guard_hook_entry_of_the_source_carries_the_time_limit  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_one_source_entry_without_the_whole_number_60_is_found  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_a_limit_written_as_a_fraction_in_the_source_file_is_found  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::test_a_source_entry_that_runs_no_kernel_hook_is_left_as_it_is  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_every_guard_hook_entry_of_the_generated_settings_carries_the_time_limit  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_generated_settings_run_the_containment_program_after_a_failed_bash_call  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestGeneratedGuardHooks::test_the_three_events_compared_are_the_kernel_template_s_guard_events  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestRulesyncPassesBothThrough::test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_an_acceptance_test_changed_by_a_failed_command_is_restored  # cap
+tests/acceptance/W1-38/test_w1_38_hooks_source.py::TestFailedCommandInAGeneratedProject::test_a_failed_command_that_stays_in_scope_is_left_alone  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSkillGeneration::test_skill_body_matches_source  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestVendoredSkillRegistration::test_vendored_skill_is_the_kernel_copy  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestClaudeMdAndAgentsMd::test_agents_md_carries_the_root_rule  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestOpenSpecCommands::test_generated_command_is_the_one_openspec_ships  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestOpenSpecCommands::test_no_opsx_command_that_openspec_does_not_ship  # cap
+rep: tests/acceptance/W1-38/test_w1_38_rulesync.py::TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestOpenSpecSkills::test_no_openspec_skill_that_openspec_does_not_ship  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_red_after_a_hand_edit  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRulesyncVersion::test_registry_file_absent_is_not_green  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRulesyncVersion::test_registry_without_a_rulesync_entry_is_not_green  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRulesyncVersion::test_project_expecting_another_version_is_not_green  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRulesyncVersion::test_installed_rulesync_of_another_version_is_not_green  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_kernel_role_changed_without_its_source  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_role_source_changed_without_its_kernel_role  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_kernel_skill_changed_without_its_source  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestKernelAgainstAdapterSource::test_skill_source_changed_without_its_kernel_skill  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_role_file  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestHandEditDetected::test_hand_edit_skill_file  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestFindings::test_findings_name_exactly_the_edited_file  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestFindings::test_one_hand_edit_is_one_finding  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestFindings::test_rulesync_failure_without_a_file_is_reported_with_its_reason  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestMissingFileDetected::test_missing_agents_md_fails_check  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSourceChangeDetected::test_source_change_fails_check  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestToolAbsentOrHanging::test_rulesync_absent_not_green  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestToolAbsentOrHanging::test_rulesync_bin_missing_file  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestToolAbsentOrHanging::test_timeout_handling  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_without_a_source_is_found_and_named  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSettingsHandEdit::test_key_added_by_hand_is_found_and_named  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSettingsHandEdit::test_rule_removed_by_hand_is_found_and_named  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRoleToolsAgainstKernel::test_source_tools_are_the_kernel_role_s  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRoleToolsAgainstKernel::test_source_with_a_tool_the_kernel_role_does_not_name  # cap
+tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRoleToolsAgainstKernel::test_source_without_a_tool_the_kernel_role_names  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheRuleIsGone::test_the_templates_source_holds_no_edit_rule_on_the_acceptance_test_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheRuleIsGone::test_the_generated_settings_hold_no_deny_rule_on_the_acceptance_test_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheRuleIsGone::test_the_generated_settings_hold_no_rule_of_a_write_tool_on_the_folder_in_any_list  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_four_other_deny_rules_are_still_generated_and_nothing_else  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestEveryOtherRuleStays::test_the_generated_settings_still_close_the_ticket_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_is_still_refused_outside_the_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_every_other_role_is_refused_a_write_under_the_folder  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestTheGuardInAProjectMadeFromTheTemplate::test_the_engineer_is_let_through_inside_its_ticket  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_leave_the_folder_to_the_test_designer  # cap
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py::TestALaunchedSessionInAProjectMadeFromTheTemplate::test_no_settings_of_a_launched_test_designer_close_the_folder  # cap
+rep: tests/acceptance/W1-38/test_w1_38_heldout_step.py  # one row per parametrised function
+rep: tests/acceptance/W1-38/test_w1_38_hooks_any_folder.py  # one row per parametrised function
+rep: tests/acceptance/W1-38/test_w1_38_hooks_command_line.py  # one row per parametrised function
+
+# acceptance/W1-39
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_hidden_from_git_by_an_ignore_rule_is_still_drift_naming_it  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_file_in_a_bytecode_folder_inside_the_kernel_is_not_drift  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_folder_that_cannot_be_listed_is_not_passed_over  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_without_any_installed_kernel_file_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_file_the_project_adds_outside_the_kernel_is_not_drift  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_an_installed_project_whose_lock_was_deleted_fails_the_lock_part  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_doctor_without_json_exits_non_zero_and_names_the_lock_when_it_was_deleted  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_deleting_the_lock_does_not_silence_an_edited_kernel_file  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_without_manifest_entries_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_drift.py::test_a_lock_that_is_not_readable_as_a_map_is_not_a_match  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_created_project_has_the_time_limit_on_every_guard_hook_entry  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_that_had_settings_of_its_own_gets_the_time_limit_on_the_guard_s_entries  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_copy_leaves_a_project_s_own_settings_as_they_were  # cap
+tests/acceptance/W1-39/test_w1_39_hook_time_limit.py::test_a_project_of_an_earlier_release_gets_the_time_limit_by_an_update  # cap
+tests/acceptance/W1-39/test_w1_39_layout.py::test_a_created_project_holds_only_the_product_layout  # cap
+tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_the_lock_refers_to_the_answers_file  # cap
+tests/acceptance/W1-39/test_w1_39_lock_identity.py::test_doctor_fails_when_the_locks_tag_or_commit_disagrees_with_the_install  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_keeps_the_path_map_when_the_release_ships_a_different_one  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_leaves_every_file_the_project_added_as_it_was  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_update_brings_the_kernel_of_the_second_release  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_after_an_update_the_lock_names_the_second_release_and_its_files  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_copier_prints_the_update_procedure_after_an_update  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_the_generated_lock_states_the_update_procedure_in_its_comment_header  # cap
+tests/acceptance/W1-39/test_w1_39_update.py::test_the_lock_keeps_its_comment_header_after_an_update  # cap
+
+# acceptance/W1-40
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_ci_reports_that_no_g3_check_is_declared_and_does_not_fail_for_it  # cap
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_a_record_of_a_failed_g3_run_that_reaches_the_remote_fails_ci  # cap
+tests/acceptance/W1-40/test_w1_40_evidence_record.py::test_the_note_of_another_commit_copied_onto_the_head_commit_fails_ci  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_commit_passes_again_once_the_check_passes  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_g3_check_does_not_run_at_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_the_sheltering_words_alone_do_not_stop_a_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_secret_staged_beside_a_clean_working_copy_is_what_counts  # cap
+tests/acceptance/W1-40/test_w1_40_pre_commit.py::test_a_missing_tool_stops_the_commit  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_push_passes_again_once_the_g3_check_passes  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_one_push_through_the_hook_leaves_the_record_ci_asks_for  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_record_follows_the_head_commit_push_after_push  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_the_push_leaves_the_project_clean  # cap
+tests/acceptance/W1-40/test_w1_40_pre_push.py::test_a_push_without_a_tool_the_hook_needs_never_ends_with_ci_green  # cap
+tests/acceptance/W1-40/test_w1_40_templates.py::test_the_hook_template_renders_to_the_repositorys_hook_file  # cap
+tests/acceptance/W1-40/test_w1_40_templates.py::test_the_workflow_template_keeps_github_expressions_whole  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_a_commit_is_refused_when_a_tier_the_hook_names_has_no_declared_check  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_named_tiers_when_one_of_them_has_no_declared_check  # cap
+tests/acceptance/W1-40/test_w1_40_tiers.py::test_gov_refuses_a_tier_name_that_is_no_tier_beside_a_declared_one  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_a_workflow_runs_on_every_push  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_job_runs_on_a_hosted_runner_without_gpu  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_result_is_thrown_away  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_every_step_runs_a_command_or_a_pinned_action  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_checkout_brings_the_parent_commit  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_job_names_gitleaks_and_gov_check  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_a_tool_the_job_installs_is_registered_at_its_registered_version  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_hook_file_has_the_two_hooks_and_drops_no_result  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_hooks_carry_no_baseline_and_no_bypass  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_the_carrier_of_the_evidence_record_is_documented  # cap
+tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_lefthook_hook_is_installed_in_this_repository  # cap
+rep: tests/acceptance/W1-40/test_w1_40_ci_evidence.py  # one row per parametrised function
+
+# acceptance/W1-41
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_adapter_generation_is_run_or_named  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_parsed_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_read_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_chat_database_is_retired_after_its_knowledge_is_in_records  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_chat_database_with_nothing_extracted_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_an_extraction_from_another_content_of_the_database_does_not_count  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_chat_database_that_cannot_be_read_is_not_retired  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_memory_store_a_rule_cites_is_not_retired  # cap
+rep: tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_kept_rule_file_cites_the_store_however_it_writes_the_path  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_longer_path_or_id_that_only_contains_the_stores_is_no_citation  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_still_stands_keeps_the_store  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_no_longer_stands_does_not_keep_the_store  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_retirement_of_the_memory_store_is_a_cit_e  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_index_is_refreshed_after_the_retirement  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_what_the_path_map_keeps_is_untouched_by_the_retirement  # cap
+tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_file_deleted_from_the_active_tree_stays_reachable_too  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_the_rollback_points_are_the_ones_the_plan_recorded  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_the_index_refresh_follows_the_moves  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_a_backup_ref_that_no_longer_resolves_stops_the_migration  # cap
+tests/acceptance/W1-41/test_w1_41_migration.py::test_a_tree_that_is_dirty_at_a6_is_not_migrated  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_every_artefact_has_exactly_one_of_the_eight_actions  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_each_of_the_eight_actions_is_recorded_as_proposed  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_an_action_outside_the_eight_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_an_artefact_given_two_actions_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_path_the_inventory_does_not_hold_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_without_a_target_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_onto_an_artefact_that_stays_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_proposal_that_cannot_be_read_is_refused  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off  # cap
+tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_plan_has_the_proposed_batches_each_with_its_own_rollback_point  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_the_unknown_artefact_becomes_a_decision_package_for_the_customer  # cap
+tests/acceptance/W1-41/test_w1_41_unknown.py::test_a_project_without_unknown_artefacts_raises_no_package_about_one  # cap
+rep: tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_not_committed_by_the_independent_auditor_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_written_and_not_committed_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_about_a_path_map_that_changed_afterwards_moves_nothing  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_path_map_that_changes_after_a5_passed_is_not_executed  # cap
+tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_that_cannot_be_read_moves_nothing  # cap
+rep: tests/acceptance/W1-41/test_w1_41_baseline.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_embedding_policy.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_external_follow_up.py  # one row per parametrised function
+rep: tests/acceptance/W1-41/test_w1_41_external_references.py  # one row per parametrised function
+
+# acceptance/W1-48
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_version_below_the_minimum_fails_even_when_the_registry_records_it  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_failure_names_what_is_below_the_minimum  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_cli_and_an_active_extension_at_or_above_the_minimum_are_no_hard_failure  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_difference_at_or_above_the_minimum_is_reported_as_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_record_written_with_a_leading_v_is_the_same_version  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_failure_and_drift_are_told_apart_in_one_look  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_a_newer_binary_with_another_digest_is_drift_by_its_version_alone  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_recorded_digest_is_compared_without_case  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_cli_at_the_recorded_version_with_another_digest_is_a_hard_failure  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_extensions_binary_at_the_recorded_version_with_another_digest_is_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_both_binaries_at_the_recorded_version_with_another_digest_are_one_failure_and_one_drift  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_clis_digest_fails_whatever_the_extension_is  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_active_extension_is_the_row_of_extensions_json  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_extension_id_is_compared_without_case  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_an_index_without_a_claude_code_row_gives_no_active_extension  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_folder_of_a_row_is_its_location  # cap
+tests/acceptance/W1-48/test_w1_48_drift.py::test_the_folder_of_a_row_without_a_location_is_its_relative_location_under_the_extensions_folder  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_every_node_22_command_of_the_registry_carries_the_path_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_sees_the_node_22_commands_the_registry_has  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_refuses_a_node_22_command_without_the_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_accepts_a_node_22_command_with_the_prefix  # cap
+tests/acceptance/W1-48/test_w1_48_node22_prefix.py::test_the_check_leaves_other_commands_alone  # cap
+tests/acceptance/W1-48/test_w1_48_registry.py::test_an_entry_of_this_ticket_states_every_fact_the_schema_requires  # cap
+tests/acceptance/W1-48/test_w1_48_registry.py::test_the_registry_as_read_is_the_committed_one  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_dec_141_is_an_owner_decision_that_names_the_prerequisite_and_its_version  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_sha256_digest  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_a_sandbox_prerequisite_carries_a_calendar_date  # cap
+tests/acceptance/W1-48/test_w1_48_sandbox_prereqs.py::test_the_sandbox_prerequisite_on_this_machine_is_the_recorded_version  # cap
+rep: tests/acceptance/W1-48/test_w1_48_claude_code.py  # one row per parametrised function
+rep: tests/acceptance/W1-48/test_w1_48_cli_path.py  # one row per parametrised function
+rep: tests/acceptance/W1-48/test_w1_48_drift.py  # one row per parametrised function
+
+# acceptance/W1-49
+tests/acceptance/W1-49/test_w1_49_threshold.py::test_the_pinned_cli_has_an_auto_compact_window  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_session_text_between_a_begin_marker_near_the_top_and_an_end_marker_at_the_end_is_kept  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_marker_lines_that_are_not_exact_do_not_make_a_block_of_the_text_between_them  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_line_the_session_wrote_inside_the_block_is_not_deleted  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_session_text_between_marker_lines_at_the_end_of_the_section_is_injected  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_marker_line_in_what_tk_prints_does_not_break_the_block  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_checkpoint_saved_while_the_hook_gathers_its_state_keeps_the_new_text  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_file_beside_the_checkpoint_is_neither_changed_nor_removed  # cap
+tests/acceptance/W1-49/test_w1_49_written_part.py::test_a_link_beside_the_checkpoint_is_not_written_through_and_does_not_become_the_checkpoint  # cap
+rep: tests/acceptance/W1-49/test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_loop_counts  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_the_state_block_is_appended_and_the_written_part_is_unchanged_and_first  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_missing_checkpoint_is_said_so_and_none_is_created  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_without_tk_the_block_says_so_and_holds_the_rest  # one row
+rep: tests/acceptance/W1-49/test_w1_49_precompact.py::test_a_workers_compaction_is_not_blocked_and_appends_nothing  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_sessionstart_hook_is_registered_for_compact_clear_and_resume  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_guard_hooks_stay_registered  # one row
+rep: tests/acceptance/W1-49/test_w1_49_registration.py::test_the_guard_hooks_stay_registered_in_the_kernel_s_wiring  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_missing_checkpoint_does_not_fail_the_hook  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_in_a_worktree_the_leads_section_is_injected  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_checkpoint_that_cannot_be_read_does_not_fail_the_hook  # one row
+rep: tests/acceptance/W1-49/test_w1_49_sessionstart.py::test_a_worker_session_is_not_given_the_leads_checkpoint  # one row
+
+# acceptance/W2-02
+rep: tests/acceptance/W2-02/test_w2_02_record_types.py  # one row per parametrised function
+rep: tests/acceptance/W2-02/test_w2_02_verdict_conditions.py  # one row per parametrised function
+
+# acceptance/W2-03
+rep: tests/acceptance/W2-03/test_w2_03_entry_records.py::test_the_span_is_the_entrys_own_text_in_the_register  # one row
+rep: tests/acceptance/W2-03/test_w2_03_grammar.py  # one row per parametrised function
+rep: tests/acceptance/W2-03/test_w2_03_not_records.py::test_a_file_with_a_decision_id_in_its_frontmatter_is_not_loaded_as_that_decision  # one row
+rep: tests/acceptance/W2-03/test_w2_03_not_records.py::test_a_file_with_a_decision_id_in_its_frontmatter_does_not_satisfy_a_citation  # one row
+
+# acceptance/W2-04
+tests/acceptance/W2-04/test_w2_04_reproducible.py::test_the_check_is_never_green_on_a_stale_store_and_red_on_a_fresh_one  # cap
+tests/acceptance/W2-04/test_w2_04_unreadable.py::test_a_source_that_no_longer_stands_blocks_naming_its_status  # cap
+rep: tests/acceptance/W2-04/test_w2_04_batches.py  # one row per parametrised function
+rep: tests/acceptance/W2-04/test_w2_04_ceiling.py  # one row per parametrised function
+rep: tests/acceptance/W2-04/test_w2_04_context_check.py  # one row per parametrised function
+rep: tests/acceptance/W2-04/test_w2_04_refusal.py  # one row per parametrised function
+
+# acceptance/W2-05
+tests/acceptance/W2-05/test_w2_05_planted.py::test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_under_planted_trace_variables_writes_no_trace  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_in_a_partial_clone_fetches_nothing  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_containment_check_catches_the_change_whatever_its_environment_holds  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_does_not_run_the_git_first_on_path  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_one_helper_is_there_and_the_sweep_names_it  # cap
+rep: tests/acceptance/W2-05/test_w2_05_declared_check.py  # one row per parametrised function
+rep: tests/acceptance/W2-05/test_w2_05_hooks_source.py  # one row per parametrised function
+rep: tests/acceptance/W2-05/test_w2_05_planted.py::test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it  # one row
+
+# acceptance/W2-112
+rep: tests/acceptance/W2-112/test_w2_112_bundle.py  # one row per parametrised function
+rep: tests/acceptance/W2-112/test_w2_112_fallback.py  # one row per parametrised function
+rep: tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder  # one row
+rep: tests/acceptance/W2-112/test_w2_112_slots.py  # one row per parametrised function
+
+# acceptance/W2-123
+rep: tests/acceptance/W2-123/test_w2_123_config_invalid.py  # one row per parametrised function
+rep: tests/acceptance/W2-123/test_w2_123_probe.py  # one row per parametrised function
+rep: tests/acceptance/W2-123/test_w2_123_retry.py  # one row per parametrised function
+
+# acceptance/W2-126
+rep: tests/acceptance/W2-126/test_w2_126_writers.py  # one row per parametrised function
+
+# acceptance/W2-16
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_lock_from_a_source_with_no_release_record_is_refused_where_the_lock_records_a_release  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_lock_from_the_installed_release_s_own_source_never_makes_an_edited_kernel_pass  # cap
+rep: tests/acceptance/W2-16/test_w2_16_last_round.py::test_a_lock_whose_release_entries_were_deleted_fails  # one row (round 2: the function is a KPI line's case)
+rep: tests/acceptance/W2-16/test_w2_16_last_round.py::test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_gov_release_runs_for_the_orchestrator_and_the_owner  # cap
+tests/acceptance/W2-16/test_w2_16_last_round.py::test_the_suite_runs_gov_and_copier_with_gov_role_unset  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_a_chain_that_does_not_reach_process_1_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_gov_role_set_to_any_value_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_gov_ticket_set_to_any_value_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_without_a_terminal_on_both_sides_the_build_refuses  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_anything_but_the_shown_code_refuses_the_build  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_code_comes_from_the_system_s_random_source  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_command_refuses_with_standard_input_from_dev_null  # cap
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py::test_the_command_refuses_on_a_terminal_under_this_suite_s_ancestry  # cap
+rep: tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_full_commit_the_release_was_built_from  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_lists_every_shipped_file_with_its_sha256  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_second_release_lists_the_shipped_file_that_changed_with_its_new_hash  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_wheel_hash  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_cli_version  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_the_schema_versions  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_holds_release_notes  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_the_manifest_s_own_hash_is_in_the_record_and_a_reader_finds_it_equal  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_from_a_tree_with_uncommitted_or_untracked_changes  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_from_a_commit_that_is_not_on_w2_integrate  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_with_a_version_that_is_not_a_semantic_version  # cap
+tests/acceptance/W2-16/test_w2_16_release.py::test_no_release_without_a_version  # cap
+rep: tests/acceptance/W2-16/test_w2_16_doctor.py  # one row per parametrised function
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_from_an_older_integration_commit_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_after_its_record_was_removed_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_the_same_version_as_an_existing_owner_tag_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_immutability.py::test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused  # one row
+rep: tests/acceptance/W2-16/test_w2_16_install.py  # one row per parametrised function
+rep: tests/acceptance/W2-16/test_w2_16_owner_terminal.py  # one row per parametrised function
+
+# acceptance/W2-49
+tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_44f_gate_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_rest_of_cap_43b_stays_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_cap_02c_signed_release_tag_stays_in_wave_3  # cap
+rep: tests/acceptance/W2-49/test_w2_49_contract.py::test_qualification_certificate_cap_43c_stays_in_wave_3  # one row (round 2: the function is a KPI line's case)
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_other_covers_item_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_covers_item_is_removed  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_new_covers_items_are_only_splits_of_cap_43_and_cap_44  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_no_capability_is_added_removed_or_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_contract.py::test_yaml_and_markdown_agree_on_every_covers_item_and_wave  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_new_split_id_exists_in_wave_3_naming_its_part  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_split_item_keeps_its_id_at_wave_2  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_new_covers_id_but_cap_43d_44k_44l  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_other_covers_item_of_cap_43_or_cap_44_changes_wave  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_covers_count_by_wave_is_w1_149_w2_20_w3_38_none_7  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_lite_cap_43b_names_none_of_the_nine_other_release_contents  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_43_wave_note_names_cap_43d_and_no_ticket  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_45a_stays_w2_with_the_release_manifest_and_hashes_as_its_wave_2_source  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_45a_names_no_signed_tag_as_a_wave_2_requirement  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_states_the_three_verdict_rules  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_says_the_auditor_accepts_no_exception  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_lets_no_one_but_the_owner_accept_an_exception  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_names_the_operational_lite_condition  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cap_44h_names_its_lite_conditions_and_marks_each_of_the_ten_if_it_lists_them  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cit_e_names_w2_52_as_the_builder_of_the_lite_a7_and_a10_stage_records  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_cit_p_records_the_owner_answer_naming_w2_52  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_every_capability_record_cites_contract_version_4_2  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_no_capability_record_cites_contract_version_4_1  # cap
+tests/acceptance/W2-49/test_w2_49_owner_answers.py::test_both_contract_files_state_status_accepted_for_v4_2  # cap
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py::test_cap_45a_record_carries_contract_v4_2_item_text  # cap
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py::test_every_capability_record_states_the_contracts_status  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_rows_of_a11_and_a9_still_say_wave_3_unchanged  # cap
+tests/acceptance/W2-49/test_w2_49_source_map.py::test_source_map_no_row_but_the_eight_differs_from_before_this_ticket  # cap
+rep: tests/acceptance/W2-49/test_w2_49_validator_lines.py::test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it  # one row (round 2: the function is a KPI line's case)
+rep: tests/acceptance/W2-49/test_w2_49_capability_records.py::test_record_of_split_item_follows_contract_v4_2  # one row
+rep: tests/acceptance/W2-49/test_w2_49_cit_e.py  # one row per parametrised function
+rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_names_each_impacted_ticket  # one row
+rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_presents_dec_105_three_options_with_their_cost  # one row
+rep: tests/acceptance/W2-49/test_w2_49_contract.py  # one row per parametrised function
+
+# acceptance/W2-51
+rep: tests/acceptance/W2-51/test_w2_51_cit_p.py  # one row per parametrised function
+rep: tests/acceptance/W2-51/test_w2_51_counts.py::test_a_triage_count_that_disagrees_with_its_rows_fails_naming_it  # one row
+rep: tests/acceptance/W2-51/test_w2_51_exit_criterion_7.py  # one row per parametrised function
+rep: tests/acceptance/W2-51/test_w2_51_plan_reading.py::test_every_check_prints_one_line_with_pass_and_a_named_reason  # one row
+rep: tests/acceptance/W2-51/test_w2_51_plan_reading.py::test_an_item_delivered_only_by_a_ticket_with_a_malformed_id_is_not_delivered  # one row
+
+# acceptance/W2-54
+rep: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_no_schema_file_of_w2_02_s_other_types_comes_with_it  # one row
+rep: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_a_record_of_type_audit_report_owes_no_shared_frontmatter  # one row
+rep: tests/acceptance/W2-54/test_w2_54_audit_report.py::test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes  # one row
+rep: tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once  # one row
+rep: tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_a_store_whose_index_is_missing_gives_one_packet_under_any_order  # one row
+rep: tests/acceptance/W2-54/test_w2_54_query_cache.py  # one row per parametrised function
+rep: tests/acceptance/W2-54/test_w2_54_query_vector.py  # one row per parametrised function
+
+# acceptance/W2-55
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding  # one row
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found  # one row
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweeps_kept_and_closed_places_give_no_finding  # one row
+rep: tests/acceptance/W2-55/test_w2_55_tags.py  # one row per parametrised function
+
+# acceptance/W2-57
+rep: tests/acceptance/W2-57/test_w2_57_rulesync_probe.py::test_a_late_answer_is_waited_for_and_the_check_compares_as_with_a_prompt_one  # one row
+
+# acceptance/W2-61
+rep: tests/acceptance/W2-61/test_w2_61_any_set.py  # one row per parametrised function
+rep: tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py::test_the_measure_refuses_the_hidden_part_to_a_measured_session  # one row
+rep: tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py::test_an_error_on_a_hidden_question_names_only_its_id  # one row
+rep: tests/acceptance/W2-61/test_w2_61_sources_matched.py  # one row per parametrised function
+
+# acceptance/W2-61h
+rep: tests/acceptance/W2-61h/test_w2_61h_visible_new.py  # one row per parametrised function
+
+# acceptance/W2-62
+rep: tests/acceptance/W2-62/test_w2_62_prompt_in_force.py::test_with_no_setting_the_main_tree_names_no_prompt  # one row
+rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_a_section_of_50000_characters_is_named_by_its_lines_never_cut  # one row
+rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_no_section_still_says_so  # one row
+rep: tests/acceptance/W2-62/test_w2_62_resume_in_full.py::test_unreadable_input_exits_0  # one row
+
+# acceptance/W2-64
+rep: tests/acceptance/W2-64/test_w2_64_close_schema.py::test_this_repository_s_close_records_validate  # one row
+rep: tests/acceptance/W2-64/test_w2_64_imported.py  # one row per parametrised function
+rep: tests/acceptance/W2-64/test_w2_64_tool_red.py  # one row per parametrised function
+rep: tests/acceptance/W2-64/test_w2_64_what_stays.py  # one row per parametrised function
+
+# acceptance/W2-66
+rep: tests/acceptance/W2-66/test_w2_66_full_widening.py  # one row per parametrised function
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_the_test_map_and_the_template_s_copy_are_valid_against_the_schema  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_paths_dec_891_does_not_name_are_not_record_only  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_the_record_reading_set_holds_each_reader_of_a_record_path  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_each_coupling_imports_cannot_see_is_declared  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_a_fixture_input_change_does_not_reach_the_real_model_suites  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it  # one row
+rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared  # one row
+rep: tests/acceptance/W2-66/test_w2_66_retention.py::test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays  # one row per parametrised function
+tests/acceptance/W2-66/test_w2_66_retention.py::test_every_test_run_of_the_close_is_given_the_retention_option[serial-afterwards]  # fold (round 2: a row past the line's named classes)
+rep: tests/acceptance/W2-66/test_w2_66_scoped_selection.py  # one row per parametrised function
+
+# acceptance/W2-76
+rep: tests/acceptance/W2-76/test_w2_76_fail_closed.py  # one row per parametrised function
+rep: tests/acceptance/W2-76/test_w2_76_machine_lock.py  # one row per parametrised function
+
+# acceptance/W2-77
+rep: tests/acceptance/W2-77/test_w2_77_unchanged.py  # one row per parametrised function
+
+# acceptance/W2-87
+rep: tests/acceptance/W2-87/test_w2_87_authority.py::test_4_an_unreadable_block_refuses_with_config_invalid  # one row
+rep: tests/acceptance/W2-87/test_w2_87_authority.py::test_5_the_superseded_entry_ranks_below_its_successor_and_gets_no_lift  # one row
+
+# acceptance/W2-91
+rep: tests/acceptance/W2-91/test_w2_91_full_embeddings.py  # one row per parametrised function
+
+# acceptance/W2-95
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_paths_in_none_and_in_two_are_named  # one row
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_at_the_root_matches_only_root_files  # one row
+rep: tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_alone_leaves_files_in_folders_unplaced  # one row
+rep: tests/acceptance/W2-95/test_w2_95_path_map_faults.py  # one row per parametrised function
+
+# acceptance/W2-96
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r14_a_churner_stops_once_its_canary_is_gone_and_its_folder_then_stays_still  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r15_a_plain_recursive_removal_takes_the_sibling_folders_away_in_a_few_seconds  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_r16_a_sigterm_to_gov_alone_while_a_nested_run_sleeps_leaves_no_process_and_nothing_later  # cap
+tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_premise_r16_the_token_search_finds_a_process_of_its_own_session_and_its_child_and_not_once_gone  # cap
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_one_failing_mapped_line_fails_the_run_with_exit_code_3  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_an_unknown_ticket_is_refused_with_accept_unknown_ticket  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_exit_codes.py::test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_premises.py  # one row per parametrised function
+rep: tests/acceptance/W2-96/test_w2_96_at_review_1.py::test_r6_no_log_file_is_written_whatever_the_projects_pytest_configuration_says  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_review_1.py::test_premise_r6_raw_pytest_writes_the_configured_log_file_holding_the_marker  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_review_3.py  # one row per parametrised function
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r10_a_chain_of_nested_folders_deeper_than_a_recursive_removal_leaves_the_result_as_the_tests_gave_it  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_run_errors.py::test_a_crash_is_an_error_of_kind_crash_with_no_message  # one row
+rep: tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py  # one row per parametrised function
+
+# unit/accept
+rep: tests/unit/accept/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/adapters
+rep: tests/unit/adapters/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/adopt
+rep: tests/unit/adopt/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/bridge
+rep: tests/unit/bridge/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/check
+rep: tests/unit/check/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/ci
+rep: tests/unit/ci/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/cli
+rep: tests/unit/cli/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/close
+rep: tests/unit/close/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/closure
+rep: tests/unit/closure/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/context
+rep: tests/unit/context/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/decisions
+rep: tests/unit/decisions/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/doctor
+rep: tests/unit/doctor/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/gitenv
+rep: tests/unit/gitenv/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/hooks
+rep: tests/unit/hooks/test_w29_hooks.py  # one row per parametrised function
+
+# unit/lock
+rep: tests/unit/lock/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/orchestration
+rep: tests/unit/orchestration/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/rebuild
+rep: tests/unit/rebuild/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/release
+rep: tests/unit/release/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/retrieval
+rep: tests/unit/retrieval/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/secrets_check
+rep: tests/unit/secrets_check/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/status
+rep: tests/unit/status/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/store
+rep: tests/unit/store/  # one row per parametrised function (no KPI line, DEC-136)
+
+# unit/telemetry
+rep: tests/unit/telemetry/  # one row per parametrised function (no KPI line, DEC-136)
