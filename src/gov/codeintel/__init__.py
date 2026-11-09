@@ -27,7 +27,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from gov.secrets import indexable, path_holds_secret
+from gov.secrets import indexable, path_holds_secret, pool_size
 from gov.util.gitenv import git_env
 
 TOOL = "codebase-memory-mcp"
@@ -186,7 +186,9 @@ def index(root: Path) -> None:
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
                             capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
-    with ThreadPoolExecutor() as pool:  # the index stores paths: a path that holds a secret stays out (DEC-339)
+    # The index stores paths: a path that holds a secret stays out (DEC-339). The pool is as wide as the CPUs this
+    # process may use (its CPU set), never the machine's count (W2-20 S18): inside a slot, at most the slot's share.
+    with ThreadPoolExecutor(max_workers=pool_size()) as pool:
         named = list(pool.map(lambda rel: path_holds_secret(root, rel), allowed))
     for rel in (rel for rel, secret in zip(allowed, named) if not secret):
         (staged / rel).parent.mkdir(parents=True, exist_ok=True)

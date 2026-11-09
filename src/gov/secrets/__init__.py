@@ -322,6 +322,12 @@ def _workers() -> int:
     return max(1, cpus)
 
 
+def pool_size() -> int:
+    """The width of any of the product's own pools (W2-20 S18): the CPUs this process may use, within the slot's
+    thread budget; the rule ``_workers`` applies to the scan, for the code index and any other pool to share."""
+    return _workers()
+
+
 def _matches(rel: str, pattern: str) -> bool:
     """``*`` stays inside one folder, ``**`` crosses folders (the language of the path map)."""
     parts = [re.escape(part).replace(r"\*", "[^/]*") for part in pattern.split("**")]

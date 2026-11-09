@@ -1,8 +1,11 @@
 """What ``gov rebuild`` keeps around its stages (W2-76, DEC-939 item 2; rows W2-M408, W2-L451).
 
 - **The settings:** ``governance/project/rebuild.yaml`` in the tree rebuilt, optional: ``slow_after_s`` (a positive
-  number of seconds, 1800 by default) and ``lock`` (an absolute path, the machine's rebuild lock by default). A file
+  number of seconds, 1800 by default) and ``lock`` (an absolute path, the tree's own rebuild lock by default). A file
   that is not valid YAML, not a map, or holds a value of the wrong kind refuses the rebuild.
+- **Each tree its own lock (W2-20 S7, DEC-1001 (d)):** the default lock is ``/tmp/gov-os-rebuild-<12 hex>.lock``, the
+  digits from the tree's real path, so a rebuild excludes only another rebuild of the same tree, never every rebuild on
+  the machine. Rebuilds share the machine's heavy-job slots with test runs (``gov resources --slot rebuild``).
 - **The lock's override:** ``GOV_REBUILD_LOCK``, where set, replaces the machine's default lock (the test harness gives
   each process of a test run one of its own, DEC-956 item 2); a tree's ``lock`` still wins over it. A value that is
   not an absolute path refuses the rebuild: never a fall-back to another lock. The lock's part of the result and the
@@ -25,6 +28,7 @@ from __future__ import annotations
 
 import fcntl
 import functools
+import hashlib
 import json
 import os
 import re
@@ -39,7 +43,7 @@ from gov.cli.errors import GovError
 
 SETTINGS_REL = "governance/project/rebuild.yaml"
 SLOW_AFTER_S = 1800
-LOCK = "/tmp/gov-os-rebuild.lock"  # the interim wrapper's own path: shared across the launcher's sandbox (W2-76)
+LOCK = "/tmp/gov-os-rebuild.lock"  # the base of each tree's own lock name: /tmp is shared across the sandbox (W2-76)
 ENV_LOCK = "GOV_REBUILD_LOCK"
 FROM_SETTINGS, FROM_ENV, FROM_DEFAULT = "rebuild.yaml", ENV_LOCK, "default"  # the lock's ``source``
 RECORD_REL = ".gov-runtime/rebuild/record.json"
@@ -58,12 +62,19 @@ def _refused(message: str, details: dict) -> GovError:
     return GovError("REBUILD_FAILED", f"{message}: nothing is rebuilt", details)
 
 
-def _default_lock() -> tuple[str, str]:
-    """The lock a tree without its own uses: ``GOV_REBUILD_LOCK`` where set, else the machine's. A value that is not
-    an absolute path refuses (DEC-866)."""
+def tree_lock(root: Path) -> str:
+    """The tree's own default rebuild lock (W2-20 S7): ``LOCK``'s name with 12 hex digits of the tree's real path."""
+    digits = hashlib.sha256(os.path.realpath(root).encode("utf-8", "surrogateescape")).hexdigest()[:12]
+    base, suffix = os.path.splitext(LOCK)
+    return f"{base}-{digits}{suffix}"
+
+
+def _default_lock(root: Path) -> tuple[str, str]:
+    """The lock a tree without its own uses: ``GOV_REBUILD_LOCK`` where set, else the tree's own (``tree_lock``). A
+    value that is not an absolute path refuses (DEC-866)."""
     value = os.environ.get(ENV_LOCK)
     if value is None:
-        return LOCK, FROM_DEFAULT
+        return tree_lock(root), FROM_DEFAULT
     if not os.path.isabs(value):
         reason = "is empty" if not value else f"is not an absolute path: {value!r}"
         raise _refused(f"the environment variable {ENV_LOCK} {reason}", {"variable": ENV_LOCK, "value": value})
@@ -75,7 +86,7 @@ def settings(root: Path) -> tuple[float, str, str]:
     ``GOV_REBUILD_LOCK``, else the defaults. A wrong ``GOV_REBUILD_LOCK`` refuses even where the tree names a lock."""
     from gov.config.loader import read_yaml
 
-    default = _default_lock()
+    default = _default_lock(Path(root))
     path = Path(root) / SETTINGS_REL
     if not path.is_file():
         return SLOW_AFTER_S, *default
