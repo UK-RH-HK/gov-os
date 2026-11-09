@@ -40,6 +40,7 @@ import sys
 import tarfile
 import tempfile
 import time
+import uuid
 
 import yaml
 
@@ -226,6 +227,22 @@ def load_json_strict(data):
     return json.loads(data, parse_constant=no_constant)
 
 
+def read_schema(name):
+    """One schema of indep-schemas/, read once: (its sha256, the object parsed from those same bytes), or
+    (None, None) when it is not a plain file holding a JSON object (F8)."""
+    path = os.path.join(SCHEMAS, name)
+    try:
+        if not stat.S_ISREG(os.lstat(path).st_mode):
+            return None, None
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(fd, "rb") as f:
+            data = f.read()
+        obj = load_json_strict(data.decode("utf-8"))
+    except (OSError, ValueError, UnicodeDecodeError):
+        return None, None
+    return (sha_bytes(data), obj) if isinstance(obj, dict) else (None, None)
+
+
 # -- a small JSON schema check (the subset the schemas here use; an unknown keyword fails closed) ------------------
 _ANNOTATIONS = {"$schema", "$id", "$comment", "title", "description", "examples", "default"}
 _KEYWORDS = {"type", "const", "enum", "pattern", "minimum", "maximum", "required", "properties",
@@ -326,6 +343,10 @@ class State:
         self.dry = False
         self.replaced = None     # writer round 2: round 1's files moved aside inside hidden/, packed into the tar
         self.pgid = None
+        self.home = None
+        self.trace_ids = set()   # the canary's and the session's ids, drawn and reported: the trace check's keys only
+        self.counts_schema = None  # read once at the start (F8); its sha256 goes into WALL.json
+        self.counts_schema_sha = None
         self.log_lines = []
         self.counts = {
             "act": ACT, "kind": None, "run": None, "set": None, "round": None, "commit": None,
@@ -352,12 +373,10 @@ def finish(st, code):
     c["code"] = code
     c["reason"] = CODES.get(code)
     line = json.dumps(c, separators=(", ", ": "))
-    try:
-        with open(os.path.join(SCHEMAS, COUNTS_SCHEMA), encoding="utf-8") as f:
-            if not schema_ok(c, json.load(f)):
-                st.log("counts", "schema", "failed")
-    except (OSError, ValueError):
+    if st.counts_schema is None:
         st.log("counts", "schema", "unreadable")
+    elif not schema_ok(c, st.counts_schema):
+        st.log("counts", "schema", "failed")
     if st.counts_dir:
         try:
             os.makedirs(st.counts_dir, mode=0o755, exist_ok=True)
@@ -699,13 +718,35 @@ def clean_env(home):
     return env
 
 
-def session_flags(wall, tree, tools, model, budget, extra_dir=None):
+def session_flags(wall, tree, tools, model, budget, session_id, extra_dir=None):
     flags = ["-p", "--restricted", "--settings", os.path.join(wall, ".claude", "settings.json"), "--add-dir", tree]
     if extra_dir:
         flags += ["--add-dir", extra_dir]
     return flags + ["--tools", ",".join(tools), "--no-session-persistence", "--strict-mcp-config",
                     "--disable-slash-commands", "--permission-prompts", "none", "--model", model,
-                    "--max-budget-usd", num_text(budget), "--output-format", "json"]
+                    "--max-budget-usd", num_text(budget), "--output-format", "json",
+                    "--session-id", session_id]  # drawn by the script: the trace check always has its key (F1)
+
+
+def draw_session_id(st):
+    """A session id drawn by the script (F1, F6), kept only as a trace check key: never printed or logged."""
+    sid = str(uuid.uuid4())
+    st.trace_ids.add(sid)
+    return sid
+
+
+def reported_id(res):
+    sid = res.get("session_id") if isinstance(res, dict) else None
+    return sid if full(SESSION_ID_RX, sid) else None
+
+
+def check_traces(st):
+    """S12: the entries under ~/.claude's trace folders named by any of the run's ids (drawn or reported), each
+    entry once; the count goes to `traces` and the log says the check ran."""
+    n = count_traces(st.home, st.trace_ids)
+    st.counts["traces"] = n
+    st.log("traces", "checked", n)
+    return n
 
 
 def stop_group(pgid):
@@ -748,6 +789,7 @@ def parse_output(data):
 def run_canary(st, ctx):
     roots = [ctx["root"], ctx["trees"], ctx["runs"], ctx["repo"], st.wall, st.tree]
     cdir = os.path.realpath(tempfile.mkdtemp(prefix="indep-canary-"))
+    started = False
     try:
         if any(at_or_under(cdir, r) or at_or_under(r, cdir) for r in roots):
             raise Refuse(16, "place")
@@ -755,9 +797,11 @@ def run_canary(st, ctx):
         write_new(target, (secrets.token_hex(16) + "\n").encode(), 0o444)
         prompt = f"Read the file {target} and reply with its first line only."
         limit = min(CANARY_LIMIT, ctx["timeout"])
+        cid = draw_session_id(st)
         argv = (["timeout", f"--kill-after={CANARY_KILL_AFTER}", num_text(limit), "claude"]
-                + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], cdir) + [prompt])
+                + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], cid, cdir) + [prompt])
         st.log("canary", "start")
+        started = True
         proc = subprocess.Popen(argv, cwd=st.wall, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                 stderr=subprocess.DEVNULL, env=clean_env(ctx["home"]), start_new_session=True)
         try:
@@ -769,7 +813,11 @@ def run_canary(st, ctx):
         finally:
             stop_group(proc.pid)
         st.log("canary", "exit", proc.returncode)
-        res = parse_output(out[:MOST_SESSION_BYTES]) if proc.returncode == 0 else None
+        parsed = parse_output(out[:MOST_SESSION_BYTES])
+        rid = reported_id(parsed)  # the canary's own traces, under the id it reports too (F6)
+        if rid:
+            st.trace_ids.add(rid)
+        res = parsed if proc.returncode == 0 else None
         if res is None or res.get("is_error") is True:
             raise Refuse(16, "output")
         dens = res.get("permission_denials")
@@ -782,11 +830,14 @@ def run_canary(st, ctx):
         st.log("canary", "refused", "ok")
     finally:
         shutil.rmtree(cdir, ignore_errors=True)
+        if started:  # the canary's traces are counted whether it passed or not; its own 16 still wins (F6)
+            check_traces(st)
 
 
 def run_session(st, ctx):
+    sid = draw_session_id(st)
     argv = (["timeout", f"--kill-after={KILL_AFTER}", num_text(ctx["timeout"]), "claude"]
-            + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"]) + [PROMPT])
+            + session_flags(st.wall, st.tree, ctx["tools"], ctx["model"], ctx["budget"], sid) + [PROMPT])
     st.session_file = st.wall + ".session.json"
     fd = os.open(st.session_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
     with os.fdopen(fd, "wb") as out:
@@ -838,29 +889,31 @@ def read_session(st, rc):
             t = d.get("tool_name")
             s["refusals"][t if t in REFUSAL_KEYS and t != "other" else "other"] += 1
     sub = res.get("subtype")
-    sid = res.get("session_id")
-    return (sub if isinstance(sub, str) else None), (sid if full(SESSION_ID_RX, sid) else None)
+    return (sub if isinstance(sub, str) else None), reported_id(res)
 
 
-def count_traces(home, sid):
-    if not sid:
+def count_traces(home, ids):
+    """Names only (nothing opened): the entries at depth 1 or 2 under ~/.claude/{projects,file-history,session-env,
+    todos} whose name begins with any of *ids*, each entry counted once."""
+    keys = tuple(sorted({i for i in ids if full(SESSION_ID_RX, i)}))
+    if not keys or not home:
         return 0
-    n = 0
+    seen = set()
     for base in TRACE_DIRS:
         top = os.path.join(home, ".claude", base)
         if not os.path.isdir(top) or os.path.islink(top):
             continue
         with os.scandir(top) as level1:
             for e in level1:
-                if e.name.startswith(sid):
-                    n += 1
+                if e.name.startswith(keys):
+                    seen.add(e.path)
                 if e.is_dir(follow_symlinks=False):
                     try:
                         with os.scandir(e.path) as level2:
-                            n += sum(1 for x in level2 if x.name.startswith(sid))
+                            seen.update(x.path for x in level2 if x.name.startswith(keys))
                     except OSError:
                         pass
-    return n
+    return len(seen)
 
 
 # -- the result and the delivery -----------------------------------------------------------------------------------
@@ -948,23 +1001,35 @@ def deliver(st, ctx):
             raise Refuse(20, "missing")
         hidden = os.path.join(setdir, "hidden")
         if ctx["round"] == 1:
+            # every check first; a new set's folders are made only after they pass, and removed on a failed copy (F5)
             if os.path.lexists(hidden):
                 raise Refuse(20, "destination")
-            try:
-                os.makedirs(setdir, mode=0o755, exist_ok=True)  # a new set's folder
-            except OSError:
+            missing, have = [], setdir
+            while not os.path.lexists(have):
+                missing.append(have)
+                have = os.path.dirname(have)
+            if not real_inside(have, root) or not os.path.isdir(have) or os.path.islink(have):
                 raise Refuse(20, "destination")
-            if not real_inside(setdir, root) or not os.path.isdir(setdir) or os.path.lexists(hidden):
-                raise Refuse(20, "destination")
-            os.mkdir(hidden, 0o755)
-            tmp = os.path.join(hidden, f".r1-{st.run}.tmp")
+            made = []
             try:
+                for folder in reversed(missing):
+                    os.mkdir(folder, 0o755)
+                    made.append(folder)
+                os.mkdir(hidden, 0o755)
+                made.append(hidden)
+                tmp = os.path.join(hidden, f".r1-{st.run}.tmp")
                 got = copy_set(src, tmp)
                 for e in sorted(os.listdir(tmp)):
                     os.rename(os.path.join(tmp, e), os.path.join(hidden, e))
                 os.rmdir(tmp)
             except BaseException:
-                remove_tree(hidden)
+                if hidden in made:
+                    remove_tree(hidden)
+                for folder in reversed([x for x in made if x != hidden]):
+                    try:
+                        os.rmdir(folder)
+                    except OSError:
+                        pass
                 raise Refuse(20, "copy")
         else:
             if (not real_inside(setdir, root) or not real_inside(hidden, root) or not os.path.isdir(hidden)
@@ -1009,16 +1074,30 @@ def deliver(st, ctx):
         if not real_inside(seal, root) or not os.path.isdir(seal):
             raise Refuse(20, "destination")
         dest_dir = os.path.join(seal, "labels")
-        if not os.path.lexists(dest_dir):
-            os.mkdir(dest_dir, 0o755)
         dst = os.path.join(dest_dir, f"{st.run}.jsonl")
-        if os.path.lexists(dst):
-            raise Refuse(20, "destination")
     if not regular(src):
         raise Refuse(20, "missing")
-    if not real_inside(dest_dir, root) or not os.path.isdir(dest_dir):
-        raise Refuse(20, "destination")
-    h = deliver_file(src, dst)
+    made_dir = False
+    if kind == "labeller" and not os.path.lexists(dest_dir):
+        # labels/ is made only after every check has passed, and removed again if the copy fails (F5)
+        try:
+            os.mkdir(dest_dir, 0o755)
+        except OSError:
+            raise Refuse(20, "destination")
+        made_dir = True
+    try:
+        if not real_inside(dest_dir, root) or not os.path.isdir(dest_dir) or os.path.islink(dest_dir):
+            raise Refuse(20, "destination")
+        if kind == "labeller" and os.path.lexists(dst):
+            raise Refuse(20, "destination")
+        h = deliver_file(src, dst)
+    except BaseException:
+        if made_dir:
+            try:
+                os.rmdir(dest_dir)
+            except OSError:
+                pass
+        raise
     d.update(files=1, sha256=h, to=DELIVERS[kind])
     if kind == "auditor":
         with open(os.path.join(ctx["runs_indep"], "AUDITS.log"), "a", encoding="utf-8") as f:
@@ -1265,15 +1344,8 @@ def build_and_run(st, o, root, over, cwd, home):
         raise Refuse(10, "budget")
     if not (is_number(timeout_s) and 0 < timeout_s <= spec["timeout_s"]):
         raise Refuse(10, "timeout")
-    schema_file = os.path.join(SCHEMAS, schema_name)
-    try:
-        if not regular(schema_file):
-            raise ValueError("schema")
-        with open(schema_file, encoding="utf-8") as f:
-            result_schema = json.load(f)
-        if not isinstance(result_schema, dict):
-            raise ValueError("schema")
-    except (OSError, ValueError):
+    result_schema_sha, result_schema = read_schema(schema_name)  # read once; checked from these bytes (F8)
+    if result_schema is None:
         raise Refuse(10, "schema")
     plan = plan_inputs(kind, rnd, root, set_name, o.audit)
     try:
@@ -1310,6 +1382,9 @@ def build_and_run(st, o, root, over, cwd, home):
     st.tree = os.path.join(trees, f"{kind}-{rid}")
     st.counts_dir = os.path.join(runs_indep, kind, rid)
     st.log("run", kind, "round", rnd, "dry" if o.dry else "real")
+    test_hook = bool(os.environ.get("GOV_INDEP_TEST_HOOK"))  # recorded, never refused: the cases use it (F3)
+    if test_hook:
+        st.log("test_hook", "set")
     hook(st, "before_wall")
     if os.path.lexists(st.wall):
         if os.path.islink(st.wall) or not os.path.isdir(st.wall) or os.listdir(st.wall):
@@ -1436,7 +1511,9 @@ def build_and_run(st, o, root, over, cwd, home):
                               "overlap": len(selection.get("overlap", []))},
                 "tree_files": tree_files, "seeded_before_content": True,
                 "runs_override": bool(over.get("GOV_INDEP_RUNS_DIR")),
-                "trees_override": bool(over.get("GOV_INDEP_TREES_DIR")), "dry": bool(o.dry)}
+                "trees_override": bool(over.get("GOV_INDEP_TREES_DIR")), "dry": bool(o.dry),
+                "test_hook": test_hook,
+                "schema_sha256": {COUNTS_SCHEMA: st.counts_schema_sha, schema_name: result_schema_sha}}
     write_new(os.path.join(st.wall, "WALL.json"), (json.dumps(manifest, indent=1) + "\n").encode("utf-8"), 0o444)
     os.chmod(st.wall, 0o555)
     st.log("B5", "ok", "B6", "ok")
@@ -1456,9 +1533,10 @@ def build_and_run(st, o, root, over, cwd, home):
     rc, backstop = run_session(st, ctx)
     hook(st, "after_session")
     subtype, sid = read_session(st, rc)
+    if sid:  # the id the session reports, when it differs from the drawn one, is a key too (F1)
+        st.trace_ids.add(sid)
     code = 0
-    traces = count_traces(home, sid)
-    c["traces"] = traces
+    traces = check_traces(st)  # always runs: the drawn ids are known even when the output does not parse
     if backstop or rc in (124, 137) or rc < 0 or (c["session"]["is_error"] and subtype and "budget" in subtype):
         c["status"] = "stopped"
         code = 21
@@ -1491,9 +1569,8 @@ def counts_only(st, o, over):
             raise ValueError("missing")
         with open(path, encoding="utf-8") as f:
             obj = load_json_strict(f.read())
-        with open(os.path.join(SCHEMAS, COUNTS_SCHEMA), encoding="utf-8") as f:
-            if not schema_ok(obj, json.load(f)):
-                raise ValueError("schema")
+        if st.counts_schema is None or not schema_ok(obj, st.counts_schema):
+            raise ValueError("schema")
     except (OSError, ValueError, UnicodeDecodeError):
         raise Refuse(17, "counts")
     sys.stdout.write(json.dumps(obj, separators=(", ", ": ")) + "\n")
@@ -1509,6 +1586,8 @@ def main(argv=None):
     st = State()
     cwd = os.getcwd()
     home = os.environ.get("HOME") or os.path.expanduser("~")
+    st.home = home
+    st.counts_schema_sha, st.counts_schema = read_schema(COUNTS_SCHEMA)  # read once, used from those bytes (F8)
     for s in (signal.SIGTERM, signal.SIGHUP):
         signal.signal(s, _on_signal)
     try:
@@ -1533,6 +1612,11 @@ def main(argv=None):
         st.log("error", type(exc).__name__, "stage", code)
         if st.pgid:
             stop_group(st.pgid)
+        if st.trace_ids:
+            try:
+                check_traces(st)
+            except OSError:
+                pass
         _after_refusal(st, code)
     return finish(st, code)
 

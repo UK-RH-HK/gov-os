@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tarfile
 import fnmatch
+import uuid
 from pathlib import Path
 
 import pytest
@@ -47,7 +48,8 @@ import json, os, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 cfg = json.load(open(os.path.join(HERE, "stub.json")))
 argv = sys.argv[1:]
-VALUED = ("--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format")
+VALUED = ("--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
+          "--session-id")
 flags, adds, i = {}, [], 0
 while i < len(argv) - 1:
     a = argv[i]
@@ -73,13 +75,21 @@ with open(os.path.join(HERE, "calls.jsonl"), "a") as f:
     f.write(json.dumps(rec) + "\n")
 
 def emit(denials=(), is_error=False, subtype="success", text="done"):
-    print(json.dumps({"type": "result", "subtype": subtype, "is_error": is_error, "session_id": cfg.get("sid"),
+    sid = flags.get("--session-id") if cfg.get("report_drawn") else cfg.get("sid")
+    print(json.dumps({"type": "result", "subtype": subtype, "is_error": is_error, "session_id": sid,
                       "num_turns": 3, "total_cost_usd": 0.004, "duration_ms": 1500,
                       "permission_denials": list(denials), "result": text}))
+
+def trace_drawn(base):  # a trace named by the id the script passed with --session-id
+    d = os.path.join(os.environ["HOME"], ".claude", base)
+    os.makedirs(d, exist_ok=True)
+    open(os.path.join(d, flags["--session-id"] + ".json"), "w").write("x")
 
 if paths:
     mode = cfg.get("canary", "model")
     target = paths[0]
+    if cfg.get("canary_trace"):
+        trace_drawn("todos")
     if mode == "garbage":
         print("not json at all"); sys.exit(0)
     if mode == "sleep":
@@ -123,6 +133,8 @@ for rel, text in cfg.get("out", {}).items():
     p = os.path.join(os.getcwd(), rel)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w").write(text)
+if cfg.get("trace_drawn"):
+    trace_drawn("session-env")
 if mode == "child":
     subprocess.Popen(["sleep", "300"])
     time.sleep(300)
@@ -725,7 +737,12 @@ def test_canary_runs_with_the_session_flags_plus_its_folder(w):
     assert canary["canary"] and not session["canary"]
     assert canary["adds"][0] == session["adds"][0] == str(w.tree(counts))
     assert len(canary["adds"]) == 2 and len(session["adds"]) == 1
-    assert {k: v for k, v in canary["flags"].items()} == session["flags"]
+    drop = "--session-id"
+    assert {k: v for k, v in canary["flags"].items() if k != drop} == {
+        k: v for k, v in session["flags"].items() if k != drop}
+    # each draws its own id (F1, F6)
+    assert canary["flags"][drop] != session["flags"][drop]
+    assert all(uuid.UUID(c["flags"][drop]).version == 4 for c in (canary, session))
 
 
 # -- the session: S10, S13, S16, S17 -------------------------------------------------------------------------------
@@ -747,9 +764,11 @@ def test_writer_session_is_closed_and_delivers_counts_only(w):
     wall, tree = w.wall(counts), w.tree(counts)
     a = session["argv"]
     assert a[:6] == ["-p", "--restricted", "--settings", f"{wall}/.claude/settings.json", "--add-dir", str(tree)]
-    assert a[6:-1] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
+    assert a[6:-3] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
                        "--strict-mcp-config", "--disable-slash-commands", "--permission-prompts", "none", "--model",
                        "claude-haiku-5-5", "--max-budget-usd", "25", "--output-format", "json"]
+    assert a[-3] == "--session-id" and uuid.UUID(a[-2]).version == 4  # the closing flag: the id the script drew
+    drawn = a[-2]
     assert a[-1] == indep_launch.PROMPT
     assert session["cwd"] == str(wall) and session["stdin_null"]
     assert set(session["env"]) <= {"HOME", "PATH", "LANG", "USER"} and "HOME" in session["env"]
@@ -782,6 +801,7 @@ def test_writer_session_is_closed_and_delivers_counts_only(w):
     log = (cdir / "launch.log").read_text()
     for text in (p.stdout, p.stderr, log, (cdir / "counts.json").read_text()):
         assert marker not in text and "done" not in text and str(wall) not in text
+        assert drawn not in text  # the drawn id is the trace check's key only, never printed
 
 
 @pytest.mark.parametrize("out", [{}, {"out/result.json": "{not json"},
@@ -830,6 +850,120 @@ def test_a_trace_under_dot_claude_is_counted_22(w):
     rc, counts, _ = w.launch()
     assert rc == 22
     assert counts["traces"] == 1 and counts["status"] == "delivered" and counts["reason"] == "trace"
+
+
+# -- round 2: the review's findings ---------------------------------------------------------------------------------
+def short_brief(w, timeout_s=2):
+    w.put("governance/project/indep-briefs/writer.md", World.brief_text("writer", timeout_s=timeout_s))
+    c = w.commit_all("short")
+    w.approve(c)
+    return c
+
+
+def trace_lines(w, counts):
+    log = (w.runs / counts["kind"] / counts["run"] / "launch.log").read_text().splitlines()
+    return [x.split()[1:] for x in log if x.split()[1:3] == ["traces", "checked"]]
+
+
+def test_f1_a_timed_out_session_with_a_trace_under_the_drawn_id_22(w):
+    # the session is killed by timeout: no output, so no reported id; the drawn id is still the check's key
+    w.stub({"session": "sleep", "trace_drawn": True})
+    rc, counts, p = w.launch(commit=short_brief(w))
+    assert rc == 22, counts
+    assert counts["traces"] == 1 and counts["status"] == "stopped" and counts["reason"] == "trace"
+    assert counts["session"]["exit"] in (124, 137)
+    drawn = w.calls()[1]["flags"]["--session-id"]
+    assert (w.home / ".claude" / "session-env" / (drawn + ".json")).exists()
+    log = (w.runs / "writer" / counts["run"] / "launch.log").read_text()
+    for text in (p.stdout, p.stderr, log):
+        assert drawn not in text
+
+
+def test_f1_a_timed_out_session_without_traces_is_checked_0(w):
+    w.stub({"session": "sleep"})
+    rc, counts, _ = w.launch(commit=short_brief(w))
+    assert rc == 21 and counts["traces"] == 0 and counts["status"] == "stopped"
+    assert trace_lines(w, counts) == [["traces", "checked", "0"]] * 2  # the canary's check, then the session's
+
+
+def test_f1_the_reported_and_the_drawn_id_count_each_entry_once(w):
+    # the session reports the id it was given: one trace, named by both keys, counted once
+    w.stub({"session": "write", "out": writer_out(), "trace_drawn": True, "report_drawn": True})
+    rc, counts, _ = w.launch()
+    assert rc == 22 and counts["traces"] == 1
+
+
+def test_count_traces_counts_each_entry_once_over_every_key(tmp_path):
+    a, b = str(uuid.uuid4()), str(uuid.uuid4())
+    for rel in (f"projects/p1/{a}.jsonl", f"todos/{b}-agent.json", f"file-history/{a}/x", "todos/unrelated.json"):
+        p = tmp_path / ".claude" / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("x")
+    assert indep_launch.count_traces(str(tmp_path), {a, b}) == 3
+    assert indep_launch.count_traces(str(tmp_path), [a, a]) == 2
+    assert indep_launch.count_traces(str(tmp_path), {None, "bad id!"}) == 0
+
+
+def test_f6_a_canary_trace_is_counted_22(w):
+    w.stub({"canary_trace": True, "session": "write", "out": writer_out()})
+    rc, counts, _ = w.launch()
+    assert rc == 22, counts
+    assert counts["traces"] == 1 and counts["status"] == "delivered"
+    drawn = w.calls()[0]["flags"]["--session-id"]
+    assert (w.home / ".claude" / "todos" / (drawn + ".json")).exists()
+
+
+def test_f6_a_failed_canary_keeps_its_16_and_counts_its_trace(w):
+    w.stub({"canary": "other", "canary_trace": True, "session": "write"})
+    rc, counts, _ = w.launch()
+    assert rc == 16 and counts["reason"] == "canary" and counts["traces"] == 1
+    assert len(w.calls()) == 1
+
+
+def test_f3_the_test_hook_is_recorded(w):
+    rc, plain, _ = w.launch(seed=1, dry=True)
+    assert rc == 0
+    m = json.loads((w.wall(plain) / "WALL.json").read_text())
+    log = (w.runs / "writer" / plain["run"] / "launch.log").read_text()
+    assert m["test_hook"] is False and "test_hook set" not in log
+    rc, hooked, _ = w.launch(seed=1, dry=True, extra={"GOV_INDEP_TEST_HOOK": w.hook("pass\n")})
+    assert rc == 0
+    m = json.loads((w.wall(hooked) / "WALL.json").read_text())
+    log = (w.runs / "writer" / hooked["run"] / "launch.log").read_text()
+    assert m["test_hook"] is True and "test_hook set" in log
+
+
+def test_f5_a_rejected_labeller_leaves_no_labels_folder(w):
+    seal = w.plant_seal()
+    before = tree_hash(w.sets / "fixtures")
+    w.stub({"session": "write", "out": {"out/result.json": json.dumps({"labelled": 3, "allow": 2, "refuse": 1})}})
+    rc, counts, _ = w.launch("labeller")
+    assert rc == 20 and counts["status"] == "rejected"
+    assert not (seal / "labels").exists()
+    assert tree_hash(w.sets / "fixtures") == before
+
+
+def test_f5_a_rejected_writer_round_one_leaves_no_set_folder(w):
+    # the evaluation folder reached through a link (inside the root): the delivery's check fails before any mkdir
+    ev = w.sets / "fixtures" / "evaluation"
+    moved = w.sets / "elsewhere"
+    ev.rename(moved)
+    os.symlink(moved, ev)
+    before = tree_hash(moved)
+    w.stub({"session": "write", "out": writer_out()})
+    rc, counts, _ = w.launch(set_name="brand-new-set")
+    assert rc == 20 and counts["status"] == "rejected"
+    assert not (moved / "brand-new-set").exists()
+    assert tree_hash(moved) == before
+
+
+def test_f8_the_schemas_hashes_are_in_the_wall(w):
+    rc, counts, _ = w.launch(seed=1, dry=True)
+    assert rc == 0
+    m = json.loads((w.wall(counts) / "WALL.json").read_text())
+    assert m["schema_sha256"] == {
+        "indep-counts.schema.json": sha((SCHEMAS / "indep-counts.schema.json").read_bytes()),
+        "writer-result.schema.json": sha((SCHEMAS / "writer-result.schema.json").read_bytes())}
 
 
 # -- the other kinds -----------------------------------------------------------------------------------------------
