@@ -54,7 +54,7 @@ if [ -e "$BASE" ]; then
   [ -f "$BASE/.op2-rehearsal" ] || { echo "REHEARSAL STOP: $BASE exists and is not this script's"; exit 3; }
   chmod -R u+w "$BASE" 2>/dev/null; rm -rf "$BASE"
 fi
-rm -rf "$TMPD"; mkdir -p "$TMPD" "$BASE/hooks-safe" "$BASE/replay" "$BASE/claude-bin" && : > "$BASE/.op2-rehearsal"
+chmod -R u+w "$TMPD" 2>/dev/null; rm -rf "$TMPD"; mkdir -p "$TMPD" "$BASE/hooks-safe" "$BASE/replay" "$BASE/claude-bin" && : > "$BASE/.op2-rehearsal"
 mv "$BASE.live-before.txt" "$BASE/live-before.txt"
 head=$(git -C "$MAIN" rev-parse HEAD)
 git clone -q --no-hardlinks "$MAIN" "$R" || { bad "clone"; exit 1; }
@@ -90,9 +90,9 @@ EOF
 chmod u+w "$O/install" "$O/install/operator-settings.json" "$O/install/APPROVED"
 cp "$SB" "$O/install/operator-settings.json"
 ( cd "$O/install" && find . -path ./__pycache__ -prune -o -type f ! -name APPROVED -print | sed 's#^\./##' | LC_ALL=C sort \
-    | xargs sha256sum > APPROVED.new && mv APPROVED.new APPROVED )
+    | xargs sha256sum > "$BASE/APPROVED.planted" ) && cat "$BASE/APPROVED.planted" > "$O/install/APPROVED"
 chmod 0444 "$O/install/operator-settings.json" "$O/install/APPROVED"
-( cd "$O" && find . -path ./install -prune -o -path ./log -prune -o -type f -print | LC_ALL=C sort | xargs sha256sum ) > "$BASE/owner-files-before.txt"
+( cd "$O" && find CLAUDE.md .claude hooks log/2026-11-01.log -type f | LC_ALL=C sort | xargs sha256sum ) > "$BASE/owner-files-before.txt"
 echo "planted install: $(ls "$O/install" | wc -l) entries, APPROVED $(sha256sum "$O/install/APPROVED" | cut -c1-12); live install APPROVED $(sha256sum "$HOME/gov-os-operator/install/APPROVED" | cut -c1-12)"
 
 say "suites on the clone (the code the install will carry): W2-148 acceptance, tests/unit/operator"
@@ -132,8 +132,10 @@ $OPR plant-replay "$R" "$PH" "$BASE" agree
 $OPR bundle-p "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-1 opr2-new-1 | tee "$BASE/bundle-1.txt"
 $OPR queue "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-1
 OP2_TMP=$TMPD $OPR launch "$R" "$PH" "$BASE" | tee "$BASE/launch-1.txt"
-expect "$BASE/launch-1.txt" '"result": "applied"' "ACT-OPR2-PATHMAP-1 applied"
+expect "$BASE/launch-1.txt" '"result": "launched"' "the launcher started the walled session"
 $OPR show "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-1 | tee "$BASE/show-1.txt"
+expect "$BASE/show-1.txt" "log apply applied votes=\\{'code': 'a', 'claim': 'a', 'review': 'a'\\}" "ACT-OPR2-PATHMAP-1 applied, votes a/a/a"
+expect "$BASE/show-1.txt" "replay\\(calls=3, turned=\\[\\]" "its after-check replayed the 3 calls after the both-way check: none turned"
 grep -c "opr2-new-1" "$R/governance/project/path-map.yaml" | sed 's/^/the clone map holds the new glob: /'
 git -C "$R" log -1 --format='%h %s%n%b' | head -12
 msha=$(python3 -c "import json,sys; print(json.loads(open(sys.argv[1]).readline())['manifest_sha256'])" "$BASE/bundle-1.txt")
@@ -146,8 +148,11 @@ $OPR plant-replay "$R" "$PH" "$BASE" missing
 $OPR bundle-p "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-2 opr2-new-2 | tee "$BASE/bundle-2.txt"
 $OPR queue "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-2
 OP2_TMP=$TMPD $OPR launch "$R" "$PH" "$BASE" | tee "$BASE/launch-2.txt"
-expect "$BASE/launch-2.txt" 'missing|not in the set|no line|logged' "the mismatch named"
+expect "$BASE/launch-2.txt" '"result": "launched"' "the launcher started the walled session"
 $OPR show "$R" "$PH" "$BASE" ACT-OPR2-PATHMAP-2 | tee "$BASE/show-2.txt"
+cat "$BASE/launch-2.txt" "$BASE/show-2.txt" "$BASE/pushes.log" > "$BASE/told-2.txt" 2>/dev/null
+expect "$BASE/told-2.txt" 'log after-check undone .*missing from the set' "ACT-OPR2-PATHMAP-2 refused at its after-check, the mismatch named, undone"
+expect "$BASE/told-2.txt" 'notice P1 undo' "a P1 notice"
 c=$(grep -c "opr2-new-2" "$R/governance/project/path-map.yaml"); echo "the clone map holds the second glob: $c"
 [ "$c" = 0 ] && echo "ok: the refused ACT left the map as before" || bad "the refused ACT's glob stayed"
 cat "$BASE/pushes.log" 2>/dev/null | tail -3 | cut -c1-240
@@ -162,7 +167,7 @@ say "apply.sh undo, then check: the planted install as before"
 rm -rf "$O/queue/"*.req 2>/dev/null
 AP undo > "$BASE/ap-undo2.txt" 2>&1; tail -2 "$BASE/ap-undo2.txt"; expect "$BASE/ap-undo2.txt" "state before" "undone at the end"
 AP check | tail -1 | tee "$BASE/ap-check4.txt"; expect "$BASE/ap-check4.txt" "ready to apply" "check: ready to apply at the end"
-( cd "$O" && find . -path ./install -prune -o -path ./log -prune -o -type f -print | LC_ALL=C sort | xargs sha256sum ) > "$BASE/owner-files-after.txt"
+( cd "$O" && find CLAUDE.md .claude hooks log/2026-11-01.log -type f | LC_ALL=C sort | xargs sha256sum ) > "$BASE/owner-files-after.txt"
 cmp -s "$BASE/owner-files-before.txt" "$BASE/owner-files-after.txt" && echo "ok: the owner's planted files unchanged" || bad "the owner's planted files changed"
 
 say "live files: unchanged"
