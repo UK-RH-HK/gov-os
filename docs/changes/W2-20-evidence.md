@@ -1,4 +1,4 @@
-# W2-20 — the machine-wide resource gate: evidence (DAEO-r30l, round 2: built to the stated interface)
+# W2-20 — the machine-wide resource gate: evidence (DAEO-r30l, round 3: the review's findings; round 2: the interface)
 
 Round 1 (`8985180a3`) built every line but S16, but `gov accept W2-20` passed 39 of 164: the acceptance cases assume an
 interface (the designer's README, "The interface these tests assume") round 1 could not see. Round 2 brings the product
@@ -12,6 +12,41 @@ sessions, `gate.py` the conditions and `check_disk`, `slots.py` the slots, CPU s
 launch's enforcement and F2); `rebuild/watch.py` (each tree its own lock); `secrets` and `codeintel` (pools);
 `retrieval/ollama.py` (DEC-1037). Unit tests: `tests/unit/resources/` (150 cases), `tests/unit/rebuild/test_w2_20_*`,
 `tests/unit/secrets_check/test_w2_20_*`; planted machines only.
+
+## Round 3: the independent review's findings (round 1, NOT READY on F1) and the CTO's rulings
+
+The configuration format is unchanged (frozen from `28fbcfebf`): no key of `gate.json` is renamed, added or given
+another meaning; `src/gov/resources/config.py` is untouched. No fix needed a configuration change.
+
+| Finding | Ruling | What changed | Unit evidence (`tests/unit/resources/test_w2_20_round3.py`) |
+|---|---|---|---|
+| **F1** (blocking): launches that start together all passed the memory check | fix | `gov.launch.gate.StartLock`: an exclusive `flock` on `~/.gov-os/machine/launch.lock`, taken in `launcher.launch` before the start check and given back in `_run` once the session is registered (or when the launch ends without a session, in `finally`). Launches are judged one after another, each with the sessions before it counted. The descriptor is `O_CLOEXEC` (never inherited by the session); a lock not taken within 300 s, or that cannot be opened, refuses the launch (never a check run unlocked). A launch that ends before registering leaves no entry: nothing is registered before `Popen`, and a failed registration stops the session. | `test_f1_launches_started_together_admit_only_those_the_memory_rule_admits` (six forked launches, a stand-in CLI, room for three: three start, three refused on memory; with the lock replaced by a no-op the same case starts all six), `test_f1_the_check_runs_under_the_machine_wide_start_lock`, `test_f1_a_launch_that_ends_before_registering_leaves_no_entry_and_frees_the_lock`, `test_f1_a_registration_that_fails_stops_the_session_leaves_no_entry_and_frees_the_lock`, `test_f1_a_held_start_lock_refuses_after_its_wait_and_is_never_inherited` |
+| **F2**: the cpu rule counted the servers twice | fix (round 7's interface) | `cpu`: `busy_cores_1m + max(0, p95(shared) - now(shared)) + max(0, p95(query) - now(query)) < nproc`. New reading `embedding_cpu_now` (`machine.servers_cpu`): `GOV_RESOURCES_EMBEDDING_CPU_NOW`, else each server's process-tree CPU over the busy cores' last minute (kept `[t, pid, ticks]` samples in `server-cpu.json`'s `window`, the same window rule as the busy cores; a server's new process, or a history from round 2 with no window, gets a short window at once). Unreadable: `null`, shut on `cpu` with `reading` `null`. | `test_f2_only_the_part_of_each_servers_p95_above_its_current_use_is_added` (4: the store rebuild opens at 12.5; the same p95 idle now shuts at 20.0; busier now than its p95 adds nothing, 20.0 shuts; 3.9 of 4 opens), `test_f2_busy_cores_alone_shut_only_at_nproc`, `test_f2_an_unreadable_current_use_shuts_on_cpu_with_a_null_reading` (4), `test_f2_the_own_current_use_is_the_servers_cpu_over_the_last_minute`, `test_f2_a_kept_history_written_before_round_3_still_reads` |
+| **F4**: the trip-wire silently off without `oom_floor_bytes` | fix | `slots.run` names it on the job's stderr when the job starts (`OOM_TRIPWIRE_OFF: ... oom_floor_bytes: <the fault> (S8, S11)`); `slots.tripwire` without a usable floor stops nothing and names it in `why` (no `KeyError`); `gov resources --trip-wire` already refused naming it; the gate is shut on it (`config`, S8). The job still runs: the ruling asks for the key named, and S7 refuses a slot only on `heavy_slots`. | `test_f4_a_missing_or_malformed_trip_floor_is_named_when_a_heavy_job_starts` (3), `test_f4_a_good_trip_floor_is_not_named`, `test_f4_a_trip_wire_pass_without_its_floor_stops_nothing_and_names_it`, `test_f4_the_trip_wire_command_names_a_missing_floor` |
+| **F6**: after a WSL restart, old state refused falsely | fix | (1) `registry.register` records the process's own `boot` (boot id) and `start_ticks` (from `/proc/<pid>/stat`); `registry.sessions` clears an entry whose live pid has another boot or start, or (an entry without them) started more than 5 s after the entry's `started`: a reused pid. Where it cannot be told (a planted process table, an unreadable stat) the live pid stands (counted, never dropped). (2) `machine.busy_cores` drops kept samples of another boot or with counters above today's at once, so after a restart the reading is a short window, never `null`. | `test_f6_an_entry_whose_live_pid_started_after_it_was_made_is_stale_and_cleared`, `test_f6_an_entry_made_when_its_process_ran_stays`, `test_f6_register_records_the_process_start_and_another_start_is_stale`, `test_f6_on_a_planted_process_table_the_start_is_not_judged`, `test_f6_cpu_samples_from_before_a_restart_are_dropped_at_once` (2) |
+| **F8**: a plan override logged before the gate's check | fix | `_admit_lead` returns the override; `_record_plan_override` writes it (launch log and stderr) only after `_admit_start` admits the launch (open, or a recorded gate override, whose line comes first). | `test_f8_a_plan_override_for_a_lead_the_gate_refuses_is_not_logged`, `test_f8_a_plan_override_the_gate_admits_is_logged_once`, `test_f8_with_a_gate_override_both_overrides_are_logged_gate_first` |
+| F3 | row (the designer revised S16; the CTO re-runs it) | nothing in the product | — |
+| F5 | row, not this round | unchanged: a listening socket with no readable owner still reads as 0 cores (now and p95) | — |
+| F7 | row, out of scope (tooling and the decision) | unchanged: `heavy_slot.sh`'s `/tmp` locks and the product's `~/.gov-os/machine/slots/` are two pools until the tooling moves | — |
+| F9 | row, not this round | unchanged | — |
+| F10 | row, not this round | unchanged: the re-measure takes the largest kept sample; nothing samples on a schedule | — |
+
+The four launch fixtures that plant an open gate (`test_runs.py`, `test_w1_28.py`, `test_w1_32.py`,
+`test_w2_136_plan_check.py`) and the resources fixture (`conftest.py`) now plant `GOV_RESOURCES_EMBEDDING_CPU_NOW` idle,
+as the designer's support does, so no unit case reads the real servers.
+
+**Round 3's runs (inside the sandbox, on `b6c6dad61` plus a style-only edit of `machine.py`; an empty `HOME` with only
+the user site's `lib` linked in, since `gov accept` drops `PYTHON*` variables):**
+
+- `gov accept W2-20`: **168 passed, 0 failed, 1 skipped (169)**; every line passes but S16, whose one case skips (the
+  CTO's run outside the sandbox, `GOV_W2_20_MEASURE=1`). Round 7's new cases (the cpu rule, the frozen configuration
+  format) are green.
+- `gov accept W2-136`: **76 passed, 0 failed**.
+- Unit tests, `tests/unit/resources tests/unit/launch tests/unit/rebuild tests/unit/secrets_check` with `-m "not
+  local_only" -k "not real and not green_here and not time_limit"`: **375 passed** (202 opt-in rows deselected by
+  `tests/conftest.py`); with `--optin=lifted,breadth` **576 passed**, the one case left out by the name filter being
+  `test_w2_20_pool.py::test_a_real_cpu_set_bounds_the_width`. The new file alone: 31 passed.
+- W2-112's socket cases were not re-run (not in this round's brief; no file of theirs changed).
 
 ## What round 2 changed (the interface)
 

@@ -20,6 +20,7 @@ Sources, each replaceable for a planted machine:
 
 from __future__ import annotations
 
+import datetime
 import json
 import math
 import os
@@ -298,6 +299,7 @@ def _sample_servers(folder: Path, values: dict):
     for name in list(history):
         if not isinstance(history[name], dict):
             del history[name]
+
     def known(name, pid) -> tuple[bool, bool]:
         """Whether an earlier sample of this server's process is kept: as its last, and in its window."""
         kept = history.get(name) or {}
@@ -485,7 +487,6 @@ def same_process(pid: int, entry: dict) -> bool:
     if not isinstance(started, str) or found["start_time"] is None:
         return True
     try:
-        import datetime
         when = datetime.datetime.fromisoformat(started.replace("Z", "+00:00"))
         if when.tzinfo is None:
             when = when.replace(tzinfo=datetime.timezone.utc)
