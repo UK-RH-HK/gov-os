@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1106 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1107 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -365,3 +365,5 @@ other restart is an ACT.
   anything else: write nothing, refuse, hold the lock, P1 naming each file; the same in the (a) undo); **the guard's
   call log** (a hash of the action, the role, allow or refuse, never contents) by its own ACT; the commit freeze a file
   in the operator's install folder the CTO's session may not write; F7 kept; then ACT-OPERATOR-1. Basis: 2.
+- DEC-1107 (2026-11-09): W2-148's F21 fixed in one tiny extra round before ACT-OPERATOR-1 (the owner-undo and
+  crash-recovery paths exit non-zero and say "refused" whenever they leave another's files). Basis: 2.

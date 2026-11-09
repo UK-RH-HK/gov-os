@@ -14063,6 +14063,13 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (an operator that can never silently undo someone else's change; a guard whose decisions are
   logged without their contents).
 
+### DEC-1107 — W2-148's F21 fixed in one tiny extra round before ACT-OPERATOR-1: the owner-undo and crash-recovery paths exit non-zero and say "refused" whenever they leave another's files
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (1), DEC-1010 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's merge (`511a4a17`)
+- **Decision:** (a): one tiny extra round, an exception to DEC-1010, before ACT-OPERATOR-1 installs the agent: a designer
+  case first, one engineer pass, a narrow review; the owner-undo and crash-recovery paths exit non-zero and say
+  "refused" whenever they leave another's files untouched (the P1 and the held lock as before).
+- **Basis:** question 2 (no success code that could hide someone else's change).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14107,3 +14114,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |
 | 0.490 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1105 (an exception to DEC-1010 for W2-20). Next free id: DEC-1106. |
 | 0.491 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1106 (an exception to DEC-1010 for W2-148). Next free id: DEC-1107. |
+| 0.492 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1107 (an exception to DEC-1010 for W2-148's F21). Next free id: DEC-1108. |
