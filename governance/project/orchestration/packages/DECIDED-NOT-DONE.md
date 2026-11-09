@@ -40,7 +40,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | IN PROGRESS 11-09 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | IN PROGRESS 11-09 |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | IN PROGRESS 11-09 |
-| 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | IN PROGRESS 11-09 (design) |
+| 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
 | 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
 
