@@ -60,9 +60,11 @@ kpis:
   - 'Anything the CTO writes, other than a queue line, that makes the agent run; a queue line that bypasses a gate.'
   - 'A wait or a stop by a name match.'
   - 'The trial or any test changing a live file, ~/gov-os-operator/ or ~/.claude/.'
+  - 'Any live change made by the operator that is not its own dry-run or apply change: a file someone else changed during the dry run or the apply restored, deleted or overwritten, instead of left as written with a refusal, the lock held and a P1 naming the file (DEC-1106 (1)).'
 profile: FULL
 sources:
 - DEC-1104
+- DEC-1106
 - DEC-1103
 - DEC-1101
 - DEC-1058
@@ -122,4 +124,14 @@ trial on past ACTs replayed. Read the package in full: its §1 to §6 are this t
 - **Est.:** about 900 lines with the engineer's tests; about 3 working days elapsed with its review and the trial
   (OPERATOR-AGENT-1 §7).
 
-[DEC-1104 (2); DEC-1103 (4)]
+**The owner's DEC-1106 (2026-11-09), after review round 2 (one exception round to DEC-1010):**
+- **(1) F15:** after the dry run, and in the (a) after-check's undo (S12, S15), the agent restores only its own
+  change, meaning a touched file whose live bytes equal the frozen after-copy. Any other live difference it leaves exactly
+  as written: it refuses, holds the lock and sends a P1 naming each file. This overrides S15's "undoes the ACT" for
+  files that are not the ACT's own; the fifteenth failure line is DEC-1106's.
+- **(3) The commit freeze** (S14) is `install/act-in-progress.txt` in the operator's install folder, the freeze
+  setting's default, and is not counted by the APPROVED check. The CTO's tools, the landing hook and the guard's deny
+  come with ACT-OPERATOR-1.
+- **(2) The guard's call log** (F3) is its own ACT. **(4) F7** is kept as the package says.
+
+[DEC-1104 (2); DEC-1103 (4); DEC-1106]
