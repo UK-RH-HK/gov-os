@@ -78,7 +78,8 @@ def test_several_broken_conditions_are_all_named(machine, repo):
 def test_exactly_at_a_threshold(machine, repo, condition):
     """DEC-1097 (8). "At least" opens at the value: memory (MemAvailable equal to the floor plus the new session's
     working size, no session running, S6), disk and inodes (S4 "shuts below a floor"). "Below" shuts at the value:
-    load (both loads equal to nproc, S5) and CPU (busy cores plus the servers' p95 equal to nproc, S2)."""
+    load (both loads equal to nproc, S5) and CPU (S2, round 7's rule: busy cores plus the part of each server's p95
+    above its current use equal to nproc: 2.25 + (1.0 - 0.5) + (0.25 - 0.0) = 3.0; counted twice it would be 3.5)."""
     machine.open_config(memory_floor_bytes=2 * GIB, working_size_bytes=1 * GIB)
     machine.set_readings(nproc=3)
     if condition == "memory":
@@ -86,7 +87,7 @@ def test_exactly_at_a_threshold(machine, repo, condition):
     elif condition == "load":
         machine.set_readings(load=3.0, load_15=3.0)
     elif condition == "cpu":
-        machine.set_readings(busy_cores=2.5, embedding_p95=(0.25, 0.25))
+        machine.set_readings(busy_cores=2.25, embedding_p95=(1.0, 0.25), embedding_now=(0.5, 0.0))
     elif condition == "disk":
         machine.set_readings(free_bytes=100 * GIB)
     else:
