@@ -9607,6 +9607,9 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ---
 
 ## 265. A delegated decision of 2026-10-20 on W2-59's run 2 (register v0.265, recorded by the W2 orchestrator on branch `w2/integrate`)
+- **Kept:** tests/acceptance/W2-07/README.md — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
+- **Kept:** tests/acceptance/W2-07/test_w2_07_decision_records.py — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
+- **Kept:** tests/acceptance/W2-07/w2_07_support.py — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
 
 ### DEC-877 — W2-59: the untrailered merge-back remade under DEC-412; a bare `gov` with `PYTHONPATH` set is a run of the code under test; the launcher's `PYTHONPATH` a row for W2-56 (delegated)
 - **Status:** DONE (owner, 2026-11-09, DEC-1098 (3)); it was ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** DEC-412, DEC-750, DEC-732, DEC-822, DEC-801, DEC-864 · **Basis:** W2-59's lead returned PACKAGES (run 2, `log/W2-59-A5-run2.json`; the packages in its worktree's `.gov-runtime/scratch/lead/packages-run2.md`): the review's F1 is fixed and verified (`e791465b`); the merge-back `3eadca4c` carries no `Task:` or `Role:` (DEC-750), so once W2-59 lands every later close whose range holds it would refuse as work without a task.
