@@ -10,7 +10,7 @@ integrate's code (DEC-963). The ticket's implementation was never read.
     PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-153 -q -p no:cacheprovider \
       -o tmp_path_retention_policy=failed
 
-About 6 s, 50 cases. No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
+About 6 s, 51 cases. No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
 baseline commit in the repository's history.
 
 - **`gov launch` (S1, F1, F2).** Each case runs `gov.launch.launcher.launch` (the launcher's public entry) in a child
@@ -48,7 +48,8 @@ baseline commit in the repository's history.
 - **Flag:** `--append-system-prompt-file <root>/.claude/templates/<stem>.md`, appended after the caller's arguments,
   with an absolute path, where `<root>` is the launch's repository root (its real path). A missing file refuses with
   `GovError` `LAUNCH_NO_TEMPLATE` naming that path, and no session starts.
-- **Skills lists:** engineer `[test-driven-development]`, independent-auditor `[audit]`, product-spec `[change]`,
+- **Skills lists** (under `claudecode: skills:` in each source, DEC-1112 (3): rulesync 24.0.0 drops a top-level
+  `skills` from the generated agent, so a list there would deliver nothing): engineer `[test-driven-development]`, independent-auditor `[audit]`, product-spec `[change]`,
   research `[discovery]`, orchestrator `[orchestration]`. The test designer gets `[test-design]` only once W2-128 has
   reconciled that skill with DEC-963, which the case reads as "the kernel skill names DEC-963". Until then the list
   leaves `test-design` out, so it is empty or absent. On integrate today the skill does not name DEC-963.
@@ -58,8 +59,9 @@ baseline commit in the repository's history.
 
 ## KPI lines, tests, and the outcome on `w2/integrate` (`1ef1a7a48c53`)
 
-Run in the launch sandbox on integrate's code: **50 cases, 37 failed, 13 passed** (about 6 s). Every red fails on
-what its KPI line asks for, none on a premise. A reference build (below) passes all 50.
+Run in the launch sandbox on integrate's code: **51 cases, 38 failed, 13 passed** (about 6 s). Every red fails on
+what its KPI line asks for, none on a premise. A reference build (below) passed the first 50; revision 2 (DEC-1112
+(3)) moved the skills list under `claudecode` and added one case.
 
 | KPI line | Test (node id) | On integrate | Why |
 |---|---|---|---|
@@ -76,10 +78,11 @@ what its KPI line asks for, none on a premise. A reference build (below) passes 
 | S3, S4 | `test_w2_153_portability.py::test_s3_s4_a_project_with_the_composed_source_and_the_eight_copies_is_reported_consistent` | red | `SOURCE_DIFFERS`: integrate compares the source with the role file's body, not the template's |
 | S3 | `test_w2_153_portability.py::test_s3_a_source_that_keeps_the_kernel_role_file_s_body_is_a_finding` | red | today's form (the role file's body) is no finding on integrate |
 | S3 | `test_w2_153_portability.py::test_s3_the_skills_list_is_part_of_the_composition` | red | the composed source is a finding on integrate (its first half) |
+| S3 | `test_w2_153_portability.py::test_s3_a_skills_list_at_the_top_level_is_a_finding` | red | the composed source (list under `claudecode`) is a finding on integrate (its first half); its second half makes the same list at the top level, with none under `claudecode`, a finding (DEC-1112 (3)) |
 | S4 | `test_w2_153_portability.py::test_s4_a_changed_copy_and_a_missing_copy_are_findings` | red | integrate does not look at `.claude/templates/` |
 | S4 | `test_w2_153_portability.py::test_s4_a_copy_differing_by_one_byte_is_a_finding` | red (2: trailing newline, line ending) | the same; the two cases make sure the copy is compared byte for byte |
 | S4 | `test_w2_153_portability.py::test_s4_the_writer_writes_the_eight_copies_byte_for_byte` | red | integrate's `main()` takes no arguments: it runs the check and writes nothing |
-| S3 | `test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_and_its_template_s_body` | red (6 roles × 2 trees) | the sources hold the role files' bodies and no `skills:` list |
+| S3 | `test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_and_its_template_s_body` | red (6 roles × 2 trees) | the sources hold the role files' bodies and no `claudecode.skills` list; a top-level `skills` is refused, and the front matter must equal integrate's but for `claudecode.skills` (the rest of `claudecode`, such as `tools`, unchanged) |
 | S3 | `test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository` | green (guard) | the check, run from this repository's root without rulesync, names no `subagents` source; it must stay so once the sources and the check change together |
 | S5 | untestable here | none | the CTO's evidence: see below |
 
@@ -107,8 +110,9 @@ the dispatcher without its file check failed its F1.
   tests follow the ticket.
 - **D-2. "The kernel role file's front matter".** The kernel role files (`template/governance/kernel/roles/*.md`)
   have no front matter. The tests read S3 as the ACT note does: the source keeps its rulesync front matter (`name`,
-  `targets`, `description`, `claudecode.tools`), checked equal to integrate's at the baseline commit, plus `skills:`.
-  The tools check against the role file's Tools field is left as it is.
+  `targets`, `description`, `claudecode.tools`), checked equal to integrate's at the baseline commit, plus
+  `claudecode.skills` (DEC-1112 (3); no top-level `skills`). The tools check against the role file's Tools field is
+  left as it is. The portability bed's source plants its list under `claudecode` too.
 - **D-3. `--write-templates <dir>`.** The ticket does not say whether `<dir>` is the copies' folder or a root under
   which `.claude/templates/` is made. The writer case accepts either (exactly the eight files, in one of the two). It
   runs from the repository's root, so it reads that root's kernel.

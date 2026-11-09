@@ -1,5 +1,6 @@
 """S3 on this repository: each ``.rulesync/subagents/<role>.md`` and ``template/.rulesync/subagents/<role>.md`` is the
-rulesync front matter it has on integrate plus the role's ``skills:`` list, with the body of its kernel role template
+rulesync front matter it has on integrate plus the role's skills list under ``claudecode: skills:`` (DEC-1112 (3):
+rulesync 24.0.0 drops a top-level ``skills``, so none may sit there), with the body of its kernel role template
 (``template/governance/kernel/templates/<stem>.md`` without its own front matter), read as the portability check
 reads a Markdown file (the blank lines after the front matter dropped).
 
@@ -36,14 +37,23 @@ def test_s3_each_role_source_is_its_front_matter_its_skills_and_its_template_s_b
         (support.KERNEL_TEMPLATES / f"{KERNEL_ROLE_TEMPLATE[role]}.md").read_text(encoding="utf-8"))
     assert body == template_body, f"{rel}: the body is not that of templates/{KERNEL_ROLE_TEMPLATE[role]}.md"
     assert isinstance(front, dict), f"{rel} has no front matter"
+    assert "skills" not in front, f"{rel}: a top-level skills list (rulesync 24.0.0 drops it; DEC-1112 (3))"
+    claudecode = front.get("claudecode") or {}
+    assert isinstance(claudecode, dict), f"{rel}: claudecode is {claudecode!r}, not a mapping"
+    listed = claudecode.get("skills")
     expected = _expected_skills(role)
     if expected is None:
-        assert front.get("skills") in (None, []), f"{rel}: test-design is listed before W2-128 reconciles it"
+        assert listed in (None, []), f"{rel}: test-design is listed before W2-128 reconciles it"
     else:
-        assert front.get("skills") == expected, f"{rel}: skills {front.get('skills')!r}, not {expected!r}"
+        assert listed == expected, f"{rel}: claudecode.skills {listed!r}, not {expected!r}"
     integrate_front, _ = support.split_front(support.git("show", f"{support.BASELINE_COMMIT}:{rel}"))
-    kept = {key: value for key, value in front.items() if key != "skills"}
-    assert kept == integrate_front, f"{rel}: the front matter changed beyond the skills list"
+    kept = dict(front)
+    kept_claudecode = {key: value for key, value in claudecode.items() if key != "skills"}
+    if kept_claudecode or "claudecode" in integrate_front:
+        kept["claudecode"] = kept_claudecode
+    else:
+        kept.pop("claudecode", None)
+    assert kept == integrate_front, f"{rel}: the front matter changed beyond claudecode.skills"
 
 
 def test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository(tmp_path):

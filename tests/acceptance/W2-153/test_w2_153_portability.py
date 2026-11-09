@@ -2,7 +2,7 @@
 
 The fixture (``w2_153_support.PortabilityBed``) mirrors the unit tests' project (``tests/unit/adapters/
 test_portability.py``) in this repository's layout, with one kernel role (engineer) and S3's composition: its
-rulesync source is the rulesync front matter plus ``skills: [test-driven-development]`` and the body of
+rulesync source is the rulesync front matter plus ``claudecode: skills: [test-driven-development]`` and the body of
 ``templates/role-engineer.md``. The check runs as ``python3 -m gov.adapters.portability`` in the project, with a
 stand-in rulesync that writes the generated files the project holds.
 """
@@ -45,6 +45,18 @@ def test_s3_the_skills_list_is_part_of_the_composition(bed):
     support.write(bed.source(), support.composed_source(skills=None))
     code, printed, _ = bed.check()
     assert support.naming(printed["findings"], SOURCE), f"a source with no skills list is no finding: {printed}"
+    assert code != 0
+
+
+def test_s3_a_skills_list_at_the_top_level_is_a_finding(bed):
+    """DEC-1112 (3): the list sits under ``claudecode: skills:``; rulesync 24.0.0 drops a top-level ``skills``, so
+    the agent would preload nothing. With the list under ``claudecode`` the source is consistent; the same list at
+    the top level (and none under ``claudecode``) is a finding naming the source."""
+    code, printed, _ = bed.check()
+    assert support.naming(printed["findings"], SOURCE) == [], f"the composed source is a finding: {printed}"
+    support.write(bed.source(), support.composed_source(top_level=True))
+    code, printed, _ = bed.check()
+    assert support.naming(printed["findings"], SOURCE), f"a top-level skills list is no finding: {printed}"
     assert code != 0
 
 
