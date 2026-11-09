@@ -105,3 +105,28 @@ lane), now filed as **W2-151** (`DAEO-qzca`, `56ad463a`). Today the six files st
   `templates/checkpoint.md:7`'s example (W2-128's; a placeholder for round 2), the other two other lanes'.
   **Still before the merge (the CTO's):** (3) `LEAD-w2-common.md` lines 87, 149, 163 pointed to the templates; (4) W1-30's
   template-ticket cases outside the sandbox. Review F6-F8 go to round 2 (TPL-6, TPL-4).
+- 2026-11-09 (night): **round 1 merged** by the CTO (`c6aefae9`); `LEAD-w2-common.md` pointed at the role templates
+  (`15c606f6`); W1-30's template-ticket cases 13/13 outside the sandbox.
+
+## Delegated decision: the split of the code half (the CTO, 2026-11-09; DEC-1112 (3), a P2)
+
+**Decided:** W2-128's code half is two engineer tickets:
+- **W2-152** (`DAEO-o5x1`): `gov brief`, TPL-2 S3, TPL-3 S1-S4, S6, S7, TPL-5 S3's ready check, and the dependency
+  refusals of DEC-1088 (3);
+- **W2-153** (`DAEO-8s85`): TPL-4 S1-S4, delivery at launch, landing at the `.claude/` copies ACT.
+
+W2-128 keeps the templates' text, TPL-6, TPL-7, TPL-8 and the CIT-P; it depends on both and closes after them.
+
+**Reason:**
+- `gov launch` starts an engineer only on an engineer's ticket, and W2-128 is product-spec's, with no `src/` path.
+- One engineer ticket for both halves would be about 630 lines, over the 400-line small-change guidance R3 cites (A1).
+- The two halves touch disjoint code (`src/gov/brief/` against the launcher and the portability check), so neither
+  waits on the other's code.
+- W2-153 must go live with the ACT that installs the copies, or every launch would be refused. Keeping it apart lets
+  W2-152 land first.
+
+**Interfaces:** in each ticket's body (D5 row 9). The KPI lines move from W2-128's S6, S7, S9, S10 and S19, each
+marked on W2-128.
+
+**Order:** W2-152's test designer first, then W2-128 round 2a (text: review F6 and F7 through TPL-6 S3, and the
+`DAEO-0000` example), then W2-152's engineer, then W2-153. One launched worker at a time.
