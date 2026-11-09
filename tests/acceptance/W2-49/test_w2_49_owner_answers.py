@@ -22,6 +22,12 @@ not know:
 
 Every Contract test runs on both files and first checks the version, so none
 passes on the unchanged 4.1 text by accident.
+
+Revised for Contract 4.3 (W2-140; DEC-1093 (1), the approved W2-27-CIT-P):
+the counts (covers W2 19 / W3 39; capabilities W2 6 / W3 12), D (ii) (CAP-45.a
+is W3; its authenticated source names the signed tag and the manifest and file
+hashes; no Wave 2 clause left), K (1) (the version in force, once), and
+CAP-45 itself at W3. Each revised function carries its Rewrite-Reason.
 """
 
 from __future__ import annotations
@@ -39,17 +45,22 @@ from w2_49_support import (
     CIT_E,
     CIT_P,
     CONTRACT_MD,
+    CONTRACT_YAML,
     MOVED_ITEMS,
     NEW_SPLIT_IDS,
     ROOT,
+    _flatten,
     base_yaml_model,
     cap_wave_note,
     clauses,
+    clean,
     contract_status,
     current_model,
     describe,
     gate,
     has,
+    is_v42_or_later,
+    load_yaml_text,
     md_model,
     read_base,
     read_doc,
@@ -140,13 +151,27 @@ def test_no_other_covers_item_of_cap_43_or_cap_44_changes_wave(model):
     assert not wrong, f"{model.source}: covers items of CAP-43/CAP-44 changed wave: {wrong}"
 
 
-def test_covers_count_by_wave_is_w1_149_w2_20_w3_38_none_7(model):
-    """CIT-P §6.3 under A (a1): 211 -> 214 covers items, W1 149 / W2 20 / W3 38 / NONE 7."""
+def test_covers_count_by_wave_is_w1_149_w2_19_w3_39_none_7(model):
+    """CIT-P §6.3 under A (a1), then W2-27-CIT-P §5.5: 214 covers items, W1 149 / W2 19 / W3 39 / NONE 7; 62
+    capabilities, W1 42 / W2 6 / W3 12 / NONE 2 (the markdown's §1 Counts says the same)."""
+    # Rewrite-Reason: DEC-1093 (1) — CAP-45.a to W3: covers W2 20 -> 19, W3 38 -> 39 (214 kept); CAP-45 to W3 (A (i)):
+    # capabilities W2 7 -> 6, W3 11 -> 12 (62 kept), counted from the capabilities and, in the markdown, §1 Counts.
+    # Renamed: the old name stated W2 20 / W3 38.
     require_v42(model)
     counts = Counter(c.wave for c in model.covers)
-    expected = {"W1": 149, "W2": 20, "W3": 38, "NONE": 7}
+    expected = {"W1": 149, "W2": 19, "W3": 39, "NONE": 7}
     assert dict(counts) == expected, f"{model.source}: covers by wave {dict(counts)}, expected {expected}"
     assert len(model.covers) == 214, f"{model.source}: {len(model.covers)} covers items, expected 214"
+    caps = Counter(model.cap_waves.values())
+    expected_caps = {"W1": 42, "W2": 6, "W3": 12, "NONE": 2}
+    assert dict(caps) == expected_caps, f"{model.source}: capabilities by wave {dict(caps)}, expected {expected_caps}"
+    assert len(model.cap_waves) == 62, f"{model.source}: {len(model.cap_waves)} capabilities, expected 62"
+    if model.source == "markdown":
+        table = {
+            m.group(1): int(m.group(2))
+            for m in re.finditer(r"^\|\s*(W1|W2|W3|NONE)\s*\|(?:\s*\d+\s*\|){3}\s*(\d+)\s*\|\s*$", read_doc(CONTRACT_MD), re.MULTILINE)
+        }
+        assert table == expected_caps, f"markdown: §1 Counts totals {table}, expected {expected_caps}"
 
 
 # --------------------------------------------------------------------------
@@ -182,28 +207,91 @@ def test_cap_43_wave_note_names_cap_43d_and_no_ticket(model):
 # D (ii): CAP-45.a's Wave 2 wording
 
 
-def test_cap_45a_stays_w2_with_the_release_manifest_and_hashes_as_its_wave_2_source(model):
-    """D (ii): in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite)."""
+AUTH_SOURCE_PARTS = {
+    "the signed tag": r"\bsign\w*\b[^;]*\btag",
+    "CAP-02.c": r"CAP-02\.c(?![\w])",
+    "the manifest": r"manifest",
+    "the file hashes": r"\bhash",
+    "CAP-43.b": r"CAP-43\.b(?![\w])",
+}
+
+
+def test_cap_45a_moves_to_w3_with_the_signed_tag_and_the_manifest_and_hashes_as_its_authenticated_source(model):
+    """D (ii) as DEC-1093 (1) changes it (A (i), C (i)): CAP-45.a is W3, and one clause names, as its authenticated
+    source, the signed tag (CAP-02.c) and the release's manifest and file hashes (CAP-43.b); it cites DEC-722 and
+    DEC-1090 (W2-27-CIT-P §5.1, §5.2)."""
+    # Rewrite-Reason: DEC-1093 (1) — CAP-45.a moves W2 -> W3 and C (i) withdraws the "in Wave 2" clause, keeping the
+    # manifest and file hashes beside the signed tag: W2 becomes W3, and the Wave 2 source clause becomes one
+    # authenticated-source clause naming both; DEC-722 still cited, DEC-1090 added. Renamed: the old name said
+    # "stays W2".
     require_v42(model)
     item = _item(model, "CAP-45.a")
-    assert item.wave == "W2", f"{model.source}: CAP-45.a is in {item.wave}, not W2"
-    assert any(W2.search(c) and has(r"manifest", c) and has(r"hash", c) for c in clauses(item.text)), (
-        f"{model.source}: CAP-45.a does not say that in Wave 2 its authenticated source is the manifest "
-        f"and file hashes: {item.text}"
+    assert item.wave == "W3", f"{model.source}: CAP-45.a is in {item.wave}, not W3 (DEC-1093 moves it)"
+    sources = [c for c in clauses(item.text) if has(r"authenticated source", c)]
+    assert sources, f"{model.source}: CAP-45.a names no authenticated source: {item.text}"
+    whole = [c for c in sources if all(has(p, c) for p in AUTH_SOURCE_PARTS.values())]
+    assert whole, (
+        f"{model.source}: no clause of CAP-45.a names, as its authenticated source, "
+        f"{[n for n, p in AUTH_SOURCE_PARTS.items() if not any(has(p, c) for c in sources)] or list(AUTH_SOURCE_PARTS)} "
+        f"together: {item.text}"
     )
-    assert has(r"CAP-43\.b", item.text), f"{model.source}: CAP-45.a does not cite CAP-43.b (lite)"
-    assert any(has(r"CAP-02\.c", c) and W3.search(c) and has(r"\bsign", c) for c in clauses(item.text)), (
-        f"{model.source}: CAP-45.a does not say that the signed tag goes with CAP-02.c in Wave 3: {item.text}"
-    )
-    assert has(r"DEC-722", item.text), f"{model.source}: CAP-45.a does not cite DEC-722"
+    assert has(r"DEC-722(?!\d)", item.text), f"{model.source}: CAP-45.a does not cite DEC-722"
+    assert has(r"DEC-1090(?!\d)", item.text), f"{model.source}: CAP-45.a does not cite DEC-1090"
 
 
 def test_cap_45a_names_no_signed_tag_as_a_wave_2_requirement(model):
-    """D (ii), failure: every mention of the signed tag in CAP-45.a carries its Wave 3 qualifier."""
+    """D (ii), failure, as DEC-1093 (1) changes it (C (i)): no clause of CAP-45.a names Wave 2 at all, so neither
+    the signed tag nor anything else is a Wave 2 requirement, and the withdrawn clause is gone."""
+    # Rewrite-Reason: DEC-1093 (1) — C (i) withdraws "in Wave 2 the authenticated source is …" and CAP-45.a is W3:
+    # "every signed-tag mention carries a W3 qualifier" becomes "no clause of CAP-45.a names W2 or Wave 2".
     require_v42(model)
     item = _item(model, "CAP-45.a")
-    bare = [c.strip() for c in clauses(item.text) if has(r"\bsign", c) and not W3.search(c)]
-    assert not bare, f"{model.source}: CAP-45.a names a signed tag with no Wave 3 qualifier: {bare}"
+    wave_2 = [c.strip() for c in clauses(item.text) if W2.search(c)]
+    assert not wave_2, f"{model.source}: CAP-45.a still has a Wave 2 clause: {wave_2}"
+    assert not has(r"in\s+Wave\s+2\s+the\s+authenticated\s+source", item.text), (
+        f"{model.source}: CAP-45.a keeps the withdrawn Wave 2 clause: {item.text}"
+    )
+
+
+def _cap_45_fields(source: str) -> tuple[str, list[str], list[str]]:
+    """CAP-45's wave note, provider entries and sources, as each file states them."""
+    if source == "yaml":
+        caps = {c["id"]: c for c in load_yaml_text(read_doc(CONTRACT_YAML)).get("capabilities", [])}
+        cap = caps.get("CAP-45") or {}
+        return _flatten(cap.get("wave_note")), [str(p) for p in cap.get("provider") or []], [str(s) for s in cap.get("sources") or []]
+    lines, inside = {}, False
+    for line in read_doc(CONTRACT_MD).splitlines():
+        if line.startswith("### "):
+            inside = line.startswith("### CAP-45 ")
+            continue
+        m = re.match(r"^- \*\*(Wave|Provider|Sources):\*\*\s*(.*)$", line)
+        if inside and m and m.group(1) not in lines:
+            lines[m.group(1)] = m.group(2)
+    split = lambda text, sep: [s.strip() for s in text.split(sep) if s.strip()]  # noqa: E731
+    return lines.get("Wave", ""), split(lines.get("Provider", ""), ","), split(lines.get("Sources", ""), ";")
+
+
+def test_cap_45_moves_to_w3_with_its_wave_note_provider_and_sources(model):
+    """A (i) (W2-27-CIT-P §5.1, §5.2): CAP-45 is W3 in both files; its wave note puts gov update and the first real
+    `copier update` in W3 (DEC-1089, DEC-1090) beside the pending-update report (DEC-165), with no W2 left; its
+    provider reads `W3: gov update --check` and names nothing W2; its sources keep the five and add DEC-1090;
+    CAP-45.b stays W3."""
+    # Added-For: DEC-1093 (1) — A (i), CAP-45's wave, wave note, provider and sources in both forms (the note's §5).
+    require_v42(model)
+    assert model.cap_waves.get("CAP-45") == "W3", f"{model.source}: CAP-45 is {model.cap_waves.get('CAP-45')}, not W3"
+    note, provider, sources = _cap_45_fields(model.source)
+    assert not W2.search(note), f"{model.source}: CAP-45's wave note still names W2: {note}"
+    for what, pattern in (("gov update", r"gov update"), ("copier update", r"copier update"), ("DEC-1089", r"DEC-1089(?!\d)"),
+                          ("DEC-1090", r"DEC-1090(?!\d)"), ("DEC-165", r"DEC-165(?!\d)"), ("W3", W3.pattern)):
+        assert has(pattern, note), f"{model.source}: CAP-45's wave note does not name {what}: {note}"
+    assert any(re.fullmatch(r"W3:\s*gov update --check", p) for p in provider), (
+        f"{model.source}: CAP-45's provider has no 'W3: gov update --check': {provider}"
+    )
+    assert not [p for p in provider if W2.search(p)], f"{model.source}: CAP-45's provider still names W2: {provider}"
+    kept = ["Contract v3 Gate S5", "Framework v4.1.2 §82", "Distribution Protocol v1.2 §12", "DEC-023", "DEC-165", "DEC-1090"]
+    missing = [s for s in kept if s not in sources]
+    assert not missing, f"{model.source}: CAP-45's sources lack {missing}: {sources}"
+    assert _item(model, "CAP-45.b").wave == "W3", f"{model.source}: CAP-45.b is no longer W3"
 
 
 # --------------------------------------------------------------------------
@@ -345,8 +433,7 @@ def test_cit_p_records_the_owner_answer_naming_w2_52():
 # --------------------------------------------------------------------------
 # K (1): the version line in every capability record (independent of K (2))
 
-V42 = r"Contract v4,?\s+version\s+4\.2(?![\d])"
-V41 = r"version\s+4\.1(?![\d])"
+V41 =r"version\s+4\.1(?![\d])"
 
 
 def _base_record_names() -> list[str]:
@@ -366,11 +453,28 @@ def _records() -> dict[str, str]:
     return found
 
 
-def test_every_capability_record_cites_contract_version_4_2():
-    """K (1): every record under docs/contract/capabilities/ cites Contract v4, version 4.2."""
+CITED_VERSION = re.compile(r"Contract v4,?\s+version\s+(\d+(?:\.\d+)+)(?![\d])")
+
+
+def test_every_capability_record_cites_the_contract_version_in_force_once():
+    """K (1): every record under docs/contract/capabilities/ cites "Contract v4, version <the version in force>",
+    read from contract.yaml (4.2 or later), exactly once, and no other Contract version. The six master-rule
+    records (docs/contract/master-rules/) are not capability records and are not read (W2-27-CIT-P §4 row 6)."""
+    # Rewrite-Reason: DEC-1093 (1) — V (i): the records cite 4.3 after the apply, so "cites version 4.2" becomes
+    # "cites the version in force, read from contract.yaml, exactly once, and no other" (the note's §5.3 and §8
+    # step 2); the version in force must still be 4.2 or later. Renamed: the old name said "version 4.2".
+    version = str(load_yaml_text(read_doc(CONTRACT_YAML)).get("version"))
+    assert is_v42_or_later(version), f"contract.yaml is version {version!r}, not 4.2 or later"
     records = _records()
-    stale = sorted(name for name, text in records.items() if not has(V42, text))
-    assert not stale, f"{len(stale)} of {len(records)} capability records do not cite Contract v4, version 4.2: {stale[:10]}"
+    wrong = {}
+    for name, text in records.items():
+        cited = CITED_VERSION.findall(clean(text))
+        if cited != [version]:
+            wrong[name] = cited
+    assert not wrong, (
+        f"{len(wrong)} of {len(records)} capability records do not cite Contract v4, version {version} exactly once "
+        f"(and no other version): {dict(list(wrong.items())[:10])}"
+    )
 
 
 def test_no_capability_record_cites_contract_version_4_1():
