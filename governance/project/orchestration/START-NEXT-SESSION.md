@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1098.**
+the register and the owner's word hold over both. **Next free id: DEC-1099.**
 
 ## 0. Where things stand (2026-11-08)
 - **Re-pin window 4 is live** (`pin-bcea09060ebc`, 11-07 14:22); the pool is on (`c00d525f`); PAT-1 done.
@@ -14,6 +14,16 @@ the register and the owner's word hold over both. **Next free id: DEC-1098.**
 - **Merged since window 4, live at the lift:** W2-136 (`gov plan`), W2-137 (the reranker's cap 64), W2-138 (the
   store's commit in results). **Filed, not started:** W2-139, W2-140, W2-141, W2-142.
 - **Nothing is running** but the session watchers (§6).
+
+## 0b. DEC-1098 (2026-11-09): the fresh 80 accepted; the work restarts
+- **The fresh 80 ran 11-08:** K9's memory line met (78/79 right end to end, 0 wrong claims; `packages/LIFT-1/FRESH-80-RESULT.md`).
+  **Standing:** the measured configuration is Gov OS's memory standard and every adopted repository's Wave 0 practice.
+- **Started 11-09 (agents):** item 8 (W2-141, W2-20 rebuilt with DEC-1037's line, W2-142, W2-145 filed; test designers
+  first); W2-130's sitting applied (patches, then an independent audit, then the CTO applies); W2-88-STANDARD-1 (the
+  lines for the standard); P-SELECT-FIXES-1 (three proposals; the code route's figures by a counts-only script the CTO
+  runs); SANDBOX-GUARD-EXP-1 (the design, to the owner before any run); Q07/Q14 re-worded (`Q07-Q14-REWORD.md`).
+- **Then, in order:** W2-139/W2-140 in one batch; D-5 and D-6 part 2; D-10 on the owner's word; the lift (ADR-0002
+  re-read at its re-pin). Track every item in `packages/DECIDED-NOT-DONE.md` §0 and §0b.
 
 ## 1. DEC-1097 (2026-11-08): the experiments decided; the road to the fresh 80
 - **Decided:** the fresh 80 judges window 4's pin, pool on, today's bundle, search again once, at `c00d525f`, the
