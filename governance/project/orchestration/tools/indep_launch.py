@@ -432,6 +432,9 @@ def check_args(o, st, cwd, home):
     root = os.path.realpath(root_abs)
     if WALLS in root.split("/") or root in ("/", os.path.realpath(home)) or not os.path.isdir(root):
         raise Refuse(17, "sets_root")
+    approved = os.path.join(root, WALLS, "APPROVED")
+    if regular(approved):  # every result line carries it, an argument refusal's too (reading is no check)
+        st.counts["approved_sha256"] = sha_file(approved)
     if o.counts_only:
         if any(v is not None for v in (o.brief, o.brief_sha256, o.commit, o.set, o.round, o.audit, o.seed)) or o.dry:
             raise Refuse(17, "counts_only")
@@ -1118,9 +1121,12 @@ def build_tree(st, repo, commit, excluded):
                         or not (m.isreg() or m.isdir()) or ".git" in parts or "" in parts[:-1]):
                     raise Refuse(14, "archive")
                 name = name.rstrip("/")
-                if not name or excluded(name, m.isdir()) or m.isdir():
+                if not name or excluded(name, m.isdir()):
                     continue
                 dest = os.path.join(st.tree, name)
+                if m.isdir():  # the archive's folders less the excluded, an emptied one too
+                    os.makedirs(dest, mode=0o700, exist_ok=True)
+                    continue
                 os.makedirs(os.path.dirname(dest), mode=0o700, exist_ok=True)
                 src = t.extractfile(m)
                 fd = os.open(dest, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
