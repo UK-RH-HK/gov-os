@@ -11,7 +11,8 @@ when pytest-xdist is there, else serially. It is run twice, once through ``gov r
 plainly, under the real gate configuration (``~/.gov-os/machine/gate.json``, read, never written). Busy cores are
 sampled from ``/proc/stat`` every 0.2 s during each run; the 95th percentile is compared. Run:
 
-    PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py -m local_only -p no:cacheprovider
+    GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py \
+        -m local_only -p no:cacheprovider -s
 
 The case prints both figures and both times for the evidence record.
 """
@@ -30,7 +31,11 @@ import pytest
 
 import w2_20_support as support
 
-pytestmark = pytest.mark.local_only
+pytestmark = [
+    pytest.mark.local_only,
+    pytest.mark.skipif(os.environ.get("GOV_W2_20_MEASURE") != "1",
+                       reason="S16 measures the real machine: the CTO runs it with GOV_W2_20_MEASURE=1 -m local_only"),
+]
 
 TESTS, WORKERS, SPIN_S = 8, 2, 3.0
 
