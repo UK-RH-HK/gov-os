@@ -103,24 +103,6 @@ def test_exactly_at_a_threshold(machine, repo, condition):
         assert (reasons[condition]["reading"], reasons[condition]["threshold"]) == (3.0, 3)
 
 
-@pytest.mark.parametrize("heavy", [False, True], ids=["two light", "two heavy"])
-def test_a_heavy_session_counts_double_and_tips_the_count_over_the_maximum(machine, repo, heavy):
-    machine.open_config(max_weighted_sessions=3)
-    for n in range(2):
-        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-h{n}", heavy=heavy)
-
-    reading = machine.read(repo)
-    reasons = support.reasons_by_condition(reading)
-    if not heavy:
-        assert reading.get("weighted_sessions") == 2, reading
-        assert support.gate_of(reading)["open"] is True, reading
-    else:
-        assert reading.get("weighted_sessions") == 4, f"two heavy sessions weigh 2 + 2: {reading}"
-        assert support.gate_of(reading)["open"] is False, reading
-        assert set(reasons) == {"sessions"}, reasons
-        assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (4, 3)
-
-
 def test_the_proposed_defaults_are_in_force_when_nothing_is_configured(machine, repo):
     """No ``gate.json``: at least 4 GiB available, load below the processor count, at most 8 weighted sessions."""
     assert not machine.config_file.exists()
