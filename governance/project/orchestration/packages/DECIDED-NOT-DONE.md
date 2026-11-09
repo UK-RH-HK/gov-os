@@ -60,9 +60,9 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0d. DEC-1100's items (2026-11-09)
 | # | item | fate (DEC-1100) | state |
 |---|---|---|---|
-| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | NOT STARTED |
+| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | Rehearsed 11-09 (34/34); F1 (a) being added; WAITS: the operator |
 | 38 | W2-66c | (1) tests first, pins (i) and (ii) | NOT STARTED |
-| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | NOT STARTED |
+| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | Rehearsed 11-09 (ACT-SELECT-HOOK-1; `tools/landing_select.sh` 45/45); WAITS: the operator. Row to W2-116: its hook line passes a worktree's GIT_DIR to gov rebuild |
 | 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first: broken only at a ticket inside the cycle; a ticket outside every cycle keeps its waits | NOT STARTED: W2-147 to file, its test designer first |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
