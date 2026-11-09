@@ -764,8 +764,8 @@ def test_writer_session_is_closed_and_delivers_counts_only(w):
     files = {"q01.yaml": "q one\n", "deep/q02.yaml": "q two\n"}
     bundle = sha("".join(f"{sha(files[p].encode())}  {p}\n" for p in sorted(files)).encode())
     assert counts["delivered"] == {"files": 2, "sha256": bundle, "to": "set"}
-    assert counts["out"]["questions"] == 2 and counts["out"]["by_kind"]["fact"] == 1
-    assert counts["out"]["by_kind"]["procedure"] is None and counts["out"]["files"] == 3
+    assert counts["out"]["questions"] == 2 and counts["out"]["by_kind"] == {"fact": 1, "negative": 1}
+    assert counts["out"]["by_area"] == {"docs": 2} and counts["out"]["files"] == 3
     assert counts["session"]["refusals"]["Read"] == 1 and counts["session"]["refusals"]["other"] == 1
     assert counts["session"]["turns"] == 3 and counts["session"]["duration_s"] == 1.5
     # packed: one file, the wall and its tree gone
@@ -843,7 +843,7 @@ def test_checker_delivers_its_notes(w):
     notes = w.sets / "fixtures" / "evaluation" / SET / "XCHECK-r1.md"
     assert notes.read_text() == "notes\n"
     assert counts["delivered"] == {"files": 1, "sha256": sha(b"notes\n"), "to": "notes"}
-    assert counts["out"]["checked"] == 2 and "questions" not in counts["out"]
+    assert counts["out"]["checked"] == 2 and counts["out"]["questions"] is None
 
 
 def test_auditor_delivers_its_classes_and_the_audit_is_logged(w):
@@ -858,7 +858,7 @@ def test_auditor_delivers_its_classes_and_the_audit_is_logged(w):
     assert (w.sets / "runs" / "e0" / "miss-classes.json").read_text() == "{}\n"
     line = json.loads((w.runs / "AUDITS.log").read_text().splitlines()[-1])
     assert line["commit"] == w.commit and line["run"] == counts["run"] and line["audit"] == "e0"
-    assert counts["out"]["misses"]["retrieval_miss"] == 2 and counts["out"]["misses"]["gold_wrong"] is None
+    assert counts["out"]["misses"] == {"retrieval_miss": 2}
 
 
 def test_labeller_delivers_into_the_sealed_folder(w):
@@ -939,12 +939,18 @@ def test_schema_checker_is_strict():
 
 
 def test_counts_schema_closes_every_object_and_string():
+    whole = schema()
+    out = whole["properties"]["out"]["properties"]
+    as_given = [out["by_kind"], out["by_area"], out["misses"]]  # the result's own counts, copied as given
+
     def walk(node):
         if isinstance(node, dict):
             t = node.get("type")
             types = t if isinstance(t, list) else [t]
             if "object" in types:
                 assert node.get("additionalProperties") is False, node
+                if not any(node is x for x in as_given):
+                    assert set(node.get("required", [])) == set(node.get("properties", {})), node
             if "string" in types:
                 assert "enum" in node or "const" in node or node.get("pattern", "").startswith("^"), node
                 if "pattern" in node:
@@ -954,7 +960,7 @@ def test_counts_schema_closes_every_object_and_string():
         elif isinstance(node, list):
             for v in node:
                 walk(v)
-    walk(schema())
+    walk(whole)
 
 
 def test_a_signal_to_the_script_is_not_needed_for_cleanup_by_name():

@@ -334,7 +334,8 @@ class State:
             "selection": {"changed": None, "sample": None, "overlap": None},
             "session": {"exit": None, "is_error": None, "turns": None, "cost_usd": None, "duration_s": None,
                         "refusals": None},
-            "out": {"schema_ok": None, "files": None},
+            "out": dict({"schema_ok": None, "files": None},
+                        **{k: None for kind in KINDS for k in OUT_KEYS[kind]}),  # every key on every result
             "delivered": {"files": 0, "sha256": None, "to": None},
             "traces": 0, "status": "refused", "code": None, "reason": None}
 
@@ -344,8 +345,6 @@ class State:
     def set_kind(self, kind):
         self.kind = kind
         self.counts["kind"] = kind
-        for k in OUT_KEYS[kind]:
-            self.counts["out"][k] = None
 
 
 def finish(st, code):
@@ -874,12 +873,15 @@ def out_files(out):
 
 def copy_numbers(st, kind, res):
     o = st.counts["out"]
+    def counts_of(d, names):  # the fixed names the result gives, numbers only
+        return {k: d[k] for k in names if k in d and is_count(d[k])}
+
     if kind == "writer":
-        o["questions"] = res["questions"]
-        o["by_kind"] = {k: res["by_kind"].get(k) for k in BY_KIND}
-        o["by_area"] = {k: res["by_area"].get(k) for k in BY_AREA}
+        o["questions"] = res["questions"] if is_count(res["questions"]) else None
+        o["by_kind"] = counts_of(res["by_kind"], BY_KIND)
+        o["by_area"] = counts_of(res["by_area"], BY_AREA)
     elif kind == "auditor":
-        o["misses"] = {k: res["misses"].get(k) for k in MISS_CLASSES}
+        o["misses"] = counts_of(res["misses"], MISS_CLASSES)
     else:
         for k in OUT_KEYS[kind]:
             v = res.get(k)
