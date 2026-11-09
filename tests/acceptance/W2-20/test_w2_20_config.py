@@ -13,6 +13,9 @@ The file is ``$HOME/.gov-os/machine/gate.json`` (the file W2-123's server start 
 
 from __future__ import annotations
 
+import datetime
+import json
+
 import pytest
 
 import w2_20_support as support
@@ -87,3 +90,48 @@ def test_f5_the_values_in_force_are_the_files_and_follow_it(machine, repo):
     machine.open_config(memory_floor_bytes=2 * GIB, working_size_bytes=3 * GIB)
     second = support.reasons_by_condition(machine.read(repo))
     assert second["memory"]["threshold"] == 5 * GIB, second
+
+
+# P-3 (a), settled (DEC-1097 (8)): the engineer ships a dated, sourced configuration template,
+# ``gov resources --init-config``, with this machine's values from the decisions, never overwriting an existing file;
+# no default is read in its absence (S8, ``test_with_no_configuration_file_the_gate_is_shut_and_names_it``).
+DECIDED = {
+    "memory_floor_bytes": 3 * GIB,      # DEC-942 item 2
+    "disk_floor_bytes": 100 * GIB,      # DEC-898 item 1 (S4's floor)
+    "inode_floor": 10_000_000,          # DEC-898 item 1 (S4's floor)
+}
+
+
+def test_s8_init_config_writes_a_dated_sourced_template_with_this_machines_decided_values(machine, repo):
+    """No file: ``--init-config`` writes ``$HOME/.gov-os/machine/gate.json`` with every gate value, each with a real
+    date and a source; the decided floors and margin are the decisions'; and the gate then reads the file whole
+    (no ``config`` reason)."""
+    machine.config_file.unlink()
+    code, envelope, out, err = machine.gov(repo, "--init-config")
+    assert code == 0 and envelope is not None and envelope.get("ok") is True, (
+        f"--init-config did not succeed: exit {code}\nstdout: {out}\nstderr: {err}")
+    assert machine.config_file.is_file(), f"--init-config wrote no {machine.config_file}"
+
+    written = json.loads(machine.config_file.read_text())
+    for key in support.GATE_KEYS:
+        entry = written.get(key)
+        assert isinstance(entry, dict) and "value" in entry, f"the template has no {key} value: {entry}"
+        try:
+            datetime.date.fromisoformat(str(entry.get("date")))
+        except ValueError:
+            raise AssertionError(f"the template's {key} has no date: {entry}") from None
+        assert isinstance(entry.get("source"), str) and entry["source"].strip(), f"{key} has no source: {entry}"
+    for key, value in DECIDED.items():
+        assert written[key]["value"] == value, f"the template's {key} is not the decision's {value}: {written[key]}"
+    assert support.close_to(written["gpu_margin"]["value"], 0.10), written["gpu_margin"]  # DEC-950 item 2
+
+    assert support.config_reasons(machine.read(repo)) == [], "the gate does not read the template whole"
+
+
+def test_s8_init_config_never_overwrites_an_existing_file(machine, repo):
+    before = machine.config_file.read_bytes()
+    code, envelope, out, err = machine.gov(repo, "--init-config")
+    assert code != 0, f"--init-config over an existing file ended with exit 0\nstdout: {out}\nstderr: {err}"
+    assert envelope is None or envelope.get("ok") is False, envelope
+    assert machine.config_file.read_bytes() == before, "--init-config changed an existing configuration file"
+    assert "gate.json" in out + err, f"the refusal does not name the file it keeps: {out}{err}"
