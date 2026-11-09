@@ -107,7 +107,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 66 | the sandbox experiment: set-up B's runner, the fixed briefs for approval | IN PROGRESS |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
-| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (`284125776f04`), test_fusion on `w2/W2-137-d10` (`a13fe809d802`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
+| 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
 ## 1. Every item not done, partly done or waiting
 
