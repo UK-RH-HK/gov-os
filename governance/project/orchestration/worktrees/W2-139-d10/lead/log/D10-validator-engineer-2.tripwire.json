@@ -1,0 +1,95 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "92b725a98ebe",
+   "after": "9f9809e0934d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "8cfba36a14bf",
+   "after": "5423118bb446"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "92b725a98ebe",
+   "after": "9f9809e0934d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "92b725a98ebe",
+   "after": "9f9809e0934d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "adec4718a0fc",
+   "after": "6129d96cd40c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05-d10-tests",
+   "change": "status line added",
+   "line": " M tests/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05-d10-tests",
+   "change": "status line added",
+   "line": "?? tests/unit/gitenv/test_w2_05_suite_git_env.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-19/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-19/w1_19_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-54/test_w2_54_shared_gpu.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-19"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W2-54"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139-d10",
+   "change": "head",
+   "before": "4771fba139cd",
+   "after": "d76e79996260"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-56/test_w2_56_r3_sweep.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-56/test_w2_56_r5_lead_store.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-56/w2_56_sweep_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  }
+ ]
+}

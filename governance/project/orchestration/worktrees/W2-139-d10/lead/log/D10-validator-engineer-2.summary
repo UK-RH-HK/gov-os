@@ -1,0 +1,1 @@
+launch_worker product-spec DAEO-ongl: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-139-d10/.gov-runtime/scratch/lead/log/D10-validator-engineer-2.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-139-d10/.gov-runtime/scratch/lead/log/D10-validator-engineer-2.json

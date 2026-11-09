@@ -1,0 +1,14 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139-d10",
+   "change": "status line added",
+   "line": " M tests/unit/plan/test_validate_w2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-f-tests",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  }
+ ]
+}

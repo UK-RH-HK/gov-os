@@ -1,0 +1,14 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-19/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-126-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-19"
+  }
+ ]
+}
