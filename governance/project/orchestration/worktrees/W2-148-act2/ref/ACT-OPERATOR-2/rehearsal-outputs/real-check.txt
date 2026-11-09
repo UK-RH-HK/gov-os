@@ -1,0 +1,1 @@
+{"result": "refused", "reason": "after-check: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missing from the set (session, sha256, time): ad44f5fe a35b5a5a8932 2026-11-09T20:03:44.464Z", "kind": "Refused"}

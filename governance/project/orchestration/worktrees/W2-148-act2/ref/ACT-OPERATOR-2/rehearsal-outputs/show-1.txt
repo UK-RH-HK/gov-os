@@ -1,0 +1,13 @@
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log recompute pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G7 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G8 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G9 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log apply applied votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit=8076101b8972 undo=ready replay(calls=3, turned=[], dropped={'names the sets root': 1}) 
+  log launch launched votes=None commit= undo=None 
+  notice info applied: info ACT-OPR2-PATHMAP-1 | applied (a) 23:32, checks green, commit 8076101b8972 | to undo, say: undo ACT-OPR2-PATHMAP-1 8653a32d

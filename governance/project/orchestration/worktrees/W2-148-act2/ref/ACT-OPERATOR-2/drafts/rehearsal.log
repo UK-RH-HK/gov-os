@@ -1,0 +1,126 @@
+
+== prepare: the clone, the planted HOME, the install copied from the live one (read only) (23:29:26)
+start 2026-11-09T23:29:26Z
+clone at 6129d96cd40c; the tree's operator code: e392d8a0e177 fe2e2f424616 
+planted install: 14 entries, APPROVED 2dbf8e0b054d; live install APPROVED 157a9dc01fca
+
+== suites on the clone (the code the install will carry): W2-148 acceptance, tests/unit/operator (23:29:28)
+183 passed in 39.81s
+ok: W2-148 acceptance ran
+220 passed in 41.18s
+
+== apply.sh: check, apply, a second apply, check, undo, check, apply again (23:31:53)
+install: before (APPROVED 2dbf8e0b054d)
+check: ready to apply
+ok: check: ready
+the install's own APPROVED check: ok
+APPROVED 9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae
+state applied
+ok: applied
+ok: the install's own APPROVED check
+a second apply: refused (apply.sh: the install is not in its before state (applied); nothing changed)
+check: already applied
+ok: check: already applied
+e392d8a0e177  opcommon.py
+fe2e2f424616  operator_run.py
+16e28a5365f7  operator-settings.json
+9b0d07d05174  APPROVED
+APPROVED 2dbf8e0b054dc26b4776ff5e23134b413cbc7e46c3680884d9ebf5263b8eccf0
+state before (undone)
+ok: undone
+check: ready to apply
+ok: check: ready again
+after undo: every install file matches the before APPROVED
+a request waiting: refused (apply.sh: a request waits in queue/ (20990101T000000-ACT-X.req): let it run first; nothing changed)
+the freeze held: refused (apply.sh: the operator's freeze is held (install/act-in-progress.txt): a run is applying; nothing changed)
+APPROVED 9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae
+state applied
+ok: applied again
+
+== the launcher as the cron runs it, nothing queued: the re-installed APPROVED holds (23:31:54)
+launch: exit 0 in 0 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "idle"}
+ok: the launcher: idle, its APPROVED check passed
+
+== a class-(a) path-map ACT through every gate, the call set and the guard's log agreeing (the replay check) (23:31:54)
+{"mode": "agree", "set_lines": 4, "log_lines": 4, "log_days": ["2026-11-08.jsonl", "2026-11-09.jsonl"], "calls": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/replay/calls.jsonl"}
+{"act": "ACT-OPR2-PATHMAP-1", "manifest_sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620", "bundle": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-OPR2-PATHMAP-1", "touched": ["repo:governance/project/path-map.yaml"]}
+{"queued": "20261109T233154-ACT-OPR2-PATHMAP-1.req", "line": "ACT-OPR2-PATHMAP-1 8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620"}
+launch: exit 0 in 18 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "launched", "request": {"act": "ACT-OPR2-PATHMAP-1", "sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620"}, "session": {"pid": 3703019, "pgid": 3703019, "exit": 0}}
+ok: the launcher started the walled session
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log recompute pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G7 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G8 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G9 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log apply applied votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit=8076101b8972 undo=ready replay(calls=3, turned=[], dropped={'names the sets root': 1}) 
+  log launch launched votes=None commit= undo=None 
+  notice info applied: info ACT-OPR2-PATHMAP-1 | applied (a) 23:32, checks green, commit 8076101b8972 | to undo, say: undo ACT-OPR2-PATHMAP-1 8653a32d
+ok: ACT-OPR2-PATHMAP-1 applied, votes a/a/a
+ok: its after-check replayed the 3 calls after the both-way check: none turned
+the clone map holds the new glob: 1
+8076101b8 ACT-OPR2-PATHMAP-1: applied by the operator agent, class (a)
+Role: operator
+Act: ACT-OPR2-PATHMAP-1
+Act-sha: 8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620
+Class: a
+Review: 66096714653fce1b4c29ab7e7499de6da08be6c0e9a72fe8c391494cb6e3ad01
+
+{"owner_line": "undo ACT-OPR2-PATHMAP-1 8653a32d"}
+undo: exit 0 in 0 s
+{"result": "undone", "act": "ACT-OPR2-PATHMAP-1", "manifest_sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620", "class": "a", "votes": {"code": "a", "claim": "a", "review": "a"}, "commit": "7493c04f08d4cd62096d354bcbd03715290e06af", "approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "undo": "done", "left": [], "lock": false}
+ok: ACT-OPR2-PATHMAP-1 undone by the owner's line
+
+== the same kind of ACT with a logged live call the call set does not hold: refused at the after-check, undone (23:32:12)
+{"mode": "missing", "set_lines": 4, "log_lines": 5, "log_days": ["2026-11-08.jsonl", "2026-11-09.jsonl"], "calls": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/replay/calls.jsonl"}
+{"act": "ACT-OPR2-PATHMAP-2", "manifest_sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72", "bundle": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-OPR2-PATHMAP-2", "touched": ["repo:governance/project/path-map.yaml"]}
+{"queued": "20261109T233212-ACT-OPR2-PATHMAP-2.req", "line": "ACT-OPR2-PATHMAP-2 b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72"}
+launch: exit 0 in 21 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "launched", "request": {"act": "ACT-OPR2-PATHMAP-2", "sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72"}, "session": {"pid": 3707846, "pgid": 3707846, "exit": 0}}
+ok: the launcher started the walled session
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log recompute pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G7 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G8 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G9 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log after-check undone votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit=0c12ac7c69f8 undo=done the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missing from the set (session, sha256, time): 6e3d2c1b 354b46b7dcde 2026-11-09T18:32:12.680Z; undone
+  log launch launched votes=None commit= undo=None 
+  notice P1 undo: P1 ACT-OPR2-PATHMAP-2 | after-check: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missin… | undone byte for byte
+ok: ACT-OPR2-PATHMAP-2 refused at its after-check, the mismatch named, undone
+ok: a P1 notice
+the clone map holds the second glob: 0
+ok: the refused ACT left the map as before
+{"time": "2026-11-09T23:32:08.213077+00:00", "act": "ACT-OPR2-PATHMAP-1", "priority": "info", "kind": "applied", "text": "Applied ACT-OPR2-PATHMAP-1 (a) 23:32, checks green; to undo, say `undo ACT-OPR2-PATHMAP-1 8653a32d`", "line": "info AC
+{"time": "2026-11-09T23:32:12.640665+00:00", "act": "ACT-OPR2-PATHMAP-1", "priority": "P1", "kind": "undo", "text": "Undone ACT-OPR2-PATHMAP-1 on the owner's line (2026-11-09T23:32:12+00:00)", "line": "P1 ACT-OPR2-PATHMAP-1 | undone on the 
+{"time": "2026-11-09T23:32:27.708628+00:00", "act": "ACT-OPR2-PATHMAP-2", "priority": "P1", "kind": "undo", "text": "ACT-OPR2-PATHMAP-2: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 
+
+== the real call set (the CTO's builder over the real transcripts) against the real guard log, by the installed check (23:32:33)
+no set line: session ad44f5fe Monitor 2026-11-09T20:03:44.464Z rule none sha256 a35b5a5a8932
+{"calls in the window": 14709, "calls written": 7525, "dropped: names the sets root": 112, "left out: no log line": 7072, "logged replayable calls in the window": 7499, "logged replayable calls with no set line": 1, "reconciled with the log": 17, "window": {"since": "2026-11-07T23:32:33.561Z", "until": "2026-11-09T23:32:33.561Z"}, "file": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/real-calls.jsonl", "sha256": "8aa7fa92f0e76a33c65e0fdf6384cda389eb3b1399ac36b8ee2acf775b5c3510"}
+{"result": "refused", "reason": "after-check: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missing from the set (session, sha256, time): ad44f5fe a35b5a5a8932 2026-11-09T20:03:44.464Z", "kind": "Refused"}
+
+== apply.sh undo, then check: the planted install as before (23:32:42)
+APPROVED 2dbf8e0b054dc26b4776ff5e23134b413cbc7e46c3680884d9ebf5263b8eccf0
+state before (undone)
+ok: undone at the end
+check: ready to apply
+ok: check: ready to apply at the end
+ok: the owner's planted files unchanged
+
+== live files: unchanged (23:32:42)
+ok: live files unchanged (32 lines hashed)
+scratch: 145M	/home/usain/gov-os-runs/OPERATOR2-rehearsal
+scratch: 14M	/tmp/gov-os-op2-rehearsal
+end 2026-11-09T23:32:42Z
+failures: 0

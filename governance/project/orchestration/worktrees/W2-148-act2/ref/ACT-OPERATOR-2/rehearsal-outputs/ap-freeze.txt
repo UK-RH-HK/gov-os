@@ -1,0 +1,1 @@
+apply.sh: the operator's freeze is held (install/act-in-progress.txt): a run is applying; nothing changed

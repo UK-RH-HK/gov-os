@@ -1,0 +1,79 @@
+{
+  "model": "@MODEL@",
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "@BASH_TIMEOUT_MS@",
+    "BASH_MAX_TIMEOUT_MS": "@BASH_TIMEOUT_MS@"
+  },
+  "permissions": {
+    "defaultMode": "default",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Bash(python3 @INSTALL@/operator_run.py run @ACT@ @SHA@)",
+      "Bash(bash @FROZEN@/apply.sh check)",
+      "Bash(bash @FROZEN@/apply.sh apply)",
+      "Bash(bash @FROZEN@/apply.sh undo)",
+      "Read(/@WALL@/**)",
+      "Read(/@FROZEN@/**)",
+      "Read(/@TRANSCRIPT@)"
+    ],
+    "deny": [
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Agent",
+      "NotebookEdit",
+      "Skill",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash(sudo *)",
+      "Bash(sudo:*)",
+      "Bash(git push*)",
+      "Bash(git -C * push*)",
+      "Bash(git tag*)",
+      "Bash(git -C * tag*)",
+      "Bash(git reset*)",
+      "Bash(git -C * reset*)",
+      "Bash(git rebase*)",
+      "Bash(git -C * rebase*)",
+      "Bash(git filter-branch*)",
+      "Bash(git -C * commit --amend*)",
+      "Bash(rm *)",
+      "Bash(gov *)",
+      "Bash(@HOME@/.local/bin/gov *)",
+      "Bash(python3 -m gov.cli.main *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+      "Bash(npm *)",
+      "Read(/@INSTALL@/**)",
+      "Read(/@HOME@/.ssh/**)",
+      "Read(/@HOME@/.config/gov-os/**)",
+      "Read(/@HOME@/gov-os-eval/**)",
+      "Read(/@HOME@/gov-os-runs/**)",
+      "Read(/@REPO@/tests/acceptance/**)",
+      "Read(/@HOME@/.claude/settings*.json)",
+      "Read(/@HOME@/.claude/hooks/**)",
+      "Read(/@HOME@/.claude/agents/**)",
+      "Read(/@HOME@/.claude/skills/**)",
+      "Read(/@HOME@/.claude/CLAUDE.md)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I @WALL@/.claude/operator_wall_hook.py @WALL@",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": false,
+  "cleanupPeriodDays": 1
+}

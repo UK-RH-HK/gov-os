@@ -1,0 +1,2 @@
+no set line: session ad44f5fe Monitor 2026-11-09T20:03:44.464Z rule none sha256 a35b5a5a8932
+{"calls in the window": 14709, "calls written": 7525, "dropped: names the sets root": 112, "left out: no log line": 7072, "logged replayable calls in the window": 7499, "logged replayable calls with no set line": 1, "reconciled with the log": 17, "window": {"since": "2026-11-07T23:32:33.561Z", "until": "2026-11-09T23:32:33.561Z"}, "file": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/real-calls.jsonl", "sha256": "8aa7fa92f0e76a33c65e0fdf6384cda389eb3b1399ac36b8ee2acf775b5c3510"}

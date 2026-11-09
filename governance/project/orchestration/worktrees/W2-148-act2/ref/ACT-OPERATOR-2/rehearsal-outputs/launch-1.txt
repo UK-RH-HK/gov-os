@@ -1,0 +1,2 @@
+launch: exit 0 in 18 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "launched", "request": {"act": "ACT-OPR2-PATHMAP-1", "sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620"}, "session": {"pid": 3703019, "pgid": 3703019, "exit": 0}}

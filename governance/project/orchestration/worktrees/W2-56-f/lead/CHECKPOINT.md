@@ -10,3 +10,7 @@
 - Designer launched 23:14 UTC, pid 3504466, brief briefs/W2-56-designer-f.md (xhigh). Next: merge its tests into
   w2/W2-56-f, red check, engineer (high) with the README's interface section, gov accept, review (max), merge.
 - Loop count: lead's own.
+- 23:44 UTC designer DONE (PACKAGES D-15): tests 473e8ad828d5 (R3 9 functions/22 items, R5 6/14); gov accept in sandbox
+  270/13/13. D-15 settled (a): owner check by a kernel-released lock inside the folder (pid namespaces differ per
+  sandboxed command). Real cases on integrate outside the sandbox: 3 red (expected), 5 green.
+- 23:45 tests merged into w2/W2-56-f: 52566b514. 23:46 engineer launched, pid 3869264, brief W2-56-engineer-f.md (high).

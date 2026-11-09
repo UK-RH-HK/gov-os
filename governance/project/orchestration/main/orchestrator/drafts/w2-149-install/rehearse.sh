@@ -10,7 +10,7 @@
 # root); this ACT checked, applied, committed; the launch script's stage-10 checks on every line; undo.
 if [ -z "${WI_FRESH:-}" ]; then
   exec env -i HOME="$HOME" USER="${USER:-usain}" LOGNAME="${LOGNAME:-usain}" PATH="/usr/local/bin:/usr/bin:/bin" \
-    LANG="${LANG:-C.UTF-8}" WI_FRESH=1 bash --noprofile --norc "$0" "$@"
+    LANG="${LANG:-C.UTF-8}" WI_HEAD="${WI_HEAD:-}" WI_FRESH=1 bash --noprofile --norc "$0" "$@"
 fi
 set -u
 MAIN=/home/usain/Dynamic-Agentic-Engineering-OS
@@ -35,8 +35,9 @@ bad() { echo "REHEARSAL FAIL: $*"; FAILS=$((FAILS + 1)); }
 expect() { grep -Eq "$2" "$1" && echo "ok: $3" || bad "$3 (wanted /$2/ in $(basename "$1"))"; }
 AP() { ( cd "$R" && bash "$D/apply.sh" "$1" --sets-root "$PR" ); }
 launch() {  # $1 kind, $2 brief path, $3 sha, $4 set; a dry launch with a given seed, HOME planted; prints the exit
+  local extra=(); [ "$1" = auditor ] && extra=(--audit e0)   # the auditor's audit folder (the planted runs/e0)
   ( cd "$R" && HOME=$PH python3 "$R/$SCRIPT" --sets-root "$PR" --kind "$1" --brief "$2" --brief-sha256 "$3" \
-      --commit HEAD --set "$4" --seed 17 --dry > "$BASE/launch.out" 2> "$BASE/launch.err" ); local rc=$?
+      --commit HEAD --set "$4" "${extra[@]}" --seed 17 --dry > "$BASE/launch.out" 2> "$BASE/launch.err" ); local rc=$?
   echo "launch $1 $(basename "$2"): exit $rc; $(tail -1 "$BASE/launch.err")"
   return $rc
 }
@@ -57,7 +58,7 @@ if [ -e "$BASE" ]; then
 fi
 mkdir -p "$BASE/hooks-safe" && : > "$BASE/.wi-rehearsal"
 mv "$BASE.live-before.txt" "$BASE/live-before.txt"
-head=$(git -C "$MAIN" rev-parse HEAD)
+head=$(git -C "$MAIN" rev-parse "${WI_HEAD:-HEAD}")
 git clone -q --no-hardlinks "$MAIN" "$R" || { bad "clone"; exit 1; }
 git -C "$R" config core.hooksPath "$BASE/hooks-safe"
 git -C "$R" checkout -q -B w2/integrate "$head" || bad "checkout"

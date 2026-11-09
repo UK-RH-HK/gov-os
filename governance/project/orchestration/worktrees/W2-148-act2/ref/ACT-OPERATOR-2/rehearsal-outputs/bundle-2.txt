@@ -1,0 +1,1 @@
+{"act": "ACT-OPR2-PATHMAP-2", "manifest_sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72", "bundle": "/home/usain/gov-os-runs/OPERATOR2-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-OPR2-PATHMAP-2", "touched": ["repo:governance/project/path-map.yaml"]}

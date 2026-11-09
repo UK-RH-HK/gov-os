@@ -1,0 +1,2 @@
+launch: exit 0 in 0 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "idle"}

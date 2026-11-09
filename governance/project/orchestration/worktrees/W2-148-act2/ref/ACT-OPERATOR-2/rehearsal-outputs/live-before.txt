@@ -1,0 +1,32 @@
+7f11e837b252a80ea80a7609b0fe796e4802d1783244e3619968580bf2dec16f  ./.claude/settings.json
+83166e2fca19289048fadc4ac7d8f9e12d14c0801dddb10bad412b7172312e6a  ./CLAUDE.md
+5d35cdb758112c04b13fd3bb4f769d8e0d0e86d9098a65c78b43964a4f296abe  ./hooks/log_command.py
+157a9dc01fcaab78b04dc78f153df8b077460a33ffaa9027cb05bc4b8e474ad7  ./install/APPROVED
+2a0337593b25c90ea57971b5cc8ef0e1b02d88339a37d15a57b76d1d8b6ce383  ./install/__pycache__/opcommon.cpython-312.pyc
+c8ce4308aaf7a94975ea872d8eb4cb7bd045ef6415dc5e8c9f286cc63bbcc523  ./install/act_class.py
+51c459cfbcfec47652df455844480a56a5bc91b5fba3bcf57dc807c5dbf08cc2  ./install/brief.md
+0f130073bbbd06f7b56c7be44e72d42ffe6460bc49f4c6a684f81f499979bab1  ./install/class-rules.yaml
+00e8ce13249e427626765b1c53b54811815276d6fbed4c8dd55c238c29c4122a  ./install/freeze_gate.py
+a0687ebde2365fb2d7b1b63a50cef2c3da94f2d56a4a01eede287e7d9f5afd32  ./install/landing_check.py
+1c694692129069cb3c5cb8b31bbcb93f464b528d567b01b2c46830c7f2f5c714  ./install/opcommon.py
+a7d6dcbf40be49a57b56097058a91ec7f652d95711a653f9afa4bb20786fad29  ./install/operator-settings.json
+5bdcfc9bbc9c9707dab7a217a0c4ed6f561c76fcf4d2c1049853a4fd342fbf69  ./install/operator_launch.py
+41271992b6379ecb77ecabc8b0e81bd543eac749e1cd1ce1ee37301ceb150a95  ./install/operator_run.py
+e86703304144f7d0c3f48332478f696d8f704c540f5ecf6c0551f6bd761ff81a  ./install/reviewer-brief.md
+277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378  ./install/verdict.py
+d1f7b23c1c2dd8f7390f4be97508a7e5ac222729a332634199a8bd17230b02da  ./install/wall/operator_wall_hook.py
+09fcd4239da357c0d0bb54cb95f64968458d550541ba55841c5dcb63736f0cf6  ./install/wall/settings.json.tmpl
+ae191d76a7d9ceeeccfcd54ed03b2ce7104840d99e682713a38e014f515b2ee2  ./install/win_toast.ps1
+log/ entries: 2026-09-30.log 2026-10-01.log 2026-10-02.log 2026-10-03.log 2026-10-04.log 2026-10-05.log 2026-10-06.log 2026-10-07.log 2026-10-09.log 2026-10-10.log 2026-10-11.log 2026-10-12.log 2026-10-13.log 2026-10-14.log 2026-10-15.log 2026-10-16.log 2026-10-17.log 2026-10-18.log 2026-10-19.log 2026-10-20.log 2026-10-21.log 2026-10-22.log 2026-10-23.log 2026-10-26.log 2026-10-27.log 2026-10-28.log 2026-10-29.log 2026-10-30.log 2026-10-31.log 2026-11-01.log 2026-11-02.log 2026-11-03.log 2026-11-04.log 2026-11-05.log 2026-11-06.log 2026-11-09.log last-diff-check-head last-diff-check-head.notes launch.lock operator-launch.out 
+97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+c8ce4308aaf7a94975ea872d8eb4cb7bd045ef6415dc5e8c9f286cc63bbcc523  governance/project/operator/act_class.py
+00e8ce13249e427626765b1c53b54811815276d6fbed4c8dd55c238c29c4122a  governance/project/operator/freeze_gate.py
+a0687ebde2365fb2d7b1b63a50cef2c3da94f2d56a4a01eede287e7d9f5afd32  governance/project/operator/landing_check.py
+e392d8a0e177e999f5361243a053e386f5fccc0619dec7d5e8c832cd756a1024  governance/project/operator/opcommon.py
+5bdcfc9bbc9c9707dab7a217a0c4ed6f561c76fcf4d2c1049853a4fd342fbf69  governance/project/operator/operator_launch.py
+fe2e2f424616b9083f371fd3e611a91ff9488c2c9d24513b61200cb7beeb4ac2  governance/project/operator/operator_run.py
+277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378  governance/project/operator/verdict.py
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+live crontab: 91e07361e51e

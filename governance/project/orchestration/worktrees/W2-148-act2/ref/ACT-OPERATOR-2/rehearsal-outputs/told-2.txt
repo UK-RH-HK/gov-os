@@ -1,0 +1,18 @@
+launch: exit 0 in 21 s
+{"approved_sha256": "9b0d07d0517415e741daa79a18f5c2c11518e2e1d8e287221c577aac14e7edae", "result": "launched", "request": {"act": "ACT-OPR2-PATHMAP-2", "sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72"}, "session": {"pid": 3707846, "pgid": 3707846, "exit": 0}}
+  log G1 pass votes=None commit= undo=None 
+  log G2 pass votes=None commit= undo=None 
+  log G3 pass votes=None commit= undo=None 
+  log G4 pass votes=None commit= undo=None 
+  log G5 pass votes=None commit= undo=None 
+  log G6 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log recompute pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G7 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G8 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log G9 pass votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit= undo=None 
+  log after-check undone votes={'code': 'a', 'claim': 'a', 'review': 'a'} commit=0c12ac7c69f8 undo=done the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missing from the set (session, sha256, time): 6e3d2c1b 354b46b7dcde 2026-11-09T18:32:12.680Z; undone
+  log launch launched votes=None commit= undo=None 
+  notice P1 undo: P1 ACT-OPR2-PATHMAP-2 | after-check: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missin… | undone byte for byte
+{"time": "2026-11-09T23:32:08.213077+00:00", "act": "ACT-OPR2-PATHMAP-1", "priority": "info", "kind": "applied", "text": "Applied ACT-OPR2-PATHMAP-1 (a) 23:32, checks green; to undo, say `undo ACT-OPR2-PATHMAP-1 8653a32d`", "line": "info ACT-OPR2-PATHMAP-1 | applied (a) 23:32, checks green, commit 8076101b8972 | to undo, say: undo ACT-OPR2-PATHMAP-1 8653a32d", "manifest_sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620", "commit": "8076101b8972c1092ec0ea8dd6f439ed51b10667"}
+{"time": "2026-11-09T23:32:12.640665+00:00", "act": "ACT-OPR2-PATHMAP-1", "priority": "P1", "kind": "undo", "text": "Undone ACT-OPR2-PATHMAP-1 on the owner's line (2026-11-09T23:32:12+00:00)", "line": "P1 ACT-OPR2-PATHMAP-1 | undone on the owner's line (2026-11-09T23:32:12+00:00) | undone byte for byte", "manifest_sha256": "8653a32d1575852aa50c5d3e3677d8dca8d89e23b6ed6553865f81f4241e9620"}
+{"time": "2026-11-09T23:32:27.708628+00:00", "act": "ACT-OPR2-PATHMAP-2", "priority": "P1", "kind": "undo", "text": "ACT-OPR2-PATHMAP-2: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missing from the set (session, sha256, time): 6e3d2c1b 354b46b7dcde 2026-11-09T18:32:12.680Z; undone", "line": "P1 ACT-OPR2-PATHMAP-2 | after-check: the guard replay refused: the call set does not match the guard's call log by sha256 (DEC-1108 (2)): 1 logged live call(s) missin\u2026 | undone byte for byte", "manifest_sha256": "b5b7ea61337088ae0331b6b71d4ee2757d20f646ad5f4891de224e4bf1fbbf72"}
