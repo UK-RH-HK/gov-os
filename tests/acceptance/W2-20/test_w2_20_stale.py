@@ -8,6 +8,7 @@ kept.
 from __future__ import annotations
 
 import w2_20_support as support
+from w2_20_support import GIB
 
 
 def test_W2_M244_W2_M188_W2_M262_a_dead_pid_is_cleared_and_a_live_one_is_kept(machine, repo):
@@ -33,15 +34,18 @@ def test_W2_M244_W2_M188_W2_M262_a_dead_pid_is_cleared_and_a_live_one_is_kept(ma
 
 
 def test_W2_M244_W2_M188_W2_M262_a_stale_entry_does_not_count_against_the_gate(machine, repo):
-    """A heavy entry whose process has died would shut a gate of maximum 1; once dead it does not."""
-    machine.open_config(max_weighted_sessions=1)
+    """DEC-1097 (8), the memory rule of S6 in place of the session weights: a live entry would need a second working
+    size (1 + 10 x 2 = 21 GiB > 12 GiB) and shut the gate; once its process has died it does not (1 + 10 = 11)."""
+    machine.open_config(memory_floor_bytes=1 * GIB, working_size_bytes=10 * GIB)
+    machine.set_readings(available_bytes=12 * GIB)
     gone = machine.live_process()
-    machine.register(repo, gone.pid, ticket="DAEO-gone", heavy=True)
+    machine.register(repo, gone.pid, ticket="DAEO-gone")
+    live_reading = machine.read(repo)
+    assert support.gate_of(live_reading)["open"] is False, f"the premise: one live session shuts it: {live_reading}"
     machine.stop(gone)
 
     reading = machine.read(repo)
     assert reading.get("sessions") == [], reading
-    assert reading.get("weighted_sessions") == 0, reading
     assert support.gate_of(reading)["open"] is True, f"a dead session counted against the gate: {reading}"
 
     code, envelope, out, err = machine.check(repo)
