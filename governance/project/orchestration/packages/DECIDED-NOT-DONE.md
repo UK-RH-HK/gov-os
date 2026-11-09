@@ -16,7 +16,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | **MERGED 11-09** (`b1e2c3b9`, review READY round 2, accept 182/182); its hook change (`docs/changes/W2-141-hook/`) goes live in the lift's re-pin ACT |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
-| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Round 1 built (39/164; the interface was in the acceptance README); round 2 BLOCKED: no `~/.gov-os/machine/gate.json` (an owner ACT, option (a)) |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | **MERGED 11-09** (`686c594f`); live at the lift's re-pin |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
@@ -89,7 +89,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0g. DEC-1105 and DEC-1106 (2026-11-09)
 | # | item | fate | state |
 |---|---|---|---|
-| 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | IN PROGRESS (S16 revised `bdc5e052`) |
+| 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
 | 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | IN PROGRESS 11-09 |
 | 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | IN PROGRESS 11-09 |
 | 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept | WAITS: W2-148 READY and merged |
