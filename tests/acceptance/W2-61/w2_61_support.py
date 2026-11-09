@@ -441,6 +441,7 @@ class World:
             "PATH": path, "HOME": str(self.home), "TMPDIR": str(self.tmp), "LANG": "C.UTF-8",
             "LC_ALL": "C.UTF-8", "TZ": "UTC", "PYTHONPATH": python_path(), "PYTHONDONTWRITEBYTECODE": "1",
             "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
+            **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
         }
         if role is not None:
             env["GOV_ROLE"] = role

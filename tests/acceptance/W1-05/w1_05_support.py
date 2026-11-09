@@ -335,6 +335,7 @@ def command_environment(project, sandbox, role=None, ticket=None):
         "TMPDIR": str(sandbox.tmpdir),
         "CLAUDE_PROJECT_DIR": str(project),
         "PYTHONDONTWRITEBYTECODE": "1",
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     if role is not None:
         env["GOV_ROLE"] = role

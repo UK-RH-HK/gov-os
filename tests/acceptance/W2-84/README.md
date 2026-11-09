@@ -247,3 +247,5 @@ Also not tested: a registered worktree whose folder is missing (design note item
   (DEC-868).
 - The temporary folders are pytest's own (no `--basetemp`); the fixtures' worlds take a few megabytes each, and the
   bound case writes 10,001 small files in its own temporary folder.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_84_support.base_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

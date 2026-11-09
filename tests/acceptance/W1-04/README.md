@@ -259,3 +259,5 @@ Left open on purpose; the tests take no side:
 - **Limits on the values of an entry:** an empty string, the shape of `sha256`, `date` or `approved_by`, and keys
   beyond the seven. The KPI says "requires".
 - **A record of an ask or a denial** in `.gov-runtime/findings.jsonl`. No KPI asks for one.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w1_04_support.hook_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
