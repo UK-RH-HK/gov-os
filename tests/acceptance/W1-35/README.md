@@ -104,7 +104,7 @@ The five file names are fixed by this suite. Nothing else is: no heading text, n
 | Each row is stated (success), and a row or clause that is absent is found (failure) | `TestRows::test_every_clause_of_the_row_is_stated[<row>]` × 11 | the skill does not exist |
 | The Wave 2 items are rules followed by hand, not a mechanism yet (DEC-537) | `TestWave2Items` (2): one section says both "by hand" and "not enforced yet" and cites DEC-537; it names the resource gate, the launch without a model, `AUTH_REQUIRED`, and leads started through the launcher | the skill does not exist |
 | The ticket lead is a section of the role file | `TestTicketLeadSection` (7): what a lead is; what it does; what it never does (merge, edit ticket files or the decision register, push); the four return forms; an id cited; no labelled field added; the roles and the rulesync subagents stay at six | no section whose heading names the ticket lead |
-| The five briefs | `TestBriefTemplates` (12): placeholders for ticket, profile, paths, sources, decisions × 5; the three standing sentences × 5; the test designer's states behaviour and sources only and cites DEC-462; no brief is named or framed as a record template | the brief does not exist |
+| The five briefs | `TestBriefTemplates` (12): placeholders for ticket, profile, paths, sources, decisions × 5; the three standing sentences × 5; the test designer's states behaviour and sources only and cites DEC-462; no brief is named or framed as a record template. Three of these cases revised for W2-128 TPL-1 S4 (see "The revision for W2-128" below) | the brief does not exist |
 | The wording | `TestWording` (2): no `pytest`, `python`, `.py`, `conftest` or `tests/acceptance` in the skill's body, the lead section or a brief, and the skill names tests in a project's terms (DEC-534); no ticket id, branch, folder, workbench, model name or `x.y.z` version of this repository's wave (DEC-539) | a deliverable does not exist |
 | The check is registered as `skill-regression-a` is | `TestOrchestrationCheck` (5): five string fields, family, tier and severity those of `skill-regression-a`, an id of its own; the command runs the generic validator over the skill's folder with no fallback; the delivered skill passes the validator; the same file with a body over the bound gives the one finding `SKILL_BODY_TOO_LONG` (failure line 1); in a temporary project `gov check` shows the check `GREEN` under `skill regression`, and `RED` with the skill taken out | no declaration; the skill does not exist |
 | The template's rulesync sources stay in step | `TestRulesyncSources` (2) | the skill does not exist; the role case is the green guard |
@@ -119,7 +119,7 @@ The rows and their cases (each case lists the clauses a reader cannot find):
 | Decisions | `[decisions]` | DEC-220, DEC-416, DEC-463 |
 | Stops | `[stops]` | |
 | Sessions | `[sessions]` | DEC-460, DEC-420 |
-| Briefs | `[briefs]` (and `TestBriefTemplates`) | DEC-462, DEC-221 |
+| Briefs | `[briefs]` (and `TestBriefTemplates`); revised for W2-128, see below | DEC-462, DEC-221 |
 | Commits | `[commits]` | DEC-476, DEC-491 |
 | Checkpoints and context | `[checkpoints and context]` | DEC-511 |
 | Temp hygiene and protected files | `[temp hygiene and protected files]` | DEC-508, DEC-525 |
@@ -187,6 +187,21 @@ The parts and "not read" are looked for in the section where the route is stated
 7. **"can read".** The permission rule of the four skills (an id on the line of `may|can|shall` + `read`,
    `write`, ...) also matches "an owner can read on a phone". Write "readable on a phone", or put an id on the
    line.
+
+### The revision for W2-128 (DAEO-t8mp; DEC-1050, DEC-1052; DEC-866)
+
+W2-128 TPL-1 S4 removes the five `brief-*.md` or makes each a one-line pointer to the template that replaces it
+(`role-test-designer.md`, `role-engineer.md`, `role-reviewer.md`, `role-product-spec.md`, `role-lead.md`; T-0
+`brief.md` is the envelope sent with each). A brief is **retired** when it is removed or its body is one non-blank
+line; a retired brief is read as the template its line names (else the ticket's map) plus `brief.md`. While a brief
+stands in full, every case below reads it exactly as before.
+
+| Case (full node id) | Choice | Why |
+|---|---|---|
+| `test_w1_35_orchestration.py::TestRows::test_every_clause_of_the_row_is_stated[briefs]` | (a) | The row's clauses and ids still govern the way a wave is run: the corpus follows a retired brief the skill names to its replacement and the envelope. The two standing sentences are held word for word while any brief stands; once all five are retired, DEC-1050's templates replace that rule (see the next row) |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_brief_has_a_placeholder_for_each_thing_it_is_filled_in_with` (× 5, one per brief) | (b) | Pointer form accepted; the five placeholders (ticket, profile, paths, sources, decisions) are looked for in the replacement and the envelope together. There the decisions may be the sources placeholder in a statement that sends the reader to the decision register (R3-TEMPLATES.md's T-0: `Sources: {SOURCES} (read each in .../DECISION_REGISTER.md ...)`) |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_brief_carries_the_standing_sentences_word_for_word` (× 5, one per brief) | (c) once retired | DEC-1050's one template per role replaces the word-for-word sentences in every brief (R3-1: four contradicting layers), and the first is contradicted by the templates' own rule (wait for long runs with an exit file). Held while the brief stands; once retired the case holds only that the replacement and the envelope exist |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_test_designers_brief_states_behaviour_and_sources_only` | (b) | DEC-462 stands. Pointer form accepted; the statement and the DEC-462 citation are looked for in the templates a designer's brief is made of and written from: `role-test-designer.md`, `brief.md`, and `role-lead.md` (the lead fills the brief's free text) |
 
 ## Token counting
 
