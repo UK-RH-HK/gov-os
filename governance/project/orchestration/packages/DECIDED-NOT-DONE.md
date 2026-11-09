@@ -106,7 +106,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 65 | D-6 part 2 (with its rows) | IN PROGRESS: A-F merged 11-09 (W2-129 S17, W2-92 S11, W2-151, W2-141 S4, W2-150 with its follow-up, F; gov links 1,403 standing); F3 found no wrong marks; next: F2 |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | **MERGED 11-09** W2-149 (`b4de529b`, accept 77/77, review READY round 2) |
-| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | IN PROGRESS: rehearsed (0 failures; class (b), the hook changes too); next: runs/*/misses.jsonl added (delegated) and re-rehearsed, then the owner's yes and the operator |
+| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | WAITS: the owner's yes (class (b)); rehearsal run 6 0 failures with the listing-only walk; the live check 8 ms → 11 ms, ready to apply; then the operator |
 | 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | NOT STARTED: next after ACT-SETS-GLOBS-1 |
 | 77 | W2-149's F11 follow-up | the launch script passes `--setting-sources project` (defence in depth: the user's allow-all settings never load into a wall; delegated; S10's wording marked DEC-1088 (6)), tests first | NOT STARTED |
 | 78 | W2-141's hook rebuilt on the new hook | its staged change (docs/changes/W2-141-hook/) rebuilt on top of ACT-SETS-GLOBS-1's hook before the lift's re-pin ACT | WAITS: ACT-SETS-GLOBS-1 applied |
@@ -125,10 +125,10 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0j. DEC-1114's items (2026-11-09)
 | # | item | state |
 |---|---|---|
-| 79 | W2-56 merged without S8's reach and S10 | IN PROGRESS: next: merge `w2/W2-56` into integrate (this commit's follow-up) |
+| 79 | W2-56 merged without S8's reach and S10 | **MERGED 11-09** in `cf23e9f8d` (that commit's subject is W2-153's review: a helper's commit took the CTO's staged merge); checked after on integrate: `gov accept W2-56` 256/0/4 (the real cases skip without the opt-in), launch units 182/182 |
 | 80 | W3-P28: ranked search for sandboxed workers without opening every Unix socket | DONE (parked) 11-09: `docs/plan/WAVE_3_PARKING.md` W3-P28; a ticket in Wave 3 |
 | 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3, R5 follow-ups before the close, tests first (NOT STARTED); R1 to W2-60a's rows (NOT STARTED); R2, R4 rows for the close review; R6 parked as W3-P29 (DONE) |
-| 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | IN PROGRESS: a read-only helper drafting; next: the CTO checks it, commits it and sends it to the owner |
+| 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | **DONE 11-09**: `packages/FORECAST-W2-2.md`, sent to the owner |
 
 ## 1. Every item not done, partly done or waiting
 
