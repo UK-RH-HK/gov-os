@@ -47,7 +47,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0c. DEC-1099's items (2026-11-09)
 | # | item | fate (DEC-1099) | state |
 |---|---|---|---|
-| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | NOT STARTED |
+| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
 | 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
@@ -69,7 +69,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0e. DEC-1101's items (2026-11-09; standing)
 | # | item | fate (DEC-1101) | state |
 |---|---|---|---|
-| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | IN PROGRESS 11-09 (design) |
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **Rehearsed 11-09** (`ACT-INDEP-WALLS-1.md`, 0 failures; the sandbox seal inside); WAITS: the owner's §7 (four), then the operator |
 | 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
 | 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
 | 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
