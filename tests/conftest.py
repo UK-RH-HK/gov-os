@@ -66,6 +66,14 @@
   it) is replaced by a folder of this process's own with links to the rest of
   its entries. A stand-in a case puts on a nested run's ``PATH`` stays.
 
+- git's repository-local variables (DEC-1074 (8), DEC-1083; W2-05's R4-1): ``git bisect run`` and git's hooks
+  export ``GIT_DIR`` and others to what they start, and a case's ``git init`` in a folder of its own then acts on
+  the repository they name (``core.bare = true`` in the project's config, 2026-11-04). Each process of a run (the
+  controller before xdist starts its workers, and every worker) removes them from ``os.environ`` when this file is
+  imported: the names ``git rev-parse --local-env-vars`` prints, joined with a fixed list (git 2.43's) used alone
+  when git cannot answer, and every ``GIT_CONFIG_KEY_<n>`` / ``GIT_CONFIG_VALUE_<n>``. Nothing is restored at the
+  end: the run's process is the run's. A case may set one itself (``monkeypatch``).
+
 The conftest sets no base folder and changes no retention count or policy.
 """
 
@@ -78,12 +86,54 @@ import os
 import re
 import shutil
 import stat
+import subprocess
 import tempfile
 from pathlib import Path
 
 import pytest
 from _pytest.pathlib import maybe_delete_a_numbered_dir
 from _pytest.tmpdir import get_user
+
+# git's repository-local variables as git 2.43 prints them (``git rev-parse --local-env-vars``): used with git's own
+# answer, and alone when git cannot answer (DEC-1074 (8)).
+_GIT_LOCAL_FALLBACK = (
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_CONFIG", "GIT_CONFIG_PARAMETERS", "GIT_CONFIG_COUNT",
+    "GIT_OBJECT_DIRECTORY", "GIT_DIR", "GIT_WORK_TREE", "GIT_IMPLICIT_WORK_TREE", "GIT_GRAFT_FILE",
+    "GIT_INDEX_FILE", "GIT_NO_REPLACE_OBJECTS", "GIT_REPLACE_REF_BASE", "GIT_PREFIX", "GIT_SHALLOW_FILE",
+    "GIT_COMMON_DIR",
+)
+_GIT_CONFIG_PAIR = re.compile(r"GIT_CONFIG_(?:KEY|VALUE)_\d+")
+
+
+def git_local_env_vars() -> set[str]:
+    """The names of git's repository-local variables: git's own answer (a newer git may add names) joined with the
+    fixed list, so an older git or one that cannot answer still leaves none of git 2.43's behind. git is asked from
+    ``/`` with the fixed list's names already out of its environment: the question needs no repository."""
+    names = set(_GIT_LOCAL_FALLBACK)
+    env = {key: value for key, value in os.environ.items()
+           if key not in names and not _GIT_CONFIG_PAIR.fullmatch(key)}
+    try:
+        done = subprocess.run(["git", "rev-parse", "--local-env-vars"], cwd="/", env=env, capture_output=True,
+                              text=True, timeout=30, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return names
+    if done.returncode == 0:
+        names.update(line.strip() for line in done.stdout.splitlines()
+                     if re.fullmatch(r"GIT_[A-Z0-9_]+", line.strip()))
+    return names
+
+
+def drop_git_local_env() -> list[str]:
+    """Remove git's repository-local variables from ``os.environ``; return the names removed (DEC-1074 (8))."""
+    names = git_local_env_vars()
+    gone = sorted(key for key in os.environ if key in names or _GIT_CONFIG_PAIR.fullmatch(key))
+    for key in gone:
+        del os.environ[key]
+    return gone
+
+
+# At import, in every process of a run: before any hook, fixture or case, and before xdist starts its workers.
+drop_git_local_env()
 
 _ALLOW = "GOV_ALLOW_BASETEMP"
 _HELD = ".lock-held"
