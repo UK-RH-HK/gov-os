@@ -28,6 +28,7 @@ LIVE_REPO = "/home/usain/Dynamic-Agentic-Engineering-OS"
 QUIET = ((2, 0), (7, 30))           # the quiet hours, 02:00 to 07:30 (DEC-1104 (2), G9)
 DEFAULT_NIGHTLY = "03:50-08:00"     # the nightly (04:00 to about 07:00) and its wake (03:50): ACT-NIGHTLY-0400
 AFTER_G7 = ("G7", "G8", "G9", "recompute", "apply", "checks", "unlisted", "staged", "commit", "after-check")
+FREEZE_NAME = "act-in-progress.txt"  # the commit freeze, <operator root>/install/act-in-progress.txt (DEC-1106 (3))
 
 
 class Refused(Exception):
@@ -90,7 +91,10 @@ def load_settings(config_path=None):
         conf.get("nightly_flag") or os.path.join(s["scratch"], "NIGHTLY-RUNNING")))
     s["nightly_flag_max_age_s"] = float(conf.get("nightly_flag_max_age_s") or 6 * 3600)
     s["poll_s"] = float(conf.get("poll_s") if conf.get("poll_s") is not None else 60)
-    s["freeze"] = os.path.abspath(os.path.expanduser(conf.get("freeze") or os.path.join(log, "act-in-progress.txt")))
+    # DEC-1106 (3): the commit freeze lives in the install folder, never in a log/ (the CTO's tools and the landing
+    # hook read it; the APPROVED check and the install's control-file hash leave it out)
+    s["freeze"] = os.path.abspath(os.path.expanduser(
+        conf.get("freeze") or os.path.join(s["operator_root"], "install", FREEZE_NAME)))
     s["approvals"] = os.path.abspath(os.path.expanduser(
         conf.get("approvals") or os.path.join(log, "act-approvals.jsonl")))
     s["cto_freeze"] = os.path.join(s["scratch"], "log/act-in-progress.txt")
@@ -179,8 +183,48 @@ def holds(s):
     if os.path.lexists(s["cto_freeze"]):
         out.append("the CTO's log/act-in-progress.txt exists")
     if os.path.lexists(s["freeze"]):
-        out.append("the operator's log/act-in-progress.txt exists (another ACT)")
+        out.append("the commit freeze install/act-in-progress.txt exists (another run's, or a stale one: "
+                   "only the run that wrote it removes it)")
     return out
+
+
+def claim_freeze(s, act, sha, what="operator"):
+    """Write the commit freeze if no one holds it (O_EXCL): returns the exact text written (the run's token), or None
+    when the file already exists. Only the run holding the token removes it (release_freeze)."""
+    path = s["freeze"]
+    ensure_dir(os.path.dirname(path))
+    try:
+        t = iso(now(s))
+    except (OSError, ValueError, IndexError):
+        t = iso(datetime.now(timezone.utc).astimezone())
+    token = f"{act} {sha} {t} {what} {os.getpid()}-{uuid.uuid4().hex}\n"
+    try:
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+    except FileExistsError:
+        return None
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(token)
+        f.flush()
+        os.fsync(f.fileno())
+    return token
+
+
+def release_freeze(s, token):
+    """Remove the commit freeze only when it still holds this run's own token: a freeze another run wrote, or a stale
+    one, is never removed (DEC-1106 (3))."""
+    if not token:
+        return False
+    path = s["freeze"]
+    try:
+        if os.path.islink(path):
+            return False
+        with open(path, encoding="utf-8", errors="replace") as f:
+            if f.read() != token:
+                return False
+        os.unlink(path)
+        return True
+    except OSError:
+        return False
 
 
 # ------------------------------------------------------------------------------------------------------------ hashes
@@ -208,8 +252,9 @@ def safe_rel(path):
 
 # ---------------------------------------------------------------------------------------------------------- APPROVED
 def approved_state(install=None):
-    """(ok, approved_sha256, reason, lines {rel path: sha256}). Every file under install/ but APPROVED and __pycache__
-    must match its line, and every line must name a file: one byte off, one file more or less refuses (S17)."""
+    """(ok, approved_sha256, reason, lines {rel path: sha256}). Every file under install/ but APPROVED, __pycache__ and
+    the commit freeze act-in-progress.txt (DEC-1106 (3)) must match its line, and every line must name a file: one
+    byte off, one file more or less refuses (S17)."""
     install = install or HERE
     ap = os.path.join(install, "APPROVED")
     if not os.path.isfile(ap) or os.path.islink(ap):
@@ -241,7 +286,7 @@ def approved_state(install=None):
         for fn in files:
             full = os.path.join(top, fn)
             rel = os.path.relpath(full, install).replace(os.sep, "/")
-            if rel == "APPROVED":
+            if rel in ("APPROVED", FREEZE_NAME):
                 continue
             if os.path.islink(full) or not os.path.isfile(full):
                 return False, asha, f"install/ holds a link or a special file ({rel})", lines

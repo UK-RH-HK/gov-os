@@ -204,16 +204,20 @@ def test_a_staged_extra_file_is_refused(kit):
     assert (kit.repo / "tests/optin-x.txt").read_bytes() == b"one\ntwo\nthree\n"
 
 
-def test_an_a_act_changing_a_control_file_live_is_undone(kit):
+def test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left(kit):
+    """DEC-1106 (1): the ACT's own touched file undone; the control file left exactly as the apply wrote it (the
+    agent cannot tell that change from someone else's), the lock held, a P1 naming it."""
     hookf = kit.repo / ".claude/hooks/pretooluse.py"
     before = hookf.read_bytes()
     msha = kit.bundle("ACT-K1", optin_removal(kit),
                       extra_apply='[ "$step" = apply ] && [ -e "$PWD/.live-marker" ] && echo "# x" >> '
                                   '"$PWD/.claude/hooks/pretooluse.py"')
     rc, res, _ = kit.run("run", "ACT-K1", msha)
-    assert res["result"] == "undone", res
-    assert hookf.read_bytes() == before
+    assert res["result"] == "undone" and res["left"] == ["repo:.claude/hooks/pretooluse.py"], res
+    assert hookf.read_bytes() == before + b"# x\n"
     assert (kit.repo / "tests/optin-x.txt").read_bytes() == b"one\ntwo\nthree\n"
+    assert (kit.root / "log/operator.lock").exists()
+    assert ".claude/hooks/pretooluse.py" in [n for n in kit.notices() if n["priority"] == "P1"][-1]["text"]
 
 
 def test_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone(kit):

@@ -234,7 +234,8 @@ def main(argv):
         oc.finish(dict(base, result="refused", gate="approved", reason="APPROVED mismatch: " + approved[2]), 1)
     if os.path.exists(operator_run.lock_path(s)):
         oc.finish(dict(base, result="refused", gate="lock",
-                       reason="an undo failed earlier: the lock is held; nothing is launched"), 1)
+                       reason="the lock is held (an undo failed, or a live change not the operator's own was left "
+                              "for the owner); nothing is launched"), 1)
     oc.ensure_dir(s["log_dir"])
     lockf = open(os.path.join(s["log_dir"], "launch.lock"), "a")
     try:
@@ -262,6 +263,7 @@ def main(argv):
     request = {"act": act, "sha256": sha}
     why = oc.holds(s)
     if why:
+        oc.log_event(s, act, sha, "G9", "held", why=why)
         oc.finish(dict(base, result="held", gate="G9", reason="; ".join(why), request=request, **extra), 0)
     try:
         wall = build_wall(s, act, sha)

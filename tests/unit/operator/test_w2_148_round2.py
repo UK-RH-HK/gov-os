@@ -95,24 +95,25 @@ def reversed_path(p):
     ("repo:.claude/hooks/pretooluse.py", "echo '# z' >>"),        # a control file
     ("home:.local/bin/gov", "echo z >"),                          # the pin, created
 ])
-def test_a_live_file_changed_by_the_dry_run_is_restored_and_refused(kit, target, how):
+def test_a_live_file_changed_by_the_dry_run_is_left_refused_and_locked(kit, target, how):
+    """Round 3 (DEC-1106 (1)): a live change the agent cannot show is its own (here the dry run's script reaching the
+    live tree: a touched file at third bytes, a control file, a file created) is left exactly as written; refused at
+    G8, the lock held, the P1 naming the file. (Round 2 restored these; F15.)"""
     root, rel = target.split(":")
     path = (kit.repo if root == "repo" else kit.home) / rel
     path.parent.mkdir(parents=True, exist_ok=True)
-    before = path.read_bytes() if path.exists() else None
     # the dry run only (no .live-marker in the clone); the path built at run time, so the rule cannot see it
     msha = kit.bundle("ACT-LV1", removal(), extra_apply=f'[ "$step" = apply ] && [ ! -e "$PWD/.live-marker" ] && '
                                                        f'{how} {reversed_path(path)}')
     rc, res, _ = kit.run("run", "ACT-LV1", msha)
-    assert rc != 0 and res["gate"] == "G8" and "LIVE FILES CHANGED" in res["reason"], res
-    assert res["restored"] is True and f"{root}:{rel}" in res["live_changed"]
-    assert (path.read_bytes() if path.exists() else None) == before
-    assert (kit.repo / "tests/optin-x.txt").read_bytes() == ORIG
+    assert rc != 0 and res["gate"] == "G8" and "live files changed" in res["reason"], res
+    assert res["restored"] is False and res["left"] == [f"{root}:{rel}"] and res["lock"] is True
+    assert path.read_bytes().endswith(b"z\n")                          # left exactly as written
     line = g8_line(kit)
-    assert line["result"] == "refused" and line["restored"] is True and f"{root}:{rel}" in line["live_changed"]
+    assert line["result"] == "refused" and f"{root}:{rel}" in line["live_changed"] and line["left"] == [f"{root}:{rel}"]
     p1 = [n for n in kit.notices() if n["priority"] == "P1"]
-    assert p1 and "LIVE FILES CHANGED" in p1[-1]["text"]
-    assert not (kit.root / "log/operator.lock").exists()
+    assert p1 and "live files changed" in p1[-1]["text"] and rel in p1[-1]["text"]
+    assert (kit.root / "log/operator.lock").exists()
 
 
 # ------------------------------------------------------------------------------------------ F8: the frozen copy kept
@@ -199,14 +200,16 @@ def test_the_dry_run_counts_git_config_in_its_changed_set(kit):
     assert (kit.repo / ".git/config").read_bytes() == cfg
 
 
-def test_a_live_git_config_change_is_undone(kit):
-    cfg = (kit.repo / ".git/config").read_bytes()
+def test_a_live_git_config_change_is_left_and_locked(kit):
+    """Round 3 (DEC-1106 (1)): the ACT's own touched file undone; .git/config left as the apply wrote it, lock, P1."""
     msha = kit.bundle("ACT-F11B", removal(), extra_apply='[ "$step" = apply ] && [ -e "$PWD/.live-marker" ] && '
                                                          'git config core.hooksPath .hooks-y')
     rc, res, _ = kit.run("run", "ACT-F11B", msha)
-    assert res["result"] == "undone", res
-    assert (kit.repo / ".git/config").read_bytes() == cfg
+    assert res["result"] == "undone" and res["left"] == ["repo:.git/config"] and res["lock"] is True, res
+    assert b".hooks-y" in (kit.repo / ".git/config").read_bytes()
     assert (kit.repo / "tests/optin-x.txt").read_bytes() == ORIG
+    assert (kit.root / "log/operator.lock").exists()
+    assert ".git/config" in [n for n in kit.notices() if n["priority"] == "P1"][-1]["text"]
 
 
 def test_the_folder_core_hookspath_names_is_a_control(kit):
@@ -218,7 +221,9 @@ def test_the_folder_core_hookspath_names_is_a_control(kit):
                                                          f'echo "# z" >> {reversed_path(hooks / "pre-commit")}')
     rc, res, _ = kit.run("run", "ACT-F11C", msha)
     assert res["result"] == "undone" and res["gate"] == "after-check", res
-    assert (hooks / "pre-commit").read_bytes() == before
+    assert (hooks / "pre-commit").read_bytes() == before + b"# z\n"     # left as written (DEC-1106 (1))
+    assert res["left"] == [f"path:{hooks / 'pre-commit'}"] and (kit.root / "log/operator.lock").exists()
+    assert (kit.repo / "tests/optin-x.txt").read_bytes() == ORIG
     snap = operator_run.control_snapshot(opcommon.load_settings(str(kit.config)), kit.env())
     assert ("path", str(hooks / "pre-commit")) in snap and ("repo", ".git/config") in snap
 

@@ -13,9 +13,13 @@ The gates, in order; each passes or refuses, and every gate fails closed (an err
   recomputed manifest sha the same; G6 the class (three votes, the highest applies; (O) refused; (b) the owner's yes
   from the CTO session's transcript); the recompute from the frozen copy; G7 the live state as stated (apply.sh
   check); G8 the dry run in a clone with a planted HOME (check, apply, checks, undo byte for byte, the changed set
-  equal to the touched list); G9 the holds (it waits; it never refuses for a hold).
-Then the apply: the commit freeze, a journal, apply.sh apply, the checks, the touched-file check, the staged list,
-the commit with its trailers, the after-checks for (a) (the control files, the guard replay); any failure undoes.
+  equal to the touched list; then the live files re-hashed); G9 the holds (it waits; it never refuses for a hold).
+Then the apply: the commit freeze (install/act-in-progress.txt, DEC-1106 (3)), a journal, apply.sh apply, the checks,
+the touched-file check, the staged list, the commit with its trailers, the after-checks for (a) (the control files,
+the guard replay); any failure undoes.
+The restore rule (F15, DEC-1106 (1)): the agent writes back only a live file it can show is its own change (a touched
+file at the frozen after-copy). Anything else that differs is left exactly as it is, the lock held, a P1 naming it.
+Test hook points (GOV_OPERATOR_TEST_HOOK <point> <frozen>): after-G1, after-G6, in-G8, in-apply-checks.
 The result is the last line of stdout, one JSON object; exit 0 when applied, undone (the undo step) or digested.
 """
 import json
@@ -190,6 +194,7 @@ class Run:
         self.checks = None
         self.disagreement = False
         self.at = None                     # the gate being run (F10: an error at G7 or later is pushed)
+        self.freeze = None                 # the commit freeze's text this run wrote (its token), DEC-1106 (3)
 
     # ----------------------------------------------------------------------------------------------------- helpers
     def line(self, gate, result, **extra):
@@ -566,51 +571,51 @@ class Run:
             self._g8(tmp)
         finally:
             oc.remove_tree(tmp)
+            self.hook("in-G8")             # DEC-1106 (1): the dry run's steps done, the live re-hash next
             # F2: whatever the dry run's outcome, the live files must be as they were before it
             after = self.live_snapshot(env)
             changed = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
             if changed:
-                self.live_changed(before, changed, env)
+                self.live_changed(before, after, changed, env)
         self.line("G8", "pass")
 
-    def live_changed(self, before, changed, env):
-        """The dry run changed live files: restore the touched ones from the frozen before/ copies and the control
-        files from the bytes read just before the dry run; refuse with a reason that says live files changed (the P1
-        follows from the refusal after G7). A restore that does not bring every file back holds the lock."""
+    def live_changed(self, before, after, changed, env):
+        """Live files differ after the dry run (F15, DEC-1106 (1)). Only a touched file whose live bytes are the frozen
+        after-copy's (absent, for a deletion) is the dry run's own change: it is restored to the bytes read before the
+        dry run. Anything else (a control file, a file created or removed, a touched file at third bytes) is someone
+        else's or cannot be shown to be ours: it is left exactly as it is, the lock is held and the P1 names each file.
+        Always refused at G8; the P1 follows from the refusal after G7 and its text says live files changed."""
         s = self.s
-        names = [f"{r}:{p}" for r, p in changed]
         touched = {(t["root"], t["path"]): t for t in self.manifest["touched"]}
-        problems = []
+        own, left, problems = [], [], []
         for key in changed:
             t = touched.get(key)
-            if t is None:
-                continue
-            data = None
-            if t["before"] is not None:
-                data = read_bytes(os.path.join(self.frozen, "before", t["root"], t["path"]))
-                if data is None or oc.sha256_bytes(data) != t["before"]:
-                    data = before.get(key)
+            (own if t is not None and is_after(t, after.get(key)) else left).append(key)
+        for key in own:
             try:
-                restore_live_file(s, t["root"], t["path"], data, env)
+                restore_live_file(s, key[0], key[1], before.get(key), env)
             except OSError as exc:
                 problems.append(f"{key[0]}:{key[1]} ({exc.__class__.__name__})")
-        try:
-            restore_controls(s, {k: v for k, v in before.items() if k[0] in ("repo", "home", "install", "crontab",
-                                                                             "path") and k not in touched},
-                             set(touched), env)
-        except Exception as exc:  # fail closed
-            problems.append(f"the control files ({exc.__class__.__name__}: {exc})")
-        now = self.live_snapshot(env)
-        left = [f"{r}:{p}" for r, p in changed if now.get((r, p)) != before.get((r, p))]
-        restored = not left and not problems
-        reason = (f"LIVE FILES CHANGED during the dry run ({', '.join(names[:5])}"
-                  f"{', ...' if len(names) > 5 else ''}): "
-                  + ("restored from the frozen before/ copies and the bytes read before the dry run"
-                     if restored else "NOT ALL RESTORED (" + ", ".join((left + problems)[:5]) + "): lock held")
-                  + f"; {PATH_RULE}")
-        if not restored:
+        if not problems:
+            again = self.live_snapshot(env)
+            problems = [f"{r}:{p} (not back to its bytes before the dry run)" for r, p in own
+                        if again.get((r, p)) != before.get((r, p))]
+        names = [f"{r}:{p}" for r, p in changed]
+        own_n, left_n = [f"{r}:{p}" for r, p in own], [f"{r}:{p}" for r, p in left]
+        parts = [f"live files changed during the dry run ({', '.join(names)})"]
+        if own_n:
+            parts.append("the dry run's own change restored to the bytes read before it: " + ", ".join(own_n))
+        if left_n:
+            parts.append("left exactly as written, not shown to be the dry run's change (someone else's, or "
+                         "unknown): " + ", ".join(left_n))
+        if problems:
+            parts.append("NOT RESTORED: " + ", ".join(problems))
+        hold = bool(left_n or problems)
+        reason = "; ".join(parts) + ("; lock held, nothing else is applied" if hold else "") + f"; {PATH_RULE}"
+        if hold:
             hold_lock(s, self.act, self.sha, reason)
-        raise oc.Refused("G8", reason, live_changed=names, restored=restored)
+        raise oc.Refused("G8", reason, live_changed=names, restored=not hold, restored_files=own_n, left=left_n,
+                         lock=hold)
 
     def _g8(self, tmp):
         s = self.s
@@ -750,8 +755,7 @@ class Run:
         hooks_before = git_controls(repo)
         oc.write_atomic(journal_path(s), json.dumps({
             "act": self.act, "manifest_sha256": self.sha, "frozen": self.frozen, "class": self.cls,
-            "stage": "applying", "head": head, "commit": None, "time": oc.iso(oc.now(s))}))
-        oc.write_atomic(s["freeze"], f"{self.act} {self.sha} {oc.iso(oc.now(s))} operator\n")
+            "stage": "applying", "head": head, "commit": None, "time": oc.iso(oc.now(s)), "freeze": self.freeze}))
         try:
             rc, out, err = self.apply_sh("apply", repo, env)
             if rc != 0:
@@ -801,6 +805,7 @@ class Run:
                 j = json.load(open(journal_path(s)))
                 j.update(stage="committed", commit=commit)
                 oc.write_atomic(journal_path(s), json.dumps(j))
+            self.hook("in-apply-checks")   # DEC-1106 (1): applied, checks green, committed; the after-check next
             if self.cls == "a":
                 why = after_checks(self, st, env)
                 if why:
@@ -808,7 +813,6 @@ class Run:
         except Exception as exc:  # fail closed: an error mid-apply undoes
             return st.fail("apply", f"an error mid-apply ({exc.__class__.__name__}: {exc}); undone", "refused")
         oc.remove_tree(journal_path(s))
-        oc.remove_tree(s["freeze"])
         notice = None
         when = oc.now(s)
         if self.cls == "b" or oc.within_first_14_days(s, when):
@@ -850,15 +854,24 @@ class Run:
                            ("G6", self.g6), ("recompute", self.recompute), ("G7", self.g7), ("G8", self.g8)):
             self.at = name
             step()
-        self.at = "G9"
-        held = self.g9()
-        if held == "timeout":
-            raise oc.Refused("G9", "the hold outlasted hold_max_s")
-        self.recompute(log_pass=False)
-        if held == "held":
-            self.g7(log_pass=False)
+        while True:
+            self.at = "G9"
+            held = self.g9()
+            if held == "timeout":
+                raise oc.Refused("G9", "the hold outlasted hold_max_s")
+            self.recompute(log_pass=False)
+            if held == "held":
+                self.g7(log_pass=False)
+            # the commit freeze (DEC-1106 (3)), written only when no one holds it; a run that finds it taken
+            # between G9 and here waits at G9 again (it never refuses for a hold)
+            self.freeze = oc.claim_freeze(self.s, self.act, self.sha)
+            if self.freeze:
+                break
         self.at = "apply"
-        return self.apply()
+        try:
+            return self.apply()
+        finally:
+            oc.release_freeze(self.s, self.freeze)     # only its own: never a freeze another run wrote
 
 
 CLEAN = "clean"
@@ -878,6 +891,20 @@ esac
 
 def clean_key_value(v):
     return v
+
+
+def is_after(t, data):
+    """True when a touched file's bytes (None: absent) are the ACT's own after-state: the frozen after-copy's sha, or
+    absent for a deletion (DEC-1106 (1))."""
+    if t["after"] is None:
+        return data is None
+    return data is not None and oc.sha256_bytes(data) == t["after"]
+
+
+def is_before(t, data):
+    if t["before"] is None:
+        return data is None
+    return data is not None and oc.sha256_bytes(data) == t["before"]
 
 
 def dry_want(t, a):
@@ -1035,7 +1062,10 @@ def control_snapshot(s, env):
         dirs[:] = [d for d in dirs if d != "__pycache__"]
         for fn in files:
             full = os.path.join(top, fn)
-            snap[("install", os.path.relpath(full, inst).replace(os.sep, "/"))] = read_bytes(full)
+            rel = os.path.relpath(full, inst).replace(os.sep, "/")
+            if rel == oc.FREEZE_NAME or os.path.abspath(full) == s["freeze"]:
+                continue                   # the commit freeze is not a control file (DEC-1106 (3))
+            snap[("install", rel)] = read_bytes(full)
     return snap
 
 
@@ -1078,14 +1108,18 @@ def after_checks(run, st, env):
     refused but those the review listed. Returns the reason for an undo, or None."""
     s = run.s
     now_snap = control_snapshot(s, env)
-    allowed = {(t["root"], t["path"]): t["after"] for t in run.manifest["touched"]}
+    touched = {(t["root"], t["path"]): t for t in run.manifest["touched"]}
+    bad = []
     for key in sorted(set(st.controls) | set(now_snap)):
         before, after = st.controls.get(key), now_snap.get(key)
         if before == after:
             continue
-        if key in allowed and (None if after is None else oc.sha256_bytes(after)) == allowed[key]:
+        if key in touched and is_after(touched[key], after):
             continue
-        return f"a control file changed ({key[0]}:{key[1]})"
+        bad.append(f"{key[0]}:{key[1]}")
+    if bad:
+        # the undo that follows undoes the ACT's own touched files only; these are left as they are (DEC-1106 (1))
+        return "a control file changed (" + ", ".join(bad) + ")"
     lists = [t for t in run.repo_touched() if t["path"] in REPLAY_FILES or DENY_LIST_FILE.match(t["path"])]
     if not lists:
         return None
@@ -1271,22 +1305,37 @@ class UndoState:
         self.tree_before = ({}, {})
         self.staged = False
         self.committed = None
+        self.left = []                     # live differences not the ACT's own, left as written (DEC-1106 (1))
 
     def fail(self, gate, reason, result, kind="undo"):
         run, s = self.run, self.run.s
         ok, why = undo_live(run, self)
+        left = left_text(self.left)
         if not ok:
-            hold_lock(s, run.act, run.sha, f"{reason}; the undo failed too: {why}")
-            run.line(gate, "refused", undo="failed", reason=reason, notice="lock")
-            oc.notify(s, run.act, "P1", "lock", f"{run.act}: {reason}; the UNDO FAILED ({why}): lock held, nothing "
-                                                "else is applied", manifest_sha256=run.sha,
+            hold_lock(s, run.act, run.sha, f"{reason}; the undo failed too: {why}{left}")
+            run.line(gate, "refused", undo="failed", reason=reason + left, notice="lock", left=self.left)
+            oc.notify(s, run.act, "P1", "lock", f"{run.act}: {reason}; the UNDO FAILED ({why}){left}: lock held, "
+                                                "nothing else is applied", manifest_sha256=run.sha,
                       short=f"{gate}: {reason}", undo=f"UNDO FAILED ({why[:40]}): lock held")
-            return run.result("refused", gate, f"{reason}; the undo failed ({why}): lock held", undo="failed",
-                              checks=run.checks), 1
-        run.line(gate, result, undo="done", reason=reason, notice=kind, replay=getattr(run, "replay_detail", None))
+            return run.result("refused", gate, f"{reason}; the undo failed ({why}){left}: lock held", undo="failed",
+                              checks=run.checks, left=self.left), 1
+        if self.left:
+            reason = f"{reason}; the ACT's own touched files undone{left}; lock held, nothing else is applied"
+            hold_lock(s, run.act, run.sha, reason)
+        run.line(gate, result, undo="done", reason=reason, notice=kind, replay=getattr(run, "replay_detail", None),
+                 left=self.left, lock=bool(self.left))
         oc.notify(s, run.act, "P1", kind, f"{run.act}: {reason}", manifest_sha256=run.sha, short=f"{gate}: {reason}",
-                  undo="undone byte for byte")
-        return run.result(result, gate, reason, undo="done", checks=run.checks), 1
+                  undo="own files undone; others left: lock held" if self.left else "undone byte for byte")
+        return run.result(result, gate, reason, undo="done", checks=run.checks, left=self.left,
+                          lock=bool(self.left)), 1
+
+
+def left_text(left):
+    """The P1's words for the files left as written: each named by its path relative to its root."""
+    if not left:
+        return ""
+    return ("; left exactly as written, not shown to be the ACT's own change (someone else's, or unknown): "
+            + ", ".join(left))
 
 
 def hold_lock(s, act, sha, why):
@@ -1295,24 +1344,52 @@ def hold_lock(s, act, sha, why):
 
 
 def undo_live(run, st):
-    """apply.sh undo on the live tree; the touched files byte for byte as before; the controls and any unlisted tree
-    file restored; the index or the commit put back. (ok, why)."""
+    """The restore rule (F15, DEC-1106 (1)): the agent writes back only what it can show is its own change. A touched
+    file at the ACT's after-copy is undone (by the frozen apply.sh undo; when some touched file is at third bytes,
+    apply.sh is not run, as it would write over them, and each own file is put back from the frozen before/ copy);
+    a touched file at third bytes, a control file the ACT does not list, or any other tree difference is left exactly
+    as it is and named in st.left (the caller holds the lock and names each in its P1). The undo commit holds only the
+    own files; a commit someone else made meanwhile stays in HEAD's history. (ok, why)."""
     s = run.s
     env = run.live_env()
     repo = s["repo"]
-    rc, _, err = run.apply_sh("undo", repo, env)
-    if rc != 0:
-        return False, f"apply.sh undo exited {rc}"
-    for t in run.manifest["touched"]:
+    tlist = run.manifest["touched"]
+    touched = {(t["root"], t["path"]) for t in tlist}
+    live = {(t["root"], t["path"]): oc.live_file(s, t["root"], t["path"], env) for t in tlist}
+    third = [t for t in tlist if not is_after(t, live[(t["root"], t["path"])])
+             and not is_before(t, live[(t["root"], t["path"])])]
+    mine = [t for t in tlist if t not in third]
+    left = {f"{t['root']}:{t['path']}" for t in third}
+    if not third:
+        rc, _, err = run.apply_sh("undo", repo, env)
+        if rc != 0:
+            st.left = sorted(left)
+            return False, f"apply.sh undo exited {rc}"
+    else:
+        for t in mine:
+            if not is_after(t, live[(t["root"], t["path"])]):
+                continue
+            data = None
+            if t["before"] is not None:
+                data = read_bytes(os.path.join(run.frozen, "before", t["root"], t["path"]))
+                if data is None or oc.sha256_bytes(data) != t["before"]:
+                    st.left = sorted(left)
+                    return False, f"{t['root']}:{t['path']} has no frozen before/ copy to undo it from"
+            try:
+                restore_live_file(s, t["root"], t["path"], data, env)
+            except OSError as exc:
+                st.left = sorted(left)
+                return False, f"{t['root']}:{t['path']} could not be undone ({exc.__class__.__name__})"
+    for t in mine:
         if oc.live_hash(s, t["root"], t["path"], env) != t["before"]:
+            st.left = sorted(left)
             return False, f"{t['root']}:{t['path']} is not restored byte for byte"
-    touched = {(t["root"], t["path"]) for t in run.manifest["touched"]}
     try:
-        restore_controls(s, st.controls, touched, env)
-        restore_tree(repo, st, touched, env)
-    except Exception as exc:  # fail closed
-        return False, f"a control or tree file could not be restored ({exc})"
-    committed = stageable(repo, run.repo_touched(), env)
+        left |= foreign_differences(s, st, touched, env)
+    except Exception as exc:  # fail closed: what cannot be compared is not written either
+        left.add(f"the live state could not be compared ({exc.__class__.__name__})")
+    st.left = sorted(left)
+    committed = stageable(repo, [t for t in mine if t["root"] == "repo"], env)
     paths = [t["path"] for t in committed]
     if paths and st.committed:
         rc, _, _ = oc.git(repo, "add", "-A", "--", *paths, env=env)
@@ -1325,8 +1402,23 @@ def undo_live(run, st):
     elif paths:
         oc.git(repo, "reset", "-q", "--", *paths, env=env)
     oc.remove_tree(journal_path(s))
-    oc.remove_tree(s["freeze"])
     return True, ""
+
+
+def foreign_differences(s, st, touched, env):
+    """The live differences since the undo state was taken that are not a touched file: the control files (S15's
+    list) and the repository's tree as git status reports it. Named by root and path; never written."""
+    out = set()
+    now_c = control_snapshot(s, env)
+    for key in set(st.controls) | set(now_c):
+        if key not in touched and st.controls.get(key) != now_c.get(key):
+            out.add(f"{key[0]}:{key[1]}")
+    before = st.tree_before[0]
+    after = tree_state(s["repo"], ignored=False, keep=False)[0]
+    for path in set(before) | set(after):
+        if ("repo", path) not in touched and before.get(path, CLEAN) != after.get(path, CLEAN):
+            out.add(f"repo:{path}")
+    return out
 
 
 def root_base(s, root):
@@ -1352,61 +1444,6 @@ def restore_live_file(s, root, rel, data, env):
         os.unlink(full)
     write_file(full, data)
     os.chmod(full, mode)
-
-
-def restore_controls(s, snap, touched, env):
-    now_snap = control_snapshot(s, env)
-    for key, data in snap.items():
-        if key in touched or now_snap.get(key) == data:
-            continue
-        root, rel = key
-        if root == "crontab":
-            if data is None:
-                oc.run(["crontab", "-r"], env=env, timeout=60)
-            else:
-                oc.run(["crontab", "-"], env=env, timeout=60, input_bytes=data)
-            continue
-        base = root_base(s, root)
-        full = os.path.join(base, rel)
-        if data is None:
-            if os.path.lexists(full):
-                os.unlink(full)
-        elif data.startswith(b"link:") and not os.path.isfile(full):
-            pass
-        else:
-            mode = os.stat(full).st_mode & 0o7777 if os.path.exists(full) else 0o644
-            os.makedirs(os.path.dirname(full), exist_ok=True)
-            if os.path.islink(full):
-                os.unlink(full)
-            with open(full, "wb") as f:
-                f.write(data)
-            os.chmod(full, mode)
-    for key in now_snap:
-        if key not in snap and key not in touched and key[0] in ("repo", "home", "install", "path"):
-            full = os.path.join(root_base(s, key[0]), key[1])
-            if os.path.lexists(full):
-                os.unlink(full)
-
-
-def restore_tree(repo, st, touched, env):
-    before, contents = st.tree_before
-    after = tree_state(repo, ignored=False, keep=False)[0]
-    for path in sorted(set(before) | set(after)):
-        if ("repo", path) in touched or before.get(path, CLEAN) == after.get(path, CLEAN):
-            continue
-        full = os.path.join(repo, path)
-        if path in before:
-            if before[path] is None:
-                if os.path.lexists(full):
-                    os.unlink(full)
-            elif path in contents:
-                write_file(full, contents[path])
-        elif st.head:
-            rc, data, _ = oc.git(repo, "cat-file", "-p", f"{st.head}:{path}", env=env)
-            if rc == 0:
-                write_file(full, data)
-            elif os.path.lexists(full):
-                os.unlink(full)
 
 
 # ===================================================================================================== the undo step
@@ -1459,22 +1496,36 @@ def undo_step(s, act, sha, approved):
     st.controls = control_snapshot(s, env)
     st.tree_before = tree_state(s["repo"], ignored=False, keep=True)
     st.committed = run.commit
-    oc.write_atomic(journal_path(s), json.dumps({
-        "act": act, "manifest_sha256": sha, "frozen": frozen, "class": run.cls, "stage": "undoing",
-        "head": st.head, "commit": run.commit, "time": oc.iso(now)}))
-    oc.write_atomic(s["freeze"], f"{act} {sha} {oc.iso(now)} operator undo\n")
-    run.undo_commit = None
-    ok, why = undo_live(run, st)
+    token = oc.claim_freeze(s, act, sha, what="operator-undo")
+    if not token:
+        raise oc.Refused("undo", "the commit freeze (install/act-in-progress.txt) is held by another run or left "
+                                 "stale; nothing written; say the undo again once it is gone")
+    try:
+        oc.write_atomic(journal_path(s), json.dumps({
+            "act": act, "manifest_sha256": sha, "frozen": frozen, "class": run.cls, "stage": "undoing",
+            "head": st.head, "commit": run.commit, "time": oc.iso(now), "freeze": token}))
+        run.undo_commit = None
+        ok, why = undo_live(run, st)
+    finally:
+        oc.release_freeze(s, token)
+    left = left_text(st.left)
     if not ok:
-        hold_lock(s, act, sha, f"the owner's undo failed: {why}")
-        run.line("undo", "refused", undo="failed", reason=why, notice="lock")
-        oc.notify(s, act, "P1", "lock", f"{act}: the owner's UNDO FAILED ({why}): lock held", manifest_sha256=sha)
-        return run.result("refused", "undo", f"the undo failed ({why}): lock held", undo="failed"), 1
+        hold_lock(s, act, sha, f"the owner's undo failed: {why}{left}")
+        run.line("undo", "refused", undo="failed", reason=why + left, notice="lock", left=st.left)
+        oc.notify(s, act, "P1", "lock", f"{act}: the owner's UNDO FAILED ({why}){left}: lock held",
+                  manifest_sha256=sha)
+        return run.result("refused", "undo", f"the undo failed ({why}){left}: lock held", undo="failed",
+                          left=st.left), 1
     run.commit = getattr(run, "undo_commit", None) or run.commit
-    run.line("undo", "undone", undo="done", notice="undo", typed=oc.iso(found[2]))
-    oc.notify(s, act, "P1", "undo", f"Undone {act} on the owner's line ({oc.iso(found[2])})", manifest_sha256=sha,
-              short=f"undone on the owner's line ({oc.iso(found[2])})", undo="undone byte for byte")
-    return run.result("undone", undo="done"), 0
+    text = f"Undone {act} on the owner's line ({oc.iso(found[2])})"
+    if st.left:
+        text += f"{left}; lock held, nothing else is applied"
+        hold_lock(s, act, sha, text)
+    run.line("undo", "undone", undo="done", notice="undo", typed=oc.iso(found[2]), left=st.left, lock=bool(st.left))
+    oc.notify(s, act, "P1", "undo", text, manifest_sha256=sha,
+              short=f"undone on the owner's line ({oc.iso(found[2])})",
+              undo="others left: lock held" if st.left else "undone byte for byte")
+    return run.result("undone", undo="done", left=st.left, lock=bool(st.left)), 0
 
 
 # ================================================================================================= the journal's undo
@@ -1516,21 +1567,30 @@ def recover(s, approved):
         if paths:
             oc.git(s["repo"], "reset", "-q", "--", *paths, env=env)
         oc.remove_tree(jp)
-        oc.remove_tree(s["freeze"])
         ok, why = True, ""
     else:
         run.undo_commit = None
         ok, why = undo_live(run, st)
+    # the dead run's commit freeze: removed only when it still holds the token that run recorded in its journal
+    # (a freeze anyone else wrote, or one with other text, stays and holds G9; DEC-1106 (3))
+    if ok and isinstance(j.get("freeze"), str):
+        oc.release_freeze(s, j["freeze"])
+    left = left_text(st.left)
     if not ok:
-        hold_lock(s, act, sha, f"the journal's undo failed: {why}")
-        run.line("journal", "refused", undo="failed", reason=why, notice="lock")
-        oc.notify(s, act, "P1", "lock", f"{act}: an unfinished journal; its UNDO FAILED ({why}): lock held",
+        hold_lock(s, act, sha, f"the journal's undo failed: {why}{left}")
+        run.line("journal", "refused", undo="failed", reason=why + left, notice="lock", left=st.left)
+        oc.notify(s, act, "P1", "lock", f"{act}: an unfinished journal; its UNDO FAILED ({why}){left}: lock held",
                   manifest_sha256=sha)
-        return run.result("refused", "journal", f"the journal's undo failed ({why}): lock held", undo="failed"), 1
-    run.line("journal", "undone", undo="done", notice="recovered")
-    oc.notify(s, act, "P1", "recovered", f"{act}: a session died mid-apply; undone at the next launch",
-              manifest_sha256=sha)
-    return run.result("undone", "journal", "a session died mid-apply; undone at the next launch", undo="done"), 0
+        return run.result("refused", "journal", f"the journal's undo failed ({why}){left}: lock held",
+                          undo="failed", left=st.left), 1
+    text = f"{act}: a session died mid-apply; undone at the next launch"
+    if st.left:
+        text += f"{left}; lock held, nothing else is applied"
+        hold_lock(s, act, sha, text)
+    run.line("journal", "undone", undo="done", notice="recovered", left=st.left, lock=bool(st.left))
+    oc.notify(s, act, "P1", "recovered", text, manifest_sha256=sha)
+    return run.result("undone", "journal", text[len(act) + 2:], undo="done", left=st.left,
+                      lock=bool(st.left)), (1 if st.left else 0)
 
 
 # ========================================================================================================= the digest
@@ -1638,9 +1698,10 @@ def main(argv):
         oc.finish(dict(base, result="refused", gate="request", act=act, manifest_sha256=sha,
                        reason="the request is not ACT-<id> and a 64-hex manifest sha"), 2)
     if os.path.exists(lock_path(s)):
-        oc.log_event(s, act, sha, "lock", "refused", reason="an undo failed earlier: the lock is held")
+        why = "the lock is held (an undo failed, or a live change not the operator's own was left for the owner)"
+        oc.log_event(s, act, sha, "lock", "refused", reason=why)
         oc.finish(dict(base, result="refused", gate="lock", act=act, manifest_sha256=sha,
-                       reason="an undo failed earlier: the lock is held; nothing else is applied"), 1)
+                       reason=why + "; nothing else is applied"), 1)
     if step == "undo":
         try:
             res, code = undo_step(s, act, sha, approved)
