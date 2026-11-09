@@ -110,7 +110,7 @@ arrives only after the session, and is lost when the launcher is killed.
   foreground group and the terminal is taken back after.
 - **S15**: the temp folder is removed whole, after its folders are opened to their owner (a 0500 module cache, a
   0000 folder); a fifo goes, a link goes as a link and its target stays.
-- **S1**: the daemon folders stand in the test session's own folder (`GOV_CBM_BASE`, made and removed by
+- **S1**: the daemon folders stand in the test session's own folder (`CODEINTEL_DAEMON_BASE`, made and removed by
   `tests/conftest.py`), else in the launched session's temp folder (`<gov-launch-…>/cbm`, found from
   `CLAUDE_CODE_TMPDIR`), else in `/tmp/gov-cbm-<uid>`. The worker's temp folder is `gov-launch-` and 8 letters
   (D-12): with the temp root `/tmp`, a daemon folder plus the tool's 50-byte socket tail is 95 bytes (a test

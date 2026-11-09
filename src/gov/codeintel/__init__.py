@@ -38,7 +38,7 @@ BASE_REL = ".gov-runtime/codeintel"
 DAEMON_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
 # W2-56 S1 (DEC-799 item 1): a test session's own folder for its daemon directories (``tests/conftest.py`` makes it,
 # sets this variable and removes the folder when the session ends) ...
-BASE_ENV = "GOV_CBM_BASE"
+BASE_ENV = "CODEINTEL_DAEMON_BASE"
 # ... and, in a session ``gov launch`` started, its own temp folder (``gov-launch-`` and a few letters, DEC-159),
 # found from ``CLAUDE_CODE_TMPDIR``: the launcher's folder itself, or the CLI's ``claude-<uid>`` folder in it.
 LAUNCH_TMP_ENV, LAUNCH_PREFIX, LAUNCH_SUB = "CLAUDE_CODE_TMPDIR", "gov-launch-", "cbm"
@@ -73,7 +73,7 @@ def launch_folder(env=None) -> Path | None:
 
 
 def daemon_base(env=None) -> Path:
-    """Where the daemon directories of this process stand: the test session's own folder (``GOV_CBM_BASE``), else
+    """Where the daemon directories of this process stand: the test session's own folder (``CODEINTEL_DAEMON_BASE``), else
     the launched session's temp folder (``launch_folder``), else ``DAEMON_BASE``."""
     env = os.environ if env is None else env
     given = env.get(BASE_ENV) or ""

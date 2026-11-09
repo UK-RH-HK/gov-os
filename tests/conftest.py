@@ -54,11 +54,13 @@
 
 - The code graph (W2-56 S1, DEC-799 item 1, T-8): the controlling process of a
   run makes one folder for the run's code-graph daemon folders
-  (``gov.codeintel.make_session_base``), names it in ``GOV_CBM_BASE`` before
+  (``gov.codeintel.make_session_base``), names it in ``CODEINTEL_DAEMON_BASE`` before
   xdist starts its workers, and removes it at the end. The real tool
   (``codebase-memory-mcp``) is on ``PATH`` only while a case of W1-16 or W1-20
-  runs; for every other case each ``PATH`` folder that holds it is replaced by
-  a folder of this process's own with links to the rest of its entries.
+  runs; for every other case each ``PATH`` folder that held it when the
+  outermost run started (``CODEINTEL_OFF_PATH``, kept by a run started inside
+  it) is replaced by a folder of this process's own with links to the rest of
+  its entries. A stand-in a case puts on a nested run's ``PATH`` stays.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -239,37 +241,62 @@ def pytest_collection_modifyitems(config, items):
 
 _CBM_TOOL = "codebase-memory-mcp"
 _CBM_SUITES = frozenset({"W1-16", "W1-20"})  # the suites that run the real code-graph tool (T-8)
-_cbm_base = None  # this run's daemon folder and GOV_CBM_BASE's former value (the controlling process only)
+_cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
 _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
 
 
 def _own_cbm_base():
-    """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``GOV_CBM_BASE``; None without one."""
+    """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``CODEINTEL_DAEMON_BASE``; None without one."""
     try:
         from gov import codeintel
         made = codeintel.make_session_base()
     except Exception:  # noqa: BLE001 -- no gov here, or no place: the code index keeps its own default
         return None
-    former = os.environ.get("GOV_CBM_BASE")
-    os.environ["GOV_CBM_BASE"] = str(made)
+    former = os.environ.get("CODEINTEL_DAEMON_BASE")
+    os.environ["CODEINTEL_DAEMON_BASE"] = str(made)
     return made, former
 
 
 def _drop_cbm_base(made: Path, former: str | None) -> None:
     if former is None:
-        os.environ.pop("GOV_CBM_BASE", None)
+        os.environ.pop("CODEINTEL_DAEMON_BASE", None)
     else:
-        os.environ["GOV_CBM_BASE"] = former
+        os.environ["CODEINTEL_DAEMON_BASE"] = former
     shutil.rmtree(made, ignore_errors=True)
 
 
+def _tool_folders(value: str) -> list[str]:
+    """The folders of ``value`` (a PATH) that hold the code-graph tool, as real paths, less those in a temp folder
+    (a case's stand-in, put on a nested run's PATH: that run may get an environment of the case's own making)."""
+    temps = {os.path.realpath(place) for place in ("/tmp", "/var/tmp", tempfile.gettempdir())}
+    found = []
+    for part in value.split(os.pathsep):
+        tool = os.path.join(part, _CBM_TOOL) if part else ""
+        if not (tool and os.path.isfile(tool) and os.access(tool, os.X_OK)):
+            continue
+        real = os.path.realpath(part)
+        if not any(real == temp or real.startswith(temp + os.sep) for temp in temps):
+            found.append(real)
+    return found
+
+
+def _own_off_path():
+    """The folders that held the tool when the outermost run started (``CODEINTEL_OFF_PATH``), kept by a run started
+    inside it: a stand-in a case puts on a nested run's PATH stays there. None when the variable was set already."""
+    if "CODEINTEL_OFF_PATH" in os.environ:
+        return None
+    os.environ["CODEINTEL_OFF_PATH"] = os.pathsep.join(_tool_folders(os.environ.get("PATH", "")))
+    return True
+
+
 def _without_tool(value: str) -> str | None:
-    """``value`` (a PATH) with each folder that holds the code-graph tool replaced by a folder of links to the rest of
-    its entries; None when no folder holds it."""
+    """``value`` (a PATH) with each folder that held the code-graph tool when the outermost run started replaced by a
+    folder of links to the rest of its entries; None when no such folder is on it."""
+    off = {part for part in os.environ.get("CODEINTEL_OFF_PATH", "").split(os.pathsep) if part}
     parts, changed = value.split(os.pathsep), False
     for i, part in enumerate(parts):
         tool = os.path.join(part, _CBM_TOOL) if part else ""
-        if not (tool and os.path.isfile(tool) and os.access(tool, os.X_OK)):
+        if not (tool and os.path.isfile(tool) and os.access(tool, os.X_OK)) or os.path.realpath(part) not in off:
             continue
         links = _off_path["links"].get(part)
         if links is None:
@@ -310,6 +337,7 @@ def pytest_configure(config):
         _rebuild_lock = _own_rebuild_lock()
     if _cbm_base is None and not _is_worker(config):
         _cbm_base = _own_cbm_base()
+        _off_path["set"] = _own_off_path()
 
 
 def _refuse_basetemp(config) -> None:
@@ -445,6 +473,8 @@ def pytest_unconfigure(config):
     if _cbm_base is not None:
         _drop_cbm_base(*_cbm_base)
         _cbm_base = None
+    if _off_path.pop("set", None):
+        os.environ.pop("CODEINTEL_OFF_PATH", None)
     if _off_path["folder"] is not None:
         shutil.rmtree(_off_path["folder"], ignore_errors=True)
         _off_path["folder"], _off_path["links"] = None, {}

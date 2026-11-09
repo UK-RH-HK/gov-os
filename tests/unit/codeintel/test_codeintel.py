@@ -126,7 +126,7 @@ def test_the_daemon_directory_is_short_and_one_per_repository(tmp_path, monkeypa
 
 
 def test_a_test_sessions_folder_holds_its_daemon_directories(tmp_path, monkeypatch):
-    """W2-56 S1: ``GOV_CBM_BASE`` (the conftest's folder for one test session) comes first, whatever else is set."""
+    """W2-56 S1: ``CODEINTEL_DAEMON_BASE`` (the conftest's folder for one test session) comes first, whatever else is set."""
     monkeypatch.setenv(codeintel.BASE_ENV, str(tmp_path / "session"))
     monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, "/tmp/gov-launch-abcd1234/claude-1000")
     assert codeintel.daemon_dir(tmp_path / "one").parent == tmp_path / "session"
