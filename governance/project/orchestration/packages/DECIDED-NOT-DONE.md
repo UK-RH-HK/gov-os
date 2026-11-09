@@ -109,6 +109,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
+## 0i. DEC-1110's items (2026-11-09)
+| # | item | state |
+|---|---|---|
+| 70 | the standing-rules list at the top of the prompt and in START-NEXT-SESSION §2 | IN PROGRESS |
+| 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | IN PROGRESS |
+| 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
+| 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms
