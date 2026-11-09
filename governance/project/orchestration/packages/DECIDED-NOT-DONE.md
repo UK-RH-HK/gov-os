@@ -102,7 +102,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|
 | 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | **DONE 11-09** (`0240833b`, `5f7641e6`); applied `2a646265` |
 | 63 | W2-139 and W2-140, one batch, before D-10 | **MERGED 11-09** (one batch; accept 160/160; review READY); close at the lift; the queue run sets GOV_TESTS_OPTIN=breadth,lifted |
-| 64 | D-5 (the templates) | IN PROGRESS |
+| 64 | D-5 (the templates) | IN PROGRESS: W2-128 round 1 merged 11-09 (`c6aefae9`, accept 92/92, review READY; the lead brief pointed at the role templates); next: round 2 (TPL-4, TPL-6, review F6-F8); WAITS: the owner on the templates' approval, the `.claude/` copies ACT and TPL-6's Appendix A |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
