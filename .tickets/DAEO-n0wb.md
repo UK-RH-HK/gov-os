@@ -46,6 +46,7 @@ kpis:
   - 'A verbless change label''s prose id counted as a changer, or a clause-head changer lost (S11) [DEC-1109 (2)]'
 profile: STANDARD
 sources:
+- DEC-1098
 - DEC-1109
 - DEC-957
 - DEC-954
