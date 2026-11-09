@@ -128,6 +128,101 @@ def test_s8_init_config_writes_a_dated_sourced_template_with_this_machines_decid
     assert support.config_reasons(machine.read(repo)) == [], "the gate does not read the template whole"
 
 
+# Round 7: the configuration format is frozen from 28fbcfebf (W2-20's head when ACT-GATE-CONFIG-2 writes the machine's
+# file): no key renamed, added or given another meaning. The expected set is the README's "The configuration file"
+# section as it stands, never W2-20's code. Each dated value is exactly {"value", "date", "source"}.
+def _int(low):
+    return lambda v: isinstance(v, int) and not isinstance(v, bool) and v >= low
+
+
+def _number(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and v >= 0
+
+
+FROZEN_DATED = {
+    "memory_floor_bytes": _int(0),
+    "verification_peak_bytes": _int(0),
+    "working_size_bytes": _int(0),
+    "rebuild_peak_bytes": _int(0),
+    "disk_floor_bytes": _int(0),
+    "inode_floor": _int(0),
+    "verification_lock": lambda v: isinstance(v, str) and v.strip() != "",
+    "gpu_margin": _number,
+    "oom_floor_bytes": _int(0),
+    "heavy_slots": _int(1),
+    "gpu_shares": lambda v: isinstance(v, dict) and set(v) == {"embedder_mib", "reranker_mib"} and all(
+        _int(0)(n) for n in v.values()),
+}
+FROZEN_OPTIONAL = {"thread_budget": _int(1)}  # "optional": the template may leave it out
+FROZEN_SECTION = "embedding_servers"          # W2-123's section, not a dated value
+SERVER_KEYS = {"cpus", "nice", "parallel", "probe_slow_s", "probe_hung_s", "date", "source"}
+
+
+def _dated_ok(entry) -> bool:
+    if not isinstance(entry, dict) or set(entry) != {"value", "date", "source"}:
+        return False
+    try:
+        datetime.date.fromisoformat(str(entry["date"]))
+    except ValueError:
+        return False
+    return isinstance(entry["source"], str) and entry["source"].strip() != ""
+
+
+def _dated_by(entry: dict, section: dict) -> bool:
+    """A server's date and source, on the server or on the whole section ("plus date and source")."""
+    for holder in (entry, section):
+        if "date" in holder or "source" in holder:
+            try:
+                datetime.date.fromisoformat(str(holder.get("date")))
+            except ValueError:
+                return False
+            return isinstance(holder.get("source"), str) and holder["source"].strip() != ""
+    return False
+
+
+def test_s8_init_config_writes_exactly_the_frozen_configuration_format(machine, repo):
+    """Under a planted HOME with no file, ``--init-config`` writes exactly the README's key set, nesting and value
+    form, and nothing else: the eleven dated values, ``thread_budget`` only as a dated value when present, and
+    ``embedding_servers`` as W2-123's section (``shared`` and ``query``, each ``cpus`` as a CPU list text and ``nice``
+    from 0 to 19, optionally ``parallel`` and ``probe_*``, ``query`` optionally ``device`` ``gpu``/``cpu``, with a date
+    and a source)."""
+    machine.config_file.unlink()
+    code, envelope, out, err = machine.gov(repo, "--init-config")
+    assert code == 0 and envelope is not None and envelope.get("ok") is True, (
+        f"--init-config did not succeed: exit {code}\nstdout: {out}\nstderr: {err}")
+    written = json.loads(machine.config_file.read_text())
+    assert isinstance(written, dict), f"the template is not a JSON object: {written!r}"
+
+    allowed = set(FROZEN_DATED) | set(FROZEN_OPTIONAL) | {FROZEN_SECTION}
+    required = set(FROZEN_DATED) | {FROZEN_SECTION}
+    assert not set(written) - allowed, f"keys the README does not state: {sorted(set(written) - allowed)}"
+    assert not required - set(written), f"keys the README states are missing: {sorted(required - set(written))}"
+
+    for key, value_ok in {**FROZEN_DATED, **FROZEN_OPTIONAL}.items():
+        if key not in written:
+            continue
+        entry = written[key]
+        assert _dated_ok(entry), f"{key} is not exactly {{value, date, source}} with a real date: {entry}"
+        assert value_ok(entry["value"]), f"{key}'s value is not of the README's form: {entry['value']!r}"
+
+    section = written[FROZEN_SECTION]
+    assert isinstance(section, dict), f"{FROZEN_SECTION} is not an object: {section!r}"
+    assert {"shared", "query"} <= set(section) <= {"shared", "query", "date", "source"}, (
+        f"{FROZEN_SECTION} holds other keys than shared, query, date and source: {sorted(section)}")
+    for name in ("shared", "query"):
+        entry = section[name]
+        assert isinstance(entry, dict), f"{FROZEN_SECTION}.{name} is not an object: {entry!r}"
+        keys = SERVER_KEYS | ({"device"} if name == "query" else set())
+        assert not set(entry) - keys, f"{FROZEN_SECTION}.{name} holds keys the README does not state: {sorted(entry)}"
+        assert isinstance(entry.get("cpus"), str) and entry["cpus"].strip(), (
+            f"{FROZEN_SECTION}.{name}.cpus is not a CPU list text: {entry.get('cpus')!r}")
+        assert _int(0)(entry.get("nice")) and entry["nice"] <= 19, (
+            f"{FROZEN_SECTION}.{name}.nice is not an integer from 0 to 19: {entry.get('nice')!r}")
+        assert _dated_by(entry, section), f"{FROZEN_SECTION}.{name} has no date and source: {entry}"
+        if "device" in entry:
+            assert entry["device"] in ("gpu", "cpu"), f"{FROZEN_SECTION}.query.device: {entry['device']!r}"
+
+
 def test_s8_init_config_never_overwrites_an_existing_file(machine, repo):
     before = machine.config_file.read_bytes()
     code, envelope, out, err = machine.gov(repo, "--init-config")

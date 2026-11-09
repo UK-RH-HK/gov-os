@@ -15,9 +15,11 @@ The share is the slot's real one, by S17's rule in the README's interface (round
 are this process's CPUs (``os.sched_getaffinity``, which ``gov resources`` inherits) less every CPU the file's
 ``embedding_servers`` section names, and the share is ``max(1, len(slots' CPUs) // heavy_slots)``. Each planted program
 records the CPU set it ran on, and the case checks that inside the slot it was the share. Busy cores count the whole
-machine, so each run is measured net of the machine's background: for ``BACKGROUND_S`` seconds just before each run the
-busy cores are sampled with nothing of the case running, and that p95 is subtracted from the run's p95 (the background's
-median is printed too). Run:
+machine, so each run is measured net of the machine's background (round 7, the CTO's ruling under DEC-1097 (8)): the
+background is sampled once, before the plain run, on a quiet machine (after a settle, for ``BACKGROUND_S`` seconds with
+nothing of the case running), and its median is subtracted from each run's p95. A background taken after the plain run
+would hold that run's tail and flatter the net figure. The case prints each run's gross and net p95 and the
+background's median and p95. Run:
 
     GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py \
         -m local_only -p no:cacheprovider -s
@@ -46,7 +48,7 @@ pytestmark = [
 ]
 
 TESTS, WORKERS, SPIN_S = 8, 2, 3.0
-BACKGROUND_S, SETTLE_S = 3.0, 1.0
+BACKGROUND_S, SETTLE_S = 5.0, 2.0
 
 # One forked process per CPU, not threads: the GIL holds a program's threads to about one core (round 5).
 # Each program writes the CPU set it runs on to seen/<pid>.json beside it (round 6).
@@ -110,7 +112,7 @@ def _real_share(config: dict, slots: int) -> tuple[int, set[int], set[int]]:
 
 
 def _background() -> list[float]:
-    """The machine's busy cores with nothing of the case running, just before a run."""
+    """The machine's busy cores with nothing of the case running: taken once, before the plain run."""
     time.sleep(SETTLE_S)
     samples, _ = _busy(lambda: time.sleep(BACKGROUND_S))
     return samples
@@ -180,21 +182,21 @@ def test_s16_one_slot_holds_a_cpu_hungry_suite_to_its_share_plus_one_within_20_p
     share, pool, servers = _real_share(config, slots)
     mine = len(os.sched_getaffinity(0))
 
-    background_without = _background()
+    background = _background()  # once, before the plain run, on a quiet machine (round 7)
     run_without, without_s = _busy(plain)
     _seen(suite)
-    background_with = _background()
+    time.sleep(SETTLE_S)  # the plain run's tail is not sampled in the slot's run either
     run_with, with_s = _busy(in_slot)
     seen_in_slot = _seen(suite)
 
-    without_net = _p95(run_without) - _p95(background_without)
-    with_net = _p95(run_with) - _p95(background_with)
+    base = _median(background)
+    without_net = _p95(run_without) - base
+    with_net = _p95(run_with) - base
     sizes = sorted({len(cpus) for cpus in seen_in_slot})
     print(f"\nS16 evidence: share {share} = {len(pool)} CPUs outside the servers' {len(servers)} of {mine} // "
           f"{slots} slots; the slot's programs ran on {sizes} CPUs ({len(seen_in_slot)} programs)")
-    print(f"S16 evidence: background p95 before the plain run {_p95(background_without):.2f} (median "
-          f"{_median(background_without):.2f}), before the slot's run {_p95(background_with):.2f} (median "
-          f"{_median(background_with):.2f})")
+    print(f"S16 evidence: background, sampled once before the plain run for {BACKGROUND_S:.0f} s: median "
+          f"{base:.2f}, p95 {_p95(background):.2f} ({len(background)} samples); the median is subtracted from both runs")
     print(f"S16 evidence: busy cores p95 without the slot {_p95(run_without):.2f} gross, {without_net:.2f} net; "
           f"with the slot {_p95(run_with):.2f} gross, {with_net:.2f} net; limit share + 1 = {share + 1}")
     slower = (with_s / without_s - 1) * 100
