@@ -16,6 +16,23 @@ from gov.launch.plan_check import check_lead
 REPOSITORY_CHECK = launcher._check_repository_settings
 
 
+def _open_gate(home: Path, monkeypatch) -> None:
+    """An open resource gate under this HOME (W2-20 S19: every launch runs the start check): the gate file and its
+    readings planted, nothing of the real machine's gate read."""
+    from gov.resources import config as gate_config
+    folder = home / ".gov-os" / "machine"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "gate.json").write_text(json.dumps(gate_config.template(cpus=list(range(20)))), encoding="utf-8")
+    (folder / "meminfo").write_text("MemAvailable: 67108864 kB\n", encoding="utf-8")
+    (folder / "loadavg").write_text("0.1 0.1 0.1 1/1 1\n", encoding="utf-8")
+    for name, value in (("GOV_RESOURCES_MEMINFO", folder / "meminfo"), ("GOV_RESOURCES_LOADAVG", folder / "loadavg"),
+                        ("GOV_RESOURCES_NPROC", 20), ("GOV_RESOURCES_BUSY_CORES", 0),
+                        ("GOV_RESOURCES_EMBEDDING_CPU", '{"shared": 0, "query": 0}'),
+                        ("GOV_RESOURCES_EMBEDDING_CPU_NOW", '{"shared": 0, "query": 0}'),
+                        ("GOV_RESOURCES_DISK", '{"free_bytes": 1000000000000000, "free_inodes": 1000000000}')):
+        monkeypatch.setenv(name, str(value))
+
+
 def _plant(root: Path, *tickets: dict) -> Path:
     folder = root / ".tickets"
     folder.mkdir(parents=True, exist_ok=True)
@@ -138,6 +155,7 @@ def _sessions(monkeypatch, tmp_path, *, caller=None, ticket=None):
     (home / ".local" / "bin").mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
+    _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
     started = []
 

@@ -219,13 +219,14 @@ failure says:
   `stderr (trimmed):` and the traceback's end (`_check_path_map` → `_git`). W2-57's own case for that cause is in
   `tests/acceptance/W2-57/`.
 
-## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569)
+## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569), with `accept` (DEC-970) and W2-20's `resources` in their form: six recorded
 
 DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer
 line." DEC-546: the lines are written by a test designer in the follow-up, "with the list itself".
 
 **The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`,
-and `accept` since DEC-970, W2-96) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
+`accept` since DEC-970, W2-96, and `resources`, W2-20's command, in DEC-542's form: `173e8e97`, ported for
+DEC-1097 (8)) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
 (CAP-28.b): no existing list, case or invocation of this suite changed, and only those lines were added to the
 support.
 
@@ -244,12 +245,12 @@ orders the subcommand). So `lock` is recorded as that module command, and record
 
 | Case (`test_w1_07_recorded_commands.py`) | Holds | Today |
 |---|---|---|
-| `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` | the lines name exactly the four, apart from the twelve | green |
-| `test_a_recorded_gov_command_is_offered_and_answers_its_help` (3: `ci`, `launch`, `telemetry`; the one case of each) | `gov --help` offers the command and `gov <command> --help` ends with exit code 0 and names it. The command itself is not run: `launch` starts a session, `ci` runs gates | green, all three |
+| `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` | the lines name exactly six, apart from the twelve: DEC-542's four, `accept` (DEC-970) and `resources`, recorded by W2-20 in DEC-542's form (`173e8e97`) | green (it reads the support's lines only) |
+| `test_a_recorded_gov_command_is_offered_and_answers_its_help` (5: `ci`, `launch`, `telemetry`, `accept`, and W2-20's `resources`; the one case of each) | `gov --help` offers the command and `gov <command> --help` ends with exit code 0 and names it. The command itself is not run: `launch` starts a session, `ci` runs gates | green, the four before `resources`; `resources` red until W2-20 builds it (`invalid choice`) |
 | `test_lock_is_recorded_as_the_module_command_and_is_no_gov_command` (the one case of `lock`) | `gov --help` offers no `lock`; `gov lock` is a usage error (exit code 2); `python3 -m gov.lock` in a folder that is no installed project runs, ends with exit code 1, names `framework.lock` and writes nothing | green |
 
-5 cases, all green: the commands exist as found, and the cases hold them so that the list and the command
-line cannot part unseen. The red of this piece is in W1-26's suite. The command set as a whole (nothing beyond
+7 cases (5 with DEC-542's four; 6 with `accept`; 7 with W2-20's `resources`), all green once W2-20 is built: the
+commands exist as found, and the cases hold them so that the list and the command line cannot part unseen. The red of this piece is in W1-26's suite. The command set as a whole (nothing beyond
 the twelve and the three) is W1-32's case, rewritten for DEC-542.
 
 ## Decision package
