@@ -3,7 +3,7 @@
   "title": "facts",
   "description": "The project facts file (governance/project/facts.yaml) the kernel templates are filled from (DEC-1050 TPL-2): named paths, named commands each with a check form, the Definition of Done (at most six lines, quoted by id), the step switches with the M3 match pattern of each, the prose budgets per template, and the commands the harness allows headless. A `paths` name upper-cased is a template key ({TREE} is paths.tree).",
   "type": "object",
-  "required": ["paths", "commands", "dod", "steps", "budgets", "harness_allowed"],
+  "required": ["paths", "commands", "dod", "steps", "budgets", "harness_allowed", "ready"],
   "additionalProperties": false,
   "properties": {
     "paths": {

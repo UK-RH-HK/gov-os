@@ -187,6 +187,71 @@ def test_command_output_and_refusal(tmp_path, capsys):
     assert error["details"]["findings"] == [{"code": "ALLOWED_PATHS_EMPTY", "detail": "DAEO-aaaa"}]
 
 
+@pytest.mark.parametrize("role", ["engineer", "lead"])
+def test_until_in_the_whole_role_template_is_checked(tmp_path, role):
+    """F1: an "until <ticket>" line anywhere in the role's own template, outside any run block, is refused."""
+    closed = dict(GOOD, id="DAEO-done", **{"external-ref": "W2-901"}, status="closed")
+    root = plant(tmp_path, extra={"DAEO-done": closed})
+    stem = "role-engineer.md" if role == "engineer" else "role-lead.md"
+    path = root / "template/governance/kernel/templates" / stem
+    path.write_text(path.read_text(encoding="utf-8").replace("# ", "# Kept until W2-901 lands\n# ", 1), encoding="utf-8")
+    out = build(root, role, "W2-900", run="build" if role == "lead" else None)
+    assert ("UNTIL_CLOSED", "W2-901") in codes(out)
+
+
+@pytest.mark.parametrize("ready, code", [("", "READY_NEW_SINCE_MISSING"),
+                                         ('ready: {new_since: "soon"}\n', "READY_NEW_SINCE_NOT_DATE"),
+                                         ('ready: {new_since: "2026-13-40"}\n', "READY_NEW_SINCE_NOT_DATE")])
+def test_no_readable_new_since_is_refused(tmp_path, ready, code):
+    """F3: the dependency-field check never switches off silently."""
+    out = build(plant(tmp_path, facts=FACTS.replace('ready: {new_since: "2026-11-10"}\n', ready)), "engineer", "W2-900")
+    assert codes(out) == [(code, "ready.new_since")]
+
+
+@pytest.mark.parametrize("kpis", [None, ["S1 a line. Verify: x"], {"success": [], "failure": []}, {"failure": []}])
+def test_no_readable_kpi_lines_is_refused(tmp_path, kpis):
+    """F4: kpis missing, not a mapping or with no success line is not READY."""
+    front = {key: value for key, value in GOOD.items() if key != "kpis"}
+    if kpis is not None:
+        front["kpis"] = kpis
+    assert codes(build(plant(tmp_path, front), "engineer", "DAEO-aaaa")) == [("KPI_NO_VERIFY", "kpis")]
+
+
+@pytest.mark.parametrize("text", ["---\nid: DAEO-aaaa\nexternal-ref: W2-900\ntitle: open\n# no closing line\n",
+                                  "---\nid: DAEO-aaaa\nexternal-ref: W2-900\ntitle: 'unclosed quote\n---\n# T\n",
+                                  "---\n- a list\n---\n# T\n"])
+def test_unreadable_front_matter_is_ticket_unreadable(tmp_path, text):
+    """F6: refused by its own name, not as ALLOWED_PATHS_EMPTY, with no advisory warning."""
+    root = plant(tmp_path)
+    (root / ".tickets/DAEO-aaaa.md").write_text(text, encoding="utf-8")
+    out = build(root, "engineer", "DAEO-aaaa")
+    assert [c for c, _ in codes(out)] == ["TICKET_UNREADABLE"] and out["warnings"] == []
+    if "external-ref" in text:  # its W2 id still finds it
+        assert [c for c, _ in codes(build(root, "engineer", "W2-900"))] == ["TICKET_UNREADABLE"]
+
+
+def test_unreadable_files_are_named_refusals(tmp_path, capsys):
+    """F5: a file that is not UTF-8, or facts.yaml that is not YAML, is a named GovError, never a traceback."""
+    root = plant(tmp_path)
+    (root / ".tickets/DAEO-bad0.md").write_bytes(b"---\ntitle: \xff\xfe\n---\n")  # another ticket: lookups still work
+    assert build(root, "engineer", "W2-900")["findings"] == []
+    assert [c for c, _ in codes(build(root, "engineer", "DAEO-bad0"))] == ["TICKET_UNREADABLE"]
+    bad = tmp_path / "bad.txt"
+    bad.write_bytes(b"\xff\xfe not utf-8")
+    for flag in ("part", "repair"):
+        with pytest.raises(GovError) as raised:
+            build(root, "engineer", "W2-900", **{flag: str(bad)})
+        assert raised.value.code == "BRIEF_FILE_UNREADABLE"
+    facts = root / "governance/project/facts.yaml"
+    for content in (b"paths: [unclosed\n", b"\xff\xfe: x\n"):
+        facts.write_bytes(content)
+        with pytest.raises(GovError) as raised:
+            build(root, "engineer", "W2-900")
+        assert raised.value.code == "BRIEF_FACTS_UNREADABLE"
+    assert main(["brief", "engineer", "W2-900", "--root", str(root)]) != 0  # the CLI names it, no traceback
+    assert "Traceback" not in capsys.readouterr().err
+
+
 def test_facts_schema_requires_a_date(tmp_path):
     import jsonschema
     import yaml
@@ -197,3 +262,4 @@ def test_facts_schema_requires_a_date(tmp_path):
     validator = jsonschema.Draft202012Validator(schema)
     assert isinstance(facts["ready"]["new_since"], str) and not list(validator.iter_errors(facts))
     assert list(validator.iter_errors(dict(facts, ready={"new_since": "soon"})))
+    assert list(validator.iter_errors({key: value for key, value in facts.items() if key != "ready"}))  # F3

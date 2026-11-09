@@ -8,12 +8,13 @@ inputs give the same bytes. ``build`` returns the brief, the ready check's warni
 
 from __future__ import annotations
 
+import datetime
 import re
 from pathlib import Path
 
 from gov.brief import ROLE_TEMPLATES
 from gov.cli.errors import GovError
-from gov.util.frontmatter import ids, with_body
+from gov.util.frontmatter import FrontmatterError, ids, parse, with_body
 
 EST_LOC_LIMIT = 400  # DEC-1083: over it, a warning (suggest a split), never a refusal
 # {KEY}, {KEY: description}, {CMD:name}, {STEP:name}; a brace a shell's $ opens (${HOME}) is none
@@ -28,44 +29,77 @@ MAX_DEPTH = 8  # a facts value may name another key ({MAIN}/...); no deeper chai
 
 
 def _read(path: Path) -> str:
-    with open(path, encoding="utf-8") as handle:
-        return handle.read()
+    """The file's text; a file that is not UTF-8 or cannot be opened is a named refusal, never a traceback (F5)."""
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return handle.read()
+    except (OSError, UnicodeDecodeError) as error:
+        raise GovError("BRIEF_FILE_UNREADABLE", f"{path}: {error}", {"path": str(path)}) from None
 
 
 def _finding(code: str, detail: object = "") -> dict:
     return {"code": code, "detail": str(detail)}
 
 
+W2_FIELD = re.compile(r"^(?:external-ref|wbs_id):\s*['\"]?([A-Za-z0-9][A-Za-z0-9_.-]*)['\"]?\s*$", re.MULTILINE)
+
+
 class Tickets:
-    """The tickets under ``<root>/.tickets/``, by tk id (the file's stem) or by W2 id (``external-ref``/``wbs_id``)."""
+    """The tickets under ``<root>/.tickets/``, by tk id (the file's stem) or by W2 id (``external-ref``/``wbs_id``).
+    A ticket that is not UTF-8, or whose front-matter block is unclosed or not a YAML mapping, reads as empty and
+    its reason is kept in ``unreadable`` (F5, F6)."""
 
     def __init__(self, root: Path):
         self.folder = root / ".tickets"
         self._read: dict[Path, tuple[dict, str]] = {}
         self._by_w2: dict[str, Path] | None = None
+        self.unreadable: dict[Path, str] = {}
 
-    def _load(self, path: Path) -> tuple[dict, str]:
+    def load(self, path: Path) -> tuple[dict, str]:
         if path not in self._read:
-            front, body = with_body(_read(path))
-            self._read[path] = (front if isinstance(front, dict) else {}, body)
+            try:
+                text = _read(path)
+                front = parse(text, rstrip=True)
+            except GovError:
+                self.unreadable[path] = "not UTF-8"
+                front, text = None, None
+            except FrontmatterError as error:
+                self.unreadable[path] = f"front matter {error.kind}"
+                front, text = None, None
+            if text is None:
+                self._read[path] = ({}, "")
+            elif front is None:
+                self._read[path] = ({}, text.strip())
+            else:
+                lines = text.split("\n")
+                end = [line.rstrip() for line in lines].index("---", 1)
+                self._read[path] = (front, "\n".join(lines[end + 1:]).strip())
         return self._read[path]
 
-    def get(self, ref: str) -> tuple[dict, str] | None:
-        """(front matter, body) of the ticket ``ref`` names, or None."""
+    def _w2_of_unreadable(self, path: Path) -> list[str]:
+        """The W2 ids an unreadable ticket's raw lines name, so a W2 id still finds it and it is refused by name."""
+        return W2_FIELD.findall(path.read_bytes().decode("utf-8", errors="replace"))
+
+    def find(self, ref: str) -> Path | None:
+        """The file of the ticket ``ref`` names, or None."""
         if not TICKET_REF.match(ref):
             return None
         path = self.folder / f"{ref}.md"
         if path.is_file():
-            return self._load(path)
+            return path
         if self._by_w2 is None:
             self._by_w2 = {}
             for other in sorted(self.folder.glob("*.md")) if self.folder.is_dir() else ():
-                front = self._load(other)[0]
-                for field in ("external-ref", "wbs_id"):
-                    if isinstance(front.get(field), str):
-                        self._by_w2.setdefault(front[field], other)
-        found = self._by_w2.get(ref)
-        return self._load(found) if found else None
+                front = self.load(other)[0]
+                named = [front[field] for field in ("external-ref", "wbs_id") if isinstance(front.get(field), str)]
+                for w2 in named or (self._w2_of_unreadable(other) if other in self.unreadable else []):
+                    self._by_w2.setdefault(w2, other)
+        return self._by_w2.get(ref)
+
+    def get(self, ref: str) -> tuple[dict, str] | None:
+        """(front matter, body) of the ticket ``ref`` names, or None."""
+        found = self.find(ref)
+        return self.load(found) if found else None
 
     def closed(self, ref: str) -> bool:
         ticket = self.get(ref)
@@ -98,6 +132,17 @@ def _day(value) -> str | None:
     return day if ISO_DATE.match(day) else None
 
 
+def _since(value) -> str | None:
+    """facts.yaml's ``ready.new_since`` as an ISO day; None when it is not a date (F3)."""
+    if isinstance(value, datetime.date):
+        return value.isoformat()[:10]
+    text = value.strip() if isinstance(value, str) else ""
+    try:
+        return text if ISO_DATE.match(text) and datetime.date.fromisoformat(text) else None
+    except ValueError:
+        return None
+
+
 def _wait_ref(item) -> str:
     """The id or record path of a waits_on item: ``ref`` of a mapping, a string's first word (``DAEO-x — why``)."""
     if isinstance(item, dict):
@@ -112,6 +157,9 @@ def ready_check(front: dict, tickets: Tickets, root: Path, new_since) -> tuple[l
     ticket_id = str(front.get("id", ""))
     if not front.get("allowed_paths"):
         refuse.append(_finding("ALLOWED_PATHS_EMPTY", ticket_id))
+    kpis = front.get("kpis")
+    if not isinstance(kpis, dict) or not isinstance(kpis.get("success"), list) or not kpis["success"]:
+        refuse.append(_finding("KPI_NO_VERIFY", "kpis"))  # no readable success line: none is verified (F4)
     refuse += [_finding("KPI_NO_VERIFY", label) for label, _, verify in kpi_rows(front) if verify is None]
     for dep in ids(front.get("depends_on")):
         if not tickets.closed(dep):
@@ -233,18 +281,28 @@ def _templates(root: Path) -> Path:
     return kernel if kernel.is_dir() else root / "governance/kernel/templates"
 
 
-def _template(folder: Path, stem: str) -> tuple[dict, str]:
+def _template(folder: Path, stem: str) -> tuple[dict, str, str]:
+    """(front matter, body, the whole file's text) of a kernel template."""
     path = folder / f"{stem}.md"
     if not path.is_file():
         raise GovError("BRIEF_TEMPLATE_MISSING", f"no template {stem}.md in {folder}", {"template": stem})
-    front, body = with_body(_read(path))
-    return (front if isinstance(front, dict) else {}), body
+    text = _read(path)
+    front, body = with_body(text)
+    return (front if isinstance(front, dict) else {}), body, text
 
 
-def _yaml(path: Path) -> dict:
+def _yaml(path: Path, code: str = "BRIEF_FILE_UNREADABLE") -> dict:
+    """The YAML mapping in ``path``, {} when there is no such file; YAML that cannot be read is ``code`` (F5)."""
     import yaml
 
-    data = yaml.safe_load(_read(path)) if path.is_file() else None
+    if not path.is_file():
+        return {}
+    try:
+        data = yaml.safe_load(_read(path))
+    except GovError as error:
+        raise GovError(code, error.message, {"path": str(path)}) from None
+    except yaml.YAMLError as error:
+        raise GovError(code, f"{path}: not valid YAML: {error}", {"path": str(path)}) from None
     return data if isinstance(data, dict) else {}
 
 
@@ -263,25 +321,35 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
         raise GovError("BRIEF_RUN_MISSING", "--run <kind> goes with the lead role, and only with it",
                        {"role": role, "run": run})
     tickets = Tickets(root)
-    ticket = tickets.get(ticket_ref)
-    if ticket is None:
+    ticket_path = tickets.find(ticket_ref)
+    if ticket_path is None:
         raise GovError("BRIEF_TICKET_UNKNOWN", f"no ticket {ticket_ref} in {root / '.tickets'}", {"ticket": ticket_ref})
-    front, body = ticket
+    front, body = tickets.load(ticket_path)
     facts_path = root / "governance/project/facts.yaml"
     if not facts_path.is_file():
         raise GovError("BRIEF_FACTS_MISSING", f"no facts file at {facts_path}", {"path": str(facts_path)})
-    facts = _yaml(facts_path)
+    facts = _yaml(facts_path, "BRIEF_FACTS_UNREADABLE")
+    budgets = facts.get("budgets") if isinstance(facts.get("budgets"), dict) else {}
+    if ticket_path in tickets.unreadable:  # F6: refused by its own name, not as the fields it seems to miss
+        return {"brief": "", "warnings": [], "size": 0, "budget": budgets.get("brief"), "ticket": ticket_ref,
+                "findings": [_finding("TICKET_UNREADABLE", f"{ticket_ref}: {tickets.unreadable[ticket_path]}")]}
     folder = _templates(root)
     keys = _yaml(folder / "keys.yaml").get("keys")
     keys = {str(key) for key in keys} if isinstance(keys, list) else set()
-    _, t0 = _template(folder, "brief")
-    role_front, role_body = _template(folder, ROLE_TEMPLATES[role])
+    _, t0, t0_text = _template(folder, "brief")
+    role_front, role_body, role_text = _template(folder, ROLE_TEMPLATES[role])
     lead_lines = run_section(role_body, run) if run else []
     part_text, repair_text = _flag_file(part, "--part"), _flag_file(repair, "--repair")
 
-    refuse, warnings = ready_check(front, tickets, root, (facts.get("ready") or {}).get("new_since")
-                                   if isinstance(facts.get("ready"), dict) else None)
-    for line in [*t0.split("\n"), *lead_lines, *(part_text or "").split("\n")]:
+    ready = facts.get("ready")
+    new_since = ready.get("new_since") if isinstance(ready, dict) else None
+    since = _since(new_since)
+    refuse, warnings = ready_check(front, tickets, root, since)
+    if since is None:  # F3: the dependency-field check never switches off silently
+        missing = not isinstance(ready, dict) or new_since is None
+        refuse.append(_finding("READY_NEW_SINCE_MISSING" if missing else "READY_NEW_SINCE_NOT_DATE", "ready.new_since"))
+    # F1: the whole role template, every role's, goes as the system prompt (W2-153), so all of it is scanned
+    for line in [*t0_text.split("\n"), *role_text.split("\n"), *(part_text or "").split("\n")]:
         for ref in UNTIL.findall(line):
             if tickets.closed(ref) and _finding("UNTIL_CLOSED", ref) not in refuse:
                 refuse.append(_finding("UNTIL_CLOSED", ref))
@@ -293,7 +361,6 @@ def build(root: Path, role: str, ticket_ref: str, run: str | None = None, part: 
     if lead_lines:
         brief += "\n" + filler.lines("\n".join(lead_lines)) + "\n"
     findings = refuse + [_finding("PLACEHOLDER_LEFT", key) for key in filler.left]
-    budgets = facts.get("budgets") if isinstance(facts.get("budgets"), dict) else {}
     return {"brief": brief, "warnings": warnings, "findings": findings, "size": prose_size(brief),
             "budget": budgets.get("brief"), "ticket": str(front.get("id", ticket_ref))}
 
