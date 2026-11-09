@@ -85,12 +85,12 @@ VALUES = {
     "verification_lock": _abs_path,         # S9: the lock a verification run holds
     "gpu_margin": _fraction,                # S10: 10 %
     "heavy_slots": _int(1),                 # S7: the machine-wide heavy-job slots
+    "trip_floor_bytes": _int(0),            # S11: the out-of-memory trip-wire's lower floor ("in the file")
 }
-# Values the file may set, each dated and sourced when set, malformed a fault like any other. Absent: the trip-wire
-# does not act (it needs its floor) and the embedding servers' p95 is not counted (nothing configured to count);
-# the GPU shares are DEC-1032's default (S14 states it); the disk is the one holding HOME (the shared disk, S4).
+# Values the file may set, each dated and sourced when set, malformed a fault like any other. Absent: the GPU shares
+# are DEC-1032's default (S14 states it); the disk is the one holding HOME (the shared disk, S4). The embedding
+# servers' section (S12, "the file holds each one's") is required too, below.
 OPTIONAL = {
-    "trip_floor_bytes": _int(0),            # S11: the out-of-memory trip-wire's lower floor
     "gpu_shares": _shares,                  # S14: the embedder first, then one reranker, then the rest
     "disk_path": _abs_path,                 # S4: a path on the shared disk
     "thread_budget": _int(1),               # S15: the slot's thread budget, when the file sets it
@@ -187,12 +187,11 @@ def load(today: datetime.date | None = None) -> dict:
     if "disk_path" not in values and "disk_path" not in data:
         values["disk_path"] = os.environ.get("HOME") or str(Path.home())
         out["sources"]["disk_path"] = "default: the disk holding HOME"
-    if SERVERS_KEY in data:
-        servers = data[SERVERS_KEY]
-        faults = _server_faults(servers)
-        out["faults"] += faults
-        if not faults:
-            values[SERVERS_KEY] = servers
+    servers = data.get(SERVERS_KEY)
+    faults = _server_faults(servers)
+    out["faults"] += faults
+    if not faults:
+        values[SERVERS_KEY] = servers
     return out
 
 

@@ -186,7 +186,13 @@ def test_counters_that_hold_no_time_or_go_back_shut_the_gate(planted, stat):
     assert reasons(gate.read("session"))["cpu"]["reading"] is None
 
 
-@pytest.mark.parametrize("key", ["trip_floor_bytes", "gpu_shares", "disk_path", "embedding_servers"])
+def test_a_missing_servers_section_shuts_the_gate_naming_it(planted):
+    planted.config(embedding_servers=None)
+    named = [r["why"] for r in gate.read("session")["gate"]["reasons"] if r["condition"] == "config"]
+    assert any(why.startswith("embedding_servers") for why in named), named
+
+
+@pytest.mark.parametrize("key", ["gpu_shares", "disk_path"])
 def test_a_value_the_file_may_leave_out_does_not_shut_the_gate(planted, key):
     planted.config(**{key: None})
     reading = gate.read("session")
