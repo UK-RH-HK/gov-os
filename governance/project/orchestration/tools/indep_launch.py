@@ -643,10 +643,7 @@ def plan_inputs(kind, rnd, root, set_name, audit):
         return [(os.path.join(hidden, r), os.path.join("input", "set", r)) for r in rels]
 
     if kind == "writer":
-        if rnd == 1:
-            if not real_inside(setdir, root) or not os.path.isdir(setdir) or os.path.lexists(hidden):
-                raise Refuse(10, "destination")
-        else:
+        if rnd == 2:  # round 1 makes a new set: its folder may not exist yet; its destination is checked at delivery
             plan += set_copies()
             plan.append((need_file(os.path.join(setdir, "XCHECK-r1.md")), "input/notes.md"))
     elif kind == "checker":
@@ -945,10 +942,14 @@ def deliver(st, ctx):
         if not files:
             raise Refuse(20, "missing")
         hidden = os.path.join(setdir, "hidden")
-        if not real_inside(setdir, root) or not os.path.isdir(setdir):
-            raise Refuse(20, "destination")
         if ctx["round"] == 1:
             if os.path.lexists(hidden):
+                raise Refuse(20, "destination")
+            try:
+                os.makedirs(setdir, mode=0o755, exist_ok=True)  # a new set's folder
+            except OSError:
+                raise Refuse(20, "destination")
+            if not real_inside(setdir, root) or not os.path.isdir(setdir) or os.path.lexists(hidden):
                 raise Refuse(20, "destination")
             os.mkdir(hidden, 0o755)
             tmp = os.path.join(hidden, f".r1-{st.run}.tmp")
@@ -961,7 +962,8 @@ def deliver(st, ctx):
                 remove_tree(hidden)
                 raise Refuse(20, "copy")
         else:
-            if not real_inside(hidden, root) or not os.path.isdir(hidden) or os.path.islink(hidden):
+            if (not real_inside(setdir, root) or not real_inside(hidden, root) or not os.path.isdir(hidden)
+                    or os.path.islink(hidden)):
                 raise Refuse(20, "destination")
             new = os.path.join(hidden, f".r2-{st.run}.tmp")
             old = os.path.join(hidden, f".r1-{st.run}.old")

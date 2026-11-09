@@ -901,6 +901,23 @@ def test_writer_round_two_replaces_its_set_inside_hidden(w):
         assert f"{counts['run']}/replaced-hidden/old.yaml" in t.getnames()
 
 
+def test_writer_round_one_makes_a_new_sets_folder(w):
+    w.stub({"session": "write", "out": writer_out()})
+    rc, counts, _ = w.launch(set_name="brand-new-set")
+    assert rc == 0, counts
+    hidden = w.sets / "fixtures" / "evaluation" / "brand-new-set" / "hidden"
+    assert sorted(tree_hash(hidden)) == ["deep/", "deep/q02.yaml", "q01.yaml"]
+
+
+def test_writer_round_one_over_an_existing_hidden_is_rejected_20(w):
+    hidden = w.plant_set({"old.yaml": "old\n"})
+    before = tree_hash(hidden.parent)
+    w.stub({"session": "write", "out": writer_out()})
+    rc, counts, _ = w.launch()
+    assert rc == 20 and counts["status"] == "rejected"
+    assert tree_hash(hidden.parent) == before
+
+
 # -- --counts-only -------------------------------------------------------------------------------------------------
 def test_counts_only_prints_the_runs_counts(w):
     rc, counts, _ = w.launch(seed=3, dry=True)
