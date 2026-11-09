@@ -18,9 +18,12 @@ import w2_20_support as support
 @pytest.mark.parametrize("busy, load, shut", [(4.0, 0.1, "cpu"), (0.5, 9.0, "load")],
                          ids=["busy cores high, load low", "load high, busy cores low"])
 def test_s2_the_gate_judges_busy_cores_and_load_each_on_its_own_and_shows_both(machine, repo, busy, load, shut):
-    """Busy cores high: all 4 of 4 busy with the servers' p95 at 0.0, so the cpu sum is 4.0, not below nproc (the
-    README's cpu rule: equal shuts), while the load (0.1) is far below it. Load high: 9.0 of 4, busy cores 0.5."""
-    machine.set_readings(nproc=4, busy_cores=busy, load=load, load_15=load, embedding_p95=(0.0, 0.0))
+    """Busy cores high: all 4 of 4 busy, the two servers each using 0.25 cores now (inside the busy cores) with a p95
+    of 0.25, so nothing above their current use is added: the cpu reading is the busy cores alone, 4.0, not below
+    nproc (the README's cpu rule, round 7: equal shuts), while the load (0.1) is far below it. Load high: 9.0 of 4,
+    busy cores 0.5."""
+    machine.set_readings(nproc=4, busy_cores=busy, load=load, load_15=load, embedding_p95=(0.25, 0.25),
+                         embedding_now=(0.25, 0.25))
 
     reading = machine.read(repo)
     assert reading.get("busy_cores_1m") == busy, f"the reading does not show the busy cores: {reading}"
@@ -28,6 +31,9 @@ def test_s2_the_gate_judges_busy_cores_and_load_each_on_its_own_and_shows_both(m
     reasons = support.reasons_by_condition(reading)
     assert support.gate_of(reading)["open"] is False, reading
     assert set(reasons) == {shut}, f"only {shut} is broken: {reasons}"
+    if shut == "cpu":
+        assert support.close_to(reasons["cpu"]["reading"], busy) and reasons["cpu"]["threshold"] == 4, (
+            f"the servers' use is counted twice: {reasons['cpu']}")
 
     refused = support.refusal_of(*machine.check(repo))
     assert set(support.reasons_by_condition(refused)) == {shut}, refused
