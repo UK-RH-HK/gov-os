@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1102 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1103 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -347,3 +347,8 @@ other restart is an ACT.
   settings), the launch script (tests first, one review), the briefs to the owner, then default. Basis: 1 and 2.
 - DEC-1102 (2026-11-09): **`gov plan`'s cycle break fixed before the lift's re-pin,** tests first: a cycle broken only
   at a ticket inside it; a ticket outside every cycle keeps all its waits (a new ticket, one review). Basis: 2.
+- DEC-1103 (2026-11-09): W2-20's gate file by an ACT (`gov resources --init-config` from W2-20's code, rehearsed);
+  D-4's 3 capped and 7 lifted cases back into the gates by an ACT (DEC-1061 amended for them); ACT-INDEP-WALLS-1's four
+  answers as recommended. Requested: an operator-agent package (class (a) checks-only ACTs applied by an independent
+  operator agent after rehearsal, a READY review and matching hashes; class (b) loosening ACTs on the owner's one-line
+  yes; sudo the owner's; the CTO never changes a reviewed ACT nor applies one). Basis: 2 and 4.

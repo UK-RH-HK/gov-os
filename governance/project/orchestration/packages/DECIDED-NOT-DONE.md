@@ -70,13 +70,20 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0e. DEC-1101's items (2026-11-09; standing)
 | # | item | fate (DEC-1101) | state |
 |---|---|---|---|
-| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **Rehearsed 11-09** (`ACT-INDEP-WALLS-1.md`, 0 failures; the sandbox seal inside); WAITS: the owner's §7 (four), then the operator |
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **Rehearsed; §7 answered** (DEC-1103 (3)); WAITS: the operator applies |
 | 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
 | 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
 | 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
 | 46 | the weekly counts | (1) "not found" and "may be incomplete" from agents' returns, in the digest | NOT STARTED |
 | 47 | unindexed-path notices | (1) resolved within a day | STANDING (from now) |
 | 48 | the sandbox labellers automated | (2) DEC-1099 (1) Q5 by the automated sessions | IN PROGRESS (the experiment's prep told) |
+
+## 0f. DEC-1103's items (2026-11-09)
+| # | item | fate (DEC-1103) | state |
+|---|---|---|---|
+| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | IN PROGRESS 11-09 |
+| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | IN PROGRESS 11-09 |
+| 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | IN PROGRESS 11-09 |
 
 ## 1. Every item not done, partly done or waiting
 
