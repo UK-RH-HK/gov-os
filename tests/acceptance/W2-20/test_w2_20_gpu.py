@@ -64,10 +64,14 @@ def test_s10_no_nvidia_smi_or_no_gpu_shuts_a_start_that_declares_a_need_named(ma
 
 @pytest.mark.parametrize("planted", [True, False], ids=["a GPU planted", "no nvidia-smi"])
 def test_s10_a_start_with_no_declared_need_never_reads_the_gpu(machine, repo, planted):
+    """P-6: the start check without a need never runs nvidia-smi. The suite's location check (a plain reading,
+    which reads the GPU once, S13) runs first; only the start check's own calls are counted."""
     if planted:
         machine.plant_gpu(gpus=[_gpu(8192, 0)])  # a full GPU: a read of it would matter
+    before = machine.located(repo)
     support.opened_of(*machine.check(repo))
-    assert machine.gpu_call_list() == [], f"a start with no GPU need read the GPU: {machine.gpu_call_list()}"
+    calls = machine.gpu_call_list()[before:]
+    assert calls == [], f"a start with no GPU need read the GPU: {calls}"
 
 
 def test_s13_the_reading_measures_gpu_memory_utilisation_and_which_processes_hold_it(machine, repo):
