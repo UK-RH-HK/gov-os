@@ -156,13 +156,17 @@ Absent `budget_usd`/`timeout_s`: the kind's from `kinds.yaml`.
   passes only when the JSON output parses and `permission_denials` holds a `Read` whose `tool_input.file_path` is the
   target. Anything else (output unreadable, the limit passed, an error, another denial): **16**, the session never
   started.
-- **The session:** `timeout --kill-after=<s> <timeout_s> claude -p --restricted --settings
-  <wall>/.claude/settings.json --add-dir <tree> --tools <the kind's, comma-joined> --no-session-persistence
+- **The session** (S10, `--setting-sources project` added by DEC-1112 (3), F11): `timeout --kill-after=<s> <timeout_s>
+  claude -p --restricted --setting-sources project --settings <wall>/.claude/settings.json --add-dir <tree> --tools <the kind's, comma-joined> --no-session-persistence
   --strict-mcp-config --disable-slash-commands --permission-prompts none --model <brief's> --max-budget-usd
   <brief's or kind's> --output-format json "<prompt>"`, cwd the wall, stdin `/dev/null`, stdout to
   `<wall>.session.json`, environment exactly `HOME PATH LANG USER` (the script's own values), in its own process
   group. The prompt: one line, naming `brief.md` and `out/result.json`, no absolute path; its sha256 written in the
   script's source as a 64-hex literal.
+- **`--setting-sources project`** (DEC-1112 (3), F11): the session and the canary each carry it once, the value
+  `project` exactly (no `user`, no `local`), in either form (`--setting-sources project` or `=project`), so the
+  user's `~/.claude/settings.json` (and any user hook) never loads into a wall; the wall's own settings still come by
+  `--settings`.
 - **The pid files:** `session.pid` (the process the script started) and `session.pgid` (its group, the session's)
   in the counts folder; waits and stops only by them (`os.killpg`), never by a name.
 - **Stopped (21):** `timeout`'s exit (124/137), or `is_error` with a `subtype` naming the budget
@@ -227,7 +231,12 @@ is **the canary** when its prompt names an existing file by absolute path. For t
 `--restricted` refuses a Read outside cwd and every `--add-dir` folder; a `--settings` file it cannot read, parse or
 validate (a known key of the wrong type) is ignored without a word; with the settings loaded the Read is refused only
 when a `PreToolUse` hook in them refuses it, run as `sh -c <command>` with the event on stdin (exit 2 or a `deny`
-decision). It writes `{"type": "result", "subtype", "is_error", "session_id", "num_turns", "total_cost_usd",
+decision). **The user's settings source** (S10, F11): with no `--setting-sources`, or a list naming `user`, every
+call loads `$HOME/.claude/settings.json` when that file is valid: its `SessionStart` hooks run at the call's start and
+its `PreToolUse` hooks run beside the `--settings` file's on the canary's Read (its allow lines never lift a refusal,
+as Claude Code's deny-over-allow); a list that leaves `user` out loads nothing from it. Each call records
+`user_settings` (`sources`, `present`, `loaded`) in `calls.jsonl`, the canary's outcome `user_settings_loaded`. No
+earlier case plants that file, so their behaviour is unchanged. It writes `{"type": "result", "subtype", "is_error", "session_id", "num_turns", "total_cost_usd",
 "duration_ms", "permission_denials": [{"tool_name", "tool_use_id", "tool_input"}], "result"}`. A case can make the
 canary print garbage, sleep, or report another denial; and make the session write `out/` files, sleep, spawn a child
 (`sleep 300`), end on its budget, or leave a trace file. With no session set, a session call fails (exit 97) and is
@@ -282,6 +291,7 @@ Every red fails on "governance/project/orchestration/tools/indep_launch.py does 
 | S9 | `test_w2_149_premises.py::test_s9_premise_the_stub_models_claude_code` | green (premise) | restricted alone refuses outside; valid hook refuses; invalid settings ignored |
 | S9 | `test_w2_149_live.py::test_s9_live_the_canary_refused_with_valid_settings_not_with_one_key_corrupted` | skipped (live) | the CTO, outside the sandbox |
 | S10 | `test_w2_149_canary_session.py::test_s10_the_session_s_line_cwd_environment_and_stdin_flag_by_flag` | red | no script |
+| S10 | `test_w2_149_canary_session.py::test_s10_the_session_and_the_canary_carry_setting_sources_project_and_no_user_settings_load` | red at `d1e53016e` (F11) | the canary's (and the session's) line names no `--setting-sources`; the stub loads the planted user file |
 | S10 | `test_w2_149_canary_session.py::test_s10_tools_budget_and_timeout_come_from_kinds_yaml_when_the_brief_names_none` | red | no script |
 | S10 | `test_w2_149_canary_session.py::test_s10_a_brief_asking_more_than_the_kind_s_budget_refuses_10` | red | no script |
 | S10 | `test_w2_149_canary_session.py::test_s10_a_kinds_yaml_naming_bash_refuses_11` | red | no script |
@@ -327,6 +337,24 @@ Every red fails on "governance/project/orchestration/tools/indep_launch.py does 
 | F9 | `test_w2_149_canary_session.py::test_s15_a_session_s_child_is_stopped_with_its_process_group` | red | no script |
 | F9 | `test_w2_149_canary_session.py::test_s21_the_script_holds_no_name_matched_wait_or_stop` | red | no script |
 | F10 | `test_w2_149_premises.py::test_f10_every_launch_runs_on_planted_roots` | green (guard) | the planted-roots tripwire refuses a real HOME or sets root |
+
+### The F11 follow-up (DEC-1112 (3)), on `w2/integrate` `d1e53016e` (W2-149 merged, S10 changed)
+
+One case added for S10's change, plus the stub's user-source rule (above); no earlier case adjusted (none asserts the
+exact flag list or its length); the live S11 case asserts nothing about the command line (a real `claude`, no argv
+record), so nothing was added there, and no case writes into the real `~/.claude/`.
+
+- `test_s10_the_session_and_the_canary_carry_setting_sources_project_and_no_user_settings_load`: a planted
+  `<HOME>/.claude/settings.json` (allow `Bash(*)`, `Read(*)`, `Edit(*)`, `Write(*)`; `defaultMode: acceptEdits`; a
+  `SessionStart` and a `PreToolUse` hook that append to a log). First the premise, the stub driven directly: no flag
+  and `user,project` load it (the hook runs), `project` does not. Then a good writer launch: each of the two calls
+  gives `--setting-sources` exactly once, `project`; neither loaded the user file; the user hooks never ran; exit 0,
+  `delivered`; one canary, one session; the canary refused by the wall's own settings' hook.
+- **Outcome** (the launch sandbox, the heavy slot): **81 cases: 1 failed (the new one), 77 passed, 3 skipped (live)**.
+  The new case fails on "the canary's line gives --setting-sources []; want exactly ['project']".
+- **A check of the case:** the merged script run as a program behind a throwaway `PATH` shim (scratch only, never
+  committed) whose `claude` adds only `--setting-sources project` before the stub: the new case and the other S9 and
+  S10 cases pass (the flag-by-flag case's prompt-constant check reads the wrapper's text, the shim's own artefact).
 
 Every refusal case (codes 10-17) also asserts nothing built (the kind's wall listing, the trees folder and
 `SEEDS.log` unchanged, no `claude` started; for 12 the planted entries' hashes) and then a second, good `--dry` launch
