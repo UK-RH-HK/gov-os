@@ -13,14 +13,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1097) | state |
 |---|---|---|---|
 | 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | **DONE 11-08**: applied by the owner's operator `15952bbf`; live guard check 453 run, PASS (hook `bd545af83198`); the writer's and checker's transcripts moved into the sets root's transcripts folder; no live worktree to merge |
-| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | NOT STARTED |
+| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | Tests DONE 11-09 (88, `c3e0e16b`); the hook role_reads.py added to its paths; engineer next |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
-| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Tests revised 11-09 (146, `61682b3e`); F2 a KPI line next; engineer next |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
-| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
+| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | Filed W2-145 `DAEO-2tfd`; tests DONE 11-09 (79 + 25 revised); engineer next |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | Q07/Q14 **DONE 11-09** (`55d1c029`, the sets root's visible copy synced); the gaps WAIT: the next label audit |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
@@ -31,7 +31,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 17 | GLOSSARY-1 | (6) (b): redesign beside the agent's words, toward decisions, for asking; retest on the 138 after the 80; build only if it helps | **DECIDED 11-08**; **DUE NOW** (after the 80): the redesign and its declaration, then the retest on the 138 |
 | 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | **DONE 11-08 21:46**: K9's bar PASSES, right end to end 78/79 (98.7 %), wrong claims 0 (`FRESH-80-RESULT.md`); every data condition run, all below the judged one; spent $109.05 |
 | 19 | W2-139, W2-140 | (1)(g) held until after the 80 | **DUE NOW** (the 80 ran 11-08): one batch, one green run, outside a GPU window (DEC-1093 (1)) |
-| 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |
+| 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it | **DONE 11-09**: W2-20's line (`19b9ce4b`), ollama.py in its paths |
 
 ## 0b. DEC-1098's items (2026-11-09)
 | # | item | fate (DEC-1098) | state |
