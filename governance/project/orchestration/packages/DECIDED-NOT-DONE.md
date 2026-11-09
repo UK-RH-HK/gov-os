@@ -91,7 +91,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
 | 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | **MERGED 11-09** (`511a4a17`, review READY, accept 166/166); F21 (the owner's undo exits 0 when it leaves another's files) to fix before ACT-OPERATOR-1 installs it: the owner's word on a tiny round |
-| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | IN PROGRESS 11-09 |
+| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **Rehearsed 11-09** (`ACT-GUARD-CALLLOG-1.md`, 0 failures); WAITS: the owner's §7 (five), then the operator |
 | 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept; F26 (Claude Code's own `.claude/**` runtime writes in a dry run) settled in it | WAITS: F21, then preparation |
 
 ## 1. Every item not done, partly done or waiting
