@@ -61,3 +61,16 @@ Rows:
   UNKNOWN_ID left in the tests. For each ENFORCES_SUPERSEDED it decides between history (a Kept list for the
   register, the CTO's), an old citation of a current rule (re-cited), or a real finding (reported).
 - **F2 waits:** it starts when W2-150 merges (both touch `decisions/`).
+
+**State 11-10 01:20:**
+- **F is READY:** `w2/D6-F-tests`, head `2761682a2`. It changes comments, docstrings and READMEs in 53 acceptance
+  files; the AST shows no code change. The test designer's findings go from ENFORCES_SUPERSEDED 45 and UNKNOWN_ID 60 to
+  8 and 0. Its review is READY.
+  - W2-07's Kept lines are on DEC-876 (`6c8a24fc`), so 4 of those 8 are already gone on `w2/integrate`.
+  - **The rows:**
+    - F1/F2: three stale "wholly on the CPU (DEC-798)" comments (W1-19, W1-21, W1-22 support) and W2-108's README
+      line;
+    - three findings in `tests/unit` with no owner;
+    - the W2-54 `shared_gpu` case still asserts the CPU, against DEC-1033 (2)(b); a designer revision on D-10's list.
+- **F2 waits** for W2-150's merge.
+- **F3: none.**
