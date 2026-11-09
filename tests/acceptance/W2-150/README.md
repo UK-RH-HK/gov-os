@@ -14,8 +14,9 @@ yet).
 Or `python3 -m gov.cli.main accept W2-150 --root <worktree>`. The runner drops every `PYTHON*` variable, so with a
 scratch HOME, link `<scratch>/.local` to the real user site so its child finds pytest.
 
-26 cases, about 2 seconds. No GPU, model, network, install or store. Nothing under `fixtures/evaluation/**`, the
-hidden half or held-out material is read: the walk parses `src/gov/**/*.py` only.
+32 cases (26 for S1 to S4, 6 for the follow-up's S6), about 3 seconds. No GPU, model, network, install or store.
+Nothing under `fixtures/evaluation/**`, the hidden half or held-out material is read: the walk and the scan parse
+`src/gov/**/*.py` only.
 
 ## The instrument
 
@@ -70,6 +71,24 @@ The failure lines, by the cases that would catch each:
 | F2 | `test_w2_150_old_names.py::test_s3_match_pattern_behaves_as_today` | green (guard) | a change in the guard's and the close selection's pattern grammar |
 | F2 | `test_w2_150_guard_imports.py::test_s4_import_of_guard_decide_loads_only_guard_util_and_stdlib` | green (guard) | the guard's hot path pulling a new module |
 
+## The follow-up: S6, one source each (DEC-1109 (2))
+
+Written from the new KPI line S6 and the ticket's note "The follow-up placed here", on `w2/W2-150` with `w2/integrate`
+merged (`66fdb8750`), read as static facts (`src/gov/**`); nothing of the engineer's worktree was read. The review's
+R1 and R2: `_Glob` (`guard/protected.py:87` and `util/parts.py:58`), `load_yaml_unique` (`guard/heldout.py:29` and
+`util/parts.py:42`) and the git runner (`close/repo.py:28` `git` and `store/loader.py:599` `_commit_git`) are each
+defined twice. On `66fdb8750` the 26 cases above are all green, S1 included.
+
+| KPI line | Test (node id) | On `66fdb8750` | Why |
+|---|---|---|---|
+| S6 | `test_w2_150_one_source.py::test_s6_glob_defined_once_not_in_guard_protected` | red | the scan finds `_Glob` defined twice: `src/gov/guard/protected.py:87`, `src/gov/util/parts.py:58` |
+| S6 | `test_w2_150_one_source.py::test_s6_load_yaml_unique_defined_once_not_in_guard_heldout` | red | defined twice: `src/gov/guard/heldout.py:29`, `src/gov/util/parts.py:42` |
+| S6 | `test_w2_150_one_source.py::test_s6_git_runner_defined_once_not_in_close_repo` | red | `gov.close.repo` defines its own `git` (line 28); two git runners: `close/repo.py:28` and `store/loader.py:599` (`_commit_git`); the one in `gov.close` is not in a new home |
+| S6 | `test_w2_150_one_source.py::test_s6_old_names_are_the_new_homes_objects` | red | fresh process: `gov.guard.protected._Glob is gov.util.parts._Glob` false (from `gov.guard.protected`), the same for `gov.guard.heldout.load_yaml_unique`; `gov.close.repo.git.__module__` is `gov.close.repo`, and no name of `gov.store.loader` is bound to it |
+| S6 (S1) | `test_w2_150_one_source.py::test_s6_guard_new_homes_reach_no_gate` | green (guard) | each helper's definitions outside the gates (today `gov.util.parts`; `gov.store.loader` for the runner) and their static closure reach no gate: the new homes must not import back from the gates |
+| S6 (S3) | `test_w2_150_one_source.py::test_s6_guard_old_names_importable_and_behave_as_today` | green (guard) | fresh process: `from gov.guard.protected import _Glob`, `from gov.guard.heldout import load_yaml_unique`, `from gov.close.repo import git`; five glob matches, a twice-written key refused (`ConstructorError`), `git`'s whole call kept (`root, *args, ok, code, given, pinned`) on a temporary repository: output, `given` as stdin, `ok`/`code`, `GIT_FAILURE` |
+| S6 (S1) | `test_w2_150_closure.py::test_s1_memory_closure_reaches_no_gate` | green (guard) | S1 still holds after the change (the same case as above, unchanged) |
+
 ## Notes and limits
 
 - **N-1. S5 and F3 are the reviewer's.** S5 (each moved helper's unit cases under `tests/unit/util/`, the old ones
@@ -105,10 +124,20 @@ The failure lines, by the cases that would catch each:
   in S1.
 - **N-5. S4's allowance.** `gov` (the empty top package), `gov.guard.*`, `gov.util.*`, and any module whose top-level
   name is in `sys.stdlib_module_names`. A third-party module (for example `yaml`) loaded at import time is outside.
+- **N-6. S6's scan.** Every class and function defined at module level in `src/gov` (`ast`; module-level
+  `if`/`try`/`with`/`for`/`while` blocks included, class and function bodies not). `_Glob` and `load_yaml_unique` are
+  found by name, and their one definition must sit under `gov.util` or `gov.store`. The git runner's new name is
+  not fixed by the KPI line, so it is found two ways: by name (`gov.close.repo` defines no `git`) and by body (a
+  module-level function holding the `"--no-replace-objects"` option and calling `git_env`; today exactly
+  `close/repo.py:28` and `store/loader.py:599`; the other `--no-replace-objects` uses in `guard/containment.py`,
+  `secrets/__init__.py` and `decisions/checker.py` are module-level constants, not such functions). At most one such
+  runner, under `gov.util` or `gov.store`. The identity case accepts any name in `gov.store.loader` bound to
+  `gov.close.repo.git` (`_commit_git`, `git`, …) and a home under `gov.util` or `gov.store`. A module-level alias
+  (`_Glob = …`) or an import is not a definition.
 
 ## Files
 
 - `w2_150_walk.py`: the static walk (S1, S2).
 - `w2_150_run.py`: the fresh-subprocess runner (S3, S4).
 - `test_w2_150_closure.py` (S1), `test_w2_150_edges.py` (S2), `test_w2_150_old_names.py` (S3),
-  `test_w2_150_guard_imports.py` (S4).
+  `test_w2_150_guard_imports.py` (S4), `test_w2_150_one_source.py` (S6).
