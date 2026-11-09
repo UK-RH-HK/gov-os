@@ -77,6 +77,8 @@ sources:
 - DEC-1038
 - DEC-1039
 - DEC-1088
+- DEC-1037
+- DEC-1097
 - DEC-899
 - DEC-961
 - DEC-979
