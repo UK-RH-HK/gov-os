@@ -84,6 +84,7 @@ def test_s13_the_reading_measures_gpu_memory_utilisation_and_which_processes_hol
         {"pid": other.pid, "process_name": "python3", "used_memory": 500},
     ])
 
+    before = machine.located(repo)  # the suite's location check (a plain reading of its own) is not this check
     gpu = machine.read(repo).get("gpu")
     assert isinstance(gpu, dict) and gpu.get("available") is True, f"the reading has no GPU measure: {gpu}"
     assert gpu.get("memory_used_mib") == 5000 and gpu.get("memory_total_mib") == 8192, gpu
@@ -92,7 +93,7 @@ def test_s13_the_reading_measures_gpu_memory_utilisation_and_which_processes_hol
     assert kinds == {embedder.pid: ("embedder", 3000), reranker.pid: ("reranker", 1500),
                      other.pid: ("other", 500)}, kinds
 
-    calls = machine.gpu_call_list()
+    calls = machine.gpu_call_list()[before:]  # this reading's calls only: "read once per check"
     for query in ("--query-gpu", "--query-compute-apps"):
         assert sum(any(a.startswith(query) for a in call) for call in calls) <= 1, (
             f"the GPU was read more than once in one check ({query}): {calls}")
