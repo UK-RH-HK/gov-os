@@ -19,9 +19,16 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.guard.decide import LONG_REFUSAL, decide  # noqa: E402
 from gov.guard.reads import (CHANGED_REFUSAL, HIDDEN_REFUSAL, RUNTIME_REFUSAL,  # noqa: E402
                              SECRET_REFUSAL, TESTS_REFUSAL, WRITE_FORM_REFUSAL, PolicyError,
-                             check_sets, policy_refusal, set_fault)
+                             check_sets, policy_refusal, set_fault, x_how)
 
 TICKET = "DAEO-t95"
+
+
+def _search(tool):
+    """DEC-1093 (2): a search that can reach the engineer's own acceptance folder is refused
+    with a reason that names tests/acceptance/W2-95/ and the tool's own exclusion (checked in
+    test_the_search_refusal_names_the_folder_and_how_to_exclude_it)."""
+    return x_how("W2-95", tool)
 SETS = ("evaluation_sets:\n  m:\n    visible: [docs/q.md]\n"
         "    hidden: [eval/hidden/**, eval/answers-*.yaml]\n    measures:\n      roles: [research]\n")
 
@@ -105,29 +112,30 @@ CASES = [
     ("engineer", *_bash("ls tests/acceptance"), ""),
     ("engineer", "Glob", {"pattern": "tests/acceptance/W2-95/*"}, TESTS_REFUSAL),
     ("engineer", "Glob", {"pattern": "tests/acceptance/*"}, ""),
-    ("engineer", "Grep", {"pattern": "z", "path": "tests"}, TESTS_REFUSAL),
-    ("engineer", "Grep", {"pattern": "z"}, TESTS_REFUSAL),
+    ("engineer", "Grep", {"pattern": "z", "path": "tests"}, _search("Grep")),  # DEC-1093 (2)
+    ("engineer", "Grep", {"pattern": "z"}, _search("Grep")),  # DEC-1093 (2)
     ("engineer", "Grep", {"pattern": "z", "glob": "*.md"}, ""),
     ("engineer", "Grep", {"pattern": "z", "path": "src"}, ""),
-    ("engineer", *_bash("grep -rn z tests/"), TESTS_REFUSAL),
+    ("engineer", *_bash("grep -rn z tests/"), _search("grep")),  # DEC-1093 (2)
     ("engineer", *_bash("grep -rn z --include='*.md' ."), ""),
-    ("engineer", *_bash("rg z"), TESTS_REFUSAL),
+    ("engineer", *_bash("rg z"), _search("rg")),  # DEC-1093 (2)
     ("engineer", *_bash("rg z -g '*.md'"), ""),
     # a listing from above shows names: refused only aimed inside
     ("engineer", *_bash("find . -name '*.py'"), ""),
-    ("engineer", *_bash("find . -name '*.py' -exec cat {} +"), TESTS_REFUSAL),
-    ("engineer", *_bash("find . -type f -exec grep -l z {} +"), TESTS_REFUSAL),
+    ("engineer", *_bash("find . -name '*.py' -exec cat {} +"), _search("find")),  # DEC-1093 (2)
+    ("engineer", *_bash("find . -type f -exec grep -l z {} +"), _search("find")),  # DEC-1093 (2)
     ("engineer", *_bash("find . -name x"), ""),
     ("engineer", *_bash("ls -R tests"), ""),
     ("engineer", *_bash("rg --files"), ""),
-    ("engineer", "Glob", {"pattern": "**/*.py"}, ""),
-    ("engineer", *_bash("grep -rn z . 2>&1 | head"), TESTS_REFUSAL),
+    # DEC-1093 (2): S1 refuses a Glob from the root whose pattern can reach the own folder
+    ("engineer", "Glob", {"pattern": "**/*.py"}, _search("Glob")),
+    ("engineer", *_bash("grep -rn z . 2>&1 | head"), _search("grep")),  # DEC-1093 (2)
     # an rg fed by a pipe or an input redirect searches what feeds it
     ("engineer", *_bash("git log --oneline | rg -g '!*.md' z 2>/dev/null"), ""),
     ("engineer", *_bash("rg z < docs/q.md"), ""),
-    ("engineer", *_bash("ls | rg z ."), TESTS_REFUSAL),
-    ("engineer", *_bash("ls | rg z &"), TESTS_REFUSAL),
-    ("engineer", *_bash("ls | grep -r z"), TESTS_REFUSAL),
+    ("engineer", *_bash("ls | rg z ."), _search("rg")),  # DEC-1093 (2)
+    ("engineer", *_bash("ls | rg z &"), _search("rg")),  # DEC-1093 (2)
+    ("engineer", *_bash("ls | grep -r z"), _search("grep")),  # DEC-1093 (2)
     ("engineer", *_bash("git show HEAD:src/app/main.py 2>&1"), ""),
     ("engineer", *_bash("git grep -n z"), TESTS_REFUSAL),
     ("engineer", *_bash("git grep -n z -- src"), ""),
@@ -172,6 +180,18 @@ CASES = [
 @pytest.mark.parametrize("role, tool, tool_input, why", CASES)
 def test_each_route_is_decided_as_policy_2_says(project, role, tool, tool_input, why):
     assert _why(project, role, tool, tool_input) == why
+
+
+@pytest.mark.parametrize("tool, exclusion", [
+    ("Grep", "!tests/acceptance/W2-95/**"), ("grep", "--exclude-dir=W2-95"),
+    ("rg", "-g '!tests/acceptance/W2-95/**'"), ("find", "-name W2-95 -prune"),
+    ("Glob", "Glob has no exclusion"),
+])
+def test_the_search_refusal_names_the_folder_and_how_to_exclude_it(tool, exclusion):
+    # DEC-1093 (2): the rows above expect _search(tool); this pins what that reason says.
+    reason = _search(tool)
+    assert "tests/acceptance/W2-95/" in reason and exclusion in reason, reason
+    assert "DEC-820 (c)" in reason and "DEC-1093 (2)" in reason and reason != TESTS_REFUSAL
 
 
 def test_a_subagent_is_refused_its_session_s_and_its_type_s_parts(project):
@@ -220,10 +240,11 @@ def test_the_repository_s_credential_names_are_secrets(project, rel):
 RUNTIME = [
     # (role, command, refused): the listing judged from where it starts.
     ("engineer", "git ls-files | xargs grep -n q", TESTS_REFUSAL),
-    ("engineer", "find . -name '*.py' | xargs grep -n q", TESTS_REFUSAL),
+    ("engineer", "find . -name '*.py' | xargs grep -n q", _search("find")),  # DEC-1093 (2)
     ("engineer", "grep -n q $(git ls-files '*.py')", TESTS_REFUSAL),
-    ("engineer", "cat `find tests -name test_feature.py`", TESTS_REFUSAL),
-    ("engineer", 'find . -print | while read f; do grep -H q "$f"; done', TESTS_REFUSAL),
+    ("engineer", "cat `find tests -name test_feature.py`", _search("find")),  # DEC-1093 (2)
+    ("engineer", 'find . -print | while read f; do grep -H q "$f"; done',
+     _search("find")),  # DEC-1093 (2)
     ("engineer", "for f in $(git ls-files); do cat $f; done", TESTS_REFUSAL),
     ("engineer", "ls tests/acceptance/W2-95 | xargs cat", TESTS_REFUSAL),
     ("engineer", "git ls-files src | xargs grep -n q", ""),
@@ -358,7 +379,7 @@ TILDE = [
     ("research", "Read", {"file_path": "~/proj/eval/hidden/a.yaml"}, ("deny", HIDDEN_REFUSAL)),
     ("independent-test-designer", "Read", {"file_path": "~/proj/src/app/main.py"},
      ("deny", CHANGED_REFUSAL)),
-    ("engineer", "Grep", {"pattern": "x", "path": "~/proj"}, ("deny", TESTS_REFUSAL)),
+    ("engineer", "Grep", {"pattern": "x", "path": "~/proj"}, ("deny", _search("Grep"))),  # DEC-1093 (2)
     ("engineer", "Glob", {"pattern": "*.py", "path": "~/proj/tests/acceptance/W2-95"},
      ("deny", TESTS_REFUSAL)),
     ("engineer", "Glob", {"pattern": "~/proj/tests/acceptance/W2-95/*.py"},
