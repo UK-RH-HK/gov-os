@@ -1,0 +1,198 @@
+"""KPI success 2: the gate opens or shuts with a named reason.
+
+The gate is open only when available memory is at least the configured minimum, the 1-minute load is below the
+configured limit, and the weighted count of live sessions (a heavy session counts double) is within the configured
+maximum. Each broken condition is a reason with its reading and its threshold. A reading that cannot be taken never
+opens the gate. W2-M262 (close's cases fail under concurrent machine load) is the load condition's row.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+import w2_20_support as support
+from w2_20_support import GIB
+
+
+def test_the_gate_is_open_when_every_condition_holds(machine, repo):
+    machine.open_config()
+    machine.set_readings(available_bytes=16 * GIB, load=0.5, nproc=4)
+    proc = machine.live_process()
+    machine.register(repo, proc.pid, ticket="DAEO-open")
+
+    reading = machine.read(repo)
+    gate = support.gate_of(reading)
+    assert gate["open"] is True, reading
+    assert gate["reasons"] == [], reading
+
+
+@pytest.mark.parametrize("condition", ["memory", "load", "sessions"],
+                         ids=["memory", "load [W2-M262]", "sessions"])
+def test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_threshold(machine, repo, condition):
+    if condition == "memory":
+        machine.open_config(min_available_memory_bytes=128 * GIB)
+        expected = (64 * GIB, 128 * GIB)
+    elif condition == "load":
+        machine.open_config(max_load_1m=8.0)
+        machine.set_readings(load=9.0)
+        expected = (9.0, 8.0)
+    else:
+        machine.open_config(max_weighted_sessions=1)
+        for n in range(3):
+            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-s{n}")
+        expected = (3, 1)
+
+    reading = machine.read(repo)
+    gate = support.gate_of(reading)
+    reasons = support.reasons_by_condition(reading)
+    assert gate["open"] is False, reading
+    assert set(reasons) == {condition}, f"expected the one reason {condition!r}: {gate['reasons']}"
+    assert (reasons[condition]["reading"], reasons[condition]["threshold"]) == expected, reasons[condition]
+
+
+def test_several_broken_conditions_are_all_named(machine, repo):
+    machine.open_config(min_available_memory_bytes=1 * GIB, max_load_1m=8.0, max_weighted_sessions=1)
+    machine.set_readings(available_bytes=512 * 1024 * 1024, load=12.0)
+    for n in range(3):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-m{n}")
+
+    reading = machine.read(repo)
+    reasons = support.reasons_by_condition(reading)
+    assert support.gate_of(reading)["open"] is False, reading
+    assert set(reasons) == {"memory", "load", "sessions"}, reasons
+    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (512 * 1024 * 1024, 1 * GIB)
+    assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (12.0, 8.0)
+    assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (3, 1)
+
+
+@pytest.mark.parametrize("condition", ["memory", "load"])
+def test_exactly_at_a_threshold(machine, repo, condition):
+    """Memory exactly at the minimum opens ("at least"); load exactly at the limit shuts ("below")."""
+    machine.open_config(min_available_memory_bytes=2 * GIB, max_load_1m=3.0)
+    if condition == "memory":
+        machine.set_readings(available_bytes=2 * GIB, load=0.5)
+    else:
+        machine.set_readings(available_bytes=16 * GIB, load=3.0)
+
+    reading = machine.read(repo)
+    reasons = support.reasons_by_condition(reading)
+    if condition == "memory":
+        assert support.gate_of(reading)["open"] is True, f"memory equal to the minimum must open: {reading}"
+        assert reasons == {}, reasons
+    else:
+        assert support.gate_of(reading)["open"] is False, f"load equal to the limit must shut: {reading}"
+        assert set(reasons) == {"load"}, reasons
+        assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (3.0, 3.0)
+
+
+@pytest.mark.parametrize("heavy", [False, True], ids=["two light", "two heavy"])
+def test_a_heavy_session_counts_double_and_tips_the_count_over_the_maximum(machine, repo, heavy):
+    machine.open_config(max_weighted_sessions=3)
+    for n in range(2):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-h{n}", heavy=heavy)
+
+    reading = machine.read(repo)
+    reasons = support.reasons_by_condition(reading)
+    if not heavy:
+        assert reading.get("weighted_sessions") == 2, reading
+        assert support.gate_of(reading)["open"] is True, reading
+    else:
+        assert reading.get("weighted_sessions") == 4, f"two heavy sessions weigh 2 + 2: {reading}"
+        assert support.gate_of(reading)["open"] is False, reading
+        assert set(reasons) == {"sessions"}, reasons
+        assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (4, 3)
+
+
+def test_the_proposed_defaults_are_in_force_when_nothing_is_configured(machine, repo):
+    """No ``gate.json``: at least 4 GiB available, load below the processor count, at most 8 weighted sessions."""
+    assert not machine.config_file.exists()
+    machine.set_readings(available_bytes=4 * GIB, load=3.99, nproc=4)
+    for n in range(3):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-d{n}")
+
+    reading = machine.read(repo)
+    assert reading.get("thresholds") == {
+        "min_available_memory_bytes": support.DEFAULT_MIN_AVAILABLE_MEMORY_BYTES,
+        "max_load_1m": 4,
+        "max_weighted_sessions": support.DEFAULT_MAX_WEIGHTED_SESSIONS,
+    }, reading
+    assert support.gate_of(reading)["open"] is True, reading
+
+    # Just under 4 GiB, load at the processor count (now 6), and 3 light + 3 heavy sessions (weight 9 > 8).
+    machine.set_readings(available_bytes=4 * GIB - 1024, load=6.0, nproc=6)
+    for n in range(3):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-dh{n}", heavy=True)
+    reading = machine.read(repo)
+    reasons = support.reasons_by_condition(reading)
+    assert support.gate_of(reading)["open"] is False, reading
+    assert reading["thresholds"]["max_load_1m"] == 6, f"the default load limit follows the processor count: {reading}"
+    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (4 * GIB - 1024, 4 * GIB)
+    assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (6.0, 6)
+    assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (9, 8)
+
+
+@pytest.mark.parametrize("missing", ["memory", "load"])
+def test_a_reading_that_cannot_be_taken_never_opens_the_gate(machine, repo, missing):
+    """Fail closed: even with thresholds any reading would pass, an unreadable reading shuts the gate, named."""
+    machine.open_config(min_available_memory_bytes=0, max_load_1m=1000000.0, max_weighted_sessions=100)
+    if missing == "memory":
+        env_extra = {"GOV_RESOURCES_MEMINFO": str(machine.base / "no-such-meminfo")}
+        field = "available_memory_bytes"
+    else:
+        machine.loadavg.write_text("not a load average\n")
+        env_extra = {}
+        field = "load_1m"
+
+    code, envelope, out, err = machine.gov(repo, env_extra=env_extra)
+    reading = support.reading_of(code, envelope, out, err)
+    reasons = support.reasons_by_condition(reading)
+    assert reading.get(field) is None, f"an unreadable {missing} reading is reported as {reading.get(field)!r}"
+    assert support.gate_of(reading)["open"] is False, f"an unreadable {missing} reading opened the gate: {reading}"
+    assert set(reasons) == {missing}, reasons
+    assert reasons[missing]["reading"] is None, reasons[missing]
+
+    refused = support.refusal_of(*machine.check(repo, env_extra=env_extra))
+    assert missing in support.reasons_by_condition(refused), refused
+
+
+@pytest.mark.parametrize("weighted, start", [(7, "light"), (7, "heavy"), (8, "light")],
+                         ids=["7, a light start opens", "7, a heavy start is refused",
+                              "8, the reading shuts and a light start is refused"])
+def test_DEC_747_at_most_8_holds_after_the_start(machine, repo, weighted, start):
+    """DEC-747 (delegated, staged), a reading of DEC-742: the start check opens on sessions only when the live
+    weighted count plus the new session's weight (1 light, 2 heavy) is at most the maximum; the reading shows the
+    gate shut on sessions once the count is at the maximum. DEC-742's default maximum, 8; the other conditions hold.
+    """
+    assert not machine.config_file.exists()
+    for n in range(3):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bh{n}", heavy=True)
+    for n in range(weighted - 6):
+        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bl{n}")
+
+    reading = machine.read(repo)
+    assert reading.get("weighted_sessions") == weighted, f"three heavy and {weighted - 6} light sessions: {reading}"
+    assert reading["thresholds"]["max_weighted_sessions"] == 8, reading
+    reasons = support.reasons_by_condition(reading)
+    if weighted < 8:
+        assert support.gate_of(reading)["open"] is True and reasons == {}, f"{weighted} of 8 must read open: {reading}"
+    else:
+        assert support.gate_of(reading)["open"] is False, f"8 of 8 leaves no room and must read shut: {reading}"
+        assert set(reasons) == {"sessions"}, reasons
+        assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (8, 8), reasons["sessions"]
+
+    heavy = start == "heavy"
+    after = weighted + (2 if heavy else 1)
+    code, envelope, out, err = machine.check(repo, heavy=heavy)
+    if after <= 8:
+        opened = support.reading_of(code, envelope, out, err)
+        gate = support.gate_of(opened)
+        assert gate["open"] is True and gate["reasons"] == [], f"{weighted} + 1 = {after} must open: {opened}"
+    else:
+        refused = support.refusal_of(code, envelope, out, err)
+        assert refused.get("weighted_sessions") == weighted, f"the refusal does not carry the reading: {refused}"
+        assert support.gate_of(refused)["open"] is False, refused
+        reasons = support.reasons_by_condition(refused)
+        assert set(reasons) == {"sessions"}, f"a {start} start at {weighted} of 8 is refused on sessions: {reasons}"
+        assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (after, 8), (
+            f"the reason carries the count after the start ({weighted} + {after - weighted}) and the maximum: "
+            f"{reasons['sessions']}")
