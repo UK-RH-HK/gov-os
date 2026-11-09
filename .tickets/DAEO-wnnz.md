@@ -1,6 +1,6 @@
 ---
 id: DAEO-wnnz
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -23,6 +23,7 @@ allowed_paths:
 - tests/unit/launch/**
 - tests/unit/codeintel/**
 - docs/changes/W2-56-CIT-E.md
+- tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]
 kpis:
   success:
   - 'A suite that builds the code graph uses one daemon folder per test session (DAEMON_BASE, src/gov/codeintel/__init__.py:35), cleaned when the session ends, so no daemon folder is left behind; the real code-graph daemon runs only in W1-16 and W1-20, and on a change under `src/gov/codeintel/**` or to the tool''s pin, and elsewhere the tool is off PATH (T-8); inside a launched, sandboxed worker the session''s daemon folder is under its own temporary folder, and the suite runs there [DEC-799 item 1, DEC-1052, P1-PLAN T-8, INVESTIGATION-1 T-8] [re-scoped, DEC-1083]'
@@ -82,6 +83,9 @@ sources:
 - W2-M275
 - W2-M393
 - W2-M405
+- DEC-1099
+- DEC-1097
+- DEC-1098
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-56/
@@ -99,3 +103,12 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
 - **Beside W2-60a:** both change `launcher.py`. Each puts its work in modules of its own (W2-56: `sandbox.py`, `environ.py`; W2-60a: `role.py`, `record.py`) and touches `launcher.py` at its call sites and argument checks only; the second to merge merges the first back first (DEC-786). The split of lens E F13 and DEC-826 Q5: W2-56 takes the process environment and the refused flags above; W2-60a takes what the session loads (no connectors, no user-level agents or skills, no model-side memory) and refuses the arguments it then sets itself (`--agent`, `--model` other than the role's, `--autocompact` and the rest).
 - **Paths:** `src/gov/codeintel/__init__.py` for the daemon's folder only; `tests/unit/codeintel/**` for the daemon's folder only. A file outside the paths that the placeholder KPI needs (an ignore file, the guard's containment check) is a package.
 - **The test designer's files** (MR-3: named here, not in the engineer's paths): `tests/acceptance/W2-56/**`.
+
+**The first half's points settled (the CTO, 2026-11-09):**
+- **Nothing of W2-56 is built before the sandbox experiment's results reach the owner (DEC-1098 (4)):** its first-half
+  tests are on `w2/W2-56-tests` (`6ffcc77c0`); no engineer until then.
+- **D-1:** `tests/conftest.py` added to the paths, for S1's two lines only [DEC-1099 (1)].
+- **D-2:** moving `DAEMON_BASE` breaks W1-27's W2-67 cases that hard-code `/tmp/gov-cbm-<uid>`; a test designer
+  revises them together with W2-56's merge [DEC-1099 (1)].
+- **S11** (a sandboxed session's reranker fallback logged and counted) is revised after W2-145 (`DAEO-2tfd`) removes
+  the private fallback [DEC-1097 (8)].
