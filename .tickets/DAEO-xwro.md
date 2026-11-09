@@ -23,6 +23,7 @@ allowed_paths:
 - .claude/hooks/role_reads.py  # the live hook's side [changed, DEC-1093 (2); DEC-1102]
 - docs/changes/W2-141-hook/**  # the hook as built, staged for the operator's ACT (a launched worker cannot edit .claude/, DEC-315) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/hooks/test_live_hook.py  # its one G14_PASSED case that S1 now refuses (the designer's round-2 P-2) [changed, DEC-1093 (2); DEC-1102]
+- tests/unit/guard/test_reads.py  # its rows that expect the old refusal of a search into the own acceptance folder (the engineer's round-1 report) [changed, DEC-1093 (2); DEC-1102]
 kpis:
   success:
   - 'S1 For an engineer on ticket T, a Grep or Glob tool call whose path and pattern can reach tests/acceptance/<T>/ (the repository root, tests/, tests/acceptance/, a pattern such as **/*.py) is refused unless the call excludes that folder; the refusal names the folder and says how to exclude it (for Grep a glob such as !tests/acceptance/<T>/**). Verify: planted calls, each refused or allowed as stated [DEC-1093 (2), DEC-1056, DEC-1059]'

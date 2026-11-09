@@ -47,7 +47,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0c. DEC-1099's items (2026-11-09)
 | # | item | fate (DEC-1099) | state |
 |---|---|---|---|
-| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | NOT STARTED |
+| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
 | 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
@@ -60,8 +60,8 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0d. DEC-1100's items (2026-11-09)
 | # | item | fate (DEC-1100) | state |
 |---|---|---|---|
-| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | Rehearsed 11-09 (34/34); F1 (a) being added; WAITS: the operator |
-| 38 | W2-66c | (1) tests first, pins (i) and (ii) | NOT STARTED |
+| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | **Rehearsed 11-09** with F1 (a): named 34/34, actually run 30/34 (23 gates, 7 report-only; 18 without); WAITS: the operator, and the owner on D-4's 3 capped and 7 lifted cases |
+| 38 | W2-66c | (1) tests first, pins (i) and (ii) | Filed `DAEO-btcs` (`28b4b5ba`); its test designer next |
 | 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | Rehearsed 11-09 (ACT-SELECT-HOOK-1; `tools/landing_select.sh` 45/45); WAITS: the operator. Row to W2-116: its hook line passes a worktree's GIT_DIR to gov rebuild |
 | 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first: broken only at a ticket inside the cycle; a ticket outside every cycle keeps its waits | NOT STARTED: W2-147 to file, its test designer first |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
@@ -69,7 +69,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0e. DEC-1101's items (2026-11-09; standing)
 | # | item | fate (DEC-1101) | state |
 |---|---|---|---|
-| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | IN PROGRESS 11-09 (design) |
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **Rehearsed 11-09** (`ACT-INDEP-WALLS-1.md`, 0 failures; the sandbox seal inside); WAITS: the owner's §7 (four), then the operator |
 | 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
 | 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
 | 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
