@@ -137,7 +137,7 @@ CASES = [
     ("engineer", *_bash("ls | rg z &"), _search("rg")),  # DEC-1093 (2)
     ("engineer", *_bash("ls | grep -r z"), _search("grep")),  # DEC-1093 (2)
     ("engineer", *_bash("git show HEAD:src/app/main.py 2>&1"), ""),
-    ("engineer", *_bash("git grep -n z"), TESTS_REFUSAL),
+    ("engineer", *_bash("git grep -n z"), _search("git")),  # DEC-1093 (2), the review's F1
     ("engineer", *_bash("git grep -n z -- src"), ""),
     ("engineer", *_bash("git log -p"), TESTS_REFUSAL),
     ("engineer", *_bash("git log -p -- src/"), ""),
@@ -185,7 +185,7 @@ def test_each_route_is_decided_as_policy_2_says(project, role, tool, tool_input,
 @pytest.mark.parametrize("tool, exclusion", [
     ("Grep", "!tests/acceptance/W2-95/**"), ("grep", "--exclude-dir=W2-95"),
     ("rg", "-g '!tests/acceptance/W2-95/**'"), ("find", "-name W2-95 -prune"),
-    ("Glob", "Glob has no exclusion"),
+    ("Glob", "Glob has no exclusion"), ("git", "-- . ':!tests/acceptance/W2-95'"),
 ])
 def test_the_search_refusal_names_the_folder_and_how_to_exclude_it(tool, exclusion):
     # DEC-1093 (2): the rows above expect _search(tool); this pins what that reason says.
@@ -239,13 +239,13 @@ def test_the_repository_s_credential_names_are_secrets(project, rel):
 
 RUNTIME = [
     # (role, command, refused): the listing judged from where it starts.
-    ("engineer", "git ls-files | xargs grep -n q", TESTS_REFUSAL),
+    ("engineer", "git ls-files | xargs grep -n q", _search("git")),  # DEC-1093 (2), the review's F2
     ("engineer", "find . -name '*.py' | xargs grep -n q", _search("find")),  # DEC-1093 (2)
-    ("engineer", "grep -n q $(git ls-files '*.py')", TESTS_REFUSAL),
+    ("engineer", "grep -n q $(git ls-files '*.py')", _search("git")),  # DEC-1093 (2), the review's F2
     ("engineer", "cat `find tests -name test_feature.py`", _search("find")),  # DEC-1093 (2)
     ("engineer", 'find . -print | while read f; do grep -H q "$f"; done',
      _search("find")),  # DEC-1093 (2)
-    ("engineer", "for f in $(git ls-files); do cat $f; done", TESTS_REFUSAL),
+    ("engineer", "for f in $(git ls-files); do cat $f; done", _search("git")),  # DEC-1093 (2), F2
     ("engineer", "ls tests/acceptance/W2-95 | xargs cat", TESTS_REFUSAL),
     ("engineer", "git ls-files src | xargs grep -n q", ""),
     ("engineer", "find src -name '*.py' | xargs grep -n q", ""),

@@ -36,15 +36,37 @@ exclusion, missed Glob with `**`, ag and ack, and never said how to keep the fol
   list.
 - **`tests/unit/hooks/test_live_hook.py`**: the one `G14_PASSED` case `grep -r foo tests/` becomes
   `grep -r --exclude-dir=W2-G14T foo tests/` (commented DEC-1093 (2)). It passes on the live hook and on the copy.
-- **`tests/unit/guard/test_w2_141_search.py`**: 121 cases run the same planted calls against both sides.
+- **`tests/unit/guard/test_reads.py`**: its rows that expected the old refusal of a search into the own folder expect
+  the new one (round 2: 15 rows; round 3: the four `git grep` and `git ls-files` rows, and the git "how").
+- **Round 3, the independent review's findings (round 1):**
+  - **F1** (`git grep` from a folder that holds the own folder). The block's `x_search` reads `git grep` and
+    `git ls-files` (`_x_git`): pathspecs from the folder git runs in, their exclusions (`:!`, `:^`, `:(exclude)`)
+    honoured; before `--`, a word that is not a path, a wildcard or magic is a revision. Decide: `git` judges the own
+    folder through it (`_own_git`), with the git "how" (`-- . ':!tests/acceptance/<T>'`), and the other parts as
+    before. Hook: `Bash.git` records the search from where `-C` leaves it.
+  - **F2** (`git ls-files` piped into a reader). `git ls-files` is a listing in the block. Hook: it waits in
+    `_listed` like find's. Decide: the run-time listing (`lists`) judges the own folder through it, with the git "how".
+  - **F3** (a for loop over a listing's `$(...)` whose body reads). Hook: `_for_reads` makes the list's `$(...)` a
+    reader's word. Decide already refused these through `runtime()`.
+  - **F4** (decide: a recursive search whose start is a shell glob). `above()` reads a glob start, for the own folder,
+    as a search from its literal folder of what lies at or below a path the glob matches (`x_spread`). The hook
+    already expanded the glob.
+  - **F5** (decide: `zgrep -r`, `grep -d recurse`). Judged for the own folder through `x_search`, which already read
+    them as recursive. The hook already refused them.
+  - **F6** (a brace-expanded `--exclude-dir={.git,<T>}`). The block reads an option word with braces as the options
+    Bash makes of it, on both sides.
+  - **F7**: a rollback step in `W2-141-hook/README.md`. **F8**: this file's regression section.
+- **`tests/unit/guard/test_w2_141_search.py`**: 204 cases run the same planted calls against both sides; round 3 adds
+  a case for every call F1 to F6 name (refused or allowed as stated). Each of them fails on round 2's code on the side
+  the review named and passes now.
 
 ## The KPI lines
 
 | KPI line | Evidence | Applied |
 |---|---|---|
 | S1: Grep or Glob that can reach `tests/acceptance/<T>/` is refused unless it keeps the folder out; the refusal names the folder and says how | `gov accept W2-141`, success-1: 49 passed. Unit: `REFUSED` Grep and Glob rows (from the root, `tests/`, `tests/acceptance/`, `**/*.py`, `*.py`, `tests/**`, a later glob taking the folder back), both sides, each reason with `tests/acceptance/W2-95/` and `!tests/acceptance/W2-95/**` or Glob's "no exclusion" | decide side: on merge; hook side: by the operator's ACT at the lift's re-pin (`role_reads.py` and `pretooluse.py` copies) |
-| S2: Bash recursive searches the same (grep -r/-R, rg, ag, ack, find with a reading action or piped into a reader) | `gov accept W2-141`, success-2: 61 passed. Unit: `REFUSED` Bash rows (grep -rn/-R, grep after a cd, `--exclude-dir` given as a path, rg, ag, ack, find -exec, find piped into `xargs grep`, into a while-read loop, in a `$(...)`, `rg --files \| xargs cat`), each reason with its tool's exclusion | as S1 |
-| S3: nothing else changes (searches that cannot reach the folder or keep it out, other tickets' tests, other roles, names-only listings, a grep for the tests' names by pattern) | `gov accept W2-141`, success-3: 81 passed. Unit: 32 `ALLOWED` rows on both sides. `test_live_hook.py`'s G-14 cases pass (the one revised case included). See "The regression run" | as S1 |
+| S2: Bash recursive searches the same (grep -r/-R, rg, ag, ack, find with a reading action or piped into a reader) | `gov accept W2-141`, success-2: 61 passed. Unit: `REFUSED` Bash rows (grep -rn/-R, grep after a cd, `--exclude-dir` given as a path, rg, ag, ack, find -exec, find piped into `xargs grep`, into a while-read loop, in a `$(...)`, `rg --files \| xargs cat`; round 3: `git grep`, `git ls-files` into a reader, a for loop over a listing that reads, glob starts, `zgrep -r`, `grep -d recurse`), each reason with its tool's exclusion | as S1 |
+| S3: nothing else changes (searches that cannot reach the folder or keep it out, other tickets' tests, other roles, names-only listings, a grep for the tests' names by pattern) | `gov accept W2-141`, success-3: 81 passed. Unit: 52 `ALLOWED` rows on both sides (round 3 adds git pathspec exclusions, a brace-expanded `--exclude-dir`, glob starts that cannot reach the folder or keep it out). `test_live_hook.py`'s G-14 cases pass (the one revised case included). See "The regression run" | as S1 |
 | Failure 1: an engineer's search reaching its folder allowed without an exclusion | `gov accept`, failure-1: 82 passed | as S1 |
 | Failure 2: a refusal that does not say how | `gov accept`, failure-2: 71 passed | as S1 |
 | Failure 3: any other role or call newly refused | `gov accept`, failure-3: 79 passed. Unit: other roles' rows; `test_a_find_test_naming_a_secret_still_refuses` | as S1 |
@@ -52,33 +74,21 @@ exclusion, missed Glob with `**`, ag and ack, and never said how to keep the fol
 `gov accept W2-141`: outcome pass, 182 passed, 0 failed, 0 skipped. It ran with the real `HOME`: the runner strips
 `PYTHON*` from its child, so with an empty `HOME` its pytest is not found. No case there loads a model.
 
-## The regression run
+## The regression run (round 3, 2026-11-09)
 
-All runs used an empty `HOME` and `-m "not local_only"`. These folders hold no real-model case: no test is named for
-one, and none starts a model, reranker or embedder.
+Folders: `tests/unit/guard`, `tests/unit/hooks`, `tests/acceptance/W2-84`. Each run went through the heavy slot with
+`PYTHONPATH` set to this tree's `src`, the real `HOME` (pytest is installed in the user's site, so an empty `HOME`
+cannot find it), `-m "not local_only"` and `-k "not real and not green_here and not time_limit"`.
 
-- **The standard run** (`tests/unit/guard`, `tests/unit/hooks`, `tests/acceptance/W2-84`): 345 passed, 2 failed,
-  997 deselected. The deselected cases are the project's opt-in rows (DEC-1061, `tests/conftest.py`: a parametrized
-  function keeps only its first row unless the run opts in), with or without the brief's `-k`.
-- **With every opt-in row** (`GOV_TESTS_OPTIN=lifted,breadth`; `tests/unit/guard` and `test_live_hook.py`): 1,252
-  passed, 17 failed.
-- **Two reds caused by the empty `HOME`, not by this change:** `test_live_hook.py::test_a_catastrophic_rm_is_refused`
-  `[outside the project]` and `::test_the_reason_is_plain` (`rm -f ~/.bashrc`, where `~` is then a scratch folder
-  under `/tmp`). Both pass when re-run alone with the real `HOME` (8 passed).
-- **15 reds in `tests/unit/guard/test_reads.py`, all opt-in rows, all contradicting S1 or S2. The file is outside
-  this ticket's paths.**
-  - 14 rows expect the old fixed `TESTS_REFUSAL` for a search from above. The refusal now names the folder and says
-    how to keep it out:
-    - `CASES` rows 30 and 31 (Grep from `tests` and from the root);
-    - row 34 (`grep -rn z tests/`);
-    - row 36 (`rg z`);
-    - rows 39 and 40 (find with `-exec`);
-    - row 45 (`grep -rn z . 2>&1 | head`);
-    - rows 48 to 50 (`ls | rg z .`, `ls | rg z &`, `ls | grep -r z`);
-    - `RUNTIME` rows `find . -name '*.py' | xargs grep -n q`, ``cat `find tests -name test_feature.py` `` and
-      `find . -print | while read f; ...`;
-    - `TILDE`'s Grep of `~/proj`.
-  - 1 row, `CASES` row 44, expects the Glob `**/*.py` from the root to be allowed. S1 refuses it.
-
-  They need the same revision as `test_live_hook.py`'s P-2: compare those rows with the new reason (or check that it
-  holds `tests/acceptance/W2-95/` and the tool's exclusion), and make row 44 a refusal.
+- **The standard run:** 436 passed, 0 failed, 997 deselected. The deselected cases are the project's opt-in rows
+  (DEC-1061, `tests/conftest.py`: a parametrized function keeps only its first row unless the run opts in).
+- **With every opt-in row** (`GOV_TESTS_OPTIN=lifted,breadth`): 1,433 passed, 0 failed.
+- **What the exclusion left out:** nothing. A collect-only run with the opposite filter (`-k "real or green_here or
+  time_limit or local_only"`, and separately `-m local_only`) collects 0 of the 1,433 cases. No case in these
+  folders starts a model, reranker or embedder.
+- **`tests/unit/guard/test_reads.py`** has been in this ticket's paths since round 2 (DEC-1102). Its rows that
+  expected the old refusal of a search into the own folder now expect the new one, and they pass: 15 rows in round 2,
+  and in round 3 the four `git grep` and `git ls-files` rows (`CASES` `git grep -n z`; `RUNTIME`
+  `git ls-files | xargs grep -n q`, `grep -n q $(git ls-files '*.py')`, `for f in $(git ls-files); do cat $f; done`).
+- **The two reds that the empty `HOME` caused in round 1** (`test_live_hook.py::test_a_catastrophic_rm_is_refused`
+  `[outside the project]` and `::test_the_reason_is_plain`) do not occur with the real `HOME`. They pass in both runs.

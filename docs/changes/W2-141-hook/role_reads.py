@@ -615,9 +615,11 @@ class Bash:
         env, stack, ecwd = {}, [], cwd
         outer, self._listed, piped = self._listed, [], False
         for k, (words, reds, sep) in enumerate(cmds):
+            # a reader's $(...) word, or a for loop's list whose body reads: its names are opened
+            reads_them = _reads_names(words) or _for_reads(cmds, k)
             for marker in re.findall(r"__gov_sub_(\d+)__", " ".join(words + [r[1] for r in reds])):
                 if int(marker) < len(subs):
-                    self.run(subs[int(marker)], ecwd, depth + 1, into=_reads_names(words))
+                    self.run(subs[int(marker)], ecwd, depth + 1, into=reads_them)
             if words and all(bw._ASSIGN.match(w) for w in words):
                 for w in words:
                     name, value = bw._ASSIGN.match(w).groups()
@@ -651,7 +653,7 @@ class Bash:
         """W2-141: a recursive search's starts, each with what it keeps out (x_search); a listing's wait in
         _listed for a reader, unless it is a reader's $(...) word (``into``). An rg, ag or ack fed by a pipe or a
         redirect with no folder named searches what feeds it."""
-        spec = x_search(name, args)
+        spec = x_search(name, args, ecwd)
         if spec is None:
             return
         operands, keep, how, names = spec
@@ -680,7 +682,8 @@ class Bash:
         if not words:
             return ecwd
         name, args = os.path.basename(words[0]), words[1:]
-        self.search(name, args, ecwd, env, fed, into)
+        if name != "git":  # git's searches start where its -C leaves it (Bash.git)
+            self.search(name, args, ecwd, env, fed, into)
         if name in ("cd", "pushd"):
             if not args:
                 return os.path.expanduser("~")
@@ -702,7 +705,7 @@ class Bash:
                         self.run(bodies[int(m.group(1))]["text"], ecwd, depth + 1)
             return ecwd
         if name == "git":
-            self.git(args, ecwd, env)
+            self.git(args, ecwd, env, into)
             return ecwd
         if name == "find":
             execs = [i for i, a in enumerate(args) if a in ("-exec", "-execdir", "-ok", "-okdir")]
@@ -757,10 +760,11 @@ class Bash:
                 operands = operands[:-1]
         return [o for o in operands if o != "-"] + files
 
-    def git(self, args, ecwd, env):
+    def git(self, args, ecwd, env, into=False):
         """git show/diff/blame/cat-file/grep/log -p: ``rev:path`` words, the words after ``--``, and words that are
         existing paths; each judged in the cwd's tree and, when a revision names the branch w2/<X>, in
-        ~/gov-os-worktrees/<X> too. Names only (--stat, --name-only, log without a patch) read nothing."""
+        ~/gov-os-worktrees/<X> too. Names only (--stat, --name-only, log without a patch) read nothing. W2-141: git
+        grep is a search, and git ls-files a listing, from where git runs, with its pathspecs' exclusions."""
         i = 0
         while i < len(args) and args[i].startswith("-"):
             a = args[i]
@@ -771,6 +775,9 @@ class Bash:
                 i += 2
                 continue
             i += 2 if a in ("-c", "--git-dir", "--work-tree", "--namespace") else 1
+        if i < len(args) and args[i] in ("grep", "ls-files"):
+            sub_args = [args[i]] + [w if self.word(w, env) is None else self.word(w, env) for w in args[i + 1:]]
+            self.search("git", sub_args, ecwd, env, False, into)
         if i >= len(args) or args[i] not in GIT_SHOWS:
             return
         sub, rest = args[i], args[i + 1:]
@@ -930,10 +937,21 @@ def _xargs_reads(words):
 
 def _loop_reads(cmds, k):
     """Command ``k`` starts a while (or until) read loop whose body, up to its done, runs a reader."""
-    import bash_writes as bw
     words = cmds[k][0]
     if words[:1] not in (["while"], ["until"]) or "read" not in words:
         return False
+    return _body_reads(cmds, k)
+
+
+def _for_reads(cmds, k):
+    """W2-141 (F3): command ``k`` starts a for (or select) loop whose body, up to its done, runs a reader: the names
+    its list's $(...) gives are files it opens."""
+    return cmds[k][0][:1] in (["for"], ["select"]) and _body_reads(cmds, k)
+
+
+def _body_reads(cmds, k):
+    """The loop that command ``k`` starts runs a reader before its done."""
+    import bash_writes as bw
     for body, _reds, _sep in cmds[k + 1:]:
         if body[:1] == ["done"]:
             return False
@@ -1012,7 +1030,17 @@ X_HOW = {
              "start from a folder that does not hold it"),
     "Glob": ("Glob has no exclusion: give a path or a pattern that cannot reach it (src/, "
              "or a pattern under another folder)"),
+    "git": ("exclude it with the pathspec ':!tests/acceptance/{w}' after -- (git grep "
+            "PATTERN -- . ':!tests/acceptance/{w}', from the repository's root), or give "
+            "pathspecs that do not hold it"),
 }
+_X_GIT_VALUED = {
+    "grep": frozenset("-e -f -m -A -B -C --max-count --context --after-context "
+                      "--before-context --max-depth --threads".split()),
+    "ls-files": frozenset("-x -X --exclude --exclude-from --exclude-per-directory "
+                          "--format --with-tree".split()),
+}
+_X_BRACE = re.compile(r"\{([^{},]*,[^{}]*)\}")
 _X_GREP_VALUED = frozenset(
     "-e -f -m -A -B -C -d -D --regexp --file --include --exclude --exclude-dir "
     "--exclude-from --max-count --context --after-context --before-context "
@@ -1336,13 +1364,128 @@ def x_grep_tool_globs(glob: str) -> list[tuple[str, bool]]:
     return out
 
 
-def x_search(name: str, args: list[str]):
+def _x_braces(word: str) -> list[str]:
+    """The words Bash makes of *word*'s braces ({a,b}), at most 256."""
+    out, todo = [], [word]
+    while todo and len(out) + len(todo) <= 256:
+        w = todo.pop(0)
+        m = _X_BRACE.search(w)
+        if m:
+            todo += [w[:m.start()] + alt + w[m.end():] for alt in m.group(1).split(",")]
+        else:
+            out.append(w)
+    return out + todo
+
+
+def _x_top(cwd: str | None) -> str | None:
+    """The tree that holds *cwd*: the nearest folder at or above it with a .git."""
+    at = cwd
+    while at and at != "/":
+        if os.path.lexists(os.path.join(at, ".git")):
+            return at
+        at = os.path.dirname(at)
+    return None
+
+
+def _x_pathspec(spec: str):
+    """A git pathspec as (exclude, top, icase, glob, pattern): its long magic
+    :(exclude,top,icase,glob) or its short magic :! :^ :/."""
+    ex = top = fold = glob = False
+    if spec.startswith(":(") and ")" in spec:
+        magic = spec[2:spec.index(")")].split(",")
+        ex, top = "exclude" in magic, "top" in magic
+        fold, glob = "icase" in magic, "glob" in magic
+        spec = spec[spec.index(")") + 1:]
+    elif spec.startswith(":"):
+        i = 1
+        while i < len(spec) and spec[i] in "/!^":
+            ex, top = ex or spec[i] in "!^", top or spec[i] == "/"
+            i += 1
+        spec = spec[i + 1:] if spec[i:i + 1] == ":" else spec[i:]
+    return ex, top, fold, glob, spec
+
+
+def _x_spec_hit(rel: str, pattern: str, fold: bool, glob: bool, wide: bool) -> bool:
+    """Whether a path (from where the pathspec is read) matches it: a plain
+    pathspec names a path and what is below it; with a wildcard, ``*``
+    crosses folders (``:(glob)``: ``**`` only).  *wide*: a leading folder
+    that matches takes the path in too (a positive pathspec, read wide)."""
+    import fnmatch as fm
+    if fold:
+        rel, pattern = rel.lower(), pattern.lower()
+    if not any(c in pattern for c in "*?["):
+        p = os.path.normpath(pattern) if pattern else "."
+        return p == "." or rel == p or rel.startswith(p + "/")
+    names = rel.split("/")
+    tries = ["/".join(names[:k]) for k in range(1, len(names) + 1)] if wide else [rel]
+    if glob:
+        rx = x_glob(pattern.rstrip("/"))
+        return any(rx.match(t) for t in tries)
+    return any(fm.fnmatchcase(t, pattern.rstrip("/")) for t in tries)
+
+
+def _x_git(sub: str, rest: list[str], cwd: str | None):
+    """git grep's or git ls-files's (starts, keep): its pathspecs (after --;
+    before it, ls-files's operands, and git grep's words that are magic,
+    wildcards or paths from *cwd*, the folder git runs in; another word is a
+    revision, which leaves the start at *cwd*); a file is taken in when a
+    positive pathspec (or none) takes it and no exclusion does."""
+    dd = rest.index("--") if "--" in rest else len(rest)
+    operands, options, _letters = _x_parse(rest[:dd], _X_GIT_VALUED[sub])
+    if sub == "grep" and _X_PATTERN.isdisjoint(o for o, _ in options):
+        operands = operands[1:]
+    base = os.path.realpath(cwd) if cwd else None
+    specs = [o for o in operands if sub == "ls-files" or o.startswith(":") or any(
+        c in o for c in "*?[") or (base and os.path.lexists(os.path.join(base, o)))]
+    specs += rest[dd + 1:]
+    pos, neg, starts = [], [], []
+    for s in specs:
+        ex, top, fold, glob, pat = _x_pathspec(s)
+        (neg if ex else pos).append((top, fold, glob, pat))
+        if ex:
+            continue
+        lead = []
+        for seg in pat.split("/"):
+            if any(c in seg for c in "*?["):
+                break
+            lead.append(seg)
+        lead = "." if fold else "/".join(lead) or "."
+        if top:
+            t = _x_top(base)
+            lead = os.path.join(t, lead) if t else "/"
+        starts.append(lead)
+
+    def keep(f: str, start: str, word: str, here: str | None) -> bool:
+        at = base or here
+
+        def hit(item, wide: bool) -> bool:
+            top, fold, glob, pat = item
+            frm = _x_top(at) if top else at
+            if not frm:
+                return wide  # not placed: taken in, never kept out
+            return _x_spec_hit(os.path.relpath(f, frm), pat, fold, glob, wide)
+        if pos and not any(hit(i, True) for i in pos):
+            return False
+        return not any(hit(i, False) for i in neg)
+    return starts or ["."], keep
+
+
+def x_search(name: str, args: list[str], cwd: str | None = None):
     """A recursive search's (start operands, keep, how, names only), or None:
     keep(f, start, word, cwd) says whether it takes in the file ``f`` (real
     paths; ``word``: the start as written).  Names only: a listing (rg
-    --files, ag -g, ack -f/-g, a find with no action that reads), a search
-    only when its names go to a reader."""
+    --files, ag -g, ack -f/-g, a find with no action that reads, git
+    ls-files), a search only when its names go to a reader.  git: *args*
+    from its subcommand on (grep or ls-files), *cwd* the folder it runs in."""
     name = os.path.basename(name)
+    # An option word with braces is the options Bash makes of it
+    # (--exclude-dir={.git,W2-1} is --exclude-dir=.git --exclude-dir=W2-1).
+    args = [b for a in args for b in (_x_braces(a) if a.startswith("-") else [a])]
+    if name == "git":
+        if not args or args[0] not in _X_GIT_VALUED:
+            return None
+        starts, keep = _x_git(args[0], args[1:], cwd)
+        return starts, keep, "git", args[0] == "ls-files"
     if name in ("grep", "egrep", "fgrep", "zgrep"):
         operands, options, letters = _x_parse(args, _X_GREP_VALUED)
         if not (letters & {"r", "R"} or any(

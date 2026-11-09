@@ -25,7 +25,7 @@ changes; `tests/unit/guard/test_w2_141_search.py` checks that this is the only d
 
 ## `role_reads.py`: a search from above no longer passes for the engineer's own folder
 
-Against the live file: 574 lines added, 11 changed (`git diff --no-index .claude/hooks/role_reads.py
+Against the live file: 720 lines added, 14 removed (`git diff --no-index --stat .claude/hooks/role_reads.py
 docs/changes/W2-141-hook/role_reads.py`).
 
 - **The docstring** says what changes. The live text says "a search from a folder above" is let through. The new
@@ -33,10 +33,12 @@ docs/changes/W2-141-hook/role_reads.py`).
 - **`from __future__ import annotations`** is added after the docstring. The matching block has type hints, and this
   keeps them working on every interpreter the pin may use.
 - **`Bash` records searches.** `Bash.search` keeps each recursive search's start, as `x_search` reads it: grep -r/-R,
-  rg, ag, ack, and a find whose action reads. A listing (find, `rg --files`, `ag -g`, `ack -f`) waits in `_listed`
-  and becomes a search only when a reader takes its names: `| xargs <reader>`, a while-read loop that reads, or a
-  reader's `$(...)` word. `run` tracks the pipeline for this (`fed`, `into`, `_xargs_reads`, `_loop_reads`). An rg,
-  ag or ack fed by a pipe, with no folder named, searches its input and is not recorded.
+  rg, ag, ack, a find whose action reads, and `git grep`. A listing (find, `rg --files`, `ag -g`, `ack -f`,
+  `git ls-files`) waits in `_listed` and becomes a search only when a reader takes its names: `| xargs <reader>`, a
+  while-read loop that reads, a reader's `$(...)` word, or the `$(...)` list of a for loop whose body reads. `run`
+  tracks the pipeline for this (`fed`, `into`, `_xargs_reads`, `_loop_reads`, `_for_reads`). An rg, ag or ack fed by
+  a pipe, with no folder named, searches its input and is not recorded. `git grep` and `git ls-files` are recorded
+  by `Bash.git`, from the folder its `-C` leaves it in, with their pathspecs.
 - **`scan` and `tool_searches`.** `scan` returns the paths a call reads (as `reads_of` did; `reads_of` now calls it)
   and its searches. A Grep call searches from its path, with its globs read as rg's. A Glob call lists from its path,
   matched against its pattern.
@@ -46,8 +48,8 @@ docs/changes/W2-141-hook/role_reads.py`).
   folder's files (`_reaches`), the call is refused. The reason names the folder, cites
   `role_paths.engineer.reads_denied`, DEC-1052 G-14 and DEC-1093 (2), and says how to keep the folder out:
   `!tests/acceptance/<T>/**` for Grep, `--exclude-dir=<T>` for grep, `-g '!tests/acceptance/<T>/**'` for rg,
-  `--ignore-dir=<T>` for ag and ack, `-name <T> -prune -o ...` for find; Glob gets a path or pattern that cannot reach
-  the folder. Some cases are let through, as today:
+  `--ignore-dir=<T>` for ag and ack, `-name <T> -prune -o ...` for find, `-- . ':!tests/acceptance/<T>'` for git grep
+  and git ls-files; Glob gets a path or pattern that cannot reach the folder. Some cases are let through, as today:
   - an empty folder, or no file in the folder that the call takes in;
   - a start the guard cannot resolve.
 
@@ -62,6 +64,10 @@ docs/changes/W2-141-hook/role_reads.py`).
   - ack's `--ignore-dir`.
   - find's `-prune` and its negated `-path` and `-name` tests, and `-maxdepth`.
   - Glob's pattern.
+  - git grep's and git ls-files's pathspecs, read from the folder git runs in: a plain one names a path and what is
+    below it, `*` crosses folders, and an exclusion (`:!`, `:^`, `:(exclude)`) keeps its files out. Before `--`, a
+    git grep word that is not a path, a wildcard or magic is a revision, which leaves the search at that folder.
+  - An option word with braces (`--exclude-dir={.git,<T>}`) is read as the options Bash makes of it.
 
   The block is byte for byte the one in `src/gov/guard/reads.py`, and a unit test compares the two. It is copied in
   so that the hook does not depend on the pinned product holding it: an import the pin lacked would refuse every read.
@@ -72,6 +78,21 @@ Unchanged:
 - Names-only listings that no reader takes.
 - A grep for the tests' names by pattern, from a folder that does not hold them.
 - Every path the live hook already refuses: direct reads keep their reason.
+
+## Rollback
+
+Both live files are tracked; the hashes above are their contents at commit
+`15952bbfa576dcfabb7d36d95912a848077e5c3c`, the last that changed them. In the tree the ACT applies to:
+
+1. **Before copying**, keep the live files outside the hook folder (a `.py` left in `.claude/hooks/` could be loaded):
+   `cp .claude/hooks/role_reads.py .claude/hooks/pretooluse.py <a folder outside .claude/>/`, and check that
+   `sha256sum` of the two copies gives the hashes in the table.
+2. **To roll back**, copy the kept files back over `.claude/hooks/role_reads.py` and `.claude/hooks/pretooluse.py`.
+   If the copies are lost, restore the tracked versions:
+   `git checkout 15952bbfa576dcfabb7d36d95912a848077e5c3c -- .claude/hooks/role_reads.py .claude/hooks/pretooluse.py`
+   (this holds only while the live files matched the hashes above when the ACT was applied).
+3. **Check** that `sha256sum .claude/hooks/role_reads.py .claude/hooks/pretooluse.py` gives the two hashes in the table
+   again. No other file changes in the ACT, so nothing else needs restoring.
 
 ## Before the ACT
 

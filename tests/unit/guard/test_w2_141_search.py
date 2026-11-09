@@ -31,7 +31,7 @@ ROLE_PATHS = ('role_paths:\n  engineer:\n    reads_denied: ["{ticket_tests}"]\n'
 HOW = {  # a word of each refusal's "how"
     "Grep": f"!tests/acceptance/{W}/**", "grep": f"--exclude-dir={W}", "rg": f"-g '!tests/acceptance/{W}/**'",
     "ag": f"--ignore-dir={W}", "ack": f"--ignore-dir={W}", "find": f"-name {W} -prune -o",
-    "Glob": "Glob has no exclusion",
+    "Glob": "Glob has no exclusion", "git": f"-- . ':!tests/acceptance/{W}'",
 }
 
 
@@ -115,6 +115,30 @@ REFUSED = [  # (name, tool, input, how): S1 and S2, the engineer
      "find"),
     ("find in a reader's $(...) word", *_b("cat $(find . -name '*.py')"), "find"),
     ("rg --files piped into xargs cat", *_b("rg --files | xargs cat"), "rg"),
+    # the review's round 1 (F1 to F6)
+    ("F1 git grep from the root", *_b("git grep -n z"), "git"),
+    ("F1 git grep -- .", *_b("git grep -n z -- ."), "git"),
+    ("F1 git grep with a revision", *_b("git grep -n z HEAD"), "git"),
+    ("F1 git -C tests grep", *_b("git -C tests grep z"), "git"),
+    ("F1 git grep whose pathspec glob can reach it", *_b("git grep z -- '*.py'"), "git"),
+    ("F1 git grep whose exclusion is another folder", *_b("git grep z -- . ':!tests/acceptance/W2-96'"), "git"),
+    ("F2 git ls-files piped into xargs grep", *_b("git ls-files | xargs grep z"), "git"),
+    ("F2 git ls-files tests piped into xargs cat", *_b("git ls-files tests | xargs cat"), "git"),
+    ("F2 git ls-files in a reader's $(...) word", *_b("grep -n q $(git ls-files '*.py')"), "git"),
+    ("F3 a for loop over find's names that reads", *_b("for f in $(find . -name '*.py'); do head -3 $f; done"),
+     "find"),
+    ("F3 a for loop over rg --files that reads", *_b('for f in $(rg --files); do head -3 "$f"; done'), "rg"),
+    ("F3 a for loop over git ls-files that reads", *_b("for f in $(git ls-files); do cat $f; done"), "git"),
+    ("F4 grep -rn from */", *_b("grep -rn z */"), "grep"),
+    ("F4 grep -rn from tests/*", *_b("grep -rn z tests/*"), "grep"),
+    ("F4 rg from tests/*", *_b("rg z tests/*"), "rg"),
+    ("F4 grep -rn from tests/acc*", *_b("grep -rn z tests/acc*"), "grep"),
+    ("F4 find from tests/* with a reading action", *_b("find tests/* -name '*.py' -exec cat {} +"), "find"),
+    ("F5 zgrep -r", *_b("zgrep -r z ."), "grep"),
+    ("F5 grep -d recurse", *_b("grep -d recurse z ."), "grep"),
+    ("F5 grep --directories=recurse", *_b("grep --directories=recurse z ."), "grep"),
+    ("F6 a brace-expanded exclusion of other folders", *_b("grep -rn --exclude-dir={.git,node_modules} z ."),
+     "grep"),
 ]
 
 ALLOWED = [  # (name, role, tool, input): S3
@@ -147,6 +171,28 @@ ALLOWED = [  # (name, role, tool, input): S3
     ("a search in another ticket's tests", E, *_b("grep -rn z tests/acceptance/W2-96")),
     ("rg fed by a pipe", E, *_b("git log --oneline | rg z")),
     ("a start the guard cannot resolve", E, *_b("grep -rn z $NOWHERE_W2_141")),
+    # the review's round 1 (F1 to F6)
+    ("F1 git grep -- . with the exclusion pathspec", E, *_b(f"git grep z -- . ':!tests/acceptance/{W}'")),
+    ("F1 git grep with the exclusion alone", E, *_b(f"git grep z -- ':^tests/acceptance/{W}'")),
+    ("F1 git grep with the long exclusion", E, *_b(f"git grep z -- ':(exclude)tests/acceptance/{W}/*'")),
+    ("F1 git grep with an exclusion glob", E, *_b(f"git grep z -- ':!*/{W}/*'")),
+    ("F1 git grep -- src", E, *_b("git grep -n z -- src")),
+    ("F1 git grep from src", E, *_b("git -C src grep z")),
+    ("F1 git grep in another ticket's tests", E, *_b("git grep z -- tests/acceptance/W2-96")),
+    ("F2 git ls-files keeping it out, into a reader", E,
+     *_b(f"git ls-files -- . ':!tests/acceptance/{W}' | xargs grep z")),
+    ("F2 git ls-files src into a reader", E, *_b("git ls-files src | xargs cat")),
+    ("F2 git ls-files into a command that does not read", E, *_b("git ls-files | xargs wc -l")),
+    ("F3 a for loop over src's names that reads", E, *_b("for f in $(find src -name '*.py'); do head -3 $f; done")),
+    ("F3 a for loop over names that does not read", E, *_b("for f in $(find . -name '*.py'); do echo $f; done")),
+    ("F4 grep -rn from src/*", E, *_b("grep -rn z src/*")),
+    ("F4 grep -rn from a glob that cannot reach it", E, *_b("grep -rn z tests/u*")),
+    ("F4 grep -rn from tests/* keeping it out", E, *_b(f"grep -rn --exclude-dir={W} z tests/*")),
+    ("F5 zgrep -r keeping it out", E, *_b(f"zgrep -r --exclude-dir={W} z .")),
+    ("F5 grep -d recurse from src", E, *_b("grep -d recurse z src")),
+    ("F6 a brace-expanded exclusion", E, *_b(f"grep -rn --exclude-dir={{.git,{W}}} z .")),
+    ("F6 rg with a brace-expanded glob option", E, *_b(f"rg -g{{'!tests/acceptance/{W}/**','!*.md'}} z")),
+    ("the orchestrator's git grep from the root", O, *_b("git grep -n z")),
     ("the orchestrator's search from the root", O, *_b("grep -rn z .")),
     ("the auditor's Grep from the root", A, "Grep", {"pattern": "z"}),
     ("the orchestrator's Glob", O, "Glob", {"pattern": "**/*.py"}),
@@ -187,9 +233,20 @@ def test_a_direct_read_keeps_its_own_refusal(rr, project):
     read = {"file_path": f"{OWN}test_feature.py"}
     assert _decide(project, E, "Read", read) == TESTS_REFUSAL
     assert _decide(project, E, *_b(f"grep -n z {OWN}test_feature.py")) == TESTS_REFUSAL
+    assert _decide(project, E, *_b(f"git grep -n z -- {OWN}")) == TESTS_REFUSAL  # a pathspec in it names it
+    assert OWN in _hook(rr, project, E, *_b(f"git grep -n z -- {OWN}"))
     assert "role_paths.engineer.reads_denied" in _hook(rr, project, E, "Read", {"file_path": str(project / read[
         "file_path"])})
     assert _decide(project, E, "Read", {"file_path": "tests/acceptance/W2-96/test_other.py"}) == ""
+
+
+def test_f4_a_glob_start_that_expands_to_the_folder_itself_is_refused(rr, project):
+    """grep -rn from tests/acceptance/*: decide says how; the hook expands the glob, so the folder is also named
+    directly and either of its reasons may answer."""
+    for command, how in (("grep -rn z tests/acceptance/*", "grep"), ("rg z tests/acceptance/*", "rg")):
+        _check_refused(_decide(project, E, *_b(command)), how)
+        assert OWN in _hook(rr, project, E, *_b(command)), command
+    assert _decide(project, E, *_b(f"grep -rn --exclude-dir={W} z tests/acceptance/*")) == ""
 
 
 def test_a_find_test_naming_a_secret_still_refuses(project):
