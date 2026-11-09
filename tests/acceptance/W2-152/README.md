@@ -94,6 +94,9 @@ About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case i
 | S5 | `test_w2_152_refusals.py::test_s5_a_template_line_until_a_closed_ticket_is_refused` | red | no `gov brief` (exit 2) |
 | S5 | `test_w2_152_refusals.py::test_s5_a_part_line_until_a_closed_ticket_is_refused` | red | no `gov brief` (exit 2) |
 | S5 | `test_w2_152_refusals.py::test_s5_until_a_ticket_still_open_is_not_refused` | red | no `gov brief` (exit 2) |
+| S5 | `test_w2_152_rev2.py::test_s5_role_engineer_template_until_a_closed_ticket_is_refused` | red | no `gov brief` (exit 2); on the engineer's round-1 head: role-engineer.md's until line not checked |
+| S5 | `test_w2_152_rev2.py::test_s5_role_lead_common_part_until_a_closed_ticket_is_refused` | red | no `gov brief` (exit 2); on the round-1 head: role-lead.md's common part not checked |
+| S5 | `test_w2_152_rev2.py::test_s5_role_templates_until_an_open_ticket_are_not_refused` | red | no `gov brief` (exit 2); a guard, green on the round-1 head |
 | S6 | `test_w2_152_fill.py::test_s6_golden_lead_block_per_run_kind[tests]` | red | no `gov brief` (exit 2) |
 | S6 | `test_w2_152_fill.py::test_s6_golden_lead_block_per_run_kind[build]` | red | no `gov brief` (exit 2) |
 | S6 | `test_w2_152_fill.py::test_s6_golden_lead_block_per_run_kind[review]` | red | no `gov brief` (exit 2) |
@@ -112,6 +115,11 @@ About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case i
 | S8 | `test_w2_152_ready.py::test_s8_est_loc_401_warns_and_never_refuses` | red | no `gov brief` (exit 2) |
 | S8 | `test_w2_152_ready.py::test_s8_est_loc_400_does_not_warn` | red | no `gov brief` (exit 2) |
 | S8 | `test_w2_152_ready.py::test_f2_advisory_items_alone_exit_0_with_ok_true` | red | exits 0 with advisory warnings only; no `gov brief` |
+| S8 | `test_w2_152_rev2.py::test_s8_no_readable_kpi_lines_is_refused_naming_kpis[kpis-missing]` | red | no `gov brief` (exit 2); on the round-1 head: no KPI lines read as none lacking a verify, READY |
+| S8 | `test_w2_152_rev2.py::test_s8_no_readable_kpi_lines_is_refused_naming_kpis[kpis-a-list]` | red | no `gov brief` (exit 2); on the round-1 head: READY |
+| S8 | `test_w2_152_rev2.py::test_s8_no_readable_kpi_lines_is_refused_naming_kpis[success-empty]` | red | no `gov brief` (exit 2); on the round-1 head: READY |
+| S8 | `test_w2_152_rev2.py::test_s8_unreadable_front_matter_is_refused_as_ticket_unreadable[unclosed-block]` | red | no `gov brief` (exit 2); on the round-1 head: refused as ALLOWED_PATHS_EMPTY |
+| S8 | `test_w2_152_rev2.py::test_s8_unreadable_front_matter_is_refused_as_ticket_unreadable[invalid-yaml]` | red | no `gov brief` (exit 2); on the round-1 head: refused as ALLOWED_PATHS_EMPTY |
 | S9 | `test_w2_152_ready.py::test_s9_a_ticket_created_on_new_since_without_the_field_is_refused[needs]` | red | no `gov brief` (exit 2) |
 | S9 | `test_w2_152_ready.py::test_s9_a_ticket_created_on_new_since_without_the_field_is_refused[reads]` | red | no `gov brief` (exit 2) |
 | S9 | `test_w2_152_ready.py::test_s9_a_ticket_created_on_new_since_without_the_field_is_refused[waits_on]` | red | no `gov brief` (exit 2) |
@@ -121,6 +129,9 @@ About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case i
 | S9 | `test_w2_152_ready.py::test_s9_a_waits_on_reference_that_does_not_exist_is_refused[unknown-id]` | red | no `gov brief` (exit 2) |
 | S9 | `test_w2_152_ready.py::test_s9_a_waits_on_reference_that_does_not_exist_is_refused[unknown-record-path]` | red | no `gov brief` (exit 2) |
 | S9 | `test_w2_152_ready.py::test_s9_waits_on_references_that_exist_are_ready` | red | no `gov brief` (exit 2) |
+| S9 | `test_w2_152_rev2.py::test_s9_facts_without_a_readable_new_since_is_refused_naming_it[no-ready-key]` | red | no `gov brief` (exit 2); on the round-1 head: the dependency check silently off, READY |
+| S9 | `test_w2_152_rev2.py::test_s9_facts_without_a_readable_new_since_is_refused_naming_it[new-since-soon]` | red | no `gov brief` (exit 2); on the round-1 head: the dependency check silently off, READY |
+| S9 | `test_w2_152_rev2.py::test_s9_schema_requires_ready` | red | facts.schema.json does not require `ready` (none declared on integrate; declared, not required, on the round-1 head) |
 | S10 | `test_w2_152_facts.py::test_s10_facts_yaml_holds_ready_new_since_an_iso_date` | red | facts.yaml has no `ready` key |
 | S10 | `test_w2_152_facts.py::test_s10_schema_declares_ready_new_since_and_the_file_validates` | red | facts.schema.json declares no `ready` |
 | S10 | `test_w2_152_facts.py::test_s10_gov_accept_w2_128_still_passes` | green | a guard: W2-128's 92 cases pass through `gov accept` today and must still pass |
@@ -131,6 +142,23 @@ About 15 s. No model, no network, no GPU, no store, no `gov retrieve`. No case i
 | F3 | `test_w2_152_files.py::test_f3_the_tree_is_byte_unchanged_after_a_brief_and_after_a_refusal` | red | no `gov brief` (exit 2): the run must succeed before the tree is compared |
 | F3 | `test_w2_152_files.py::test_f3_the_spy_sees_no_write_and_no_read_beyond_the_inputs` | red | no `gov brief` (exit 2) |
 | F3 | `test_w2_152_files.py::test_f3_no_process_starts_and_unreadable_other_files_change_nothing` | red | no `gov brief` (exit 2) |
+
+## Revision 2 (`test_w2_152_rev2.py`, 11 cases)
+
+Added by a fresh independent test designer after review round 1, from the ticket's lines only (the implementation was
+not read). The "round-1 head" column notes give the expected outcome on the engineer's branch as the review describes
+it; these were not run there.
+
+- **S5, every role's template:** an "until <ticket>" line in the role's own template (role-engineer.md; role-lead.md's
+  common part, outside the selected run block) is refused as `UNTIL_CLOSED` when that ticket is closed, because W2-153
+  delivers the whole role template as the system prompt (DEC-1050). The closed ticket is W2-909 (`DAEO-fx09`) and the
+  open one W2-908 (`DAEO-fx08`); W2-901 is the briefed fixture ticket itself, so it is not the "until" target.
+- **S9, never off silently:** a facts file with no `ready` key, or `ready.new_since: "soon"`, is refused (any error
+  code) with `new_since` named in the envelope's error and on stderr; nothing on stdout. The schema requires `ready`.
+- **S8, no readable KPI lines:** `kpis` missing, `kpis` a list, or `kpis.success` empty: refused `BRIEF_NOT_READY`,
+  a finding (any code) naming `kpis`.
+- **S8, unreadable front matter:** an unclosed front-matter block or invalid YAML in it: refused as
+  `TICKET_UNREADABLE` (the error code, or a finding's code), never `ALLOWED_PATHS_EMPTY`.
 
 ## Checked against a stand-in
 
