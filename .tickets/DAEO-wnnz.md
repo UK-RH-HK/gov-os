@@ -168,3 +168,13 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
   a time (emergency mode). The S7 real case is intermittent until then (red once, green twice outside the sandbox).
 - **Outside the sandbox on `466e279fb`:** `gov accept W2-56` with the real cases 260/0/0; `gov accept W1-20` 35/35;
   W1-27's W2-67 cases and `test_w2_20_round3.py` 41/41.
+
+**READY, not merged (the CTO, 2026-11-09):** `w2/W2-56` at `befa57695` (the engineer's round 2 `466e279fb`, integrate
+merged in; tests `w2/W2-56-tests` `85b28ef0f`). The review, round 1: READY by `verdict.py` (`reviews/w2-56.md`), every
+line pass, six findings for rows: R1 (the main repository's `.claude/settings.local.json` reaches worktree sessions:
+W2-60a's), R2 (the placeholder exclude lines repo-wide), R3 (a killed test run's `/tmp/gov-cbm-<uid>-XXXX` outside the
+weekly sweep), R4 (`sandbox.faults` does not check `allowWrite`'s or `allowedDomains`' contents), R5 (a lead no longer
+inherits `GOV_STORE`, `TERM`, `TMPDIR`), R6 (the CLI's `config.lock` placeholder on the host: P-S7). Outside the
+sandbox: `gov accept W2-56` with the real cases 260/0/0 (on `466e279fb`), 256/0/4 without them on `befa57695`;
+W1-20 35/35; W1-16 44/44 (representative rows); W1-27's W2-67 cases revised (D-2) and green. **Open before the close:**
+D-13's DEC-105 choice for the owner (S8's reach and S10 on Linux: a one-path socket allow is inert there); S10 then.
