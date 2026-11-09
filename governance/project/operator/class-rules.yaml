@@ -1,0 +1,218 @@
+# The operator agent's rule table (OPERATOR-AGENT-1 §2, DEC-1104 (2)): every kind of change ACTs have made, by effect.
+# Read by act_class.py from the install (hashed in APPROVED). A change to this file is the owner's (O) (§5).
+#
+# Rows are tried in order; the first whose root and path glob match a touched file decides that file's class.
+# Globs read as allowed_paths are read: ** any characters including /, * any characters but /, the rest literal, the
+# whole path. A row is either fixed (`class`) or list-shaped (`list`): the file is parsed before and after, and it is
+# (a) only when the only differences are the ones `list` allows; anything else is `else` (or `ratchet` for a key
+# whose any change is the owner's). A file that cannot be parsed, or whose bytes the bundle does not hold as hashed,
+# is never (a). `control: true` marks the (b) and (O) control paths the landing check reads (S16); the (O) catch-all
+# and the "none" rows are not control paths (N-2, N-5).
+#
+# Script hits (apply.sh, `commands`, the checks' cmds) raise the ACT's class: sudo, git push, git tag, history
+# prunes, rm outside the project and Windows-side steps to (O); installs and network calls to non-local hosts to (b).
+version: 1
+rows:
+  # --- none: not the operator's (§2's last rows; N-2): (O), so a manifest naming them is refused at G6 as "yours"
+  - id: operator-own
+    why: "the operator's own install, brief, rule table, reviewer's brief and APPROVED: yours (§5)"
+    match:
+      - {root: repo, path: "governance/project/operator/**"}
+      - {root: home, path: "gov-os-operator/**"}
+    class: O
+    control: true
+  - id: cto-scratch
+    why: "the CTO's own scratch tools (record_checks.sh): none, never an ACT's business (N-2)"
+    match:
+      - {root: repo, path: ".gov-runtime/**"}
+    class: O
+    control: false
+  - id: walled-sessions
+    why: "the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 (N-2)"
+    match:
+      - {root: home, path: "gov-os-writer/**"}
+      - {root: home, path: "gov-os-checker/**"}
+      - {root: home, path: "gov-os-labeller*/**"}
+      - {root: home, path: "gov-os-eval/**"}
+      - {root: home, path: "gov-os-wall-trees/**"}
+      - {root: repo, path: "governance/project/indep-walls/**"}
+      - {root: repo, path: "governance/project/indep-briefs/**"}
+    class: O
+    control: false
+
+  # --- the guard and the settings
+  - id: guard-hook
+    why: "guard hook code (1-GUARD, GUARD-FIX-1 to 4, G14, G14b, INDEP-WALLS-1's rule 2c): no rule can prove a code change only tightens"
+    match:
+      - {root: repo, path: ".claude/hooks/**"}
+      - {root: repo, path: "governance/project/orchestration/tools/stop_waiter_check.py"}
+      - {root: repo, path: "governance/project/orchestration/tools/permission_request.py"}
+      - {root: home, path: ".claude/hooks/**"}
+    class: b
+    control: true
+  - id: settings
+    why: "settings: items only added to permissions.deny tighten (a); allow rules, hooks blocks, any other key alter a control (b) (PERMISSIONS-1/2, QUIET-DENY-1, STOP-WAITER-1, PUSH-INPUT-1)"
+    match:
+      - {root: repo, path: ".claude/settings*.json"}
+      - {root: home, path: ".claude/settings*.json"}
+    list:
+      kind: json
+      only_added: ["permissions.deny"]
+    else: b
+    control: true
+  - id: rulesync-permissions
+    why: "the settings' source: only new deny entries tighten (a); anything else alters a control (b)"
+    match:
+      - {root: repo, path: ".rulesync/permissions.jsonc"}
+    list:
+      kind: jsonc
+      only_added_deny: ["permission.*"]
+    else: b
+    control: true
+  - id: rulesync-other
+    why: "the settings' and agents' source (.rulesync/**): alters a control or instructs agents (b)"
+    match:
+      - {root: repo, path: ".rulesync/**"}
+    class: b
+    control: true
+  - id: agents-skills-kernel
+    why: "generated role files and skills, the kernel template: they instruct agents (CAP-33)"
+    match:
+      - {root: repo, path: ".claude/agents/**"}
+      - {root: repo, path: ".claude/skills/**"}
+      - {root: repo, path: "template/governance/kernel/**"}
+      - {root: home, path: ".claude/agents/**"}
+      - {root: home, path: ".claude/skills/**"}
+      - {root: home, path: ".claude/CLAUDE.md"}
+    class: b
+    control: true
+  - id: claude-rest
+    why: "the rest of .claude/**: the sessions' configuration (b)"
+    match:
+      - {root: repo, path: ".claude/**"}
+    class: b
+    control: true
+  - id: git-hooks
+    why: "git hooks (SELECT-HOOK-1): they run code outside every session's guard"
+    match:
+      - {root: repo, path: ".git/hooks/**"}
+    class: b
+    control: true
+
+  # --- the path map: refusal additions tighten; the ratchet lists are the owner's
+  - id: path-map
+    why: "path map: items only added to refusal lists (sets_root_hidden, role_paths denies, a new evaluation_sets entry with its hidden globs) tighten (a) (SANDBOX-SEAL-1); any other change alters a control (b) (GUARD-SETS-1); a ratchet list (acceptance_exemptions, accepted_reds, load_sensitive) is read only from the owner's commits (O)"
+    match:
+      - {root: repo, path: "governance/project/path-map.yaml"}
+    list:
+      kind: yaml
+      ratchet: [acceptance_exemptions, accepted_reds, load_sensitive]
+      only_added:
+        - "sets_root_hidden.hidden"
+        - "sets_root_hidden.refused_roles"
+        - "role_paths.*.reads_denied"
+        - "evaluation_sets.*.hidden"
+        - "evaluation_sets.*.measures.roles"
+        - "evaluation_sets.*.measures.tickets"
+      new_entries: ["evaluation_sets"]
+      new_entry_needs: {evaluation_sets: hidden}
+    else: b
+    ratchet_class: O
+    control: true
+
+  # --- the test map and the opt-in lists: more tests run (a); fewer, or a changed run (b)
+  - id: test-map
+    why: "test map: items only added under couplings, record_reading, every_close, shared_core run more tests (a); record_only additions, any removal, timeouts, distribution run fewer or change the run (b) (SELECT-FIXES-1)"
+    match:
+      - {root: repo, path: "governance/project/test-map.yaml"}
+    list:
+      kind: yaml
+      only_added: ["shared_core", "record_reading", "every_close", "couplings.[].paths", "couplings.[].suites"]
+      appendable: ["couplings"]
+      free: ["couplings.[].why"]
+    else: b
+    control: true
+  - id: optin
+    why: "opt-in lists: lines only removed put cases back into the gates (a) (DEC-1103 (2)); lines added or changed take cases out (b)"
+    match:
+      - {root: repo, path: "tests/optin-*.txt"}
+    list:
+      kind: lines_removed
+    else: b
+    control: true
+
+  # --- the machine
+  - id: machine-gate
+    why: "machine gate files (DEC-1103 (1)'s gate.json): they decide what launches"
+    match:
+      - {root: home, path: ".gov-os/machine/**"}
+      - {root: home, path: ".config/gov-os*"}
+      - {root: home, path: ".config/gov-os*/**"}
+    class: b
+    control: true
+  - id: cache
+    why: "~/.cache/gov-os/**: governs nothing"
+    match:
+      - {root: home, path: ".cache/gov-os/**"}
+    class: a
+    control: false
+  - id: servers
+    why: "the shared servers' committed configs and modules, with their restart (OLLAMA-CAP-1, QUERY-CPUS-1, QUERY-GPU-2, RERANK-GPU-SLOTS-1, RERANK-WAIT-1): govern no agent, (a) by Q3 (N-7)"
+    match:
+      - {root: repo, path: "governance/project/orchestration/tools/gov_reranker_gpu_slot.py"}
+      - {root: home, path: ".config/systemd/user/ollama*"}
+      - {root: home, path: ".config/systemd/user/gov-reranker*"}
+      - {root: home, path: ".config/systemd/user/*.service.d/**"}
+      - {root: home, path: ".ollama/*.log"}
+    class: a
+    control: false
+  - id: watchers
+    why: "the sentinel, the dead-man's switch and the dispatcher (DEADMAN-1, SENTINEL-1): they watch the CTO"
+    match:
+      - {root: repo, path: "governance/project/orchestration/tools/deadman.py"}
+      - {root: repo, path: "governance/project/orchestration/tools/sentinel*"}
+      - {root: repo, path: "governance/project/orchestration/tools/dispatch/**"}
+    class: b
+    control: true
+  - id: crontab
+    why: "crontab lines (NIGHTLY-1, NIGHTLY-STOP-1, SCHEDULE-STOP-2, DISPATCH-CRON-2, DISPATCHER-1, RUNS-SWEEP-1): run code on a schedule outside the guard"
+    match:
+      - {root: crontab, path: "crontab"}
+    class: b
+    control: true
+  - id: pin
+    why: "the pinned gov, re-pins (REPIN-1, 2, EMERGENCY-1, W2 to W4): DEC-928 (3), a plain terminal (Q4)"
+    match:
+      - {root: home, path: ".local/bin/gov"}
+      - {root: home, path: ".local/share/gov-os/**"}
+    class: O
+    control: true
+  - id: installs
+    why: "installs and downloads without sudo (RERANK-TRIAL-1/2): new code on the machine (DEC-083, DEC-957)"
+    match:
+      - {root: home, path: ".local/**"}
+      - {root: home, path: ".venv*/**"}
+      - {root: home, path: ".npm-global/**"}
+    class: b
+    control: true
+
+  # --- the catch-all: src/**, tests, the register, tickets, or a path no rule names
+  - id: unknown
+    why: "src/**, tests, the register, tickets, or a path no rule names: not an ACT's business, or unclassifiable"
+    match:
+      - {root: repo, path: "**"}
+      - {root: home, path: "**"}
+      - {root: crontab, path: "**"}
+    class: O
+    control: false
+
+# Script hits: what each kind of hit raises the ACT to.
+hits:
+  sudo: O
+  push: O
+  tag: O
+  history: O
+  rm-outside: O
+  windows: O
+  install: b
+  network: b
