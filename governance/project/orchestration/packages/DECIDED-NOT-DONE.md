@@ -61,9 +61,9 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0d. DEC-1100's items (2026-11-09)
 | # | item | fate (DEC-1100) | state |
 |---|---|---|---|
-| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | **Rehearsed 11-09** with F1 (a): named 34/34, actually run 30/34 (23 gates, 7 report-only; 18 without); WAITS: the operator, and the owner on D-4's 3 capped and 7 lifted cases |
+| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | **APPLIED 11-09** by the operator (`8038e0ee`); WAITS: the owner on D-4's 3 capped and 7 lifted cases |
 | 38 | W2-66c | (1) tests first, pins (i) and (ii) | Filed `DAEO-btcs` (`28b4b5ba`); its test designer next |
-| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | Rehearsed 11-09 (ACT-SELECT-HOOK-1; `tools/landing_select.sh` 45/45); WAITS: the operator. Row to W2-116: its hook line passes a worktree's GIT_DIR to gov rebuild |
+| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | **APPLIED 11-09** (the hook line, 12:14); first run refused by a missing folder (fixed); the re-run RED 13 of 2,841: W1-06 (known), test_fusion (W2-137's cap, now on D-10's list), 11 reranker-service cases that pass in the main tree (the selection's environment: a row to fix in `landing_select.sh`); a regression case for the folder; row to W2-116 (GIT_DIR) |
 | 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first | **MERGED 11-09** W2-147 (`7ed72a1e`, review READY, accept 25/25); live at the lift's re-pin |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
