@@ -1,62 +1,40 @@
-# volatile: its answer changes with ordinary work (DEC-1069 (6)); gold as at cc9c94d42a54
-# Lens B's Q14 (Table 2): "The nine dependents (0mab, 6n5k, h4rh, j8gn, nn1s, rd0g, u4oz, yadm, zqvn)": the answer
-# needs all of them, so each dependent's depends_on line naming DAEO-ym8a (W2-03) is its own entry.
-# Re-labelled by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-WRONG, R7-MISSING-PIECE and R3-AMBIGUOUS),
-# checked blind at the commit by a session independent of the retrieval work (every ticket's front matter read).
-# The gold answer said nine, but at the commit 13 tickets list DAEO-ym8a in depends_on: the nine, plus DAEO-2bdu
-# (W2-88), DAEO-arrl (W2-55), DAEO-n0wb (W2-92) and DAEO-s9qc (W2-87, closed). The four had no entry, so full
-# evidence was scored without them; each now has its own. DAEO-rd0g's line is now 19 (the heading governs). The
-# question is kept (Table 2's command). Its "depend on" is settled in the gold answer: depends_on is the governed
-# field. DAEO-2d6f, a child of W2-03 (parent DAEO-ym8a) with no depends_on, depends on it only through tk's deps,
-# and is named as outside it. The label before is in ../retired/q14-pre-dec1069.yaml.
+# Re-worded to a stable fact by the owner's DEC-1070 (13) (R11), as DEC-1074 (8), DEC-1097 (12) and DEC-1098 (6)
+# keep it: after the fresh 80 and before any re-measure, by a session independent of the retrieval work, 2026-11-09,
+# blind (from the rubric, this file and the repository at 8bb10a68366c; no search, no result read).
+# The question before asked which tickets depend on W2-03: a list of dependents that grows whenever a ticket naming
+# DAEO-ym8a in depends_on is filed (nine in lens B's label, 13 at cc9c94d42a54, spread over 13 files), so its gold
+# drifted (R11-GROWS, marked volatile by DEC-1069 (6)). It now asks what W2-03 itself had to show about decision
+# hashes: its KPIs, in a closed ticket's front matter and the approved WBS card (DEC-729), which change only by a
+# decision about W2-03 (R11 item 4). Two entries: the per-decision hash (the first success KPI) and the edit case
+# (the failure line); each has three alternatives holding the whole piece: the ticket's front matter, the ticket's
+# body and the WBS card. Category, ticket and radius kept.
+# The label before is in ../retired/q14-pre-reword-2026-11-09.yaml (and before that q14-pre-dec1069.yaml).
 id: Q14
 category: ticket
-commit: cc9c94d42a54
+commit: 8bb10a68366c
 ticket: DAEO-ym8a
 radius: 1
-question: Which tickets depend on W2-03?
+question: Before W2-03 could close, what did it have to show about how decisions get hashed, including when one is edited?
 gold_answer: >-
-  Thirteen tickets list DAEO-ym8a (W2-03) in depends_on: DAEO-0mab (W2-24), DAEO-2bdu (W2-88), DAEO-6n5k (W2-37),
-  DAEO-arrl (W2-55), DAEO-h4rh (W2-27), DAEO-j8gn (W2-12), DAEO-n0wb (W2-92), DAEO-nn1s (W2-46), DAEO-rd0g (W2-15a),
-  DAEO-s9qc (W2-87, closed), DAEO-u4oz (W2-04), DAEO-yadm (W2-34) and DAEO-zqvn (W2-13). Outside depends_on,
-  DAEO-2d6f, a child ticket of W2-03 (parent DAEO-ym8a), names it only in tk's deps.
+  Each `### DEC-nnn` entry of the register is loaded as a record by itself, with a sha256 taken over that entry's
+  span only, so no two decisions ever have the same hash; and editing one entry changes that entry's hash and no
+  other (the same failure line also requires a duplicate DEC id to be refused, naming both places).
 sources:
-  - path: .tickets/DAEO-0mab.md
-    heading: "- DAEO-ym8a"
-    lines: [20, 20]
-  - path: .tickets/DAEO-6n5k.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-h4rh.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-j8gn.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-nn1s.md
-    heading: "- DAEO-ym8a"
-    lines: [20, 20]
-  - path: .tickets/DAEO-rd0g.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-u4oz.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-yadm.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-zqvn.md
-    heading: "- DAEO-ym8a"
-    lines: [19, 19]
-  - path: .tickets/DAEO-2bdu.md
-    heading: "- DAEO-ym8a"
-    lines: [18, 18]
-  - path: .tickets/DAEO-s9qc.md
-    heading: "- DAEO-ym8a"
-    lines: [18, 18]
-  - path: .tickets/DAEO-arrl.md
-    heading: "depends_on: [DAEO-ym8a]"
-    lines: [17, 17]
-  - path: .tickets/DAEO-n0wb.md
-    heading: "depends_on: [DAEO-s9qc, DAEO-ym8a]"
-    lines: [17, 17]
+  - - path: .tickets/DAEO-ym8a.md
+      heading: "  - 'The store loads each ### DEC-nnn entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share a hash [AR-1, F-M5].'"
+      lines: [31, 31]
+    - path: .tickets/DAEO-ym8a.md
+      heading: "  - The store loads each `### DEC-nnn` entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share a hash [AR-1, F-M5]."
+      lines: [66, 66]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "  - The store loads each `### DEC-nnn` entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share a hash [AR-1, F-M5]."
+      lines: [325, 325]
+  - - path: .tickets/DAEO-ym8a.md
+      heading: "  - An edited entry changes only its own hash; a duplicate DEC id is refused with both locations."
+      lines: [36, 36]
+    - path: .tickets/DAEO-ym8a.md
+      heading: "- **KPIs, failure:** an edited entry changes only its own hash; a duplicate DEC id is refused with both locations."
+      lines: [70, 70]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "- **KPIs, failure:** an edited entry changes only its own hash; a duplicate DEC id is refused with both locations."
+      lines: [329, 329]

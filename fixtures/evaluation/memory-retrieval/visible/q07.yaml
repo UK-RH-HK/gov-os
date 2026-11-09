@@ -1,28 +1,29 @@
-# volatile: its answer changes with ordinary work (DEC-1069 (6)); gold as at cc9c94d42a54
-# Lens B's Q07 (Table 2): "The front matter's dependency list (DAEO-0mab.md 1–72) or WBS:118": one piece of
-# evidence in two places, alternatives of one entry.
-# Re-labelled by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-WRONG and R6-SPAN-OVERRUNS), checked blind at
-# the commit by a session independent of the retrieval work. The gold answer gave 27 tickets, DAEO-g0ip to DAEO-7rr2.
-# At the commit DAEO-0mab's depends_on (and its tk deps, the same list) holds 23, DAEO-g0ip to DAEO-2bdu: DEC-954's
-# change moved nine out and put five new ones in. The ticket's span (17 to 44) ran past the list into allowed_paths
-# and the KPIs; the list is lines 17 to 40. The WBS row's heading is found at line 150 (it was 118). The question
-# and both sources are kept. The label before is in ../retired/q07-pre-dec1069.yaml.
+# Re-worded to a stable fact by the owner's DEC-1070 (13) (R11), as DEC-1074 (8), DEC-1097 (12) and DEC-1098 (6)
+# keep it: after the fresh 80 and before any re-measure, by a session independent of the retrieval work, 2026-11-09,
+# blind (from the rubric, this file and the repository at 8bb10a68366c; no search, no result read).
+# The question before asked for the tickets the Track A gate run waits on: a list (23 at cc9c94d42a54, 27 in lens B's
+# label) that moved with re-scoping (DEC-954 took nine out and put five in), so its gold drifted (R11-GROWS, marked
+# volatile by DEC-1069 (6)). It now asks the decided rule behind that list, which changes only by a decision: the gate
+# waits on the Track A tickets that stayed in Wave 2, never on those moved to Wave 3 (DEC-954). One entry, three
+# places that each state the whole rule: the WBS card's DEC-954 line, the WBS row (the old label's second source) and
+# the ticket's DEC-954 line. Category and ticket kept. W2-24 was later retired (DEC-1083, W-8; its AR lines are shown
+# in W2-46); the question asks only what it was to wait on, so nothing it presupposes is false.
+# The label before is in ../retired/q07-pre-reword-2026-11-09.yaml (and before that q07-pre-dec1069.yaml).
 id: Q07
 category: ticket
-commit: cc9c94d42a54
+commit: 8bb10a68366c
 ticket: DAEO-0mab
-question: Which tickets must be done before the Track A gate run?
+question: Did the Track A gate (W2-24) have to wait for the Track A tickets that got pushed back to Wave 3?
 gold_answer: >-
-  Every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954): DAEO-0mab's depends_on
-  lists 23 tickets, DAEO-g0ip (W2-01), DAEO-zflj (W2-02), DAEO-ym8a (W2-03), DAEO-u4oz (W2-04), DAEO-0z8c (W2-05),
-  DAEO-kia7 (W2-06), DAEO-r9ss (W2-07), DAEO-7r5e (W2-08), DAEO-k7hz (W2-11), DAEO-zqvn (W2-13), DAEO-rd0g (W2-15a),
-  DAEO-49o5 (W2-16), DAEO-r30l (W2-20), DAEO-1ahb (W2-21), DAEO-kmcr (W2-23), DAEO-ha8z (W2-49), DAEO-kl5e (W2-50),
-  DAEO-7rr2 (W2-53), DAEO-cy5o (W2-57), DAEO-siiz (W2-52), DAEO-wnnz (W2-56), DAEO-egsy (W2-51) and DAEO-2bdu
-  (W2-88).
+  No. Under DEC-954 the Track A gate run depends only on the Track A tickets that stayed in Wave 2; the tickets moved
+  to Wave 3 are not among its dependencies.
 sources:
-  - - path: .tickets/DAEO-0mab.md
-      heading: "depends_on:"
-      lines: [17, 40]
+  - - path: docs/plan/WAVE_2_WBS.md
+      heading: "  - its dependencies are the Wave 2 tickets only, with the Wave 3 tickets and the withdrawn W2-48 removed;"
+      lines: [800, 800]
     - path: docs/plan/WAVE_2_WBS.md
       heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954) | 0 | AR-1 … AR-10 (the lines whose tickets moved are named Wave 3 in its report) |"
       lines: [150, 150]
+    - path: .tickets/DAEO-0mab.md
+      heading: "**DEC-954:** dependencies are the Wave 2 tickets only (W2-57, W2-52, W2-56, W2-51 and W2-88 added as later Track A tickets). The AR lines whose tickets moved to Wave 3 are named Wave 3 in this ticket's report (exit criterion 5). W2-17 is Wave 3, so the \"gov update\" step is a named Wave 3 line. The release is W2-16's."
+      lines: [72, 72]
