@@ -74,3 +74,15 @@ Rows:
     - the W2-54 `shared_gpu` case still asserts the CPU, against DEC-1033 (2)(b); a designer revision on D-10's list.
 - **F2 waits** for W2-150's merge.
 - **F3: none.**
+
+**State 11-09 23:30 (machine clock):**
+- **F2 is READY in two branches that merge together:**
+  - `w2/W2-55-f2`, head `2fe928a4c`: W2-55 S9 removes `tags.py`'s `STATUS_RELATION_UNMARKED`. Accept 55/3; the 3 are
+    the base's backfill reds.
+  - `w2/W2-129-f2`, head `c031faba0`: W2-129 S18 makes a `**Settles:**` label a change for UNMARKED_CHANGE. Accept
+    156/0; `--all` 1,404 → 1,405, adding DEC-026 ← DEC-086.
+- **The reviews:** round 1 found F1, blocking (an unmarked Settles was left unreported once the old check went).
+  Round 2 is READY. Its rows: R2-F1, a PROPOSED changer gives no finding (by design); R2-F2, a status line naming the
+  changer anywhere counts as marked (Wave 3 row).
+- **Out-of-date text naming `STATUS_RELATION_UNMARKED`:** W2-129's ticket and LINK-INTEGRITY. Rows.
+- **D-6 part 2 is complete** once those two branches merge.
