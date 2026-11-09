@@ -8,7 +8,7 @@ aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  template gover
 21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6  template governance/project/indep-walls/tree-exclude.txt
 # ACT-W2-149-INSTALL-1 (DEC-1101 (2)-(3), DEC-1112, DEC-1113): the fixed briefs the owner approved once
 # (SANDBOX-GUARD-EXP-DECLARATION §12), for the launch script governance/project/orchestration/tools/indep_launch.py
-# b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5 (W2-149 with its F11 follow-up, 99cdce97a29c). Written by the owner's operator only.
+# b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5 (W2-149 with its F11 follow-up, ff1865184930). Written by the owner's operator only.
 bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068  brief labeller governance/project/indep-briefs/sgx1/labeller.md
 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904  brief labeller governance/project/indep-briefs/sgx1/labeller-2.md
 82134b3dd6b5a077abfc2eb6fa7481f0f5a73eab60396cfbd655042d53027c57  brief writer governance/project/indep-briefs/sgx1/writer-tuning.md

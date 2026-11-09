@@ -35,7 +35,7 @@ BACKUP=$HERE/backup
 # The hashes as built (frozen by freeze.py; see the package §4)
 LAUNCH_SHA=b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5
 LIST_BEFORE=331e48fa336ef58ba5dc6fd4afcf9c1387ec4bd29e583eb955280a267626bbc9
-LIST_AFTER=18126755f5d24dd641edb32c0fdd9d2a1348a2c608f58d8ee19b2ffec81b773c
+LIST_AFTER=9e9d6f212a1ebd54e8bcb6c0c0c691fbb23c8aefbb70e359a9b5a61dba44b56f
 declare -A BRIEF=(
   [labeller.md]=bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068
   [labeller-2.md]=e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904
