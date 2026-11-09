@@ -402,3 +402,5 @@ other restart is an ACT.
   b212a424062e… (full hashes in SANDBOX-GUARD-EXP-DECLARATION §12); the declaration's scorer escalates any settled case
   whose other label would change the verdict (§ A3). The approved list the launch script checks is written by the
   launch script's install ACT.
+- Delegated (CTO, 2026-11-09, DEC-1112 (3)): W2-139's S3 ("a green validator") judged against integrate: the batch adds
+  no new FAIL; the 5 FAIL already on integrate go onto D-10's red-fix list.

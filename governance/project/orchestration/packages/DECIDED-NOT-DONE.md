@@ -56,7 +56,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
 | 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
 | 35 | W2-15a with W2-32 | (3) closed together at the lift | Noted in P1-13 (`741faf90`); WAITS: the lift |
-| 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
+| 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | **MERGED 11-09** (see 63) |
 
 ## 0d. DEC-1100's items (2026-11-09)
 | # | item | fate (DEC-1100) | state |
@@ -101,7 +101,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | state |
 |---|---|---|
 | 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | **DONE 11-09** (`0240833b`, `5f7641e6`); applied `2a646265` |
-| 63 | W2-139 and W2-140, one batch, before D-10 | IN PROGRESS |
+| 63 | W2-139 and W2-140, one batch, before D-10 | **MERGED 11-09** (one batch; accept 160/160; review READY); close at the lift; the queue run sets GOV_TESTS_OPTIN=breadth,lifted |
 | 64 | D-5 (the templates) | IN PROGRESS |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
