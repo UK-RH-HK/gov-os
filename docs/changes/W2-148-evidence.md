@@ -354,3 +354,27 @@ the trial); within this run before and after are equal.
   is still the token the journal recorded; a journal from before round 3 has no token, so its freeze stays and holds
   G9 until removed by hand.
 
+## F21 (DEC-1107): the owner's undo and the recovery leaving another's file say "refused" (2026-11-09)
+
+The narrow DEC-1106 review left F21: with files left, the owner's undo step returned `result: "undone"` with exit 0 and
+the journal's recovery `undone` (exit 1). The owner's DEC-1107 fixed it in one tiny round. Code commit on
+`w2/W2-148-f21`: `0e43fac2ebd7` (`operator_run.py`: `undo_step`, `recover`); unit cases in
+`tests/unit/operator/test_w2_148_f21.py` (9 new).
+
+| Point | The change | Unit cases |
+|---|---|---|
+| The owner's undo leaving a file (`undo_step`) | With `st.left` not empty after `undo_live` (the restore rule, unchanged): `result` `refused`, `gate` `undo`, exit 1; `undo: "done"`, `left`, `lock: true`; the lock written; the log line `refused` with `undo: "done"` and `left`; the P1 (kind `undo`) says "refused" and names each file. The ACT's own touched files at their after-copy are undone as before; the undo commit holds only them | `test_the_owners_undo_leaving_a_foreign_file_says_refused_and_exits_non_zero` (the frozen `apply.sh undo` writes an unlisted control file live; the next run refused at the lock) |
+| The owner's undo with a touched file at third bytes | The up-front "moved since the apply" refusal no longer applies when some touched file is at third bytes: `undo_live` runs (no `apply.sh`; each own file at its after-copy put back from the frozen `before/` copy; the third-bytes file left as written), then the row above. With no file at third bytes, a touched file not at its after-copy (back at its before-copy) still refuses up front, nothing written | `test_the_owners_undo_with_a_touched_file_at_third_bytes_undoes_its_own_and_says_refused` (the undo commit holds only its own file), `test_the_owners_undo_with_a_touched_file_back_at_its_before_copy_refuses_up_front` |
+| A second undo after the lock is cleared | "already undone" now also counts a later line for the same ACT and sha with `undo: "done"` (the refused-with-left line), so a cleared lock does not let the undo run twice | `test_the_owners_undo_after_the_lock_is_cleared_is_already_undone` |
+| The recovery leaving a file (`recover`) | With `st.left`: `result` `refused`, `gate` `journal`, exit 1, `undo: "done"`, `left`, `lock: true`; the P1 (kind `recovered`) says "refused" and names each file. The launcher already passes a non-zero recovery's result through as its own, so no object on its stdout carries `undone` | `test_the_recovery_leaving_a_touched_file_at_third_bytes_says_refused_on_the_launchers_stdout`, `test_the_recovery_leaving_a_foreign_file_says_refused_through_the_recover_step` |
+| Unchanged | With nothing left: the owner's undo `undone`, exit 0; the recovery `undone` (the launcher's `recovered.result`). An undo after the next ACT on the same files stays a plain refusal. The run path's undo (`UndoState.fail`) is not changed | `test_the_owners_undo_with_nothing_left_still_says_undone_with_exit_0`, `test_the_recovery_with_nothing_left_still_says_undone`, `test_the_owners_undo_after_the_next_act_on_the_same_files_stays_a_plain_refusal` |
+
+### F21's runs
+
+- **Unit tests:** 184 passed (`tests/unit/operator/`: round 3's 175 plus 9 in `test_w2_148_f21.py`), with
+  `-m "not local_only" -k "not real and not green_here and not time_limit"` (the exclusion left nothing out).
+- **`gov accept W2-148`:** pass, 169 passed, 0 failed, 0 skipped, 0 unmapped; all 39 lines pass (success-22 10,
+  failure-15 9).
+- **The trial (S23)** was not re-run: the change touches only the owner's undo and the recovery, which the trial does
+  not reach.
+
