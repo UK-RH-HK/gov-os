@@ -31,7 +31,7 @@
 | S12 G8 dry run | `Run._g8`: a clone at the live head outside the live tree (system temp), a planted HOME and a crontab stub; check, apply, the changed set (tree, HOME, crontab) equal to the touched list, the checks, undo byte for byte | gov accept S12; unit `test_g8_*`; fault "an unlisted file touched" |
 | S13 G9 holds | `Run.g9`: quiet hours, the nightly window, the close flag, the CTO's and the operator's `act-in-progress.txt`; it waits (a `G9 held` line) and proceeds | gov accept S13; unit `test_g9_*` |
 | S14 apply and commit | `Run.apply`: the freeze, the journal, `apply.sh apply`, the after-hashes, the checks, the live unlisted-file check, the staged list, the commit with its trailers; the freeze removed | gov accept S14; unit `test_an_a_act_is_applied_*`, `test_a_staged_extra_file_is_refused` |
-| S15 control files for (a) | `after_checks`: the controls' bytes before and after; the guard replayed on the last 48 hours of calls on a clone (old and new lists); any other difference undoes at once (controls restored byte for byte) and pushes P1 | gov accept S15; unit `test_an_a_act_changing_a_control_file_live_is_undone`, `test_a_path_map_addition_*` |
+| S15 control files for (a) | `after_checks`: the controls' bytes before and after; the guard replayed on the last 48 hours of calls on a clone (old and new lists); any other difference undoes the ACT's own touched files at once and pushes P1; the control file itself is left exactly as it is, the lock held, the P1 naming it (DEC-1106 (1), round 3) | gov accept S15; unit `test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left`, `test_a_path_map_addition_*`, round 3's `test_a_*_during_the_checks_*` |
 | S16 the landing check | `landing_check.py`: outside a ticket as the landing selection reads it; the rule table's control rows | gov accept S16; unit `test_the_landing_check_*` |
 | S17 queue and launch | `operator_launch.py`: the oldest `.req`, a malformed one moved aside under its own name, the wall built under the root, a clean environment, pid and pgid recorded, waited and stopped by them; APPROVED checked on every run and launch | gov accept S17; unit `test_the_launcher_*`, `test_a_malformed_request_is_moved_aside`, `test_an_approved_mismatch_*`, `test_no_wait_or_stop_by_a_name_match` |
 | S18 the canary | `operator_launch.canary`: a Read outside the wall must come back in `permission_denials`, else refused before the session | gov accept S18; unit `test_the_canary_refuses_*` |
@@ -53,17 +53,18 @@
 | `transcripts` | `<home>/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS` |
 | `clock` | none: the system clock |
 | `pings_log` | `<home>/.config/gov-os-notify/pings.log` (the dead-man's log channel) |
-| `push_cmd` | `python3 <repo>/governance/project/orchestration/tools/deadman.py --channel push --test` (the notice JSON appended) |
+| `push_cmd` | unset: a notice goes through the dead-man's three channels from the install's own code (the `pings_log` line, the Windows toast through `install/win_toast.ps1`, a headless `claude -p` asked to call PushNotification), one line of at most 190 characters (F4, F19); when set, `<push_cmd> <notice JSON>` replaces the toast and the push (the tests' stub) |
 | `calls` | `<operator root>/log/calls.jsonl`: the call log the operator writes itself during its dry run (G8), one `{id, time, role: operator, ticket: <ACT>, event: {tool_name: Bash, tool_input: {command}, cwd: "."}}` line per command it runs there; the replay reads it |
 | `close_flag` | `<scratch>/CLOSE-RUNNING` (close_queue.sh's lock) |
 | `nightly_window` | `03:50-08:00` (the wake at 03:50, the nightly 04:00 to about 07:00, its check at 08:00) |
 | `poll_s` | 60 |
-| `freeze` | `<operator root>/log/act-in-progress.txt` (G9 also holds on `<scratch>/log/act-in-progress.txt`) |
+| `freeze` | `<operator root>/install/act-in-progress.txt` (the commit freeze, DEC-1106 (3); never in either `log/`; not counted by the APPROVED check nor by the install's control-file hash; G9 also holds on the CTO's `<scratch>/log/act-in-progress.txt`) |
 | `approvals` | `<operator root>/log/act-approvals.jsonl` |
 | others | `claude` (`claude`), `model` (`claude-sonnet-5-5`), `canary_model` (`claude-haiku-5-5`), `budget_usd` (1), `canary_budget_usd` (0.05), `session_timeout_s` (2700), `canary_timeout_s` (300), `check_timeout_s` (3600), `hold_max_s` (0: a hold waits as long as it lasts) |
 
-The journal is `<operator root>/log/journal.json`; a failed undo holds `<operator root>/log/operator.lock`
-(every run and launch refuses while it exists; the freeze stays too); the session's pid and pgid are in
+The journal is `<operator root>/log/journal.json`; a failed undo, or a live change left for the owner under the
+restore rule (round 3), holds `<operator root>/log/operator.lock` (every run and launch refuses while it exists; the
+run's own freeze is still removed at its end); the session's pid and pgid are in
 `log/session.json`; a malformed request goes to `queue/rejected/<stamp>-<pid>/<its name>`, a taken one to
 `queue/taken/…` and then `queue/done/…`. Without `--config`, the install reads `install/operator-settings.json` when
 it exists (hashed in APPROVED like the code), else the defaults above.
@@ -290,4 +291,66 @@ Commits on `w2/W2-148`: `f680fc5ae` (F1, F14) and `43eb90435` (the rest); unit c
 
 Equal: **True**. Two rows differ from round 1's (the path map row and `~/gov-os-operator/`): the live files changed
 between the two runs by others' work; within each run before and after are equal.
+
+## Round 3 (DEC-1106): the owner's exception round, F15 and the freeze (2026-11-09)
+
+Review round 2 found one blocking defect, F15: the live re-hash around G8 and the (a) after-check's undo restored every
+live difference and deleted files created meanwhile, so a CTO commit or merge landing during the dry run or the apply
+was reverted (a guard tightening silently stopped applying) and the P1 blamed the dry run. The owner's DEC-1106 decided
+one exception round to DEC-1010: (1) the restore rule, (3) the commit freeze in the install folder. Code commit on
+`w2/W2-148`: `1ac0c1716fe4`; unit cases in `tests/unit/operator/test_w2_148_round3.py` (22 new) and six round-1/2 cases
+revised to the new rule.
+
+| Point | The change | Unit cases |
+|---|---|---|
+| (1) after G8 (`Run.g8`, `Run.live_changed`) | The live touched files and the control files (the path map among them; files created or removed under `.claude/**` count) are re-hashed after the dry run against the hashes taken before it. A touched file whose live bytes are the frozen after-copy's (absent, for a deletion: `is_after`) is the dry run's own change and is restored to its bytes from before the dry run; anything else (a control file, a file created or removed, a touched file at third bytes) is left exactly as it is. Always refused at `G8`; the reason, and so the P1's `text`, holds "live files changed" and names every file (no truncation); with anything left, the lock is held (S22's form: the next run and the next launch refuse at `lock`). The result and the log line carry `live_changed`, `restored_files`, `left`, `lock` | `test_g8_the_dry_runs_own_change_is_restored_and_refused_without_the_lock`, `test_g8_a_concurrent_commit_to_the_path_map_is_left_with_the_lock` (the commit stays in HEAD, the tree clean, the next run and launch refused at the lock and change nothing), `test_g8_a_new_skill_file_committed_meanwhile_is_left`, `test_g8_a_touched_file_at_third_bytes_is_left`, `test_g8_both_at_once_its_own_restored_the_rest_left`; revised: `test_a_live_file_changed_by_the_dry_run_is_left_refused_and_locked` (3 forms) |
+| (1) in every live undo (`undo_live`, used by the (a) after-check's undo, the apply's other failures, the owner's undo and the journal's) | The blind restorers `restore_controls` and `restore_tree` are gone. Each touched file is read: at its after-copy it is the ACT's own and is undone; at its before-copy nothing is done; at third bytes it is left. With no touched file at third bytes the frozen `apply.sh undo` runs as before; with one, `apply.sh` is not run (it would write over it) and each own file is put back from the frozen `before/` copy. Every other difference since the undo state was taken (the control files, S15's list, and the tree as git status reports it) is left as written and named (`foreign_differences`). The undo commit holds only the own files; a commit someone else made meanwhile stays in HEAD's history. With anything left: the lock held, the P1 naming each file (`left_text`), the result `undone` (or `refused` when the undo itself failed), never `applied`. `after_checks` now names every differing control file, not only the first | `test_a_concurrent_control_commit_during_the_checks_is_left_and_the_acts_own_file_undone` (the undo commit holds only `tests/optin-x.txt`; the other commit stays), `test_a_control_file_written_but_not_committed_during_the_checks_is_left`, `test_a_crontab_change_during_the_checks_is_left` (a stateful crontab stub), `test_the_acts_touched_file_at_third_bytes_in_the_undo_is_left_too`, `test_a_clean_a_act_with_no_concurrent_change_is_applied_without_the_lock`; revised: `test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left`, `test_a_live_git_config_change_is_left_and_locked`, `test_the_folder_core_hookspath_names_is_a_control` |
+| (1) the hook points | `GOV_OPERATOR_TEST_HOOK` gains `in-G8` (after the dry run's steps and the clone's removal, before the live re-hash; the hashes from before are already taken) and `in-apply-checks` (for every class, after `apply.sh apply`, the checks and the run's own commit, before the after-check). The run waits for the hook, ignores its exit code, runs no git command while it runs (so holds no `.git/index.lock`) and gives it its own environment | `test_the_hook_is_waited_for_its_exit_code_ignored_and_no_git_lock_held`, `test_the_in_apply_checks_point_runs_for_a_b_act_too`, and every case above |
+| (3) the commit freeze | `<operator root>/install/act-in-progress.txt` (the `freeze` setting's default). Claimed with `O_EXCL` after G9 passes (`claim_freeze`; a run that finds it taken meanwhile waits at G9 again: it never refuses for a hold), its text a token unique to the run, recorded in the journal; removed at the end of the run whatever the outcome, only while it still holds that token (`release_freeze`). Never in either `log/`. The APPROVED check and the install's control-file hash leave it out. A stale one holds G9 (a `G9 held` line, in the run and now also in the launcher's log) and is never removed by a run that did not write it; the owner's undo refuses (nothing written) while one is held; the journal's undo removes the dead run's freeze only when it still holds the token that run recorded | `test_the_freeze_defaults_to_the_install_folder`, `test_the_approved_check_and_the_control_hash_never_count_the_freeze`, `test_the_freeze_is_claimed_once_and_released_only_by_its_writer`, `test_the_freeze_exists_during_the_apply_in_install_never_in_a_log_and_is_gone_after` (seen from the hook: in `install/`, in neither log, no index lock, a `digest` passing the APPROVED check meanwhile), `test_a_stale_freeze_holds_g9_and_is_never_removed_by_the_run`, `test_a_stale_freeze_holds_until_it_is_gone_then_the_run_proceeds`, `test_the_launcher_holds_on_a_stale_freeze_with_a_g9_line`, `test_the_owners_undo_never_writes_over_a_stale_freeze`, `test_the_journals_undo_removes_only_the_freeze_its_run_wrote` (own token, someone else's) |
+| F19 | The defaults table above: `push_cmd` unset means the three channels; `freeze` the install folder | — |
+| Not in this round | F3 (the guard's call log: its own ACT, DEC-1106 (2)); F7 (kept, DEC-1106 (4)); F16 to F18 and F20 (their text was not in this round's brief) | — |
+
+### Round 3's runs
+
+- **Unit tests:** 175 passed (`tests/unit/operator/`: round 2's 153 plus 22 in `test_w2_148_round3.py`; 6 cases
+  revised in place), run with `-m "not local_only" -k "not real and not green_here and not time_limit"` (the exclusion
+  left nothing out of this folder).
+- **`gov accept W2-148`:** pass, 166 passed, 0 failed, 0 skipped, 0 unmapped; every one of the 39 lines pass
+  (success-1 to 24, failure-1 to 15; failure-15, DEC-1106's line, 7 passed).
+- **The trial re-run (S23):** the same results as round 2. 57 ACT files (54 at `116c2b413`, 3 later), none lower than
+  the table, counts (a) 6, (b) 19, (O) 32, the same 22 rises; the 8 replays as before (SELECT-FIXES-1, SELECT-HOOK-1,
+  GUARD-SETS-1's control part, PERMISSIONS-2, NIGHTLY-STOP-1 applied as (b), OLLAMA-CAP-1 applied as (a), GUARD-SETS-1
+  whole, W1-01-EXEMPT-1 and D8 refused at G6 as (O)); the 7 faults as before (an edit after review refused at G4, a
+  wrong class claim refused at G6, an unlisted file touched refused at G8, a red check undone, a failing undo lock held,
+  a missing yes and a yes for an older sha refused at G6). The live files, hashed before and after the run, equal:
+
+| Path | Files | Before | After |
+|---|---|---|---|
+| live repository: .claude/hooks/** | 6 | 8d775c6a79680b1086e66fda5b17a5b737997c4cbea8c2ee76b06e684a5dbb06 | 8d775c6a79680b1086e66fda5b17a5b737997c4cbea8c2ee76b06e684a5dbb06 |
+| live repository: .claude/settings*.json | 2 | 1730c3f7c9ca19acabb591726c994d889e12b6852e9148d097572662721af9b9 | 1730c3f7c9ca19acabb591726c994d889e12b6852e9148d097572662721af9b9 |
+| live repository: the rest of .claude/** (agents, skills, commands) | 41 | fd9570353a05e66acdda70661a8ff4332a186f082b593f310402c0a9947aa0d7 | fd9570353a05e66acdda70661a8ff4332a186f082b593f310402c0a9947aa0d7 |
+| live repository: .git/hooks/** | 15 | a3037550074b3cf21383ac235cff33081e0ef1e4da1d09bbc8efe18c9d0d7c9c | a3037550074b3cf21383ac235cff33081e0ef1e4da1d09bbc8efe18c9d0d7c9c |
+| live repository: path map, test map, opt-in lists | 6 | de1deae14fc972c91fffb7be5c0db35c8b0a86918cb4c12ef00e785ed7cbf91a | de1deae14fc972c91fffb7be5c0db35c8b0a86918cb4c12ef00e785ed7cbf91a |
+| live repository: deadman.py, sentinel-brief.md | 2 | d467b8db04823b8cefb018b391b2122db6df960ff42db021b3a13bf0a887492f | d467b8db04823b8cefb018b391b2122db6df960ff42db021b3a13bf0a887492f |
+| the pin ~/.local/bin/gov | 1 | 20205dbcd3d368875c5ffdb9543efad210f35cfa482f90316147c301b17f4b46 | 20205dbcd3d368875c5ffdb9543efad210f35cfa482f90316147c301b17f4b46 |
+| ~/gov-os-operator/ (every file) | 41 | 7b68bd2edda32656dbd12e809457d9652507e2f141391f4da59daea25b558ba7 | 7b68bd2edda32656dbd12e809457d9652507e2f141391f4da59daea25b558ba7 |
+| ~/.claude/ (its configuration: settings, CLAUDE.md, hooks, agents, skills, commands, rules) | 233 | 83fd1a239de3116e38796b9e72d5ddb131df7dc7776632dc77d2b5f656bf1b20 | 83fd1a239de3116e38796b9e72d5ddb131df7dc7776632dc77d2b5f656bf1b20 |
+| crontab -l (its output; exit 1) | 1 | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 |
+
+Equal: **True**. The `~/.claude/` row differs from round 2's: that configuration changed between the two runs (not by
+the trial); within this run before and after are equal.
+
+### Round 3's notes for the narrow review
+
+- **The rule reaches every live undo, not only the (a) after-check's.** The designer's revised S15 families include
+  control files the live unlisted-file check catches first (the hook folder, `.git/config`), so the rule had to hold
+  in the `unlisted` path too. A live unlisted file the apply wrote is now left as written (the lock held, the P1 naming
+  it) instead of being restored; the touched files are still undone.
+- **Ordinary work under the rule:** a control file Claude Code itself writes in the live tree during G8 (for example
+  `.claude/settings.local.json` or `.claude/scheduled_tasks.lock`, both under `.claude/**`) is now a difference the
+  agent leaves, so that run refuses at G8 and holds the lock until the owner clears it. That is DEC-1106's rule as
+  written; whether such files leave the control list is a question for ACT-OPERATOR-1.
+- **The journal's freeze:** the journal's undo after a dead session removes that session's freeze only when its text
+  is still the token the journal recorded; a journal from before round 3 has no token, so its freeze stays and holds
+  G9 until removed by hand.
 
