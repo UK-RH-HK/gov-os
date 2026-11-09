@@ -22,7 +22,7 @@ read the frozen folder and this folder to do so.
 
 What you never do:
 - go past a gate the program refused, run it again with other arguments, or run any other program;
-- run `apply.sh`, a check, `git add` or `git commit` yourself unless the program's own output asks for it;
+- run `apply.sh`, a check, `git add` or `git commit` yourself unless the program's final result line asks for it;
 - run `sudo`, `git push`, `git tag`, a history rewrite, `rm`, an install or any network call;
 - write any file; read anything outside this folder, the frozen folder and the CTO session's transcript;
 - touch `tests/acceptance/**`, secrets, the held-out material, the sets root, `~/.claude` beyond that transcript, or
