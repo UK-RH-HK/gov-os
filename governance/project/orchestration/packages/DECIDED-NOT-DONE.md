@@ -81,8 +81,8 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0f. DEC-1103's items (2026-11-09)
 | # | item | fate (DEC-1103) | state |
 |---|---|---|---|
-| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | IN PROGRESS 11-09 |
-| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | IN PROGRESS 11-09 |
+| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **Rehearsed 11-09** (`ACT-GATE-CONFIG-1.md`, 0 failures); WAITS: the operator, before W2-20 merges |
+| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | **Rehearsed 11-09** (A and B); WAITS: the owner's A/B/C (3 of the ten red by design: their guard features are off) |
 | 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | **Package to the owner 11-09** (`OPERATOR-AGENT-1.md`); WAITS: the owner's seven answers |
 
 ## 1. Every item not done, partly done or waiting
