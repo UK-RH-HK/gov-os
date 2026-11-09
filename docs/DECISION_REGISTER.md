@@ -9599,6 +9599,9 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   4. **A target for the round,** measured and reported: at least 60 to 70 % of tests reused on a typical ticket's close, and a typical close under about 15 minutes. **If the round falls short,** no further open-ended round: a package with a fallback (for example, running only the suites the change's paths affect, with the nightly full run as backstop).
   5. **Size:** W2-48 stands at about 1,680 lines (source 1,117: `testcache/__init__.py` 440, the pytest plugin 364, `commands.py` 165, `__main__.py` 81, `close/cache.py` 67; builder tests 364; the research record 199) against an estimate of 220, for what is meant to be mostly glue around testmon. The round simplifies where it can rather than adds, and its return says where the lines went.
 - Next free id: DEC-877.
+- **Kept:** tests/acceptance/W2-07/README.md — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
+- **Kept:** tests/acceptance/W2-07/test_w2_07_decision_records.py — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
+- **Kept:** tests/acceptance/W2-07/w2_07_support.py — it names DEC-876's entry only as the source of a copied register status-line form (`SUPERSEDED by DEC-n (<date>; it was ACCEPTED…)`), not DEC-876's cache decision (D-6 part 2 item F, DEC-1109 (2))
 
 | Version | Date | Change |
 |---|---|---|
