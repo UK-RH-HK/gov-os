@@ -22,6 +22,7 @@ allowed_paths:
 - docs/changes/W2-141-evidence.md
 - .claude/hooks/role_reads.py  # the live hook's side [changed, DEC-1093 (2); DEC-1102]
 - docs/changes/W2-141-hook/**  # the hook as built, staged for the operator's ACT (a launched worker cannot edit .claude/, DEC-315) [changed, DEC-1093 (2); DEC-1102]
+- tests/unit/hooks/test_live_hook.py  # its one G14_PASSED case that S1 now refuses (the designer's round-2 P-2) [changed, DEC-1093 (2); DEC-1102]
 kpis:
   success:
   - 'S1 For an engineer on ticket T, a Grep or Glob tool call whose path and pattern can reach tests/acceptance/<T>/ (the repository root, tests/, tests/acceptance/, a pattern such as **/*.py) is refused unless the call excludes that folder; the refusal names the folder and says how to exclude it (for Grep a glob such as !tests/acceptance/<T>/**). Verify: planted calls, each refused or allowed as stated [DEC-1093 (2), DEC-1056, DEC-1059]'
@@ -72,5 +73,12 @@ whole-file copy at `docs/changes/W2-141-hook/role_reads.py` and tests it there; 
 merged branch and the owner's operator applies it to `.claude/hooks/role_reads.py` at the lift's re-pin. The
 acceptance tests load the staged copy when it exists, else the live hook. The exclusion line's grep form is the
 base name (`--exclude-dir=<WBS id>`; GNU grep matches the base name), fixed in EMG-common (the designer's P-1).
+
+**The designer's round-2 points settled (the CTO, 2026-11-09) [changed, DEC-1093 (2); DEC-1102]:** P-1: the live hook
+routes only Read, NotebookRead, Grep and Bash to `role_reads` (`.claude/hooks/pretooluse.py`, the G-14 block), so S1's Glob half
+needs Glob added there: the engineer stages that one-word change as `docs/changes/W2-141-hook/pretooluse.py` (a whole-file
+copy), applied in the same operator ACT. P-2: `tests/unit/hooks/test_live_hook.py`'s `G14_PASSED` case
+`grep -r foo tests/` contradicts S1; the engineer revises it (the unit test is in the paths). The CTO checks
+`guard4_check.py`'s cases against S1 when preparing the ACT.
 
 [DEC-1093]
