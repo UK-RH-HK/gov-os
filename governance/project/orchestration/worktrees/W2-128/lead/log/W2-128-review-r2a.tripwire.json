@@ -1,0 +1,97 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/ACT-CLAUDE-COPIES-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "61231e61839e",
+   "after": "0e8fde43f342"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "af2543e27fd4",
+   "after": "0e8fde43f342"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "head",
+   "before": "14135b50c1fc",
+   "after": "b85efb8791f7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": " M src/gov/retrieval/supplementary.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": " M src/gov/retrieve/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? docs/changes/W2-150-evidence.md"
+  }
+ ]
+}

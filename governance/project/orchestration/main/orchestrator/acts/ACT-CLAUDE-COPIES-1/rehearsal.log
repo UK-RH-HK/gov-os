@@ -1,0 +1,11 @@
+ACT-CLAUDE-COPIES-1 rehearsal; live HEAD 97f39dc4e73e; rulesync 24.0.0
+generation clone: changed or new files 13 (expected 13)
+ok   apply.sh check (the live state as stated): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1: exit 0
+ok   check 2: exit 0
+ok   portability after the apply: exit 0; findings []
+ok   the changed set equals the touched list (13 files)
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+failures: 0

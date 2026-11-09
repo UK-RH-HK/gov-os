@@ -341,3 +341,5 @@
 2026-11-09 14:15:09 interim result: W2-20 6b2a8f9a2 W2-20 round 2 (DAEO-r30l): the planted readings GOV_RESOURCES_BUSY_CORES, _EMBED
 2026-11-09 16:03:08 interim result: W2-20 bdc5e0525 W2-20 tests: S16 measured per CPU, the slot's own CPUs and an escape check outsi
 2026-11-09 18:33:08 guard refusals: 4 new
+2026-11-09 19:17:07 interim result: W2-129-d6 0eb83d9ad W2-129 S17: the research record's section 9 (before and after counts, timing, go
+2026-11-09 19:43:01 interim result: W2-92-d6 27d9ecaa3 W2-92 S11: the probe before and after in the memory measure (D-6 part 2)

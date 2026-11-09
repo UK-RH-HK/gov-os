@@ -1,0 +1,87 @@
+ACT-STOP-IDLE-1 rehearsal 2026-11-09 19:48:17; live HEAD 7a3c527c8
+1. The live files before
+  2b8909d236b70f8cef97eb23d5023b151dbc05e9ec879a189caee70bfb33d477  .claude/settings.local.json
+  8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+  97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+  bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+  5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+  40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+  8343270dd89c51f45e779dd87ad8495e3d1e30fccc9dc5e5a5483d5891ba4c70  governance/project/orchestration/tools/stop_waiter_check.py
+  01002f8a56bc17841eb3d0a6385f2c723307592a237ac7937eba9fb0a9f2fc21  governance/project/orchestration/tools/permission_request.py
+  absent  governance/project/orchestration/tools/stop_idle_check.py
+  absent  tests/unit/orchestration/test_stop_idle_check.py
+  absent  .gov-runtime/scratch/orchestrator/log/stop-idle.log
+  absent  .gov-runtime/scratch/orchestrator/log/stop-idle-state.json
+  26a4184cc501234e343e7a18a2cca4270a9f99295d62d34c072c26ad459ad918  .gov-runtime/scratch/orchestrator/log/cto-session.txt
+2. The clone
+  ok: clone at 7a3c527c8; its settings.local.json 2b8909d236b7
+3. Before apply: the inbox waiter's hook and its tests
+  waiter tests: 6 passed
+  waiter hook on the CTO's input: 'rc=0'
+4. check, then apply, then check and apply again
+apply.sh: the three draft files hash as reviewed (hook d56a7aa79331, tests a58027c533fd, edit b9afa575c4ed)
+apply.sh: the draft tests on the draft hook: 31 passed in 1.59s
+apply.sh: state: old (settings 2b8909d236b7)
+  ok: check exits 0 in state old
+apply.sh: the three draft files hash as reviewed (hook d56a7aa79331, tests a58027c533fd, edit b9afa575c4ed)
+apply.sh: the draft tests on the draft hook: 31 passed in 1.71s
+apply.sh: state: old (settings 2b8909d236b7)
+apply.sh: settings backed up: /home/usain/gov-os-runs/STOP-IDLE-1-rehearsal/repo/.gov-runtime/scratch/orchestrator/drafts/stop-idle/backup/settings.local.json.before (2b8909d236b7)
+apply.sh: installed: governance/project/orchestration/tools/stop_idle_check.py, tests/unit/orchestration/test_stop_idle_check.py
+apply.sh: settings: the idle check's Stop entry added (sha256 16d9dde58dcf)
+verify: only the idle check's Stop entry was added; env, permissions, PermissionRequest and the inbox waiter's Stop entry unchanged
+apply.sh: installed tests (the idle check and the inbox waiter's): 37 passed in 1.74s
+apply.sh: the hook's command as Claude Code runs it: another session, no answer, exit 0
+apply.sh: APPLIED. It takes effect in the CTO's session at its next settings reload or restart.
+  ok: apply exits 0
+    apply.sh: the three draft files hash as reviewed (hook d56a7aa79331, tests a58027c533fd, edit b9afa575c4ed)
+    apply.sh: the draft tests on the draft hook: 31 passed in 1.51s
+    apply.sh: state: applied (settings 16d9dde58dcf)
+  ok: check now reads state applied
+  ok: a second apply: already applied
+5. The clone's settings after apply
+verify: only the idle check's Stop entry was added; env, permissions, PermissionRequest and the inbox waiter's Stop entry unchanged
+  ok: only the idle check's entry added (against the live file's bytes)
+  ok: the same edit on the live bytes with the live path gives the pinned d715292711a2… (computed, not written)
+6. After apply: the inbox waiter unaffected
+  waiter tests: 6 passed
+  ok: waiter tests the same before and after
+  ok: the waiter's command byte-identical
+  ok: the waiter's answer on the same input unchanged ('rc=0')
+7. The installed hook end to end, through its settings command, on the live state (read only)
+  answer: '' rc=0 in 75 ms
+  log: 2026-11-09 19:48:30	ad44f5fe	through	running: 24	agent Launch script, tests first; agent W2-56: second half and engineer; agent Prepare the stop-hook ACT; agent D-6 part 2 and its rows; agent W2-139 and W2-140 batch; agent D-5: the templates; task b1keq5r17: cd stop-idle && H=$(sha256sum stop_idle_check.py | cut -c1-64); T=$(sha256sum te; task b83w7niwj: S="tests/acceptance/W1-30 tests/acceptance/
+  ok: the CTO's session now: let through while its agents and workers run, exit 0
+  ok: another session: no answer, exit 0
+  7b. The same command with the live state planted away (no agents, tasks or workers; a fresh open status)
+  answer: {"decision": "block", "reason": "Idle check (DEC-1110 (1), DEC-1109 (3)): nothing of yours is running (none of the session's agents or tasks, no launched worker; dispatcher: no lead or job, the gate open, the machine not full) while DECIDED-NOT-DONE shows 21 unblocked item(s): #14 the label audit (DONE (trigger set); rubric v3 DUE NOW (a); #17 GLOSSARY-1 (DECIDED 11-08; DUE NOW (after the 80): t); #19 W2-139, W2-140 (DUE NOW (the 80 ran 11-08): one batch, o); #21 W2-88's lines for the memory standard (ANSWERED 11-09 (DEC-1099 (2)); next: the); #22 P-SELECT-GRAPH's three cheaper fixes (ANSWERED
+  ok: idle with the live DECIDED-NOT-DONE's open items: block, naming them
+  the second stop: {"systemMessage": "Idle check (DEC-1110): a second stop this turn, let through (no IDLE-REASON line stated)"}
+  ok: the second stop of the same turn: let through, named
+  gate shut: {"systemMessage": "Idle check (DEC-1110): nothing running; let through: the gate shut (SHUT (planted))."}
+  ok: the gate shut: let through, named
+  DECIDED-NOT-DONE missing: {"systemMessage": "Idle check (DEC-1110) could not run: CheckError: DECIDED-NOT-DONE unreadable: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/STOP-IDLE-1-rehearsal/repo/governance/project/orchestration/p
+  ok: a parse error: named, not a block, exit 0, logged
+  ok: the hook file missing: exit 1 (a non-blocking error Claude Code shows), never 2: 'stop idle check: /home/usain/gov-os-runs/STOP-IDLE-1-rehearsal/repo/governance/project/orchestration/tools/stop_idle_check.py is missing, so the idle check did not run (DEC-1110)'
+8. Planted faults refused
+  ok: an edit after review: check refuses
+9. undo
+apply.sh: settings: the backup put back (2b8909d236b7)
+apply.sh: removed governance/project/orchestration/tools/stop_idle_check.py
+apply.sh: removed tests/unit/orchestration/test_stop_idle_check.py
+apply.sh: UNDONE (log/stop-idle.log kept as the record). State now: old
+  ok: undo exits 0
+  ok: settings back to the live bytes (2b8909d236b7…)
+  ok: the two files removed (untracked in the clone)
+  ok: the clone's tree clean again
+  ok: check reads state old again
+  ok: a settings file changed since the rehearsal: apply refuses
+  ok: the waiter's tests after undo: 6 passed
+10. The classifier's vote (governance/project/operator/act_class.py, read only), two manifests
+  settings-only: b | [('.claude/settings.local.json', 'b', 'settings')] | hits []
+  full: O | [('.claude/settings.local.json', 'b', 'settings'), ('governance/project/orchestration/tools/stop_idle_check.py', 'O', 'unknown'), ('tests/unit/orchestration/test_stop_idle_check.py', 'O', 'unknown')] | hits []
+11. The live files after
+  ok: the live files hash as before (13 paths, the targets and the hook's log still absent)
+  ok: the live tree's git status unchanged
+  guard suites: not run, no guard file touched (.claude/hooks/**, the path map and the guard's code hash as before)
+RESULT: 0 failure(s)

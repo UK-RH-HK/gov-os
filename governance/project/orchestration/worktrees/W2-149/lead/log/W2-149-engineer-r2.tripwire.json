@@ -1,0 +1,93 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "15c606f6b7ec",
+   "after": "97f39dc4e73e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "15c606f6b7ec",
+   "after": "97f39dc4e73e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "15c606f6b7ec",
+   "after": "97f39dc4e73e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "c6aefae9e14f",
+   "after": "0439b8596baf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149",
+   "change": "head",
+   "before": "8d4569bfef3c",
+   "after": "a929356ea544"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-150/w2_150_walk.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150-tests",
+   "change": "acceptance folder",
+   "folder": "W2-150"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M src/gov/codeintel/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M src/gov/launch/launcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M template/governance/kernel/settings.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M tests/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M tests/unit/codeintel/test_codeintel.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M tests/unit/launch/test_runs.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": " M tests/unit/launch/test_w1_32.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": "?? src/gov/launch/environ.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56",
+   "change": "status line added",
+   "line": "?? src/gov/launch/sandbox.py"
+  }
+ ]
+}

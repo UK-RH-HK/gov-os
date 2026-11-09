@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-129-d6
+status: interim result 0eb83d9ad: W2-129 S17: the research record's section 9 (before and after counts, timing, gov accept 150/0)

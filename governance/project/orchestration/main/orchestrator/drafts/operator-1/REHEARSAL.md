@@ -45,3 +45,21 @@ Notes:
   now applies only while the live hook is pre-calllog, and each kind sets its own hook in its clone.
 - The CTO session's real calls ran with the real HOME (sign-in), so the clone's `write_refused` roots were set to the
   planted absolute paths for that step and set back after.
+
+## After DEC-1109 (1): the brief's one change (`0240833b4`)
+`install.sums` (`29ea26233916`), the expected live `APPROVED` (`157a9dc0…e474ad7`) and `apply.sh`'s `SUMS` line rebuilt
+(`apply.sh` `6bcdcf2f6ca8`; nothing else changed). `rehearsal-dec1109.log` (18:52–18:53 GMT, a fresh pre-calllog clone
+at `0240833b4`, **0 failures**): check, apply (install 14 files, its own APPROVED check ok), the commit (4 M, 2 A); the
+(a) ACT through the real walled session, its wall holding the new brief (`51c459cf…`): applied, undone; the (b) ACT:
+refused at G6, applied and committed with the yes, undone; the freeze's four commit cases as before; the owner's files
+unchanged; undo, then "ready to apply"; live files unchanged. W2-148 acceptance 169/169 and `tests/unit/operator`
+184/184 at `0240833b4`; `apply.sh check` on the live main tree: "ready to apply (the hook is post-calllog)".
+
+## The live crontab defect and the real-crontab test (2026-11-09 19:04)
+The owner's operator's apply stopped at the crontab step: Debian's `crontab <file>` cut the 115-character backup path at
+99 characters. The rehearsals' stub accepted any path, so they could not show it (a lesson: a stub must model the real
+command's limits, or the step is tested against the real command). `apply.sh` (`bafcd1e72316`) now uses `crontab - <
+file` in apply and undo; `check` reads the table by content. `crontab-real-test.log`: the real `/usr/bin/crontab`, this
+user's table saved first; paths of 138–143 characters: the path form exit 1, table unchanged; undo's and apply's
+stdin forms each loaded their table byte for byte; the saved table restored and compared byte for byte
+(`91e07361e51e`). Live `apply.sh check`: "already applied".

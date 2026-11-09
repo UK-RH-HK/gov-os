@@ -37,7 +37,8 @@ hold for every one of them.
   The guard misreads heredocs and `$(…)` loops today (W2-42a fixes it): prefer the Edit/Write tools for file edits.
 - **An engineer never searches into its own ticket's acceptance folder (DEC-1093 (2), until W2-141's guard lands):**
   every Grep or Glob call that could reach it carries the exclusion `!tests/acceptance/<your ticket's W2 id>/**`, and
-  every recursive Bash search the matching one (`grep -r --exclude-dir=<that folder>`, `rg -g '!tests/acceptance/<id>/**'`,
+  every recursive Bash search the matching one (`grep -r --exclude-dir=<your W2 id>`: grep matches the folder's BASE
+  NAME only, e.g. `--exclude-dir=W2-141`, never a path, which excludes nothing; `rg -g '!tests/acceptance/<id>/**'`,
   `find … -path <that folder> -prune -o …`). If a search shows you any line from there anyway, stop reading it and
   say so in your return.
 - **Under `.gov-runtime/`:** commit hashes written as 12 digits; row W2-L423's rule (write none of the keywords

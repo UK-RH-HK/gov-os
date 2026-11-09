@@ -1,0 +1,3 @@
+{"decision":"allow","id":"w-0000000000000001","why":"ran"}
+{"decision":"deny","id":"w-0000000000000002","why":"refused-by-sandbox"}
+{"decision":"deny","id":"w-0000000000000003","why":"refused-by-sandbox"}

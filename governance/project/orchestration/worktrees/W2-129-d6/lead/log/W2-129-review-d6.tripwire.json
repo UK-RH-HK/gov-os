@@ -1,0 +1,1560 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "5ecfeb22dd14",
+   "after": "d1f50e2fa31c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "5ecfeb22dd14",
+   "after": "4c3b2ce2361d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "27f6140ef233",
+   "after": "4c3b2ce2361d"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "5ecfeb22dd14",
+   "after": "d1f50e2fa31c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "head",
+   "before": "75a29ff64ac0",
+   "after": "f67e57deb9dd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/test_w2_128_facts.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/test_w2_128_links.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/test_w2_128_rows.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/test_w2_128_schemas.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/test_w2_128_templates.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-128/w2_128_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "acceptance folder",
+   "folder": "W1-06"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "acceptance folder",
+   "folder": "W2-128"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "head",
+   "before": "2d9115ce5d56",
+   "after": "beeb3c29ab6b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/CONTRACT_v4.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/SOURCE_MAP.csv"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-01.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-01.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-01.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-01.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-01.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-02.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-02.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-02.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-02.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-03.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-04.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-04.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-04.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-04.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-04.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-05.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-05.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-05.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-05.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-05.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-06.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-07.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-07.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-07.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-08.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-08.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-09.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-09.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-09.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-10.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-10.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-10.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-11.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-11.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-12.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-12.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-12.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-13.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-13.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-13.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-14.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-14.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-15.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-16.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-16.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-16.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-16.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-17.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-17.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-17.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-17.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-18.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-18.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-18.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-19.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-19.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-19.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-19.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-20.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-20.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-21.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-21.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-21.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-22.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-22.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-22.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-22.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-22.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-23.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-23.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-23.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-23.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-24.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-24.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-24.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-24.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-25.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-26.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-26.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-27.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-27.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-27.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-28.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-28.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-28.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-29.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-29.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-29.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-30.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-31.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-31.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-31.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-31.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-31.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-32.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-32.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-32.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-32.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-32.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-33.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-34.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-35.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-35.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-35.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-35.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-36.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-36.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-37.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-38.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-39.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-39.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-39.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-39.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-39.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-40.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-40.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-40.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-40.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-40.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.h.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.i.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.j.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-41.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-42.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-42.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-42.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-42.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-43.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-43.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-43.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-43.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-43.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.h.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.i.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.j.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.k.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.l.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-44.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-45.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-45.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-45.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-46.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-46.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-47.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-47.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-47.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-47.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-47.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-48.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-48.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-48.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-49.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-49.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-49.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-49.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-50.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-51.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-51.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-51.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-52.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-52.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-52.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-53.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-53.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-53.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-53.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-54.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-54.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-54.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-55.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-55.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-56.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-56.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-57.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-57.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.g.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.h.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-58.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-59.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-59.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-59.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-59.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-60.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-60.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.b.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.c.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.d.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.e.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.f.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-61.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-62.a.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/capabilities/CAP-62.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": " M docs/contract/contract.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139",
+   "change": "status line gone",
+   "line": "?? docs/changes/W2-27-CIT-P.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line added",
+   "line": " M governance/project/operator/opcommon.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line added",
+   "line": " M governance/project/operator/operator_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line added",
+   "line": " M tests/unit/operator/test_w2_148_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line added",
+   "line": " M tests/unit/operator/test_w2_148_trial.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line added",
+   "line": "?? tests/unit/operator/test_w2_148_replay.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_canary_session.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_guard_line.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_live.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_refusals.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_results.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_seed_content.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_tree_settings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-149/w2_149_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  }
+ ]
+}

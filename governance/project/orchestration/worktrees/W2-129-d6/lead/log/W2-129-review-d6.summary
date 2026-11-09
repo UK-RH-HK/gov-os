@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-q7lk: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-129-d6/.gov-runtime/scratch/lead/log/W2-129-review-d6.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-129-d6/.gov-runtime/scratch/lead/log/W2-129-review-d6.json

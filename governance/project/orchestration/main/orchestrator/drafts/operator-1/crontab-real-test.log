@@ -1,0 +1,20 @@
+real crontab test, 2026-11-09T19:04:27+00:00, /usr/bin/crontab, user usain
+saved: 91e07361e51e (6 lines; operator line: 1)
+path length of crontab.before: 143
+path length of crontab.after: 142
+path length of saved.txt: 138
+live table == backup/crontab.after
+-- 1. a path argument (the old form), the same table:
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/operator-1/cron: No such file or directory
+exit 1
+table unchanged
+-- 2. undo's form: crontab - < crontab.before (long path)
+exit 0
+table == crontab.before (operator line gone: 0)
+-- 3. apply's form: crontab - < crontab.after (long path)
+exit 0
+table == crontab.after
+-- 4. restore the saved table through stdin
+exit 0
+RESTORED: crontab -l byte for byte the saved table (91e07361e51e)
+test folder: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/operator-1/crontab-real-test-20261109T190427

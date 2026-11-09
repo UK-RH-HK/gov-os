@@ -1,0 +1,80 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "b2b59cafff0d",
+   "after": "ffa38798b45f"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M docs/DECISION_REGISTER.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/DECISIONS-IN-FORCE.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/START-NEXT-SESSION.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/LIFT-1/D5-STATUS.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "27aaab3814f1",
+   "after": "ffa38798b45f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "27aaab3814f1",
+   "after": "328d40f50a80"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "b2b59cafff0d",
+   "after": "ffa38798b45f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153",
+   "change": "head",
+   "before": "fd7d53f8ceaa",
+   "after": "96e600d65d0c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153",
+   "change": "status line gone",
+   "line": " M tests/unit/launch/test_runs.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153",
+   "change": "status line gone",
+   "line": " M tests/unit/launch/test_w1_28.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153",
+   "change": "status line gone",
+   "line": " M tests/unit/launch/test_w1_32.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "head",
+   "before": "b2b59cafff0d",
+   "after": "c5ed68d4eb45"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "acceptance folder",
+   "folder": "W2-55"
+  }
+ ]
+}

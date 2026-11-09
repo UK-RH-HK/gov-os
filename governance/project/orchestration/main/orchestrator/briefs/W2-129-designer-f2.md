@@ -1,26 +1,54 @@
-# W2-129 — the test designer's third pass: S16 in a closing commit (DAEO-q7lk)
+# W2-129 — the independent test designer's brief, S18: a settlement is a change (DAEO-q7lk)
 
-You are the independent test designer for **W2-129**. The review (`.gov-runtime/scratch/orchestrator/reviews/w2-129.md`,
-finding F2) found that S16 is not checked in a commit that **closes** a ticket. If the closing commit also rewrites
-`kpis`, `allowed_paths` or `acceptance_tests` with no decision id, nothing is reported. The KPI exempts only "status,
-assignee or links alone", and DEC-1088 (6) says `gov links` flags any change without a decision.
+You are the independent test designer for **W2-129** (`.tickets/DAEO-q7lk.md`). Read the new line **S18** and the note
+"D-6 part 2 item F2's round 2 placed here". Your earlier cases are in `tests/acceptance/W2-129/`: read your README and
+support module first.
 
-## What to do
-In `/home/usain/gov-os-worktrees/W2-129-tests` (merge `w2/integrate` first if it moved: `git merge w2/integrate`),
-add to `tests/acceptance/W2-129/` (S16):
-- a commit that closes an open ticket **and** changes its `kpis` with no decision id: `TICKET_CHANGE_UNMARKED`, naming
-  the ticket, the commit and `kpis`;
-- the same with `allowed_paths` and with `acceptance_tests`;
-- a closing commit that changes only `status` (and `assignee`): no finding (a guard);
-- a closing commit whose `kpis` change carries `[re-worded, DEC-n]`: no finding (a guard).
+## What S18 says
+UNMARKED_CHANGE also names a decision another entry **settles**: a `**Settles:** DEC-x` label, which the loader's
+`register_statements` gives the class `settle`. It applies when the settled entry's own status line names no such
+changer, as for supersede and amend. `--propose-marks` gives the same `**Changed by:** DEC-y` mark for it. Every other
+code and count is unchanged.
 
-Add the README rows (`| S16 | ... |`). Leave every other case. The new reds are red on the branch for the right
-reason. Run the folder and `gov accept W2-129` through the heavy slot (`HOME=/home/usain`).
+Why: W2-55 S9 removes `tags.py`'s narrower relation check, which caught an unmarked `**Settles:**` (a change by
+DEC-866 (1)). Once that check is gone, `gov links` must catch it.
+
+## What the cases must show (2 to 4; add them first)
+- **Red today:** a planted register in which DEC-y has `**Settles:** DEC-x` and DEC-x's status line does not name
+  DEC-y. `gov links --all --json` gives an UNMARKED_CHANGE with ids `[DEC-x, DEC-y]`, and `--propose-marks` gives a
+  patch adding `**Changed by:** DEC-y` to DEC-x's status line.
+- **Guards (green):**
+  - DEC-x's status line naming DEC-y (`**Changed by:** DEC-y`) gives no finding;
+  - a PROPOSED settling entry gives no finding (as for the other forms);
+  - the existing UNMARKED_CHANGE cases are unchanged.
+
+Map them to S18 and update the README.
+
+## Where you work
+- `/home/usain/gov-os-worktrees/W2-129-f2-tests`, branch `w2/W2-129-f2-tests`, from `w2/integrate` at `7aaece52e`.
+  Write only `tests/acceptance/W2-129/`.
+- **Your record:** your session's final message.
 
 ## Rules
-As before: only `tests/acceptance/W2-129/`; the hidden-half rule; DEC-1080 (Read and Grep tools; one simple command per
-Bash call; no `cd … &&`; no `git -C`; one line before a command that will ask). Commit with
-`--trailer "Task: DAEO-q7lk" --trailer "Implements: DEC-1088" --trailer "Role: independent-test-designer" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`.
+- **Never read this ticket's implementation (G-14):** `src/gov/links/` and `tests/unit/links/`.
+  - Recursive grep carries `--exclude-dir=links`.
+  - Grep and Glob carry `!src/gov/links/**` and `!tests/unit/links/**`.
+  - Run the code only through your cases.
+- The hidden-half rule: never open the evaluation sets' hidden half or the run folders outside this repository, as
+  `EMG-common.md` names them. No GPU, network or installs.
+- Run your cases through the heavy slot that `EMG-common.md` names, with
+  `PYTHONPATH=/home/usain/gov-os-worktrees/W2-129-f2-tests/src`, a scratch HOME with `.local` linked in, and
+  `PYTHONUSERBASE=/home/usain/.local`. Then run
+  `python3 -m gov.cli.main accept W2-129 --root /home/usain/gov-os-worktrees/W2-129-f2-tests`.
+- **DEC-1080:** one simple command per Bash call. **Search again once.** Waits by pid only.
+- **Commit** on `w2/W2-129-f2-tests` with
+  `--trailer "Task: DAEO-q7lk" --trailer "Implements: DEC-1109, DEC-866" --trailer "Role: independent-test-designer" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`.
 
 ## Return
-The twelve labelled fields, with the commit, the new cases (red or green) and `gov accept`'s counts.
+In your final message:
+- the twelve labelled fields of `EMG-common.md`;
+- the cases (node id, expectation, red or green today);
+- the README's interface line;
+- the commit;
+- `gov accept`'s counts;
+- `TESTS-READY`.

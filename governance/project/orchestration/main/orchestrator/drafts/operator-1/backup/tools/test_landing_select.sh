@@ -1,0 +1,257 @@
+#!/usr/bin/env bash
+# Tests for landing_select.sh (DEC-1100 (2)-(4)) on planted ranges: a temporary repository with a w2/integrate branch,
+# commits planted with each kind of trailer and path, a private CTO folder (log/, dispatch/inbox/, the hold file), a
+# stub verifier in place of lead_verify.sh and a stub heavy slot. One case runs the real select_tests.py through the
+# tool's generated selection, on a --shared clone of the main repository with a planted settings commit (selection only,
+# no pytest). Nothing here touches the main tree, its hooks or its log. One pytest is started: the real lead_verify.sh
+# through the tool on the same clone, its selection narrowed to the reranker's socket cases (stand-in services, no GPU).
+#   bash test_landing_select.sh
+set -u
+HERE=$(cd "$(dirname "$0")" && pwd)
+T=$HERE/landing_select.sh
+MAIN=/home/usain/Dynamic-Agentic-Engineering-OS
+W=$(mktemp -d "${TMPDIR:-/tmp}/gov-os-test-landing-select.XXXXXX")
+fails=0
+ok() { echo "ok   $1"; }
+no() { echo "FAIL $1"; fails=$((fails+1)); }
+check() { if eval "$2"; then ok "$1"; else no "$1"; fi; }
+
+R=$W/repo O=$W/orch
+mkdir -p "$O/log" "$O/dispatch/inbox" "$W/rec"
+export LANDING_REPO=$R LANDING_ORCH=$O LANDING_CLONES=$W/clones LANDING_PREP=true LANDING_DISK=$W/disk.sh
+printf '#!/bin/sh\nexit 0\n' > "$W/disk.sh"
+# the stub verifier: records its arguments and the selection wrapper's command, exits STUB_RC (default 0)
+cat > "$W/verify.sh" <<'EOF'
+#!/usr/bin/env bash
+[ "$1" = --fg ] && shift
+mkdir -p "$LEAD_VERIFY_OUT"
+{ echo "args $*"; echo "select $LEAD_VERIFY_SELECT"; echo "slot $LEAD_VERIFY_SLOT"; echo "as_slot ${LANDING_AS_SLOT:-}";
+  echo "head $(git -C "$1" rev-parse HEAD)"; grep -o -- '"--merge", "[^"]*"' "$LEAD_VERIFY_SELECT"; } > "$STUB_REC/verify.txt"
+[ -n "${STUB_SLEEP:-}" ] && sleep "$STUB_SLEEP"
+[ -n "${STUB_SLOT_RUN:-}" ] && { bash "$LEAD_VERIFY_SLOT" true; echo "slot_rc $?" >> "$STUB_REC/verify.txt"; }
+echo "stub summary rc ${STUB_RC:-0}" > "$LEAD_VERIFY_OUT/summary.txt"
+exit "${STUB_RC:-0}"
+EOF
+export LANDING_VERIFY=$W/verify.sh STUB_REC=$W/rec
+
+git init -q -b w2/integrate "$R"
+gc() {  # $1 path, $2 trailers (one per line, may be empty), [$3 message]: change the path and commit
+  mkdir -p "$(dirname "$R/$1")"; echo "$RANDOM $1" >> "$R/$1"
+  git -C "$R" add -f -- "$1"
+  git -C "$R" -c user.name=t -c user.email=t@t commit -q -m "${3:-planted $1}" ${2:+-m "$2"} -- "$1"
+  git -C "$R" rev-parse HEAD
+}
+gc README "" "root" >/dev/null
+gc .claude/settings.json "" "base settings" >/dev/null
+B0=$(git -C "$R" rev-parse HEAD)
+last() { tail -1 "$O/log/landing-select.log"; }
+dry() { bash "$T" --dry "$1" "$2"; }
+
+echo "-- which commits start a run (--dry)"
+c=$(gc .claude/settings.json $'Task: DAEO-sdxk\nRole: orchestrator')
+check "the CTO's settings commit starts a run" '[ "$(dry $c^ $c)" = "$c .claude/settings.json" ]'
+c=$(gc .claude/settings.json $'Task: DAEO-ab12\nRole: engineer')
+check "a ticket's settings commit does not" '[ "$(dry $c^ $c)" = none ]'
+c=$(gc governance/project/orchestration/notes.md $'Task: DAEO-sdxk\nRole: orchestrator')
+check "the CTO's records-only commit does not" '[ "$(dry $c^ $c)" = none ]'
+c=$(gc governance/project/tool-registry.yaml $'Task: DAEO-sdxk\nImplements: DEC-1\nRole: owner')
+check "an owner ACT on the tool registry starts a run" '[ "$(dry $c^ $c)" = "$c governance/project/tool-registry.yaml" ]'
+c=$(gc governance/project/test-map.yaml "")
+check "a commit with no trailer on the test map starts a run" '[ "$(dry $c^ $c)" = "$c governance/project/test-map.yaml" ]'
+c=$(gc .claude/settings.local.json $'Task: decision-record\nRole: owner')
+check "a decision-record by the owner on settings.local.json starts a run" '[ "$(dry $c^ $c)" = "$c .claude/settings.local.json" ]'
+c=$(gc .rulesync/hooks.jsonc $'Task: decision-record\nRole: orchestrator')
+check "the settings' source (.rulesync) starts a run" '[ "$(dry $c^ $c)" = "$c .rulesync/hooks.jsonc" ]'
+c=$(gc .claude/settings.json $'Task: DAEO-ab12\nRole: owner')
+check "Role: owner starts a run whatever its Task" '[ "$(dry $c^ $c)" = "$c .claude/settings.json" ]'
+c=$(gc src/gov/x.py $'Task: DAEO-sdxk\nRole: orchestrator')
+check "the CTO's code commit off the trigger paths does not" '[ "$(dry $c^ $c)" = none ]'
+c=$(gc .claude/settingsXjson $'Task: DAEO-sdxk')
+check "a look-alike path (.claude/settingsXjson) does not" '[ "$(dry $c^ $c)" = none ]'
+git init -q "$W/other" && git -C "$W/other" -c user.name=t -c user.email=t@t commit -q --allow-empty -m other
+c=$(gc .claude/settings.json $'Task: DAEO-sdxk')
+check "a GIT_DIR exported by git to the hook (a worktree's landing) is not followed" \
+  '[ "$(GIT_DIR=$W/other/.git GIT_WORK_TREE=$W/other bash $T --dry $c^ $c)" = "$c .claude/settings.json" ]'
+
+echo "-- merges: first parent only, judged by the merge's own trailers"
+base=$(git -C "$R" rev-parse HEAD)
+git -C "$R" checkout -q -b w2/W2-99 && t1=$(gc .claude/settings.json $'Task: DAEO-ab12\nRole: engineer')
+git -C "$R" checkout -q w2/integrate
+git -C "$R" -c user.name=t -c user.email=t@t merge -q --no-ff w2/W2-99 -m "Merge w2/W2-99" -m $'Task: DAEO-ab12\nRole: orchestrator'
+m1=$(git -C "$R" rev-parse HEAD)
+check "a ticket's merge touching settings does not start a run (nor its branch's commit)" '[ "$(dry $base $m1)" = none ]'
+git -C "$R" checkout -q -b emg/x && gc governance/project/test-map.yaml $'Task: DAEO-sdxk' >/dev/null
+git -C "$R" checkout -q w2/integrate
+git -C "$R" -c user.name=t -c user.email=t@t merge -q --no-ff emg/x -m "Merge emg/x" -m $'Task: DAEO-sdxk\nRole: orchestrator'
+m2=$(git -C "$R" rev-parse HEAD)
+check "the CTO's merge of an emergency branch on the test map starts one run, on the merge" \
+  '[ "$(dry $m1 $m2)" = "$m2 governance/project/test-map.yaml" ]'
+c1=$(gc .claude/settings.json $'Task: DAEO-sdxk'); c2=$(gc README $'Task: DAEO-sdxk'); c3=$(gc governance/project/test-map.yaml $'Role: owner')
+check "a range of three: the two that qualify, newest first" \
+  '[ "$(dry $m2 $c3 | cut -d" " -f1 | paste -sd, -)" = "$c3,$c1" ]'
+
+echo "-- the run (--fg): the stub verifier, the generated selection, the verdict, the inbox"
+STUB_RC=0 bash "$T" --fg "$m2" "$c3"; rc=$?
+check "green: exit 0" '[ $rc = 0 ]'
+check "the verifier ran on a clone at the new head, W2-00 DAEO-sdxk" \
+  'grep -q "^args $W/clones/.* W2-00 DAEO-sdxk$" $W/rec/verify.txt && grep -q "^head $c3$" $W/rec/verify.txt'
+check "the selection is those commits' own changes (--merge newest first)" \
+  'grep -qF "\"--merge\", \"$c3,$c1\"" $W/rec/verify.txt'
+check "every pytest goes through the tool's slot form" 'grep -q "^slot $T$" $W/rec/verify.txt'
+check "the log says GREEN" 'last | grep -q ": GREEN: stub summary rc 0"'
+check "one inbox item, status GREEN" '[ $(ls $O/dispatch/inbox | wc -l) = 1 ] && grep -q "^status: GREEN$" $O/dispatch/inbox/*'
+check "a green clone is removed" '[ -z "$(ls -A $W/clones)" ]'
+rm -f "$O"/dispatch/inbox/*
+STUB_RC=1 bash "$T" --fg "$m2" "$c3"; rc=$?
+check "red: exit 1, RED logged, the clone kept and named" \
+  '[ $rc = 1 ] && last | grep -q ": RED: .*the clone kept: $W/clones/" && [ -n "$(ls -A $W/clones)" ]'
+rm -rf "$W"/clones/*
+for f in "$O"/log/landing-select/*/tmpdir; do td=$(cat "$f"); [[ "$td" == /tmp/gov-os-ls-* ]] && rm -rf "$td"; done  # the red's
+STUB_RC=2 bash "$T" --fg "$m2" "$c3"; rc=$?
+check "a refused selection is REFUSED, never green (exit 2)" '[ $rc = 2 ] && last | grep -q ": REFUSED: "'
+STUB_RC=3 bash "$T" --fg "$m2" "$c3"; rc=$?
+check "an unfinished run is INCOMPLETE (exit 3)" '[ $rc = 3 ] && last | grep -q ": INCOMPLETE: "'
+LANDING_PREP=false bash "$T" --fg "$m2" "$c3"; rc=$?
+check "a failed store rebuild is INCOMPLETE, no verifier run" '[ $rc = 3 ] && last | grep -q "store rebuild failed"'
+printf '#!/bin/sh\necho "disk gate SHUT: planted" >&2; exit 1\n' > "$W/disk.sh"
+bash "$T" --fg "$m2" "$c3"; rc=$?
+check "a shut disk gate: INCOMPLETE, not started" '[ $rc = 3 ] && last | grep -q "not started: disk gate SHUT"'
+printf '#!/bin/sh\nexit 0\n' > "$W/disk.sh"
+rm -f "$O"/dispatch/inbox/*
+bash "$T" --fg "$base" "$m1"; rc=$?
+check "a range with nothing to run: exit 0, logged, no run, no inbox item" \
+  '[ $rc = 0 ] && last | grep -q "none outside a ticket on the trigger paths" && [ -z "$(ls $O/dispatch/inbox)" ]'
+
+echo "-- the holds (log/act-in-progress.txt)"
+echo "FRESH-80 HOLD: no commit on w2/integrate, planted" > "$O/log/act-in-progress.txt"
+rm -f "$W/rec/verify.txt"
+bash "$T" --fg "$m2" "$c3"; rc=$?
+check "a FRESH-80 hold defers the landing: exit 0, DEFERRED, no run" \
+  '[ $rc = 0 ] && last | grep -q "DEFERRED, a FRESH-80 or E4 hold" && [ ! -e $W/rec/verify.txt ]'
+echo "E4-WINDOW ON THE FRESH 80 (data only): planted" > "$O/log/act-in-progress.txt"
+bash "$T" --fg "$m2" "$c3"
+check "an E4 hold defers it too" 'last | grep -q "DEFERRED" && [ ! -e $W/rec/verify.txt ]'
+echo "ACT-REPIN-W9: handed to the owner's operator (planted)" > "$O/log/act-in-progress.txt"
+bash "$T" --fg "$m2" "$c3"; rc=$?
+check "another ACT's hold does not stop it" '[ $rc = 0 ] && [ -e $W/rec/verify.txt ]'
+rm -f "$O/log/act-in-progress.txt"
+
+echo "-- the slot form: the heavy slot, then the hold again"
+printf '#!/usr/bin/env bash\necho "heavy $*" >> "%s/heavy.txt"\nexec "$@"\n' "$W/rec" > "$W/heavy.sh"
+out=$(LANDING_AS_SLOT=1 LANDING_HEAVY=$W/heavy.sh bash "$T" echo inside); rc=$?
+check "the command runs inside the heavy slot" '[ $rc = 0 ] && [ "$out" = inside ] && grep -q "^heavy bash $T echo inside$" $W/rec/heavy.txt'
+echo "FRESH-80 HOLD (planted)" > "$O/log/act-in-progress.txt"
+mkdir -p "$W/rundir"
+out=$(LANDING_AS_SLOT=1 LANDING_HEAVY=$W/heavy.sh LANDING_RUN_DIR=$W/rundir bash "$T" echo inside 2>/dev/null); rc=$?
+check "a hold that began while waiting for the slot: exit 75, the command not run, marked" \
+  '[ $rc = 75 ] && [ -z "$out" ] && [ -e $W/rundir/held ]'
+rm -f "$O/log/act-in-progress.txt"
+STUB_SLOT_RUN=1 LANDING_HEAVY=$W/heavy.sh bash "$T" --fg "$m2" "$c3"; rc=$?
+check "through the run: the verifier's slot call takes the heavy slot" '[ $rc = 0 ] && grep -q "^slot_rc 0$" $W/rec/verify.txt'
+
+echo "-- the hook's form (--hook): state, detachment, never failing"
+rm -f "$O/log/landing-select.head" "$O/dispatch/inbox"/*
+git -C "$R" update-ref refs/heads/w2/integrate "$m2" && git -C "$R" update-ref refs/heads/w2/integrate "$c3"
+s=$(date +%s%N)
+STUB_SLEEP=4 bash "$T" --hook; rc=$?
+e=$(( ($(date +%s%N) - s) / 1000000 ))
+check "the hook's call returns at once (under 2 s) with the run still going" '[ $rc = 0 ] && [ $e -lt 2000 ]'
+check "with no state, the range is the branch's previous reflog value to its head" \
+  'grep -q "landing ${m2:0:12}..${c3:0:12}: " $O/log/landing-select.log'
+check "the state is the new head" '[ "$(cat $O/log/landing-select.head)" = "$c3" ]'
+pid=$(sed -n 's/.*started detached, pid \([0-9]*\).*/\1/p' "$O/log/landing-select.log" | tail -1)
+bash "$HERE/proc.sh" wait --max 60 --every 1 "$pid" >/dev/null
+check "the detached run finished and logged GREEN, one inbox item" \
+  'grep -q ": GREEN: " $O/log/landing-select.log && [ $(ls $O/dispatch/inbox | wc -l) = 1 ]'
+check "the detached run did not keep the state lock" 'flock -n "$O/log/landing-select.lock" true'
+n=$(wc -l < "$O/log/landing-select.log")
+bash "$T" --hook
+check "an unchanged head: nothing examined, nothing logged" '[ $(wc -l < $O/log/landing-select.log) = $n ]'
+echo "FRESH-80 HOLD (planted)" > "$O/log/act-in-progress.txt"
+d1=$(gc .claude/settings.json $'Task: DAEO-sdxk')
+bash "$T" --hook
+check "a landing in a hold: deferred, the state not advanced" \
+  'last | grep -q DEFERRED && [ "$(cat $O/log/landing-select.head)" = "$c3" ]'
+rm -f "$O/log/act-in-progress.txt"
+d2=$(gc README $'Task: DAEO-sdxk')
+bash "$T" --hook
+check "the next landing after the hold examines both, so the deferred commit runs" \
+  'grep -q "landing ${c3:0:12}..${d2:0:12}: 2 commit(s); outside a ticket on the trigger paths: ${d1:0:12}" $O/log/landing-select.log'
+pid=$(sed -n 's/.*started detached, pid \([0-9]*\).*/\1/p' "$O/log/landing-select.log" | tail -1)
+bash "$HERE/proc.sh" wait --max 60 --every 1 "$pid" >/dev/null
+git -C "$R" update-ref refs/heads/w2/integrate "$c1"
+bash "$T" --hook
+check "a branch moved back: examined from the merge base, logged" 'grep -q "moved off ${d2:0:12}" $O/log/landing-select.log'
+LANDING_REPO=$W/nothing bash "$T" --hook 2>/dev/null; rc=$?
+check "the hook's form in a place with no repository: exit 0" '[ $rc = 0 ]'
+bash "$T" --fg not-a-commit "$c3" 2>/dev/null; rc=$?
+check "an explicit range that is not one: exit 2" '[ $rc = 2 ]'
+
+echo "-- the real select_tests.py through the generated selection (a --shared clone of the main repository)"
+P=$W/real
+git clone -q --shared --no-checkout "$MAIN" "$P" && git -C "$P" checkout -q --detach "$(git -C "$MAIN" rev-parse HEAD)"
+git -C "$P" branch -q -f w2/integrate HEAD
+printf '\n' >> "$P/.claude/settings.json"
+git -C "$P" -c user.name=t -c user.email=t@t commit -q -m "planted settings" -m $'Task: DAEO-sdxk\nRole: owner' -- .claude/settings.json
+pc=$(git -C "$P" rev-parse HEAD)
+cat > "$W/verify_real.sh" <<'EOF'
+#!/usr/bin/env bash
+[ "$1" = --fg ] && shift
+mkdir -p "$LEAD_VERIFY_OUT"
+PYTHONPATH="$1/src" python3 "$LEAD_VERIFY_SELECT" "$1" "$2" "$3" > "$STUB_REC/select.json" 2> "$STUB_REC/select.err"
+rc=$?; echo "select exit $rc" > "$LEAD_VERIFY_OUT/summary.txt"; exit $rc
+EOF
+LANDING_REPO=$P LANDING_VERIFY=$W/verify_real.sh bash "$T" --fg "$pc^" "$pc"; rc=$?
+check "the real selection runs on the clone at the new head: exit 0, scoped, the commit's own change" \
+  '[ $rc = 0 ] && python3 -c "
+import json, sys
+s = json.load(open(\"$W/rec/select.json\"))
+assert s[\"scope\"] == \"scoped\" and s[\"changed\"] == [\".claude/settings.json\"] and s[\"selected\"], s.get(\"changed\")
+print(\"     selected\", len(s[\"selected\"]), \"targets; lifted_reached\", len(s.get(\"lifted_reached\") or []))
+"'
+
+echo "-- the verifier's folder (found 11-09): lead_verify.sh with LEAD_VERIFY_PREPARED=1 never creates it"
+cat > "$W/verify_prepared.sh" <<'EOF'
+#!/usr/bin/env bash
+[ "$1" = --fg ] && shift
+echo "$$" > "$LEAD_VERIFY_OUT/verify.pid" || exit 3   # lead_verify.sh's first write, with no mkdir (LEAD_VERIFY_PREPARED)
+echo "prepared summary" > "$LEAD_VERIFY_OUT/summary.txt"; exit 0
+EOF
+LANDING_VERIFY=$W/verify_prepared.sh bash "$T" --fg "$m2" "$c3"; rc=$?
+check "the tool creates the verifier's folder before it calls it: GREEN" \
+  '[ $rc = 0 ] && last | grep -q ": GREEN: prepared summary"'
+
+echo "-- the reranker's socket cases through the tool's environment (the real lead_verify.sh; stand-ins, no GPU)"
+# A socket's path is at most 107 bytes; the cases put theirs under the run's TMPDIR. One worker (the stub slot sets
+# PYTEST_XDIST_AUTO_NUM_WORKERS=1) is the longest form: every case's planted home on gw0, h0..h<n>. Red before 11-09.
+cat > "$W/select_sockets.py" <<'EOF'
+import json, sys
+from pathlib import Path
+tree = Path(sys.argv[1])
+keep = ["tests/unit/retrieval/test_w2_112_shared_reranker.py", "tests/unit/retrieval/test_w2_145_no_private_reranker.py"]
+on_route = {str(Path(k).parents[i]) for k in keep for i in range(len(Path(k).parents))} | set(keep)
+ignore = []
+for d in sorted(p for p in on_route if (tree / p).is_dir()):
+    for c in sorted((tree / d).iterdir()):
+        r = c.relative_to(tree).as_posix()
+        if r not in on_route and c.name not in ("conftest.py", "__init__.py"):
+            ignore.append(r + ("/" if c.is_dir() else ""))
+print(json.dumps({"scope": "scoped", "nothing_to_run": False, "ignore": ignore, "deselect": [],
+                  "pytest_options": ["--ignore=" + str(tree / i.rstrip("/")) for i in ignore]}))
+EOF
+printf '#!/usr/bin/env bash\nexport PYTEST_XDIST_AUTO_NUM_WORKERS=1\nexec "$@"\n' > "$W/heavy_one.sh"
+LANDING_REPO=$P LANDING_VERIFY=$HERE/lead_verify.sh LANDING_SELECT=$W/select_sockets.py LANDING_HEAVY=$W/heavy_one.sh \
+  bash "$T" --fg "$pc^" "$pc"; rc=$?
+sv=$(ls -td "$O"/log/landing-select/*/ | head -1)verify
+echo "     $(cat "$sv/summary.txt" 2>/dev/null)"
+check "the socket cases pass under the tool's TMPDIR: GREEN, 55 cases, none failed, none skipped" \
+  '[ $rc = 0 ] && grep -q "GREEN parallel exit 0 .*(55 tests 0 failed 0 errors 0 skipped)" "$sv/summary.txt"'
+check "no case said AF_UNIX path too long" '! grep -q "AF_UNIX path too long" "$sv/parallel.txt"'
+td=$(cat "${sv%verify}tmpdir" 2>/dev/null)
+check "the run's TMPDIR was short (/tmp/gov-os-ls-XXXXXX) and a green run removed it" \
+  '[[ "$td" =~ ^/tmp/gov-os-ls-[A-Za-z0-9]{6}$ ]] && [ ! -e "$td" ]'
+[[ "$td" == /tmp/gov-os-ls-* ]] && rm -rf "$td"
+
+rm -rf "$W"
+echo "test_landing_select: $fails failure(s)"
+exit $((fails > 0))

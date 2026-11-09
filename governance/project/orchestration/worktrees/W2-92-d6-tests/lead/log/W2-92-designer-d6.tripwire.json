@@ -1,0 +1,146 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "d1f50e2fa31c",
+   "after": "49885f32bd03"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "d1f50e2fa31c",
+   "after": "49885f32bd03"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "4c3b2ce2361d",
+   "after": "49885f32bd03"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "d1f50e2fa31c",
+   "after": "1b566bd0d662"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "head",
+   "before": "f67e57deb9dd",
+   "after": "bd7732def530"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "acceptance folder",
+   "folder": "W2-128"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "head",
+   "before": "235d5d45d052",
+   "after": "24abf75a1b93"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line gone",
+   "line": "A  tests/unit/operator/test_w2_148_replay.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line gone",
+   "line": "M  governance/project/operator/opcommon.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line gone",
+   "line": "M  governance/project/operator/operator_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line gone",
+   "line": "M  tests/unit/operator/test_w2_148_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay",
+   "change": "status line gone",
+   "line": "M  tests/unit/operator/test_w2_148_trial.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "head",
+   "before": "bc72066fa417",
+   "after": "8f456962f731"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_canary_session.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_guard_line.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_live.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_premises.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_refusals.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_results.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_seed_content.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/test_w2_149_tree_settings.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-149/w2_149_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-tests",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-92-d6-tests",
+   "change": "head",
+   "before": "2a64626532cb",
+   "after": "cc6d5609f3d4"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-92-d6-tests",
+   "change": "acceptance folder",
+   "folder": "W2-92"
+  }
+ ]
+}

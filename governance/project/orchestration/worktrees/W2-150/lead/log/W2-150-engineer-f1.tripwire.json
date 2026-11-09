@@ -1,0 +1,52 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/packages/ACT-SETS-GLOBS-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "head",
+   "before": "e7d471f46867",
+   "after": "892c6f851254"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "head",
+   "before": "16d052d2fda7",
+   "after": "645fcfd45685"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": " M src/gov/brief/build.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": " M template/governance/kernel/schemas/facts.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "acceptance folder",
+   "folder": "W2-152"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "head",
+   "before": "b08ede6890c6",
+   "after": "50902d8a422f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-152/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-152/test_w2_152_rev2.py"
+  }
+ ]
+}

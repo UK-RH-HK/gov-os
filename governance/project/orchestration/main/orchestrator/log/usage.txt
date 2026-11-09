@@ -286,3 +286,11 @@
 2026-11-09 17:29:45 week (all models)=20% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 4279 requests · 51 sessions
 2026-11-09 18:02:53 week (all models)=20% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 4392 requests · 51 sessions
 2026-11-09 18:35:39 week (all models)=21% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 4425 requests · 50 sessions
+2026-11-09 19:08:28 week (all models)=22% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 5081 requests · 59 sessions
+2026-11-09 19:39:38 week (all models)=25% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 5913 requests · 70 sessions
+2026-11-09 20:09:43 week (all models)=27% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 6467 requests · 72 sessions
+2026-11-09 20:39:47 week (all models)=28% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 7026 requests · 96 sessions
+2026-11-09 21:09:51 week (all models)=29% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 7562 requests · 102 sessions
+2026-11-09 21:40:11 week (all models)=31% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 8087 requests · 125 sessions
+2026-11-09 22:10:52 week (all models)=32% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 8563 requests · 132 sessions
+2026-11-09 22:41:42 week (all models)=33% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 9055 requests · 145 sessions

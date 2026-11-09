@@ -1,0 +1,14 @@
+{
+ "decisions": {
+  "allow": 1,
+  "deny": 2
+ },
+ "dropped_ids": [],
+ "judged": 3,
+ "results_sha256": "3caeb1adad70bb4cc457e604bb7c1c21b3126fdd6d63aceed211f322d2ce70b9",
+ "setup": "B",
+ "why": {
+  "ran": 1,
+  "refused-by-sandbox": 2
+ }
+}

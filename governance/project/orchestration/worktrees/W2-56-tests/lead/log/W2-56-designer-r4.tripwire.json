@@ -1,0 +1,50 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": " M governance/project/facts.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": " M template/governance/kernel/schemas/facts.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": "?? docs/changes/W2-152-evidence.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": "?? src/gov/brief/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": "?? src/gov/brief/build.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": "?? src/gov/brief/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "status line added",
+   "line": "?? tests/unit/brief/test_brief_build.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-tests",
+   "change": "head",
+   "before": "e30dc8934874",
+   "after": "85b28ef0f444"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-56-tests",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "head",
+   "before": "e7d471f46867",
+   "after": "892c6f851254"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": " M src/gov/close/repo.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": " M src/gov/store/loader.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "status line gone",
+   "line": "?? src/gov/util/gitrun.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152",
+   "change": "head",
+   "before": "645fcfd45685",
+   "after": "09fc68645c0c"
+  }
+ ]
+}

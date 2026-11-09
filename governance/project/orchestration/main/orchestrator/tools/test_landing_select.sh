@@ -19,6 +19,8 @@ check() { if eval "$2"; then ok "$1"; else no "$1"; fi; }
 R=$W/repo O=$W/orch
 mkdir -p "$O/log" "$O/dispatch/inbox" "$W/rec"
 export LANDING_REPO=$R LANDING_ORCH=$O LANDING_CLONES=$W/clones LANDING_PREP=true LANDING_DISK=$W/disk.sh
+# ACT-OPERATOR-1: the operator's freeze and landing check, planted (absent until a case plants them)
+export LANDING_OPFREEZE=$W/op/install/act-in-progress.txt LANDING_OPCHECK=$W/op/install/landing_check.py LANDING_OPPOLL=1
 printf '#!/bin/sh\nexit 0\n' > "$W/disk.sh"
 # the stub verifier: records its arguments and the selection wrapper's command, exits STUB_RC (default 0)
 cat > "$W/verify.sh" <<'EOF'
@@ -186,6 +188,37 @@ LANDING_REPO=$W/nothing bash "$T" --hook 2>/dev/null; rc=$?
 check "the hook's form in a place with no repository: exit 0" '[ $rc = 0 ]'
 bash "$T" --fg not-a-commit "$c3" 2>/dev/null; rc=$?
 check "an explicit range that is not one: exit 2" '[ $rc = 2 ]'
+
+echo "-- the operator agent's commit freeze and the landing check (ACT-OPERATOR-1)"
+mkdir -p "$W/op/install"
+git -C "$R" update-ref refs/heads/w2/integrate "$d2"; echo "$d2" > "$O/log/landing-select.head"
+echo "ACT-PLANTED-1 $(printf 'a%.0s' $(seq 64)) 2026-11-09T18:00:00+00:00 operator 1-x" > "$LANDING_OPFREEZE"
+bash "$T" --fg "$m2" "$c3" 2>/dev/null; rc=$?
+check "--fg while the operator's freeze exists: exit 4, HELD, nothing run" \
+  '[ $rc = 4 ] && last | grep -q "HELD, the operator.s commit freeze (ACT-PLANTED-1"'
+f1=$(gc .claude/settings.json $'Task: DAEO-sdxk')
+LANDING_OPWAIT=2 bash "$T" --hook
+check "--hook while the freeze holds past its wait: DEFERRED, the state not advanced" \
+  'last | grep -q "commit freeze (ACT-PLANTED-1 .*still holds after 2s: DEFERRED" && [ "$(cat $O/log/landing-select.head)" = "$d2" ]'
+( sleep 2; rm -f "$LANDING_OPFREEZE" ) &
+rmpid=$!
+LANDING_OPWAIT=30 bash "$T" --hook
+bash "$HERE/proc.sh" wait --max 10 --every 1 "$rmpid" >/dev/null 2>&1
+check "--hook waits for the freeze to clear, then examines the whole range" \
+  'grep -q "hook: waited [0-9]*s for the operator.s commit freeze to clear" $O/log/landing-select.log && grep -q "landing ${d2:0:12}..${f1:0:12}: " $O/log/landing-select.log && [ "$(cat $O/log/landing-select.head)" = "$f1" ]'
+check "with no landing check installed: logged as not run" 'grep -q "landing check: .* absent; not run" $O/log/landing-select.log'
+pid=$(sed -n 's/.*started detached, pid \([0-9]*\).*/\1/p' "$O/log/landing-select.log" | tail -1)
+[ -n "$pid" ] && bash "$HERE/proc.sh" wait --max 60 --every 1 "$pid" >/dev/null
+cp -p "$MAIN/governance/project/operator/landing_check.py" "$MAIN/governance/project/operator/act_class.py" \
+  "$MAIN/governance/project/operator/class-rules.yaml" "$W/op/install/"
+rm -f "$O/dispatch/inbox"/*
+g1=$(gc .claude/hooks/pretooluse.py $'Task: DAEO-sdxk\nRole: orchestrator' "the CTO edits the guard (planted)")
+g2=$(gc .claude/hooks/pretooluse.py $'Role: operator\nAct: ACT-PLANTED-2\nAct-sha: x' "the operator's commit (planted)")
+g3=$(gc .claude/hooks/pretooluse.py $'Task: DAEO-ab12\nRole: engineer' "a ticket's commit (planted)")
+bash "$T" --hook
+check "the landing check: the CTO's guard commit is one P1 inbox item; the operator's and the ticket's are not" \
+  '[ $(grep -l "^status: P1" $O/dispatch/inbox/* 2>/dev/null | wc -l) = 1 ] && grep -q "commit ${g1:0:12} " $(grep -l "^status: P1" $O/dispatch/inbox/*) && grep -q "landing check: P1 ${g1:0:12}" $O/log/landing-select.log && ! grep -q "landing check: P1 ${g2:0:12}" $O/log/landing-select.log'
+rm -rf "$W/op"
 
 echo "-- the real select_tests.py through the generated selection (a --shared clone of the main repository)"
 P=$W/real

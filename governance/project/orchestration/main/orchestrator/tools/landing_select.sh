@@ -26,12 +26,21 @@
 # Never during a FRESH-80 or E4 hold (log/act-in-progress.txt naming FRESH-80 or E4): the landing is DEFERRED, logged,
 # and the state is not advanced, so the next landing's range holds it (or run it by hand: --fg <old> <new>). The hold is
 # checked again inside the heavy slot just before each pytest starts (exit 75, verdict HELD).
+# The operator agent's commit freeze (ACT-OPERATOR-1, DEC-1106 (3)): while <operator root>/install/act-in-progress.txt
+# exists the live tree is mid-apply, so --hook waits for it to clear (polling, LANDING_OPWAIT seconds at most) before it
+# takes its lock and reads its range; still there then, the landing is DEFERRED, logged, the state not advanced (the
+# next landing's range holds it; a stale freeze is the owner's to remove). --fg refuses while it exists (HELD, 4).
+# The landing check (OPERATOR-AGENT-1 §3, S16): every range --hook examines is also given to the install's
+# landing_check.py; each commit outside a ticket on a (b) or (O) control path without `Role: owner`, or without
+# `Role: operator` and an `Act:` trailer, becomes one P1 item in the dispatcher's inbox (status P1).
 # Exit: 0 (also for a deferred or a quiet landing; --hook always 0); 2 usage or an unreadable range; with --fg, the
 # run's own code (0 green, 1 red, 2 refused, 3 incomplete, 4 held).
 # Env (for the tests; defaults in brackets): LANDING_REPO [the main tree], LANDING_BRANCH [w2/integrate],
 # LANDING_ORCH [the CTO's folder: log/, dispatch/inbox/], LANDING_CLONES [~/gov-os-runs/W2-00/landing-select],
 # LANDING_VERIFY [tools/lead_verify.sh], LANDING_PREP [seed_store.py rebuild], LANDING_HEAVY [tools/heavy_slot.sh],
-# LANDING_SELECT [tools/select_tests.py], LANDING_DISK [tools/disk_gate.sh].
+# LANDING_SELECT [tools/select_tests.py], LANDING_DISK [tools/disk_gate.sh], LANDING_OPFREEZE [the operator's freeze,
+# /home/usain/gov-os-operator/install/act-in-progress.txt], LANDING_OPCHECK [its install's landing_check.py],
+# LANDING_OPWAIT [3600], LANDING_OPPOLL [30].
 set -u
 # A hook runs with git's own variables (a landing made in a worktree exports GIT_DIR=<main>/.git/worktrees/<name>, which
 # would turn every `git -C <path>` below, the clone's checkout included, onto that worktree): none is kept.
@@ -63,6 +72,12 @@ STATE=$ORCH/log/landing-select.head
 LOCK=$ORCH/log/landing-select.lock
 INBOX=$ORCH/dispatch/inbox
 CLONES=${LANDING_CLONES:-$HOME/gov-os-runs/W2-00/landing-select}
+OPFREEZE=${LANDING_OPFREEZE:-/home/usain/gov-os-operator/install/act-in-progress.txt}
+OPCHECK=${LANDING_OPCHECK:-/home/usain/gov-os-operator/install/landing_check.py}
+OPWAIT=${LANDING_OPWAIT:-3600}
+OPPOLL=${LANDING_OPPOLL:-30}
+opfrozen() { [ -e "$OPFREEZE" ] || [ -L "$OPFREEZE" ]; }
+opwhat() { head -c 160 "$OPFREEZE" 2>/dev/null | head -1 | cut -d' ' -f1-3; }
 TRIGGER='^(\.claude/settings[^/]*\.json|\.rulesync/.+|governance/project/tool-registry\.yaml|governance/project/test-map\.yaml)$'
 mkdir -p "$ORCH/log"
 say() { printf '%s %s\n' "$(date '+%F %T')" "$*" >> "$LOG"; }
@@ -98,6 +113,30 @@ inbox_item() {  # $1 status word, $2 body
   mkdir -p "$INBOX" || return 0
   stamp=$(date +%Y%m%d-%H%M%S); f=$INBOX/$stamp-landing-select.txt
   while ! (set -o noclobber; printf '%s' "$2" > "$f") 2>/dev/null; do n=$((n + 1)); f=$INBOX/$stamp-landing-select-$n.txt; done
+}
+landing_check() {  # $1 old, $2 new: the install's landing check (S16) on the range; one P1 inbox item per flagged commit
+  [ -f "$OPCHECK" ] || { say "landing check: $OPCHECK absent; not run"; return 0; }
+  local out rc
+  out=$(env -u PYTHONPATH -u PYTHONHOME /usr/bin/python3 -I "$OPCHECK" --repo "$REPO" "$1..$2" 2>/dev/null); rc=$?
+  printf '%s' "$out" | /usr/bin/python3 -I -c '
+import json, sys
+try:
+    items = json.loads(sys.stdin.read() or "null")
+    assert isinstance(items, list)
+except Exception:
+    items = [{"commit": None, "reason": "the landing check printed no JSON list"}]
+for i in items:
+    print("%s\t%s\t%s\t%s" % ((i.get("commit") or "-")[:12], ",".join(i.get("paths") or [])[:300],
+                                (i.get("subject") or "")[:120], (i.get("reason") or "")[:200]))
+' | while IFS=$'\t' read -r c p s why; do
+    say "landing check: P1 $c ($p): $why"
+    inbox_item P1 "log: $LOG
+Landing check (OPERATOR-AGENT-1 §3, S16) after the landing $(short "$1")..$(short "$2") on $BRANCH: commit $c ($s) touches $p: $why
+status: P1
+"
+  done
+  [ "$rc" = 0 ] || say "landing check: exit $rc on $(short "$1")..$(short "$2")"
+  return 0
 }
 
 run() {  # $1 stamp, $2 old, $3 new, $4 commits (comma-joined, newest first): the run, in the foreground of its caller
@@ -163,6 +202,15 @@ case "${1:-}" in
 esac
 
 if [ -n "$hook" ]; then
+  waited=0
+  while opfrozen; do
+    if [ "$waited" -ge "$OPWAIT" ]; then
+      say "hook: the operator's commit freeze ($(opwhat)) still holds after ${waited}s: DEFERRED, nothing examined, state not advanced (the next landing's range holds this one; a stale freeze is the owner's to remove)"
+      exit 0
+    fi
+    sleep "$OPPOLL"; waited=$((waited + OPPOLL))
+  done
+  [ "$waited" -gt 0 ] && say "hook: waited ${waited}s for the operator's commit freeze to clear"
   exec 9>> "$LOCK"; flock -w 120 9 || { say "hook: the state lock was not free in 120 s; nothing examined"; exit 0; }
   new=$(g rev-parse -q --verify "refs/heads/$BRANCH") || { say "hook: no branch $BRANCH; nothing examined"; exit 0; }
   old=$(cat "$STATE" 2>/dev/null)
@@ -186,11 +234,17 @@ if [ -n "$dry" ]; then
   if [ -n "$found" ]; then echo "$found"; else echo "none"; fi
   exit 0
 fi
+if [ -n "$fg" ] && opfrozen; then
+  say "landing $(short "$old")..$(short "$new"): HELD, the operator's commit freeze ($(opwhat)); run it again once it is gone"
+  echo "landing_select: HELD: the operator's commit freeze $OPFREEZE exists" >&2
+  exit 4
+fi
 if held; then
   say "landing $(short "$old")..$(short "$new"): DEFERRED, a FRESH-80 or E4 hold ($(head -1 "$HOLD" | cut -c1-80)); state not advanced${found:+; would run on $(echo "$found" | cut -c1-12 | paste -sd' ' -)}"
   exit 0
 fi
 [ -n "$hook" ] && echo "$new" > "$STATE"
+[ -n "$hook" ] && landing_check "$old" "$new"
 n=$(g rev-list --first-parent --count "$old..$new")
 if [ -z "$found" ]; then
   say "landing $(short "$old")..$(short "$new"): $n commit(s); none outside a ticket on the trigger paths"

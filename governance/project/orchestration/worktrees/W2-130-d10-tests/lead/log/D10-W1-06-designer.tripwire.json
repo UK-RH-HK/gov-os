@@ -1,0 +1,52 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "bc72066fa417",
+   "after": "d48639954d1a"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/packages/LIFT-1/D10-REDS.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "98191d6caa1b",
+   "after": "75a29ff64ac0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "98191d6caa1b",
+   "after": "75a29ff64ac0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "bc72066fa417",
+   "after": "56ad463ab5f9"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-130-d10-tests",
+   "change": "head",
+   "before": "fda1e0601c24",
+   "after": "284125776f04"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-130-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-06"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-replay-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

@@ -1,0 +1,55 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "1a95e32ba49c",
+   "after": "260e70bd1a15"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "1a95e32ba49c",
+   "after": "260e70bd1a15"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "bc45fe9ff452",
+   "after": "260e70bd1a15"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "head",
+   "before": "66fdb8750379",
+   "after": "e7d471f46867"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150",
+   "change": "acceptance folder",
+   "folder": "W2-150"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150-f1-tests",
+   "change": "head",
+   "before": "66fdb8750379",
+   "after": "389b264dfe77"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-150-f1-tests",
+   "change": "acceptance folder",
+   "folder": "W2-150"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "head",
+   "before": "b08ede6890c6",
+   "after": "50902d8a422f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-152-tests",
+   "change": "acceptance folder",
+   "folder": "W2-152"
+  }
+ ]
+}

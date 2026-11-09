@@ -102,6 +102,12 @@ sources_ok() {  # review F8: every file the install copies from the tree hashes 
 }
 cron_now() { crontab -l 2>/dev/null || true; }
 cron_has() { cron_now | grep -qF "/gov-os-operator/install/operator_launch.py"; }
+cron_part() {  # before | applied (the table holds the operator's line; with a backup, byte for byte backup/crontab.after,
+  # however it was loaded: by apply.sh, or by the operator through standard input) | other
+  if ! cron_has; then echo before; return; fi
+  if [ -f "$BACKUP/crontab.after" ] && ! cmp -s <(cron_now) "$BACKUP/crontab.after"; then echo other; return; fi
+  echo applied
+}
 hook_part() {  # before-pre | before-post | applied-pre | applied-post | other
   case "$(sha "$ROOT/$HOOK")" in
     "$HOOK_PRE") echo before-pre ;; "$HOOK_POST") echo before-post ;;
@@ -143,7 +149,7 @@ states() {
   echo "githook: $(part "$ROOT/$GITHOOK" "$GITHOOK_BEFORE" "$GITHOOK_AFTER")"
   echo "tools landing_select.sh: $(part "$ROOT/$TOOLS/landing_select.sh" "$LS_BEFORE" "$LS_AFTER")"
   echo "tools test_landing_select.sh: $(part "$ROOT/$TOOLS/test_landing_select.sh" "$TLS_BEFORE" "$TLS_AFTER")"
-  echo "cron: $(cron_has && echo applied || echo before)"
+  echo "cron: $(cron_part)"
 }
 state() {  # before | applied | other (a queue that holds only a record counts as either: review F1)
   local s; s=$(states)
@@ -244,7 +250,9 @@ case "$cmd" in
     put "$HERE/test_landing_select.candidate.sh" "$ROOT/$TOOLS/test_landing_select.sh" || die "its tests: run undo"
     # 7. the crontab, last: from here the cron may launch
     { cat "$BACKUP/crontab.before"; echo "$CRONLINE"; } > "$BACKUP/crontab.after"
-    crontab "$BACKUP/crontab.after" || die "crontab refused the new table: run undo"
+    # through standard input, never a path argument: Debian's crontab cuts a path argument at 99 characters (found live,
+    # 2026-11-09: this backup's path is 115)
+    crontab - < "$BACKUP/crontab.after" || die "crontab refused the new table: run undo"
     cmp -s <(cron_now) "$BACKUP/crontab.after" || die "crontab -l is not the new table: run undo"
     show after
     [ "$(state)" = applied ] || die "the tree does not hash as applied: run undo"
@@ -270,7 +278,7 @@ case "$cmd" in
     [ "$(queue_part)" != other ] || die "queue/ holds something besides the launcher's record: nothing undone"
     # the crontab first: no launch from here on
     if cron_has; then
-      crontab "$BACKUP/crontab.before"
+      crontab - < "$BACKUP/crontab.before"     # standard input, never a path argument (see apply)
       cmp -s <(cron_now) "$BACKUP/crontab.before" || die "the crontab could not be restored"
     fi
     restore() {  # $1 backup file, $2 live path, $3 after hash

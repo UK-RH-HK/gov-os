@@ -1,0 +1,26 @@
+{
+ "arms": [
+  "b",
+  "control"
+ ],
+ "budget_usd": 0.05,
+ "claude_sha256": "708c77b204db30086ff6f1ed34577bda03e1be74ced80557cbf7b54249ebf0bd",
+ "cost_usd": 0.0024,
+ "half": "tuning",
+ "hook_sha256": "97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11",
+ "model": "haiku",
+ "prompt_sha256": "f5733ce4edd2b457bdc05b4a7198ac45df220828121fc8a1f8de9cb4cc8d2d7a",
+ "round": "wiring",
+ "seconds": 20.4,
+ "setting_sources": "",
+ "settings_sha256": {
+  "engineer--DAEO-wnnz--71c1e0d3.json": "abbfaa353d46097eb002a59849a88c57c4aaef648d100918d1c8bda7c244e4be"
+ },
+ "setup": "B",
+ "sha256": {
+  "b": "454e86eb07cd56a98dde69c6eae43c9a38156c745f36d0ed275211c0f2fb3da1",
+  "control": "d055f9c006ea3a023be6703744449daccda94acb8aab312eb1f667bea03eca3b",
+  "decisions": "3caeb1adad70bb4cc457e604bb7c1c21b3126fdd6d63aceed211f322d2ce70b9"
+ },
+ "stopped": ""
+}

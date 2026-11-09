@@ -1,0 +1,243 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "328d40f50a80",
+   "after": "4b50dbe2bfbf"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/ACT-SETS-GLOBS-1.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/LIFT-1/D5-STATUS.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  docs/changes/W2-56-CIT-E.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  src/gov/launch/environ.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  src/gov/launch/sandbox.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/README.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_endings.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_environment.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_guard_scope.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_placeholders.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_real_sandbox.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_refused_arguments.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_sandbox_block.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_session_daemon.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_session_reranker.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_start_together.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_suite_daemon.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_template.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/test_w2_56_todays_refusals.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/w2_56_daemon_probe.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/w2_56_sandbox_support.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/acceptance/W2-56/w2_56_support.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/unit/codeintel/test_w2_56_nested_daemon.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "A  tests/unit/launch/test_w2_56.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  src/gov/codeintel/__init__.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  src/gov/launch/launcher.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  template/.rulesync/permissions.jsonc"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  template/governance/kernel/settings.json"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/acceptance/W1-27/test_w2_67_codegraph_folders.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/acceptance/W1-27/w2_67_codegraph.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/acceptance/W1-27/w2_67_codegraph_probe.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/conftest.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/unit/codeintel/test_codeintel.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/unit/launch/test_runs.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/unit/launch/test_w1_32.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "M  tests/unit/resources/test_w2_20_round3.py"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W1-27"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "328d40f50a80",
+   "after": "4b50dbe2bfbf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "328d40f50a80",
+   "after": "4b50dbe2bfbf"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "b2b59cafff0d",
+   "after": "ffa38798b45f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "head",
+   "before": "b2b59cafff0d",
+   "after": "c5ed68d4eb45"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-55/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-55/test_w2_55_tags.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-f2-tests",
+   "change": "acceptance folder",
+   "folder": "W2-55"
+  }
+ ]
+}
