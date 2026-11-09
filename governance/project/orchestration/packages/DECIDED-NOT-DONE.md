@@ -81,7 +81,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0f. DEC-1103's items (2026-11-09)
 | # | item | fate (DEC-1103) | state |
 |---|---|---|---|
-| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **APPLIED 11-09** (`d7490945`; gate.json de4fb326…); W2-20 round 2 next |
+| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **APPLIED twice 11-09**: ACT-GATE-CONFIG-1 (`d7490945`), then ACT-GATE-CONFIG-2 for W2-20's frozen format (`0fcd02b0`, 52e32fc1…); W2-20 round 3 running |
 | 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | **APPLIED 11-09** form B (`a46d4517`); D-10 decides the three red by design (W1-33 auditor, W1-05 install, W1-46 research install) |
 | 53 | the landing selection's environment | DEC-1104 (3): fixed before its results are relied on | **DONE 11-09**: a short temporary folder (the socket path under 107 bytes); 49/49 tests incl. the folder regression; the re-run shows only W1-06 and test_fusion (D-10's list) |
 | 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | APPROVED (DEC-1104 (2)); next: build it, tests first, one review, a replay trial on past ACTs |
