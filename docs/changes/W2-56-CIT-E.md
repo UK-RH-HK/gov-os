@@ -68,10 +68,59 @@ the machine (and so per repository) and the lock is short: it is never held for 
 made at once from three worktrees of one repository all start and run together (the acceptance case). No second lock
 was added.
 
-What it does not cover: the CLI's sandbox builds its mounts at each command, not only at the start, so a git lock
-file that another session's git command makes and removes in the shared `.git` while a command's sandbox is set up
-can still be missing when it is bound. That race belongs to the CLI's sandbox; the launcher cannot hold a lock across
-another session's commands without serialising the sessions themselves (which the KPI line rules out).
+What it does not cover (round 2, the CTO's item 4: S7 red in the CTO's second real run, intermittent): the CLI's
+sandbox is built at each command, and the bind source that goes missing is `<common .git>/config.lock`. **It is not
+in the launcher's settings, and the launcher cannot take it out. It cannot be fixed in W2-56.** Found from the CLI
+2.1.318 itself (`~/.local/share/claude/versions/2.1.318`, its sandbox code read by byte offset) and from this
+session's own sandbox:
+
+1. **Who names it.** For every git folder the CLI makes writable, it puts that folder's `hooks`, `config`,
+   `config.lock`, `config.worktree`, `config.worktree.lock` and `commondir` on its own write-deny list. A worktree
+   session's common `.git` is one of those folders: the CLI adds it to the write list itself so the session can
+   commit (this session's write list holds `/home/usain/Dynamic-Agentic-Engineering-OS/.git`; the launcher's
+   `allowWrite` holds only the temp folder, the run folder and the reranker's log). The code is
+   `be.push(ei(Mt(Q,"hooks"…"config")))`, then `if(Ba) Ai(Mt(Q,"config.lock"),…,"all"); else
+   be.push(ei(Mt(Q,"config.lock")))`, with `Ba=P()==="windows"`. So on Linux `config.lock` is always on the deny
+   list. Only on Windows is a `.lock` cleaned up after the command instead of bound. `sandbox.filesystem.allowGitConfig`
+   changes only the CLI's separate scan for `**/.git/config`, not this list. It would also widen the sandbox (S9,
+   `sandbox_faults`).
+2. **How it binds.** On Linux the CLI binds each deny path that exists onto itself (`--ro-bind <path> <path>`). For a
+   missing deny path in a writable folder, it makes an empty placeholder file on the host as the mount point and
+   binds `/dev/null` over it ("Mounted /dev/null at … to block creation of …"). It removes the placeholder when the
+   command ends.
+3. **The race.** Session A's command makes the placeholder `<common .git>/config.lock` on the host. Session B's
+   command, built at that moment, finds the file there and binds it as its source. A's command ends and the CLI
+   removes the placeholder, so B's bwrap finds no source and B's command fails before it runs: lens E F17, "a git
+   lock that was present when the sandbox was set up and has since been removed". The same happens with a real
+   `git config` lock held by any git process. Seen here: inside this session's command, `/proc/self/mountinfo` binds
+   `/home/usain/Dynamic-Agentic-Engineering-OS/.git/config.lock` onto itself (`ro`), and that file was an empty file
+   made 90 seconds before (2026-11-09 21:57:27Z).
+4. **What the launcher builds.** Its deny rules, write list, socket and env name no path under any `.git` folder, for
+   a worktree sharing its repository's `.git`, for both deny-rule sets (the test designer's and every other role's).
+   The research fence leaves `.git` out. Unit test
+   `tests/unit/launch/test_w2_56.py::test_a_worktree_sessions_settings_name_no_path_under_a_git_folder` checks this,
+   with `config.lock`, `index.lock` and `HEAD.lock` held in the shared `.git` at launch, and also the
+   `--settings` of a whole launch. A start lock, however long, cannot cover a per-command build. Holding a lock
+   across every command of every session sharing a `.git` would serialise those sessions; the KPI line rules that out.
+
+**Side effect for the owner:** while any sandboxed session of a repository runs a command, that repository has a
+placeholder `.git/config.lock` on the host, so a host `git config` write there (`git worktree add`, a `git config`
+line, a branch's upstream) can fail with "could not lock config file". The leftover empty
+`<common .git>/config.worktree` dated 2026-10-05 is most likely such a placeholder that a session left behind.
+
+**The smallest ways, outside W2-56's paths:**
+- (a) **One `.git` per concurrent session.** The worktree tooling (`launch_worker.sh` and the orchestrator's
+  worktree set-up) gives each concurrently sandboxed worker a clone of its own rather than a worktree of the shared
+  repository. Each CLI then protects only its own `.git`. Cost: a clone per worker, and merges go through a fetch
+  rather than a shared object store.
+- (b) **Upstream.** Report it to Anthropic. On Linux, either handle `config.lock` and `config.worktree.lock` as the
+  Windows path already does (clean up, do not bind), or make the placeholder's mount point inside the sandbox rather
+  than on the host. Cost: none here; the timing is not ours.
+- (c) **Not recommended:** a per-repository lock, taken in a PreToolUse hook and given back in PostToolUse. It
+  serialises every Bash command of the sessions sharing a `.git`, and a session that crashes keeps the lock.
+
+Recommendation: (b) now, and (a) for waves that run three or more sandboxed workers in one repository at once.
+Confidence: high on the cause (the code and this session's mounts agree); medium on (a)'s cost.
 
 ## 5. S11's way: one log file
 
@@ -116,10 +165,35 @@ arrives only after the session, and is lost when the launcher is killed.
   (D-12): with the temp root `/tmp`, a daemon folder plus the tool's 50-byte socket tail is 95 bytes (a test
   session's, in a 4-letter folder of its own: 96), under 107; a test session in an engineer's folder of the older
   name (`gov-launch-engineer-` and 8 letters) still fits (105). The real tool is off `PATH` for every case but W1-16's and W1-20's.
+  **Round 2 (the CTO's item 3, D-2):** after round 1, four W1-27 W2-67 rows left `/tmp/gov-cbm-<uid>/<hash>` behind.
+  The cause: a case's nested `gov rebuild` runs with an environment built anew, with its own `TMPDIR` and neither
+  `CODEINTEL_DAEMON_BASE` nor `CLAUDE_CODE_TMPDIR`. So `daemon_base()` (`src/gov/codeintel/__init__.py`, round 1's
+  lines 75–83) fell back to `DAEMON_BASE`. Meanwhile the fixture's own clean-up (TD1C-A, DEC-914 item 2), running in
+  the session's process where the variable is set, removed `<session folder>/<hash>`. Integrate had no session folder,
+  so both sides named `/tmp/gov-cbm-<uid>/<hash>`. The fix: each test process writes a mark, `.gov-cbm-base` (the
+  folder's path and the writer's pid), in its pytest temp base. `daemon_dir(root)` follows the nearest mark above the
+  repository when the variable is absent. Only a mark that is a regular file of the user's own, names an absolute
+  folder, and was written by another process counts: a case that removes the variable in the session's own process
+  still gets the default place. The conftest also makes the folder when `gov` cannot be imported at configure time.
+  Beside it, a daemon folder made for a tool that cannot be started (off `PATH`) is removed again. Unit cases:
+  `tests/unit/codeintel/test_w2_56_nested_daemon.py`. On round 1's code the same shape gives
+  `/tmp/gov-cbm-1000/<hash>`.
+- **S14 through a regeneration (round 2, P-3)**: `template/.rulesync/permissions.jsonc` has
+  `"gov launch:*": "allow"` under `bash`. rulesync 's generation (`rulesync generate --targets claudecode --features
+  permissions,hooks --input-roots template/.rulesync`, output in an empty folder) writes `"allow": ["Bash(gov
+  launch:*)"]`, the kernel template's one allow rule. Without the source line it writes no allow list. The repository
+  has no unit check that runs the template's generation; `tests/unit/hooks/test_w2_106_template_hook_lines.py`
+  compares the hook lines only. `tests/unit/launch/test_w2_56.py` now compares the source with the kernel settings and
+  runs the generation when rulesync is on `PATH`.
+- **S5 against W2-20's F1 case (round 2, P-2)**: its stand-in CLI has its marks folder written into it, since the
+  cleaned environment no longer carries the test's `MARKS`; every expectation is kept.
 - **S8 on Linux (D-13)**: the one-path `network.allowUnixSockets` is built from the service's own setting and is inert
   on Linux (the CTO's measure); its reach and S10 are the owner's DEC-105 choice.
 
-## 7. The S13 conflict (named, not resolved here)
+## 7. The S13 conflict (settled: P-1 (b), DEC-1112 (3))
+
+`gov rebuild` inside the sandbox is deferred to Wave 3 with set-up B; no deny rule is dropped; gov check and the
+suite stay in S13. The record below is round 1's.
 
 S2 keeps a literal deny rule for each `.gov-runtime/` entry but `scratch` that exists at launch (DEC-180). `gov
 rebuild` writes `.gov-runtime/rebuild/` (and the code index's `.gov-runtime/codeintel/`), so inside the sandbox it

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import signal
 import stat
 import subprocess
@@ -378,3 +379,114 @@ def test_a_cli_that_cannot_be_started_is_refused_and_leaves_no_folder(launched, 
     with pytest.raises(GovError):
         launched()
     assert os.listdir(tmp_path / "temp") == []
+
+
+# --- S7 (round 2, the CTO's item 4): no path under a .git folder in the settings the launcher builds ----------------
+
+def _strings(value):
+    """Every string of a settings value, keys and values, at any depth."""
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            yield key
+            yield from _strings(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _strings(item)
+
+
+def _under_a_git_folder(text: str) -> bool:
+    return ".git" in text.replace("(", "/").replace(")", "/").split("/")
+
+
+def test_a_worktree_sessions_settings_name_no_path_under_a_git_folder(tmp_path, monkeypatch):
+    """Lens E F17: the CLI's sandbox binds each existing path its settings deny (``--ro-bind <path> <path>``), so a git
+    lock file named there, or beside a git file the settings name, can vanish between the build and the mount. The
+    launcher's own settings (deny rules, write list, socket, env) name no path in or under any ``.git`` folder, for a
+    worktree that shares its repository's ``.git``; the git folder's own protections are the CLI's (CIT-E, S7)."""
+    home, temp, main = tmp_path / "home", tmp_path / "temp", tmp_path / "main"
+    for folder in (home / ".local/bin", temp, main):
+        folder.mkdir(parents=True)
+    git = git_env(main)
+    subprocess.run(["git", "init", "-q", str(main)], check=True, env=git)
+    (main / ".tickets").mkdir()
+    (main / ".tickets/TST-a001.md").write_text(
+        "---\nid: TST-a001\nwbs_id: W2-90\nstatus: in_progress\nrole: engineer\n---\n", encoding="utf-8")
+    (main / ".gov-runtime/scratch").mkdir(parents=True)
+    (main / ".gov-runtime/rebuild").mkdir()
+    subprocess.run(["git", "-C", str(main), "add", ".tickets"], check=True, env=git)
+    subprocess.run(["git", "-C", str(main), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "t"],
+                   check=True, env=git)
+    worktree = tmp_path / "W2-77"
+    subprocess.run(["git", "-C", str(main), "worktree", "add", "-q", str(worktree)], check=True, env=git)
+    (worktree / ".gov-runtime/scratch").mkdir(parents=True)
+    for lock in ("config.lock", "index.lock", "HEAD.lock"):  # a git command in another worktree holds its locks now
+        (main / ".git" / lock).write_text("", encoding="utf-8")
+    out = tmp_path / "out.json"
+    cli = home / launcher.CLI_REL
+    cli.write_text(CLI.format(python=sys.executable, out=str(out)), encoding="utf-8")
+    cli.chmod(0o755)
+    monkeypatch.setenv("HOME", str(home))
+    _open_gate(home, monkeypatch)
+    monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
+    monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
+    for root in (main, worktree):
+        for role in ("engineer", "independent-test-designer"):
+            built = launcher.build_settings(Path(os.path.realpath(root)), role, "TST-a001")
+            assert [text for text in _strings(built) if _under_a_git_folder(text)] == [], (root.name, role)
+    assert launcher.launch(worktree, "engineer", "TST-a001", ["0"]) == 0
+    seen = json.loads(out.read_text(encoding="utf-8"))["settings"]
+    assert [text for text in _strings(seen) if _under_a_git_folder(text)] == []
+    assert launcher.sandbox_faults(seen) == []
+
+
+def test_the_research_fence_names_no_git_folder(tmp_path):
+    """The one launcher rule that lists a folder's entries leaves ``.git`` out at the top (it is the session's to commit
+    through), so neither ``.git`` nor a lock file in it is named."""
+    root = tmp_path / "repo"
+    for rel in (".git", "experiments/x", "src"):
+        (root / rel).mkdir(parents=True)
+    (root / ".git" / "config.lock").write_text("", encoding="utf-8")
+    rules = launcher._fence_rules(root, str(root / "experiments" / "x"))
+    assert rules and not [rule for rule in rules if _under_a_git_folder(rule)]
+
+
+def test_the_git_name_check_sees_each_form():
+    for text in ("Edit(//r/.git/config.lock)", "/r/.git", "/r/.git/worktrees/W2-77/index.lock", "Edit(/r/.git/**)"):
+        assert _under_a_git_folder(text), text
+    for text in ("Edit(//r/.gitignore)", "/r/.github/x", "/tmp/gov-launch-ab", "Edit(//r/.gov-runtime/rebuild)"):
+        assert not _under_a_git_folder(text), text
+
+
+# --- S14 (round 2, P-3): the template's rulesync source keeps the one allow rule through a regeneration ---------------
+
+TEMPLATE_SOURCE = REPO / "template" / ".rulesync" / "permissions.jsonc"
+TEMPLATE_SETTINGS = REPO / "template" / "governance" / "kernel" / "settings.json"
+
+
+def _jsonc(path: Path) -> dict:
+    return json.loads("\n".join(line for line in path.read_text(encoding="utf-8").splitlines()
+                                if not line.lstrip().startswith("//")))
+
+
+def test_the_rulesync_source_allows_exactly_the_kernel_settings_allow_rule():
+    source = _jsonc(TEMPLATE_SOURCE)["permission"]
+    allowed = [f"Bash({key})" for key, value in source.get("bash", {}).items() if value == "allow"]
+    allowed += [f"{tool.capitalize()}({key})" for tool, rules in source.items() if tool != "bash"
+                for key, value in rules.items() if value == "allow"]
+    assert allowed == json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))["permissions"]["allow"] \
+        == ["Bash(gov launch:*)"]
+
+
+@pytest.mark.skipif(shutil.which("rulesync") is None, reason="rulesync is not on PATH")
+def test_a_rulesync_regeneration_of_the_template_keeps_the_allow_rule(tmp_path):
+    """The generation itself (the template's sources only read; the output in an empty folder)."""
+    done = subprocess.run(["rulesync", "generate", "--targets", "claudecode", "--features", "permissions,hooks",
+                           "--input-roots", str(TEMPLATE_SOURCE.parent)], cwd=tmp_path, capture_output=True,
+                          text=True, timeout=120)
+    assert done.returncode == 0, done.stderr[-1000:]
+    generated = json.loads((tmp_path / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    kernel = json.loads(TEMPLATE_SETTINGS.read_text(encoding="utf-8"))
+    assert generated["permissions"]["allow"] == kernel["permissions"]["allow"] == ["Bash(gov launch:*)"]
+    assert generated["hooks"]["PreToolUse"] == kernel["hooks"]["PreToolUse"]
