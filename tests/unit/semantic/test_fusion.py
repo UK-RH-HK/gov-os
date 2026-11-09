@@ -14,7 +14,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
-from gov.retrieval import fusion  # noqa: E402
+from gov.retrieval import fusion, rerank  # noqa: E402
 
 NAMES = [f"chunk-{number:02}" for number in range(35)]
 
@@ -44,8 +44,13 @@ def passes(monkeypatch):
 def test_only_the_first_30_fused_chunks_are_scored_and_returned(passes):
     seen, reranker = passes
     answer = fusion.search(Path("unused"), "a question", limit=None, reranker=reranker)
-    # one rerank of the first 30, in requests of at most 16 texts (DEC-1067 (f))
-    assert fusion.RERANK_TOP == 30 and [len(texts) for texts in seen] == [16, 14]
+    # one rerank of the first 30, in requests split as rerank.requests splits them: at most MAX_REQUEST_TEXTS texts
+    # and MAX_REQUEST_CHARS padded characters (count times the longest pair) each (DEC-1090 (2)). The 30 texts are of
+    # one length, so each request takes as many as both bounds allow; with these pairs (645 characters) that is all 30.
+    longest = len("a question") + max(len(text) for texts in seen for text in texts)
+    fits = max(1, min(rerank.MAX_REQUEST_TEXTS, rerank.MAX_REQUEST_CHARS // longest))
+    expected = [min(fits, fusion.RERANK_TOP - start) for start in range(0, fusion.RERANK_TOP, fits)]
+    assert fusion.RERANK_TOP == 30 and [len(texts) for texts in seen] == expected
     assert [hit["chunk_id"] for hit in answer["hits"]] == NAMES[29::-1]  # the reranker's order, of the first 30
     assert answer["reranked"] is True
     assert [hit["chunk_id"] for hit in fusion.search(Path("unused"), "a question", limit=2, reranker=reranker)["hits"]] \
