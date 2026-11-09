@@ -179,7 +179,7 @@ arrives only after the session, and is lost when the launcher is killed.
   `tests/unit/codeintel/test_w2_56_nested_daemon.py`. On round 1's code the same shape gives
   `/tmp/gov-cbm-1000/<hash>`.
 - **S14 through a regeneration (round 2, P-3)**: `template/.rulesync/permissions.jsonc` has
-  `"gov launch:*": "allow"` under `bash`. rulesync 's generation (`rulesync generate --targets claudecode --features
+  `"gov launch:*": "allow"` under `bash`. rulesync's generation (`rulesync generate --targets claudecode --features
   permissions,hooks --input-roots template/.rulesync`, output in an empty folder) writes `"allow": ["Bash(gov
   launch:*)"]`, the kernel template's one allow rule. Without the source line it writes no allow list. The repository
   has no unit check that runs the template's generation; `tests/unit/hooks/test_w2_106_template_hook_lines.py`
