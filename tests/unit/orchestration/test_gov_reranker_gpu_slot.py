@@ -283,7 +283,9 @@ def test_an_internal_error_ends_named(setup, bad):
     assert not list(marks.iterdir())  # neither the script nor torch
 
 
-# The real caller: gov.retrieval.rerank starting the real rerank_worker.py with the environment's interpreter.
+# The real caller: gov.retrieval.rerank with the environment's interpreter. DEC-1048 (5) (W2-145): it starts no
+# private rerank_worker.py any more; the shared service, which here cannot read the GPU's free memory, refuses (or a
+# sandbox refuses its socket), and the search goes on unranked and named.
 CANDIDATES = [{"chunk_id": "short", "text": "ab"}, {"chunk_id": "long", "text": "abcdef"}]
 
 
@@ -295,19 +297,21 @@ def caller(setup, monkeypatch):
             monkeypatch.delenv(key)
     for key in ("HOME", "GOV_RERANK_GPU_LOCK_DIR", "MARKS"):
         monkeypatch.setenv(key, env[key])
-    rerank._started.cache_clear()
-    yield marks
-    rerank._started.cache_clear()
+    yield marks  # DEC-1048 (5): no private reranker's cache to clear (rerank._started is gone)
 
 
-def test_the_search_reranks_on_a_free_slot(caller):
+def test_the_search_starts_no_private_reranker_on_a_free_slot(caller):
+    # DEC-1048 (5): formerly "the search reranks on a free slot" through the private worker
     ranked = rerank.rerank("a question", CANDIDATES)
-    assert [(entry["chunk_id"], entry["rerank_score"]) for entry in ranked] == [("long", 6.0), ("short", 2.0)]
+    assert ranked == CANDIDATES and not any("rerank_score" in entry for entry in ranked)
+    assert rerank.last_outcome()["by"] == "unavailable"
+    assert not [path for path in caller.iterdir() if path.name.startswith(("worker-", "model-"))]
 
 
 def test_the_search_goes_on_unranked_when_no_slot_frees(caller, holders, monkeypatch, capfd):
     monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
     ranked = rerank.rerank("a question", CANDIDATES)
     assert ranked == CANDIDATES and not any("rerank_score" in entry for entry in ranked)  # merge.reranked: false
-    assert NAMED.format(1) in capfd.readouterr().err  # the caller's standard error names why
+    # DEC-1048 (5): named in the outcome (the service's failure), no longer by a private worker's standard error
+    assert rerank.last_outcome()["by"] == "unavailable" and NAMED.format(1) not in capfd.readouterr().err
     assert not [path for path in caller.iterdir() if path.name.startswith("model-")]  # no model was loaded
