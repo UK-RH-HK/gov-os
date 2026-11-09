@@ -181,3 +181,10 @@ marked on W2-128.
   `gov brief`. A failure line may take `Verify: S<n>`. W2-153's were added today. Options (b) (date-gate the verify
   rule) and (c) (failure lines exempt) would change DEC-1052 and DEC-1083, so they are the owner's, and are not
   taken.
+- 2026-11-10: **W2-152 READY, not merged:** `w2/W2-152` **`09fc68645`** (tests `b08ede6890c6` and `50902d8a422f`).
+  - The fix closed F1 (every role's whole template checked for "until"), F3, F4, F5 and F6.
+  - The CTO's runs: `gov accept W2-152` 67/67, W2-128 92/92, unit tests 25/25, schema ok.
+  - Review round 2 READY (`reviews/w2-152-r1.md`, round 2 appended).
+  - Rows kept: F7 (unfilled ticket keys in a brief), F8 (§C's size measure), F9 (tk's `deps:`), F10 (`waits_on` ids
+    beyond tickets), F11 (other "until" spellings).
+- 2026-11-10: **W2-153 in progress**, its test designer launched (`w2/W2-153-tests`).
