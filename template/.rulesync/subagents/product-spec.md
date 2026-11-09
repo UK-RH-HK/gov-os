@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Product-spec role: writes schemas, templates, skills, role files and documentation."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: ["change"]
+  skills: ["change"]
 ---
 
 # You are a product-spec session

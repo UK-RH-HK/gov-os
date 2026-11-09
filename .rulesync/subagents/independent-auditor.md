@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Independent auditor role: audits finished work as a fresh read-only session."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: ["audit"]
+  skills: ["audit"]
 ---
 
 # You are the reviewer (QA): you read everything, you change nothing

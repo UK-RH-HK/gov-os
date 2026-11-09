@@ -9,7 +9,8 @@ Three comparisons, each a finding when it fails or cannot be made:
    When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
    applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
 A role with a kernel role template (W2-153, DEC-1050) has its source compared with the composition instead of the
-role file's whole text: the source's own rulesync front matter, the role's ``skills:`` list and the template's body.
+role file's whole text: the source's own rulesync front matter, the role's skills list under ``claudecode: skills:``
+(where rulesync passes it to the generated agent, DEC-1112 (3)) and the template's body.
 The generated template copies under ``.claude/templates/`` are compared byte for byte with the kernel's templates;
 ``--write-templates <dir>`` writes those copies into ``<dir>`` (the copies' folder itself), the ACT's step.
 And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
@@ -161,12 +162,17 @@ def _role_template(kernel: Path, role: str) -> Path | None:
 
 
 def _skills_difference(role: str, front: object) -> str:
-    """Empty when the source's ``skills:`` list is the role's (an absent list is empty); else what differs."""
-    listed = front.get("skills", []) if isinstance(front, dict) else []
+    """Empty when the source's ``claudecode.skills`` list is the role's (an absent list is empty) and the source has
+    no top-level ``skills:``, which rulesync 24.0.0 drops (DEC-1112 (3)); else what differs."""
+    front = front if isinstance(front, dict) else {}
+    if "skills" in front:
+        return f"a top-level skills list {front['skills']!r}, which rulesync drops; it belongs under claudecode"
+    adapter = front.get("claudecode")
+    listed = adapter.get("skills", []) if isinstance(adapter, dict) else []
     expected = ROLE_SKILLS.get(role, [])
     if isinstance(listed, list) and sorted(str(skill) for skill in listed) == sorted(expected):
         return ""
-    return f"the source lists {listed!r}, the role's are {expected!r}"
+    return f"the source lists {listed!r} under claudecode, the role's are {expected!r}"
 
 
 def _template_findings(root: Path) -> list[dict]:

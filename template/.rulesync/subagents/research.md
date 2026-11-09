@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Research role: runs experiments and leaves an evidence record."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: ["discovery"]
+  skills: ["discovery"]
 ---
 
 # You are a research session

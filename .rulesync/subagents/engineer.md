@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Engineer role: implements one ticket within its allowed paths until acceptance tests pass."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: ["test-driven-development"]
+  skills: ["test-driven-development"]
 ---
 
 # You are the engineer

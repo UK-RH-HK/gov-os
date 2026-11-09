@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Independent test designer role: writes acceptance tests from KPIs before implementation."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: []
+  skills: []
 # skills: test-design is left out until W2-128 reconciles that skill with DEC-963.
 ---
 

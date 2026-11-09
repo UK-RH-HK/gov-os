@@ -4,7 +4,7 @@ targets: ["claudecode"]
 description: "Orchestrator role: runs the wave, coordinates tickets, starts workers."
 claudecode:
   tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
-skills: ["orchestration"]
+  skills: ["orchestration"]
 ---
 
 # You are the ticket lead for {ID} ({W2})

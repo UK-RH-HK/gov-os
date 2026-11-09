@@ -18,7 +18,8 @@ REPO = Path(__file__).resolve().parents[3]
 ROLE = "- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n"
 TEMPLATE = "---\nname: role-engineer\nversion: 1.0.0\nrole: engineer\nskills: [x, y]\n---\n# You are the engineer\n1. Do.\n"
 FRONT = "---\nname: engineer\ntargets: [\"claudecode\"]\nclaudecode:\n  tools: [\"Read\", \"Grep\", \"Bash\"]\n{skills}---\n\n"
-COMPOSED = FRONT.format(skills='skills: ["test-driven-development"]\n') + "# You are the engineer\n1. Do.\n"
+SKILLS = '  skills: ["test-driven-development"]\n'  # under claudecode: rulesync 24.0.0 drops a top-level list
+COMPOSED = FRONT.format(skills=SKILLS) + "# You are the engineer\n1. Do.\n"
 
 
 def _write(path: Path, text: str) -> Path:
@@ -45,8 +46,7 @@ def test_the_composed_source_is_consistent(project):
 
 
 def test_the_source_holding_the_role_files_body_differs_once_a_template_exists(project):
-    _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills='skills: ["test-driven-development"]\n')
-           + ROLE)
+    _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills=SKILLS) + ROLE)
     findings, _count = portability._kernel_findings(project)
     assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
     assert "governance/kernel/templates/role-engineer.md" in findings[0]["message"]
@@ -70,13 +70,25 @@ def test_the_role_files_body_is_no_longer_compared_but_its_tools_are(project):
         ("SOURCE_TOOLS_DIFFER", ".rulesync/subagents/engineer.md")]
 
 
-@pytest.mark.parametrize("skills", ['skills: ["audit"]\n', "", 'skills: "test-driven-development"\n',
-                                    'skills: ["test-driven-development", "audit"]\n'])
+@pytest.mark.parametrize("skills", ['  skills: ["audit"]\n', "", '  skills: "test-driven-development"\n',
+                                    '  skills: ["test-driven-development", "audit"]\n',
+                                    '  skills: []\n'])
 def test_skills_other_than_the_roles_are_a_finding(project, skills):
     _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills=skills) + "# You are the engineer\n1. Do.\n")
     findings, _count = portability._kernel_findings(project)
     assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
     assert "skills" in findings[0]["message"]
+
+
+@pytest.mark.parametrize("under", ["", SKILLS])
+def test_a_top_level_skills_list_is_a_finding(project, under):
+    """DEC-1112 (3): rulesync drops a top-level skills list, so the agent would preload nothing; with or without the
+    list under claudecode, a top-level one is a finding."""
+    front = FRONT.format(skills=under).replace("---\n\n", 'skills: ["test-driven-development"]\n---\n\n')
+    _write(project / ".rulesync/subagents/engineer.md", front + "# You are the engineer\n1. Do.\n")
+    findings, _count = portability._kernel_findings(project)
+    assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
+    assert "top-level" in findings[0]["message"]
 
 
 def test_the_skills_lists_are_the_tickets():
