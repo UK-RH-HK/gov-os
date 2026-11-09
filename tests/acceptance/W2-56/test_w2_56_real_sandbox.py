@@ -33,6 +33,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -164,7 +165,16 @@ with open(out, "w") as handle:
 def test_s9_real_sandbox_a_second_unix_socket_is_refused(tmp_path):
     box = _box(tmp_path)
     project = _project(box)
-    path = str(box.elsewhere / "o.sock")
+    # The socket lives in a short folder under /tmp (a long TMPDIR would pass the AF_UNIX path limit and skip the case);
+    # the test removes it. The script's name shadows no standard module, and -I keeps the script's folder off sys.path.
+    short = tempfile.mkdtemp(prefix="w56s-", dir="/tmp")
+    try:
+        _s9_case(box, project, os.path.join(short, "o.sock"))
+    finally:
+        shutil.rmtree(short, ignore_errors=True)
+
+
+def _s9_case(box: s.Box, project: Path, path: str) -> None:
     if len(path) > 100:
         pytest.skip(f"the planted socket path is too long here: {path}")
     server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -185,10 +195,10 @@ def test_s9_real_sandbox_a_second_unix_socket_is_refused(tmp_path):
     thread = threading.Thread(target=serve, daemon=True)
     thread.start()
     try:
-        out = project / RESULTS_REL / "socket.json"
-        script = _script(box, "socket", SOCKET_SCRIPT)
-        code, output = _finish(_start(project, s.T.tk, f"python3 {script} {out} {path}"))
-        outcome = _result(project, "socket", output)["outcome"]
+        out = project / RESULTS_REL / "w56_unix_connect_probe.json"
+        script = _script(box, "w56_unix_connect_probe", SOCKET_SCRIPT)
+        code, output = _finish(_start(project, s.T.tk, f"python3 -I {script} {out} {path}"))
+        outcome = _result(project, "w56_unix_connect_probe", output)["outcome"]
     finally:
         stop.set()
         thread.join(timeout=5)

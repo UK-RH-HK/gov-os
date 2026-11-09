@@ -305,6 +305,19 @@ the length guard is green.
 - **D-10. A launch-time sandbox probe.** If B makes the launcher check that a sandbox can be built (for example by
   running bubblewrap), these cases' stand-in harness needs a revision so the launch still reaches the stand-in.
 
+### The CTO's settled points (2026-11-09)
+
+- **D-11 settled (a):** `<HOME>/.cache/gov-os/rerank.log` on the write list, made by the launcher if missing, never a
+  link. The five `test_s11_the_reranker_log_is_on_the_write_list_as_the_service_names_it` cases stand as written.
+- **D-12 settled as recommended:** a shorter launcher temp folder keeping the `gov-launch-` prefix; the daemon folders
+  at the launcher's folder, found from `CLAUDE_CODE_TMPDIR`.
+- **D-13 measured by the CTO** (2026-11-09, `claude -p` with haiku, a planted Unix socket server): with
+  `network.allowUnixSockets: [<the one path>]` the sandboxed command's connect is refused `PermissionError [Errno 1]`,
+  exactly as with no allow; with `allowAllUnixSockets: true` it connects. On Linux a one-path allow does not open the
+  socket. S8's settings-level form (the one path, nothing wider) is still built: inert on Linux, honoured where the
+  CLI supports it. S8's reach and S10 on Linux go to the owner as a DEC-105 choice. The S8 cases stay as written.
+- **D-14:** not added to W2-56's paths now (it matters only once a socket can be reached); carried with D-13.
+
 ## Files
 
 - `w2_56_support.py`: the fixture project, the stand-in CLI and its plan steps, the launch helpers, the planted
@@ -324,7 +337,22 @@ the length guard is green.
 Each starts real `claude -p` sessions (model `haiku` unless `GOV_W2_56_REAL_MODEL` says otherwise) that run one Bash
 command; one session is roughly 20-60 s and a few cents of tokens (mostly the cached system prompt). Run them outside
 the launch sandbox, with the machine's resource gate open, by
-`GOV_W2_56_REAL=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-56/test_w2_56_real_sandbox.py`.
+`GOV_W2_56_REAL=1 TMPDIR=$(mktemp -d /tmp/w56r.XXXX) PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-56/test_w2_56_real_sandbox.py`.
+
+**They need a short `TMPDIR`** (for example `/tmp/w56r.XXXX`). The CLI's sandbox makes its bridge sockets under the
+temp folder it inherits; under a long `TMPDIR` their paths pass the Unix socket limit (107 bytes) and the sandbox
+cannot start ("Failed to create bridge sockets after 5 attempts"), so every case fails for a reason not its own. S9's
+planted socket lies in its own short folder under `/tmp` (made and removed by the test), so it does not skip under a
+long `TMPDIR` either.
+
+**The CTO's run (2026-11-09, outside the sandbox, `TMPDIR=/tmp/w56r.XXXX`, on integrate's code):**
+
+| Case | Outcome | Reading |
+|---|---|---|
+| `test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | passed | the OS refuses both writes |
+| `test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | red, product | in the sandbox the placeholder `.bash_profile` is a character device: `git add -A` fails "can only add regular files" (D-8); kept |
+| `test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` | red, product | `gov rebuild` cannot remove `.gov-runtime/rebuild/stores.json` (read-only); kept |
+| `test_s9_real_sandbox_a_second_unix_socket_is_refused` | red, test bug (fixed) | the planted script was `elsewhere/socket.py`, which shadowed Python's `socket` module, so the command exited 1 before it tried to connect. Now `w56_unix_connect_probe.py`, run with `python3 -I`, its socket under a short `/tmp` folder; the claim is unchanged. Not yet re-run |
 
 | Case | Sessions | What it proves that the settings-level cases cannot |
 |---|---|---|
