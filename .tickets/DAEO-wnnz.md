@@ -129,3 +129,20 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
   close; the engineer leaves its section in `docs/changes/W2-127-evidence.md` to the CTO.
 - The second half's tests: the independent test designer on `w2/W2-56-tests`, then the engineer with the tests'
   interface section in its brief.
+
+**The second half's points settled (the CTO, 2026-11-09; delegated, DEC-1112 (3)):** tests `w2/W2-56-tests`
+(`72f2433f0`, the designer's D-11 to D-14).
+- **D-11 (a):** S11's count by `~/.cache/gov-os/rerank.log` on the write list, made by the launcher if missing, never
+  a link; the one widening S11 allows.
+- **D-12:** a shorter launcher temp folder (the `gov-launch-` prefix kept) and the daemon folders at the launcher's
+  folder, found from `CLAUDE_CODE_TMPDIR`, so every role's folder fits the tool's 107-byte socket.
+- **D-13, measured (a real `claude -p` session, a planted socket):** on Linux `network.allowUnixSockets` with the one
+  path leaves the connect refused (EPERM), as with none; only `allowAllUnixSockets` connects, which S9 and F4 refuse.
+  S8's settings-level form (the one path, nothing wider) is built, inert on Linux; S8's reach and S10 on Linux go to
+  the owner as a DEC-105 choice (against DEC-1035 (2)). Until then a sandboxed search on Linux stays unranked, named
+  and counted (S11).
+- **D-14** (`rerank.py`'s chmod before connect) waits with D-13; not in W2-56's paths.
+- **Outside the sandbox (the CTO's run, integrate's code):** the S2 real case passes; S7's is red on the sandbox's
+  placeholder character devices (`git add -A` fails: S4's work); S13's is red on `gov rebuild` writing
+  `.gov-runtime/rebuild/` under the literal deny rules (the engineer reconciles S13 with S2 or names the conflict).
+  W1-27's revised W2-67 cases (D-2) are green, 5 of 5.
