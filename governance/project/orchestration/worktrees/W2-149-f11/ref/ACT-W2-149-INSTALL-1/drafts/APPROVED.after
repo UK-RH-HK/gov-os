@@ -1,0 +1,20 @@
+# ACT-INDEP-WALLS-1: the owner's approved list (DEC-1101 (2)). The launch script builds a wall only from files
+# whose sha256 is here. Written by the owner's operator only; the six refused roles neither read nor write it.
+65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49  template governance/project/indep-walls/README.md
+9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  template governance/project/indep-walls/settings.json.tmpl
+95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  template governance/project/indep-walls/wall_hook.py
+aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  template governance/project/indep-walls/CLAUDE.md.tmpl
+8b50a78f01b316d0bd5d41689cd3730da0e3142ac4c54705dc83bad0ace4d74f  template governance/project/indep-walls/kinds.yaml
+21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6  template governance/project/indep-walls/tree-exclude.txt
+# ACT-W2-149-INSTALL-1 (DEC-1101 (2)-(3), DEC-1112, DEC-1113): the fixed briefs the owner approved once
+# (SANDBOX-GUARD-EXP-DECLARATION §12), for the launch script governance/project/orchestration/tools/indep_launch.py
+# b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5 (W2-149 with its F11 follow-up, ff1865184930). Written by the owner's operator only.
+bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068  brief labeller governance/project/indep-briefs/sgx1/labeller.md
+e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904  brief labeller governance/project/indep-briefs/sgx1/labeller-2.md
+82134b3dd6b5a077abfc2eb6fa7481f0f5a73eab60396cfbd655042d53027c57  brief writer governance/project/indep-briefs/sgx1/writer-tuning.md
+137a73d1df4c265fd5ce4e24716797703e2b12dcaeb90663c0170834a60fafe6  brief writer governance/project/indep-briefs/sgx1/writer-heldout.md
+b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab  brief auditor governance/project/indep-briefs/sgx1/overlap-auditor.md
+# The operator agent's two fixed briefs (DEC-1109 (1)), approved once, kept on the owner's one list; no launch
+# can use them (the launch script knows no kind "operator").
+51c459cfbcfec47652df455844480a56a5bc91b5fba3bcf57dc807c5dbf08cc2  brief operator governance/project/operator/brief.md
+e86703304144f7d0c3f48332478f696d8f704c540f5ecf6c0551f6bd761ff81a  brief operator governance/project/operator/reviewer-brief.md

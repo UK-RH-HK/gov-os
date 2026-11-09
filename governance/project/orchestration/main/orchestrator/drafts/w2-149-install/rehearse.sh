@@ -79,15 +79,26 @@ echo "planted list $(sha256sum "$PR/indep-walls/APPROVED" | cut -c1-12) (ACT-IND
 ( cd "$D" && sha256sum apply.sh freeze.py install_check.py rehearse.sh APPROVED.before APPROVED.after briefs/* ) | cut -c1-12,65-
 
 say "order: this ACT before ACT-SETS-GLOBS-1 is refused"
-AP check > "$BASE/check0.txt" 2>&1 && bad "check passed before ACT-SETS-GLOBS-1" || true
-cat "$BASE/check0.txt"; expect "$BASE/check0.txt" "ACT-SETS-GLOBS-1 is not applied" "refused: apply ACT-SETS-GLOBS-1 first"
-
-say "ACT-SETS-GLOBS-1 applied in the clone (its own apply.sh, the planted root), committed as its message says"
-( cd "$R" && bash "$G/apply.sh" check --sets-root "$PR" && bash "$G/apply.sh" apply --sets-root "$PR" ) > "$BASE/sg.txt" 2>&1 \
-  || bad "ACT-SETS-GLOBS-1 did not apply in the clone"
-tail -3 "$BASE/sg.txt"
-git -C "$R" add .claude/hooks/pretooluse.py governance/project/path-map.yaml
-git -C "$R" commit -q -m "ACT-SETS-GLOBS-1 (rehearsal)" --trailer "Task: DAEO-sdxk" --trailer "Role: owner" || bad "SETS-GLOBS commit"
+SGC=9cce7430d   # ACT-SETS-GLOBS-1 as the owner's operator applied it live (2026-11-09)
+if grep -q '^def sets_line_keys(' "$R/.claude/hooks/pretooluse.py"; then
+  echo "the clone's head already holds ACT-SETS-GLOBS-1 (applied live at $SGC): the hook and map before it put back in the clone's working files for this step"
+  git -C "$R" show "$SGC^:.claude/hooks/pretooluse.py" > "$R/.claude/hooks/pretooluse.py"
+  git -C "$R" show "$SGC^:governance/project/path-map.yaml" > "$R/governance/project/path-map.yaml"
+  ( cd "$R" && sha256sum .claude/hooks/pretooluse.py governance/project/path-map.yaml | cut -c1-12,65- )
+  AP check > "$BASE/check0.txt" 2>&1 && bad "check passed before ACT-SETS-GLOBS-1" || true
+  cat "$BASE/check0.txt"; expect "$BASE/check0.txt" "ACT-SETS-GLOBS-1 is not applied" "refused: apply ACT-SETS-GLOBS-1 first"
+  git -C "$R" checkout -q -- .claude/hooks/pretooluse.py governance/project/path-map.yaml
+  ( cd "$R" && sha256sum .claude/hooks/pretooluse.py governance/project/path-map.yaml | cut -c1-12,65- ) | sed 's/^/back: /'
+else
+  AP check > "$BASE/check0.txt" 2>&1 && bad "check passed before ACT-SETS-GLOBS-1" || true
+  cat "$BASE/check0.txt"; expect "$BASE/check0.txt" "ACT-SETS-GLOBS-1 is not applied" "refused: apply ACT-SETS-GLOBS-1 first"
+  say "ACT-SETS-GLOBS-1 applied in the clone (its own apply.sh, the planted root), committed as its message says"
+  ( cd "$R" && bash "$G/apply.sh" check --sets-root "$PR" && bash "$G/apply.sh" apply --sets-root "$PR" ) > "$BASE/sg.txt" 2>&1 \
+    || bad "ACT-SETS-GLOBS-1 did not apply in the clone"
+  tail -3 "$BASE/sg.txt"
+  git -C "$R" add .claude/hooks/pretooluse.py governance/project/path-map.yaml
+  git -C "$R" commit -q -m "ACT-SETS-GLOBS-1 (rehearsal)" --trailer "Task: DAEO-sdxk" --trailer "Role: owner" || bad "SETS-GLOBS commit"
+fi
 ( cd "$R" && sha256sum .claude/hooks/pretooluse.py governance/project/path-map.yaml | cut -c1-12,65- )
 
 say "before this ACT: an approved brief is refused (10; its file is not in the tree, no APPROVED line)"
