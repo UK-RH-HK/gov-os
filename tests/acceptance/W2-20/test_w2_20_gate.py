@@ -103,32 +103,21 @@ def test_exactly_at_a_threshold(machine, repo, condition):
         assert (reasons[condition]["reading"], reasons[condition]["threshold"]) == (3.0, 3)
 
 
-def test_the_proposed_defaults_are_in_force_when_nothing_is_configured(machine, repo):
-    """No ``gate.json``: at least 4 GiB available, load below the processor count, at most 8 weighted sessions."""
-    assert not machine.config_file.exists()
-    machine.set_readings(available_bytes=4 * GIB, load=3.99, nproc=4)
-    for n in range(3):
-        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-d{n}")
+def test_with_no_configuration_file_the_gate_is_shut_and_names_it(machine, repo):
+    """DEC-1097 (8), S8 and F5 (DEC-947 item 3, DEC-950 item 2): every value is in the one configuration file, and a
+    value missing shuts the gate, named; no default stands in for it (the old defaults of DEC-742 are gone)."""
+    machine.config_file.unlink()
+    machine.set_readings(available_bytes=64 * GIB, load=0.5, nproc=4)
 
     reading = machine.read(repo)
-    assert reading.get("thresholds") == {
-        "min_available_memory_bytes": support.DEFAULT_MIN_AVAILABLE_MEMORY_BYTES,
-        "max_load_1m": 4,
-        "max_weighted_sessions": support.DEFAULT_MAX_WEIGHTED_SESSIONS,
-    }, reading
-    assert support.gate_of(reading)["open"] is True, reading
-
-    # Just under 4 GiB, load at the processor count (now 6), and 3 light + 3 heavy sessions (weight 9 > 8).
-    machine.set_readings(available_bytes=4 * GIB - 1024, load=6.0, nproc=6)
-    for n in range(3):
-        machine.register(repo, machine.live_process().pid, ticket=f"DAEO-dh{n}", heavy=True)
-    reading = machine.read(repo)
-    reasons = support.reasons_by_condition(reading)
-    assert support.gate_of(reading)["open"] is False, reading
-    assert reading["thresholds"]["max_load_1m"] == 6, f"the default load limit follows the processor count: {reading}"
-    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (4 * GIB - 1024, 4 * GIB)
-    assert (reasons["load"]["reading"], reasons["load"]["threshold"]) == (6.0, 6)
-    assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (9, 8)
+    assert support.gate_of(reading)["open"] is False, f"no configuration file, and the gate opened: {reading}"
+    config = support.config_reasons(reading)
+    assert config, f"the gate is not shut on the configuration: {reading['gate']}"
+    named = " ".join(map(str, config))
+    assert "gate.json" in named or any(key in named for key in support.GATE_KEYS), (
+        f"the reason names neither the file nor a value: {config}")
+    refused = support.refusal_of(*machine.check(repo))
+    assert support.config_reasons(refused), refused
 
 
 @pytest.mark.parametrize("missing", ["memory", "load"])
