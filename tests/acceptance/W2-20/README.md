@@ -24,6 +24,14 @@ passed 160 of 164; three cases disagreed with this README's own interface or wit
 revised each one (table "Round 4's changes"). The interface did not change. Only the S2 example and the GPU counting
 note were made explicit. No implementation of W2-20 was read.
 
+**Round 7 (2026-11-09, the CTO's rulings, DEC-1097 (8)).** Before the engineer's round 3, a fresh test designer
+brought in three rulings (table "Round 7's changes"): (1) review F2, a false refusal: the **cpu rule** no longer
+counts the embedding servers twice; the busy cores already hold their current use, so only the part of each server's
+p95 above its current use is added, and the reading shows their current use (`embedding_cpu_now`) beside the p95;
+(2) the **configuration format is frozen** from `28fbcfebf`, pinned by one new case on `--init-config`; (3) **S16's
+background** is sampled once, before the plain run, and its median nets both runs. No implementation of W2-20 was
+read.
+
 ## Run
 
 ```sh
@@ -78,6 +86,7 @@ The engineer builds to this; where the ticket left a form open, the choice is th
 | `load_1m`, `load_15m` | The 1- and 15-minute loads, or `null`. |
 | `busy_cores_1m` | Busy cores over the last minute, or `null`. |
 | `embedding_cpu_p95` | `{"shared": cores, "query": cores}`, the two servers' CPU p95, or `null`. |
+| `embedding_cpu_now` | `{"shared": cores, "query": cores}`, the two servers' CPU use over the same last minute as `busy_cores_1m` (the part of the busy cores that is theirs), shown beside their p95, or `null` (round 7). |
 | `nproc` | The processor count. |
 | `disk` | `{"free_bytes", "free_inodes"}` of the shared disk, or `null`. |
 | `sessions` | The live sessions: `pid`, `repository`, `ticket`, `role`, `live_memory_bytes`. |
@@ -98,9 +107,15 @@ no ceiling on leads or sessions** (DEC-983); heavy jobs wait for slots instead, 
   side; threshold: the right side. "At least": equal opens. The verification peak is not added (nothing is reserved
   for a run that has not started).
 - **load (S5):** `min(load_1m, load_15m) < nproc`. Reading: the min; threshold: nproc. Equal shuts.
-- **cpu (S2, S12):** `busy_cores_1m + p95(shared) + p95(query) < nproc`. Reading: the sum; threshold: nproc. Equal
-  shuts. *(choice: how the servers' p95 is counted)* Busy cores alone shut it only at nproc or above: 4.0 busy of 4
-  with both p95 at 0.0 shuts (S2's case); 3.9 opens.
+- **cpu (S2, S12), round 7 (the CTO's ruling under DEC-1097 (8) on review F2):**
+  `busy_cores_1m + max(0, p95(shared) − now(shared)) + max(0, p95(query) − now(query)) < nproc`, where `now` is
+  `embedding_cpu_now`. The busy cores already hold the servers' current use, so only the part of each server's p95
+  above its current use is added: the servers are never counted twice, and a server busier now than its p95 adds
+  nothing (it takes nothing away either). Reading: the sum; threshold: nproc. Equal shuts. Busy cores alone shut it
+  only at nproc or above: 4.0 busy of 4 with each server's p95 equal to its current use shuts (S2's case); 3.9 opens.
+  A store rebuild (12 busy of 20, the shared server using 7.5 of its p95 8.0 now) adds 0.5 and opens; the same p95
+  with the servers idle now adds all 8.0 of it. An unreadable `embedding_cpu_now` shuts on `cpu` with `reading`
+  `null` (F5). (Rounds 1 to 6 added the whole p95 on top of the busy cores: a false refusal during store rebuilds.)
 - **disk, inodes (S4):** `free_bytes ≥ disk_floor_bytes`, `free_inodes ≥ inode_floor`. Equal opens.
 - **config (S8):** one reason per value missing or malformed, naming its key (or the file, when it is missing or not
   JSON); `reading` the raw value or `null`.
@@ -121,6 +136,7 @@ no ceiling on leads or sessions** (DEC-983); heavy jobs wait for slots instead, 
 | `GOV_RESOURCES_NPROC` | the processor count | an integer (the gate's nproc; CPU sets use the real affinity) |
 | `GOV_RESOURCES_BUSY_CORES` | the gate's own sampling of `/proc/stat` | one number: busy cores over the last minute |
 | `GOV_RESOURCES_EMBEDDING_CPU` | the gate's own sampling of the two servers | JSON `{"shared": p95 cores, "query": p95 cores}` |
+| `GOV_RESOURCES_EMBEDDING_CPU_NOW` | the gate's own sampling of the two servers over the busy cores' last minute | JSON `{"shared": cores, "query": cores}` (round 7) |
 | `GOV_RESOURCES_DISK` | `statvfs` of the shared disk | JSON `{"free_bytes": N, "free_inodes": N}` |
 | `nvidia-smi` on `PATH` | | read with `--query-gpu=<fields>` and `--query-compute-apps=<fields>`, `--format=csv[,noheader][,nounits]`; fields `memory.total`, `memory.used`, `memory.free`, `utilization.gpu`; `pid`, `process_name`, `used_memory`. Exit 6 with "No devices were found" is no GPU. |
 
@@ -133,12 +149,20 @@ The file `gov.retrieval.ollama` already reads for the servers' cap (`GATE_REL`).
 `{"value": V, "date": "YYYY-MM-DD", "source": "text"}`; a value without its date or source, or with a date that is
 not a date, is malformed. **No default stands in for a missing value** (the old defaults of DEC-742 are gone).
 
+**Frozen from `28fbcfebf` (round 7, the CTO):** W2-20's head when ACT-GATE-CONFIG-2 writes the machine's file. No key
+below is renamed, added or given another meaning. `gov resources --init-config` writes exactly this set and nothing
+else: the eleven dated values (each exactly `{"value", "date", "source"}`); `thread_budget` only as a dated value
+when present (the template may leave it out); `embedding_servers` with `shared` and `query` (and at most a section
+`date` and `source`), each server `cpus` (a CPU list text, W2-123's form) and `nice` (0 to 19), optionally
+`parallel`, `probe_slow_s`, `probe_hung_s`, its own `date` and `source`, and for `query` `device`. Each server is
+dated and sourced on itself or by the section (`test_s8_init_config_writes_exactly_the_frozen_configuration_format`).
+
 | Key | Value | Notes |
 |---|---|---|
 | `memory_floor_bytes` | integer ≥ 0 | 3 GiB on this machine (DEC-942 item 2) |
 | `verification_peak_bytes` | integer ≥ 0 | measured (S9); due after seven days |
 | `working_size_bytes` | integer ≥ 0 | measured (S9); due after seven days |
-| `rebuild_peak_bytes` | integer ≥ 0 | measured (S9, P-5 (a)); the tests plant it in every file; whether it is required is package P-7 |
+| `rebuild_peak_bytes` | integer ≥ 0 | measured (S9, P-5 (a)); required, dated and sourced like every value (P-7, settled in the ticket) |
 | `disk_floor_bytes` | integer ≥ 0 | 100 GiB (DEC-898 item 1) |
 | `inode_floor` | integer ≥ 0 | 10,000,000 (DEC-898 item 1) |
 | `verification_lock` | a path (text) | a verification run holds an exclusive `flock` on it |
@@ -253,6 +277,15 @@ share + 1. The time-bound design (P-4) and the 20 % check are unchanged. It prin
 share and how it was reached, the CPU sets seen in the slot; the two backgrounds (p95 and median); the gross and net
 p95 of each run against share + 1; the two times.
 
+**Round 7 (2026-11-09, `Rewrite-Reason: DEC-1097 (8)`).** The CTO did not accept round 6's background: one sampled just
+after the plain run holds that run's tail and flatters the net figure. The background is now sampled **once, before the
+plain run**, on a quiet machine (a 2 s settle, then 5 s of samples with nothing of the case running), and its
+**median** is subtracted from both runs' p95 (net = gross p95 − the background's median). An unsampled 2 s settle
+separates the plain run from the slot's run. The second `S16 evidence:` line now gives the one background's median and
+p95 and its sample count; the third each run's gross and net p95 against share + 1. The real share (S17's rule), the
+CPU-set check, the time-bound design (P-4) and the 20 % check are unchanged. **On a quiet machine** is the CTO's run
+condition: the case does not judge quietness itself; a busy background shows in the printed median and p95.
+
 ## KPI lines
 
 Ids in the ticket's order (`.tickets/DAEO-r30l.md`, 2026-11-09). "New/changed" from the ticket's history
@@ -352,6 +385,33 @@ W2-20 builds it: `test_w1_07_recorded_commands.py::test_a_recorded_gov_command_i
 `test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it[resources]`,
 `::test_with_every_module_present_the_check_has_no_finding`, `::test_a_skill_may_name_a_recorded_gov_command[resources]`
 (W1-07's and W1-26's run only with `--optin=breadth`/`lifted`, DEC-1061).
+
+## Round 7's changes (2026-11-09)
+
+The CTO's rulings before the engineer's round 3. Item 1's commits carry `Rewrite-Reason: the CTO's ruling under
+DEC-1097 (8), a false refusal (review F2)`; item 3's `Rewrite-Reason: DEC-1097 (8)`; item 2's new case none.
+
+| Ruling | Case | Change | Commit |
+|---|---|---|---|
+| 1, F2 | support (`w2_20_support.py`) | the servers' current use as a planted reading, `GOV_RESOURCES_EMBEDDING_CPU_NOW` (`set_readings(embedding_now=...)`), idle (0.0, 0.0) by default, so a case that plants only the p95 keeps its sum; no case changes what it asserts | `e5aafd01d` |
+| 1, F2 | `test_w2_20_cpu.py::test_s2_the_gate_judges_busy_cores_and_load_each_on_its_own_and_shows_both` | the servers busy now at their p95 (0.25 each, inside the busy cores): the cpu reading is the busy cores alone, 4.0 of 4, asserted | `7919608ec` |
+| 1, F2 | `test_w2_20_cpu.py::test_s12_both_servers_cpu_p95_count_when_a_session_is_admitted` | the servers idle now: their whole p95 is headroom and counts (same sums); the reading shows `embedding_cpu_now` beside the p95 | `e8d18604a` |
+| 1, F2 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added` (new, 3 cases) | 20 CPUs: a store rebuild (busy 12, shared p95 8.0 using 7.5 now) opens; the same p95 idle now shuts at equal (20.0); a server busier now than its p95 subtracts nothing, equal shuts (20.0) | `4f86a75db` |
+| 1, F2 | `test_w2_20_cpu.py::test_s12_f5_the_servers_current_use_unreadable_shuts_on_cpu` (new) | the new reading fails closed: `null`, shut on `cpu`, `reading` `null` | `ee04552af` |
+| 1, F2 | `test_w2_20_gate.py::test_exactly_at_a_threshold[cpu]` | equal by the new rule: 2.25 + (1.0 − 0.5) + (0.25 − 0.0) = 3.0 of 3 shuts (counted twice it reads 3.5) | `ecd13afd4` |
+| 2 | `test_w2_20_config.py::test_s8_init_config_writes_exactly_the_frozen_configuration_format` (new) | `--init-config` under a planted HOME writes exactly "The configuration file"'s key set, value form and nesting, and nothing else | `a197aed6f` |
+| 3 | `test_w2_20_measured.py::test_s16_one_slot_holds_a_cpu_hungry_suite_to_its_share_plus_one_within_20_percent_of_the_time` | one background, before the plain run; its median nets both runs; gross, net, median and p95 printed | `fe6fe8ac0` |
+
+Unchanged, and still right under the new rule because the servers are idle now in them (the support's default): the
+cpu cases of `test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_threshold[cpu]` (3.5 + 0.25 +
+0.25 = 4.0), `test_several_broken_conditions_are_all_named` (9 + 0.5 + 0.5 = 10.0) and
+`test_w2_20_launch.py`'s `cpu` rows (4.0).
+
+Run on this branch (no product; integrate's code), round 2's command with an empty `HOME` (and `PYTHONUSERBASE` at
+the user site, so pytest is found): **159 failed, 9 passed, 1 deselected** (169 cases): round 4's 154 red plus the five
+new cases, all red because the product is missing (`gov resources`: `invalid choice: 'resources'`, exit 2, no JSON
+envelope); the nine greens are the same guards; the deselected one is S16 (`local_only`), which collects and skips
+without `GOV_W2_20_MEASURE=1`.
 
 ## KPI line → tests → state on integrate
 
@@ -551,9 +611,17 @@ and one green guard (S21's main-tree case).
 | F5 | `test_w2_20_gate.py::test_a_reading_that_cannot_be_taken_never_opens_the_gate[embedding p95]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 | F5 | `test_w2_20_gate.py::test_a_reading_that_cannot_be_taken_never_opens_the_gate[disk]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 | F6 | `test_w2_20_memory.py::test_f6_a_workers_memory_is_charged_once_not_in_its_leads_tree_and_again_as_its_own_session` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
+| S12 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added[a store rebuild: the shared server busy now near its p95 opens]` | red | `gov resources` does not exist (`invalid choice: 'resources'`); round 7 |
+| S12 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added[the same p95 with both servers idle now counts its headroom: equal shuts]` | red | `gov resources` does not exist; round 7 |
+| S12 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added[a server busier now than its p95 subtracts nothing: equal shuts]` | red | `gov resources` does not exist; round 7 |
+| S12 | `test_w2_20_cpu.py::test_s12_f5_the_servers_current_use_unreadable_shuts_on_cpu` | red | `gov resources` does not exist; round 7 |
+| S2 | `test_w2_20_cpu.py::test_s12_only_the_part_of_each_servers_p95_above_its_current_use_is_added[a store rebuild: the shared server busy now near its p95 opens]` | red | `gov resources` does not exist; round 7 (the cpu rule) |
+| F5 | `test_w2_20_cpu.py::test_s12_f5_the_servers_current_use_unreadable_shuts_on_cpu` | red | `gov resources` does not exist; round 7 |
+| S8 | `test_w2_20_config.py::test_s8_init_config_writes_exactly_the_frozen_configuration_format` | red | `gov resources` does not exist (`invalid choice: 'resources'`); round 7 |
 
-**Count.** KPI lines with tests: 27 of 27 (21 success, 6 failure); S16 by its `local_only` case only. 164 cases in
-79 test functions (round 1: 146 in 66); 183 map rows (a case that proves two lines is listed under each).
+**Count.** KPI lines with tests: 27 of 27 (21 success, 6 failure); S16 by its `local_only` case only. Round 7: 170
+cases in 82 test functions (round 2: 164 in 79; round 1: 146 in 66); 190 map rows (a case that proves two lines is
+listed under each; round 7's seven rows at the end of the table).
 
 **Not tested (and why), after round 2:** S4's literal floors are now checked in `--init-config`'s template (P-3);
 elsewhere they stay planted (no default may stand, S8). S7's "the rebuild's peak ... counted by the gate like a test
@@ -623,8 +691,8 @@ check". The tests: the start check without a need never runs `nvidia-smi`; the r
 check with a need read it once. Recommendation: keep that reconciliation, confidence medium-high.
 
 **Interface choices the engineer may challenge** (each costs one support constant or a few asserts to change): the
-CPU condition counts `busy + p95(shared) + p95(query) < nproc` (the servers' current use may be counted twice; an
-alternative is to add only the p95 above their current use); a GPU process's kind from its command line; the
+CPU condition (round 7: settled by the CTO's ruling on review F2; only the part of each server's p95 above its current
+use is added; the servers' current use as its own reading, `embedding_cpu_now`); a GPU process's kind from its command line; the
 trip-wire, re-measure and slot as `gov resources` options; the log and start-log paths under `~/.gov-os/machine/`.
 
 ## Discoveries
