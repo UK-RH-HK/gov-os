@@ -14046,6 +14046,23 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   `gov resources --sample` over a working day and then `--remeasure`.
 - **Basis:** question 2 (no false refusal of honest work; evidence that measures the slot, not the machine).
 
+### DEC-1106 — W2-148: F15 fixed in one exception round to DEC-1010; the guard's call log by its own ACT; the commit freeze in the operator agent's install folder; F7 kept; then ACT-OPERATOR-1
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1104 (2), DEC-1103 (4), DEC-1010, DEC-1099 (1), DEC-1101 (1), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's review round 2 (not READY on F15)
+- **Decision:**
+  - (1) **F15: fixed now,** one exception round to DEC-1010 for W2-148: the agent restores only its own dry-run change
+    (a touched file whose live bytes equal the frozen after-copy); for anything else it writes nothing, refuses, holds
+    the lock and sends the owner a P1 naming each file. The same rule in the (a) after-check's undo. One engineer pass,
+    one narrow review of those points.
+  - (2) **F3: the guard appends each decision to a call log** (a hash of the action, the role, allow or refuse; never
+    the contents), as its own ACT for the owner's operator, rehearsed; it serves the after-check's replay, the sandbox
+    experiment and the false-refusal counts.
+  - (3) **F5: the commit freeze is a file in the operator agent's install folder;** the CTO's tools and the landing hook
+    read it; the guard denies the CTO's session writing it.
+  - (4) **F7: kept** as the approved package says (the agent runs an ACT's own `apply.sh` and its `git add`/`commit`).
+  - (5) Then **ACT-OPERATOR-1** with these settings, as a message for the owner's operator.
+- **Basis:** question 2 (an operator that can never silently undo someone else's change; a guard whose decisions are
+  logged without their contents).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14089,3 +14106,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.488 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1103; DEC-1061 amended for ten cases. Next free id: DEC-1104. |
 | 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |
 | 0.490 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1105 (an exception to DEC-1010 for W2-20). Next free id: DEC-1106. |
+| 0.491 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1106 (an exception to DEC-1010 for W2-148). Next free id: DEC-1107. |

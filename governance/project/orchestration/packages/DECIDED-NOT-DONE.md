@@ -86,6 +86,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 53 | the landing selection's environment | DEC-1104 (3): fixed before its results are relied on | **DONE 11-09**: a short temporary folder (the socket path under 107 bytes); 49/49 tests incl. the folder regression; the re-run shows only W1-06 and test_fusion (D-10's list) |
 | 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | APPROVED (DEC-1104 (2)); next: build it, tests first, one review, a replay trial on past ACTs |
 
+## 0g. DEC-1105 and DEC-1106 (2026-11-09)
+| # | item | fate | state |
+|---|---|---|---|
+| 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | IN PROGRESS (S16 revised `bdc5e052`) |
+| 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | IN PROGRESS 11-09 |
+| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | IN PROGRESS 11-09 |
+| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept | WAITS: W2-148 READY and merged |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms
