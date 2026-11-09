@@ -14,7 +14,7 @@ Every case builds its own planted world under `tmp_path` (`w2_148_support.World`
 `~/.claude`, crontab, git hook, push channel, `claude`, network, GPU or model. Each subprocess gets the world's `HOME`
 and a `PATH` that starts with the world's stubs (`claude`, `crontab`, `sudo`, `pkill`, `killall`), plus
 `PYTHONUSERBASE` (the real user site, for PyYAML) and `PYTHONDONTWRITEBYTECODE=1`. Nothing needs a live session; the
-`live` marker is registered and no case carries it. About 166 cases, most of them a full planted run of a few seconds.
+`live` marker is registered and no case carries it. About 169 cases (166, and DEC-1107's three), most of them a full planted run of a few seconds.
 
 ## The interface the tests call (the engineer builds to it)
 
@@ -61,7 +61,13 @@ file; default `<operator_root>/install/act-in-progress.txt`, DEC-1106 (3)).
 - Each of the first two prints its result as the **last line of stdout, one JSON object**: `result` (`applied`,
   `refused`, `undone`, `launched`, ...), `gate` (`G1`…`G9`, `recompute`, ...) and `reason` on a refusal,
   `approved_sha256`, and for the launcher `request: {act, sha256}` and `session: {pid, pgid, exit}`. Exit 0 when
-  applied, undone (the undo step) or launched; non-zero on a refusal. Fixed phrases in `reason`: `changed after
+  applied, undone (the undo step) or launched; non-zero on a refusal. **The undo step and the recovery leaving a file
+  (DEC-1107):** the undo step (`... undo <ACT> <sha>`, on the owner's line) and the launcher's recovery of an unfinished
+  journal print `result` `refused` and exit non-zero whenever they leave any file untouched that is not the ACT's own
+  (a touched file whose bytes are neither its before- nor its after-copy); then no JSON object on the launcher's stdout,
+  nested ones included, carries `result` `undone`; the ACT's own touched files (at their after-copy) are still undone,
+  a P1 names each file left, and the lock is held. With nothing left, the undo step says `undone` with exit 0 and the
+  recovery's result (on the launcher's stdout, at any nesting) is `undone`. Fixed phrases in `reason`: `changed after
   review` (any sha mismatch, S5), `to the owner` (a third review round), `yours` (class O), `rebuild, rehearse,
   re-review` (G7).
 - **Test hook:** `GOV_OPERATOR_TEST_HOOK=<executable>` is run as `<exe> <point> <frozen folder>` at the points
@@ -235,6 +241,9 @@ integrate; the cases marked "guard" are green once the code is built and fail an
 | S22 | `test_w2_148_notices_undo.py::test_s22_a_failing_undo_holds_the_lock_and_the_next_queued_act_is_not_run` | red | no code; P1; the launcher starts no real session |
 | S22 | `test_w2_148_notices_undo.py::test_s22_an_apply_failing_partway_is_undone_from_the_backups_with_a_p1` | red | no code |
 | S22 | `test_w2_148_notices_undo.py::test_s22_an_unfinished_journal_is_undone_at_the_next_launch_with_a_p1` | red | no code; the run stopped by its pgid mid-apply; the next launch (empty queue) undoes |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_the_owner_s_undo_leaving_another_s_file_exits_non_zero_refused_held` | red at `b134a760b` | DEC-1107: an applied two-file ACT, one file then at third bytes, a valid owner's line on day 3: exit non-zero, `refused`, that file as the other wrote it, the other file undone, a P1 naming it, lock held. Today: non-zero and `refused` (`moved since the apply`) but nothing undone |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_the_crash_recovery_leaving_another_s_file_is_refused_non_zero_held` | red at `b134a760b` | DEC-1107: the run stopped mid-apply (first file placed), the second file then at third bytes, a launch with an empty queue: non-zero, `refused`, no `undone` on stdout, no session, that file as written, the placed file undone, a P1 naming it, lock held. Today: non-zero but `result` `undone` |
+| S22 | `test_w2_148_undo_refused.py::test_s22_f21_guard_the_crash_recovery_with_nothing_foreign_still_says_undone` | green at `b134a760b` | guard (DEC-1107): the same stop with nothing foreign: every file at its before bytes, a result `undone` on stdout and none `refused`, a P1. The owner's undo guard is `test_s22_the_owner_s_undo_line_on_day_3_undoes_and_none_refuses` (`undone`, exit 0) |
 | S23 | `test_w2_148_trial.py::test_s23_the_record_has_a_row_per_act_file_with_its_class` | red | no record; the 54 at `116c2b413` and the two later |
 | S23 | `test_w2_148_trial.py::test_s23_the_counts_per_class_match_the_rows` | red | no record |
 | S23 | `test_w2_148_trial.py::test_s23_no_pinned_act_is_classed_lower_than_the_table` | red | no record; the pinned subset (N-6) |
@@ -262,6 +271,8 @@ The failure lines, by the cases that would catch each:
 | F15 | `test_w2_148_restore_freeze.py::test_s12_f15_a_concurrent_commit_during_the_dry_run_is_left_untouched_refused_and_held` | red | any live change made by the operator that is not its own: none (the CTO's commit kept, not reverted or deleted) |
 | F15 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | as above, with its own change beside it |
 | F15 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | as above, in the (a) after-check's undo |
+| F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_owner_s_undo_leaving_another_s_file_exits_non_zero_refused_held` | red at `b134a760b` | DEC-1107: in the owner's undo, another's file left as written, never a success code (`refused`, non-zero) |
+| F15 | `test_w2_148_undo_refused.py::test_s22_f21_the_crash_recovery_leaving_another_s_file_is_refused_non_zero_held` | red at `b134a760b` | DEC-1107: as above, in the crash recovery |
 | F5 | `test_w2_148_restore_freeze.py::test_s12_f15_the_dry_run_s_own_change_reaching_the_live_tree_is_restored_and_refused` | red | a dry run that changed a live file is refused, the file restored |
 | F7 | `test_w2_148_apply.py::test_s16_the_landing_check_flags_control_commits_outside_a_ticket_without_the_trailers` | red | flagged |
 | F8 | `test_w2_148_launch.py::test_s17_the_launcher_starts_the_walled_session_for_the_oldest_request_clean_and_by_pid` | red | the wall's settings, cwd, clean environment |
@@ -316,6 +327,14 @@ The failure lines, by the cases that would catch each:
   revised (`Rewrite-Reason: DEC-1106 (3)`). (4) F7 kept: S19's allowed forms are unchanged. (2) (the guard's call log)
   is its own ACT and not tested here. The failure line "any live change made by the operator that is not its own" is
   DEC-1106's, mapped as F15 above. Nothing of the engineer's work was read for this round.
+- **N-10. DEC-1107 (the owner, 2026-11-09), round 3 of this design (F21).** The owner's undo and the crash recovery
+  exit non-zero and say `refused` whenever they leave another's file untouched (the interface line above); the P1
+  naming each file and the held lock stay as DEC-1106 (1) put them, and the ACT's own touched files are still undone.
+  "Someone else" writes third bytes into one touched file before the undo or the launch is called (no hook point). The
+  new cases are in `test_w2_148_undo_refused.py`, mapped to S22 and F15; their reds were seen on the merged agent at
+  `b134a760b`, run only through the cases (G-14). The owner's undo case trips today on a different path from the one
+  the review reported: it already refuses (`moved since the apply`) but undoes nothing, so it is red on the ACT's own
+  file. The 166 earlier cases are unchanged. Nothing of the engineer's work was read for this round.
 
 ## Files
 
@@ -325,4 +344,5 @@ The failure lines, by the cases that would catch each:
 - `test_w2_148_gates.py` (S1-S5, S9, S11-S13), `test_w2_148_classify.py` (S6), `test_w2_148_votes_yes.py` (S7, S8,
   S10), `test_w2_148_apply.py` (S14-S16), `test_w2_148_launch.py` (S17-S19, S24), `test_w2_148_notices_undo.py`
   (S20-S22), `test_w2_148_trial.py` (S23), `test_w2_148_restore_freeze.py` (DEC-1106: F15 in S12 and S15, the freeze
-  in S14 and S13).
+  in S14 and S13), `test_w2_148_undo_refused.py` (DEC-1107: the owner's undo and the crash recovery leaving another's
+  file, S22 and F15).
