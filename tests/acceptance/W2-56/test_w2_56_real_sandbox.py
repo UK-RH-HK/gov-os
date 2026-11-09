@@ -15,10 +15,10 @@ allows every call, so the operating system is the only fence measured. The cheap
   listens on, other than the reranker's; refused, and the listener sees no connection.
 - ``test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit`` (S7): three sessions
   started at once in three worktrees of one repository each commit; none fails on a ``.git/*.lock`` source path.
-- ``test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox`` (S13, S1): after a
-  rebuild made outside (so ``.gov-runtime/`` holds entries the launcher's literal deny rules name), a script runs
-  ``gov check --list``, ``gov rebuild --no-embeddings`` and S1's probe suite; all end 0, and the suite's daemon
-  folders lie under the session's temp folder.
+- ``test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox`` (S13, S1): after a rebuild made
+  outside (so ``.gov-runtime/`` holds entries the launcher's literal deny rules name), a script runs
+  ``gov check --list`` and S1's probe suite; both end 0, and the suite's daemon folders lie under the session's temp
+  folder. ``gov rebuild`` inside the sandbox is a Wave 3 row (S13 changed, DEC-1112 (3): the engineer's P-1 (b)).
 
 What they cost and prove is in the README. They write what ``gov launch`` writes: a run folder under
 ``~/gov-os-runs`` for the fixture's ticket, and the machine-wide registry entry while each session runs. They never
@@ -244,16 +244,15 @@ SUITE_SCRIPT = """import json, os, subprocess, sys
 out, src, repo, probe, tools = sys.argv[1:6]
 env = dict(os.environ, PYTHONPATH=src, PYTHONDONTWRITEBYTECODE="1")
 record, calls = os.path.join(os.path.dirname(out), "probe.jsonl"), os.path.join(tools, "calls.txt")
+os.makedirs(os.path.dirname(out), exist_ok=True)  # the probe's record and the stand-in's calls are written here
 runs = {}
 for label, argv, cwd, extra in (
         ("check", [sys.executable, "-m", "gov.cli.main", "check", "--list"], os.getcwd(), {}),
-        ("rebuild", [sys.executable, "-m", "gov.cli.main", "rebuild", "--no-embeddings"], os.getcwd(), {}),
         ("suite", [sys.executable, "-m", "pytest", probe, "--rootdir=" + repo, "-q", "-p", "no:cacheprovider"], repo,
          {"W2_56_PROBE_RECORD": record, "W2_56_PROBE_STANDIN": tools})):
     done = subprocess.run(argv, cwd=cwd, env=dict(env, **extra), capture_output=True, text=True)
     runs[label] = {"code": done.returncode, "tail": (done.stdout + done.stderr)[-1200:]}
 daemons = sorted(set(open(calls).read().split())) if os.path.exists(calls) else []
-os.makedirs(os.path.dirname(out), exist_ok=True)
 with open(out, "w") as handle:
     json.dump({"runs": runs, "daemons": daemons, "tmpdir": os.environ.get("TMPDIR", "")}, handle)
 """
@@ -264,7 +263,7 @@ printf '%s\\n' '{"isError": false, "content": [{"type": "text", "text": "{\\"pro
 """
 
 
-def test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox(tmp_path):
+def test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox(tmp_path):
     box = _box(tmp_path)
     project = _project(box)
     before = subprocess.run(s.gov_argv("rebuild", "--no-embeddings"), cwd=str(project), env=_env(),

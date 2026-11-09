@@ -155,7 +155,7 @@ the length guard is green.
 | S1 | `test_w2_56_suite_daemon.py::test_s1_guard_each_daemon_folder_is_short_enough_for_the_tools_socket` | red here, green outside a sandbox | guard (DEC-338): here no build reaches the tool; today's folder is 34 bytes |
 | S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_is_under_the_sessions_temp_folder` | red (5 roles) | `daemon_dir` gives `/tmp/gov-cbm-1000/<16 hex>` for the session's commands and a suite inside, not under the session's temp folder |
 | S1 | `test_w2_56_session_daemon.py::test_s1_inside_a_launched_session_the_daemon_folder_leaves_room_for_the_tools_socket` | green (guard, 5 roles) | today's folder is 34 bytes; a folder under the session's temp folder that is too long for the socket (D-12) fails it |
-| S1, S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | the CTO's; expected red today: the suite's build cannot write `/tmp/gov-cbm-<uid>` inside the sandbox |
+| S1, S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | the CTO's; expected red on integrate: the suite's build cannot write `/tmp/gov-cbm-<uid>` inside the sandbox; gov rebuild inside is out (P-1 (b)) |
 | S2 | `test_w2_56_sandbox_block.py::test_s2_the_write_list_is_the_temp_folder_the_run_folder_and_at_most_the_reranker_log` | green (guard, 5 roles) | today's list: the temp folder and the run folder; an entry from the allowed paths, the worktree or `/tmp/gov-cbm-<uid>` fails it |
 | S2 | `test_w2_56_sandbox_block.py::test_s2_the_literal_deny_rules_for_gov_runtime_and_the_acceptance_tests_stay` | green (guard, 5 roles) | today's literal rules; dropping one fails it |
 | S2 | `test_w2_56_guard_scope.py::test_s2_premise_a_write_inside_the_roles_scope_is_allowed` | green (premise, 5 roles) | a guard that refuses everything fails it |
@@ -193,7 +193,7 @@ the length guard is green.
 | S12 | `test_w2_56_endings.py::test_s12_a_process_of_the_group_that_ignores_the_ending_signal_is_killed_after_the_wait` | red | the grandchild that ignores SIGTERM still runs 13 s later |
 | S12 | `test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled` | green (guard, 3) | the folder goes on each ending signal today |
 | S12, S15 | `test_w2_56_endings.py::test_s15_a_temp_folder_holding_folders_the_owner_may_not_write_is_removed` | red (2) | exit 0 and SIGTERM: `shutil.rmtree` cannot empty a 0500 folder, the folder stays with one line on stderr |
-| S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | as S1's row |
+| S13 | `test_w2_56_real_sandbox.py::test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | skipped here (real) | as S1's row |
 | S14 | `test_w2_56_template.py::test_s14_the_template_carries_one_allow_rule_bash_gov_launch` | red | the template has no `permissions.allow` |
 | S14 | `test_w2_56_template.py::test_s14_guard_the_template_keeps_its_hooks` | green (guard) | the PreToolUse hook stays |
 | S15 | `test_w2_56_endings.py::test_s15_the_temp_folder_is_removed_whatever_the_sessions_exit` | green (guard, 3) | exit 0, exit 3, killed by SIGKILL: removed today |
@@ -231,7 +231,7 @@ the length guard is green.
 | S9 | nothing else widens (settings level); `sandbox_faults` refuses 13 changes; a second socket refused by the OS: `test_s9_real_sandbox_…` |
 | S10 | no case: the CTO's measurement, outside the sandbox (mapped `—`) |
 | S11 (changed to W2-145's form) | interface chosen (D-11: one log file); the log on the write list; an unranked search in the session counted where `gov status` counts |
-| S13 | `test_s13_real_sandbox_…`: gov check, gov rebuild and a code-graph suite in a real session, after a rebuild made outside |
+| S13 (changed, DEC-1112 (3): the engineer's P-1 (b)) | `test_s13_real_sandbox_…`: gov check and a code-graph suite in a real session, after a rebuild made outside; gov rebuild inside the sandbox is a Wave 3 row (it writes `.gov-runtime/rebuild/` and a rebuild lock, read-only in today's sandbox; DEC-180), so no case runs it |
 | F1 (changed) | as S2, S3 and S11; the log-link edge; `/tmp/gov-cbm-<uid>` never on the list |
 | F2: the sandbox's refusals | `enabled` and `failIfUnavailable` true for every role; a sandbox key in either repository settings file still refuses; `sandbox_faults`'s five refusals of today |
 | F4 | as S8 and S9; the socket-link edge |
@@ -351,15 +351,27 @@ long `TMPDIR` either.
 |---|---|---|
 | `test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | passed | the OS refuses both writes |
 | `test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | red, product | in the sandbox the placeholder `.bash_profile` is a character device: `git add -A` fails "can only add regular files" (D-8); kept |
-| `test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` | red, product | `gov rebuild` cannot remove `.gov-runtime/rebuild/stores.json` (read-only); kept |
+| `test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` (the old name) | red, product | `gov rebuild` cannot remove `.gov-runtime/rebuild/stores.json` (read-only); the step is now out of S13 (P-1 (b), below) |
 | `test_s9_real_sandbox_a_second_unix_socket_is_refused` | red, test bug (fixed) | the planted script was `elsewhere/socket.py`, which shadowed Python's `socket` module, so the command exited 1 before it tried to connect. Now `w56_unix_connect_probe.py`, run with `python3 -I`, its socket under a short `/tmp` folder; the claim is unchanged. Not yet re-run |
+
+**The CTO's second run (2026-11-09, outside the sandbox, short `TMPDIR`, on the engineer's head):** 259 passed, 1
+failed: the S13 case (then still with gov rebuild). S2, S7 and S9 pass.
+
+- **P-1 (b) (S13 changed, DEC-1112 (3)):** gov rebuild inside the sandbox is deferred to Wave 3 with set-up B; no
+  deny rule dropped, DEC-180 kept. Its step is dropped and the case renamed
+  `test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox`; gov check and the suite stay.
+- **The suite step's `FileNotFoundError` on `.w56-real/probe.jsonl`: test bug (fixed).** The planted script made
+  `.w56-real/` only after its runs, but the probe suite appends its record there (and the stand-in tool its
+  `calls.txt`) during the suite run, so the probe's first `open(mode='a')` failed on the missing folder whatever the
+  product did. The other real cases make the folder before they write. The script now makes it first; the claim is
+  unchanged. Not yet re-run.
 
 | Case | Sessions | What it proves that the settings-level cases cannot |
 |---|---|---|
 | `test_s2_real_sandbox_a_script_write_into_another_worktree_or_a_denied_name_is_refused` | 1 | that the CLI turns today's write list and literal deny rules into the OS's refusal of a script's write (the guard cannot name it) into another worktree and into `tests/acceptance/` |
 | `test_s9_real_sandbox_a_second_unix_socket_is_refused` | 1 | that a socket the block does not allow is refused by the OS while the reranker's one is allowed; with S10 it settles D-13 |
 | `test_s7_real_sandbox_three_sessions_at_once_in_worktrees_sharing_one_git_start_and_commit` | 3 at once | the `.git/*.lock` source-path failure exists only when bubblewrap binds the lock files |
-| `test_s13_real_sandbox_gov_check_gov_rebuild_and_a_code_graph_suite_run_inside_the_sandbox` | 1, plus a `gov rebuild --no-embeddings` outside first | that the daemon folder is writable inside the sandbox, short enough for the real socket, and that the literal deny rules on an existing `.gov-runtime/` leave `gov rebuild` working |
+| `test_s13_real_sandbox_gov_check_and_a_code_graph_suite_run_inside_the_sandbox` | 1, plus a `gov rebuild --no-embeddings` outside first | that the daemon folder is writable inside the sandbox and short enough for the real socket, and that the literal deny rules on an existing `.gov-runtime/` leave gov check and the suite working (gov rebuild inside: Wave 3, P-1 (b)) |
 
 They write what `gov launch` writes under the real `HOME` (a run folder under `~/gov-os-runs`, the registry entry
 while each session runs); the fixture's guard is a no-op, so only the OS fences; they never touch the live
