@@ -12,6 +12,13 @@ suite; see "Second batch" below.
 **Third batch (2026-10-03, a fresh designer, after implementation).** The owner answered DP-5 (DEC-199). This batch
 adds 2 cases in one file and changes no existing test; see "Third batch" below.
 
+**Revision (2026-11-09, a fresh designer, DEC-1098 (3), DEC-1109 (2)).** W2-130's sitting wrote the owner's ruling
+first on 103 register status lines, `DONE (owner, <date>, DEC-1098 (3)); it was ACCEPTED (owner, …`, and
+`test_every_approving_decision_is_accepted_by_the_owner` went red on DEC-892 (pytest-timeout): `Decision.accepted_by_owner`
+now also counts that form (the old line after "it was" must start `ACCEPTED (owner`), and `Decision.date` reads the
+acceptance's date after "it was", not the ruling's; added `test_an_owner_acceptance_is_read_from_each_status_form`
+(9 rows) to pin both; no other expectation lowered.
+
 ## Run
 
 ```sh
@@ -127,7 +134,8 @@ on the machine is `gov doctor` (W1-27); the only such comparison here is ccusage
     `ccusage`.
 12. **A recorded owner approval, as far as tested:** `approved_by` is one `DEC-nnn` id, that id is a
     `### DEC-nnn — …` entry of `docs/DECISION_REGISTER.md`, and its status line starts `ACCEPTED (owner`. `DONE` and
-    `PROPOSED` entries do not count. What more the decision must say was DP-4: readings 15 to 21.
+    `PROPOSED` entries do not count. What more the decision must say was DP-4: readings 15 to 21. (Revised for
+    DEC-1098 (3): `DONE (owner, …); it was ACCEPTED (owner, …` counts; any other `DONE` line still does not.)
 13. **ccusage's install date is not before its approval's date** (DEC-083: "installs only after the owner's explicit
     approval"). The approval's date is the first date in the decision's status line, else in its heading. This is
     applied to ccusage only, the one install this ticket makes; the other pins were installed before the registry
@@ -343,5 +351,5 @@ Cases: 45 in the full run, 51 in `breadth`, 0 in `lifted`.
 |---|---|---|
 | S1: ccusage installed and pinned through a DEC-083 decision package and recorded in the registry | `test_w1_06_install_approvals.py::test_the_approval_of_an_install_of_this_ticket_is_made_under_dec_083` (1 of 2), `test_w1_06_ccusage.py::test_ccusage_is_recorded_in_the_registry`, `test_w1_06_ccusage.py::test_the_recorded_install_command_installs_the_pinned_version` | the ticket's words |
 | S2: The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with sha256 [C... | `test_w1_06_pins.py::test_superpowers_is_recorded_with_a_sha256_digest`, `test_w1_06_digests.py::test_a_single_file_tool_is_recorded_with_the_sha256_of_its_binary` (1 of 7), `test_w1_06_install_approvals.py::test_the_superpowers_install_command_fetches_the_approved_source` | the ticket's words |
-| F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner`, `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register` | the ticket's words |
+| F1: Any tool installed without a recorded owner approval | `test_w1_06_approvals.py::test_every_approving_decision_is_accepted_by_the_owner`, `test_w1_06_approvals.py::test_every_entry_names_one_decision_as_its_approval`, `test_w1_06_approvals.py::test_every_approving_decision_is_in_the_register`, `test_w1_06_approvals.py::test_an_owner_acceptance_is_read_from_each_status_form` (9 of 9; added 2026-11-09, DEC-1098 (3)) | the ticket's words |
 | F2: A registry entry lacks an uninstall command | `test_w1_06_registry.py::test_the_schema_refuses_this_registry_once_an_entry_loses_its_uninstall_command`, `test_w1_06_registry.py::test_every_entry_has_an_uninstall_command` | the ticket's words |
