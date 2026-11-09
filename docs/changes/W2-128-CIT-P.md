@@ -53,7 +53,18 @@ median worker brief about 12.6k to 12.9k characters, R3's header).
 | `template/governance/kernel/schemas/lesson.schema.json`, `failure.schema.json`, `research.schema.json` | Optional `sources`; research also optional `decisions` |
 | `governance/project/facts.yaml` | New (project-owned): `paths`, `commands` (each with `run` and `check`), `dod` (six), `steps` (eight switches, on), `budgets`, `harness_allowed` |
 
-Every existing record stays valid: `python3 -m gov.check.schema` validates 970 records with no finding after the change (fresh run, 2026-11-09, round 1 fixes).
+**Round 2a (text, product-spec, DEC-1112 (3)):**
+
+| File | Change |
+|---|---|
+| `template/governance/kernel/skills/test-design/SKILL.md` (1.0.0 → 1.1.0) | Kernel. "Read restriction": the designer may read the integrated code on `w2/integrate` and never this ticket's implementation (DEC-963, DEC-820 (c)); the ban on `src/` dropped (review F7; TPL-6 S3) |
+| `template/governance/kernel/skills/orchestration/SKILL.md` (1.0.0 → 1.1.0) | Kernel. Lines 14, 29 and 61 point to the kernel templates (`brief.md` and the `role-*.md`) in place of the retired `brief-*.md` texts; "states each step in full" and "the standing sentences word for word" retired (review F6; DEC-1050, DEC-1052). K-4's two lines (84, 85) restated per DEC-820: reads open, four refusals, the held-out contents kept (DEC-820, DEC-525; K-4 approved by DEC-1052) |
+| `template/governance/kernel/roles/orchestrator.md` | Kernel. Line 39: a lead is started from `brief.md` and `role-lead.md`, not `brief-lead.md` (review F6) |
+| `template/governance/kernel/templates/checkpoint.md` | The example's ticket ids are the placeholder `{ID}` (a key in `keys.yaml`), not `DAEO-0000` |
+| `template/.rulesync/skills/{discovery,retrieval,orchestration,test-design}/SKILL.md` | Byte copies of the kernel skills (discovery and retrieval had not been copied after their 1.1.0) |
+| JUDGEMENT's rules (TPL-6 S4, kernel half) | Checked: only `role-reviewer.md` (T-6) carries them among the kernel templates; no change |
+
+Every existing record stays valid: `python3 -m gov.check.schema` validates 974 records with no finding after round 2a (2026-11-09). Round 1: 970 records with no finding after the change (fresh run, 2026-11-09, round 1 fixes).
 
 ## 3. The three options (DEC-105)
 
@@ -69,7 +80,8 @@ Every existing record stays valid: `python3 -m gov.check.schema` validates 970 r
 |---|---|
 | Acceptance suites of other tickets | W1-35's S14 cases read the five `brief-*.md` texts word for word; TPL-1 S4 reduces them to pointers, so those cases enforce the superseded texts and need a test designer's revision under DEC-866 (`Rewrite-Reason:`). W1-42's case needs only the files to exist; they do |
 | Generated copies | `.claude/agents/engineer.md` (line 5) and, in round 2, `.claude/templates/*.md`: installed by the owner's operator as an ACT (DEC-315, DEC-1081) |
-| The guard, the launcher, the close | None in round 1 |
+| The guard, the launcher, the close | None in round 1 or round 2a |
+| Generated skill copies (round 2a) | `.claude/skills/{orchestration,test-design,discovery,retrieval}/SKILL.md` and `.rulesync/skills/…`: the operator's ACT (`ACT-CLAUDE-COPIES-1`) |
 
 ## 5. CAP-33's steps
 
