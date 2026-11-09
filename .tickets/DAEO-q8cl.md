@@ -1,6 +1,6 @@
 ---
 id: DAEO-q8cl
-status: in_progress
+status: open
 deps: [DAEO-q7lk, DAEO-n0wb]
 links: []
 created: 2026-11-06T13:56:01Z
@@ -41,6 +41,7 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-1073
+- DEC-1109
 - DEC-1072
 - DEC-866
 - DEC-825
