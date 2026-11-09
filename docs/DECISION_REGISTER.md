@@ -13928,6 +13928,30 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   repository), question 2 (the guard proven at 100 % before it is widened) and question 4 (no test selector built
   without a measured gain).
 
+### DEC-1099 — The sandbox-and-guard experiment's design approved with its ten answers, run beside D-10; W2-88's memory-standard lines adopted, EXAMIN's copy the practice's first full run; the forecast's five proposals; W2-139 and W2-140 merged before D-10
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (1), (4), DEC-1093 (1), DEC-1091, DEC-820, DEC-873, DEC-1088 (6), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after SANDBOX-GUARD-EXP-1, W2-88-STANDARD-1 and FORECAST-W2-1
+- **Decision:**
+  - (1) **SANDBOX-GUARD-EXP-1 approved.** Q1: write scope (DEC-820 (4)) is in the bar. Q2: the engineer-tests
+    conflict accepted (DEC-873; G-14 for the engineer rests on the hook in both set-ups). Q3: a names-only listing of
+    the held-out material is allowed (DEC-820 (b)). Q4: the CTO's session stays unsandboxed, judged as in set-up A.
+    Q5: a labeller outside the CTO's system, a second labeller on a 10 % overlap. Q6: the held-out halves sealed by a
+    path-map entry, an ACT for the owner's operator. Q7: three rounds per set-up; a held-out failure reported, not
+    fixed. Q8: if both set-ups miss the bar, tuned A's changes come as an ACT if they cut false refusals with no new
+    wrong allow on the held-out halves; the remaining failures are filed as rows. Q9: the reranker socket and the WSL
+    socket in the bar, web domains out. Q10: no budget cap; a runaway brake at twice the projection (DEC-1091). Run
+    beside D-10; W2-56's test designer writes the tests that do not depend on its result meanwhile.
+  - (2) **W2-88-STANDARD-1:** (1) S10 to S17 and the three failure lines as written; (2) (c): EXAMIN's copy at W2-27
+    is the practice's first full run, with no separate proof repository; what goes wrong is fixed there, and the
+    repositories adopted after EXAMIN follow the practice as fixed; (3) (a): a tuning set of 80 in two halves, the
+    second reporting only; (4) the writers are sessions outside the system, opened by the owner's operator; (5) the
+    set tools and the practice record added to W2-88's allowed paths; (6) the nonexistent-id row filed as its own
+    ticket now.
+  - (3) **FORECAST-W2-1's five proposals:** W2-82 after W2-27; the sandbox experiment beside D-10; W2-88 answered now;
+    G1's fewer scored pairs deferred until after EXAMIN's copy; W2-15a closed together with W2-32. **W2-139 and W2-140
+    merged before D-10**, so they close at the lift.
+- **Basis:** question 2 (the guard proven before it is widened, the held-out halves sealed) and question 1 (the memory
+  standard carried to EXAMIN as the practice's first full run).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13964,3 +13988,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.481 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 (item 6 open; the DECIDED-NOT-DONE line standing). Next free id: DEC-1098. |
 | 0.482 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 item (6) decided (b). Next free id: DEC-1098. |
 | 0.483 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1098 (item 1 standing). Next free id: DEC-1099. |
+| 0.484 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1099. Next free id: DEC-1100. |

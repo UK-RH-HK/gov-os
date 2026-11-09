@@ -36,13 +36,26 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0b. DEC-1098's items (2026-11-09)
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
-| 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | **Package to the owner 11-09** (`W2-88-STANDARD-1.md`, S10-S17); WAITS: the owner's six answers, then W2-88's test designer applies the lines |
-| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | **Proposals to the owner 11-09** (`P-SELECT-FIXES-1.md` §5); WAITS: the owner's word |
+| 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | ANSWERED 11-09 (DEC-1099 (2)); next: the lines into W2-88 (marked), its allowed paths, the nonexistent-id ticket filed |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | **Proposals to the owner 11-09** (`P-SELECT-FIXES-1.md` §5); WAITS: the owner's three answers |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | **DONE 11-09** (`P-SELECT-FIXES-1.md` §6: first gold by code for 9 of 12 callers on the 138, 3 of 8 on the 80; ~2 % of bundle items) |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
 | 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
+
+## 0c. DEC-1099's items (2026-11-09)
+| # | item | fate (DEC-1099) | state |
+|---|---|---|---|
+| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | NOT STARTED |
+| 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
+| 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
+| 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | NOT STARTED |
+| 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | NOT STARTED |
+| 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | NOT STARTED |
+| 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
+| 35 | W2-15a with W2-32 | (3) closed together at the lift | WAITS: the lift |
+| 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
 
 ## 1. Every item not done, partly done or waiting
 
