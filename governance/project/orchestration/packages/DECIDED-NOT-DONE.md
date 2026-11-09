@@ -17,7 +17,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
 | 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
-| 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **List DONE 11-08** (`2f9c80b1`, `W2-130-SITTING.md`, 150 ids grouped); marks a1/a2 and sources b1 drafted, in independent audit; a3 and b2 after the sitting |
+| 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
 | 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
@@ -39,7 +39,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | **Package to the owner 11-09** (`W2-88-STANDARD-1.md`, S10-S17); WAITS: the owner's six answers, then W2-88's test designer applies the lines |
 | 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | IN PROGRESS 11-09 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | IN PROGRESS 11-09 |
-| 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | IN PROGRESS 11-09 |
+| 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
 | 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
