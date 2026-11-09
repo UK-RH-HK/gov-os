@@ -1,13 +1,14 @@
 """The start check every session start consults, and the machine-wide launch log (W2-20 S19, S21; DEC-1088 (5)(b),
 DEC-899, P-1, P-8).
 
-``check_start(kind="session", gpu_need_mib=None)`` returns the gate's reading (``gov.resources.gate.read``) when
+``check_start(gpu_need_mib=None, gpu_kind="other")`` returns the gate's reading (``gov.resources.gate.read``) when
 the gate is open, and refuses with ``RESOURCE_GATE_SHUT`` (exit 3) and the reading in the error's details when it is
-shut, naming every limit and its reading. ``gov launch`` runs it for every session, lead or worker; ``gov resources
---check`` is the same check.
+shut, naming every broken condition and its reading (``shut_text``). ``gov resources --check`` is this check; ``gov
+launch`` runs it for every session, lead or worker, and refuses with ``LAUNCH_REFUSED``.
 
 An override (``gov launch ... --gate-override DEC-NNN``, or a ticket's ``plan_override`` for the plan's check) is
-written as one line to ``~/.gov-os/machine/launch.log`` and the same line to standard error.
+written as one line to ``~/.gov-os/machine/launch.log`` (``record``); the launcher prints its own line on standard
+error.
 """
 
 from __future__ import annotations
@@ -27,16 +28,19 @@ DECISION = re.compile(r"DEC-\d+")
 MIB = 1024 ** 2
 
 
-def check_start(heavy: bool = False, *, kind: str = "session", gpu_need_mib: int | None = None,
-                gpu_kind: str = "other") -> dict:
-    """The gate for one start; ``heavy`` is kept for the 10-17 callers and means nothing now (DEC-983: no weights)."""
-    from gov.resources.gate import describe, read
+def shut_text(reading: dict) -> str:
+    """The broken conditions in words: ``memory: reading 1073741824, limit 4294967296; config: heavy_slots: ...``."""
+    from gov.resources.gate import describe
+    return "; ".join(describe(reason) for reason in reading["gate"]["reasons"])
 
-    need = None if not gpu_need_mib else int(gpu_need_mib) * MIB
-    reading = read(kind=kind, gpu_need_bytes=need, gpu_kind=gpu_kind, read_gpu=bool(need))
+
+def check_start(*, gpu_need_mib: int | None = None, gpu_kind: str = "other") -> dict:
+    """The start check of one new session (or a job that declares a GPU need); the GPU is read only for a need."""
+    from gov.resources.gate import read
+
+    reading = read(True, gpu_need_mib=gpu_need_mib or None, gpu_kind=gpu_kind)
     if not reading["gate"]["open"]:
-        named = "; ".join(describe(reason) for reason in reading["gate"]["reasons"])
-        raise GovError(GATE_SHUT, f"the resource gate is shut, no session starts: {named}", reading,
+        raise GovError(GATE_SHUT, f"the resource gate is shut: {shut_text(reading)}", reading,
                        exit_code=EXIT_GATE_SHUT)
     return reading
 
@@ -62,10 +66,9 @@ def _stderr(line: str) -> None:
         pass
 
 
-def record(line: str) -> str:
-    """Write one line to the launch log (with its time) and the same line to standard error; the line written.
-
-    A log that cannot be written refuses: an override is never left unrecorded."""
+def record(line: str, *, stderr: bool = False) -> str:
+    """Write one line to the launch log (with its time), and with ``stderr`` the same line to standard error; the
+    line written. A log that cannot be written refuses: an override is never left unrecorded."""
     line = " ".join(line.split())
     stamp = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     path = log_path()
@@ -76,7 +79,8 @@ def record(line: str) -> str:
     except OSError as error:
         raise GovError("LAUNCH_REFUSED", f"the launch log {path} cannot be written ({error.strerror}): an override is "
                                          f"never left unrecorded") from None
-    _stderr(line + "\n")
+    if stderr:
+        _stderr(line + "\n")
     return line
 
 

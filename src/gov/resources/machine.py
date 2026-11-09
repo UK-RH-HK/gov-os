@@ -1,23 +1,26 @@
 """The gate's readings of the machine (W2-20 S1, S2, S4, S5, S12, S13).
 
 Each reader returns ``(value, why)``: the value, or None with why it cannot be read. A reading that cannot be taken
-is never a default: the gate shuts on it, naming it.
+is never a default: the gate shuts on it, naming it (F5).
 
 Sources, each replaceable for a planted machine:
 
-- memory ``/proc/meminfo`` (``GOV_RESOURCES_MEMINFO``), load ``/proc/loadavg`` (``GOV_RESOURCES_LOADAVG``), the CPU
-  counters ``/proc/stat`` (``GOV_RESOURCES_STAT``), the processes ``/proc/<pid>`` (``GOV_RESOURCES_PROC``, a folder
-  laid out as ``/proc``), the processor count (``GOV_RESOURCES_NPROC``, else the machine's online CPUs), the GPU
-  ``nvidia-smi`` on ``PATH`` (``GOV_RESOURCES_NVIDIA_SMI`` names another).
-- Busy cores over the last minute: two readings of the CPU counters; the earlier one is the newest sample at least a
+- memory ``/proc/meminfo`` (``GOV_RESOURCES_MEMINFO``: ``MemAvailable:`` in kB); load ``/proc/loadavg``
+  (``GOV_RESOURCES_LOADAVG``: fields 1 and 3); the processor count (``GOV_RESOURCES_NPROC``, else the machine's);
+  busy cores over the last minute (``GOV_RESOURCES_BUSY_CORES``, one number, else the gate's own sampling of
+  ``/proc/stat``, ``GOV_RESOURCES_STAT``); the embedding servers' CPU p95 (``GOV_RESOURCES_EMBEDDING_CPU``, JSON
+  ``{"shared": cores, "query": cores}``, else the gate's own sampling of the two servers); the shared disk
+  (``GOV_RESOURCES_DISK``, JSON ``{"free_bytes", "free_inodes"}``, else ``statvfs`` of HOME's disk); the processes
+  ``/proc/<pid>`` (``GOV_RESOURCES_PROC``); the GPU ``nvidia-smi`` on ``PATH``.
+- The own busy-cores sampling: two readings of the CPU counters; the earlier one is the newest sample at least a
   minute old in ``~/.gov-os/machine/cpu-stat.json`` (each reading adds one), else the oldest at least a quarter of a
-  second old, else a reading a quarter of a second before. Counters that do not advance (a planted, still snapshot)
-  give their own share of busy time; counters that go back or hold no time cannot be read.
+  second old, else a reading a quarter of a second before.
 """
 
 from __future__ import annotations
 
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -28,8 +31,11 @@ from pathlib import Path
 PAGE = os.sysconf("SC_PAGE_SIZE") if hasattr(os, "sysconf") else 4096
 TICKS = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
 CPU_HISTORY = "cpu-stat.json"
-WINDOW_S, KEEP_S, SHORT_S = 60.0, 600.0, 0.25  # the last minute; a week's samples; the window with no history
+SERVER_HISTORY = "server-cpu.json"
+WINDOW_S, KEEP_S, SHORT_S = 60.0, 600.0, 0.25  # the last minute; the history kept; the window with no history
+SERVER_KEEP_S, SERVER_SAMPLES, P95 = 7 * 24 * 3600, 500, 0.95
 SMI_TIMEOUT_S = 10.0
+MIB = 1024 ** 2
 
 
 def _source(env: str, default: str) -> str:
@@ -41,37 +47,36 @@ def proc_root() -> Path:
 
 
 def memory():
-    """``({"available": bytes, "total": bytes}, None)`` from MemAvailable and MemTotal."""
+    """``(MemAvailable in bytes, None)``."""
     source = _source("GOV_RESOURCES_MEMINFO", "/proc/meminfo")
     try:
-        fields = {}
         for line in Path(source).read_text().splitlines():
             name, _, rest = line.partition(":")
-            if name in ("MemAvailable", "MemTotal"):
-                fields[name] = int(rest.split()[0]) * 1024
+            if name.strip() == "MemAvailable":
+                value = int(rest.split()[0]) * 1024
+                if value < 0:
+                    raise ValueError("a negative MemAvailable")
+                return value, None
     except (OSError, ValueError, IndexError) as error:
         return None, f"{source}: {error}"
-    if "MemAvailable" not in fields:
-        return None, f"{source} has no MemAvailable line"
-    return {"available": fields["MemAvailable"], "total": fields.get("MemTotal")}, None
+    return None, f"{source} has no MemAvailable line"
 
 
 def load():
-    """``((load1, load5, load15), None)``."""
+    """``((load1, load15), None)``: fields 1 and 3 of the load file."""
     source = _source("GOV_RESOURCES_LOADAVG", "/proc/loadavg")
     try:
         parts = Path(source).read_text().split()
-        values = tuple(float(part) for part in parts[:3])
-        if len(values) != 3 or any(value < 0 for value in values):
-            raise ValueError("three non-negative load figures are needed")
-        return values, None
-    except (OSError, ValueError) as error:
+        one, fifteen = float(parts[0]), float(parts[2])
+        if not (math.isfinite(one) and math.isfinite(fifteen)) or one < 0 or fifteen < 0:
+            raise ValueError("non-negative load figures are needed")
+        return (one, fifteen), None
+    except (OSError, ValueError, IndexError) as error:
         return None, f"{source}: {error}"
 
 
 def nproc():
-    """``(count, None)``: the machine's processors, never the caller's CPU set (a gate read inside a slot still
-    judges the whole machine)."""
+    """``(count, None)``: the machine's processors (``GOV_RESOURCES_NPROC`` where set), never the caller's CPU set."""
     given = os.environ.get("GOV_RESOURCES_NPROC")
     if given is None:
         count = os.cpu_count()
@@ -83,6 +88,19 @@ def nproc():
         pass
     return None, f"GOV_RESOURCES_NPROC={given!r} is not a positive count"
 
+
+def _planted_number(name: str):
+    given = os.environ.get(name)
+    try:
+        value = float(given)
+        if not math.isfinite(value) or value < 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        return None, f"{name}={given!r} is not a non-negative number"
+    return value, None
+
+
+# --- busy cores ------------------------------------------------------------------------------------------------------
 
 def cpu_counters():
     """``((busy_ticks, total_ticks), None)`` from the ``cpu`` line of ``/proc/stat`` (idle and iowait are not busy)."""
@@ -101,41 +119,39 @@ def cpu_counters():
     return None, f"{source} has no cpu line"
 
 
-def _history_path(folder: Path) -> Path:
-    return folder / CPU_HISTORY
-
-
-def _read_history(folder: Path) -> list[dict]:
+def _read_json(path: Path, kind):
     try:
-        data = json.loads(_history_path(folder).read_text(encoding="utf-8"))
-        return [item for item in data if isinstance(item, dict) and {"t", "busy", "total"} <= set(item)]
-    except (OSError, ValueError, TypeError):
-        return []
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, kind) else kind()
+    except (OSError, ValueError):
+        return kind()
 
 
-def _write_history(folder: Path, items: list[dict]) -> None:
+def _write_json(path: Path, data) -> None:
     try:
-        folder.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile("w", dir=folder, prefix=".cpu-", suffix=".tmp", delete=False) as handle:
-            json.dump(items, handle)
-        os.replace(handle.name, _history_path(folder))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile("w", dir=path.parent, prefix=".hist-", suffix=".tmp", delete=False) as out:
+            json.dump(data, out)
+        os.replace(out.name, path)
     except OSError:
-        pass  # the history only lengthens the window; without it the window is one second
+        pass  # a history only lengthens the window
 
 
 def busy_cores(folder: Path, processors: int | None):
-    """``({"cores": busy cores, "window_s": seconds}, None)`` over the last minute where the history allows."""
+    """``(busy cores over the last minute, None)``: ``GOV_RESOURCES_BUSY_CORES`` where set, else the own sampling."""
+    if "GOV_RESOURCES_BUSY_CORES" in os.environ:
+        return _planted_number("GOV_RESOURCES_BUSY_CORES")
     now_counters, why = cpu_counters()
     if why:
         return None, why
     if not processors:
         return None, "the processor count is unknown, so busy cores cannot be counted"
-    now = time.time()
-    history = [item for item in _read_history(folder) if 0 <= now - item["t"] <= KEEP_S]
+    path, now = folder / CPU_HISTORY, time.time()
+    history = [item for item in _read_json(path, list) if isinstance(item, dict) and {"t", "busy", "total"} <= set(item)
+               and 0 <= now - item["t"] <= KEEP_S]
     older = [item for item in history if now - item["t"] >= WINDOW_S]
     recent = [item for item in history if SHORT_S <= now - item["t"] < WINDOW_S]
-    base = max(older, key=lambda item: item["t"]) if older else (min(recent, key=lambda item: item["t"])
-                                                                    if recent else None)
+    base = max(older, key=lambda i: i["t"]) if older else (min(recent, key=lambda i: i["t"]) if recent else None)
     if base is None:
         time.sleep(SHORT_S)
         later, why = cpu_counters()
@@ -144,26 +160,116 @@ def busy_cores(folder: Path, processors: int | None):
         base = {"t": now, "busy": now_counters[0], "total": now_counters[1]}
         now, now_counters = time.time(), later
     history.append({"t": now, "busy": now_counters[0], "total": now_counters[1]})
-    _write_history(folder, history[-64:])
+    _write_json(path, history[-64:])
     busy, total = now_counters[0] - base["busy"], now_counters[1] - base["total"]
     if total > 0 and busy >= 0:
-        return {"cores": round(processors * busy / total, 2), "window_s": round(now - base["t"], 1)}, None
-    # Counters that did not advance (a planted, still snapshot: the kernel's always do): the snapshot's own share of
-    # busy time, since its counters began. Counters that hold no time at all, or went back, cannot be read.
-    if total == 0 and busy == 0 and now_counters[1] > 0:
-        return {"cores": round(processors * now_counters[0] / now_counters[1], 2), "window_s": None,
-                "since": "the counters' start (they did not advance)"}, None
+        return round(processors * busy / total, 2), None
+    if total == 0 and busy == 0 and now_counters[1] > 0:  # a still, planted snapshot: its own share since its start
+        return round(processors * now_counters[0] / now_counters[1], 2), None
     return None, "the CPU counters went back or hold no time, so busy cores cannot be counted"
 
 
-def disk(place: str):
-    """``({"free_bytes", "free_inodes", "path"}, None)`` of the file system holding ``place``."""
+# --- the embedding servers' CPU p95 ---------------------------------------------------------------------------------
+
+def _p95(rates: list[float]) -> float:
+    ordered = sorted(rates)
+    return ordered[max(0, math.ceil(P95 * len(ordered)) - 1)]
+
+
+def _server_ports(values: dict) -> dict[str, int] | None:
+    from gov.retrieval import ollama
+
+    if values.get("embedding_servers") is None:
+        return None
+    hosts = {"shared": os.environ.get("OLLAMA_HOST") or ollama.DEFAULT_HOST, "query": ollama.query_host()}
+    out = {}
+    for name, host in hosts.items():
+        entry = values["embedding_servers"].get(name) or {}
+        host = entry.get("host") if isinstance(entry.get("host"), str) else host
+        try:
+            out[name] = int(host.rsplit(":", 1)[1].split("/")[0])
+        except (IndexError, ValueError):
+            return None
+    return out
+
+
+def embedding_cpu(folder: Path, values: dict):
+    """``({"shared": p95 cores, "query": p95 cores}, None)``: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else one
+    sample of each server's process tree per reading, kept for a week in ``server-cpu.json``. A server that is not
+    listening uses no CPU now."""
+    given = os.environ.get("GOV_RESOURCES_EMBEDDING_CPU")
+    if given is not None:
+        try:
+            data = json.loads(given)
+            out = {name: float(data[name]) for name in ("shared", "query")}
+            if any(not math.isfinite(v) or v < 0 for v in out.values()) or any(
+                    isinstance(data[name], bool) for name in out):
+                raise ValueError
+            return out, None
+        except (ValueError, TypeError, KeyError):
+            return None, f"GOV_RESOURCES_EMBEDDING_CPU={given!r} is not {{\"shared\": cores, \"query\": cores}}"
+    ports = _server_ports(values)
+    if ports is None:
+        return None, "the embedding servers' section cannot be read, so their CPU cannot be measured"
+    path, history = folder / SERVER_HISTORY, _read_json(folder / SERVER_HISTORY, dict)
+
+    def ticks_now():
+        table = processes()
+        pids = {name: listener(port, table) for name, port in ports.items()}
+        return {name: (pid, sum(table[p]["ticks"] for p in tree(table, pid)) if pid in table else None)
+                for name, pid in pids.items()}, time.time()
+
+    first, at = ticks_now()
+    pending = [n for n, (pid, t) in first.items() if pid is not None and t is not None and not (
+        isinstance((history.get(n) or {}).get("last"), list) and (history[n]["last"][1:2] == [pid]))]
+    if pending:  # no earlier sample of this server's process: a short second one
+        time.sleep(SHORT_S)
+        second, later = ticks_now()
+        for name in pending:
+            history.setdefault(name, {})["last"] = [at, first[name][0], first[name][1]]
+        first, at = second, later
+    out = {}
+    for name, (pid, ticks) in first.items():
+        kept = history.get(name) if isinstance(history.get(name), dict) else {}
+        rates = [r for r in kept.get("rates", []) if isinstance(r, list) and len(r) == 2 and at - r[0] <= SERVER_KEEP_S]
+        last, current = kept.get("last"), (0.0 if pid is None else None)
+        if ticks is not None and isinstance(last, list) and len(last) == 3 and last[1] == pid and at > last[0] \
+                and isinstance(last[2], int):
+            current = max(0.0, (ticks - last[2]) / TICKS / (at - last[0]))
+        if current is not None:
+            rates.append([at, round(current, 3)])
+        history[name] = {"rates": rates[-SERVER_SAMPLES:], "last": [at, pid, ticks] if ticks is not None else None}
+        out[name] = round(_p95([r[1] for r in rates]), 2) if rates else None
+    _write_json(path, history)
+    if None in out.values():
+        return None, "an embedding server's CPU could not be sampled"
+    return out, None
+
+
+# --- the disk ---------------------------------------------------------------------------------------------------------
+
+def disk(env=None):
+    """``({"free_bytes", "free_inodes"}, None)`` of the shared disk (HOME's): ``GOV_RESOURCES_DISK`` where set."""
+    env = os.environ if env is None else env
+    given = env.get("GOV_RESOURCES_DISK")
+    if given is not None:
+        try:
+            data = json.loads(given)
+            out = {key: data[key] for key in ("free_bytes", "free_inodes")}
+            if any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in out.values()):
+                raise ValueError
+            return out, None
+        except (ValueError, TypeError, KeyError):
+            return None, f"GOV_RESOURCES_DISK={given!r} is not {{\"free_bytes\": N, \"free_inodes\": N}}"
+    place = env.get("HOME") or str(Path.home())
     try:
         stat = os.statvfs(place)
     except OSError as error:
         return None, f"{place}: {error}"
-    return {"path": place, "free_bytes": stat.f_bavail * stat.f_frsize, "free_inodes": stat.f_favail}, None
+    return {"free_bytes": stat.f_bavail * stat.f_frsize, "free_inodes": stat.f_favail}, None
 
+
+# --- processes --------------------------------------------------------------------------------------------------------
 
 def processes() -> dict[int, dict]:
     """Every readable process: ``{pid: {"ppid", "rss", "ticks", "cmdline"}}`` (rss in bytes, ticks of CPU time)."""
@@ -197,19 +303,24 @@ def children(table: dict[int, dict]) -> dict[int, list[int]]:
     return kids
 
 
-def tree(table: dict[int, dict], pid: int, stop: set[int] = frozenset()) -> list[int]:
+def tree(table: dict[int, dict], pid, stop=frozenset()) -> list[int]:
     """``pid`` and every descendant, a subtree rooted at a pid in ``stop`` left out (another session's own)."""
-    kids, out, todo = children(table), [], [pid]
+    kids, out, seen, todo = children(table), [], set(), [pid]
     while todo:
         current = todo.pop()
-        if current in table and current not in out:
+        if current in table and current not in seen:
+            seen.add(current)
             out.append(current)
             todo += [child for child in kids.get(current, []) if child not in stop]
     return out
 
 
+def tree_memory(table: dict[int, dict], pid, stop=frozenset()) -> int:
+    return sum(table[p]["rss"] for p in tree(table, pid, stop))
+
+
 def alive(pid: int) -> bool:
-    """Whether ``pid`` runs; on a planted process table, whether the table holds it (no real process is asked)."""
+    """Whether ``pid`` runs (a zombie does not); on a planted process table, whether the table holds it."""
     if proc_root() != Path("/proc"):
         return (proc_root() / str(pid)).is_dir()
     try:
@@ -217,18 +328,22 @@ def alive(pid: int) -> bool:
     except ProcessLookupError:
         return False
     except PermissionError:  # another user's process: alive
-        pass
+        return True
     except OSError:
         return False
-    return True
+    try:
+        state = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0]
+        return state not in ("Z", "X")
+    except (OSError, IndexError):
+        return True
 
 
-def listener(port: int) -> int | None:
+def listener(port: int, table: dict[int, dict] | None = None) -> int | None:
     """The eldest pid listening on TCP ``port`` (its children may share the socket), or None."""
     root, sockets = proc_root(), set()
-    for table in ("net/tcp", "net/tcp6"):
+    for name in ("net/tcp", "net/tcp6"):
         try:
-            rows = (root / table).read_text().splitlines()[1:]
+            rows = (root / name).read_text().splitlines()[1:]
         except OSError:
             continue
         for row in rows:
@@ -240,7 +355,7 @@ def listener(port: int) -> int | None:
                 continue
     if not sockets:
         return None
-    holders, table = set(), processes()
+    holders, table = set(), processes() if table is None else table
     for pid in table:
         try:
             if any(os.readlink(fd) in sockets for fd in (root / str(pid) / "fd").iterdir()):
@@ -251,70 +366,108 @@ def listener(port: int) -> int | None:
     return min(eldest) if eldest else None
 
 
-def gpu(smi: str | None = None):
-    """``({"gpus": [{"index", "used_bytes", "total_bytes", "free_bytes", "utilization"}], "holders": [...]}, None)``
-    from ``nvidia-smi``; ``(None, why)`` where there is no ``nvidia-smi``, no GPU, or its answer cannot be read.
-    The holders (``{"pid", "used_bytes", "kind"}``: ``embedder``, ``reranker`` or ``other``) are read in the same
-    check; holders that cannot be read are named, never an error."""
-    program = smi or os.environ.get("GOV_RESOURCES_NVIDIA_SMI") or shutil.which("nvidia-smi")
-    if not program or not os.path.exists(program):
-        return None, "no nvidia-smi on this machine"
-    query = [program, "--query-gpu=index,memory.used,memory.total,utilization.gpu", "--format=csv,noheader,nounits"]
+# --- the GPU ------------------------------------------------------------------------------------------------------------
+
+GPU_FIELDS = ("memory.total", "memory.used", "memory.free", "utilization.gpu")
+APP_FIELDS = ("pid", "process_name", "used_memory")
+
+
+def _figure(text: str) -> float | None:
+    """A CSV figure (``1024``, ``1024 MiB``, ``37 %``); None for ``[N/A]`` or anything not a number."""
+    words = text.strip().split()
     try:
-        answer = subprocess.run(query, capture_output=True, text=True, timeout=SMI_TIMEOUT_S)
-    except (OSError, subprocess.SubprocessError) as error:
-        return None, f"nvidia-smi cannot be run: {error}"
-    if answer.returncode != 0:
-        return None, f"nvidia-smi exit {answer.returncode}: {' '.join((answer.stderr or answer.stdout).split())[:160]}"
-    gpus = []
-    for line in answer.stdout.splitlines():
+        value = float(words[0]) if words else None
+    except ValueError:
+        return None
+    return value if value is not None and math.isfinite(value) and value >= 0 else None
+
+
+def _rows(stdout: str, fields: tuple) -> list[list[str]]:
+    rows = []
+    for line in stdout.splitlines():
         if not line.strip():
             continue
-        try:
-            index, used, total, util = (part.strip() for part in line.split(","))
-            used_b, total_b = int(float(used)) * 1024 ** 2, int(float(total)) * 1024 ** 2
-            gpus.append({"index": int(index), "used_bytes": used_b, "total_bytes": total_b,
-                         "free_bytes": max(0, total_b - used_b),
-                         "utilization": None if util in ("[N/A]", "N/A") else float(util)})
-        except ValueError:
-            return None, f"nvidia-smi: an unreadable line {line[:80]!r}"
-    if not gpus:
-        return None, "nvidia-smi names no GPU"
-    holders, holders_why = _holders(program)
-    return {"gpus": gpus, "holders": holders, "holders_why": holders_why}, None
+        parts = [part.strip() for part in line.split(",")]
+        if parts and parts[0].split(" ")[0] in fields:  # a header, though none was asked for
+            continue
+        rows.append(parts)
+    return rows
 
 
-def _kind(cmdline: str) -> str:
-    low = cmdline.lower()
-    if "rerank" in low:
+def gpu_kind(cmdline: str) -> str:
+    """A process's GPU work: ``reranker`` (``rerank`` anywhere), ``embedder`` (a word whose file name begins with
+    ``ollama``) or ``other``."""
+    if "rerank" in cmdline.lower():
         return "reranker"
-    if "ollama" in low or "embed" in low:
+    if any(os.path.basename(word).lower().startswith("ollama") for word in cmdline.split()):
         return "embedder"
     return "other"
 
 
-def _holders(program: str):
-    query = [program, "--query-compute-apps=pid,used_memory", "--format=csv,noheader,nounits"]
+def gpu():
+    """``({"available": true, "memory_used_mib", "memory_total_mib", "memory_free_mib", "utilisation_pct",
+    "gpus": [...], "processes": [{pid, kind, used_mib}]}, None)``, or ``({"available": false, "reason"}, why)``
+    where there is no ``nvidia-smi``, no GPU (exit 6) or an unreadable answer: never an error. One check: two calls of
+    ``nvidia-smi``, the GPUs and their processes. A process's memory ``[N/A]`` (WSL) is ``used_mib: null``."""
+    program = shutil.which("nvidia-smi")
+    if not program:
+        return _no_gpu("no nvidia-smi on PATH")
+    query = [program, f"--query-gpu={','.join(GPU_FIELDS)}", "--format=csv,noheader,nounits"]
     try:
         answer = subprocess.run(query, capture_output=True, text=True, timeout=SMI_TIMEOUT_S)
     except (OSError, subprocess.SubprocessError) as error:
-        return [], f"the GPU's holders cannot be read: {error}"
+        return _no_gpu(f"nvidia-smi cannot be run: {error}")
+    said = " ".join((answer.stderr + " " + answer.stdout).split())[:200]
+    if answer.returncode == 6 or "No devices were found" in said:
+        return _no_gpu(f"no GPU: nvidia-smi exit {answer.returncode}: {said}")
     if answer.returncode != 0:
-        return [], f"the GPU's holders cannot be read (nvidia-smi exit {answer.returncode})"
-    holders, root = [], proc_root()
-    for line in answer.stdout.splitlines():
-        parts = [part.strip() for part in line.split(",")]
-        if len(parts) != 2 or not parts[0].isdigit():
-            if line.strip():
-                return holders, f"the GPU's holders: an unreadable line {line[:80]!r}"
-            continue
+        return _no_gpu(f"the GPU cannot be read: nvidia-smi exit {answer.returncode}: {said}")
+    gpus = []
+    for index, parts in enumerate(_rows(answer.stdout, GPU_FIELDS)):
+        figures = [_figure(part) for part in parts] if len(parts) == len(GPU_FIELDS) else []
+        total, used, free, util = figures if figures else (None,) * 4
+        if total is None or (used is None and free is None):
+            return _no_gpu(f"the GPU cannot be read: an unreadable line {','.join(parts)[:80]!r}")
+        used = used if used is not None else max(0.0, total - free)
+        free = free if free is not None else max(0.0, total - used)
+        gpus.append({"index": index, "memory_total_mib": int(total), "memory_used_mib": int(used),
+                     "memory_free_mib": int(free), "utilisation_pct": util})
+    if not gpus:
+        return _no_gpu("no GPU: nvidia-smi names none")
+    found, why = _processes(program)
+    utils = [g["utilisation_pct"] for g in gpus if g["utilisation_pct"] is not None]
+    out = {"available": True,
+           "memory_used_mib": sum(g["memory_used_mib"] for g in gpus),
+           "memory_total_mib": sum(g["memory_total_mib"] for g in gpus),
+           "memory_free_mib": sum(g["memory_free_mib"] for g in gpus),
+           "utilisation_pct": round(sum(utils) / len(utils), 1) if utils else None,
+           "gpus": gpus, "processes": found}
+    if why:
+        out["processes_unreadable"] = why
+    return out, None
+
+
+def _no_gpu(reason: str):
+    return {"available": False, "reason": reason}, reason
+
+
+def _processes(program: str):
+    query = [program, f"--query-compute-apps={','.join(APP_FIELDS)}", "--format=csv,noheader,nounits"]
+    try:
+        answer = subprocess.run(query, capture_output=True, text=True, timeout=SMI_TIMEOUT_S)
+    except (OSError, subprocess.SubprocessError) as error:
+        return [], f"the GPU's processes cannot be read: {error}"
+    if answer.returncode != 0:
+        return [], f"the GPU's processes cannot be read (nvidia-smi exit {answer.returncode})"
+    out, root = [], proc_root()
+    for parts in _rows(answer.stdout, APP_FIELDS):
+        if len(parts) < 3 or not parts[0].isdigit():
+            return out, f"the GPU's processes: an unreadable line {','.join(parts)[:80]!r}"
+        pid, name, used = int(parts[0]), ",".join(parts[1:-1]), _figure(parts[-1])
         try:
-            cmdline = (root / parts[0] / "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
+            cmdline = (root / str(pid) / "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
         except OSError:
-            cmdline = ""  # a pid of the host, or ended: other
-        try:
-            used = int(float(parts[1])) * 1024 ** 2
-        except ValueError:
-            used = None
-        holders.append({"pid": int(parts[0]), "used_bytes": used, "kind": _kind(cmdline)})
-    return holders, None
+            cmdline = ""
+        out.append({"pid": pid, "kind": gpu_kind(cmdline.strip() or name), "used_mib": None if used is None
+                    else int(used)})
+    return out, None

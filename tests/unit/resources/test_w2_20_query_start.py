@@ -114,24 +114,32 @@ def test_the_server_output_goes_to_its_own_log_and_each_start_is_one_caller_line
     while time.monotonic() < deadline and "stand-in serve output" not in output.read_text():
         time.sleep(0.05)
     assert "stand-in serve output" in output.read_text()
-    [line] = (stage.home / ollama.QUERY_STARTS_REL).read_text().splitlines()
-    assert "(cpu)" in line and f"caller pid {os.getpid()}" in line and f"cwd {os.getcwd()}" in line
-    assert "pytest" in line or "python" in line  # the caller's command
+    assert output == stage.home / ".gov-os/machine/embedding-query.log"
+    [line] = (stage.home / ".gov-os/machine/embedding-starts.jsonl").read_text().splitlines()
+    record = json.loads(line)
+    assert record["server"] == "query" and record["device"] == "cpu" and record["time"][:4].isdigit()
+    assert record["caller"]["pid"] == os.getpid() and record["caller"]["cwd"] == os.getcwd()
+    assert "pytest" in record["caller"]["command"] or "python" in record["caller"]["command"]
 
 
-def test_the_logs_may_be_named_in_the_gate_file(stage, tmp_path):
-    stage.gate("gpu", log=str(tmp_path / "q.log"), start_log=str(tmp_path / "starts.log"))
+def test_each_start_appends_one_line(stage):
+    stage.gate("gpu")
     assert ollama.ensure_query_available(start=True, timeout_s=15, env=stage.env)["started"]
-    stage.runs()
-    assert "(gpu)" in (tmp_path / "starts.log").read_text()
+    [first] = stage.runs()
+    os.kill(first["pid"], signal.SIGKILL)
+    time.sleep(0.3)
+    assert ollama.ensure_query_available(start=True, timeout_s=15, env=stage.env)["started"]
+    stage.runs(2)
+    lines = (stage.home / ollama.QUERY_STARTS_REL).read_text().splitlines()
+    assert [json.loads(line)["device"] for line in lines] == ["gpu", "gpu"]
 
 
-@pytest.mark.parametrize("extra", [{"device": "tpu"}, {"device": 1}, {"log": "relative.log"}])
-def test_an_unreadable_device_or_log_shuts_the_start_named(stage, extra):
+@pytest.mark.parametrize("extra", [{"device": "tpu"}, {"device": 1}])
+def test_an_unreadable_device_shuts_the_start_named(stage, extra):
     stage.gate(**extra)
     result = ollama.ensure_query_available(start=True, timeout_s=2, env=stage.env)
     assert not result["started"] and result["state"] == "CONFIG_INVALID"
-    assert "embedding_servers.query." in result["warning"] and stage.runs(1, 0.3) == []
+    assert "embedding_servers.query.device" in result["warning"] and stage.runs(1, 0.3) == []
 
 
 def test_the_shared_servers_start_drops_the_budget_too_and_keeps_its_streams_closed(stage):

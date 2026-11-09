@@ -28,9 +28,10 @@ server inherits a heavy slot's thread budget (``BUDGET_VARIABLES`` are left out 
 server's start also takes its device from the gate's file (``embedding_servers.query.device``: ``gpu``, the default,
 leaves the GPU visible, a caller's value that hides it removed; ``cpu`` hides it with ``CUDA_VISIBLE_DEVICES=-1``; any
 other value refuses the start, named), appends the server's output to its own log
-(``~/.gov-os/machine/query-server.log``, or the section's ``log``), and writes one line per start to the start log
-(``~/.gov-os/machine/query-starts.log``, or ``start_log``) naming the time, the device and the caller (pid, working
-folder, command). So ``~/.local/bin/ollama`` can be removed by a small ACT (its steps in W2-20's evidence).
+(``~/.gov-os/machine/embedding-query.log``), and appends one JSON line per start to
+``~/.gov-os/machine/embedding-starts.jsonl``: ``{"time", "server": "query", "device", "caller": {"pid", "cwd",
+"command"}}``, the caller being the process that called ``ensure_query_available``. So ``~/.local/bin/ollama`` can be
+removed by a small ACT (its steps in W2-20's evidence).
 """
 
 from __future__ import annotations
@@ -80,8 +81,8 @@ BUDGET_VARIABLES = ("GOMAXPROCS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLA
                     "GOV_HEAVY_CPUS", "GOV_HEAVY_SLOT", "PYTEST_XDIST_AUTO_NUM_WORKERS")
 DEVICES = ("gpu", "cpu")
 GPU_SETTING = "CUDA_VISIBLE_DEVICES"
-QUERY_LOG_REL = ".gov-os/machine/query-server.log"      # the query server's own output (W2-20, DEC-1037)
-QUERY_STARTS_REL = ".gov-os/machine/query-starts.log"   # one line per start, naming its caller (W2-20, DEC-1037)
+QUERY_LOG_REL = ".gov-os/machine/embedding-query.log"        # the query server's own output (W2-20, DEC-1037)
+QUERY_STARTS_REL = ".gov-os/machine/embedding-starts.jsonl"  # one JSON line per start, naming its caller (DEC-1037)
 
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
 
@@ -188,7 +189,7 @@ def _config(server: str, env) -> tuple[dict | None, dict | None, str | None]:
 
 def _query_start(env) -> tuple[dict | None, str | None]:
     """The query server's start from the gate's file: ``({"device", "log", "start_log"}, None)``, or ``(None,
-    warning)`` naming the key that cannot be read. No file, or no key, is the GPU and the default logs."""
+    warning)`` naming the key that cannot be read. No file, or no key, is the GPU. The logs are HOME's."""
     path = _home(env) / GATE_REL
     entry: dict = {}
     if path.exists():
@@ -203,14 +204,8 @@ def _query_start(env) -> tuple[dict | None, str | None]:
     if device not in DEVICES:
         return None, (f"{path}: {SECTION}.query.device is unreadable (one of {', '.join(DEVICES)} is needed, not "
                       f"{device!r}); the query embedding server is not started")
-    out = {"device": device}
-    for key, rel in (("log", QUERY_LOG_REL), ("start_log", QUERY_STARTS_REL)):
-        value = entry.get(key, str(_home(env) / rel))
-        if not isinstance(value, str) or not os.path.isabs(value):
-            return None, (f"{path}: {SECTION}.query.{key} is unreadable (an absolute path is needed); the query "
-                          f"embedding server is not started")
-        out[key] = value
-    return out, None
+    return {"device": device, "log": str(_home(env) / QUERY_LOG_REL),
+            "start_log": str(_home(env) / QUERY_STARTS_REL)}, None
 
 
 def _daemon_env(env, server: str, settings: dict, start: dict | None) -> dict:
@@ -227,7 +222,7 @@ def _daemon_env(env, server: str, settings: dict, start: dict | None) -> dict:
 
 
 def _caller_line(device: str) -> str:
-    """One start-log line: the time, the device and the caller (pid, working folder, command)."""
+    """One start-log line, JSON: the time, the server, the device and the caller (pid, working folder, command)."""
     try:
         command = Path("/proc/self/cmdline").read_bytes().rstrip(b"\0").replace(b"\0", b" ").decode(errors="replace")
     except OSError:
@@ -235,10 +230,10 @@ def _caller_line(device: str) -> str:
     try:
         cwd = os.getcwd()
     except OSError:
-        cwd = "unknown"
+        cwd = None
     stamp = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
-    return (f"{stamp} query server started ({device}) by gov's automatic start; caller pid {os.getpid()} cwd {cwd}: "
-            f"{command[:300]}\n")
+    return json.dumps({"time": stamp, "server": "query", "device": device,
+                       "caller": {"pid": os.getpid(), "cwd": cwd, "command": command[:1000]}}) + "\n"
 
 
 def _server(env) -> str:

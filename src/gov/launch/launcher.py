@@ -336,27 +336,33 @@ def _admit_lead(root: Path, ticket_id: str) -> None:
     if not field("admitted"):
         raise _refuse(f"no lead for ticket '{ticket_id}': {field('reason')} (DEC-1088 (5))")
     if field("override"):
-        record(f"gov launch: OVERRIDE {field('override')}: {field('reason')} (DEC-899)")
+        record(f"gov launch: OVERRIDE plan_override: {field('override')}: ticket {ticket_id}: {field('reason')} "
+               f"(DEC-899)")
+        _say(f"gov launch: OVERRIDE {field('override')}: {field('reason')} (DEC-899)\n")
 
 
 def _admit_start(root: Path, role: str, ticket_id: str, gate_override: str | None, gpu_need_mib: int | None) -> None:
     """W2-20 S19 (DEC-1088 (5)(b)): no session, lead or worker, while the resource gate is shut on any reading; one
     recorded override (``--gate-override DEC-NNN``) starts it anyway, written to the launch log and standard error."""
-    from gov.launch.gate import check_start, override_decision, record
+    from gov.launch.gate import GATE_SHUT, check_start, override_decision, record, shut_text
 
     decision = override_decision(gate_override)
     if gpu_need_mib is not None and (isinstance(gpu_need_mib, bool) or not isinstance(gpu_need_mib, int)
                                      or gpu_need_mib < 1):
         raise _refuse(f"--gpu-need-mib takes a positive number of MiB, not {gpu_need_mib!r}")
     try:
-        check_start(kind="session", gpu_need_mib=gpu_need_mib)
+        check_start(gpu_need_mib=gpu_need_mib)
     except GovError as shut:
+        if shut.code != GATE_SHUT:
+            raise _refuse(f"the resource gate cannot be read: {shut.message} (DEC-1088 (5))") from None
+        text = shut_text(shut.details)
         if decision is None:
-            raise GovError(shut.code, f"gov launch refuses the {role} session for ticket '{ticket_id}': "
-                                      f"{shut.message} (DEC-1088 (5)(b))", shut.details,
-                           exit_code=shut.exit_code) from None
-        record(f"gov launch: OVERRIDE gate {decision}: the {role} session for ticket '{ticket_id}' in {root} starts "
-               f"while {shut.message} (DEC-899)")
+            raise GovError("LAUNCH_REFUSED", f"the resource gate is shut: {text} (DEC-1088 (5))",
+                           shut.details) from None
+        line = (f"gov launch: OVERRIDE gate_override: {decision}: {role} {ticket_id} started with the resource gate "
+                f"shut: {text} (DEC-899)")
+        record(line)
+        _say(line + "\n")
 
 
 def _cli() -> Path:
@@ -366,7 +372,7 @@ def _cli() -> Path:
     return cli
 
 
-def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], *, gate_override: str | None = None,
+def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
            gpu_need_mib: int | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
 
@@ -381,7 +387,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], *, gate_o
         _check_cli_args(cli_args)
         _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
         cli = _cli()
-        _admit_start(root, LEAD_GOV_ROLE, ticket_id, gate_override, gpu_need_mib)
+        _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
         # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
         return _run(root, cli, build_lead_settings(ticket_id), cli_args, entry=(ticket_id, LEAD_GOV_ROLE))
     if role not in WORKER_ROLES:

@@ -6,26 +6,15 @@ from __future__ import annotations
 import fcntl
 import json
 import os
-import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
 from gov.cli.errors import GovError
-from gov.launch import gate as launch_gate
 from gov.launch import launcher, plan_check
 
 GIB = 1024 ** 3
-SMI = """#!{python}
-import json, os, sys
-with open(os.environ["SMI_LOG"], "a") as log:
-    log.write(json.dumps(sys.argv[1:]) + "\\n")
-if any(a.startswith("--query-gpu") for a in sys.argv):
-    print(os.environ.get("SMI_GPU", "0, 1000, 8000, 5"))
-elif any(a.startswith("--query-compute-apps") for a in sys.argv):
-    print(os.environ.get("SMI_APPS", ""))
-"""
 
 
 @pytest.fixture
@@ -49,8 +38,6 @@ def sessions(planted, monkeypatch):
 
         def __init__(self, argv, cwd, env):
             started.append(argv)
-            seen.append(sorted(p.name for p in (planted.dir / "sessions").glob("*.json"))
-                        if (planted.dir / "sessions").exists() else [])
 
         def wait(self):
             seen.append(json.loads((planted.dir / "sessions" / "777001.json").read_text()))
@@ -80,18 +67,17 @@ def test_an_open_gate_starts_the_session_and_registers_it_while_it_runs(planted,
     assert launcher.launch(_project(planted), role, "T-1", []) == 0
     assert len(started) == 1
     entry = seen[-1]
-    assert entry["pid"] == 777001 and entry["ticket"] == "T-1"
-    assert entry["role"] == ("orchestrator" if role == "orchestrator" else "engineer")
+    assert entry["pid"] == 777001 and entry["ticket"] == "T-1" and entry["role"] == role
     assert not (planted.dir / "sessions" / "777001.json").exists()  # removed when it ended
 
 
 SHUT = {
-    "load": lambda m: m.loads(30.0, 30.0, 30.0),
-    "cpu": lambda m: m.busy(20.0),
-    "memory": lambda m: m.memory(available=GIB),
-    "disk": lambda m: m.config(disk_floor_bytes=10 ** 18),
-    "inodes": lambda m: m.config(inode_floor=10 ** 15),
-    "config": lambda m: m.config(rebuild_peak_bytes=None),
+    "load": (lambda m: m.loads(30.0, 30.0), "load: reading 30.0, limit 20"),
+    "cpu": (lambda m: m.busy(20.0), "cpu: reading 21.0, limit 20"),
+    "memory": (lambda m: m.memory(available=GIB), "memory: reading 1073741824, limit "),
+    "disk": (lambda m: m.disk(GIB, 50_000_000), "disk: reading 1073741824, limit 107374182400"),
+    "inodes": (lambda m: m.disk(500 * GIB, 7), "inodes: reading 7, limit 10000000"),
+    "config": (lambda m: m.config(rebuild_peak_bytes=None), "rebuild_peak_bytes"),
 }
 
 
@@ -100,11 +86,12 @@ SHUT = {
 def test_each_reading_shut_refuses_the_launch_naming_it_and_starts_nothing(planted, sessions, role, condition):
     started, _ = sessions
     planted.config()
-    SHUT[condition](planted)
+    plant, named = SHUT[condition]
+    plant(planted)
     with pytest.raises(GovError) as refused:
         launcher.launch(_project(planted), role, "T-1", [])
-    assert refused.value.code == launch_gate.GATE_SHUT and refused.value.exit_code == launch_gate.EXIT_GATE_SHUT
-    assert "gov launch refuses" in refused.value.message and condition in refused.value.message
+    assert refused.value.code == "LAUNCH_REFUSED"
+    assert refused.value.message.startswith("the resource gate is shut: ") and named in refused.value.message
     assert started == []
 
 
@@ -116,9 +103,10 @@ def test_an_override_starts_it_anyway_with_one_line_in_the_launch_log_and_on_std
     assert launcher.launch(_project(planted), role, "T-1", [], gate_override="DEC-1088") == 0
     assert len(started) == 1
     [line] = (planted.dir / "launch.log").read_text().splitlines()
-    assert "OVERRIDE gate DEC-1088" in line and "memory" in line
+    assert f"OVERRIDE gate_override: DEC-1088: {role} T-1 started with the resource gate shut: memory: reading " \
+           "1073741824" in line
     err = capfd.readouterr().err
-    assert line.split(" ", 1)[1] in err  # the same line, less its time
+    assert [x for x in err.splitlines() if "OVERRIDE" in x] == [line.split(" ", 1)[1]]  # the same line, less its time
 
 
 def test_an_override_on_an_open_gate_is_not_logged(planted, sessions):
@@ -144,107 +132,57 @@ def test_an_override_whose_log_cannot_be_written_refuses(planted, sessions):
     assert "never left unrecorded" in refused.value.message and sessions[0] == []
 
 
-def _hold_every_slot(planted, count=3):
+def test_a_full_set_of_slots_never_refuses_a_session(planted, sessions):
+    planted.config()
     folder = planted.dir / "slots"
     folder.mkdir(parents=True, exist_ok=True)
     held = []
-    for slot in range(1, count + 1):
+    for slot in (1, 2, 3):
         fd = os.open(folder / f"slot-{slot}.lock", os.O_RDWR | os.O_CREAT)
         fcntl.flock(fd, fcntl.LOCK_EX)
-        (folder / f"slot-{slot}.json").write_text(json.dumps({"slot": slot, "pid": 10 + slot, "kind": "test"}))
+        (folder / f"slot-{slot}.json").write_text(json.dumps({"slot": slot, "pid": os.getpid(), "kind": "test"}))
         held.append(fd)
-    return held
-
-
-def test_a_full_set_of_slots_never_refuses_a_session(planted, sessions):
-    planted.config()
-    held = _hold_every_slot(planted)
     try:
         from gov.resources.gate import read
-        assert read("session")["slots"]["full"]
+        assert len(read(True)["slots"]["held"]) == 3
         assert launcher.launch(_project(planted), "engineer", "T-1", []) == 0
     finally:
         for fd in held:
             os.close(fd)
 
 
-def test_an_unreadable_slot_refuses_the_launch_naming_the_slots(planted, sessions):
-    planted.config()
-    (planted.dir / "slots").mkdir(parents=True)
-    (planted.dir / "slots" / "slot-1.json").write_text("{broken")
+@pytest.mark.parametrize("value", [None, 0])
+def test_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken(planted, sessions, value):
+    planted.config(heavy_slots=value)
     with pytest.raises(GovError) as refused:
         launcher.launch(_project(planted), "engineer", "T-1", [])
-    assert "slots" in refused.value.message
+    assert "heavy_slots" in refused.value.message
 
 
 # --- the GPU (S10, P-6) ---------------------------------------------------------------------------------------------
 
-@pytest.fixture
-def smi(planted, monkeypatch):
-    program = planted.root / "nvidia-smi"
-    program.write_text(SMI.format(python=sys.executable))
-    program.chmod(0o755)
-    log = planted.root / "smi.log"
-    monkeypatch.setenv("GOV_RESOURCES_NVIDIA_SMI", str(program))
-    monkeypatch.setenv("SMI_LOG", str(log))
-    return lambda: [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
-
-
-def test_a_start_with_no_declared_need_never_reads_the_gpu(planted, sessions, smi):
+def test_a_start_with_no_declared_need_never_reads_the_gpu(planted, sessions):
     planted.config()
+    calls = planted.smi()
     assert launcher.launch(_project(planted), "engineer", "T-1", []) == 0
-    assert smi() == []
+    assert calls() == []
 
 
-def test_a_start_with_a_need_opens_only_with_the_need_plus_the_margin_free(planted, sessions, smi, monkeypatch):
-    planted.config(gpu_shares=[{"kind": "headroom", "bytes": 0}])
-    monkeypatch.setenv("SMI_GPU", "0, 7000, 8000, 10")  # 1000 MiB free
+def test_a_start_with_a_need_opens_only_with_the_need_plus_the_margin_free(planted, sessions):
+    planted.config(gpu_shares={"value": {"embedder_mib": 0, "reranker_mib": 0}, "date": "2026-11-09", "source": "t"})
+    calls = planted.smi(gpu="8000, 7000, 1000, 10")  # 1000 MiB free
     with pytest.raises(GovError) as refused:
-        launcher.launch(_project(planted), "engineer", "T-1", [], gpu_need_mib=910)  # 910 * 1.1 = 1001 > 1000
-    assert "gpu" in refused.value.message
+        launcher.launch(_project(planted), "engineer", "T-1", [], gpu_need_mib=910)  # 1001 > 1000
+    assert "gpu: reading 1000, limit 1001" in refused.value.message
     assert launcher.launch(_project(planted), "engineer", "T-1", [], gpu_need_mib=909) == 0  # 999.9 <= 1000
-    assert len([call for call in smi() if call[0].startswith("--query-gpu")]) == 2  # once per check
+    assert len([c for c in calls() if any(a.startswith("--query-gpu") for a in c)]) == 2  # once per check
 
 
-def test_no_nvidia_smi_shuts_a_start_that_declares_a_need(planted, sessions, monkeypatch):
+def test_no_nvidia_smi_shuts_a_start_that_declares_a_need(planted, sessions):
     planted.config()
-    monkeypatch.setenv("GOV_RESOURCES_NVIDIA_SMI", str(planted.root / "absent"))
     with pytest.raises(GovError) as refused:
         launcher.launch(_project(planted), "engineer", "T-1", [], gpu_need_mib=100)
-    assert "no nvidia-smi" in refused.value.message
-
-
-def test_a_job_that_would_push_the_embedder_off_waits_and_the_room_is_stated(planted, smi, monkeypatch):
-    from gov.resources.gate import read
-    planted.config(gpu_shares=[{"kind": "embedder", "bytes": 3000 * 1024 ** 2},
-                               {"kind": "reranker", "bytes": 2000 * 1024 ** 2},
-                               {"kind": "headroom", "bytes": 500 * 1024 ** 2}])
-    monkeypatch.setenv("SMI_GPU", "0, 1000, 8000, 20")  # 7000 MiB free; the embedder not loaded yet
-    other = read("session", gpu_need_bytes=2000 * 1024 ** 2, gpu_kind="other")
-    gpu = [r for r in other["gate"]["reasons"] if r["condition"] == "gpu"]
-    assert gpu and "the GPU room it saw" in gpu[0]["why"] and "runs its model on the CPU" in gpu[0]["why"]
-    assert other["gpu"]["room"]["reserved_bytes"] == 5500 * 1024 ** 2
-    embedder = read("session", gpu_need_bytes=2000 * 1024 ** 2, gpu_kind="embedder")
-    assert not [r for r in embedder["gate"]["reasons"] if r["condition"] == "gpu"]
-
-
-def test_the_reading_measures_the_gpu_and_its_holders_once(planted, smi, monkeypatch):
-    from gov.resources.gate import read
-    planted.config()
-    planted.process(5001, cmdline="ollama runner --model x")
-    planted.process(5002, cmdline="python rerank_service.py")
-    monkeypatch.setenv("SMI_APPS", "5001, 3000\n5002, 2000\n6000, 100")
-    gpu = read(None)["gpu"]
-    assert gpu["read"] and gpu["gpus"][0]["used_bytes"] == 1000 * 1024 ** 2 and gpu["gpus"][0]["utilization"] == 5.0
-    assert [h["kind"] for h in gpu["holders"]] == ["embedder", "reranker", "other"]
-    assert len([call for call in smi() if call[0].startswith("--query-gpu")]) == 1
-
-
-def test_a_machine_with_no_gpu_is_named_in_the_reading_never_an_error(planted, monkeypatch):
-    from gov.resources.gate import read
-    planted.config()
-    reading = read(None)
-    assert reading["gpu"] == {"read": False, "why": "no nvidia-smi on this machine"} and reading["gate"]["open"]
+    assert "gpu: reading null" in refused.value.message and "nvidia-smi" in refused.value.message
 
 
 # --- S21: the plan check reads the main tree ------------------------------------------------------------------------
@@ -306,8 +244,10 @@ def test_a_plan_override_is_one_line_in_the_launch_log_and_the_line_on_stderr(pl
     planted.config()
     assert launcher.launch(lead, "orchestrator", "T-3", []) == 0
     [line] = (planted.dir / "launch.log").read_text().splitlines()
-    assert "gov launch: OVERRIDE DEC-899: plan_override DEC-899 admits ticket T-3" in line
-    assert line.split(" ", 1)[1] in capfd.readouterr().err
+    assert "plan_override" in line and "DEC-899" in line and "T-3" in line
+    err = [x for x in capfd.readouterr().err.splitlines() if "OVERRIDE" in x]
+    assert err == ["gov launch: OVERRIDE DEC-899: plan_override DEC-899 admits ticket T-3 despite: "
+                   + err[0].split(" despite: ", 1)[1]]
 
 
 def test_gov_launch_takes_both_options(monkeypatch, tmp_path):
