@@ -286,6 +286,28 @@ p95 and its sample count; the third each run's gross and net p95 against share +
 CPU-set check, the time-bound design (P-4) and the 20 % check are unchanged. **On a quiet machine** is the CTO's run
 condition: the case does not judge quietness itself; a busy background shows in the printed median and p95.
 
+**Round 8 (2026-11-09, DEC-1105, `Rewrite-Reason: DEC-1105`): a per-CPU measure.** The CTO's two runs on round 3's code:
+run 1 passed (net 2.86), run 2 failed by 0.003 (net 3.003 against 2 + 1) with the slot's programs held to exactly 2
+CPUs: the whole machine's busy cores less the background's median kept the background's tail in the figure (review
+R2-F2). The case now samples **every `cpuN` line of `/proc/stat`** every 0.2 s (each CPU's busy fraction), the
+background once before the plain run as in round 7, and judges:
+
+- **without the slot** (unchanged): the whole machine's p95 less the background's whole-machine median must exceed the
+  share + 1 (else no measure);
+- **with the slot:** the busy cores **on the slot's own CPUs** (the union of the CPU sets the planted programs recorded
+  inside the slot, which the CPU-set check pins to the share), p95, at most the share + 1; the rest of the machine,
+  background included, does not enter it;
+- **no program escaped the set:** the CPUs outside the slot's set, median busy cores during the slot's run, at most
+  their own median in the background (the same CPUs) **plus one core**; an escaped program would put most of its
+  `os.cpu_count()` spinning processes there;
+- **the suite loaded its slot:** the slot's CPUs' p95 at least half the share (else nothing was measured).
+
+The bar is unchanged (share + 1; at most 20 % slower). Busy cores on a set of CPUs cannot exceed the set's size, so
+once the CPU-set check holds the "with" bar holds by construction: the escape check and the CPU-set check carry the
+evidence that the planted suite's whole load stayed in the slot. Six `S16 evidence:` lines: the share and the set; the
+background per region (whole machine, outside the set, the set); the plain run; the slot's CPUs; the CPUs outside the
+set with their gain (and the whole machine's p95 for the record, not judged); the two times.
+
 ## KPI lines
 
 Ids in the ticket's order (`.tickets/DAEO-r30l.md`, 2026-11-09). "New/changed" from the ticket's history
