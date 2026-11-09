@@ -10,7 +10,8 @@
 # and the "none" rows are not control paths (N-2, N-5).
 #
 # Script hits (apply.sh, `commands`, the checks' cmds) raise the ACT's class: sudo, git push, git tag, history
-# prunes, rm outside the project and Windows-side steps to (O); installs and network calls to non-local hosts to (b).
+# prunes, rm outside the project and Windows-side steps to (O); installs, network calls to non-local hosts and a
+# command that starts a Claude session (a watcher such as the sentinel, SENTINEL-1) to (b).
 version: 1
 rows:
   # --- none: not the operator's (§2's last rows; N-2): (O), so a manifest naming them is refused at G6 as "yours"
@@ -101,12 +102,12 @@ rows:
 
   # --- the path map: refusal additions tighten; the ratchet lists are the owner's
   - id: path-map
-    why: "path map: items only added to refusal lists (sets_root_hidden, role_paths denies, a new evaluation_sets entry with its hidden globs) tighten (a) (SANDBOX-SEAL-1); any other change alters a control (b) (GUARD-SETS-1); a ratchet list (acceptance_exemptions, accepted_reds, load_sensitive) is read only from the owner's commits (O)"
+    why: "path map: items only added to refusal lists (sets_root_hidden, role_paths denies, a new evaluation_sets entry with its hidden globs) tighten (a) (SANDBOX-SEAL-1); any other change alters a control (b) (GUARD-SETS-1); a ratchet list or accepted history (acceptance_exemptions, accepted_reds, load_sensitive, accepted_history) is read only from the owner's commits (O) (W1-01-EXEMPT-1, W2-57-LS-1, P-TRACE-IMPL-1)"
     match:
       - {root: repo, path: "governance/project/path-map.yaml"}
     list:
       kind: yaml
-      ratchet: [acceptance_exemptions, accepted_reds, load_sensitive]
+      ratchet: [acceptance_exemptions, accepted_reds, load_sensitive, accepted_history]
       only_added:
         - "sets_root_hidden.hidden"
         - "sets_root_hidden.refused_roles"
@@ -160,10 +161,11 @@ rows:
     why: "the shared servers' committed configs and modules, with their restart (OLLAMA-CAP-1, QUERY-CPUS-1, QUERY-GPU-2, RERANK-GPU-SLOTS-1, RERANK-WAIT-1): govern no agent, (a) by Q3 (N-7)"
     match:
       - {root: repo, path: "governance/project/orchestration/tools/gov_reranker_gpu_slot.py"}
+      - {root: home, path: ".local/share/gov-os/reranker-venv/lib/*/site-packages/gov_reranker_gpu_slot.py*"}
+      - {root: home, path: ".local/share/gov-os/reranker-venv/lib/*/site-packages/gov-reranker-*.pth"}
       - {root: home, path: ".config/systemd/user/ollama*"}
       - {root: home, path: ".config/systemd/user/gov-reranker*"}
-      - {root: home, path: ".config/systemd/user/*.service.d/**"}
-      - {root: home, path: ".ollama/*.log"}
+      - {root: home, path: ".ollama/*"}
     class: a
     control: false
   - id: watchers
@@ -184,7 +186,9 @@ rows:
     why: "the pinned gov, re-pins (REPIN-1, 2, EMERGENCY-1, W2 to W4): DEC-928 (3), a plain terminal (Q4)"
     match:
       - {root: home, path: ".local/bin/gov"}
-      - {root: home, path: ".local/share/gov-os/**"}
+      - {root: home, path: ".local/share/gov-os/pin-*"}
+      - {root: home, path: ".local/share/gov-os/pin-*/**"}
+      - {root: home, path: ".local/share/gov-os/wheels/**"}
     class: O
     control: true
   - id: installs
@@ -216,3 +220,4 @@ hits:
   windows: O
   install: b
   network: b
+  session: b

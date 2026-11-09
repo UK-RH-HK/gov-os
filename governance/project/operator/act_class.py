@@ -305,6 +305,14 @@ def scan_segment(toks, out, depth=0):
         out.append(("sudo", joined))
         scan_segment(args, out, depth)
         return
+    if cmd == "claude":
+        out.append(("session", joined))
+        return
+    if cmd == "tmux" and depth < 3:
+        for a in args:
+            if " " in a or os.path.basename(a) == "claude":
+                scan_text(a, out, depth + 1)
+        return
     if cmd in ("bash", "sh", "zsh", "dash") and "-c" in args and depth < 3:
         k = args.index("-c")
         if k + 1 < len(args):
