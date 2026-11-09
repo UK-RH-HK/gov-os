@@ -95,7 +95,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 59 | W2-148's replay corpus | DEC-1108 (2): the CTO's builder, the agent's sha256 check both ways; tests first | WAITS: before the first path-map ACT through the agent |
 | 60 | the live-hook suites' temporary folder | DEC-1108 (5): GOV_GUARD_CALLS_DIR set in the suites (W2-141's acceptance file by its designer) | NOT STARTED (follow-up) |
 | 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
-| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept; F26 (Claude Code's own `.claude/**` runtime writes in a dry run) settled in it | WAITS: F21, then preparation |
+| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file, rule 2d (the operator's folder and the call log refused to every session's writes), F26, F7 kept | **Rehearsed 11-09** (0 failures; review READY round 2); WAITS: the owner's approval of the two fixed briefs, then the operator |
 
 ## 1. Every item not done, partly done or waiting
 
