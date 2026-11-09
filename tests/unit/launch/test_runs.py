@@ -22,6 +22,22 @@ from gov.launch import launcher  # noqa: E402
 TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: engineer\nallowed_paths:\n- src/**\n---\n"
 
 
+def _open_gate(home: Path, monkeypatch) -> None:
+    """An open resource gate under this HOME (W2-20 S19: every launch runs the start check): the gate file and its
+    readings planted, nothing of the real machine's gate read."""
+    from gov.resources import config as gate_config
+    folder = home / ".gov-os" / "machine"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "gate.json").write_text(json.dumps(gate_config.template(cpus=list(range(20)))), encoding="utf-8")
+    (folder / "meminfo").write_text("MemAvailable: 67108864 kB\n", encoding="utf-8")
+    (folder / "loadavg").write_text("0.1 0.1 0.1 1/1 1\n", encoding="utf-8")
+    for name, value in (("GOV_RESOURCES_MEMINFO", folder / "meminfo"), ("GOV_RESOURCES_LOADAVG", folder / "loadavg"),
+                        ("GOV_RESOURCES_NPROC", 20), ("GOV_RESOURCES_BUSY_CORES", 0),
+                        ("GOV_RESOURCES_EMBEDDING_CPU", '{"shared": 0, "query": 0}'),
+                        ("GOV_RESOURCES_DISK", '{"free_bytes": 1000000000000000, "free_inodes": 1000000000}')):
+        monkeypatch.setenv(name, str(value))
+
+
 @pytest.fixture
 def started(tmp_path, monkeypatch):
     """``started()`` launches an engineer on TST-a001 and returns the settings and what the session found."""
@@ -31,6 +47,7 @@ def started(tmp_path, monkeypatch):
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
+    _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
     found = {}
@@ -97,6 +114,7 @@ def test_a_project_under_the_root_gets_no_folder_made_or_added(tmp_path, monkeyp
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
+    _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
     found = {}
