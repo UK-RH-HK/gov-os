@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1104 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1108 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -358,3 +358,16 @@ other restart is an ACT.
   from a queue, pushes for (a) for two weeks, built after the walls tests first); the landing selection's environment
   fixed before its results are relied on. **Standing: each ACT given as a message for the owner's operator;** the owner
   does only re-pins, pushes and sudo. Basis: 2 and 4.
+- DEC-1105 (2026-11-09): W2-20 gets one exception round to DEC-1010 (S16 revised to a per-CPU measure first; R2-F1's
+  stale readings resampled; one narrow review of those two); then the merge, `gov resources --sample` over a working
+  day and `--remeasure`. Basis: 2.
+- DEC-1106 (2026-11-09): W2-148's F15 fixed in one exception round (the agent restores only its own dry-run change;
+  anything else: write nothing, refuse, hold the lock, P1 naming each file; the same in the (a) undo); **the guard's
+  call log** (a hash of the action, the role, allow or refuse, never contents) by its own ACT; the commit freeze a file
+  in the operator's install folder the CTO's session may not write; F7 kept; then ACT-OPERATOR-1. Basis: 2.
+- DEC-1107 (2026-11-09): W2-148's F21 fixed in one tiny extra round before ACT-OPERATOR-1 (the owner-undo and
+  crash-recovery paths exit non-zero and say "refused" whenever they leave another's files). Basis: 2.
+- DEC-1108 (2026-11-09): the guard's call log as designed (hashes, never contents); W2-148's replay from a corpus the
+  CTO's tool builds, checked against the log by sha256 both ways (tests first, before the first path-map ACT through the
+  agent); the plain sha256 kept; the log hidden from the W2-56 tuner in a fresh window; every session refused writes
+  into the log folder (in ACT-OPERATOR-1); the live-hook suites to a temporary folder (follow-up). Basis: 2.

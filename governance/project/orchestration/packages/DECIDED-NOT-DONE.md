@@ -16,7 +16,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | **MERGED 11-09** (`b1e2c3b9`, review READY round 2, accept 182/182); its hook change (`docs/changes/W2-141-hook/`) goes live in the lift's re-pin ACT |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
-| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Round 1 built (39/164; the interface was in the acceptance README); round 2 BLOCKED: no `~/.gov-os/machine/gate.json` (an owner ACT, option (a)) |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | **MERGED 11-09** (`686c594f`); live at the lift's re-pin |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
@@ -81,10 +81,21 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0f. DEC-1103's items (2026-11-09)
 | # | item | fate (DEC-1103) | state |
 |---|---|---|---|
-| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **APPLIED 11-09** (`d7490945`; gate.json de4fb326…); W2-20 round 2 next |
-| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | Option C (DEC-1104 (1)): form B to the operator; D-10 decides the three red by design |
-| 53 | the landing selection's environment | DEC-1104 (3): fixed before its results are relied on | NOT STARTED |
+| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **APPLIED twice 11-09**: ACT-GATE-CONFIG-1 (`d7490945`), then ACT-GATE-CONFIG-2 for W2-20's frozen format (`0fcd02b0`, 52e32fc1…); W2-20 round 3 running |
+| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | **APPLIED 11-09** form B (`a46d4517`); D-10 decides the three red by design (W1-33 auditor, W1-05 install, W1-46 research install) |
+| 53 | the landing selection's environment | DEC-1104 (3): fixed before its results are relied on | **DONE 11-09**: a short temporary folder (the socket path under 107 bytes); 49/49 tests incl. the folder regression; the re-run shows only W1-06 and test_fusion (D-10's list) |
 | 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | APPROVED (DEC-1104 (2)); next: build it, tests first, one review, a replay trial on past ACTs |
+
+## 0g. DEC-1105 and DEC-1106 (2026-11-09)
+| # | item | fate | state |
+|---|---|---|---|
+| 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
+| 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | **MERGED 11-09** (`511a4a17`, review READY, accept 166/166); F21 fixed and merged (DEC-1107, review READY, accept 169/169) |
+| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **Rehearsed; §7 answered** (DEC-1108); WAITS: the operator |
+| 59 | W2-148's replay corpus | DEC-1108 (2): the CTO's builder, the agent's sha256 check both ways; tests first | WAITS: before the first path-map ACT through the agent |
+| 60 | the live-hook suites' temporary folder | DEC-1108 (5): GOV_GUARD_CALLS_DIR set in the suites (W2-141's acceptance file by its designer) | NOT STARTED (follow-up) |
+| 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
+| 58 | ACT-OPERATOR-1 | DEC-1106 (3)-(5): the install, the freeze file (the CTO's session denied writing it), F7 kept; F26 (Claude Code's own `.claude/**` runtime writes in a dry run) settled in it | WAITS: F21, then preparation |
 
 ## 1. Every item not done, partly done or waiting
 

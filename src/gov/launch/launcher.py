@@ -14,6 +14,13 @@ the plan's check admits its ticket, with ``GOV_ROLE=orchestrator``, its
 ``GOV_TICKET`` and no sandbox block, as the dispatcher starts a lead
 (``build_lead_settings``); a worker launch never consults the plan.
 
+Every launch, lead or worker, passes the machine-wide resource gate (W2-20 S19,
+DEC-1088 (5)(b)): while it is shut on any reading, the launch is refused naming
+each limit and its reading, unless ``--gate-override DEC-NNN`` starts it anyway;
+that override, and a lead's plan override, are written to
+``~/.gov-os/machine/launch.log`` and to stderr (P-1, P-8). A started session is
+in the machine-wide registry while it runs.
+
 No message of this module carries a held-out path.
 """
 
@@ -317,16 +324,53 @@ def _say(line: str) -> None:
         pass
 
 
-def _admit_lead(root: Path, ticket_id: str) -> None:
-    """W2-136 S9 (DEC-1088 (5)(a)): a lead only for a planned ticket whose waits are met; an override is logged."""
+def _admit_lead(root: Path, ticket_id: str) -> tuple[str, str] | None:
+    """W2-136 S9 (DEC-1088 (5)(a)): a lead only for a planned ticket whose waits are met. A plan override's
+    ``(decision, reason)`` is returned, for ``_record_plan_override`` once the gate admits the launch too (review F8):
+    a lead the gate refuses leaves no override line."""
     verdict = check_lead(root, ticket_id)
     if isinstance(verdict, tuple) and len(verdict) == 3:
         verdict = dict(zip(("admitted", "reason", "override"), verdict))
     field = verdict.get if isinstance(verdict, dict) else lambda name: getattr(verdict, name, None)
     if not field("admitted"):
         raise _refuse(f"no lead for ticket '{ticket_id}': {field('reason')} (DEC-1088 (5))")
-    if field("override"):
-        _say(f"gov launch: OVERRIDE {field('override')}: {field('reason')} (DEC-899)\n")
+    return (field("override"), field("reason")) if field("override") else None
+
+
+def _record_plan_override(ticket_id: str, override: tuple[str, str] | None) -> None:
+    """A plan override that admitted a lead: one line in the machine-wide launch log and one on standard error
+    (W2-20 S21, W2-136 review F4, P-8)."""
+    from gov.launch.gate import record
+
+    if override is None:
+        return
+    decision, reason = override
+    record(f"gov launch: OVERRIDE plan_override: {decision}: ticket {ticket_id}: {reason} (DEC-899)")
+    _say(f"gov launch: OVERRIDE {decision}: {reason} (DEC-899)\n")
+
+
+def _admit_start(root: Path, role: str, ticket_id: str, gate_override: str | None, gpu_need_mib: int | None) -> None:
+    """W2-20 S19 (DEC-1088 (5)(b)): no session, lead or worker, while the resource gate is shut on any reading; one
+    recorded override (``--gate-override DEC-NNN``) starts it anyway, written to the launch log and standard error."""
+    from gov.launch.gate import GATE_SHUT, check_start, override_decision, record, shut_text
+
+    decision = override_decision(gate_override)
+    if gpu_need_mib is not None and (isinstance(gpu_need_mib, bool) or not isinstance(gpu_need_mib, int)
+                                     or gpu_need_mib < 1):
+        raise _refuse(f"--gpu-need-mib takes a positive number of MiB, not {gpu_need_mib!r}")
+    try:
+        check_start(gpu_need_mib=gpu_need_mib)
+    except GovError as shut:
+        if shut.code != GATE_SHUT:
+            raise _refuse(f"the resource gate cannot be read: {shut.message} (DEC-1088 (5))") from None
+        text = shut_text(shut.details)
+        if decision is None:
+            raise GovError("LAUNCH_REFUSED", f"the resource gate is shut: {text} (DEC-1088 (5))",
+                           shut.details) from None
+        line = (f"gov launch: OVERRIDE gate_override: {decision}: {role} {ticket_id} started with the resource gate "
+                f"shut: {text} (DEC-899)")
+        record(line)
+        _say(line + "\n")
 
 
 def _cli() -> Path:
@@ -336,19 +380,36 @@ def _cli() -> Path:
     return cli
 
 
-def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
+def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_override: str | None = None,
+           gpu_need_mib: int | None = None) -> int:
     """Start one worker or lead session and return the CLI's exit code; raise ``GovError`` to refuse.
 
     Only a lead (``role`` in ``LEAD_ROLES``) is checked against the plan; a worker launch never is, whoever calls.
+    Every launch, lead or worker, passes the resource gate (W2-20 S19), unless ``gate_override`` (a decision id)
+    starts it anyway; ``gpu_need_mib`` is the session's declared GPU need. The started session is entered in the
+    machine-wide registry while it runs (W2-20 S1).
+
+    The machine-wide start lock is held from the gate's check until the session is registered (review F1): launches
+    that start together are judged one after another, each with the sessions started before it counted, and one that
+    ends before registering leaves no entry.
     """
+    from gov.launch.gate import StartLock
+
     root = Path(os.path.realpath(root))
     if role in LEAD_ROLES:
-        _admit_lead(root, ticket_id)
+        plan_override = _admit_lead(root, ticket_id)
         _check_cli_args(cli_args)
         _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
         cli = _cli()
-        # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-        return _run(root, cli, build_lead_settings(ticket_id), cli_args)
+        lock = StartLock()
+        try:
+            _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+            _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
+            # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
+            return _run(root, cli, build_lead_settings(ticket_id), cli_args, entry=(ticket_id, LEAD_GOV_ROLE),
+                        lock=lock)
+        finally:
+            lock.release()
     if role not in WORKER_ROLES:
         raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)}) "
                       f"or a lead role ({', '.join(LEAD_ROLES)})")
@@ -360,22 +421,33 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
-    # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
-    # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
-    # folder made here is marked as this repository's; a folder that is there without this repository's marker,
-    # or that cannot be named, made or marked, is not opened: the session then has none.
-    name = runs.folder(str(root), ticket_id, role)
-    if name is not None and not os.path.lexists(name):
-        runs.make(name, str(root))
-    own = runs.own_folder(str(root), ticket_id, role)
-    return _run(root, cli, settings, cli_args, temp_prefix=f"gov-launch-{role}-", own=own)
+    lock = StartLock()
+    try:
+        _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
+        # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
+        # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
+        # folder made here is marked as this repository's; a folder that is there without this repository's marker,
+        # or that cannot be named, made or marked, is not opened: the session then has none.
+        name = runs.folder(str(root), ticket_id, role)
+        if name is not None and not os.path.lexists(name):
+            runs.make(name, str(root))
+        own = runs.own_folder(str(root), ticket_id, role)
+        return _run(root, cli, settings, cli_args, temp_prefix=f"gov-launch-{role}-", own=own,
+                    entry=(ticket_id, role), lock=lock)
+    finally:
+        lock.release()
 
 
 def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_prefix: str | None = None,
-         own: str | None = None) -> int:
+         own: str | None = None, entry: tuple[str, str] | None = None, lock=None) -> int:
     """Start the session and wait for it. With ``temp_prefix`` (a worker), the session gets a temp folder of its
-    own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386)."""
-    state = {"session": None, "ended": False, "asked": False}
+    own, in its env and its sandbox's write list with ``own``, removed when it ends (DEC-159, DEC-386). With
+    ``entry`` (its ticket and role), the session is in the machine-wide registry while it runs (W2-20 S1): one that
+    cannot be entered is stopped, so the gate never runs blind to a session. ``lock`` (the machine-wide start lock,
+    review F1) is given back once the session is registered, or when the launch ends without one."""
+    from gov.resources import registry
+
+    state = {"session": None, "ended": False, "asked": False, "registered": None}
 
     def end(signum=None, frame=None):
         """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session. It is asked first, and killed when a second
@@ -405,6 +477,16 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
                                                     cwd=root, env=env)
             except OSError:
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            pid = getattr(state["session"], "pid", None)  # a started process always has one
+            if entry is not None and isinstance(pid, int) and pid > 0:
+                try:
+                    registry.register(pid, root, *entry)
+                    state["registered"] = pid
+                except (OSError, GovError) as error:
+                    raise _refuse(f"the session cannot be entered in the machine-wide registry "
+                                  f"({getattr(error, 'message', error)}): it is stopped (W2-20)") from None
+            if lock is not None:  # registered: the next launch's check counts this session (review F1)
+                lock.release()
             if state["ended"]:  # a signal that came while the session was started
                 end()
             code = state["session"].wait()
@@ -416,6 +498,10 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
         if session is not None and session.poll() is None:  # only an error on the way here: no session is left
             session.kill()
             session.wait()
+        if state["registered"] is not None:
+            registry.unregister(state["registered"])
+        if lock is not None:
+            lock.release()
         # DEC-386: the folder goes when the session ends, whole; a link in it is removed as a link.
         try:
             if tmpdir is not None:

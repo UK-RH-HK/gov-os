@@ -70,8 +70,12 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     Revised for DEC-970 (W2-96, P-W2-96-CMDLIST (a); a recorded rewrite, DEC-959 item 6): ``accept`` is recorded,
     so the recorded ``gov`` commands are four, not the three of the case's name, which W1-32's README map names
     and so stays as it is.
+
+    Revised for W2-20 (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20's KPI adds ``resources`` to the
+    recorded ``gov`` commands; the set is still exact, and ``release`` is still excused until recorded (DEC-753).
     """
-    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "telemetry"}, RECORDED
+    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "resources", "telemetry"}, (
+        RECORDED)
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)

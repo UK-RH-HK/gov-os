@@ -44,7 +44,8 @@ def _offered(run):
 def test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve():
     recorded = support.RECORDED_GOV_COMMANDS + support.RECORDED_MODULE_COMMANDS
     # DEC-970: ``accept`` (W2-96) is recorded too, so the lines name five; the case keeps its name.
-    assert sorted(recorded) == ["accept", "ci", "launch", "lock", "telemetry"], recorded
+    # Revised (DEC-491; ported for DEC-1097 (8) from 173e8e97a): W2-20 records ``resources`` beside them: six.
+    assert sorted(recorded) == ["accept", "ci", "launch", "lock", "resources", "telemetry"], recorded
     assert not set(recorded) & set(support.RESERVED_COMMANDS), "a recorded command is one of the twelve"
 
 

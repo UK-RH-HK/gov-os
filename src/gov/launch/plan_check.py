@@ -3,7 +3,12 @@
 A lead (a session started as ``GOV_ROLE=orchestrator`` with a ``GOV_TICKET``) is refused for a ticket that is not in
 the approved ready list's batches, or whose waits (``depends_on``, ``needs``, ``waits_on``) are not met when checked
 now against the current tickets. The refusal names what the ticket waits for: the ticket, the path or the id. A
-``plan_override: <DEC-id>`` on the ticket admits it anyway, and the launcher writes the override in its log.
+``plan_override: <DEC-id>`` on the ticket admits it anyway, and the launcher writes the override in the machine-wide
+launch log and on standard error (W2-20 S21, review F4).
+
+**The current plan (W2-20 S21, review F2):** the tickets and the approved ready list are the main tree's (the main
+worktree of the launch tree's repository, ``gov.launch.store.main_root``), never a lead worktree's own copies, which
+can be stale. ``GOV_PLAN_READY`` names the list the dispatcher keeps; a relative value is read against the main tree.
 
 The launcher calls ``check_lead`` once, at its argument checks; nothing else calls it.
 """
@@ -14,6 +19,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from gov.launch.store import main_root
 from gov.plan.derive import Context, hard_waits, unknown_waits
 from gov.plan.tickets import PlanError, index, load
 
@@ -41,10 +47,11 @@ class LeadCheck:
 
 
 def ready_path(root: Path) -> Path:
-    """Where the approved ready list is: ``$GOV_PLAN_READY`` (relative to the project), else ``READY_REL``."""
+    """Where the approved ready list is: ``$GOV_PLAN_READY``, else ``READY_REL``; a relative path is read against the
+    main tree of ``root``'s repository (P-8), never a worktree's copy."""
     named = os.environ.get(READY_ENV, "").strip()
     path = Path(named) if named else Path(READY_REL)
-    return path if path.is_absolute() else Path(root) / path
+    return path if path.is_absolute() else main_root(Path(root)) / path
 
 
 def ready_entries(ready) -> set[str] | None:
@@ -78,9 +85,9 @@ def _named(waits, unknown, by: dict) -> str:
 
 
 def check_lead(root, ticket_id: str, *, ready=None) -> LeadCheck:
-    """Whether a lead for ``ticket_id`` may start now. ``ready`` is the approved ready list (a file, or its ids);
-    None reads ``ready_path(root)``. Nothing is written."""
-    root = Path(root)
+    """Whether a lead for ``ticket_id`` may start now, from the main tree's current tickets. ``ready`` is the
+    approved ready list (a file, or its ids); None reads ``ready_path(root)``. Nothing is written."""
+    root = main_root(Path(root))
     try:
         tickets = load(root)
     except PlanError as error:

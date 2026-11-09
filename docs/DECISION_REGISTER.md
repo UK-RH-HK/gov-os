@@ -14037,6 +14037,54 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no gate that reports a known switch over and over; a red that means a red) and question 4 (the
   owner's time kept for re-pins, pushes and sudo).
 
+### DEC-1105 — W2-20: one exception round to DEC-1010's two-round rule (S16's per-CPU measure, R2-F1's stale readings), then the merge and the re-measure
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1010, DEC-1097 (8), DEC-1103 (1) · **Source:** the owner's message (chat, 2026-11-09), after W2-20's review round 2 (READY at `2bb6f70b`; S16 run 2 net 3.003 against 3; R2-F1)
+- **Decision:** (b): one exception round to DEC-1010's two-round rule for W2-20 only: the designer first revises S16 to a
+  per-CPU measure (the slot's own CPUs read, so the machine's background does not enter the figure); then one engineer
+  pass fixes R2-F1 (a server whose kept readings have all expired is resampled, so the gate never refuses a launch for
+  stale readings); then one narrow review of those two points only. Then the CTO merges W2-20, runs
+  `gov resources --sample` over a working day and then `--remeasure`.
+- **Basis:** question 2 (no false refusal of honest work; evidence that measures the slot, not the machine).
+
+### DEC-1106 — W2-148: F15 fixed in one exception round to DEC-1010; the guard's call log by its own ACT; the commit freeze in the operator agent's install folder; F7 kept; then ACT-OPERATOR-1
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1104 (2), DEC-1103 (4), DEC-1010, DEC-1099 (1), DEC-1101 (1), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's review round 2 (not READY on F15)
+- **Decision:**
+  - (1) **F15: fixed now,** one exception round to DEC-1010 for W2-148: the agent restores only its own dry-run change
+    (a touched file whose live bytes equal the frozen after-copy); for anything else it writes nothing, refuses, holds
+    the lock and sends the owner a P1 naming each file. The same rule in the (a) after-check's undo. One engineer pass,
+    one narrow review of those points.
+  - (2) **F3: the guard appends each decision to a call log** (a hash of the action, the role, allow or refuse; never
+    the contents), as its own ACT for the owner's operator, rehearsed; it serves the after-check's replay, the sandbox
+    experiment and the false-refusal counts.
+  - (3) **F5: the commit freeze is a file in the operator agent's install folder;** the CTO's tools and the landing hook
+    read it; the guard denies the CTO's session writing it.
+  - (4) **F7: kept** as the approved package says (the agent runs an ACT's own `apply.sh` and its `git add`/`commit`).
+  - (5) Then **ACT-OPERATOR-1** with these settings, as a message for the owner's operator.
+- **Basis:** question 2 (an operator that can never silently undo someone else's change; a guard whose decisions are
+  logged without their contents).
+
+### DEC-1107 — W2-148's F21 fixed in one tiny extra round before ACT-OPERATOR-1: the owner-undo and crash-recovery paths exit non-zero and say "refused" whenever they leave another's files
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (1), DEC-1010 · **Source:** the owner's message (chat, 2026-11-09), after W2-148's merge (`511a4a17`)
+- **Decision:** (a): one tiny extra round, an exception to DEC-1010, before ACT-OPERATOR-1 installs the agent: a designer
+  case first, one engineer pass, a narrow review; the owner-undo and crash-recovery paths exit non-zero and say
+  "refused" whenever they leave another's files untouched (the P1 and the held lock as before).
+- **Basis:** question 2 (no success code that could hide someone else's change).
+
+### DEC-1108 — ACT-GUARD-CALLLOG-1's five answers: the location, fields and limits; W2-148's replay from a corpus checked against the log by sha256 both ways; the plain sha256 kept; the log hidden from the W2-56 tuner in a fresh window; every session refused writes into the log folder
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1106 (2)-(3), DEC-1104 (2), DEC-1099 (1) · **Source:** the owner's message (chat, 2026-11-09), after ACT-GUARD-CALLLOG-1 §7
+- **Decision:**
+  - (1) The log's location (`~/.gov-os/guard-calls/<UTC day>.jsonl`), fields and limits approved.
+  - (2) **Option 1:** the CTO's tool builds the 48-hour set of actions in the form W2-148's replay reads, and the
+    operator agent checks each against the log's sha256 both ways before re-judging; built, tests first, before the first
+    path-map ACT goes through the agent.
+  - (3) The plain sha256 kept beside the keyed hash.
+  - (4) `~/.gov-os/guard-calls` added to the W2-56 tuner's hidden paths when a fresh experiment window opens.
+  - (5) The guard refuses every session's writes into `~/.gov-os/guard-calls`, included in ACT-OPERATOR-1 with the
+    freeze file's rule; the suites that run the live hook pointed at a temporary folder as a follow-up.
+  - (6) ACT-GUARD-CALLLOG-1 given as a message for the owner's operator.
+- **Basis:** question 2 (decisions logged without contents; an operator that cannot be shown a curated replay; a log no
+  session can rewrite).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14079,3 +14127,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.487 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1102. Next free id: DEC-1103. |
 | 0.488 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1103; DEC-1061 amended for ten cases. Next free id: DEC-1104. |
 | 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |
+| 0.490 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1105 (an exception to DEC-1010 for W2-20). Next free id: DEC-1106. |
+| 0.491 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1106 (an exception to DEC-1010 for W2-148). Next free id: DEC-1107. |
+| 0.492 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1107 (an exception to DEC-1010 for W2-148's F21). Next free id: DEC-1108. |
+| 0.493 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1108. Next free id: DEC-1109. |

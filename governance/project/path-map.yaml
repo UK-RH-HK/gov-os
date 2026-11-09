@@ -129,6 +129,9 @@ namespaces:
       - "governance/project/*"
       - "governance/project/briefs/**"
       - "governance/project/prompts/**"
+      # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1) and the operator agent's install (W2-148)
+      - "governance/project/indep-walls/**"
+      - "governance/project/operator/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
       # DEC-953 items 1 and 5: the build-phase close records
