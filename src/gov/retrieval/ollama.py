@@ -22,6 +22,15 @@ the defaults below. The CPUs and the niceness are set in the started process its
 inherits them; an unreadable value refuses the start, never an uncapped one. ``probe`` states a daemon healthy,
 slow, hung or down, ``safe_restart`` restarts a hung or down one under the same cap (DEC-1015 item 2), and
 ``check_determinism`` refuses a parallel setting that changes a vector.
+
+**The interim wrapper's caps, carried by the start itself (W2-20, DEC-1037 (a) and (4), DEC-1038 (1)):** no started
+server inherits a heavy slot's thread budget (``BUDGET_VARIABLES`` are left out of its environment). The query
+server's start also takes its device from the gate's file (``embedding_servers.query.device``: ``gpu``, the default,
+leaves the GPU visible, a caller's value that hides it removed; ``cpu`` hides it with ``CUDA_VISIBLE_DEVICES=-1``; any
+other value refuses the start, named), appends the server's output to its own log
+(``~/.gov-os/machine/query-server.log``, or the section's ``log``), and writes one line per start to the start log
+(``~/.gov-os/machine/query-starts.log``, or ``start_log``) naming the time, the device and the caller (pid, working
+folder, command). So ``~/.local/bin/ollama`` can be removed by a small ACT (its steps in W2-20's evidence).
 """
 
 from __future__ import annotations
@@ -65,6 +74,14 @@ DEFAULT_PROBE_SLOW_S = 10.0  # above a cold model load to the first vector (evid
 DEFAULT_PROBE_HUNG_S = 120.0  # semantic.TIMEOUT_S: past it a rebuild's own request gives up on the server
 PROBE_TEXT = "Gov OS embedding server health probe"
 STOP_WAIT_S = 10.0  # how long a stopped server's port is waited for before its processes are killed
+# A server outlives the run that started it: never a heavy slot's thread budget (W2-20 S15, DEC-1037, DEC-1038).
+BUDGET_VARIABLES = ("GOMAXPROCS", "OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "RAYON_NUM_THREADS",
+                    "NUMEXPR_NUM_THREADS", "NUMEXPR_MAX_THREADS", "VECLIB_MAXIMUM_THREADS", "GOV_HEAVY_THREAD_BUDGET",
+                    "GOV_HEAVY_CPUS", "GOV_HEAVY_SLOT", "PYTEST_XDIST_AUTO_NUM_WORKERS")
+DEVICES = ("gpu", "cpu")
+GPU_SETTING = "CUDA_VISIBLE_DEVICES"
+QUERY_LOG_REL = ".gov-os/machine/query-server.log"      # the query server's own output (W2-20, DEC-1037)
+QUERY_STARTS_REL = ".gov-os/machine/query-starts.log"   # one line per start, naming its caller (W2-20, DEC-1037)
 
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
 
@@ -169,6 +186,61 @@ def _config(server: str, env) -> tuple[dict | None, dict | None, str | None]:
     return {"parallel": parallel, "cpus": _cpu_list(cpus), "nice": nice, "source": source}, limits, None
 
 
+def _query_start(env) -> tuple[dict | None, str | None]:
+    """The query server's start from the gate's file: ``({"device", "log", "start_log"}, None)``, or ``(None,
+    warning)`` naming the key that cannot be read. No file, or no key, is the GPU and the default logs."""
+    path = _home(env) / GATE_REL
+    entry: dict = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            entry = data.get(SECTION, {}).get("query", {})
+            if not isinstance(entry, dict):
+                raise ValueError
+        except (OSError, ValueError, AttributeError):
+            entry = {}  # an unreadable section is named by _config, which refuses the start first
+    device = entry.get("device", "gpu")
+    if device not in DEVICES:
+        return None, (f"{path}: {SECTION}.query.device is unreadable (one of {', '.join(DEVICES)} is needed, not "
+                      f"{device!r}); the query embedding server is not started")
+    out = {"device": device}
+    for key, rel in (("log", QUERY_LOG_REL), ("start_log", QUERY_STARTS_REL)):
+        value = entry.get(key, str(_home(env) / rel))
+        if not isinstance(value, str) or not os.path.isabs(value):
+            return None, (f"{path}: {SECTION}.query.{key} is unreadable (an absolute path is needed); the query "
+                          f"embedding server is not started")
+        out[key] = value
+    return out, None
+
+
+def _daemon_env(env, server: str, settings: dict, start: dict | None) -> dict:
+    """The started daemon's environment: the caller's, less every heavy slot's budget variable, with its parallel
+    setting; the query server's device applied (DEC-1037)."""
+    daemon = {key: value for key, value in env.items() if key not in BUDGET_VARIABLES}
+    daemon[PARALLEL_SETTING] = str(settings["parallel"])
+    if server == "query" and start is not None:
+        if start["device"] == "cpu":
+            daemon[GPU_SETTING] = "-1"
+        elif daemon.get(GPU_SETTING) is not None and daemon[GPU_SETTING].strip() in ("", "-1"):
+            del daemon[GPU_SETTING]  # the GPU left visible: a value that hides it is not passed on (DEC-1033)
+    return daemon
+
+
+def _caller_line(device: str) -> str:
+    """One start-log line: the time, the device and the caller (pid, working folder, command)."""
+    try:
+        command = Path("/proc/self/cmdline").read_bytes().rstrip(b"\0").replace(b"\0", b" ").decode(errors="replace")
+    except OSError:
+        command = " ".join(sys.argv)
+    try:
+        cwd = os.getcwd()
+    except OSError:
+        cwd = "unknown"
+    stamp = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+    return (f"{stamp} query server started ({device}) by gov's automatic start; caller pid {os.getpid()} cwd {cwd}: "
+            f"{command[:300]}\n")
+
+
 def _server(env) -> str:
     """``"query"`` when ``OLLAMA_HOST`` is the query embedder's address (``ensure_query_available`` sets it so),
     else ``"shared"``."""
@@ -199,6 +271,9 @@ def ensure_available(*, timeout_s: float = 20.0, env=None, start: bool = False) 
     env = os.environ if env is None else env
     server = _server(env)
     settings, _, invalid = _config(server, env)
+    query_start = None
+    if server == "query" and start and not invalid:
+        query_start, invalid = _query_start(env)
     deadline = time.monotonic() + timeout_s
     url = _url(env.get("OLLAMA_HOST") or DEFAULT_HOST, HEALTH_PATH)
     available = _healthy(url, deadline)
@@ -221,17 +296,36 @@ def ensure_available(*, timeout_s: float = 20.0, env=None, start: bool = False) 
                 "settings": None}
     executable = None if available else _executable(env)
     if executable:
-        daemon_env = {**env, PARALLEL_SETTING: str(settings["parallel"])}  # the GPU is not hidden (DEC-1033)
+        daemon_env = _daemon_env(env, server, settings, query_start)
+        output, logged = None, True
+        if query_start is not None:  # the query server's output appended to its own log (DEC-1037)
+            try:
+                Path(query_start["log"]).parent.mkdir(parents=True, exist_ok=True)
+                output = open(query_start["log"], "ab")
+            except OSError as error:  # no log, no start
+                logged = False
+                print(f"{query_start['log']}: the query server's log cannot be opened ({error}); it is not started",
+                      file=sys.stderr)
         try:
-            # Its own session and no inherited streams: the daemon outlives this call and is never stopped.
-            subprocess.Popen([executable, "serve"], env=daemon_env, stdin=subprocess.DEVNULL,
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True,
-                             preexec_fn=_capped(settings))
-            started = True
+            if logged:
+                # Its own session and no inherited streams: the daemon outlives this call and is never stopped.
+                subprocess.Popen([executable, "serve"], env=daemon_env, stdin=subprocess.DEVNULL,
+                                 stdout=output or subprocess.DEVNULL, stderr=output or subprocess.DEVNULL,
+                                 start_new_session=True, preexec_fn=_capped(settings))
+                started = True
         except FileNotFoundError:  # the executable named is not there: it is not found
             executable = None
         except (OSError, subprocess.SubprocessError):  # a cap that cannot be set is no start
             pass
+        finally:
+            if output is not None:
+                output.close()
+        if started and query_start is not None:
+            try:
+                with open(query_start["start_log"], "a", encoding="utf-8") as starts:
+                    starts.write(_caller_line(query_start["device"]))
+            except OSError as error:
+                print(f"{query_start['start_log']}: the start could not be logged: {error}", file=sys.stderr)
         while started and not available and time.monotonic() < deadline:
             time.sleep(0.1)
             available = _healthy(url, deadline)
