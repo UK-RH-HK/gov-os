@@ -29,6 +29,9 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
 8. **Waits and holds:** every wait and stop by pid only (`tools/proc.sh`); no commit on `w2/integrate` during a GPU
    measure or a hold.
 9. **After the lift:** each ready list the CTO commits covers several of `gov plan`'s batches ahead (DEC-1110 (3)).
+10. **What goes to the owner:** only P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs; fixed briefs to
+    approve once; anything that changes one of the owner's standing decisions; steps only the owner can do physically.
+    Every other P2 is the CTO's, recorded and listed in the digest (DEC-1112 (3)).
 
 ## 0. What holds: DECISIONS-IN-FORCE (owner, DEC-1052 R-9) — that list overrides everything below
 

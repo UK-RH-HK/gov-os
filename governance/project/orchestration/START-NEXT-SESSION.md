@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1112.**
+the register and the owner's word hold over both. **Next free id: DEC-1113.**
 
 ## 0. Where things stand (2026-11-08)
 - **Re-pin window 4 is live** (`pin-bcea09060ebc`, 11-07 14:22); the pool is on (`c00d525f`); PAT-1 done.
@@ -49,7 +49,8 @@ The same list as the top of `governance/project/prompts/w2-orchestrator.md`: rea
 while unblocked work remains; DECIDED-NOT-DONE kept current; ACTs as messages for the owner's operator (the owner does
 only re-pins, pushes, sudo); fixed briefs never changed without the owner; memory audited, notices resolved in a day;
 usage recorded only, the brake at twice each projection; faults to the owner at once; waits by pid; after the lift,
-ready lists several batches deep.
+ready lists several batches deep; only P1s, re-pins/pushes/sudo, class (b) yeses, fixed briefs, changes to standing
+decisions and physical steps go to the owner, every other P2 is the CTO's (DEC-1112 (3)).
 
 ## 2. The emergency: in force
 - **What holds it:** DEC-1047 (the emergency); DEC-1049 (no nightly or full suite until the owner's word); DEC-1050
