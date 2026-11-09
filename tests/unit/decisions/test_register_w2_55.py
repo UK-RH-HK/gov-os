@@ -91,8 +91,9 @@ def test_status_relations_and_successors(tmp_path):
 - **Status:** ACCEPTED (corrected by DEC-103)
 {TAGS_R}
 """)
-    assert _codes(decisions.check_tags(root)) == [("STATUS_RELATION_UNMARKED", ("DEC-101", "DEC-103")),
-                                                  ("STATUS_SUCCESSOR_UNNAMED", ("DEC-102",))]
+    # DEC-101's unmarked relation is gov links' UNMARKED_CHANGE now (DEC-1109 (2)): check_tags no longer reports it
+    assert _codes(decisions.check_tags(root)) == [("STATUS_SUCCESSOR_UNNAMED", ("DEC-102",))]
+    assert "STATUS_RELATION_UNMARKED" not in {finding["code"] for finding in decisions.check_tags(root)}
 
 
 def test_a_partial_supersedes_changes_and_the_digest_names_it(tmp_path):
