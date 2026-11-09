@@ -457,8 +457,16 @@ def gov_argv(*args) -> list[str]:
     return [sys.executable, "-c", code, *args]
 
 
-def launch_argv(role: str, ticket: str, cli_args=None) -> list[str]:
+# W2-20's resource gate (merged into integrate after the first half) is shut in a planted HOME (no gate.json): every
+# launch here passes it with one recorded override, written to the planted HOME's launch log only. The gate is
+# W2-20's, not under test here; the real cases (test_w2_56_real_sandbox) keep the machine's own gate.
+GATE_OVERRIDE = "DEC-1112"
+
+
+def launch_argv(role: str, ticket: str, cli_args=None, gate_override: bool = True) -> list[str]:
     args = ["launch", role, ticket]
+    if gate_override:
+        args += ["--gate-override", GATE_OVERRIDE]
     if cli_args is not None:
         args += ["--", *cli_args]
     return gov_argv(*args)

@@ -86,7 +86,8 @@ def _cli_args(command: str) -> list[str]:
 
 
 def _start(project: Path, ticket: str, command: str, role: str = s.ENGINEER) -> subprocess.Popen:
-    return subprocess.Popen(s.launch_argv(role, ticket, _cli_args(command)), cwd=str(project), env=_env(),
+    return subprocess.Popen(s.launch_argv(role, ticket, _cli_args(command), gate_override=False), cwd=str(project),
+                            env=_env(),
                             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
 
