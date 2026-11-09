@@ -5,16 +5,20 @@ Started by ``gov.retrieval.rerank`` with the reranker environment's interpreter,
 the socket), taken by the search that started it and held by this process for its life, so no second service starts
 while it lives. The same pinned model and the same model call as ``rerank_worker.py`` (``load`` and ``scores``).
 
-- **The GPU slots (DEC-1036 T6):** first it takes one of the private rerankers' GPU slots for its life, with their
-  rule (``rerank_worker.take_slot``: the same locks and settings, a wait of ``GOV_RERANK_GPU_WAIT_S``), never
-  allowing the CPU; so at most one private reranker runs beside it. Without a slot it ends named (exit 75; 76 when
-  the GPU is hidden). The interim module ``gov_reranker_gpu_slot`` acts only on ``rerank_worker.py``, never here.
+- **The GPU slots (DEC-1036 T6, W2-145 S3):** first it takes one of the reranker GPU slots for its life, with the
+  slot rule (``rerank_worker.take_slot``: the same locks and settings, a wait of ``GOV_RERANK_GPU_WAIT_S``), never
+  the CPU. Without a slot it ends named (exit 75; 76 when the GPU is hidden). Once it will run (its share checked),
+  its own thread takes every other slot that is free and, for one another process holds (a private reranker of an
+  older tree), takes it within ``POLL_S`` of its release; all go with the process when it ends (idle, SIGTERM or a
+  crash). So while it runs, no reranker that keeps the slot rule loads on the GPU beside it: it waits, then ends
+  named (exit 75) (DEC-1043 (2), DEC-1048 (5)). The thread only tries locks without waiting; it never delays an
+  answer. The interim module ``gov_reranker_gpu_slot`` acts only on ``rerank_worker.py``, never here.
 - **The GPU only (DEC-1036 T5, DEC-1032, DEC-1033):** holding a slot, it reads the GPU's free memory with the
   library that will hold it (``torch.cuda.mem_get_info``). Less than its share plus the headroom free, or no GPU to
   read: it does not start (exit 77). It never loads on the CPU. Every refusal is a REFUSED line in ``rerank.log``,
-  and the search falls back.
+  and the search goes on unranked (W2-145).
 - **Requests:** one connection per request, answered first come, first served, one request at a time (no batching
-  across callers, so every answer is a private reranker's): ``[query, [text, …]]`` in, one JSON line out,
+  across callers, so every answer is the model's for that request alone): ``[query, [text, …]]`` in, one JSON line out,
   ``{"scores": […], "device": …}`` or ``{"error": …, "device": …}``. More than ``MAX_TEXTS`` texts is refused.
 - **Memory after each request (DEC-1068, re-pin window 4):** once a request's answer is sent (or the caller has
   gone, or the request failed, a GPU out-of-memory among them), the service empties PyTorch's caching allocator
@@ -37,6 +41,7 @@ import os
 import signal
 import socket
 import sys
+import threading
 import time
 
 # The worker's model call, by its file: this folder is never put on the path (its modules would shadow libraries).
@@ -53,6 +58,54 @@ SHARE, HEADROOM = 3.5 * GIB, 2.0 * GIB  # DEC-1032: the reranker's share (2.5 to
 # whose requests a search never exceeds. A request over it is refused with its count named, never cut.
 MAX_TEXTS = 512
 READ_S = 10.0  # a caller sends its request as soon as it connects
+POLL_S = 0.5  # how often the other slots are tried: one released is held within 2 s (W2-145 S3)
+_SLOTS: dict = {}  # the other GPU slots this process holds, index -> its lock file, open for the process's life
+
+
+def take_free_slots(held: dict | None = None) -> list:
+    """One pass over the GPU slots (the slot rule's locks and settings): each slot not in ``held`` and not this
+    process's first (``GOV_RERANK_GPU_SLOT``) that is free is taken, without waiting, into ``held`` (the process's
+    own by default). The indices taken in this pass."""
+    import fcntl
+
+    held = _SLOTS if held is None else held
+    slots, folder = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2")), os.environ.get("GOV_RERANK_GPU_LOCK_DIR", "/tmp")
+    first, taken = os.environ.get("GOV_RERANK_GPU_SLOT"), []
+    for i in range(slots):
+        if i in held or str(i) == first:
+            continue
+        try:
+            fd = os.open(os.path.join(folder, f"gov-os-rerank-gpu-{i}.lock"), os.O_CREAT | os.O_RDWR, 0o600)
+        except OSError:
+            continue
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:  # another process holds it: tried again at the next pass
+            os.close(fd)
+            continue
+        held[i], taken = fd, taken + [i]
+    return taken
+
+
+def hold_every_slot(poll: float = POLL_S, stop: threading.Event | None = None) -> threading.Thread:
+    """The thread that keeps taking the free slots until every slot is held (or ``stop`` is set); a daemon, so the
+    slots go with the process however it ends."""
+    stop = stop or threading.Event()
+
+    def keep():
+        while not stop.is_set():
+            try:
+                take_free_slots()
+                if len(_SLOTS) + (1 if os.environ.get("GOV_RERANK_GPU_SLOT") else 0) >= \
+                        int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2")):
+                    return  # every slot held, for the process's life
+            except Exception:  # a pass that fails is tried again: the thread never ends the service
+                pass
+            stop.wait(poll)
+
+    thread = threading.Thread(target=keep, name="gov-rerank-gpu-slots", daemon=True)
+    thread.start()
+    return thread
 
 
 def _free_gpu() -> int:
@@ -140,6 +193,7 @@ def main(model: str, revision: str, path: str, lock_fd: str) -> None:
     if refused:
         note(log, "REFUSED", f"the shared reranker does not start: {refused[1]}")
         sys.exit(refused[0])
+    hold_every_slot()  # W2-145 S3: every other slot, before the load, for the process's life
     encoder = load(model, revision)  # the worker's call: the library's device, the GPU it has just read
     device = device_of(encoder) or "cuda"
     listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

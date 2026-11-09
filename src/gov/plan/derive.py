@@ -9,6 +9,7 @@
 - ``reads:`` orders nothing: a read that overlaps an unfinished ticket's writes is a ``READS_WIDE`` warning naming the
   waits it would have caused;
 - **ties and cycles** by the fixed key (priority, then WBS order, then id), a broken cycle named ``CYCLE_TIEBREAK``;
+  a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits (DEC-1102);
 - **findings:** ``NEEDS_UNDECLARED`` (planned on its own writes alone), ``DEPS_DISAGREE``, ``UNKNOWN_WAIT``;
 - ``plan_override: <DEC-id>`` lets a ticket share a batch despite an overlap or a wait, shown as ``OVERRIDE``.
 
@@ -139,9 +140,11 @@ def _first_overlap(left: tuple[str, ...], right: tuple[str, ...]) -> tuple[str, 
     return None
 
 
-def hard_waits(ticket: Ticket, ctx: Context) -> list[Wait]:
+def hard_waits(ticket: Ticket, ctx: Context, *, self_loop: bool = False) -> list[Wait]:
     """Every wait of ``ticket`` not met on the current tickets: its ``depends_on`` on unfinished tickets, its
-    ``waits_on`` not closed or not ACCEPTED, and the unfinished tickets that write a path it needs."""
+    ``waits_on`` not closed or not ACCEPTED, and the unfinished tickets that write a path it needs. A ``waits_on``
+    on the ticket itself is kept only with ``self_loop`` (the plan breaks and names it, W2-147); the launch check
+    leaves it out."""
     waits: list[Wait] = []
     for dep in ticket.depends_on:
         other = ctx.by.get(dep)
@@ -149,7 +152,7 @@ def hard_waits(ticket: Ticket, ctx: Context) -> list[Wait]:
             waits.append(Wait(ticket.id, other.id, DEPENDS_ON, other.id))
     for wid in ticket.waits_on:
         kind, target, met = ctx.resolve(wid)
-        if kind is not None and not met and target != ticket.id:
+        if kind is not None and not met and (self_loop or target != ticket.id):
             waits.append(Wait(ticket.id, target, WAITS_ON, wid))
     if ticket.needs:
         for other in sorted(ctx.tickets.values(), key=key):
@@ -213,7 +216,7 @@ def make_plan(root: Path, selected: list[str] | None = None) -> Plan:
     outside: dict[str, list[Wait]] = defaultdict(list)
     overrides: list[Override] = []
     for t in planned:
-        for wait in hard_waits(t, ctx):
+        for wait in hard_waits(t, ctx, self_loop=True):
             if t.override:
                 overrides.append(Override(t.id, wait.on, t.override, wait.code, wait.what))
             elif wait.on in ids:
@@ -290,9 +293,65 @@ def make_plan(root: Path, selected: list[str] | None = None) -> Plan:
     )
 
 
+def _components(left: set[str], outgoing: dict[str, set[str]], rank: dict[str, int]) -> list[list[str]]:
+    """The strongly connected components of ``left`` under ``outgoing`` (Tarjan's, iterative, visited by the key)."""
+    def after(n: str):
+        return iter(sorted(outgoing[n] & left, key=rank.__getitem__))
+
+    index: dict[str, int] = {}
+    low: dict[str, int] = {}
+    stack: list[str] = []
+    on_stack: set[str] = set()
+    found: list[list[str]] = []
+    for root in sorted(left, key=rank.__getitem__):
+        if root in index:
+            continue
+        index[root] = low[root] = len(index)
+        stack.append(root)
+        on_stack.add(root)
+        work = [(root, after(root))]
+        while work:
+            v, rest = work[-1]
+            for w in rest:
+                if w not in index:
+                    index[w] = low[w] = len(index)
+                    stack.append(w)
+                    on_stack.add(w)
+                    work.append((w, after(w)))
+                    break
+                if w in on_stack:
+                    low[v] = min(low[v], index[w])
+            else:
+                work.pop()
+                if work:
+                    low[work[-1][0]] = min(low[work[-1][0]], low[v])
+                if low[v] == index[v]:
+                    component = []
+                    while True:
+                        w = stack.pop()
+                        on_stack.discard(w)
+                        component.append(w)
+                        if w == v:
+                            break
+                    found.append(sorted(component, key=rank.__getitem__))
+    return found
+
+
+def _break_ticket(left: set[str], outgoing: dict[str, set[str]], rank: dict[str, int]) -> tuple[str, set[str]]:
+    """Where a stuck order breaks (DEC-1102): the first ticket by the key of the first cycle no other remaining
+    ticket leads into, and that cycle's tickets. Every remaining ticket waits on another, so such a component is a
+    cycle (or a self-loop), and every wait into its first ticket comes from inside it."""
+    components = _components(left, outgoing, rank)
+    of = {n: k for k, component in enumerate(components) for n in component}
+    fed = {of[v] for u in left for v in outgoing[u] & left if of[u] != of[v]}
+    first = min((c for k, c in enumerate(components) if k not in fed), key=lambda c: rank[c[0]])
+    return first[0], set(first)
+
+
 def _order(nodes: list[str], edges: dict[tuple[str, str], list], rank: dict[str, int]):
-    """The nodes in an order that respects the edges, ties by the fixed key; a cycle is broken at its first ticket
-    by the key, whose remaining incoming edges are returned as broken."""
+    """The nodes in an order that respects the edges, ties by the fixed key. A cycle is broken only inside its
+    strongly connected component, at the component's first ticket by the key: that ticket's incoming edges from
+    inside the component are returned as broken; a ticket outside every cycle keeps all its edges (DEC-1102)."""
     incoming: dict[str, set[str]] = defaultdict(set)
     outgoing: dict[str, set[str]] = defaultdict(set)
     for (u, v) in edges:
@@ -304,12 +363,12 @@ def _order(nodes: list[str], edges: dict[tuple[str, str], list], rank: dict[str,
     by_rank = {rank[n]: n for n in nodes}
     order, broken = [], {}
     while left:
-        if not ready:  # a cycle: its first ticket by the key goes first
-            node = min(left, key=rank.__getitem__)
-            for u in sorted(incoming[node], key=rank.__getitem__):
+        if not ready:  # a cycle: its component's first ticket by the key goes first
+            node, inside = _break_ticket(left, outgoing, rank)
+            for u in sorted(incoming[node] & inside, key=rank.__getitem__):
                 broken[(u, node)] = edges[(u, node)]
                 outgoing[u].discard(node)
-            incoming[node] = set()
+            incoming[node] -= inside
             heapq.heappush(ready, rank[node])
         node = by_rank[heapq.heappop(ready)]
         if node not in left:

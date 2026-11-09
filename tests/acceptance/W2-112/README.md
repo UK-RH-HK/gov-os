@@ -131,14 +131,14 @@ The measurement on the 20 visible questions and the 48 is the research document'
 
 | Test | Red reason on the base |
 |---|---|
-| `test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker` | green on the base (a private reranker, as today) |
-| `test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer` | the one load the base tries fails, so the search comes back unranked |
-| `test_a_service_that_does_not_answer_is_passed_over` (both parameters: full, silent; failure 1) | green on the base where Unix sockets are allowed (the base never asks a socket); **in a sandbox that refuses Unix sockets they fail at making the stand-in broken service** |
-| `test_a_service_that_answers_with_an_error_is_passed_over` (both parameters: error, garbage; failure 1) | as above |
-| `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back` | no service stays up after the first search |
+| `test_when_the_service_cannot_start_the_search_goes_on_unranked_and_starts_no_private_reranker` | green on the base (a private reranker, as today) |
+| `test_when_the_services_model_cannot_load_the_search_goes_on_unranked_named` | the one load the base tries fails, so the search comes back unranked |
+| `test_a_service_that_does_not_answer_leaves_the_search_unranked` (both parameters: full, silent; failure 1) | green on the base where Unix sockets are allowed (the base never asks a socket); **in a sandbox that refuses Unix sockets they fail at making the stand-in broken service** |
+| `test_a_service_that_answers_with_an_error_leaves_the_search_unranked` (both parameters: error, garbage; failure 1) | as above |
+| `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked` | no service stays up after the first search |
 | `test_a_service_killed_mid_run_leaves_every_search_answered` (the central case; failures 1, 2) | no service stays up after the first search |
-| `test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored` (both parameters: no reranker environment, no model loads) | green on the base (DEC-374) |
-| `test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error` (DEC-1034 item 4) | green on the base (the base never asks a socket) |
+| `test_where_no_reranker_can_load_the_order_given_is_kept_unscored` (both parameters: no reranker environment, no model loads) | green on the base (DEC-374) |
+| `test_a_session_that_cannot_make_a_unix_socket_goes_on_unranked_quickly_without_an_error` (DEC-1034 item 4) | green on the base (the base never asks a socket) |
 | `test_each_fallback_is_logged_under_the_users_cache_folder` | no file under `~/.cache/gov-os/` logs the fallback |
 | `test_w2_112_bundle.py::test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank` | the bundle has no `rerank` entry (only `merge.reranked: false`) |
 | `test_w2_112_bundle.py::test_gov_status_counts_the_searches_that_fell_back` | `gov status --json` has no count under a rerank entry |
@@ -220,15 +220,15 @@ How these cases read the note:
 
 | Test | Red reason on the base |
 |---|---|
-| `test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot` | the private reranker loads on the GPU without holding a slot in `GOV_RERANK_GPU_LOCK_DIR` |
-| `test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu` | the base ignores the slots: it reranks at once |
-| `test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees` | the private reranker loads 1.5 s before a slot frees |
+| `test_with_a_gpu_slot_free_and_the_service_unable_to_start_no_private_reranker_loads` | the private reranker loads on the GPU without holding a slot in `GOV_RERANK_GPU_LOCK_DIR` |
+| `test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting` | the base ignores the slots: it reranks at once |
+| `test_a_slot_that_frees_while_the_search_runs_is_taken_by_no_private_reranker` | the private reranker loads 1.5 s before a slot frees |
 | `test_a_fallback_never_runs_a_reranker_on_the_cpu` (both parameters: no-gpu, gpu-hidden) | the private reranker loads on the CPU |
-| `test_the_service_holds_one_of_the_two_gpu_slots` (DEC-1036 T6 (b)) | no service stays up after the first search |
-| `test_with_the_service_up_and_the_other_slot_held_a_fallback_waits_then_goes_on_unranked` (T6 (b)) | no service stays up after the first search |
+| `test_the_service_holds_every_gpu_slot` (DEC-1036 T6 (b)) | no service stays up after the first search |
+| `test_with_the_service_up_no_slot_is_left_and_a_failing_service_leaves_the_search_unranked_at_once` (T6 (b)) | no service stays up after the first search |
 | `test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` (T6 (b)) | the base ignores the slots: its private reranker scores the search |
 | `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason` (both parameters: service-down, no-service-yet; T6 (b)) | the base reranks the bundle (`merge.reranked: true`) |
-| `test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down` | the bundle has no `rerank` entry |
+| `test_w2_112_bundle.py::test_the_bundle_is_unranked_and_names_the_service_unavailable_when_the_service_is_down` | the bundle has no `rerank` entry |
 | `test_w2_112_retirement_act.py` (four cases, KPI 7 as re-baselined by DEC-1048, P-W2-112-F9 (c): §5 records that the module and its `.pth` are not retired by an ACT now and stay as the machine-wide guard, whatever a tree's commit; that they are retired only when old code fails closed by construction, in a later ticket; no step removes the module or its `.pth` now; no step removes the slot lock files, unchanged from review round 1, F1) | there is no `docs/research/W2-112-shared-reranker.md` in this worktree; against the record at `7fafe8f2798f` (still the retirement ACT) the first three fail for that reason (no sentence says the module is not retired now; none ties its retirement to old code failing closed; two steps remove the module or its `.pth`) and the fourth passes |
 
 The GPU-slot stopgap (ACT-RERANK-GPU-SLOTS-1's module and its `gov-reranker-gpu-slot.pth`) is the subject of the
@@ -249,8 +249,8 @@ installed `gov`'s re-pin, every other tree): there is no retirement precondition
 
 | KPI | Tests |
 |---|---|
-| Failure 1: a search that fails, hangs, or returns another session's scores because of the service | `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_requests_are_answered_in_arrival_order`, `test_a_search_with_more_texts_than_the_cap_still_answers`, `test_a_request_past_its_time_limit_does_not_hold_the_search`, `test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model`, `test_a_service_that_does_not_answer_is_passed_over`, `test_a_service_that_answers_with_an_error_is_passed_over`, `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_a_service_killed_mid_run_leaves_every_search_answered`, `test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error`, `test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu` |
-| Failure 2: two services started at once, or a socket another user can open | `test_two_searches_starting_together_start_one_service`, `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu`, `test_the_service_holds_one_of_the_two_gpu_slots`, `test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port`, `test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_a_service_killed_mid_run_leaves_every_search_answered` |
+| Failure 1: a search that fails, hangs, or returns another session's scores because of the service | `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_requests_are_answered_in_arrival_order`, `test_a_search_with_more_texts_than_the_cap_still_answers`, `test_a_request_past_its_time_limit_does_not_hold_the_search`, `test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model`, `test_a_service_that_does_not_answer_leaves_the_search_unranked`, `test_a_service_that_answers_with_an_error_leaves_the_search_unranked`, `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_a_service_killed_mid_run_leaves_every_search_answered`, `test_a_session_that_cannot_make_a_unix_socket_goes_on_unranked_quickly_without_an_error`, `test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting` |
+| Failure 2: two services started at once, or a socket another user can open | `test_two_searches_starting_together_start_one_service`, `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu`, `test_the_service_holds_every_gpu_slot`, `test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port`, `test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_a_service_killed_mid_run_leaves_every_search_answered` |
 | Failure 3: answers that differ from a private reranker's on the same inputs and device | `test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_candidates_the_service_scores_alike_keep_the_order_given`, `test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` |
 
 Every session is bounded (hung at 120 s; a fallback within 20 s plus any slot wait), and every scored result in
@@ -258,13 +258,56 @@ the suite is checked against a private reranker's order and scores.
 
 ## What fails inside the launch sandbox for that reason alone
 
-Where `socket(AF_UNIX)` is refused, the four broken-service cases (`test_a_service_that_does_not_answer_is_passed_over`
-`[full]`, `[silent]`, `test_a_service_that_answers_with_an_error_is_passed_over[error]`, `[garbage]`) fail at
+Where `socket(AF_UNIX)` is refused, the four broken-service cases (`test_a_service_that_does_not_answer_leaves_the_search_unranked`
+`[full]`, `[silent]`, `test_a_service_that_answers_with_an_error_leaves_the_search_unranked[error]`, `[garbage]`) fail at
 making the stand-in, whatever the code; on the base they pass elsewhere. Once the service exists, every case that
 needs it running (the service, concurrency, answers, GPU service cases, the service's GPU slot, the killed and
 failing service cases, and the service-naming bundle case) would also fail inside that sandbox for this reason
 alone. The four memory-release cases (DEC-1068's note) are the exception: they carry the box's Unix sockets over
 loopback TCP there, and run red or green for the release itself.
+
+## Revised by W2-145 (DAEO-2tfd): no private reranker beside the shared service
+
+Rewrite-Reason: DEC-1048 (5) (with DEC-1046 (1), DEC-1097 (8)), by W2-145's independent test designer, before its
+engineer; they land with the engineer's change (G-1). A search the shared service cannot answer now keeps the order
+given, named `unavailable` with the service's failure, and starts no private reranker (W2-145 S1, S2); it never waits
+for a GPU slot after the service's own refusal (S4); the service holds every GPU slot for its life (S3). The tables
+above carry the new node ids; their "red reason on the base" column is W2-112's history and is not rewritten. The
+in-process reference reranker the answer cases compare the service with stays (a reference, not a fallback):
+`test_w2_112_answers.py` and `test_w2_112_memory_release.py` are unchanged, as are `test_w2_112_service.py`, the
+record and retirement cases. On integrate (before W2-145's engineer) each revised case below is red for the old
+premise's reason: a private reranker answers, waits for a slot, or the service holds one slot of two.
+
+| File | Case (new node id) | Old premise | New premise |
+|---|---|---|---|
+| `test_w2_112_fallback.py` | `test_when_the_service_cannot_start_the_search_goes_on_unranked_and_starts_no_private_reranker` (was `…falls_back_to_a_private_reranker`) | a private reranker answers | the order given, named, no model loaded |
+| `test_w2_112_fallback.py` | `test_when_the_services_model_cannot_load_the_search_goes_on_unranked_named` (was `…still_gets_a_private_rerankers_answer`) | a private reranker answers | unranked, named; one load attempted (the service's) |
+| `test_w2_112_fallback.py` | `test_a_service_that_does_not_answer_leaves_the_search_unranked` (full, silent; was `…is_passed_over`) | a private reranker answers | unranked, named, no model loaded |
+| `test_w2_112_fallback.py` | `test_a_service_that_answers_with_an_error_leaves_the_search_unranked` (error, garbage; was `…is_passed_over`) | a private reranker answers | unranked, named, no model loaded |
+| `test_w2_112_fallback.py` | `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked` (was `…and_the_search_falls_back`) | a process other than the service scores it | unranked, named; only the service scored; no other load |
+| `test_w2_112_fallback.py` | `test_a_service_killed_mid_run_leaves_every_search_answered` (same id) | at least one search answered by a private on a slot | each scored by the service before the kill or unranked, named; no load but a shared service's |
+| `test_w2_112_fallback.py` | `test_where_no_reranker_can_load_the_order_given_is_kept_unscored` (was `test_where_no_private_reranker_can_start_either_…`) | no private could start either | no reranker can load: unranked, named; at most the service's one load attempt |
+| `test_w2_112_fallback.py` | `test_a_session_that_cannot_make_a_unix_socket_goes_on_unranked_quickly_without_an_error` (was `…falls_back_quickly…`) | its private reranker answers | unranked, named, nothing scored or loaded |
+| `test_w2_112_fallback.py` | `test_each_fallback_is_logged_under_the_users_cache_folder` (same id) | the log mentions the fallback (private taken) | the log says unranked or unavailable, never private |
+| `test_w2_112_slots.py` | `test_with_a_gpu_slot_free_and_the_service_unable_to_start_no_private_reranker_loads` (was `…the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot`) | a private loads on the free slot | nothing loads; no slot held after |
+| `test_w2_112_slots.py` | `test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting` (was `…a_fallback_waits_then_goes_on_unranked…`) | the search waits the slot wait | it comes back within CONNECT_S + 1 s |
+| `test_w2_112_slots.py` | `test_a_slot_that_frees_while_the_search_runs_is_taken_by_no_private_reranker` (was `test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees`) | a private takes the slot that frees | nothing takes it |
+| `test_w2_112_slots.py` | `test_a_fallback_never_runs_a_reranker_on_the_cpu` (no-gpu, gpu-hidden; same id) | no load on the CPU | no load at all |
+| `test_w2_112_slots.py` | `test_the_service_holds_every_gpu_slot` (was `test_the_service_holds_one_of_the_two_gpu_slots`) | the service holds 1 of 2 | it holds 2 of 2 within 3 s |
+| `test_w2_112_slots.py` | `test_with_the_service_up_no_slot_is_left_and_a_failing_service_leaves_the_search_unranked_at_once` (was `…the_other_slot_held_a_fallback_waits…`) | the test takes the other slot; a fallback waits for it | the test can take none; the failing service's search is unranked at once |
+| `test_w2_112_slots.py` | `test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` (same id) | two slot waits allowed (the service's, then a private's) | one wait (the service's) plus CONNECT_S + 1 s; the reason names the slot |
+| `test_w2_112_gpu.py` | `test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu` (both; same id) | a private's answer on a slot accepted | unranked, named with the GPU's reason; no load |
+| `test_w2_112_gpu.py` | `test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder` (both; same id) | the log mentions a fallback (private taken) | the log names the unranked search and its reason, never private |
+| `test_w2_112_bundle.py` | `test_the_bundle_is_unranked_and_names_the_service_unavailable_when_the_service_is_down` (was `test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down`) | reranked by a private on the GPU | `merge.reranked` false, `rerank` unavailable naming the service, never private |
+| `test_w2_112_bundle.py` | `test_gov_status_counts_the_searches_that_fell_back` (same id) | both bundles reranked by a private | both unranked; still counted |
+| `test_w2_112_bundle.py` | `test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason` (both; same id) | reranked by a private, or unranked | unranked only, named with the GPU's reason, no load |
+| `test_w2_112_bundle.py` | `test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason` (both; same id) | the reason names the slot a fallback waited for | service-down: the reason names the service; no-service-yet: the slot; no load |
+| `test_w2_112_concurrency.py` | `test_a_request_past_its_time_limit_does_not_hold_the_search` (same id) | a private reranker scores it, within 20 s more | unranked, named, within the limit + 1 s; only the service scored |
+| `w2_112_support.py` | (helper) | `FALLBACK_S` 20 s (a private's start) | `UNRANKED_S` 10 s; `check_named_unavailable`, `strays`, `outcome_of` added; the "private" helpers named as the reference |
+| `w2_112_session.py` | (helper) | — | reports `last_outcome()` after a search |
+
+Like the service cases, every revised case that plants a broken service or warms the real one needs Unix sockets:
+run outside the launch sandbox (the EPERM case, the blocked-socket cases and the no-environment case run anywhere).
 
 ## Earlier tests this ticket would turn red
 
@@ -291,10 +334,10 @@ memory-release cases, in no opt-in list, are mapped to success 6 in that section
 | S1: One reranker process serves every session on the machine: the same pinned model, revision and environment as today (ADR-0002 §2, DEC-397), list... | `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_gpu.py::test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu` | the ticket's words |
 | S2: Many sessions at once: 20 concurrent searches are answered by that one process, each with its own scores for its own texts, in arrival order, w... | `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_concurrency.py::test_requests_are_answered_in_arrival_order`, `test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search` | the ticket's words |
 | S3: The same answers: for the same inputs on the same device, the order and the scores match a private reranker's (within float rounding; ties keep... | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_candidates_the_service_scores_alike_keep_the_order_given`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
-| S4: If the service is down (it cannot start, does not answer within about 2 s, or answers with an error), the search falls back to a private rerank... | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker`, `test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error` | the ticket's words |
+| S4: If the service is down (it cannot start, does not answer within about 2 s, or answers with an error), the search falls back to a private rerank... | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_goes_on_unranked_and_starts_no_private_reranker`, `test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_goes_on_unranked_quickly_without_an_error` | the ticket's words |
 | S5: Measured, in docs/research/W2-112-shared-reranker.md: memory with 10 concurrent searches before and after (today up to 9 rerankers, 9.4 GiB at ... | `test_w2_112_record.py::test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times` | the ticket's words |
-| S6: The service runs its one model on the GPU, within the GPU budget (DEC-1032: the embedder first, about 3.5 GB; the shared reranker second, about... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
-| S7: When it lands, the stopgap that caps private rerankers on the GPU (the `gov-reranker-gpu-slot.pth` in the reranker environment, ACT-RERANK-GPU-... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
-| F1: A search that fails, hangs, or returns another session's scores because of the service. | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
+| S6: The service runs its one model on the GPU, within the GPU budget (DEC-1032: the embedder first, about 3.5 GB; the shared reranker second, about... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
+| S7: When it lands, the stopgap that caps private rerankers on the GPU (the `gov-reranker-gpu-slot.pth` in the reranker environment, ACT-RERANK-GPU-... | `test_w2_112_slots.py::test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting`, `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
+| F1: A search that fails, hangs, or returns another session's scores because of the service. | `test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked`, `test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F2: Two services started at once, or a socket another user can open. | `test_w2_112_service.py::test_two_searches_starting_together_start_one_service`, `test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered` | the ticket's words |
 | F3: Answers that differ from a private reranker's on the same inputs and device. | `test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` | the ticket's words |
