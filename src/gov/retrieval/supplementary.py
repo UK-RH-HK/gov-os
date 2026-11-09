@@ -9,7 +9,7 @@ and the chunks of its batch from it on are named as left for a further batch. Wh
 chunk, or is none at all, the next ranked chunks, one batch at most, are named instead (DEC-1025 item 2).
 
 Role separation (W2-13 S5, DEC-1065 (2)): a chunk the caller's role may not be handed (``GOV_ROLE``, ``GOV_TICKET``,
-the main tree's ``role_paths:``; ``gov.guard.role_paths``) is never ranked; where a filter applies, the block's
+the main tree's ``role_paths:``; ``gov.util.role_paths``) is never ranked; where a filter applies, the block's
 ``role_filter`` counts what was withheld by rule, and one entry of ``dropped`` (id ``role_filter``) says it in a line,
 so the packet names it. Role paths that cannot be read raise: the packet's block is then empty and names why.
 """
@@ -53,8 +53,8 @@ def _ranked(root: Path, words: list[str], skip_paths: set, skip_entries: set,
     role may not be handed (``withhold``, which counts them), of a record that no longer stands, or of a register
     entry that is in ``skip_entries`` or is not current; and W2-55's ``left_out``."""
     from gov import records
-    from gov.decisions.register import leave_out
     from gov.retrieval import authority, lexical
+    from gov.util.register import leave_out
 
     holders: dict[str, set] = {}
     where: dict[str, tuple] = {}  # chunk id -> its path and the first line a word was found on
@@ -127,7 +127,7 @@ def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), 
     "supplementary_batches", "left_out"}``, each batch the ranked items it read and its limit, in the order taken.
     ``Unavailable`` where the lexical index does not answer."""
     from gov.context import _tokens
-    from gov.guard import role_paths
+    from gov.util import role_paths
 
     asked = query(title, kpis)
     # W2-13 S5: GOV_ROLE, a --role beside it (``role``: adds, never lifts) and GOV_TICKET; RolePathsError when unreadable
