@@ -20,6 +20,10 @@ allowed_paths:
 - src/gov/adapters/portability.py
 - tests/unit/launch/test_w2_153*
 - tests/unit/adapters/test_w2_153*
+- tests/unit/launch/test_runs.py
+- tests/unit/launch/test_w1_28.py
+- tests/unit/launch/test_w1_32.py
+- tests/unit/launch/test_w2_136_plan_check.py
 - governance/project/orchestration/tools/dispatch/launch_now.sh
 - .rulesync/subagents/*.md
 - template/.rulesync/subagents/*.md
@@ -66,5 +70,13 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
   test designer's `test-design` only once W2-128 has reconciled that skill with DEC-963 (review F7): until then it is
   left out and the case says so.
 - **The copies** are written only by the ACT (DEC-315): this ticket commits no `.claude/` file.
+
+- **Decided after the build (2026-11-10, the CTO, DEC-1112 (3)):**
+  - The source's skills list sits under `claudecode: skills:`, because rulesync 24.0.0 passes `skills` to the
+    generated agent only there. A top-level `skills:` is dropped, so the agents would preload nothing.
+  - The existing launcher unit tests whose fixtures start a session (`test_runs.py`, `test_w1_28.py`, `test_w1_32.py`,
+    `test_w2_136_plan_check.py`) write the role's `.claude/templates/<stem>.md` in their fixture. W2-136's case that
+    the caller's arguments end the argv now allows the one appended flag. Paths added. Refusing only when the folder
+    exists was not taken: it would fail open against F1.
 
 **Not here:** the templates' text (W2-128); `gov brief` (W2-152).
