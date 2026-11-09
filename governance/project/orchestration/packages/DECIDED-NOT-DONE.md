@@ -105,7 +105,10 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 64 | D-5 (the templates) | IN PROGRESS: W2-128 round 1 merged 11-09 (`c6aefae9`, accept 92/92, review READY; the lead brief pointed at the role templates); next: round 2 (TPL-4, TPL-6, review F6-F8); WAITS: the owner on the templates' approval, the `.claude/` copies ACT and TPL-6's Appendix A |
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
-| 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
+| 67 | the launch script for the independent sessions, tests first | **MERGED 11-09** W2-149 (`b4de529b`, accept 77/77, review READY round 2) |
+| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | IN PROGRESS: preparing; next: the operator applies; WAITS: before the first real writer run |
+| 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | NOT STARTED: next after ACT-SETS-GLOBS-1 |
+| 76 | ACT-OPERATOR-2 | the operator agent re-installed to carry the replay check (`a170641e`) | NOT STARTED |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS: merged 11-09 (`a170641e`); next: ACT-OPERATOR-2 re-installs the agent to carry it; WAITS: the call log's 48 h of history (about 11-11 18:16Z) before path-map ACTs go through the agent |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
