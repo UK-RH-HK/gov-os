@@ -14,6 +14,9 @@ prints one JSON object: {"class": "a"|"b"|"O", "files": [...], "hits": [...], "w
 - apply.sh, the manifest's `commands` and its checks' cmds are scanned: sudo, git push, git tag, history prunes, rm
   outside the project and Windows-side steps raise the class to (O); installs and network calls to non-local hosts to
   (b).
+- Shell reserved words (`then`, `do`, `else`, `{`, `!` ...) are stepped over like `env`, so a command after them is
+  scanned as the command it is.
+- An empty touched list with any command (in `commands` or `apply.sh`) is at least (b): an effect with no file trace.
 - The ACT's class is the highest among its files and its hits. Fails closed: a manifest it cannot read is (O).
 Standalone: the standard library and PyYAML.
 """
@@ -195,6 +198,10 @@ def list_class(row, before, after):
 # ------------------------------------------------------------------------------------------------------ script hits
 WRAPPERS = {"env", "nohup", "setsid", "timeout", "nice", "ionice", "exec", "command", "time", "stdbuf", "taskset",
             "flock", "xargs", "builtin", "chrt"}
+# Shell reserved words and grouping marks stepped over at a command's head, as the wrappers are (review F1): the
+# command after `then`, `do`, `else`, `{`, `!` ... is the one that runs.
+RESERVED = {"if", "then", "else", "elif", "fi", "do", "done", "while", "until", "esac", "{", "}", "(", ")", "!",
+            "coproc"}
 INSTALLERS = {"pip", "pip3", "pipx", "uv", "npm", "yarn", "pnpm", "apt", "apt-get", "dnf", "yum", "brew", "cargo",
               "gem", "go", "conda", "mamba", "snap", "flatpak", "dpkg", "rpm", "poetry"}
 NETWORK = {"curl", "wget", "aria2c", "ssh", "scp", "sftp", "ftp", "nc", "ncat", "telnet", "http", "https"}
@@ -258,7 +265,19 @@ def strip_wrappers(toks):
     while i < len(toks):
         t = toks[i]
         b = os.path.basename(t)
-        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t):
+        if t in RESERVED:
+            i += 1
+        elif t in ("for", "select"):
+            # `for x in a b; do cmd`: the header names no command; a `do` on the same segment starts one
+            rest = toks[i + 1:]
+            if "do" not in rest:
+                return []
+            i += 1 + rest.index("do") + 1
+        elif t == "case":
+            return []                      # `case x in`: a header, no command
+        elif t == "function":
+            i += 2                         # `function name {`
+        elif re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t):
             i += 1
         elif b in ("sudo", "doas"):
             return toks[i:]
@@ -389,6 +408,28 @@ def scan_segment(toks, out, depth=0):
             out.append(("rm-outside", joined))
 
 
+TRIVIAL = {"exit", "true", ":", "set", "echo", "printf", "shift", "return", "local", "readonly", "export", "cd",
+           "[", "[[", "test", "]", "]]"}
+
+
+def has_command(text):
+    """True when a shell text runs anything beyond the trivial built-ins (exit, set, echo, cd, test ...); a line it
+    cannot tokenise counts as a command (fail closed)."""
+    if not isinstance(text, str):
+        return False
+    for line in re.sub(r"\\\n", " ", text).splitlines():
+        if not line.strip() or line.strip().startswith("#"):
+            continue
+        segs = segments(line)
+        if segs is None:
+            return True
+        for seg in segs:
+            toks = strip_wrappers(seg)
+            if toks and os.path.basename(toks[0]) not in TRIVIAL:
+                return True
+    return False
+
+
 def scan_text(text, out, depth=0):
     if not isinstance(text, str):
         return
@@ -455,7 +496,8 @@ def classify_manifest(manifest, bundle=None, rules=None):
             cls, w = row["class"], row.get("why", "")
         files.append({"root": root, "path": path, "class": cls, "row": row.get("id"), "why": w})
     texts = []
-    if bundle and os.path.isfile(os.path.join(bundle, "apply.sh")):
+    apply_held = bool(bundle and os.path.isfile(os.path.join(bundle, "apply.sh")))
+    if apply_held:
         with open(os.path.join(bundle, "apply.sh"), encoding="utf-8", errors="replace") as f:
             texts.append(f.read())
     cmds = manifest.get("commands") or []
@@ -468,6 +510,9 @@ def classify_manifest(manifest, bundle=None, rules=None):
     raw = []
     for t in texts:
         scan_text(t, raw)
+    apply_text = texts[0] if apply_held else ""
+    if not touched and (any(has_command(c) for c in cmds) or has_command(apply_text)):
+        raw.append(("commands-only", "an empty touched list with commands: an effect with no file trace"))
     hit_class = rules.get("hits") or {}
     seen = set()
     for kind, line in raw:

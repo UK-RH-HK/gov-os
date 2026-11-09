@@ -125,6 +125,43 @@ def test_script_hits_raise_the_class(tmp_path, cmd, want):
     assert bundle(tmp_path, {("home", ".cache/gov-os/x"): (b"x", b"y")}, commands=[cmd])["class"] == want
 
 
+@pytest.mark.parametrize("cmd,want", [
+    ("if true; then sudo systemctl restart x; fi", "O"),
+    ("for r in a b; do git push origin $r; done", "O"),
+    ("{ git tag v1; }", "O"),
+    ("if [ -d ~/x ]; then rm -rf ~/x; fi", "O"),
+    ("for u in a; do curl -s https://example.com/$u; done", "b"),
+    ("if ! python3 -c 'import x'; then pip install x; fi", "b"),
+    ("! git push", "O"),
+    ("if false; then :; else git push; fi", "O"),
+    ("if a; then b; elif c; then git push; fi", "O"),
+    ("while true; do git push; break; done", "O"),
+    ("until git push; do sleep 1; done", "O"),
+    ("( git tag v2 )", "O"),
+    ("for r in a b\ndo\n  git push origin $r\ndone", "O"),
+    ("f() {\n  git push\n}\nf", "O"),
+    ("function g { sudo true; }", "O"),
+    ("bash <<'EOF'\ngit push origin main\nEOF", "O"),
+    ("case $x in\n  y) git tag v3 ;;\nesac", "O"),
+    ("for u in a b; do curl -s http://127.0.0.1:11434/api/$u; done", "a"),
+    ("if true; then echo do then else; fi", "a"),
+])
+def test_reserved_words_are_stepped_over(tmp_path, cmd, want):
+    """F1: a command after a shell reserved word gives its hit, in commands and in apply.sh."""
+    assert bundle(tmp_path / "c", {("home", ".cache/gov-os/x"): (b"x", b"y")}, commands=[cmd])["class"] == want
+    assert bundle(tmp_path / "s", {("home", ".cache/gov-os/x"): (b"x", b"y")},
+                  apply_sh="#!/bin/bash\n" + cmd + "\n")["class"] == want
+
+
+def test_an_empty_touched_list_with_commands_is_at_least_b(tmp_path):
+    """F14: commands with no file trace are never (a)."""
+    r = bundle(tmp_path / "c", {}, commands=["curl -s http://127.0.0.1:11434/api/pull -d '{\"name\": \"m\"}'"])
+    assert r["class"] == "b" and any(h["kind"] == "commands-only" for h in r["hits"])
+    assert bundle(tmp_path / "s", {}, apply_sh="#!/bin/bash\nollama pull m\n")["class"] == "b"
+    assert bundle(tmp_path / "n", {})["class"] == "a"                           # nothing at all: nothing governs agents
+    assert bundle(tmp_path / "t", {}, apply_sh="#!/bin/bash\nset -eu\ncd \"$(dirname \"$0\")\"\nexit 0\n")["class"] == "a"
+
+
 def test_a_hit_in_apply_sh_and_the_highest_file_win(tmp_path):
     r = bundle(tmp_path, {("home", ".cache/gov-os/x"): (b"x", b"y"),
                           ("repo", "tests/optin-a.txt"): (b"a\nb\n", b"a\n"),

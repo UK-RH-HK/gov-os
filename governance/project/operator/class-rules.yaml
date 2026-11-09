@@ -221,3 +221,6 @@ hits:
   install: b
   network: b
   session: b
+  # an empty touched list with any command: an effect with no file trace (a model pull, a server call) is at least
+  # (b), never (a) (review F14)
+  commands-only: b
