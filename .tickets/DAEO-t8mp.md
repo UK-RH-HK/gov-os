@@ -128,12 +128,12 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
 - **Files:** `template/governance/kernel/templates/` holds `brief.md` (T-0), `ticket.md` (T-1, replacing today's),
   `role-research.md`, `role-product-spec.md`, `role-test-designer.md`, `role-engineer.md`, `role-reviewer.md`,
   `role-lead.md`, `role-cto.md` (T-2 to T-8). Each opens with front matter holding `name` (the file's stem),
-  `version` (semver) and `role`; T-1's ticket skeleton follows in its body as one fenced `yaml` block. The record
+  `version` (semver) and `role` (a plain string, `any` for T-0 and T-1, never a placeholder); T-1's ticket skeleton follows in its body as one fenced `yaml` block. The record
   templates `checkpoint.md`, `decision-record.md`, `decision-package.md`, `failure.md`, `lesson.md`, `research.md` stay
   and gain the link lines. `brief-*.md` become one-line pointers to the template that replaces each.
 - **Placeholders:** `{KEY}` or `{KEY: description}` with KEY in `[A-Z][A-Z0-9_]*`, plus `{CMD:name}` (a key of
   facts.yaml's `commands`) and `{STEP:name}` (a key of its `steps`); lower-case braces such as `{path: …}` are not
-  placeholders. **The key list** TPL-3's generator will read is `template/governance/kernel/templates/keys.yaml`, one
+  placeholders; no other family (R3's `{FACT:…}` is not used: a fact is a KEY or a `CMD:`). **The key list** TPL-3's generator will read is `template/governance/kernel/templates/keys.yaml`, one
   top-level `keys:` list of KEY names (the Appendix's, and any the templates add).
 - **The facts file** `governance/project/facts.yaml` validates against `template/governance/kernel/schemas/facts.schema.json`
   (JSON Schema 2020-12, as the other schemas). Top-level keys: `paths` (name → path), `commands` (name →
@@ -144,6 +144,6 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
 - **Prose size (TPL-1 S2):** the body after the front matter, less fenced code blocks and table lines (lines starting
   `|`), in characters; T-0 measured unfilled.
 - **The ticket schema:** `non_goals: [str]`; a KPI line either a string or `{line: str, verify: str}`; `reads: [str]`,
-  `needs: [str]`, `waits_on: [{on: <id or record path>, reason: <one line>}]`, all optional in the schema (the old
+  `needs: [str]`, `waits_on:` items either a string or `{ref: <id or record path>, reason: <one line>}` (the key is `ref`, never `on`, which YAML 1.1 reads as `true`; strings keep DAEO-2bdu valid; the CTO's P1 (b) and P2 (a) on the designer's D1 and D2, 2026-11-09, DEC-1109 (2)), all optional in the schema (the old
   tickets stay valid; the ready check, round 2, requires them on new tickets). **The lesson, failure and research
   schemas:** optional `sources: [str]`; research also optional `decisions: [str]`.
