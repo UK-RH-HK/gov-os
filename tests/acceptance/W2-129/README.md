@@ -9,7 +9,7 @@ the same loader, decisions, CLI and accept code, DEC-963).
 for its failure lines. (The brief counted thirteen and called never-a-gate S11 and the timing S12; in the ticket's
 order they are **S13** and **S15**, and "any repository" is S14.) **S16** is the ticket-changes line DEC-1088 (6)
 added after them. **S17** (planted ids in test fixtures) and its failure line **F7** are D-6 part 2's (DEC-1109 (2),
-DEC-1098 (3) row 24).
+DEC-1098 (3) row 24). **S18** (a settlement is a change) is D-6 part 2 item F2's round 2 (DEC-866 (1), DEC-1109 (2)).
 
 ## How they run
 
@@ -216,6 +216,12 @@ cases, `there is no gov.links package`. The four greens are two premises and the
 | S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_a_python_test_file_that_does_not_parse_is_judged_as_today` | green (guard) | a syntax error in the file: DEC-988 in its "literal" gives UNKNOWN_ID, DEC-107 there is carried |
 | S17, F7 | `test_w2_129_fixtures.py::test_s17_guard_a_line_with_the_id_in_a_literal_and_in_a_trailing_comment_is_judged` | green (guard) | `WINDOW = "DEC-107"  # DEC-107 ...` is carried; `RECORD = "...DEC-989.md"  # DEC-989 ...` gives UNKNOWN_ID |
 | S17 | `test_w2_129_fixtures.py::test_s17_w2_55_propagation_still_names_the_planted_literal_lines` | green (guard) | `python3 -m gov.decisions.propagation` in the planted repository exits 1 and still names both literal lines |
+| S18 | `test_w2_129_settles.py::test_s18_an_unmarked_settles_label_gives_unmarked_change_naming_both_ids` | red | today: no UNMARKED_CHANGE for DEC-140 <- DEC-141 (`**Settles:** DEC-140`, DEC-140's status line naming nobody; the loader reads it as `settle`, premise); after: one in the register within either entry, and `--all --json` gives ids [DEC-140, DEC-141] in the order the run gives DEC-101 <- DEC-102's |
+| S18 | `test_w2_129_settles.py::test_s18_propose_marks_adds_changed_by_dec_141_to_dec_140_s_status_line` | red | today: the applied patch leaves DEC-140's status line bare; after: `**Changed by:**` and DEC-141 on it, DEC-142's line untouched, and committed, `--all` names DEC-140 in no UNMARKED_CHANGE |
+| S18 | `test_w2_129_settles.py::test_s18_guard_a_marked_or_proposed_change_gives_no_unmarked_change[settled-entry-names-its-settler]` | green (guard) | DEC-142's status line has `**Changed by:** DEC-143`, DEC-143 settles it: no UNMARKED_CHANGE naming DEC-142; the control DEC-101 <- DEC-102 is found |
+| S18 | `test_w2_129_settles.py::test_s18_guard_a_marked_or_proposed_change_gives_no_unmarked_change[proposed-settles]` | green (guard) | as above: the PROPOSED DEC-145 settles DEC-144 |
+| S18 | `test_w2_129_settles.py::test_s18_guard_a_marked_or_proposed_change_gives_no_unmarked_change[proposed-supersedes]` | green (guard) | as above: the PROPOSED DEC-147 supersedes DEC-146 (the same rule for the other forms, in the same run) |
+| S18 | `test_w2_129_settles.py::test_s18_guard_every_other_finding_is_unchanged` | green (guard) | every finding naming none of DEC-140 to DEC-147 is the base `--all` run's (code, first field, path, line, role): the five unmarked changes and every other code and count unchanged |
 | F1 | `test_w2_129_sources.py::test_s13_no_close_queue_landing_launch_claim_readiness_or_hook_module_calls_gov_links` | green (guard) | as S13 |
 | F2 | `test_w2_129_command.py::test_s1_writes_nothing_but_its_mark_the_head_it_judged` | red | as S1 |
 | F2 | `test_w2_129_command.py::test_s1_starts_only_git_opens_no_socket_and_writes_only_the_mark` | red | as S1 |
@@ -267,6 +273,17 @@ fail on the planted literal ids still reported (UNKNOWN_ID at `test_s17_planted.
 at `:11`), each after its control in the same run is found. S1 to S16 are unchanged; repository A itself is unchanged,
 so S7's "no other ENFORCES_SUPERSEDED" holds as before.
 
+**S18, the fifth pass (D-6 part 2 item F2's round 2; DEC-866 (1), DEC-1109 (2)).** 6 cases (4 functions) in
+`test_w2_129_settles.py`, written on `w2/W2-129-f2-tests` from `w2/integrate` at `7aaece52e`. One planted commit
+(`Task: decision-record`) on a copy of repository A appends eight entries after DEC-133, so no line of A moves:
+DEC-141 `**Settles:** DEC-140` (unmarked), DEC-143 `**Settles:** DEC-142` with DEC-142 `**Changed by:** DEC-143`
+(marked), the PROPOSED DEC-145 `**Settles:** DEC-144` and the PROPOSED DEC-147 `**Supersedes:** DEC-146`. One
+`gov links --all` and one `--all --json` run on it; the base is S9's `--all` on repository A. Run in the launch
+sandbox through the heavy slot with the same options: the 6 give **2 failed, 4 passed**; the two reds fail on the
+missing UNMARKED_CHANGE for DEC-140 <- DEC-141 (after the loader premise and the control DEC-101 <- DEC-102 pass) and
+on DEC-140's bare status line after the marks patch. S1 to S17 and `statement_pairs` (S8's oracle, supersede and
+amend) are unchanged; repository A itself is unchanged.
+
 ## The interface the tests assume
 
 - **The command:** `src/gov/links/command.py` (`gov.links.command`), a read command, options `--since <rev>`,
@@ -307,6 +324,14 @@ so S7's "no other ENFORCES_SUPERSEDED" holds as before.
   | independent-test-designer | <fix>`); the first field holds the id. `python3 -m gov.decisions.propagation`, run in
   the repository, still prints every line it printed before (W2-55's module is not changed; the filter is in
   `gov links`' carrying).
+- **S18's line (DEC-866 (1), DEC-1109 (2)):** a register statement the loader's `register_statements` gives the class
+  `settle` (`**Settles:** DEC-x` in DEC-y's status line), from an entry that is not PROPOSED, to an entry whose own text
+  names neither DEC-y nor any changer, gives `UNMARKED_CHANGE <DEC-x> ... <DEC-y> ... | docs/DECISION_REGISTER.md:<a
+  line of DEC-x's or DEC-y's entry> | <role> | <fix>`, both ids as whole words in the first field; in `--json` its
+  `ids` are exactly DEC-x and DEC-y, in the order the same run gives a supersession's (changed, changer), and its
+  `path` the register. `--propose-marks` adds `**Changed by:** DEC-y` to DEC-x's status line (the first line under
+  its heading that is not blank). An entry already naming DEC-y (`**Changed by:** DEC-y`) or a PROPOSED settling or
+  superseding entry gives none; every finding naming no planted S18 id is the same as without the S18 entries.
 
 ## Notes and limits
 
@@ -351,4 +376,4 @@ so S7's "no other ENFORCES_SUPERSEDED" holds as before.
 - `conftest.py`: the session's repositories, a copy per test, and the three shared runs.
 - `test_w2_129_findings.py` (S2 to S8), `test_w2_129_command.py` (S1, S9, S11, S14),
   `test_w2_129_incremental.py` (S10, F5), `test_w2_129_patches.py` (S12), `test_w2_129_sources.py` (S8, S13),
-  `test_w2_129_tickets.py` (S16), `test_w2_129_fixtures.py` (S17, F7).
+  `test_w2_129_tickets.py` (S16), `test_w2_129_fixtures.py` (S17, F7), `test_w2_129_settles.py` (S18).
