@@ -3,8 +3,8 @@
 Each skill is compared, whole, with the reference commit's text (``w2_142_support.reference``):
 - the retrieval skill with its step 7 paragraph (from the line starting ``7.`` to the blank line after it) taken
   out and its ``version:`` line set aside must equal the reference with its ``version:`` line set aside;
-- the discovery skill with line 55 cut back to the reference's text must equal the reference exactly (its version
-  included: S2 names no version change, and the ticket applies §3.2 "exactly").
+- the discovery skill with line 55 cut back to the reference's text and its ``version:`` line set aside must equal
+  the reference with its ``version:`` line set aside (S2 bumps its version, DEC-1097 (8)).
 """
 
 from __future__ import annotations
@@ -28,10 +28,11 @@ def test_f1_the_retrieval_skill_is_the_reference_but_for_step_7_and_its_version(
         "the retrieval skill changed outside step 7 and its version line")
 
 
-def test_f1_the_discovery_skill_is_the_reference_but_for_line_55_s_added_sentence():
+def test_f1_the_discovery_skill_is_the_reference_but_for_line_55_s_added_sentence_and_its_version():
     before = support.reference(support.DISCOVERY)
     lines = support.current(support.DISCOVERY).split("\n")
     held = [i for i, line in enumerate(lines) if line.startswith(support.LINE_55)]
     assert len(held) == 1, f"line 55's text no longer starts exactly one line ({len(held)})"
     lines[held[0]] = support.LINE_55
-    assert "\n".join(lines) == before, "the discovery skill changed outside line 55's added sentence"
+    assert _versions_set_aside("\n".join(lines)) == _versions_set_aside(before), (
+        "the discovery skill changed outside line 55's added sentence and its version line")
