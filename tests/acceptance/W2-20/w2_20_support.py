@@ -255,6 +255,8 @@ class Machine:
         self.loadavg = self.readings / "loadavg"
         self.busy = self.readings / "busy_cores"
         self.embedding_cpu = self.readings / "embedding_cpu.json"
+        # Round 7 (the CTO's ruling on review F2): the servers' current use, beside their p95.
+        self.embedding_now = self.readings / "embedding_cpu_now.json"
         self.disk = self.readings / "disk.json"
         self.gpu_state = self.readings / "gpu.json"
         self.gpu_calls = self.readings / "nvidia-smi-calls.jsonl"
@@ -265,9 +267,11 @@ class Machine:
         self._counter = 0
         for name, text in (("session.py", SESSION_SCRIPT), ("lead.py", LEAD_SCRIPT), ("job.py", JOB_SCRIPT)):
             (self.scripts / name).write_text(text)
-        # Generous readings by default; each test sets what it needs.
+        # Generous readings by default; each test sets what it needs. The servers are idle now by default (0.0), so
+        # a case that plants only their p95 counts the whole p95 as headroom (the cpu rule, README "The gate").
         self.set_readings(available_bytes=64 * GIB, load=0.10, load_15=0.10, nproc=4, busy_cores=0.5,
-                          embedding_p95=(0.25, 0.25), free_bytes=500 * GIB, free_inodes=50_000_000)
+                          embedding_p95=(0.25, 0.25), embedding_now=(0.0, 0.0), free_bytes=500 * GIB,
+                          free_inodes=50_000_000)
         self.open_config()
 
     # ------------------------------------------------------------------ places
@@ -310,9 +314,11 @@ class Machine:
     # ---------------------------------------------------------------- readings
 
     def set_readings(self, *, available_bytes=None, load=None, load_15=None, nproc=None, busy_cores=None,
-                     embedding_p95=None, free_bytes=None, free_inodes=None) -> None:
+                     embedding_p95=None, embedding_now=None, free_bytes=None, free_inodes=None) -> None:
         """Write the reading files. ``available_bytes`` must be a whole number of KiB (meminfo counts in kB).
-        ``load`` alone sets the 1-, 5- and 15-minute loads alike; ``load_15`` sets the 15-minute load."""
+        ``load`` alone sets the 1-, 5- and 15-minute loads alike; ``load_15`` sets the 15-minute load.
+        ``embedding_p95`` and ``embedding_now`` are ``(shared, query)`` in cores: the servers' CPU p95 and their use
+        over the last minute (part of ``busy_cores``)."""
         if available_bytes is not None:
             assert available_bytes % KIB == 0
             kib = available_bytes // KIB
@@ -334,6 +340,8 @@ class Machine:
             self.busy.write_text(f"{busy_cores}\n")
         if embedding_p95 is not None:
             self.embedding_cpu.write_text(json.dumps({"shared": embedding_p95[0], "query": embedding_p95[1]}))
+        if embedding_now is not None:
+            self.embedding_now.write_text(json.dumps({"shared": embedding_now[0], "query": embedding_now[1]}))
         if free_bytes is not None or free_inodes is not None:
             current = json.loads(self.disk.read_text()) if self.disk.exists() else {}
             if free_bytes is not None:
@@ -517,6 +525,7 @@ class Machine:
             "GOV_RESOURCES_NPROC": str(self.nproc),
             "GOV_RESOURCES_BUSY_CORES": str(self.busy),
             "GOV_RESOURCES_EMBEDDING_CPU": str(self.embedding_cpu),
+            "GOV_RESOURCES_EMBEDDING_CPU_NOW": str(self.embedding_now),
             "GOV_RESOURCES_DISK": str(self.disk),
         }
         env.update({k: v for k, v in extra.items() if v is not None})
