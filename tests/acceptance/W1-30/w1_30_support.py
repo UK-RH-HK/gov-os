@@ -95,7 +95,7 @@ ENGINEER_ROLE = "Role: engineer"
 TICKETS_PREFIX = ".tickets/"
 ACCEPTANCE_PREFIX = "tests/acceptance/"
 
-# The record every fixture ticket names as its source (``tasks_support.ticket_text``: ``sources: [DEC-000]``).
+# The planted record every fixture ticket names as its source (``tasks_support.ticket_text``'s ``sources``).
 BASE_SOURCE = "DEC-000"
 
 # The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
@@ -416,7 +416,7 @@ class Project:
         self._copy_kernel_templates()
         if self._settings is not None:
             write(self.root, PATH_MAP_REL, path_map_text(self._settings))
-        # The source every fixture ticket names (``sources: [DEC-000]``): without it the ticket's context
+        # The source every fixture ticket names (``sources: [BASE_SOURCE]``): without it the ticket's context
         # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
         write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
         commit_all(self.root, "initial project")

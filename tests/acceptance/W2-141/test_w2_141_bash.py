@@ -2,7 +2,7 @@
 reader) started at a folder that holds its own ticket's acceptance folder is refused unless the command excludes it
 (grep --exclude-dir, rg -g '!...', find -prune / -not -path); the refusal names the folder and says how.
 
-The planted engineer is on DAEO-zz41 (WBS id W2-941); its folder is tests/acceptance/W2-941/ (w2_141_support).
+The planted engineer is on DAEO-zz41 (WBS id ``WBS``); its folder is ``OWN`` (w2_141_support).
 """
 
 from __future__ import annotations

@@ -796,7 +796,8 @@ def read_denial_faults(settings, project, home, rels):
     The launcher adds no OS-level Read rule for (c) or (d), because running a
     test means reading it: the CLI turns every ``Read`` deny rule that matches
     existing files into a read denial of the session's own commands, whatever its
-    form (``<folder>/**``, ``<file>*``, ``W2-5[8]/**``; P-W2-58-1), so no ``Read``
+    form (``<folder>/**``, ``<file>*``, the folder's name with its last digit in
+    brackets and ``/**``; P-W2-58-1), so no ``Read``
     deny rule and no sandbox read denial may cover these files. The guard alone
     refuses them.
     """

@@ -333,7 +333,7 @@ class Api:
             "PYTHONPATH": os.pathsep.join([str(SRC), *([str(self.site)] if self.site else [])]),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "OLLAMA_HOST": ollama_host or self.dead_host,
-            # W2-54, DEC-798: the CPU-only embedder's address; the same stand-in (or the same dead port).
+            # W2-54, DEC-1033: the query embedder's address; the same stand-in (or the same dead port).
             "GOV_QUERY_OLLAMA_HOST": ollama_host or self.dead_host,
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",

@@ -26,8 +26,8 @@ The layout of one world (``make_world``)::
       gov-os-worktrees/W2-81/            a worktree (branch w2/W2-81: the engineer's own, with its acceptance tests)
       gov-os-worktrees/W2-82/            a worktree (branch w2/W2-82)
       gov-os-worktrees/W2-85/            a worktree whose branch removes the hidden part ("clean")
-      gov-os-runs/W2-83/                 an own folder, its marker naming repo's git common directory
-      gov-os-runs/W2-83/clone/           a run clone (git clone of repo)
+      gov-os-runs/<own>/                 an own folder (a planted name), its marker naming repo's git common directory
+      gov-os-runs/<own>/clone/           a run clone (git clone of repo)
       gov-os-runs/W2-00/a/b/repo/        a clone made by hand, deeper, in a folder with no marker
       held-out-material/                 the stand-in held-out material (W2-58's form)
       outside/                           symbolic links outside every tree

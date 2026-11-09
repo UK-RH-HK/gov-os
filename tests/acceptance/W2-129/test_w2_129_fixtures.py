@@ -29,7 +29,7 @@ JSON = "tests/unit/fixtures/planted.json"
 
 S17_FILES = {
     # Literals only: a planted register (an unknown DEC-981 and the superseded DEC-107), a record path (DEC-982) and
-    # an f-string path (W1-90). The module docstring names no id.
+    # an f-string path (``TARGET``'s ticket). The module docstring names no id.
     PLANTED: '''\
 """The planted fixtures of a window check: a register, a record path and a test path."""
 
@@ -157,8 +157,8 @@ def propagation_lines(repo) -> set[tuple[str, int]]:
 # ---------------------------------------------------------------------------------- planted, now quiet (red)
 
 def test_s17_an_unknown_id_in_a_non_docstring_literal_of_a_python_test_file_gives_no_unknown_id(out, repo):
-    """S17 (1), F7: DEC-981 (in a planted register string), DEC-982 (in a record path) and W1-90 (in an f-string
-    path) give no UNKNOWN_ID; nor does DEC-983, a literal in a file whose comment DEC-984 is still found."""
+    """S17 (1), F7: DEC-981 (in a planted register string), DEC-982 (in a record path) and ``TARGET``'s ticket id
+    (in an f-string path) give no UNKNOWN_ID; nor does DEC-983, a literal in a file whose comment DEC-984 is still found."""
     control = found_at(out, "UNKNOWN_ID", COMMENTS, line(repo, COMMENTS, "# DEC-984"), "DEC-984")
     assert control, "the control is missing: no UNKNOWN_ID for DEC-984 in a comment of a test file"
     assert not [f for f in out.findings if f.code == "UNKNOWN_ID" and f.path == PLANTED], \
