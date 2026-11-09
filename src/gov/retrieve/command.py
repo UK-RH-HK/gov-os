@@ -16,7 +16,7 @@ for the code index), or a ``--continue`` is given, it is retrieved as before too
 answer, or the record graph cannot be read, nothing is decided here and the request is retrieved as before.
 
 Role separation (W2-13 S5, DEC-1065 (2)): every route's hits are filtered by the caller's ``role_paths``
-(``GOV_ROLE``, a ``--role`` beside it, ``GOV_TICKET``; ``gov.guard.role_paths``), and the bundle's ``role_filter``
+(``GOV_ROLE``, a ``--role`` beside it, ``GOV_TICKET``; ``gov.util.role_paths``), and the bundle's ``role_filter``
 counts what was withheld, by rule; no section, no filter, no ``role_filter``. ``ROLE_PATHS_UNREADABLE``: the section
 or the session's ticket cannot be read, so nothing is handed out.
 

@@ -9,7 +9,7 @@ and the chunks of its batch from it on are named as left for a further batch. Wh
 chunk, or is none at all, the next ranked chunks, one batch at most, are named instead (DEC-1025 item 2).
 
 Role separation (W2-13 S5, DEC-1065 (2)): a chunk the caller's role may not be handed (``GOV_ROLE``, ``GOV_TICKET``,
-the main tree's ``role_paths:``; ``gov.guard.role_paths``) is never ranked; where a filter applies, the block's
+the main tree's ``role_paths:``; ``gov.util.role_paths``) is never ranked; where a filter applies, the block's
 ``role_filter`` counts what was withheld by rule, and one entry of ``dropped`` (id ``role_filter``) says it in a line,
 so the packet names it. Role paths that cannot be read raise: the packet's block is then empty and names why.
 """
