@@ -10,7 +10,10 @@ cases replace ``subprocess.Popen`` and the check itself, as the launcher's unit 
 
 from __future__ import annotations
 
+import datetime
 import importlib
+import json
+import os
 import sys
 import types
 
@@ -94,6 +97,52 @@ def test_s9_a_plan_override_admits_the_lead_with_its_decision_id(check):
 
 # --- the launcher's path, with the check and the session replaced ------------------------------------------------------
 
+GIB = 1024 ** 3
+
+
+def _plant_open_gate(home, base, monkeypatch):
+    """An open resource gate for the launcher's cases (W2-20 S19 runs it on every launch; S8 shuts it when the
+    configuration is missing). W2-20's README, "The configuration file": every value dated and sourced, in
+    ``$HOME/.gov-os/machine/gate.json``; the readings planted through ``GOV_RESOURCES_*`` with room to spare, so
+    these cases test the plan check alone, whatever the machine is doing. Code with no gate reads none of it."""
+    def dated(value, source="planted for the W2-136 launcher cases (W2-20 README)"):
+        return {"value": value, "date": datetime.date.today().isoformat(), "source": source}
+
+    base.mkdir()
+    cpu = str(max(os.sched_getaffinity(0)))
+    values = {
+        "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+        "verification_peak_bytes": dated(4 * GIB),
+        "working_size_bytes": dated(1 * GIB),
+        "rebuild_peak_bytes": dated(2 * GIB),
+        "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+        "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+        "verification_lock": dated(str(base / "verification.lock")),
+        "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+        "oom_floor_bytes": dated(1 * GIB),
+        "heavy_slots": dated(2),
+        "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+        "embedding_servers": {
+            "shared": {"cpus": cpu, "nice": 10, "date": datetime.date.today().isoformat(), "source": "planted"},
+            "query": {"cpus": cpu, "nice": 10, "date": datetime.date.today().isoformat(), "source": "planted"},
+        },
+    }
+    machine = home / ".gov-os" / "machine"
+    machine.mkdir(parents=True)
+    (machine / "gate.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
+    readings = {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+    for variable, (name, text) in readings.items():
+        (base / name).write_text(text, encoding="utf-8")
+        monkeypatch.setenv(variable, str(base / name))
+    monkeypatch.setenv("GOV_RESOURCES_NPROC", "64")
+
+
 @pytest.fixture
 def launcher_with(planted, tmp_path, monkeypatch):
     """``launcher_with(answer)``: (launch, calls, started) with the plan check answering ``answer``."""
@@ -105,6 +154,7 @@ def launcher_with(planted, tmp_path, monkeypatch):
     temp.mkdir()
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
+    _plant_open_gate(home, tmp_path / "gate-readings", monkeypatch)
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
     # the repository's settings are not what these cases are about (the check comes at the argument checks)
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
