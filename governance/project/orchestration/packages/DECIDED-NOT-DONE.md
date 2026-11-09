@@ -13,14 +13,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1097) | state |
 |---|---|---|---|
 | 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | **DONE 11-08**: applied by the owner's operator `15952bbf`; live guard check 453 run, PASS (hook `bd545af83198`); the writer's and checker's transcripts moved into the sets root's transcripts folder; no live worktree to merge |
-| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | NOT STARTED |
+| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | **MERGED 11-09** (`b1e2c3b9`, review READY round 2, accept 182/182); its hook change (`docs/changes/W2-141-hook/`) goes live in the lift's re-pin ACT |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
-| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | NOT STARTED |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Round 1 built (39/164; the interface was in the acceptance README); round 2 BLOCKED: no `~/.gov-os/machine/gate.json` (an owner ACT, option (a)) |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
-| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | NOT STARTED: ticket to file |
+| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | **MERGED 11-09** W2-145 (`22b734cb`, review READY round 2, accept 79/79); the slot-hold watcher retires at the lift's re-pin |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | Q07/Q14 **DONE 11-09** (`55d1c029`, the sets root's visible copy synced); the gaps WAIT: the next label audit |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
@@ -31,31 +31,60 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 17 | GLOSSARY-1 | (6) (b): redesign beside the agent's words, toward decisions, for asking; retest on the 138 after the 80; build only if it helps | **DECIDED 11-08**; **DUE NOW** (after the 80): the redesign and its declaration, then the retest on the 138 |
 | 18 | the fresh-80 path | (1): the scripts, the checker's pass (operator), the readiness review, the pre-flight, the control, the 80 | **DONE 11-08 21:46**: K9's bar PASSES, right end to end 78/79 (98.7 %), wrong claims 0 (`FRESH-80-RESULT.md`); every data condition run, all below the judged one; spent $109.05 |
 | 19 | W2-139, W2-140 | (1)(g) held until after the 80 | **DUE NOW** (the 80 ran 11-08): one batch, one green run, outside a GPU window (DEC-1093 (1)) |
-| 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it; no ticket carries it | NOT DONE: add the line, marked DEC-1037, with W2-20's rebuild (item 8) |
+| 20 | DEC-1037's query-wrapper removal line (found by ADR-0002's review, F17) | DEC-1037 says a W2-20 or W2-121 KPI line tracks it | **DONE 11-09**: W2-20's line (`19b9ce4b`), ollama.py in its paths |
 
 ## 0b. DEC-1098's items (2026-11-09)
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
 | 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | ANSWERED 11-09 (DEC-1099 (2)); next: the lines into W2-88 (marked), its allowed paths, the nonexistent-id ticket filed |
-| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | **Proposals to the owner 11-09** (`P-SELECT-FIXES-1.md` §5); WAITS: the owner's three answers |
+| 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | ANSWERED 11-09 (DEC-1100): see rows 37-40 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | **DONE 11-09** (`P-SELECT-FIXES-1.md` §6: first gold by code for 9 of 12 callers on the 138, 3 of 8 on the 80; ~2 % of bundle items) |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
+| 49 | the lift's re-pin ACT carries | W2-136, W2-137, W2-138, W2-141 (+ its hook), W2-142 (+ the `.claude/` skill copies), W2-145 (watcher retired), W2-147, W2-20 | WAITS: W2-20, then D-10 and the owner's word |
 | 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
 
 ## 0c. DEC-1099's items (2026-11-09)
 | # | item | fate (DEC-1099) | state |
 |---|---|---|---|
-| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | NOT STARTED |
+| 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | Rehearsed; inside ACT-INDEP-WALLS-1 |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
 | 30 | W2-56's result-independent tests | (1) its test designer meanwhile | NOT STARTED |
-| 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | NOT STARTED |
-| 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | NOT STARTED |
-| 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | NOT STARTED |
+| 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
+| 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
+| 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
 | 34 | G1's fewer scored pairs | (3) after EXAMIN's copy | WAITS: EXAMIN's copy |
-| 35 | W2-15a with W2-32 | (3) closed together at the lift | WAITS: the lift |
+| 35 | W2-15a with W2-32 | (3) closed together at the lift | Noted in P1-13 (`741faf90`); WAITS: the lift |
 | 36 | W2-139 and W2-140 | (3) merged before D-10, closed at the lift | NOT STARTED |
+
+## 0d. DEC-1100's items (2026-11-09)
+| # | item | fate (DEC-1100) | state |
+|---|---|---|---|
+| 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | **APPLIED 11-09** by the operator (`8038e0ee`); WAITS: the owner on D-4's 3 capped and 7 lifted cases |
+| 38 | W2-66c | (1) tests first, pins (i) and (ii) | Filed `DAEO-btcs` (`28b4b5ba`); its test designer next |
+| 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | **APPLIED 11-09** (the hook line, 12:14); first run refused by a missing folder (fixed); the re-run RED 13 of 2,841: W1-06 (known), test_fusion (W2-137's cap, now on D-10's list), 11 reranker-service cases that pass in the main tree (the selection's environment: a row to fix in `landing_select.sh`); a regression case for the folder; row to W2-116 (GIT_DIR) |
+| 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first | **MERGED 11-09** W2-147 (`7ed72a1e`, review READY, accept 25/25); live at the lift's re-pin |
+| 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
+
+## 0e. DEC-1101's items (2026-11-09; standing)
+| # | item | fate (DEC-1101) | state |
+|---|---|---|---|
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **APPLIED 11-09** by the operator (`147706ae`); the CTO merges the live worktrees, W2-56's first, and runs walls_check.py repo |
+| 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
+| 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
+| 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
+| 46 | the weekly counts | (1) "not found" and "may be incomplete" from agents' returns, in the digest | NOT STARTED |
+| 47 | unindexed-path notices | (1) resolved within a day | STANDING (from now) |
+| 48 | the sandbox labellers automated | (2) DEC-1099 (1) Q5 by the automated sessions | IN PROGRESS (the experiment's prep told) |
+
+## 0f. DEC-1103's items (2026-11-09)
+| # | item | fate (DEC-1103) | state |
+|---|---|---|---|
+| 50 | W2-20's gate file | (1) an ACT: `gov resources --init-config` from W2-20's code, rehearsed, exact commands | **APPLIED 11-09** (`d7490945`; gate.json de4fb326…); W2-20 round 2 next |
+| 51 | D-4's ten cases back in the gates | (2) an ACT, rehearsed (DEC-1061 amended) | Option C (DEC-1104 (1)): form B to the operator; D-10 decides the three red by design |
+| 53 | the landing selection's environment | DEC-1104 (3): fixed before its results are relied on | NOT STARTED |
+| 52 | the operator-agent package | (4) classes (a)/(b), who classifies, how a misclassification is caught | APPROVED (DEC-1104 (2)); next: build it, tests first, one review, a replay trial on past ACTs |
 
 ## 1. Every item not done, partly done or waiting
 

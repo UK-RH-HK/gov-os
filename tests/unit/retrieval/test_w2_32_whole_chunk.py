@@ -474,29 +474,29 @@ def test_one_chunk_above_the_budget_is_read_up_to_it():
     assert indices == [0] and len(query) + len(texts[0]) == rerank.MAX_REQUEST_CHARS
 
 
-def test_the_shared_service_and_a_private_reranker_are_each_asked_within_both_bounds(tmp_path, monkeypatch):
-    import functools
+def test_the_shared_service_is_asked_within_both_bounds_and_a_failed_request_leaves_the_search_unranked(
+        tmp_path, monkeypatch):
+    # DEC-1048 (5): formerly "the shared service and a private reranker are each asked within both bounds"; the
+    # private reranker is gone, so the request the service fails leaves the whole search unranked and named
     from gov.retrieval import rerank
     interpreter = tmp_path / rerank.PYTHON_REL
     interpreter.parent.mkdir(parents=True)
     interpreter.write_text("")
     monkeypatch.setenv("HOME", str(tmp_path))
-    service, private = [], []
+    service = []
 
     def ask(interpreter, query, texts):
         service.append(_padded(query, texts))
         if len(service) > 1:
-            raise TimeoutError("timed out")  # the second request falls back to the private reranker
+            raise TimeoutError("timed out")  # the second request: no answer within the time limit
         return [1.0] * len(texts), "cuda:0"
 
-    @functools.lru_cache(maxsize=None)
-    def started(interpreter):
-        return (lambda query, texts: private.append(_padded(query, texts)) or [2.0] * len(texts)), "cuda:0", None
-
     monkeypatch.setattr(rerank, "_ask", ask)
-    monkeypatch.setattr(rerank, "_started", started)
-    rerank.rerank("q", [{"chunk_id": str(n), "text": "z" * (9_000 if n % 3 else 100)} for n in range(9)])
-    assert service and private and all(padded <= rerank.MAX_REQUEST_CHARS for padded in service + private)
+    given = [{"chunk_id": str(n), "text": "z" * (9_000 if n % 3 else 100)} for n in range(9)]
+    ranked = rerank.rerank("q", given)
+    assert len(service) == 2 and all(padded <= rerank.MAX_REQUEST_CHARS for padded in service)
+    assert ranked == given and rerank.last_outcome()["by"] == "unavailable"
+    assert "timed out" in rerank.last_outcome()["reason"]
 
 
 def test_the_fusion_reads_a_chunk_up_to_the_budget(monkeypatch):

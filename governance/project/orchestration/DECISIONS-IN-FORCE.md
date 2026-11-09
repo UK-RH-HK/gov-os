@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1099 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1104 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -331,3 +331,30 @@ other restart is an ACT.
   full run** (no separate proof repository; later adoptions follow it as fixed); tuning set 80 in two halves; outside
   writers; the nonexistent-id row a ticket now. W2-82 after W2-27; G1's fewer pairs after EXAMIN's copy; W2-15a closes
   with W2-32; **W2-139 and W2-140 merged before D-10.** Basis: 1 and 2.
+- DEC-1100 (2026-11-09): **ACT-SELECT-FIXES-1** (the test-map couplings; W2-66's record-only case always run), pinned by
+  **W2-66c**, tests first; a scoped selection after every landing outside a ticket that touches settings, the registry
+  or the test map (widened if an emergency merge reds again), from one line in the `reference-transaction` hook (an
+  ACT for the operator), in the CTO's tools first; into W2-115 only once proven in use. Basis: 4 and 5.
+- DEC-1101 (2026-11-09, standing): **memory audited periodically with fresh questions** (Gov OS and every adopted
+  repository via W2-88): a fresh set weighted to what changed plus older areas, cross-checked in at most two rounds,
+  measured once against the bar (85 %, target 95 %), misses classified by an independent auditor, structural fixes only
+  (to the owner, judged on earlier sets), the spent set into a regression pool re-run each audit, the next fresh set
+  the verdict on the fixes; every two weeks while active, monthly once stable; "not found" and "may be incomplete"
+  counted weekly in the digest; an unindexed-path notice resolved within a day. **Automated independent sessions:**
+  writers, checkers, labellers launched headless in walled folders, fixed briefs the owner approves once (hashed, not
+  changed by the CTO), content chosen by rule (git changes plus a seeded sample), memory's search, run outputs, the
+  CTO's scratch and other sessions' folders denied, only counts to the CTO. Order: the ACT (path map, guard, folder
+  settings), the launch script (tests first, one review), the briefs to the owner, then default. Basis: 1 and 2.
+- DEC-1102 (2026-11-09): **`gov plan`'s cycle break fixed before the lift's re-pin,** tests first: a cycle broken only
+  at a ticket inside it; a ticket outside every cycle keeps all its waits (a new ticket, one review). Basis: 2.
+- DEC-1103 (2026-11-09): W2-20's gate file by an ACT (`gov resources --init-config` from W2-20's code, rehearsed);
+  D-4's 3 capped and 7 lifted cases back into the gates by an ACT (DEC-1061 amended for them); ACT-INDEP-WALLS-1's four
+  answers as recommended. Requested: an operator-agent package (class (a) checks-only ACTs applied by an independent
+  operator agent after rehearsal, a READY review and matching hashes; class (b) loosening ACTs on the owner's one-line
+  yes; sudo the owner's; the CTO never changes a reviewed ACT nor applies one). Basis: 2 and 4.
+- DEC-1104 (2026-11-09): D-4's ten cases by option C (the seven green into the gates now; D-10 decides each of the
+  three red by design); **the operator agent approved as recommended** (classes (a)/(b), the owner's `yes ACT-<id>
+  <sha8>` read from the transcript, the shared servers' settings (a), re-pins the owner's for now, the cron launches it
+  from a queue, pushes for (a) for two weeks, built after the walls tests first); the landing selection's environment
+  fixed before its results are relied on. **Standing: each ACT given as a message for the owner's operator;** the owner
+  does only re-pins, pushes and sudo. Basis: 2 and 4.

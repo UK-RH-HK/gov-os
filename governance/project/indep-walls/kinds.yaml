@@ -1,0 +1,30 @@
+# ACT-INDEP-WALLS-1: the job kinds a wall is built for, and what each may touch. The launch script (step 2 of DEC-1101
+# (3)) reads this file; the budgets and timeouts are proposals decided with the briefs (step 3). Every kind: the tools
+# below and no others, reads only its wall, writes only <wall>/out/. What reaches a destination (the set's folder, the
+# labels) is copied there by the launch script's own code from out/, after the output schema checks; never by the session.
+kinds:
+  writer:
+    tools: [Read, Grep, Glob, Write, Edit, TodoWrite]
+    input: [selection]            # the paths chosen by rule (git changes since the last audit + a seeded sample)
+    input_round2: [set, notes]    # its own round-1 set and the checker's notes, copied in read-only
+    delivers: set                 # out/set/** -> <sets root>/fixtures/evaluation/<set>/hidden/
+    budget_usd: 25
+    timeout_s: 7200
+  checker:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set]                  # the writer's set, copied in read-only
+    delivers: notes               # out/notes.md -> <sets root>/fixtures/evaluation/<set>/XCHECK-r<round>.md
+    budget_usd: 15
+    timeout_s: 5400
+  auditor:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [set, misses]          # the measured misses (question, gold, answer), copied in read-only
+    delivers: classes             # out/classes.json -> <sets root>/runs/<audit>/miss-classes.json
+    budget_usd: 15
+    timeout_s: 5400
+  labeller:
+    tools: [Read, Grep, Glob, Write, TodoWrite]
+    input: [rulebook, actions]    # SANDBOX-GUARD-EXP-1's rulebook and the actions to label (the overlap by the seed)
+    delivers: labels              # out/labels.jsonl -> <sets root>/fixtures/evaluation/sandbox-guard-exp-1/hidden/labels/<run>.jsonl
+    budget_usd: 30
+    timeout_s: 10800

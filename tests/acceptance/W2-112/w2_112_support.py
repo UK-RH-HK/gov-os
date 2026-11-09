@@ -27,9 +27,17 @@ Everything runs on any machine, in a sandbox, with no model, no GPU and no netwo
 The interface the tests rely on, beyond the base's public ``gov.retrieval.rerank`` (each one constant below):
 the socket's place and the one-line request ``[query, [text, ...]]`` answered by one line of scores, both from
 P-RERANKER-1; the idle and time-limit settings (DEC-1034 item 3); the GPU slot rule's settings and lock files
-(ACT-RERANK-WAIT-1, KPI 7), which the service obeys too (DEC-1036 T6 (b): it holds one of the two slots); the
-fallback log with its reason in a file under ``~/.cache/gov-os/`` (DEC-1034 item 3); the bundle's ``rerank`` entry
-(DEC-1034 item 2). No reranker loads on the CPU anywhere (DEC-1033, DEC-1036 T5 (b)).
+(ACT-RERANK-WAIT-1, KPI 7), which the service obeys too; the fallback log with its reason in a file under
+``~/.cache/gov-os/`` (DEC-1034 item 3); the bundle's ``rerank`` entry (DEC-1034 item 2). No reranker loads on the
+CPU anywhere (DEC-1033, DEC-1036 T5 (b)).
+
+Revised by W2-145's test designer (DAEO-2tfd; Rewrite-Reason: DEC-1048 (5), DEC-1046 (1)): there is no private
+reranker beside the shared service any more. A search the service cannot answer (it cannot start, is unreachable,
+does not answer, or answers wrongly) keeps the order given, unscored, named ``unavailable`` with the service's
+failure, and starts no other reranker; it comes back within ``UNRANKED_S`` here (W2-145's own cases hold the exact
+bounds, ``CONNECT_S`` or the time limit plus 1 s). The service holds every GPU slot for its life (W2-145 S3), not one
+of two. The "private" reranker these helpers still name is the in-process *reference* the answer cases compare the
+service with (``expected``, ``check_scored``, a session's ``"private"`` request), never a fallback.
 """
 
 from __future__ import annotations
@@ -74,12 +82,14 @@ SLOT_WAIT_S = 5.0        # the boxes' default wait for a slot: short, so a case 
 LOCK_NAME = "gov-os-rerank-gpu-{}.lock"
 # ---- the bounds
 CONNECT_S = 2.0          # "does not answer within about 2 s" (the KPI, P-RERANKER-1)
-FALLBACK_S = 20.0        # a search whose service is down answers within this: 2 s, a private reranker's start, slack
+# A search whose service is down answers within this, unranked (W2-145, DEC-1048 (5)): CONNECT_S + 1 s or the time
+# limit + 1 s (W2-145 S4), plus a refused start's own time and a loaded machine's slack; never a private's start.
+UNRANKED_S = 10.0
 HUNG_S = 120.0           # a session not ended by then is hung
 OVER_CAP = 20_000        # texts in one request: above any cap the bundle's candidate limit gives
 GIB = 1024 ** 3
 TOLERANCE = 1e-6         # "within float rounding"; the stand-in's scores lie in [-10, 10)
-SETTLE_S = 1.0           # a private reranker ends within this once its session has ended
+SETTLE_S = 1.0           # a process that ends with its session is seen gone within this once the session has ended
 ROOM = {"present": True, "total": 16 * GIB, "free": 14 * GIB, "name": "Stand-in GPU"}
 SHORT = {"present": True, "total": 16 * GIB, "free": 1 * GIB, "name": "Stand-in GPU"}
 NO_GPU = {"present": False}
@@ -311,8 +321,8 @@ def query_of(tag: str) -> str:
 
 
 def expected(query: str, given: list[dict]) -> list[dict]:
-    """What a private reranker of the stand-in model gives: the order of the scores, equal scores in the order
-    given, each candidate with its ``rerank_score``."""
+    """What a private reranker of the stand-in model gives (the reference, computed here; never a fallback): the
+    order of the scores, equal scores in the order given, each candidate with its ``rerank_score``."""
     ranked = sorted(((score(query, item["text"]), item) for item in given), key=lambda pair: -pair[0])
     return [{**item, "rerank_score": value} for value, item in ranked]
 
@@ -356,12 +366,42 @@ def is_scored(result) -> bool:
 
 
 def check_scored_or_unranked(result, query: str, given: list[dict], who: str = "the search") -> str:
-    """Either a private reranker's answer or the order given, unscored; never anything in between."""
+    """Either the reference's answer (as the service gives it) or the order given, unscored; never anything in
+    between. Who scored is the caller's to check (``strays``)."""
     if is_scored(result):
         check_scored(result, query, given, who)
         return "scored"
     check_unranked(result, given, who)
     return "unranked"
+
+
+def outcome_of(report: dict) -> dict:
+    """The session's ``last_outcome()`` after its search (``w2_112_session.py`` reports it), or ``{}``."""
+    return report.get("outcome") or {}
+
+
+def check_named_unavailable(report: dict, who: str, reason: str | None = None) -> None:
+    """W2-145: an unranked search is named: ``last_outcome()`` by ``unavailable``, never ``private``, with a reason
+    that names the shared service (and holds ``reason``, a pattern, when given)."""
+    import re
+
+    outcome = outcome_of(report)
+    assert outcome.get("by") == "unavailable", \
+        f"{who}: last_outcome() is by {outcome.get('by')!r}, not 'unavailable' (never a private reranker): {outcome}"
+    text = str(outcome.get("reason") or "")
+    assert re.search(r"service|shared", text, re.IGNORECASE), \
+        f"{who}: the reason does not name the shared service's failure: {text!r}"
+    if reason:
+        assert re.search(reason, text, re.IGNORECASE), f"{who}: the reason does not name /{reason}/: {text!r}"
+
+
+def strays(box, services) -> list[tuple[int, str]]:
+    """W2-145: the processes that loaded the model and are no shared service: neither one of ``services`` nor a
+    process still alive and listening at the service's socket (a private reranker ends with its search; the service
+    stays). ``(pid, device)`` each; none is allowed."""
+    listening_now = set(unix_listeners(box.socket))
+    return [(record["pid"], record["device"]) for record in box.loads()
+            if record["pid"] not in set(services) and not (alive(record["pid"]) and record["pid"] in listening_now)]
 
 
 # ---------------------------------------------------------------- the box

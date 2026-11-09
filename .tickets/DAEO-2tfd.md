@@ -93,4 +93,8 @@ The owner's DEC-1097 (8): "a new ticket for 'no private reranker beside the shar
 - **Est.:** about 230 lines (product about 80, the engineer's unit tests about 150); the designer's round about 25
   acceptance cases revised and about 15 new; about a day in all with the review.
 
+**The designer's P-1 settled (the CTO, 2026-11-09) [DEC-1097 (8)]:** (a): S4's bound for a search whose service start
+is refused is measured from the moment the refused start ends (a service that waits for a GPU slot refuses only after
+its own wait); no second wait and no private reranker follow it.
+
 [DEC-1097]

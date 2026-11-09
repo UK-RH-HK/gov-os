@@ -13952,6 +13952,91 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the guard proven before it is widened, the held-out halves sealed) and question 1 (the memory
   standard carried to EXAMIN as the practice's first full run).
 
+### DEC-1100 — P-SELECT-FIXES-1: the test-map couplings and W2-66's record-only case as ACT-SELECT-FIXES-1, pinned by W2-66c; a scoped selection after landings outside a ticket on settings, the registry or the test map, from one hook line, in the CTO's tools first
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1098 (2), DEC-1062, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after P-SELECT-FIXES-1 §5
+- **Decision:**
+  - (1) Proposals (i) the test-map couplings and (ii) W2-66's record-only case in the always-run set accepted as
+    **ACT-SELECT-FIXES-1**, with **W2-66c**, tests first, to pin them.
+  - (2) Proposal (iii)'s trigger (a): a scoped selection after every landing outside a ticket that touches settings,
+    the tool registry or the test map; **widened if an emergency merge reds again.**
+  - (3) (iii)'s mechanism (a): one line in the `reference-transaction` hook, as an ACT for the owner's operator.
+  - (4) (iii) runs in the CTO's tools first; its product line goes into W2-115 only once it has proven itself in use.
+- **Basis:** question 4 (the cheaper fixes that caught all 34 traced reds in the replay, no selector built) and
+  question 5 (proven in use before it enters the product).
+
+### DEC-1101 — Memory quality audited periodically with fresh questions, for Gov OS and every adopted repository; the "not found" and "may be incomplete" answers counted weekly; independent writers, checkers and labellers launched automatically in walled folders, with fixed briefs the owner approves once
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`)
+- **Decision:**
+  - (1) **Standing: memory quality is audited periodically with new questions,** for Gov OS and for every adopted
+    repository (through W2-88). Each audit: an independent writer writes a fresh set, weighted toward what was added or
+    changed since the last audit plus a sample of older areas, cross-checked in at most two rounds; measured once
+    (retrieval figures, and agents right end to end with search again once) against the bar (85 %, target 95 %); an
+    independent auditor classifies the misses by kind; structural fixes only, brought to the owner and judged on the
+    earlier sets; the spent set joins a growing pool of earlier questions, re-run at every audit as a regression check;
+    the next audit's fresh set is the verdict on the fixes. Every two weeks while development is active, monthly once
+    stable. **Beside it:** agents' "not found" and "may be incomplete" answers counted from their returns and shown
+    weekly in the digest; a structural-pass notice of an unindexed path resolved within a day.
+  - (2) **Standing: automated independent sessions, a priority now.** Every question writer, checker and labeller is
+    launched automatically, without the owner opening sessions: headless sessions in their own walled folders. From now
+    for the periodic audits, the sandbox experiment's labellers (DEC-1099 (1) Q5) and the sets W2-88 needs for
+    EXAMIN's copy. Independence: a fixed brief per job that the owner approves once, hashed, which the CTO may not
+    change without the owner's approval; the writer chooses its content by rule (what changed since the last audit,
+    from git, plus a random sample of older areas from a seed recorded before writing), not by the CTO; memory's own
+    search, run outputs, the CTO's scratch and the other sessions' folders denied to them by their settings, the guard,
+    and the sandbox once proven; only counts reach the CTO.
+  - (3) **The order:** first what must land in the path map, the guard and the folders' settings, as one ACT for the
+    owner's operator, rehearsed; then the launch script, tests first, with one review; then the fixed briefs for writer,
+    checker, auditor and labeller, to the owner for approval; then it becomes the default. With the briefs: the set
+    size per audit, how each wall is enforced and tested, the costs per audit (tokens, GPU, the owner's time), the home
+    tickets for Gov OS and the lines for W2-88, and when the first audit runs.
+- **Basis:** question 1 (memory kept right as the repository grows, judged on fresh questions) and question 2 (the
+  sets' independence enforced by walls, not by trust).
+
+### DEC-1102 — `gov plan`'s cycle break fixed before the lift's re-pin, tests first: a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1088, DEC-1099 (3), DEC-1088 (6) · **Source:** the owner's message (chat, 2026-11-09), on the defect found while applying DEC-1099 (3)
+- **Decision:** the defect (W2-136's `_order` breaks the incoming waits of the first remaining ticket even when it is not in the cycle) is not a row: `gov plan` decides launches from the lift, so it is fixed before the lift's re-pin, tests first: **a cycle is broken only at a ticket inside it, and a ticket outside every cycle keeps all its waits.** A new ticket (W2-136 is merged; DEC-1088 (6)), an independent test designer first, one review, merged before the re-pin.
+- **Basis:** question 2 (a plan that silently drops a real wait would launch work out of order).
+
+### DEC-1103 — W2-20's machine gate file by an ACT; D-4's 3 capped and 7 lifted cases back into the gates by an ACT; ACT-INDEP-WALLS-1's four answers; an operator-agent package requested
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1100, DEC-1101 (3), DEC-1098 (6), DEC-1061, DEC-1088 (5)(b), DEC-1052 · **Source:** the owner's message (chat, 2026-11-09), after the selection ACTs were applied (`8038e0ee`; the hook 6fbbf312…) and the push (`795d97c7`, `3ce6394f`)
+- **Decision:**
+  - (1) **W2-20's gate file, option (a):** `~/.gov-os/machine/gate.json` created by `gov resources --init-config`
+    from W2-20's code, as an ACT for the owner's operator, rehearsed, with the exact commands.
+  - (2) **D-4's 3 capped and 7 lifted cases go back into the gates** (amending DEC-1061's cut for these ten), rehearsed,
+    as one more ACT.
+  - (3) **ACT-INDEP-WALLS-1, all four as recommended:** the layout and the three layers, the sandbox added once
+    proven; rule 2c for the tuner on W2-56; `~/gov-os-writer` and `~/gov-os-checker` left as they are until the launch
+    script is the default, then retired; the budgets and timeouts decided with the fixed briefs. The CTO says when it is
+    ready for the operator.
+  - (4) **Requested: an operator-agent package** so that ACTs no longer need the owner at the terminal: classes by
+    effect: (a) ACTs that only add checks, tighten a control, or change nothing that governs agents, applied by an
+    independent operator agent in its own walled folder, only after the rehearsal passes, an independent review says
+    READY and the hashes match what was reviewed; logged, undo ready, the owner notified; (b) anything that loosens or
+    alters a control (the guard, permissions, settings, pins, installs) or needs sudo: the owner's one-line "yes" in the
+    chat, then the operator agent runs it, except sudo, which stays the owner's. The CTO never changes an ACT after its
+    review and cannot apply one; P1 issues always come to the owner. The package says who classifies each ACT and how a
+    misclassification is caught. Not decided until the owner approves the package.
+- **Basis:** question 2 (the gates restored where the trial showed misses; the walls' controls as recommended) and
+  question 4 (the owner's time kept for what loosens a control).
+
+### DEC-1104 — D-4's ten cases by option C; the operator agent approved as recommended; the landing selection's environment fixed before its results are relied on; ACTs given as messages for the owner's operator
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing · **Under:** DEC-1103, DEC-1100, DEC-1101, DEC-1061, DEC-1058, DEC-928 (3), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), after ACT-INDEP-WALLS-1 (`147706ae`) and ACT-GATE-CONFIG-1 (`d7490945`) were applied by the owner's operator
+- **Decision:**
+  - (1) **ACT-D4-RESTORE-1: option C.** The seven green cases into the gates now (the ACT's form B); D-10 decides each
+    of the three red-by-design cases (W1-33's auditor, W1-05's install, W1-46's research install): rewrite it for
+    today's hook and gate it, or keep it report-only. DEC-1103 (2) is narrowed accordingly.
+  - (2) **OPERATOR-AGENT-1, all seven as recommended:** the classes and the table, tightening-only edits as (a), guard
+    code always (b); the owner's yes typed as `yes ACT-<id> <sha8>`, read from the CTO session's transcript; the shared
+    servers' settings become (a) (amending DEC-1058 (b) for them); re-pins stay the owner's for now (DEC-928 (3)),
+    decided again after one rehearsed re-pin in the agent's form; the dispatcher's cron launches it from a queue, the
+    CTO only queues; a push for every (a) ACT for the first two weeks, then the digest only, failures always pushed;
+    built after the walls ACT, tests first, one review, a trial on past ACTs replayed.
+  - (3) **The landing selection's environment row fixed before its results are relied on,** so a red means a red.
+  - (4) **Standing:** each ACT is given to the owner as a message for the owner's operator, not as terminal commands;
+    the owner does only the re-pins, the pushes and sudo personally.
+- **Basis:** question 2 (no gate that reports a known switch over and over; a red that means a red) and question 4 (the
+  owner's time kept for re-pins, pushes and sudo).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -13989,3 +14074,8 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.482 | 2026-11-08 | Owner (recorded by the orchestrator, DEC-861): DEC-1097 item (6) decided (b). Next free id: DEC-1098. |
 | 0.483 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1098 (item 1 standing). Next free id: DEC-1099. |
 | 0.484 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1099. Next free id: DEC-1100. |
+| 0.485 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1100. Next free id: DEC-1101. |
+| 0.486 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1101 (items 1 and 2 standing). Next free id: DEC-1102. |
+| 0.487 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1102. Next free id: DEC-1103. |
+| 0.488 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1103; DEC-1061 amended for ten cases. Next free id: DEC-1104. |
+| 0.489 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1104 (item 4 standing); DEC-1103 (2) narrowed, DEC-1058 (b) amended for the shared servers. Next free id: DEC-1105. |
