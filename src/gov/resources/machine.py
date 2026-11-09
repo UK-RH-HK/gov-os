@@ -9,7 +9,8 @@ Sources, each replaceable for a planted machine:
   (``GOV_RESOURCES_LOADAVG``: fields 1 and 3); the processor count (``GOV_RESOURCES_NPROC``, else the machine's);
   busy cores over the last minute (``GOV_RESOURCES_BUSY_CORES``, one number, else the gate's own sampling of
   ``/proc/stat``, ``GOV_RESOURCES_STAT``); the embedding servers' CPU p95 (``GOV_RESOURCES_EMBEDDING_CPU``, JSON
-  ``{"shared": cores, "query": cores}``, else the gate's own sampling of the two servers); the shared disk
+  ``{"shared": cores, "query": cores}``, else the gate's own sampling of the two servers) and their use over the
+  same last minute (``GOV_RESOURCES_EMBEDDING_CPU_NOW``, the same form; round 7, review F2); the shared disk
   (``GOV_RESOURCES_DISK``, JSON ``{"free_bytes", "free_inodes"}``, else ``statvfs`` of HOME's disk); the processes
   ``/proc/<pid>`` (``GOV_RESOURCES_PROC``); the GPU ``nvidia-smi`` on ``PATH``.
 - The own busy-cores sampling: two readings of the CPU counters; the earlier one is the newest sample at least a
@@ -153,8 +154,24 @@ def _write_json(path: Path, data) -> None:
         pass  # a history only lengthens the window
 
 
+def boot_id() -> str | None:
+    """This boot's id (``/proc/sys/kernel/random/boot_id``), or None where it cannot be read."""
+    try:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip() or None
+    except OSError:
+        return None
+
+
+def _this_boot(item: dict, boot: str | None) -> bool:
+    """Whether a kept sample may be of this boot: one that names another boot is not (review F6)."""
+    return not (boot and isinstance(item.get("boot"), str) and item["boot"] != boot)
+
+
 def busy_cores(folder: Path, processors: int | None):
-    """``(busy cores over the last minute, None)``: ``GOV_RESOURCES_BUSY_CORES`` where set, else the own sampling."""
+    """``(busy cores over the last minute, None)``: ``GOV_RESOURCES_BUSY_CORES`` where set, else the own sampling.
+
+    A kept sample from before a restart (another boot, or counters above today's) is dropped at once, so the reading
+    after a restart is a short window, never null (review F6)."""
     if "GOV_RESOURCES_BUSY_CORES" in os.environ:
         return _planted_number("GOV_RESOURCES_BUSY_CORES")
     now_counters, why = cpu_counters()
@@ -162,9 +179,11 @@ def busy_cores(folder: Path, processors: int | None):
         return None, why
     if not processors:
         return None, "the processor count is unknown, so busy cores cannot be counted"
-    path, now = folder / CPU_HISTORY, time.time()
+    path, now, boot = folder / CPU_HISTORY, time.time(), boot_id()
     history = [item for item in _read_json(path, list) if isinstance(item, dict) and {"t", "busy", "total"} <= set(item)
-               and 0 <= now - item["t"] <= KEEP_S]
+               and all(isinstance(item[k], (int, float)) and not isinstance(item[k], bool) for k in ("t", "busy", "total"))
+               and 0 <= now - item["t"] <= KEEP_S and _this_boot(item, boot)
+               and item["busy"] <= now_counters[0] and item["total"] <= now_counters[1]]
     older = [item for item in history if now - item["t"] >= WINDOW_S]
     recent = [item for item in history if SHORT_S <= now - item["t"] < WINDOW_S]
     base = max(older, key=lambda i: i["t"]) if older else (min(recent, key=lambda i: i["t"]) if recent else None)
@@ -175,7 +194,7 @@ def busy_cores(folder: Path, processors: int | None):
             return None, why
         base = {"t": now, "busy": now_counters[0], "total": now_counters[1]}
         now, now_counters = time.time(), later
-    history.append({"t": now, "busy": now_counters[0], "total": now_counters[1]})
+    history.append({"t": now, "busy": now_counters[0], "total": now_counters[1], **({"boot": boot} if boot else {})})
     _write_json(path, history[-64:])
     busy, total = now_counters[0] - base["busy"], now_counters[1] - base["total"]
     if total > 0 and busy >= 0:
@@ -209,26 +228,64 @@ def _server_ports(values: dict) -> dict[str, int] | None:
     return out
 
 
+def _planted_servers(name: str):
+    """``({"shared": cores, "query": cores}, None)`` of a planted servers' reading, or ``(None, why)``."""
+    given, why = _planted_text(name)
+    if why:
+        return None, why
+    try:
+        data = json.loads(given)
+        out = {server: float(data[server]) for server in ("shared", "query")}
+        if any(not math.isfinite(v) or v < 0 for v in out.values()) or any(
+                isinstance(data[server], bool) for server in out):
+            raise ValueError
+        return out, None
+    except (ValueError, TypeError, KeyError):
+        return None, f"{name}={given!r} is not {{\"shared\": cores, \"query\": cores}}"
+
+
 def embedding_cpu(folder: Path, values: dict):
-    """``({"shared": p95 cores, "query": p95 cores}, None)``: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else one
-    sample of each server's process tree per reading, kept for a week in ``server-cpu.json``. A server that is not
-    listening uses no CPU now."""
-    if os.environ.get("GOV_RESOURCES_EMBEDDING_CPU") is not None:
-        given, why = _planted_text("GOV_RESOURCES_EMBEDDING_CPU")
-        if why:
-            return None, why
-        try:
-            data = json.loads(given)
-            out = {name: float(data[name]) for name in ("shared", "query")}
-            if any(not math.isfinite(v) or v < 0 for v in out.values()) or any(
-                    isinstance(data[name], bool) for name in out):
-                raise ValueError
-            return out, None
-        except (ValueError, TypeError, KeyError):
-            return None, f"GOV_RESOURCES_EMBEDDING_CPU={given!r} is not {{\"shared\": cores, \"query\": cores}}"
+    """``({"shared": p95 cores, "query": p95 cores}, None)``: the servers' CPU p95 (``servers_cpu``'s first half)."""
+    return servers_cpu(folder, values)[0]
+
+
+def servers_cpu(folder: Path, values: dict):
+    """``((p95, why), (now, why))``, each ``{"shared": cores, "query": cores}`` or None (round 7, review F2).
+
+    - p95: ``GOV_RESOURCES_EMBEDDING_CPU`` where set, else one sample of each server's process tree per reading, kept
+      for a week in ``server-cpu.json``.
+    - now: ``GOV_RESOURCES_EMBEDDING_CPU_NOW`` where set, else each server's CPU use over the busy cores' last minute
+      (the same window rule: the newest kept sample of the same process at least a minute old, else the oldest at
+      least a quarter of a second old). It is the servers' part of the busy cores.
+
+    A server that is not listening uses no CPU now."""
+    planted = {}
+    for key, name in (("p95", "GOV_RESOURCES_EMBEDDING_CPU"), ("now", "GOV_RESOURCES_EMBEDDING_CPU_NOW")):
+        if os.environ.get(name) is not None:
+            planted[key] = _planted_servers(name)
+    if len(planted) < 2:
+        sampled = _sample_servers(folder, values)
+        planted.setdefault("p95", sampled[0])
+        planted.setdefault("now", sampled[1])
+    return planted["p95"], planted["now"]
+
+
+def _window_rate(window: list, at: float, pid: int, ticks: int) -> float | None:
+    """A server's cores over the last minute from its kept ``[t, pid, ticks]`` samples (the same process only)."""
+    same = [w for w in window if w[1] == pid and isinstance(w[2], int) and w[2] <= ticks and at > w[0]]
+    older = [w for w in same if at - w[0] >= WINDOW_S]
+    base = max(older, key=lambda w: w[0]) if older else (min(same, key=lambda w: w[0]) if same else None)
+    if base is None:
+        return None
+    return round(max(0.0, (ticks - base[2]) / TICKS / (at - base[0])), 2)
+
+
+def _sample_servers(folder: Path, values: dict):
+    """The servers' own sampling: ``((p95, why), (now, why))``."""
     ports = _server_ports(values)
     if ports is None:
-        return None, "the embedding servers' section cannot be read, so their CPU cannot be measured"
+        why = "the embedding servers' section cannot be read, so their CPU cannot be measured"
+        return (None, why), (None, why)
     path, history = folder / SERVER_HISTORY, _read_json(folder / SERVER_HISTORY, dict)
 
     def ticks_now():
@@ -238,30 +295,55 @@ def embedding_cpu(folder: Path, values: dict):
                 for name, pid in pids.items()}, time.time()
 
     first, at = ticks_now()
-    pending = [n for n, (pid, t) in first.items() if pid is not None and t is not None and not (
-        isinstance((history.get(n) or {}).get("last"), list) and (history[n]["last"][1:2] == [pid]))]
+    for name in list(history):
+        if not isinstance(history[name], dict):
+            del history[name]
+    def known(name, pid) -> tuple[bool, bool]:
+        """Whether an earlier sample of this server's process is kept: as its last, and in its window."""
+        kept = history.get(name) or {}
+        last = isinstance(kept.get("last"), list) and kept["last"][1:2] == [pid]
+        window = isinstance(kept.get("window"), list) and any(
+            isinstance(w, list) and len(w) == 3 and w[1] == pid and isinstance(w[0], (int, float)) and w[0] < at
+            for w in kept["window"])
+        return last, window
+
+    pending = [n for n, (pid, t) in first.items() if pid is not None and t is not None and not all(known(n, pid))]
     if pending:  # no earlier sample of this server's process: a short second one
         time.sleep(SHORT_S)
         second, later = ticks_now()
         for name in pending:
-            history.setdefault(name, {})["last"] = [at, first[name][0], first[name][1]]
+            pid, ticks = first[name]
+            had_last, _ = known(name, pid)
+            history.setdefault(name, {})
+            if not had_last:
+                history[name]["last"] = [at, pid, ticks]
+            if not isinstance(history[name].get("window"), list):
+                history[name]["window"] = []
+            history[name]["window"].append([at, pid, ticks])
         first, at = second, later
-    out = {}
+    out, now = {}, {}
     for name, (pid, ticks) in first.items():
         kept = history.get(name) if isinstance(history.get(name), dict) else {}
         rates = [r for r in kept.get("rates", []) if isinstance(r, list) and len(r) == 2 and at - r[0] <= SERVER_KEEP_S]
+        window = [w for w in kept.get("window", []) if isinstance(w, list) and len(w) == 3
+                  and isinstance(w[0], (int, float)) and 0 <= at - w[0] <= KEEP_S]
         last, current = kept.get("last"), (0.0 if pid is None else None)
         if ticks is not None and isinstance(last, list) and len(last) == 3 and last[1] == pid and at > last[0] \
                 and isinstance(last[2], int):
             current = max(0.0, (ticks - last[2]) / TICKS / (at - last[0]))
         if current is not None:
             rates.append([at, round(current, 3)])
-        history[name] = {"rates": rates[-SERVER_SAMPLES:], "last": [at, pid, ticks] if ticks is not None else None}
+        now[name] = 0.0 if pid is None else (None if ticks is None else _window_rate(window, at, pid, ticks))
+        if ticks is not None:
+            window.append([at, pid, ticks])
+        history[name] = {"rates": rates[-SERVER_SAMPLES:], "last": [at, pid, ticks] if ticks is not None else None,
+                         "window": window[-64:]}
         out[name] = round(_p95([r[1] for r in rates]), 2) if rates else None
     _write_json(path, history)
-    if None in out.values():
-        return None, "an embedding server's CPU could not be sampled"
-    return out, None
+    p95 = (None, "an embedding server's CPU could not be sampled") if None in out.values() else (out, None)
+    current = (None, "an embedding server's CPU use over the last minute could not be sampled") \
+        if None in now.values() else (now, None)
+    return p95, current
 
 
 # --- the disk ---------------------------------------------------------------------------------------------------------
@@ -356,6 +438,60 @@ def alive(pid: int) -> bool:
         return state not in ("Z", "X")
     except (OSError, IndexError):
         return True
+
+
+START_GRACE_S = 5.0  # a process may have started this long after its entry's ``started`` and still be its own
+
+
+def _boot_time() -> float | None:
+    try:
+        for line in Path("/proc/stat").read_text().splitlines():
+            if line.startswith("btime "):
+                return float(line.split()[1])
+    except (OSError, ValueError, IndexError):
+        pass
+    return None
+
+
+def identity(pid: int) -> dict | None:
+    """Who ``pid`` is on the real ``/proc``: ``{"boot", "start_ticks", "start_time"}`` (the boot's id, its start in
+    clock ticks since boot, and in epoch seconds where the boot time reads); None on a planted process table or where
+    it cannot be read."""
+    if proc_root() != Path("/proc"):
+        return None
+    try:
+        ticks = int(Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19])
+    except (OSError, ValueError, IndexError):
+        return None
+    boot = _boot_time()
+    return {"boot": boot_id(), "start_ticks": ticks,
+            "start_time": None if boot is None else round(boot + ticks / TICKS, 2)}
+
+
+def same_process(pid: int, entry: dict) -> bool:
+    """Whether the live ``pid`` is still the process the registry entry names (review F6): False when the entry's
+    recorded boot or start differs from the process's, or, for an entry that records neither, when the process started
+    after the entry's ``started`` (a pid reused, e.g. after a WSL restart). True where it cannot be told: a live pid
+    the gate cannot place is counted, never dropped."""
+    found = identity(pid)
+    if found is None:
+        return True
+    boot, ticks = entry.get("boot"), entry.get("start_ticks")
+    if isinstance(ticks, int) and not isinstance(ticks, bool):
+        if isinstance(boot, str) and found["boot"] and boot != found["boot"]:
+            return False
+        return ticks == found["start_ticks"]
+    started = entry.get("started")
+    if not isinstance(started, str) or found["start_time"] is None:
+        return True
+    try:
+        import datetime
+        when = datetime.datetime.fromisoformat(started.replace("Z", "+00:00"))
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=datetime.timezone.utc)
+    except ValueError:
+        return True
+    return found["start_time"] <= when.timestamp() + START_GRACE_S
 
 
 def listener(port: int, table: dict[int, dict] | None = None) -> int | None:

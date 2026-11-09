@@ -34,6 +34,7 @@ def _open_gate(home: Path, monkeypatch) -> None:
     for name, value in (("GOV_RESOURCES_MEMINFO", folder / "meminfo"), ("GOV_RESOURCES_LOADAVG", folder / "loadavg"),
                         ("GOV_RESOURCES_NPROC", 20), ("GOV_RESOURCES_BUSY_CORES", 0),
                         ("GOV_RESOURCES_EMBEDDING_CPU", '{"shared": 0, "query": 0}'),
+                        ("GOV_RESOURCES_EMBEDDING_CPU_NOW", '{"shared": 0, "query": 0}'),
                         ("GOV_RESOURCES_DISK", '{"free_bytes": 1000000000000000, "free_inodes": 1000000000}')):
         monkeypatch.setenv(name, str(value))
 

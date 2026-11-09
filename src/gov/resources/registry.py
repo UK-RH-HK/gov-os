@@ -4,7 +4,10 @@ One file per session, ``~/.gov-os/machine/sessions/<pid>.json``, whichever repos
 
     {"pid": 4242, "repository": "/path/to/repo", "ticket": "DAEO-xxxx", "role": "engineer", "started": "..."}
 
-An entry whose process is gone is removed by the read that finds it (``cleared``). An entry that cannot be read is
+An entry whose process is gone is removed by the read that finds it (``cleared``), and so is one whose pid now
+belongs to another process: the entry records its process's boot and start (``boot``, ``start_ticks``), and a pid
+alive with another start, or started after the entry's ``started``, is a reused pid (review F6, a WSL restart). An
+entry that cannot be read is
 named, and the gate shuts on it: a session the gate cannot see is never treated as absent.
 
 Each live session's memory is its process tree's resident memory, less every subtree that is another registered
@@ -37,6 +40,9 @@ def register(pid: int, repository, ticket: str, role: str, **extra) -> dict:
         raise GovError("RESOURCE_REGISTER_INVALID", f"{pid!r} is not a process id", {"pid": pid})
     entry = {"pid": pid, "repository": str(Path(repository).resolve()), "ticket": ticket, "role": role,
              "started": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), **extra}
+    found = machine.identity(pid)  # the process's own boot and start, so a reused pid is never taken for it (F6)
+    if found is not None:
+        entry.update({"boot": found["boot"], "start_ticks": found["start_ticks"]})
     place = folder()
     place.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", dir=place, prefix=".entry-", suffix=".tmp", delete=False) as handle:
@@ -71,7 +77,7 @@ def sessions() -> tuple[list[dict], list[dict], str | None]:
         except (OSError, ValueError, KeyError, TypeError) as error:
             unreadable.append(f"{path}: {error}")
             continue
-        if machine.alive(pid):
+        if machine.alive(pid) and machine.same_process(pid, entry):
             live.append(entry)
         else:
             try:

@@ -10,7 +10,9 @@ slots instead, and a session takes no slot.
 - **memory (S6):** ``available + sessions_live >= floor + working_size * (running sessions + 1)``; equal opens.
   Nothing is reserved for a run that has not started.
 - **load (S5):** ``min(load_1m, load_15m) < nproc``; equal shuts.
-- **cpu (S2, S12):** ``busy_cores_1m + p95(shared) + p95(query) < nproc``; equal shuts.
+- **cpu (S2, S12; round 7, review F2):** ``busy_cores_1m + max(0, p95(shared) - now(shared)) + max(0, p95(query) -
+  now(query)) < nproc``; equal shuts. The busy cores already hold the servers' current use (``embedding_cpu_now``),
+  so only the part of each server's p95 above it is added: the servers are never counted twice.
 - **disk, inodes (S4):** ``free_bytes >= disk_floor_bytes``, ``free_inodes >= inode_floor``; equal opens.
 - **config (S8):** one reason per value missing or malformed, naming its key (or the file).
 - **gpu (S10, S14), a start check with a declared need only:** some single GPU has room ``>= need * (1 +
@@ -88,10 +90,11 @@ def read(check: bool = False, *, gpu_need_mib: int | None = None, gpu_kind: str 
         reasons.append(_reason("load", least, count, load_why or count_why))
 
     busy, busy_why = machine.busy_cores(configuration.machine_dir(), count)
-    p95, p95_why = machine.embedding_cpu(configuration.machine_dir(), values)
-    demand = None if busy is None or p95 is None else round(busy + p95["shared"] + p95["query"], 3)
+    (p95, p95_why), (now, now_why) = machine.servers_cpu(configuration.machine_dir(), values)
+    demand = None if busy is None or p95 is None or now is None else round(
+        busy + sum(max(0.0, p95[name] - now[name]) for name in ("shared", "query")), 3)
     if demand is None or count is None or not demand < count:
-        reasons.append(_reason("cpu", demand, count, busy_why or p95_why or count_why))
+        reasons.append(_reason("cpu", demand, count, busy_why or p95_why or now_why or count_why))
 
     available, memory_why = machine.memory()
     floor, work = values.get("memory_floor_bytes"), values.get("working_size_bytes")
@@ -115,7 +118,7 @@ def read(check: bool = False, *, gpu_need_mib: int | None = None, gpu_kind: str 
         "registry": str(registry.folder().parent), "config": conf["path"],
         "available_memory_bytes": available, "sessions_live_memory_bytes": sessions_live,
         "load_1m": None if loads is None else loads[0], "load_15m": None if loads is None else loads[1],
-        "busy_cores_1m": busy, "embedding_cpu_p95": p95, "nproc": count, "disk": disk,
+        "busy_cores_1m": busy, "embedding_cpu_p95": p95, "embedding_cpu_now": now, "nproc": count, "disk": disk,
         "sessions": sessions, "cleared": cleared,
         "slots": {"total": values.get("heavy_slots"), "held": jobs},
         "due_for_remeasure": conf["due"],

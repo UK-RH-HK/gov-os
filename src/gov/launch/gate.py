@@ -9,21 +9,28 @@ launch`` runs it for every session, lead or worker, and refuses with ``LAUNCH_RE
 An override (``gov launch ... --gate-override DEC-NNN``, or a ticket's ``plan_override`` for the plan's check) is
 written as one line to ``~/.gov-os/machine/launch.log`` (``record``); the launcher prints its own line on standard
 error.
+
+``StartLock`` is the machine-wide lock a launch holds from its start check until its session is registered (review
+F1), so launches that start together are counted against each other.
 """
 
 from __future__ import annotations
 
 import datetime
+import fcntl
 import io
 import os
 import re
 import sys
+import time
 
 from gov.cli.errors import GovError
 
 GATE_SHUT = "RESOURCE_GATE_SHUT"
 EXIT_GATE_SHUT = 3
 LAUNCH_LOG = "launch.log"
+START_LOCK = "launch.lock"
+START_LOCK_WAIT_S, START_LOCK_POLL_S = 300.0, 0.05
 DECISION = re.compile(r"DEC-\d+")
 MIB = 1024 ** 2
 
@@ -43,6 +50,47 @@ def check_start(*, gpu_need_mib: int | None = None, gpu_kind: str = "other") -> 
         raise GovError(GATE_SHUT, f"the resource gate is shut: {shut_text(reading)}", reading,
                        exit_code=EXIT_GATE_SHUT)
     return reading
+
+
+class StartLock:
+    """The machine-wide start lock (review F1): an exclusive ``flock`` on ``~/.gov-os/machine/launch.lock``, taken
+    before the start check and given back once the started session is in the registry (or the launch ends without
+    one), so launches that start together are each judged with the others already counted. The descriptor is never
+    inherited by the session (``O_CLOEXEC``; ``Popen`` closes the rest). A lock that cannot be taken within
+    ``wait_s`` refuses the launch: never a check run unlocked."""
+
+    def __init__(self, wait_s: float = START_LOCK_WAIT_S):
+        from gov.resources.config import machine_dir
+
+        path = machine_dir() / START_LOCK
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_CLOEXEC, 0o666)
+        except OSError as error:
+            raise GovError("LAUNCH_REFUSED", f"the machine-wide start lock {path} cannot be opened "
+                                             f"({error.strerror}): no start check runs unlocked (W2-20)") from None
+        deadline = time.monotonic() + wait_s
+        while True:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    os.close(fd)
+                    raise GovError("LAUNCH_REFUSED", f"the machine-wide start lock {path} was held by another launch "
+                                                     f"for {wait_s:g} s: no start check runs unlocked (W2-20)") from None
+                time.sleep(START_LOCK_POLL_S)
+            except OSError as error:
+                os.close(fd)
+                raise GovError("LAUNCH_REFUSED", f"the machine-wide start lock {path} cannot be taken "
+                                                 f"({error.strerror}) (W2-20)") from None
+        self.fd: int | None = fd
+
+    def release(self) -> None:
+        """Give the lock back; a second call does nothing."""
+        fd, self.fd = self.fd, None
+        if fd is not None:
+            os.close(fd)
 
 
 def log_path():

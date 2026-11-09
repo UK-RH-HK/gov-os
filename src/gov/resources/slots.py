@@ -15,7 +15,9 @@
 - **The trip-wire (S11):** ``tripwire()`` (``gov resources --trip-wire``) is one pass: below ``oom_floor_bytes`` it
   stops the heavy job (its command's process group, then its runner) whose process tree holds the most memory, and
   appends the stop to ``~/.gov-os/machine/findings.jsonl``. Only slot holders are ever stopped. While a job runs, its
-  runner makes that pass every few seconds on the kernel's own memory reading.
+  runner makes that pass every few seconds on the kernel's own memory reading. A missing or malformed
+  ``oom_floor_bytes`` is named on the job's standard error when it starts (``OOM_TRIPWIRE_OFF``), never skipped
+  silently (review F4); the gate itself is shut on it (S8).
 """
 
 from __future__ import annotations
@@ -235,10 +237,26 @@ def _stop(job: dict) -> bool:
     return stopped
 
 
+def tripwire_off(conf: dict) -> str | None:
+    """Why the trip-wire cannot run, naming ``oom_floor_bytes`` and its fault (S8, review F4); None when it can."""
+    from gov.resources.config import FILE
+
+    if "oom_floor_bytes" in conf["values"]:
+        return None
+    named = "; ".join(f["why"] for f in conf["faults"] if f["key"] in ("oom_floor_bytes", FILE))
+    return (f"OOM_TRIPWIRE_OFF: the out-of-memory trip-wire cannot run for this job: "
+            f"{named or 'oom_floor_bytes: missing'} (S8, S11)")
+
+
 def tripwire(values: dict, available: int | None = None) -> dict:
     """One pass: below ``oom_floor_bytes``, stop the heavy job whose process tree holds the most memory.
-    ``{"stopped": the job and its command or None, "available_memory_bytes", "oom_floor_bytes"}``."""
-    floor = values["oom_floor_bytes"]
+    ``{"stopped": the job and its command or None, "available_memory_bytes", "oom_floor_bytes"}``; without a usable
+    ``oom_floor_bytes``, nothing is stopped and ``why`` names it (review F4)."""
+    floor = values.get("oom_floor_bytes")
+    if isinstance(floor, bool) or not isinstance(floor, int) or floor < 0:
+        return {"stopped": None, "available_memory_bytes": available, "oom_floor_bytes": None,
+                "why": f"OOM_TRIPWIRE_OFF: oom_floor_bytes: missing or malformed ({floor!r}): nothing can be judged "
+                       f"(S8, S11)"}
     why = None
     if available is None:
         available, why = machine.memory()
@@ -317,6 +335,10 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
     def say(line: str) -> None:
         print(f"gov resources: {line}", file=sys.stderr, flush=True)
 
+    trip_off = tripwire_off(conf)
+    if trip_off:  # S8, S11, review F4: named, never a silently skipped trip-wire
+        say(trip_off)
+
     def ended(signum, frame):
         raise SystemExit(128 + signum)
 
@@ -363,7 +385,7 @@ def run(kind: str, command: list[str], *, workers: int | None = None, tree: str 
 
         def watch():  # the kernel's reading only: a planted one is a test's, read by its own passes
             while not done.wait(TRIP_EVERY_S):
-                if os.environ.get("GOV_RESOURCES_MEMINFO") or "oom_floor_bytes" not in values:
+                if os.environ.get("GOV_RESOURCES_MEMINFO") or trip_off:  # trip_off was named at the start
                     continue
                 try:
                     tripwire(values)

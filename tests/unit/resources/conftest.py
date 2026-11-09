@@ -51,6 +51,7 @@ class Machine:
         self.nproc(20)
         self.busy(2.0)
         self.servers(0.5, 0.5)
+        self.servers_now(0.0, 0.0)  # idle now: their whole p95 is headroom (round 7)
         self.disk(500 * GIB, 50_000_000)
 
     # readings
@@ -73,6 +74,9 @@ class Machine:
 
     def servers(self, shared, query):
         self.mp.setenv("GOV_RESOURCES_EMBEDDING_CPU", json.dumps({"shared": shared, "query": query}))
+
+    def servers_now(self, shared, query):
+        self.mp.setenv("GOV_RESOURCES_EMBEDDING_CPU_NOW", json.dumps({"shared": shared, "query": query}))
 
     def disk(self, free: int, inodes: int):
         self.mp.setenv("GOV_RESOURCES_DISK", json.dumps({"free_bytes": free, "free_inodes": inodes}))
