@@ -91,7 +91,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 55 | W2-20's exception round | DEC-1105: S16 per-CPU; R2-F1 resampled; one narrow review; then merge, `--sample` a working day, `--remeasure` | **MERGED 11-09** (`686c594f`, review READY, accept 170/170, S16 passed twice per CPU). The sample day WAITS the first working day after the lift's re-pin: `--sample` records only sessions registered through W2-20's launcher (none until it is live); tool ready: `tools/resources_sample_day.sh`. Rows: R3-F1 (a runner child's exit reads as null once; fold its two-line fix into the next W2-20 touch, DEC-802), R3-F2 |
 | 56 | W2-148's exception round | DEC-1106 (1): F15 (restore only its own change; else refuse, hold, P1) | **MERGED 11-09** (`511a4a17`, review READY, accept 166/166); F21 fixed and merged (DEC-1107, review READY, accept 169/169) |
-| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **Rehearsed; §7 answered** (DEC-1108); WAITS: the operator |
+| 57 | the guard's call log | DEC-1106 (2): an ACT, rehearsed (hash, role, decision; no contents) | **APPLIED 11-09** (`b7a373cf`; the hook a7981319); the first day's file validates PASS; W2-56's worktree merged |
 | 59 | W2-148's replay corpus | DEC-1108 (2): the CTO's builder, the agent's sha256 check both ways; tests first | WAITS: before the first path-map ACT through the agent |
 | 60 | the live-hook suites' temporary folder | DEC-1108 (5): GOV_GUARD_CALLS_DIR set in the suites (W2-141's acceptance file by its designer) | NOT STARTED (follow-up) |
 | 61 | the tuner's hidden log | DEC-1108 (4): ~/.gov-os/guard-calls in W2-56's tuner's hidden paths | WAITS: a fresh experiment window |
