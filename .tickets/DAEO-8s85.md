@@ -38,6 +38,7 @@ profile: STANDARD
 sources:
 - DEC-1050
 - DEC-1052
+- DEC-1083
 - DEC-1112
 - DEC-1109
 - CAP-33
