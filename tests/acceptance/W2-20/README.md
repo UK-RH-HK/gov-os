@@ -9,6 +9,16 @@ ticket, the decisions, and today's `w2/integrate` code outside W2-20's own work 
 `gov.retrieval.ollama`, the pools of `gov.secrets` and `gov.codeintel`) and the interim wrapper `~/.local/bin/ollama`
 (read, never run).
 
+**Round 2 (2026-11-09, DEC-1097 (8), DEC-1088 (5)(b)).** A fresh test designer, from the ticket as the CTO revised it
+after round 1 (`61682b3e2`): (1) the new KPI line for W2-136's F2 entry criterion got its cases, as **S21**
+(`test_w2_20_plan_source.py`); (2) round 1's packages P-1 to P-6, settled in the ticket ("The designer's points
+settled"), were brought into the cases where they were not already (each change its own commit,
+`Rewrite-Reason: DEC-1097 (8)`; the table "Round 2's changes" below); (3) the 10-17 designer's revisions of W1-07's,
+W1-26's and W1-32's cases (`173e8e97a`, `d82619c36`: the recorded `gov` commands include `resources`) were ported onto
+today's versions of those files, keeping `accept` (DEC-970) and the `release` excuse (DEC-753). No implementation of
+W2-20 was read; only `w2/integrate`'s code (`gov.launch.plan_check`, `launcher`, `command`, `store.main_root`,
+`gov.plan.tickets`) and W2-136's suite for how a lead check is driven.
+
 ## Run
 
 ```sh
@@ -48,8 +58,9 @@ The engineer builds to this; where the ticket left a form open, the choice is th
 | `gov resources --check [--gpu-need-mib N] [--gpu-kind embedder\|reranker\|other] [--json]` | **The start check** for one new session (or a job that declares a GPU need). Without `--gpu-need-mib` it never runs `nvidia-smi` (S10). `--gpu-kind` defaults to `other`. | 0 and `ok: true` (the reading as `result`) when open; when shut, `ok: false`, `error.code` `RESOURCE_GATE_SHUT`, the reading in `error.details`, an exit code other than 0 and 2 (the same without `--json`, and the text names the broken condition) |
 | `gov resources --register PID --ticket ID --session-role ROLE` | Enters a session in the machine-wide registry (its pid, repository, ticket, role). `--heavy` is no longer part of the interface (no weights, DEC-983). | 0, `ok: true` |
 | `gov resources --slot test\|rebuild [--tree T] [--workers N] -- CMD...` | **A heavy job.** Waits for one of the configured machine-wide slots (a rebuild also for its tree's lock, `--tree` default the root), then runs `CMD` confined to the slot's CPU set with the slot's thread budget, and gives the slot back when `CMD` ends. *(choice)* | `CMD`'s exit code; `CMD`'s output passes through |
-| `gov resources --sample [--json]` | Takes one sample of every live session's process-tree memory, noting whether a verification run holds the lock. Result `samples`: `[{pid, tree_memory_bytes, verification}]`. *(choice)* | 0 |
-| `gov resources --remeasure [--json]` | Writes `verification_peak_bytes` (largest sample) and `working_size_bytes` (largest sample outside verification) into the configuration file, dated today, with a source; result `{"old": {both keys}, "new": {both keys}}`. *(choice)* | 0 |
+| `gov resources --sample [--json]` | Takes one sample of every live session's process-tree memory, noting whether a verification run holds the lock, and (P-5 (a)) one of every heavy-job slot holder's process tree, with its `kind`. Result `samples`: `[{pid, tree_memory_bytes, verification}]`, a slot holder's sample also `kind: "test"\|"rebuild"`. *(choice)* | 0 |
+| `gov resources --remeasure [--json]` | Writes `verification_peak_bytes` (largest sample) and `working_size_bytes` (largest session sample outside verification) and (P-5 (a)) `rebuild_peak_bytes` (largest sample of a `rebuild` slot holder) into the configuration file, dated today, with a source; result `{"old": {the keys}, "new": {the keys}}`. A slot holder is no session: its sample is not a working size. *(choice)* | 0 |
+| `gov resources --init-config [--json]` | **P-3 (a), settled.** Writes `$HOME/.gov-os/machine/gate.json`, a template holding every gate value with its date and source and this machine's values from the decisions (floor 3 GiB, DEC-942 item 2; disk 100 GiB and inodes 10,000,000, DEC-898 item 1; GPU margin 0.10, DEC-950 item 2); the gate reads it whole. Over an existing file: refuses, names `gate.json`, changes nothing. | 0 written; not 0 refused |
 | `gov resources --trip-wire [--json]` | One pass of the trip-wire: below `oom_floor_bytes`, stops the heavy job (slot holder and its command's processes) whose process tree holds the most memory; result `stopped` (an object naming the job and its command) or `null`; the stop appended as one JSON line to `$HOME/.gov-os/machine/findings.jsonl`. Only slot holders are ever stopped. *(choice)* | 0 |
 
 ### The reading (`result`, or `error.details` of a refused start check)
@@ -121,6 +132,7 @@ not a date, is malformed. **No default stands in for a missing value** (the old 
 | `memory_floor_bytes` | integer ≥ 0 | 3 GiB on this machine (DEC-942 item 2) |
 | `verification_peak_bytes` | integer ≥ 0 | measured (S9); due after seven days |
 | `working_size_bytes` | integer ≥ 0 | measured (S9); due after seven days |
+| `rebuild_peak_bytes` | integer ≥ 0 | measured (S9, P-5 (a)); the tests plant it in every file; whether it is required is package P-7 |
 | `disk_floor_bytes` | integer ≥ 0 | 100 GiB (DEC-898 item 1) |
 | `inode_floor` | integer ≥ 0 | 10,000,000 (DEC-898 item 1) |
 | `verification_lock` | a path (text) | a verification run holds an exclusive `flock` on it |
@@ -152,8 +164,10 @@ or W2-66's line).
 ### The launch (S19)
 
 - `gov.launch.launcher.launch(root, role, ticket, cli_args, gate_override=None, gpu_need_mib=None)`, and on the
-  command line `gov launch <role> <ticket> [--gate-override DEC-NNN] [--gpu-need-mib N] [-- ...]` *(choice; package
-  P-1)*.
+  command line `gov launch <role> <ticket> [--gate-override DEC-NNN] [--gpu-need-mib N] [-- ...]` (P-1 (a),
+  settled).
+- **The slots (P-2 (a) with (c), settled):** a full set of heavy-job slots never refuses a session (S7, DEC-983); a
+  launch is refused on the slots only when their reading cannot be taken (`heavy_slots` missing or malformed, named).
 - Every launch, lead or worker, runs the start check before any session starts (after W2-136's plan check for a
   lead). A shut gate raises `GovError("LAUNCH_REFUSED", message)`; the message names each broken condition and its
   reading as the reading gives it (an integer of bytes or inodes, a load or a core count as a number), for example
@@ -164,6 +178,23 @@ or W2-66's line).
   as W2-136's plan override prints its own), each holding `OVERRIDE`/`gate_override: DEC-NNN`, the role, the ticket and
   the conditions passed over, e.g. `gov launch: OVERRIDE gate_override: DEC-1234: engineer DAEO-wrk01 started with the
   resource gate shut: memory: reading 1073741824, limit 4294967296 (DEC-899)`.
+
+### The plan check's source (S21, W2-136's F2 entry criterion)
+
+- `gov.launch.plan_check.check_lead(root, ticket_id, *, ready=None)` (W2-136's function, unchanged in form) and the
+  launcher's lead path (`launch(root, "orchestrator", ...)`), called with `root` a **lead worktree** (a git worktree
+  of the project), read the tickets (`.tickets/`) and the approved ready list
+  (`governance/project/orchestration/ready.txt`) of the **main tree**: the main worktree of `root`'s repository, as
+  `gov.launch.store.main_root` finds it. Never the lead worktree's own copies. Called with the main tree, nothing
+  changes (W2-136's cases).
+- **A named path the dispatcher keeps:** `GOV_PLAN_READY` (W2-136's variable): absolute, that file; relative, read
+  against the main tree *(choice)*, never the lead worktree.
+- **A plan override** (`plan_override: <DEC-id>` on the main tree's ticket) that admits a lead writes **one line to
+  `$HOME/.gov-os/machine/launch.log`** (P-1's launch log) holding `plan_override`, the decision id and the ticket
+  (its id or WBS id), and keeps W2-136's one `OVERRIDE` line on standard error.
+
+The planted trees: a main tree and a lead worktree made from it, then one commit on the main tree, so the worktree
+holds yesterday's tickets and list (the table in `test_w2_20_plan_source.py`'s docstring).
 
 ### The query server's start (S20, DEC-1037)
 
@@ -192,7 +223,7 @@ with it, at most the share + 1; and the slot's run at most 20 % slower. It print
 CTO runs it outside the sandbox**, on the real machine, not inside another heavy slot; elsewhere it skips:
 `GOV_W2_20_MEASURE=1 PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20/test_w2_20_measured.py -m local_only -p no:cacheprovider -s`.
 The planted programs spin until a deadline, so the time compares the slot's overhead, not a fixed amount of work
-(package P-4).
+(P-4, confirmed by the CTO 2026-11-09: the 20 % is measured on time-bound programs; the case is unchanged).
 
 ## KPI lines
 
@@ -221,6 +252,7 @@ Ids in the ticket's order (`.tickets/DAEO-r30l.md`, 2026-11-09). "New/changed" f
 | S18 | the product's pools sized to the CPU set (gov.secrets included) | new 11-02 (DEC-1039, DEC-1041) |
 | S19 | enforcement at launch, every session, one recorded override | new 11-06 (DEC-1088 (5)(b)) |
 | S20 | the query-wrapper removal (DEC-1037) | new 11-09 (DEC-1097 (8)) |
+| S21 | W2-136's F2 entry criterion: the plan check reads the main tree's tickets and ready list (or a named path), never a lead worktree's; a plan override in a launch log as well as stderr | new 11-09 (DEC-1088 (5)(b), DEC-1097 (8)), round 2 |
 | F1 | a heavy job's children use more CPUs than its share | new 11-02 |
 | F2 | another repository's session counts; a start while shut is refused with the reading | 10-16, unchanged |
 | F3 | a launch or close below either disk floor; disk read without inodes | new 10-22 |
@@ -255,11 +287,40 @@ removal below is its own commit with `Rewrite-Reason: DEC-1097 (8)`.
 | `test_a_reading_that_cannot_be_taken_never_opens_the_gate` | revised | the current readings (memory, load, busy cores, p95, disk) | `c906733ca` |
 | `test_DEC_747_at_most_8_holds_after_the_start` | removed | DEC-742/DEC-747's ceiling superseded (DEC-983) | `07aed5068` |
 
+## Round 2's changes (2026-11-09)
+
+| Change | Point | Cases | Commit |
+|---|---|---|---|
+| new file: S21's cases | the F2 line (DEC-1088 (5)(b)) | 9 cases in `test_w2_20_plan_source.py` | `cc88ceeea` |
+| support: every planted file carries a dated `rebuild_peak_bytes` | P-5 (a) | none changed in what it asserts | `a8575eda6` |
+| new case: the rebuild peak from rebuild slot holders, no verification lock | P-5 (a) | `test_w2_20_remeasure.py::test_s7_s9_...` | `3418453fc` |
+| new cases: `--init-config` writes the template, never overwrites | P-3 (a) | 2 in `test_w2_20_config.py` | `cc2f14f42` |
+| new cases: a full set of slots never refuses a launch; an unreadable `heavy_slots` does; docstring notes P-1 (a) and P-2 | P-1 (a), P-2 (a)+(c) | 6 in `test_w2_20_launch.py` | `1562a461e` |
+| none: the override already a launch option logged to `launch.log` and stderr | P-1 (a) | round 1's four override and command-line cases, unchanged | — |
+| none: the measured case already uses time-bound programs | P-4 | S16's case, unchanged | — |
+| none: no `nvidia-smi` without a declared need; once with one | P-6 | round 1's S10/S13 cases, unchanged | — |
+
+**The port (part 3)**, each file its own commit with `Rewrite-Reason: DEC-1097 (8)`: `w1_07_support.py`
+(`b393e2ddd`: `resources` added after `accept`), `test_w1_07_recorded_commands.py` (`c4b57a5af`: six recorded),
+`test_w1_32_command_set.py` (`f3d357e4a`: `resources` in the exact set, `release` still excused), W1-07's README
+(`999b5fd1d`), W1-26's README (`800495a4e`). On integrate the cases that need `gov resources` itself are red until
+W2-20 builds it: `test_w1_07_recorded_commands.py::test_a_recorded_gov_command_is_offered_and_answers_its_help[resources]`,
+`test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones`,
+`test_w1_26_recorded_commands.py::test_a_recorded_command_without_its_module_is_a_finding_that_names_it[resources]`,
+`::test_with_every_module_present_the_check_has_no_finding`, `::test_a_skill_may_name_a_recorded_gov_command[resources]`
+(W1-07's and W1-26's run only with `--optin=breadth`/`lifted`, DEC-1061).
+
 ## KPI line → tests → state on integrate
 
 `w2/integrate` at `8bb10a683` (this branch's base), with this suite: **137 failed, 8 passed, 1 skipped** (146
 cases; the skipped one is S16's `local_only`, which skips unless `GOV_W2_20_MEASURE=1`). Every red fails for the reason in its row; the greens are guards
 of what integrate already does and must keep doing.
+
+**Round 2**, on this branch (integrate merged at `570ba4dc0`), run as
+`pytest tests/acceptance/W2-20 -m "not local_only" -k "not real and not green_here and not time_limit"` with an empty
+`HOME`: **154 failed, 9 passed, 1 deselected** (164 cases; the deselected one is S16's `local_only` case; the `-k`
+filter matches no case of this suite). Round 1's cases are in the same state as before; the 18 new ones are 17 red
+and one green guard (S21's main-tree case).
 
 | KPI line | Test (node id) | On integrate | Why |
 |---|---|---|---|
@@ -401,6 +462,28 @@ of what integrate already does and must keep doing.
 | S20 | `test_w2_20_query_start.py::test_s20_the_output_is_appended_to_the_servers_own_log` | red | the output goes to `/dev/null`; no log |
 | S20 | `test_w2_20_query_start.py::test_s20_each_start_writes_one_line_naming_the_time_the_device_and_the_caller[gpu]` | red | no start log (`0 lines`) |
 | S20 | `test_w2_20_query_start.py::test_s20_each_start_writes_one_line_naming_the_time_the_device_and_the_caller[cpu]` | red | no start log (`0 lines`) |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_lead_its_stale_ready_list_would_admit_is_refused` | red | the check reads the lead worktree's list: `admitted=True` for PLN-f001 |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_lead_its_stale_ticket_would_admit_is_refused_naming_the_current_wait` | red | the check reads the lead worktree's ticket: `admitted=True` for PLN-f002 |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_lead_the_main_tree_admits_is_admitted_from_the_lead_worktree` | red | `unknown ticket 'PLN-f004'` (the worktree has no copy) |
+| S21 | `test_w2_20_plan_source.py::test_s21_guard_from_the_main_tree_itself_the_check_reads_its_own_tickets_and_list` | green (guard) | W2-136's check from the main tree, kept |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_named_ready_list_is_followed_from_the_lead_worktree[absolute]` | red | the tickets come from the worktree: `unknown ticket 'PLN-f004'` |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_named_ready_list_is_followed_from_the_lead_worktree[relative to the main tree]` | red | `unknown ticket 'PLN-f004'` (and the relative path read in the worktree) |
+| S21 | `test_w2_20_plan_source.py::test_s21_the_launcher_refuses_a_lead_its_stale_copies_would_admit` | red | `DID NOT RAISE`: the lead starts on the stale list |
+| S21 | `test_w2_20_plan_source.py::test_s21_the_launcher_starts_a_lead_the_main_tree_admits` | red | `LAUNCH_REFUSED`: `unknown ticket 'PLN-f004'` |
+| S21 | `test_w2_20_plan_source.py::test_s21_a_plan_override_is_one_line_in_the_launch_log_and_the_line_on_standard_error` | red | no `launch.log`: the override goes to stderr only |
+| S4 | `test_w2_20_config.py::test_s8_init_config_writes_a_dated_sourced_template_with_this_machines_decided_values` | red | `gov resources` does not exist (`invalid choice: 'resources'`) |
+| S7 | `test_w2_20_launch.py::test_s19_s7_a_full_set_of_heavy_slots_never_refuses_a_launch[a lead]` | red | `gov resources --slot` does not exist (the holder cannot be planted) |
+| S7 | `test_w2_20_launch.py::test_s19_s7_a_full_set_of_heavy_slots_never_refuses_a_launch[a worker]` | red | `gov resources --slot` does not exist |
+| S7 | `test_w2_20_remeasure.py::test_s7_s9_the_remeasure_keeps_the_rebuild_peak_from_rebuild_slot_holders_which_hold_no_verification_lock` | red | `gov resources` does not exist (`invalid choice: 'resources'`) |
+| S8 | `test_w2_20_config.py::test_s8_init_config_writes_a_dated_sourced_template_with_this_machines_decided_values` | red | `gov resources` does not exist (`invalid choice: 'resources'`) |
+| S8 | `test_w2_20_config.py::test_s8_init_config_never_overwrites_an_existing_file` | red | `gov resources` does not exist (`invalid choice: 'resources'`) |
+| S9 | `test_w2_20_remeasure.py::test_s7_s9_the_remeasure_keeps_the_rebuild_peak_from_rebuild_slot_holders_which_hold_no_verification_lock` | red | `gov resources` does not exist (`invalid choice: 'resources'`) |
+| S19 | `test_w2_20_launch.py::test_s19_s7_a_full_set_of_heavy_slots_never_refuses_a_launch[a lead]` | red | `gov resources --slot` does not exist |
+| S19 | `test_w2_20_launch.py::test_s19_s7_a_full_set_of_heavy_slots_never_refuses_a_launch[a worker]` | red | `gov resources --slot` does not exist |
+| S19 | `test_w2_20_launch.py::test_s19_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken[heavy_slots missing-a lead]` | red | the launcher never consults the gate: `DID NOT RAISE` |
+| S19 | `test_w2_20_launch.py::test_s19_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken[heavy_slots missing-a worker]` | red | the launcher never consults the gate: `DID NOT RAISE` |
+| S19 | `test_w2_20_launch.py::test_s19_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken[heavy_slots malformed-a lead]` | red | the launcher never consults the gate: `DID NOT RAISE` |
+| S19 | `test_w2_20_launch.py::test_s19_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken[heavy_slots malformed-a worker]` | red | the launcher never consults the gate: `DID NOT RAISE` |
 | F1 | `test_w2_20_budget.py::test_s15_every_program_a_heavy_job_starts_gets_the_slots_thread_budget[one worker]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 | F1 | `test_w2_20_budget.py::test_s15_every_program_a_heavy_job_starts_gets_the_slots_thread_budget[four workers]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 | F1 | `test_w2_20_budget.py::test_s17_a_heavy_job_and_its_children_are_confined_to_the_slots_share_outside_the_servers_cpus` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
@@ -426,16 +509,35 @@ of what integrate already does and must keep doing.
 | F5 | `test_w2_20_gate.py::test_a_reading_that_cannot_be_taken_never_opens_the_gate[disk]` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 | F6 | `test_w2_20_memory.py::test_f6_a_workers_memory_is_charged_once_not_in_its_leads_tree_and_again_as_its_own_session` | red | `gov resources` does not exist (`invalid choice: 'resources'`, exit 2, no JSON envelope) |
 
-**Count.** KPI lines with tests: 26 of 26 (20 success, 6 failure); S16 by its `local_only` case only. 146 cases in
-66 test functions; 161 map rows (a case that proves two lines is listed under each).
+**Count.** KPI lines with tests: 27 of 27 (21 success, 6 failure); S16 by its `local_only` case only. 164 cases in
+79 test functions (round 1: 146 in 66); 183 map rows (a case that proves two lines is listed under each).
 
-**Not tested (and why):** S4's literal floors (100 GiB, 10,000,000) are planted, not read from a shipped file: no
-file ships with the product and none may stand as a default (P-3). S7's "the rebuild's peak memory is measured with
-the re-measure and counted like a test run's" has no case: how the re-measure tells a rebuild's tree apart is not
-stated (P-5). S19's "a heavy-job slot" among the readings that refuse a launch has no case: it contradicts S7 (P-2).
-W2-136's F2 entry criterion is not W2-20's to test.
+**Not tested (and why), after round 2:** S4's literal floors are now checked in `--init-config`'s template (P-3);
+elsewhere they stay planted (no default may stand, S8). S7's "the rebuild's peak ... counted by the gate like a test
+run's" has its measuring half (P-5's case) but no case of the gate's use: a running job's memory is already in
+`MemAvailable` and S6 reserves nothing for a run not started, so no reading shows the count apart (package P-7).
+S19's "a heavy-job slot" is tested as P-2 settles it (an unreadable `heavy_slots` refuses; a full set does not).
+W2-136's F2 entry criterion is now W2-20's line, S21.
 
 ## Packages for the orchestrator
+
+**Round 1's P-1 to P-6 are settled** (the CTO, delegated, 2026-11-09; the ticket's "The designer's points settled",
+DEC-1097 (8)): P-1 (a), P-2 (a) with (c), P-3 (a), P-4 confirmed, P-5 (a), P-6 confirmed. They stay below as written
+in round 1, for the record; the cases follow the settlement (table "Round 2's changes").
+
+**P-7 (round 2). Is `rebuild_peak_bytes` a required value of the file (S8: missing shuts), and how does the gate
+count it (S7 "counted by the gate like a test run's")?** Options: (a) required like the other measured values, due
+after seven days, and counted as the verification peak is: not reserved before a run starts (S6), so in practice only
+recorded; (b) optional until the first re-measure writes it (a gap in S8's "a value missing shuts"); (c) reserved for
+a rebuild waiting for its slot (a rule the line does not state). The tests plant it in every file and assert only its
+measure, so (a) and (b) both pass them. Recommendation (a), confidence medium; a case for "missing shuts" and for
+`due_for_remeasure` once decided (one parameter each).
+
+**P-8 (round 2). The plan override's line (S21).** The F2 line says "a launch log"; the tests use P-1's
+`~/.gov-os/machine/launch.log` (one log for every launch override) and ask the line to hold `plan_override`, the
+decision id and the ticket. Alternative: a log of the project's (`.gov-runtime/`), which a lead worktree would not
+share. Recommendation: the machine-wide log, confidence medium-high. A relative `GOV_PLAN_READY` is read against the
+main tree *(choice)*; drop that one row if the dispatcher only ever names an absolute path.
 
 **P-1. The override's form (S19).** "gate_override: <DEC-id> on the launch". Options: (a) a launch option,
 `gov launch ... --gate-override DEC-NNN` / `launch(..., gate_override=)`, written to the launch log and stderr (the
@@ -486,6 +588,16 @@ trip-wire, re-measure and slot as `gov resources` options; the log and start-log
 
 - `gov.check.schema` (line 327) sizes its pool to a fixed `min(8, len(keys))`, not the CPU set (S18 "the product's
   own parallel work"); outside W2-20's paths. A row for its owner.
+- **Round 2: W2-136's launcher cases will meet W2-20's gate.** `tests/acceptance/W2-136/test_w2_136_launch_check.py`
+  (`launcher_with`, lines 97-142) runs the real `launch` with a temporary `HOME` that has no `gate.json` and no
+  planted readings. Once every launch runs the gate (S19), with no file the gate is shut (S8) and those cases
+  (`test_s9_the_launcher_starts_a_lead_the_check_admits`, `..._writes_an_override_in_the_launch_log`,
+  `..._a_worker_launch_never_consults_the_plan`) would be refused by the gate, not by the plan. A recorded rewrite
+  of W2-136's fixture (plant an open gate, or stub it) is needed when W2-20 lands; not this designer's paths.
+- **Round 2: W1-32's command-set case fails on `links` and `plan` too**, apart from `resources` (read from its code
+  and integrate's `gov --help`, lines 79-82; not run without the port): `gov --help` offers `links` and `plan`,
+  which no recorded list names (`RECORDED_GOV_COMMANDS` in W1-07's support), so its "extra" assertion fails on them
+  once `resources` exists. A row for whoever records those commands.
 - `tests/acceptance/W2-07/w2_07_support.py` (line 90) says W2-07's disk floors are top-level keys of the path map,
   while S4 puts them in the gate's configuration file and gives `gov close` one function to call. Two homes for one
   value; W2-07's or W2-66's call should read `check_disk` (S4) rather than its own keys.
