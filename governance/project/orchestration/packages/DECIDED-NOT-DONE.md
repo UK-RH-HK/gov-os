@@ -13,14 +13,14 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | # | item | fate (DEC-1097) | state |
 |---|---|---|---|
 | 1 | ACT-GUARD-SETS-1 | (2) rebuilt with the reader folder and W2-84's cases deleted; rehearsed; operator applies before the 80 | **DONE 11-08**: applied by the owner's operator `15952bbf`; live guard check 453 run, PASS (hook `bd545af83198`); the writer's and checker's transcripts moved into the sets root's transcripts folder; no live worktree to merge |
-| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | Tests DONE 11-09 (88, `c3e0e16b`); the hook role_reads.py added to its paths; engineer next |
+| 2 | W2-141 | (8) tests first, built, reviewed, before the lift's re-pin | **MERGED 11-09** (`b1e2c3b9`, review READY round 2, accept 182/182); its hook change (`docs/changes/W2-141-hook/`) goes live in the lift's re-pin ACT |
 | 3 | G3 | (7) no change before the 80; a ticket after the lift if the review finds it worth it | **DONE (decided)**; readiness 4: no ticket of its own, fold into M5's retest (16 % of items overlap, ~3 % of text) |
 | 4 | G1 fewer scored pairs | (10) after the lift, as an option; the 138 re-measured if adopted | WAITS: after the lift |
-| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Tests revised 11-09 (146, `61682b3e`); F2 a KPI line next; engineer next |
+| 5 | W2-20's launch line | (8) rebuilt to the line and W2-136's F2, reviewed, merged before the lift | Round 1 built (39/164; the interface was in the acceptance README); round 2 BLOCKED: no `~/.gov-os/machine/gate.json` (an owner ACT, option (a)) |
 | 6 | W2-130 and the 110-decision list | (9) now, CPU, proposal per id for the owner's sitting | **DONE 11-09**: the clean-up (`e12f8a30`) and the sitting (`c4420040`) applied |
 | 7 | P-SELECT-GRAPH | (9) now, research only, result to the owner | **DONE**: do not build accepted, DEC-1062 closed (DEC-1098 (2)) |
 | 8 | W2-84's hidden-half cases | (2) deleted with ACT-GUARD-SETS-1 | **DONE 11-08** (`15952bbf`); its three support files stay, a row for W2-84's close |
-| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | Filed W2-145 `DAEO-2tfd`; tests DONE 11-09 (79 + 25 revised); engineer next |
+| 9 | no private reranker | (8) a new ticket, tests first, built before the lift | **MERGED 11-09** W2-145 (`22b734cb`, review READY round 2, accept 79/79); the slot-hold watcher retires at the lift's re-pin |
 | 10 | P-LB-PRODUCT-1 | (11) into the three-layer plan after the lift | WAITS: after the lift |
 | 11 | Q07/Q14; the visible 40's gaps | (12) Q07/Q14 after the 80, before any 138 re-measure; gaps to the next label audit | Q07/Q14 **DONE 11-09** (`55d1c029`, the sets root's visible copy synced); the gaps WAIT: the next label audit |
 | 12 | the status block's K9 | (15) computed from the plan's list | **DONE 11-08**: `tools/status_block.py` reads `keystone_lists` in `log/report-state.json` (K9 from D9-FATES §3, 22 tickets; K7 done by DEC-1089); K9 now "in progress". K5 and K8 have neither a list nor a tag |
@@ -42,6 +42,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | **DONE 11-09** (`c4420040`; audit READY; gov links 2204 -> 1973). Rows to D-6 part 2: the 29 test-fixture ids now flagged ENFORCES_SUPERSEDED (made-up ids; the check to skip test fixtures), the loader's 8 wrong pairs, MR-1..MR-6 regenerated from contract.yaml |
 | 25 | the sandbox-and-guard experiment | (4) the design package to the owner first; then run; both results before W2-56 builds | **Design to the owner 11-09** (`SANDBOX-GUARD-EXP-1.md`); WAITS: the owner's answers (§7, ten), then a declaration, then the run |
 | 26 | ADR-0002 re-read | (5) at the lift's re-pin | WAITS: the lift's re-pin |
+| 49 | the lift's re-pin ACT carries | W2-136, W2-137, W2-138, W2-141 (+ its hook), W2-142 (+ the `.claude/` skill copies), W2-145 (watcher retired), W2-147, W2-20 | WAITS: W2-20, then D-10 and the owner's word |
 | 27 | the work in order | (6) item 8; Q07/Q14; W2-139/W2-140; the sitting; D-5, D-6 part 2; D-10 on the owner's word; the lift | IN PROGRESS 11-09 |
 
 ## 0c. DEC-1099's items (2026-11-09)
@@ -63,7 +64,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 37 | ACT-SELECT-FIXES-1 | (1) the test-map couplings and W2-66's record-only case always run; an ACT for the operator | **Rehearsed 11-09** with F1 (a): named 34/34, actually run 30/34 (23 gates, 7 report-only; 18 without); WAITS: the operator, and the owner on D-4's 3 capped and 7 lifted cases |
 | 38 | W2-66c | (1) tests first, pins (i) and (ii) | Filed `DAEO-btcs` (`28b4b5ba`); its test designer next |
 | 39 | the scoped selection's hook line | (2)-(3) trigger (a), one line in the reference-transaction hook, an ACT for the operator; in the CTO's tools first | Rehearsed 11-09 (ACT-SELECT-HOOK-1; `tools/landing_select.sh` 45/45); WAITS: the operator. Row to W2-116: its hook line passes a worktree's GIT_DIR to gov rebuild |
-| 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first: broken only at a ticket inside the cycle; a ticket outside every cycle keeps its waits | NOT STARTED: W2-147 to file, its test designer first |
+| 41 | `gov plan`'s cycle break (DEC-1102) | fixed before the lift's re-pin, tests first | **MERGED 11-09** W2-147 (`7ed72a1e`, review READY, accept 25/25); live at the lift's re-pin |
 | 40 | (iii) into W2-115 | (4) once proven in use; widen the trigger if an emergency merge reds again | WAITS: proven in use |
 
 ## 0e. DEC-1101's items (2026-11-09; standing)
