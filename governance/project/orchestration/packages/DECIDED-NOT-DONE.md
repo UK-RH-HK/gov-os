@@ -106,7 +106,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 65 | D-6 part 2 (with its rows) | **MERGED 11-09**: A-F, then F2 (`757cf3109` W2-129 S18, `336828354` W2-55 S9, merged together; accept W2-129 156/0, W2-55 55 with the 3 backfill base reds on D-10's list); D-6 part 2 complete; a Wave 3 row: gov links counts an entry marked if its status line names the changer anywhere |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | **MERGED 11-09** W2-149 (`b4de529b`, accept 77/77, review READY round 2) |
-| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | WAITS: the owner's yes (class (b)); rehearsal run 6 0 failures with the listing-only walk; the live check 8 ms → 11 ms, ready to apply; then the operator |
+| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | WAITS: the owner's operator applying it by hand (yes 11-09, DEC-1115 (1)); next: the CTO merges integrate into the live worktrees, runs sets_globs_check.py on the live tree, W2-141's hook rebuilt (row 78) |
 | 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | IN PROGRESS 11-09 (helper of `ad44f5fe`): drafting `drafts/w2-149-install/`, built after ACT-SETS-GLOBS-1 and the F11 merge; **found: the five approved briefs cannot launch through the merged script** (no `model`/`result_schema` in any front matter, no `sample` in the labellers' and the auditor's: refusal 10; the labellers' two rounds, the overlap auditor's inputs and the deliveries' names are unbuilt, sandbox-exp README "none of it is built"); next: a W2-149 follow-up for set-up A's wiring, tests first (the CTO's to open), then this ACT rebuilt if the template changes; next: the package's review |
 | 77 | W2-149's F11 follow-up | the launch script passes `--setting-sources project` (defence in depth: the user's allow-all settings never load into a wall; delegated; S10's wording marked `[changed, DEC-1112 (3): F11]`, `5f8c85733`), tests first | IN PROGRESS 11-09: the designer's case `8bb4d9726` (red for the reason), merged into `w2/W2-149-f11` (`5e3c9abf4`); next: the engineer, one review, the live S11 re-run, the merge |
 | 78 | W2-141's hook rebuilt on the new hook | its staged change (docs/changes/W2-141-hook/) rebuilt on top of ACT-SETS-GLOBS-1's hook before the lift's re-pin ACT | WAITS: ACT-SETS-GLOBS-1 applied |
@@ -129,6 +129,13 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 80 | W3-P28: ranked search for sandboxed workers without opening every Unix socket | DONE (parked) 11-09: `docs/plan/WAVE_3_PARKING.md` W3-P28; a ticket in Wave 3 |
 | 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3, R5 follow-ups before the close, tests first (NOT STARTED); R1 to W2-60a's rows (NOT STARTED); R2, R4 rows for the close review; R6 parked as W3-P29 (DONE) |
 | 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | **DONE 11-09**: `packages/FORECAST-W2-2.md`, sent to the owner |
+
+## 0k. DEC-1115's items (2026-11-09; item 4 standing until the lift)
+| # | item | state |
+|---|---|---|
+| 83 | ACT-CLAUDE-COPIES-1 by the operator agent, its first live run | WAITS: the owner's yes in the agent's form (`yes ACT-CLAUDE-COPIES-1 5d3a1883`); next: the CTO queues `ACT-CLAUDE-COPIES-1 <manifest sha>`; on a refusal the CTO tells the owner why and the operator applies §5 by hand |
+| 84 | TPL-6's Appendix A cut to the pointer | **DONE 11-09** (this commit) |
+| 85 | past 80 % of the week's usage before the lift, only the lift's critical path runs | STANDING until the lift (rule 6); usage 33 % at 22:41 11-09 |
 
 ## 1. Every item not done, partly done or waiting
 
