@@ -13,7 +13,8 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
    DEC-1109 (3)). A stop-hook check enforces it once its ACT is applied.
 2. **Decided but not done.** Every decision with a stage trigger enters
    `governance/project/orchestration/packages/DECIDED-NOT-DONE.md` the moment it is decided, and is ticked off with its
-   commit when done; read it at session start and whenever a stage ends (DEC-1097).
+   commit when done; read it at session start and whenever a stage ends (DEC-1097). A row's state begins DONE, MERGED,
+   APPLIED, IN PROGRESS, NOT STARTED or WAITS, and any pending step is written `next: …` (the idle check reads these).
 3. **ACTs.** Given to the owner as a message for the owner's operator, never as terminal commands; the owner does only
    re-pins, pushes and sudo (DEC-1104 (4)). Once the operator agent is live (ACT-OPERATOR-1): class (a) ACTs go to its
    queue after rehearsal, a READY review and matching hashes; class (b) need the owner's `yes ACT-<id> <sha8>`. The CTO

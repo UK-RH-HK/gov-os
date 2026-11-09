@@ -70,7 +70,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0e. DEC-1101's items (2026-11-09; standing)
 | # | item | fate (DEC-1101) | state |
 |---|---|---|---|
-| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **APPLIED 11-09** by the operator (`147706ae`); the CTO merges the live worktrees, W2-56's first, and runs walls_check.py repo |
+| 42 | the walls ACT | (3) path map, guard and the folders' settings for the automated sessions, one ACT, rehearsed | **DONE 11-09**: applied by the operator (`147706ae`); W2-56's worktree merged; walls_check.py repo PASS (245 run, 0 failed) |
 | 43 | the launch script | (3) tests first, one review | WAITS: the ACT's design |
 | 44 | the fixed briefs and their package | (3) writer, checker, auditor, labeller, to the owner with set size, walls, costs, home tickets, W2-88's lines, the first audit's date | WAITS: the script |
 | 45 | the periodic audit | (1) every two weeks while active, monthly once stable; the regression pool | WAITS: 42-44 |
@@ -106,7 +106,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 65 | D-6 part 2 (with its rows: the fixture ids, the loader's 8 pairs, MR-1..6, the live-hook suites' temp folder) | IN PROGRESS 11-09: plan `LIFT-1/D6-PART2.md` (A W2-129 S17, B W2-92 S11, C W2-151, D W2-141 S4, E W2-150; F W2-130/W2-55 after) |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | IN PROGRESS |
-| 68 | the replay set builder (DEC-1108 (2)) | **MERGED 11-09**; the installed agent needs a re-install ACT (ACT-OPERATOR-2) to carry it; the replay refuses until the log has 48 h of history (about 11-11 18:16Z); path-map ACTs through the agent after both |
+| 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS: merged 11-09 (`a170641e`); next: ACT-OPERATOR-2 re-installs the agent to carry it; WAITS: the call log's 48 h of history (about 11-11 18:16Z) before path-map ACTs go through the agent |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
 ## 0i. DEC-1110's items (2026-11-09)
