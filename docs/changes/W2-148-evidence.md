@@ -31,7 +31,7 @@
 | S12 G8 dry run | `Run._g8`: a clone at the live head outside the live tree (system temp), a planted HOME and a crontab stub; check, apply, the changed set (tree, HOME, crontab) equal to the touched list, the checks, undo byte for byte | gov accept S12; unit `test_g8_*`; fault "an unlisted file touched" |
 | S13 G9 holds | `Run.g9`: quiet hours, the nightly window, the close flag, the CTO's and the operator's `act-in-progress.txt`; it waits (a `G9 held` line) and proceeds | gov accept S13; unit `test_g9_*` |
 | S14 apply and commit | `Run.apply`: the freeze, the journal, `apply.sh apply`, the after-hashes, the checks, the live unlisted-file check, the staged list, the commit with its trailers; the freeze removed | gov accept S14; unit `test_an_a_act_is_applied_*`, `test_a_staged_extra_file_is_refused` |
-| S15 control files for (a) | `after_checks`: the controls' bytes before and after; the guard replayed on the last 48 hours of calls on a clone (old and new lists); any other difference undoes the ACT's own touched files at once and pushes P1; the control file itself is left exactly as it is, the lock held, the P1 naming it (DEC-1106 (1), round 3) | gov accept S15; unit `test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left`, `test_a_path_map_addition_*`, round 3's `test_a_*_during_the_checks_*` |
+| S15 control files for (a) | `after_checks`: the controls' bytes before and after; the guard replayed on the CTO's call set on a clone (old and new lists), only after the set is checked against the guard's call log by sha256 both ways (DEC-1108 (2), "Replay check" below); any other difference undoes the ACT's own touched files at once and pushes P1; the control file itself is left exactly as it is, the lock held, the P1 naming it (DEC-1106 (1), round 3) | gov accept S15; unit `test_an_a_act_changing_a_control_file_live_is_undone_and_the_control_left`, `test_a_path_map_addition_*`, round 3's `test_a_*_during_the_checks_*` |
 | S16 the landing check | `landing_check.py`: outside a ticket as the landing selection reads it; the rule table's control rows | gov accept S16; unit `test_the_landing_check_*` |
 | S17 queue and launch | `operator_launch.py`: the oldest `.req`, a malformed one moved aside under its own name, the wall built under the root, a clean environment, pid and pgid recorded, waited and stopped by them; APPROVED checked on every run and launch | gov accept S17; unit `test_the_launcher_*`, `test_a_malformed_request_is_moved_aside`, `test_an_approved_mismatch_*`, `test_no_wait_or_stop_by_a_name_match` |
 | S18 the canary | `operator_launch.canary`: a Read outside the wall must come back in `permission_denials`, else refused before the session | gov accept S18; unit `test_the_canary_refuses_*` |
@@ -54,7 +54,9 @@
 | `clock` | none: the system clock |
 | `pings_log` | `<home>/.config/gov-os-notify/pings.log` (the dead-man's log channel) |
 | `push_cmd` | unset: a notice goes through the dead-man's three channels from the install's own code (the `pings_log` line, the Windows toast through `install/win_toast.ps1`, a headless `claude -p` asked to call PushNotification), one line of at most 190 characters (F4, F19); when set, `<push_cmd> <notice JSON>` replaces the toast and the push (the tests' stub) |
-| `calls` | `<operator root>/log/calls.jsonl`: the call log the operator writes itself during its dry run (G8), one `{id, time, role: operator, ticket: <ACT>, event: {tool_name: Bash, tool_input: {command}, cwd: "."}}` line per command it runs there; the replay reads it |
+| `calls` | `<operator root>/log/calls.jsonl`: the CTO's call set for S15's replay (DEC-1108 (2)): a header line with its window, then calls and dropped calls; until the CTO's tool writes it, a path-map or deny-list ACT is refused at its after-check. The agent never writes it: its own dry-run commands (G8) go to `<operator root>/log/operator-calls.jsonl` |
+| `guard_calls` | `<home>/.gov-os/guard-calls`: the guard's call log, one `<UTC day>.jsonl` per day (ACT-GUARD-CALLLOG-1), read only |
+| `replay_stale_h` | 12: how old the set's `until` may be, in hours |
 | `close_flag` | `<scratch>/CLOSE-RUNNING` (close_queue.sh's lock) |
 | `nightly_window` | `03:50-08:00` (the wake at 03:50, the nightly 04:00 to about 07:00, its check at 08:00) |
 | `poll_s` | 60 |
@@ -68,6 +70,45 @@ run's own freeze is still removed at its end); the session's pid and pgid are in
 `log/session.json`; a malformed request goes to `queue/rejected/<stamp>-<pid>/<its name>`, a taken one to
 `queue/taken/…` and then `queue/done/…`. Without `--config`, the install reads `install/operator-settings.json` when
 it exists (hashed in APPROVED like the code), else the defaults above.
+
+## Replay check (DEC-1108 (2))
+
+S15's replay no longer trusts the `calls` file. `replay()` in `operator_run.py` now checks the CTO's call set against
+the guard's call log first; no guard hook runs until the check passes. Any refusal goes through the after-check's undo
+and P1, as every replay refusal does.
+
+| Step | Code | Refuses with |
+|---|---|---|
+| 1 the window | `read_call_set`: the first line is a header with `window.since` and `window.until`; `until` at most clock + 5 min and at least clock − `replay_stale_h`; `until − since` ≥ 48 h | `no header`; "ahead of the clock"; `window stale`; `window short` |
+| 2 well formed | `read_call_set`: each later line is a call (an `event` object; its sha256 recomputed from the event) or a dropped call (64-hex `sha256`, non-empty `dropped`) | "the call set has a malformed line (line N)" |
+| 3 the log whole | `read_guard_log`: the folder exists; each UTC day file from since − 2 min to until + 2 min has no `.capped` marker and no malformed line (a JSON object with a parseable time, a string session, a null or 64-hex sha256) | `log missing`; `log capped (YYYY-MM-DD…)`; `log malformed (YYYY-MM-DD…)` |
+| 4 set to log | `check_against_log`: each set line in [since, until] (or with no parseable time) has a log line with the same session and sha256, timed within [since − 2 min, until + 2 min] | named by the call's `id` |
+| 5 log to set | `check_against_log`: each log line in [since + 2 min, until − 2 min] with a lower-case UUID session and tree `main` or `worktree` has a set line in the window with the same session and sha256; a null sha256 counts as missing | named by session[:8], sha256[:12] and the log line's own time |
+
+- **The hash** is the live hook's `action_bytes` (read from `.claude/hooks/pretooluse.py`, not imported):
+  `json.dumps({"tool", "input"}, sort_keys=True, separators=(",", ":"), ensure_ascii=False)` encoded as UTF-8 (with
+  `surrogatepass`, as the hook does, so a lone surrogate hashes the same instead of raising).
+- **The mismatch reason** lists at most 5 of each kind, with the counts, and never an input's text.
+- **The re-judging** runs as before over the set's calls in the window (dropped calls are counted by reason in the
+  log line's `replay.dropped`, never re-judged). Each call takes the **role and ticket of its matching log line** (the
+  nearest in time when several match), given to the hook as `GOV_ROLE`/`GOV_TICKET`. Every hook run has
+  `GOV_GUARD_CALLS_DIR` set to `<the replay's temporary folder>/guard-calls`, so the live log is never written.
+- **The agent's own record** of its dry-run commands moved from `log/calls.jsonl` (the call set's default) to
+  `log/operator-calls.jsonl`. Otherwise the agent would have appended lines with no session to the CTO's set, and
+  those lines would have failed step 4.
+- **The trial (S23):** `Planted` now plants a call set (a 48.5-hour window ending 30 min before the trial's clock,
+  one call) and its guard log line in each world's own temporary folder (`calls`, `guard_calls` in its config). The
+  two agree both ways: `check_against_log` matched 1 of 1. ACT-GUARD-SETS-1 was replayed again with them: whole, (O)
+  refused at G6 ("yours"); its control part, (b) applied with the owner's yes. **Both outcomes are unchanged.** S15's
+  after-check runs only for an (a) ACT, so GUARD-SETS-1 ((b)) never reaches the replay. The planted set and log keep
+  every trial world complete for an (a) path-map ACT. The full trial's `main` was not re-run here: it hashes the live
+  `~/.claude/` and `~/gov-os-operator/`, which this session may not read. The review re-runs it.
+- **Unit tests** (`tests/unit/operator/test_w2_148_replay.py`, 18 cases): each window refusal, four malformed set
+  lines, the log missing, capped and malformed, a set call with no log line, a logged live call missing, a null log
+  sha256, non-live sessions and trees not required, calls outside the window ignored, the hash, and end to end: a
+  mismatch undone with a P1 naming it, the log's role winning both ways, and the replay's hook runs writing only to
+  its own folder (the live log's bytes unchanged). The run test's path-map case now plants an agreeing set and log.
+- **Verified:** `tests/unit/operator/` 202 passed; `gov accept W2-148` 183 passed, 0 failed (every line green).
 
 ## What the trial could not do in the sandbox (for the CTO's run outside it)
 
