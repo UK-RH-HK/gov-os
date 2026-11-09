@@ -31,6 +31,9 @@ allowed_paths:
 - src/gov/retrieval/measure.py
 - tests/unit/util/**
 - docs/changes/W2-150-evidence.md
+- src/gov/retrieval/retrieve.py  # the fifth edge, retrieve.py -> guard.role_paths (W2-13 S5's role filter, after E-2 was measured); P1-PLAN's D-6 row names retrieve.py [changed, DEC-1109 (2)]
+- src/gov/retrieval/supplementary.py  # its role_paths and decisions.register imports, the same edges [changed, DEC-1109 (2)]
+- src/gov/guard/role_paths.py  # re-imports what moves out of it, as the other guard modules do [changed, DEC-1109 (2)]
 kpis:
   success:
   - 'S1 Memory''s static import closure holds none of the gates: following every import statement (module level and inside functions) from the memory modules (every module of gov.retrieval, gov.retrieve, gov.store and gov.secrets) through src/gov reaches no module of gov.close or gov.guard and not gov.decisions.checker. Verify: a static walk of src/gov''s imports on the branch [DEC-1039 (2), DEC-1040 (1), P1-PLAN P1-6 item 1]'
@@ -78,3 +81,5 @@ close and guard suites (the CTO checks `select_tests.py` on a `src/gov/retrieval
   one review. Overlaps: W2-139/W2-140 touch none of these paths.
 
 **Filed 2026-11-09 by the CTO (DEC-1109 (2)).**
+
+**The test designer's discoveries placed here (CTO, 2026-11-09; DEC-1109 (2)):** a fifth edge, `retrieval/retrieve.py:39` and `supplementary.py:135` -> `gov.guard.role_paths` -> `guard.reads` -> `guard.decide` (W2-13 S5's role filter, `5b42e981`, a day after E-2's measure), and a second route to `decisions.checker` through `supplementary.py:56` -> `gov.decisions.register` -> `gov/decisions/__init__`. The three paths are added; S1 stands as written (no exception for the role filter). The untangling moves names (the role filter's path rules, `leave_out`) into `gov.util` or `gov.store`; it never hides an import from the walk (no `importlib` in place of an import statement).
