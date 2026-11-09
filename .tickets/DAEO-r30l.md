@@ -30,6 +30,12 @@ allowed_paths:
 - src/gov/launch/plan_check.py  # W2-136's F2 entry criterion [added, DEC-1088 (5)(b); DEC-1097 (8)]
 - src/gov/launch/launcher.py  # the launch's call of the gate and its override (P-1) [added, DEC-1088 (5)(b); DEC-1097 (8)]
 - src/gov/launch/command.py  # gov launch's --gate-override and --gpu-need-mib options (P-1) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_runs.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w1_28.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w1_32.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w2_136_plan_check.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/rebuild/test_w2_76_watch.py  # its machine-wide rebuild-lock default, now each tree its own (S7, DEC-1001 (d)) [added, DEC-1097 (8)]
+- tests/unit/rebuild/test_w2_76_lock_override.py  # the same [added, DEC-1097 (8)]
 kpis:
   success:
   - gov resources reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under ~/.gov-os/machine/, whichever repository started it.
@@ -141,3 +147,9 @@ Now a KPI line, with `plan_check.py` in the paths [added, DEC-1088 (5)(b); DEC-1
 - **W2-136's launcher cases** (`tests/acceptance/W2-136/test_w2_136_launch_check.py`) plant no gate configuration, so
   once every launch runs the gate they would be refused by it (S8, S19): a test designer revises their fixture to plant
   an open gate, landing with this ticket's change (G-1).
+- **The engineer's round-1 points (the CTO, 2026-11-09):** (1) (a): each tree its own rebuild lock (S7, DEC-1001 (d));
+  W2-76's two unit tests that pin the machine-wide `/tmp/gov-os-rebuild.lock` default change with it (in the paths).
+  (2) The launch unit tests that start a launch with no gate planted (`test_runs.py`, `test_w1_28.py`, `test_w1_32.py`,
+  `test_w2_136_plan_check.py`) plant an open gate in their fixtures only (unit tests, the engineer's; in the paths).
+  (3) The interface the acceptance cases assume (the designer's README, "The interface these tests assume") is the
+  spec the engineer builds to: the CTO hands that section to the engineer in its brief.
