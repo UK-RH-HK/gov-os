@@ -21,6 +21,10 @@ that override, and a lead's plan override, are written to
 ``~/.gov-os/machine/launch.log`` and to stderr (P-1, P-8). A started session is
 in the machine-wide registry while it runs.
 
+Every session, lead or worker, gets its role's template as the appended system prompt
+(``--append-system-prompt-file <root>/.claude/templates/<stem>.md``, after the caller's arguments); a launch whose
+template is missing is refused (W2-153, DEC-1050).
+
 No message of this module carries a held-out path.
 """
 
@@ -58,6 +62,19 @@ OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
 # environment: a worker launch never consults the plan (DEC-1088 (5)(a), settled by the CTO).
 LEAD_ROLES = ("lead", "orchestrator")
 LEAD_GOV_ROLE = "orchestrator"
+# W2-153 (DEC-1050, W2-128 TPL-4): the role -> template map. The template is the session's appended system prompt;
+# gov.adapters.portability reuses the map for the subagent sources and the template copies.
+ROLE_TEMPLATES = {
+    "engineer": "role-engineer",
+    "independent-test-designer": "role-test-designer",
+    "independent-auditor": "role-reviewer",
+    "product-spec": "role-product-spec",
+    "research": "role-research",
+    "lead": "role-lead",
+    "orchestrator": "role-lead",
+}
+TEMPLATES_REL = ".claude/templates"  # the generated copies, written only by an ACT (DEC-315)
+TEMPLATE_FLAG = "--append-system-prompt-file"
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
@@ -300,6 +317,16 @@ def _check_cli_args(cli_args: list[str]) -> None:
                           "would have no guard hook")
 
 
+def template_args(root: Path, role: str) -> list[str]:
+    """The flag that gives the session its role template, by absolute path; refused when the file is missing, so no
+    session starts without its template (W2-153 S1, F1)."""
+    path = root / TEMPLATES_REL / f"{ROLE_TEMPLATES[role]}.md"
+    if not path.is_file():
+        raise GovError("LAUNCH_NO_TEMPLATE", f"the role template {path} is missing: no '{role}' session starts "
+                                             f"without it (DEC-1050)")
+    return [TEMPLATE_FLAG, str(path)]
+
+
 def check_lead(root: Path, ticket_id: str):
     """The plan's check of a lead (W2-136 S9): ``gov.launch.plan_check.check_lead``, looked up when called."""
     from gov.launch import plan_check
@@ -400,14 +427,15 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         plan_override = _admit_lead(root, ticket_id)
         _check_cli_args(cli_args)
         _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
+        template = template_args(root, role)
         cli = _cli()
         lock = StartLock()
         try:
             _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, build_lead_settings(ticket_id), cli_args, entry=(ticket_id, LEAD_GOV_ROLE),
-                        lock=lock)
+            return _run(root, cli, build_lead_settings(ticket_id), [*cli_args, *template],
+                        entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
     if role not in WORKER_ROLES:
@@ -416,6 +444,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     _check_cli_args(cli_args)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
+    template = template_args(root, role)
     cli = _cli()
     settings = build_settings(root, role, ticket_id)
     faults = sandbox_faults(settings)
@@ -432,7 +461,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         if name is not None and not os.path.lexists(name):
             runs.make(name, str(root))
         own = runs.own_folder(str(root), ticket_id, role)
-        return _run(root, cli, settings, cli_args, temp_prefix=f"gov-launch-{role}-", own=own,
+        return _run(root, cli, settings, [*cli_args, *template], temp_prefix=f"gov-launch-{role}-", own=own,
                     entry=(ticket_id, role), lock=lock)
     finally:
         lock.release()
