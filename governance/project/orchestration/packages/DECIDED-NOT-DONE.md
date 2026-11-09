@@ -36,7 +36,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0b. DEC-1098's items (2026-11-09)
 | # | item | fate (DEC-1098) | state |
 |---|---|---|---|
-| 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | IN PROGRESS 11-09 |
+| 21 | W2-88's lines for the memory standard | (1) a package to the owner: the standard built at Wave 0, proven with the repository's own tuning set and a fresh verdict set, once | **Package to the owner 11-09** (`W2-88-STANDARD-1.md`, S10-S17); WAITS: the owner's six answers, then W2-88's test designer applies the lines |
 | 22 | P-SELECT-GRAPH's three cheaper fixes | (2)(b) proposals: test-map couplings; W2-66's record-only case always run; a scoped selection on every commit outside a ticket touching settings, the registry or the test map | IN PROGRESS 11-09 |
 | 23 | the code route confirmed | (2)(b) its figures on the 138 and the 80 (callers questions; where it supplied the gold) | IN PROGRESS 11-09 |
 | 24 | W2-130's sitting applied | (3) A-G, H1 (b) (open and in-progress tickets; KPI 4 changed), H2 | IN PROGRESS 11-09 |
