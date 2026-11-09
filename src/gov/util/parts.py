@@ -2,9 +2,8 @@
 
 Moved from ``gov.guard.reads`` unchanged (DEC-1039 (2), DEC-1109 (2)), so that memory's measure
 (``gov.retrieval.measure``) and the role filter (``gov.util.role_paths``) read them without importing the guard;
-``gov.guard.reads`` imports every name from here. ``_Glob`` is ``gov.guard.protected._Glob`` and ``load_yaml_unique``
-is ``gov.guard.heldout.load_yaml_unique``, copied as they stand: those two files are outside W2-150's paths, and
-re-importing them from here is their follow-up.
+``gov.guard.reads`` imports every name from here. ``_Glob`` and ``load_yaml_unique`` are defined here only:
+``gov.guard.protected._Glob`` and ``gov.guard.heldout.load_yaml_unique`` are these objects, imported (W2-150 S6).
 
 Nothing here carries a path in a message (DEC-820).
 """

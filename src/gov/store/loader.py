@@ -33,7 +33,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import sqlite3
 import subprocess
@@ -41,6 +40,8 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.util.gitenv import git_env
+# The fingerprints' git runner is the close's own (``gov.close.repo.git``, DEC-500): one source (W2-150 S6).
+from gov.util.gitrun import git as _commit_git
 from gov.util.patterns import _match_pattern
 
 STORE_REL = ".gov-runtime/store.db"
@@ -594,25 +595,6 @@ SCHEMA_DIRS = ("template/governance/kernel/schemas", "governance/kernel/schemas"
 SCHEMA_RELS = tuple(f"{folder}/{TEST_MAP_SCHEMA}" for folder in SCHEMA_DIRS)
 ALWAYS_CODE = frozenset((PATH_MAP_REL, TEST_MAP_REL, *SCHEMA_RELS))
 PREFIX = "sha256:"
-
-
-def _commit_git(root: Path, *args: str) -> str:
-    """The output of a git command, as ``gov.close.repo.git`` gives it with its defaults (DEC-500): no ``GIT_*``
-    variable of the caller's passed on, replacement refs not followed, the configuration pinned (W2-M161);
-    ``GIT_FAILURE`` on any exit code but 0. A copy: ``gov.close.repo`` is outside W2-150's paths."""
-    env = git_env(root, pinned=True,
-                  base={key: value for key, value in os.environ.items() if not key.startswith("GIT_")})
-    try:
-        done = subprocess.run(["git", "-C", str(root), "--no-replace-objects", *args],
-                              capture_output=True, text=True, env=env, input=None, stdin=subprocess.DEVNULL)
-    except OSError as e:
-        raise GovError("GIT_FAILURE", f"git {args[0]} cannot run: {e}",
-                       {"root": str(root)})
-    if done.returncode not in (0,):
-        raise GovError("GIT_FAILURE",
-                       f"git {args[0]} failed: {done.stderr.strip()[:200]}",
-                       {"root": str(root), "arguments": list(args)})
-    return done.stdout
 
 
 def _commit_tree(root: Path, commit: str) -> dict[str, str]:
