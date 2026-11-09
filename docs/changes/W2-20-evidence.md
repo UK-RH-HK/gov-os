@@ -1,90 +1,120 @@
-# W2-20 — the machine-wide resource gate: evidence (DAEO-r30l, the rebuild under DEC-1097 (8))
+# W2-20 — the machine-wide resource gate: evidence (DAEO-r30l, round 2: built to the stated interface)
 
-Built on `w2/W2-20` (today's `w2/integrate` with the designer's cases, `a71d9670e`). The 10-17 build (`w2/W2-20-1017`)
-was read for its interface only: its reading variables (`GOV_RESOURCES_MEMINFO`, `_LOADAVG`, `_NPROC`), its registry
-layout (`~/.gov-os/machine/sessions/<pid>.json`), `gov resources --check` / `--register`, exit 3 and
-`RESOURCE_GATE_SHUT` are kept; its code (DEC-742's weights and session ceiling, gone by DEC-983) is replaced.
+Round 1 (`8985180a3`) built every line but S16, but `gov accept W2-20` passed 39 of 164: the acceptance cases assume an
+interface (the designer's README, "The interface these tests assume") round 1 could not see. Round 2 brings the product
+to that interface, handed to the engineer in its brief (the ticket's round-1 point (3)); the engineer read only the
+interface and `gov accept`'s results and one-line failure messages, never the cases.
 
 **Where it lives:** `src/gov/resources/` (`config.py` the one file, `machine.py` the readings, `registry.py` the
-sessions, `gate.py` the conditions, `slots.py` the slots, budgets, CPU sets and trip-wire, `measure.py` the re-measure,
-`command.py` the command); `src/gov/launch/gate.py` (the start check and the launch log); `launcher.py`, `command.py`,
-`plan_check.py` (the launch's enforcement and F2); `rebuild/watch.py` (each tree its own lock); `secrets` and
-`codeintel` (pools); `retrieval/ollama.py` (DEC-1037). Unit tests: `tests/unit/resources/` (118 cases),
-`tests/unit/rebuild/test_w2_20_tree_lock.py`, `tests/unit/secrets_check/test_w2_20_pools.py`; planted machines only.
+sessions, `gate.py` the conditions and `check_disk`, `slots.py` the slots, CPU sets, thread budgets and trip-wire,
+`measure.py` the sample and re-measure, `command.py` the command; `gov.resources.check_disk` for `gov close`);
+`src/gov/launch/gate.py` (the start check and the launch log); `launcher.py`, `command.py`, `plan_check.py` (the
+launch's enforcement and F2); `rebuild/watch.py` (each tree its own lock); `secrets` and `codeintel` (pools);
+`retrieval/ollama.py` (DEC-1037). Unit tests: `tests/unit/resources/` (150 cases), `tests/unit/rebuild/test_w2_20_*`,
+`tests/unit/secrets_check/test_w2_20_*`; planted machines only.
+
+## What round 2 changed (the interface)
+
+- **The file** `~/.gov-os/machine/gate.json`: every value `{"value", "date", "source"}`; keys `memory_floor_bytes`,
+  `verification_peak_bytes`, `working_size_bytes`, `rebuild_peak_bytes` (required, P-7), `disk_floor_bytes`,
+  `inode_floor`, `verification_lock`, `gpu_margin`, `oom_floor_bytes`, `heavy_slots`, `gpu_shares`
+  (`{"embedder_mib", "reranker_mib"}`), `thread_budget` (optional), `embedding_servers` (`shared` and `query`, each
+  `cpus`, `nice`; `query.device`). No default stands in for a missing value; round 1's `disk_path` and its GPU-share
+  default are gone. A fault is one `config` reason naming its key (or `gate.json`), `reading` the raw value.
+- **The reading:** `registry`, `available_memory_bytes`, `sessions_live_memory_bytes`, `load_1m`, `load_15m`,
+  `busy_cores_1m`, `embedding_cpu_p95`, `nproc`, `disk`, `sessions` (with `live_memory_bytes`), `cleared`, `slots`
+  (`total`, `held`), `gpu`, `gpu_room_mib`, `due_for_remeasure` (key names), `gate`. Conditions only `memory`, `load`,
+  `cpu`, `disk`, `inodes`, `config`, `gpu` (round 1's `sessions` and `slots` conditions gone).
+- **The conditions as stated:** memory `available + live >= floor + working_size x (running + 1)` (round 1 counted a
+  session at what it used, DEC-961's wording; the interface counts the working size); cpu `busy + p95(shared) +
+  p95(query) < nproc` (round 1 counted the servers' p95 in place of their current use).
+- **The readings' sources:** `GOV_RESOURCES_BUSY_CORES`, `GOV_RESOURCES_EMBEDDING_CPU`, `GOV_RESOURCES_DISK` name a
+  file holding the value (as `GOV_RESOURCES_MEMINFO` does), else the gate's own sampling; `nvidia-smi` from `PATH`
+  with the stated fields; a process's GPU kind from its command line (an `ollama*` word an embedder, `rerank` a
+  reranker).
+- **The slot command:** `--slot test|rebuild [--tree T] [--workers N] -- CMD`: no memory wait (round 1 waited for room
+  for the job's peak, which kept planted low-memory cases from ever starting); a rebuild takes its tree's lock first;
+  the thread variables set to the budget whatever the caller had; `slots.held` lists one entry per running job.
+- **The trip-wire:** one pass, result `stopped`; the stop kills the job's command group, then its runner. The runner's
+  own periodic pass acts only on the kernel's memory reading (a planted reading is a test's, read by its own passes).
+- **Sample and re-measure:** `samples: [{pid, tree_memory_bytes, verification}]` (slot holders also `kind`);
+  `--remeasure` returns `{"old": {key: value}, "new": {key: value}}` (the entries written under `written`).
+- **The launch:** refusal `GovError("LAUNCH_REFUSED", "the resource gate is shut: memory: reading N, limit M (DEC-1088
+  (5))")`; the override line `gov launch: OVERRIDE gate_override: DEC-NNN: <role> <ticket> started with the resource
+  gate shut: ... (DEC-899)` in the launch log and on stderr; a plan override's log line holds `plan_override`, the
+  decision and the ticket, and W2-136's own `OVERRIDE` line stays on stderr.
+- **The query start:** its output in `~/.gov-os/machine/embedding-query.log`; one JSON line per start in
+  `embedding-starts.jsonl` (`time`, `server`, `device`, `caller` `{pid, cwd, command}`).
+- **The GPU's `[N/A]` (ACT-GATE-CONFIG-1 note 2):** where a kind's processes are on the GPU but their memory reads
+  `[N/A]` (WSL), that kind holds its share, already inside the GPU's used memory, so nothing more is kept back for it;
+  a kind with no process keeps its whole share. The free memory alone then decides: the rehearsal's 1,024 MiB start of
+  kind `other` with 9.5 GB free is admitted. Unit case:
+  `test_per_process_memory_that_cannot_be_read_holds_its_share_and_only_free_memory_decides`.
 
 | Line | The KPI line (short) | How it is met | Unit evidence |
 |---|---|---|---|
-| S1 | `gov resources` reads memory, load and every live session from `~/.gov-os/machine/`, whichever repository | `registry.sessions()` reads `sessions/<pid>.json`; `gov launch` registers each session it starts (pid, repository, ticket, role) and removes it at its end; `gov resources --register` for any other starter | `test_every_live_session_is_read_whichever_repository_started_it`, `test_an_open_gate_starts_the_session_and_registers_it_while_it_runs` |
-| S2 | Opens or shuts with a named reason; busy cores over the last minute and the load, both shown | each reason `{condition, reading, threshold, why}`, `describe()` in words; busy cores from two `/proc/stat` readings a minute apart (`cpu-stat.json` history; with no history, a quarter-second window), shown with `busy_window_s`; counters that do not advance shut it | `test_busy_cores_over_the_last_minute_shut_the_gate_and_both_figures_are_shown`, `test_idle_cores_with_a_high_load_shut_on_load_alone`, `test_cpu_counters_that_do_not_advance_shut_the_gate` |
-| S3 | A stale entry (dead PID) is cleared | the read that finds a dead pid removes its entry and lists it in `cleared`; an unreadable entry shuts the gate | `test_a_stale_entry_is_cleared_by_the_read_that_finds_it`, `test_an_unreadable_entry_shuts_the_gate` |
-| S4 | Disk and inode floors (100 GiB, 10,000,000) from the file; `gov launch` refuses below either; one function a close can call | conditions `disk` and `inodes` on `statvfs(disk_path)`; `gate.check_disk()` for W2-07 / W2-66 to call | `test_the_disk_floor_and_the_inode_floor_each_shut_the_gate`, `test_check_disk_is_one_function_a_close_can_call`, `test_each_reading_shut_refuses_the_launch_naming_it_and_starts_nothing[disk/inodes]` |
-| S5 | Load opens while `min(load1, load15) < nproc` | as written; `nproc` the machine's online CPUs, never the caller's CPU set | `test_the_load_opens_while_the_lesser_of_one_and_fifteen_minutes_is_below_nproc` (5 cases) |
-| S6 | Memory: MemAvailable plus the sessions' live memory at least the floor plus a working size per session and the new one; nothing reserved for a run not started | have = MemAvailable + live; need = floor + each running session at what it uses, at least its working size (DEC-961's wording) + the newcomer's working size | `test_memory_opens_with_room_for_every_running_session_and_the_new_one`, `test_nothing_is_reserved_for_a_run_that_has_not_started`, `test_a_session_using_more_than_its_working_size_counts_at_what_it_uses` |
-| S7 | Heavy jobs wait for one of the configured slots; sessions take none; no other ceiling; each tree its own rebuild lock; the rebuild peak counted like a test run's | `gov resources --slot test\|rebuild -- <cmd>`: a slot lock under `~/.gov-os/machine/slots/`, then room for the job's own peak (verification or rebuild); a full set never refuses a session (P-2); `watch.tree_lock()` per tree | `test_a_job_waits_while_every_slot_is_taken`, `test_a_job_waits_for_memory_room_for_its_own_peak`, `test_a_heavy_job_asks_for_room_for_its_own_peak`, `test_a_full_set_of_slots_never_refuses_a_session`, `test_w2_20_tree_lock.py` (4) |
-| S8 | All values in one file, each dated and sourced; missing or malformed shuts the gate naming it; a measured figure over seven days old named due | `config.load()`: `{"value","date","source"}` per value (the servers' section dated per server); every fault a `config` reason; `due_for_remeasure`; `gov resources --init-config` writes this machine's from the decisions and never overwrites (P-3); `rebuild_peak_bytes` required (P-7); the trip floor (S11) and the servers' section (S12) required; the GPU shares (S14's stated default, DEC-1032) and the disk's path (default: the disk holding HOME) may be left out, and are faults when malformed | `test_each_missing_value_shuts_the_gate_naming_it` (12), `test_a_malformed_value_shuts_the_gate_naming_it` (8), `test_a_value_without_date_or_source_shuts_the_gate`, `test_a_measured_figure_older_than_seven_days_is_due_for_remeasure_and_still_counts`, `test_init_config_writes_a_dated_sourced_file_and_never_overwrites` |
-| S9 | The re-measure: samples of each session's tree memory with the verification lock's state; writes the verification peak, the working size (and the rebuild peak, P-5) dated, old and new side by side | `gov resources --sample` (sessions, lock state, slot holders with kind) and `--remeasure` | `test_the_remeasure_writes_the_three_figures_dated_with_old_and_new_side_by_side`, `test_a_figure_with_no_sample_is_kept_and_said_so` |
-| S10 | GPU, minimal: a declared need opens only with need + 10 % free; no `nvidia-smi` or no GPU shuts such a start; no need never reads the GPU | `--gpu-need-mib` on `gov launch` and `gov resources --check`; `gpu_margin` from the file | `test_a_start_with_a_need_opens_only_with_the_need_plus_the_margin_free`, `test_no_nvidia_smi_shuts_a_start_that_declares_a_need`, `test_a_start_with_no_declared_need_never_reads_the_gpu` |
-| S11 | The trip-wire: below the lower floor, the largest heavy job named and stopped, a finding; nothing else stopped | each slot's runner checks every 5 s; `slots.tripwire()` stops the largest slot job's process group and appends `OOM_TRIPWIRE` to `findings.jsonl`; also `gov resources --trip-wire` | `test_below_the_trip_floor_the_largest_heavy_job_is_stopped_and_the_stop_is_a_finding` (real processes: the larger job stopped, the smaller job and a session untouched) |
-| S12 | Both embedding servers' CPUs and priority in the file, read by their start (W2-123); the gate counts their CPU p95 | `embedding_servers.{shared,query}` with `host`, `cpus`, `nice`, date, source (W2-123's reader unchanged); each reading samples each server's process tree on its port, and the CPU condition counts the p95 in place of the current use | `test_the_servers_p95_is_counted_in_place_of_their_current_use`, `test_a_server_p95_is_measured_from_its_process_tree`; the restart cap: W2-123's `test_w2_123_embedding_cap.py` still green |
-| S13 | The GPU measured: memory used and total, utilisation, holders (embedder, reranker, other), read once per check; no GPU named, never an error | `machine.gpu()`: one `--query-gpu` read per check (holders from `--query-compute-apps`, named if unreadable) | `test_the_reading_measures_the_gpu_and_its_holders_once`, `test_a_machine_with_no_gpu_is_named_in_the_reading_never_an_error` |
-| S14 | GPU shares (embedder, then one reranker, then the rest); a job that would push the embedder off waits or runs on the CPU; the answer states the room it saw | `gpu_shares` in priority order (DEC-1032's default); `gate.gpu_room()` keeps the unheld part of each higher share and the headroom | `test_a_job_that_would_push_the_embedder_off_waits_and_the_room_is_stated` |
-| S15 | A slot's thread budget for every program the job starts, the share over its workers, at least 1, from the machine; never raised by an inherited value; the file may set it | `slots.job_env()`: Go, OpenMP, MKL, OpenBLAS, Rayon, numexpr (2), Accelerate; `thread_budget` optional in the file | `test_a_job_runs_in_its_slot_confined_with_its_budget_and_every_child_inherits_both` (job and grandchild), `test_an_inherited_value_never_raises_the_budget`, `test_the_configured_thread_budget_replaces_the_derived_one` |
-| S16 | Measured: a planted suite of all-CPU programs in one slot stays within the share + 1; within 20 % of the time without (time-bound programs, P-4) | **the CTO's run outside the sandbox** (a measurement of the whole machine's busy cores cannot be taken from inside the launch sandbox, DEC-1012) | — (the confinement itself is unit-tested under S15 and S17) |
-| S17 | A slot confined to its share of the CPUs, derived from the machine and the slots, outside the servers' CPU sets | `slots.shares()`; the job started with `sched_setaffinity` in the child before it runs; a set that cannot be applied refuses the run | `test_the_shares_divide_the_cpus_outside_the_servers_evenly_and_contiguously`, `test_servers_covering_every_cpu_are_not_excluded_and_it_is_said`, the run test under S15 |
-| S18 | The product's pools sized to the CPU set (`gov.secrets` included) | `gov.secrets.pool_size()` (the scan's rule: affinity, within `GOV_HEAVY_THREAD_BUDGET`); the code index's pool uses it | `test_w2_20_pools.py` (3) |
-| S19 | `gov launch` refuses any session, lead or worker, while the gate is shut on any reading, naming it; one recorded override in the launch log | `launcher._admit_start` for both paths, `RESOURCE_GATE_SHUT`, exit 3; `--gate-override DEC-NNN` (`launch(..., gate_override=)`) written to `~/.gov-os/machine/launch.log` and the same line to stderr; a log that cannot be written refuses (P-1) | `test_each_reading_shut_refuses_the_launch_naming_it_and_starts_nothing` (12), `test_an_override_starts_it_anyway_with_one_line_in_the_launch_log_and_on_stderr` (2), `test_an_override_that_names_no_decision_is_refused` (4), `test_an_unreadable_slot_refuses_the_launch_naming_the_slots` |
-| S20 | DEC-1037: `ensure_query_available(start=True)` carries the wrapper's caps: CPUs and priority (as today), device from the file, no slot budget inherited, own log, one caller line per start | `ollama._query_start`, `_daemon_env`, `_caller_line`; logs `~/.gov-os/machine/query-server.log` and `query-starts.log` (or the section's `log`, `start_log`) | `test_w2_20_query_start.py` (11: one case per device and caller value, a planted budget, the logs, a malformed device) |
-| S21 | W2-136's F2: the plan check reads the main tree's tickets and ready list from a lead worktree; a plan override in the launch log and on stderr | `plan_check.check_lead` and `ready_path` on `store.main_root(root)` (relative `GOV_PLAN_READY` against the main tree, P-8); `_admit_lead` writes through `gate.record` | `test_the_check_follows_the_main_trees_tickets_and_ready_list_not_the_worktrees`, `test_a_relative_ready_list_variable_is_read_against_the_main_tree`, `test_a_plan_override_is_one_line_in_the_launch_log_and_the_line_on_stderr` |
-| F1 | A heavy job's children use more CPUs than its share | held by S15's budget and S17's CPU set (inherited by every descendant) | S15, S17 |
-| F2 | Another repository's session counts; a start while shut is refused with the reading | the registry is machine-wide; refusals carry the reading in the error's details | S1, S19 |
-| F3 | A launch or close below either floor; disk without inodes | S4 | S4 |
-| F4 | A fixed ceiling on leads or sessions other than the slots | none: the gate has no session count (DEC-983); a full set of slots never refuses a session | `test_a_full_set_of_slots_never_refuses_a_session` |
-| F5 | A value not from the file, or a reading that cannot be taken treated as met | no defaults: every value from the file; every unreadable reading (memory, load, CPU counters, disk, registry, slots, GPU for a need) is a reason | `test_unreadable_memory_shuts_the_gate`, `test_an_unreadable_load_shuts_the_gate`, `test_an_unreadable_disk_shuts_both`, `test_cpu_counters_that_do_not_advance_shut_the_gate` |
-| F6 | A worker's memory charged twice | each session's tree less every other session's subtree | `test_a_worker_inside_its_leads_tree_is_charged_once` |
+| S1 | `gov resources` reads memory, load and every live session from `~/.gov-os/machine/`, whichever repository | `registry.sessions()`; `gov launch` registers each session it starts and removes it at its end; `--register` for any other starter | `test_every_live_session_is_read_whichever_repository_started_it`, `test_an_open_gate_starts_the_session_and_registers_it_while_it_runs` |
+| S2 | Opens or shuts with a named reason; busy cores and the load, each judged, both shown | reasons `{condition, reading, threshold}`; `busy_cores_1m` and the loads in the reading | `test_busy_cores_and_load_are_judged_each_on_its_own`, `test_the_cpu_condition_is_busy_cores_plus_both_servers_p95_below_nproc` |
+| S3 | A stale entry is cleared | the read that finds a dead pid removes it and lists it in `cleared` | `test_a_stale_entry_is_cleared_and_does_not_count` |
+| S4 | Disk and inode floors; launch refuses; one function a close can call | `disk`, `inodes` conditions; `gov.resources.check_disk(env=None)` | `test_the_disk_floor_and_the_inode_floor_each_shut_the_gate` (4), `test_check_disk_reads_the_env_it_is_given`, `test_an_unreadable_disk_shuts_both_for_a_start_and_a_close` (3) |
+| S5 | Load opens while `min(load1, load15) < nproc` | as written | `test_the_load_opens_while_the_lesser_of_one_and_fifteen_minutes_is_below_nproc` (5) |
+| S6 | Memory: the floor plus a working size per running session and the new one; nothing reserved for a run not started | as written | `test_memory_needs_the_floor_and_a_working_size_for_each_running_session_and_the_new_one`, `test_nothing_is_reserved_for_a_run_that_has_not_started` |
+| S7 | Heavy jobs wait for one of the configured slots; sessions take none; each tree its own rebuild lock; the rebuild peak measured | `slots.run`; a rebuild's tree lock among the slots; `watch.tree_lock` for `gov rebuild` | `test_a_job_waits_while_every_slot_is_taken`, `test_a_rebuild_excludes_only_another_rebuild_of_the_same_tree`, `test_a_full_set_of_slots_never_refuses_a_session`, W2-76's two tests |
+| S8 | All values in one file, dated and sourced; missing or malformed shuts, named; due for re-measure after seven days | `config.load()`; `--init-config` (P-3) | `test_each_missing_value_shuts_the_gate_naming_it` (12), `test_a_malformed_value_shuts_the_gate_naming_it_with_its_raw_value` (9), `test_a_value_without_its_date_or_source_is_malformed` (5), `test_a_measured_figure_older_than_seven_days_is_due_and_still_counts` (2), `test_init_config_writes_a_dated_sourced_file_with_the_decided_values_and_never_overwrites` |
+| S9 | Samples with the verification lock's state; the re-measure writes the figures dated, old and new side by side | `--sample`, `--remeasure` (three figures, P-5) | `test_the_remeasure_writes_the_three_figures_dated_with_old_and_new_side_by_side`, `test_a_figure_with_no_sample_is_kept` |
+| S10 | A declared need opens only with need + margin on one GPU; no `nvidia-smi` or no GPU shuts it; no need never reads the GPU | `--gpu-need-mib`; `gpu` condition | `test_a_need_opens_only_with_the_need_plus_the_margin_on_one_gpu` (2), `test_room_only_across_two_gpus_shuts`, `test_a_start_check_with_no_need_never_runs_nvidia_smi`, launch's GPU cases (3) |
+| S11 | The trip-wire stops the largest heavy job below the lower floor, a finding; nothing else | `slots.tripwire` | `test_below_the_trip_floor_the_largest_heavy_job_is_stopped_and_the_stop_is_a_finding` (real processes) |
+| S12 | Both servers' CPUs and priority in the file; the gate counts both p95 | `embedding_servers`; `machine.embedding_cpu` | `test_a_servers_p95_is_measured_from_its_process_tree`, the cpu cases; W2-123's restart cap unchanged |
+| S13 | The GPU measured once per check; no GPU named, never an error | `machine.gpu()` | `test_the_reading_measures_the_gpu_and_its_processes_once`, `test_no_gpu_or_an_unreadable_one_is_named_never_an_error` (3) |
+| S14 | GPU shares by kind; a job that would push the embedder off waits; the room stated | `gate.gpu_room`, `gpu_room_mib` | `test_a_job_that_would_push_the_embedder_off_waits_and_the_room_is_stated` (5), the `[N/A]` case |
+| S15 | A slot's thread budget for every program the job starts; the file may set it | `slots.job_env`, `budget` | `test_a_job_runs_in_its_slot_confined_with_its_budget_and_every_child_inherits_both`, `test_the_configured_thread_budget_replaces_the_derived_one`, `test_the_callers_value_never_stands` |
+| S16 | Measured: one slot keeps busy cores within the share + 1, within 20 % of the time | **the CTO's run outside the sandbox** | — |
+| S17 | A slot confined to its share of the CPUs outside the servers' sets | `slots.cpu_set`, `sched_setaffinity` in the child | `test_each_slot_has_its_share_of_the_cpus_outside_the_servers`, `test_two_held_slots_have_disjoint_cpu_sets_and_are_in_the_reading` |
+| S18 | Pools sized to the CPU set | unchanged from round 1 | `test_w2_20_pools.py` |
+| S19 | `gov launch` refuses any session while the gate is shut, naming it; one recorded override | `launcher._admit_start` | `test_each_reading_shut_refuses_the_launch_naming_it_and_starts_nothing` (12), `test_an_override_starts_it_anyway_with_one_line_in_the_launch_log_and_on_stderr` (2), `test_the_slots_refuse_a_launch_only_when_their_reading_cannot_be_taken` (2) |
+| S20 | DEC-1037: the query start carries the wrapper's caps | `ollama._query_start`, `_daemon_env`, `_caller_line` | `test_w2_20_query_start.py` (10) |
+| S21 | W2-136's F2: the plan check reads the main tree; a plan override in the launch log and on stderr | `plan_check.check_lead` on `store.main_root` | `test_the_check_follows_the_main_trees_tickets_and_ready_list_not_the_worktrees`, `test_a_plan_override_is_one_line_in_the_launch_log_and_the_line_on_stderr` |
+| F1-F6 | | held by S15/S17, S1/S19, S4, S7, S8 and the readings, the registry's subtrees | as above; `test_no_ceiling_on_sessions`, `test_a_worker_inside_its_leads_tree_is_charged_once` |
 
-## Measured on this machine (inside the sandbox)
+## gov accept (inside the sandbox, on `6b2a8f9a2`)
 
-- `gov resources --init-config` then `gov resources` on a scratch HOME (2026-11-09): load 1.36 / 3.03 on 20
-  processors, 1.14 busy cores over 1.0 s, have 14.9 GB against need 5.4 GB, the disk 886 GB and 64.6 M inodes free,
-  3 slots none held, the GPU named unreadable ("GPU access blocked by the operating system", the sandbox): open.
-- A slot's job under that file ran on CPUs 0-1 with `OMP_NUM_THREADS=2` (20 CPUs less the servers' 8-19 = 0-7, three
-  slots: 0-1, 2-4, 5-7).
-
-## gov accept (inside the sandbox, on `8cf9c10c6`)
-
-- **W2-20:** 39 passed, 124 failed, 1 skipped (164); before this build 9 / 154 / 1. S18 passes (2/2); S8 14/27,
-  S20 8/11, S21 7/9, S1 2/5, S3 1/2, S12 2/5, S19 2/28, F2 1/9; every other line 0, S16 the one skip (the CTO's run).
-  Lines with no passing case are almost all those that need an open gate under the designer's planted machine, so
-  the planted readings or the calls these cases make are not the ones built here. The ticket names part of the
-  interface (P-1 to P-8: the override option and log, `--init-config`, `rebuild_peak_bytes`, `--gpu-need-mib`); the
-  rest (how a case plants memory, load, busy cores, disk and the GPU, and which keys and calls it reads) is not
-  stated, and the engineer does not read the cases (DEC-820 (c)).
-- **W2-136:** 73 passed, 3 failed: every line passes but S9 (11/14), the launcher cases with the revised fixture.
-- **W1-07, W1-32:** refused before running: `ACCEPT_MAP_UNREADABLE` (W1-07's README has a map row naming no KPI line
-  `gov accept` can read) and `ACCEPT_NO_MAP` (W1-32's README maps no KPI line). Their folders are the designer's.
+- **W2-20: 160 passed, 3 failed, 1 skipped (164)**; round 1: 39 / 124 / 1. Every line passes but S2 (15/16), S10
+  (8/9), S13 (3/4) and S16 (the one skip, the CTO's run). The three reds are cases where the stated interface and the
+  case disagree (the engineer saw only their one-line messages):
+  - `test_w2_20_cpu::test_s2_..._each_on_its_own_and_shows_both[busy cores high, load low]`: `AssertionError:
+    {'available_memory_bytes': 68719476736, 'busy_cores_1m': 3.9, ...}`. The case plants busy 3.9, both servers' p95
+    0.0, nproc 4, load 0.1, and expects the gate shut on cpu. The interface's rule (`busy + p95 + p95 < nproc`, equal
+    shuts) opens at 3.9 < 4; the KPI line (S2) states no threshold. Built to the interface.
+  - `test_w2_20_gpu::test_s10_a_start_with_no_declared_need_never_reads_the_gpu[a GPU planted]`: `a start with no GPU
+    need read the GPU: [['--query-gpu=...'], ['--query-compute-apps=...']]`. The case makes a plain `gov resources`
+    reading before the start check; the reading reads the GPU (P-6, S13; the no-GPU cases need `gpu` in the plain
+    reading), the start check without a need does not. The calls listed are the reading's.
+  - `test_w2_20_gpu::test_s13_the_reading_measures_gpu_memory_utilisation_and_which_processes_hold_it`: `the GPU was
+    read more than once in one check (--query-gpu): [4 calls]`. The case makes two plain readings, each reading the GPU
+    once (two calls: the GPUs, then their processes); the count covers both readings.
+- **W2-136: 76 passed, 0 failed (every line passes)**: its launcher cases with the revised fixture, and the launch's
+  plan check reading the main tree unchanged.
+- Unit tests (`-m "not local_only" -k "not real and not green_here and not time_limit"`): `tests/unit/resources`,
+  `launch`, `rebuild`, `secrets_check` 344 passed; `tests/unit/retrieval` 529 passed, 22 failed: W2-112's 20 socket
+  cases (`PermissionError` in the sandbox, the CTO's run) and W2-91's two namespace cases
+  (`test_every_tracked_path_is_in_one_namespace`, `test_the_root_files_the_overlay_and_schemas_are_embedded`), red on
+  `governance/project/indep-walls/**` from the ACT-INDEP-WALLS-1 merge (`147706ae4`), not this change.
 
 ## For the owner and the CTO
 
-- **S16** is the CTO's run outside the sandbox: a planted suite of all-CPU programs through
-  `gov resources --slot test -- ...` and without it, busy cores sampled from `/proc/stat`.
-- **ACT to remove the interim wrapper (DEC-1037), not applied by this ticket:** (1) once this change is pinned, move
-  `~/.local/bin/ollama` aside (`mv ~/.local/bin/ollama ~/.local/bin/ollama.wrapper-retired`); (2) check the real
-  binary is what an automatic start now finds: `command -v ollama` (PATH order) or `GOV_OLLAMA_BIN`, else
-  `~/.local/ollama/bin/ollama`; (3) set `embedding_servers.query.device` to `gpu` in `~/.gov-os/machine/gate.json`
-  (the wrapper's `~/.ollama/query-server-device` reads `gpu` today); (4) restart the query server through
-  `safe_restart("query")` (or let an automatic start happen) and see it capped: the listener's
-  `/proc/<pid>/status` `Cpus_allowed_list` is the configured set, its niceness the configured one, no
-  `OMP_NUM_THREADS` in `/proc/<pid>/environ`, one new line in `~/.gov-os/machine/query-starts.log`, and its output
-  in `~/.gov-os/machine/query-server.log`.
-- **The slots' CPU sets exclude the servers' CPU sets, as S17 says.** On this machine that leaves 8 of 20 CPUs for
-  three slots; `heavy_slot.sh` chose not to exclude them (its header, EMG-gitleaks' measure). The file's
-  `embedding_servers` sets decide it: narrowing them widens the slots.
-- **Each tree its own rebuild lock (S7) changes `watch.settings()`'s default**, so two asserts in W2-76's unit tests
-  (`tests/unit/rebuild/test_w2_76_watch.py:33`, `test_w2_76_lock_override.py:46,48`), which pin the machine-wide
-  `/tmp/gov-os-rebuild.lock`, go red. They are outside this ticket's paths. Options (DEC-105): (a) apply now, the
-  two files' asserts changed to `watch.tree_lock(tmp_path)` with this change (recommended: S7 and DEC-1001 (d) say so);
-  (b) defer the per-tree default, keeping S7's half unmet; (c) re-baseline S7.
-- **Every launch now passes the gate (S19):** unit tests that start launches without planting an open gate
-  (`tests/unit/launch/test_w2_136_plan_check.py`, `test_launcher.py`, `test_w1_32.py` and similar) are refused by it,
-  as the ticket foresaw for W2-136's acceptance cases (G-1). They are outside this ticket's paths: their fixtures need
-  an open gate planted (a dated, sourced `gate.json` under their temporary HOME and planted readings).
+- **The real gate file must be written again before W2-20 merges.** ACT-GATE-CONFIG-1 wrote round 1's file
+  (`floor_bytes`, `trip_floor_bytes`, `disk_path`, the GPU shares as a list, each server's `host`). Round 2 reads the
+  interface's keys, so that file now shuts the gate on `config` (every launch refused). The ACT again, from round 2's
+  code: `apply.sh undo` (or move the file aside), then `gov resources --init-config` from W2-20's head; the new file's
+  bytes differ from `de4fb326288d…`, so `apply.sh`'s pinned hash needs the CTO's update.
+- **The working size (2.04 GiB) is below today's measured lead p95 (3.2 GB):** the CTO's `gov resources --remeasure`
+  after the merge re-measures it (`--sample` over a working day first).
+- **S16** is the CTO's run outside the sandbox (`GOV_W2_20_MEASURE=1`).
+- **ACT to remove the interim wrapper (DEC-1037), not applied by this ticket:** (1) move `~/.local/bin/ollama` aside;
+  (2) check the real binary is what an automatic start finds (`command -v ollama`, `GOV_OLLAMA_BIN`, else
+  `~/.local/ollama/bin/ollama`); (3) `embedding_servers.query.device` set to `gpu` in the gate file; (4) restart the
+  query server (`safe_restart("query")`) and see it capped: `Cpus_allowed_list` and niceness as configured, no
+  thread-budget variable in `/proc/<pid>/environ`, one new line in `~/.gov-os/machine/embedding-starts.jsonl`, its
+  output in `~/.gov-os/machine/embedding-query.log`.
+- **The slots' CPU sets exclude the servers' CPU sets, as S17 says:** on this machine 8 of 20 CPUs for three slots
+  (2 each); `heavy_slot.sh` chose not to exclude them. The file's `embedding_servers` sets decide it.
