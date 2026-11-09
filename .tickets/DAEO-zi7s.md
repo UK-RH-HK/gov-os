@@ -56,4 +56,8 @@ defect is its own ticket.
 - **Timing:** tests first (an independent test designer), one review, merged before the lift's re-pin.
 - **Est.:** about 80 lines with the engineer's unit tests; half a day with its review.
 
+**The designer's discovery settled (the CTO, 2026-11-09) [DEC-1102]:** today `hard_waits` silently drops a ticket's
+wait on itself; keeping a `waits_on` self-loop as a wait (so S4's self-loop is broken and named) is the engineer's,
+inside this ticket.
+
 [DEC-1102]

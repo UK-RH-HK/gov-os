@@ -22,7 +22,7 @@ allowed_paths:
 kpis:
   success:
   - 'S1 The retrieval skill gains step 7, after step 6, with SEARCH-AGAIN-PRACTICE §2''s practice (the paragraph, the "does not answer" list in short, the cap of two searches), W2-138''s step-5 line kept, version 1.0.0 to 1.1.0, under the skills validator''s size budget. Verify: a string test for "search again once", "own, different words", "not found", "two searches", and the skills check [DEC-1094 (2), DEC-1092 (1)]'
-  - 'S2 The discovery skill''s line 55 gains one sentence: search again once before routing a question to the owner as unanswered. Verify: a string test and the skills check [DEC-1094 (2)]'
+  - 'S2 The discovery skill''s line 55 gains one sentence: search again once before routing a question to the owner as unanswered; its version 1.0.0 to 1.1.0. Verify: a string test and the skills check [DEC-1094 (2)] [changed, DEC-1097 (8)]'
   - 'S3 It lands at the lift''s re-pin ACT, with the generated .claude/ copies regenerated there (the retrieval skill''s copy is regenerated for W2-138 at the same ACT), and only after the project layer has been in use (CAP-33; DEC-1052''s fifth test): the adoption count''s first reading is in the evidence. Verify: the ACT''s record and the evidence [DEC-1094 (2), CAP-33]'
   failure:
   - 'Any change to a skill beyond the two named lines, or W2-138''s step-5 line lost.'
@@ -32,6 +32,7 @@ sources:
 - DEC-1092
 - DEC-1085
 - CAP-33
+- DEC-1097
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-142/
