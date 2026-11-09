@@ -42,7 +42,9 @@ def test_a_session_entered_from_another_repository_counts_against_this_ones_gate
 
 
 def test_W2_M244_W2_M188_a_start_while_the_gate_is_shut_is_refused_with_the_reading(machine, repo):
-    machine.open_config(min_available_memory_bytes=8 * GIB)
+    """DEC-1097 (8): the memory rule of S6 (floor 8 GiB plus the new session's 1 GiB working size, no session
+    running) in place of the old minimum."""
+    machine.open_config(memory_floor_bytes=8 * GIB, working_size_bytes=1 * GIB)
     machine.set_readings(available_bytes=2 * GIB, load=0.5, nproc=4)
 
     refused = support.refusal_of(*machine.check(repo))
@@ -52,7 +54,7 @@ def test_W2_M244_W2_M188_a_start_while_the_gate_is_shut_is_refused_with_the_read
     assert support.gate_of(refused)["open"] is False, refused
     reasons = support.reasons_by_condition(refused)
     assert set(reasons) == {"memory"}, reasons
-    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (2 * GIB, 8 * GIB)
+    assert (reasons["memory"]["reading"], reasons["memory"]["threshold"]) == (2 * GIB, 9 * GIB)
 
 
 def test_W2_M244_the_refusal_without_json_has_the_same_exit_code_and_names_the_reason(machine, repo):
