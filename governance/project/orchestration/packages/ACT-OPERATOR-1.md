@@ -105,7 +105,7 @@ W2-148's review r3 names two files Claude Code writes under `.claude/**` during 
 | `reference-transaction.candidate` | `099de326c45b` |
 | `landing_select.candidate.sh`, `test_landing_select.candidate.sh` | `9e55c0b88032`, `16aa390131c6` |
 | `operator-settings.json`, `crontab.line`, `install.sums` | `a7d6dcbf40be`, `77dcf4661777`, `29ea26233916` |
-| `apply.sh` (check, apply, undo) | `6bcdcf2f6ca8` (DEC-1109: only its `SUMS` line changed from `7e9398ad91ca`, the reviewed one) |
+| `apply.sh` (check, apply, undo) | `bafcd1e72316` (from `7e9398ad91ca`, the reviewed one: DEC-1109's `SUMS` line; then the crontab through standard input in apply and undo, and `check` reading the table by content, after the live defect below) |
 | `build.py`, `freeze.py` (the builders), `op_cases.py`, `op_rehearsal.py`, `rehearse.sh` | the rehearsal's own |
 | `rehearsal-pre.log`, `rehearsal-post.log`, `REHEARSAL.md` | §6 |
 
@@ -160,6 +160,19 @@ commit cases; the owner's files unchanged; `apply.sh undo` then "ready to apply"
 acceptance tests 169/169 and `tests/unit/operator` 184/184 on `0240833b4`. `apply.sh check` on the live main tree:
 "ready to apply (the hook is post-calllog)".
 
+**The live defect at the crontab step (2026-11-09, the owner's operator's apply):** Debian's `crontab <file>` cut the
+115-character path of `backup/crontab.after` at 99 characters ("…/back: No such file or directory"); every part before
+it had applied. The operator loaded the same table through standard input, confirmed it with `cmp` and `apply.sh
+check`, and committed (`2a6462653`). The rehearsals' crontab stub took any path, so they could not show it. **Fixed:**
+`apply.sh` now installs and restores the table only through standard input (`crontab - < file`), in apply and in undo,
+and `check` reads the crontab by content (the operator's line present and, with a backup, byte for byte
+`backup/crontab.after`, however it was loaded). **Tested with the real `crontab`** (`crontab-real-test.log`,
+19:04 GMT, this user's table saved first): with paths of 138 to 143 characters the path-argument form failed the same
+way (exit 1, table unchanged); `crontab - < crontab.before` (undo's form) and `crontab - < crontab.after` (apply's) each
+loaded their table byte for byte; the saved table was restored through standard input and compared byte for byte
+(`91e07361e51e`). `apply.sh check` on the live tree after the fix: **"check: already applied"** (cron applied, state
+applied). `install.sums` and `APPROVED` are unchanged (`apply.sh` is not in the install).
+
 ## 7. Residuals, and what follows
 1. **Order with ACT-GUARD-CALLLOG-1 (review F7):** met: CALLLOG-1 is live (`b7a373cf9`), so this ACT lands on the
    post-calllog hook. Undo in reverse (this ACT's undo first, if both are ever undone).
@@ -205,7 +218,9 @@ acceptance tests 169/169 and `tests/unit/operator` 184/184 on `0240833b4`. `appl
 > sha256sum ~/gov-os-operator/install/APPROVED    # expect 157a9dc01fcaab78b04dc78f153df8b077460a33ffaa9027cb05bc4b8e474ad7
 > crontab -l | tail -1                            # the operator's line, */10 0,8-23
 > ```
-> **Undo:** `bash $G/apply.sh undo`, then commit the six restored files the same way, subject "ACT-OPERATOR-1 undone".
+> **Undo:** `bash $G/apply.sh undo` (it restores the crontab through standard input; it refuses while a run holds the freeze, the journal or the lock, or a request waits), then `git add` the same six paths and commit with the subject "ACT-OPERATOR-1 undone" and the same three trailers.
+>
+> *Applied live 2026-11-09 (`2a6462653`); the crontab step finished by hand through standard input (§6). `apply.sh check` now reads "already applied".*
 
 `apply.sh undo` checks every part first and refuses while a run holds the freeze, the journal or the lock, or a request
 waits; then the crontab line first, every part byte for byte, the install removed; `queue/`'s record, `acts/`, `wall/`

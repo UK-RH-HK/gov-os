@@ -36,14 +36,18 @@ kpis:
   - 'S8 One bounded hop: from what the record route or the closure reached, retrieval follows CITES, UNDER and OF_TASK out and AMENDS and SUPERSEDES in (from the changed decision to its changer), at most 12 records, after today''s closure chunks; adopted only under DEC-1071''s rule (all 80 not lower, the halves'' gap not wider) [DEC-1071, DEC-1072]'
   - 'S9 Status in the bundle: every register chunk a bundle carries names its entry''s status word and the entries that change it; a PROPOSED, REJECTED, WITHDRAWN or SUPERSEDED decision is marked not in force, so no agent takes it as a rule [DEC-1073 (2)]'
   - 'S10 The drift count before and after, by the census''s definitions (docs/research/W2-92-proto-drift.py on the rebuilt store): of the decisions current though stated changed, how many a search reaching the decision also reaches a changer of, in docs/research/W2-92-memory-measure.md [DEC-1072 (1)]'
+  - 'S11 The register''s verbless change labels (D-6 part 2; DEC-1109 (2), DEC-1098 (3) row 24): a **Changed by:**, **Amended by:**, **Lifted by:**, **Superseded by:** or **Amended:** value with no "<verb> ... by" names as changers only the ids at the head of its clauses: (1) the value ends at " · " and at any line break that starts a list item, at any indentation ("\n   - ..."); (2) it splits into clauses at each ";" outside parentheses; (3) a clause''s head is its text before its first ":" outside parentheses (the whole clause when it has none); (4) the changers are the ids in a head that stand outside parentheses. An id in the prose after a clause''s colon, inside parentheses, or on a sub-item below the label is not a changer. Verify: register_statements on this repository''s register no longer gives the wrong pairs the W2-130 sitting found (the CTO''s probe: DEC-208, DEC-237 and DEC-838 -> DEC-281; DEC-880 and DEC-913 -> DEC-608; DEC-843 -> DEC-880; DEC-891 -> DEC-896; DEC-866 -> DEC-492; DEC-723 -> DEC-728; DEC-775 -> DEC-780), and every head pair stays (e.g. DEC-900 and DEC-899 -> DEC-757; DEC-882, DEC-884 and DEC-889 -> DEC-880; DEC-868 and DEC-908 -> DEC-455; DEC-1057 and DEC-522 -> DEC-511); labels with a verb, and every other statement form, give what they give today [DEC-1109 (2), DEC-1098 (3), DEC-1073 (5)(b)]'
   failure:
   - 'A question that names no record or symbol gets a different bundle than today.'
   - 'A whole-graph query, or one over the tool''s row cap.'
   - 'A missing index reported ok, or failing the whole answer.'
   - 'A figure of the measure reported without the other, or the hidden half read or run.'
   - 'A partial supersession that drops its target from what is current; a register chunk in a bundle without its status.'
+  - 'A verbless change label''s prose id counted as a changer, or a clause-head changer lost (S11) [DEC-1109 (2)]'
 profile: STANDARD
 sources:
+- DEC-1098
+- DEC-1109
 - DEC-957
 - DEC-954
 - DEC-859
@@ -86,3 +90,5 @@ the prototype's code. W2-54's `test_an_empty_retrieval_result_gives_one_packet` 
 designer (DEC-1074 (6)), with `Task:` this ticket, since the links now legitimately bring a record into it.
 
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: 14 of 15, all but S6 (S1 to S5 at `0d33901a`; S7 to S10 and F5 at `3679ca0b`, acceptance 116/0, READY, DEC-1071's rule); met in part: S6 (14/15 at `88748f99`, green only at `3679ca0b`; its 1.2 s median is recorded nowhere, evidence:120); the pin carries them at re-pin window 4. The CTO closes it at the lift (P1-13).
+
+**D-6 part 2 placed here (CTO, 2026-11-09; DEC-1109 (2)):** S11 and its failure line are DECIDED-NOT-DONE row 24's "the loader's 8 wrong pairs" (the sitting's count; the CTO's probe finds the ten listed in S11). Built as a follow-up on `w2/W2-92-d6` after `w2/W2-92-d6-tests` (its test designer, `tests/acceptance/W2-92/`), one review; plan item B in `governance/project/orchestration/packages/LIFT-1/D6-PART2.md`. `src/gov/store/loader.py` and `tests/unit/store/**` only.

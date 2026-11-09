@@ -14102,6 +14102,32 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (no session prompted by an ACT's own output) and question 4 (the machine kept working while the
   owner decides).
 
+### DEC-1110 — The standing operating rules at the top of the CTO's prompt and in START-NEXT-SESSION §2; a stop-hook check against idling while unblocked work remains, by an ACT; a fresh CTO session before D-10; ready lists that cover several of gov plan's batches after the lift
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (3) standing · **Under:** DEC-936 item 2, DEC-942, DEC-1109 (3), DEC-1104 (4), DEC-1007, DEC-1088 · **Source:** the owner's message (chat, 2026-11-09), accepting the CTO's answers on why DEC-1109 (3) restated DEC-936 item 2, a fresh session, and the flow after the lift
+- **Decision:**
+  - (1) **The standing operating rules** as one short list at the top of `governance/project/prompts/w2-orchestrator.md`
+    and in START-NEXT-SESSION §2; and **a stop-hook check as an ACT for the owner's operator, rehearsed:** before the
+    CTO ends a turn, if no agent or job is running while DECIDED-NOT-DONE shows unblocked items, it blocks with a
+    reminder; it lets a legitimate wait through (the machine full, the gate shut, every remaining item waiting on the
+    owner or on a running job), naming which.
+  - (2) **A fresh CTO session at the boundary:** after the seven running helpers report and before D-10, the handover
+    written to the 11-08 standard (START-NEXT-SESSION, RESUME HERE, DECISIONS-IN-FORCE, DECIDED-NOT-DONE, the
+    standing-rules list); the CTO says when it is ready to switch.
+  - (3) **Standing, after the lift:** each ready list the CTO commits covers several of `gov plan`'s batches ahead, so
+    the dispatcher keeps the machine full through a wait.
+- **Basis:** question 4 (the machine kept full while the owner decides) and question 2 (a rule that a long session's
+  compactions cannot erase is enforced by a check, not by memory).
+
+### DEC-1111 — D-10's red-by-design cases: W1-33's auditor case and W1-05's install case report-only until their features return; W1-46's research-install case open
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (2) OPEN (the owner marked no option) · **Under:** DEC-1104 (1), DEC-1061 (3a), DEC-953 · **Source:** the owner's message (chat, 2026-11-09), after `packages/LIFT-1/D10-REDS.md`
+- **Decision:**
+  - (1) **W1-33's auditor case and W1-05's install case stay report-only until their features return,** each taken out
+    of the opt-in list by the switch that turns its feature back on (DEC-953).
+  - (2) **W1-46's research-install case: OPEN:** (a) report-only permanently, as recommended; or (b) rewritten by a test
+    designer to today's rule and gated, or retired with a record if no rule remains to test. The owner's message named
+    both without marking one.
+- **Basis:** question 2 (no gate that reports a known switch over and over).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14149,3 +14175,5 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.492 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1107 (an exception to DEC-1010 for W2-148's F21). Next free id: DEC-1108. |
 | 0.493 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1108. Next free id: DEC-1109. |
 | 0.494 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1109 (item 3 standing). Next free id: DEC-1110. |
+| 0.495 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1110 (items 1 and 3 standing). Next free id: DEC-1111. |
+| 0.496 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1111 (item 2 open). Next free id: DEC-1112. |
