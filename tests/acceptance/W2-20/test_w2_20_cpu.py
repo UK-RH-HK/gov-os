@@ -48,14 +48,18 @@ def test_s2_busy_cores_and_load_within_open_the_gate(machine, repo):
 @pytest.mark.parametrize("p95, opens", [((0.5, 0.5), True), ((1.5, 0.0), False), ((0.0, 1.5), False)],
                          ids=["both within", "the shared server's p95 tips it", "the query server's p95 tips it"])
 def test_s12_both_servers_cpu_p95_count_when_a_session_is_admitted(machine, repo, p95, opens):
-    """2.5 busy cores of 4: with 0.5 + 0.5 cores of p95 the sum is 3.5 (open); with 1.5 from either server it is
-    4.0 (shut, "below nproc")."""
-    machine.set_readings(nproc=4, busy_cores=2.5, embedding_p95=p95)
+    """Round 7 (review F2): the servers idle now (0.0 cores each), so all of each p95 is headroom above their current
+    use and counts. 2.5 busy cores of 4: with 0.5 + 0.5 cores of p95 the sum is 3.5 (open); with 1.5 from either
+    server it is 4.0 (shut, "below nproc"). The reading shows each server's current use beside its p95."""
+    machine.set_readings(nproc=4, busy_cores=2.5, embedding_p95=p95, embedding_now=(0.0, 0.0))
 
     reading = machine.read(repo)
     shown = reading.get("embedding_cpu_p95")
     assert isinstance(shown, dict) and support.close_to(shown.get("shared"), p95[0]) and support.close_to(
         shown.get("query"), p95[1]), f"the reading does not show both servers' p95: {reading}"
+    now = reading.get("embedding_cpu_now")
+    assert isinstance(now, dict) and support.close_to(now.get("shared"), 0.0) and support.close_to(
+        now.get("query"), 0.0), f"the reading does not show both servers' current use: {reading}"
     code, envelope, out, err = machine.check(repo)
     if opens:
         support.opened_of(code, envelope, out, err)
