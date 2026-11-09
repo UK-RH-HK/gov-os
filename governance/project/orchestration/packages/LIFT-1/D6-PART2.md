@@ -44,3 +44,20 @@ Rows:
 - `gov links` might also check the master-rule records' version.
 
 **Next:** F, F2 and F3, after A, B and E merge.
+
+**State 11-10 00:20:**
+- A to D are merged (the CTO).
+- **E is READY with its follow-up** on `w2/W2-150`, head `892c6f851`: S6 gives `_Glob`, `load_yaml_unique` and the git
+  runner one source each (`gov.util.parts`, `gov.util.gitrun`), so no copy is left. Its review is READY with no
+  finding. The CTO's runs at that head, outside the sandbox, with the tree's code under the pinned interpreter:
+  - `guard4_check.py` PASS (453 cases run, 0 failed);
+  - `test_guard_fix_4.py` 467 passed;
+  - `test_g14.py` 151 passed, 1 skipped;
+  - `tests/unit/hooks` 102 passed;
+  - `gov accept W2-150` 32/0.
+- **C still matches** `contract.yaml` 4.3 after W2-139: all six records, every field.
+- **F3: no wrong mark.** No W2-130 mark heads with a source from the ten wrong pairs.
+- **F is started:** a test designer on `w2/D6-F-tests` (under W2-129) takes the 45 ENFORCES_SUPERSEDED and the 60
+  UNKNOWN_ID left in the tests. For each ENFORCES_SUPERSEDED it decides between history (a Kept list for the
+  register, the CTO's), an old citation of a current rule (re-cited), or a real finding (reported).
+- **F2 waits:** it starts when W2-150 merges (both touch `decisions/`).
