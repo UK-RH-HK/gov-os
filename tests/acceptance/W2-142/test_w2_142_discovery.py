@@ -1,5 +1,5 @@
 """S2: the discovery skill's line 55 gains one sentence: search again once before routing a question to the owner as
-unanswered (README).
+unanswered; its version 1.0.0 to 1.1.0 (README; the version marked DEC-1097 (8)).
 
 Line 55 is found by its text as the reference holds it (it must stay the start of its line); what follows it on
 the same line is the added sentence.
@@ -24,3 +24,8 @@ def test_s2_line_55_gains_one_sentence_to_search_once_more_before_treating_a_que
     folded = support.fold(sentence)
     assert "search" in folded and "once" in folded, f"the sentence does not say to search once more: {sentence!r}"
     assert "unanswered" in folded, f"the sentence does not say before treating the question as unanswered: {sentence!r}"
+
+
+def test_s2_the_discovery_skill_s_version_is_1_1_0():
+    found = support.version(support.current(support.DISCOVERY))
+    assert found == "1.1.0", f"the discovery skill's version is {found!r}, not '1.1.0'"
