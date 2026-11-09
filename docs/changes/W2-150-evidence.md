@@ -52,13 +52,9 @@ memory modules in a fresh process loads no module of `gov.close` or `gov.guard`,
   `.changed` and `.engineer_side` (`tests/unit/guard/test_role_paths.py`), and `register._read`
   (`tests/unit/decisions/test_register_w2_55.py`). A plain re-import would leave those tests patching a copy the moved
   code never reads.
-- **Copies, because the home files are outside the ticket's paths:**
-  - `gov.util.parts._Glob` is `gov.guard.protected._Glob`;
-  - `gov.util.parts.load_yaml_unique` is `gov.guard.heldout.load_yaml_unique`;
-  - `gov.store.loader._commit_git` is `gov.close.repo.git` with its defaults.
-
-  Each copy is identical in behaviour. The follow-up: `protected.py`, `heldout.py` and `close/repo.py` import these
-  names from their new homes.
+- **Copies in the first pass, one source since S6:** `_Glob`, `load_yaml_unique` and the git runner were copied,
+  because their home files were outside the ticket's paths. The follow-up removed the copies (see "S6 (the follow-up)"
+  below).
 - **Why the fingerprint went to `gov.store`, not `gov.util`.** The fingerprint starts git. W2-05's sweep
   (`tests/acceptance/W2-05/test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep`)
   requires every `src/gov` file that starts git to be named in `docs/research/AR-2-git-sweep.md`. `loader.py` is named
@@ -105,5 +101,55 @@ memory modules in a fresh process loads no module of `gov.close` or `gov.guard`,
 - Not run here: `tests/unit/hooks/test_live_hook.py` (it plants trees under `~/gov-os-worktrees`, which the sandbox
   keeps read-only); the scoped set from `select_tests.py` (the CTO runs it outside the sandbox, as DEC-1064 asks); the
   real-model and `local_only` cases; the CTO's `hook_timing.py`.
+
+## S6 (the follow-up): one source each (the review's R1, R2)
+
+| helper | defined once in | imported by (the old name, the same object) |
+|---|---|---|
+| `_Glob` | `gov.util.parts` | `gov.guard.protected` (and its alias `_glob_rx`), `gov.guard.reads` |
+| `load_yaml_unique` | `gov.util.parts` | `gov.guard.heldout` |
+| the git runner `git` | `gov.util.gitrun` (new) | `gov.close.repo.git`; `gov.store.loader._commit_git` |
+
+- **The move.** The copies in `guard/protected.py`, `guard/heldout.py`, `close/repo.py` and `store/loader.py` are
+  deleted. Each of those files imports the name from its home. The bodies moved without a change, so glob matching, the
+  twice-written-key refusal and `git`'s call (arguments, environment, `GIT_FAILURE` errors, return value) behave
+  exactly as before. `close/repo.py` no longer imports `os` or `subprocess`, and `loader.py` no longer imports `os`;
+  nothing else used them.
+- **Why `gov.util.gitrun` and not `gov.util.gitenv`.** `gov.guard.decide` imports `gov.util.gitenv` when it loads.
+  Adding the runner there would add `gov.cli.errors` to the guard hook's imports. The new module imports only the
+  standard library, `gov.cli.errors` and `gov.util.gitenv`. Neither new home imports a gate: importing `gov.util.gitrun`
+  and `gov.util.parts` in a fresh process loads no module of `gov.close` or `gov.guard`.
+- **The guard's hook.** `gov.guard.reads` already imported `gov.util.parts`. Where the hook imports only
+  `gov.guard.heldout`, it now also loads `gov.util.parts`, which is a `gov.util` module (S4).
+- **DEC-500 comparison.** `close.repo.git` and the store's `_commit_git` were the same, so there was no stricter
+  side to choose. Both:
+  - drop every `GIT_*` variable of the caller's environment before `git_env` runs, so the person's identity and
+    `GIT_INDEX_FILE` are dropped too;
+  - pin the configuration (`pinned=True`: no system or global config);
+  - set `GIT_NO_LAZY_FETCH=1`;
+  - pass `--no-replace-objects`;
+  - set stdin to `DEVNULL`;
+  - raise `GIT_FAILURE` on any exit code outside `ok`.
+
+  The store's copy was `git` with its defaults (`ok=(0,)`, no `given`, `pinned=True`). The single source keeps all of
+  it.
+- **Static scan.** An `ast` scan of `src/gov` finds one `class _Glob` (`util/parts.py`), one
+  `def load_yaml_unique` (`util/parts.py`), and one function that runs `git --no-replace-objects` under `git_env`
+  (`util/gitrun.py:git`).
+- **Unit cases.** `tests/unit/util/test_w2_150_gitrun.py` has 5 cases:
+  - the close and the store share the object;
+  - output, exit code and stdin;
+  - `GIT_FAILURE` outside `ok`;
+  - a caller's `GIT_DIR` does not reach git;
+  - replacement refs are not followed.
+
+  The old names keep their cases in `tests/unit/close` and `tests/unit/guard`.
+- **Runs (2026-11-09).** `gov accept W2-150`: **32 passed, 0 failed** (success-1 3, success-2 4, success-3 18,
+  success-4 1, success-6 7, failure-1 5, failure-2 15).
+- **Unit suites (2026-11-09).** `tests/unit/{util,guard,close,store}` with `--optin=lifted,breadth`, `-m "not local_only"`
+  and `-k "not real and not green_here and not time_limit"`: **1,906 passed, 1 failed**. Of 1,922 cases, 15 were
+  deselected, all by `-k` (12 `time_limit`, 3 `real`); no case in these suites is marked `local_only`.
+  - The red is the known base red: `tests/unit/guard/test_w2_141_search.py::test_the_staged_pretooluse_adds_only_glob_to_g14s_tools`.
+    It compares two hook files that S6 does not touch, and it fails the same way when re-run alone.
 
 [DEC-1109 (2), DEC-1039 (2), DEC-1040 (1), DEC-136]
