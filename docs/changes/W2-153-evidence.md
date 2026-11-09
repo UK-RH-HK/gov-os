@@ -21,3 +21,12 @@ Ticket `DAEO-8s85`, engineer, branch `w2/W2-153` (from integrate with the design
 **rulesync and `skills:`:** rulesync 24.0.0 drops a top-level `skills:` from the generated `.claude/agents/<role>.md`;
 it passes `skills` through when the key sits under `claudecode:` (tried on a temporary copy). As built, the sources
 follow S3's text (a top-level list), so the generated agents carry no `skills:` after the ACT.
+
+**Fix round (DAEO-8s85, the CTO's decision after the build, DEC-1112 (3)):** the 12 sources hold the list under
+`claudecode: skills:`; portability reads it there and reports a top-level `skills:` as `SOURCE_DIFFERS` (unit cases
+`test_a_top_level_skills_list_is_a_finding[*]`). `rulesync generate --targets claudecode --features subagents` from a
+temporary copy of `.rulesync/` into an empty folder writes 6 agents, each with its `skills:` (engineer
+`test-driven-development`, auditor `audit`, product-spec `change`, research `discovery`, orchestrator `orchestration`;
+the test designer `[]` until W2-128). The launcher's existing unit tests (`test_runs.py`, `test_w1_28.py`,
+`test_w1_32.py`, `test_w2_136_plan_check.py`) write the role's template copy in their fixtures; W2-136's argv-end case
+allows the one appended flag. Acceptance 51/51; W2-128 92/92.
