@@ -1,11 +1,15 @@
-# W2-56 acceptance tests, the first half: `gov launch` usable for every worker
+# W2-56 acceptance tests: `gov launch` usable for every worker
 
 Ticket DAEO-wnnz (W2-56), profile FULL. Written by the independent test designer (MR-3) from the ticket's KPI lines,
-before any implementation, reading only the integrated code (`w2/integrate`, this branch's base `3e41b223ab86`,
-DEC-963) and SANDBOX-GUARD-EXP-1 §0, §3 and §5. **The first half (DEC-1099 (1)):** only the tests whose expected
-outcome is the same whether the experiment chooses set-up A (the path-map guard alone) or set-up B (the guard with
-a sandbox generated from the path map). Every line, or part of a line, whose test would differ by that result is
-listed below as **after the experiment**, with no test.
+before any implementation, reading only the integrated code (DEC-963).
+
+- **The first half (DEC-1099 (1)),** base `3e41b223ab86`: only the tests whose outcome was the same under set-up A
+  or B of the sandbox experiment.
+- **The second half (DEC-1112 (1)),** on integrate merged at `ca9c3c580`: the owner chose the path-map guard alone,
+  with today's launcher sandbox for workers unchanged (not generated from the path map; set-up B a Wave 3 row). The
+  lines the first half held back are tested now: S1's sandboxed part, S2, S3, S8, S9, S11 (W2-145's form), S13, F1,
+  F2's sandbox refusals, F4, F5, S7's lock failure; S10 is the CTO's measurement. The section "The second half: what
+  this round did with each line" replaces the first half's "After the experiment" table.
 
 The KPI lines are numbered in the ticket's order: S1 to S15 (success), F1 to F6 (failure).
 
@@ -61,6 +65,55 @@ to the launcher's END_WAIT_S (5 s) and a margin each.
   session's, gone when the session ends, and each is short enough for the tool's socket (107 bytes, DEC-338).
 - **The template:** `template/governance/kernel/settings.json`'s `permissions.allow` is exactly
   `["Bash(gov launch:*)"]`, and its hooks stay.
+
+### The second half's interface (DEC-1112 (1))
+
+- **The sandbox block** of a worker's `--settings` (every worker role; a path entry is read with one leading `/`,
+  so today's `//<absolute path>` and `/<absolute path>` are the same):
+  - `sandbox` keys only from today's: `enabled` (true), `failIfUnavailable` (true), `allowUnsandboxedCommands`
+    (false), `network`, `filesystem`; never `excludedCommands`, `enableWeakerNestedSandbox` or any other key.
+  - `network` keys only `strictAllowlist` (true), `allowedDomains` (today's: empty, the research allowlist for
+    research) and `allowUnixSockets`: exactly one entry, `<HOME>/.cache/gov-os/rerank.sock`, where `HOME` is the
+    launcher's and the rest is `gov.retrieval.rerank`'s `CACHE_REL` and `SOCKET` (the service's own setting); no
+    pattern, never the folder. No `allowAllUnixSockets`, `allowLocalBinding` or port key.
+  - `filesystem` keys only `allowWrite` (and the narrowing `denyWrite`, `denyRead`). `allowWrite`: the session's
+    temp folder (the `TMPDIR` the CLI is handed), exactly one run folder under `<HOME>/gov-os-runs`, and **S11's
+    one log file** `<HOME>/.cache/gov-os/rerank.log` (`CACHE_REL` and `LOG`), nothing else: no entry from the
+    ticket's allowed paths, none in the worktree, never `/tmp/gov-cbm-<uid>`. The settings are the same for two
+    tickets whose allowed paths differ (but for the two folders), and name none of the allowed paths.
+  - `permissions.deny` keeps today's literal rules: `Edit(//<root>/.gov-runtime/<name>)` for each entry of
+    `.gov-runtime/` but `scratch` that exists at launch, none for `scratch`, and `Edit(//<root>/tests/acceptance)`
+    for every role but the test designer.
+- **Links (fail open if followed):** a `rerank.log` that is a link puts neither the link nor its target on the write
+  list (and the target is untouched); a `rerank.sock` that is a link allows neither. The launch may refuse instead.
+- **S11 (choice: one log file):** the log is a regular file when the session starts (the launcher makes it if it is
+  missing: the sandbox cannot bind a file that is not there). A search in the session that the service does not
+  answer leaves one FALLBACK line that `gov.retrieval.rerank.status()` (what `gov status` shows as `reranker`)
+  counts. The decision package D-11 weighs the other way.
+- **`sandbox_faults`:** `from gov.launch.launcher import sandbox_faults` still works; `sandbox_faults(settings)`
+  returns a list of reasons, empty for the settings the launcher built, and non-empty for each of: `enabled` false,
+  `failIfUnavailable` false, `allowUnsandboxedCommands` true, `strictAllowlist` false, `excludedCommands`,
+  `allowAllUnixSockets`, a second Unix socket, another socket in the reranker's place, a socket pattern, the socket's
+  folder, `allowLocalBinding`, `httpProxyPort`, `enableWeakerNestedSandbox`. It is called in a process whose `HOME`
+  is the launcher's (the reranker's socket is read from it).
+- **The guard** (`template/governance/kernel/hooks/pretooluse.py`, copied into the fixture project, event JSON on
+  stdin, `GOV_ROLE` and `GOV_TICKET` set): for every worker role, a `Write` or `Edit` outside the ticket's paths and a
+  Bash write it names (`>`, `tee`, `cp`, `touch`, `mv`, `sed -i`, a path in another worktree) are refused; a write
+  inside each role's scope is allowed. A name pattern `tests/unit/test_batch*` lets `tests/unit/test_batch_one.py`
+  through and refuses `tests/unit/test_other.py`, `tests/unit/sub/test_batch_four.py` and `tests/test_batch_five.py`
+  (one `*` holds within one folder). A script's write the guard cannot name is the gap the CIT-E names: not tested.
+- **S1, the daemon's place:** `gov.codeintel.daemon_dir(root)` stays public and names the daemon folder of `root` as
+  the calling process sees it. In a launched session, with `TMPDIR` and `CLAUDE_CODE_TMPDIR` set to
+  `<session temp>/claude-<uid>` (as the CLI sets them for its commands; seen in a launched session on 2026-11-09),
+  and with `TMPDIR` a folder deeper under that (as a test session inside sets it), it lies under the session's temp
+  folder, and with the launcher's temp root taken as `/tmp` the folder plus the tool's 50-byte socket tail is at most
+  107 bytes. W1-27's W2-67 cases read the place through `daemon_dir` and through the `CBM_RUNTIME_DIR` the code index
+  hands the tool (D-2's revision).
+- **The stand-in's `run` step** (added to `w2_56_support`): runs a command with the session's own environment and
+  the step's overrides (`{tmpdir}`, `{cwd}`, `{uid}` filled), recording its exit code and output.
+- **The real cases:** skipped unless `GOV_W2_56_REAL=1`; `GOV_W2_56_REAL_MODEL` names the model (default `haiku`,
+  empty for no `--model`). They use the real `HOME` and `~/.local/bin/claude`, and need a machine whose resource
+  gate is open.
 
 ## KPI lines, tests, and the outcome on `w2/integrate` (`3e41b223ab86`)
 

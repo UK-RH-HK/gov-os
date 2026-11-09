@@ -313,7 +313,8 @@ tmp = os.environ.get("TMPDIR", "")
 
 
 def fill(text):
-    return text.replace("{name}", name).replace("{tmpdir}", tmp).replace("{cwd}", cwd)
+    return (text.replace("{name}", name).replace("{tmpdir}", tmp).replace("{cwd}", cwd)
+            .replace("{uid}", str(os.getuid())))
 
 
 GRANDCHILD = (
@@ -370,6 +371,16 @@ for step in plan:
             handle.write(step.get("text", "x\n"))
     elif do == "git":
         done = subprocess.run([GIT, *[fill(a) for a in step["argv"]]], cwd=cwd, capture_output=True, text=True)
+        out = os.path.join(RESULTS, "%s-%s.json" % (name, step.get("label", count)))
+        with open(out, "w", encoding="utf-8") as handle:
+            json.dump({"argv": step["argv"], "code": done.returncode, "stdout": done.stdout,
+                       "stderr": done.stderr}, handle)
+    elif do == "run":  # second half: a command in the session's environment, with the overrides the step names
+        env = dict(os.environ)
+        env.update({key: fill(value) for key, value in step.get("env", {}).items()})
+        for folder in step.get("mkdir", []):
+            os.makedirs(fill(folder), exist_ok=True)
+        done = subprocess.run([fill(a) for a in step["argv"]], cwd=cwd, env=env, capture_output=True, text=True)
         out = os.path.join(RESULTS, "%s-%s.json" % (name, step.get("label", count)))
         with open(out, "w", encoding="utf-8") as handle:
             json.dump({"argv": step["argv"], "code": done.returncode, "stdout": done.stdout,
