@@ -71,16 +71,30 @@ FAMILIES = {
                  "sed -i 's/\"Bash(git status)\"/\"Bash(git status)\", \"Bash(git push *)\"/' .claude/settings.json"),
     "claude-folder": ("repo", ".claude/agents/engineer.md", "echo changed >> .claude/agents/engineer.md"),
     "git-hooks": ("repo", ".git/hooks/reference-transaction", "echo '# changed' >> .git/hooks/reference-transaction"),
-    "crontab": ("crontab", "crontab", "{ crontab -l; echo '*/5 * * * * /bin/true # added'; } | crontab -"),
+    "crontab": ("crontab", "crontab",  # read whole before writing: a pipe into `crontab -` can truncate first
+                "c=\"$(crontab -l)\"; printf '%s\\n%s\\n' \"$c\" '*/5 * * * * /bin/true # added' | crontab -"),
     "pin": ("home", ".local/bin/gov", "echo '# changed' >> \"$HOME/.local/bin/gov\""),
     "dead-man-code": ("repo", "governance/project/orchestration/tools/deadman.py",
                       "echo '# changed' >> governance/project/orchestration/tools/deadman.py"),
     "operator-install": ("install", "brief.md", None),
 }
 
+APPENDED = {"hook-folder": b"# changed\n", "claude-folder": b"changed\n", "git-hooks": b"# changed\n",
+            "crontab": b"*/5 * * * * /bin/true # added\n", "pin": b"# changed\n", "dead-man-code": b"# changed\n",
+            "operator-install": b"changed\n"}
+
+
+def written(family, before: bytes) -> bytes:
+    """The bytes the family's line leaves in the control file."""
+    if family == "settings":
+        return before.replace(b'"Bash(git status)"', b'"Bash(git status)", "Bash(git push *)"', 1)
+    return before + APPENDED[family]
+
 
 @pytest.mark.parametrize("family", list(FAMILIES))
 def test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1(world, family):
+    """DEC-1106 (1): the agent cannot tell an unlisted control file's change from someone else's, so it leaves it
+    exactly as it is, holds the lock and names it in a P1; the ACT's own touched files are undone."""
     root, path, line = FAMILIES[family]
     if root == "install":
         target = world.install / path
@@ -93,10 +107,14 @@ def test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1(world
     assert before is not None
     b = world.ready("ACT-T-CF", [world.optin_removal()], live_apply=line)
     r = world.run(b)
-    assert state() == before, f"the {family} control file was left changed"
+    expected = written(family, before)
+    assert state() == expected, f"the {family} control file was not left exactly as the apply wrote it"
     restored(world, b)
-    assert r.out.get("result") == "undone", (r.out, r.stderr[-3000:])
-    assert world.p1s(b.act), "no P1 for a control file changed by an (a) ACT"
+    assert r.out.get("result") in ("undone", "refused"), (r.out, r.stderr[-3000:])
+    missing = support.p1_missing(world, b.act, path)
+    assert not missing, ("no P1 names the control file left changed", missing, world.p1s(b.act))
+    support.assert_lock_held(world)
+    assert state() == expected, f"the next launch changed the {family} control file"
 
 
 def _calls(w, rows):

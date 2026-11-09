@@ -138,7 +138,9 @@ event's paths relative to the repository. The planted guard `.claude/hooks/preto
 **The control files (S15), as planted:** the hook folder `.claude/hooks/**`, `.claude/settings*.json`, the rest of
 `.claude/**`, `<repo>/.git/hooks/**`, `crontab -l`, the pin `<home>/.local/bin/gov`, the dead-man's and the
 sentinel's code `governance/project/orchestration/tools/deadman.py` and `sentinel-brief.md`, and the install. After
-an (a) ACT changed one of them, the ACT is undone and the control file is restored byte for byte too.
+an (a) ACT changed one of them, the ACT's own touched files are undone and the control file is left exactly as it is
+(the agent cannot tell that change from someone else's), the lock held and a P1 naming it (DEC-1106 (1), the restore
+rule below).
 
 **The restore rule (F15, DEC-1106 (1)).** The agent never writes a live file it cannot show is its own change.
 - **After the G8 dry run** the agent re-hashes the live touched files and the control files above, with the path map
@@ -207,7 +209,7 @@ integrate; the cases marked "guard" are green once the code is built and fail an
 | S14 | `test_w2_148_apply.py::test_s14_a_check_whose_count_differs_from_the_rehearsal_is_red_and_undone` | red | no code; count 3 against 2: undone, P1 |
 | S14 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | no code; DEC-1106 (3): a stale `install/act-in-progress.txt`: G9 held (not an APPROVED refusal), the freeze kept, then applied once it is gone, same `approved_sha256` |
 | S13 | `test_w2_148_restore_freeze.py::test_s14_a_stale_freeze_in_the_install_holds_g9_and_never_refuses_on_approved` | red | as above: a hold, never a refusal |
-| S15 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | no code; eight families (hooks, settings, `.claude/**`, git hooks, crontab by a stub, the pin, the dead-man's code, the install) |
+| S15 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | no code; eight families (hooks, settings, `.claude/**`, git hooks, crontab by a stub, the pin, the dead-man's code, the install): the ACT's file undone, the control file left as the apply wrote it, lock held, P1 naming it (DEC-1106 (1)) |
 | S15 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | no code; DEC-1106 (1): at `in-apply-checks` the hook file written, a `.claude/agents/` file committed, the crontab by its store: left as written (the commit kept in HEAD's history), the ACT's file undone, not applied, lock held, P1 naming the file |
 | S15 | `test_w2_148_apply.py::test_s15_guard_a_path_map_addition_whose_replay_refuses_only_listed_calls_stays` | red | no code; guard: a listed newly refused call and an older one leave it applied |
 | S15 | `test_w2_148_apply.py::test_s15_a_path_map_addition_whose_replay_refuses_an_unlisted_call_is_undone` | red | no code; one unlisted call within 48 hours turned to refused: undone, P1 |
@@ -255,7 +257,7 @@ The failure lines, by the cases that would catch each:
 | F4 | `test_w2_148_votes_yes.py::test_s10_a_yes_that_does_not_count_is_refused` | red | each wrong source, ACT, sha or time |
 | F4 | `test_w2_148_votes_yes.py::test_s10_a_yes_in_a_record_the_cto_wrote_or_another_session_does_not_count` | red | a record the CTO wrote |
 | F5 | `test_w2_148_gates.py::test_s12_g8_the_dry_run_refuses` | red | an unlisted file in the tree or the planted HOME |
-| F6 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | undone, P1 |
+| F6 | `test_w2_148_apply.py::test_s15_an_a_act_that_also_changes_a_control_file_is_undone_with_a_p1` | red | the ACT undone, lock held, P1 naming the file |
 | F6 | `test_w2_148_restore_freeze.py::test_s15_f15_a_concurrent_control_change_during_the_apply_is_left_as_written_and_the_act_undone` | red | a control change during the apply: the ACT undone, never left applied without a P1 naming the file |
 | F15 | `test_w2_148_restore_freeze.py::test_s12_f15_a_concurrent_commit_during_the_dry_run_is_left_untouched_refused_and_held` | red | any live change made by the operator that is not its own: none (the CTO's commit kept, not reverted or deleted) |
 | F15 | `test_w2_148_restore_freeze.py::test_s12_f15_with_its_own_change_and_a_concurrent_one_it_restores_only_its_own` | red | as above, with its own change beside it |
