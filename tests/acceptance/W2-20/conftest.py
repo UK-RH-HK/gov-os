@@ -12,9 +12,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import w2_20_support as support  # noqa: E402
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "local_only: measures this machine's real CPUs; the CTO runs it outside the "
+                                       "sandbox (README, S16)")
+
+
 @pytest.fixture
 def machine(tmp_path):
-    """A temporary home folder, reading files and child processes, all removed at the end of the test."""
+    """A temporary home folder, reading files, stand-ins and child processes, all removed at the end of the test."""
     m = support.Machine(tmp_path)
     try:
         yield m
