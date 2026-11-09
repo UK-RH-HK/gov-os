@@ -3,8 +3,8 @@ with the reading [W2-M244, W2-M188].
 
 The start check is ``gov resources --check``, the gate a session start consults before it starts anything: exit 0
 and ``ok: true`` when the gate is open; when it is shut, ``ok: false``, the named error ``RESOURCE_GATE_SHUT``, an exit
-code other than 0 and 2, and the reading with its reasons in ``error.details``. ``gov launch`` is not run here: the
-launcher is W2-21's, whose KPI is that the launch passes this gate.
+code other than 0 and 2, and the reading with its reasons in ``error.details``. The launch's own refusal (DEC-1088
+(5)(b)) is ``test_w2_20_launch.py``.
 """
 
 from __future__ import annotations

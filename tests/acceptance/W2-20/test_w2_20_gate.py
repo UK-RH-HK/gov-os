@@ -1,9 +1,9 @@
-"""KPI success 2: the gate opens or shuts with a named reason.
+"""S2: the gate opens or shuts with a named reason (with S4, S5, S6 and S8 where a case touches them).
 
-The gate is open only when available memory is at least the configured minimum, the 1-minute load is below the
-configured limit, and the weighted count of live sessions (a heavy session counts double) is within the configured
-maximum. Each broken condition is a reason with its reading and its threshold. A reading that cannot be taken never
-opens the gate. W2-M262 (close's cases fail under concurrent machine load) is the load condition's row.
+The gate is open only when every condition of README "The gate" holds: memory (S6), load (S5), CPU (S2), disk and
+inodes (S4), the configuration (S8). There is no sessions condition (DEC-983). Each broken condition is a reason with
+its reading and its threshold. A reading that cannot be taken never opens the gate (F5). W2-M262 (close's cases fail
+under concurrent machine load) is the load condition's row.
 """
 
 from __future__ import annotations
