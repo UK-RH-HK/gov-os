@@ -17,6 +17,9 @@ role: engineer
 depends_on:
 - DAEO-qzrq
 allowed_paths:
+- tests/acceptance/W1-19/w1_19_support.py  # its scratch environment carries the test's own vector cache folder (D-10's red-fix list item 2) [DEC-1042, DEC-1109 (2)]
+- tests/acceptance/W2-54/test_w2_54_shared_gpu.py  # the query embedder's device as DEC-1033 (2)(b) has it (D-10's red-fix list) [DEC-1033, DEC-1109 (2)]
+- tests/acceptance/W2-54/README.md  # the line for that revision [DEC-1109 (2)]
 - src/gov/retrieval/semantic.py
 - src/gov/retrieval/vector_cache.py
 - tests/unit/retrieval/test_w2_126*
