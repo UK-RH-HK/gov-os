@@ -1,53 +1,56 @@
 # W2-20 — Machine-wide resource gate: acceptance tests
 
-Written by the independent test designer (MR-3) from the KPI lines of ticket `DAEO-r30l` (W2-20, STANDARD), its
-card in `docs/plan/WAVE_2_WBS.md` §2 and §0 rule 9, the list rows W2-M188, W2-M244 and W2-M262
-(`docs/plan/WAVE_2_LIST.md`, `docs/plan/WAVE_2_TRIAGE.md`), and DEC-729, DEC-221, DEC-136 and DEC-732. Written before
-implementation; no implementation was read. No earlier ticket's test was rewritten.
-After implementation began, a fresh test designer recorded `resources` in the command list in the form of DEC-542
-(`tests/acceptance/W1-07/w1_07_support.py`) and revised the lines that pin the recorded set in W1-07 and W1-32
-(`Rewrite-Reason:`, DEC-491). W1-26 reads the same list, so it now also holds `resources` in `core-commands` and the skill validator.
-Run 2 (a fresh test designer, after the engineer's commit): DEC-747 (delegated, staged), item 2 (P-B), a reading
-of DEC-742, settles package P-1. It adds one parametrised test of the sessions boundary (3 cases), `--heavy` on the
-start check, and these lines; no existing test was revised, none contradicts the decision (`Rewrite-Reason:`).
+Written by the independent test designer (MR-3) from the KPI lines of ticket `DAEO-r30l` (W2-20, STANDARD) as they
+stand on 2026-11-09, and the decisions they cite. **Revision round of 2026-11-09 (DEC-1097 (8)):** W2-20 was built on
+2026-10-17 to its first KPI lines; its ticket has since gained and changed many lines. The 10-17 cases were brought
+from `w2/W2-20` unchanged (commit `fa2abff4d`), then each old case whose line changed was revised or removed in its
+own commit (`Rewrite-Reason: DEC-1097 (8)`), and every new line got new cases. No implementation was read: only the
+ticket, the decisions, and today's `w2/integrate` code outside W2-20's own work (the launcher, W2-136's plan check,
+`gov.retrieval.ollama`, the pools of `gov.secrets` and `gov.codeintel`) and the interim wrapper `~/.local/bin/ollama`
+(read, never run).
 
 ## Run
 
 ```sh
-PYTHONPATH=/home/usain/gov-os-worktrees/W2-20/src python3 -m pytest tests/acceptance/W2-20 -q -p no:cacheprovider -rs
+PYTHONPATH=<tree>/src python3 -m pytest tests/acceptance/W2-20 -q -p no:cacheprovider -m "not local_only"
 ```
 
-Standard library and `pytest` only. No network, no dev tier, nothing installed. About 10 seconds.
+Standard library and `pytest` only. No network, no GPU, no model, no real server. About two minutes once built (the
+slot cases wait a few seconds each to show a job still waiting). One case is `local_only` (S16, measured): the CTO runs
+it outside the sandbox with `-m local_only` (see S16 below).
 
-- **The code under test (DEC-732).** Every command runs as `python3 -m gov.cli.main resources ...` with `PYTHONPATH`
-  set to the `src/` folder of the working tree that holds this suite (`w2_20_support.SRC`, computed from the file's
-  own location), so in the W2-20 worktree it runs `/home/usain/gov-os-worktrees/W2-20/src`.
-  `test_the_suite_runs_this_worktrees_code` checks that `gov.__file__` points there. Bytecode is not written
-  (`PYTHONDONTWRITEBYTECODE=1`).
-- **The real `~/.gov-os/` is never touched.** Every command runs with an environment built from scratch: `PATH`, a
-  temporary `HOME`, `TMPDIR`, locale, `PYTHONPATH` and the three reading variables below. The session's `GOV_ROLE`
-  and `GOV_TICKET` are not passed on. Before a test enters its first session, the suite reads the registry folder the
-  command names and fails if it is not inside that test's temporary home.
-- **No real machine state.** Every reading comes from a file the test writes; repositories are temporary git
-  repositories built from scratch (one commit); "live" and "dead" sessions are child processes the test starts and
-  stops itself (`python3 -c "time.sleep(600)"`, killed and reaped). Children are killed at the end of every test.
+- **The code under test (DEC-732).** `gov resources` runs as `python3 -m gov.cli.main resources ...` with
+  `PYTHONPATH` set to the `src/` folder of the tree that holds this suite (`w2_20_support.SRC`); the launcher, the
+  pools and the server start are imported in the test's own process from the same `src/` (the runner's
+  `PYTHONPATH`). `test_the_suite_runs_this_worktrees_code` checks it.
+- **Nothing real is touched.** Every command runs with an environment built from scratch: a temporary `HOME` (never
+  the real `~/.gov-os/machine/`), `TMPDIR`, and `PATH` = this test's stand-in folder + `/usr/local/bin:/usr/bin:/bin`,
+  so neither `~/.local/bin` (the interim wrapper) nor `/usr/lib/wsl/lib` (the real `nvidia-smi`) is on it. The
+  session's `GOV_ROLE` and `GOV_TICKET` are not passed on. Before a test enters its first session the suite checks
+  that the registry folder the command names is inside that test's temporary home.
+- **Planted machines only.** Every reading comes from a file the test writes (the variables below); the GPU from a
+  stand-in `nvidia-smi` that answers from a planted state and logs its calls; the embedding server from a stand-in
+  `ollama` that records its environment, CPU affinity and niceness, started on a free local port (never 11434 or
+  11435). Sessions and heavy jobs are child processes the test starts, each in its own process group, killed at the
+  end of every test. Memory figures that must be real (a session's live memory) come from children that hold written
+  memory (64 to 256 MiB).
 
-## The public interface these tests define
+## The interface these tests assume
+
+The engineer builds to this; where the ticket left a form open, the choice is the test designer's and is marked
+*(choice)*; the open ones are in the decision packages at the end.
 
 ### The command
 
 | Invocation | What it does | Exit |
 |---|---|---|
-| `gov resources [--json] [--root R]` | The reading: memory, load, processors, the live sessions of the machine-wide registry, the thresholds, and the gate. Clears stale entries. | 0, whether the gate is open or shut |
-| `gov resources --check [--heavy] [--json] [--root R]` | **The start check**, the gate a session start consults before it starts anything. It is asked for the start of one session: a light one (no `--heavy`, the start of a session told nothing about weight) adds 1 to the weighted count, a heavy one (`--heavy`) adds 2 (DEC-747). | 0 and `ok: true` (the reading as `result`) when open; when shut, `ok: false`, `error.code` `RESOURCE_GATE_SHUT`, the reading in `error.details`, and an exit code other than 0 and 2 (a code the command declares, 3–255, or 1). The same exit code without `--json`, and the text names the broken condition. |
-| `gov resources --register PID --ticket ID --session-role ROLE [--heavy] [--root R]` | Enters a session in the machine-wide registry: its process id, its repository (the project root, `--root` or the working directory), its ticket, its role, and whether it is heavy. | 0, `ok: true` |
-
-`--session-role` is used because `--role` is already one of `gov`'s own options. **The start check chosen is
-`gov resources --check`**: the launcher (`src/gov/launch/launcher.py`, `command.py`) is W2-21's, whose KPI is that the
-launch "passes the resource gate"; it may call this check, or the same gate in `src/gov/launch/gate*`. No test runs
-`gov launch` or starts a real session. **A heavy start is asked with `--check --heavy`**, the same flag that enters a
-heavy session with `--register` (DEC-747 needs the start check to know the new session's weight). `--heavy` with
-neither `--check` nor `--register` is not part of this interface.
+| `gov resources [--json] [--root R]` | The reading (below) and the gate. Clears stale entries. Applies nothing else. | 0, open or shut |
+| `gov resources --check [--gpu-need-mib N] [--gpu-kind embedder\|reranker\|other] [--json]` | **The start check** for one new session (or a job that declares a GPU need). Without `--gpu-need-mib` it never runs `nvidia-smi` (S10). `--gpu-kind` defaults to `other`. | 0 and `ok: true` (the reading as `result`) when open; when shut, `ok: false`, `error.code` `RESOURCE_GATE_SHUT`, the reading in `error.details`, an exit code other than 0 and 2 (the same without `--json`, and the text names the broken condition) |
+| `gov resources --register PID --ticket ID --session-role ROLE` | Enters a session in the machine-wide registry (its pid, repository, ticket, role). `--heavy` is no longer part of the interface (no weights, DEC-983). | 0, `ok: true` |
+| `gov resources --slot test\|rebuild [--tree T] [--workers N] -- CMD...` | **A heavy job.** Waits for one of the configured machine-wide slots (a rebuild also for its tree's lock, `--tree` default the root), then runs `CMD` confined to the slot's CPU set with the slot's thread budget, and gives the slot back when `CMD` ends. *(choice)* | `CMD`'s exit code; `CMD`'s output passes through |
+| `gov resources --sample [--json]` | Takes one sample of every live session's process-tree memory, noting whether a verification run holds the lock. Result `samples`: `[{pid, tree_memory_bytes, verification}]`. *(choice)* | 0 |
+| `gov resources --remeasure [--json]` | Writes `verification_peak_bytes` (largest sample) and `working_size_bytes` (largest sample outside verification) into the configuration file, dated today, with a source; result `{"old": {both keys}, "new": {both keys}}`. *(choice)* | 0 |
+| `gov resources --trip-wire [--json]` | One pass of the trip-wire: below `oom_floor_bytes`, stops the heavy job (slot holder and its command's processes) whose process tree holds the most memory; result `stopped` (an object naming the job and its command) or `null`; the stop appended as one JSON line to `$HOME/.gov-os/machine/findings.jsonl`. Only slot holders are ever stopped. *(choice)* | 0 |
 
 ### The reading (`result`, or `error.details` of a refused start check)
 
@@ -55,119 +58,126 @@ neither `--check` nor `--register` is not part of this interface.
 |---|---|
 | `registry` | Absolute path of the registry folder: `$HOME/.gov-os/machine/` or a folder inside it. |
 | `available_memory_bytes` | `MemAvailable` in bytes, or `null` when it cannot be read. |
-| `load_1m` | The 1-minute load average, or `null` when it cannot be read. |
+| `sessions_live_memory_bytes` | The live sessions' memory: each session's process tree, **each process counted once** (a worker inside its lead's tree is not counted again, F6). |
+| `load_1m`, `load_15m` | The 1- and 15-minute loads, or `null`. |
+| `busy_cores_1m` | Busy cores over the last minute, or `null`. |
+| `embedding_cpu_p95` | `{"shared": cores, "query": cores}`, the two servers' CPU p95, or `null`. |
 | `nproc` | The processor count. |
-| `sessions` | The live sessions: objects with `pid` (int), `repository` (absolute path), `ticket`, `role`, `heavy` (bool). |
-| `weighted_sessions` | The weighted count of live sessions: a light session counts 1, a heavy one 2. |
-| `cleared` | The stale entries this read removed from the registry, same shape as `sessions`; `[]` when none. |
-| `thresholds` | `{min_available_memory_bytes, max_load_1m, max_weighted_sessions}` in force. |
-| `gate` | `{open: bool, reasons: [{condition, reading, threshold}]}`; `condition` is `memory`, `load` or `sessions`; `reasons` is `[]` when open. |
+| `disk` | `{"free_bytes", "free_inodes"}` of the shared disk, or `null`. |
+| `sessions` | The live sessions: `pid`, `repository`, `ticket`, `role`, `live_memory_bytes`. |
+| `cleared` | The stale entries this read removed, same shape; `[]` when none. |
+| `slots` | `{"total": heavy_slots, "held": [one entry per running heavy job]}`. |
+| `gpu` | `{"available": true, "memory_used_mib", "memory_total_mib", "utilisation_pct", "processes": [{pid, kind, used_mib}]}` or `{"available": false, "reason": "..."}` (never an error). On the start check only with a GPU need. |
+| `gpu_room_mib` | On a start check with a GPU need: the room the job's kind had. |
+| `due_for_remeasure` | The measured keys (`verification_peak_bytes`, `working_size_bytes`) dated more than seven days ago; `[]` when none. A notice: it does not shut the gate. |
+| `gate` | `{open: bool, reasons: [{condition, reading, threshold, ...}]}`; `reasons` is `[]` when open. |
 
 ### The gate
 
-Open only when all hold; each broken condition is one reason with its reading and its threshold:
+Open only when every condition holds; each broken condition is one reason with its `reading` and `threshold`.
+`condition` is one of `memory`, `load`, `cpu`, `disk`, `inodes`, `config`, `gpu`. There is **no sessions condition and
+no ceiling on leads or sessions** (DEC-983); heavy jobs wait for slots instead, and a session takes no slot.
 
-- **memory:** `available_memory_bytes >= min_available_memory_bytes` ("at least": exactly at the minimum **opens**);
-- **load:** `load_1m < max_load_1m` ("below": exactly at the limit **shuts**);
-- **sessions** (DEC-742 "at most 8", read by DEC-747 (delegated, staged): it holds after the start):
-  - **in the reading** (`gov resources` without `--check`): `weighted_sessions < max_weighted_sessions`, room for at
-    least a light session. Exactly at the maximum **shuts**. A `sessions` reason carries `reading` =
-    `weighted_sessions` (the live count) and `threshold` = `max_weighted_sessions`: 8 of 8 is `(8, 8)`.
-  - **in the start check**: `weighted_sessions + weight ≤ max_weighted_sessions`, where `weight` is 1 for a light
-    start and 2 for a heavy start (`--heavy`). The gate in `result` or `error.details` is this start's gate. A
-    `sessions` reason carries `reading` = `weighted_sessions + weight` (the count the start would make) and
-    `threshold` = `max_weighted_sessions`: a light start at 8 of 8 is `(9, 8)`, a heavy start at 7 of 8 is `(9, 8)`.
-    The reading's other keys stay as in the reading: `weighted_sessions` is the live count (7 or 8 here).
-  - The boundary, with DEC-742's default maximum of 8: 7, a light start opens (7 + 1 = 8); 7, a heavy start is
-    refused (7 + 2 = 9); at 8 the reading is shut and a light start is refused. Elsewhere the tests use counts
-    clearly within (2 of 3) or clearly over (3 of 1, 4 of 3, 9 of 8).
-
-**Fail closed:** a reading that cannot be taken is `null` and shuts the gate with a reason whose `reading` is `null`.
-
-### Configuration: `$HOME/.gov-os/machine/gate.json`
-
-One JSON object, the one place the thresholds live. A key that is absent (or the file absent) takes its default,
-DEC-742's values (P-W2-9, accepted by the owner on 2026-10-17; first proposed as rule 9):
-
-| Key | Default |
-|---|---|
-| `min_available_memory_bytes` | `4294967296` (4 GiB) |
-| `max_load_1m` | the processor count (`nproc`) |
-| `max_weighted_sessions` | `8` |
+- **memory (S6):** `available + sessions_live ≥ floor + working_size × (running sessions + 1)`. Reading: the left
+  side; threshold: the right side. "At least": equal opens. The verification peak is not added (nothing is reserved
+  for a run that has not started).
+- **load (S5):** `min(load_1m, load_15m) < nproc`. Reading: the min; threshold: nproc. Equal shuts.
+- **cpu (S2, S12):** `busy_cores_1m + p95(shared) + p95(query) < nproc`. Reading: the sum; threshold: nproc. Equal
+  shuts. *(choice: how the servers' p95 is counted)*
+- **disk, inodes (S4):** `free_bytes ≥ disk_floor_bytes`, `free_inodes ≥ inode_floor`. Equal opens.
+- **config (S8):** one reason per value missing or malformed, naming its key (or the file, when it is missing or not
+  JSON); `reading` the raw value or `null`.
+- **gpu (S10, S14), start check with a need only:** some single GPU has room ≥ need × (1 + `gpu_margin`). The room
+  for a job is that GPU's free memory less the unused part of the shares of the kinds before it (an `embedder`: none;
+  a `reranker`: the embedder's; `other`: the embedder's and the reranker's), where a share's unused part is its share
+  less what that kind's processes use on the GPU. No `nvidia-smi`, no GPU, or an unreadable answer: reason `gpu`
+  with `reading` `null`.
+- **Fail closed (F5):** a reading that cannot be taken is `null` and shuts the gate with its condition, `reading`
+  `null`.
 
 ### Where the readings come from
 
 | Variable | Default | Format |
 |---|---|---|
-| `GOV_RESOURCES_MEMINFO` | `/proc/meminfo` | `/proc/meminfo`'s; the `MemAvailable:` line, in kB (×1024 for bytes) |
-| `GOV_RESOURCES_LOADAVG` | `/proc/loadavg` | `/proc/loadavg`'s; the first field |
-| `GOV_RESOURCES_NPROC` | the machine's processor count | an integer |
+| `GOV_RESOURCES_MEMINFO` | `/proc/meminfo` | `MemAvailable:` in kB |
+| `GOV_RESOURCES_LOADAVG` | `/proc/loadavg` | fields 1 and 3 (1- and 15-minute) |
+| `GOV_RESOURCES_NPROC` | the processor count | an integer (the gate's nproc; CPU sets use the real affinity) |
+| `GOV_RESOURCES_BUSY_CORES` | the gate's own sampling of `/proc/stat` | one number: busy cores over the last minute |
+| `GOV_RESOURCES_EMBEDDING_CPU` | the gate's own sampling of the two servers | JSON `{"shared": p95 cores, "query": p95 cores}` |
+| `GOV_RESOURCES_DISK` | `statvfs` of the shared disk | JSON `{"free_bytes": N, "free_inodes": N}` |
+| `nvidia-smi` on `PATH` | | read with `--query-gpu=<fields>` and `--query-compute-apps=<fields>`, `--format=csv[,noheader][,nounits]`; fields `memory.total`, `memory.used`, `memory.free`, `utilization.gpu`; `pid`, `process_name`, `used_memory`. Exit 6 with "No devices were found" is no GPU. |
 
-A missing file, a missing `MemAvailable` line, or a first field that is not a number is a reading that cannot be
-taken.
+A process's GPU kind is read from its command line *(choice)*: a word whose file name begins with `ollama` is an
+`embedder`; `rerank` anywhere a `reranker`; anything else `other`.
 
-### Sessions
+### The configuration file: `$HOME/.gov-os/machine/gate.json`
 
-A session is live while its process id names a running process. The registry's on-disk format is the
-implementation's; the tests enter sessions only with `--register` and read them only with `gov resources`. A stale
-entry is removed by the read that finds it: that read lists it under `cleared`, and a later read does not list it
-again.
+The file `gov.retrieval.ollama` already reads for the servers' cap (`GATE_REL`). Every gate value is an object
+`{"value": V, "date": "YYYY-MM-DD", "source": "text"}`; a value without its date or source, or with a date that is
+not a date, is malformed. **No default stands in for a missing value** (the old defaults of DEC-742 are gone).
 
-## KPI line and list row → tests → red reason
-
-Red run 1 on `w2/W2-20` at `689bd17e`: **21 failed, 1 passed** (22 cases, 17 test functions). Every failing case fails
-on the same reason: `gov resources` does not exist — `gov: error: argument <command>: invalid choice: 'resources'`,
-exit code 2, no JSON envelope (`AssertionError: gov resources printed no JSON envelope (exit 2)`). It is raised by the
-suite's first call in each test, the registry-location check. The one passing case is the DEC-732 check that the
-suite runs this worktree's code.
-
-Red run 2 (DEC-747), on `w2/W2-20` at `2ceae1e9` with the engineer's code: **2 failed, 23 passed** (25 cases, 18 test
-functions). The cases the decision makes stricter than the code as built fail; the rest of the suite is green:
-
-- `test_DEC_747_at_most_8_holds_after_the_start[7, a heavy start is refused]`: `gov resources --check --heavy` is
-  refused, but not by the gate: `the refusal is not the named error RESOURCE_GATE_SHUT: {'code':
-  'RESOURCE_REGISTER_INVALID', 'message': '--ticket, --session-role and --heavy go with --register', ...}`. The start
-  check does not take the new session's weight.
-- `test_DEC_747_at_most_8_holds_after_the_start[8, the reading shuts and a light start is refused]`: `8 of 8 leaves no
-  room and must read shut: {...}` (`assert True is False`): the reading opens at the maximum (within, not below). The
-  case stops there; its light start check is not reached.
-- `[7, a light start opens]` passes (7 + 1 = 8 opens, as built).
-
-| KPI line / row | File | Tests |
+| Key | Value | Notes |
 |---|---|---|
-| **Success 1.** `gov resources` reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under `~/.gov-os/machine/`, whichever repository started it | `test_w2_20_reading.py` | `test_the_reading_reports_memory_load_processors_and_the_registry_folder` · `test_every_live_session_is_read_with_its_pid_repository_ticket_role_and_weight` · `test_the_registry_belongs_to_the_home_folder_not_to_the_repository` · (another repository: `test_a_session_entered_from_another_repository_counts_against_this_ones_gate`) |
-| **Success 2.** The gate opens or shuts with a named reason | `test_w2_20_gate.py` | `test_the_gate_is_open_when_every_condition_holds` · `test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_threshold[memory, load [W2-M262], sessions]` · `test_several_broken_conditions_are_all_named` · `test_exactly_at_a_threshold[memory, load]` · `test_a_heavy_session_counts_double_and_tips_the_count_over_the_maximum[two light, two heavy]` · `test_the_proposed_defaults_are_in_force_when_nothing_is_configured` (DEC-742's defaults; the name is the first run's) · `test_a_reading_that_cannot_be_taken_never_opens_the_gate[memory, load]` · the sessions boundary, DEC-747: `test_DEC_747_at_most_8_holds_after_the_start[7, a light start opens; 7, a heavy start is refused; 8, the reading shuts and a light start is refused]` |
-| **Success 3.** A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262] | `test_w2_20_stale.py` | `test_W2_M244_W2_M188_W2_M262_a_dead_pid_is_cleared_and_a_live_one_is_kept` · `test_W2_M244_W2_M188_W2_M262_a_stale_entry_does_not_count_against_the_gate` |
-| **Failure.** A session in another repository counts against the gate | `test_w2_20_failure.py` | `test_a_session_entered_from_another_repository_counts_against_this_ones_gate` |
-| **Failure.** A start while the gate is shut is refused with the reading | `test_w2_20_failure.py` | `test_W2_M244_W2_M188_a_start_while_the_gate_is_shut_is_refused_with_the_reading` · `test_W2_M244_the_refusal_without_json_has_the_same_exit_code_and_names_the_reason` · `test_W2_M188_a_start_while_the_gate_is_open_goes_ahead` · (fail closed: the second half of `test_a_reading_that_cannot_be_taken_never_opens_the_gate`) · (the sessions boundary: the start checks of `test_DEC_747_at_most_8_holds_after_the_start[7, a heavy start is refused; 8, the reading shuts and a light start is refused]`, refused with the reading and the `sessions` reason) |
-| **W2-M188** (each rule enforced by a command or check) | | the start-check tests above, and the stale-entry tests |
-| **W2-M244** (a gov command refuses to start a ticket when memory or load breaks the gate; a case shows the refusal) | | `test_W2_M244_W2_M188_a_start_while_the_gate_is_shut_is_refused_with_the_reading` (memory) · `test_W2_M244_the_refusal_without_json_has_the_same_exit_code_and_names_the_reason` (load), and the stale-entry tests |
-| **W2-M262** (close's cases fail under concurrent machine load) | | `test_one_broken_condition_shuts_the_gate_and_is_named_with_its_reading_and_threshold[load [W2-M262]]`, and the stale-entry tests |
+| `memory_floor_bytes` | integer ≥ 0 | 3 GiB on this machine (DEC-942 item 2) |
+| `verification_peak_bytes` | integer ≥ 0 | measured (S9); due after seven days |
+| `working_size_bytes` | integer ≥ 0 | measured (S9); due after seven days |
+| `disk_floor_bytes` | integer ≥ 0 | 100 GiB (DEC-898 item 1) |
+| `inode_floor` | integer ≥ 0 | 10,000,000 (DEC-898 item 1) |
+| `verification_lock` | a path (text) | a verification run holds an exclusive `flock` on it |
+| `gpu_margin` | number ≥ 0 | 0.10 |
+| `oom_floor_bytes` | integer ≥ 0 | the trip-wire's floor, below `memory_floor_bytes` |
+| `heavy_slots` | integer ≥ 1 | the machine-wide slots |
+| `gpu_shares` | `{"embedder_mib": int ≥ 0, "reranker_mib": int ≥ 0}` | the GPU shares by kind |
+| `thread_budget` | integer ≥ 1, **optional** | when present, the slot's thread budget (S15) |
+| `embedding_servers` | W2-123's section: `shared` and `query`, each `cpus`, `nice` (and `parallel`, `probe_*`), plus `date` and `source`; `query` also `device`: `"gpu"` (default when absent) or `"cpu"` | the servers' cap (S12) and the query server's device (S20) |
 
-**Count.** KPI lines with tests: 4 of 4 (3 success, 1 failure with its two halves). List rows named by a test: 3 of 3.
-25 cases in 18 test functions (run 1: 22 in 17; run 2 adds the 3 cases of the sessions boundary).
+### Heavy jobs: slots, thread budget, CPU set (S7, S15, S17)
 
-**The test logic was checked** (run 1) against a throwaway stand-in kept outside the repository (never in `src/`, never
-committed), driven by a temporary edit of the support module that was reverted before the commit: 22 passed; with
-stale entries filtered but not removed, and with an unreadable memory reading treated as open, exactly the stale and
-the fail-closed tests failed.
+- The slots' CPUs are the CPUs the `gov resources` process may use (`os.sched_getaffinity`) less every CPU the
+  `embedding_servers` section names. Each slot's CPU set has `max(1, len(slots' CPUs) // heavy_slots)` of them; two
+  slots held at once have disjoint sets (where there are CPUs enough).
+- The thread budget is `max(1, len(slot's set) // workers)` (`--workers`, default 1), or `thread_budget` when the file
+  sets it. Every program the job starts gets it in `GOMAXPROCS`, `OMP_NUM_THREADS`, `MKL_NUM_THREADS`,
+  `OPENBLAS_NUM_THREADS`, `RAYON_NUM_THREADS`, `NUMEXPR_NUM_THREADS`, `VECLIB_MAXIMUM_THREADS` and
+  `GOV_HEAVY_THREAD_BUDGET` (the variable `gov.secrets` reads), whatever the caller had (999 in the tests).
+- A rebuild holds its tree's lock (the real path of `--tree`): a second rebuild of the same tree waits, a rebuild of
+  another tree does not.
 
-## Package for the orchestrator
+### The disk reading for gov close (S4)
 
-**P-1 is decided by DEC-747 (delegated, staged), item 2 (P-B): option (a).** "At most 8" holds after the start: the
-start check opens on sessions only when the weighted count of live sessions plus the new session's weight (2 when
-heavy) is at most the maximum; the reading shows the gate shut when the weighted count is already at the maximum. Not
-"< 8 everywhere" (a heavy start could then reach 9). DEC-742 stands, its values the defaults. The interface and the
-test are above ("The gate", `test_DEC_747_at_most_8_holds_after_the_start`). The package as returned in run 1:
+`gov.resources.check_disk(env=None) -> {"open": bool, "reasons": [{condition, reading, threshold}], "free_bytes",
+"free_inodes"}`; `env` (default `os.environ`) supplies `HOME` and `GOV_RESOURCES_DISK`. `gov close` calls it (W2-07's
+or W2-66's line).
 
-**P-1. Does the session limit count the session being started?** The sources say "at most 8 Gov OS sessions on the
-machine" (rule 9) and "within the configured maximum" (brief). With 8 live light sessions and a maximum of 8, the gate
-reading is open if it tests `weighted ≤ max`, but starting a ninth session then makes 9. Options: (a) the gate tests
-the live count, `weighted ≤ max`, and the start check adds the weight of the session being started
-(`weighted + weight(new) ≤ max`), which needs the start check to know whether the new session is heavy (for example
-`--check --heavy`); (b) the gate opens only while there is room for one more light session (`weighted < max`, same
-answer for the reading and the check); (c) `weighted ≤ max` for both, accepting up to max + 2 after a start. Impact:
-which side of the boundary opens, and a possible `--heavy` on `--check`. Reversible: yes, one comparison and at most
-one option, plus one boundary test. Cost: small. Recommendation: (b), the simplest that keeps "at most 8" true for
-light starts, with the heavy case left to the launcher (W2-21). Confidence: medium. Until decided, no test sits on this
-boundary. (Decided otherwise: the reading follows (b), the start check (a).)
+### The launch (S19)
+
+- `gov.launch.launcher.launch(root, role, ticket, cli_args, gate_override=None, gpu_need_mib=None)`, and on the
+  command line `gov launch <role> <ticket> [--gate-override DEC-NNN] [--gpu-need-mib N] [-- ...]` *(choice; package
+  P-1)*.
+- Every launch, lead or worker, runs the start check before any session starts (after W2-136's plan check for a
+  lead). A shut gate raises `GovError("LAUNCH_REFUSED", message)`; the message names each broken condition and its
+  reading as the reading gives it (an integer of bytes or inodes, a load or a core count as a number), for example
+  `the resource gate is shut: memory: reading 1073741824, limit 4294967296 (DEC-1088 (5))`; a missing configuration
+  value is named by its key.
+- `gate_override="DEC-NNN"` (a decision id, `DEC-` and digits; anything else is refused) starts the session anyway and
+  writes **one line to `$HOME/.gov-os/machine/launch.log`** and **one line to standard error** (the launch's output,
+  as W2-136's plan override prints its own), each holding `OVERRIDE`/`gate_override: DEC-NNN`, the role, the ticket and
+  the conditions passed over, e.g. `gov launch: OVERRIDE gate_override: DEC-1234: engineer DAEO-wrk01 started with the
+  resource gate shut: memory: reading 1073741824, limit 4294967296 (DEC-899)`.
+
+### The query server's start (S20, DEC-1037)
+
+`gov.retrieval.ollama.ensure_query_available(start=True, env=...)`, with no wrapper on `PATH`:
+
+- CPUs and niceness from `embedding_servers.query` (as today);
+- device from `embedding_servers.query.device`: `"gpu"` or absent: the server's environment has no
+  `CUDA_VISIBLE_DEVICES=-1` (a caller's `-1` is removed); `"cpu"`: `CUDA_VISIBLE_DEVICES=-1`; anything else: no start,
+  `started: false`, and the answer (its `warning`) names `device`;
+- none of the eight thread-budget variables above in the server's environment;
+- the server's standard output and error appended to `$HOME/.gov-os/machine/embedding-query.log`;
+- one JSON line per start appended to `$HOME/.gov-os/machine/embedding-starts.jsonl`:
+  `{"time": ISO 8601, "server": "query", "device": "gpu"|"cpu", "caller": {"pid", "cwd", "command"}}`, the caller being
+  the process that called `ensure_query_available`.
+
+The evidence names the owner ACT's steps (the wrapper removed, the real binary found on PATH, a restart seen capped);
+the tests do not apply them.
