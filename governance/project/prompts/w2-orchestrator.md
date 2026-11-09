@@ -27,8 +27,9 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
    DEC-1091).
 7. **Faults:** any fault, or any stop outside the planned windows, goes to the owner at once; P1s always to the owner;
    P2s delegated and listed in the next digest (DEC-936 item 2.5).
-8. **Waits and holds:** every wait and stop by pid only (`tools/proc.sh`); no commit on `w2/integrate` during a GPU
-   measure or a hold.
+8. **Waits and holds:** every wait and stop by pid only (`tools/proc.sh wait` in a background Bash run, or
+   `wait_for.sh` on an exit file; never the Monitor tool, which asks the owner each time, and never a name match); no
+   commit on `w2/integrate` during a GPU measure or a hold. Every helper's brief says so.
 9. **After the lift:** each ready list the CTO commits covers several of `gov plan`'s batches ahead (DEC-1110 (3)).
 10. **What goes to the owner:** only P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs; fixed briefs to
     approve once; anything that changes one of the owner's standing decisions; steps only the owner can do physically.
