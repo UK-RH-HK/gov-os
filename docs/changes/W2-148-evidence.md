@@ -235,3 +235,59 @@ Hashed before the trial and after it (names and hashes only: each row's sha256 i
 
 Equal: **True**.
 
+## Round 2: the review's findings (2026-11-09)
+
+The independent review's round 1 found the work not READY: F1 and F2 blocked (in scope, ordinary work, fail open).
+Round 2 fixes both and the cheap rows; F3, F5 and F7 are left to the CTO and the owner, as the round-2 brief says.
+Commits on `w2/W2-148`: `f680fc5ae` (F1, F14) and `43eb90435` (the rest); unit cases in
+`tests/unit/operator/test_w2_148_parts.py` (F1, F14) and `tests/unit/operator/test_w2_148_round2.py` (the rest).
+
+| Finding | The fix | Unit cases |
+|---|---|---|
+| F1 (S6, blocking) | `act_class.strip_wrappers` steps over the shell's reserved words and grouping marks (`if then else elif fi do done while until esac { } ( ) ! coproc`) as it steps over `env`; a `for`/`select` header is skipped up to its `do`, a `case` header and `function <name>` are skipped. So `then sudo …`, `do git push`, `{ git tag v1; }`, `then rm -rf ~/x`, `do curl https://…`, `then pip install …`, `! git push` and `else git push` give their hits, in `commands` and in `apply.sh` | `test_reserved_words_are_stepped_over` (19 forms, each in a command and in `apply.sh`: those eight, `elif`, `while`, `until`, a subshell, a multi-line `for`, a function body `f() { … }`, `function g { … }`, a heredoc-fed `bash`, a `case` arm; and two that stay (a): a local `curl` in a loop, reserved words as `echo`'s arguments) |
+| F2 (S12, blocking): refuse before running | `operator_run.path_rule` at G1, on the frozen copy, before anything runs: `apply.sh`, each manifest command and each check is refused when it names the live repository's path (the `repo` setting, and its real path) or the real HOME (the `home` setting) literally, the repository as `~/<rel>`, `$HOME/<rel>`, `${HOME}/<rel>` (quoted or not), HOME as `~<user>`, or `cd`s/`pushd`es to HOME (a bare `cd`, `cd ~`, `cd $HOME`, `cd ${HOME}`). The reason names the rule: "the frozen script must work relative to its cwd and HOME". `$HOME/<file>` and `cd "$(dirname …)"` stay allowed (the dry run plants HOME). The settings' values are the live ones by default, so planted runs check against their planted roots | `test_the_path_rule_reads_every_form` (16 refused forms, 12 allowed), `test_g1_refuses_a_script_that_names_the_live_paths` (in `apply.sh`, a command, a check, a bare `cd`, the HOME path), `test_g1_refuses_the_repository_named_through_home` |
+| F2: detect after the dry run | `Run.g8` reads the live touched files and the control files (§3's list: `.claude/**`, `.rulesync/**`, the git hooks, `.git/config` and core.hooksPath's folder, `crontab -l`, the pin, the dead-man's and the sentinel's code, the path map, the install) before the dry run and again after it, whatever its outcome. On any change it restores the touched files from the frozen `before/` copies and the control files from the bytes read before, re-reads them, and refuses at G8 with "LIVE FILES CHANGED during the dry run (…)"; the log line carries `live_changed` and `restored`; the refusal after G7 pushes the P1, whose text says live files changed; a restore that does not bring every file back holds the lock | `test_a_live_file_changed_by_the_dry_run_is_restored_and_refused` (a touched file, a control file, the pin created in HOME; each path built at run time so the G1 rule cannot see it) |
+| F2: the briefs | `reviewer-brief.md`'s first check now holds the path rule (relative to the cwd and `$HOME`, the bundle through the script's own folder, no live path named, no `cd` to either). `brief.md` needs nothing for it: the session never writes a script | — |
+| F14 | An empty touched list with any command (a manifest command, or an `apply.sh` line beyond `exit`, `set`, `echo`, `cd`, `test` …) adds the hit `commands-only`, class (b) in `class-rules.yaml` | `test_an_empty_touched_list_with_commands_is_at_least_b` |
+| F8 | G1 never removes or replaces an existing `acts/<id>-<sha12>/`: a second request for the same sha reuses it only when its manifest hashes as the request and every file as the manifest says; otherwise "changed after review", the copy left as it is. Only `review.md` (not hashed by the manifest) is taken afresh from the bundle, so a later review round on the same manifest is read | `test_a_stale_requeue_never_replaces_an_applied_acts_frozen_copy` (re-queued after an edit: refused at G7, the frozen bytes unchanged, the owner's undo then works), `test_an_existing_frozen_copy_that_changed_is_refused_and_left_alone`, `test_a_later_review_round_on_the_same_manifest_is_read` |
+| F9 | G4 refuses a manifest with no `author` | `test_g4_refuses_a_manifest_with_no_author` |
+| F10 | An unexpected error at G7 or later (`Run.at`, the gate being run) is pushed as a P1 (kind `refused`) and its log line carries `notice: refused`, so the digest's `missing_notices` counts it when the push is missing; an error before G7 is logged only | `test_an_unexpected_error_after_g7_is_pushed_and_counted`, `test_an_error_before_g7_is_not_pushed` |
+| F11 | `.git/config` and the files of the folder core.hooksPath names (when outside `.git/hooks`) join the control snapshot (S15 and the F2 re-hash); `.git/config` joins the dry run's changed set and the live unlisted-file check | `test_the_dry_run_counts_git_config_in_its_changed_set`, `test_a_live_git_config_change_is_undone`, `test_the_folder_core_hookspath_names_is_a_control` |
+| F12 | G9 (and so the launcher) also holds while `NIGHTLY-RUNNING` exists: setting `nightly_flag`, default `<scratch>/NIGHTLY-RUNNING` (`nightly.sh` writes `$ORCH/NIGHTLY-RUNNING`, `ORCH` the CTO's scratch); a flag older than `nightly_flag_max_age_s` (6 hours, `nightly.sh`'s own stale mark) is a dead run's leftover and does not hold | `test_g9_holds_while_the_nightly_flag_is_fresh`, `test_a_dead_nightlys_old_flag_does_not_hold` |
+| F13 | `owner_text` refuses a line with `isCompactSummary` (beside `isMeta`) | `test_a_compact_summary_is_never_the_owners_line` |
+| F6 | The wall's settings `env` sets `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS` to `session_timeout_s` less a minute (2,640,000 ms by default); `request.txt` names it as `timeout_ms`, and `brief.md` tells the session to give its one Bash call that timeout, never in the background, never twice | `test_the_wall_sizes_the_bash_timeout_to_the_session` |
+| F4 | Without `push_cmd` (today's default), a notice goes through the dead-man's three channels from the install's own code (the forms of `deadman.py`'s `send()` copied, nothing imported): the JSON line in `pings_log` (the log channel, as before), the Windows toast through the install's own `win_toast.ps1` (a copy), and a headless `claude -p` asked to call PushNotification with the line. The line (`notice_line`) is at most 190 characters: the priority and the ACT first, then the gate or the result, then the undo line; the middle is cut, never the head or the undo line; no "TEST" label, no `deadman.log` note. `push_cmd` still overrides it (the tests' stub) | `test_the_notice_line_fits_190_and_keeps_its_head_and_undo`, `test_the_default_notice_goes_through_the_three_channels` (stub `claude`, PowerShell and `wslpath`) |
+| F3, F5, F7 | Not in this round (the CTO's or the owner's): the replay's call source, the freeze's place and the hand-over rule, the session's `apply.sh` and `git` forms | — |
+
+### Round 2's runs
+
+- **Unit tests:** 153 passed (`tests/unit/operator/`, 108 in round 1 plus 19 F1 forms, 1 F14 case and 25 in
+  `test_w2_148_round2.py`), run with `-m "not local_only" -k "not real and not green_here and not time_limit"`
+  (the exclusion left nothing out of this folder).
+- **`gov accept W2-148`:** pass, 157 passed, 0 failed, 0 skipped, 0 unmapped; every one of the 38 lines pass
+  (success-1 to 24, failure-1 to 14).
+- **The trial re-run (S23):** the same results as round 1. 57 ACT files (54 counted at `116c2b413`, 3 later:
+  ACT-D4-RESTORE-1, ACT-GATE-CONFIG-1, ACT-PATHMAP-NS-1), none lower than the table, counts (a) 6, (b) 19, (O) 32,
+  the same 22 rises. The 8 replays (their `apply.sh` relative, so the path rule passes them): SELECT-FIXES-1,
+  SELECT-HOOK-1, PERMISSIONS-2, NIGHTLY-STOP-1 applied as (b), OLLAMA-CAP-1 applied as (a), GUARD-SETS-1 whole refused
+  at G6 as (O) and its control part applied as (b), W1-01-EXEMPT-1 and D8 refused at G6 as (O). The 7 faults: an edit
+  after review refused (G4), a wrong class claim refused (G6), an unlisted file touched refused (G8), a red check undone,
+  a failing undo lock held, a missing yes refused (G6), a yes for an older sha refused (G6). The live files, hashed
+  before and after the run, equal:
+
+| Path | Files | Before | After |
+|---|---|---|---|
+| live repository: .claude/hooks/** | 6 | 8d775c6a79680b1086e66fda5b17a5b737997c4cbea8c2ee76b06e684a5dbb06 | 8d775c6a79680b1086e66fda5b17a5b737997c4cbea8c2ee76b06e684a5dbb06 |
+| live repository: .claude/settings*.json | 2 | 1730c3f7c9ca19acabb591726c994d889e12b6852e9148d097572662721af9b9 | 1730c3f7c9ca19acabb591726c994d889e12b6852e9148d097572662721af9b9 |
+| live repository: the rest of .claude/** (agents, skills, commands) | 41 | fd9570353a05e66acdda70661a8ff4332a186f082b593f310402c0a9947aa0d7 | fd9570353a05e66acdda70661a8ff4332a186f082b593f310402c0a9947aa0d7 |
+| live repository: .git/hooks/** | 15 | a3037550074b3cf21383ac235cff33081e0ef1e4da1d09bbc8efe18c9d0d7c9c | a3037550074b3cf21383ac235cff33081e0ef1e4da1d09bbc8efe18c9d0d7c9c |
+| live repository: path map, test map, opt-in lists | 6 | de1deae14fc972c91fffb7be5c0db35c8b0a86918cb4c12ef00e785ed7cbf91a | de1deae14fc972c91fffb7be5c0db35c8b0a86918cb4c12ef00e785ed7cbf91a |
+| live repository: deadman.py, sentinel-brief.md | 2 | d467b8db04823b8cefb018b391b2122db6df960ff42db021b3a13bf0a887492f | d467b8db04823b8cefb018b391b2122db6df960ff42db021b3a13bf0a887492f |
+| the pin ~/.local/bin/gov | 1 | 20205dbcd3d368875c5ffdb9543efad210f35cfa482f90316147c301b17f4b46 | 20205dbcd3d368875c5ffdb9543efad210f35cfa482f90316147c301b17f4b46 |
+| ~/gov-os-operator/ (every file) | 41 | 7b68bd2edda32656dbd12e809457d9652507e2f141391f4da59daea25b558ba7 | 7b68bd2edda32656dbd12e809457d9652507e2f141391f4da59daea25b558ba7 |
+| ~/.claude/ (its configuration: settings, CLAUDE.md, hooks, agents, skills, commands, rules) | 233 | aecb0752f552ee3736efc4d3eae78a452be2e76212f6d7a70ba28a46ecb6ba91 | aecb0752f552ee3736efc4d3eae78a452be2e76212f6d7a70ba28a46ecb6ba91 |
+| crontab -l (its output; exit 1) | 1 | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 | e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 |
+
+Equal: **True**. Two rows differ from round 1's (the path map row and `~/gov-os-operator/`): the live files changed
+between the two runs by others' work; within each run before and after are equal.
+
