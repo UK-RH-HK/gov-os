@@ -393,10 +393,14 @@ def kernel_template_text(stem: str) -> str:
     return f"---\nname: {stem}\nversion: 1.0.0\n---\n# {stem} (fixture)\n"
 
 
-def composed_source(*, skills: list[str] | None = ("test-driven-development",), body: str = ENGINEER_TEMPLATE_BODY) -> str:
+def composed_source(*, skills: list[str] | None = ("test-driven-development",), body: str = ENGINEER_TEMPLATE_BODY,
+                    top_level: bool = False) -> str:
+    """S3's source: the list sits under ``claudecode: skills:`` (DEC-1112 (3): rulesync 24.0.0 drops a top-level
+    ``skills``). ``top_level=True`` plants it at the top level instead, with none under ``claudecode``."""
     front = RULESYNC_FRONT
     if skills is not None:
-        front += f"skills: [{', '.join(skills)}]\n"
+        listed = f"skills: [{', '.join(skills)}]\n"
+        front += listed if top_level else "  " + listed
     return front + "---\n\n" + body
 
 
