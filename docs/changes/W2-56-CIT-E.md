@@ -144,7 +144,11 @@ arrives only after the session, and is lost when the launcher is killed.
   and `CLAUDE_CODE_OAUTH_TOKEN`, **the one `CLAUDE*` exception** (D-3). A CLI signed in through `~/.claude` needs
   none of them. Not passed: `TERM`, `SHELL`, the other `LC_*` and `XDG_*` variables (an interactive launch draws its
   screen without `TERM`; workers start with `-p`). A lead gets the same process environment and keeps its
-  `--settings` env of role and ticket alone (W2-136 S9).
+  `--settings` env of role and ticket alone (W2-136 S9), with the launcher's own `GOV_STORE`.
+  **Follow-up R5 (DEC-1114):** a lead's `GOV_STORE` is a worker's (`launcher._store_env`: the main repository's
+  `integration_store`, as written), in its `--settings` env and its process environment; a setting that cannot be used
+  refuses the lead before the gate and before anything starts. The parent's `GOV_STORE`, `TERM` and `TMPDIR` never pass
+  (a lead has no temp folder, DEC-743 item 7). Unit cases: `tests/unit/launch/test_w2_56_r5_lead_store.py`.
 - **S4, placeholders** (`sandbox.exclude_placeholders`): the CLI's fixed names (`.bashrc`, `.bash_profile`,
   `.profile`, `.zshrc`, `.zprofile`, `.gitconfig`, `.gitmodules`, `.ripgreprc`, `.mcp.json`, `.vscode`, `.idea`), its
   folders (`.claude/commands`, `.claude/agents`, `.claude/skills`, `.claude/hooks`) and each literal `Edit` deny rule
@@ -179,6 +183,20 @@ arrives only after the session, and is lost when the launcher is killed.
   Beside it, a daemon folder made for a tool that cannot be started (off `PATH`) is removed again. Unit cases:
   `tests/unit/codeintel/test_w2_56_nested_daemon.py`. On round 1's code the same shape gives
   `/tmp/gov-cbm-1000/<hash>`.
+  **Follow-up R3 (DEC-1114): a killed run's folders.** A run killed by SIGKILL or a heavy-slot timeout left its run
+  folder and its `gov-path-*` links folders, and no sweep covered them. Each now holds its owner's record inside it
+  (`.gov-owner`): a file the process that made the folder holds an exclusive `flock` on, opened close-on-exec, staged
+  under another name and renamed once held. The next run's controlling process, at configure (before its first case),
+  removes the folders of the run folder's names in the place where it made its own (`c???` in a launched session's
+  temp folder, else `gov-cbm-<uid>-XXXXXXXX`) and the `gov-path-XXXXXXXX` folders in its temp root whose record its
+  non-blocking `flock` takes (the owner is gone). A pid is never read: each sandboxed command runs in a pid namespace
+  of its own, so a pid may name no process or another one, while the kernel lets the lock go when its holder dies, seen
+  from any namespace (a folder whose pid is reused stays kept). A folder with no record is removed only when it and its
+  entries were last modified more than 24 hours ago (DEC-902). Never touched: a link at such a name (or its target), a
+  regular file, another user's folder, any other name, anything inside the shared `/tmp/gov-cbm-<uid>`, the
+  `gov-launch-*` folders. A 0500 folder is opened to its owner and removed; whatever cannot be read or removed is left,
+  and the clean-up never fails or holds up the run. Left open: a killed run's `gov-rebuild-<pid>-*.lock` file in the
+  temp root (`_own_rebuild_lock`) is not swept. Unit cases: `tests/unit/codeintel/test_w2_56_r3_killed_run.py`.
 - **S14 through a regeneration (round 2, P-3)**: `template/.rulesync/permissions.jsonc` has
   `"gov launch:*": "allow"` under `bash`. rulesync's generation (`rulesync generate --targets claudecode --features
   permissions,hooks --input-roots template/.rulesync`, output in an empty folder) writes `"allow": ["Bash(gov
