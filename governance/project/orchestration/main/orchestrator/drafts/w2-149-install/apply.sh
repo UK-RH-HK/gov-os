@@ -9,10 +9,12 @@
 #   - the tree (found from this file's place, <tree>/.gov-runtime/scratch/orchestrator/drafts/w2-149-install/): five new
 #     files, governance/project/indep-briefs/sgx1/{labeller,labeller-2,writer-tuning,writer-heldout,overlap-auditor}.md,
 #     byte for byte the briefs the owner approved (DEC-1113; SANDBOX-GUARD-EXP-DECLARATION §12). The operator commits them.
-#   - <sets root>/indep-walls/APPROVED (0400): ACT-INDEP-WALLS-1's six template lines kept as they are, then one comment
-#     naming the launch script's sha256, five `brief <kind> <path>` lines and the operator agent's two (DEC-1109 (1)).
+#   - <sets root>/indep-walls/APPROVED (0400): ACT-INDEP-WALLS-1's text, its two template lines for kinds.yaml and
+#     tree-exclude.txt carrying the set-up A wiring's sha256s (the other four as they are), then a comment naming the
+#     replaced hashes, one naming the launch script's sha256, five `brief <kind> <path>` lines and the operator agent's
+#     two (DEC-1109 (1)).
 # It refuses unless ACT-SETS-GLOBS-1 is applied (its four globs in the map's sets_root_hidden, its line keys in the
-# hook) and the launch script is W2-149 with its F11 follow-up. It reads nothing under the sets root but indep-walls/APPROVED.
+# hook) and the tree's launch script and the two template files are the set-up A wiring's (W2-149, merged). It reads nothing under the sets root but indep-walls/APPROVED.
 set -euo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$HERE/../../../../.." && pwd)
@@ -36,6 +38,11 @@ BACKUP=$HERE/backup
 LAUNCH_SHA=b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5
 LIST_BEFORE=331e48fa336ef58ba5dc6fd4afcf9c1387ec4bd29e583eb955280a267626bbc9
 LIST_AFTER=9e9d6f212a1ebd54e8bcb6c0c0c691fbb23c8aefbb70e359a9b5a61dba44b56f
+KINDS_SHA=unset
+EXCLUDE_SHA=unset
+KINDS_BEFORE=8b50a78f01b316d0bd5d41689cd3730da0e3142ac4c54705dc83bad0ace4d74f
+EXCLUDE_BEFORE=21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6
+TEMPLATE=governance/project/indep-walls
 declare -A BRIEF=(
   [labeller.md]=bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068
   [labeller-2.md]=e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904
@@ -55,13 +62,19 @@ drafts_ok() {
   local n
   for n in $NAMES; do [ "$(sha "$HERE/briefs/$n")" = "${BRIEF[$n]}" ] || die "the draft briefs/$n is not the approved brief"; done
   [ "$(sha "$HERE/APPROVED.after")" = "$LIST_AFTER" ] || die "APPROVED.after is not as built"
-  head -c "$(stat -c %s "$HERE/APPROVED.before")" "$HERE/APPROVED.after" | cmp -s - "$HERE/APPROVED.before" \
-    || die "APPROVED.after does not keep APPROVED.before's bytes as its head"
+  local h; h=$(mktemp)
+  sed -e "s/^$KINDS_BEFORE  template /$KINDS_SHA  template /" -e "s/^$EXCLUDE_BEFORE  template /$EXCLUDE_SHA  template /" \
+    "$HERE/APPROVED.before" > "$h"
+  head -c "$(stat -c %s "$h")" "$HERE/APPROVED.after" | cmp -s - "$h" \
+    || { rm -f "$h"; die "APPROVED.after's head is not APPROVED.before with the two template lines changed"; }
+  rm -f "$h"
   [ "$(sha "$HERE/APPROVED.before")" = "$LIST_BEFORE" ] || die "APPROVED.before is not as built"
 }
-order_ok() {  # ACT-SETS-GLOBS-1 applied; the launch script W2-149 with F11
+order_ok() {  # ACT-SETS-GLOBS-1 applied; the launch script and the two template files the set-up A wiring's
   [ "$(sha "$ROOT/$SCRIPT")" = "$LAUNCH_SHA" ] \
-    || die "the tree's $SCRIPT is not W2-149 with its F11 follow-up (${LAUNCH_SHA:0:12}): merge it first"
+    || die "the tree's $SCRIPT is not W2-149 with set-up A's wiring (${LAUNCH_SHA:0:12}): merge it first"
+  [ "$(sha "$ROOT/$TEMPLATE/kinds.yaml")" = "$KINDS_SHA" ] && [ "$(sha "$ROOT/$TEMPLATE/tree-exclude.txt")" = "$EXCLUDE_SHA" ] \
+    || die "the tree's $TEMPLATE/kinds.yaml or tree-exclude.txt is not the set-up A wiring's: merge it first"
   python3 -I -B - "$ROOT/$MAP" "${SETS_GLOBS[@]}" <<'EOF' || die "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first"
 import sys, yaml
 d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))

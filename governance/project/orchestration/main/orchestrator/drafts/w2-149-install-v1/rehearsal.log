@@ -1,0 +1,110 @@
+
+== prepare: the clone, the planted HOME and sets root (00:23:39)
+start 2026-11-10T00:23:39Z
+clone at f73e72d4a43b; the launch script b04db4547eec
+planted list 331e48fa336e (ACT-INDEP-WALLS-1's, rebuilt)
+871d2c9db3dc  apply.sh
+1f65c76bb05a  freeze.py
+164136c6d8ea  install_check.py
+9d07a23cb26f  rehearse.sh
+331e48fa336e  APPROVED.before
+9e9d6f212a1e  APPROVED.after
+e13b5f96d0e0  briefs/labeller-2.md
+bbff1249953b  briefs/labeller.md
+b212a424062e  briefs/overlap-auditor.md
+137a73d1df4c  briefs/writer-heldout.md
+82134b3dd6b5  briefs/writer-tuning.md
+
+== order: this ACT before ACT-SETS-GLOBS-1 is refused (00:23:40)
+the clone's head already holds ACT-SETS-GLOBS-1 (applied live at 9cce7430d): the hook and map before it put back in the clone's working files for this step
+97a84e770058  .claude/hooks/pretooluse.py
+40085090306e  governance/project/path-map.yaml
+apply.sh: ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first; nothing more is done
+ok: refused: apply ACT-SETS-GLOBS-1 first
+back: 74f8dbea4761  .claude/hooks/pretooluse.py
+back: 44f99ea563cb  governance/project/path-map.yaml
+74f8dbea4761  .claude/hooks/pretooluse.py
+44f99ea563cb  governance/project/path-map.yaml
+
+== before this ACT: an approved brief is refused (10; its file is not in the tree, no APPROVED line) (00:23:41)
+launch writer writer-tuning.md: exit 10; indep_launch: refused 10 brief
+
+== this ACT: check, apply, a second apply, check, the commit (00:23:41)
+state: before (the list 331e48fa336e)
+check: ready to apply
+ok: check: ready
+ok: check from a folder holding runs/x/misses.jsonl: still ready (F3)
+the list as the launch script reads it: 6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0
+the list 9e9d6f212a1ebd54e8bcb6c0c0c691fbb23c8aefbb70e359a9b5a61dba44b56f
+state applied
+ok: applied
+ok: no bytecode cache written into the tree (F1)
+ok: the launch script's parser reads the list
+a second apply: refused (apply.sh: not in the before state (applied); nothing more is done)
+the list as the launch script reads it: 6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0
+check: already applied
+ok: check: already applied
+A	governance/project/indep-briefs/sgx1/labeller-2.md
+A	governance/project/indep-briefs/sgx1/labeller.md
+A	governance/project/indep-briefs/sgx1/overlap-auditor.md
+A	governance/project/indep-briefs/sgx1/writer-heldout.md
+A	governance/project/indep-briefs/sgx1/writer-tuning.md
+ok: exactly 5 A
+ 5 files changed, 654 insertions(+)
+296ad04bb ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list
+Task: DAEO-sdxk
+Implements: DEC-1101, DEC-1112
+Role: owner
+
+the planted list after: 9e9d6f212a1e
+700 <root>/indep-walls
+400 <root>/indep-walls/APPROVED
+
+== the launch script's stage-10 checks on every line, at the ACT's commit (its own code) (00:23:42)
+list: 6 template lines, 7 brief lines
+  labeller  governance/project/indep-briefs/sgx1/labeller.md: approved line ok; front matter refused (10 front_matter): sample, model, result_schema
+  labeller  governance/project/indep-briefs/sgx1/labeller-2.md: approved line ok; front matter refused (10 front_matter): sample, model, result_schema
+  writer    governance/project/indep-briefs/sgx1/writer-tuning.md: approved line ok; front matter refused (10 front_matter): model, result_schema
+  writer    governance/project/indep-briefs/sgx1/writer-heldout.md: approved line ok; front matter refused (10 front_matter): model, result_schema
+  auditor   governance/project/indep-briefs/sgx1/overlap-auditor.md: approved line ok; front matter refused (10 front_matter): sample, model, result_schema
+  operator  governance/project/operator/brief.md: approved line ok; not a launch kind (the script refuses --kind operator with 17): a record only
+  operator  governance/project/operator/reviewer-brief.md: approved line ok; not a launch kind (the script refuses --kind operator with 17): a record only
+approved lines that match their bytes at the commit: 7 of 7
+ok: every brief line matches its bytes
+launch labeller labeller.md: exit 10; indep_launch: refused 10 brief
+  as expected today: 10 (the front matter; the wiring follow-up)
+launch labeller labeller-2.md: exit 10; indep_launch: refused 10 brief
+  as expected today: 10 (the front matter; the wiring follow-up)
+launch writer writer-tuning.md: exit 10; indep_launch: refused 10 brief
+  as expected today: 10 (the front matter; the wiring follow-up)
+launch writer writer-heldout.md: exit 10; indep_launch: refused 10 brief
+  as expected today: 10 (the front matter; the wiring follow-up)
+launch auditor overlap-auditor.md: exit 10; indep_launch: refused 10 brief
+  as expected today: 10 (the front matter; the wiring follow-up)
+launch writer brief.md: exit 10; indep_launch: refused 10 brief
+  the operator's brief under kind writer: refused 10 (its line is kind operator)
+
+== a control: a complete brief (rehearsal only), its line added to the planted list for one dry launch, then removed (00:23:42)
+launch writer control-writer.md: exit 0; indep_launch: dry 0
+ok: the control's dry launch built its wall (0, dry): the list and the script work end to end
+  counts: {'status': 'dry', 'code': 0, 'template_ok': True, 'brief_sha256': 'ebe30e49ec42cf8f7829e6308462e7fe682319535cde543edbbfa5630c87da8f', 'approved_sha256': 'c0f32951f0f8a691fc2863de6867dd843dda0d3fead3e2b710b592ca8f4fe39b'}
+the planted list back to the ACT's bytes
+
+== undo: apply.sh undo, the removal committed, then check (00:23:44)
+the list 331e48fa336ef58ba5dc6fd4afcf9c1387ec4bd29e583eb955280a267626bbc9
+state before (undone)
+ok: undone
+D  governance/project/indep-briefs/sgx1/labeller-2.md
+D  governance/project/indep-briefs/sgx1/labeller.md
+D  governance/project/indep-briefs/sgx1/overlap-auditor.md
+D  governance/project/indep-briefs/sgx1/writer-heldout.md
+D  governance/project/indep-briefs/sgx1/writer-tuning.md
+ok: the list byte for byte as before
+check: ready to apply
+ok: check: ready to apply again
+
+== live files: unchanged (00:23:45)
+ok: live files unchanged (18 lines hashed)
+scratch: 155M	/home/usain/gov-os-runs/W2-149-INSTALL-rehearsal
+end 2026-11-10T00:23:45Z
+failures: 0
