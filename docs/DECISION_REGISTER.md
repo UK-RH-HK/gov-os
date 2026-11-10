@@ -14239,6 +14239,32 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     changes until the owner decides.
 - **Basis:** question 4 (the week's allowance spent where it buys most, with no quality gate moved off Opus).
 
+### DEC-1119 — MODEL-TIERS-1 with one change: the owner's tiered rubric of model and effort by task is found and applied; ACT-preparation helpers on Sonnet at high now; trials only where the rubric leaves a role open; the default effort to high; an inventory of the emergency's tools
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1118, DEC-839, DEC-957 · **Source:** the owner's message (chat, 2026-11-10), on MODEL-TIERS-1
+- **Decision:**
+  - (1) **The rubric first (the fresh session's first task, before the lift's other steps):** the owner decided a
+    tiered rubric of model and effort by task long ago, and it is in this repository. Find it: the register, the
+    Contract (CAP-35 and its lenses, lens F included), the research and assessment records, the packages, the role
+    files and the earlier session records; search again once in other words. Bring it with its decision id and status,
+    and name any conflict with DEC-839 or DEC-957. If no decision holds it, bring the closest map (for example lens F's
+    T0-T3) for the owner to decide; the CTO writes none itself.
+  - (2) **Then apply it before the lift:** at once in practice (every launch's and every helper's model and effort set
+    by its tier, through launch_worker.sh and the Agent call, recorded in the spend log); and into the product through
+    W2-33 and W2-60a, with a trial exception, beside the lift's critical path without holding D-10, landing before
+    EXAMIN's copy, so the dispatcher, gov launch and every launch apply each tier's model and effort.
+  - (3) Within it: ACT-preparation helpers on Sonnet at effort high, now (DEC-1118 C); the trials (E, then F) only for
+    roles the rubric leaves open, after the lift; not MODEL-TIERS-1's options 4 or 5 unless the rubric calls for them;
+    option 6 as guidance for helpers and leads (gov retrieve for orientation questions; long command outputs cut to
+    their head and tail).
+  - (4) `~/.claude/settings.json`'s default effort from xhigh to high (DEC-957's floor), as a small ACT for the owner's
+    operator.
+  - (5) **An inventory** (read-only, a short package, for the fresh session): every tool, check and wiring built
+    during the emergency (the CTO's scratch, the operator's install, hooks, cron, the product), where each lives today,
+    whether the kernel and an adopted repository need it, and its route into the product (proven in use first, then a
+    ticket), with which must land before EXAMIN's copy.
+- **Basis:** question 4 (each task on the model and effort its tier calls for, as the owner decided) and question 1
+  (what the emergency built reaches the product by its own route).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14295,3 +14321,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.501 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1116. Next free id: DEC-1117. |
 | 0.502 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1117. Next free id: DEC-1118. |
 | 0.503 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1118 (items 1 and 2 standing). Next free id: DEC-1119. |
+| 0.504 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1119. Next free id: DEC-1120. |

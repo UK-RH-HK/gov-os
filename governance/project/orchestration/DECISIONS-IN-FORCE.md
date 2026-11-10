@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1118 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1119 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -452,3 +452,8 @@ other restart is an ACT.
   idles over an hour; ACT-preparation helpers on Sonnet, reviews, test design and engineering on Opus; every session's
   list-price cost logged. D (5-minute worker cache) once verified on this CLI; E and F trials after the lift. A
   model-tier investigation for the fresh session to finish (MODEL-TIERS-1). Basis: 4.
+- DEC-1119 (2026-11-10): the owner's tiered rubric of model and effort by task found first (the fresh session's first
+  task) and applied before the lift: in practice at once, into the product through W2-33 and W2-60a with a trial
+  exception before EXAMIN's copy; ACT-preparation helpers on Sonnet at high now; trials only where the rubric leaves a
+  role open; not options 4 or 5 unless the rubric calls for them; option 6 as guidance; the default effort to high by
+  an ACT; an inventory of the emergency's tools. Basis: 4 and 1.

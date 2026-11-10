@@ -162,6 +162,15 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 101 | MODEL-TIERS-1, a read-only package | **DONE 11-10** (`packages/MODEL-TIERS-1.md`); WAITS: the owner's choice among its options (1 now; 2, 3 after the lift; 6 guidance) |
 | 102 | E and F trials | WAITS: after the lift |
 
+## 0n. DEC-1119's items (2026-11-10)
+| # | item | state |
+|---|---|---|
+| 103 | find the owner's tiered rubric of model and effort (the fresh session's first task) | NOT STARTED: next: the fresh session searches, brings it with its id and status and any conflict with DEC-839 or DEC-957 |
+| 104 | apply the rubric in practice (launch_worker.sh, the Agent call, spend.jsonl) | WAITS: row 103; ACT-preparation helpers on Sonnet at high from now (rule 11) |
+| 105 | apply the rubric in the product (W2-33, W2-60a, a trial exception) before EXAMIN's copy | WAITS: row 103 |
+| 106 | the default effort xhigh to high in ~/.claude/settings.json, a small ACT | NOT STARTED |
+| 107 | EMERGENCY-TOOLS-1: the inventory of the emergency's tools and their routes into the product | NOT STARTED |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms

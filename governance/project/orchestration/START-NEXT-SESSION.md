@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1119.**
+the register and the owner's word hold over both. **Next free id: DEC-1120.**
 
 ## 0. Where things stand (2026-11-10 ~14:30 UTC)
 - **The lift is next:** about 11-11 (FORECAST-W2-2: lift 11-11, EXAMIN's copy 11-15, Wave 2's end 11-22, E). Its
@@ -20,6 +20,31 @@ the register and the owner's word hold over both. **Next free id: DEC-1119.**
   critical path runs.** USAGE-1 (`packages/USAGE-1.md`): one meter point ≈ $27.5 at list price; most cost is long Opus
   contexts re-read. Keep your own context short; brief helpers to hand over past ~200k.
 - **Nothing is running** but the session watchers (§6).
+
+## 0c. YOUR FIRST TASK (DEC-1119), before the lift's other steps
+1. **Find the owner's tiered rubric of model and effort by task** ("decided long ago, in this repository"). Search the
+   register, the Contract (CAP-35 and its lenses, lens F included), the research and assessment records
+   (`docs/research/`, `docs/assessment/`), the packages, the role files (`template/governance/kernel/roles/`) and the
+   earlier session records (CHECKPOINT history, `log/`); then search again once in other words (tier, T0-T3, model
+   choice, effort level, cost tier, routing). Bring it with its decision id and status, and name any conflict with
+   DEC-839 or DEC-957. If no decision holds it, bring the closest map (e.g. lens F's T0-T3) for the owner to decide;
+   **write none yourself**. A research helper may do the search (Sonnet is not for it: it is not ACT preparation).
+2. **Then apply it before the lift:** in practice at once (every launch's and helper's model and effort by its tier:
+   `launch_worker.sh`'s `LAUNCH_MODEL` and effort, the Agent call's `model` and `effort`, recorded in `spend.jsonl`);
+   into the product through **W2-33 and W2-60a**, with a trial exception (W2-60a refuses a model not the role's),
+   beside the lift's critical path without holding D-10, landing **before EXAMIN's copy**, so the dispatcher,
+   `gov launch` and every launch apply each tier's model and effort. Check every committed path's class first.
+3. Within it: **ACT-preparation helpers on Sonnet at effort high now** (Agent `model: "sonnet"`, `effort: "high"`;
+   DEC-1119 (3) is the owner's explicit instruction); trials E then F only for roles the rubric leaves open, after the
+   lift; not MODEL-TIERS-1's options 4 or 5 unless the rubric calls for them; option 6 as guidance in helper and lead
+   briefs (`gov retrieve` for orientation questions; long command outputs cut to head and tail).
+4. **A small ACT for the owner's operator:** `~/.claude/settings.json`'s `effortLevel` from `xhigh` to `high`
+   (DEC-957's floor); class by class-rules.yaml; rehearsed with a planted HOME; one review; the exact yes line.
+5. **An inventory, read-only, a short package (`packages/EMERGENCY-TOOLS-1.md`):** every tool, check and wiring built
+   during the emergency (`.gov-runtime/scratch/orchestrator/tools/`, `~/gov-os-operator/install/`, the hooks, the
+   crontab, `governance/project/orchestration/tools/`, the product), where each lives today, whether the kernel and an
+   adopted repository need it, its route into the product (proven in use first, then a ticket), and which must land
+   before EXAMIN's copy.
 
 ## 1. With the owner now (bring each in the first report if still open)
 1. **Yes lines** (each on its own line, the agent's form `yes ACT-<id> <manifest sha8>`):
