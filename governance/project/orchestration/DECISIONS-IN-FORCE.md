@@ -434,3 +434,9 @@ other restart is an ACT.
 - DEC-1117 (2026-11-10): the dead-man's night limit stays 2 hours; the owner checks the phone's Claude notifications
   before any other channel; USAGE-1 (the week's usage by source, ticket and day, the ten largest, savings to decide);
   the spend log in one unit. Basis: 4.
+- Delegated (CTO, 2026-11-10, DEC-1112 (3)): the close's serial phase: serial-only.txt's stale W1-16 ui_off entry
+  re-pointed before D-10, then the close's plugin treats an entry whose cases an opt-in list leaves out as not in this
+  run (W2-57's code); nightly.sh reports how many serial cases ran. gov accept enables the opt-in groups its own map's
+  cases need; its map reader refuses or reads every listed id. The composed agents carry the role file's six fields
+  through W2-153's composition, the approved 1.0.0 templates unchanged; W1-38's builder copies templates/; then
+  ACT-CLAUDE-COPIES-3 for the owner's yes.
