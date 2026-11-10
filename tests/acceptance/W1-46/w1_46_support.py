@@ -123,6 +123,13 @@ PROJECT_FILES = {
     "experiments/archive/old.txt": "archived\n",
     "experiments/notes.md": "experiment notes\n",
 }
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
+# project holds the eight copies (any bytes), so the template check is never what refuses a launch here. W1-28's,
+# W1-32's, W1-50's and W2-54's launch projects are this one, and W2-90's generated one takes these files too.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+PROJECT_FILES.update({f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W1-46 fixture template copy {stem}\n"
+                      for stem in TEMPLATE_STEMS})
 # What exists under ``.gov-runtime/`` at launch (ignored by git): the findings, the records, the snapshots, scratch.
 RUNTIME_FILES = {
     ".gov-runtime/findings.jsonl": "",

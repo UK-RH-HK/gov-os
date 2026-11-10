@@ -51,9 +51,19 @@ def sessions(planted, monkeypatch):
     return started, seen
 
 
+def _plant_templates(root: Path) -> None:
+    """Every role's template copy a session starts with (W2-153 S1, DEC-1112 (3)), so the gate's refusal is the one
+    tested: any content will do."""
+    for stem in set(launcher.ROLE_TEMPLATES.values()):
+        path = root / launcher.TEMPLATES_REL / f"{stem}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {stem}\n")
+
+
 def _project(planted) -> Path:
     project = planted.root / "project"
     project.mkdir(exist_ok=True)
+    _plant_templates(project)
     return project
 
 
@@ -206,6 +216,7 @@ def trees(tmp_path, monkeypatch):
     (gitdir / "commondir").write_text("../..\n")
     lead.mkdir()
     (lead / ".git").write_text(f"gitdir: {gitdir}\n")
+    _plant_templates(lead)
     # Main: T-2 waits on T-1 (open) and only T-1 is approved. The worktree's stale copy: T-1 closed, T-2 approved.
     _tickets(main, {"id": "T-1", "wbs_id": "W9-1"}, {"id": "T-2", "wbs_id": "W9-2", "depends_on": ["T-1"],
                                                      "deps": ["T-1"]})

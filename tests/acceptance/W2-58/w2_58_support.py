@@ -274,6 +274,12 @@ BRANCH_FILES = {
     ),
     f"{T.acceptance}/README.md": f"# The tests of W2-95 {TEST_WORD} {WORD}\n",
 }
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
+# base commit holds the eight copies (any bytes), so the template check is never what refuses a launch here.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-58 fixture template copy {stem}\n"
+                  for stem in TEMPLATE_STEMS}
 # The files T's branch changes against its base, other than tests and tickets.
 CHANGED = ("src/app/main.py", "src/app/added.py")
 UNCHANGED = ("src/other/main.py", "docs/notes.md")
@@ -325,6 +331,7 @@ def make_project(sandbox, base=True, extra=None, branch_extra=None, orphan=False
     make_outside_files(sandbox)
     project = sandbox.project
     files = dict(BASE_FILES)
+    files.update(TEMPLATE_FILES)
     for rel in SECRET_FILES:
         files[rel] = f"STAND_IN={SECRET_WORD}\n"
     for ticket in TICKETS:

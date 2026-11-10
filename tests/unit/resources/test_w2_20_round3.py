@@ -58,6 +58,10 @@ def _quiet_launch_checks(planted, monkeypatch) -> Path:
     monkeypatch.setattr(launcher, "check_lead", lambda root, ticket: plan_check.LeadCheck(True, "admitted"))
     project = planted.root / "project"
     project.mkdir(exist_ok=True)
+    for stem in set(launcher.ROLE_TEMPLATES.values()):  # every role's template copy (W2-153 S1, DEC-1112 (3))
+        path = project / launcher.TEMPLATES_REL / f"{stem}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {stem}\n")
     return project
 
 

@@ -154,6 +154,9 @@ def _sessions(monkeypatch, tmp_path, *, caller=None, ticket=None):
     home = tmp_path / "home"
     (home / ".local" / "bin").mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    for stem in set(launcher.ROLE_TEMPLATES.values()):  # W2-153 S1: the store (tmp_path) holds each role's template
+        (tmp_path / launcher.TEMPLATES_REL).mkdir(parents=True, exist_ok=True)
+        (tmp_path / launcher.TEMPLATES_REL / f"{stem}.md").write_text(f"# {stem}\n", encoding="utf-8")
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
@@ -188,7 +191,8 @@ def test_an_admitted_lead_reaches_the_session_start_with_the_leads_env(store, mo
     [(argv, cwd, env)] = started
     settings = _settings(argv)
     assert settings == {"env": {"GOV_ROLE": "orchestrator", "GOV_TICKET": "T-4"}}  # no sandbox, no deny rules
-    assert argv[-len(args):] == args and Path(cwd) == Path(os.path.realpath(store))
+    flag = [launcher.TEMPLATE_FLAG, os.path.join(os.path.realpath(store), launcher.TEMPLATES_REL, "role-lead.md")]
+    assert argv[-len(args) - 2:] == args + flag and Path(cwd) == Path(os.path.realpath(store))  # W2-153: one flag
     assert (env["GOV_ROLE"], env["GOV_TICKET"]) == ("orchestrator", "T-4")
     assert made == []
 
