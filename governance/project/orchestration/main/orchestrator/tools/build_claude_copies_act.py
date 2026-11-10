@@ -1,6 +1,6 @@
 """Builds and rehearses ACT-CLAUDE-COPIES-1 (the .claude/ copies of W2-128 and W2-142; DEC-1109 (2), DEC-1112 (3)).
 
-    python3 build_claude_copies_act.py <live repo> <bundle dir> <scratch dir>
+    python3 build_claude_copies_act.py <live repo> <bundle dir> <scratch dir> [<ACT id>]
 
 1. A clone at the live repository's HEAD; in it, every rulesync source the portability check finds differing from its
    kernel file is brought to the kernel's (a skill file byte for byte; a role as its source's front matter with the
@@ -15,7 +15,7 @@ import hashlib, json, os, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 LIVE, BUNDLE, SCRATCH = (Path(a).resolve() for a in sys.argv[1:4])
-ACT = "ACT-CLAUDE-COPIES-1"
+ACT = sys.argv[4] if len(sys.argv) > 4 else "ACT-CLAUDE-COPIES-1"  # the ACT's id (ACT-CLAUDE-COPIES-2 after W2-153)
 TEMPLATES = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer", "role-reviewer",
              "role-lead", "role-cto")
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")
@@ -24,7 +24,7 @@ GENERATE = ["generate", "--targets", "claudecode,agentsmd", "--features",
             "rules,hooks,permissions,subagents,commands,skills", "--input-roots"]
 RULESYNC = shutil.which("rulesync") or str(Path.home() / ".local/bin/rulesync")
 APPLY_SH = r'''#!/bin/bash
-# ACT-CLAUDE-COPIES-1's apply.sh: reads its bundle from its own folder; check, apply, undo by list.txt, relative to the
+# The copies ACT's apply.sh: reads its bundle from its own folder; check, apply, undo by list.txt, relative to the
 # repository it is run in (its cwd).
 set -u
 B="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
