@@ -49,6 +49,8 @@ kpis:
   - 'The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.'
 profile: FULL
 sources:
+- DEC-1109
+- DEC-889
 - DEC-725
 - DEC-900
 - DEC-1052
