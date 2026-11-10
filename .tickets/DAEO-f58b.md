@@ -39,6 +39,8 @@ kpis:
   - 'A re-index that fails leaves the previous index and reports the failure; it never leaves no index [W2-M088]. [moved from W2-06 F1, DEC-1083]'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-983
 - DEC-982
 - DEC-963

@@ -31,6 +31,8 @@ kpis:
   - 'A case that runs a pytest selection, starts a gov command, or reads anything outside this repository''s tracked files and its own temporary folders.'
 profile: LITE
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-1100
 - DEC-1098
 - DEC-889
