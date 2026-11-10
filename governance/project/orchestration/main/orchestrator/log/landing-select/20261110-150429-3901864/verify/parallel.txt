@@ -51,4 +51,738 @@ F.F.F..F................................................................ [  3%]
 ........................................................................ [ 94%]
 ........................................................................ [ 96%]
 ...................................................................FF..F [ 98%]
-.....................................................................
+.......................................................................  [100%]
+=================================== FAILURES ===================================
+_ test_the_definition_agrees_with_its_kernel_role_file[independent-test-designer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/independent-test-designer.md and template/governance/kernel/roles/independent-test-designer.md do not have the same fields: ['allowed paths', 'authority level', 'handoff format', 'model tier', 'network', 'permission classes', 'purpose', 'tools']
+E       assert [] == ['allowed pat...classes', ...]
+E         
+E         Right contains 8 more items, first extra item: 'allowed paths'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+________ test_the_definition_agrees_with_its_kernel_role_file[engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/engineer.md and template/governance/kernel/roles/engineer.md do not have the same fields: ['allowed paths', 'authority level', 'handoff format', 'model tier', 'network', 'permission classes', 'purpose', 'tools']
+E       assert [] == ['allowed pat...classes', ...]
+E         
+E         Right contains 8 more items, first extra item: 'allowed paths'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+__ test_the_definition_agrees_with_its_kernel_role_file[independent-auditor] ___
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/independent-auditor.md and template/governance/kernel/roles/independent-auditor.md do not have the same fields: ['allowed paths', 'authority level', 'handoff format', 'model tier', 'network', 'permission classes', 'purpose', 'tools']
+E       assert [] == ['allowed pat...classes', ...]
+E         
+E         Right contains 8 more items, first extra item: 'allowed paths'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+__ test_the_definition_states_what_the_kpis_require_of_the_role[orchestrator] __
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_states_what_the_kpis_require_of_the_role(role):
+        """The six fields, the acceptance-test pattern, the permission classes, and per role: the orchestrator's scope,
+        the read-only auditor, the launcher's network profile."""
+        faults = support.role_faults(role, _definition(role))
+>       assert not faults, f"{support.agent_rel(role)}: {faults}"
+E       AssertionError: .claude/agents/orchestrator.md: ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools' is missing or empty", "the field 'model tier' is missing or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", 'there is no allowed-path pattern', 'there is no permission-classes field', 'it does not say the scope is anywhere in the repository', 'it does not except tests/acceptance/**']
+E       assert not ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools'...ng or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", ...]
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:77: AssertionError
+__ test_the_definition_states_what_the_kpis_require_of_the_role[product-spec] __
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_states_what_the_kpis_require_of_the_role(role):
+        """The six fields, the acceptance-test pattern, the permission classes, and per role: the orchestrator's scope,
+        the read-only auditor, the launcher's network profile."""
+        faults = support.role_faults(role, _definition(role))
+>       assert not faults, f"{support.agent_rel(role)}: {faults}"
+E       AssertionError: .claude/agents/product-spec.md: ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools' is missing or empty", "the field 'model tier' is missing or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", 'there is no allowed-path pattern', 'there is no permission-classes field']
+E       assert not ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools'...ng or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", ...]
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:77: AssertionError
+_ test_the_definition_states_what_the_kpis_require_of_the_role[independent-test-designer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_states_what_the_kpis_require_of_the_role(role):
+        """The six fields, the acceptance-test pattern, the permission classes, and per role: the orchestrator's scope,
+        the read-only auditor, the launcher's network profile."""
+        faults = support.role_faults(role, _definition(role))
+>       assert not faults, f"{support.agent_rel(role)}: {faults}"
+E       AssertionError: .claude/agents/independent-test-designer.md: ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools' is missing or empty", "the field 'model tier' is missing or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", 'there is no allowed-path pattern', 'there is no permission-classes field', 'there is no network field']
+E       assert not ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools'...ng or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", ...]
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:77: AssertionError
+____ test_the_definition_states_what_the_kpis_require_of_the_role[engineer] ____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_states_what_the_kpis_require_of_the_role(role):
+        """The six fields, the acceptance-test pattern, the permission classes, and per role: the orchestrator's scope,
+        the read-only auditor, the launcher's network profile."""
+        faults = support.role_faults(role, _definition(role))
+>       assert not faults, f"{support.agent_rel(role)}: {faults}"
+E       AssertionError: .claude/agents/engineer.md: ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools' is missing or empty", "the field 'model tier' is missing or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", 'there is no allowed-path pattern', 'there is no permission-classes field', 'there is no network field']
+E       assert not ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools'...ng or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", ...]
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:77: AssertionError
+_ test_the_definition_states_what_the_kpis_require_of_the_role[independent-auditor] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_states_what_the_kpis_require_of_the_role(role):
+        """The six fields, the acceptance-test pattern, the permission classes, and per role: the orchestrator's scope,
+        the read-only auditor, the launcher's network profile."""
+        faults = support.role_faults(role, _definition(role))
+>       assert not faults, f"{support.agent_rel(role)}: {faults}"
+E       AssertionError: .claude/agents/independent-auditor.md: ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools' is missing or empty", "the field 'model tier' is missing or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", 'there is no allowed-path pattern', 'there is no permission-classes field', 'it does not say the auditor is read-only', 'it does not name the one exception, the report path its own ticket allows (DEC-112)', 'there is no network field']
+E       assert not ["the field 'purpose' is missing or empty", "the field 'allowed-path pattern' is missing or empty", "the field 'tools'...ng or empty", "the field 'authority level' is missing or empty", "the field 'handoff format' is missing or empty", ...]
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:77: AssertionError
+___________ test_the_orchestrator_definition_states_its_write_scope ____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_orchestrator_definition_states_its_write_scope():
+        """DEC-156: anywhere in the repository except ``tests/acceptance/**``."""
+        faults = support.orchestrator_scope_faults(_definition(support.ORCHESTRATOR))
+>       assert not faults, f"{support.agent_rel(support.ORCHESTRATOR)}: {faults}"
+E       AssertionError: .claude/agents/orchestrator.md: ['it does not say the scope is anywhere in the repository', 'it does not except tests/acceptance/**']
+E       assert not ['it does not say the scope is anywhere in the repository', 'it does not except tests/acceptance/**']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:83: AssertionError
+______________ test_the_research_definition_is_the_generated_one _______________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw1/test_the_research_definition_i0')
+
+    def test_the_research_definition_is_the_generated_one(tmp_path):
+        """Rewritten after implementation (DEC-665). Until the owner's apply block of 2026-10-11 this case,
+        ``test_the_research_definition_is_unchanged``, held the hash of the file the owner committed by hand (DEC-312).
+        The definition is now the generated file: byte for byte what the registered rulesync writes from this
+        repository's adapter source of the research role. The role stays in place (DEC-163): it is still defined, once,
+        under its own name."""
+        rel, source_rel = support.agent_rel(support.RESEARCH), support.adapter_source_rel(support.RESEARCH)
+        installed = support.rulesync_version()
+        if installed is None:
+            pytest.skip(f"rulesync is not installed at {support.RULESYNC_BIN} (set RULESYNC_BIN): not compared")
+        registered = support.registered_rulesync_version()
+        assert installed == registered, (
+            f"the installed rulesync is {installed}, the tool registry records {registered}: its output is not the "
+            "generated file"
+        )
+        committed = (support.REPO_ROOT / rel)
+        assert committed.is_file(), f"{rel} does not exist: the research role is not left in place (DEC-163)"
+        pairs = support.live_support.frontmatter(committed.read_text(encoding="utf-8")) or {}
+        assert pairs.get("name") == support.RESEARCH, f"{rel} declares name {pairs.get('name')!r}"
+>       assert committed.read_bytes() == support.generate_definition(support.RESEARCH, tmp_path), (
+            f"{rel} is not the generated file: it differs from what rulesync {installed} writes from {source_rel} "
+            "(DEC-665)"
+        )
+E       AssertionError: .claude/agents/research.md is not the generated file: it differs from what rulesync 24.0.0 writes from .rulesync/subagents/research.md (DEC-665)
+E       assert b'---\nname: ... two lines.\n' == b'---\nname: ...the record.\n'
+E         
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:112: AssertionError
+_____ test_a_definition_without_one_required_field_is_found[orchestrator] ______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_a_definition_without_one_required_field_is_found(role):
+        """KPI failure 1, on the definition: each of the six fields in turn is taken out."""
+        text = _definition(role)
+>       assert support.missing_fields(text) == [], f"{support.agent_rel(role)} is not complete to begin with"
+E       AssertionError: .claude/agents/orchestrator.md is not complete to begin with
+E       assert ['purpose', '...ndoff format'] == []
+E         
+E         Left contains 6 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
+_____ test_a_definition_without_one_required_field_is_found[product-spec] ______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_a_definition_without_one_required_field_is_found(role):
+        """KPI failure 1, on the definition: each of the six fields in turn is taken out."""
+        text = _definition(role)
+>       assert support.missing_fields(text) == [], f"{support.agent_rel(role)} is not complete to begin with"
+E       AssertionError: .claude/agents/product-spec.md is not complete to begin with
+E       assert ['purpose', '...ndoff format'] == []
+E         
+E         Left contains 6 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
+_ test_a_definition_without_one_required_field_is_found[independent-test-designer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_a_definition_without_one_required_field_is_found(role):
+        """KPI failure 1, on the definition: each of the six fields in turn is taken out."""
+        text = _definition(role)
+>       assert support.missing_fields(text) == [], f"{support.agent_rel(role)} is not complete to begin with"
+E       AssertionError: .claude/agents/independent-test-designer.md is not complete to begin with
+E       assert ['purpose', '...ndoff format'] == []
+E         
+E         Left contains 6 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
+_______ test_a_definition_without_one_required_field_is_found[engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_a_definition_without_one_required_field_is_found(role):
+        """KPI failure 1, on the definition: each of the six fields in turn is taken out."""
+        text = _definition(role)
+>       assert support.missing_fields(text) == [], f"{support.agent_rel(role)} is not complete to begin with"
+E       AssertionError: .claude/agents/engineer.md is not complete to begin with
+E       assert ['purpose', '...ndoff format'] == []
+E         
+E         Left contains 6 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
+__ test_a_definition_without_one_required_field_is_found[independent-auditor] __
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_a_definition_without_one_required_field_is_found(role):
+        """KPI failure 1, on the definition: each of the six fields in turn is taken out."""
+        text = _definition(role)
+>       assert support.missing_fields(text) == [], f"{support.agent_rel(role)} is not complete to begin with"
+E       AssertionError: .claude/agents/independent-auditor.md is not complete to begin with
+E       assert ['purpose', '...ndoff format'] == []
+E         
+E         Left contains 6 more items, first extra item: 'purpose'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x716db99f9620>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert started.exists()
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review3.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/p...>
+endtime = 558833.135077572, orig_timeout = 60, stdout_seq = []
+stderr_seq = None, skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r14_a_stopped_run_k0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r14_a_stopped_run_k0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+_______________ test_a_ticket_without_the_field_is_refused[kpis] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+field = 'kpis'
+ticket = (PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
+check = <w1_08_support.Checker object at 0x7b254fe43fb0>
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
+    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
+        """Left out, or null in its place: both are a ticket without the field."""
+        schema, good = ticket
+>       assert field in good, f"the ticket template has no `{field}`"
+E       AssertionError: the ticket template has no `kpis`
+E       assert 'kpis' in {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
+
+tests/acceptance/W1-08/test_w1_08_ticket.py:64: AssertionError
+_______________ test_a_ticket_without_the_field_is_refused[role] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+field = 'role'
+ticket = (PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
+check = <w1_08_support.Checker object at 0x7b254fe40f50>
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
+    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
+        """Left out, or null in its place: both are a ticket without the field."""
+        schema, good = ticket
+        assert field in good, f"the ticket template has no `{field}`"
+>       check.good(schema, good, "the ticket template")
+
+tests/acceptance/W1-08/test_w1_08_ticket.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-08/w1_08_support.py:222: in good
+    self.accepts(schema, document, what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7b254fe40f50>
+schema = PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json')
+document = {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
+what = 'the ticket template'
+
+    def accepts(self, schema, document, what):
+        accepted, output = self.run(schema, self._write(document))
+>       assert accepted, f"{Path(schema).name} refuses {what}:\n{output}"
+               ^^^^^^^^
+E       AssertionError: ticket.schema.json refuses the ticket template:
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw0/test_a_ticket_without_the_fiel1/instance-1.json::$: 'allowed_paths' is a required property
+E         /tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw0/test_a_ticket_without_the_fiel1/instance-1.json::$: 'kpis' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:264: AssertionError
+__________ test_a_ticket_without_the_field_is_refused[allowed_paths] ___________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+field = 'allowed_paths'
+ticket = (PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
+check = <w1_08_support.Checker object at 0x7b25542f8170>
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
+    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
+        """Left out, or null in its place: both are a ticket without the field."""
+        schema, good = ticket
+>       assert field in good, f"the ticket template has no `{field}`"
+E       AssertionError: the ticket template has no `allowed_paths`
+E       assert 'allowed_paths' in {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
+
+tests/acceptance/W1-08/test_w1_08_ticket.py:64: AssertionError
+_________ test_a_ticket_without_kpis_role_and_allowed_paths_is_refused _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+ticket = (PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
+check = <w1_08_support.Checker object at 0x7b254fe421b0>
+
+    @pytest.mark.local_only
+    def test_a_ticket_without_kpis_role_and_allowed_paths_is_refused(ticket, check):
+        schema, good = ticket
+        bad = support.without(support.without(support.without(good, "kpis"), "role"), "allowed_paths")
+>       check.good(schema, good, "the ticket template")
+
+tests/acceptance/W1-08/test_w1_08_ticket.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-08/w1_08_support.py:222: in good
+    self.accepts(schema, document, what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w1_08_support.Checker object at 0x7b254fe421b0>
+schema = PosixPath('/home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/template/governance/kernel/schemas/ticket.schema.json')
+document = {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
+what = 'the ticket template'
+
+    def accepts(self, schema, document, what):
+        accepted, output = self.run(schema, self._write(document))
+>       assert accepted, f"{Path(schema).name} refuses {what}:\n{output}"
+               ^^^^^^^^
+E       AssertionError: ticket.schema.json refuses the ticket template:
+E       Schema validation errors were encountered.
+E         /tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw0/test_a_ticket_without_kpis_rol0/instance-1.json::$: 'allowed_paths' is a required property
+E         /tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw0/test_a_ticket_without_kpis_rol0/instance-1.json::$: 'kpis' is a required property
+
+tests/acceptance/W1-08/w1_08_support.py:264: AssertionError
+_ test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r16_an_own_session_0')
+launch = <function planted.<locals>.launch at 0x716db99f8540>, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+        _wait_for(started)
+        gov.send_signal(signum)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_review4.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/p...>
+endtime = 558898.478778002, orig_timeout = 60, stdout_seq = []
+stderr_seq = None, skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r16_an_own_session_0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r16_an_own_session_0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+____ test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0] _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur0')
+launch = <function planted.<locals>.launch at 0x716db97f74c0>, signals = (2,)
+
+    @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
+    def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        for signum in signals:
+            gov.send_signal(signum)
+            time.sleep(0.1)
+        out, _ = gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + signals[0]  # an ordinary exit, never a death by the signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/pyte...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:194: AssertionError
+_____________ test_the_definition_has_the_six_fields[orchestrator] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_has_the_six_fields(role):
+        missing = support.missing_fields(_definition(role))
+>       assert not missing, f"{support.agent_rel(role)} lacks {missing}"
+E       AssertionError: .claude/agents/orchestrator.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+E       assert not ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:55: AssertionError
+_____________ test_the_definition_has_the_six_fields[product-spec] _____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_has_the_six_fields(role):
+        missing = support.missing_fields(_definition(role))
+>       assert not missing, f"{support.agent_rel(role)} lacks {missing}"
+E       AssertionError: .claude/agents/product-spec.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+E       assert not ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:55: AssertionError
+______ test_the_definition_has_the_six_fields[independent-test-designer] _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_has_the_six_fields(role):
+        missing = support.missing_fields(_definition(role))
+>       assert not missing, f"{support.agent_rel(role)} lacks {missing}"
+E       AssertionError: .claude/agents/independent-test-designer.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+E       assert not ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:55: AssertionError
+_______________ test_the_definition_has_the_six_fields[engineer] _______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_has_the_six_fields(role):
+        missing = support.missing_fields(_definition(role))
+>       assert not missing, f"{support.agent_rel(role)} lacks {missing}"
+E       AssertionError: .claude/agents/engineer.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+E       assert not ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:55: AssertionError
+_________ test_the_definition_has_the_six_fields[independent-auditor] __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_has_the_six_fields(role):
+        missing = support.missing_fields(_definition(role))
+>       assert not missing, f"{support.agent_rel(role)} lacks {missing}"
+E       AssertionError: .claude/agents/independent-auditor.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+E       assert not ['purpose', 'allowed-path pattern', 'tools', 'model tier', 'authority level', 'handoff format']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:55: AssertionError
+______ test_the_definition_agrees_with_its_kernel_role_file[orchestrator] ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/orchestrator.md and template/governance/kernel/roles/orchestrator.md do not have the same fields: ['allowed paths', 'authority level', 'handoff format', 'model tier', 'network', 'permission classes', 'purpose', 'tools']
+E       assert [] == ['allowed pat...classes', ...]
+E         
+E         Right contains 8 more items, first extra item: 'allowed paths'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+______ test_the_definition_agrees_with_its_kernel_role_file[product-spec] ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+>       assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+E       AssertionError: .claude/agents/product-spec.md and template/governance/kernel/roles/product-spec.md do not have the same fields: ['allowed paths', 'authority level', 'handoff format', 'model tier', 'network', 'permission classes', 'purpose', 'tools']
+E       assert [] == ['allowed pat...classes', ...]
+E         
+E         Right contains 8 more items, first extra item: 'allowed paths'
+E         Use -v to get more diff
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:64: AssertionError
+_ test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur1/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur1/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur1')
+launch = <function planted.<locals>.launch at 0x716db97f5760>, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(first)
+>       _wait_for(slow)
+
+tests/unit/accept/test_w2_96_run2.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur1/slow')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -> None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_a_signal_dur1/slow').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError
+________ test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0] ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_presses_unti0/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_presses_unti0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_presses_unti0')
+launch = <function planted.<locals>.launch at 0x716db97f4fe0>, kinds = (2,)
+
+    @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+    def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
+        root, temp = project
+        started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+        go.write_text("x")
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+        gov = launch(root, temp, env=_slow(slow))
+        _wait_for(slow)
+        sent = 0
+        while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+            try:
+                gov.send_signal(kinds[sent % len(kinds)])
+            except ProcessLookupError:
+                break
+            sent += 1
+            time.sleep(0.005)
+        gov.communicate(timeout=60)
+>       assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 0 == (128 + 2)
+E        +  where 0 = <Popen: returncode: 0 args: ['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/pyte...>.returncode
+
+tests/unit/accept/test_w2_96_run2.py:235: AssertionError
+_______________ test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it _______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = (PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = <function planted.<locals>.launch at 0x716db97f4860>
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+        _wait_for(started)
+        child = int(started.read_text())
+        gov.send_signal(signal.SIGINT)
+>       out, _ = gov.communicate(timeout=60)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/accept/test_w2_96_run2.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: None args: ['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/p...>
+endtime = 559031.610830144, orig_timeout = 60, stdout_seq = []
+stderr_seq = None, skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['/usr/bin/python3', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_ctrl_c_durin0/w296_reap/w296_gov.py', 'accept', 'DAEO-t001', '--json', '--root', '/tmp/gov-os-ls-IxehOD/pytest-of-usain/pytest-0/popen-gw2/test_w2_96_r9_r12_ctrl_c_durin0/proj']' timed out after 60 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3903982) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+32 failed, 3632 passed, 7 skipped, 6 warnings in 597.98s (0:09:57)
