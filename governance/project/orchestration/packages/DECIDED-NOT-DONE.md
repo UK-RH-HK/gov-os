@@ -133,7 +133,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0k. DEC-1115's items (2026-11-09; item 4 standing until the lift)
 | # | item | state |
 |---|---|---|
-| 83 | ACT-CLAUDE-COPIES-1 by the operator agent, its first live run | IN PROGRESS: the owner's yes typed in the agent's form (11-10 00:0x); queued 00:03Z (`queue/ACT-CLAUDE-COPIES-1.req`); next: the agent's run; on a refusal the CTO tells the owner why and the operator applies §5 by hand |
+| 83 | ACT-CLAUDE-COPIES-1 by the operator agent, its first live run | **APPLIED 11-10** by the operator agent (`eb48fe2fd`, 00:10Z; class (b); the owner's yes read from the CTO transcript, 00:02:59Z, logged in act-approvals.jsonl); 19 files; structural pass all 10 families ok, portability ok; next: R3 (worktrees merge integrate), W2-153's merge, ACT-CLAUDE-COPIES-2 |
 | 84 | TPL-6's Appendix A cut to the pointer | **DONE 11-09** (this commit) |
 | 85 | past 80 % of the week's usage before the lift, only the lift's critical path runs | STANDING until the lift (rule 6); usage 33 % at 22:41 11-09 |
 
