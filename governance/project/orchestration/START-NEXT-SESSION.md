@@ -12,8 +12,12 @@ the register and the owner's word hold over both. **Next free id: DEC-1120.**
   live ACTs 11-10); **D-6 part 2** (complete 11-09); **D-5** (W2-128 rounds 1/2a/2b, W2-152, W2-153 merged; templates
   approved as 1.0.0, DEC-1116; ACT-CLAUDE-COPIES-1 and -2 applied by the operator agent); W2-56 with R3/R5 (S8's reach
   and S10 to Wave 3, DEC-1114); W2-149 with F11 and set-up A's wiring; W2-141's staged hook rebuilt on the live guard.
-- **D-10's red-fix list: ready** except the adapter-portability family (47 cases), which turns green with
-  ACT-CLAUDE-COPIES-3 (verified in a clone). The serial-phase blocker is fixed (`b78f862a9`); every lift ticket's map
+- **D-10's red-fix list: ready** except (a) the adapter-portability family (47 cases), which turns green with
+  ACT-CLAUDE-COPIES-3 (verified in a clone), and (b) **W1-08's 10 cases** (found 15:16 by the landing check after
+  ACT-WIN-TOAST-1, red on integrate since W2-128's templates): `tests/acceptance/W1-08/` uses the kernel's ticket and
+  checkpoint templates as sample records, and the new templates (approved 1.0.0, DEC-1116) do not validate against
+  `ticket.schema.json` and the checkpoint schema in that form. Fix by a test designer under DEC-866 (take the sample
+  from the template's fenced block or a fixture); the templates do not change. Before D-10's run. The serial-phase blocker is fixed (`b78f862a9`); every lift ticket's map
   reads (`93ac67c0b`); `gov accept` enables `breadth` only, `lifted` report-only (`8f6e66a17`). Detail:
   `packages/LIFT-1/D10-REDS.md` §6, `P1-PLAN.md`'s D-10 row.
 - **Usage: 58 % of the week at 13:56** (reset 11-15 09:00). **DEC-1115 (4): past 80 % before the lift, only the lift's
