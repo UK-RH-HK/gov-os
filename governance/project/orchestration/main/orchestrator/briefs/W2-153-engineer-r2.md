@@ -26,7 +26,7 @@ show `claudecode.skills []`, not `['test-design']`.
   `~/gov-os-runs/`, or any `hidden`, `memory-verdict` or `memory-verdict-2` folder. DEC-1080: one simple command per
   Bash call. Do not merge. Never touch `tests/acceptance/**`, `.tickets/` or `.claude/`.
 - **Commit** on `w2/W2-153`, only your paths, with
-  `--trailer "Task: DAEO-8s85" --trailer "Implements: DEC-1050, DEC-963" --trailer "Role: engineer" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`.
+  `--trailer "Task: DAEO-8s85" --trailer "Implements: DEC-1050, DEC-1112" --trailer "Role: engineer" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"`.
 - A one-line round.
 - **Return** (your final message, in full): the twelve labelled fields of `EMG-common.md` (sandbox and `ps` checks
   first), the diff, the counts and the portability findings.

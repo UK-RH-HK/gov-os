@@ -1,0 +1,136 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx-tests",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-153",
+   "change": "head",
+   "before": "122ae4cc07dc",
+   "after": "49b990521e75"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "head",
+   "before": "df7c672929bc",
+   "after": "440304dd9964"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-28/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-28/w1_28_launch_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/test_w1_32_added_cases.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/w1_32_launch_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-38/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-38/test_w1_38_test_folder_rule.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-46/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-46/test_w1_46_live_sessions.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-46/w1_46_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-50/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-50/test_w1_50_freeze_launcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-116/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-116/w2_116_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-50/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-50/w2_50_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-54/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-58/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-58/test_w2_58_launched_sessions.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-58/test_w2_58_review.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10b-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-58/w2_58_support.py"
+  }
+ ]
+}
