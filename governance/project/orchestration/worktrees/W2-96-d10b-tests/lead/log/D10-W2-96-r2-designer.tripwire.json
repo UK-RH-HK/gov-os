@@ -1,0 +1,59 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "b5c23e7b35b7",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/DECIDED-NOT-DONE.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "6ae59d79ef94",
+   "after": "684bf86cdc80"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "b5c23e7b35b7",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "0b97228e2d0e",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b",
+   "change": "status line added",
+   "line": " M src/gov/accept/runner.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b",
+   "change": "status line added",
+   "line": "?? tests/unit/accept/test_w2_96_d10_r2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b",
+   "change": "acceptance folder",
+   "folder": ".claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "head",
+   "before": "88c0772ff479",
+   "after": "5e36c7fc5e4b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "acceptance folder",
+   "folder": "W2-96"
+  }
+ ]
+}

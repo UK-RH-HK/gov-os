@@ -1,0 +1,7 @@
+log: helper-watch.log
+Helper: worker gone
+status: launched worker W2-149-review-sgx (pid 2340179, /home/usain/gov-os-worktrees/W2-149-sgx/.gov-runtime/scratch/lead/log) is gone without its exit file
+last: no exit file; its log: /home/usain/gov-os-worktrees/W2-149-sgx/.gov-runtime/scratch/lead/log/W2-149-review-sgx.json
+
+file: /home/usain/gov-os-worktrees/W2-149-sgx/.gov-runtime/scratch/lead/log/W2-149-review-sgx.pid
+Check it and resume it (SendMessage to the agent id, or a fresh session from its brief).

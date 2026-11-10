@@ -1,0 +1,90 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "9f66e4084b44",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/packages/ACT-WIN-TOAST-1.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/reviews/ACT-WIN-TOAST-1-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/ACT-win-toast-review",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-base",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "e0bce125ec47",
+   "after": "684bf86cdc80"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "e779e19e8789",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "e779e19e8789",
+   "after": "622fa4fe67ab"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "9f66e4084b44",
+   "after": "b5c23e7b35b7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-d10b-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b",
+   "change": "status line added",
+   "line": " M src/gov/accept/runner.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b",
+   "change": "acceptance folder",
+   "folder": ".claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-96/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-96/test_w2_96_at_d10a_optin.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-96/test_w2_96_at_d10b_cells.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-d10b-tests",
+   "change": "acceptance folder",
+   "folder": "W2-96"
+  }
+ ]
+}
