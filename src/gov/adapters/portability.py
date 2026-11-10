@@ -8,9 +8,10 @@ Three comparisons, each a finding when it fails or cannot be made:
    temporary folder; a file of the generated folders that rulesync does not write has no source.
    When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
    applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
-A role with a kernel role template (W2-153, DEC-1050) has its source compared with the composition instead of the
-role file's whole text: the source's own rulesync front matter, the role's skills list under ``claudecode: skills:``
-(where rulesync passes it to the generated agent, DEC-1112 (3)) and the template's body.
+A role with a kernel role template (W2-153, DEC-1050) has its source compared with ``compose(root, role)``: the
+source's own rulesync front matter, with the role's skills list under ``claudecode: skills:`` (where rulesync passes
+it to the generated agent, DEC-1112 (3)), the template's body, one blank line and the role file's body (S3 amended,
+DEC-1112 (3)), so the agent carries the role file's labelled fields.
 The generated template copies under ``.claude/templates/`` are compared byte for byte with the kernel's templates;
 ``--write-templates <dir>`` writes those copies into ``<dir>`` (the copies' folder itself), the ACT's step.
 And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
@@ -125,7 +126,11 @@ def _version_finding(root: Path, binary: str | None) -> dict | None:
 def _split(path: Path) -> tuple[object, str]:
     """``(frontmatter, body)`` of a Markdown file. The blank lines between the frontmatter and the
     first line of the body are dropped: rulesync drops them, and it is the one tolerated difference."""
-    text = path.read_text(encoding="utf-8")
+    return _split_text(path.read_text(encoding="utf-8"))
+
+
+def _split_text(text: str) -> tuple[object, str]:
+    """``_split`` on a file's text."""
     end = text.find("\n---", 3) if text.startswith("---") else -1
     if end < 0:
         return None, text.lstrip("\n")
@@ -159,6 +164,30 @@ def _role_template(kernel: Path, role: str) -> Path | None:
     stem = ROLE_TEMPLATES.get(role)
     template = kernel / "templates" / f"{stem}.md" if stem else None
     return template if template is not None and template.is_file() else None
+
+
+def _front_block(text: str) -> str:
+    """The front matter of a Markdown file's text as written, its closing ``---`` line included; empty for none.
+    Its end is found as ``_split`` finds it."""
+    end = text.find("\n---", 3) if text.startswith("---") else -1
+    return "" if end < 0 else text[:end + 4] + text[end + 4:].partition("\n")[0] + "\n"
+
+
+def compose(root: Path | str, role: str) -> str:
+    """The full text a role's rulesync source must have (W2-153 S3 amended, DEC-1112 (3)): the source's own rulesync
+    front matter as written (with ``claudecode.skills``), one blank line, the kernel role template's body, one blank
+    line, and the kernel role file's body, its front matter (if any) stripped by ``_split``. A role without a
+    template has the role file's body alone after the front matter. The check compares each source with this text,
+    and the copies ACT's builder writes it. Raises ``FileNotFoundError`` without a kernel, a role file or a source."""
+    root = Path(root)
+    kernel = _kernel(root)
+    if kernel is None:
+        raise FileNotFoundError(f"no kernel folder under {root} ({' or '.join(KERNEL_ROOTS)})")
+    role_body = _split(kernel / "roles" / f"{role}.md")[1]
+    front = _front_block((root / SOURCES / "subagents" / f"{role}.md").read_text(encoding="utf-8"))
+    template = _role_template(kernel, role)
+    body = role_body if template is None else _split(template)[1].rstrip("\n") + "\n\n" + role_body
+    return front + "\n" + body if front else body
 
 
 def _skills_difference(role: str, front: object) -> str:
@@ -238,12 +267,11 @@ def _kernel_findings(root: Path) -> tuple[list[dict], int]:
             continue
         if kernel_file.parent.name == "roles":
             (_front, role_body), (front, source_body) = _split(kernel_file), _split(source)
+            # W2-153 S3 amended: the source against compose(), the one composition the copies ACT also writes
+            same = _split_text(compose(root, kernel_file.stem))[1] == source_body
             template = _role_template(kernel, kernel_file.stem)
-            if template is None:
-                same = role_body == source_body
-            else:  # W2-153 S3: the composition, in place of the role file's whole text
-                origin = str(template.relative_to(root))
-                same = _split(template)[1] == source_body
+            if template is not None:
+                origin = f"its composition of {template.relative_to(root)} and {origin}"
                 if (skills := _skills_difference(kernel_file.stem, front)) and same:
                     findings.append(_finding("SOURCE_DIFFERS", f"skills are not the role's: {skills}", rel))
             if tools := _tools_difference(role_body, front):
