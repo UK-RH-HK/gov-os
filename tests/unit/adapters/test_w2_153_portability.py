@@ -19,7 +19,8 @@ ROLE = "- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. N
 TEMPLATE = "---\nname: role-engineer\nversion: 1.0.0\nrole: engineer\nskills: [x, y]\n---\n# You are the engineer\n1. Do.\n"
 FRONT = "---\nname: engineer\ntargets: [\"claudecode\"]\nclaudecode:\n  tools: [\"Read\", \"Grep\", \"Bash\"]\n{skills}---\n\n"
 SKILLS = '  skills: ["test-driven-development"]\n'  # under claudecode: rulesync 24.0.0 drops a top-level list
-COMPOSED = FRONT.format(skills=SKILLS) + "# You are the engineer\n1. Do.\n"
+BODY = "# You are the engineer\n1. Do.\n\n" + ROLE  # S3 amended: template body, blank line, role file body
+COMPOSED = FRONT.format(skills=SKILLS) + BODY
 
 
 def _write(path: Path, text: str) -> Path:
@@ -45,7 +46,7 @@ def test_the_composed_source_is_consistent(project):
     assert portability._kernel_findings(project) == ([], 1)
 
 
-def test_the_source_holding_the_role_files_body_differs_once_a_template_exists(project):
+def test_the_source_holding_only_the_role_files_body_differs_once_a_template_exists(project):
     _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills=SKILLS) + ROLE)
     findings, _count = portability._kernel_findings(project)
     assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
@@ -62,10 +63,13 @@ def test_the_templates_own_front_matter_is_not_compared(project):
     assert portability._kernel_findings(project)[0] == []
 
 
-def test_the_role_files_body_is_no_longer_compared_but_its_tools_are(project):
+def test_the_role_files_body_and_its_tools_are_compared(project):
+    """S3 amended: the role file's body is part of the composition again, after the template's."""
     _write(project / "governance/kernel/roles/engineer.md", ROLE + "- **Network:** none.\n")
-    assert portability._kernel_findings(project)[0] == []
-    _write(project / "governance/kernel/roles/engineer.md", ROLE.replace("Bash", "Bash, Write"))
+    assert _codes(portability._kernel_findings(project)[0]) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
+    tools = ROLE.replace("Bash", "Bash, Write")
+    _write(project / "governance/kernel/roles/engineer.md", tools)
+    _write(project / ".rulesync/subagents/engineer.md", COMPOSED.replace(ROLE, tools))
     assert _codes(portability._kernel_findings(project)[0]) == [
         ("SOURCE_TOOLS_DIFFER", ".rulesync/subagents/engineer.md")]
 
@@ -74,7 +78,7 @@ def test_the_role_files_body_is_no_longer_compared_but_its_tools_are(project):
                                     '  skills: ["test-driven-development", "audit"]\n',
                                     '  skills: []\n'])
 def test_skills_other_than_the_roles_are_a_finding(project, skills):
-    _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills=skills) + "# You are the engineer\n1. Do.\n")
+    _write(project / ".rulesync/subagents/engineer.md", FRONT.format(skills=skills) + BODY)
     findings, _count = portability._kernel_findings(project)
     assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
     assert "skills" in findings[0]["message"]
@@ -85,7 +89,7 @@ def test_a_top_level_skills_list_is_a_finding(project, under):
     """DEC-1112 (3): rulesync drops a top-level skills list, so the agent would preload nothing; with or without the
     list under claudecode, a top-level one is a finding."""
     front = FRONT.format(skills=under).replace("---\n\n", 'skills: ["test-driven-development"]\n---\n\n')
-    _write(project / ".rulesync/subagents/engineer.md", front + "# You are the engineer\n1. Do.\n")
+    _write(project / ".rulesync/subagents/engineer.md", front + BODY)
     findings, _count = portability._kernel_findings(project)
     assert _codes(findings) == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
     assert "top-level" in findings[0]["message"]
