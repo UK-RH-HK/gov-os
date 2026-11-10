@@ -1,0 +1,3 @@
+log: (interim)
+Interim: D10-merge
+status: interim result 389867fe6: W2-138 D-10 (DEC-1109 (2)): W2-54's query-cache case in its paths: it compares gov retrieve's answers from two folders whole, red since S1 put result.store.root in every answer (dcda2701; measured at 
