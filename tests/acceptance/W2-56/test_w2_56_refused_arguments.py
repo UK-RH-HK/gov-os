@@ -101,7 +101,21 @@ def test_s6_every_worker_role_is_refused_each_new_argument(box, role, name):
 def test_s6_guard_arguments_that_are_not_refused_start_the_session(box, args):
     launch = s.run_launch(box, s.ENGINEER, s.T.tk, args)
     assert launch.returncode == 0 and launch.started, f"the launch did not start\n{launch.describe()}"
-    assert launch.call["args"][-len(args):] == args, f"the session did not get the arguments {args}"
+    assert _caller_args_then_template_pair(launch.call["args"], args), (
+        f"the session did not get the arguments {args}, followed by nothing or by the one template pair: "
+        f"{launch.call['args']}")
+
+
+def _caller_args_then_template_pair(argv, args):
+    """True when ``args`` are one contiguous, ordered run in ``argv`` followed by nothing or by exactly
+    ``--append-system-prompt-file <...>/.claude/templates/<stem>.md`` (W2-153's S1, DEC-1050; DEC-866)."""
+    argv, args = list(argv), list(args)
+    if argv[-len(args):] == args:
+        return True
+    if len(argv) < len(args) + 2 or argv[-len(args) - 2:-2] != args or argv[-2] != "--append-system-prompt-file":
+        return False
+    head, sep, stem = argv[-1].replace("\\", "/").rpartition("/.claude/templates/")
+    return bool(sep and head and stem.endswith(".md") and len(stem) > 3 and "/" not in stem)
 
 
 @pytest.mark.parametrize("case", TODAY_REFUSED, ids=_id)
