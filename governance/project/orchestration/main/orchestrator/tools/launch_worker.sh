@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # Starts one worker through `gov launch` (TPL-3b: R3-TEMPLATES D, TPL-3 S5; R2-6, R2-9; DEC-1052, DEC-1079), with the
 # checks every launch needs, so no lead or CTO writes the line by hand (LEAD-w2-common, DEC-789, DEC-799, DEC-898).
-#   launch_worker.sh [--fg] [--projection-usd <N>] <role> <effort> <brief>
+#   [LAUNCH_MODEL=<model>] launch_worker.sh [--fg] [--model <model>] --class C0|C1|C2|C3 [--promoted "<reason>"]
+#                                           [--projection-usd <N>] <role> <effort> <brief>
+# RUBRIC-2 (DEC-1120 (3), 2026-11-10): every spawn names its model and effort, and the spend log records the tier, the
+# class and any promotion. So: --class is required (the ticket's criticality class: C3 critical, C2 significant, C1
+# routine, C0 mechanical); the model is named by --model or LAUNCH_MODEL and there is no default (--model wins); --promoted
+# gives the recorded reason when the spawn is a promotion (a ticket's next round moved up after two failed reviews or a
+# fail-open finding). A missing or invalid class, or no model, exits 2 before anything is written.
 # Run it in the worker's worktree (or name it with LAUNCH_TREE); never the main tree. In order:
 #  1. the ticket: LAUNCH_TICKET, else the one in_progress ticket of the tree's W2 (the folder's name less -tests) whose
 #     role is <role> (a test designer or reviewer with none of its own: the W2's one in_progress implementer ticket);
@@ -13,7 +19,7 @@
 #     run in the tree's code (nothing started), and no `.sandbox-trial-<ticket>` file already there; after: that file
 #     must still be absent (step 0 (a) of EMG-d4b-launched.md must have failed), named SANDBOX BREACH if not;
 #  5. the tripwire snapshot (tripwire.py, DEC-789), compared when the session ends;
-#  6. the `gov launch` line (the tree's own code; claude-opus-5-5 or LAUNCH_MODEL; the reviewer read-only), stdin the
+#  6. the `gov launch` line (the tree's own code; the model named at the launch; the reviewer read-only), stdin the
 #     brief's copy, to <tree>/.gov-runtime/scratch/lead/log/<name>.json; then <name>.summary, then <name>.exit (the
 #     session's code, written last). <name> is the brief's, made unique with -2, -3 ...
 # By default the session is detached (its own session and process group; <name>.pid holds its pid for proc.sh), and
@@ -23,10 +29,10 @@
 # Spend and the brake (DAEO-sdxk, 2026-11-10; DEC-1091, DEC-1112 (3)): the projection is --projection-usd, else the
 # brief's budget (spend.py brief-budget), else none; when the session ends, spend.py from-log appends one line to the
 # CTO's log/spend.jsonl (cost_usd, output_tokens, cache tokens each in their own field; no `tokens` sum), with the
-# ticket, its W2 and the projection, then runs spend.py check (the runaway brake at twice the projection; record only,
+# ticket, its W2, the projection, and the model, class, tier and promotion, then runs spend.py check (the runaway brake at twice the projection; record only,
 # never to the owner). A launch for a W2 whose brake file (log/brake/<W2>.json) exists is refused with exit 5 until
 # the CTO clears it (spend.py clear <W2>). Env: LAUNCH_ORCH (the CTO's scratch root), LAUNCH_SPEND_TOOL.
-# Env (tests): LAUNCH_TREE, LAUNCH_TICKET, LAUNCH_MODEL, LAUNCH_DISK_GATE, LAUNCH_TRIPWIRE, LAUNCH_TRIAL_DIR,
+# Env (tests): LAUNCH_TREE, LAUNCH_TICKET, LAUNCH_MODEL (the model, also for real launches), LAUNCH_DISK_GATE, LAUNCH_TRIPWIRE, LAUNCH_TRIAL_DIR,
 # LAUNCH_COMMON_DIR, LAUNCH_MAIN.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -34,14 +40,15 @@ MAIN=${LAUNCH_MAIN:-/home/usain/Dynamic-Agentic-Engineering-OS}
 SPEND_ORCH=${LAUNCH_ORCH:-$MAIN/.gov-runtime/scratch/orchestrator} SPEND_TOOL=${LAUNCH_SPEND_TOOL:-$HERE/spend.py}
 COMMON_DIR=${LAUNCH_COMMON_DIR:-$MAIN/.gov-runtime/scratch/orchestrator/briefs}
 GATE=${LAUNCH_DISK_GATE:-$HERE/disk_gate.sh} TRIP=${LAUNCH_TRIPWIRE:-$HERE/tripwire.py}
-TRIAL_DIR=${LAUNCH_TRIAL_DIR:-/home/usain/gov-os-worktrees} MODEL=${LAUNCH_MODEL:-claude-opus-5-5}
+TRIAL_DIR=${LAUNCH_TRIAL_DIR:-/home/usain/gov-os-worktrees} MODEL=${LAUNCH_MODEL:-}
 say() { echo "launch_worker: $*" >&2; }
 cli() {  # the CLI arguments after `--` (LEAD-w2-common's form; the reviewer gets no Edit or Write)
   CLI=(-p --model "$MODEL" --effort "$2" --output-format json --permission-mode acceptEdits --allowedTools)
   if [ "$1" = independent-auditor ]; then CLI+=("Bash" "Read" "Grep" "Glob"); else CLI+=("Bash" "Read" "Edit" "Write" "Grep" "Glob"); fi
 }
 if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, tripwire, sandbox check, summary, exit
-  shift; tree=$1 ID=$2 role=$3 effort=$4 copy=$5 base=$6 proj=${7:-} W2=${8:-}
+  shift; tree=$1 ID=$2 role=$3 effort=$4 copy=$5 base=$6 proj=${7:-} W2=${8:-} MODEL=${9:-} cls=${10:-} promoted=${11:-}
+  [ -n "$MODEL" ] || { say "the session was started without a model"; exit 2; }
   echo "$$" > "$base.pid"; cd "$tree" || exit 2
   cli "$role" "$effort"
   PYTHONPATH="$tree/src" python3 -m gov.cli.main launch "$role" "$ID" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
@@ -51,21 +58,30 @@ if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, t
   sb="sandbox trial file absent"; [ -e "$TRIAL_DIR/.sandbox-trial-$ID" ] && sb="SANDBOX BREACH: $TRIAL_DIR/.sandbox-trial-$ID exists (never delete it; report it)"
   if err=$(ORCH=$SPEND_ORCH python3 -I "$SPEND_TOOL" from-log "$base.json" --kind launched \
       --what "$W2 $role (launched, $effort) $(basename "$base")" --ticket "$ID" --wbs "$W2" --role "$role" \
-      --effort "$effort" --exit "$rc" ${proj:+--projection-usd "$proj"} 2>&1 > /dev/null); then
+      --effort "$effort" --exit "$rc" --model "$MODEL" ${cls:+--class "$cls"} ${promoted:+--promoted "$promoted"} \
+      ${proj:+--projection-usd "$proj"} 2>&1 > /dev/null); then
     sp="spend recorded (projection ${proj:-none})"
     bk=$(ORCH=$SPEND_ORCH python3 -I "$SPEND_TOOL" check 2>&1 | grep -m1 "^BRAKE $W2:") && sp="$sp; $bk"
   else sp="spend NOT recorded: $(tail -n 1 <<< "$err" | cut -c1-160)"; fi
   echo "launch_worker $role $ID: session exit $rc; $tw; $sb; log $base.json; $sp" | tee "$base.summary"
   echo "$rc" > "$base.exit.tmp" && mv "$base.exit.tmp" "$base.exit"; exit "$rc"
 fi
-fg="" proj=""
+fg="" proj="" cls="" promoted=""
 while :; do case "${1:-}" in
   --fg) fg=1; shift;;
+  --class) [ $# -ge 2 ] || { say "--class needs a value: C0, C1, C2 or C3"; exit 2; }; cls=$2; shift 2;;
+  --model) [ $# -ge 2 ] || { say "--model needs a value"; exit 2; }; MODEL=$2; shift 2;;
+  --promoted) [ $# -ge 2 ] || { say "--promoted needs the reason"; exit 2; }; promoted=$2; shift 2
+    [ -n "${promoted//[[:space:]]/}" ] || { say "--promoted needs a reason, not an empty one"; exit 2; };;
   --projection-usd) [ $# -ge 2 ] || { say "--projection-usd needs a value in USD"; exit 2; }; proj=$2; shift 2
     [[ "$proj" =~ ^[0-9]+([.][0-9]+)?$ ]] && ! [[ "$proj" =~ ^0+([.]0+)?$ ]] || { say "not a projection in USD above 0: $proj"; exit 2; };;
   *) break;; esac; done
-[ $# = 3 ] || { sed -n 2,30p "$0"; exit 2; }
+[ $# = 3 ] || { sed -n '/^#/!q;2,$p' "$0"; exit 2; }
 role=$1 effort=$2 brief=$3
+case "$cls" in C0|C1|C2|C3) ;;
+  "") say "--class is required: C0, C1, C2 or C3 (DEC-1120: the spend log records the class)"; exit 2;;
+  *) say "not a class: $cls (C0, C1, C2 or C3)"; exit 2;; esac
+[ -n "$MODEL" ] || { say "no model named: set LAUNCH_MODEL or pass --model (DEC-1120 (3): every spawn names its model; no default)"; exit 2; }
 case "$role" in engineer|independent-test-designer|independent-auditor|research|product-spec) ;;
   *) say "not a worker role: $role"; exit 2;; esac
 case "$effort" in low|medium|high|xhigh|max) ;; *) say "not an effort: $effort"; exit 2;; esac
@@ -146,9 +162,9 @@ print("sandbox settings strict")
 PY
 ) || refuse 4 "the launcher's dry run refuses: $(tail -n 3 <<< "$dry" | tr '\n' ' ')"
 python3 "$TRIP" snapshot > "$base.tripwire-before.json" 2>> "$base.json" || refuse 4 "the tripwire snapshot failed"
-say "$role $ID in $tree: $dry; disk gate open; brief $copy; projection ${proj:-none}"
-if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS"; exit $?; fi
-setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" < /dev/null > /dev/null 2>&1 &
+say "$role $ID in $tree: $dry; disk gate open; brief $copy; projection ${proj:-none}; model $MODEL; class $cls${promoted:+; promoted: $promoted}"
+if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted"; exit $?; fi
+setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" "$MODEL" "$cls" "$promoted" < /dev/null > /dev/null 2>&1 &
 echo "$!" > "$base.pid"
 echo "launch_worker: started pid $! (its own process group) for $role $ID; log $base.json"
 echo "launch_worker: wait with: bash $HERE/wait_for.sh $base.exit"

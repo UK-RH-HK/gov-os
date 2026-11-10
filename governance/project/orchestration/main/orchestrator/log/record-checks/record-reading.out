@@ -1,4 +1,4 @@
-................F.......................FFFF............................ [ 59%]
+................F....................................................... [ 59%]
 .................FFFFFFFFFFFFFFFF.FFFFFF.........                        [100%]
 =================================== FAILURES ===================================
 ____________ test_every_tracked_path_matches_exactly_one_namespace _____________
@@ -18,109 +18,10 @@ ____________ test_every_tracked_path_matches_exactly_one_namespace _____________
                 twice.append(f"{path} -> {found}")
 >       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
                              f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
-E       AssertionError: 5 of 3880 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['governance/project/indep-briefs/sgx1/labeller-2.md', 'governance/project/indep-briefs/sgx1/labeller.md', 'governance/project/indep-briefs/sgx1/overlap-auditor.md', 'governance/project/indep-briefs/sgx1/writer-heldout.md', 'governance/project/indep-briefs/sgx1/writer-tuning.md']
+E       AssertionError: 5 of 3882 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['governance/project/indep-briefs/sgx1/labeller-2.md', 'governance/project/indep-briefs/sgx1/labeller.md', 'governance/project/indep-briefs/sgx1/overlap-auditor.md', 'governance/project/indep-briefs/sgx1/writer-heldout.md', 'governance/project/indep-briefs/sgx1/writer-tuning.md']
 E       assert not ['governance/project/indep-briefs/sgx1/labeller-2.md', 'governance/project/indep-briefs/sgx1/labeller.md', 'governance...md', 'governance/project/indep-briefs/sgx1/writer-heldout.md', 'governance/project/indep-briefs/sgx1/writer-tuning.md']
 
 tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError
-_______________ test_a_ticket_without_the_field_is_refused[kpis] _______________
-
-field = 'kpis'
-ticket = (PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
-check = <w1_08_support.Checker object at 0x7a2fbb746450>
-
-    @pytest.mark.local_only
-    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
-    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
-        """Left out, or null in its place: both are a ticket without the field."""
-        schema, good = ticket
->       assert field in good, f"the ticket template has no `{field}`"
-E       AssertionError: the ticket template has no `kpis`
-E       assert 'kpis' in {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
-
-tests/acceptance/W1-08/test_w1_08_ticket.py:64: AssertionError
-_______________ test_a_ticket_without_the_field_is_refused[role] _______________
-
-field = 'role'
-ticket = (PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
-check = <w1_08_support.Checker object at 0x7a2fbb744b30>
-
-    @pytest.mark.local_only
-    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
-    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
-        """Left out, or null in its place: both are a ticket without the field."""
-        schema, good = ticket
-        assert field in good, f"the ticket template has no `{field}`"
->       check.good(schema, good, "the ticket template")
-
-tests/acceptance/W1-08/test_w1_08_ticket.py:65: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/acceptance/W1-08/w1_08_support.py:222: in good
-    self.accepts(schema, document, what)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <w1_08_support.Checker object at 0x7a2fbb744b30>
-schema = PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json')
-document = {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
-what = 'the ticket template'
-
-    def accepts(self, schema, document, what):
-        accepted, output = self.run(schema, self._write(document))
->       assert accepted, f"{Path(schema).name} refuses {what}:\n{output}"
-               ^^^^^^^^
-E       AssertionError: ticket.schema.json refuses the ticket template:
-E       Schema validation errors were encountered.
-E         /tmp/pytest-of-usain/pytest-452/test_a_ticket_without_the_fiel1/instance-1.json::$: 'allowed_paths' is a required property
-E         /tmp/pytest-of-usain/pytest-452/test_a_ticket_without_the_fiel1/instance-1.json::$: 'kpis' is a required property
-
-tests/acceptance/W1-08/w1_08_support.py:264: AssertionError
-__________ test_a_ticket_without_the_field_is_refused[allowed_paths] ___________
-
-field = 'allowed_paths'
-ticket = (PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
-check = <w1_08_support.Checker object at 0x7a2fbb747470>
-
-    @pytest.mark.local_only
-    @pytest.mark.parametrize("field", REQUIRED_BY_THE_KPI)
-    def test_a_ticket_without_the_field_is_refused(field, ticket, check):
-        """Left out, or null in its place: both are a ticket without the field."""
-        schema, good = ticket
->       assert field in good, f"the ticket template has no `{field}`"
-E       AssertionError: the ticket template has no `allowed_paths`
-E       assert 'allowed_paths' in {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
-
-tests/acceptance/W1-08/test_w1_08_ticket.py:64: AssertionError
-_________ test_a_ticket_without_kpis_role_and_allowed_paths_is_refused _________
-
-ticket = (PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json'), {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...})
-check = <w1_08_support.Checker object at 0x7a2fbb745910>
-
-    @pytest.mark.local_only
-    def test_a_ticket_without_kpis_role_and_allowed_paths_is_refused(ticket, check):
-        schema, good = ticket
-        bad = support.without(support.without(support.without(good, "kpis"), "role"), "allowed_paths")
->       check.good(schema, good, "the ticket template")
-
-tests/acceptance/W1-08/test_w1_08_ticket.py:74: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/acceptance/W1-08/w1_08_support.py:222: in good
-    self.accepts(schema, document, what)
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <w1_08_support.Checker object at 0x7a2fbb745910>
-schema = PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/template/governance/kernel/schemas/ticket.schema.json')
-document = {'id': 'PROJ-0000', 'name': 'ticket', 'role': 'any', 'state_class': 'AUTHORITATIVE', ...}
-what = 'the ticket template'
-
-    def accepts(self, schema, document, what):
-        accepted, output = self.run(schema, self._write(document))
->       assert accepted, f"{Path(schema).name} refuses {what}:\n{output}"
-               ^^^^^^^^
-E       AssertionError: ticket.schema.json refuses the ticket template:
-E       Schema validation errors were encountered.
-E         /tmp/pytest-of-usain/pytest-452/test_a_ticket_without_kpis_rol0/instance-1.json::$: 'allowed_paths' is a required property
-E         /tmp/pytest-of-usain/pytest-452/test_a_ticket_without_kpis_rol0/instance-1.json::$: 'kpis' is a required property
-
-tests/acceptance/W1-08/w1_08_support.py:264: AssertionError
 _____________ test_the_definition_has_the_six_fields[orchestrator] _____________
 
 role = 'orchestrator'
@@ -368,7 +269,7 @@ E       assert not ['it does not say the scope is anywhere in the repository', '
 tests/acceptance/W1-33/test_w1_33_agent_definitions.py:83: AssertionError
 ______________ test_the_research_definition_is_the_generated_one _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-452/test_the_research_definition_i0')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-453/test_the_research_definition_i0')
 
     def test_the_research_definition_is_the_generated_one(tmp_path):
         """Rewritten after implementation (DEC-665). Until the owner's apply block of 2026-10-11 this case,
@@ -481,10 +382,6 @@ E         Use -v to get more diff
 tests/acceptance/W1-33/test_w1_33_agent_definitions.py:122: AssertionError
 =========================== short test summary info ============================
 FAILED tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
-FAILED tests/acceptance/W1-08/test_w1_08_ticket.py::test_a_ticket_without_the_field_is_refused[kpis]
-FAILED tests/acceptance/W1-08/test_w1_08_ticket.py::test_a_ticket_without_the_field_is_refused[role]
-FAILED tests/acceptance/W1-08/test_w1_08_ticket.py::test_a_ticket_without_the_field_is_refused[allowed_paths]
-FAILED tests/acceptance/W1-08/test_w1_08_ticket.py::test_a_ticket_without_kpis_role_and_allowed_paths_is_refused
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_has_the_six_fields[orchestrator]
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_has_the_six_fields[product-spec]
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_the_definition_has_the_six_fields[independent-test-designer]
@@ -507,4 +404,4 @@ FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_a_definition
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_a_definition_without_one_required_field_is_found[independent-test-designer]
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_a_definition_without_one_required_field_is_found[engineer]
 FAILED tests/acceptance/W1-33/test_w1_33_agent_definitions.py::test_a_definition_without_one_required_field_is_found[independent-auditor]
-27 failed, 94 passed, 25 deselected in 128.91s (0:02:08)
+23 failed, 98 passed, 25 deselected in 134.21s (0:02:14)

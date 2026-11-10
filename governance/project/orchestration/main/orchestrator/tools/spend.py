@@ -6,6 +6,11 @@
                     [--projection-usd N] [--note <text>] [--extra key=value ...]     one line, by hand or by a tool
     spend.py from-log <claude -p json log> --what ... --kind launched [--ticket --wbs --role --projection-usd --note]
                     one line from a session's own result (total_cost_usd and usage), as launch_worker.sh does
+    spend.py add-helper --what <text> --role R --model M --effort E --class C0|C1|C2|C3 [--ticket ID] [--wbs W2-n]
+                    [--promoted <reason>] [--cost-usd N] [--output-tokens N] [--cache-read-tokens N]
+                    [--cache-creation-tokens N] [--input-tokens N] [--note <text>]
+                    one line (kind "agent") for an in-session helper the CTO started with the Agent tool, in the
+                    same schema as a launched worker (DEC-1120 (3)): the model, effort and class are all required
     spend.py check                       the brake: one inbox item per ticket past twice its projection
     spend.py clear <W2> [--projection-usd N] [--note <text>]     the CTO lifts a ticket's brake
     spend.py sum                         each ticket's cost, projection and brake state, one line each
@@ -20,6 +25,10 @@ The one schema (every line has exactly these keys; unknown values are null, neve
   output_tokens, cache_read_tokens, cache_creation_tokens (each only where the source says which kind), projection_usd,
   note, orig_tokens, orig_cost (an old line's free-text `tokens`/`cost`, kept as written), extra (every other key an
   old line had, as written).
+RUBRIC-2 (DEC-1120 (3), 2026-11-10) adds four top-level keys, after `extra`: model (the model as named at the spawn),
+class (C0 mechanical, C1 routine, C2 significant, C3 critical), tier (opus, sonnet, haiku, or other: derived from the
+model's name), promoted (null, or the recorded reason for a promotion). A line written before them has the first 17
+keys alone: it stays valid, and normal() gives it the four as null; a reader that ignores them is unaffected.
 There is no `tokens` field: cached context is never summed into a token count (the 17,057,921 of 2026-11-09).
 
 The brake (DEC-1091): per ticket (the `wbs`, the W2 id; lines without one, all lines before this tool, never count), the
@@ -43,7 +52,10 @@ ORCH = Path(os.environ.get("ORCH") or "/home/usain/Dynamic-Agentic-Engineering-O
 SPEND = Path(os.environ.get("SPEND") or ORCH / "log/spend.jsonl")
 BRAKES, INBOX = ORCH / "log/brake", ORCH / "dispatch/inbox"
 KEYS = ("at", "what", "kind", "ticket", "wbs", "role", "cost_usd", "cost_source", "input_tokens", "output_tokens",
-        "cache_read_tokens", "cache_creation_tokens", "projection_usd", "note", "orig_tokens", "orig_cost", "extra")
+        "cache_read_tokens", "cache_creation_tokens", "projection_usd", "note", "orig_tokens", "orig_cost", "extra",
+        "model", "class", "tier", "promoted")
+BASE_KEYS = KEYS[:17]  # the keys of a line written before RUBRIC-2: still a normal line
+CLASSES = ("C0", "C1", "C2", "C3")
 USD = re.compile(r"(\d+(?:\.\d+)?)\s*USD|total_cost_usd\W{0,3}(\d+(?:\.\d+)?)")
 OLD_TOKEN_KINDS = {"input": "input_tokens", "output": "output_tokens", "cache_read": "cache_read_tokens",
                    "cache_creation": "cache_creation_tokens"}
@@ -60,10 +72,22 @@ def num(v):
         return None
 
 
+def tier_of(model):
+    """opus, sonnet or haiku from the model's name (claude-sonnet-5-5, sonnet, ...); other for any other name."""
+    low = str(model or "").lower()
+    for t in ("opus", "sonnet", "haiku"):
+        if t in low:
+            return t
+    return "other" if low else None
+
+
 def normal(d):
-    """One line in the schema. Idempotent: a normal line comes back unchanged."""
-    if set(d) == set(KEYS):
-        out = {k: d[k] for k in KEYS}
+    """One line in the schema. Idempotent: a normal line comes back unchanged (one of 17 keys gets the four
+    RUBRIC-2 keys as null; a tier is derived from a model that has none)."""
+    if set(d) in (set(KEYS), set(BASE_KEYS)):
+        out = {k: d.get(k) for k in KEYS}
+        if out["model"] and not out["tier"]:
+            out["tier"] = tier_of(out["model"])
         if out["cost_usd"] is None and isinstance(out["orig_cost"], str) and USD.search(out["orig_cost"]):
             m = USD.search(out["orig_cost"])  # a cost an earlier pass missed (review finding 6)
             out["cost_usd"] = float(m.group(1) or m.group(2))
@@ -100,6 +124,8 @@ def normal(d):
         out["extra"]["projection_as_written"] = out["projection_usd"]
         out["projection_usd"] = None
     out["extra"] = out["extra"] or None
+    if out["model"] and not out["tier"]:
+        out["tier"] = tier_of(out["model"])
     return out
 
 
@@ -260,8 +286,24 @@ def normalise(swap, keep_as="orig"):
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("record", "from-log"):
+    for name in ("record", "from-log", "add-helper"):
         s = sub.add_parser(name)
+        helper = name == "add-helper"  # an in-session helper: the model, effort and class are all required
+        s.add_argument("--model", required=helper, help="the model as named at the spawn (DEC-1120 (3))")
+        s.add_argument("--class", dest="klass", required=helper, choices=CLASSES, help="criticality class C0..C3")
+        s.add_argument("--promoted", help="the recorded reason, when the spawn is a promotion")
+        if helper:
+            s.add_argument("--effort", required=True)
+            s.add_argument("--role", required=True)
+            s.add_argument("--what", required=True)
+            for k in ("ticket", "wbs", "note"):
+                s.add_argument("--" + k)
+            s.add_argument("--cost-usd", type=float)
+            s.add_argument("--projection-usd", type=float)
+            for k in ("output-tokens", "cache-read-tokens", "cache-creation-tokens", "input-tokens"):
+                s.add_argument("--" + k, type=int)
+            s.add_argument("--extra", action="append", default=[], help="key=value, kept in extra")
+            continue
         if name == "from-log":
             s.add_argument("log")
             s.add_argument("--exit")
@@ -287,13 +329,21 @@ def main():
     s.add_argument("--swap", action="store_true")
     s.add_argument("--keep-as", default="orig", help="the kept file's suffix word (orig, or pre-repair for a re-run)")
     a = ap.parse_args()
-    if a.cmd in ("record", "from-log"):
+    if a.cmd in ("record", "from-log", "add-helper"):
+        if a.cmd == "add-helper":
+            a.kind = "agent"
+        for what, v in (("--model", a.model), ("--promoted", a.promoted)):
+            if v is not None and not v.strip():
+                sys.exit(f"spend: {what} is empty")
         d = {"at": now_s(), "what": a.what, "kind": a.kind, "ticket": a.ticket, "wbs": a.wbs, "role": a.role,
              "cost_usd": a.cost_usd, "projection_usd": a.projection_usd, "note": a.note,
              "output_tokens": a.output_tokens, "cache_read_tokens": a.cache_read_tokens,
              "cache_creation_tokens": a.cache_creation_tokens, "input_tokens": a.input_tokens,
-             "cost_source": "given" if a.cost_usd is not None else None}
+             "cost_source": "given" if a.cost_usd is not None else None,
+             "model": a.model, "class": a.klass, "tier": tier_of(a.model), "promoted": a.promoted}
         extra = dict(x.split("=", 1) for x in a.extra if "=" in x)
+        if a.cmd == "add-helper":
+            extra["effort"] = a.effort
         if a.cmd == "from-log":
             r = from_log(a.log)
             u = r.get("usage") or {}

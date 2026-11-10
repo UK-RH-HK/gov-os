@@ -1,0 +1,114 @@
+# ACT-PATHMAP-NS-2 rehearsal, 2026-11-10T15:50:05Z
+clone head: baac0b2c2f61; clone status: '0' changed
+live map sha256: 44f99ea563cb59ddd2e0f143e7d7f7c6869c358390fc7b18dbaffc1a4fba7f70
+clone map sha256: 44f99ea563cb59ddd2e0f143e7d7f7c6869c358390fc7b18dbaffc1a4fba7f70
+--- 0. before: the faults (expect 5 x PATH_NO_NAMESPACE, nothing else)
+[pathmap exit 1]
+PATH_NO_NAMESPACE count: 5; all codes:  5 "code": "PATH_NO_NAMESPACE",;
+    "path": "governance/project/indep-briefs/sgx1/labeller-2.md",
+    "path": "governance/project/indep-briefs/sgx1/labeller.md",
+    "path": "governance/project/indep-briefs/sgx1/overlap-auditor.md",
+    "path": "governance/project/indep-briefs/sgx1/writer-heldout.md",
+    "path": "governance/project/indep-briefs/sgx1/writer-tuning.md",
+briefs file: governance/project/indep-briefs/sgx1/labeller-2.md -> []
+briefs file: governance/project/indep-briefs/sgx1/labeller.md -> []
+briefs file: governance/project/indep-briefs/sgx1/overlap-auditor.md -> []
+briefs file: governance/project/indep-briefs/sgx1/writer-heldout.md -> []
+briefs file: governance/project/indep-briefs/sgx1/writer-tuning.md -> []
+tracked paths: 3879 | with no namespace: 5 | with several: 0
+  no namespace: governance/project/indep-briefs/sgx1/labeller-2.md
+  no namespace: governance/project/indep-briefs/sgx1/labeller.md
+  no namespace: governance/project/indep-briefs/sgx1/overlap-auditor.md
+  no namespace: governance/project/indep-briefs/sgx1/writer-heldout.md
+  no namespace: governance/project/indep-briefs/sgx1/writer-tuning.md
+[ns_count exit 1]
+--- 1. check, apply, verify, check
+$ bash <bundle>/apply.sh check
+state before (sha256 44f99ea563cb)
+[exit 0]
+$ bash <bundle>/apply.sh verify
+not applied: governance/project/path-map.yaml (sha256 44f99ea563cb)
+[exit 3]
+$ bash <bundle>/apply.sh apply
+backup <bundle>/backup/path-map.yaml.20261110T155006Z (sha256 44f99ea563cb)
+state applied (sha256 7c69c414c0e7)
+[exit 0]
+$ bash <bundle>/apply.sh verify
+[exit 0]
+$ bash <bundle>/apply.sh check
+state applied (sha256 7c69c414c0e7)
+[exit 0]
+map mode: 644; diff against the frozen before:
+133a134,135
+>       # ACT-PATHMAP-NS-2 (DEC-1101, DEC-1113): the walled sessions' fixed briefs (ACT-W2-149-INSTALL-1)
+>       - "governance/project/indep-briefs/**"
+[diff exit 1]
+clone map sha256 after apply: 7c69c414c0e747cbf40b84db5079893f8dd611edfdcef3ad09abc121f4d6eb7e
+ M governance/project/path-map.yaml
+--- 2. the structural check after (expect exit 0, no findings)
+[pathmap exit 0]
+findings after: 0; PATH_NO_NAMESPACE: 0; PATH_MULTIPLE_NAMESPACES: 0
+briefs file: governance/project/indep-briefs/sgx1/labeller-2.md -> ['project-overlay']
+briefs file: governance/project/indep-briefs/sgx1/labeller.md -> ['project-overlay']
+briefs file: governance/project/indep-briefs/sgx1/overlap-auditor.md -> ['project-overlay']
+briefs file: governance/project/indep-briefs/sgx1/writer-heldout.md -> ['project-overlay']
+briefs file: governance/project/indep-briefs/sgx1/writer-tuning.md -> ['project-overlay']
+tracked paths: 3879 | with no namespace: 0 | with several: 0
+[ns_count exit 0]
+--- 3. W1-08's path-map tests
+............................                                             [100%]
+28 passed, 6 deselected in 6.05s
+[pytest exit 0]
+--- 4. the hook loads the map: the clone's pretooluse.py on a plain event, with the clone's map (applied)
+[hook exit 0]
+--- 5. negative cases on the script (in the clone)
+# a second apply: no change
+$ bash <bundle>/apply.sh apply
+state applied (sha256 7c69c414c0e7); nothing to do
+[exit 0]
+# the backups made:
+path-map.yaml.20261110T155006Z
+# a later change (one appended line), then undo must refuse and leave it
+$ bash <bundle>/apply.sh check
+state other (sha256 6a3dfb5c1530); expected before 44f99ea563cb or applied 7c69c414c0e7
+[exit 3]
+$ bash <bundle>/apply.sh undo
+refused: governance/project/path-map.yaml is not as this ACT left it (sha256 6a3dfb5c1530); a later change is not overwritten
+[exit 3]
+$ bash <bundle>/apply.sh apply
+refused: governance/project/path-map.yaml is neither the before nor the after (sha256 6a3dfb5c1530)
+[exit 3]
+later change still there: # later
+--- 6. undo
+$ bash <bundle>/apply.sh undo
+state before (sha256 44f99ea563cb)
+[exit 0]
+$ bash <bundle>/apply.sh undo
+state before (sha256 44f99ea563cb); nothing to undo
+[exit 0]
+clone map sha256 after undo: 44f99ea563cb59ddd2e0f143e7d7f7c6869c358390fc7b18dbaffc1a4fba7f70
+[cmp with the frozen before: exit 0]
+[git diff exit 0; status lines: 0]
+[pathmap exit after undo 1 (expect 1: the fault is back, as before the ACT)]
+# a tampered frozen copy: apply and undo refuse (exit 4)
+$ bash <bundle>/apply.sh apply
+the frozen copy does not hash as listed: <bundle>/after/repo/governance/project/path-map.yaml
+[exit 4]
+$ bash <bundle>/apply.sh check
+state before (sha256 44f99ea563cb)
+[exit 0]
+--- end
+--- 7. guard4_check on the clone with the map applied (the hook, settings line and map are the clone's)
+state applied (sha256 7c69c414c0e7)
+map sha256: 7c69c414c0e7
+[guard4_check exit 0]
+ok   [L] sets A28abs lead Bash: bash $F/f80_e4_replays.sh --sets-root /home/usain/gov-os-eval: want allow, got allow
+cases run: 453, failed: 0, sets cases: 527, skipped: R (SETS_PLANTED unset): 144
+PASS
+cases: 455 lines; FAIL lines: 0
+--- 8. undo and byte-for-byte
+state before (sha256 44f99ea563cb)
+[cmp with the frozen before: exit 0]
+git status lines in the clone: 0
+--- end of part 2
+# (the rehearsal ran on a copy of this bundle, <bundle>, so the live bundle holds no backup folder; <clone> is a fresh clone at baac0b2c2f61)

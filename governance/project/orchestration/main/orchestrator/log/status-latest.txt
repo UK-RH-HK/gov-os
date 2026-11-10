@@ -1,8 +1,8 @@
-Status at 2026-11-10 15:32:25 (the last report's block)
+Status at 2026-11-10 16:13:06 (the last report's block)
 - Progress: 74 closed / 27 merged-not-closed / 4 built-and-held / 17 in flight / 39 not started, of 161.
 - Leads: 0 running (none); queued next: none; the gate: open.
 - Closes: none running; next: none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13); refused since the last report: none.
 - Memory chain: W2-61 closed; W2-61h MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 merged, closing; W2-55 merged, closing; W2-64 closed; W2-04 MERGED as built (D-1, M-1); formal close at the lift; W2-06 closed; W2-13 MERGED in D-4b; formal close at the lift; W2-15a not started.
 - Toward EXAMIN's copy: AT RISK, re-estimated (11-10 09:40): the lift about 11-11, EXAMIN's copy about 11-15, Wave 2's end about 11-22 (FORECAST-W2-2; 7 h lost overnight to a network stop).
-- Emergency plan: D-5 and D-6 done; ACT-3 queued (15:30); D-10's list: W1-08 in hand, then ready; the lift about 11-11.
-- OWNER_ACTION: P2 ACT-W2-149-INSTALL-1 - your operator applies it by hand (package section 5); then D-10's word once W1-08 and the portability family are green; the rubric (DEC-1119) when found
+- Emergency plan: ACT-DEADMAN-WAKE-1 applied (905b82a3b); ACT-CLAUDE-COPIES-3 at the agent's 16:20 pass; ACT-PATHMAP-NS-2 ready for your yes; then D-10's word; the lift about 11-11.
+- OWNER_ACTION: P1 yes ACT-PATHMAP-NS-2 b1985584 (then your operator by hand, after the agent's ACT-CLAUDE-COPIES-3 finishes); next: the ticket template 1.0.1 hash to approve (DEC-1121); ACT-EFFORT-HIGH-2's yes once reviewed; then D-10's word

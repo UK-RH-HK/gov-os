@@ -130,3 +130,119 @@ def test_r8_the_brake_file_is_created_once_even_when_it_appeared_meanwhile(tmp_p
     (tmp_path / "orch/log/brake/W2-6.json").write_text("{}")  # another check won the race
     assert "no ticket past" in run(tmp_path, "check").stdout
     assert not list((tmp_path / "orch/dispatch/inbox").glob("*")) if (tmp_path / "orch/dispatch/inbox").exists() else True
+
+
+# RUBRIC-2 (DEC-1120 (3)): model, class, tier and promoted in the one schema; add-helper for in-session helpers
+
+OLD17 = {"at": "2026-11-09 10:00", "what": "old normal line", "kind": "launched", "ticket": "T-o", "wbs": "W2-97",
+         "role": "engineer", "cost_usd": 1.0, "cost_source": "x", "input_tokens": None, "output_tokens": 5,
+         "cache_read_tokens": None, "cache_creation_tokens": None, "projection_usd": 4.0, "note": None,
+         "orig_tokens": None, "orig_cost": None, "extra": {"effort": "high"}}
+
+
+def last_line(tmp_path):
+    return json.loads((tmp_path / "orch/log/spend.jsonl").read_text().splitlines()[-1])
+
+
+def test_rubric2_the_schema_has_four_new_keys_and_an_old_line_stays_valid():
+    assert S.KEYS[-4:] == ("model", "class", "tier", "promoted") and S.KEYS[:17] == S.BASE_KEYS and len(S.KEYS) == 21
+    old = S.normal(dict(OLD17))
+    assert tuple(old) == S.KEYS and (old["model"], old["class"], old["tier"], old["promoted"]) == (None,) * 4
+    assert old["extra"] == {"effort": "high"} and old["orig_tokens"] is None  # nothing moved into extra
+    assert {k: old[k] for k in S.BASE_KEYS} == OLD17  # every old field unchanged
+    assert S.normal(json.loads(json.dumps(old))) == old  # idempotent
+    # a free-form old line and a partial one are as before, with the new keys null
+    free = S.normal({"at": "a", "what": "w", "kind": "worker", "tokens": 5, "cost": "2.00 USD (x)"})
+    assert tuple(free) == S.KEYS and free["cost_usd"] == 2.0 and free["model"] is None and free["tier"] is None
+    # a normal line that names a model without a tier gets the tier derived
+    d = dict(old, model="claude-haiku-5")
+    assert S.normal(d)["tier"] == "haiku"
+
+
+def test_rubric2_tier_of_the_model_name():
+    for model, tier in (("claude-opus-5-5", "opus"), ("claude-sonnet-5-5", "sonnet"), ("claude-haiku-5", "haiku"),
+                        ("Sonnet", "sonnet"), ("some-other-model", "other"), ("", None), (None, None)):
+        assert S.tier_of(model) == tier, model
+
+
+def test_rubric2_record_and_from_log_carry_the_fields(tmp_path):
+    log = tmp_path / "r.json"
+    log.write_text(json.dumps({"type": "result", "total_cost_usd": 2.5, "session_id": "s",
+                               "usage": {"output_tokens": 9}}) + "\n")
+    r = run(tmp_path, "from-log", str(log), "--what", "w", "--kind", "launched", "--model", "claude-sonnet-5-5",
+            "--class", "C2", "--promoted", "fail-open finding", "--effort", "high", "--role", "engineer")
+    assert r.returncode == 0, r.stderr
+    d = last_line(tmp_path)
+    assert tuple(d) == S.KEYS and (d["model"], d["class"], d["tier"], d["promoted"]) == (
+        "claude-sonnet-5-5", "C2", "sonnet", "fail-open finding")
+    assert d["cost_usd"] == 2.5 and d["extra"]["effort"] == "high" and d["extra"]["session_id"] == "s"
+    # the old call (no model, no class) still works and has the new keys as null
+    assert run(tmp_path, "from-log", str(log), "--what", "w2", "--kind", "launched").returncode == 0
+    d = last_line(tmp_path)
+    assert (d["model"], d["class"], d["tier"], d["promoted"]) == (None,) * 4 and d["cost_usd"] == 2.5
+    assert run(tmp_path, "record", "--what", "w3", "--kind", "agent", "--model", "opus", "--class", "C3").returncode == 0
+    d = last_line(tmp_path)
+    assert (d["model"], d["class"], d["tier"]) == ("opus", "C3", "opus")
+    r = run(tmp_path, "record", "--what", "w4", "--kind", "agent", "--class", "C9")
+    assert r.returncode != 0 and "invalid choice" in r.stderr  # a class outside C0..C3 is refused
+
+
+def test_rubric2_add_helper_logs_an_in_session_helper_in_the_same_schema(tmp_path):
+    r = run(tmp_path, "add-helper", "--what", "RUBRIC-2 spend tools", "--role", "product-spec", "--model",
+            "claude-sonnet-5-5", "--effort", "high", "--class", "C1", "--ticket", "W2-1", "--wbs", "W2-1",
+            "--cost-usd", "1.25", "--output-tokens", "100", "--cache-read-tokens", "5000",
+            "--cache-creation-tokens", "300", "--input-tokens", "12", "--promoted", "two failed reviews")
+    assert r.returncode == 0, r.stderr
+    d = last_line(tmp_path)
+    assert tuple(d) == S.KEYS and d == json.loads(r.stdout)
+    assert (d["kind"], d["what"], d["role"], d["ticket"], d["wbs"]) == ("agent", "RUBRIC-2 spend tools",
+                                                                        "product-spec", "W2-1", "W2-1")
+    assert (d["model"], d["class"], d["tier"], d["promoted"]) == ("claude-sonnet-5-5", "C1", "sonnet",
+                                                                   "two failed reviews")
+    assert (d["cost_usd"], d["cost_source"], d["output_tokens"], d["cache_read_tokens"], d["cache_creation_tokens"],
+            d["input_tokens"]) == (1.25, "given", 100, 5000, 300, 12)
+    assert d["extra"] == {"effort": "high"}
+    # no cost known: null, never a made-up number; not promoted: null
+    assert run(tmp_path, "add-helper", "--what", "w", "--role", "research", "--model", "claude-haiku-5", "--effort",
+               "low", "--class", "C0").returncode == 0
+    d = last_line(tmp_path)
+    assert (d["cost_usd"], d["promoted"], d["tier"], d["wbs"]) == (None, None, "haiku", None)
+    # the cost counts for the ticket (the brake) like any other line's
+    assert "W2-1: 1.25 USD" in run(tmp_path, "sum").stdout
+
+
+def test_rubric2_add_helper_refuses_what_every_spawn_must_name(tmp_path):
+    full = ["--what", "w", "--role", "research", "--model", "claude-sonnet-5-5", "--effort", "high", "--class", "C1"]
+    assert run(tmp_path, "add-helper", *full).returncode == 0
+    for drop in ("--model", "--effort", "--class", "--role", "--what"):
+        args = list(full)
+        i = args.index(drop)
+        del args[i:i + 2]
+        r = run(tmp_path, "add-helper", *args)
+        assert r.returncode != 0 and "required" in r.stderr, drop
+    r = run(tmp_path, "add-helper", *full[:-1], "C4")
+    assert r.returncode != 0 and "invalid choice" in r.stderr
+    r = run(tmp_path, "add-helper", *full, "--promoted", " ")
+    assert r.returncode != 0 and "--promoted is empty" in r.stderr
+    assert len((tmp_path / "orch/log/spend.jsonl").read_text().splitlines()) == 1  # only the good one was written
+
+
+def test_rubric2_a_log_of_old_and_new_lines_is_read_summed_and_normalised(tmp_path):
+    (tmp_path / "orch/log").mkdir(parents=True)
+    path = tmp_path / "orch/log/spend.jsonl"
+    path.write_text(json.dumps(OLD17) + "\n" + json.dumps({"at": "a", "what": "free", "kind": "agent",
+                                                           "tokens": 5, "cost": "2.00 USD (x)", "wbs": "W2-97"}) + "\n")
+    assert run(tmp_path, "add-helper", "--what", "h", "--role", "research", "--model", "claude-sonnet-5-5",
+               "--effort", "high", "--class", "C1", "--wbs", "W2-97", "--cost-usd", "0.5").returncode == 0
+    assert "W2-97: 3.50 USD" in run(tmp_path, "sum").stdout  # 1.00 + 2.00 + 0.50, old and new counted alike
+    assert [ln["what"] for ln in S.load(path)] == ["old normal line", "free", "h"]
+    raw = [json.loads(x) for x in path.read_text().splitlines()]
+    assert len(raw[0]) == 17 and len(raw[2]) == 21  # old lines are never rewritten by an append
+    # a reader that ignores the new keys still sees the old fields of every line
+    for line in raw:
+        assert {"at", "what", "kind", "cost_usd"} <= set(S.normal(line)) and "tokens" not in S.normal(line)
+    r = run(tmp_path, "normalise")
+    assert r.returncode == 0, r.stderr
+    norm = [json.loads(x) for x in (tmp_path / "orch/log/spend.jsonl.norm").read_text().splitlines()]
+    assert len(norm) == 3 and all(tuple(n) == S.KEYS for n in norm)
+    assert norm[2]["model"] == "claude-sonnet-5-5" and norm[0]["model"] is None

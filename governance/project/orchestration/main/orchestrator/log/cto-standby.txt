@@ -1,1 +1,1 @@
-2026-11-07 23:04:03 STAND-BY: every experiment done; waiting on the owner's decisions (FRESH-80-1, M3-ADOPTION-1, GLOSSARY-1). Nothing running.
+2026-11-10 15:49:50 CTO 412a4e37 waits on the owner: the two yes lines re-sent as fresh messages (ACT-CLAUDE-COPIES-3, ACT-DEADMAN-WAKE-1; G6 refused the mid-turn form); helpers running: the ACT-EFFORT-HIGH-1 review, ACT-PATHMAP-NS-2's preparation

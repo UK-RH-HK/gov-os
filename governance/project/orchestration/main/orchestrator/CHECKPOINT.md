@@ -1,5 +1,32 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
+## RESUME HERE — 2026-11-10 ~16:20 UTC: session `412a4e37` (the fresh session, DEC-1110 (2)); next free id DEC-1122
+- **Start checks passed 15:26** (pin, guard PASS, hook `74f8dbea4761`, map `44f99ea563cb`, bare false); watchers armed;
+  digests CronCreate `632cadb7` 09:02 and `50697231` 18:02 (session jobs). Phone push works (DEC-1117 (2) done).
+- **Decided today in this session:** DEC-1120 RUBRIC-2 (standing; changes DEC-839 (1)-(3); rule 11 rewritten);
+  DEC-1121 ticket template 1.0.1 with `class` (owner approves its hash before it lands). RUBRIC-1 replaced.
+- **Applied:** ACT-W2-149-INSTALL-1 by hand `baac0b2c2`; ACT-DEADMAN-WAKE-1 by the agent `905b82a3b`;
+  ACT-CLAUDE-COPIES-3 queued again 16:04 (first refused at G6 15:40: a yes typed mid-turn is stored as a
+  queued_command attachment that `find_owner_line` does not read; the owner re-sent at 16:03:51). After its commit:
+  landing check, then the portability family (W2-05, W1-38, W1-33, W2-57) on integrate.
+- **W1-08 merged** `34b7815f9` (review READY, `reviews/D10-W1-08-review.md`).
+- **Fault:** the install ACT left `governance/project/indep-briefs/**` without a namespace: `core-pathmap` red (5
+  PATH_NO_NAMESPACE), W1-08 path-map case red. **ACT-PATHMAP-NS-2** ready: manifest `b19855849e1e…`, yes line
+  `yes ACT-PATHMAP-NS-2 b1985584`, review READY (`reviews/ACT-PATHMAP-NS-2-review.md`, uncommitted); by hand (no
+  path-map ACT through the agent before 11-11 20:02Z); the hand commit only after the agent's ACT finishes (F2).
+- **ACT-EFFORT-HIGH-1 withdrawn** (review F1: the top-level key is legacy for 5.5 models); a Sonnet helper builds
+  ACT-EFFORT-HIGH-2 (adds `modelSettings["claude-sonnet-5-5"].effortLevel: high`); then a review under the FIXED
+  reviewer brief (G4 needs `reviewer_brief_sha256`), then the owner's yes.
+- **Running (16:20):** product-spec template 1.0.1 (Sonnet, pid 4095759, worktree `W2-128-tpl101`) → then a C3
+  review on Opus high → the hash to the owner; helpers (in-session, Sonnet high): RUBRIC-2-APPLY (classes, DEC-839
+  sweep, W2-33/W2-60a deltas), USAGE-RUBRIC-2 (the estimate for the owner's next report), spend fields
+  (launch_worker `--class`, model required; spend.py tier/class/promoted; `.pre-rubric2` backups), ACT-EFFORT-HIGH-2.
+- **Brake W2-20 cleared** 16:12 (borrowed ticket for ACT reviews; projection 30).
+- **Next:** NS-2 yes → owner's operator; D-10's word once NS-2 and COPIES-3 land and the family is green; W2-33/W2-60a
+  revisions by RUBRIC-2 beside D-10; EMERGENCY-TOOLS-1's gaps (`.claude/settings.local.json` uncommitted; the reranker
+  venv's slot module behind integrate); USAGE-1 (D) 5-minute cache check; the daily cost job; DECIDED-NOT-DONE §1a's
+  overdue owner items (DEC-1090 (4) G3, DEC-1094 (1) the reranker option) to raise.
+
 ## RESUME HERE — 2026-11-10 ~14:30 UTC: session `ad44f5fe` hands over to a FRESH session (DEC-1110 (2))
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-10: §0 the state, §1 what is

@@ -67,15 +67,16 @@ printf 'Step 0: the sandbox-trial check. Then %s.\n' "$W/common/EMG-common.md" >
 printf '# W2-99 engineer\nRead %s first.\nBuild it.\n' "$W/common/EMG-common.md" > "$W/briefs/W2-99-eng.md"
 printf '# W2-99 review\nRead everything; write nothing.\n' > "$W/briefs/W2-99-review.md"
 export STUB_REC=$W/rec LAUNCH_MAIN=$W/main LAUNCH_COMMON_DIR=$W/common LAUNCH_DISK_GATE=$W/gate.sh \
-  LAUNCH_TRIPWIRE=$W/trip.py LAUNCH_TRIAL_DIR=$W/trial
+  LAUNCH_TRIPWIRE=$W/trip.py LAUNCH_TRIAL_DIR=$W/trial LAUNCH_MODEL=claude-opus-5-5  # RUBRIC-2: the model is always named
+CLS=(--class C2)  # every launch here names its class (RUBRIC-2); section 12 tests it absent, invalid and promoted
 LOG=$R/.gov-runtime/scratch/lead/log DEST=$R/.gov-runtime/scratch/brief
-lw() { rm -f "$W"/rec/*; (cd "$R" && bash "$T" "$@") > "$W/stdout" 2> "$W/stderr"; }
+lw() { rm -f "$W"/rec/*; (cd "$R" && bash "$T" "${CLS[@]}" "$@") > "$W/stdout" 2> "$W/stderr"; }
 
 # 1. usage and refusals before anything is written
 lw --fg reviewer high "$W/briefs/W2-99-eng.md"; check "not a worker role: exit 2" '[ $? = 2 ]'
 lw --fg engineer hard "$W/briefs/W2-99-eng.md"; check "not an effort: exit 2" '[ $? = 2 ]'
 lw --fg engineer high "$W/briefs/none.md"; check "no brief: exit 2" '[ $? = 2 ]'
-(cd "$W/main" && LAUNCH_TREE=$W/main bash "$T" --fg engineer high "$W/briefs/W2-99-eng.md") > /dev/null 2>&1
+(cd "$W/main" && LAUNCH_TREE=$W/main bash "$T" --class C2 --fg engineer high "$W/briefs/W2-99-eng.md") > /dev/null 2>&1
 check "the main tree is refused: exit 2" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
 
 # 2. an engineer, in the foreground: the launch line, the brief's copy, the log, the summary, the exit file
@@ -183,6 +184,50 @@ mkdir -p "$BK"; echo '{}' > "$BK/W2-98.json"
 LAUNCH_TICKET=T-other lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
 check "the brake on the ticket's own W2 refuses its launch from another folder (exit 5)" '[ $rc = 5 ] && [ ! -e "$W/rec/argv" ]'
 rm "$BK/W2-98.json"
+
+# 12. RUBRIC-2 (DEC-1120 (3)): the class required and validated, the model always named, the spend line's four fields
+CLS=(); lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "class: none given -> exit 2, nothing started, the reason named" '[ $rc = 2 ] && [ ! -e "$W/rec/argv" ] && grep -q "^launch_worker: --class is required" "$W/stderr"'
+lw --fg --class C9 engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "class: C9 -> exit 2, nothing started" '[ $rc = 2 ] && [ ! -e "$W/rec/argv" ] && grep -q "not a class: C9" "$W/stderr"'
+lw --fg --class c2 engineer high "$W/briefs/W2-99-eng.md"; check "class: lower case c2 -> exit 2" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
+lw --fg engineer high "$W/briefs/W2-99-eng.md" --class C2; check "class: after the positionals (a usage error) -> exit 2" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
+lw --fg --class; check "class: --class last, no value -> exit 2" '[ $? = 2 ]'
+for c in C0 C1 C2 C3; do
+  lw --fg --class $c engineer high "$W/briefs/W2-99-eng.md"; check "class: $c is accepted" '[ $? = 0 ] && [ -e "$W/rec/argv" ]'
+done
+CLS=(--class C2)
+LAUNCH_MODEL= lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "model: LAUNCH_MODEL empty, no --model -> exit 2, nothing started, the reason named" '[ $rc = 2 ] && [ ! -e "$W/rec/argv" ] && grep -q "no model named" "$W/stderr"'
+(unset LAUNCH_MODEL; lw --fg engineer high "$W/briefs/W2-99-eng.md"); rc=$?
+check "model: LAUNCH_MODEL unset -> exit 2 (no default model any more), nothing started" '[ $rc = 2 ] && [ ! -e "$W/rec/argv" ] && grep -q "no model named" "$W/stderr"'
+lw --fg --model; check "model: --model last, no value -> exit 2" '[ $? = 2 ]'
+LAUNCH_MODEL= lw --fg --model claude-haiku-5 engineer high "$W/briefs/W2-99-eng.md"
+check "model: --model alone names it: on the launch line and on the dry run's" 'grep -q "^launch engineer T-eng -- -p --model claude-haiku-5 --effort high " "$W/rec/argv" && grep -q -- "--model claude-haiku-5 " "$W/rec/dry_args"'
+LAUNCH_MODEL=claude-opus-5-5 lw --fg --model claude-sonnet-5-5 engineer high "$W/briefs/W2-99-eng.md"
+check "model: --model wins over LAUNCH_MODEL" 'grep -q -- "-p --model claude-sonnet-5-5 --effort" "$W/rec/argv"'
+check "model: no model is built into the tool (no default left)" '! grep -q "claude-opus-5-5\|claude-sonnet-5-5" "$T"'
+lw --fg --promoted "" engineer high "$W/briefs/W2-99-eng.md"; check "promoted: an empty reason -> exit 2, nothing started" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
+lw --fg --promoted; check "promoted: no value -> exit 2" '[ $? = 2 ]'
+# the spend line: model, class, tier, promoted beside the old fields
+STUB_COST=0.4 lw --fg --class C1 --model claude-sonnet-5-5 --promoted "two failed reviews (DEC-1120 (3))" engineer high "$W/briefs/W2-99-eng.md"
+last=$(ls -t "$LOG"/*.summary | head -n 1)
+check "spend line: model, class, tier, promoted, and the old fields kept" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"], d[\"promoted\"], d[\"cost_usd\"], d[\"ticket\"], d[\"role\"], d[\"extra\"][\"effort\"])")" = "('"'"'claude-sonnet-5-5'"'"', '"'"'C1'"'"', '"'"'sonnet'"'"', '"'"'two failed reviews (DEC-1120 (3))'"'"', 0.4, '"'"'T-eng'"'"', '"'"'engineer'"'"', '"'"'high'"'"')" ]'
+check "spend line: the stderr launch line names the model, the class and the promotion" 'grep -q "model claude-sonnet-5-5; class C1; promoted: two failed reviews" "$W/stderr"'
+STUB_COST=0.4 lw --fg engineer xhigh "$W/briefs/W2-99-eng.md"
+check "spend line: not promoted -> promoted null; the tier of LAUNCH_MODEL (opus); class C2" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"], d[\"promoted\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C2'"'"', '"'"'opus'"'"', None)" ]'
+STUB_COST=0.4 lw --class C0 --model claude-haiku-5 --fg independent-auditor medium "$W/briefs/W2-99-review.md"
+check "spend line: a haiku launch -> tier haiku, class C0" '[ "$(lastline "(d[\"tier\"], d[\"class\"])")" = "('"'"'haiku'"'"', '"'"'C0'"'"')" ]'
+STUB_COST=0.4 lw engineer high "$W/briefs/W2-99-eng.md"
+ex=$(sed -n 's/^launch_worker: wait with: bash .*wait_for.sh //p' "$W/stdout"); WAIT_FOR_EVERY=1 bash "$HERE/wait_for.sh" "$ex" 60 > /dev/null
+check "spend line: a detached launch carries the same fields" '[ "$(lastline "(d[\"model\"], d[\"class\"], d[\"tier\"])")" = "('"'"'claude-opus-5-5'"'"', '"'"'C2'"'"', '"'"'opus'"'"')" ]'
+# old lines still parse: a 17-key line, a free-form one and an old-style summary, beside the new ones
+ORCHD=$W/main/.gov-runtime/scratch/orchestrator
+printf '%s\n' '{"at": "2026-11-09 10:00", "what": "old normal line", "kind": "launched", "ticket": "T-o", "wbs": "W2-97", "role": "engineer", "cost_usd": 1.0, "cost_source": "x", "input_tokens": null, "output_tokens": 5, "cache_read_tokens": null, "cache_creation_tokens": null, "projection_usd": 4.0, "note": null, "orig_tokens": null, "orig_cost": null, "extra": {"effort": "high"}}' '{"at": "2026-11-09 11:00", "what": "free form", "kind": "agent", "tokens": 5, "cost": "2.00 USD (x)"}' >> "$SP"
+out=$(ORCH=$ORCHD python3 "$HERE/spend.py" sum 2>&1); rc=$?
+check "old lines: spend.py sum reads the log with old and new lines mixed; the old W2's cost is counted" '[ $rc = 0 ] && grep -q "^W2-97: 1.00 USD" <<< "$out"'
+ORCH=$ORCHD python3 "$HERE/spend.py" check > /dev/null; check "old lines: spend.py check still runs" '[ $? = 0 ]'
+check "old lines: the old line is left as written in the file (17 keys, no model)" '! grep "old normal line" "$SP" | grep -q "\"model\""'
 
 rm -rf "$W"
 echo "$([ $fails = 0 ] && echo PASS || echo "FAILED $fails") test_launch_worker.sh"
