@@ -236,9 +236,12 @@ Readings these cases take:
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
 credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script,
-`.gov-runtime/scratch/w2-58/probe.sh`, which writes the commands' output there. The test reads those files from
-outside. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
+(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe command line in a
+single Bash call: plain commands the guard can place (DEC-953 item 2), never a script file. Each command writes its
+output to `.gov-runtime/scratch/w2-58/` and its exit status to `results.txt` there. The test reads those files from
+outside. `gov launch` hands the session no `PYTHONPATH` (W2-56 S5, DEC-826 Q5), so the fixture's hook names its
+interpreter and the product code (`live_guard_command`), as this repository's hook names the pinned interpreter. A
+bare `python3` hook cannot import `gov` there and refuses every call with exit 2 and no reason; that was D-10's red. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
 fails with "did not run the probe to its end" when the session could not run (no network to the model's API).
 Each session runs once per module, and its sandbox, HOME and project are temporary.
 

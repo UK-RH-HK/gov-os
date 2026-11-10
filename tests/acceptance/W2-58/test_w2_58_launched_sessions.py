@@ -24,8 +24,11 @@ Two kinds of case:
   repeated here. The malformed block's case is in ``test_w2_58_fails_closed.py``.
 - **Live cases** (``local_only``, as W1-46 marks its own): a real engineer
   session and a real test-designer session on T, each started once through
-  ``gov launch`` in a fixture project built from scratch, run one probe script
-  and leave its output in ``.gov-runtime/scratch/w2-58/``. They need the CLI at
+  ``gov launch`` in a fixture project built from scratch, run one probe
+  command line (plain commands the guard can place, never a script file) and
+  leave its output in ``.gov-runtime/scratch/w2-58/``. The fixture's hook names
+  its interpreter and the product code, as ``gov launch`` hands the session no
+  ``PYTHONPATH``. They need the CLI at
   ``~/.local/bin/claude`` with the caller's credentials, ``bwrap``, ``socat``
   and the network to the model's API; they are skipped when one of the first
   three is missing (W1-46's conditions). A launched test designer cannot run
@@ -34,10 +37,13 @@ Two kinds of case:
 
 from __future__ import annotations
 
+import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -101,27 +107,43 @@ SESSION_TIMEOUT_S = 420.0
 NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
 NOT_INHERITED_PREFIX = "CLAUDE"   # DEC-784, as W1-46's live sessions launch
 
-_HEAD = f"""#!/bin/bash
-# W2-58 acceptance probe (DEC-873). It reads and runs; it writes nothing outside {SCRATCH}.
-export PYTHONDONTWRITEBYTECODE=1
-D={SCRATCH}
-OUT=$D/results.txt
-: > "$OUT"
-"""
-_TAIL = """git status --short > $D/status.txt 2>&1; echo "status=$?" >> "$OUT"
-git update-index --refresh > $D/refresh.txt 2>&1; echo "refresh=$?" >> "$OUT"
-echo "end=1" >> "$OUT"
-"""
-ENGINEER_PROBE = _HEAD + f"""python3 -m pytest {ACC}/ --collect-only -q -p no:cacheprovider > $D/collect.txt 2>&1; \
-echo "collect=$?" >> "$OUT"
-python3 -m pytest {ACC}/ -q -p no:cacheprovider > $D/run.txt 2>&1; echo "run=$?" >> "$OUT"
-""" + _TAIL
-TEST_DESIGNER_PROBE = _HEAD + """PYTHONPATH=src python3 -c "import app.main, app.added; \
-print('value=%s added=%s' % (app.main.value(), app.added.ADDED))" > $D/import.txt 2>&1; echo "import=$?" >> "$OUT"
-""" + _TAIL
-PROMPT = ("Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not "
-          f"work around it. Run this Bash command as written: bash {SCRATCH}/probe.sh  Then run "
-          f"cat {SCRATCH}/results.txt and answer with its output.")
+# The probe is one plain Bash command line, never a script file: the guard reads each command of a line and places
+# what it reads (DEC-953 item 2); a ``bash <script>`` hides its commands from the guard, which may refuse a session
+# that is refused a part of the project (DEC-820 (c), (d)) a call whose reads it cannot place. Each command writes
+# its output to the scratch folder and its exit status to results.txt.
+OUT = f"{SCRATCH}/results.txt"
+_TAIL = (f'git status --short > {SCRATCH}/status.txt 2>&1; echo "status=$?" >> {OUT}; '
+         f'git update-index --refresh > {SCRATCH}/refresh.txt 2>&1; echo "refresh=$?" >> {OUT}; '
+         f'echo "end=1" >> {OUT}')
+ENGINEER_PROBE = (f'python3 -B -m pytest {ACC}/ --collect-only -q -p no:cacheprovider > {SCRATCH}/collect.txt 2>&1; '
+                  f'echo "collect=$?" >> {OUT}; '
+                  f'python3 -B -m pytest {ACC}/ -q -p no:cacheprovider > {SCRATCH}/run.txt 2>&1; '
+                  f'echo "run=$?" >> {OUT}; ' + _TAIL)
+TEST_DESIGNER_PROBE = ("PYTHONPATH=src python3 -B -c \"import app.main, app.added; "
+                       "print('value=%s added=%s' % (app.main.value(), app.added.ADDED))\" "
+                       f'> {SCRATCH}/import.txt 2>&1; echo "import=$?" >> {OUT}; ' + _TAIL)
+
+
+def prompt(probe):
+    """The one-try prompt: the probe line in one Bash call, as written, then the results."""
+    return ("Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not "
+            "work around it. Run this Bash command as written, in a single Bash call, without changing a character:\n"
+            f"{probe}\nThen run cat {OUT} and answer with its output.")
+
+
+def live_guard_command():
+    """The fixture's hook as the live session runs it. ``gov launch`` hands the session no ``PYTHONPATH`` (W2-56 S5,
+    DEC-826 Q5), so the hook names its interpreter and the product code it imports, as this repository's own hook
+    names the pinned interpreter: a bare ``python3`` hook cannot import ``gov`` there and refuses every call (exit 2,
+    no reason)."""
+    return (f"PYTHONPATH={shlex.quote(s.python_path())} PYTHONDONTWRITEBYTECODE=1 {shlex.quote(sys.executable)} "
+            f'"$CLAUDE_PROJECT_DIR"/{s.GUARD_REL}')
+
+
+def live_settings_text():
+    return json.dumps({"hooks": {
+        "PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": live_guard_command()}]}],
+    }}, indent=2) + "\n"
 
 
 @dataclass(frozen=True)
@@ -152,14 +174,14 @@ def _start(tmp, role, probe):
     """Build the fixture project, start one real session through ``gov launch`` and return what its probe left."""
     _prerequisites()
     sandbox = s.make_sandbox(tmp)
-    project = s.make_project(sandbox, base=True)
-    s.write(project / SCRATCH / "probe.sh", probe)
+    project = s.make_project(sandbox, base=True, extra={s.SETTINGS_REL: live_settings_text()})
+    s.write(project / OUT, "")
     env = {key: value for key, value in os.environ.items()
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
     env.update({"PYTHONPATH": s.python_path(), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
     env.update(s.plant_open_gate(sandbox))
-    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT, "--permission-mode", "acceptEdits",
+    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", prompt(probe), "--permission-mode", "acceptEdits",
                       "--model", "haiku", "--max-turns", "6", "--allowedTools", "Bash")
     try:
         done = subprocess.run(argv, cwd=str(project), env=env, capture_output=True, text=True,
