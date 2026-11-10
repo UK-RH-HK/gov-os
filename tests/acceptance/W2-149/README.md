@@ -625,6 +625,20 @@ marker; the stub's programs write a valid hand file and decisions file and each 
 the planted YAML parses. No sketch of the script was written for this follow-up: the green side is unproven until the
 engineer's script runs them.
 
+**Fix to S16's writer case** (DAEO-52ku, the lead's finding against the engineer's build; `Rewrite-Reason: DEC-1112 (3)
+(S16's writer case: the skip of the wall's own tar compared a str with a Path)`): in
+`test_w2_149_setup_a_delivery.py::test_s16_set_up_a_writers_deliver_their_cases_to_the_half_s_planted_folder` (both
+params) the case passes `skip=[world.tar(line)]`, a `Path`, to `w2_149_setup_a.files_holding`, which compared each
+walked file (a `str`) with `p == s`; a `str` never equals a `Path`, so the wall's own tar, where `out/aims.jsonl`
+belongs (the writer brief §6, S16), was never skipped and counted as a leak. `files_holding` now compares both sides as
+resolved path strings (`os.path.realpath(os.fspath(...))`): a skip entry, `str` or `Path`, leaves out its own file and
+anything under it, and nothing else (a sibling whose name has the tar's as a prefix is still walked). The expectation is
+unchanged: a copy of the aims marker anywhere but the wall's tar (the sets root, the runs root or the wall trees) still
+fails the case. The other caller (`test_w2_149_setup_a_rules.py`, S26's marker check) passes no skip and means what it
+did. Checked both ways in scratch (never committed) on the helper itself: with the old helper a `Path` skip returned the
+tar as a hit; with the fix a `Path` or `str` skip returns `[]`, and a planted extra copy in each of the three roots is
+returned as the only hit.
+
 ## Notes and limits
 
 - **N-1. `--dry` leaves its wall.** The cases inspect a built wall (S4, S5, S7, S8, S20) through `--dry`. On the real
