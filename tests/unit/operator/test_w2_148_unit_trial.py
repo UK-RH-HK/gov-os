@@ -3,7 +3,7 @@ replayed end to end, 7 planted faults, and the live files hashed before and afte
 folders: clones of this repository, a planted operator root, HOME, scratch, transcript and clock, stub push and
 crontab channels. Nothing live is written; no `claude` is started.
 
-    python3 tests/unit/operator/test_w2_148_trial.py --out <result.json> [--part classify|replays|faults|all]
+    python3 tests/unit/operator/test_w2_148_unit_trial.py --out <result.json> [--part classify|replays|faults|all]
 
 The pytest test below runs the classification part only (cheap): no ACT file classed lower than the table.
 
