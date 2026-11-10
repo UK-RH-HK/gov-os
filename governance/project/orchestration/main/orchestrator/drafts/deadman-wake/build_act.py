@@ -24,15 +24,29 @@ ACT = "ACT-DEADMAN-WAKE-1"
 BUNDLE = REPO / ".gov-runtime/scratch/orchestrator/acts" / ACT
 PATH = "governance/project/orchestration/tools/deadman.py"
 WAKE_JSON = '{"type":"assistant","timestamp":"2026-11-10T02:35:00Z","message":{"content":[{"type":"text"}]}}'
+DAY_JSON = '{"type":"assistant","timestamp":"2026-11-10T12:00:00Z","message":{"content":[{"type":"text"}]}}'
+# Standard library and coreutils only: the operator's dry run plants HOME, so no user-site package (pytest) is there.
+# Every file the tool writes is under the check's own mktemp folder (ORCH, --state, --log, --inbox-stale named).
+OWN = ('--session-file "$T/none" --standby "$T/none" --state "$T/st/state.json" --log "$T/deadman.log"')
+ONE = ("T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{j}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" "
+       "python3 " + PATH + " --projects \"$T\" --now '{now}' --channel nothing --inbox-stale \"$T/none\" " + OWN +
+       " > \"$T/note.json\" && ")
+WATCH = ("T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && "
+         "printf '{{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{{\"content\":[{{\"type\":\"text\"}}]}}}}\\n' "
+         "\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && {plant}"
+         "printf 'inbox: {n} item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && "
+         "ORCH=\"$T/o\" python3 " + PATH + " --watch --every 1 --max 1 --projects \"$T\" --inbox-stale "
+         "\"$T/d/inbox-stale.txt\" " + OWN)
+WAKE_ITEM = "touch -d '40 minutes ago' \"$T/d/inbox/20261110-033600-deadman-wake.txt\" && "
+GUARD_ITEM = "touch -d '35 minutes ago' \"$T/d/inbox/20261110-034000-guard-131.txt\" && "
 CHECKS = [
-    {"cmd": 'ORCH="$(mktemp -d)" python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py',
-     "exit": 0, "count": None},
-    {"cmd": ("T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '" + WAKE_JSON + "' > \"$T/s.jsonl\" && "
-             "TZ=UTC ORCH=\"$T/o\" python3 " + PATH + " --projects \"$T\" --now '2026-11-10 03:36' --channel nothing "
-             "--state \"$T/st/state.json\" --log \"$T/deadman.log\" --session-file \"$T/none\" --standby \"$T/none\" "
-             "--inbox-stale \"$T/none\" > \"$T/note.json\" && grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && "
-             "ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'"),
+    {"cmd": ONE.format(j=WAKE_JSON, now="2026-11-10 03:36") + "grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && "
+            "ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'", "exit": 0, "count": 1},
+    {"cmd": ONE.format(j=DAY_JSON, now="2026-11-10 13:01") + "grep -cF '\"line\": \"P1 DEADMAN | the CTO session is "
+            "idle since 12:00 (its turn ended and nothing woke it), 61 min | approve or restart it\"' \"$T/note.json\"",
      "exit": 0, "count": 1},
+    {"cmd": WATCH.format(plant=WAKE_ITEM, n=1), "exit": 0, "count": None},
+    {"cmd": WATCH.format(plant=WAKE_ITEM + GUARD_ITEM, n=2), "exit": 10, "count": None},
 ]
 APPLY = r'''#!/bin/bash
 # ACT-DEADMAN-WAKE-1's apply.sh: check | apply | undo | verify, by list.txt (root|path|before sha256|after sha256),
@@ -129,7 +143,7 @@ def gates():
     for where, text in texts:
         why = orun.live_path_refs(text, s)
         assert why is None, f"{where}: {why}"
-    print("path rule: pass (apply.sh and both checks)")
+    print("path rule: pass (apply.sh and every check)")
     v = act_class.classify(str(BUNDLE))
     print(f"act_class.classify: class {v['class']}; hits {v['hits']}; why {v['why']}")
     print(f"manifest sha256 {sha(BUNDLE / 'manifest.json')}")

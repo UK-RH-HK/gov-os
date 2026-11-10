@@ -1,0 +1,25 @@
+== clone at c906619646da
+== check
+state before
+check: ready to apply
+exit 0
+== apply
+state applied
+exit 0
+== diff
+ governance/project/test-map.yaml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+== check after
+state applied
+check: already applied
+exit 0
+== the selection places win_toast.ps1 nowhere now (a change to it runs the full set)
+record_only entries: 16 | win_toast.ps1 listed: False
+== W2-66's live test map suite (both opt-ins)
+.................                                                        [100%]
+89 passed in 3.23s
+== undo
+state before
+exit 0
+(empty diff after undo)
+== done

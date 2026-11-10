@@ -15,19 +15,34 @@
   "before/repo/governance/project/orchestration/tools/deadman.py": "b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68",
   "after/repo/governance/project/orchestration/tools/deadman.py": "ebc94de1d3802c0f98c574bfa6b188ce0b3d9c888d96249f97497557ef3381f7",
   "apply.sh": "6107995519fb124566fd11dc5e51a70e6310e22e4fef3a704e9c14b11d18e8d1",
-  "list.txt": "c39aa9db370be28ca40d98b7138e5416f1ed455995cf3574ea62e4e4da2be2d2"
+  "list.txt": "c39aa9db370be28ca40d98b7138e5416f1ed455995cf3574ea62e4e4da2be2d2",
+  "rehearsal.log": "b5ba5eee7e708b397437b0bd491fe8fd6eba3219efd21586c06912e17f74ff6e"
  },
  "checks": [
   {
-   "cmd": "ORCH=\"$(mktemp -d)\" python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py",
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T02:35:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 03:36' --channel nothing --inbox-stale \"$T/none\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" > \"$T/note.json\" && grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T12:00:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 13:01' --channel nothing --inbox-stale \"$T/none\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" > \"$T/note.json\" && grep -cF '\"line\": \"P1 DEADMAN | the CTO session is idle since 12:00 (its turn ended and nothing woke it), 61 min | approve or restart it\"' \"$T/note.json\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && printf '{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{\"content\":[{\"type\":\"text\"}]}}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && touch -d '40 minutes ago' \"$T/d/inbox/20261110-033600-deadman-wake.txt\" && printf 'inbox: 1 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --inbox-stale \"$T/d/inbox-stale.txt\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\"",
    "exit": 0,
    "count": null
   },
   {
-   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T02:35:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 03:36' --channel nothing --state \"$T/st/state.json\" --log \"$T/deadman.log\" --session-file \"$T/none\" --standby \"$T/none\" --inbox-stale \"$T/none\" > \"$T/note.json\" && grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'",
-   "exit": 0,
-   "count": 1
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && printf '{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{\"content\":[{\"type\":\"text\"}]}}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && touch -d '40 minutes ago' \"$T/d/inbox/20261110-033600-deadman-wake.txt\" && touch -d '35 minutes ago' \"$T/d/inbox/20261110-034000-guard-131.txt\" && printf 'inbox: 2 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --inbox-stale \"$T/d/inbox-stale.txt\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\"",
+   "exit": 10,
+   "count": null
   }
  ],
- "commands": []
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "b5ba5eee7e708b397437b0bd491fe8fd6eba3219efd21586c06912e17f74ff6e"
+ }
 }

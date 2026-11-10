@@ -44,19 +44,23 @@ t "the file's mode is 644" '[ "$(stat -c %a "$C/$P")" = 644 ]'
 t "the changed set is exactly the touched file" '[ "$(cd "$C" && git status --porcelain)" = " M $P" ]'
 # the manifest's checks, each as the operator runs it (cwd the repository, HOME planted)
 n=0
-while IFS= read -r line; do
-  n=$((n + 1)); cmd=$(jq -r '.cmd' <<< "$line"); want=$(jq -r '.exit' <<< "$line"); cnt=$(jq -r '.count' <<< "$line")
-  out=$(run bash -c "$cmd" 2>&1); rc=$?
+while IFS='|' read -r b64 want cnt; do
+  n=$((n + 1)); cmd=$(base64 -d <<< "$b64")
+  out=$(cd "$C" && env -i PATH="$PATH" LANG=C.UTF-8 HOME="$R/home" TMPDIR="$TMPDIR" bash -c "$cmd" 2>&1); rc=$?
   last=$(printf '%s\n' "$out" | sed '/^[[:space:]]*$/d' | tail -n 1)
   say "check $n: exit $rc; last line: ${last:0:120}"
   t "check $n: exit $want$([ "$cnt" != null ] && echo ", count $cnt")" '[ "$rc" = "$want" ] && { [ "$cnt" = null ] || [ "$last" = "$cnt" ]; }'
-done < <(jq -c '.checks[]' "$B/manifest.json")
-# the wake's own tests against the clone's applied file, and the safety nets with the post-ACT fixture
-out=$(cd "$D" && HOME=$R/home DEADMAN=$C/$P python3 -m pytest -q -p no:cacheprovider test_deadman_wake.py 2>&1 | tail -n 1)
+done < <(python3 -I -c 'import base64, json, sys
+for c in json.load(open(sys.argv[1]))["checks"]:
+    print(base64.b64encode(c["cmd"].encode()).decode(), c["exit"], "null" if c["count"] is None else c["count"], sep="|")' "$B/manifest.json")
+# the wake's own tests against the clone's applied file, and the safety nets with the post-ACT fixture: pytest is in the
+# real HOME's user site, so these two run with the real HOME; every path the tool writes is the tests' own (--log,
+# --state, ORCH), and the live-state comparison at the end proves it
+out=$(cd "$D" && DEADMAN=$C/$P python3 -m pytest -q -p no:cacheprovider test_deadman_wake.py 2>&1 | tail -n 1)
 say "test_deadman_wake.py on the applied file: $out"
 t "the wake's tests: 7 passed" 'grep -q "^7 passed" <<< "$out"'
 cp "$D/test_cto_safety_nets.py" "$C/tests/unit/orchestration/test_cto_safety_nets.py"
-out=$(run python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py 2>&1 | tail -n 1)
+out=$(cd "$C" && python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py 2>&1 | tail -n 1)
 say "test_cto_safety_nets.py with the post-ACT ORCH fixture: $out"
 t "the safety nets with the fixture: 9 passed" 'grep -q "^9 passed" <<< "$out"'
 (cd "$C" && git checkout -q -- tests/unit/orchestration/test_cto_safety_nets.py)
