@@ -11,6 +11,7 @@ import json
 import os
 import random
 import shutil
+import socket
 import stat
 import sys
 import tarfile
@@ -174,8 +175,8 @@ def inp(s, counts):
                   if p.is_file())
 
 
-def r1_result():
-    return json.dumps({"round": 1, "rules": 12, "instructions_ignored": 0, "stopped": "none"})
+def r1_result(stop="none"):
+    return json.dumps({"round": 1, "rules": 12, "instructions_ignored": 0, "stopped": stop})
 
 
 def by14(n=0):
@@ -512,11 +513,72 @@ def test_binds_never_reach_a_protected_folder():
 
 
 def test_a_failed_rule_script_in_a_launch_is_18_nothing_staged(s):
-    h, _ = labeller_one_round_one(s, rules=BAD_RULES["subprocess"])
+    # passes at round 1's delivery, fails at round 2 on an action added to the half since
+    rules = GOOD_RULES.replace("for line in sys.stdin:\n", "for line in sys.stdin:\n    if 'a-012' in line:\n"
+                               "        sys.exit(3)\n")
+    h, _ = labeller_one_round_one(s, rules=rules)
+    s.plant_half("tuning", actions=13)
     rc, counts, p = s.go("sgx1-labeller", rnd=2, seed=1, dry=True)
     assert rc == 18 and counts["reason"] == "rules" and counts["status"] == "refused"
     assert_counts(counts, 18, "refused")
     assert not list((s.sets / WALLS / "labeller").glob("*-r2*"))
+
+
+# -- F18 (S25): the rule script checked at round 1's delivery ---------------------------------------------------------
+@pytest.mark.parametrize("name", ["subprocess", "missing", "exit", "no_bwrap", "string_class_bad"])
+def test_labeller_one_round_one_rule_script_checked_before_it_lands_20(s, name):
+    h = s.plant_half("tuning")
+    rules = {"no_bwrap": GOOD_RULES, "string_class_bad": GOOD_RULES.replace("14 if n % 3 else 11", "'07'")}.get(
+        name, BAD_RULES.get(name))
+    s.stub({"session": "write", "out": {"out/result.json": r1_result(), "out/rulebook.md": "the rules\n",
+                                        "out/label_rules.py": rules}})
+    extra = {"GOV_INDEP_BWRAP": str(s.bin / "no-bwrap")} if name == "no_bwrap" else None
+    rc, counts, _ = s.go("sgx1-labeller", extra=extra)
+    assert rc == 20 and counts["status"] == "rejected" and counts["reason"] == "result", counts
+    assert_counts(counts, 20, "rejected")
+    assert not (h / "labels").exists()
+    assert f"{counts['run']}/out/label_rules.py" in s.tar_names(counts)  # the wall packed as for any rejection
+    assert not s.wall(counts).exists()
+
+
+def test_labeller_one_round_one_string_classes_pass_and_round_two_stores_integers(s):
+    rules = GOOD_RULES.replace('"rule_class": 14 if n % 3 else 11', '"rule_class": "14" if n % 3 else 11')
+    h, _ = labeller_one_round_one(s, rules=rules)
+    rc, counts, _ = s.go("sgx1-labeller", rnd=2, seed=77, dry=True)
+    assert rc == 0, counts
+    labs = [json.loads(x) for x in (s.wall(counts) / "input" / "script-labels.jsonl").read_text().splitlines()]
+    assert {type(x["rule_class"]) for x in labs} == {int} and {x["rule_class"] for x in labs} == {11, 14}
+
+
+# -- F23 (S31): a rule class in either form ---------------------------------------------------------------------------
+def test_rule_class_forms():
+    for v, want in ((1, 1), (14, 14), (7, 7), ("1", 1), ("7", 7), ("10", 10), ("14", 14)):
+        assert indep_launch.rule_class(v) == want and type(indep_launch.rule_class(v)) is int
+    for v in (True, False, 7.0, 0, 15, -1, "0", "15", "07", " 7", "7 ", "+7", "-7", "seven", "", "7\n", None, [7],
+              "٧"):
+        assert indep_launch.rule_class(v) is None, v
+
+
+def test_rule_output_takes_the_string_form_stored_as_an_integer():
+    good = b'{"id": "x", "label": "ask", "rule_class": "3", "clauses": [], "uncertain": true}\n'
+    raws, got = indep_launch.check_rule_output(good, ["x"])
+    assert got["x"]["rule_class"] == 3 and json.loads(raws[0])["rule_class"] == 3
+    for bad in (b'"03"', b'"3.0"', b'3.0', b'" 3"', b'"+3"', b'"15"'):
+        with pytest.raises(ValueError):
+            indep_launch.check_rule_output(good.replace(b'"3"', bad), ["x"])
+
+
+def test_merge_takes_a_string_class_and_stores_an_integer():
+    ctx = {"sgx": {"staged": [("a-1", b"", {}, "corpus/x")],
+                   "script_labels": {"a-1": {"id": "a-1", "label": "allow", "rule_class": 2, "clauses": [],
+                                             "uncertain": False}}, "sample_ids": []}}
+    hand = json.dumps({"id": "a-1", "label": "ask", "rule_class": "13", "clauses": ["d"], "reason": "why"}) + "\n"
+    got = json.loads(indep_launch.merge_labels(ctx, hand.encode()))
+    assert got["rule_class"] == 13
+    for bad in ('"013"', "13.0", "true", '"thirteen"'):
+        with pytest.raises(indep_launch.Refuse) as e:
+            indep_launch.merge_labels(ctx, hand.replace('"13"', bad).encode())
+        assert e.value.code == 20
 
 
 @needs_bwrap
@@ -533,9 +595,20 @@ def test_bwrap_a_rule_script_reading_a_file_outside_is_18(monkeypatch, tmp_path)
 
 @needs_bwrap
 def test_bwrap_a_rule_script_reaching_the_network_is_18(monkeypatch, tmp_path):
-    with pytest.raises(indep_launch.Refuse) as e:
-        rule_run(monkeypatch, tmp_path, "import socket\nsocket.create_connection(('127.0.0.1', 11434), 2)\n")
-    assert e.value.code == 18
+    # a planted listener (F26): never a shared server's port
+    lis = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    lis.bind(("127.0.0.1", 0))
+    lis.listen(1)
+    lis.settimeout(0.5)
+    port = lis.getsockname()[1]
+    try:
+        with pytest.raises(indep_launch.Refuse) as e:
+            rule_run(monkeypatch, tmp_path, f"import socket\nsocket.create_connection(('127.0.0.1', {port}), 2)\n")
+        assert e.value.code == 18
+        with pytest.raises(socket.timeout):
+            lis.accept()  # no connection reached the listener
+    finally:
+        lis.close()
 
 
 @needs_bwrap
@@ -573,16 +646,22 @@ def test_writer_one_delivers_into_a_new_experiment_folder_aims_stay_in_the_tar(s
 
 
 def test_writer_two_delivers_into_the_sealed_folder_not_sealed_word_only_for_two(s):
-    s.stub({"session": "write", "out": {"out/result.json": writer_result("not-sealed"),
-                                        "out/cases.jsonl": '{"id": "p2-c1"}\n'}})
+    s.stub({"session": "write", "out": {"out/result.json": writer_result(), "out/cases.jsonl": '{"id": "p2-c1"}\n'}})
     rc, counts, _ = s.go("sgx1-writer-heldout", half="held-out")
     assert rc == 0, counts
     assert (s.h("held-out") / "planted" / "cases.jsonl").read_text() == '{"id": "p2-c1"}\n'
-    assert counts["out"]["stopped"] == "not-sealed"
+    assert counts["out"]["stopped"] == "none"
+    # not-sealed: valid for writer 2, but a stopped result delivers nothing (F19)
+    (s.h("held-out") / "planted" / "cases.jsonl").unlink()
+    s.stub({"session": "write", "out": {"out/result.json": writer_result("not-sealed"),
+                                        "out/cases.jsonl": '{"id": "p2-c1"}\n'}})
+    rc, counts, _ = s.go("sgx1-writer-heldout", half="held-out")
+    assert rc == 20 and counts["out"]["schema_ok"] is True and counts["out"]["stopped"] == "not-sealed"
+    assert not (s.h("held-out") / "planted" / "cases.jsonl").exists()
     s.stub({"session": "write", "out": {"out/result.json": writer_result("not-sealed"),
                                         "out/cases.jsonl": '{"id": "p1-c1"}\n'}})
     rc, counts, _ = s.go("sgx1-writer-tuning")
-    assert rc == 20  # writer 1's schema has no not-sealed
+    assert rc == 20 and counts["out"]["schema_ok"] is False  # writer 1's schema has no not-sealed
 
 
 # -- S28: the results ------------------------------------------------------------------------------------------------
@@ -751,6 +830,184 @@ def test_auditor_bad_decisions_are_20_nothing_under_h_changes(s, change):
     rc, counts, _ = s.go("sgx1-overlap-auditor")
     assert rc == 20 and counts["status"] == "rejected"
     assert tree_hash(h) == before
+
+
+def test_auditor_disputes_blind_the_reasons_when_either_is_empty(s):
+    """F21 (S27): when either side's reason is empty, both are empty; when both have one, both are kept."""
+    h = plant_labels(s, n=6)
+    lab = h / "labels"
+    l1 = [json.loads(x) for x in (lab / "labels.jsonl").read_text().splitlines()]
+    l2 = [json.loads(x) for x in (lab / "labels-2.jsonl").read_text().splitlines()]
+    for k, x in enumerate(l1):
+        if k % 2 == 0:
+            x.update(reason=f"one-{k}", how="hand")
+    l2[2]["reason"] = ""  # a-002: labeller 1 has a reason, labeller 2 none
+    (lab / "labels.jsonl").write_text("".join(json.dumps(x) + "\n" for x in l1))
+    (lab / "labels-2.jsonl").write_text("".join(json.dumps(x) + "\n" for x in l2))
+    rc, counts, _ = s.go("sgx1-overlap-auditor", seed=11, dry=True)
+    assert rc == 0, counts
+    rows = {json.loads(x)["id"]: json.loads(x) for x in
+            (s.wall(counts) / "input" / "disputes.jsonl").read_text().splitlines()}
+    assert len(rows) == 6
+    for k in range(6):
+        r = rows[f"a-{k:03d}"]
+        got = {r["x"]["reason"], r["y"]["reason"]}
+        assert got == ({f"one-{k}", "r2"} if k in (0, 4) else {""}), (k, got)
+        assert {r["x"]["label"], r["y"]["label"]} == {"allow", "refuse"}  # labels as in each file
+
+
+def test_auditor_settled_case_takes_the_decision_and_string_classes_are_integers(s):
+    """F22 (S27) and F23 (S31): a settled line is the auditor's decision; rule_class stored as an integer."""
+    h = plant_labels(s, n=3)
+    cases = ["a-000", "a-001", "a-002"]
+    dec = decisions(cases, flag_first=True).replace('"rule_class": 11', '"rule_class": "7"')
+    s.stub({"session": "write", "out": {"out/result.json": auditor_result(3), "out/decisions.jsonl": dec}})
+    old = {json.loads(x)["id"]: json.loads(x) for x in (h / "labels" / "labels.jsonl").read_text().splitlines()}
+    rc, counts, _ = s.go("sgx1-overlap-auditor")
+    assert rc == 0, counts
+    labels = {json.loads(x)["id"]: json.loads(x) for x in (h / "labels" / "labels.jsonl").read_text().splitlines()}
+    for i in ("a-001", "a-002"):
+        assert labels[i] == {"id": i, "label": "refuse", "rule_class": 7, "clauses": ["DEC-820 (4)"], "reason": "",
+                             "how": "audit"}
+    assert labels["a-000"] == dict(old["a-000"], how="owner")
+    assert all(labels[i] == old[i] for i in old if i not in cases)
+    got = [json.loads(x) for x in
+           (h / "labels" / "audit" / f"{counts['run']}.decisions.jsonl").read_text().splitlines()]
+    assert [d["rule_class"] for d in got] == [7, 7, 7]
+    owner = [json.loads(x) for x in (h / "labels" / "owner.jsonl").read_text().splitlines()]
+    assert owner[0]["decision"]["rule_class"] == 7
+
+
+@pytest.mark.parametrize("bad", ['"07"', "7.0", "true", "0", "15", '" 7"', '"+7"', '"seven"'])
+def test_auditor_a_bad_rule_class_is_20(s, bad):
+    h = plant_labels(s, n=3)
+    dec = decisions(["a-000", "a-001", "a-002"]).replace('"rule_class": 11', '"rule_class": ' + bad, 1)
+    s.stub({"session": "write", "out": {"out/result.json": auditor_result(3), "out/decisions.jsonl": dec}})
+    before = tree_hash(h)
+    rc, counts, _ = s.go("sgx1-overlap-auditor")
+    assert rc == 20 and counts["status"] == "rejected" and tree_hash(h) == before
+
+
+# -- F20 (S30): the second labeller's labels checked -------------------------------------------------------------------
+L2_LINE = {"label": "refuse", "rule_class": "11", "clauses": ["DEC-820 (4)"], "how": "hand", "reason": "r"}
+
+
+def l2_result(stop="none"):
+    return json.dumps({"round": 2, "sample": 3, "labelled": 3, "allow": 1, "refuse": 1, "ask": 1, "by_class": by14(),
+                       "instructions_ignored": 0, "stopped": stop})
+
+
+def labeller_two_round_one(s):
+    h = s.plant_half("tuning", actions=120, cases=30)
+    s.stub({"session": "write", "out": {"out/result.json": r1_result(), "out/rulebook-2.md": "rules two\n"}})
+    rc, counts, _ = s.go("sgx1-labeller-2")
+    assert rc == 0, counts
+    return h
+
+
+def test_labeller_two_round_two_delivers_checked_labels_with_integer_classes(s):
+    h = labeller_two_round_one(s)
+    s.stub({"session": "write", "out": {"out/result.json": l2_result()},
+            "per_id": {"out/labels-2.jsonl": {"src": "input/sample.jsonl", "line": L2_LINE}}})
+    rc, counts, _ = s.go("sgx1-labeller-2", rnd=2)
+    assert rc == 0, counts
+    seed = s.seed_of(counts)
+    staged = [json.loads(x)["id"] for x in (h / "corpus" / "actions.jsonl").read_text().splitlines()
+              + (h / "planted" / "cases.jsonl").read_text().splitlines()]
+    want = [i for i in staged if by_rule(seed, "overlap", i, 10)]
+    dest = h / "labels" / "labels-2.jsonl"
+    got = [json.loads(x) for x in dest.read_text().splitlines()]
+    assert [g["id"] for g in got] == want and want
+    assert all(g == dict(L2_LINE, id=g["id"], rule_class=11) for g in got)
+    assert list(got[0]) == ["label", "rule_class", "clauses", "how", "reason", "id"]  # each line as written
+    assert counts["delivered"] == {"files": 1, "sha256": sha(dest.read_bytes()), "to": "labels"}
+
+
+@pytest.mark.parametrize("change", ["missing", "extra", "repeat", "bad_label", "how", "class", "extra_key",
+                                    "clauses", "reason"])
+def test_labeller_two_round_two_bad_labels_are_20_nothing_written(s, change):
+    h = labeller_two_round_one(s)
+    line, spec = dict(L2_LINE), {}
+    if change == "missing":
+        spec["drop"] = 1
+    elif change == "extra":
+        spec["extra"] = ["zz-999"]
+    elif change == "repeat":
+        spec["repeat"] = 1
+    elif change == "bad_label":
+        line["label"] = "maybe"
+    elif change == "how":
+        line["how"] = "script"
+    elif change == "class":
+        line["rule_class"] = "07"
+    elif change == "extra_key":
+        line["note"] = "x"
+    elif change == "clauses":
+        line["clauses"] = "DEC-820"
+    else:
+        line["reason"] = None
+    s.stub({"session": "write", "out": {"out/result.json": l2_result()},
+            "per_id": {"out/labels-2.jsonl": dict(spec, src="input/sample.jsonl", line=line)}})
+    before = tree_hash(h)
+    rc, counts, _ = s.go("sgx1-labeller-2", rnd=2)
+    assert rc == 20 and counts["status"] == "rejected", counts
+    assert tree_hash(h) == before and not (h / "labels" / "labels-2.jsonl").exists()
+
+
+# -- F19 (S29): a result that says it stopped delivers nothing --------------------------------------------------------
+def places(s):
+    return tree_hash(s.home / "gov-os-runs" / "SANDBOX-GUARD-EXP-1"), tree_hash(s.sets / "fixtures")
+
+
+@pytest.mark.parametrize("flow", ["writer-1", "writer-2", "labeller-1-r1", "labeller-1-r2", "labeller-2-r1",
+                                  "labeller-2-r2", "auditor"])
+def test_a_stopped_result_delivers_nothing_20(s, flow):
+    half, rnd = "tuning", 1
+    if flow == "writer-1":
+        bid, out = "sgx1-writer-tuning", {"out/result.json": writer_result("form-not-writable"),
+                                          "out/cases.jsonl": '{"id": "c1"}\n'}
+    elif flow == "writer-2":
+        bid, half = "sgx1-writer-heldout", "held-out"
+        out = {"out/result.json": writer_result("decisions-conflict"), "out/cases.jsonl": '{"id": "c1"}\n'}
+    elif flow == "labeller-1-r1":
+        s.plant_half("tuning")
+        bid, out = "sgx1-labeller", {"out/result.json": r1_result("input-malformed"), "out/rulebook.md": "r\n",
+                                     "out/label_rules.py": GOOD_RULES}
+    elif flow == "labeller-1-r2":
+        labeller_one_round_one(s)
+        bid, rnd = "sgx1-labeller", 2
+        ids = [f"a-{i:03d}" for i in range(12)] + [f"p-{i:03d}" for i in range(6)]
+        hand = "".join(json.dumps({"id": i, "label": "ask", "rule_class": 13, "clauses": [], "reason": "r"}) + "\n"
+                       for i in ids)
+        r2 = json.dumps({"round": 2, "hand_labelled": 18, "allow": 0, "refuse": 0, "ask": 18, "by_class": by14(1),
+                         "uncertain_seen": 0, "sample": 1, "instructions_ignored": 0, "stopped": "decisions-conflict"})
+        out = {"out/result.json": r2, "out/hand-labels.jsonl": hand}
+    elif flow == "labeller-2-r1":
+        s.plant_half("tuning")
+        bid, out = "sgx1-labeller-2", {"out/result.json": r1_result("forbidden-read-needed"),
+                                       "out/rulebook-2.md": "r\n"}
+    elif flow == "labeller-2-r2":
+        labeller_two_round_one(s)
+        bid, rnd, out = "sgx1-labeller-2", 2, {"out/result.json": l2_result("input-missing")}
+    else:
+        plant_labels(s, n=3)
+        res = json.loads(auditor_result(3))
+        res["stopped"] = "input-malformed"
+        bid, out = "sgx1-overlap-auditor", {"out/result.json": json.dumps(res),
+                                            "out/decisions.jsonl": decisions(["a-000", "a-001", "a-002"], True)}
+    cfg = {"session": "write", "out": out}
+    if flow == "labeller-2-r2":
+        cfg["per_id"] = {"out/labels-2.jsonl": {"src": "input/sample.jsonl", "line": L2_LINE}}
+    s.stub(cfg)
+    before = places(s)
+    rc, counts, _ = s.go(bid, half=half, rnd=rnd)
+    assert rc == 20 and counts["status"] == "rejected" and counts["reason"] == "result", counts
+    assert counts["out"]["schema_ok"] is True and counts["out"]["stopped"] not in (None, "none")
+    assert_counts(counts, 20, "rejected")
+    assert places(s) == before
+    assert not (s.runs / "AUDITS.log").exists()
+    names = s.tar_names(counts)
+    assert all(f"{counts['run']}/{rel}" in names for rel in out)  # the products in the wall's tar only
 
 
 def test_counts_schema_takes_the_new_numbers_and_code_18():
