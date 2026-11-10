@@ -10,6 +10,9 @@ before any implementation, reading only the integrated code (DEC-963).
   lines the first half held back are tested now: S1's sandboxed part, S2, S3, S8, S9, S11 (W2-145's form), S13, F1,
   F2's sandbox refusals, F4, F5, S7's lock failure; S10 is the CTO's measurement. The section "The second half: what
   this round did with each line" replaces the first half's "After the experiment" table.
+- **The follow-ups R3 and R5 (DEC-1112 (3), DEC-1114),** on integrate at `336828354` (W2-56 merged, review round 1
+  READY): two findings sent back before the close, tests first. Section "The follow-ups R3 and R5" below; no earlier
+  case changed.
 
 The KPI lines are numbered in the ticket's order: S1 to S15 (success), F1 to F6 (failure).
 
@@ -318,6 +321,135 @@ the length guard is green.
   CLI supports it. S8's reach and S10 on Linux go to the owner as a DEC-105 choice. The S8 cases stay as written.
 - **D-14:** not added to W2-56's paths now (it matters only once a socket can be reached); carried with D-13.
 
+## The follow-ups R3 and R5 (DEC-1112 (3), DEC-1114)
+
+Follow-up: R3 (DEC-1112 (3))
+
+Follow-up: R5 (DEC-1112 (3); the lead gets the launcher's own GOV_STORE)
+
+The review's round 1 (`reviews/w2-56.md`, READY) left R3 (a killed test run's daemon folders' folder and links folder
+outside the weekly sweep, DEC-902) and R5 (a lead no longer inherits `GOV_STORE`, and gets none of its own). The CTO
+sends both back before the close, tests first (DEC-1112 (3), DEC-1114). Written from the ticket (S1, S5, F3, the
+note "The owner's choice"), the CTO's brief, the CIT-E and the code that is not this follow-up's (`store.py`,
+`plan_check.py`, `gate.py`, the W2-116, W2-136 and W2-20 tests); the follow-up's own code was not read (DEC-820 (c)).
+
+**How they run.** As the folder (above). The R3 cases start real runs of this repository's pytest
+(`sys.executable -m pytest`) from the environment the outer run was started with: with `HOME` a scratch folder,
+pytest must still import there (here: `PYTHONUSERBASE=/home/usain/.local`, where this machine's pytest lies). The
+sandbox's exclusion (`-k "not real and not green_here and not time_limit"`) leaves out the eight cases whose node ids
+hold `real`: the six `[real-tmp]` cases (they need a writable real `/tmp`, outside a launched session) and the two
+`real_namespaces` cases (they need `bwrap` to make a pid namespace, which the launch sandbox refuses). Each also skips
+itself where it cannot run, so `gov accept` without the exclusion skips them in the sandbox. **The CTO's lead runs
+those eight outside the sandbox**, with a short `TMPDIR`. The R3 file takes about 20 s here (14 cases), the R5 file
+about 11 s (14 cases).
+
+**On integrate (`336828354`), in the launch sandbox through the heavy slot, with the exclusion:** R3 14 run, 4
+failed, 10 passed (8 deselected); R5 14 run, 9 failed, 5 passed. Every red fails on its own label; every green is a
+guard.
+
+| KPI line | Test (node id) | On integrate | Why |
+|---|---|---|---|
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_killed_runs_folders_are_removed_when_the_next_run_starts` | red (session, temp-root); `[real-tmp]` skipped here (real), expected red | point 1: nothing removes a killed run's folders; the next run's case still sees `…/gov-launch-XXXXXXXX/cXXX` (session) or `…/t/gov-cbm-1000-XXXXXXXX` (temp-root) and the `gov-path-*` folder |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_live_runs_folders_are_kept_while_another_run_starts_and_ends` | green (guard, session, temp-root); `[real-tmp]` skipped here, expected green | point 2: nothing removes another run's folders today; a clean-up that takes a live run's folder fails it |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_real_namespaces_a_live_run_in_another_pid_namespace_keeps_its_folders` | skipped here (real: no pid namespace in the sandbox), expected green | point 2 across pid namespaces (two commands of one sandboxed session): an owner check by pid alone, which finds no such pid in the next run's namespace, fails it |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_real_namespaces_a_killed_runs_folders_in_another_pid_namespace_are_removed` | skipped here (real), expected red | point 1 across pid namespaces; **D-15**: the CTO keeps or drops this one case |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_link_at_a_run_folders_name_is_never_removed_nor_followed` | green (guard, session, temp-root); `[real-tmp]` skipped here, expected green | point 3: a link (25 h old) at a run folder's and a links folder's own path, its target outside; removing or following it fails it |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_folders_of_other_names_and_the_shared_places_are_never_removed` | green (guard, session, temp-root); `[real-tmp]` skipped here, expected green | point 3: folders of other names (25 h old) in the place and the temp root, regular files at run folders' names; in `/tmp` the shared `/tmp/gov-cbm-<uid>` (and a run folder's form planted inside it) and `/tmp/gov-launch-*` |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_folder_with_no_owner_record_younger_than_24_hours_is_kept` | green (guard, session, temp-root); `[real-tmp]` skipped here, expected green | point 4: a folder with no owner record, fresh or 23 h old, is kept |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_folder_with_no_owner_record_older_than_24_hours_is_removed` | red (session, temp-root); `[real-tmp]` skipped here, expected red | point 4: nothing removes a folder with no owner record last modified 25 h ago |
+| S1 (R3) | `test_w2_56_r3_sweep.py::test_r3_a_folder_the_clean_up_cannot_simply_remove_never_fails_or_delays_the_run` | green (guard, session, temp-root) | point 5: a clean-up that raises on the 0500 folders, or waits on them, fails it |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_a_lead_gets_the_launchers_own_gov_store_launched_from_the_main_tree` | red (orchestrator, lead) | point 1: the lead's process environment has no `GOV_STORE`; its `--settings` env holds `GOV_ROLE` and `GOV_TICKET` only |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_a_lead_launched_from_a_worktree_gets_the_main_repositorys_gov_store` | red (orchestrator, lead) | point 1, from a worktree whose own `rebuild.yaml` lacks the line: as above |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_a_parents_gov_store_never_reaches_a_lead` | green (guard, with and without the setting) | point 2: S5 keeps the parent's `GOV_STORE` from a lead today; with no setting the lead has none |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_an_unusable_store_setting_refuses_a_lead_as_it_refuses_a_worker` | red (relative, not a map; orchestrator, lead) | point 3: the lead starts (exit 0, one session) where the worker's launch is refused (`LAUNCH_REFUSED: governance/project/rebuild.yaml: integration_store must be an absolute path …` / `… is not a map …`) |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_a_leads_environment_holds_no_parent_term_or_tmpdir_and_its_settings_env_role_ticket_and_store` | red (with the setting), green (guard, without) | point 4: no parent `TERM`, `TMPDIR` or S5 variable reaches a lead today; with the setting its `--settings` env lacks `GOV_STORE` |
+| S5 (R5) | `test_w2_56_r5_lead_store.py::test_r5_guard_a_workers_gov_store_is_still_the_launchers_own` | green (guard, main tree and worktree) | point 5: a worker's `GOV_STORE` is the main repository's `integration_store` as written (W2-116 S3); S5's earlier cases stay as they are |
+
+### The follow-ups' interface (R3, R5)
+
+**R3 (S1): a killed test run's folders.**
+
+- *What the cases start:* real runs of this repository's pytest on a one-case suite,
+  `<python> -m pytest tests/acceptance/W2-56/w2_56_sweep_probe.py --rootdir=<repo> -q -p no:cacheprovider -o tmp_path_retention_policy=failed`,
+  from the repository's root (so `tests/conftest.py` applies), each leading a process group of its own. Each run's
+  environment is the one the outer test run was started with (`/proc/self/environ`), without `PYTEST_*`,
+  `CODEINTEL_DAEMON_BASE`, `TMPDIR`, `TEMP`, `TMP` and `CLAUDE_CODE_TMPDIR`, then one of three settings:
+  - *session* (inside a launched session): `TMPDIR` and `CLAUDE_CODE_TMPDIR` both `<case folder>/gov-launch-XXXXXXXX/claude-<uid>`,
+    the session folder made as the launcher makes its own (`gov-launch-` and 8 letters, mode 0700);
+  - *temp-root* (outside a launched session): `TMPDIR` a folder of the case's own, no `CLAUDE_CODE_TMPDIR`;
+  - *real-tmp* (outside, from a shell): no `TMPDIR`, so the temp root is `/tmp`.
+- *What they read inside a run:* `CODEINTEL_DAEMON_BASE` (the run's folder for its daemon folders: it must name a
+  folder that exists while the run's cases run); the run's **place** is the folder that holds it; the temp root is
+  `tempfile.gettempdir()`; the run's **links folders** are the `gov-path-*` folders that hold an entry of its `PATH`
+  (today `<temp root>/gov-path-XXXXXXXX/tmpXXXXXXXX`; a run that makes none has none to leave). Inside a launched
+  session the run's folder must lie in the session's temp folder (the `gov-launch-` folder above `CLAUDE_CODE_TMPDIR`).
+  Two runs started alike must share their place and temp root. The place is never assumed: today it is the session
+  folder (session), the temp root where `/tmp` cannot be written (temp-root in the sandbox), or `/tmp`.
+- *How a run is killed:* SIGKILL to its process group, once its case has written its record (its folders exist).
+- *What they expect:*
+  1. The next run started alike has removed a killed run's folder and links folders **before its first case runs**
+     (the case reads them gone), and they stay gone after it.
+  2. A run held in its case keeps its folder and links folders while another run starts and ends, **whether or not
+     the two share a pid namespace**: two commands of one sandboxed session each run in a pid namespace of their own
+     (pids 4 and 5 seen here), so the pid a run records for itself may name no process, or another one, in the next
+     run's namespace. The held run, let go, ends with 0 and removes its own; the other removes its own at its end.
+  3. Never removed or changed, at any age (the cases set 25 hours): a link at a run folder's or a links folder's own
+     path, and its target (a folder outside, holding a file); a regular file at such a path; folders of other names
+     in the place and the temp root (`gov-cbm-<uid>`, `cbm`, `cc-socks`, `gov-launch-w56XXXXXXXX`,
+     `w56-other-XXXXXXXX`, `gov-pathology-XXXXXXXX`, `w56-gov-path-XXXXXXXX`); in the real `/tmp`, the shared
+     `/tmp/gov-cbm-<uid>` and a folder of a run folder's form planted inside it (`gov-cbm-<uid>-w56XXXXXXXX`), and the
+     live `/tmp/gov-launch-*`. Another user's folder is not planted (it needs a second user): the auditor reads it.
+  4. **"Its owner cannot be told" is read as: the folder holds no record of its owner.** A case makes one by emptying
+     a killed run's folder **in place** (its own path, so its name is the code's; one file `older-code.txt` inside),
+     so the owner's record must lie inside the run's folder (and inside the links folder), not beside it. Fresh, or
+     last modified 23 hours ago: kept. Last modified 25 hours ago (the folder and its file): removed by the next run.
+  5. A killed run's folders emptied in place, 25 hours old, mode 0500 with a 0500 folder inside holding a file: the
+     next run starts, makes its own folder, its case passes, and the whole run takes no more than an ordinary run of
+     the same setting, timed just before, and 15 s. Opening and removing them, or leaving them, are both right.
+  6. A folder whose recorded owner's pid now belongs to an unrelated live process: no case; keeping it is accepted
+     (no case asks for its removal).
+
+**R5 (S5): a lead gets the launcher's own `GOV_STORE`.**
+
+- *What the cases launch:* `gov launch orchestrator <ticket>` and `gov launch lead <ticket>` through gov's console
+  entry point, `--gate-override DEC-1112` before `--` (as every launch of these cases), the stand-in CLI and the
+  fixture project of S5, an approved ready list naming the ticket at `governance/project/orchestration/ready.txt` in
+  the main tree. `integration_store` in the main repository's `governance/project/rebuild.yaml` is the absolute path
+  of a link to a folder.
+- *What they expect:*
+  1. The lead's process environment and its `--settings` env hold `GOV_STORE` equal to that path **as written**
+     (the link, not its target), launched from the main tree, and from a worktree of it whose own `rebuild.yaml`
+     has no `integration_store` (the main tree's names it, uncommitted).
+  2. A parent `GOV_STORE` (`/tmp/zqxw56parent-store`) is never in either; with no `integration_store`, neither holds
+     `GOV_STORE`.
+  3. `integration_store: relative/store`, or a `rebuild.yaml` that is a list: the lead's launch exits non-zero,
+     says `LAUNCH_REFUSED` and names `rebuild.yaml` or `integration_store`, starts no session and leaves no
+     `gov-launch-*` folder, as the worker's launch of the same project is refused.
+  4. With the parent's `TERM`, `TMPDIR` and every variable S5's cases plant (each value holds `zqxw56parent`): none
+     of their values in the lead's process environment or `--settings` env under any name; `TERM`, `TMPDIR` and
+     `PYTHONPATH` not there at all; the `--settings` env exactly `GOV_ROLE=orchestrator`, `GOV_TICKET=<ticket>` and,
+     where `integration_store` is set, `GOV_STORE`.
+  5. A worker's `GOV_STORE` stays the launcher's own (main tree and worktree), and S5's earlier cases are unchanged.
+
+### The follow-ups' notes and decisions to take
+
+- **D-15. Point 1 across pid namespaces.** In the launch sandbox each command runs in a pid namespace of its own
+  (shown here: the nested runs' pids were 4 and 5). Point 2 across namespaces (a live run's folder is never removed)
+  is a safety line and has its case. Point 1 across namespaces (a killed run's folders removed by a next run in
+  another namespace) is read from point 1's words, but point 4's "owner cannot be told" can be read to cover "its
+  owner is in another namespace" (then kept, and the session's temp folder goes at the session's end anyway, S15).
+  (a) Keep `test_r3_real_namespaces_a_killed_runs_folders_in_another_pid_namespace_are_removed`: the engineer needs
+  an owner check that holds across namespaces, for example a lock on a file in the folder held for the run's life
+  (the kernel lets go of it when the run dies, whatever its namespace); it serves points 1 and 2 at once. (b) Drop
+  that one case: point 1 is held within one namespace; a pid with its start time and namespace serves. Recommendation
+  (a), confidence medium (the lock is simple; its cost is a file and a held descriptor per run).
+- **D-16. Point 6 read on the safe side:** no case; none asks for removal when the recorded pid is now another
+  process's.
+- **D-17. Another user's folder** (point 3) is not planted: it needs a second user on the machine.
+- **Seen beside R3, not in it:** a killed run also leaves `gov-rebuild-<pid>-XXXXXXXX.lock` in its temp root (a file;
+  the brief names the two folders only). The `[real-tmp]` cases remove the ones their own killed runs leave in
+  `/tmp`.
+
 ## Files
 
 - `w2_56_support.py`: the fixture project, the stand-in CLI and its plan steps, the launch helpers, the planted
@@ -331,6 +463,9 @@ the length guard is green.
   `test_w2_56_sandbox_block.py` (S2, S3, S8, S9, S11, F1, F2, F4), `test_w2_56_guard_scope.py` (S2, S3, F1),
   `test_w2_56_session_daemon.py` (S1), `test_w2_56_session_reranker.py` (S8, S11, F5),
   `test_w2_56_real_sandbox.py` (S2, S7, S9, S13 in real sessions; skipped unless `GOV_W2_56_REAL=1`).
+- The follow-ups: `w2_56_sweep_probe.py` (the one-case suite R3's nested runs run; no `test_` prefix),
+  `w2_56_sweep_support.py` (the places, the nested runs, the plants, the pid-namespace wrapper);
+  `test_w2_56_r3_sweep.py` (S1, R3), `test_w2_56_r5_lead_store.py` (S5, R5).
 
 ## The real cases: what each costs and proves
 

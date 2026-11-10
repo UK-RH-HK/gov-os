@@ -631,8 +631,8 @@ All in `test_w2_54_cpu_embedder.py` but the last two rows. Red reasons as seen a
 | **4** two sessions at once: one embedder serving, both answered | `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | the same |
 | **4** the address held by a non-embedder: no other port, no fallback, exit 0, unavailable with a reason, the other routes answer | `test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback` | "the semantic facet is not unavailable with a reason (available is True, no reason (None))" |
 | **4** no executable: the same | `test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers` | the same |
-| **5** on the shared GPU: one answer cold, warm, unwritable, after other texts, two processes; the shared runner on the GPU before and after | `test_w2_54_shared_gpu.py::test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` | run by the lead (not run here) |
-| **5** the shared runner holds the model on the GPU, the CPU embedder with `size_vram` 0; one revision; prints the port and the size | `test_w2_54_shared_gpu.py::test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu` | run by the lead (not run here) |
+| **5** on the shared GPU: one answer cold, warm, unwritable, after other texts, two processes; the shared runner on the GPU before and after (not revised: holds one answer per text, which DEC-1033 accepts may drift on the GPU; no CPU placement) | `test_w2_54_shared_gpu.py::test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` | run by the lead (not run here) |
+| **5** (DEC-1033 (2)(b), `Rewrite-Reason` in the file; was `…_and_the_cpu_embedder_holds_it_on_the_cpu`, `size_vram` 0) the shared runner and the query server both hold the model wholly on the GPU (`size_vram` equal to `size`); one revision; prints the port and the size | `test_w2_54_shared_gpu.py::test_shared_gpu_the_shared_runner_and_the_query_server_hold_the_model_on_the_gpu_at_one_revision` | run by the CTO outside the sandbox (collected only here) |
 | **6** the change record states the figure | `test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80` | "docs/changes/W2-54-CIT-E.md has no line naming W1-21, hit@5 and CPU query vectors" |
 
 **Count:** 16 new cases (11 functions). The 14 stand-in cases are all red here. The 2 `shared_gpu` cases are not
@@ -1056,7 +1056,8 @@ set … {'CUDA_VISIBLE_DEVICES': '-1'}"); the two not-loaded cases passed there 
   figure the change record holds from DEC-798's measurement; green.
 - `test_w2_54_shared_gpu.py` (2 cases, `shared_gpu`, deselected unless `-m shared_gpu`, run by a lead on the real
   servers only): `test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu`
-  requires the query embedder at `127.0.0.1:11435` to hold the model with `size_vram` 0, which ACT-QUERY-GPU-2 ended;
+  required the query embedder at `127.0.0.1:11435` to hold the model with `size_vram` 0, which ACT-QUERY-GPU-2 ended
+  (revised 2026-11-09, DEC-1109 (2): now `…_the_shared_runner_and_the_query_server_hold_the_model_on_the_gpu_at_one_revision`);
   `test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` holds one answer
   per text, which DEC-1033 accepted may drift on the GPU. Both would be red if run now; neither is run by the queue or
   the closes, and this designer may not reach the real servers, so neither was revised (a decision package).

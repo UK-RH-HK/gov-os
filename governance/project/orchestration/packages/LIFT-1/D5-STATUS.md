@@ -239,3 +239,34 @@ marked on W2-128.
   - The message is in `../ACT-CLAUDE-COPIES-1.md` §5.
   - Next, unchanged: W2-153's R1 (the fixtures), W2-128 round 2b, the link notices (item 4); W2-153 unmerged until
     ACT-1 is applied, then the worktrees merge integrate (R3).
+- 2026-11-10 00:29 UTC: **ACT-CLAUDE-COPIES-1 applied** by the operator agent (`eb48fe2fd`). **R3:** integrate merged into W2-153,
+  W2-153-tests, W2-128, W2-128-tests and W2-152-tests. W2-153's two conflicts were resolved by the CTO:
+  - `launch()`: kept both sides, the template flag and W2-56's `TEMP_PREFIX`;
+  - `.rulesync/subagents/orchestrator.md`: kept W2-153's composition.
+  The CTO's untracked template copies were removed first. Portability on W2-153 now reports only the six generated
+  agents, which is ACT-2's job. ACT-SETS-GLOBS-1's hook is in each of those trees.
+- 2026-11-10 00:29 UTC: **W2-128 round 2b READY, not merged:** `w2/W2-128` **`5cfa4b28f`** (round 2b `9d95279c9`, tests
+  `aeee55f658f6`); `gov accept` 121/121; review READY (`reviews/w2-128-r2b.md`). One finding, out of scope: five more
+  test-design lines still cite CAP-38.b (a row). Merge before ACT-2 is built, so ACT-2 carries the 1.2.0 skills.
+- 2026-11-10 00:29 UTC: **W2-153 R1, widened:** after W2-56 merged, its acceptance folder goes 136 of 256 red on W2-153, and
+  W2-153's own harness loses its stub's environment variable to W2-56's cleaned environment. The designer (fixtures,
+  nine folders, the harness) goes next, then the engineer (three unit files).
+- 2026-11-10 01:50 UTC: **W2-153 READY to merge: `w2/W2-153` `d77d702c3`**, integrate merged in (`e242a66b`, three launcher
+  conflicts resolved by the CTO over the night, each keeping both sides).
+  - R1 done:
+    - the fixtures of W2-56, W2-20, W2-136, W1-46, W1-28, W1-32, W2-58, W1-50 and W2-54 (a test designer,
+      `1e896245ee93`, `Rewrite-Reason:`);
+    - W2-153's own stub record past W2-56's cleaned environment;
+    - F2's baseline moved to the merge base after W2-56 (`ac0409a40`);
+    - W2-56 S6's argv-tail assertion allows the one pair (`896190341226`);
+    - four unit files' fixtures (the engineer, `d86ca7f4b`, `d77d702c3`);
+    - the test designer's skills switched to `[test-design]` (`49b990521`).
+  - The CTO's runs on the merge result, outside the sandbox: `gov accept W2-153` 51/51; acceptance W2-128 113,
+    W2-152 67, W2-56 284, W2-20 170, W2-136 76 and W2-54 67, all passed, no new failure against integrate. W1-46's
+    80 reds are on integrate too (the fixture HOMEs' missing gate file, another item). Unit launch, resources and
+    adapters: 486 passed, 0 failed.
+  - Structural pass: portability NOTICE (the six agents, ACT-2's), links ok.
+- 2026-11-10 01:50 UTC: **also READY, not merged:** W2-128 round 2b `5cfa4b28f` (121/121, review READY) and W2-152-tests
+  `32b89d25a` (the link-notice comment). **Next, the CTO's order:** merge round 2b, W2-152-tests and W2-153; then
+  ACT-CLAUDE-COPIES-2 (the same builder, on that integrate: the six agents from W2-153's composed sources and round
+  2b's 1.2.0 skills), rehearsed, reviewed, and §6 with the line `yes ACT-CLAUDE-COPIES-2 <manifest sha8>`.
