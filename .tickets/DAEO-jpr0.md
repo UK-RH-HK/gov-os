@@ -44,6 +44,7 @@ kpis:
   - 'A rebuild or search that fails because of the cache.'
 profile: STANDARD
 sources:
+- DEC-1109
 - DEC-1032
 - DEC-1031
 - DEC-1015

@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 allowed_paths:
+- tests/conftest.py  # the suites' own git calls never reach a repository the caller's environment names (D-10's red-fix list item 1, the core.bare tests' half) [DEC-1074 (8), DEC-1083, DEC-1109 (2)]
 - src/gov/**/*.py
 - src/gov/util/gitenv.py
 - lefthook.yml

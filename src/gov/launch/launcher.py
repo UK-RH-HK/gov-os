@@ -11,8 +11,9 @@ shape refuses the launch.
 
 A lead (``gov launch orchestrator|lead <ticket>``, W2-136 S9) is started only when
 the plan's check admits its ticket, with ``GOV_ROLE=orchestrator``, its
-``GOV_TICKET`` and no sandbox block, as the dispatcher starts a lead
-(``build_lead_settings``); a worker launch never consults the plan.
+``GOV_TICKET``, the launcher's own ``GOV_STORE`` as a worker's (W2-56 R5) and no
+sandbox block, as the dispatcher starts a lead (``build_lead_settings``); a worker
+launch never consults the plan.
 
 Every launch, lead or worker, passes the machine-wide resource gate (W2-20 S19,
 DEC-1088 (5)(b)): while it is shut on any reading, the launch is refused naming
@@ -204,16 +205,7 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
         check_sets(str(root))
     except PolicyError as error:
         raise _refuse(f"{error} (DEC-820)") from None
-    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id}
-    # W2-116 S3 (DEC-963, DEC-1087 (3)): every worker's plain `gov retrieve` answers from the integration store, the
-    # configured link itself (followed at each search), never from the worktree the session runs in. The place is the
-    # main repository's (review F4): a worktree branched before the line was added still gets it.
-    try:
-        store = configured_store(main_store_root(root))
-    except StoreSettingError as error:
-        raise _refuse(f"{error}: the session's retrieval would have no store to answer from (W2-116)") from None
-    if store is not None:
-        env[STORE_ENV] = store
+    env = {"GOV_ROLE": role, "GOV_TICKET": ticket_id, **_store_env(root)}
     return {
         "env": env,
         "permissions": {"deny": deny},
@@ -227,11 +219,25 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     }
 
 
-def build_lead_settings(ticket_id: str) -> dict:
-    """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator`` and its ``GOV_TICKET``, no
-    sandbox block, as the dispatcher starts a lead. Kept apart from ``build_settings`` so that a worker's settings
-    never lose their sandbox block or deny rules on a lead's account."""
-    return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id}}
+def _store_env(root: Path) -> dict:
+    """``GOV_STORE`` for a launched session, or nothing where the project configures no integration store. W2-116 S3
+    (DEC-963, DEC-1087 (3)): a session's plain `gov retrieve` answers from the integration store, the configured link
+    itself as written (followed at each search), never from the worktree the session runs in. The place is the main
+    repository's (review F4): a worktree branched before the line was added still gets it. A setting that cannot be
+    used refuses the launch before anything starts; the parent's ``GOV_STORE`` never counts (W2-56 S5)."""
+    try:
+        store = configured_store(main_store_root(root))
+    except StoreSettingError as error:
+        raise _refuse(f"{error}: the session's retrieval would have no store to answer from (W2-116)") from None
+    return {} if store is None else {STORE_ENV: store}
+
+
+def build_lead_settings(root: Path, ticket_id: str) -> dict:
+    """The ``--settings`` value of a lead session (W2-136 S9): ``GOV_ROLE=orchestrator``, its ``GOV_TICKET`` and the
+    launcher's own ``GOV_STORE`` as a worker's (W2-56 R5, ``_store_env``), no sandbox block, as the dispatcher starts
+    a lead. Kept apart from ``build_settings`` so that a worker's settings never lose their sandbox block or deny
+    rules on a lead's account. ``root`` is a real path."""
+    return {"env": {"GOV_ROLE": LEAD_GOV_ROLE, "GOV_TICKET": ticket_id, **_store_env(root)}}
 
 
 def sandbox_faults(settings: dict) -> list[str]:
@@ -435,13 +441,13 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         _check_repository_settings(root)  # a lead has no sandbox: the guard is its only fence
         template = template_args(root, role)
         cli = _cli()
+        settings = build_lead_settings(root, ticket_id)  # an unusable store setting refuses here, before the gate
         lock = StartLock()
         try:
             _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
             _record_plan_override(ticket_id, plan_override)  # only once the gate admits it too (review F8)
             # DEC-743 7: a ticket lead has no own folder under ~/gov-os-runs; the dispatcher gives a lead no temp folder.
-            return _run(root, cli, build_lead_settings(ticket_id), [*cli_args, *template],
-                        entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
+            return _run(root, cli, settings, [*cli_args, *template], entry=(ticket_id, LEAD_GOV_ROLE), lock=lock)
         finally:
             lock.release()
     if role not in WORKER_ROLES:
@@ -520,7 +526,7 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             if faults:
                 raise _refuse("the built settings are not strict: " + "; ".join(faults))
         # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
-        # lead's keeps its role and ticket alone, W2-136 S9)
+        # lead's keeps its role, ticket and store alone, W2-136 S9, W2-56 R5)
         settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
         env = environ.session_env(os.environ, own_env)
         if not state["ended"]:  # a signal that came first: no session is started

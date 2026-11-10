@@ -34,6 +34,8 @@ kpis:
   - 'A write in the repository.'
 profile: FULL
 sources:
+- DEC-866
+- DEC-1109
 - DEC-959
 - DEC-957
 - DEC-820

@@ -418,3 +418,10 @@ other restart is an ACT.
   agent, its first live run; on a refusal the CTO says why and the operator applies by hand; the agent's yes form is
   `yes ACT-<id> <manifest sha8>` on its own line); TPL-6's Appendix A applied now. **Standing until the lift: past 80 %
   of the week's usage, only the lift's critical path runs; the rest waits for the reset.** Basis: 2 and 4.
+- Delegated (CTO, 2026-11-10, DEC-1112 (3)): set-up A's seeds by the launch script's own draw, written to SEEDS.log
+  before any content (the declaration's amendment A5; option (2) of the wiring lead's DEC-105 choice: commit-derived
+  seeds are knowable in advance); the wiring's proposals taken: W2-149's allowed paths gain the walls' kinds.yaml and
+  tree-exclude.txt; tree-exclude.txt gains governance/project/indep-briefs/**; model claude-opus-5-5 for every kind;
+  labeller 1's round-2 delivery refused (20) unless every hand-label action has one; S16 and S20 to set-up A's
+  deliveries and the declaration's overlap rule; the overlap auditor never appends to AUDITS.log; exit 18 for a rule
+  script that cannot run confined. The pin amendment follows the wiring's merge and the rebuilt install ACT's apply.
