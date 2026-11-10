@@ -48,7 +48,7 @@ import json, os, subprocess, sys, time
 HERE = os.path.dirname(os.path.abspath(__file__))
 cfg = json.load(open(os.path.join(HERE, "stub.json")))
 argv = sys.argv[1:]
-VALUED = ("--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
+VALUED = ("--setting-sources", "--settings", "--tools", "--permission-prompts", "--model", "--max-budget-usd", "--output-format",
           "--session-id")
 flags, adds, i = {}, [], 0
 while i < len(argv) - 1:
@@ -740,6 +740,11 @@ def test_canary_runs_with_the_session_flags_plus_its_folder(w):
     drop = "--session-id"
     assert {k: v for k, v in canary["flags"].items() if k != drop} == {
         k: v for k, v in session["flags"].items() if k != drop}
+    # F11 (DEC-1112 (3)): both lines carry --setting-sources project, exactly once, beside --restricted
+    for c in (canary, session):
+        assert c["flags"]["--setting-sources"] == "project"
+        assert c["argv"].count("--setting-sources") == 1 and c["argv"][1:4] == [
+            "--restricted", "--setting-sources", "project"]
     # each draws its own id (F1, F6)
     assert canary["flags"][drop] != session["flags"][drop]
     assert all(uuid.UUID(c["flags"][drop]).version == 4 for c in (canary, session))
@@ -763,8 +768,10 @@ def test_writer_session_is_closed_and_delivers_counts_only(w):
     session = w.calls()[1]
     wall, tree = w.wall(counts), w.tree(counts)
     a = session["argv"]
-    assert a[:6] == ["-p", "--restricted", "--settings", f"{wall}/.claude/settings.json", "--add-dir", str(tree)]
-    assert a[6:-3] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
+    assert a[:8] == ["-p", "--restricted", "--setting-sources", "project",  # F11 (DEC-1112 (3))
+                     "--settings", f"{wall}/.claude/settings.json", "--add-dir", str(tree)]
+    assert a.count("--setting-sources") == 1
+    assert a[8:-3] == ["--tools", "Read,Grep,Glob,Write,Edit,TodoWrite", "--no-session-persistence",
                        "--strict-mcp-config", "--disable-slash-commands", "--permission-prompts", "none", "--model",
                        "claude-haiku-5-5", "--max-budget-usd", "25", "--output-format", "json"]
     assert a[-3] == "--session-id" and uuid.UUID(a[-2]).version == 4  # the closing flag: the id the script drew

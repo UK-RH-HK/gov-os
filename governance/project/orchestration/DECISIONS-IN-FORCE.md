@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1114 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1115 on 2026-11-09. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -414,3 +414,7 @@ other restart is an ACT.
   and R5 (leads lose GOV_STORE, TERM, TMPDIR) are follow-ups before W2-56 closes, tests first; R1 (the main
   repository's settings.local.json in worktree sessions) is W2-60a's; R2 and R4 are rows for W2-56's close review; R6
   (the CLI's config.lock placeholders, P-S7) is W3-P29.
+- DEC-1115 (2026-11-09): yes to ACT-SETS-GLOBS-1 (the owner's operator by hand) and ACT-CLAUDE-COPIES-1 (the operator
+  agent, its first live run; on a refusal the CTO says why and the operator applies by hand; the agent's yes form is
+  `yes ACT-<id> <manifest sha8>` on its own line); TPL-6's Appendix A applied now. **Standing until the lift: past 80 %
+  of the week's usage, only the lift's critical path runs; the rest waits for the reset.** Basis: 2 and 4.
