@@ -21,6 +21,7 @@ The kernel's template set, version 1.0.0, as these bytes:
 |---|---|---|---|
 | T-0 envelope | `template/governance/kernel/templates/brief.md` | 1.0.0 | `004ce0fc8f09dcc89a8ecda0b0a0ef813737323719aac3e469a1eac6ee4cfe6d` |
 | T-1 ticket | `template/governance/kernel/templates/ticket.md` | 1.0.0 | `fd97779dc4987d0015c1f4615a82b7d6c9c8ff0e302bfcda89b7f6fc9e4af956` |
+| T-1 ticket | `template/governance/kernel/templates/ticket.md` | **1.0.1** (DEC-1121, DEC-1122: `class` added; approved by the owner 2026-11-10 at `0aa20ac0c`; replaces the 1.0.0 row) | `bbfc068e58e20020483fa5019e4bfc88951f9b5b7b79c373185faf9a0231ab60` |
 | T-2 research | `template/governance/kernel/templates/role-research.md` | 1.0.0 | `6f63e5b23b213a5f88894303cd685c2f2e819f158da01aee14ba653960656b3b` |
 | T-3 product-spec | `template/governance/kernel/templates/role-product-spec.md` | 1.0.0 | `66d556c0ff90ba9d2bc9516c2151ce87590aaf8a789705b097929daf1f844d10` |
 | T-4 test designer | `template/governance/kernel/templates/role-test-designer.md` | 1.0.0 | `3a0bfd4abbeef355f230350913236b1d9f7071cfac36f24768c758d4f211cad3` |

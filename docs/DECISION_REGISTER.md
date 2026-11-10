@@ -14301,6 +14301,19 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   hash for the owner's approval before it lands; `test_the_ticket_template_carries_the_nine_fields` then passes.
 - **Basis:** question 2 (the templates one approved source, matching the Contract).
 
+### DEC-1122 — The ticket template 1.0.1 approved; usage option (A) from now; D-10 goes once ACT-PATHMAP-NS-2 is committed and gov check is green; a fresh CTO session at the next quiet point
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1121, DEC-1115 (4), DEC-1118, DEC-1049 · **Changes:** DEC-1115 (4) (its 80 % trigger brought forward to now, until the weekly reset) · **Source:** the owner's message (chat, 2026-11-10), on the template's hash, USAGE-RUBRIC-2's projection and D-10
+- **Decision:**
+  - (1) **Template 1.0.1 approved:** `template/governance/kernel/templates/ticket.md` at `0aa20ac0c`, sha256
+    `bbfc068e58e20020483fa5019e4bfc88951f9b5b7b79c373185faf9a0231ab60`. The CTO merges it, adds the 1.0.1 line to
+    TEMPLATES-APPROVAL-1's table and files the round-2 review's F4 as a row.
+  - (2) **Usage (A), from now:** only the lift's critical path runs; the helpers already running finish; everything
+    else waits for the weekly reset (11-15 09:00 Europe/London). The CTO hands over to a fresh session at the next
+    quiet point. (B), extra usage, the owner checks and tells the CTO.
+  - (3) **D-10 goes** as soon as ACT-PATHMAP-NS-2 is committed and `gov check` is green, with no further word; the
+    owner gets the triage of the reds after the first run.
+- **Basis:** question 1 (the lift first, within the week's allowance) and question 2 (the template).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14359,3 +14372,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.503 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1118 (items 1 and 2 standing). Next free id: DEC-1119. |
 | 0.504 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1119. Next free id: DEC-1120. |
 | 0.505 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1120 (RUBRIC-2, standing; DEC-839 (1)-(3) and DEC-1119 (1) changed), DEC-1121 (the ticket template 1.0.1 with `class`). Next free id: DEC-1122. |
+| 0.506 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1122 (the template 1.0.1 approved; usage (A) from now, DEC-1115 (4) changed; D-10's go on a condition). Next free id: DEC-1123. |

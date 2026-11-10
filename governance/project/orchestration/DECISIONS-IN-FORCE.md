@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1121 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1122 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -467,3 +467,7 @@ other restart is an ACT.
   reason; every spawn names model and effort; the spend log records tier, class and promotion. Basis: 4.
 - DEC-1121 (2026-11-10): the ticket template gains `class` as version 1.0.1 (W1-08's DEC-105 case, (a)); its hash to
   the owner before it lands. Basis: 2.
+- DEC-1122 (2026-11-10): the ticket template 1.0.1 approved (`bbfc068e58e2`); **usage (A) from now until the reset
+  11-15 09:00: only the lift's critical path runs** (DEC-1115 (4) brought forward); D-10 goes once ACT-PATHMAP-NS-2 is
+  committed and gov check is green, the triage of the first run's reds to the owner; a fresh CTO session at the next
+  quiet point. Basis: 1 and 2.

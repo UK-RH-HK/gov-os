@@ -1,8 +1,32 @@
-# Start here — the next CTO session (written 2026-11-10, final at ~15:15 UTC, by session ad44f5fe: the fresh-session handover of DEC-1110 (2))
+# Start here — the next CTO session (written 2026-11-10 ~17:45 UTC by session 412a4e37, handing over under DEC-1122 (2))
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1120.**
+the register and the owner's word hold over both. **Next free id: DEC-1123.**
+
+## 00. NOW (17:45 UTC 11-10): read this first; the sections below it are the 14:30 handover, still valid where not replaced
+- **Usage (A) is in force (DEC-1122 (2)): only the lift's critical path runs until the reset 11-15 09:00.** 60 % at
+  16:00; at the last 24 h's pace 80 % ≈ 11-11 03:00, 100 % ≈ 11-11 afternoon (`packages/USAGE-RUBRIC-2.md` §4).
+  Keep your own context short; start nothing off the critical path. (B) extra usage: the owner checks and tells you.
+- **RUBRIC-2 (DEC-1120) governs every spawn:** name model and effort; `launch_worker.sh` now requires `--class C0-C3`
+  and `--model` (or LAUNCH_MODEL), `--promoted "<why>"` when promoted (NOTE: `.gov-runtime/scratch/orchestrator/drafts/rubric2-spend/NOTE.md`).
+  In-session helpers: Agent `model`/`effort` per RUBRIC-2. Through D-10, C2/C1 engineers stay on Opus, high.
+- **D-10 (DEC-1122 (3)):** goes once ACT-PATHMAP-NS-2 is committed and gov check is green, no further word. If session
+  412a4e37 started it, its pid and log are in CHECKPOINT's RESUME HERE. Run: `governance/project/orchestration/nightly/nightly.sh`
+  (day mode, a fresh clone of the head, ~5 h), then the `lifted` suite once, report-only (D4-LIST §2). **No commits on
+  w2/integrate during it.** Then: **triage the reds by group for the owner** (re-run each alone; P1-NIGHTLY-2026-11-02
+  as the old map); fixes by role under RUBRIC-2; a second run.
+- **Done today (11-10 afternoon):** ACT-W2-149-INSTALL-1 `baac0b2c2` (by hand); ACT-DEADMAN-WAKE-1 `905b82a3b`,
+  ACT-CLAUDE-COPIES-3 `a4e703580` (agent); the portability family 204/0; W1-08 merged `34b7815f9`; the ticket template
+  1.0.1 approved (DEC-1121, DEC-1122) and merged; DEC-1119's rubric found then replaced by RUBRIC-2; EMERGENCY-TOOLS-1.
+- **In flight at handover:** ACT-PATHMAP-NS-2 by the owner's operator (fixes `core-pathmap`: the install left
+  `governance/project/indep-briefs/**` without a namespace); ACT-EFFORT-HIGH-2 queued for the agent at 17:33 (the owner's yes just before).
+  Check both landed (`git log`, `~/gov-os-operator/log/operator.jsonl`); landing check after each.
+- **Lesson:** a yes line the owner types while the CTO is mid-turn is stored as a queued-command attachment; the
+  operator agent's G6 does not read it. Ask for yes lines when idle (an ACT to fix the reader after the reset).
+- **Waits for the reset (DEC-1122 (2)):** W2-33/W2-60a by RUBRIC-2 (`packages/RUBRIC-2-APPLY.md` §3, W2-60a C3); the
+  seven C1 record edits of RUBRIC-2-APPLY; row 109 (template F4); EMERGENCY-TOOLS-1's gaps; set-up A; USAGE-1 (D)
+  and the daily cost job; DECIDED-NOT-DONE §1a's overdue owner items.
 
 ## 0. Where things stand (2026-11-10 ~14:30 UTC)
 - **The lift is next:** about 11-11 (FORECAST-W2-2: lift 11-11, EXAMIN's copy 11-15, Wave 2's end 11-22, E). Its

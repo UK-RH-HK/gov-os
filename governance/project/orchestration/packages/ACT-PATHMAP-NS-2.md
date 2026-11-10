@@ -105,6 +105,12 @@ yes ACT-PATHMAP-NS-2 b1985584
 2. **Process:** an install package that adds tracked files under a new folder should rehearse `gov.check.pathmap` and the W1-08
    path-map test file. Recommendation: add it to the ACT template's rehearsal list. Confidence: high. Blocks nothing.
 
-## Review: pending
+## Review: READY (round 1)
+`governance/project/orchestration/reviews/ACT-PATHMAP-NS-2-review.md`: an independent auditor (Opus, max, launched under
+W2-20), verdict.py READY. F1 (in scope, other): the five briefs become searchable by every session at the store refresh
+the commit starts; their reads were already open. F2 (out of scope, fails closed): a hand commit during an agent ACT is
+refused by the freeze; wait for the agent, then commit.
 
-[DEC-1101, DEC-1113, DEC-1057, DEC-1104 (2), OPERATOR-AGENT-1 §2]
+**Applied 2026-11-10 17:34 by the owner's operator:** `58211909f` (one file, two lines); check "state before (sha256
+44f99ea563cb)", then "state applied (sha256 7c69c414c0e7)"; verify silent; `gov.check.pathmap` exit 0; backup at the
+bundle's `backup/path-map.yaml.20261110T173422Z`.
