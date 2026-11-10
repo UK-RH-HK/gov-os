@@ -38,6 +38,7 @@ repository has no such branch (its first branch is ``main``).
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import re
@@ -565,9 +566,9 @@ class Run:
                 f"stderr:\n{self.stderr[-2000:]}")
 
 
-def run_gov(sandbox, cwd, *args, timeout=COMMAND_TIMEOUT_S):
+def run_gov(sandbox, cwd, *args, timeout=COMMAND_TIMEOUT_S, env=None):
     try:
-        done = subprocess.run(gov_argv(*args), cwd=str(cwd), env=base_environment(sandbox),
+        done = subprocess.run(gov_argv(*args), cwd=str(cwd), env=env or base_environment(sandbox),
                               capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         raise AssertionError(f"gov {' '.join(args)} did not end within {timeout:.0f} s") from None
@@ -666,9 +667,71 @@ class Launch:
         return data
 
 
+GIB = 1024 ** 3
+
+
+def plant_open_gate(sandbox):
+    """An open resource gate in the sandbox's HOME; the variables that name its readings, for ``gov launch``'s
+    environment (``base_environment`` builds it from scratch).
+
+    W2-20 S19 (DEC-1088 (5)(b)) runs the gate on every launch, and S8 shuts it when the configuration is missing. The
+    form is W2-136's ``_plant_open_gate`` (``tests/acceptance/W2-136/test_w2_136_launch_check.py``), from W2-20's
+    README, "The configuration file": every value dated and sourced, in ``$HOME/.gov-os/machine/gate.json``; the
+    readings are files under ``<elsewhere>/open-gate`` with room to spare, named through ``GOV_RESOURCES_*``. These
+    cases test the settings a launch builds, whatever the machine is doing. Planted once per sandbox."""
+    today = datetime.date.today().isoformat()
+
+    def dated(value, source="planted for the W2-58 launcher cases (W2-20 README)"):
+        return {"value": value, "date": today, "source": source}
+
+    base = sandbox.elsewhere / "open-gate"
+    readings = {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+    env = {"GOV_RESOURCES_NPROC": "64", **{variable: str(base / name) for variable, (name, _) in readings.items()}}
+    if base.is_dir():
+        return env
+    base.mkdir(parents=True)
+    cpu = str(max(os.sched_getaffinity(0)))
+    values = {
+        "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+        "verification_peak_bytes": dated(4 * GIB),
+        "working_size_bytes": dated(1 * GIB),
+        "rebuild_peak_bytes": dated(2 * GIB),
+        "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+        "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+        "verification_lock": dated(str(base / "verification.lock")),
+        "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+        "oom_floor_bytes": dated(1 * GIB),
+        "heavy_slots": dated(2),
+        "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+        "embedding_servers": {
+            "shared": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+            "query": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+        },
+    }
+    machine = sandbox.home / ".gov-os" / "machine"
+    machine.mkdir(parents=True, exist_ok=True)
+    (machine / "gate.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
+    for name, text in readings.values():
+        (base / name).write_text(text, encoding="utf-8")
+    return env
+
+
+def launch_environment(sandbox):
+    """``base_environment`` with the open gate planted and its readings added (``plant_open_gate``)."""
+    return {**base_environment(sandbox), **plant_open_gate(sandbox)}
+
+
 def launch(sandbox, cli, role, ticket):
+    """``gov launch <role> <ticket>`` in ``sandbox.project``, the resource gate planted open: it is W2-20's, not
+    under test here."""
     before = len(_calls(cli))
-    run = run_gov(sandbox, sandbox.project, "launch", role, ticket.tk)
+    run = run_gov(sandbox, sandbox.project, "launch", role, ticket.tk, env=launch_environment(sandbox))
     return Launch(run, tuple(_calls(cli)[before:]))
 
 
