@@ -159,7 +159,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 98 | A, B, C: fresh sessions at ~200k; the CTO clears before idles over 1 h; Sonnet for ACT-preparation helpers | **DONE 11-10**: rule 11 in the prompt's standing list and START-NEXT-SESSION §1b; in force from now |
 | 99 | D: the 5-minute cache for launched workers | NOT STARTED: next: the fresh session confirms the setting on this CLI, then sets it in launch_worker.sh |
 | 100 | every session's list-price cost logged in spend.jsonl | NOT STARTED: next: a daily job from USAGE-1's collect.py for the CTO and the helpers |
-| 101 | MODEL-TIERS-1, a read-only package | IN PROGRESS: a research helper from `drafts/model-tiers/BRIEF.md` (11-10 ~14:45); next: the fresh session checks, commits and brings it |
+| 101 | MODEL-TIERS-1, a read-only package | **DONE 11-10** (`packages/MODEL-TIERS-1.md`); WAITS: the owner's choice among its options (1 now; 2, 3 after the lift; 6 guidance) |
 | 102 | E and F trials | WAITS: after the lift |
 
 ## 1. Every item not done, partly done or waiting

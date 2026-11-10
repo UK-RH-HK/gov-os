@@ -35,11 +35,12 @@ the register and the owner's word hold over both. **Next free id: DEC-1119.**
    env-vars page, one planted worker's usage fields), then set it in `launch_worker.sh` and record it; (E, F) trials
    only after the lift. **Every session's list-price cost logged** (DEC-1118 (3)): a daily job from USAGE-1's scripts
    (`drafts/usage-1/collect.py`) appends the CTO's and the helpers' costs to `log/spend.jsonl` in its schema.
-6. **MODEL-TIERS-1 (DEC-1118 (4)), for you to finish:** a read-only research helper started 11-10 ~14:45 from
-   `.gov-runtime/scratch/orchestrator/drafts/model-tiers/BRIEF.md`; its draft lands as `drafts/model-tiers/MODEL-TIERS-1.md`.
-   If the draft is missing or incomplete when you start (the old session's helper dies with it), relaunch a research
-   agent on the same brief. Check the draft, commit it to `packages/MODEL-TIERS-1.md`, bring it to the owner; nothing
-   changes until the owner decides.
+6. **MODEL-TIERS-1 (DEC-1118 (4)): done, with the owner** (`packages/MODEL-TIERS-1.md`, 11-10). Its options: (1) apply C
+   as decided: every ACT-preparation helper's Agent call passes `model: "sonnet"` (and `effort: "high"` once the
+   owner says so: a Sonnet helper does not take the session's effort, and the Agent tool's effort is set only on an
+   explicit instruction); (2) E and F trials after the lift; (3) the map written through W2-33 and W2-60a after the
+   lift, with a trial exception (CIT-P and an ACT); (6) brief guidance on `gov retrieve` and long Bash outputs; not 4
+   or 5. Bring the owner's choice into the register; nothing else changes until then.
 4. **D-10's word** (the full suite), after ACT-CLAUDE-COPIES-3 and this fresh session.
 5. The owner's phone check of Claude notifications (DEC-1117 (2)); ntfy only if that is not the cause.
 
