@@ -39,10 +39,19 @@ def transcript(path, entries):
     path.write_text("\n".join(json.dumps(e) for e in entries) + "\n")
 
 
+def isolated(tmp_path):
+    """The switch's files in the case's own folder, never the CTO's live ones: a live stand-by note made the verdict
+    `standby` and a case's line in the live log tripped the sentinel check (D-10 run 1, 2026-11-10). A case's own
+    later arguments win (argparse keeps the last)."""
+    return ["--log", str(tmp_path / "deadman.log"), "--state", str(tmp_path / "dm-state.json"),
+            "--standby", str(tmp_path / "no-standby.txt"), "--inbox", str(tmp_path / "inbox"),
+            "--session-file", str(tmp_path / "no-session.txt")]
+
+
 def deadman(projects, now, tmp_path):
-    env = dict(os.environ, HOME=str(tmp_path))  # its state and log stay in the real scratch; --dry sends nothing
-    r = subprocess.run([sys.executable, str(DEADMAN), "--dry", "--projects", str(projects), "--now", now],
-                       capture_output=True, text=True, env=env)
+    env = dict(os.environ, HOME=str(tmp_path))  # --dry sends nothing
+    r = subprocess.run([sys.executable, str(DEADMAN), *isolated(tmp_path), "--dry", "--projects", str(projects),
+                        "--now", now], capture_output=True, text=True, env=env)
     return json.loads(r.stdout.strip().splitlines()[-1])
 
 
@@ -72,8 +81,8 @@ def test_the_switch_counts_a_tool_result_as_an_answered_call_and_alerts_by_day_a
 
 
 def test_a_forced_test_alert_goes_through_the_channel_and_a_replay_keeps_its_own_state(tmp_path):
-    r = subprocess.run([sys.executable, str(DEADMAN), "--test", "unit", "--dry", "--channel", "push"],
-                       capture_output=True, text=True)
+    r = subprocess.run([sys.executable, str(DEADMAN), *isolated(tmp_path), "--test", "unit", "--dry", "--channel",
+                        "push"], capture_output=True, text=True)
     assert json.loads(r.stdout.strip().splitlines()[-1]) == {**json.loads(r.stdout.strip().splitlines()[-1]),
                                                              "verdict": "TEST", "sent": ["push: dry"]}
     p = tmp_path / "proj"
@@ -81,14 +90,15 @@ def test_a_forced_test_alert_goes_through_the_channel_and_a_replay_keeps_its_own
     transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
                                 "message": {"content": [{"type": "tool_use", "name": "Bash"}]}}])
     state = tmp_path / "state.json"
-    r = subprocess.run([sys.executable, str(DEADMAN), "--projects", str(p), "--now", "2026-11-01 04:00",
-                        "--channel", "nothing", "--state", str(state)], capture_output=True, text=True)
+    r = subprocess.run([sys.executable, str(DEADMAN), *isolated(tmp_path), "--projects", str(p), "--now",
+                        "2026-11-01 04:00", "--channel", "nothing", "--state", str(state)], capture_output=True,
+                       text=True)
     assert json.loads(r.stdout.strip().splitlines()[-1])["verdict"] == "ALERT" and state.is_file()
 
 
 def watch(projects, tmp_path, *extra):
-    return subprocess.run([sys.executable, str(DEADMAN), "--watch", "--every", "1", "--max", "2", "--projects",
-                           str(projects), "--state", str(tmp_path / "st.json"), *extra],
+    return subprocess.run([sys.executable, str(DEADMAN), *isolated(tmp_path), "--watch", "--every", "1", "--max",
+                           "2", "--projects", str(projects), "--state", str(tmp_path / "st.json"), *extra],
                           capture_output=True, text=True, timeout=60)
 
 
