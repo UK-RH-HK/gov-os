@@ -98,3 +98,5 @@ alone fails S3's two ticket cases, its continued pages and S2's DEC-424 guard: S
 - `w2_131_support.py`: the planted repository, today's `retrieve` from git, the label oracle, the page walker.
 - `conftest.py`: the session's planted repository, today's module, the stand-ins (autouse) and `ask`.
 - `test_w2_131_labels.py` (S1), `test_w2_131_map.py` (S2), `test_w2_131_unchanged.py` (S3).
+
+- **D-10 run 2 (W2-138 `dcda27011`, DEC-1090 (3); DEC-1122 (3)):** `test_w2_131_unchanged.py` compares the continuation token decoded without its `s` key (the store's commit); the running tree's token must name a full commit, the same on every page, today's none, and every other key is still compared.
