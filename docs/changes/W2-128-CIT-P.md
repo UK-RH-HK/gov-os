@@ -1,7 +1,7 @@
 ---
 id: W2-128-CIT-P
 type: change-impact-proposal
-status: PROPOSED
+status: ACCEPTED
 state_class: EVIDENCE
 date: 2026-11-09
 branch: w2/W2-128
@@ -100,7 +100,7 @@ Every existing record stays valid: `python3 -m gov.check.schema` validates 974 r
 | Evidence | §1 (R2, R3, LINK-INTEGRITY §5, D5-ROWS) |
 | Corroboration | §1: R2 and R3 agree on the counts |
 | Proposal | This record (round 1 draft) |
-| Independent review | To come: one read-only reviewer after the acceptance suite is green |
-| Owner's approval | To come |
-| Versioned promotion | To come: each template carries `version: 1.0.0`; the promotion records the kernel version |
-| The `.claude/` copies | To come: the owner's operator installs them as an ACT |
+| Independent review | Done: READY for round 1, round 2a, round 2b, W2-152 (round 2) and W2-153 |
+| Owner's approval | **Approved: "Templates approved at 1bf23a0b3e77"** (owner, chat, 2026-11-10; DEC-1116; TEMPLATES-APPROVAL-1's table) |
+| Versioned promotion | Done: the kernel template set promoted as version 1.0.0 at `1bf23a0b3e77` (DEC-1116) |
+| The `.claude/` copies | ACT-CLAUDE-COPIES-1 applied (`eb48fe2f`); ACT-CLAUDE-COPIES-2 queued for the operator agent (the owner's yes, 2026-11-10) |

@@ -14194,6 +14194,17 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (the hidden sets hidden before the first writer run; the templates one source) and question 4
   (the lift's date protected if the week's allowance runs short).
 
+### DEC-1116 — W2-128's kernel templates approved at 1bf23a0b3e77 and promoted as version 1.0.0; ACT-CLAUDE-COPIES-2: yes
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** CAP-33, DEC-1050, DEC-1052, DEC-1081 (2), DEC-1115 · **Source:** the owner's messages (chat, 2026-11-10): "yes ACT-CLAUDE-COPIES-2 36ab6b62" and "Templates approved at 1bf23a0b3e77"
+- **Decision:**
+  - (1) **The templates approved** as the bytes in TEMPLATES-APPROVAL-1's table at integrate `1bf23a0b3e77` (the
+    brief envelope, the ticket, the seven role templates, the key list and the kernel skills and role of rounds 1, 2a
+    and 2b); W2-128's CIT-P moves to ACCEPTED and the set is promoted as version 1.0.0 of the kernel templates. The
+    test-design skill's remaining CAP-38.b citations follow as a later delta (DECIDED-NOT-DONE row 89).
+  - (2) **ACT-CLAUDE-COPIES-2: yes** (`yes ACT-CLAUDE-COPIES-2 36ab6b62`, class (b)), run by the operator agent.
+  - (3) The owner's operator applies ACT-OPERATOR-2 once the agent has finished ACT-CLAUDE-COPIES-2.
+- **Basis:** question 2 (the templates one approved source for every brief).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14247,3 +14258,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.498 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1113. Next free id: DEC-1114. |
 | 0.499 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1114. Next free id: DEC-1115. |
 | 0.500 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1115 (item 4 standing until the lift). Next free id: DEC-1116. |
+| 0.501 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1116. Next free id: DEC-1117. |
