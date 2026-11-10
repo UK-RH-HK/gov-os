@@ -43,10 +43,10 @@
   "D-10's red-fix list ready but for the portability family: ACT-CLAUDE-COPIES-3 clears it (your yes)",
   "A fresh CTO session: the handover ready (START-NEXT-SESSION, 11-10 14:30); switch when you are ready",
   "Then D-10 on your word: two runs and fixes; the re-pin ACT; your re-pin and push; the formal closes. The lift about 11-11",
-  "Beside: ACT-DEADMAN-WAKE-1, ACT-W2-149-INSTALL-1 (yeses), ACT-OPERATOR-2 and ACT-WIN-TOAST-1 (your operator); USAGE-1's savings",
+  "Beside: ACT-DEADMAN-WAKE-1, ACT-W2-149-INSTALL-1 (yeses); ACT-OPERATOR-2 and ACT-WIN-TOAST-1 APPLIED 11-10; DEC-1119's rubric first in the fresh session",
   "After: EXAMIN's copy about 11-15; Wave 2's end about 11-22 (E); usage 58 % at 13:56, the 80 % rule (DEC-1115 (4))"
  ],
- "owner_action": "yes ACT-CLAUDE-COPIES-3 7368f4f2; yes ACT-DEADMAN-WAKE-1 25c3af62; yes ACT-W2-149-INSTALL-1 dec93288; ACT-OPERATOR-2 and ACT-WIN-TOAST-1 by hand; USAGE-1 A-H; switch to the fresh session; then D-10's word",
+ "owner_action": "in the fresh session: yes ACT-CLAUDE-COPIES-3 7368f4f2; yes ACT-DEADMAN-WAKE-1 25c3af62; yes ACT-W2-149-INSTALL-1 dec93288; the rubric (DEC-1119) first; then D-10's word",
  "last_report": "2026-11-10 09:34:50",
  "chain_spec": "../dispatch/ready.txt",
  "chain_log": "chain-2026-10-31f.log",
