@@ -1,0 +1,14 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139-d10",
+   "change": "status line gone",
+   "line": "M  docs/plan/tools/validate_w2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139-d10",
+   "change": "status line gone",
+   "line": "M  tests/unit/plan/test_validate_w2.py"
+  }
+ ]
+}

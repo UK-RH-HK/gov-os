@@ -1,0 +1,3 @@
+window 2026-11-08T00:08:21 .. 2026-11-10T00:08:21; calls judged before 14569, after 14569, in both 14569
+answers: {'allow->allow': 14483, 'deny->deny': 86} ; calls naming the new globs: 86
+differences: 0; naming the new globs: 0; other: 0

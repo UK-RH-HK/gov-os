@@ -1,0 +1,575 @@
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/sub/zz-sg-none.txt: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r12.md: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [R] N1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [L] N2 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N2 engineer Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N2 engineer Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json').read())": want deny, got deny
+ok   [L] N2 engineer Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N2 research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N2 research Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N2 research Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json').read())": want deny, got deny
+ok   [L] N2 research Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N2 orchestrator (the CTO) Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N2 orchestrator (the CTO) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json').read())": want deny, got deny
+ok   [L] N2 orchestrator (the CTO) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N2 the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N2 the tuner (engineer@DAEO-wnnz) Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r2.md: want deny, got deny
+ok   [L] N2 the tuner (engineer@DAEO-wnnz) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json').read())": want deny, got deny
+ok   [L] N2 the tuner (engineer@DAEO-wnnz) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [R] N2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N2r engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden: want deny, got deny
+ok   [R] N2r engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg: want deny, got deny
+ok   [R] N2r engineer Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4: want deny, got deny
+ok   [R] N2r engineer Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N2r engineer Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N2r research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden: want deny, got deny
+ok   [R] N2r research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg: want deny, got deny
+ok   [R] N2r research Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4: want deny, got deny
+ok   [R] N2r research Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N2r research Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK-r1.md: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/miss-classes.json: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden/q01.yaml: want deny, got deny
+ok   [R] N2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [R] N3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 x: want deny, got deny
+ok   [R] N3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg x: want deny, got deny
+ok   [R] N3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden x: want deny, got deny
+ok   [R] N3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 x: want deny, got deny
+ok   [R] N3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg x: want deny, got deny
+ok   [R] N3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden x: want deny, got deny
+ok   [R] N3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 x: want deny, got deny
+ok   [R] N3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg x: want deny, got deny
+ok   [R] N3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden x: want deny, got deny
+ok   [R] N3 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 x: want deny, got deny
+ok   [R] N3 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg x: want deny, got deny
+ok   [R] N3 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/hidden x: want deny, got deny
+ok   [R] N3g engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs */miss-classes.json: want deny, got deny
+ok   [R] N3g engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 *.md: want deny, got deny
+ok   [R] N3g engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 hidden/*: want deny, got deny
+ok   [R] N3g engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg *.jsonl: want deny, got deny
+ok   [R] N3g research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs */miss-classes.json: want deny, got deny
+ok   [R] N3g research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 *.md: want deny, got deny
+ok   [R] N3g research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 hidden/*: want deny, got deny
+ok   [R] N3g research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg *.jsonl: want deny, got deny
+ok   [R] N3g orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs */miss-classes.json: want deny, got deny
+ok   [R] N3g orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 *.md: want deny, got deny
+ok   [R] N3g orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 hidden/*: want deny, got deny
+ok   [R] N3g orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg *.jsonl: want deny, got deny
+ok   [R] N3g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs */miss-classes.json: want deny, got deny
+ok   [R] N3g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 *.md: want deny, got deny
+ok   [R] N3g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4 hidden/*: want deny, got deny
+ok   [R] N3g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg *.jsonl: want deny, got deny
+ok   [L] N4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4a auditor Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4b engineer Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4b engineer Bash: cp /tmp/zz-sg-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4b engineer Bash: mkdir -p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden && : > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4b engineer Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4b orchestrator (the CTO) Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4b orchestrator (the CTO) Bash: cp /tmp/zz-sg-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4b orchestrator (the CTO) Bash: mkdir -p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden && : > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4b orchestrator (the CTO) Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] N4b lead Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] N4b lead Bash: cp /tmp/zz-sg-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] N4b lead Bash: mkdir -p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden && : > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want deny, got deny
+ok   [L] N4b lead Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --file fixtures/evaluation/zz-sg-new/hidden/q01.yaml: want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --notes fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --classes runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --name 'miss-classes.json': want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --misses runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] L1 orchestrator (the CTO) Bash: python3 x.py --sets-root ~/gov-os-eval --name 'misses.jsonl': want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --file fixtures/evaluation/zz-sg-new/hidden/q01.yaml: want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --notes fixtures/evaluation/zz-sg-new/XCHECK-r1.md: want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --classes runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --name 'miss-classes.json': want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --misses runs/zz-sg-audit/misses.jsonl: want deny, got deny
+ok   [L] L1 lead Bash: python3 x.py --sets-root ~/gov-os-eval --name 'misses.jsonl': want deny, got deny
+ok   [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --file zz-sg-new/hidden/q01.yaml: want deny, got deny
+ok   [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --notes zz-sg-new/XCHECK-r3.md: want deny, got deny
+ok   [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --classes runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --misses runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [L] L1a lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --file zz-sg-new/hidden/q01.yaml: want deny, got deny
+ok   [L] L1a lead Bash: python3 x.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --notes zz-sg-new/XCHECK-r3.md: want deny, got deny
+ok   [L] L1a lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --classes runs/zz-sg-audit/miss-classes.json: want deny, got deny
+ok   [L] L1a lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --misses runs/audit-sg/misses.jsonl: want deny, got deny
+ok   [L] S1 orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/writer.md --commit 6ff398a28 --set zz-sg-new: want allow, got allow
+ok   [L] S1 orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind checker --set memory-verdict-4 --round 2 --commit 6ff398a28: want allow, got allow
+ok   [L] S1 orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --audit zz-sg-audit --set memory-verdict-4 --commit 6ff398a28: want allow, got allow
+ok   [L] S1 orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --counts-only --run 20261110T010203Z-writer-r1 > /tmp/zz-sg-counts.json 2>&1: want allow, got allow
+ok   [L] S1 lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/writer.md --commit 6ff398a28 --set zz-sg-new: want allow, got allow
+ok   [L] S1 lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind checker --set memory-verdict-4 --round 2 --commit 6ff398a28: want allow, got allow
+ok   [L] S1 lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --audit zz-sg-audit --set memory-verdict-4 --commit 6ff398a28: want allow, got allow
+ok   [L] S1 lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --counts-only --run 20261110T010203Z-writer-r1 > /tmp/zz-sg-counts.json 2>&1: want allow, got allow
+ok   [L] S1a orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind writer --set zz-sg-new --round 2: want allow, got allow
+ok   [L] S1a orchestrator (the CTO) Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind auditor --audit audit-sg --dry: want allow, got allow
+ok   [L] S1a lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind writer --set zz-sg-new --round 2: want allow, got allow
+ok   [L] S1a lead Bash: python3 governance/project/orchestration/tools/indep_launch.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind auditor --audit audit-sg --dry: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/README.md: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK.md: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden-notes.md: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/XCHECK-r1.md.bak: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/sub/XCHECK-r1.md: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/miss-classes.json: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/sub/misses.jsonl: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl.bak: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/misses.jsonl: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/miss-classes.json: want allow, got allow
+ok   [L] O1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/fixtures/evaluation/memory-retrieval/visible/q03.yaml: want allow, got allow
+ok   [L] O1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O1t the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/wt/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [R] O2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got allow
+ok   [R] O2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got allow
+ok   [R] O2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got allow
+ok   [R] O2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/classes.json: want allow, got allow
+ok   [R] O2r engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got allow
+ok   [R] O2r engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] O2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] O2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got allow
+ok   [R] O2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got allow
+ok   [R] O2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got allow
+ok   [R] O2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/classes.json: want allow, got allow
+ok   [R] O2r research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got allow
+ok   [R] O2r research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] O2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/classes.json: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/audit-sg/classes.json: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] O2g engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible x: want allow, got allow
+ok   [R] O2g research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible x: want allow, got allow
+ok   [R] O2g orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible x: want allow, got allow
+ok   [R] O2g the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible x: want allow, got allow
+ok   [L] O2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O2 orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --out runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O2 lead Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got allow
+ok   [L] O2 lead Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/classes.json: want allow, got allow
+ok   [L] O2 lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --out runs/zz-sg-audit/report.md: want allow, got allow
+ok   [L] O3 engineer Bash: ls fixtures/evaluation: want allow, got allow
+ok   [L] O3 engineer Bash: grep -rln question fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [L] O3 engineer Bash: git log --oneline -1 -- fixtures/evaluation: want allow, got allow
+ok   [L] O3 research Bash: ls fixtures/evaluation: want allow, got allow
+ok   [L] O3 research Bash: grep -rln question fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [L] O3 research Bash: git log --oneline -1 -- fixtures/evaluation: want allow, got allow
+ok   [L] O3 orchestrator (the CTO) Bash: ls fixtures/evaluation: want allow, got allow
+ok   [L] O3 orchestrator (the CTO) Bash: grep -rln question fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [L] O3 orchestrator (the CTO) Bash: git log --oneline -1 -- fixtures/evaluation: want allow, got allow
+ok   [L] O3 the tuner (engineer@DAEO-wnnz) Bash: ls fixtures/evaluation: want allow, got allow
+ok   [L] O3 the tuner (engineer@DAEO-wnnz) Bash: grep -rln question fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [L] O3 the tuner (engineer@DAEO-wnnz) Bash: git log --oneline -1 -- fixtures/evaluation: want allow, got allow
+ok   [L] O4 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O4 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want allow, got allow
+ok   [L] O4 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/hidden/zz-sg-none.txt: want allow, got allow
+ok   [L] O4 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-sg-audit/miss-classes.json: want allow, got allow
+ok   [L] O5 orchestrator (the CTO) Bash: cat > /tmp/zz-sg-note.md <<'EOF': want allow, got allow
+ok   [L] O5 orchestrator (the CTO) Bash: echo the hidden folder, XCHECK-r1.md, miss-classes.json and misses.jsonl: want allow, got allow
+ok   [L] O5 orchestrator (the CTO) Bash: grep -rn miss-classes docs/contract: want allow, got allow
+ok   [L] O5 lead Bash: cat > /tmp/zz-sg-note.md <<'EOF': want allow, got allow
+ok   [L] O5 lead Bash: echo the hidden folder, XCHECK-r1.md, miss-classes.json and misses.jsonl: want allow, got allow
+ok   [L] O5 lead Bash: grep -rn miss-classes docs/contract: want allow, got allow
+cases: 573, run: 573, failed: 0, expect: after, skipped: none
+PASS

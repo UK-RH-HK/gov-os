@@ -1,0 +1,16 @@
+{
+ "orchestrator Bash {\"command\": \"ls fixtures/evaluation\"}": 196.2,
+ "engineer Bash {\"command\": \"ls fixtures/evaluation\"}": 191.2,
+ "orchestrator Grep {\"pattern\": \"x\", \"path\": \"/home/usain/gov-os-runs/W2-141-reb": 106.8,
+ "engineer Grep {\"pattern\": \"x\", \"path\": \"/home/usain/gov-os-runs/W2-141-reb": 114.2,
+ "orchestrator Glob {\"pattern\": \"**/*.py\", \"path\": \"/home/usain/gov-os-runs/W2-1": 106.3,
+ "engineer Glob {\"pattern\": \"**/*.py\", \"path\": \"/home/usain/gov-os-runs/W2-1": 118.3,
+ "orchestrator Bash {\"command\": \"ls /home/usain/gov-os-runs/W2-141-rebase-rehear": 206.3,
+ "engineer Bash {\"command\": \"ls /home/usain/gov-os-runs/W2-141-rebase-rehear": 216.8,
+ "orchestrator Bash {\"command\": \"git diff --name-only HEAD~1 | xargs grep -l x\"}": 212.6,
+ "engineer Bash {\"command\": \"git diff --name-only HEAD~1 | xargs grep -l x\"}": 224.0,
+ "orchestrator Bash {\"command\": \"git grep -l x HEAD -- '*.yaml' '*.json'\"}": 316.1,
+ "engineer Bash {\"command\": \"git grep -l x HEAD -- '*.yaml' '*.json'\"}": 848.2,
+ "orchestrator Read {\"file_path\": \"/home/usain/gov-os-runs/W2-141-rebase-rehears": 112.0,
+ "engineer Read {\"file_path\": \"/home/usain/gov-os-runs/W2-141-rebase-rehears": 119.4
+}

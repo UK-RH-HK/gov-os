@@ -10,12 +10,14 @@ it is not re-opened, except where the new base changes what it does. The staged 
 re-pin ACT, by the owner's operator; nothing live changes here. READY is computed by `verdict.py` from your block.
 
 ## What to review
-- **The commit:** `{COMMIT}` on `w2/integrate`, in your worktree (`git show {COMMIT}`): `docs/changes/W2-141-hook/pretooluse.py`
-  and its `README.md`. The old staged copy is `{COMMIT}~1:docs/changes/W2-141-hook/pretooluse.py`.
+- **The commit:** `beec1f2f8` on `w2/integrate`, in your worktree (`git show beec1f2f8`): `docs/changes/W2-141-hook/pretooluse.py`
+  and its `README.md`. The old staged copy is `beec1f2f8~1:docs/changes/W2-141-hook/pretooluse.py`.
 - **The hooks' history:** `git log --format='%h %s' -- .claude/hooks/pretooluse.py`. The old staged copy was made from
   `bd545af83198` (`15952bbfa`, ACT-GUARD-SETS-1), not from `97a84e770058` as the row first said; since then the live
   hook took ACT-INDEP-WALLS-1 (`147706ae4`), ACT-GUARD-CALLLOG-1 (`b7a373cf9`), ACT-OPERATOR-1 (`2a6462653`) and
   ACT-SETS-GLOBS-1 (`9cce7430d`). `role_reads.py`'s live file last changed in `e02d55e40` (`5407aade9417`).
+- **ACT-SETS-GLOBS-1** (the package and its hook diff `97a84e770058` → `74f8dbea4761`): `ACT-SETS-GLOBS-1.md` and
+  `pretooluse.diff` in `.gov-runtime/scratch/ref/W2-141-rebase/`.
 - **The CTO's runs** (copied into your worktree under `.gov-runtime/scratch/ref/W2-141-rebase/`):
   - `unit.log`, `accept.log`: `tests/unit/guard/test_w2_141_search.py` (pins the staged copy's diff against the live
     hook) and `gov accept W2-141` (the declared way, the pinned judge), at the main tree with the rebuilt copy.
@@ -24,10 +26,10 @@ re-pin ACT, by the owner's operator; nothing live changes here. READY is compute
     Steps: `sets_globs_check.py`, `walls_check.py repo`, `guard4_check.py --settings`, the guard suites
     (`test_guard_fix_4`, `test_g14`, `test_live_hook` + `test_reads`), latency, and a 48-hour replay of the real calls
     judged under DAEO-sdxk and again under DAEO-xwro (W2-141's own ticket, so its search rule is exercised).
-    {RESULTS}
+    **Results:** unit 204 passed; `gov accept W2-141` 184 passed, 0 failed, 0 skipped. Rehearsal (`failures: 0`): `sets_globs_check.py` 573 run, 0 failed before and after; `walls_check.py repo` 331/0 before and after; `guard4_check.py --settings` 501/0 before and after; `test_guard_fix_4` 467/467 both; `test_live_hook` + `test_reads` 85/85 both; `test_g14` (the G-14 ACT's draft suite, `drafts/g14/test_g14.py`, copied as `test_g14.py`) before 1 failed (`test_w2_91_tests_today`, red at this head without any change, as in ACT-SETS-GLOBS-1's rehearsal), after 5 failed: that one plus four `test_near_misses_pass` engineer cases (a search from above: `grep -rn x tests/acceptance`, `Glob tests/acceptance/**`, `Grep` of the tree root, `grep -r foo tests/`) which the CTO reads as S1/S2's intended refusals (judge that). Replay, 48 h, 14,569 unique calls: under DAEO-sdxk 0 changed (14,483 allow, 86 deny); under DAEO-xwro 29 allow->deny (engineer Grep 23, Bash 6; every reason "the search can reach tests/acceptance/W2-141/"), 0 deny->allow (`out/compare-after-xwro.txt`). Latency median 147.3 -> 168.0 ms under a load of 13-16 on 20 CPUs. Live files unchanged; 0 lines in the live call log.
 
 ## Check (each a KPI line of your verdict block)
-- **R1 the rebuild is exact:** the staged `pretooluse.py` equals the live `.claude/hooks/pretooluse.py` at `{COMMIT}`
+- **R1 the rebuild is exact:** the staged `pretooluse.py` equals the live `.claude/hooks/pretooluse.py` at `beec1f2f8`
   with one change, `"Glob"` added to G-14's tool list; and the old staged copy's only change against its own base
   `bd545af83198` (`git show 15952bbfa:.claude/hooks/pretooluse.py`) was that same word, so nothing of W2-141 is lost.
   Compute the hashes and diffs yourself.

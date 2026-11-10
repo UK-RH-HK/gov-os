@@ -1,0 +1,339 @@
+ok   [L] W1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/checker/R9/input/zz-walls-none.txt: want deny, got deny
+ok   [L] W1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [R] W1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [R] W1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json: want deny, got deny
+ok   [R] W1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/.claude/settings.json: want deny, got deny
+ok   [R] W1r the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/input/selection.json: want deny, got deny
+ok   [L] W2 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 engineer Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/labeller/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [L] W2 research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 research Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/labeller/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [L] W2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 orchestrator (the CTO) Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/labeller/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [L] W2 the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 the tuner (engineer@DAEO-wnnz) Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/labeller/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W2 the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [R] W2r engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W2r engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r engineer Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r engineer Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W2r engineer Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json').read())": want deny, got deny
+ok   [R] W2r research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W2r research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r research Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r research Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W2r research Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json').read())": want deny, got deny
+ok   [R] W2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r orchestrator (the CTO) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r orchestrator (the CTO) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W2r orchestrator (the CTO) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json').read())": want deny, got deny
+ok   [R] W2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/seed.txt: want deny, got deny
+ok   [R] W2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r the tuner (engineer@DAEO-wnnz) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls: want deny, got deny
+ok   [R] W2r the tuner (engineer@DAEO-wnnz) Bash: wc -l /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/brief.md: want deny, got deny
+ok   [R] W2r the tuner (engineer@DAEO-wnnz) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/WALL.json').read())": want deny, got deny
+ok   [R] W3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1 x: want deny, got deny
+ok   [R] W3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls x: want deny, got deny
+ok   [R] W3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1 x: want deny, got deny
+ok   [R] W3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls x: want deny, got deny
+ok   [R] W3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1 x: want deny, got deny
+ok   [R] W3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls x: want deny, got deny
+ok   [R] W3 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1 x: want deny, got deny
+ok   [R] W3 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls x: want deny, got deny
+ok   [R] W3l engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls **/*.md: want deny, got deny
+ok   [R] W3l engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out *: want deny, got deny
+ok   [R] W3l research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls **/*.md: want deny, got deny
+ok   [R] W3l research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out *: want deny, got deny
+ok   [R] W3l orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls **/*.md: want deny, got deny
+ok   [R] W3l orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out *: want deny, got deny
+ok   [R] W3l the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls **/*.md: want deny, got deny
+ok   [R] W3l the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out *: want deny, got deny
+ok   [L] W4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4a auditor Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4b engineer Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4b engineer Bash: cp /tmp/zz-walls-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W4b orchestrator (the CTO) Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W4b orchestrator (the CTO) Bash: cp /tmp/zz-walls-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W5 orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --wall ~/gov-os-eval/indep-walls/writer/R1: want deny, got deny
+ok   [L] W5 orchestrator (the CTO) Bash: cat ~/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W5 orchestrator (the CTO) Bash: ls "$HOME/gov-os-eval/indep-walls/writer": want deny, got deny
+ok   [L] W5 lead Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --wall ~/gov-os-eval/indep-walls/writer/R1: want deny, got deny
+ok   [L] W5 lead Bash: cat ~/gov-os-eval/indep-walls/APPROVED: want deny, got deny
+ok   [L] W5 lead Bash: ls "$HOME/gov-os-eval/indep-walls/writer": want deny, got deny
+ok   [L] W5a orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --out /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [L] W5a lead Bash: python3 tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --out /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/out: want deny, got deny
+ok   [L] W5b orchestrator (the CTO) Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $D/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W5b orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && ls indep-walls: want deny, got deny
+ok   [L] W5b lead Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $D/indep-walls/writer/R1/out/zz-walls-none.txt: want deny, got deny
+ok   [L] W5b lead Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && ls indep-walls: want deny, got deny
+ok   [L] W6 orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/writer.md --commit 6ff398a28 --seed new: want allow, got allow
+ok   [L] W6 orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --run L2 --counts-only > /tmp/zz-walls-counts.json 2>&1: want allow, got allow
+ok   [L] W6 lead Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/writer.md --commit 6ff398a28 --seed new: want allow, got allow
+ok   [L] W6 lead Bash: python3 tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --run L2 --counts-only > /tmp/zz-walls-counts.json 2>&1: want allow, got allow
+ok   [L] W6a orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind checker --commit 6ff398a28: want allow, got allow
+ok   [L] W6a orchestrator (the CTO) Bash: python3 tools/indep_launch.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind auditor --dry: want allow, got allow
+ok   [L] W6a lead Bash: python3 tools/indep_launch.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind checker --commit 6ff398a28: want allow, got allow
+ok   [L] W6a lead Bash: python3 tools/indep_launch.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --kind auditor --dry: want allow, got allow
+ok   [L] W5c orchestrator (the CTO) Bash: cat > /tmp/zz-walls-note.md <<'EOF'
+the walls
+walls
+EOF: want allow, got allow
+ok   [L] W5c orchestrator (the CTO) Bash: echo walls: want allow, got allow
+ok   [L] W5c orchestrator (the CTO) Bash: grep -rn walls docs/contract: want allow, got allow
+ok   [L] W5c lead Bash: cat > /tmp/zz-walls-note.md <<'EOF'
+the walls
+walls
+EOF: want allow, got allow
+ok   [L] W5c lead Bash: echo walls: want allow, got allow
+ok   [L] W5c lead Bash: grep -rn walls docs/contract: want allow, got allow
+ok   [L] W7 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W7 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/indep-walls/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/indep/writer/R1/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/docs/walls/zz-walls-none.txt: want allow, got allow
+ok   [L] W8 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-wall-trees/writer-R1/zz-walls-none.txt: want allow, got allow
+ok   [L] T1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T1 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none.txt: want deny, got deny
+ok   [L] T1 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T1 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none.txt: want deny, got deny
+ok   [L] T1 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T1 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none.txt: want deny, got deny
+ok   [L] T2 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects x: want deny, got deny
+ok   [L] T2 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude x: want deny, got deny
+ok   [L] T2 the tuner (engineer@DAEO-wnnz) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project x: want deny, got deny
+ok   [L] T2 the tuner by WBS id (engineer@W2-56) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects x: want deny, got deny
+ok   [L] T2 the tuner by WBS id (engineer@W2-56) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude x: want deny, got deny
+ok   [L] T2 the tuner by WBS id (engineer@W2-56) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project x: want deny, got deny
+ok   [L] T2 the tuner's subagent Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects x: want deny, got deny
+ok   [L] T2 the tuner's subagent Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude x: want deny, got deny
+ok   [L] T2 the tuner's subagent Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project x: want deny, got deny
+ok   [L] T2g the tuner (engineer@DAEO-wnnz) Glob: None /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/**/*.jsonl: want deny, got deny
+ok   [L] T2g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude projects/**: want deny, got deny
+ok   [L] T2g the tuner (engineer@DAEO-wnnz) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects *: want deny, got deny
+ok   [L] T2g the tuner by WBS id (engineer@W2-56) Glob: None /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/**/*.jsonl: want deny, got deny
+ok   [L] T2g the tuner by WBS id (engineer@W2-56) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude projects/**: want deny, got deny
+ok   [L] T2g the tuner by WBS id (engineer@W2-56) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects *: want deny, got deny
+ok   [L] T2g the tuner's subagent Glob: None /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/**/*.jsonl: want deny, got deny
+ok   [L] T2g the tuner's subagent Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude projects/**: want deny, got deny
+ok   [L] T2g the tuner's subagent Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects *: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: ls ~/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: cd ~/.claude && cat projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: D=~/.claude; cat $D/projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: grep -rn x $HOME/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: find ~/.claude -name '*.jsonl': want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: ls ~/.claude/*/: want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl').read())": want deny, got deny
+ok   [L] T3 the tuner (engineer@DAEO-wnnz) Bash: tail -1 "$HOME/.claude/projects/zz/zz.jsonl": want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: ls ~/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: cd ~/.claude && cat projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: D=~/.claude; cat $D/projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: grep -rn x $HOME/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: find ~/.claude -name '*.jsonl': want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: ls ~/.claude/*/: want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl').read())": want deny, got deny
+ok   [L] T3 the tuner by WBS id (engineer@W2-56) Bash: tail -1 "$HOME/.claude/projects/zz/zz.jsonl": want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: ls ~/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: cd ~/.claude && cat projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: D=~/.claude; cat $D/projects/zz.jsonl: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: grep -rn x $HOME/.claude/projects: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: find ~/.claude -name '*.jsonl': want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: ls ~/.claude/*/: want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl').read())": want deny, got deny
+ok   [L] T3 the tuner's subagent Bash: tail -1 "$HOME/.claude/projects/zz/zz.jsonl": want deny, got deny
+ok   [L] T4 the tuner (engineer@DAEO-wnnz) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T4 the tuner by WBS id (engineer@W2-56) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T4 the tuner's subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T4b the tuner (engineer@DAEO-wnnz) Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T4b the tuner by WBS id (engineer@W2-56) Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T4b the tuner's subagent Bash: echo x >> /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want deny, got deny
+ok   [L] T5 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T5 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/corpus/zz-walls-none.txt: want deny, got deny
+ok   [L] T5 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T5 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/corpus/zz-walls-none.txt: want deny, got deny
+ok   [L] T5 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T5 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/corpus/zz-walls-none.txt: want deny, got deny
+ok   [L] T5b the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T5b the tuner by WBS id (engineer@W2-56) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T5b the tuner's subagent Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/sandbox-guard-exp-1/hidden/zz-walls-none.txt: want deny, got deny
+ok   [L] T6 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/README.md: want allow, got allow
+ok   [L] T6 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/SANDBOX-GUARD-EXP-1/tuning/zz-walls-none.txt: want allow, got allow
+ok   [L] T6 the tuner (engineer@DAEO-wnnz) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/settings.json: want allow, got allow
+ok   [L] T6 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/README.md: want allow, got allow
+ok   [L] T6 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/SANDBOX-GUARD-EXP-1/tuning/zz-walls-none.txt: want allow, got allow
+ok   [L] T6 the tuner by WBS id (engineer@W2-56) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/settings.json: want allow, got allow
+ok   [L] T6 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/README.md: want allow, got allow
+ok   [L] T6 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-runs/SANDBOX-GUARD-EXP-1/tuning/zz-walls-none.txt: want allow, got allow
+ok   [L] T6 the tuner's subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/settings.json: want allow, got allow
+ok   [L] T6b the tuner (engineer@DAEO-wnnz) Bash: ls ~/.claude/skills: want allow, got allow
+ok   [L] T6b the tuner (engineer@DAEO-wnnz) Bash: cat ~/.claude/settings.json: want allow, got allow
+ok   [L] T6b the tuner (engineer@DAEO-wnnz) Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T6b the tuner by WBS id (engineer@W2-56) Bash: ls ~/.claude/skills: want allow, got allow
+ok   [L] T6b the tuner by WBS id (engineer@W2-56) Bash: cat ~/.claude/settings.json: want allow, got allow
+ok   [L] T6b the tuner by WBS id (engineer@W2-56) Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T6b the tuner's subagent Bash: ls ~/.claude/skills: want allow, got allow
+ok   [L] T6b the tuner's subagent Bash: cat ~/.claude/settings.json: want allow, got allow
+ok   [L] T6b the tuner's subagent Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T7 engineer on another ticket Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 lead on W2-56 Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 research on W2-56 Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 test designer on W2-56 Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7b orchestrator (the CTO) Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T7b orchestrator (the CTO) Bash: ls ~/.claude/projects: want allow, got allow
+ok   [L] T7b orchestrator (the CTO) Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7b lead on W2-56 Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T7b lead on W2-56 Bash: ls ~/.claude/projects: want allow, got allow
+ok   [L] T7b lead on W2-56 Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+ok   [L] T7b CTO's engineer subagent Bash: python3 tools/guard_refusals.py --since 2026-11-08: want allow, got allow
+ok   [L] T7b CTO's engineer subagent Bash: ls ~/.claude/projects: want allow, got allow
+ok   [L] T7b CTO's engineer subagent Bash: tail -1 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/.claude/projects/zz-walls-none-project/zz-walls-none.jsonl: want allow, got allow
+repo cases: 331, run: 331, failed: 0, expect: after, skipped: none
+PASS

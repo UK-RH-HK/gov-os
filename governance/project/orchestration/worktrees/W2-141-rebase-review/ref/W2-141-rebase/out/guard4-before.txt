@@ -1,0 +1,503 @@
+ok   rule1 engineer Write acceptance: want deny, got deny
+ok   rule1 engineer bash redirect acceptance: want deny, got deny
+ok   rule1 orchestrator Edit acceptance: want deny, got deny
+ok   rule1 test designer Write acceptance: want allow, got allow
+ok   rule2 measured role reads hidden: want deny, got deny
+ok   rule2 held-out named: want deny, got deny
+ok   rule2 measured role reads hidden in another worktree: want deny, got deny
+ok   rule2 measured role reads hidden in a run clone: want deny, got deny
+ok   rule2 measured role reads hidden in the main tree: want deny, got deny
+ok   rule5 auditor writes its probe record: want allow, got allow
+ok   rule5 auditor writes its audit report: want allow, got allow
+ok   rule5 auditor bash writes its record: want allow, got allow
+ok   rule5 auditor writes /tmp: want allow, got allow
+ok   rule5 auditor edits code: want deny, got deny
+ok   rule5 auditor writes a test: want deny, got deny
+ok   rule5 auditor edits a ticket: want deny, got deny
+ok   rule5 auditor edits the register: want deny, got deny
+ok   rule5 auditor edits a lead handover: want deny, got deny
+ok   rule5 auditor bash writes code: want deny, got deny
+ok   rule5 auditor unreadable bash (G-2: let through): want allow, got allow
+ok   rule5 auditor writes its record in the CTO's reviews/: want allow, got allow
+ok   rule5 auditor makes reviews/ and writes its record by bash: want allow, got allow
+ok   rule5 auditor deletes reviews/: want deny, got deny
+ok   rule5 auditor writes the CTO's briefs: want deny, got deny
+ok   rm catastrophic: the home folder: want deny, got deny
+ok   rm catastrophic: the repository's root: want deny, got deny
+ok   rm catastrophic: the .git: want deny, got deny
+ok   rm catastrophic: a tracked file of the main tree: want deny, got deny
+ok   rm catastrophic: an empty variable: want deny, got deny
+ok   rm catastrophic: outside the project: want deny, got deny
+ok   rm free: the project's scratch: want allow, got allow
+ok   rule5 auditor reads code: want allow, got allow
+ok   rule3 read .env: want deny, got deny
+ok   rule3 cat ssh key: want deny, got deny
+ok   rule4 engineer pip install: want deny, got deny
+ok   rule4 CTO (orchestrator on W2-00) pip install: want ask, got ask
+ok   rule4 lead (orchestrator on W2-87) pip install: want deny, got deny
+ok   rule4 lead (orchestrator on W2-64) npm install: want deny, got deny
+ok   rule4 CTO's engineer subagent pip install: want deny, got deny
+ok   rule4 sudo: want deny, got deny
+ok   lifted heredoc to tmp: want allow, got allow
+ok   lifted engineer writes src: want allow, got allow
+ok   lifted var write target: want allow, got allow
+ok   lifted backticks: want allow, got allow
+ok   lifted inline python braces: want allow, got allow
+ok   lifted rm: want allow, got allow
+ok   lifted engineer reads acceptance: want allow, got allow
+ok   lifted CronCreate: want allow, got allow
+ok   lifted general-purpose subagent write: want allow, got allow
+ok   dec958 engineer runs its acceptance tests: want allow, got allow
+ok   dec958 lead lists acceptance folders: want allow, got allow
+ok   dec958 lead greps acceptance through a pipe: want allow, got allow
+ok   dec958 lead greps a conftest with an alternation: want allow, got allow
+ok   dec958 CTO builds a brief naming the acceptance path: want allow, got allow
+ok   dec958 auditor runs git log: want allow, got allow
+ok   dec958 auditor runs the tests: want allow, got allow
+ok   dec958 engineer inline python writes acceptance: want deny, got deny
+ok   fix2 lead import check then lists acceptance: want allow, got allow
+ok   fix2 lead import check then greps acceptance: want allow, got allow
+ok   fix2 engineer inline python writes /tmp/tests/acceptance after a cd (G-1: outside every tree): want allow, got allow
+ok   fix2 engineer perl -i on acceptance (G-1: perl is not read; the landing check): want allow, got allow
+ok   fix2 unbalanced quotes naming acceptance (G-1: unreadable, let through): want allow, got allow
+ok   dec958 engineer tee into acceptance: want deny, got deny
+ok   dec958 engineer sed -i acceptance: want deny, got deny
+ok   dec958 engineer cp into acceptance: want deny, got deny
+ok   G-14 W2-126's engineer reads its own acceptance tests: want deny, got deny
+ok   G-14 W2-126's engineer reads W2-123's case revised for it (Task: DAEO-jpr0, 741f9edd): want deny, got deny
+ok   G-14 W2-126's engineer reads another ticket's tests (regressions): want allow, got allow
+ok   G-14 engineer greps for the tests' name (a pattern, not a read): want allow, got allow
+ok   G-14 orchestrator reads the acceptance tests: want allow, got allow
+ok   [L] sets S1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S2 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S3 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S4 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S5 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets S6 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/transcripts/zz-guard4-none.yaml: want deny, got deny
+ok   [R] sets S7 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md: want deny, got deny
+ok   [R] sets S7 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md: want deny, got deny
+ok   [L] sets S8 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S8 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S8 independent-reviewer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets S9 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [R] sets S10 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/governance/project/path-map.yaml: want allow, got allow
+ok   [L] sets G1 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d x: want deny, got deny
+ok   [L] sets G1 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d x: want deny, got deny
+ok   [L] sets G1 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d x: want deny, got deny
+ok   [R] sets G2 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval x: want deny, got deny
+ok   [R] sets G2 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval x: want deny, got deny
+ok   [R] sets G2 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval x: want deny, got deny
+ok   [R] sets G4 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible x: want allow, got allow
+ok   [R] sets G4 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible x: want allow, got allow
+ok   [R] sets G4 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible x: want allow, got allow
+ok   [L] sets G5 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS x: want allow, got allow
+ok   [L] sets G5 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS x: want allow, got allow
+ok   [L] sets G5 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS x: want allow, got allow
+ok   [L] sets G6 engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d *: want deny, got deny
+ok   [L] sets G6 research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d *: want deny, got deny
+ok   [L] sets G6 orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d *: want deny, got deny
+ok   [L] sets G7 engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval fixtures/evaluation/memory-verdict-2/hidden/*.yaml: want deny, got deny
+ok   [L] sets G7 research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval fixtures/evaluation/memory-verdict-2/hidden/*.yaml: want deny, got deny
+ok   [L] sets G7 orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval fixtures/evaluation/memory-verdict-2/hidden/*.yaml: want deny, got deny
+ok   [L] sets G8 engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval **/*.yaml: want allow, got allow
+ok   [L] sets G8 research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval **/*.yaml: want allow, got allow
+ok   [L] sets G8 orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval **/*.yaml: want allow, got allow
+ok   [L] sets B1 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B1 research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B1 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B4 engineer Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && cat fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B4 research Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && cat fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B4 orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && cat fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B5 engineer Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B5 research Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B5 orchestrator (the CTO) Bash: head -5 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/retired/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets B6 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d: want deny, got deny
+ok   [L] sets B6 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d: want deny, got deny
+ok   [L] sets B6 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d: want deny, got deny
+ok   [R] sets B7 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden: want deny, got deny
+ok   [R] sets B7 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden: want deny, got deny
+ok   [R] sets B7 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden: want deny, got deny
+ok   [R] sets B8 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [R] sets B8 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B8 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [R] sets B8 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B8 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [R] sets B8 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B9 engineer Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want deny, got deny
+ok   [R] sets B9 research Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want deny, got deny
+ok   [R] sets B9 orchestrator (the CTO) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want deny, got deny
+ok   [R] sets B10 engineer Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B10 research Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B10 orchestrator (the CTO) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/visible: want allow, got allow
+ok   [R] sets B11 engineer Bash: find /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval -name '*.yaml' -exec cat {} +: want deny, got deny
+ok   [R] sets B11 research Bash: find /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval -name '*.yaml' -exec cat {} +: want deny, got deny
+ok   [R] sets B11 orchestrator (the CTO) Bash: find /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval -name '*.yaml' -exec cat {} +: want deny, got deny
+ok   [R] sets B12 engineer Bash: sed -n 1,5p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md: want deny, got deny
+ok   [R] sets B12 research Bash: sed -n 1,5p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md: want deny, got deny
+ok   [R] sets B12 orchestrator (the CTO) Bash: sed -n 1,5p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md: want deny, got deny
+ok   [R] sets B13 engineer Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/p01.yaml').read())": want deny, got deny
+ok   [R] sets B13 research Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/p01.yaml').read())": want deny, got deny
+ok   [R] sets B13 orchestrator (the CTO) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/p01.yaml').read())": want deny, got deny
+ok   [L] sets B14 engineer Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml').read())": want deny, got deny
+ok   [L] sets B14 research Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml').read())": want deny, got deny
+ok   [L] sets B14 orchestrator (the CTO) Bash: python3 -c "print(open('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml').read())": want deny, got deny
+ok   [L] sets B15 no GOV_ROLE Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets B15 ticket-lead Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets B15 independent-reviewer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets M3 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --part hidden: want allow, got allow
+ok   [L] sets M4 orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && python3 -m gov.retrieval.measure memory-retrieval --root /tmp/gov-guard4-clone --sets-root . --part all: want deny, got deny
+ok   [L] sets M5 orchestrator (the CTO) Bash: bash .gov-runtime/scratch/orchestrator/drafts/score-once/so_measure.sh p n r60 '{}' /tmp/gov-guard4-c: want allow, got allow
+ok   [R] sets X1 engineer Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got allow
+ok   [R] sets X1 orchestrator (the CTO) Bash: git diff --name-only w2/integrate | xargs grep -n TODO: want allow, got allow
+ok   [R] sets X2 engineer Bash: cat $(git diff --name-only HEAD~1): want allow, got allow
+ok   [R] sets X2 orchestrator (the CTO) Bash: cat $(git diff --name-only HEAD~1): want allow, got allow
+ok   [R] sets X3 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden | xargs cat: want deny, got deny
+ok   [R] sets X3 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden | xargs cat: want deny, got deny
+ok   [R] sets X4 engineer Bash: cat $(find /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval -name '*.yaml'): want deny, got deny
+ok   [R] sets X4 orchestrator (the CTO) Bash: cat $(find /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval -name '*.yaml'): want deny, got deny
+ok   [R] sets X6 engineer Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && git diff --name-only | xargs cat: want deny, got deny
+ok   [R] sets X6 orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && git diff --name-only | xargs cat: want deny, got deny
+ok   [R] sets X7 engineer Bash: xargs -a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/list cat: want deny, got deny
+ok   [R] sets X7 orchestrator (the CTO) Bash: xargs -a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/list cat: want deny, got deny
+ok   [R] sets X8 engineer Bash: while read f; do cat "$f"; done < /tmp/gov-guard4-list: want deny, got deny
+ok   [R] sets X8 orchestrator (the CTO) Bash: while read f; do cat "$f"; done < /tmp/gov-guard4-list: want deny, got deny
+ok   [L] sets W1 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 auditor Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W1 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W2 engineer Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W3 orchestrator (the CTO) Bash: cp /tmp/gov-guard4-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W4 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W5 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4/.n: want allow, got allow
+ok   [L] sets W6 orchestrator (the CTO) Bash: mkdir -p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4 && : > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4/.n: want allow, got allow
+ok   [L] sets W7 orchestrator (the CTO) Edit: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/governance/project/path-map.yaml: want allow, got allow
+ok   [L] sets W8 no GOV_ROLE Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets W8 ticket-lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets W8 independent-reviewer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets W9 orchestrator (the CTO) Bash: mkdir -p $D/t: want allow, got allow
+ok   [L] sets T1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/Dynamic-Agentic-Engineering-OS/fixtures/evaluation/memory-retrieval/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets T2 orchestrator (the CTO) Read: /home/usain/gov-os-worktrees/W2-13/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets T3 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F1 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d: want deny, got deny
+ok   [L] sets F2 engineer Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 engineer Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 research Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 research Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d: want deny, got deny
+ok   [L] sets F2 research Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 research Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d: want deny, got deny
+ok   [L] sets F2 orchestrator (the CTO) Bash: head -3 /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F2 orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F3 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d x: want deny, got deny
+ok   [L] sets F3 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d x: want deny, got deny
+ok   [L] sets F3 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d x: want deny, got deny
+ok   [L] sets F4 engineer Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs fresh-80/*: want deny, got deny
+ok   [L] sets F4 research Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs fresh-80/*: want deny, got deny
+ok   [L] sets F4 orchestrator (the CTO) Glob: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs fresh-80/*: want deny, got deny
+ok   [R] sets F5 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80: want deny, got deny
+ok   [R] sets F5 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F5 engineer Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want deny, got deny
+ok   [R] sets F5 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F5 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80: want deny, got deny
+ok   [R] sets F5 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F5 orchestrator (the CTO) Bash: grep -rn x /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want deny, got deny
+ok   [R] sets F5 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F6 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets F6 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets F6 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-1/k01.json: want deny, got deny
+ok   [R] sets F7 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs x: want deny, got deny
+ok   [R] sets F7 research Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs x: want deny, got deny
+ok   [R] sets F7 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs x: want deny, got deny
+ok   [L] sets F8 engineer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 research Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 lead Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 product-spec Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 test designer Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 auditor Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 CTO's engineer subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F8 CTO's general-purpose subagent Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F9 orchestrator (the CTO) Bash: mkdir -p /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4 && : > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4/.n: want deny, got deny
+ok   [L] sets F9 orchestrator (the CTO) Bash: cp /tmp/gov-guard4-a /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F9 orchestrator (the CTO) Bash: echo x > /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets F10 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 research Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 product-spec Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 test designer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 auditor Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 CTO's engineer subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80b/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F10 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80.txt: want allow, got allow
+ok   [L] sets F10 CTO's general-purpose subagent Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-none.yaml: want allow, got allow
+ok   [R] sets F11 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] sets F11 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] sets F11 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0: want allow, got allow
+ok   [R] sets F11 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs: want allow, got allow
+ok   [R] sets F11 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] sets F11 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0: want allow, got allow
+ok   [R] sets F12 engineer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] sets F12 orchestrator (the CTO) Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got allow
+ok   [R] sets F13 engineer Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0 x: want allow, got allow
+ok   [R] sets F13 orchestrator (the CTO) Grep: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/e0 x: want allow, got allow
+ok   [L] sets F14 orchestrator (the CTO) Write: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/zz-guard4-e0/.n: want allow, got allow
+ok   [L] sets F15 no GOV_ROLE Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F15 ticket-lead Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F15 independent-reviewer Read: /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.yaml: want allow, got allow
+ok   [L] sets F17 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets F17 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets F17 orchestrator (the CTO) Bash: python3 -m gov.retrieval.measure memory-verdict-2 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --part hidden: want allow, got allow
+ok   [L] sets F17 lead Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets F17 lead Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets F17 lead Bash: python3 -m gov.retrieval.measure memory-verdict-2 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --part hidden: want allow, got allow
+ok   [R] sets F18 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets F20 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --out /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4: want deny, got deny
+ok   [L] sets F20 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --questions /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2/hidden/zz-guard4-none.d: want deny, got deny
+ok   [L] sets F20 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval && ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/zz-guard4-none.d: want deny, got deny
+ok   [R] sets F21 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --set /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-2: want deny, got deny
+ok   [R] sets F21 orchestrator (the CTO) Bash: test -e /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/USED && echo used: want deny, got deny
+ok   [R] sets F21 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --rows /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/rows: want deny, got deny
+ok   [L] sets F23 orchestrator (the CTO) Bash: GOV_KEEP=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80/kept-zz-guard4 python3 .gov-runtime/scratch/orchestrator/drafts/zz-guard4-f80/f80_run.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want deny, got deny
+ok   [L] sets V1 engineer Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $D/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets V1 orchestrator (the CTO) Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $D/runs/fresh-80/rows/zz-guard4-none.yaml: want deny, got deny
+ok   [L] sets V2 engineer Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80; cat "$D/rows/zz-guard4-none.yaml": want deny, got deny
+ok   [L] sets V2 orchestrator (the CTO) Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80; cat "$D/rows/zz-guard4-none.yaml": want deny, got deny
+ok   [R] sets V3 engineer Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $R/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets V3 orchestrator (the CTO) Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; cat $R/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets V4 engineer Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; ls $R/runs/fresh-80: want deny, got deny
+ok   [R] sets V4 orchestrator (the CTO) Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; ls $R/runs/fresh-80: want deny, got deny
+ok   [R] sets V5 engineer Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; grep -r x $R/runs: want deny, got deny
+ok   [R] sets V5 orchestrator (the CTO) Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; grep -r x $R/runs: want deny, got deny
+ok   [R] sets V6 engineer Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80; cd "$D" && cat rows/q01.json: want deny, got deny
+ok   [R] sets V6 orchestrator (the CTO) Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/fresh-80; cd "$D" && cat rows/q01.json: want deny, got deny
+ok   [R] sets V7 engineer Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; find $R -name '*.json' -exec cat {} +: want deny, got deny
+ok   [R] sets V7 orchestrator (the CTO) Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; find $R -name '*.json' -exec cat {} +: want deny, got deny
+ok   [R] sets V8 engineer Bash: python3 -c "import os;print(open(os.path.join('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval','runs','fresh-80','rows','q01.json')).read())": want deny, got deny
+ok   [R] sets V8 orchestrator (the CTO) Bash: python3 -c "import os;print(open(os.path.join('/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval','runs','fresh-80','rows','q01.json')).read())": want deny, got deny
+ok   [R] sets V9 engineer Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets V9 orchestrator (the CTO) Bash: cd /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat fresh-80/rows/q01.json: want deny, got deny
+ok   [R] sets V10 engineer Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/*/rows/q01.json: want deny, got deny
+ok   [R] sets V10 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs/*/rows/q01.json: want deny, got deny
+ok   [R] sets V11 engineer Bash: cat $(echo /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs)/fresh-80/USED: want deny, got deny
+ok   [R] sets V11 orchestrator (the CTO) Bash: cat $(echo /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs)/fresh-80/USED: want deny, got deny
+ok   [R] sets V12 engineer Bash: cat {/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs,/tmp}/fresh-80/USED: want deny, got deny
+ok   [R] sets V12 orchestrator (the CTO) Bash: cat {/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs,/tmp}/fresh-80/USED: want deny, got deny
+ok   [R] sets V13 engineer Bash: env -C /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs cat fresh-80/USED: want deny, got deny
+ok   [R] sets V13 orchestrator (the CTO) Bash: env -C /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs cat fresh-80/USED: want deny, got deny
+ok   [R] sets V14 engineer Bash: HOME=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; cat $HOME/fresh-80/USED: want deny, got deny
+ok   [R] sets V14 orchestrator (the CTO) Bash: HOME=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; cat $HOME/fresh-80/USED: want deny, got deny
+ok   [R] sets V15 engineer Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat $_/fresh-80/USED: want deny, got deny
+ok   [R] sets V15 orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs && cat $_/fresh-80/USED: want deny, got deny
+ok   [R] sets V16 engineer Bash: export D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; head $D/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets V16 orchestrator (the CTO) Bash: export D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval; head $D/runs/fresh-80/USED: want deny, got deny
+ok   [R] sets V17 engineer Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; for f in $R/fresh-80/rows/*; do cat $f; done: want deny, got deny
+ok   [R] sets V17 orchestrator (the CTO) Bash: R=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; for f in $R/fresh-80/rows/*; do cat $f; done: want deny, got deny
+ok   [R] sets V18 engineer Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; cat `echo $D`/fresh-80/USED: want deny, got deny
+ok   [R] sets V18 orchestrator (the CTO) Bash: D=/home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval/runs; cat `echo $D`/fresh-80/USED: want deny, got deny
+ok   [L] sets A1abs orchestrator (the CTO) Bash: F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python; mkdir -p /home/usain/gov-os-runs/fresh-80: want allow, got allow
+ok   [L] sets A1abs lead Bash: F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python; mkdir -p /home/usain/gov-os-runs/fresh-80: want allow, got allow
+ok   [L] sets A2abs orchestrator (the CTO) Bash: cd $F && python3 make_f80_e4.py --check && sha256sum f80lib.py preflight.py f80_check.py run_measure.sh fresh80_reader.py fresh80_figures.py fresh80_data.py f80_e5_live.sh f80_so_measure.sh f80_e4_prep.sh f80_e4_window.sh f80_e4_replays.sh > FRESH80-REVIEWED.sha256: want allow, got allow
+ok   [L] sets A2abs lead Bash: cd $F && python3 make_f80_e4.py --check && sha256sum f80lib.py preflight.py f80_check.py run_measure.sh fresh80_reader.py fresh80_figures.py fresh80_data.py f80_e5_live.sh f80_so_measure.sh f80_e4_prep.sh f80_e4_window.sh f80_e4_replays.sh > FRESH80-REVIEWED.sha256: want allow, got allow
+ok   [L] sets A3abs orchestrator (the CTO) Bash: $PY $F/preflight.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --expect-sha256 0000000000000000000000000000000000000000000000000000000000000000 --expect-changed 0: want allow, got allow
+ok   [L] sets A3abs lead Bash: $PY $F/preflight.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --expect-sha256 0000000000000000000000000000000000000000000000000000000000000000 --expect-changed 0: want allow, got allow
+ok   [L] sets A4abs orchestrator (the CTO) Bash: F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python; $PY $F/preflight.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --expect-sha256 0000000000000000000000000000000000000000000000000000000000000000 --expect-changed 0: want allow, got allow
+ok   [L] sets A4abs lead Bash: F=.gov-runtime/scratch/orchestrator/drafts/fresh80; PY=/home/usain/.local/share/gov-os/pin-bcea09060ebc/bin/python; $PY $F/preflight.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --expect-sha256 0000000000000000000000000000000000000000000000000000000000000000 --expect-changed 0: want allow, got allow
+ok   [L] sets A5abs orchestrator (the CTO) Bash: echo "FRESH-80 HOLD: no commit on w2/integrate, no store rebuild, no GPU window (FRESH-80-1 item 13) from $(date '+%F %T')" > .gov-runtime/scratch/orchestrator/log/act-in-progress.txt: want allow, got allow
+ok   [L] sets A5abs lead Bash: echo "FRESH-80 HOLD: no commit on w2/integrate, no store rebuild, no GPU window (FRESH-80-1 item 13) from $(date '+%F %T')" > .gov-runtime/scratch/orchestrator/log/act-in-progress.txt: want allow, got allow
+ok   [L] sets A6abs orchestrator (the CTO) Bash: setsid bash $F/run_measure.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/measure.out 2>&1 < /dev/null & echo $! > /home/usain/gov-os-runs/fresh-80/measure.pid: want allow, got allow
+ok   [L] sets A6abs lead Bash: setsid bash $F/run_measure.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/measure.out 2>&1 < /dev/null & echo $! > /home/usain/gov-os-runs/fresh-80/measure.pid: want allow, got allow
+ok   [L] sets A7abs orchestrator (the CTO) Bash: bash tools/proc.sh wait --max 3600 $(cat /home/usain/gov-os-runs/fresh-80/measure.pid): want allow, got allow
+ok   [L] sets A7abs lead Bash: bash tools/proc.sh wait --max 3600 $(cat /home/usain/gov-os-runs/fresh-80/measure.pid): want allow, got allow
+ok   [L] sets A8abs orchestrator (the CTO) Bash: setsid bash $F/run_measure.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --restart > /home/usain/gov-os-runs/fresh-80/measure.out 2>&1 < /dev/null & echo $! > /home/usain/gov-os-runs/fresh-80/measure.pid: want allow, got allow
+ok   [L] sets A8abs lead Bash: setsid bash $F/run_measure.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --restart > /home/usain/gov-os-runs/fresh-80/measure.out 2>&1 < /dev/null & echo $! > /home/usain/gov-os-runs/fresh-80/measure.pid: want allow, got allow
+ok   [L] sets A9abs orchestrator (the CTO) Bash: $PY $F/fresh80_reader.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A9abs lead Bash: $PY $F/fresh80_reader.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A10abs orchestrator (the CTO) Bash: $PY $F/fresh80_reader.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/reader.out 2>&1: want allow, got allow
+ok   [L] sets A10abs lead Bash: $PY $F/fresh80_reader.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/reader.out 2>&1: want allow, got allow
+ok   [L] sets A11abs orchestrator (the CTO) Bash: mv .gov-runtime/scratch/orchestrator/log/act-in-progress.txt .gov-runtime/scratch/orchestrator/log/act-in-progress.ended-$(date +%H%M)-fresh80.txt: want allow, got allow
+ok   [L] sets A11abs lead Bash: mv .gov-runtime/scratch/orchestrator/log/act-in-progress.txt .gov-runtime/scratch/orchestrator/log/act-in-progress.ended-$(date +%H%M)-fresh80.txt: want allow, got allow
+ok   [L] sets A12abs orchestrator (the CTO) Bash: python3 $F/fresh80_figures.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A12abs lead Bash: python3 $F/fresh80_figures.py --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A13abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e3 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A13abs lead Bash: $PY $F/fresh80_data.py e3 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A14abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e3 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A14abs lead Bash: $PY $F/fresh80_data.py e3 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A15abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e3sa --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A15abs lead Bash: $PY $F/fresh80_data.py e3sa --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A16abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e3sa --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A16abs lead Bash: $PY $F/fresh80_data.py e3sa --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A17abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e2g --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A17abs lead Bash: $PY $F/fresh80_data.py e2g --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A18abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e2g --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A18abs lead Bash: $PY $F/fresh80_data.py e2g --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A19abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e5 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A19abs lead Bash: $PY $F/fresh80_data.py e5 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A20abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e5 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A20abs lead Bash: $PY $F/fresh80_data.py e5 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A21abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e4 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A21abs lead Bash: $PY $F/fresh80_data.py e4 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A22abs orchestrator (the CTO) Bash: $PY $F/fresh80_data.py e4 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A22abs lead Bash: $PY $F/fresh80_data.py e4 --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval --dry: want allow, got allow
+ok   [L] sets A23abs orchestrator (the CTO) Bash: setsid bash $F/f80_e5_live.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e5-live.out 2>&1 < /dev/null &: want allow, got allow
+ok   [L] sets A23abs lead Bash: setsid bash $F/f80_e5_live.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e5-live.out 2>&1 < /dev/null &: want allow, got allow
+ok   [L] sets A24abs orchestrator (the CTO) Bash: DRY=1 bash $F/f80_e4_prep.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A24abs lead Bash: DRY=1 bash $F/f80_e4_prep.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A25abs orchestrator (the CTO) Bash: setsid bash $F/f80_e4_prep.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e4-prep.out 2>&1 < /dev/null &: want allow, got allow
+ok   [L] sets A25abs lead Bash: setsid bash $F/f80_e4_prep.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e4-prep.out 2>&1 < /dev/null &: want allow, got allow
+ok   [L] sets A26abs orchestrator (the CTO) Bash: DRY=1 bash $F/f80_e4_window.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A26abs lead Bash: DRY=1 bash $F/f80_e4_window.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A27abs orchestrator (the CTO) Bash: setsid bash $F/f80_e4_window.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e4-window.out 2>&1 &: want allow, got allow
+ok   [L] sets A27abs lead Bash: setsid bash $F/f80_e4_window.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval > /home/usain/gov-os-runs/fresh-80/e4-window.out 2>&1 &: want allow, got allow
+ok   [L] sets A28abs orchestrator (the CTO) Bash: bash $F/f80_e4_replays.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+ok   [L] sets A28abs lead Bash: bash $F/f80_e4_replays.sh --sets-root /home/usain/gov-os-runs/W2-141-rebase-rehearsal/home/gov-os-eval: want allow, got allow
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
