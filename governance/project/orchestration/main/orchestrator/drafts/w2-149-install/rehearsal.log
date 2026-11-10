@@ -1,22 +1,22 @@
 
-== prepare: the clone, the planted HOME and sets root (13:23:46)
-start 2026-11-10T13:23:46Z
-clone at bdda27d28148; the launch script 90b943aef8be
+== prepare: the clone, the planted HOME and sets root (13:41:08)
+start 2026-11-10T13:41:08Z
+clone at 2f98aecbc525; the launch script 90b943aef8be
 planted tuning half: 3 actions, 2 cases, labels.jsonl 3, labels-2.jsonl 1 (1 dispute)
 planted list 331e48fa336e (ACT-INDEP-WALLS-1's, rebuilt)
-088ae1cfd942  apply.sh
+122116f1a5e4  apply.sh
 2843bd193cc8  freeze.py
 0dc77d5ce966  install_check.py
 e0da436ef120  rehearse.sh
 331e48fa336e  APPROVED.before
-27d0094436aa  APPROVED.after
+6b923cb4d552  APPROVED.after
 e13b5f96d0e0  briefs/labeller-2.md
 bbff1249953b  briefs/labeller.md
 b212a424062e  briefs/overlap-auditor.md
 137a73d1df4c  briefs/writer-heldout.md
 82134b3dd6b5  briefs/writer-tuning.md
 
-== order: this ACT before ACT-SETS-GLOBS-1 is refused (13:23:47)
+== order: this ACT before ACT-SETS-GLOBS-1 is refused (13:41:09)
 the clone's head already holds ACT-SETS-GLOBS-1 (applied live at 9cce7430d): the hook and map before it put back in the clone's working files for this step
 97a84e770058  .claude/hooks/pretooluse.py
 40085090306e  governance/project/path-map.yaml
@@ -27,17 +27,17 @@ back: 44f99ea563cb  governance/project/path-map.yaml
 74f8dbea4761  .claude/hooks/pretooluse.py
 44f99ea563cb  governance/project/path-map.yaml
 
-== before this ACT: an approved brief is refused (11: the wiring's two template files are not on the list yet) (13:23:47)
+== before this ACT: an approved brief is refused (11: the wiring's two template files are not on the list yet) (13:41:09)
 launch writer writer-tuning.md: exit 11; indep_launch: refused 11 template
   as expected before the ACT: 11 (template)
 
-== this ACT: check, apply, a second apply, check, the commit (13:23:47)
+== this ACT: check, apply, a second apply, check, the commit (13:41:09)
 state: before (the list 331e48fa336e)
 check: ready to apply
 ok: check: ready
 ok: check from a folder holding runs/x/misses.jsonl: still ready (F3)
 the list as the launch script reads it: 6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0
-the list 27d0094436aac7f5d1ef47623ce2111a7be37b32865143d010bf885a96c75a59
+the list 6b923cb4d552077f99924fd5df38f1a448b21f863c4755c9ff4e0dcfb28ed959
 state applied
 ok: applied
 ok: no bytecode cache written into the tree (F1)
@@ -53,16 +53,16 @@ A	governance/project/indep-briefs/sgx1/writer-heldout.md
 A	governance/project/indep-briefs/sgx1/writer-tuning.md
 ok: exactly 5 A
  5 files changed, 654 insertions(+)
-4316b37aa ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list
+91442e04e ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list
 Task: DAEO-sdxk
 Implements: DEC-1101, DEC-1112
 Role: owner
 
-the planted list after: 27d0094436aa
+the planted list after: 6b923cb4d552
 700 <root>/indep-walls
 400 <root>/indep-walls/APPROVED
 
-== the launch script's stage-10 checks on every line, at the ACT's commit (its own code) (13:23:48)
+== the launch script's stage-10 checks on every line, at the ACT's commit (its own code) (13:41:09)
 list: 6 template lines, 7 brief lines
   labeller  governance/project/indep-briefs/sgx1/labeller.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-labeller-result.schema.json' from entry, sample 0 from entry)
   labeller  governance/project/indep-briefs/sgx1/labeller-2.md: approved line ok; front matter ok (model 'claude-opus-5-5' from kind, result_schema 'sgx1-labeller-2-result.schema.json' from entry, sample 0 from entry)
@@ -75,7 +75,7 @@ approved lines that match their bytes at the commit: 7 of 7
 ok: every brief line matches its bytes
 ok: set-up A's five briefs pass stage 10's front matter (the template's values)
 
-== set-up A's five briefs: a dry launch under each (--seed 17), each must pass stage 10 and build its wall (0) (13:23:48)
+== set-up A's five briefs: a dry launch under each (--seed 17), each must pass stage 10 and build its wall (0) (13:41:09)
 launch labeller labeller.md: exit 0; indep_launch: dry 0
   ok: 0 (dry); {'brief_id': 'sgx1-labeller', 'flow': 'sgx1-labeller-1', 'model': 'claude-opus-5-5', 'result_schema': 'sgx1-labeller-result.schema.json'} input/: ['actions.jsonl', 'cases.jsonl', 'half.json']
   brief.md byte for byte the approved brief
@@ -99,7 +99,7 @@ launch auditor overlap-auditor.md: exit 0; indep_launch: dry 0
 launch writer brief.md: exit 10; indep_launch: refused 10 brief
   the operator's brief under kind writer: refused 10 (its line is kind operator)
 
-== undo: apply.sh undo, the removal committed, then check (13:23:52)
+== undo: apply.sh undo, the removal committed, then check (13:41:14)
 the list 331e48fa336ef58ba5dc6fd4afcf9c1387ec4bd29e583eb955280a267626bbc9
 state before (undone)
 ok: undone
@@ -114,8 +114,8 @@ ok: check: ready to apply again
 launch labeller labeller.md: exit 11; indep_launch: refused 11 template
   after the undo a launch is refused again (11)
 
-== live files: unchanged (13:23:52)
+== live files: unchanged (13:41:14)
 ok: live files unchanged (23 lines hashed)
-scratch: 199M	/home/usain/gov-os-runs/W2-149-INSTALL-rehearsal
-end 2026-11-10T13:23:52Z
+scratch: 201M	/home/usain/gov-os-runs/W2-149-INSTALL-rehearsal
+end 2026-11-10T13:41:14Z
 failures: 0

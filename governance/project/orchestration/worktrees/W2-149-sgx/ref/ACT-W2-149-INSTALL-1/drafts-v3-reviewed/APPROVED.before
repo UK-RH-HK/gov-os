@@ -1,0 +1,8 @@
+# ACT-INDEP-WALLS-1: the owner's approved list (DEC-1101 (2)). The launch script builds a wall only from files
+# whose sha256 is here. Written by the owner's operator only; the six refused roles neither read nor write it.
+65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49  template governance/project/indep-walls/README.md
+9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  template governance/project/indep-walls/settings.json.tmpl
+95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  template governance/project/indep-walls/wall_hook.py
+aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  template governance/project/indep-walls/CLAUDE.md.tmpl
+8b50a78f01b316d0bd5d41689cd3730da0e3142ac4c54705dc83bad0ace4d74f  template governance/project/indep-walls/kinds.yaml
+21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6  template governance/project/indep-walls/tree-exclude.txt

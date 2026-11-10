@@ -4,14 +4,14 @@
 9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  template governance/project/indep-walls/settings.json.tmpl
 95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  template governance/project/indep-walls/wall_hook.py
 aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  template governance/project/indep-walls/CLAUDE.md.tmpl
-734b26e261faa81a4de7d4305e33291291d2e0949b4a4ba1c6fadd11672cd6df  template governance/project/indep-walls/kinds.yaml
+ddd84ae2591061327e1730517ffbce987be7a272a72311bb3b6e79e4bf2401a7  template governance/project/indep-walls/kinds.yaml
 e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537  template governance/project/indep-walls/tree-exclude.txt
 # ACT-W2-149-INSTALL-1 (DEC-1101 (2)-(3), DEC-1112 (3)): the two template lines above for kinds.yaml and
-# tree-exclude.txt are the set-up A wiring's (W2-149, 90c1fea6c7e5), approved by the owner with this ACT; they replace
+# tree-exclude.txt are the set-up A wiring's (W2-149, 2f98aecbc525), approved by the owner with this ACT; they replace
 # 8b50a78f01b3 and 21660e1ee5ad (ACT-INDEP-WALLS-1's).
 # ACT-W2-149-INSTALL-1 (DEC-1101 (2)-(3), DEC-1112, DEC-1113): the fixed briefs the owner approved once
 # (SANDBOX-GUARD-EXP-DECLARATION §12), for the launch script governance/project/orchestration/tools/indep_launch.py
-# 95fe78dd49bb493194e33cc6a832bc3674b6998ac06010cc5a5d4f7aade5f1d0 (W2-149 with set-up A's wiring, 90c1fea6c7e5). Written by the owner's operator only.
+# 90b943aef8be33f6e282dbd8527382683c6c3cfab6831e620daf4f7047d83c6e (W2-149 with set-up A's wiring, 2f98aecbc525). Written by the owner's operator only.
 bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068  brief labeller governance/project/indep-briefs/sgx1/labeller.md
 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904  brief labeller governance/project/indep-briefs/sgx1/labeller-2.md
 82134b3dd6b5a077abfc2eb6fa7481f0f5a73eab60396cfbd655042d53027c57  brief writer governance/project/indep-briefs/sgx1/writer-tuning.md
