@@ -66,4 +66,8 @@ briefs:
     flow: sgx1-overlap-auditor
     result_schema: sgx1-overlap-auditor-result.schema.json
     sample: 0
-    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+    # also every file that states which dispute side is which labeller's (F38): its tickets arrive in input/
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**",
+                   ".tickets/**", "governance/project/orchestration/packages/**",
+                   "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/**",
+                   "tests/unit/orchestration/test_w2_149*", "docs/changes/W2-149-evidence.md"]
