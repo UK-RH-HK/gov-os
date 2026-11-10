@@ -320,3 +320,5 @@ No earlier acceptance test is changed, and none is made wrong by this ticket's K
   `permissions.deny` and the hooks only; W1-04 and W1-05 assert the hook's `ask`, which stays.
 - The fixture projects of the earlier suites have no `held-out.yaml`; reading 7 keeps their calls allowed.
 - No rewrite after implementation is expected.
+
+**D-10's pinned-gov fix (2026-11-10, W2-20 `DAEO-r30l`, Rewrite-Reason: DEC-866, W2-106):** `w1_47_support.plant_pinned_gov(home)` gives a stand-in HOME the pinned `gov` the hook lines look for first (`<HOME>/.local/bin/gov`, its first line this interpreter, a user-site path file naming this tree's `src`; never the real HOME); `installed_environment` plants it, and W1-46's `ask_guard` and W2-90's `install_gov_for` call it. Before, with `PATH=/usr/bin:/bin`, 11 cases (`test_w1_47_kernel_template.py`, 10; `test_w1_47_failed_commands.py`, 1) ended `gov hook: no pinned gov`; after, both opt-ins, 967 passed under the runner's `PATH` and under `PATH=/usr/bin:/bin`. No expectation changes.
