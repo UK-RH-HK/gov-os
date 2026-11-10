@@ -471,3 +471,8 @@ other restart is an ACT.
   11-15 09:00: only the lift's critical path runs** (DEC-1115 (4) brought forward); D-10 goes once ACT-PATHMAP-NS-2 is
   committed and gov check is green, the triage of the first run's reds to the owner; a fresh CTO session at the next
   quiet point. Basis: 1 and 2.
+- DEC-1123 (2026-11-10): D-10 run 2 by option 1 (the lifted step alone, the fixes by role, run 2 from a normal shell);
+  context-reproducibility's 34 errors fixed in the records now (product-spec, Sonnet); **standing until W2-115:
+  `product-traceability-trailers` counts as a warning, not a hard block (Q-8), for D-10, the re-pin and the lift**;
+  W1-01's three merges exempted by the owner's commit (ACT-W1-01-EXEMPT-2); **standing: a stand-by note expires after
+  a set time** (ACT-DEADMAN-STANDBY-1, class (b)). Basis: D10-RECORD-REDS.

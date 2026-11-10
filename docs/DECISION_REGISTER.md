@@ -14314,6 +14314,28 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     owner gets the triage of the reds after the first run.
 - **Basis:** question 1 (the lift first, within the week's allowance) and question 2 (the template).
 
+### DEC-1123 — D-10 run 2 by option 1; context-reproducibility's records fixed now; product-traceability-trailers ruled a warning under Q-8 until W2-115; W1-01's three merges exempted by the owner's commit; a stand-by note expires
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`; items (3) and (5) standing) · **Under:** DEC-1122 (3), DEC-1120, DEC-953, DEC-482, DEC-253, DEC-998, LIFT-1 P1-PLAN row Q-8 · **Source:** the owner's answers to D-10 run 1's report and `packages/D10-RECORD-REDS.md` (chat, 2026-11-10 ~20:30 and ~20:55 UTC)
+- **Decision:**
+  - (1) **Run 2, option 1:** the `lifted` step alone first (report-only; run 1's ran nothing, the run script's fault,
+    fixed); then the fixes by role under RUBRIC-2; then run 2 from a normal shell with the setup fixes (a short
+    `TMPDIR`, a clean signal state: `tools/d10_start.sh`).
+  - (2) **`context-reproducibility`, option (a):** the records fixed now by one product-spec worker (Sonnet high,
+    C1): the mandatory inputs of the 34 errors (backlog-row and WBS ids the store does not hold) re-pointed to records
+    the store holds or moved to optional inputs. The refusals over the 6,000-token ceiling stay (a reproduced refusal
+    counts green).
+  - (3) **`product-traceability-trailers`, ruled (c):** under Q-8 it counts as a warning, not a hard block, for D-10,
+    the re-pin and the lift, until W2-115 lands the product switch after the resume. Its 424 findings (October
+    commits, the trailers base deleted by D-4 `c5e9d9625`) are recorded, not fixed.
+  - (4) **W1-01's three merges** (`cade65dfe`, `04460404e`, `8c512d7e7`, README conflicts settled as the test designer
+    settled them) are added to `path-map.yaml`'s `acceptance_exemptions` by the owner's commit (O), prepared as a
+    small rehearsed ACT for the owner's operator (ACT-W1-01-EXEMPT-2), as a message.
+  - (5) **A stand-by note expires after a set time,** so a stale one can never mute the dead-man for hours again
+    (11-10: muted 15:49 to 19:18 by a handed-over note). `deadman.py` is class (b): ACT-DEADMAN-STANDBY-1, the limit
+    proposed at 2 h; the owner's yes sets it.
+- **Basis:** `packages/D10-RECORD-REDS.md` (§1 (a), §2 (c), §3); run 1's triage
+  (`.gov-runtime/scratch/orchestrator/drafts/d10-run1-triage/NOTES.md`).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14373,3 +14395,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.504 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1119. Next free id: DEC-1120. |
 | 0.505 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1120 (RUBRIC-2, standing; DEC-839 (1)-(3) and DEC-1119 (1) changed), DEC-1121 (the ticket template 1.0.1 with `class`). Next free id: DEC-1122. |
 | 0.506 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1122 (the template 1.0.1 approved; usage (A) from now, DEC-1115 (4) changed; D-10's go on a condition). Next free id: DEC-1123. |
+| 0.507 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1123 (items 3 and 5 standing; trailers a warning under Q-8 until W2-115). Next free id: DEC-1124. |
