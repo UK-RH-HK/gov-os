@@ -96,9 +96,6 @@ sources:
 - DEC-961
 - DEC-979
 - DEC-982
-- W2-M188
-- W2-M244
-- W2-M262
 - DEC-803
 est_loc: 320
 acceptance_tests:

@@ -59,13 +59,13 @@ sources:
 - DEC-953
 - DEC-963
 - DEC-982
-- W3-P09
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/
   author: independent-test-designer (MR-3); written before implementation
 track: A
-list_rows: []
+list_rows:
+- W3-P09
 ---
 # W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents
 

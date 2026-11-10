@@ -43,7 +43,7 @@ sources:
 - DEC-1052
 - DEC-1078
 - DEC-1079
-- W2-61h
+- DAEO-h2k3
 est_loc: 60
 acceptance_tests:
   path: tests/acceptance/W2-134/

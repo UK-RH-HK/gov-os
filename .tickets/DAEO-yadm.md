@@ -35,11 +35,6 @@ profile: STANDARD
 sources:
 - CAP-30.c
 - MR-2
-- W2-H015
-- W2-H051
-- W2-M082
-- W2-M274
-- W2-M283
 est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W2-34/

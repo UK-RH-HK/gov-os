@@ -50,14 +50,14 @@ sources:
 - DEC-1083
 - DEC-1087
 - DEC-719
-- W2-06
-- W2-M088
+- DAEO-kia7
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-116/
   author: independent-test-designer (MR-3); from the spec and KPIs, in parallel with the implementer (DEC-963); a planted branch, a build killed half-way, a search during a build
 track: B
-list_rows: []
+list_rows:
+- W2-M088
 ---
 # W2-116 The designers' store in the product
 

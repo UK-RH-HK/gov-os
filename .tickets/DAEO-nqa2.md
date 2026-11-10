@@ -54,7 +54,7 @@ sources:
 - DEC-1016
 - DEC-999
 - MR-3
-- W2-106
+- DAEO-0mtg
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-90b/

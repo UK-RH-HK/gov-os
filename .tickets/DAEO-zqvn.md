@@ -62,13 +62,6 @@ sources:
 - DEC-419
 - DEC-802
 - DEC-860
-- W2-L233
-- W2-M071
-- W2-M072
-- W2-M100
-- W2-M102
-- W2-M292
-- W2-M296
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-13/

@@ -73,32 +73,22 @@ sources:
 - DEC-1083
 - DEC-715
 - DEC-902
-- W2-112
-- W2-127
-- W2-21
-- W2-I012
-- W2-L105
-- W2-M094
-- W2-M095
-- W2-M097
-- W2-M181
-- W2-M187
-- W2-M275
-- W2-M393
-- W2-M405
+- DAEO-clon
+- DAEO-1vka
+- DAEO-1ahb
 - DEC-1099
 - DEC-1097
 - DEC-1098
 - DEC-1112
 - DEC-1114
 - DEC-820
-- W2-145
+- DAEO-2tfd
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-56/
   author: independent-test-designer (MR-3); written before implementation
 track: A
-list_rows: [W2-M393, W2-I012]
+list_rows: [W2-M393, W2-I012, W2-L105, W2-M094, W2-M095, W2-M097, W2-M181, W2-M187, W2-M275, W2-M405]
 ---
 # W2-56 `gov launch` usable for every worker
 

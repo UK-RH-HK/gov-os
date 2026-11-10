@@ -40,8 +40,8 @@ sources:
 - DEC-1083
 - DEC-530
 - DEC-954
-- W2-26
-- W2-88
+- DAEO-2ds6
+- DAEO-2bdu
 est_loc: 80
 acceptance_tests:
   path: tests/acceptance/W2-124/

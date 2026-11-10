@@ -103,8 +103,8 @@ sources:
 - DEC-016
 - DEC-1083
 - DEC-1084
-- W2-124
-- W2-26
+- DAEO-mb2t
+- DAEO-2ds6
 - DEC-1098
 - DEC-1099
 - DEC-1097

@@ -42,20 +42,6 @@ profile: FULL
 sources:
 - DEC-729
 - DEC-954
-- W2-H035
-- W2-H036
-- W2-H050
-- W2-M216
-- W2-M217
-- W2-M218
-- W2-M219
-- W2-M220
-- W2-M224
-- W2-M225
-- W2-M229
-- W2-M232
-- W2-M307
-- W2-M312
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-23/

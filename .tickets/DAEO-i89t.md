@@ -34,7 +34,6 @@ sources:
 - CAP-24.b
 - DEC-718
 - DEC-1083
-- W2-L097
 est_loc: 80
 acceptance_tests:
   path: tests/acceptance/W2-120/
