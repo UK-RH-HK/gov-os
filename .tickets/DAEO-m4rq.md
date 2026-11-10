@@ -35,6 +35,7 @@ kpis:
   - 'Label text, path or lines printed for an unresolved hidden source.'
 profile: STANDARD
 sources:
+- DEC-1112
 - DEC-1085
 - DEC-1084
 - DEC-1083
