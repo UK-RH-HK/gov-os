@@ -165,6 +165,13 @@ Each item names its file and its test function in full, as `gov accept` matches 
   servers, verified by the ticket's evidence file (`docs/changes/W2-32-evidence.md`, S11's row), never by a case
   here: no real model runs in this suite, and the cases never read the harness.
 
+## D-10 run 1 (DAEO-clon): S4's scratch `HOME` where `TMPDIR` is unset
+
+`Rewrite-Reason: D-10 run 1: the socket base refused /tmp itself; red wherever TMPDIR is unset` (DEC-1122):
+`test_w2_32_s4_reranker_dies.py::_short_home` (the two default-reranker cases, `test_the_default_reranker_whose_shared_service_dies_after_accepting_is_reported_not_raised` and `test_retrieve_with_a_dying_reranker_cites_its_evidence_and_reports_the_rerank_unavailable[None]`)
+found no folder when `TMPDIR` was unset (`/tmp` itself takes no loose entries). It now makes a private folder
+(`mkdtemp`, mode 0700) directly under `/tmp`, puts the scratch `HOME` in it, and `_drop_home` removes both. Nothing else changed.
+
 ## Round 2's rewrites
 
 - **The map in the runner's form** (`Rewrite-Reason: the README map in the runner's form`): every item is
