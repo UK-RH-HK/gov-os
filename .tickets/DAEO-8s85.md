@@ -105,4 +105,23 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
     - After integrate `e242a66b` merged (W2-56's follow-ups R3/R5): `tests/unit/launch/test_w2_56_r5_lead_store.py`
       (12), its lead fixtures without the copy; the engineer's, path added (DEC-1112 (3)).
 
+- **S3 amended (2026-11-10, the CTO, DEC-1112 (3)):** after ACT-CLAUDE-COPIES-2, the D-10 helper found the composed
+  agents lack the role file's fields (purpose, allowed paths, tools, network, model tier, authority level, handoff
+  format, permission classes), which W1-33 (MR-5, DEC-066) and W1-38 require: 27 cases.
+  - **Decided:** each composed `.rulesync/subagents/<role>.md` (and the template's copy) is
+    - its rulesync front matter (with `claudecode.skills`),
+    - then the role template's body,
+    - then one blank line,
+    - then the kernel role file's body (`template/governance/kernel/roles/<role>.md` verbatim, its front matter, if
+      any, stripped).
+  - The role templates carry no labelled field, so the agent's labelled fields are exactly the role file's. The
+    approved 1.0.0 templates do not change.
+  - **Interface:** `gov.adapters.portability` exposes `compose(root, role) -> str`, the expected source's full text.
+    Its check compares against that, and the copies ACT's builder writes it, so the two cannot drift.
+  - **W1-38's project builder** (`tests/acceptance/W1-38/w1_38_support.py::build_project_from_template`) also copies
+    the kernel's `templates/` into the generated project, as it copies `roles/` and `skills/`. That is a test
+    designer's revision under DEC-866.
+  - Paths: the test designer revises W1-38's support and W2-153's S3 cases; the engineer changes the portability
+    check and the twelve sources.
+
 **Not here:** the templates' text (W2-128); `gov brief` (W2-152).
