@@ -1,6 +1,6 @@
 ---
 id: DAEO-btcs
-status: in_progress
+status: open
 deps: []
 links: [DAEO-c1uz, DAEO-zuiy]
 created: 2026-11-09T01:45:43Z
@@ -78,3 +78,5 @@ them**. The ACT's lines caught all 34 traced reds of the trial's 18 culprit tree
 - **Est.:** about 160 lines, two hours with the S6 record.
 
 [DEC-1100 (1), DEC-1098 (2)(b)]
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-10), D-10's red-fix list:** W2-66's DEC-891 record case leaves out a file under a `tools/` folder that a `.py` in that folder names by a string literal (W2-149's result schemas, read by `indep_launch.py`), option (a) of three; built on `w2/W2-66c-d10-tests` (`dc5c0fd87`), review READY (`reviews/D10-W2-66-review.md`). Rows from the review: F1 other read routes are missed, F2 `tools/win_toast.ps1` is listed record-only while `deadman.py` runs it (fails open for the selection; for the test map's owner), F4 a bare-name literal counts as read.
