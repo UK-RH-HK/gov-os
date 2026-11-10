@@ -1,6 +1,6 @@
 ---
 name: ticket
-version: 1.0.0
+version: 1.0.1
 role: any
 id: PROJ-0000
 type: task
@@ -17,6 +17,7 @@ id: DAEO-xxxx
 wbs_id: W2-00
 title: <the outcome, in one line, imperative>
 type: task
+class: implementation              # or research, test-design, discovery, data, integration, skill
 role: engineer                     # or product-spec, research, independent-test-designer
 profile: STANDARD                  # LITE, STANDARD or FULL; FULL only for memory, the five guard rules, launch/close, the queue, data loss
 status: open
