@@ -12,6 +12,13 @@ lead's interface draft, which the section "Set-up A's wiring: the interface" bel
 five briefs' bytes never change; the template supplies what they lack and the script gains set-up A's flows. Where that
 section and an older line of this README differ, that section governs.
 
+**The wiring review's F18-F23** (DEC-1112 (3), the CTO's decision before the owner is asked; S25 and S27 changed,
+S29-S31 added; written at `944f39165` from those lines, the review record `W2-149-sgx-review-r1.md` and the briefs'
+output and result sections): the rule script's check also at labeller 1's round-1 delivery; a result that says it
+stopped delivers nothing; labeller 2's labels checked; the disputes' reasons blinded; a settled line takes the auditor's
+decision; `rule_class` an integer or a decimal string 1-14, stored as an integer. The interface below carries them,
+each marked **(F18)** to **(F23)**.
+
 ## How they run
 
     PYTHONPATH=<worktree>/src TMPDIR=<scratch> python3 -m pytest tests/acceptance/W2-149 -q -p no:cacheprovider \
@@ -23,12 +30,15 @@ About 45 s, serial. **Live cases** (marker `live`, file `test_w2_149_live.py`) a
 login); they cost a few cents (model `haiku`).
 
 **`bwrap` cases** (marker `bwrap`, registered in `conftest.py`, skipped unless `GOV_W2_149_BWRAP=1`): the cases whose
-launch runs the first labeller's rule script confined (S25's good and five bad scripts, S26's two, S28's labeller
-round 2). The launch sandbox cannot start a nested `bwrap` (probed 2026-11-10: `bwrap --unshare-all --die-with-parent
+launch runs the first labeller's rule script confined: since F18 every case that delivers labeller 1's round 1 with a
+working check (S25's good and five bad round-2 scripts and its missing-`bwrap` round-2 case, S26's two, S28's labeller
+round 2, S16's labeller-1 round 1, and the F18, S29 and S31 cases listed in the table "The wiring review's F18-F23").
+The launch sandbox cannot start a nested `bwrap` (probed 2026-11-10: `bwrap --unshare-all --die-with-parent
 --ro-bind /usr /usr true` says "No permissions to create new namespace"), so the CTO runs them outside it, planted
 roots as every case, no model and no network beyond the case's own 127.0.0.1 listener:
-`GOV_W2_149_BWRAP=1 python3 -m pytest tests/acceptance/W2-149 -m bwrap ...`. S25's missing-`bwrap` case needs no
-`bwrap` and runs in the default run.
+`GOV_W2_149_BWRAP=1 python3 -m pytest tests/acceptance/W2-149 -m bwrap ...`. S25's missing-`bwrap` case at round 1's
+delivery (`test_s25_no_bwrap_at_round_1_s_delivery_rejects_20_and_lands_nothing`) needs no `bwrap` and runs in the
+default run; its round-2 twin now needs a delivered round 1, hence `bwrap`.
 
 - **Planted folders only.** One planted git repository per session (`w2_149_support.build_repo`); per case a planted
   HOME (`<tmp>/home`, holding `gov-os-eval/` (the sets root), `gov-os-runs/indep/`, `gov-os-wall-trees/`,
@@ -362,7 +372,10 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   `labels/audit/*.decisions.jsonl` names, sorted by id, the first 40; one line each, in that order: `{"id", "action":
   {role agent ticket wbs tool input cwd} (from the staged line), "x": {label rule_class clauses reason}, "y": {...}}`.
   **x/y:** `rng = random.Random(seed)`; for each case in that order, `rng.random() < 0.5` means x is labeller 1
-  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall.
+  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21) The reasons
+  blinded:** when either side's `reason` is `""` (labeller 1's script labels always carry `""`; labeller 2 may leave
+  one empty), both sides' `reason` are `""`; when both have one, both are kept as written. `label`, `rule_class` and
+  `clauses` are as in each file.
 - `tickets.jsonl`: one line per ticket a case's action names (its `ticket` matched to a ticket file's `id`, or its
   `wbs` to `wbs_id`), read from `.tickets/*.md` at `--commit`: `{"id", "role", "wbs_id", "allowed_paths"}` and nothing
   else; a name no ticket file holds gives no line; order free.
@@ -371,17 +384,29 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
 
 ### The rule script (S25; exit 18, reason `rules`)
 
+- **(F18) Twice:** at labeller 1's round-1 delivery the script runs the session's `out/label_rules.py` under the same
+  confined check, over the half's staged lines, before anything lands; any failure there (every case of the bullets
+  below, `bwrap` or the interpreter missing included) is **20**, `status: rejected`, reason `result`, nothing under
+  `H/labels/r1-sgx1-labeller/` (no file; the wall packed as for any rejection). Its output is not delivered or staged at
+  round 1. At round 2 it runs again on the delivered copy, refusing **18** as below.
 - At labeller 1's round 2 the script runs round 1's delivered `label_rules.py` under `bwrap`: the program
   `GOV_INDEP_BWRAP` names (an absolute path; tests and the trial only), else `bwrap` on `PATH`; the interpreter
   `GOV_INDEP_RULES_PYTHON` names (absolute; tests and the trial only), else the one on the first line of
   `~/.local/bin/gov`; `-I`. Every namespace unshared (no network), `--die-with-parent`, nothing bound but the
   interpreter's own files (and the rule script) read-only, nothing writable; no new process (a fork or an exec inside
   fails); caps on CPU, memory and output, a wall-clock cap of at most 60 s. Stdin: the half's staged lines.
-- The output must give every staged id exactly once: `{"id", "label": allow|refuse|ask, "rule_class": 1..14 (int),
-  "clauses": [strings], "uncertain": bool}`. Anything else (a non-zero exit, a cap reached, an id missing, repeated or
+- The output must give every staged id exactly once: `{"id", "label": allow|refuse|ask, "rule_class": 1..14 (the
+  forms of (F23) below), "clauses": [strings], "uncertain": bool}`; `script-labels.jsonl` carries each `rule_class` as
+  a JSON integer. Anything else (a non-zero exit, a cap reached, an id missing, repeated or
   unknown, a bad value; `bwrap` or the interpreter missing or unable to start): **18**, nothing staged (no
   `script-labels.jsonl` or `sample.json` in the wall or its tar), no session; it may run before or after the wall is
   built (a refusal after B1 leaves what 13 leaves).
+- **(F23) `rule_class`'s forms**, wherever a session's line carries it (the rule script's output, `hand-labels.jsonl`,
+  `labels-2.jsonl`, `decisions.jsonl`): a JSON integer 1-14, or a JSON string matching `^(?:[1-9]|1[0-4])$` (no sign,
+  no leading zero, no space). Refused, as that file's check refuses (18 at round 2 and 20 at round 1's delivery for the
+  rule script, 20 for the others): a boolean (`true`), a float (`7.0`), `0`, `15`, `"07"`, `" 7"`, `"+7"`, `"seven"`
+  and anything else. Every file the script writes carries an integer: `script-labels.jsonl`, `labels.jsonl`,
+  `labels-2.jsonl`, the delivered `<run>.decisions.jsonl`.
 
 ### The deliveries (S16, S26, S27): a temporary name, hashed, renamed; all or nothing
 
@@ -392,9 +417,14 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
 | `sgx1-labeller-1` | 1 | `rulebook.md`, `label_rules.py` | H `labels/r1-sgx1-labeller/` | `round1` |
 | `sgx1-labeller-1` | 2 | `hand-labels.jsonl`, merged | H `labels/labels.jsonl` | `labels` |
 | `sgx1-labeller-2` | 1 | `rulebook-2.md` | H `labels/r1-sgx1-labeller-2/` | `round1` |
-| `sgx1-labeller-2` | 2 | `labels-2.jsonl` (its bytes) | H `labels/labels-2.jsonl` | `labels` |
+| `sgx1-labeller-2` | 2 | `labels-2.jsonl`, checked (F20), `rule_class` an integer | H `labels/labels-2.jsonl` | `labels` |
 | `sgx1-overlap-auditor` | 1 | `decisions.jsonl`, mapped back | H `labels/audit/<run>.decisions.jsonl` (and below) | `decisions` |
 
+- **(F19) A result that says it stopped delivers nothing:** when a set-up A flow's `out/result.json` is valid against
+  its schema and its `stopped` is a word other than `none` (any flow, any round, whatever out/ holds): **20**,
+  `status: rejected`, reason `result`; `out.schema_ok` true and `out.stopped` the word in `counts.json`; nothing
+  delivered (every destination, the map and `owner.jsonl` unchanged; no `AUDITS.log` line); the out/ products (and the
+  brief's `conflicts.md`) in the wall's tar only. Labeller 1's round-1 rule-script check need not run then.
 - An existing destination file refuses **20** (the auditor's `labels.jsonl` and `owner.jsonl` excepted); nothing
   else changes under the sets root or `EXP` (the wall's tar aside). `out/aims.jsonl` stays in the tar only. A
   destination's missing folders are made (writer 1's case starts with no `EXP` at all; `labels/r1-<id>/` and
@@ -406,15 +436,22 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   must cover every id `script-labels.jsonl` marks uncertain, every id it puts in classes 1-13 and every `sample.json`
   id; else **20**, nothing written. The merge: one line per staged id, in the staged order, exactly `{"id", "label",
   "rule_class", "clauses", "reason", "how"}`: a hand line's values and `how: "hand"`, else the script's with
-  `reason: ""` and `how: "script"`.
+  `reason: ""` and `how: "script"`; `rule_class` an integer either way (F23).
+- **(F20) Labeller 2, round 2 (S30):** `out/labels-2.jsonl` must hold exactly one line per id of the wall's
+  `input/sample.jsonl` and no other id (none missing, none extra, none twice), each exactly `{"id", "label",
+  "rule_class", "clauses", "how", "reason"}` with `label` allow|refuse|ask, `rule_class` per (F23), `clauses` a list of
+  strings, `how` `"hand"`, `reason` a string (`""` allowed); else **20**, nothing written. Delivered: its lines in its
+  order, each as written but `rule_class` a JSON integer (key order and spacing free; no longer byte for byte).
 - **The overlap auditor (S27):** `out/decisions.jsonl` must hold one line per case, in the disputes' order, the same
-  ids, exactly `id label rule_class basis agrees_with flag reason` (`label` allow|refuse|ask, `rule_class` 1-14, `basis`
-  a list of strings, `agrees_with` x|y|neither, `flag` none|cannot-settle|may-change-verdict, `reason` empty exactly when
-  the flag is `none`); else **20**, nothing under H changes. Delivered: each line as the auditor wrote it, `agrees_with`
-  x or y replaced by `labeller-1` or `labeller-2` by the map; `labels/audit/<run>.map.json` = `{<id>: {"x": 1|2, "y":
-  2|1}}` for the run's cases, written at delivery only (never by a dry build or a rejection, never in the wall);
-  `labels.jsonl` rewritten, its old bytes first copied into `labels/history/` (one new file, its name free): flag `none`
-  → the auditor's `label` and `how: "audit"`; flagged → `how: "owner"`; every other line unchanged; `owner.jsonl` gains
+  ids, exactly `id label rule_class basis agrees_with flag reason` (`label` allow|refuse|ask, `rule_class` per (F23),
+  `basis` a list of strings, `agrees_with` x|y|neither, `flag` none|cannot-settle|may-change-verdict, `reason` empty
+  exactly when the flag is `none`); else **20**, nothing under H changes. Delivered: each line as the auditor wrote it,
+  `rule_class` a JSON integer (F23), `agrees_with` x or y replaced by `labeller-1` or `labeller-2` by the map;
+  `labels/audit/<run>.map.json` = `{<id>: {"x": 1|2, "y": 2|1}}` for the run's cases, written at delivery only (never
+  by a dry build or a rejection, never in the wall); `labels.jsonl` rewritten, its old bytes first copied into
+  `labels/history/` (one new file, its name free): **(F22)** flag `none` → the line becomes exactly `{"id", "label": the
+  auditor's, "rule_class": the auditor's (an integer), "clauses": its basis, "reason": its reason (so `""`), "how":
+  "audit"}`; flagged → labeller 1's line unchanged but `how: "owner"`; every other line unchanged; `owner.jsonl` gains
   one line per flagged case, in order, carrying its `id` (both labels and the decision; other keys free). **No
   `AUDITS.log` line, ever** (a memory writer's `last_audit` is untouched).
 
@@ -639,6 +676,82 @@ did. Checked both ways in scratch (never committed) on the helper itself: with t
 tar as a hit; with the fix a `Path` or `str` skip returns `[]`, and a planted extra copy in each of the three roots is
 returned as the only hit.
 
+### The wiring review's F18-F23 (DEC-1112 (3)), on `w2/integrate` `944f39165` (set-up A's wiring merged, `7f0e71519`)
+
+New cases in `test_w2_149_setup_a_fixes.py`, and six revised (below). "Today" is the merged script outside any
+change: it runs the rule script only at round 2, delivers whatever `stopped` says, delivers `labels-2.jsonl` byte for
+byte, passes each side's reason through, keeps labeller 1's class, clauses and reason on a settled line, and takes
+`rule_class` only as an integer.
+
+| KPI line | Test (node id) | Today | Why red |
+|---|---|---|---|
+| S25 | `test_w2_149_setup_a_fixes.py::test_s25_round_1_s_delivery_runs_the_rule_script_confined_and_a_failing_one_lands_nothing` | skipped (`bwrap`, 2); red outside | round 1 delivers the dropping and the reading script (exit 0, not 20): no check at round 1 |
+| S25 | `test_w2_149_setup_a_fixes.py::test_s25_no_bwrap_at_round_1_s_delivery_rejects_20_and_lands_nothing` | red | round 1 delivers with no `bwrap` (exit 0, not 20) |
+| S29 | `test_w2_149_setup_a_fixes.py::test_s29_a_result_that_says_it_stopped_delivers_nothing` | red (5), skipped (`bwrap`, 2; red outside) | each flow delivers (exit 0, not 20) though `stopped` is not `none` |
+| S30 | `test_w2_149_setup_a_fixes.py::test_s30_labeller_2_s_labels_out_of_rule_are_rejected_20` | red (6) | `labels-2.jsonl` lands unchecked (exit 0, not 20) |
+| S30 | `test_w2_149_setup_a_fixes.py::test_s30_a_good_labels_2_file_lands_with_rule_class_an_integer` | red | delivered byte for byte: `rule_class` stays a string |
+| S27 | `test_w2_149_setup_a_fixes.py::test_s27_an_empty_reason_on_either_side_blanks_both_and_two_reasons_are_kept` | red | a script-labelled side's `""` beside the other side's reason: the reasons pass through |
+| S27 | `test_w2_149_setup_a_audit.py::test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule` | red (revised) | the disputes' reasons are not blinded |
+| S27 | `test_w2_149_setup_a_audit.py::test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule` | red (revised) | the staged disputes' reasons not blinded (and a settled line keeps labeller 1's class, clauses and reason) |
+| S27 | `test_w2_149_setup_a_fixes.py::test_s31_the_auditor_s_decisions_take_rule_class_as_an_integer_or_a_decimal_string` | red (8) | the settled-line form with the string form (below) |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s31_the_rule_script_s_string_rule_class_is_accepted_and_staged_as_an_integer` | skipped (`bwrap`); red outside | round 2 refuses 18 on `"7"` |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s31_a_bad_rule_class_from_the_rule_script_rejects_round_1_20_and_refuses_round_2_18` | skipped (`bwrap`, 8); red outside | round 1 delivers the bad form (exit 0, not 20): no check at round 1 |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s31_hand_labels_take_rule_class_as_an_integer_or_a_decimal_string` | skipped (`bwrap`, 8); red outside | the bad form is refused 20 today; the string form then is too (20, not 0) |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s31_labeller_2_s_labels_take_rule_class_as_an_integer_or_a_decimal_string` | red (8) | the bad form lands unchecked (exit 0, not 20) |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s31_the_auditor_s_decisions_take_rule_class_as_an_integer_or_a_decimal_string` | red (8) | the bad form is refused 20 today; the string form then is too (20, not 0) |
+| S31 | `test_w2_149_setup_a_fixes.py::test_s30_a_good_labels_2_file_lands_with_rule_class_an_integer` | red | `labels-2.jsonl`'s strings delivered as strings |
+| F11 | `test_w2_149_setup_a_fixes.py::test_s25_no_bwrap_at_round_1_s_delivery_rejects_20_and_lands_nothing` | red | a rule script's failure (it cannot run confined) treated as a pass at round 1 |
+| F11 | `test_w2_149_setup_a_fixes.py::test_s29_a_result_that_says_it_stopped_delivers_nothing` | red | a set-up A delivery from a result that says it stopped |
+
+**Revised cases** (each commit carries `Rewrite-Reason: DEC-1112 (3) (the wiring review's F18-F23: S25, S27 changed,
+S29-S31 added)`); each changed only as far as S25, S27, S30 or S31 require:
+
+1. `test_w2_149_setup_a_rules.py::test_s25_a_rule_script_that_breaks_its_confinement_refuses_18` (5 params, `bwrap`
+   as before): since S25's round-1 check, a script that breaks its confinement on the half's lines is rejected at round
+   1 and never reaches round 2, so the five scripts (`sa.rules_round2`) behave as the good one until their input holds
+   `sa.TRIGGER`, an action line the case adds to the half after round 1 is delivered; round 2 then sees it and must
+   refuse 18 as before (the same markers, listener, caps and assertions). Green today outside (unchanged behaviour).
+2. `test_w2_149_setup_a_rules.py::test_s25_no_bwrap_refuses_18`: now marked `bwrap` (its round 1 must be delivered,
+   which now needs a working `bwrap`); its expectation unchanged. The default run's missing-`bwrap` case is the new
+   round-1 one.
+3. `test_w2_149_setup_a_delivery.py::test_s16_each_labeller_s_round_1_keeps_its_files_in_the_half_s_round_1_folder[labeller-held-out]`:
+   marked `bwrap` (its delivery runs the rule script); unchanged otherwise.
+4. `test_w2_149_setup_a_delivery.py::test_s16_labeller_2_s_round_2_delivers_its_labels_to_labels_2_jsonl`: "delivered
+   byte for byte" became "the session's lines with `rule_class` an integer" (S30, S31). Green today (the stub writes
+   integers).
+5. `test_w2_149_setup_a_audit.py::test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule`: through
+   `sa.expected_disputes`, which now blinds the reasons (`sa.blind`, S27). Red today.
+6. `test_w2_149_setup_a_audit.py::test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule`: a settled
+   line is now exactly `sa.settled_line(decision)` (the auditor's label, integer class, basis as clauses, reason,
+   `audit`), a flagged one labeller 1's line with `how: "owner"`; the delivered decisions through `sa.mapped_back`,
+   which now makes `rule_class` an integer; the disputes blinded as in 5. Red today.
+
+**Support changes** (no other case's expectation moved): the stub's three programs gain `class_form` ("str": every
+`rule_class` a decimal string) and `bad_class` (the first line's `rule_class` replaced by a JSON value); `labels2` gains
+`bad` (`missing extra repeat label how clauses`); `decide` now writes `basis` `["DEC-1113 (2)", "DEC-820 (4)"]` and
+class 9 for a `neither` case, so a settled line always differs from labeller 1's; `_by_class` counts either form.
+`w2_149_setup_a.py` gains `TRIGGER`, `rules_forms`, `rules_round2`, `plant_trigger`, `BAD_CLASS`, `STOP_WORD` (a word
+each brief allows), `stopped_out`, `blind`, `settled_line`; `mapped_back` makes `rule_class` an integer.
+
+**Outcome** (the launch sandbox, the heavy slot, at `944f39165` plus these cases): the pytest run with
+`-m "not local_only" -k "not real and not green_here and not time_limit"` gives **200 cases: 32 failed, 132 passed,
+35 skipped (3 `live`, 32 `bwrap`), 1 deselected** (the `-k` leaves out `test_s6_two_real_builds_draw_different_63_bit_seeds`).
+The 32 red are exactly the new and revised non-`bwrap` cases, each for the reason in its row: S25's round-1
+missing-`bwrap` case, S29's five, S30's seven and S31's labeller-2 eight exit 0 where 20 is due (S30's good file: the
+strings land); S27's new case and the two revised S27 cases fail on an unblinded reason in `input/disputes.jsonl` (the
+revised delivered-audit case stops there, before its F22 line checks); S31's auditor eight fail on the string form
+refused 20. No earlier case went red. `gov accept W2-149` (exit 3): **133 passed, 32 failed, 35 skipped, unmapped 0**;
+the lines failing are S16 (only through the revised delivered-audit case it maps), S25 (1 failed, 9 skipped), S26 (0
+failed, 2 skipped: its cases are all `bwrap`, as before), S27 (11 failed, 4 passed), S29 (5 failed, 2 skipped), S30 (7
+failed), S31 (17 failed, 17 skipped) and F11 (8 failed, 1 passed, 8 skipped); every other line passes.
+
+**A check of the cases themselves** (scratch, never committed): each new planted rule script rendered and run
+unconfined with the system python: `rules_forms("int")` gives `good_rules`' lines; `"str"` the same lines with strings;
+each refused form lands on the first id (`bad_on="first"`) or only on the trigger line (`"trigger"`); each
+`rules_round2` script gives `good_rules`' lines without the trigger and, with it, its marker inside its labels (the
+file's, the listener's, the child's), never ends (the loop) or gives one id fewer (the drop); no marker in any source.
+No sketch of the script was written: the green side is unproven until the engineer's script runs them.
+
 ## Notes and limits
 
 - **N-1. `--dry` leaves its wall.** The cases inspect a built wall (S4, S5, S7, S8, S20) through `--dry`. On the real
@@ -648,6 +761,10 @@ returned as the only hit.
   is tested (S7). The extraction check is stated, not tested.
 - **N-3. The live cases** were not run here (no real session in the sandbox). Their checks follow the rehearsal's
   `live_sessions` step; a model that declines with no tool call is retried up to three times.
+- **N-6. Round 2's 18 after F18.** With the same check at round 1's delivery over the same lines, a rule script that
+  fails confined can reach round 2 only if the half's lines change between the rounds; the cases add `sa.TRIGGER` to the
+  half's actions after round 1 to show round 2's 18 still holds. Whether a real half can change between the rounds is
+  not stated anywhere; if it cannot, round 2's 18 is a second guard only.
 - **N-4. Fixed lists** (the writer's `kind`/`area`, the auditor's classes) are first versions; a brief that revises
   them changes the result schemas with its own approval, and these cases' `GOOD_RESULT` with them.
 
@@ -661,7 +778,8 @@ returned as the only hit.
   `test_w2_149_premises.py` (premises, F10).
 - Set-up A's wiring: `w2_149_setup_a.py` (the planted halves, the planted rule scripts, the flows' launches, the
   oracles), `test_w2_149_setup_a_stage.py` (S22-S24), `test_w2_149_setup_a_rules.py` (S25, S26),
-  `test_w2_149_setup_a_audit.py` (S27), `test_w2_149_setup_a_delivery.py` (S16's set-up A flows, S28).
+  `test_w2_149_setup_a_audit.py` (S27), `test_w2_149_setup_a_delivery.py` (S16's set-up A flows, S28),
+  `test_w2_149_setup_a_fixes.py` (the wiring review's F18-F23: S25's round-1 check, S27's blinding, S29, S30, S31).
 - **N-5. S19's documented labeller line** still names the generic `labeller.md` and `--set sandbox-guard-exp-1`: those
   cases drive only the guard hook (no launch), so S16, S20 and S22 do not reach them and they are unchanged; the CTO's
   real set-up A lines name `indep-briefs/sgx1/<name>.md` and `--set tuning|held-out`.

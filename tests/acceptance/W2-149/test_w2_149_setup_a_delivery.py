@@ -58,8 +58,10 @@ def test_s16_set_up_a_writers_deliver_their_cases_to_the_half_s_planted_folder(w
     sa.assert_counts(world, line, sa.RESULT[flow])
 
 
-@pytest.mark.parametrize("flow,half", [("labeller", "held-out"), ("labeller-2", "tuning")])
+@pytest.mark.parametrize("flow,half", [pytest.param("labeller", "held-out", marks=pytest.mark.bwrap),
+                                       ("labeller-2", "tuning")])
 def test_s16_each_labeller_s_round_1_keeps_its_files_in_the_half_s_round_1_folder(world, flow, half):
+    """(labeller 1's param is ``bwrap`` since S25's F18 change: its delivery runs the rule script confined.)"""
     sa.plant_half(world, half)
     sr0, exp0 = world.hashes(world.sr), world.hashes(world.exp)
     out = sa.labeller_r1_out() if flow == "labeller" else sa.labeller2_r1_out()
@@ -88,7 +90,9 @@ def test_s16_labeller_2_s_round_2_delivers_its_labels_to_labels_2_jsonl(world):
     assert run.code == 0, run.why()
     line = run.line
     dest = world.half("tuning") / "labels/labels-2.jsonl"
-    assert dest.read_bytes() == world.tar_member(line, "out/labels-2.jsonl")
+    wrote = [json.loads(x) for x in world.tar_member(line, "out/labels-2.jsonl").decode().splitlines() if x.strip()]
+    assert sa.read_jsonl(dest) == [dict(x, rule_class=int(x["rule_class"])) for x in wrote], \
+        "labels-2.jsonl is not the session's lines with rule_class an integer (S30, S31)"
     actions, cases = sa.staged(world, "tuning")
     want_ids = [x["id"] for x in sa.overlap(str(sa.seed_of(world, line["run"])), actions + cases)]
     assert [x["id"] for x in sa.read_jsonl(dest)] == want_ids, "labels-2.jsonl is not the wall's overlap (S20)"

@@ -57,8 +57,10 @@ def changes(before, after):
 
 # -- S25 ------------------------------------------------------------------------------------------------------------
 
+@bwrap
 def test_s25_no_bwrap_refuses_18(world):
-    """The program GOV_INDEP_BWRAP names does not exist: the rule script cannot run confined, so it does not run."""
+    """The program GOV_INDEP_BWRAP names does not exist: the rule script cannot run confined, so it does not run.
+    (``bwrap`` since S25's F18 change: round 1's delivery now runs the script confined too.)"""
     sa.plant_half(world, "tuning")
     round1(world, "tuning", sa.RULES_GOOD)
     calls = len(world.calls())
@@ -97,24 +99,26 @@ BAD = ("reads-a-file", "opens-a-socket", "starts-a-process", "loops-past-the-cap
 @pytest.mark.parametrize("how", BAD)
 def test_s25_a_rule_script_that_breaks_its_confinement_refuses_18(world, how):
     """Each planted script would pass, with its marker inside its labels, if it ran unconfined; confined, its read,
-    socket or process fails (or the cap stops it, or an id is missing) and the launch refuses 18, nothing staged."""
+    socket or process fails (or the cap stops it, or an id is missing) and the launch refuses 18, nothing staged.
+
+    Since S25's F18 change round 1's delivery runs the same check, so each script misbehaves only when its input holds
+    ``sa.TRIGGER``, a line added to the half's actions after round 1 was delivered (round 1's check passes; round 2's
+    sees the trigger)."""
     sa.plant_half(world, "tuning")
-    listener, marker = None, None
+    listener, marker, path, port = None, None, None, None
     if how == "reads-a-file":
-        outside = world.tmp / "outside" / "note.txt"
-        support.write_file(outside.parent, outside.name, sa.MARK_FILE + "\n")
-        rules, marker = sa.rules_reading(outside), sa.MARK_FILE
+        path = world.tmp / "outside" / "note.txt"
+        support.write_file(path.parent, path.name, sa.MARK_FILE + "\n")
+        marker = sa.MARK_FILE
     elif how == "opens-a-socket":
         listener = sa.Listener(sa.MARK_SOCKET)
-        rules, marker = sa.rules_socket(listener.port), sa.MARK_SOCKET
+        port, marker = listener.port, sa.MARK_SOCKET
     elif how == "starts-a-process":
-        rules, marker = sa.rules_process(), sa.MARK_PROCESS
-    elif how == "loops-past-the-cap":
-        rules = sa.RULES_LOOP
-    else:
-        rules = sa.RULES_DROPS_AN_ID
+        marker = sa.MARK_PROCESS
+    rules = sa.rules_round2(how, path=path, port=port)
     try:
         round1(world, "tuning", rules)
+        sa.plant_trigger(world, "tuning")
         calls = len(world.calls())
         run = round2_dry(world, "tuning")
     finally:

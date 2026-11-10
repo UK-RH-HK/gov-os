@@ -183,6 +183,110 @@ def rules_process():
     return _RULES.format(pre=pre, post="")
 
 
+# Round 1's delivery runs the same confined check as round 2 (S25, F18 of the wiring's review), so a script that
+# breaks its confinement on the half's lines never reaches round 2. Round 2's own refusals are shown with a script
+# that behaves as RULES_GOOD until its input holds TRIGGER, a line the case adds to the half's actions after round 1.
+TRIGGER = "x-a999-round-2-trigger"
+_RULES_T = '''import hashlib, json, sys
+
+TRIGGER = {trigger!r}
+FORM = {form!r}
+BAD = {bad!r}
+BAD_ON = {bad_on!r}
+EXTRA = []
+
+
+def value(i, cls, first):
+    if BAD is not None and ((BAD_ON == "first" and i == first) or (BAD_ON == "trigger" and i == TRIGGER)):
+        return json.loads(BAD)
+    return str(cls) if FORM == "str" else cls
+
+
+def label(i, first):
+    h = int(hashlib.sha256(i.encode("utf-8")).hexdigest(), 16)
+    cls = 14 if h % 4 else h % 13 + 1
+    return {{"id": i, "label": "allow" if cls == 14 else ("ask" if cls == 13 else "refuse"),
+            "rule_class": value(i, cls, first), "clauses": ([] if cls == 14 else ["DEC-820 (4)"]) + EXTRA,
+            "uncertain": h % 9 == 0}}
+
+
+ids = [json.loads(x)["id"] for x in sys.stdin if x.strip()]
+if TRIGGER in ids:
+{on_trigger}
+for i in ids:
+    print(json.dumps(label(i, ids[0])))
+'''
+
+
+def _indent(code):
+    return "".join("    " + x + "\n" for x in code.splitlines()).rstrip("\n")
+
+
+def rules_forms(form="int", bad=None, bad_on="first", on_trigger="pass"):
+    """A rule script giving RULES_GOOD's labels with ``rule_class`` as ``form`` ("int" or "str"); ``bad`` (JSON text)
+    replaces the first id's (``bad_on="first"``) or TRIGGER's (``"trigger"``) rule_class; ``on_trigger`` runs only
+    when TRIGGER is in its input."""
+    return _RULES_T.format(trigger=TRIGGER, form=form, bad=bad, bad_on=bad_on, on_trigger=_indent(on_trigger))
+
+
+def rules_round2(how, path=None, port=None):
+    """S25's round-2 refusals: a script that passes round 1's check (no TRIGGER in the half) and, at round 2, reads a
+    file outside it, opens a socket, starts a process, loops past the cap or leaves out an id. Unconfined each would
+    pass with its marker inside its labels (the looping one never ends; the dropping one gives one id fewer)."""
+    child = f"print({MARK_PROCESS[::-1]!r}[::-1])"
+    code = {"reads-a-file": f"EXTRA = [open({str(path)!r}).read().strip()]",
+            "opens-a-socket": ("import socket\n"
+                               f"_s = socket.create_connection(('127.0.0.1', {port}), timeout=10)\n"
+                               "EXTRA = [_s.recv(256).decode().strip()]\n_s.close()"),
+            "starts-a-process": ("import subprocess\n"
+                                 f"EXTRA = [subprocess.run([sys.executable, '-I', '-c', {child!r}], "
+                                 "capture_output=True, text=True, check=True).stdout.strip()]"),
+            "loops-past-the-cap": "while True:\n    pass",
+            "leaves-out-an-id": "ids = [i for i in ids if i != TRIGGER]"}[how]
+    return rules_forms(on_trigger=code)
+
+
+def plant_trigger(world, half):
+    """Adds TRIGGER's line to the half's actions (after round 1 was delivered)."""
+    h = world.half(half)
+    line = dict(action_lines(half, 1)[0], id=TRIGGER)
+    with open(h / "corpus/actions.jsonl", "a") as f:
+        f.write(json.dumps(line) + "\n")
+
+
+# S31: the refused forms of rule_class, as JSON text (the param id, the value).
+BAD_CLASS = {"true": "true", "float-7.0": "7.0", "zero": "0", "fifteen": "15", "leading-zero": '"07"',
+             "leading-space": '" 7"', "plus-sign": '"+7"', "word": '"seven"'}
+
+# S29: a stopped word each flow's brief allows (the briefs' result sections), other than none.
+STOP_WORD = {"writer-tuning": "form-not-writable", "writer-heldout": "not-sealed", "labeller-r1": "input-malformed",
+             "labeller-2-r1": "decisions-conflict", "labeller-2-r2": "forbidden-read-needed",
+             "labeller-r2": "input-missing", "overlap-auditor": "input-malformed"}
+CONFLICTS = "# Conflicts (planted)\n- DEC-820 (4), DEC-1093 (2)\n"
+
+
+def stopped_out(out: dict, word: str) -> dict:
+    """A flow's out/ files with ``stopped`` set to ``word`` in its (valid) result and the brief's conflicts.md."""
+    out = dict(out)
+    out["result.json"] = json.dumps(dict(json.loads(out["result.json"]), stopped=word))
+    out["conflicts.md"] = CONFLICTS
+    return out
+
+
+def blind(one: dict, two: dict):
+    """S27 (F21): both sides' reasons as staged: when either is empty, both are empty."""
+    if one["reason"] == "" or two["reason"] == "":
+        return dict(one, reason=""), dict(two, reason="")
+    return one, two
+
+
+def settled_line(decision: dict) -> dict:
+    """S27 (F22) and S31: a settled case's labels.jsonl line: the auditor's label, rule_class (an integer), clauses
+    (its basis) and reason; how "audit"."""
+    return {"id": decision["id"], "label": decision["label"], "rule_class": int(decision["rule_class"]),
+            "clauses": decision["basis"], "reason": decision["reason"], "how": "audit"}
+
+
 def good_rules(lines):
     """RULES_GOOD's output, computed here."""
     out = []
@@ -427,7 +531,8 @@ def expected_disputes(world, half, planted, seed, ids_run):
     order = xy(seed, ids_run)
     rows = []
     for i in ids_run:
-        first, second = (one[i], two[i]) if order[i] == (1, 2) else (two[i], one[i])
+        a, b = blind(one[i], two[i])
+        first, second = (a, b) if order[i] == (1, 2) else (b, a)
         rows.append({"id": i, "action": {k: by_id[i][k] for k in ACTION7},
                      "x": {k: first[k] for k in LABEL4}, "y": {k: second[k] for k in LABEL4}})
     return rows
@@ -442,9 +547,10 @@ def expected_tickets(world, half, ids_run):
 
 
 def mapped_back(decisions, order):
+    """The delivered decisions: each line as the auditor wrote it, x/y mapped back, rule_class an integer (S31)."""
     out = []
     for d in decisions:
-        d = dict(d)
+        d = dict(d, rule_class=int(d["rule_class"]))
         if d["agrees_with"] in ("x", "y"):
             d["agrees_with"] = f"labeller-{order[d['id']][0 if d['agrees_with'] == 'x' else 1]}"
         out.append(d)

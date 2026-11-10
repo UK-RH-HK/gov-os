@@ -631,22 +631,35 @@ def _jsonl(path):
 
 
 def _by_class(lines):
-    return {str(k): sum(1 for x in lines if x["rule_class"] == k) for k in range(1, 15)}
+    return {str(k): sum(1 for x in lines if str(x["rule_class"]) == str(k)) for k in range(1, 15)}
+
+
+def _class_forms(lines, a):
+    """S31: ``class_form`` "str" writes every rule_class as its decimal string; ``bad_class`` (JSON text) replaces the
+    first line's rule_class with that value."""
+    if a.get("class_form") == "str":
+        for x in lines:
+            x["rule_class"] = str(x["rule_class"])
+    if a.get("bad_class") is not None and lines:
+        lines[0]["rule_class"] = json.loads(a["bad_class"])
+    return lines
 
 
 def prog_hand_labels(cwd, a):
     """Labeller 1, round 2: a hand label for every id the script marked uncertain, put in classes 1-13, or drew in
-    the sample (``drop``: leave out the required id at that index; ``extra``: also label that many other ids)."""
+    the sample (``drop``: leave out the required id at that index; ``extra``: also label that many other ids;
+    ``class_form``/``bad_class``: S31's forms)."""
     script = _jsonl(os.path.join(cwd, "input", "script-labels.jsonl"))
     with open(os.path.join(cwd, "input", "sample.json")) as f:
         sample = set(json.load(f)["ids"])
-    need = [x["id"] for x in script if x["uncertain"] or 1 <= x["rule_class"] <= 13 or x["id"] in sample]
+    need = [x["id"] for x in script if x["uncertain"] or 1 <= int(x["rule_class"]) <= 13 or x["id"] in sample]
     more = [x["id"] for x in script if x["id"] not in need][:a.get("extra", 0)]
     if a.get("drop") is not None:
         need = need[:a["drop"]] + need[a["drop"] + 1:]
     by = {x["id"]: x for x in script}
     lines = [{"id": i, "label": "refuse" if by[i]["label"] == "allow" else "allow", "rule_class": 11,
               "clauses": ["DEC-820 (4)"], "reason": "names docs/ and DEC-820 (4) only"} for i in need + more]
+    lines = _class_forms(lines, a)
     result = {"round": 2, "hand_labelled": len(lines), "allow": sum(x["label"] == "allow" for x in lines),
               "refuse": sum(x["label"] == "refuse" for x in lines), "ask": 0, "by_class": _by_class(lines),
               "uncertain_seen": sum(1 for x in script if x["uncertain"]), "sample": len(sample),
@@ -655,10 +668,25 @@ def prog_hand_labels(cwd, a):
 
 
 def prog_labels2(cwd, a):
-    """Labeller 2, round 2: one hand label per line of input/sample.jsonl."""
+    """Labeller 2, round 2: one hand label per line of input/sample.jsonl (``bad``: S30's broken files;
+    ``class_form``/``bad_class``: S31's forms)."""
     sample = _jsonl(os.path.join(cwd, "input", "sample.jsonl"))
     lines = [{"id": x["id"], "label": LABELS[k % 3], "rule_class": 11 if k % 3 else 14, "clauses": ["DEC-820 (4)"],
               "how": "hand", "reason": "names docs/ and DEC-820 (4) only"} for k, x in enumerate(sample)]
+    lines = _class_forms(lines, a)
+    bad = a.get("bad")
+    if bad == "missing":
+        lines = lines[:-1]
+    elif bad == "extra":
+        lines = lines + [dict(lines[0], id="x-a998-not-in-the-sample")]
+    elif bad == "repeat":
+        lines = lines + [dict(lines[0])]
+    elif bad == "label":
+        lines[0]["label"] = "maybe"
+    elif bad == "how":
+        lines[0]["how"] = "script"
+    elif bad == "clauses":
+        lines[0]["clauses"] = "DEC-820 (4)"
     result = {"round": 2, "sample": len(sample), "labelled": len(lines),
               "allow": sum(x["label"] == "allow" for x in lines), "refuse": sum(x["label"] == "refuse" for x in lines),
               "ask": sum(x["label"] == "ask" for x in lines), "by_class": _by_class(lines), "instructions_ignored": 0,
@@ -676,9 +704,10 @@ def prog_decide(cwd, a):
         pick, agree = {0: (c["x"], "x"), 1: (c["y"], "y"), 3: (c["x"], "x"), 4: (c["y"], "y")}.get(m, (None, "neither"))
         label = pick["label"] if pick else [x for x in LABELS if x not in (c["x"]["label"], c["y"]["label"])][0]
         flag = {3: "cannot-settle", 4: "may-change-verdict"}.get(m, "none")
-        out.append({"id": c["id"], "label": label, "rule_class": pick["rule_class"] if pick else 11,
-                    "basis": ["DEC-820 (4)"], "agrees_with": agree, "flag": flag,
+        out.append({"id": c["id"], "label": label, "rule_class": int(pick["rule_class"]) if pick else 9,
+                    "basis": ["DEC-1113 (2)", "DEC-820 (4)"], "agrees_with": agree, "flag": flag,
                     "reason": "" if flag == "none" else "DEC-820 (4) against DEC-1093 (2) on docs/ only"})
+    out = _class_forms(out, a)
     bad = a.get("bad")
     if bad == "drop_last":
         out = out[:-1]

@@ -69,8 +69,10 @@ def test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule(wor
 
 def test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule(world):
     """45 disputes give runs of 40 and 5; the map from the seed, outside the wall; decisions mapped back; settled
-    cases `audit`, flagged ones `owner` and appended to owner.jsonl; the old labels.jsonl in history/; nothing else
-    changes (S16); no AUDITS.log line and a memory writer's selection unchanged."""
+    cases take the auditor's label, rule_class, clauses (its basis) and reason with `audit`, flagged ones keep
+    labeller 1's line with `owner` and are appended to owner.jsonl; the old labels.jsonl in history/; nothing else
+    changes (S16); no AUDITS.log line and a memory writer's selection unchanged. The disputes' reasons are blinded
+    (either empty, both empty)."""
     planted = plant(world)
     h = world.half("tuning")
     old_labels = (h / "labels/labels.jsonl").read_bytes()
@@ -101,9 +103,9 @@ def test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule(world
         if d is None:
             assert x == old[x["id"]], x
         elif d["flag"] == "none":
-            assert x["label"] == d["label"] and x["how"] == "audit", (x, d)
+            assert x == sa.settled_line(d), ("a settled line is not the auditor's decision (S27, F22)", x, d)
         else:
-            assert x["how"] == "owner", (x, d)
+            assert x == dict(old[x["id"]], how="owner"), ("a flagged line is not labeller 1's with how owner", x, d)
     history = sorted((h / "labels/history").iterdir())
     assert len(history) == 1 and history[0].read_bytes() == old_labels
     owner = sa.read_jsonl(h / "labels/owner.jsonl")
