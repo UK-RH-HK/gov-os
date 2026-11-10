@@ -271,11 +271,47 @@ def test_the_record_only_list_hides_no_code_path(test_map, tracked):
     assert not hidden, f"the record-only list hides code paths: {hidden}"
 
 
+def _string_literals(path):
+    """Every string literal of a tracked Python file (none when it cannot be read or parsed: fail closed here,
+    where a file named by no literal stays a record)."""
+    try:
+        tree = ast.parse((ROOT / path).read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, UnicodeDecodeError, ValueError):
+        return set()
+    return {node.value for node in ast.walk(tree) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
+
+
+def _read_by_code(path, tracked):
+    """Whether a tracked file kept under a ``tools/`` folder is read by the code beside it: a tracked ``.py``
+    directly in that same ``tools/`` folder holds, as a whole string literal, the file's path relative to the folder
+    or one of its leading folders (``indep_launch.py``: ``"indep-schemas"``; ``deadman.py``: ``"win_toast.ps1"``).
+    A document (``.md``) is always a record."""
+    parts = path.split("/")
+    if path.endswith(".md") or "tools" not in parts[:-1]:
+        return False
+    at = len(parts) - 1 - parts[:-1][::-1].index("tools")       # the nearest ``tools/`` folder above the file
+    folder, rel = "/".join(parts[:at]), parts[at:]
+    names = {"/".join(rel[:depth]) for depth in range(1, len(rel) + 1)}
+    readers = [p for p in tracked if p.endswith(".py") and p.rsplit("/", 1)[0] == folder]
+    return any(names & _string_literals(reader) for reader in readers)
+
+
 @pytest.mark.parametrize("place", RECORD_PLACES)
 def test_every_record_of_each_of_dec_891_s_places_is_record_only(test_map, tracked, place):
+    """Every record DEC-891 places in a record place is record-only.
+
+    Rewrite-Reason: DEC-891, DEC-1112 (3), the CTO's option (a): a file under a DEC-891 place that code reads is not
+    a record. W2-149's result schemas (``governance/project/orchestration/tools/indep-schemas/*.schema.json``) are
+    read by ``indep_launch.py`` beside them; listed record-only, a change to them would skip their tests (fails open
+    for the selection). The rule is the narrowest one the tree decides alone: a file under a ``tools/`` folder that
+    a tracked ``.py`` directly in that folder names, by a whole string literal equal to its path relative to the
+    folder or to one of its leading folders. Prose (a docstring, a comment) names nothing; a ``.md`` is always a
+    record; no folder is excluded by name; tickets, probes, close records, checkpoints and the plan's documents are
+    untouched. The test map's own couplings are not used: a coupling could then take a real record out of this case."""
     records = _patterns(test_map, "record_only")
     files = [p for p in tracked if p.startswith(place) and not p.endswith(CODE_SUFFIXES)
-             and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))]
+             and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))
+             and not _read_by_code(p, tracked)]
     assert files, f"the fixture is wrong: no tracked record under {place}"
     unplaced = [p for p in files if not _placed(records, p)]
     assert not unplaced, f"records of {place} the record-only list leaves out: {unplaced[:20]}"

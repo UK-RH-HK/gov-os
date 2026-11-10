@@ -2,6 +2,8 @@
 # (3)) reads this file; the budgets and timeouts are proposals decided with the briefs (step 3). Every kind: the tools
 # below and no others, reads only its wall, writes only <wall>/out/. What reaches a destination (the set's folder, the
 # labels) is copied there by the launch script's own code from out/, after the output schema checks; never by the session.
+# Each kind's `model` is the default when neither the brief's front matter nor its `briefs:` entry names one (DEC-1112
+# (3), the CTO's choice).
 kinds:
   writer:
     tools: [Read, Grep, Glob, Write, Edit, TodoWrite]
@@ -10,21 +12,58 @@ kinds:
     delivers: set                 # out/set/** -> <sets root>/fixtures/evaluation/<set>/hidden/
     budget_usd: 25
     timeout_s: 7200
+    model: claude-opus-5-5
   checker:
     tools: [Read, Grep, Glob, Write, TodoWrite]
     input: [set]                  # the writer's set, copied in read-only
     delivers: notes               # out/notes.md -> <sets root>/fixtures/evaluation/<set>/XCHECK-r<round>.md
     budget_usd: 15
     timeout_s: 5400
+    model: claude-opus-5-5
   auditor:
     tools: [Read, Grep, Glob, Write, TodoWrite]
     input: [set, misses]          # the measured misses (question, gold, answer), copied in read-only
     delivers: classes             # out/classes.json -> <sets root>/runs/<audit>/miss-classes.json
     budget_usd: 15
     timeout_s: 5400
+    model: claude-opus-5-5
   labeller:
     tools: [Read, Grep, Glob, Write, TodoWrite]
-    input: [rulebook, actions]    # SANDBOX-GUARD-EXP-1's rulebook and the actions to label (the overlap by the seed)
-    delivers: labels              # out/labels.jsonl -> <sets root>/fixtures/evaluation/sandbox-guard-exp-1/hidden/labels/<run>.jsonl
+    input: [half, actions, cases] # set-up A's flows only (the briefs: entries below)
+    delivers: labels              # by its flow: round 1's files, then the half's labels (the launch script's README)
     budget_usd: 30
     timeout_s: 10800
+    model: claude-opus-5-5
+# Set-up A (SANDBOX-GUARD-EXP-1; DEC-1112 (3), DEC-1113): the five fixed briefs, keyed by their front matter's `brief:`
+# id. A brief takes `model`, `result_schema` and `sample` from its front matter, else from its entry here, else (the
+# model only) from its kind above. `flow` names the launch script's staging and delivery; `tree_exclude` is left out
+# of the wall's tree beside tree-exclude.txt (the guard's and the launcher's code: the briefs' section 4 lists).
+briefs:
+  sgx1-writer-tuning:
+    kind: writer
+    flow: sgx1-writer-1
+    result_schema: sgx1-writer-tuning-result.schema.json
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-writer-heldout:
+    kind: writer
+    flow: sgx1-writer-2
+    result_schema: sgx1-writer-heldout-result.schema.json
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-labeller:
+    kind: labeller
+    flow: sgx1-labeller-1
+    result_schema: sgx1-labeller-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-labeller-2:
+    kind: labeller
+    flow: sgx1-labeller-2
+    result_schema: sgx1-labeller-2-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+  sgx1-overlap-auditor:
+    kind: auditor
+    flow: sgx1-overlap-auditor
+    result_schema: sgx1-overlap-auditor-result.schema.json
+    sample: 0
+    tree_exclude: [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]

@@ -2,15 +2,14 @@
 
 The selection is recomputed here from the planted repository alone (``World.expected_selection``: ``git diff
 --name-only <last audit> <commit>`` less ``tree-exclude.txt``, then ``random.Random(seed).sample`` of the other tracked
-paths, sized by the brief's ``sample:``), never from the script.
+paths, sized by the brief's ``sample:``), never from the script. S20's overlap is recomputed from the planted half and
+the declaration's rule (``w2_149_setup_a.overlap``).
 """
 
 from __future__ import annotations
 
 import json
-import math
 import os
-import random
 import re
 import stat
 import subprocess
@@ -18,6 +17,7 @@ import sys
 
 import pytest
 
+import w2_149_setup_a as sa
 import w2_149_support as support
 from w2_149_support import assert_good_launch, assert_refused
 
@@ -120,15 +120,22 @@ def test_s5_the_argument_parser_offers_no_path_or_path_list_option(world):
 
 @pytest.mark.parametrize("kind,round_", [("writer", 2), ("checker", 1), ("auditor", 1), ("labeller", 1)])
 def test_s5_the_kind_s_inputs_are_read_only_copies_from_the_sets_root(world, kind, round_):
+    """The labeller: set-up A's first labeller on the held-out half, the sets root's sealed folder (DEC-1112 (3): the
+    labeller kind runs set-up A's flows only; its lines are staged kept to the brief's fields, S24)."""
     sr = world.sr
     hidden = sr / "fixtures/evaluation/memory-verdict-3/hidden"
     if kind == "writer":
         support.write_file(sr, "fixtures/evaluation/memory-verdict-3/XCHECK-r1.md", "# the checker's notes\n")
-    run = world.launch(*world.args(kind, round_=round_, set_=None if kind != "writer" else "memory-verdict-3",
-                                   dry=True))
+    if kind == "labeller":
+        sa.plant_half(world, "held-out")
+        run = world.launch(*world.args(kind, brief="sgx1/labeller", round_=round_, set_="held-out", dry=True),
+                           env=sa.rules_env())
+    else:
+        run = world.launch(*world.args(kind, round_=round_, set_=None if kind != "writer" else "memory-verdict-3",
+                                       dry=True))
     assert run.code == 0, run.why()
     inp = world.wall(run.line) / "input"
-    want = {"selection.json": None}
+    want = {"selection.json": None} if kind != "labeller" else {"half.json": None}
     if kind in ("writer", "checker", "auditor"):
         for p in files_under(hidden):
             want["set/" + os.path.relpath(p, hidden)] = open(p, "rb").read()
@@ -137,8 +144,10 @@ def test_s5_the_kind_s_inputs_are_read_only_copies_from_the_sets_root(world, kin
     if kind == "auditor":
         want["misses.jsonl"] = (sr / "runs/audit-1/misses.jsonl").read_bytes()
     if kind == "labeller":
-        want["rulebook.md"] = (sr / support.SEALED / "rulebook.md").read_bytes()
-        want["actions.jsonl"] = (sr / support.SEALED / "corpus/actions-r1.jsonl").read_bytes()
+        actions, cases = sa.staged(world, "held-out")
+        want["actions.jsonl"] = None
+        want["cases.jsonl"] = None
+        assert sa.read_jsonl(inp / "actions.jsonl") == actions and sa.read_jsonl(inp / "cases.jsonl") == cases
     got = {os.path.relpath(p, inp): p for p in files_under(inp)}
     assert set(got) == set(want), (sorted(got), sorted(want))
     for rel, data in want.items():
@@ -168,45 +177,35 @@ def test_s6_two_real_builds_draw_different_63_bit_seeds(world):
 
 
 # -- S20 ------------------------------------------------------------------------------------------------------------
+# Revised for DEC-1112 (3) (S20 changed): the second labeller's overlap is the declaration's rule on the half's staged
+# action and case lines, SEED the wall's own seed.txt less its newline; no random.Random; round 1 stages half.json only.
 
-def overlap_ids(world):
-    text = (world.sr / support.SEALED / "corpus/actions-r1.jsonl").read_text()
-    return [json.loads(x)["id"] for x in text.splitlines() if x.strip()]
-
-
-def test_s20_the_overlap_is_ten_percent_rounded_up_drawn_with_the_second_run_s_seed(world):
-    ids = overlap_ids(world)
-    k = math.ceil(len(ids) / 10)
-    assert len(ids) == 23 and k == 3, "premise: 23 actions, 2.3 rounds up to 3"
-    want = random.Random(777).sample(ids, k)
-    lines = []
-    for i in range(2):
-        if i:
-            support.next_second()
-        run = world.launch(*world.args("labeller", round_=2, seed=777, dry=True))
-        assert run.code == 0, run.why()
-        lines.append(run.line)
-    sel = [json.loads((world.wall(x) / "input/selection.json").read_text()) for x in lines]
-    assert sel[0]["overlap"] == sel[1]["overlap"] == want, (sel[0].get("overlap"), want)
-    by_id = {json.loads(x)["id"]: x for x in
-             (world.sr / support.SEALED / "corpus/actions-r1.jsonl").read_text().splitlines() if x.strip()}
-    own = [x for x in (world.sr / support.SEALED / "corpus/actions-r2.jsonl").read_text().splitlines() if x.strip()]
-    staged = [x for x in (world.wall(lines[0]) / "input/actions.jsonl").read_text().splitlines() if x.strip()]
-    assert sorted(staged) == sorted(own + [by_id[i] for i in want])
-    assert lines[0]["selection"]["overlap"] == k
-
-
-def test_s20_no_other_input_differs_between_the_two_labellers(world):
-    r1 = world.launch(*world.args("labeller", round_=1, seed=777, dry=True))
+def test_s20_the_overlap_is_the_declaration_s_rule_with_the_wall_s_seed(world):
+    sa.plant_half(world, "tuning")
+    r1 = sa.deliver(world, "labeller-2", "tuning", round_=1, out=sa.labeller2_r1_out())
     assert r1.code == 0, r1.why()
-    r2 = world.launch(*world.args("labeller", round_=2, seed=777, dry=True))
-    assert r2.code == 0, r2.why()
-    w1, w2 = world.wall(r1.line), world.wall(r2.line)
-    assert sorted(os.listdir(w1 / "input")) == sorted(os.listdir(w2 / "input"))
-    assert (w1 / "input/rulebook.md").read_bytes() == (w2 / "input/rulebook.md").read_bytes()
-    assert (w1 / "brief.md").read_bytes() == (w2 / "brief.md").read_bytes()
-    s1, s2 = (json.loads((w / "input/selection.json").read_text()) for w in (w1, w2))
-    s1.pop("overlap", None)
-    s2.pop("overlap", None)
-    assert s1 == s2, "the two labellers' selections differ beside the overlap"
-    assert (w1 / "input/actions.jsonl").read_bytes() == (world.sr / support.SEALED / "corpus/actions-r1.jsonl").read_bytes()
+    actions, cases = sa.staged(world, "tuning")
+    want = sa.overlap("777", actions + cases)
+    assert 0 < len(want) < len(actions + cases), "premise: the planted half's overlap at seed 777 is neither empty nor all"
+    walls = []
+    for _ in range(2):
+        run = sa.dry(world, "labeller-2", "tuning", seed=777, round_=2)
+        assert run.code == 0, run.why()
+        walls.append(world.wall(run.line))
+    a, b = (sa.read_jsonl(w / "input/sample.jsonl") for w in walls)
+    assert (walls[0] / "seed.txt").read_bytes() == b"777\n"
+    assert a == b, "the same seed gave different overlaps"
+    assert a == want, ([x["id"] for x in a], [x["id"] for x in want])
+
+
+def test_s20_round_1_stages_half_json_and_nothing_of_the_actions(world):
+    sa.plant_half(world, "held-out")
+    run = sa.dry(world, "labeller-2", "held-out", seed=777, round_=1)
+    assert run.code == 0, run.why()
+    wall = world.wall(run.line)
+    assert sa.input_listing(wall) == ["half.json"]
+    assert json.loads((wall / "input/half.json").read_text()) == {"half": "held-out", "pin": world.sha("B")}
+    data = sa.wall_bytes(wall)
+    actions, cases = sa.staged(world, "held-out")
+    leaked = [x["id"] for x in actions + cases if x["id"].encode() in data]
+    assert leaked == [], f"round 1's wall names actions: {leaked[:3]}"

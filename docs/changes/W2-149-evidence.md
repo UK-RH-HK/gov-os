@@ -153,6 +153,117 @@ in depth: S10's flag list carries `--setting-sources project`.
 - **`gov accept W2-149`:** **pass; 78 passed, 0 failed, 3 skipped**; success-10 is now 5/5 (4/5 before, the
   designer's F11 case red); the 3 skipped are the live cases (success-9, -11, -12). No red.
 
+## Set-up A's wiring (DEC-1112 (3))
+
+The engineer, 2026-11-10, branch `w2/W2-149-sgx` (build `1f6051e12`; finished after `74dcbd3d2`, the merge of
+`w2/integrate`). Built to S16, S20, S22-S28 and the new failure line (each `[changed, DEC-1112 (3)]`) and the lead's
+interface (`.gov-runtime/scratch/lead/INTERFACE.md`); the five fixed briefs' bytes do not change: `model`,
+`result_schema` and `sample` come from the template. Line numbers are `indep_launch.py`'s at the commit that adds
+this section.
+
+### What changed, and where
+
+| Line | What | `indep_launch.py` |
+|---|---|---|
+| S22 | Stage 10 resolves `model`, `result_schema` and `sample`: the front matter, else the `briefs:` entry its `brief:` id names (whose `kind`, and its `flow`'s kind, must be the brief's; `tree_exclude` a list of globs), else (`model` only) the kind's `model`; a value nowhere, a bad entry, or a labeller brief with no entry: 10. `load_kinds` checks each kind's `model`; `load_briefs` reads the map (absent: `{}`; not a map of maps: 11). `WALL.json` gains `model`, `result_schema`, `brief_id`, `flow`. | `resolve_brief` 654-681, `load_briefs` 639-651, `load_kinds` 634; stage 10 2064-2101; `WALL.json` 2267-2269 |
+| S23 | Every tree less `tree-exclude.txt` (now with `governance/project/indep-briefs/**`); a brief with an entry also less the entry's `tree_exclude`. The selection (S5) stays "less `tree-exclude.txt`". | `tree_ex` 2098 / 2101, `build_tree` 2186; `excluded` (selection) 2061, 2199-2201 |
+| S24 | `--set` the flow's half and `--round` its rounds, else 17, nothing built. H = `half_folder` (`tuning`: `<runs>/SANDBOX-GUARD-EXP-1/tuning`; `held-out`: the sealed folder). Every input read and checked before the wall (10): the half's lines kept to the brief's fields, round 1's delivered files against round 1's `counts.json`, the labels, the earlier audits' ids, the tickets at `--commit`, writer 2's seal from the path map at `--commit`. Staged after the seed by `stage_sgx`. | `FLOWS` 90-95, 17 at 2092-2095; `plan_sgx` 927-960, `half_folder` 782-786, `staged_half` 820-837, `project` 813-817, `round1_files` 844-870, `decided_ids` 883-896, `ticket_lines` 899-924, `sealed` 1019-1037; `stage_sgx` 963-1002, written 2206-2223 |
+| S20 | Labeller 2: round 1 stages `input/half.json` only; round 2 `half.json`, `round1/rulebook-2.md` and `sample.jsonl`, the half's staged lines whose `int(sha256(SEED + "overlap" + id), 16) % 10 == 0` (SEED = `seed.txt` less its newline = `str(seed)`); no `random.Random`. | `by_rule` 840-841; `stage_sgx` 998-1001 |
+| S25 | Labeller 1 round 2: round 1's `label_rules.py` runs confined before the wall is built (below); its output must give every staged id once with `label`, `rule_class` 1-14, `clauses`, `uncertain`; `input/script-labels.jsonl` is that output, `input/sample.json` the ids with `... "labeller-sample" ... % 20 == 0`. Any failure: 18 (`rules`), nothing staged, no session. | `RULES_PRELUDE` 133-165, caps 109-115; `rules_programs` 1126-1144, `rules_binds` 1147-1168, `rules_argv` 1171-1178, `pump` 1181-1214, `check_rule_output` 1217-1238, `run_rules` 1241-1285; called 2128-2135; staged 994-997 |
+| S16 | Set-up A's deliveries by flow, through `Landing`: every check first, each file written beside its destination under a temporary name and read back, then renamed (`os.link` for a new file, so never over an entry made meanwhile; `os.replace` for the auditor's `labels.jsonl` and `owner.jsonl`); any failure undoes every rename, removes every temporary file and every folder it made: 20. Writers' `out/cases.jsonl` to H `planted/cases.jsonl` (`out/aims.jsonl` stays in the tar); labellers' round 1 to `H/labels/r1-<brief id>/`, round 2 to `H/labels/labels.jsonl` / `labels-2.jsonl`. `delivered.sha256`: one file's own, several files' bundle hash; round 1 also records `files_sha256`. | `Landing` 1621-1689, `deliver_sgx` 1753-1785, `delivered_sha` 1486-1488; called 2307-2308 |
+| S26 | Labeller 1 round 2: `out/hand-labels.jsonl` must cover every uncertain id, every id in classes 1-13 and every sample id; the merge is one line per staged id, exactly `id label rule_class clauses reason how` (`hand` over `script`, the script's with `reason: ""`); else 20. | `valid_hand` 1699-1704, `merge_labels` 1707-1728 |
+| S27 | The disputes: ids in both labels files whose `label` differs and no earlier `*.decisions.jsonl` names, sorted, the first 40; x/y by `random.Random(seed)` (`rng.random() < 0.5`: x is labeller 1); the map kept in memory and written at delivery only (`labels/audit/<run>.map.json`); `disputes.jsonl` and `tickets.jsonl` as the brief states. `out/decisions.jsonl` checked (order, ids, keys, values, `reason` empty exactly when `flag` is `none`), mapped back, `labels.jsonl` rewritten after its old bytes go to `labels/history/` (refused 20 if it changed since the build), flagged cases appended to `owner.jsonl`. No `AUDITS.log` line on this path. | `AUDIT_SPLIT` 103; `plan_sgx` 939-959; `stage_sgx` 973-985; `check_decisions` 1734-1750, `deliver_audit` 1788-1834 |
+| S28 | Each flow's `out/result.json` against its own closed schema; `round`, when present, must be the run's; `counts.json`'s `out` carries each number under its own key (an object of numbers keyed `"1"`-`"14"` as an object) and `stopped` as its fixed word, nothing else. | `check_result` 1855-1859, `copy_sgx_numbers` 1460-1471, `SGX_OUT` 104-106, `STOPPED` 107-108 |
+| S18 | The file budget for set-up A: the wall's six fixed files, its staged inputs, the run's extras, and what lands in the sealed folder for the held-out half (an upper bound). | `SGX_INPUTS`/`SGX_LANDS` 1005-1009, `sgx_expected` 1012-1016; 2124 |
+
+- **The schemas** (`governance/project/orchestration/tools/indep-schemas/`): five new result schemas, one per brief,
+  closed at every level, numbers and fixed words only, each round's form as the brief's result section states it
+  (the labellers' two rounds as an `anyOf` of two closed forms); writer 1's `stopped` without `not-sealed`. The counts
+  schema's `out` gains the set-up A numbers and `reason` gains `rules` (code 18). The validator already took `anyOf`
+  and `const`.
+- **The template's two files:** `kinds.yaml` gains each kind's `model` and the top-level `briefs:` map (the five
+  entries, `kind flow result_schema sample tree_exclude`); `tree-exclude.txt` gains `governance/project/indep-briefs/**`.
+
+### The confinement of the rule script (S25)
+
+The rule script is the labeller's own code, so it is run as untrusted. Five layers, each enough for some of the
+threats and together for all of them:
+
+1. **`bwrap` (the file system and the network).** `--unshare-user --unshare-ipc --unshare-pid --unshare-net
+   --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --cap-drop ALL`; the root is an empty tmpfs on
+   which only `/usr`, `/lib*` (as their links or read-only binds), `/etc/ld.so.cache`, the interpreter's own prefix
+   when outside `/usr`, a fresh `/dev` and `/proc`, and the one script file are mounted, read-only; then
+   `--remount-ro /`. **A file read** of anything else (a marker under HOME, the sets root, the repository, the runs or
+   trees folders) fails because the path does not exist inside; `rules_binds` refuses 18 if a bind would sit at, under
+   or above any of those protected folders (or be `/`). **A socket** reaches nothing: the new network namespace holds
+   only its own loopback, on which nothing listens (the host's 127.0.0.1 services are in another namespace).
+2. **The prelude's seccomp filter (processes and sockets).** Before the script's code runs, the prelude (run by the
+   pinned interpreter with `-I -X utf8`) sets `PR_SET_NO_NEW_PRIVS` and a BPF filter: any architecture but x86_64 is
+   killed, x32 calls and `socket socketpair clone fork vfork execve unshare setns execveat clone3` return `EPERM`.
+   **A process** cannot be started, and a socket cannot even be created.
+3. **Hard resource limits (runaways).** `RLIMIT_NPROC 0` (no new process, belt and braces), `RLIMIT_FSIZE 0` (no byte
+   written to any file), `RLIMIT_CORE 0`, `RLIMIT_NOFILE 32`, `RLIMIT_CPU 15` s, `RLIMIT_AS` 1 GiB; set as hard limits,
+   so the script cannot raise them.
+4. **The launcher's caps (runaways and floods).** A wall-clock deadline of `RULES_WALL_S` = 20 s (at most 60) over the
+   whole run, and an output cap of 1 MiB plus 4 KiB per staged id; stdin is fed and stdout read together through a
+   selector, so neither side blocks. Past either cap: 18 (`cap`).
+5. **Stop by group, never by name.** The child is started in its own session (`start_new_session`), with an empty
+   environment, `cwd /`, stderr discarded, all other descriptors closed; on every exit, success included, the group is
+   killed with `os.killpg(pid, SIGKILL)`, the leader reaped and `stop_group` waits (up to 10 s, by `killpg(pgid, 0)`) until the group is gone; the
+   temporary folder holding the script copy is removed.
+
+Its output is then checked line by line (`check_rule_output`): every staged id exactly once, `label` allow / refuse /
+ask, `rule_class` an integer 1-14 (not a boolean), `clauses` a list of strings, `uncertain` a boolean; anything else,
+a non-zero exit, a missing `bwrap` or interpreter: 18. The run comes before the wall is built, so a refusal leaves
+nothing behind, and no text of the script's output reaches the counts, the printed line or the log.
+
+### The sha256s (at the commit that adds this section)
+
+| File | sha256 |
+|---|---|
+| `governance/project/orchestration/tools/indep_launch.py` | `a5f2e8f5d9c9b79a7a3e61e475b71da45b071eb868640953577dd7f54adad695` |
+| the template's `kinds.yaml` | `734b26e261faa81a4de7d4305e33291291d2e0949b4a4ba1c6fadd11672cd6df` |
+| the template's `tree-exclude.txt` | `e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537` |
+| `indep-counts.schema.json` | `5ba5a0594bda75a1f50f5686ec8954dc79ee06c13321a1d5ce8b31194a7e41c4` |
+| `sgx1-writer-tuning-result.schema.json` | `70160244040f80a8135ee5578c43444067e4a3ca1a4a7bcb21953b9748bc72d5` |
+| `sgx1-writer-heldout-result.schema.json` | `f4526b60c0300eea7166dcc260c5a848b4ec89c8d578393f5a5734c0c33608eb` |
+| `sgx1-labeller-result.schema.json` | `92a423bdce6ebf4ad4979a92cd3a8a6240af7143efca32f103fa18380a314b87` |
+| `sgx1-labeller-2-result.schema.json` | `15d33a912e74eb05ee5d0a0a4d97e7b7fcbd505580f28d25ff97f137585edc45` |
+| `sgx1-overlap-auditor-result.schema.json` | `4db0b76ea250baf5f97db7facf0b15822414a429c42887743815793dca4d816c` |
+
+The template's two files change two `template` lines of the approved list: ACT-W2-149-INSTALL-1 is rebuilt with these
+two hashes. The docstring's five set-up A lines name the briefs at their installed paths,
+`governance/project/indep-briefs/sgx1/<name>.md`, with the briefs' approved sha256s.
+
+### The build read against the five briefs (what the tests do not reach)
+
+Read once, each brief's inputs, deliveries and result forms against the code: the staged files per flow and round
+(the interface's table, including labeller 2's round 1 `half.json` only and the auditor's `half.json` with `cases`);
+the lines kept to `id role agent ticket wbs tool input cwd executable strata source` (+ `rule_class`); the disputes'
+`action` without `source`, `strata` or aim and its labels as `label rule_class clauses reason`; the tickets'
+`id role wbs_id allowed_paths`; each delivery's source and destination; each result schema's keys and `stopped` words
+against the brief's result section; the briefs' tools, budgets and timeouts within their kinds'. Nothing wrong found;
+the only fix was the docstring's five brief paths (and the unit test that pinned the wrong form).
+
+### Tests
+
+- **Unit** (`tests/unit/orchestration/test_w2_149*`): **116 passed, 3 skipped** with every row
+  (`--optin=lifted --optin=breadth`), through the heavy slot, with `-m "not local_only" -k "not real and not
+  green_here and not time_limit"` (which leaves out none of them). The 3 skipped are the real-`bwrap` cases (a marker
+  file outside, the network, a good script confined), run with `GOV_W2_149_BWRAP=1` outside the sandbox. Set-up A's
+  own file is `test_w2_149_setup_a.py`: S22 precedence and refusals and the five dry builds; S23's trees; S24's halves,
+  rounds, seal and missing inputs; S20's overlap; S25 through a stand-in `bwrap` (fork, subprocess, exec, socket, a
+  write, a missing id, garbage, a non-zero exit, the wall clock, an output flood, no `bwrap`, no interpreter, binds
+  near a protected folder); S26's merge; S16's writer deliveries; S27's forty-and-the-rest, the seeded map, the
+  mapped-back delivery and bad decisions; S28's closed schemas and an extra free-text field.
+- **`gov accept W2-149`** (in the sandbox, through the heavy slot): **135 passed, 2 failed, 12 skipped**, the lead's
+  measure unchanged. Every line passes except: success-16 (10 passed, 2 failed, 1 skipped) and success-28 (11, 2, 1),
+  the same two failures under both lines: S16's writer case, both params, the test defect the lead named (the case's
+  helper never skips the wall's own tar; a fresh test designer fixes it; nothing changed for it here); and success-26
+  (0, 0, 2), red only because both its cases are `bwrap` cases skipped in the sandbox. The other skips: the live cases
+  (success-9, -11, -12) and the `bwrap` cases (success-25 six, failure-11 five), run by the CTO outside the sandbox
+  (the lead's measure there: 144 passed, 2 failed).
+
 ## Notes on the runs
 
 - `gov accept` strips `PYTHON*` from its child's environment, so it ran with the session's own HOME (pytest lives in
