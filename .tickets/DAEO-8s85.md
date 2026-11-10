@@ -27,6 +27,7 @@ allowed_paths:
 - tests/unit/resources/test_w2_20_launch.py
 - tests/unit/resources/test_w2_20_round3.py
 - tests/unit/launch/test_w2_56.py
+- tests/unit/launch/test_w2_56_r5_lead_store.py
 - governance/project/orchestration/tools/dispatch/launch_now.sh
 - .rulesync/subagents/*.md
 - template/.rulesync/subagents/*.md
@@ -101,5 +102,7 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
     - `tests/unit/launch/test_w2_56.py` (3): the engineer's; path added.
     - W2-153's own launch cases read the stub's record path from an environment variable (`W2_153_RECORD`), which
       W2-56's cleaned environment (its S5) now removes. The designer moves that harness to a path W2-56 keeps.
+    - After integrate `e242a66b` merged (W2-56's follow-ups R3/R5): `tests/unit/launch/test_w2_56_r5_lead_store.py`
+      (12), its lead fixtures without the copy; the engineer's, path added (DEC-1112 (3)).
 
 **Not here:** the templates' text (W2-128); `gov brief` (W2-152).

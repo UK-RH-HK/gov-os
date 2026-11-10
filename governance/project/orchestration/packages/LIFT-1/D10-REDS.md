@@ -1,4 +1,4 @@
-# D10-REDS — D-10's three red-by-design cases: rewrite and gate, or keep report-only (DEC-1104 (1), DEC-1109 (2))
+# D10-REDS — D-10's red-fix list: the three red-by-design cases (§1-§5) and the rest of the list (§6) (DEC-1104 (1), DEC-1109 (2), DEC-1112 (3))
 
 - **For:** the owner, through the CTO. D-10 decides each case (DEC-1104 (1)); this note makes that decision ready.
 - **By:** the CTO's agent, 2026-11-09, for orchestrator DAEO-sdxk. Nothing is run or changed by this note.
@@ -84,5 +84,102 @@ regressions. No gate is added and no full run turns red on them.
 ## 5. Cost of this note
 No worker was launched for this note. The CTO's agent read the cases and re-ran the three with `--optin=lifted` once
 (0.7 s). The four sessions launched for D-10's items (4) and (6) cost $4.33 and 8.5 minutes; see P1-PLAN's D-10 row.
+
+## 6. The rest of the list: traced, fixed, or placed (2026-11-09 23:10 to 2026-11-10 UTC; FORECAST-W2-2 §3 row 11 and the CTO's additions)
+
+By the CTO's helper, for orchestrator DAEO-sdxk. Method:
+- each red reproduced by running only that case or file at integrate (a detached worktree);
+- the root cause found and measured;
+- the fix made by the right role (a test designer with `Rewrite-Reason:` under DEC-866, a product-spec worker for the
+  plan tool);
+- one independent review, READY by `verdict.py` (records in `reviews/D10-*.md`);
+- the affected cases re-run on the merge result in a scratch worktree, then a one-command `--no-ff` merge.
+
+FORECAST's two "merged" branches are merged: W1-06 in `dddf54782`, test_fusion in `56a1a554c`.
+
+### 6.1 Fixed and merged
+
+| # | Red | Cause (measured) | Fix | Merged |
+|---|---|---|---|---|
+| 1 | `core.bare`'s tests' half (DEC-1074 (8), DEC-1083) | `git bisect run` exports `GIT_DIR` and its kin, and a test's own `git init` then re-initialises the repository they name. Reproduced: `GIT_DIR=<repo>/.git/worktrees/<wt> git init -q` in an empty folder sets the main repository's `core.bare = true`. | `tests/conftest.py` removes git's repository-local variables (`git rev-parse --local-env-vars`, with a fallback) in every process. New case `tests/unit/gitenv/test_w2_05_suite_git_env.py`, red without, green with. A designer under W2-05. Scratch: `tests/unit` 5,731 passed. | `384b2245b` |
+| 2 | W1-19 `test_only_the_namespace_that_says_embedded_reaches_the_vectors`, red under `-n auto` | `Api.scratch_env` dropped the test's own `GOV_VECTOR_CACHE_DIR` (DEC-1042), and the session-scoped HOME shared one cache. 1 failed in each of two `-n auto` runs; it passes alone. | The scratch environment carries the variable. A designer under W2-126. W1-19 `-n auto`, `local_only` included: 30 passed. | `e43d66d07` |
+| 3a | W2-92 `test_u1_…[unknown symbol]` (D-6) | The planted project copied the live path map, whose `write_refused` root `~/.gov-os/guard-calls` (ACT-OPERATOR-1) matched "who calls …". | The planted map keeps only the schema's required keys and closed values. A designer under W2-92. W2-92 with the code-graph tool: 144 passed. | `6e904ced2` |
+| 3b | W2-55, three backfill cases (D-6) | On integrate the "ticket's base" is HEAD, so a fixed proposal was compared with a growing register. At `1c835d47d` all 8 pass. | DEC-1028 (2) (i): read the register as of the proposal file's own commit. No append mode (DEC-1083 lifted it). A designer under W2-55. W2-55: 83 passed. | `df7c67292` |
+| 4a | The plan validator's `wave2-tickets` and `ticket-contract-ids-exist` (DEC-1112 (3)) | It read §1's table only, while the WBS puts W2-59 onward in §2's cards. It read two-digit ids only. It read `CAP-1` inside `ACT-OLLAMA-CAP-1`. | A product-spec worker under W2-139, two rounds (round 1 NOT READY: F1, three-digit ids). The CTO's records: W2-60's split heading and cards for W2-63, W2-66c (`966a9ac67`), and cards for the 23 three-digit tickets with none (`34f97dfea`). | `18cc289a6` |
+| 4b | The validator's `triage-counts` | DEC-762's owner commit (`1330e0e2`) moved W2-M332 to Wave 3 and left its counts. | Counts brought in line. | `6129d96cd` |
+| 4c | The validator's `contract-items-delivered` (CAP-44.f) | No Wave 2 ticket's `closes` named it. | W2-52 closes CAP-44.f. | `9f9809e09` |
+| 5 | W2-54 `shared_gpu` case asserted the query embedder on the CPU (DEC-798) | DEC-1033 (2)(b) replaced DEC-798. The query server holds the model with `size_vram == size`. | Asserts the query server wholly on the GPU (DEC-1033 (2)(b), DEC-1065 (1)). Same branch as 2. On the real GPU: 2 passed. `-m shared_gpu` only, so not in the full run. | `e43d66d07` |
+| 6 | W1-19 `test_the_default_reranker_is_a_process_of_its_own_…` (`local_only`; found on the way) | It looked for a reranker process started under the caller. Since DEC-982 (W2-112, W2-145) the shared service serves every session. With the service up: 1 failed. | The process of its own is the service at its socket, started from the reranker environment. A designer under W2-145. The README conflict with 2 was settled by the designer (blob `7dfd250886e2`) and committed by commit-tree as `04460404e`, since the sandbox cannot write a merge's `.claude/` and `.tickets/`. The case alone: 1 passed. | `c570a4cc0` |
+| 7 | W2-54 `test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` (found on the way) | It compared two folders' `gov retrieve` results whole, and W2-138 S1 (`dcda27011`, DEC-1090 (3)) puts `store.root` in each. | Compares them less `store.root`. A designer under W2-138. W2-54, W2-138, W2-55: 202 passed. | `54ab0528c` |
+| 8 | W1-33's four launcher cases (the CTO's base 17) | **Not DEC-1111's.** (a) The 3 network-profile rows: W2-20 S19 (`d4ceacc1e`) makes every launch pass the gate, and the case's HOME had none. (b) The orchestrator row: W2-136 S9 (`69aa361ab`) makes it a lead launch, refused for the ready list, not "worker role". | An open gate planted; the orchestrator row checks today's lead refusal (DEC-1088 (5)). A designer under W2-20. W1-33: 112 passed. With the opt-ins only DEC-1111's two remain. | `cfe4ed605` |
+| 9 | W2-96's planted `gov accept` left orphaned (the CTO's incident 2026-11-10 00:43) | The r9/r12 cases ended their child only on the success path. | A reaper on a pipe only the case holds kills the planted groups on every ending, now in a shared `w2_96_reap.py`. Two rounds: `test_w2_96_accept.py`, `review3.py` and `review4.py` came under it too. Three proof cases. A designer under W2-96. `tests/unit/accept` 98 passed with `-n 4`. **W2-96's probe is now stale** (4 judged files). | `f7e63ae4e` |
+| 10 | Every acceptance case that starts `gov launch` read the live machine gate, W1-46's ~80 included (found on the way, and the CTO's 11-10 note) | W2-20 S19: a HOME with no `gate.json` shuts the gate; the live machine's gate shuts under load (tonight: `memory: reading 13873688576, limit 14179233792`). | An open gate planted in W1-28, W1-32, W1-38, W1-46, W1-50, W2-50, W2-54's sandboxed worker, W2-58 and W2-116 (not W2-56's). A designer under W2-20. Outside the sandbox, both opt-ins, `-n auto`: 643 reds at integrate turned green, none new. | `e74b551bc` |
+
+Implementer tickets whose `allowed_paths` had gained acceptance paths for the designers were corrected (W2-126
+`8513a4935`, W2-145 and W2-138 on their branches): MR-3. A designer writes under `tests/acceptance/` without them.
+
+### 6.2 Left after the fixes: alone and serial at integrate `e74b551bc`, outside the sandbox
+
+Of the 141 cases red both before and after item 10: 97 are on the opt-in lists (report-only or breadth). Of the 44
+gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). The other 33:
+- **W1-28 1, W1-50 13: in progress.** W1-28's whole-tree-copy rule (DEC-385) cannot run three copies, W2-92's
+  `base_src` and `test_w2_92_speed.py::base` (`5214e0f01`) and W2-13's `pre_s6_src` (`b6eb2267f`). A designer
+  under W2-92 brings them into the rule's form (`w2/W2-92-d10b-tests`), then review.
+- **W2-116 6, W1-32 7: W2-56's (another helper's).**
+  - W2-116: W2-56 S5's cleaned session environment (`8c399ea3e`) no longer passes `W2_116_SESSION_LOG` to the
+    stand-in CLI (`KeyError`).
+  - W1-32: W2-56 S15 removes the whole temp folder, restoring 0700 first, so the sealed folder no longer resists
+    removal ("the removal did not fail").
+  - Both need revisions with Rewrite-Reason from W2-56's designer.
+- **W1-32 `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`: the CTO's record first.**
+  - `gov --help` offers `brief`, `links` and `plan`, which the command lists do not record.
+  - As with `release` (DEC-753), the lists record them, then a designer adds them to W1-07's
+    `RECORDED_GOV_COMMANDS` (W2-152, W2-129 and W2-136's commands, approved by DEC-1088 and the LINK-INTEGRITY
+    decisions).
+- **W2-58 `test_w2_58_launched_sessions.py` 5: to trace (live sessions, real Claude usage).**
+  - The launched engineer's own guard hook blocks its probe (`bash .gov-runtime/scratch/w2-58/probe.sh`).
+  - Likely W2-141's S1/S2 refusing an engineer's search that can reach its own acceptance folder. The CTO notes
+    four test_g14 reds of that kind, tracked for the re-pin ACT.
+  - To be confirmed before D-10 by reading the probe, not by re-running live sessions.
+
+### 6.3 Out of reach, by design, or another owner's
+
+- **3c.** `tests/unit/guard/test_w2_141_search.py::test_the_staged_pretooluse_…`: **green.** Another helper rebuilt
+  the staged hook on the live one (`beec1f2f8`, READY); 204 passed. Off the list. The helper's duplicate
+  `w2/W2-141-d10` (`9536ea954`, byte-identical) is not merged.
+- **4d.** The validator's last three FAILs. The validator is not a case of the full run.
+  - CAP-22.c (`contract-items-delivered`) and eight of DEC-841's nine (`contract-items-cited-by-tests`) wait on
+    P1-11's Contract re-baseline, into which DEC-1083 retired W2-109.
+  - CAP-33.b/g are cited by W2-37's tests on its unmerged branch (a held merge-back).
+  - `CAP-1 (W2-134)` is prose in W2-134's KPI ("CAP-1 never matches CAP-10"), the CTO's record to word.
+- **11. The adapter-portability family: 8 W2-05 cases, 10 W1-38 `test_w1_38_heldout_step.py` cases, W1-38's
+  clean-project case, and W2-58's 3 setup errors.**
+  - Cause: `SOURCE_DIFFERS .rulesync/subagents/orchestrator.md`. W2-128 round 2a changed the kernel's role file and
+    not its rulesync source.
+  - **Green now:** W2-128 round 2b (`9d95279c9`, F1) fixed the copy. At `e74b551bc` W2-05, W1-38's two files and
+    W2-66's live map give 98 passed, 1 failed (item 12).
+- **12. W2-66 `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`.**
+  - W2-149's result schemas (`governance/project/orchestration/tools/indep-schemas/*.schema.json`, `6f811da36`) are
+    `.json` under a DEC-891 place, so the case calls them records.
+  - But `indep_launch.py` reads them. Making them record-only would skip their tests on a change, which fails open
+    for the selection.
+  - **For the CTO**, three options (DEC-105):
+    - (a) W2-66c's designer revises the case: a file the test map couples to a suite, or one under
+      `orchestration/tools/` that code reads, is not a record. About 30 min and a review.
+    - (b) W2-149 moves the schemas out of DEC-891's places. About 1 h, W2-149's helper, and its paths and ACT change.
+    - (c) List them as record-only. 5 min, but fails open. Not recommended.
+  - Recommended (a), confidence medium-high.
+- **13. Environment cases, not regressions.**
+  - W2-54's `green_here` and `time_limit` need a store in the tree they run in (green in the main tree, which has
+    one).
+  - `test_a_warm_query_answers_within_half_a_second_at_p95` is on `load_sensitive`.
+- **14. A coverage gap for W2-56's owner.** `tests/conftest.py` keeps the real code-graph tool off `PATH` for every
+  suite but W1-16's and W1-20's (W2-56 S1, T-8). So W2-92's 30 tool cases skip in every full run.
+- **15. An incident in a designer's session (W1-33's, 01:00).** It ran `git worktree prune` from its sandbox. That
+  partly removed the metadata of three registered worktrees whose folders were already gone (`W2-148-act2`,
+  `W2-149-f11-tests`, `b56`). Only `commondir` and `config.worktree` are left. No branch or commit is affected.
+  Later briefs forbid the command.
+
+**Cost:** about 26 launched sessions, about $75 (logged sums $49.05 for 17 and $10.93 for 2, plus the W2-145 review $3.36, its merge designer $0.66, the duplicate W2-141 engineer $0.79, the W2-96 review $5.94 and two designers' estimates), plus the CTO's helper
 
 [DEC-1104 (1), DEC-1103 (2), DEC-1061 (2)-(3a), DEC-953 item 2, DEC-957, DEC-105, ACT-D4-RESTORE-1 §4-§5]

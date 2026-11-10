@@ -513,3 +513,5 @@ designer's.
 - **Tests.** `test_rollback_of_a_ticket_with_no_commit_succeeds_with_an_empty_list` asserts success, the empty
   `reverted`, and that no file outside `.tickets/` and no other ticket's file changes; it does not assert whether a
   commit is made.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the launches through W1-46's `launch` get W1-46's open gate (`plant_open_gate`); `interrupted_launch` plants it before building W1-46's environment. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.

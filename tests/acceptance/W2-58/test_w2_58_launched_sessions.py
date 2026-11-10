@@ -157,6 +157,8 @@ def _start(tmp, role, probe):
     env = {key: value for key, value in os.environ.items()
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
     env.update({"PYTHONPATH": s.python_path(), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
+    # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
+    env.update(s.plant_open_gate(sandbox))
     argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT, "--permission-mode", "acceptEdits",
                       "--model", "haiku", "--max-turns", "6", "--allowedTools", "Bash")
     try:

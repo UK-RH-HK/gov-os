@@ -71,6 +71,10 @@ def _launch_environment(project, sandbox):
     env = {key: value for key, value in os.environ.items()
            if not key.startswith("CLAUDE") and key not in ("GOV_ROLE", "GOV_TICKET")}
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
+    # The session runs under the real HOME (the CLI's login), so the gate reads this machine's own gate.json; the
+    # readings are planted with room to spare (W1-46's ``plant_open_gate``), so the machine's load does not shut it
+    # (W2-20 S19, DEC-1088 (5)(b)).
+    env.update(L.plant_open_gate(sandbox))
     return env
 
 
