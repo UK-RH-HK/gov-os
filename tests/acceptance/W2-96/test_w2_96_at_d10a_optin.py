@@ -68,16 +68,16 @@ def _project(tmp_path, files, readme, lists, extra=None):
     return support.Project(tmp_path, files, readme, root_files=root_files)
 
 
-def _check(project, run, expected, exit_code, ran, groups):
+def _check(project, run, expected, exit_code, ran, groups, optin_only=False):
     """The leak probe first, then the result, the exit code, what ran (by function, times run) and the groups the
-    report names."""
+    report names (with ``optin_only``, those its ``"optin"`` names, absent meaning none: scope (b))."""
     support.assert_clean(run)
     found = support.assert_outcome(run, expected, exit_code)
     assert project.ran() == ran, (f"the planted functions that ran (and how often) are not the expected ones\n"
                                   f"expected: {ran}\ngot:      {project.ran()}\n"
                                   f"groups the child saw: {[r.get('opted') for r in project.records('optin')]}\n"
                                   f"{run.describe()}")
-    named = _enabled(found)
+    named = support.groups_named(found.get("optin")) if optin_only else _enabled(found)
     assert named == set(groups), (f"the report names the opt-in groups {sorted(named)}, expected {sorted(groups)} "
                                   f"(the groups it enabled)\n{run.describe()}")
 
@@ -244,11 +244,12 @@ UNNEEDED = {
 @pytest.mark.parametrize("variant", list(UNNEEDED))
 def test_s_d10a_a_group_no_mapped_case_needs_is_not_enabled(tmp_path, variant):
     """The unneeded group's list holds a failing case of this ticket that the map never names: had the group been
-    enabled, it would run and fail the run (PKG-1 (a))."""
+    enabled, it would run and fail the run (PKG-1 (a)). The groups enabled are those the result's ``"optin"`` names
+    (absent meaning none), as scope (b) states, never a report-only line's own wording (``report-only (lifted)``)."""
     cases, lists, rows, expected, ran, groups = UNNEEDED[variant]
     project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
     run = project.run(support.TICKET_ID)
-    _check(project, run, expected, support.EXIT_PASS, {**ALPHA_RAN, **ran}, groups)
+    _check(project, run, expected, support.EXIT_PASS, {**ALPHA_RAN, **ran}, groups, optin_only=True)
 
 
 # Scope (b): lifted is report-only in a formal accept (PKG-D10a-scope (b), DEC-1061 (2)) ----------------------------

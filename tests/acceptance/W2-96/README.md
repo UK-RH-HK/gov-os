@@ -395,8 +395,10 @@ accept` enables only `breadth` for its map's cases, never `lifted` (DEC-1061 (2)
   `lines-in-both-groups-through-every-list-name` moved from the measured case to
   `test_s_d10a_a_line_whose_cases_rest_only_on_lifted_is_report_only`; the unneeded-group variant whose mapped case
   sat in `lifted` is now `an-unneeded-breadth-beside-a-report-only-line` (the line report-only, no group enabled,
-  the unmapped failing breadth case not run). The other cases' group check now reads the result without its
-  `report_only` key.
+  the unmapped failing breadth case not run). The unneeded-group case (both variants) reads the groups enabled from
+  the result's `"optin"` only (absent meaning none), so a report-only line's own `report-only (lifted)` wording is
+  not read as an enabled group (`Rewrite-Reason`: DAEO-ouet). The other cases' group check now reads the result
+  without its `report_only` key.
 - *Report-only* (four variants: a lifted case passing or failing, a whole file in lifted, lines in both groups
   through the guard lists): the line is `{"outcome": "report-only"}` with every count 0, the run `pass`, exit 0, the
   lifted case never runs, `"optin"` exactly the groups enabled (never `lifted`) and `"report_only": ["lifted"]`.
