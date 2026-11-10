@@ -76,10 +76,12 @@ KERNEL_TEMPLATES = KERNEL / "templates"
 TEST_DESIGN_SKILL = KERNEL / "skills" / "test-design" / "SKILL.md"
 DISPATCH_REL = "governance/project/orchestration/tools/dispatch/launch_now.sh"
 
-# F2's baseline: w2/integrate's head when these tests were written (2026-11-09), this branch's base.
-BASELINE_COMMIT = "1ef1a7a48c538d1229dd750fe8b9a606b6ea8a52"
+# F2's baseline (DEC-1112 (3)): the integrate commit W2-153 is built on, `git merge-base w2/W2-153 w2/integrate`
+# (2026-11-10). Its launcher is integrate's as of the W2-56 merge (cf23e9f8dc1f: S5's cleaned env, the runs-folder and
+# reranker sandbox entries). Moved from 1ef1a7a48c53 (launcher 5ecd20c0d252), which predates W2-56.
+BASELINE_COMMIT = "f73e72d4a43b14ba598bac4829ced555842907ea"
 BASELINE_BLOBS = {
-    "src/gov/launch/launcher.py": "5ecd20c0d252da206327f4fcdd60128ff3ac0e56",
+    "src/gov/launch/launcher.py": "91033723374d9dff0d97e4a36934cc09fa00d16b",
     DISPATCH_REL: "bd8f45b9d3dd9d5071e1be7b0e74b7627e76ba0b",
 }
 

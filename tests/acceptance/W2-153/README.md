@@ -36,10 +36,16 @@ baseline commit in the repository's history.
 - **Writer and sources on this repository (S3, S4).** The writer runs from the repository's root into a temporary
   folder. The twelve role sources (`.rulesync/subagents/` and `template/.rulesync/subagents/`) are read where they
   are.
-- **F2's baseline** is integrate at `1ef1a7a48c53` (this branch's base, w2/integrate's head on 2026-11-09). Its
-  `src/gov` is unpacked with `git archive` into a temporary folder once per session, and its `launch_now.sh` is read
-  with `git cat-file`. Both are taken only after the blob ids are checked: `launcher.py` `5ecd20c0d252`,
-  `launch_now.sh` `bd8f45b9d3dd`. A moved integrate therefore never changes what F2 compares against.
+- **F2's baseline** is integrate at `f73e72d4a43b`, the commit W2-153 is built on (`git merge-base w2/W2-153
+  w2/integrate`, read 2026-11-10; DEC-1112 (3)). Its launcher is integrate's as of the W2-56 merge (`cf23e9f8dc1f`):
+  S5's cleaned environment (`PATH`, `HOME`, `LC_ALL` in the worker's `--settings` env) and the sandbox entries for
+  the session's runs folder and the reranker. Its `src/gov` is unpacked with `git archive` into a temporary folder
+  once per session, and its `launch_now.sh` is read with `git cat-file`. Both are taken only after the blob ids are
+  checked: `launcher.py` `91033723374d`, `launch_now.sh` `bd8f45b9d3dd`. A moved integrate therefore never changes
+  what F2 compares against. **Moved in revision 3** (DEC-866 `Rewrite-Reason:`) from `1ef1a7a48c53` (launcher
+  `5ecd20c0d252`, before W2-56), against which F2's five worker cases failed whatever W2-153 did. Nothing else in F2
+  changed: the comparison still allows only the one appended flag. Integrate's later W2-56 follow-ups (`4bc040898467`,
+  launcher `feec5c25458b`) are not in W2-153's base and so not in the baseline.
 
 ## The interface as read (the ticket's body)
 
@@ -58,9 +64,12 @@ baseline commit in the repository's history.
   `role-lead`, `role-cto`, byte copies of `template/governance/kernel/templates/<stem>.md`. `ticket.md` and the
   kernel's other templates are not copied.
 
-## KPI lines, tests, and the outcome on `w2/integrate` (`1ef1a7a48c53`)
+## KPI lines, tests, and the outcome on `w2/integrate` (`f73e72d4a43b`)
 
-Run in the launch sandbox on integrate's code: **51 cases, 38 failed, 13 passed** (about 6 s). Every red fails on
+Run in the launch sandbox on integrate's code (this branch, integrate merged, launcher `91033723374d`, revision 3,
+2026-11-10): **51 cases, 38 failed, 13 passed** (about 5 s). F2's eleven cases are green here, the tree's launcher being
+the baseline's. **On W2-153's branch F2 is expected green if the appended flag is the only change** to the built
+arguments and the lead line; any other difference from `f73e72d4a43b` is red. Every red fails on
 what its KPI line asks for, none on a premise. A reference build (below) passed the first 50; revision 2 (DEC-1112
 (3)) moved the skills list under `claudecode` and added one case.
 
@@ -128,7 +137,7 @@ the dispatcher without its file check failed its F1.
 - **R-1. F2's and S3's baseline commit.** If W2-128's round 2a changes a role source's rulesync front matter
   (description or tools) before W2-153 lands, the sources case flags it as a front-matter change. The baseline
   commit (`w2_153_support.BASELINE_COMMIT` and its blob ids) then moves to a commit holding that change, a one-line
-  edit by the test designer.
+  edit by the test designer. Done once in revision 3 for W2-56's launcher (`1ef1a7a48c53` → `f73e72d4a43b`).
 
 ## Files
 
