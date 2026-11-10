@@ -155,10 +155,23 @@ def git(project, *args):
 
 
 def path_map():
-    """This repository's path map with one namespace that classes everything as governance memory without vectors
-    and the planted register named; no authority block (W2-87's order is not under test here)."""
-    document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
-    document.pop("retrieval_authority", None)
+    """The planted project's path map: the kernel schema's required keys only, with one namespace that classes
+    everything as governance memory without vectors and the planted register named; no authority block (W2-87's
+    order is not under test here).
+
+    Only the planted corpus may answer a question, so no free text of this repository's live map reaches the planted
+    index (revised for DEC-1106 (3), DEC-1108 (5): the live map's ``write_refused`` block, ``root:
+    ~/.gov-os/guard-calls`` and its ``why``, made the copy match "who calls w92_nowhere"). From the live map come
+    its closed values alone, so the map stays valid as the kernel schema and its floors move: ``state_class``,
+    ``capabilities``, the ``policies`` strengths and each system's ``status``. A system's ``where`` and ``reason``
+    (paths and prose) become a fixed word, and every optional block (``write_refused``, ``session_hidden``,
+    ``evaluation_sets``, ``load_sensitive``, the others) is left out."""
+    live = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    systems = {name: ({"status": "absent", "reason": "absent"} if system["status"] == "absent"
+                      else {"status": system["status"], "where": ["**"]})
+               for name, system in live["systems"].items()}
+    document = {"state_class": live["state_class"], "capabilities": live["capabilities"],
+                "policies": live["policies"], "systems": systems}
     document["decision_register"] = REGISTER
     document["namespaces"] = {"everything": {
         "paths": ["**"], "memory_class": "governance", "sensitivity": "internal",
