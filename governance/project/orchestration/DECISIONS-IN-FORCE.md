@@ -444,3 +444,7 @@ other restart is an ACT.
   map's cases need; a KPI line resting only on `lifted` cases is reported report-only, not failed (DEC-1061 (2)); the
   map reader reads every listed id or refuses (no form dropped silently). W2-154 (the serial plugin, nightly.sh's
   serial count, the brief citation) after the lift.
+- Delegated (CTO, 2026-11-10, DEC-1112 (3)): gov accept's round 2 (W2-96, merged 8f6e66a17): a run whose every line
+  is report-only fails (stricter; the six whole-suite lifted tickets wait for their features to return); a possessive
+  or other further line name refuses the cell; a line whose only case is listed in lifted but defined nowhere fails
+  (a row, tests first, after the lift). W2-92's map row 128 fixed before the lift (it closes there).
