@@ -3,11 +3,13 @@ held back during the clean-up and ended as 128 plus the signal, a clean-up witho
 "ignore" kept, and ``accept`` recorded.
 
 Each test plants a tiny project in a temporary folder; the signal tests start ``gov accept`` as its own process.
-Nothing runs against this repository's own acceptance folders.
+Nothing runs against this repository's own acceptance folders. Every planted ``gov accept`` and the pytest it
+starts are reaped however the case ends (``_planted``, the ``launch`` fixture; incident 2026-11-10 00:43).
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import signal
@@ -144,8 +146,10 @@ GATED = ("import os, time\n\ndef test_a():\n    open({started!r}, 'w').write(str
          "    while not os.path.exists({go!r}):\n        time.sleep(0.05)\n")
 
 # gov accept as its own process; with W296_SLOW set, the clean-up's removal waits once it has begun, so that a
-# signal is sent while the clean-up runs
-WRAPPER = """import os, sys, time
+# signal is sent while the clean-up runs. With W296_RECORD set, every process gov starts (the run's pytest, in a
+# session of its own) has its pid added to that file the moment it is started, so that the case can reap it
+# whatever happens to gov; nothing else in gov changes.
+WRAPPER = """import os, subprocess, sys, time
 from gov.accept import runner
 from gov.cli.main import main
 slow = os.environ.get("W296_SLOW")
@@ -156,24 +160,182 @@ if slow:
         time.sleep(2)
         remove(folder)
     runner._remove = _slow
+record = os.environ.get("W296_RECORD")
+if record:
+    class _Recorded(subprocess.Popen):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            with open(record, "a") as file:
+                file.write(f"{self.pid}\\n")
+    subprocess.Popen = _Recorded
 sys.exit(main(sys.argv[1:]))
 """
 
+# The case's reaper (DEC-866 rewrite, incident 2026-11-10 00:43): a process of its own, in a session of its own,
+# started before the planted gov. It blocks on a pipe only the case holds; the pipe ends when the case is done
+# (the finaliser closes it) or when the case's process dies however it dies (SIGTERM, SIGKILL, xdist's worker
+# gone). Then it stops every recorded process group (the planted gov's own and the pytest gov started): SIGTERM,
+# a short grace, SIGKILL, and it waits until no live member of any of them is left. It never matches a name:
+# every group is one the case recorded by pid. It exits 0 when nothing is left, 1 otherwise.
+REAPER = """import os, signal, sys, time
+record, fd = sys.argv[1], int(sys.argv[2])
+GRACE, BOUND = float(sys.argv[3]), float(sys.argv[4])
+while os.read(fd, 64):
+    pass
 
-def _launch(root: Path, temp: Path, tmp_path: Path, slow: Path | None = None, ignore: tuple = ()):
+def recorded():
+    try:
+        with open(record) as file:
+            return {int(word) for word in file.read().split()}
+    except (OSError, ValueError):
+        return set()
+
+def children(pid):
+    found = set()
+    try:
+        for task in os.listdir(f"/proc/{pid}/task"):
+            with open(f"/proc/{pid}/task/{task}/children") as file:
+                found.update(int(child) for child in file.read().split())
+    except (OSError, ValueError):
+        pass
+    return found
+
+def live(groups):
+    found = set()
+    for name in os.listdir("/proc"):
+        if name.isdigit():
+            try:
+                with open(f"/proc/{name}/stat") as file:
+                    fields = file.read().rsplit(")", 1)[1].split()
+            except (OSError, IndexError):
+                continue
+            if fields[0] != "Z" and int(fields[2]) in groups:
+                found.add(int(fields[2]))
+    return found
+
+def groups():
+    found = set()
+    for pid in recorded():
+        found.add(pid)  # each recorded process leads a group of its own (start_new_session)
+        for child in children(pid):  # one gov started that the record may not show yet
+            try:
+                found.add(os.getpgid(child))
+            except OSError:
+                pass
+    return found - {os.getpgid(0)}
+
+def signal_all(targets, signum):
+    for group in targets:
+        try:
+            os.killpg(group, signum)
+        except OSError:
+            pass
+
+targets = groups()
+signal_all(live(targets), signal.SIGTERM)
+for limit, then in ((GRACE, signal.SIGKILL), (BOUND, None)):
+    deadline = time.monotonic() + limit
+    while live(targets | groups()) and time.monotonic() < deadline:
+        time.sleep(0.02)
+    targets |= groups()
+    if then is not None:
+        signal_all(live(targets), then)
+sys.exit(1 if live(targets) else 0)
+"""
+REAP_GRACE, REAP_BOUND = 3.0, 20.0
+
+
+def _group_alive(group: int) -> bool:
+    """Whether any process of the group is alive (a zombie is not), read from the kernel by pid, never by name."""
+    for name in os.listdir("/proc"):
+        if name.isdigit():
+            try:
+                fields = Path(f"/proc/{name}/stat").read_text().rsplit(")", 1)[1].split()
+            except (OSError, IndexError):
+                continue
+            if fields[0] != "Z" and int(fields[2]) == group:
+                return True
+    return False
+
+
+def _launch(root: Path, temp: Path, tmp_path: Path, slow: Path | None = None, ignore: tuple = (),
+            record: Path | None = None):
     script = tmp_path / "w296_gov.py"
     script.write_text(WRAPPER)
     env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]), TMPDIR=str(temp))
     env.pop("W296_SLOW", None)
+    env.pop("W296_RECORD", None)
     if slow is not None:
         env["W296_SLOW"] = str(slow)
+    if record is not None:
+        env["W296_RECORD"] = str(record)
 
     def _ignore():
         for signum in ignore:
             signal.signal(signum, signal.SIG_IGN)
 
-    return subprocess.Popen([sys.executable, str(script), "accept", "DAEO-t001", "--json", "--root", str(root)],
-                            env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=_ignore)
+    # a session of its own: one killpg reaches gov and anything left in its group, and a stop sent to the case's
+    # own group never reaches it. The signals the cases send still go to gov's pid alone, and gov's own handling
+    # still decides what they do.
+    gov = subprocess.Popen([sys.executable, str(script), "accept", "DAEO-t001", "--json", "--root", str(root)],
+                           env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=_ignore,
+                           start_new_session=True)
+    if record is not None:
+        with open(record, "a") as file:
+            file.write(f"{gov.pid}\n")
+    return gov
+
+
+@contextlib.contextmanager
+def _planted(folder: Path):
+    """Launch planted gov processes that are reaped on every ending of the case: the body's success, an assertion,
+    a timeout, an exception, KeyboardInterrupt, and the case's process being stopped or killed (the reaper then
+    does it alone). Yields ``launch(root, temp, slow=None, ignore=())``; ``launch.reaper`` is the reaper's pid.
+    """
+    folder.mkdir(parents=True, exist_ok=True)
+    record, script = folder / "w296_planted", folder / "w296_reaper.py"
+    record.write_text("")
+    script.write_text(REAPER)
+    read, write = os.pipe()
+    try:
+        reaper = subprocess.Popen([sys.executable, str(script), str(record), str(read), str(REAP_GRACE),
+                                   str(REAP_BOUND)], pass_fds=(read,), start_new_session=True,
+                                  stdin=subprocess.DEVNULL)
+    finally:
+        os.close(read)
+    launched: list[subprocess.Popen] = []
+
+    def launch(root: Path, temp: Path, slow: Path | None = None, ignore: tuple = ()) -> subprocess.Popen:
+        gov = _launch(root, temp, folder, slow=slow, ignore=ignore, record=record)
+        launched.append(gov)
+        return gov
+
+    launch.reaper = reaper.pid
+    try:
+        yield launch
+    finally:
+        os.close(write)  # the reaper wakes and stops whatever is left
+        try:
+            code = reaper.wait(timeout=REAP_GRACE + REAP_BOUND + 30)
+        except subprocess.TimeoutExpired:
+            reaper.kill()
+            code = reaper.wait()
+        for gov in launched:
+            try:
+                gov.wait(timeout=10)
+            except subprocess.TimeoutExpired:  # never expected: the reaper has killed gov's group already
+                gov.kill()
+                gov.wait()
+            if gov.stdout is not None:
+                gov.stdout.close()
+        assert code == 0, "the reaper left a planted process group alive"
+
+
+@pytest.fixture
+def launch(tmp_path):
+    """The r9/r11/r12 cases' planted gov: reaped, with the pytest it started, however the case ends."""
+    with _planted(tmp_path / "w296_reap") as start:
+        yield start
 
 
 def _wait_for(path: Path, seconds: float = 60) -> None:
@@ -184,12 +346,12 @@ def _wait_for(path: Path, seconds: float = 60) -> None:
 
 
 @pytest.mark.parametrize("signals", [(2,), (15,), (1,), (2, 15, 1)])  # SIGINT, SIGTERM, SIGHUP, all three
-def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, signals):
+def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_path, launch, signals):
     root, temp = project
     started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
     go.write_text("x")
     _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go)) + f"    print('{MARK}')\n"})
-    gov = _launch(root, temp, tmp_path, slow=slow)
+    gov = launch(root, temp, slow=slow)
     _wait_for(slow)
     for signum in signals:
         gov.send_signal(signum)
@@ -201,11 +363,11 @@ def test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back(project, tmp_pat
 
 
 @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
-def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, first, more):
+def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
     root, temp = project
     started, slow = tmp_path / "started", tmp_path / "slow"
     _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
-    gov = _launch(root, temp, tmp_path, slow=slow)
+    gov = launch(root, temp, slow=slow)
     _wait_for(started)
     child = int(started.read_text())
     gov.send_signal(first)
@@ -220,12 +382,12 @@ def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(proj
 
 
 @pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
-def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, kinds):
+def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, launch, kinds):
     root, temp = project
     started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
     go.write_text("x")
     _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
-    gov = _launch(root, temp, tmp_path, slow=slow)
+    gov = launch(root, temp, slow=slow)
     _wait_for(slow)
     sent = 0
     while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
@@ -240,11 +402,11 @@ def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, ki
     assert list(temp.iterdir()) == []
 
 
-def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path):
+def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
     root, temp = project
     started = tmp_path / "started"
     _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
-    gov = _launch(root, temp, tmp_path)
+    gov = launch(root, temp)
     _wait_for(started)
     child = int(started.read_text())
     gov.send_signal(signal.SIGINT)
@@ -255,12 +417,87 @@ def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path):
     assert _gone(child)
 
 
+# a case's process that uses the reaping and is then killed outright: it plants gov, waits for the run to block,
+# writes "<gov pid> <pytest group> <reaper pid>" and sleeps until it is killed
+HOLDER = """import importlib.util, os, sys, time
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("w296_case", sys.argv[1])
+case = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(case)
+root, temp, folder, started, out = map(Path, sys.argv[2:7])
+with case._planted(folder) as launch:
+    gov = launch(root, temp)
+    case._wait_for(started)
+    out.with_suffix(".part").write_text(f"{gov.pid} {int(started.read_text())} {launch.reaper}")
+    os.replace(out.with_suffix(".part"), out)
+    time.sleep(600)
+"""
+
+
+def _blocking(project, tmp_path) -> tuple[Path, Path, Path]:
+    root, temp = project
+    started = tmp_path / "started"
+    _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+    return root, temp, started
+
+
+def _nothing_left(seen: dict[str, int]) -> None:
+    """Neither the planted gov nor anything in its group, the pytest group it started or the reaper is alive."""
+    deadline = time.monotonic() + REAP_GRACE + REAP_BOUND + 10
+    while time.monotonic() < deadline and not (
+            _gone(seen["gov"]) and not _group_alive(seen["gov"]) and not _group_alive(seen["group"])
+            and _gone(seen["reaper"])):
+        time.sleep(0.05)
+    assert _gone(seen["gov"]) and not _group_alive(seen["gov"])  # the planted gov and anything in its group
+    assert not _group_alive(seen["group"])  # the pytest group gov started
+    assert _gone(seen["reaper"])
+
+
+def test_w2_96_r9_r12_a_case_whose_body_ends_early_leaves_no_planted_process(project, tmp_path):
+    """DEC-866 rewrite (incident 2026-11-10 00:43): a planted gov whose run blocks, and a helper using the reaping
+    whose body ends early by ``pytest.fail``: afterwards neither the planted gov nor the pytest group it started
+    has a live process, nor does the reaper. Checked by pid only."""
+    root, temp, started = _blocking(project, tmp_path)
+    seen: dict[str, int] = {}
+
+    def body(launch):
+        gov = launch(root, temp)
+        _wait_for(started)
+        seen.update(gov=gov.pid, group=int(started.read_text()), reaper=launch.reaper)
+        assert gov.poll() is None and _group_alive(seen["group"])  # the run blocks: both are alive here
+        pytest.fail("the case's body ends early")
+
+    with pytest.raises(pytest.fail.Exception, match="ends early"):
+        with _planted(tmp_path / "w296_reap") as launch:
+            body(launch)
+    _nothing_left(seen)
+
+
+def test_w2_96_r9_r12_a_case_whose_process_is_killed_leaves_no_planted_process(project, tmp_path):
+    """DEC-866 rewrite (incident 2026-11-10 00:43, the run's worker gone): the same, with the case's process killed
+    by SIGKILL while the run blocks, so that no finaliser of its own runs; the reaper alone stops what it planted."""
+    root, temp, started = _blocking(project, tmp_path)
+    script, out = tmp_path / "w296_holder.py", tmp_path / "holder_pids"
+    script.write_text(HOLDER)
+    env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]))
+    holder = subprocess.Popen([sys.executable, str(script), __file__, str(root), str(temp),
+                               str(tmp_path / "w296_reap"), str(started), str(out)], env=env, stdin=subprocess.DEVNULL)
+    try:
+        _wait_for(out)
+        seen = dict(zip(("gov", "group", "reaper"), map(int, out.read_text().split())))
+        assert not _gone(seen["gov"]) and _group_alive(seen["group"])  # the run blocks: both are alive here
+    finally:
+        holder.kill()  # SIGKILL by its pid: the case's process ends with no finaliser of its own
+        holder.wait()
+    _nothing_left(seen)
+
+
 @pytest.mark.parametrize("signum", [2, 15, 1])
-def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, signum):
+def test_w2_96_r11_an_inherited_ignore_is_kept(project, tmp_path, launch, signum):
     root, temp = project
     started, go = tmp_path / "started", tmp_path / "go"
     _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
-    gov = _launch(root, temp, tmp_path, ignore=(signum,))
+    gov = launch(root, temp, ignore=(signum,))
     _wait_for(started)
     gov.send_signal(signum)
     time.sleep(0.5)
