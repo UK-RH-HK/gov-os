@@ -374,7 +374,11 @@ def test_documented_lines_name_only_the_sets_root():
     # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; --counts-only
     assert len(lines) == 10
     briefs = [ln.split("--brief ")[1].split()[0] for ln in lines if "--brief " in ln]
-    assert sum("/sgx1-" in b for b in briefs) == 5 and "governance/project/indep-briefs/labeller.md" not in briefs
+    # the five set-up A briefs at their real paths (ACT-W2-149-INSTALL-1): governance/project/indep-briefs/sgx1/<name>.md
+    sgx = sorted(b for b in briefs if b.startswith("governance/project/indep-briefs/sgx1/"))
+    assert sgx == sorted(f"governance/project/indep-briefs/sgx1/{n}.md"
+                         for n in ("labeller", "labeller-2", "overlap-auditor", "writer-heldout", "writer-tuning"))
+    assert not any("/sgx1-" in b for b in briefs)
     for ln in lines:
         assert WALLS + "/" not in ln and "$" not in ln and not any(c in ln for c in "*?[{<>|;&`")
 
