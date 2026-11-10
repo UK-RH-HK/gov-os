@@ -1,0 +1,278 @@
+sets-globs rehearsal: 2026-11-09 21:10:38 GMT, replay window 2026-11-07T21:10:38 .. 2026-11-09T21:10:38 UTC, steps: prepare plant live_before root_planted gap maponly
+inherited GOV_ROLE, GOV_TICKET and CLAUDE_PROJECT_DIR variables: 0
+
+== prepare: the clone, its worktree, the drafts (21:10:38)
+clone /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/Dynamic-Agentic-Engineering-OS at 61231e61839e on w2/integrate
+97a84e770058  .claude/hooks/pretooluse.py
+40085090306e  governance/project/path-map.yaml
+d18a4daa1fed  apply.sh
+5f2c98a80251  pretooluse.candidate.py
+7eb43071c02b  path-map.candidate.yaml
+573dee665eb2  sets_globs_check.py
+c2d3303b4b0c  deliver_check.py
+c8b113db6755  replay_globs.py
+5b97d854a86b  rehearse.sh
+
+== plant: the planted sets root (dummy lines; the earlier layout and the three destinations) (21:10:39)
+the three destinations planted: 8 files
+planted: 19 files
+
+== live_before: the live files (21:10:39)
+97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+ccdbf2580c3a3c8376c8def073b9d4abdbcb9912a93e2286196f1b3f237f7bb9  governance/project/orchestration/tools/indep_launch.py
+aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  governance/project/indep-walls/CLAUDE.md.tmpl
+65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49  governance/project/indep-walls/README.md
+8b50a78f01b316d0bd5d41689cd3730da0e3142ac4c54705dc83bad0ace4d74f  governance/project/indep-walls/kinds.yaml
+9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  governance/project/indep-walls/settings.json.tmpl
+21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6  governance/project/indep-walls/tree-exclude.txt
+95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  governance/project/indep-walls/wall_hook.py
+ff5321041613ebfdf7a54029cda8e5ecb4bd9ef5d58a92547b8d5c99c0a55308  .gov-runtime/scratch/orchestrator/tools/guard4_check.py
+15d405ce15952fe18798dc1b5aa2fb678b016a73ea0e7484e2e2649be1ecf2dc  .gov-runtime/scratch/orchestrator/drafts/indep-walls/walls_check.py
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+d715292711a2c38fe7ea3830df3c1000b001c7348876f74902fd683981d98624  .claude/settings.local.json
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/gov-os-operator: 0e6bc46b5162 (all but log/ and queue/)
+real sets root (its own entry only): inode 387302 mode 700 size 4096 mtime 1794229567 ctime 1794229567
+
+== root_planted (21:10:39)
+sets block root: "/home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval"
+
+== gap: sets_globs_check.py on the clone as it is (expect before: every N and L case allowed) (21:10:39)
+cases: 473, run: 473, failed: 0, expect: before, skipped: none
+PASS
+
+== maponly: the candidate map with the live hook (why the hook changes): the cases expecting after (21:11:19)
+FAIL [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --file zz-sg-new/hidden/q01.yaml: want deny, got allow | 
+FAIL [L] L1a orchestrator (the CTO) Bash: python3 x.py --sets-root=/home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --notes zz-sg-new/XCHECK-r3.md: want deny, got allow | 
+FAIL [L] L1a lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --file zz-sg-new/hidden/q01.yaml: want deny, got allow | 
+FAIL [L] L1a lead Bash: python3 x.py --sets-root=/home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --notes zz-sg-new/XCHECK-r3.md: want deny, got allow | 
+FAIL [R] O2r engineer Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r engineer Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r research Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible/q01.yaml: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/XCHECK.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/README.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/audit-sg/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/memory-verdict-4/visible: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: ls /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [R] O2r the tuner (engineer@DAEO-wnnz) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/e0/counts.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 orchestrator (the CTO) Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --out runs/zz-sg-audit/report.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 lead Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/fixtures/evaluation/zz-sg-new/visible/zz-sg-none.txt: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 lead Bash: cat /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval/runs/zz-sg-audit/misses.jsonl: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+FAIL [L] O2 lead Bash: python3 x.py --sets-root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval --out runs/zz-sg-audit/report.md: want allow, got deny | oot together with a hidden folder, which is refused to this session (DEC-1082 (3), DEC-1097 (2)): name only the root, as --sets-root <root>, and let the tool's own code open its files (DEC-953 item 2)
+cases: 473, run: 473, failed: 40, expect: after, skipped: none
+FAIL
+maponly: 41 cases differ from the ACT's answers, of which O (nothing else changed): 34
+
+rehearsal done: 2026-11-09 21:11:52 GMT, failures: 0
+sets-globs rehearsal: 2026-11-09 21:12:03 GMT, replay window 2026-11-07T21:12:03 .. 2026-11-09T21:12:03 UTC, steps: walls_before guard4_before suites_before latency_before replay_before root_back deliver_before apply deliver_after root_planted after walls_after guard4_after suites_after latency_after replay_after root_back commit undo live_after
+inherited GOV_ROLE, GOV_TICKET and CLAUDE_PROJECT_DIR variables: 0
+
+== walls_before: walls_check.py repo <clone>, HOME planted (21:12:03)
+walls
+EOF: want allow, got allow
+repo cases: 331, run: 331, failed: 0, expect: after, skipped: none
+PASS
+
+== guard4_before (the registered line, root planted) (21:12:27)
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
+
+== suites_before (21:13:15)
+before test_guard_fix_4: 467 passed in 22.33s
+before test_g14: FAILED .gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py::test_w2_91_tests_today
+before test_g14: 1 failed, 150 passed, 1 skipped in 4.51s
+before live hook, reads: 85 passed in 15.08s
+before W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[absolute-approved]
+before W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[brief-in-a-wall]
+before W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[root-into-the-walls]
+before W2-149 (the launch script): 3 failed, 125 passed, 3 skipped in 11.19s
+
+== latency_before (21:14:09)
+median ms per call: 102.3
+
+== replay_before: the real calls of 2026-11-07T21:12:03 .. 2026-11-09T21:12:03 UTC, the hook and map before (21:14:21)
+ "since": "2026-11-07T21:12:03",
+ "until": "2026-11-09T21:12:03",
+ "counts": {
+  "calls in the window, to the start": 11757,
+  "duplicates": 497,
+  "skipped: names the real sets root in a form not rewritten": 55,
+  "unique judged": 11205,
+  "calls naming the new globs": 61
+ },
+ "decisions": {
+  "allow": 11131,
+  "deny": 74
+ }
+}
+
+== root_back (21:18:11)
+sets block root: "~/gov-os-eval"
+
+== deliver_before: the launch script delivers (W2-149 harness, planted); the hook before: each file open (the gap) (21:18:11)
+Traceback (most recent call last):
+AssertionError: /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/e2e-before/w/home/gov-os-eval is a real location
+deliver before: 0 ok, 0 failed
+REHEARSAL FAIL: deliver before
+
+== apply: apply.sh check, apply, a second apply, check (the size check on the planted root) (21:18:11)
+apply.sh check: tree /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/Dynamic-Agentic-Engineering-OS, sets root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval
+now: 97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+now: 40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+now: state before
+drafts: both files as built
+size (live globs, 7): 7 hidden files, walked in 0 ms
+size (candidate globs, 10): 10 hidden files, walked in 1 ms
+check: ready to apply
+apply.sh apply: tree /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/Dynamic-Agentic-Engineering-OS, sets root /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval
+before: 97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+before: 40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+before: state before
+size (live globs, 7): 7 hidden files, walked in 0 ms
+size (candidate globs, 10): 10 hidden files, walked in 1 ms
+backup: /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/sets-globs/backup (SHA256SUMS written)
+after: 5f2c98a80251ccac30553fa99a4808da323f6b09f5670f18706d431a1cd3863c  .claude/hooks/pretooluse.py
+after: 7eb43071c02b54e433bdb7b89c2b01dea0f8e935ab0c9107d352e71033babf84  governance/project/path-map.yaml
+after: state applied
+apply: done. The operator's commit stages:
+  git add .claude/hooks/pretooluse.py governance/project/path-map.yaml
+a second apply: refused
+check: already applied
+ M .claude/hooks/pretooluse.py
+ M governance/project/path-map.yaml
+applied: load_config ok; check_sets ok; hidden globs 10 ; refused roles 6
+  line key: (?<![\w.-])[^/\s'\"\x00]+/hidden(?![\w.-])
+  line key: (?<![\w.-])[^/\s'\"\x00]+/XCHECK\-r[^/\s'\"\x00]*\.md(?![\w.-])
+  line key: (?<![\w.-])runs/[^/\s'\"\x00]+/miss\-classes\.json(?![\w.-])
+
+== deliver_after: the launch script delivers into the new globs; the hook after refuses each file, allows its line (21:18:11)
+Traceback (most recent call last):
+AssertionError: /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/e2e-after/w/home/gov-os-eval is a real location
+deliver after: 0 ok, 0 failed
+REHEARSAL FAIL: deliver after
+
+== root_planted (21:18:12)
+sets block root: "/home/usain/gov-os-runs/SETS-GLOBS-rehearsal/home/gov-os-eval"
+
+== after: sets_globs_check.py with the ACT applied (HOME planted) (21:18:12)
+cases: 473, run: 473, failed: 0, expect: after, skipped: none
+PASS
+
+== walls_after (21:18:50)
+walls
+EOF: want allow, got allow
+repo cases: 331, run: 331, failed: 0, expect: after, skipped: none
+PASS
+
+== guard4_after (21:19:13)
+cases run: 501, failed: 0, sets cases: 527, skipped: names ~ or $HOME, and the root is not ~/gov-os-eval: 96
+PASS
+
+== suites_after (21:20:08)
+after test_guard_fix_4: 467 passed in 35.46s
+after test_g14: FAILED .gov-runtime/scratch/orchestrator/drafts/g14/test_g14.py::test_w2_91_tests_today
+after test_g14: 1 failed, 150 passed, 1 skipped in 4.65s
+after live hook, reads: 85 passed in 26.52s
+after W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[absolute-approved]
+after W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[brief-in-a-wall]
+after W2-149 (the launch script): FAILED tests/acceptance/W2-149/test_w2_149_guard_line.py::test_s19_the_same_line_naming_a_folder_under_the_sets_root_is_refused[root-into-the-walls]
+after W2-149 (the launch script): 3 failed, 125 passed, 3 skipped in 11.17s
+
+== latency_after (21:21:27)
+median ms per call: 122.7
+
+== replay_after: the same calls, the hook and map after; before against after (21:21:51)
+ "since": "2026-11-07T21:12:03",
+ "until": "2026-11-09T21:12:03",
+ "counts": {
+  "calls in the window, to the start": 11757,
+  "duplicates": 497,
+  "skipped: names the real sets root in a form not rewritten": 55,
+  "unique judged": 11205,
+  "calls naming the new globs": 61
+ },
+ "decisions": {
+  "allow": 11130,
+  "deny": 75
+ }
+}
+window 2026-11-07T21:12:03 .. 2026-11-09T21:12:03; calls judged before 11205, after 11205, in both 11205
+answers: {'allow->allow': 11130, 'allow->deny': 1, 'deny->deny': 74} ; calls naming the new globs: 61
+  allow->deny [OTHER] orchestrator/general-purpose Bash | git grep -l 'accepted_history' HEAD -- '*.yaml' '*.yml' '*.json' | head; git grep -n 'decision: DEC- | after: the guard could not decide in 20 seconds, so the call is ref
+differences: 1; naming the new globs: 0; other: 1
+
+== root_back (21:26:13)
+sets block root: "~/gov-os-eval"
+
+== commit: the operator's commit in the clone, as the message gives it (21:26:13)
+M	.claude/hooks/pretooluse.py
+M	governance/project/path-map.yaml
+0a431315a ACT-SETS-GLOBS-1: the launch script's destinations hidden (fixtures/evaluation/*/hidden/**, fixtures/evaluation/*/XCHECK-r*.md, runs/*/miss-classes.js
+Task: DAEO-sdxk
+Implements: DEC-1101, DEC-1112
+Role: owner
+
+
+== undo: apply.sh undo after the commit (the working files back; then the clone's commit reverted) (21:26:13)
+apply.sh undo: tree /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/Dynamic-Agentic-Engineering-OS
+before-undo: 5f2c98a80251ccac30553fa99a4808da323f6b09f5670f18706d431a1cd3863c  .claude/hooks/pretooluse.py
+before-undo: 7eb43071c02b54e433bdb7b89c2b01dea0f8e935ab0c9107d352e71033babf84  governance/project/path-map.yaml
+before-undo: state applied
+after-undo: 97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+after-undo: 40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+after-undo: state before
+undo: done; the hook and the map byte for byte as before the apply
+check: ready to apply
+the hook and the map: as before the ACT's commit
+
+== live_after: the live files against before (21:26:13)
+97a84e770058bb96705ebe41c259c0c1578bdc8ac23fac237e6cdf5f1af43e11  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+40085090306e9429e1fdc2ef4eb8bb3bd5af26ad3d50db95222950794bf242a5  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+ccdbf2580c3a3c8376c8def073b9d4abdbcb9912a93e2286196f1b3f237f7bb9  governance/project/orchestration/tools/indep_launch.py
+aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  governance/project/indep-walls/CLAUDE.md.tmpl
+65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49  governance/project/indep-walls/README.md
+8b50a78f01b316d0bd5d41689cd3730da0e3142ac4c54705dc83bad0ace4d74f  governance/project/indep-walls/kinds.yaml
+9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  governance/project/indep-walls/settings.json.tmpl
+21660e1ee5adf793e46d59e601cef662ef8a445399da185bd9397bc6067d47a6  governance/project/indep-walls/tree-exclude.txt
+95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  governance/project/indep-walls/wall_hook.py
+ff5321041613ebfdf7a54029cda8e5ecb4bd9ef5d58a92547b8d5c99c0a55308  .gov-runtime/scratch/orchestrator/tools/guard4_check.py
+15d405ce15952fe18798dc1b5aa2fb678b016a73ea0e7484e2e2649be1ecf2dc  .gov-runtime/scratch/orchestrator/drafts/indep-walls/walls_check.py
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+d715292711a2c38fe7ea3830df3c1000b001c7348876f74902fd683981d98624  .claude/settings.local.json
+bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052  /home/usain/.claude/settings.json
+~/gov-os-operator: 0e6bc46b5162 (all but log/ and queue/)
+real sets root (its own entry only): inode 387302 mode 700 size 4096 mtime 1794229567 ctime 1794229567
+live: unchanged
+this rehearsal's hook runs logged in /home/usain/gov-os-runs/SETS-GLOBS-rehearsal/calls: 27579 lines
+
+rehearsal done: 2026-11-09 21:26:13 GMT, failures: 2
