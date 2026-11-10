@@ -1,43 +1,82 @@
-# ACT-W2-149-INSTALL-1: the launch script's approved list: set-up A's five fixed briefs and the operator's two (DEC-1101 (2)-(3), DEC-1113)
+# ACT-W2-149-INSTALL-1: the launch script's approved list: set-up A's five fixed briefs, the walls' two changed template files and the operator's two briefs (DEC-1101 (2)-(3), DEC-1112 (3), DEC-1113)
 
 - **For:** the owner's yes, then the owner's operator by hand, as the message in §5 (DEC-1104 (4)). About one minute in
   the main tree.
-- **By:** a helper agent for the CTO (orchestrator `DAEO-sdxk`, session `ad44f5fe`), 2026-11-09. Built and rehearsed in
-  a clone with a planted HOME and a planted sets root. **Nothing live is changed** until the operator runs §5; the real
-  sets root was never opened. Reviewed independently (§7).
-- **Under:** DEC-1101 (2)-(3) (fixed briefs the owner approves once, hashed; the launch script checks them against the
-  owner's list); DEC-1113 and the owner's approval of 2026-11-09 (set-up A's five briefs at labeller v3 `bbff1249…`,
-  labeller-2 v3 `e13b5f96…`, writer-tuning v3 `82134b3d…`, writer-heldout v3 `137a73d1…`, overlap-auditor v1
-  `b212a424…`; DECISIONS-IN-FORCE: "the approved list the launch script checks is written by the launch script's install
-  ACT"); DEC-1109 (1) (the operator agent's two briefs, `51c459cf…`, `e8670330…`); DEC-1112 (3) (delegated to the CTO);
-  DEC-1057 (rehearsed).
-- **Sources:** W2-149 (`DAEO-52ku`; merged `b4de529b`, its F11 follow-up merged `ff1865184`); ACT-INDEP-WALLS-1 (the list as
-  first written, `331e48fa…`, six template lines); ACT-SETS-GLOBS-1 (the hidden globs for a new set's destinations,
-  W2-149 review F2, DEC-803's entry criterion of step 4); SANDBOX-GUARD-EXP-DECLARATION §12; the sandbox experiment's
-  `README.md` (`drafts/sandbox-exp/`).
-- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/w2-149-install/` (§4).
+- **By:** a ticket lead for the CTO (orchestrator `DAEO-sdxk`). Built 2026-11-09, **rebuilt 2026-11-10 on the merged
+  set-up A wiring** (W2-149, `7f0e71519`). Rehearsed in a clone with a planted HOME and a planted sets root. **Nothing
+  live changes** until the operator runs §5, and the real sets root was never opened. Reviewed independently (§7).
+- **Under:**
+  - DEC-1101 (2)-(3): fixed briefs the owner approves once, hashed; the launch script checks them and the walls'
+    template against the owner's list.
+  - DEC-1113 and the owner's approval of 2026-11-09: set-up A's five briefs at labeller v3 `bbff1249…`, labeller-2 v3
+    `e13b5f96…`, writer-tuning v3 `82134b3d…`, writer-heldout v3 `137a73d1…` and overlap-auditor v1 `b212a424…`.
+    DECISIONS-IN-FORCE says "the approved list the launch script checks is written by the launch script's install ACT".
+  - DEC-1112 (3), the CTO's delegated rulings (`4fd701aba`): the wiring, the template change, the seeds (declaration
+    amendment A5).
+  - DEC-1109 (1): the operator agent's two briefs, `51c459cf…` and `e8670330…`.
+  - DEC-1057: rehearsed.
+- **Sources:**
+  - W2-149 (`DAEO-52ku`): merged `b4de529b`; F11 `ff1865184`; set-up A's wiring `7f0e71519` (review READY round 1,
+    `.gov-runtime/scratch/orchestrator/reviews/W2-149-sgx-review-r1.md`; `gov accept W2-149` pass, 146/0/3).
+  - ACT-INDEP-WALLS-1: the list as first written, `331e48fa…`, with six template lines.
+  - ACT-SETS-GLOBS-1, applied `9cce7430d`.
+  - SANDBOX-GUARD-EXP-DECLARATION §12 and its amendment A5.
+- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/w2-149-install/` (§4). The first build's reviewed drafts are
+  kept in `drafts/w2-149-install-v1/`.
 
 ## 0. Class: (O); your yes, then your operator by hand
-**(O) (review F5), with your yes `yes ACT-W2-149-INSTALL-1 <sha8>`, then your operator by hand.**
-- **The code's vote is (O):** `class-rules.yaml`'s `walled-sessions` row names both paths this ACT writes
-  (`gov-os-eval/**`, so `<sets root>/indep-walls/APPROVED`, and `governance/project/indep-briefs/**`) as (O): OPERATOR-AGENT-1
-  §2's "the blind writers and checkers: walled sessions under DEC-1101, not the operator". The agent's brief forbids the
-  sets root altogether (§1).
-- **By effect it is at least (b):** the list decides what the launch script will start, and seven brief lines let it
-  build walls under briefs it refuses today; it adds no check and tightens nothing.
+**(O), with your yes, then your operator by hand.** The yes line: **`yes ACT-W2-149-INSTALL-1 @SHA8@`**
+
+**Your yes also approves the walls' `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1's
+table: what each change turns on). The template's own header says a change to it needs your approval. The CTO's
+delegated ruling took the change into the repository (`4fd701aba`, merged `7f0e71519`), and this list is where it is
+approved.
+
+- **The code's vote is (O).** `class-rules.yaml`'s `walled-sessions` row names both paths this ACT writes as (O):
+  `gov-os-eval/**` (so `<sets root>/indep-walls/APPROVED`) and `governance/project/indep-briefs/**`. That is
+  OPERATOR-AGENT-1 §2's "the blind writers and checkers: walled sessions under DEC-1101, not the operator". The agent's
+  brief forbids the sets root altogether.
+- **By effect it is at least (b).** The list decides what the launch script will start. Its seven brief lines and two
+  changed template lines let set-up A's walls be built under briefs and a template that the script refuses today. Its
+  only tightening is `tree-exclude.txt`'s new line (and the set-up A entries' tree exclusions).
 - The higher vote applies: (O). It never goes to the agent's queue. It changes what may launch independent sessions,
-  so the CTO asks your yes before your operator runs §5 (as ACT-SETS-GLOBS-1, DEC-1115 (1)).
+  so the CTO asks your yes before your operator runs §5 (as with ACT-SETS-GLOBS-1, DEC-1115 (1)).
 
 ## 1. What lands
-1. **The five briefs in the repository**, byte for byte as you approved them, because the launch script reads a brief
-   only from the repository at `--commit` (`git show`, W2-149 reading 3), never from a working copy:
-   `governance/project/indep-briefs/sgx1/{labeller,labeller-2,writer-tuning,writer-heldout,overlap-auditor}.md`.
-   Your operator commits them (`Role: owner`).
-2. **The list** `<sets root>/indep-walls/APPROVED` (0400, written by your operator only): ACT-INDEP-WALLS-1's text kept
-   byte for byte (`331e48fa…`, its six template lines), then:
+1. **The five briefs in the repository,** byte for byte as you approved them, at
+   `governance/project/indep-briefs/sgx1/{labeller,labeller-2,writer-tuning,writer-heldout,overlap-auditor}.md`. The
+   launch script reads a brief only from the repository at `--commit` (`git show`, W2-149 reading 3), never from a
+   working copy. Your operator commits them (`Role: owner`).
+2. **The list** `<sets root>/indep-walls/APPROVED` (0400, written by your operator only). It is ACT-INDEP-WALLS-1's
+   text, with **two of its six template lines changed** to the set-up A wiring's template files:
+
+   | Template file | Before (ACT-INDEP-WALLS-1) | After (W2-149, `7f0e71519`) | What changed |
+   |---|---|---|---|
+   | `governance/project/indep-walls/kinds.yaml` | `8b50a78f01b3…` | `734b26e261fa…` | a `model` per kind (`claude-opus-5-5`); a `briefs:` entry per set-up A brief (its flow, result schema, `sample`, and its tree exclusions: `.claude/**`, `src/gov/guard/**`, `src/gov/launch/**`, the template folder) |
+   | `governance/project/indep-walls/tree-exclude.txt` | `21660e1ee5ad…` | `e8395088167e…` | `governance/project/indep-briefs/**` left out of every wall's tree and every writer's sample (review F7 of the first build) |
+
+   **What the `kinds.yaml` change turns on** (the rebuilt ACT's review, K2 and F35):
+   - **a default model for every kind:** a brief of any kind, the memory sets' included, that names no model now runs
+     on `claude-opus-5-5` instead of being refused 10;
+   - **the labeller kind becomes launchable,** for set-up A's two labeller briefs only (any other labeller brief is
+     refused 10);
+   - **set-up A's five flows.** The script stages each half's material into the wall: the tuning half from
+     `~/gov-os-runs/SANDBOX-GUARD-EXP-1/tuning/`, the held-out half from the sealed folder under the sets root. It
+     delivers each wall's products by its own code into that half's folder; for the held-out half that is the sealed
+     folder (planted cases, round-1 files, labels, the overlap auditor's decisions and x/y map, a rewritten
+     `labels.jsonl`, `owner.jsonl`);
+   - **at labeller 1's round 2, the script runs that session's own rule script on this machine,** confined by `bwrap`
+     (no network, no files, no process, capped; any failure is 18);
+   - **a set-up A wall's tree loses** `.claude/`, `src/gov/guard/`, `src/gov/launch/` and the template folder (a
+     tightening).
+
+   `tree-exclude.txt`'s change lets a wall do nothing new.
+
+   The other four template lines are unchanged. After the six template lines come:
    ```
+   # ACT-W2-149-INSTALL-1 … the two template lines above … replace 8b50a78f01b3 and 21660e1ee5ad (ACT-INDEP-WALLS-1's).
    # ACT-W2-149-INSTALL-1 … for the launch script governance/project/orchestration/tools/indep_launch.py
-   # b04db4547eec791c2d7d4575cfe541f3744b7235280d03383474ac52d44affd5 (W2-149 with its F11 follow-up, `ff1865184`) …
+   # a5f2e8f5d9c9b79a7a3e61e475b71da45b071eb868640953577dd7f54adad695 (W2-149 with set-up A's wiring, 7f0e71519f83) …
    bbff1249…  brief labeller governance/project/indep-briefs/sgx1/labeller.md
    e13b5f96…  brief labeller governance/project/indep-briefs/sgx1/labeller-2.md
    82134b3d…  brief writer governance/project/indep-briefs/sgx1/writer-tuning.md
@@ -47,65 +86,96 @@
    51c459cf…  brief operator governance/project/operator/brief.md
    e8670330…  brief operator governance/project/operator/reviewer-brief.md
    ```
-   (`drafts/w2-149-install/APPROVED.after` in full: 20 lines, sha256 `9e9d6f212a1ebd54e8bcb6c0c0c691fbb23c8aefbb70e359a9b5a61dba44b56f`.) Each brief's kind is its
-   front matter's `kind`. The operator's two are kept on the one list of what you approved; the launch script knows no
-   kind `operator` (its `--kind` refuses with 17), so no wall can be built under them. **If you meant something else by
-   "the operator's two"** (row 75 of DECIDED-NOT-DONE), say so before your yes: the CTO drops the two lines and
-   re-rehearses.
-3. **Nothing else:** the template, the launch script, the guard, the path map and the settings are untouched.
+   `drafts/w2-149-install/APPROVED.after` gives it in full: 23 lines, sha256
+   `a0af30f840dba01fbb6129fbb07841af0858d5b2ea2961a7340efffbf457a65d`. A template line must be replaced, not added
+   beside the old one: the launch script requires exactly one hash per template file.
+   - Each brief's kind is its front matter's `kind`.
+   - The operator's two briefs are kept on the one list of what you approved. The launch script knows no kind
+     `operator` (its `--kind` refuses with 17), so no wall can be built under them. **If you meant something else by
+     "the operator's two"** (row 75 of DECIDED-NOT-DONE), say so before your yes: the CTO drops the two lines and
+     re-rehearses.
+3. **Nothing else.** The launch script, the template files and the schemas are already in the repository (the wiring's
+   merge, `7f0e71519`). The guard, the path map and the settings are untouched.
 
 ## 2. The order
-1. **W2-149's F11 follow-up merged** (`--setting-sources project`, `ff1865184`): `apply.sh` refuses unless the tree's launch
-   script hashes `b04db4547eec`, so the list names the script that will run.
-2. **ACT-SETS-GLOBS-1 applied** (done: your operator applied it at `9cce7430d`, 2026-11-09): `apply.sh` refuses unless the map's
-   `sets_root_hidden` holds its four globs and the hook has its line keys (rehearsed: refused before, applied after).
-   The deliveries of the walls these briefs start (a new set's `hidden/`, the checker's notes, an audit's miss classes
-   and misses) are hidden from every guarded session only after it (W2-149 review F2, DEC-803).
+1. **W2-149 with set-up A's wiring merged** (`7f0e71519`). `apply.sh` refuses unless the tree's launch script hashes
+   `a5f2e8f5d9c9` and its `kinds.yaml` and `tree-exclude.txt` hash `734b26e261fa` and `e8395088167e` ("merge it
+   first"). After the apply, the list holds the template and the briefs by their template and brief lines. **It holds
+   the script only until the apply:** the script's hash in the list is a comment, which the launch script's parser
+   skips (the rebuilt ACT's review, F34).
+2. **ACT-SETS-GLOBS-1 applied.** Done: your operator applied it at `9cce7430d` on 2026-11-09. `apply.sh` refuses unless
+   the map's `sets_root_hidden` holds its four globs and the hook has its line keys (rehearsed: refused before, applied
+   after).
 3. **This ACT.** W2-141's hook (row 78), rebuilt on ACT-SETS-GLOBS-1's hook, keeps both checks true whenever it lands.
+4. **Then the declaration's pin amendment** (§3), before the extractor runs.
 
-## 3. What it does not do yet: set-up A cannot launch through the merged script
-**Found while building this ACT (rehearsed, §6):** with the list applied, each of the five briefs passes the list's
-check and is then refused by the launch script's own stage 10, on its front matter:
-- no brief names `model` or `result_schema`, which the script requires (W2-149 reading 4); the two labellers and the
-  overlap auditor name no `sample` either (`is_count` needs one; 0 would do for them);
-- beyond the front matter, the sandbox experiment's README lists what set-up A asks of the script that W2-149 did not
-  build: the labellers' two rounds with `label_rules.py` run confined and its sample staged; the overlap auditor's
-  inputs (`disputes.jsonl` with `x`/`y` in a seeded order, `tickets.jsonl` with each ticket's `allowed_paths`) and its
-  `decisions.jsonl` delivery; the labellers' deliveries to the scorer's names (`labels.jsonl`, `labels-2.jsonl`) and the
-  tuning half's to `EXP/tuning/`; the declaration's overlap rule (`sha256(SEED + "overlap" + id) mod 10 = 0`) where S20
-  draws 10 % with `random.Random`.
-- **So row 66 (set-up A beside D-10) waits on a W2-149 follow-up for set-up A's wiring**, tests first, as well as on this
-  ACT. **This ACT stands only if it is applied before the follow-up changes the launch script** (review F4): `apply.sh`
-  pins the script's sha256 and the list's comment names it, so any later change to `indep_launch.py` makes `check`
-  refuse ("merge it first") and the ACT is rebuilt, re-reviewed and asked again. The follow-up may also change the
-  template (`kinds.yaml` for `model` and `result_schema`; `tree-exclude.txt`, below) or the briefs (new versions for your
-  approval), and each changes this list again. Applying this ACT first does no harm: every launch under these briefs is
-  refused at stage 10 until then, and a control brief with complete front matter builds its wall under the same list
-  (§6).
-- **And the experiment's pin moves** (review F6): the launch script reads the brief at `--commit`, the same commit it
-  builds each wall's tree from. The declaration pins every tree at `f000adda4`, where no brief exists (a launch there is
-  refused 10). Its §2 already requires a new pin, since the live hook and map changed with ACT-SETS-GLOBS-1; the new pin
-  is at or after this ACT's commit and the follow-up's merge, recorded as an amendment before the extractor runs.
+## 3. What it does, and what it does not do
+- **Set-up A launches through the merged script once this is applied.** The rehearsal (§6) applies it, and then a dry
+  launch under each of the five briefs (`--seed 17`) passes stage 10 and builds its wall (exit 0, `dry`):
+  - `model` comes from the kind (`claude-opus-5-5`);
+  - `result_schema` comes from the brief's entry (`sgx1-<brief>-result.schema.json`);
+  - `sample` comes from the front matter for the writers (400) and from the entry for the others (0);
+  - each wall's `input/` is exactly what its brief names;
+  - each wall's `brief.md` is the approved bytes;
+  - each tree holds no `governance/project/indep-briefs/`, `.claude/` or `src/gov/guard/`.
+
+  Before this ACT, every launch at the merged commit is refused with **11**: the two changed template files are not yet
+  on the list.
+- **Before the apply,** a change to the launch script or to either template file makes `check` refuse ("merge it
+  first"), and the ACT is rebuilt, re-reviewed and asked again (first build's review F4).
+- **After the apply, the two differ** (the rebuilt ACT's review, F34):
+  - a later change to either template file is refused 11 at launch until a new list approves it;
+  - a later change to the launch script launches under this list unchanged, as reviewed code without a new yes (the
+    list's comment then names an older script). `check` then says "merge it first", though the ACT is applied; `undo`
+    still works.
+- **The wiring's review rows F18 to F23** (W2-149's file; none in scope, reachable in ordinary work and fail-open or
+  work-losing) are such later script changes. Fixed before the apply, they rebuild this ACT; fixed after it, they run
+  without one:
+  - a broken rule script is first caught at round 2 (F18);
+  - a result that says it stopped is still delivered (F19);
+  - labeller 2's labels land unchecked (F20);
+  - an empty script reason tells the auditor which side is labeller 1's (F21);
+  - a settled case keeps labeller 1's class (F22);
+  - `rule_class` is accepted only as an integer (F23).
+
+  Each of these is a possible stall or a weakened blind in set-up A's first real runs, not a failure of the list.
+  Whether to fix them before asking you (one more rebuild, scripted: `freeze.py`, `rehearse.sh`) or after the apply is
+  the CTO's call.
+- **The experiment's pin moves** (first build's review F6). The launch script reads each brief and template file at
+  `--commit`, the same commit it builds each wall's tree from. The declaration pins every tree at `f000adda4`, where no
+  brief exists and the template is the old one. A launch there is refused with 10 today, and with **11** once this list
+  is applied, since its `kinds.yaml` and `tree-exclude.txt` are the two lines this list replaces (the rebuilt ACT's
+  review, F33). The new pin is the first `w2/integrate` commit at or after both the wiring's merge
+  (`7f0e71519`) and your operator's commit of §5 (and after W2-141's hook, if that lands first). The CTO records it as
+  an amendment before the extractor runs.
 
 ## 4. The files (drafts; checked by hash before they apply)
 | File (`drafts/w2-149-install/`) | sha256 (first 12) |
 |---|---|
 | `briefs/` the five, byte for byte §12's | `bbff1249953b`, `e13b5f96d0e0`, `82134b3dd6b5`, `137a73d1df4c`, `b212a424062e` |
-| `APPROVED.before` (rebuilt from ACT-INDEP-WALLS-1's own text; equals its recorded `331e48fa…`), `APPROVED.after` | `331e48fa336e`, `9e9d6f212a1e` |
-| `apply.sh`: `check`, `apply`, `undo` | `871d2c9db3dc` (round 1 reviewed `e52f548e979a`; round 2's fixes: F1 `-B`, F3 the globs quoted) |
-| `freeze.py` (builds the two lists and writes the hashes into `apply.sh`), `install_check.py`, `rehearse.sh`, `rehearsal.log` | `1f65c76bb05a`, `164136c6d8ea`, `9d07a23cb26f`, `b6c47925f15a` |
+| `APPROVED.before` (rebuilt from ACT-INDEP-WALLS-1's own text; equals its recorded `331e48fa…`), `APPROVED.after` | `331e48fa336e`, `a0af30f840db` |
+| `apply.sh`: `check`, `apply`, `undo` | `53c2c68122d2` (the first build's reviewed `871d2c9db3dc`; now pinned to the wiring's script and two template files, and its head check is the before list with the two template lines changed) |
+| `freeze.py` (builds the two lists and writes the hashes into `apply.sh`), `install_check.py` (stage 10's values and their source per brief line), `rehearse.sh`, `rehearsal.log` | `2843bd193cc8`, `0dc77d5ce966`, `e0da436ef120`, `780d8ddb9594` |
 
-`apply.sh check` and `apply` stop unless every draft hashes as built, the order of §2 holds, and the tree and the list
-are both before (no brief file, the list `331e48fa…`) or both applied ("already applied"). `apply` backs up the list
-with its sha256, writes the five files, writes the new list beside the old and renames it over (0400), then reads it
-back with the launch script's own parser (6 template lines, 7 brief lines, every hash matching its file). `undo` checks
-the backup, puts the list back byte for byte and removes the five files only. **The live check is the operator's:** the
-CTO's sessions never open the sets root, so `check` meets the real list for the first time at your apply; if the real
-list is not `331e48fa…` it stops and changes nothing.
+- **What `check` and `apply` require.** They stop unless:
+  - every draft hashes as built;
+  - `APPROVED.after`'s head is `APPROVED.before` with exactly the two template lines changed;
+  - the order of §2 holds;
+  - the tree and the list are both in the before state (no brief file, the list `331e48fa…`) or both applied ("already
+    applied").
+- **What `apply` does.** It backs up the list with its sha256 and writes the five files. It writes the new list beside
+  the old one and renames it over (0400). It then reads the list back with the launch script's own parser: 6 template
+  lines and 7 brief lines, every hash matching its file in the tree.
+- **What `undo` does.** It checks the backup, puts the list back byte for byte, and removes the five files only. The
+  tree's template files stay as merged, so after an undo every launch is refused with 11 again.
+- **The live check is the operator's.** The CTO's sessions never open the sets root, so `check` meets the real list for
+  the first time at your apply. If the real list is not `331e48fa…`, it stops and changes nothing.
 
 ## 5. The operator's steps: the message
-> **ACT-W2-149-INSTALL-1 (DEC-1101, DEC-1113): the launch script's approved list.** Class (O), by hand: your yes first
-> (`yes ACT-W2-149-INSTALL-1 <sha8>`, the sha8 of the commit that records this package ready, as the CTO's ping gives it, the form of DEC-1115 (1)). After ACT-SETS-GLOBS-1. In the main tree, about one minute:
+> **ACT-W2-149-INSTALL-1 (DEC-1101, DEC-1112 (3), DEC-1113): the launch script's approved list.** Class (O), by hand:
+> your yes first: **`yes ACT-W2-149-INSTALL-1 @SHA8@`** (the form of DEC-1115 (1)). **Your yes also approves the walls'
+> `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1). It comes after ACT-SETS-GLOBS-1 and
+> after W2-149's set-up A wiring is merged (`7f0e71519`). In the main tree, about one minute:
 > ```
 > cd /home/usain/Dynamic-Agentic-Engineering-OS
 > G=.gov-runtime/scratch/orchestrator/drafts/w2-149-install
@@ -113,80 +183,113 @@ list is not `331e48fa…` it stops and changes nothing.
 > bash $G/apply.sh apply     # backup; the five briefs; the list; "6 template lines, 7 brief lines …"; "state applied"
 > git add governance/project/indep-briefs/sgx1
 > git diff --cached --name-status    # expect exactly 5 A: the five briefs
-> git commit -m "ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list (the five and the operator agent's two)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" -- governance/project/indep-briefs/sgx1
+> git commit -m "ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list (the five, the walls' two changed template files, the operator agent's two)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" -- governance/project/indep-briefs/sgx1
 > ```
-> If `check` stops (the order, or a list that is not as first written), send its line to the CTO and apply nothing. If
-> `git diff --cached` lists anything besides the five, commit anyway: the `--` path limits the commit to them (review F2).
-> **Undo:** `bash $G/apply.sh undo` puts the list back byte for byte and removes the five files; then
+> - **If `check` stops** (the order, a script or template that is not the merged one, or a list that is not as first
+>   written), send its line to the CTO and apply nothing.
+> - **If `git diff --cached` lists anything besides the five,** commit anyway: the `--` path limits the commit to them
+>   (first build's review F2).
+> - **If the commit stops,** nothing is committed and nothing launches under the briefs (the script reads them only at
+>   `--commit`). Send the output to the CTO (first build's review F9).
+>
+> **Undo:** `bash $G/apply.sh undo` puts the list back byte for byte and removes the five files. Then run
 > `git commit -m "ACT-W2-149-INSTALL-1 undone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" -- governance/project/indep-briefs/sgx1`.
 
-**Then the CTO**, the same day: record the apply here; open (or carry on) the set-up A wiring follow-up of §3; merge
-`w2/integrate` into the worktrees that will build walls; nothing launches under these briefs until that follow-up lands.
+**Then the CTO, the same day:**
+- record the apply here;
+- record the declaration's pin amendment (§3);
+- merge `w2/integrate` into the worktrees that will build walls;
+- set-up A's steps follow the declaration's order (§13: the extractor, the writers, the labellers, the overlap
+  auditor).
 
 ## 6. The rehearsal (DEC-1057): `rehearsal.log`
-One clean run, 2026-11-09 23:54:31–23:54:34 UTC, from a fresh `env -i` shell, **failures: 0**, in a `--no-hardlinks`
-clone of the main tree at `74767736e` (W2-149 with F11 merged, `ff1865184`; ACT-SETS-GLOBS-1 applied live by your
-operator at `9cce7430d`, hook `74f8dbea4761`, map `44f99ea563cb`), with a planted HOME and a planted sets root whose
-`indep-walls/APPROVED` is ACT-INDEP-WALLS-1's list rebuilt (`331e48fa…`). The real sets root was never opened. Earlier
-runs the same evening: a trial on `w2/W2-149-f11` before the merge (one fault of the rehearsal's own: the auditor's
-launch needs `--audit`; fixed, then 0 failures), and one at `9cce7430d` that found ACT-SETS-GLOBS-1 already applied in
-the clone (the order step adapted, below).
+One clean run, 2026-11-10 10:51:49–10:51:57 UTC, from a fresh `env -i` shell. **Failures: 0.**
+- **Where:** a `--no-hardlinks` clone of the main tree at `29907d750` (W2-149 with set-up A's wiring merged at
+  `7f0e71519`, and its ticket record).
+- **What was already live:** ACT-SETS-GLOBS-1 applied by your operator at `9cce7430d` (hook `74f8dbea4761`, map
+  `44f99ea563cb`).
+- **What was planted:** a HOME, and a sets root whose `indep-walls/APPROVED` is ACT-INDEP-WALLS-1's list rebuilt
+  (`331e48fa…`). Under the planted runs folder, set-up A's tuning half: 3 actions, 2 cases, and the two labellers'
+  labels with one dispute.
+- The real sets root was never opened.
+
+A trial at the branch head (`7df7c35e3`, before the merge) gave the same results. Its output is beside the log as
+`rehearsal-trial-7df7c35e3.log`; the drafts it ran were frozen at the branch head, so its hashes differ.
 
 | Step | Result |
 |---|---|
-| **Order:** the clone's hook and map put back to before ACT-SETS-GLOBS-1 (`97a84e770058`, `40085090306e`) | `check` **refused**: "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first"; the files back (`74f8dbea4761`, `44f99ea563cb`) |
-| Before this ACT: a launch under writer-tuning | refused **10** (no brief file at the commit, no line) |
-| `apply.sh` | check "ready to apply"; apply: "6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0", the list `9e9d6f212a1e`, "state applied"; a second apply refused; check "already applied" |
-| The operator's commit | exactly **5 A** (the five briefs), the three trailers as §5 |
+| **Order:** the clone's hook and map put back to before ACT-SETS-GLOBS-1 (`97a84e770058`, `40085090306e`) | `check` **refused**: "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first". The files were then put back (`74f8dbea4761`, `44f99ea563cb`) |
+| Before this ACT: a launch under writer-tuning | refused **11** (template: the two changed files are not on the list) |
+| `apply.sh` | check: "ready to apply" (also from a folder holding `runs/x/misses.jsonl`, first build's F3). Apply: "6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0", the list `a0af30f840db`, "state applied", no `__pycache__` in the tree (F1). A second apply was refused. Check: "already applied" |
+| The operator's commit | exactly **5 A** (the five briefs), with §5's three trailers |
 | The list on disk | folder 0700, file 0400 |
-| **The launch script's own stage-10 checks** (`install_check.py`, its code) | **7 of 7** lines match their bytes at the commit; the five set-up A briefs then refused on their front matter (labellers and auditor: `sample`, `model`, `result_schema`; writers: `model`, `result_schema`); the operator's two: a record only (`--kind operator` refused with 17) |
-| Dry launches under each of the five, `--seed 17` | each refused **10** (§3); the operator's `brief.md` named as a writer: refused 10 (its line is kind `operator`) |
-| **A control** (rehearsal only): a brief with complete front matter, its line added to the planted list for one launch | dry launch **0** ("dry"): template check passed, the wall built; the list then put back to the ACT's bytes, the control commit and wall removed |
-| `apply.sh undo`, the removal committed | the list byte for byte `331e48fa…`; 5 D; check "ready to apply" again |
-| Live files (the hook, the map, `.claude/settings.json`, the launch script, the walls' template, the schemas, `~/.claude/settings.json`, the operator folder but its log) | **unchanged** |
+| **Stage 10 per line** (`install_check.py`) | **7 of 7** lines match their bytes at the commit. The five set-up A briefs' front matter is ok: model from the kind, result schema from the entry, sample from the front matter (writers) or the entry. The operator's two are a record only (`--kind operator` is refused with 17) |
+| **Dry launches under each of the five**, `--seed 17` | each **0 (dry)**: `brief_id`, `flow`, `model` `claude-opus-5-5` and `result_schema` as above. `input/`: labeller `actions.jsonl cases.jsonl half.json`; labeller-2 `half.json`; writer-tuning `selection.json`; writer-heldout `seal.json selection.json`; the auditor `disputes.jsonl half.json tickets.jsonl`. Each `brief.md` is byte for byte the approved brief, and no tree holds `indep-briefs/`, `.claude/` or `src/gov/guard/`. The operator's `brief.md` named as a writer was refused 10 |
+| `apply.sh undo`, the removal committed | the list byte for byte `331e48fa…`; 5 D; check "ready to apply" again; a launch refused again |
+| Live files (the hook, the map, `.claude/settings.json`, the launch script, the walls' template, the schemas, `~/.claude/settings.json`, the operator folder but its log) | **unchanged** (23 lines hashed) |
 
-**Round 2's re-run** (after review round 1's F1, F2, F3), 2026-11-10 00:23:39–00:23:45 UTC, **failures: 0**, at
-`f73e72d4a`: the same steps, plus: `check` run from a folder holding `runs/x/misses.jsonl` still "ready to apply" (F3);
-no `__pycache__` written into the tree's tools by `apply` (F1); the commit and the undo commit limited by `--` to the
-five files ("5 files changed, 654 insertions") (F2).
-
-Where the real run differs: the real list is checked by `apply.sh` at your apply, never before (the CTO's sessions do
-not open the sets root); the real sets root holds the hidden sets (4,560 hidden files at ACT-SETS-GLOBS-1's check), which
-this ACT neither reads nor adds to.
+**Where the real run differs:**
+- `apply.sh` checks the real list at your apply, never before: the CTO's sessions do not open the sets root.
+- The real sets root holds the hidden sets (4,560 hidden files at ACT-SETS-GLOBS-1's check), which this ACT neither
+  reads nor adds to.
+- The real halves are written later, by the extractor and the writers.
+- The rehearsal's undo commit runs `git add -A` first; §5's undo does not (first build's F8). The rebuilt ACT's
+  reviewer ran §5's undo commit exactly as written and got 5 D.
+- The main tree is shared and runs its git hooks at the commit; the clone had none. `apply.sh` needs a writable temp
+  folder (`mktemp`); without one, it stops on mktemp's own message (it fails closed).
+- The launches were dry, with seed 17, at the ACT's own commit. Real launches draw their own seed, start sessions, and
+  are made at the amended pin.
 
 ## 7. The review
-`.gov-runtime/scratch/orchestrator/reviews/ACT-W2-149-INSTALL-1-review-r1.md`: round 1 **READY by `verdict.py`** (a fresh read-only session, `independent-auditor` on `DAEO-52ku`, effort max; class
-vote **(O)**; it reviewed `apply.sh` `e52f548e979a…`, re-ran the rehearsal's steps on its own clone and planted roots).
-K1 and K6 were marked fail with no blocking finding; seven findings, all in scope, none both ordinary work and fail-open
-or work-losing:
-- **F1** (K1; yes, other): `parse_check` wrote a `__pycache__` into the tree's tools: fixed (`python3 -I -B`).
-- **F2** (K1; yes, other): the §5 commit took everything staged in the shared main tree: fixed (`-- governance/project/indep-briefs/sgx1`).
-- **F3** (K5; no, other): the four globs were unquoted, so a caller's folder could make `check` refuse falsely: fixed (an array, quoted).
-- **F4** (K5; yes, other): the pinned script hash means this ACT stands only if applied before the wiring follow-up: §3.
-- **F5** (K6; yes, other): the class is (O) by the `walled-sessions` row, not (b): §0.
-- **F6** (K7; yes, other): the declaration's pin `f000adda4` holds no brief; re-pin at or after this ACT and the follow-up: §3.
-- **F7** (K8; yes, other): the briefs' exclusion from the walls' trees is an entry criterion of the follow-up: §8 item 2.
-Round 2 (`-r2.md`, the narrow re-check of the fixes in `apply.sh` `871d2c9db3dc` and this text): **READY by `verdict.py`, K1-K6 all pass** (a fresh read-only session, class vote **(O)**, `apply.sh`
-`871d2c9db3dc…`; it ran both §5 commits as written in a tree with another session's staged and unstaged changes: each
-limited to the five files). Two findings, neither ordinary work, both other: **F8** the rehearsal's own F2 step could
-not show the `--` limit (no foreign staged change in the clone), and its undo commit staged first where §5 does not;
-**F9** §5 has no step for a commit that stops (it fails closed: nothing is committed, and the launch script reads briefs
-only at `--commit`, so nothing launches under them; send the output to the CTO).
+- **The first build** (2026-11-09; `reviews/ACT-W2-149-INSTALL-1-review-r1.md`, `-r2.md`): READY by `verdict.py` in
+  round 2, class vote (O), findings F1 to F9. Its fixes are carried into this build: F1 `-B`, F2 the `--` path, F3 the
+  globs quoted. F4, F6 and F7 are answered by the wiring and §3. F9 is answered in §5.
+- **This build** (`.gov-runtime/scratch/orchestrator/reviews/ACT-W2-149-INSTALL-1-review-v2-r1.md`): **READY by
+  `verdict.py` in round 1.**
+  - A fresh read-only session (`independent-auditor` on `DAEO-52ku`, effort max), class vote **(O)**. It read
+    `apply.sh` `53c2c68122d2…` and found all 12 drafts as §4 states, byte for byte as in the main tree.
+  - It re-ran everything on its own sparse clone, with planted roots and no `fixtures/evaluation/`: 17 refusal cases,
+    check and apply under `bash -x`, §5's commit with another session's changes staged (exactly 5 A), the parser, the
+    five dry walls, launches at the declared pin, undo and its refusals, §5's undo commit (5 D), and a launch-script
+    change after the apply.
+  - K1-K6 and K8 pass. K7 was marked fail with no blocking finding.
+  - Five findings, all in scope and ordinary work, consequence "other". **Carried as text fixes** to §0, §1, §2, §3,
+    §5, §6 and §8, as the reviewer proposed (DEC-802). `apply.sh`, the drafts and §5's commands are unchanged (the
+    same hashes):
+    - **F33:** a launch at the declared pin is refused 11 after the apply, not 10 (§3);
+    - **F34:** after the apply, the list does not hold the launch script (§2, §3, §8);
+    - **F35:** your yes approving the template change is now said in §0 and §5, with what `kinds.yaml` turns on (§1);
+    - **F31:** copies of the guard's code, its suites and the harness stay in set-up A's trees, under the briefs' "leave
+      them unread" (§8);
+    - **F32:** the operator agent's two briefs are in every wall's tree (§8).
+  - Its other notes: F21's tell seen in a planted wall; the writers' sample names 9 paths left out of the tree (names
+    only); the trial's log, now beside the log.
 
 ## 8. Residuals
-1. **Set-up A's wiring** (§3): a W2-149 follow-up, tests first; it rebuilds this ACT unless this ACT is applied first
-   (review F4); the declaration's pin moves to a commit at or after both (review F6).
-2. **The briefs in every tree:** once committed, the five briefs are in every worktree and, because `tree-exclude.txt`
-   does not exclude `governance/project/indep-briefs/`, in every wall's tree: the tuning writer's tree holds the
-   held-out writer's brief, and each labeller's holds the other's (an ordinary tree-wide Grep for a decision id would
-   surface it). Each brief stages its own copy as `brief.md`, so excluding the folder costs nothing. **An entry criterion
-   of the wiring follow-up (DEC-803; review F7):** `governance/project/indep-briefs/**` added to `tree-exclude.txt` (with
-   the guard's code, which the sandbox experiment's README already asks to exclude), an owner-approved template change
-   landing at or before the new pin. Until then no wall runs under these briefs (§3), so nothing is exposed to a wall;
-   reads in the worktrees are open by DEC-820 as for any committed file.
+1. **F18 to F23 of the wiring's review** (§3): each changes the launch script. Fixed before the apply, a fix rebuilds
+   this ACT. Fixed after it, it runs under this list without a new yes, because the list holds the script only until
+   the apply (F34).
+2. **The declaration's pin amendment** (§3): recorded by the CTO after your operator's commit, before the extractor.
 3. **The list's live state is checked only at your apply** (§4): the CTO never opens the sets root.
+4. **The briefs in every worktree:** once committed, the five briefs are in every worktree (reads there are open by
+   DEC-820, as for any committed file). They are no longer in any wall's tree: `tree-exclude.txt` now leaves out
+   `governance/project/indep-briefs/**` (first build's F7, closed by the wiring).
+5. **What set-up A's trees still hold** (the rebuilt ACT's review, F31). Every set-up A wall's tree still holds:
+   - copies of the guard's code outside the excluded folders: `docs/changes/W2-141-hook/` (the staged hook and its
+     `role_reads.py`) and `template/governance/kernel/hooks/pretooluse.py`;
+   - the guard's suites: `tests/unit/guard/`, `tests/unit/hooks/test_live_hook.py` and `tests/acceptance/W2-141/`;
+   - the launch script.
 
-**What it costs:** five files in the repository, nine lines in the list; no install, no GPU; your yes and one minute.
+   Every brief forbids reading them ("your tree holds some of these; you leave them unread"), so the labellers' and
+   the auditor's blindness to the guard rests there for these copies. Widening the entries' `tree_exclude` is a
+   template change, and so a rebuild of this ACT. Whether `docs/changes/W2-141-hook/` is still in the tree at the
+   amended pin is to be checked when the pin is recorded.
+6. **The operator agent's two briefs are in every wall's tree** (F32). `tree-exclude.txt` leaves out only
+   `indep-briefs/**`. These two briefs say nothing of set-up A's labels, cases or the guard. Leaving them out is a
+   template change, and so a rebuild.
 
-**Basis:** question 2 (the sets' independence enforced by the owner's list, not by trust: only briefs you approved can
-start an independent session).
+**What it costs:** five files in the repository; in the list, two template lines changed and fifteen lines added. No install, no GPU. Your
+yes and one minute.
+
+**Basis:** question 2: the sets' independence is enforced by the owner's list, not by trust. Only briefs and a template
+you approved can start an independent session.
