@@ -32,7 +32,7 @@ the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--
 switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
 (`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
 
-Cases: 110 in the full run, 0 in `breadth`, 3 in `lifted`.
+Cases: 111 in the full run, 0 in `breadth`, 3 in `lifted`.
 
 | KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
@@ -109,6 +109,8 @@ adapter-portability check's (W1-38); this case holds the one file KPI success 5 
 
 `RESEARCH_AGENT_SHA256` left `w1_33_support.py` with the case that read it. The two other "unchanged" cases (the
 research role file, the roster entry) were not touched.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5), DEC-1109):** the `launch` fixture plants an open resource gate (`plant_open_gate`, W2-136's form; W2-20 S19 runs the gate on every launch), and `test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker[orchestrator-no ready list|orchestrator-a ready list without the ticket]` now asserts W2-136 S9's lead refusal (it names the ticket and the ready list, and no session starts) in place of "worker role"; the full run goes from 110 to 111 cases.
 
 ## The form the tests read
 

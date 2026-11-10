@@ -50,13 +50,21 @@ def guard(project, sandbox):
 
 @pytest.fixture()
 def launch(project, sandbox):
-    """``launch(role)`` runs ``gov launch <role> <ticket>`` with a stand-in CLI that starts no session."""
+    """``launch(role)`` runs ``gov launch <role> <ticket>`` with a stand-in CLI that starts no session.
+
+    The resource gate is planted open in the sandbox's HOME, its readings passed to the process (W2-20 S19 runs the
+    gate on every launch; DEC-1088 (5)(b)). The gate is W2-20's, not under test here.
+    """
     directory = support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in")
     support.w47.configure_stand_in(project, directory)
     cli = launch_support.install_stand_in_cli(sandbox)
+    gate = support.plant_open_gate(sandbox.home, sandbox.elsewhere / "gate-readings")
 
     def _launch(role, ticket=None):
-        return launch_support.launch(project, sandbox, cli, role,
-                                     ticket or launch_support.TICKET_OF.get(role) or support.w47.TICKET_OF[role])
+        ticket = ticket or launch_support.TICKET_OF.get(role) or support.w47.TICKET_OF[role]
+        before = len(launch_support.calls(cli))
+        env = {**launch_support.gov_environment(project, sandbox, cli), **gate}
+        run = launch_support.run_gov(project, sandbox, "launch", role, ticket, cli=cli, env=env)
+        return launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
 
     return _launch

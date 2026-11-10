@@ -206,7 +206,9 @@ def launch_lead(machine, trees, monkeypatch):
     start. The real launcher, the real plan check and W2-20's gate (planted readings, open); the repository's
     settings check and the session itself replaced."""
     from gov.launch import launcher
+    import w2_20_support as support
 
+    support.plant_templates(trees.lead)  # W2-153: the role's template copy, so the plan check is what decides
     for key, value in machine.env().items():
         monkeypatch.setenv(key, value)
     for key in ("GOV_PLAN_READY", "GOV_ROLE", "GOV_TICKET"):

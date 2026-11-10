@@ -41,6 +41,7 @@ ended with that code would.
 from __future__ import annotations
 
 import base64
+import datetime
 import hashlib
 import json
 import os
@@ -122,6 +123,13 @@ PROJECT_FILES = {
     "experiments/archive/old.txt": "archived\n",
     "experiments/notes.md": "experiment notes\n",
 }
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
+# project holds the eight copies (any bytes), so the template check is never what refuses a launch here. W1-28's,
+# W1-32's, W1-50's and W2-54's launch projects are this one, and W2-90's generated one takes these files too.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+PROJECT_FILES.update({f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W1-46 fixture template copy {stem}\n"
+                      for stem in TEMPLATE_STEMS})
 # What exists under ``.gov-runtime/`` at launch (ignored by git): the findings, the records, the snapshots, scratch.
 RUNTIME_FILES = {
     ".gov-runtime/findings.jsonl": "",
@@ -322,7 +330,77 @@ def calls(cli):
 # Running ``gov launch``
 # --------------------------------------------------------------------------
 
+GIB = 1024 ** 3
+OPEN_GATE_DIR = "open-gate"   # under ``sandbox.elsewhere``: the planted readings
+
+
+def _open_gate_readings(base):
+    return {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+
+
+def open_gate_environment(sandbox):
+    """The variables that name the planted readings, once ``plant_open_gate`` has run for ``sandbox``; else none."""
+    base = Path(sandbox.elsewhere) / OPEN_GATE_DIR
+    if not base.is_dir():
+        return {}
+    env = {variable: str(base / name) for variable, (name, _) in _open_gate_readings(base).items()}
+    env["GOV_RESOURCES_NPROC"] = "64"
+    return env
+
+
+def plant_open_gate(sandbox, home=None):
+    """Plant an open resource gate for a case that starts ``gov launch``; return the variables of its readings.
+
+    W2-20 S19 (DEC-1088 (5)(b)) runs the gate on every launch, and S8 shuts it when the configuration is missing.
+    The form is W2-136's ``_plant_open_gate`` (``tests/acceptance/W2-136/test_w2_136_launch_check.py``), from W2-20's
+    README, "The configuration file": every value dated and sourced, in ``<home>/.gov-os/machine/gate.json``; the
+    readings are files under ``<sandbox.elsewhere>/open-gate`` with room to spare, named through ``GOV_RESOURCES_*``.
+    ``gov_environment`` carries them once planted. So these cases test what they were written for, whatever the
+    machine is doing. A second call plants nothing more (it adds the configuration to another ``home`` if missing).
+    A case whose point is the gate itself never calls it."""
+    today = datetime.date.today().isoformat()
+
+    def dated(value, source="planted for the W1-46 launcher cases (W2-20 README)"):
+        return {"value": value, "date": today, "source": source}
+
+    base = Path(sandbox.elsewhere) / OPEN_GATE_DIR
+    if not base.is_dir():
+        base.mkdir(parents=True)
+        for name, text in _open_gate_readings(base).values():
+            (base / name).write_text(text, encoding="utf-8")
+    config = Path(home or sandbox.home) / ".gov-os" / "machine" / "gate.json"
+    if not config.is_file():
+        cpu = str(max(os.sched_getaffinity(0)))
+        values = {
+            "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+            "verification_peak_bytes": dated(4 * GIB),
+            "working_size_bytes": dated(1 * GIB),
+            "rebuild_peak_bytes": dated(2 * GIB),
+            "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+            "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+            "verification_lock": dated(str(base / "verification.lock")),
+            "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+            "oom_floor_bytes": dated(1 * GIB),
+            "heavy_slots": dated(2),
+            "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+            "embedding_servers": {
+                "shared": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+                "query": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+            },
+        }
+        config.parent.mkdir(parents=True, exist_ok=True)
+        config.write_text(json.dumps(values, indent=1), encoding="utf-8")
+    return open_gate_environment(sandbox)
+
+
 def gov_environment(project, sandbox, cli=None, home=None):
+    """The environment of a ``gov`` run, built from scratch; with an open gate's readings once planted."""
     path = os.environ.get("PATH", "/usr/bin:/bin")
     return {
         "PATH": f"{cli.decoy}:{path}" if cli is not None else path,
@@ -331,6 +409,7 @@ def gov_environment(project, sandbox, cli=None, home=None):
         "LC_ALL": "C.UTF-8",
         "PYTHONPATH": str(Path(project) / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **open_gate_environment(sandbox),
     }
 
 
@@ -393,6 +472,8 @@ class Launch:
 
 
 def launch(project, sandbox, cli, role, ticket, *cli_args):
+    """``gov launch <role> <ticket> [-- cli_args]`` with an open resource gate planted (``plant_open_gate``)."""
+    plant_open_gate(sandbox)
     before = len(calls(cli))
     args = ("launch", role, ticket) + (("--",) + tuple(cli_args) if cli_args else ())
     run = run_gov(project, sandbox, *args, cli=cli)

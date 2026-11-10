@@ -21,6 +21,10 @@ from .test_w2_136_plan_check import _plant, _ready, _sessions, _settings
 
 def _lead_project(root: Path, rebuild: str | None) -> Path:
     _plant(root, {"id": "T-4", "wbs_id": "W9-4"})
+    for stem in set(launcher.ROLE_TEMPLATES.values()):  # W2-153 S1 (DEC-1112 (3)): any content will do
+        path = root / launcher.TEMPLATES_REL / f"{stem}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {stem}\n", encoding="utf-8")
     (root / "governance/project").mkdir(parents=True, exist_ok=True)
     if rebuild is not None:
         (root / "governance/project/rebuild.yaml").write_text(rebuild, encoding="utf-8")

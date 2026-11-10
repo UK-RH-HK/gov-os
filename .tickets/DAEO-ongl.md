@@ -16,6 +16,8 @@ state_class: AUTHORITATIVE
 role: product-spec
 depends_on: []
 allowed_paths:
+- docs/plan/tools/validate_w2.py  # the validator's ids: §2's cards with §1's table; an id after a hyphen is not a Contract id (D-10's red-fix list) [DEC-1112 (3), DEC-1109 (2)]
+- tests/unit/plan/test_validate_w2.py  # its cases for those two reads [DEC-1109 (2)]
 - docs/contract/contract.yaml
 - docs/contract/CONTRACT_v4.md
 - docs/contract/capabilities/**
@@ -32,6 +34,8 @@ kpis:
   - 'A merge apart from W2-140, or a red W2-49 run at the merge.'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-1093
 - DEC-1090
 - DEC-1089

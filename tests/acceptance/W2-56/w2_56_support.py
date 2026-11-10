@@ -235,10 +235,19 @@ BASE_FILES = {
 }
 
 
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
+# fixture project plants the eight copies (any bytes), so the template check is never what refuses a launch here.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-56 fixture template copy {stem}\n"
+                  for stem in TEMPLATE_STEMS}
+
+
 def make_project(box: Box, extra=None, project=None) -> Path:
     """The fixture project: one commit on ``w2/integrate`` holding every ticket, the files and the settings."""
     project = Path(project or box.project)
     files = dict(BASE_FILES)
+    files.update(TEMPLATE_FILES)
     files[".gitignore"] = repo_gitignore()
     for ticket in TICKETS:
         files[f".tickets/{ticket.tk}.md"] = ticket_text(ticket)

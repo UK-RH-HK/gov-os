@@ -64,6 +64,16 @@ median worker brief about 12.6k to 12.9k characters, R3's header).
 | `template/.rulesync/skills/{discovery,retrieval,orchestration,test-design}/SKILL.md` | Byte copies of the kernel skills (discovery and retrieval had not been copied after their 1.1.0) |
 | JUDGEMENT's rules (TPL-6 S4, kernel half) | Checked: only `role-reviewer.md` (T-6) carries them among the kernel templates; no change |
 
+**Round 2b (text, product-spec, DEC-1112 (3); review `reviews/w2-128-r2a.md` F1, F2, F4 and the checkpoint link notice):**
+
+| File | Change |
+|---|---|
+| `template/.rulesync/subagents/orchestrator.md` | Line 47-48: a lead is started from `brief.md` and `role-lead.md` (DEC-537, DEC-1050), the kernel role's line 39-40, not `brief-lead.md` (review F1). The repository's `.rulesync/subagents/orchestrator.md` is the ACT's |
+| `template/governance/kernel/skills/orchestration/SKILL.md` (1.1.0 → 1.2.0) | Kernel (review F2). Line 55: "never two writing sessions in one tree" cites DEC-963 item 1, not the expired DEC-254; the commit-while-a-worker-runs half keeps DEC-537. Line 76: the per-round `gov checkpoint` record dropped as DEC-1057 (R-6) lifts it from DEC-511; a checkpoint written is a real one, never one only for the close (DEC-511, DEC-1057). Line 83: "or read from another session's folders" dropped; reads are open apart from DEC-820's four refusals (line 84) |
+| `template/governance/kernel/skills/test-design/SKILL.md` (1.1.0 → 1.2.0) | Kernel (review F4). Line 13 (read rule) and line 17 (Inputs 1) cite CAP-38.c (independent test authorship), not CAP-38.b (governance test families) or DEC-136 (probe findings). "Writing acceptance tests" (lines 24 to 26) keeps CAP-38.b: round 2a's guard case allows no change there; a row for the next round |
+| `template/governance/kernel/templates/checkpoint.md` | Line 7: `task: ''`, its comment naming the ticket's id `{ID}` to fill, so `gov links` reads no unknown id in the template (review F5's notice, from the template side) |
+| `template/.rulesync/skills/{orchestration,test-design}/SKILL.md` | Byte copies of the kernel skills again |
+
 Every existing record stays valid: `python3 -m gov.check.schema` validates 974 records with no finding after round 2a (2026-11-09). Round 1: 970 records with no finding after the change (fresh run, 2026-11-09, round 1 fixes).
 
 ## 3. The three options (DEC-105)
@@ -80,7 +90,7 @@ Every existing record stays valid: `python3 -m gov.check.schema` validates 974 r
 |---|---|
 | Acceptance suites of other tickets | W1-35's S14 cases read the five `brief-*.md` texts word for word; TPL-1 S4 reduces them to pointers, so those cases enforce the superseded texts and need a test designer's revision under DEC-866 (`Rewrite-Reason:`). W1-42's case needs only the files to exist; they do |
 | Generated copies | `.claude/agents/engineer.md` (line 5) and, in round 2, `.claude/templates/*.md`: installed by the owner's operator as an ACT (DEC-315, DEC-1081) |
-| The guard, the launcher, the close | None in round 1 or round 2a |
+| The guard, the launcher, the close | None in round 1, round 2a or round 2b |
 | Generated skill copies (round 2a) | `.claude/skills/{orchestration,test-design,discovery,retrieval}/SKILL.md` and `.rulesync/skills/…`: the operator's ACT (`ACT-CLAUDE-COPIES-1`) |
 
 ## 5. CAP-33's steps
