@@ -34,6 +34,8 @@ kpis:
   - 'A merge apart from W2-140, or a red W2-49 run at the merge.'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-1093
 - DEC-1090
 - DEC-1089
