@@ -1,15 +1,14 @@
 # Proposed text for the CTO to record: SANDBOX-GUARD-EXP-DECLARATION amendment A6, the pin (not recorded by the lead)
 
-Kept current by the W2-149 lead. Last updated 2026-11-10, after W2-149's F18-F23 merge (`90c1fea6c`); `w2/integrate`
-was at `9f66e4084`.
+Kept current by the W2-149 lead. Last updated 2026-11-10, after W2-149's F36/F38 merge (`2f98aecbc`).
 
 Insert under "Amendments", after A5, once the owner's operator has committed ACT-W2-149-INSTALL-1 (§5) and before
 step 4 (the extractor). Fill the brackets at recording; nothing else changes.
 
 > - **A6 ([date], the CTO, delegated under DEC-1112 (3)): the pin.**
 >   - **§2's pinned commit moves** from `f000adda4` to **`[sha]`**.
->     - It is the first `w2/integrate` commit at or after both W2-149's last set-up A wiring merge (`90c1fea6c`: the
->       wiring `7f0e71519` and its review's F18-F23 fixes) and the owner's operator's commit of ACT-W2-149-INSTALL-1
+>     - It is the first `w2/integrate` commit at or after both W2-149's last set-up A wiring merge (`2f98aecbc`: the
+>       wiring `7f0e71519`, its review's F18-F23 fixes `90c1fea6c`, F36/F38 closed `2f98aecbc`) and the owner's operator's commit of ACT-W2-149-INSTALL-1
 >       (the five briefs, `[sha]`).
 >     - If W2-141's rebuilt hook (DECIDED-NOT-DONE row 78) is applied first, the pin is after it.
 >   - **Why:**
@@ -19,8 +18,8 @@ step 4 (the extractor). Fill the brackets at recording; nothing else changes.
 >     2. ACT-SETS-GLOBS-1 (`9cce7430d`) changed the live hook (`97a84e770058` → `74f8dbea4761`) and the path map
 >        (`40085090306e` → `44f99ea563cb`). §2 requires the live files to equal the pin's when `prepare_a.sh` copies
 >        them.
->     3. The walls' template change (`kinds.yaml` `734b26e261fa`, `tree-exclude.txt` `e8395088167e`) and the launch
->        script set-up A runs under (`95fe78dd49bb`) must be at the pin. Then every wall's tree leaves out
+>     3. The walls' template change (`kinds.yaml` `ddd84ae25910`, `tree-exclude.txt` `e8395088167e`) and the launch
+>        script set-up A runs under (`90b943aef8be`) must be at the pin. Then every wall's tree leaves out
 >        `governance/project/indep-briefs/**`, and set-up A's trees also leave out the guard's and the launcher's code.
 >   - **The guard rules A2 needs stay live at the new pin** (the walls, rule 2c, rule 2d, the call log). Between
 >     `f000adda4` and the new pin, these commits touch `.claude/`, `src/gov/guard/`, the path map or the held-out list:
@@ -49,9 +48,11 @@ step 4 (the extractor). Fill the brackets at recording; nothing else changes.
 >     - every set-up A launch takes the new pin as its `--commit`;
 >     - `prepare_a.sh check` compares the live files with the new pin's;
 >     - whether `docs/changes/W2-141-hook/` is still in the tree at the new pin is noted (ACT-W2-149-INSTALL-1 §8
->       item 5).
+>       item 5);
+>     - before the overlap auditor's first real run, the CTO dry-builds its wall at the new pin and searches its tree
+>       for any text that tells the dispute sides apart (ACT-W2-149-INSTALL-1 §3, F40), and records the result here.
 
-**Today's values** (2026-11-10, `w2/integrate` at `9f66e4084`), so the CTO can see what is expected to hold at
+**Today's values** (2026-11-10, `w2/integrate` at `2f98aecbc`), so the CTO can see what is expected to hold at
 recording:
 - the hook `74f8dbea4761`;
 - `role_reads.py` `5407aade9417`;
@@ -59,6 +60,6 @@ recording:
 - the map `44f99ea563cb`;
 - the held-out list `1d724dcb0a8b`;
 - `.claude/settings.json` `8f1a3ef183f2`;
-- the launch script `95fe78dd49bb`;
-- `kinds.yaml` `734b26e261fa`;
+- the launch script `90b943aef8be`;
+- `kinds.yaml` `ddd84ae25910`;
 - `tree-exclude.txt` `e8395088167e`.
