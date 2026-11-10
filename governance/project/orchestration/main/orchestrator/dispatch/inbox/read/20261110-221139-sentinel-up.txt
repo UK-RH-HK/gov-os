@@ -1,0 +1,3 @@
+log: sentinel-check.log
+Sentinel: UP
+status: the sentinel is back: its watch log writes and its pane shows no login or Remote Control failure
