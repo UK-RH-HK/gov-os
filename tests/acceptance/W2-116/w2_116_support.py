@@ -344,10 +344,20 @@ ENGINEERS_WORD = "zanzibar"     # only in a ticket worktree's own commit, never 
 H1_FILES = {KEPT: note(KEPT_WORD), CHANGED: note(CHANGED_WORD), "docs/other.md": note("marjoram")}
 
 
+# W2-153 (DEC-1050, DEC-866): gov launch refuses a session without ``.claude/templates/<stem>.md`` for its role; the
+# project plants the eight copies (any bytes, W1-46's and W2-56's form), so the template check is never what refuses
+# a launch here (D-10's red fix, DEC-1112 (3)). They hold none of the cases' words.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+TEMPLATE_FILES = {f".claude/templates/{stem}.md": f"---\nname: {stem}\n---\n# W2-116 fixture template copy {stem}\n"
+                  for stem in TEMPLATE_STEMS}
+
+
 def make_project(box, name="project"):
     """The project at H1, on the branch ``integrate``: the path map (docs embedded), the gitleaks rules,
     ``rebuild.yaml`` (a temporary lock; ``integration_store`` the link outside the project), three notes, two
-    in-progress tickets and the guard's settings (so ``gov launch`` accepts the project). No store."""
+    in-progress tickets, the guard's settings and the role templates (so ``gov launch`` accepts the project). No
+    store."""
     project = box.base / name
     project.mkdir(parents=True)
     write(project / ".gitignore", ".gov-runtime/\n__pycache__/\n")
@@ -355,6 +365,8 @@ def make_project(box, name="project"):
     write(project / "governance/project/path-map.yaml", path_map_text())
     write(project / SETTINGS_REL, settings_text(box))
     write(project / ".claude/settings.json", json.dumps(GUARD_SETTINGS, indent=2) + "\n")
+    for rel, text in TEMPLATE_FILES.items():
+        write(project / rel, text)
     write(project / f".tickets/{ENGINEER_TICKET}.md", ticket_text(ENGINEER_TICKET, "W2-901", "engineer", "docs/**"))
     write(project / f".tickets/{PRODUCT_SPEC_TICKET}.md",
           ticket_text(PRODUCT_SPEC_TICKET, "W2-902", "product-spec", "docs/**"))
@@ -651,15 +663,22 @@ def assert_not_answered_with(run, path, what):
 # --------------------------------------------------------------------------
 
 CLI_REL = ".local/bin/claude"
-SESSION_LOG = "W2_116_SESSION_LOG"
-SESSION_QUESTION = "W2_116_QUESTION"
 
+# How the stand-in learns its log, its question and the case's own environment (D-10's red fix, DEC-1112 (3)):
+# written into the stand-in when the case plants it, never passed through the launch's environment. W2-56 S5
+# (DEC-826 Q5, DEC-877 item 4) gives a launched session a cleaned environment: no parent CLAUDE*, GOV* or PYTHONPATH
+# value reaches it, so the case's W2_116_SESSION_LOG and W2_116_QUESTION, and its stand-in endpoints and PYTHONPATH,
+# no longer do either. The case's environment (``environment``: the endpoints, the code under test, the vector
+# cache; it names no store) is the base the session's own environment and the settings' env block are laid over, so
+# whatever the launch gives the session still wins, as before W2-56.
 _STUB = r'''#!@PYTHON@
 """Stand-in for the Claude Code CLI (W2-116 acceptance tests): it applies the settings' env block to its environment,
 as the CLI does for the session and its commands, runs a plain `gov retrieve --json <question>` (no --root) in the
-folder it was started in, and records what it saw."""
+folder it was started in, and records what it saw. Its log, its question and the case's environment are written in
+here when the case plants it (the launch gives the session a cleaned environment, W2-56 S5)."""
 import json, os, subprocess, sys
 
+PLANTED = json.loads(@PLANTED@)
 args = sys.argv[1:]
 block = {}
 for i, arg in enumerate(args):
@@ -672,21 +691,23 @@ for i, arg in enumerate(args):
             block.update({k: v for k, v in found.items() if isinstance(v, str)})
         except Exception:
             pass
-env = {**os.environ, **block}
-question = os.environ.get(@QUESTION@, "")
+env = {**PLANTED["env"], **os.environ, **block}
+question = PLANTED["question"]
 done = subprocess.run([sys.executable, "-m", "gov.cli.main", "retrieve", "--json", question], cwd=os.getcwd(),
                       env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=120)
-with open(os.environ[@LOG@], "a", encoding="utf-8") as handle:
+with open(PLANTED["log"], "a", encoding="utf-8") as handle:
     handle.write(json.dumps({"cwd": os.getcwd(), "env_block": block, "returncode": done.returncode,
                              "stdout": done.stdout, "stderr": done.stderr[-3000:]}) + "\n")
 '''
 
 
-def install_cli(box):
+def install_cli(box, log, question, env):
+    """The stand-in at ``<HOME>/.local/bin/claude``, with this launch's log, question and the case's environment
+    written in (planted anew for each launch; the cases launch one at a time)."""
     path = box.home / CLI_REL
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(_STUB.replace("@PYTHON@", sys.executable).replace("@QUESTION@", repr(SESSION_QUESTION))
-                    .replace("@LOG@", repr(SESSION_LOG)), encoding="utf-8")
+    planted = json.dumps({"log": str(log), "question": question, "env": dict(env)})
+    path.write_text(_STUB.replace("@PYTHON@", sys.executable).replace("@PLANTED@", repr(planted)), encoding="utf-8")
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     return path
 
@@ -764,11 +785,13 @@ def plant_open_gate(box):
 
 def launch_and_search(box, env, cwd, role, ticket, question):
     """``gov launch <role> <ticket>`` in ``cwd``; the stand-in session searches ``question`` with a plain
-    ``gov retrieve``. The resource gate is planted open (``plant_open_gate``): it is W2-20's, not under test here."""
-    install_cli(box)
+    ``gov retrieve``. The resource gate is planted open (``plant_open_gate``): it is W2-20's, not under test here.
+    The log, the question and the case's environment are written into the stand-in (``install_cli``), not passed
+    through the launch: W2-56's cleaned session environment passes no parent variable (DEC-826 Q5, DEC-877 item 4)."""
     log = box.base / f"session-{role}-{time.monotonic_ns()}.jsonl"
     env = {**env, **plant_open_gate(box)}
-    launched = gov(cwd, {**env, SESSION_LOG: str(log), SESSION_QUESTION: question}, "launch", role, ticket)
+    install_cli(box, log, question, env)
+    launched = gov(cwd, env, "launch", role, ticket)
     records = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()] if log.is_file() else []
     assert len(records) <= 1, f"gov launch started {len(records)} sessions"
     return Session(launched, records[0] if records else None)
