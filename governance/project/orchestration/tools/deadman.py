@@ -17,6 +17,17 @@ alert per stall, then a reminder every 2 hours while it lasts (state in log/dead
 (a Windows notification on the PC, no install), `push` (a headless `claude -p` call to PushNotification, which reaches
 the phone through Remote Control when the PC is not in use), `log` (~/.config/gov-os-notify/pings.log). Every
 decision is appended to log/deadman.log. It never reads or prints a transcript's text beyond entry types and times.
+
+The wake (DAEO-sdxk, 2026-11-10; DEC-1112 (3)): once the watched session's last `assistant` entry is 60 minutes old,
+at any hour (quiet hours included), it writes one inbox item, dispatch/inbox/<stamp>-deadman-wake.txt (the stall line
+and "check the helpers and resume them"), once per stall (state in log/deadman-wake-state.json), so the CTO's own inbox
+waiter wakes the CTO. The wake writes only into the CTO's inbox: it pushes nothing, and the ALERT, its limits (60
+minutes by day, 2 hours in the quiet hours) and its reminders are unchanged. Not in a stand-by, not with --dry. The
+inbox is ORCH/dispatch/inbox when the state is the live one, else a folder `inbox` beside --state (a replay or a test
+never writes the live inbox), or --inbox. Because an item unread 30 minutes makes the dispatcher's inbox-stale line,
+the watch leaves out an `inbox:` line whose oldest item is one of the CTO's own wake items (-deadman-wake,
+-helper-watch, -spend-brake): their staleness never brings a push forward; the stall's own ALERT stays the backstop.
+ORCH (environment) moves the whole scratch root, for rehearsals.
 """
 import argparse
 import json
@@ -28,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 PROJECTS = Path.home() / ".claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS"
-ORCH = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator")
+ORCH = Path(os.environ.get("ORCH") or "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator")
 TOOLS_DIR = Path(__file__).resolve().parent
 STATE = ORCH / "log/deadman-state.json"
 SESSION_FILE = ORCH / "log/cto-session.txt"
@@ -41,6 +52,8 @@ PINGS = Path.home() / ".config/gov-os-notify/pings.log"
 TOAST = TOOLS_DIR / "win_toast.ps1"
 PS = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
 DAY_LIMIT, NIGHT_LIMIT, REMIND = timedelta(minutes=60), timedelta(hours=2), timedelta(hours=2)
+WAKE_LIMIT = timedelta(minutes=60)  # the wake, at any hour (DEC-1112 (3)); the push keeps the owner's limits above
+WAKE_ONLY = ("-deadman-wake", "-helper-watch", "-spend-brake")  # the CTO's own wake items: no push on their staleness
 
 
 def quiet(t):
@@ -116,6 +129,41 @@ def send(channels, line, dry):
     return out
 
 
+def inbox_dir(a):
+    """The wake's inbox: --inbox, else the live inbox for the live state, else `inbox` beside the state."""
+    if getattr(a, "inbox", None):
+        return Path(a.inbox)
+    return ORCH / "dispatch/inbox" if Path(a.state).resolve() == STATE.resolve() else Path(a.state).parent / "inbox"
+
+
+def wake(a, stall, line, now):
+    """One inbox item per stall (key: the stall); returns the item's path, or a note why none was written."""
+    key_f = Path(a.state).with_name("deadman-wake-state.json")
+    try:
+        if json.loads(key_f.read_text()).get("stall") == stall:
+            return "woken already"
+    except (OSError, ValueError):
+        pass
+    box = inbox_dir(a)
+    try:
+        box.mkdir(parents=True, exist_ok=True)
+        stamp, n = now.strftime("%Y%m%d-%H%M%S"), 1
+        item = box / f"{stamp}-deadman-wake.txt"
+        while True:  # never overwrite an item (the dispatcher's rule)
+            try:
+                with open(item, "x") as f:
+                    f.write(f"log: deadman.log\nDeadman: wake\nstatus: {line}\n\ncheck the helpers and resume them "
+                            "(their transcripts: subagents/agent-*.jsonl; tools/helper_watch.py)\n")
+                break
+            except FileExistsError:
+                n += 1
+                item = box / f"{stamp}-deadman-wake-{n}.txt"
+        key_f.write_text(json.dumps({"stall": stall, "woken": now.isoformat(), "item": item.name}))
+        return str(item)
+    except OSError as exc:
+        return f"wake failed {exc.__class__.__name__}"
+
+
 def check(a, now_s, channels):
     """One look at the watched session; logs and returns the note (ALERT notes carry `line`)."""
     state_path = Path(a.state)
@@ -143,6 +191,9 @@ def check(a, now_s, channels):
         except (OSError, ValueError):
             state = {}
         stall = f"{path.name}@{last_a.isoformat()}"
+        if age >= WAKE_LIMIT and not a.dry:
+            what = (f"waiting on a tool ({tool}) since {last_a:%H:%M}" if pending else f"idle since {last_a:%H:%M}")
+            note["wake"] = wake(a, stall, f"DEADMAN WAKE | the CTO session is {what}, {note['age_min']} min", now)
         if age < limit:
             note["verdict"] = "alive"
         elif state.get("stall") == stall and now - datetime.fromisoformat(state["alerted"]) < REMIND:
@@ -175,6 +226,7 @@ def main():
     ap.add_argument("--standby", default=str(STANDBY))
     ap.add_argument("--daily", default="09:05", help="the watch exits with a DAILY line once a day at this time")
     ap.add_argument("--inbox-stale", default=str(INBOX_STALE))
+    ap.add_argument("--inbox", help="the wake's inbox (default: the live one for the live state, else beside --state)")
     a = ap.parse_args()
     if a.watch:
         start, day0 = time.time(), datetime.now()
@@ -182,7 +234,10 @@ def main():
         while True:
             stale, seen_f = Path(a.inbox_stale), Path(a.state).with_name("deadman-inbox-stale-seen.txt")
             try:  # the dispatcher may remove it between the check and the read (review of 2026-11-01, L3)
-                line = stale.read_text().strip()[:150] if stale.is_file() else None
+                text = stale.read_text() if stale.is_file() else ""
+                kept = [x for x in text.splitlines()  # the CTO's own wake items never push on staleness
+                        if not (x.startswith("inbox:") and any(w in x for w in WAKE_ONLY))]
+                line = "\n".join(kept).strip()[:150] or None
             except OSError:
                 line = None
             if line:
