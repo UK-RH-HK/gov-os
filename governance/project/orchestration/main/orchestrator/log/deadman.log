@@ -6387,3 +6387,5 @@
 {"at": "2026-11-10 11:08:36", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:22:54", "pending_tool": null, "age_min": 45, "verdict": "alive"}
 {"at": "2026-11-10 11:10:50", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:22:54", "pending_tool": null, "age_min": 47, "verdict": "alive"}
 {"at": "2026-11-10 11:13:01", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:22:54", "pending_tool": null, "age_min": 50, "verdict": "alive"}
+{"at": "2026-11-10 11:15:15", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:22:54", "pending_tool": null, "age_min": 52, "verdict": "alive"}
+{"at": "2026-11-10 11:17:29", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:22:54", "pending_tool": null, "age_min": 54, "verdict": "alive"}
