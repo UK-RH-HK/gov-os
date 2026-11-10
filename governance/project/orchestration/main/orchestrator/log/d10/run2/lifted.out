@@ -1,0 +1,2553 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+...............................................................F........ [ 15%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+..............................................F......................... [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+.....................................................F......F......F.... [ 39%]
+..F........F...F........FF..............F............F....F........F.... [ 40%]
+.F...F........F.................F.......F.....F......................F.. [ 41%]
+....F........F..........F..........................F..........F......... [ 41%]
+F.........F............................................................. [ 42%]
+........................................................................ [ 43%]
+.......................................F......F.......F.......F......... [ 44%]
+..............................F.....F.......F......F......F.......F..... [ 45%]
+................................................F............F.......... [ 46%]
+...F.................................................................... [ 46%]
+........................................F.................F....E.E.F.... [ 47%]
+..........................................F............................. [ 48%]
+...F.......F.............................F...........F.................. [ 49%]
+.F....F..................F.F.....F.............F....F..F......F...F..... [ 50%]
+.......................................................................F [ 51%]
+..F....F.F.....F...F..F...F.............F....F...F.F......F...F...F..... [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 56%]
+....E................................................................... [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+......................................................E...EE............ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................F............................... [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+...........................................................FF........... [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+....................................                                     [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+[gw14] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+[gw14] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read[cp-b-dashdash--other-ticket] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50'), home...), pycache=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50/pycache'))
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50/home/gov-os-worktrees/W2-90')
+
+    @pytest.fixture()
+    def links(sandbox, project):
+        """MAIN's and OTHER's folders made by a launch; the links; the sources. The paths by name.
+    
+        Links at a protected name:
+        - ``AL``: ``tests/acceptance/W2-90/test_link.py`` -> ``src/app/allowed.py`` (allowed, writable);
+        - ``AR``: ``tests/acceptance/W2-90/test_ro.py`` -> ``src/app/readonly.py`` (allowed, mode 0444);
+        - ``AX``: ``tests/acceptance/W2-90/test_dangling.py`` -> ``src/app/missing.py`` (not there);
+        - ``OL``: ``~/gov-os-runs/W2-91/mylink`` -> ``~/gov-os-runs/W2-90/mine.txt`` (the session's own folder);
+        - ``OD``: ``~/gov-os-runs/W2-91/dirlink`` -> ``~/gov-os-runs/W2-90/sub/`` (a link to a folder).
+        Links in an allowed folder, to an allowed place:
+        - ``PL``: ``src/app/links/ok_link.py`` -> ``src/app/allowed.py``;
+        - ``PR``: ``src/app/links/ro_link.py`` -> ``src/app/readonly.py``;
+        - ``PD``: ``src/app/dirlink`` -> ``src/app/d/`` (a link to a folder);
+        - ``WL``: ``~/gov-os-runs/W2-90/links/ok_link.txt`` -> ``~/gov-os-runs/W2-90/mine.txt``;
+        - ``WD``: ``~/gov-os-runs/W2-90/dirlink`` -> ``~/gov-os-runs/W2-90/sub/``.
+        Folders: ``AF`` the acceptance folder, ``OF`` OTHER's folder, ``PF`` ``src/app/links``, ``WF``
+        ``~/gov-os-runs/W2-90/links``, ``O`` MAIN's folder, ``P`` the project. Sources in ``S``
+        (``src/app/staging/``): ``X``, and one file at each link's name (``test_link.py``, ``mylink``,
+        ``ok_link.py``, ``ok_link.txt``) for the ``-t`` forms; ``SL``, a link to ``X``. Ordinary files:
+        ``src/app/existing.py``, ``~/gov-os-runs/W2-90/d2/f.txt``.
+        """
+>       own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_link_replaced.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/w2_50_support.py:642: in open_own_folder
+    result.session()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ... null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))\n"), calls=())
+
+    def session(self):
+>       assert self.run.returncode == 0 and len(self.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{self.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the resource gate is shut: cpu: reading null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-50/w2_50_support.py:535: AssertionError
+_ ERROR at setup of test_an_ordinary_copy_into_an_own_folder_folder_is_allowed[cp-of-several-sources] _
+[gw11] linux -- Python 3.12.3 /usr/bin/python3
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw11/test_an_ordinary_copy_into_an_0/w2-50'), hom..., pycache=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw11/test_an_ordinary_copy_into_an_0/w2-50/pycache'))
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw11/test_an_ordinary_copy_into_an_0/w2-50/home/gov-os-worktrees/W2-90')
+
+    @pytest.fixture()
+    def opened(sandbox, project):
+        """MAIN's and OTHER's folders made by a launch, a file in OTHER's, the project's acceptance test, the sources."""
+>       own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_extra_review.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/w2_50_support.py:642: in open_own_folder
+    result.session()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz91'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ... null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))\n"), calls=())
+
+    def session(self):
+>       assert self.run.returncode == 0 and len(self.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{self.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz91
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the resource gate is shut: cpu: reading null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-50/w2_50_support.py:535: AssertionError
+_ ERROR at setup of test_the_t_and_m_forms_stay_judged_as_before[install-m-separate-repository] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw2/test_the_t_and_m_forms_stay_ju0/w2-50'), home...), pycache=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw2/test_the_t_and_m_forms_stay_ju0/w2-50/pycache'))
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw2/test_the_t_and_m_forms_stay_ju0/w2-50/home/gov-os-worktrees/W2-90')
+
+    @pytest.fixture()
+    def places(sandbox, project):
+        """MAIN's and OTHER's folders made by a launch, the acceptance test, the sources; the paths by name.
+    
+        - ``E``: ``elsewhere/``, holding ``X``, ``s/inner.py``, ``W2-91/work.txt``, ``lnk/work.txt``,
+          ``sub/test_a.py`` and the folder ``cwd/``;
+        - ``O``: MAIN's own folder, holding ``d/`` (empty), ``d2/`` with ``f.txt``, ``staging/X`` and ``lnk``, a
+          link to OTHER's folder (which holds ``work.txt``);
+        - ``P``: the project, holding ``src/app/d/`` (empty), ``src/app/existing.py``, ``src/app/staging/`` with
+          ``X``, ``F`` and ``-t``, ``src/app/m/sub``, a link to the acceptance folder, and the acceptance test;
+        - ``H``: HOME, holding ``tests/acceptance/W2-90/test_a.py`` (a source whose ``../..`` spelling from the
+          project mirrors the acceptance test's path).
+        """
+>       own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_short_round.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/w2_50_support.py:642: in open_own_folder
+    result.session()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ... null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))\n"), calls=())
+
+    def session(self):
+>       assert self.run.returncode == 0 and len(self.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{self.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the resource gate is shut: cpu: reading null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-50/w2_50_support.py:535: AssertionError
+_ ERROR at setup of test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read[install-T--acceptance] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50'), home...), pycache=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50/pycache'))
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw4/test_a_write_that_replaces_a_l0/w2-50/home/gov-os-worktrees/W2-90')
+
+    @pytest.fixture()
+    def links(sandbox, project):
+        """MAIN's and OTHER's folders made by a launch; the links; the sources. The paths by name.
+    
+        Links at a protected name:
+        - ``AL``: ``tests/acceptance/W2-90/test_link.py`` -> ``src/app/allowed.py`` (allowed, writable);
+        - ``AR``: ``tests/acceptance/W2-90/test_ro.py`` -> ``src/app/readonly.py`` (allowed, mode 0444);
+        - ``AX``: ``tests/acceptance/W2-90/test_dangling.py`` -> ``src/app/missing.py`` (not there);
+        - ``OL``: ``~/gov-os-runs/W2-91/mylink`` -> ``~/gov-os-runs/W2-90/mine.txt`` (the session's own folder);
+        - ``OD``: ``~/gov-os-runs/W2-91/dirlink`` -> ``~/gov-os-runs/W2-90/sub/`` (a link to a folder).
+        Links in an allowed folder, to an allowed place:
+        - ``PL``: ``src/app/links/ok_link.py`` -> ``src/app/allowed.py``;
+        - ``PR``: ``src/app/links/ro_link.py`` -> ``src/app/readonly.py``;
+        - ``PD``: ``src/app/dirlink`` -> ``src/app/d/`` (a link to a folder);
+        - ``WL``: ``~/gov-os-runs/W2-90/links/ok_link.txt`` -> ``~/gov-os-runs/W2-90/mine.txt``;
+        - ``WD``: ``~/gov-os-runs/W2-90/dirlink`` -> ``~/gov-os-runs/W2-90/sub/``.
+        Folders: ``AF`` the acceptance folder, ``OF`` OTHER's folder, ``PF`` ``src/app/links``, ``WF``
+        ``~/gov-os-runs/W2-90/links``, ``O`` MAIN's folder, ``P`` the project. Sources in ``S``
+        (``src/app/staging/``): ``X``, and one file at each link's name (``test_link.py``, ``mylink``,
+        ``ok_link.py``, ``ok_link.txt``) for the ``-t`` forms; ``SL``, a link to ``X``. Ordinary files:
+        ``src/app/existing.py``, ``~/gov-os-runs/W2-90/d2/f.txt``.
+        """
+>       own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_link_replaced.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/w2_50_support.py:642: in open_own_folder
+    result.session()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ... null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))\n"), calls=())
+
+    def session(self):
+>       assert self.run.returncode == 0 and len(self.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{self.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the resource gate is shut: cpu: reading null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-50/w2_50_support.py:535: AssertionError
+=================================== FAILURES ===================================
+_ test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed[Glob-from-the-root-for-python-files-engineer] _
+[gw15] linux -- Python 3.12.3 /usr/bin/python3
+
+guarded = Guarded(project=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw15/guarded0/project'), sandbox=Sandbox(home=...: PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw15/guarded0/sandbox/elsewhere/link-to-the-held-out-file')})
+form = 'Glob-from-the-root-for-python-files', who = 'engineer'
+
+    @pytest.mark.parametrize("who", READERS)
+    @pytest.mark.parametrize("form", sorted(ELSEWHERE))
+    def test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed(guarded, form, who):
+        """Line 3: a search over ``src/``, a search from the root under a glob that matches neither file.
+    
+        Rewritten by W2-58 for one cell (DEC-821 item 1, brief item 3, TD-5): the engineer's Grep from the root with the
+        glob ``*.py`` takes in its own ticket's existing acceptance test
+        (``tests/acceptance/<TICKET_WBS_ID>/test_fixture.py``): refused for (c), with a reason. Every other role and form: allowed, as before.
+        """
+        tool_name, build = ELSEWHERE[form]
+        result = protected.ask(guarded, tool_name, build(guarded), who)
+        if form == "Grep-from-the-root-with-a-glob-that-cannot-match" and who == "engineer":
+            assert result.decision == "deny", f"{form} by {who} was not refused (Policy 2 (c)): {result.describe()}"
+            assert protected.reason_of(result).strip(), f"{form} by {who} was refused without a reason"
+            return
+>       protected.assert_allowed(result, f"{form} by {who}")
+
+tests/acceptance/W1-02/test_w1_02_protected_reads_open.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(decision='deny', returncode=0, stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDe...(src/, or a pattern under another folder)"}}', stderr='', seconds=0.09062534199983929, cpu_seconds=0.08767600000000009)
+what = 'Glob-from-the-root-for-python-files by engineer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: decision={result.decision} exit={result.returncode}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Glob-from-the-root-for-python-files by engineer was not allowed: decision=deny exit=0
+
+tests/acceptance/W1-02/w1_02_protected_support.py:244: AssertionError
+___ test_the_bound_holds_for_every_role[engineer-who-may-not-write-the-file] ___
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+world = World(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw1/bounded-time0'), project=PosixPath('/tmp/gov-d1...-d10/pytest-of-usain/pytest-21/popen-gw1/bounded-time0/sandbox/elsewhere/link-to-the-settings-file-of-the-home-site')})
+who = 'engineer-who-may-not-write-the-file'
+
+    @pytest.mark.parametrize("who", rnd.OTHER_ROLES)
+    def test_the_bound_holds_for_every_role(world, who):
+        """An engineer, the test designer and a session with no role: a glob of many pairs, a run of substitutions."""
+        result = rnd.ask_timed(world, "Glob", {"pattern": GLUED + NO_MATCH, "path": str(world.project)}, who)
+>       rnd.assert_decided_in_time(result, f"a Glob pattern of {PAIRS} glued star pairs by '{who}'")
+
+tests/acceptance/W1-02/test_w1_02_bounded_time.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-02/w1_02_round_support.py:186: in assert_decided_in_time
+    assert_answered_in_time(result, what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(decision='timeout', returncode=None, stdout='', stderr='', seconds=18.01676004699948, cpu_seconds=0.04058200000000012)
+what = "a Glob pattern of 60 glued star pairs by 'engineer-who-may-not-write-the-file'"
+
+    def assert_answered_in_time(result, what):
+>       assert result.decision != "timeout", (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what}: no answer within the bound: the hook was still running after {PROCESS_LIMIT_S:.0f} s "
+            f"(the bound is {BOUND_S:.0f} s of its own time)"
+        )
+E       AssertionError: a Glob pattern of 60 glued star pairs by 'engineer-who-may-not-write-the-file': no answer within the bound: the hook was still running after 18 s (the bound is 5 s of its own time)
+
+tests/acceptance/W1-02/w1_02_round_support.py:166: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8de9d8a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside0/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside0/sandbox/elsewhere'))
+role = 'engineer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside0/sandbox/elsewhere/outside.txt by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside0/sandbox/elsewhere/outside.txt by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870ec900>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside1/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside1/sandbox/elsewhere'))
+role = 'independent-test-designer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside1/sandbox/elsewhere/outside.txt by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside1/sandbox/elsewhere/outside.txt by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-independent-auditor] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870ecea0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside2/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside2/sandbox/elsewhere'))
+role = 'independent-auditor', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside2/sandbox/elsewhere/outside.txt by independent-auditor'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside2/sandbox/elsewhere/outside.txt by independent-auditor was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870ed580>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside3/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside3/sandbox/elsewhere'))
+role = 'research', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside3/sandbox/elsewhere/outside.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside3/sandbox/elsewhere/outside.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870edb20>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside4/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside4/sandbox/elsewhere'))
+role = 'engineer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside4/sandbox/elsewhere/outside.txt by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside4/sandbox/elsewhere/outside.txt by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870ee2a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside5/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside5/sandbox/elsewhere'))
+role = 'independent-test-designer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside5/sandbox/elsewhere/outside.txt by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside5/sandbox/elsewhere/outside.txt by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_w1_16_s_daemon_cases_stay_serial_and_its_cases_that_start_no_daemon_are_not_declared _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_w1_16_s_daemon_cases_stay_serial_and_its_cases_that_start_no_daemon_are_not_declared():
+        every = _collected(W1_16)
+        marked = set(_collected(W1_16, "-m", W1_16_MARKER))
+        no_daemon = {node for node in marked
+                     if node.split("::")[0].rsplit("/", 1)[-1] in W1_16_NO_DAEMON
+                     and node.split("::")[1].split("[")[0] in W1_16_NO_DAEMON[node.split("::")[0].rsplit("/", 1)[-1]]}
+        daemon = marked - no_daemon
+>       assert (len(no_daemon), len(daemon)) == (W1_16_NO_DAEMON_CASES, W1_16_DAEMON_CASES), (
+            f"the fixture is wrong: W1-16 has {len(no_daemon)} marked cases in the 19 functions that start no daemon and "
+            f"{len(daemon)} other marked cases; I3 F7 counts {W1_16_NO_DAEMON_CASES} and {W1_16_DAEMON_CASES}"
+        )
+E       AssertionError: the fixture is wrong: W1-16 has 6 marked cases in the 19 functions that start no daemon and 36 other marked cases; I3 F7 counts 94 and 67
+E       assert (6, 36) == (94, 67)
+E         
+E         At index 0 diff: 6 != 94
+E         Use -v to get more diff
+
+tests/acceptance/W1-30/test_w1_30_r11_declared_here.py:222: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-independent-auditor] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870eea20>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside6/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside6/sandbox/elsewhere'))
+role = 'independent-auditor', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside6/sandbox/elsewhere/outside.txt by independent-auditor'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside6/sandbox/elsewhere/outside.txt by independent-auditor was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870ece00>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside7/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside7/sandbox/elsewhere'))
+role = 'research', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside7/sandbox/elsewhere/outside.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside7/sandbox/elsewhere/outside.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870efa60>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside8/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside8/sandbox/elsewhere'))
+role = 'engineer', tool = 'NotebookEdit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside8/sandbox/elsewhere/outside.txt by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside8/sandbox/elsewhere/outside.txt by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702c0e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside9/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside9/sandbox/elsewhere'))
+role = 'independent-test-designer', tool = 'NotebookEdit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside9/sandbox/elsewhere/outside.txt by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside9/sandbox/elsewhere/outside.txt by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-independent-auditor] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702ca40>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside10/sandbox/home...where=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside10/sandbox/elsewhere'))
+role = 'independent-auditor', tool = 'NotebookEdit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside10/sandbox/elsewhere/outside.txt by independent-auditor'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside10/sandbox/elsewhere/outside.txt by independent-auditor was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702cae0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside11/sandbox/home...where=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside11/sandbox/elsewhere'))
+role = 'research', tool = 'NotebookEdit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit", "NotebookEdit"))
+    def test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard(guard, sandbox, role, tool):
+        """Holds before implementation for every role; it must still hold once the guard knows the research role."""
+        for target in (sandbox.elsewhere / "outside.txt", sandbox.home / ".bashrc", "/etc/w1-46-outside"):
+>           w47.assert_stopped(guard(tool, w47.write_input(tool, target), role), f"{tool} to {target} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside11/sandbox/elsewhere/outside.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: NotebookEdit to /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_outside11/sandbox/elsewhere/outside.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702cd60>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g0/repo')
+role = 'engineer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702e5c0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g1/repo')
+role = 'independent-test-designer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702f2e0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g2/repo')
+role = 'research', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702f740>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g3/repo')
+role = 'engineer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .gov-runtime/freeze by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .gov-runtime/freeze by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702fe20>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g4/repo')
+role = 'independent-test-designer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .gov-runtime/freeze by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .gov-runtime/freeze by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a8702fb00>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_a_file_tool_write_under_g5/repo')
+role = 'research', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard(guard, project, role, tool):
+        """Success 10, "through a file tool": the guard's side. Holds before implementation for the three older roles."""
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), role)
+>           support.w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_role_settings.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .gov-runtime/freeze by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .gov-runtime/freeze by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start[orchestrator] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bc220>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_file_0/repo')
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", (ORCHESTRATOR, PRODUCT_SPEC))
+    def test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start(
+            guard, project, role):
+        """DEC-311: "to every role". The four worker roles are in ``test_w1_46_role_settings.py``."""
+        for rel in PROTECTED:
+            result = guard("Write", w47.write_input("Write", project / rel), role, EVERY_ROLE[role])
+>           w47.assert_stopped(result, f"Write to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by orchestrator'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by orchestrator was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start[product-spec] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bd300>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_file_1/repo')
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", (ORCHESTRATOR, PRODUCT_SPEC))
+    def test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start(
+            guard, project, role):
+        """DEC-311: "to every role". The four worker roles are in ``test_w1_46_role_settings.py``."""
+        for rel in PROTECTED:
+            result = guard("Write", w47.write_input("Write", project / rel), role, EVERY_ROLE[role])
+>           w47.assert_stopped(result, f"Write to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by product-spec'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by product-spec was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[engineer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bd8a0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_plain0/repo')
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
+    def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
+        for rel in PROTECTED:
+            command = f"echo x > {rel}"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x > .gov-runtime/freeze` by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x > .gov-runtime/freeze` by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[independent-test-designer] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bd1c0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_plain1/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
+    def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
+        for rel in PROTECTED:
+            command = f"echo x > {rel}"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x > .gov-runtime/freeze` by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x > .gov-runtime/freeze` by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[orchestrator] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870be5c0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_plain2/repo')
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
+    def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
+        for rel in PROTECTED:
+            command = f"echo x > {rel}"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x > .gov-runtime/freeze` by orchestrator'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x > .gov-runtime/freeze` by orchestrator was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[product-spec] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bec00>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_plain3/repo')
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
+    def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
+        for rel in PROTECTED:
+            command = f"echo x > {rel}"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x > .gov-runtime/freeze` by product-spec'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x > .gov-runtime/freeze` by product-spec was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a870bf380>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_a_plain4/repo')
+role = 'research'
+
+    @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
+    def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(guard, project, role):
+        for rel in PROTECTED:
+            command = f"echo x > {rel}"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x > .gov-runtime/freeze` by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x > .gov-runtime/freeze` by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[outside-the-tickets-paths-hard] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6cd60>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_to_a0/repo')
+kind = 'hard', name = 'outside-the-tickets-paths'
+
+    @pytest.mark.parametrize("kind", sorted(LINK))
+    @pytest.mark.parametrize("name", sorted(NOT_WRITABLE))
+    def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, project, kind, name):
+        command = f"{LINK[kind]} {SEED} {NOT_WRITABLE[name]}"
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln .gov-runtime/scratch/w1-46/seed.txt docs/w1-46-link.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln .gov-runtime/scratch/w1-46/seed.txt docs/w1-46-link.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[outside-the-tickets-paths-symbolic] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6c7c0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_to_a1/repo')
+kind = 'symbolic', name = 'outside-the-tickets-paths'
+
+    @pytest.mark.parametrize("kind", sorted(LINK))
+    @pytest.mark.parametrize("name", sorted(NOT_WRITABLE))
+    def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, project, kind, name):
+        command = f"{LINK[kind]} {SEED} {NOT_WRITABLE[name]}"
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -s .gov-runtime/scratch/w1-46/seed.txt docs/w1-46-link.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -s .gov-runtime/scratch/w1-46/seed.txt docs/w1-46-link.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[the-runtime-directory-hard] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6ce00>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_to_a2/repo')
+kind = 'hard', name = 'the-runtime-directory'
+
+    @pytest.mark.parametrize("kind", sorted(LINK))
+    @pytest.mark.parametrize("name", sorted(NOT_WRITABLE))
+    def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, project, kind, name):
+        command = f"{LINK[kind]} {SEED} {NOT_WRITABLE[name]}"
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[the-runtime-directory-symbolic] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6e660>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_to_a3/repo')
+kind = 'symbolic', name = 'the-runtime-directory'
+
+    @pytest.mark.parametrize("kind", sorted(LINK))
+    @pytest.mark.parametrize("name", sorted(NOT_WRITABLE))
+    def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, project, kind, name):
+        command = f"{LINK[kind]} {SEED} {NOT_WRITABLE[name]}"
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -s .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -s .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[symbolic-forced-onto-the-findings] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6cfe0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_onto0/repo')
+command = 'ln -sf .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/findings.jsonl'
+
+    @pytest.mark.parametrize("command", (
+        f"ln -sf {SEED} {RUNTIME}/findings.jsonl",
+        f"ln -f {SEED} {RUNTIME}/records.jsonl",
+        f"ln -s {SEED} {RUNTIME}/snapshots",
+        f"cd {RUNTIME} && ln -s scratch/w1-46/seed.txt w1-46-link",
+    ), ids=("symbolic-forced-onto-the-findings", "hard-forced-onto-the-records", "into-the-snapshots-directory",
+            "after-cd-into-the-runtime-directory"))
+    def test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime(guard, project, command):
+        """An option before the operands, a destination that is a directory, and a destination relative to ``cd``."""
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -sf .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/findings.jsonl` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -sf .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/findings.jsonl` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[hard-forced-onto-the-records] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6df80>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_onto1/repo')
+command = 'ln -f .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/records.jsonl'
+
+    @pytest.mark.parametrize("command", (
+        f"ln -sf {SEED} {RUNTIME}/findings.jsonl",
+        f"ln -f {SEED} {RUNTIME}/records.jsonl",
+        f"ln -s {SEED} {RUNTIME}/snapshots",
+        f"cd {RUNTIME} && ln -s scratch/w1-46/seed.txt w1-46-link",
+    ), ids=("symbolic-forced-onto-the-findings", "hard-forced-onto-the-records", "into-the-snapshots-directory",
+            "after-cd-into-the-runtime-directory"))
+    def test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime(guard, project, command):
+        """An option before the operands, a destination that is a directory, and a destination relative to ``cd``."""
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -f .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/records.jsonl` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -f .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/records.jsonl` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[into-the-snapshots-directory] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6ea20>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_onto2/repo')
+command = 'ln -s .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/snapshots'
+
+    @pytest.mark.parametrize("command", (
+        f"ln -sf {SEED} {RUNTIME}/findings.jsonl",
+        f"ln -f {SEED} {RUNTIME}/records.jsonl",
+        f"ln -s {SEED} {RUNTIME}/snapshots",
+        f"cd {RUNTIME} && ln -s scratch/w1-46/seed.txt w1-46-link",
+    ), ids=("symbolic-forced-onto-the-findings", "hard-forced-onto-the-records", "into-the-snapshots-directory",
+            "after-cd-into-the-runtime-directory"))
+    def test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime(guard, project, command):
+        """An option before the operands, a destination that is a directory, and a destination relative to ``cd``."""
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -s .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/snapshots` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -s .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/snapshots` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[after-cd-into-the-runtime-directory] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6f560>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_onto3/repo')
+command = 'cd .gov-runtime && ln -s scratch/w1-46/seed.txt w1-46-link'
+
+    @pytest.mark.parametrize("command", (
+        f"ln -sf {SEED} {RUNTIME}/findings.jsonl",
+        f"ln -f {SEED} {RUNTIME}/records.jsonl",
+        f"ln -s {SEED} {RUNTIME}/snapshots",
+        f"cd {RUNTIME} && ln -s scratch/w1-46/seed.txt w1-46-link",
+    ), ids=("symbolic-forced-onto-the-findings", "hard-forced-onto-the-records", "into-the-snapshots-directory",
+            "after-cd-into-the-runtime-directory"))
+    def test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime(guard, project, command):
+        """An option before the operands, a destination that is a directory, and a destination relative to ``cd``."""
+        result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
+>       w47.assert_stopped(result, f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`cd .gov-runtime && ln -s scratch/w1-46/seed.txt w1-46-link` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `cd .gov-runtime && ln -s scratch/w1-46/seed.txt w1-46-link` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role[orchestrator] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6fe20>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_into0/repo')
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", (ORCHESTRATOR, RESEARCH))
+    def test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role(guard, project, role):
+        """ "To every role": the role with the widest scope, and the new one."""
+        for kind in sorted(LINK):
+            command = f"{LINK[kind]} {SEED} {RUNTIME}/w1-46-link"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by orchestrator'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by orchestrator was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role[research] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x754a86e6d620>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw6/test_the_guard_refuses_ln_into1/repo')
+role = 'research'
+
+    @pytest.mark.parametrize("role", (ORCHESTRATOR, RESEARCH))
+    def test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role(guard, project, role):
+        """ "To every role": the role with the widest scope, and the new one."""
+        for kind in sorted(LINK):
+            command = f"{LINK[kind]} {SEED} {RUNTIME}/w1-46-link"
+            result = guard("Bash", w47.bash_input(command), role, EVERY_ROLE[role], cwd=project)
+>           w47.assert_stopped(result, f"`{command}` by {role}")
+
+tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln .gov-runtime/scratch/w1-46/seed.txt .gov-runtime/w1-46-link` by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_____ test_a_research_ticket_on_the_runtime_directory_opens_nothing_there ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+launch = <function launch.<locals>._launch at 0x70896315f1a0>
+guard = <function guard.<locals>._guard at 0x70896315f2e0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_ticket_on_the_0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_ticket_on_the_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_ticket_on_the_0/sandbox/elsewhere'))
+
+    def test_a_research_ticket_on_the_runtime_directory_opens_nothing_there(launch, guard, project, sandbox):
+        """Refused, or launched with every protected runtime path still denied; the guard refuses the file tools."""
+        ticket = support.write_ticket(project, NEW_TICKET, RESEARCH, allowed_paths=(".gov-runtime/**",))
+        result = launch(RESEARCH, ticket)
+        if result.run.returncode != 0:
+            support.assert_refused(result, "allowed_paths", "experiment folder", ".gov-runtime")
+        else:
+            open_paths = [rel for rel in support.PROTECTED_RUNTIME
+                          if not support.edit_denied(result, rel, project, sandbox)]
+            assert open_paths == [], f"a research session with .gov-runtime as its folder may edit {open_paths}"
+        for rel in (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov-runtime/records.jsonl",
+                    ".gov-runtime/snapshots/keep.json"):
+            answer = guard("Write", w47.write_input("Write", project / rel), RESEARCH, ticket)
+>           w47.assert_stopped(answer, f"Write to {rel} by research on a ticket that names .gov-runtime/**")
+
+tests/acceptance/W1-46/test_w1_46_experiment_folder.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .gov-runtime/freeze by research on a ticket that names .gov-runtime/**'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .gov-runtime/freeze by research on a ticket that names .gov-runtime/** was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write[link-from-a-ticket] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633e62a0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_hard_0/repo')
+name = 'link-from-a-ticket'
+
+    @pytest.mark.parametrize("name", sorted(HARD_LINKS))
+    def test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write(guard, project, name):
+        """The link is alone in its command, and its destination is inside the engineer's paths."""
+        command = HARD_LINKS[name]
+        assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a source"
+        assert not os.path.lexists(project / FREEZE), "the fixture project is frozen"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`link .tickets/DAEO-zz90.md src/gov/guard/w1_46_link.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `link .tickets/DAEO-zz90.md src/gov/guard/w1_46_link.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write[ln-from-the-freeze-flag] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633e7380>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_hard_1/repo')
+name = 'ln-from-the-freeze-flag'
+
+    @pytest.mark.parametrize("name", sorted(HARD_LINKS))
+    def test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write(guard, project, name):
+        """The link is alone in its command, and its destination is inside the engineer's paths."""
+        command = HARD_LINKS[name]
+        assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a source"
+        assert not os.path.lexists(project / FREEZE), "the fixture project is frozen"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln .gov-runtime/freeze src/gov/guard/w1_46_link` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln .gov-runtime/freeze src/gov/guard/w1_46_link` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option[the-tickets] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633e5bc0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_mv_with0/repo')
+directory = '.tickets'
+
+    @pytest.mark.parametrize("directory", (TESTS, TICKETS), ids=("the-acceptance-tests", "the-tickets"))
+    def test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option(guard, project, directory):
+        """The one operand is the engineer's own file, a source; the file lands in the directory the option names."""
+        command = f"mv --target-directory={directory} {OWN_FILE}"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`mv --target-directory=.tickets src/gov/guard/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mv --target-directory=.tickets src/gov/guard/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633ece00>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_install0/repo')
+name = 'created-path-under-the-tickets'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x70896315f920>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_install1/repo')
+name = 'two-operands-onto-a-ticket'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command[freeze-flag-symbolic-then-touch] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633ecfe0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_link_0/repo')
+name = 'freeze-flag-symbolic-then-touch'
+
+    @pytest.mark.parametrize("name", (
+        "acceptance-tests-symbolic-then-redirect", "acceptance-tests-symbolic-then-touch",
+        "acceptance-tests-symbolic-then-cp", "acceptance-test-hard-then-redirect", "freeze-flag-symbolic-then-touch",
+    ))
+    def test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command(guard, project, name):
+        """The link's own destination is inside the engineer's paths; what the second part writes is not."""
+        command = _linked_writes(project)[name]
+        assert not os.path.lexists(project / LINK) and not os.path.lexists(project / f"{LINK}.py"), "the link exists"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -s /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_link_0/repo/.gov-runtime/freeze src/gov/guard/w1_46_link && touch src/gov/guard/w1_46_link` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -s /tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_link_0/repo/.gov-runtime/freeze src/gov/guard/w1_46_link && touch src/gov/guard/w1_46_link` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option[short] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633ef060>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_cp_with0/repo')
+spelling = 'short'
+
+    @pytest.mark.parametrize("spelling", ("short", "long-with-equals"))
+    def test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option(guard, project, spelling):
+        command = f"cp {TARGET_OPTION[spelling].format(directory=TICKETS)} {OWN_FILE}"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`cp -t .tickets src/gov/guard/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `cp -t .tickets src/gov/guard/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option[long-with-equals] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089633efce0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_cp_with1/repo')
+spelling = 'long-with-equals'
+
+    @pytest.mark.parametrize("spelling", ("short", "long-with-equals"))
+    def test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option(guard, project, spelling):
+        command = f"cp {TARGET_OPTION[spelling].format(directory=TICKETS)} {OWN_FILE}"
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`cp --target-directory=.tickets src/gov/guard/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `cp --target-directory=.tickets src/gov/guard/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination[install-long-mode-onto-a-ticket-after-cd] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960284ae0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_write0/repo')
+name = 'install-long-mode-onto-a-ticket-after-cd'
+
+    @pytest.mark.parametrize("name", sorted(TRAILING_OPTION))
+    def test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination(
+            guard, project, name):
+        """The option's value is a name inside the engineer's paths; the file lands on the operand before it."""
+        directory, command = TRAILING_OPTION[name]
+        assert os.path.isfile(project / OWN / OWN_NAME), "the fixture lost the engineer's own file"
+        assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a destination"
+>       w47.assert_stopped(_ask(guard, project, directory, command),
+                           f"`{command}` by an engineer, working directory {directory or 'the repository root'}")
+
+tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`cd src/gov/guard && install decide.py ../../../.tickets/DAEO-zz90.md --mode 644` by an engineer, working directory the repository root'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `cd src/gov/guard && install decide.py ../../../.tickets/DAEO-zz90.md --mode 644` by an engineer, working directory the repository root was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination[ln-forced-suffix-onto-an-acceptance-test-with-cwd-inside-the-paths] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960285940>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_write1/repo')
+name = 'ln-forced-suffix-onto-an-acceptance-test-with-cwd-inside-the-paths'
+
+    @pytest.mark.parametrize("name", sorted(TRAILING_OPTION))
+    def test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination(
+            guard, project, name):
+        """The option's value is a name inside the engineer's paths; the file lands on the operand before it."""
+        directory, command = TRAILING_OPTION[name]
+        assert os.path.isfile(project / OWN / OWN_NAME), "the fixture lost the engineer's own file"
+        assert os.path.isfile(project / TEST_FILE) and os.path.isfile(project / TICKET_FILE), "the fixture lost a destination"
+>       w47.assert_stopped(_ask(guard, project, directory, command),
+                           f"`{command}` by an engineer, working directory {directory or 'the repository root'}")
+
+tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`ln -sf decide.py ../../../tests/acceptance/W1-90/test_fixture.py -S bak` by an engineer, working directory src/gov/guard'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `ln -sf decide.py ../../../tests/acceptance/W1-90/test_fixture.py -S bak` by an engineer, working directory src/gov/guard was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-engineer] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960285c60>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_0/repo')
+role = 'engineer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .tickets/DAEO-zz90.md by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .tickets/DAEO-zz90.md by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-independent-test-designer] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960286480>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_1/repo')
+role = 'independent-test-designer', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .tickets/DAEO-zz90.md by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .tickets/DAEO-zz90.md by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-research] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960286f20>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_2/repo')
+role = 'research', tool = 'Write'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .tickets/DAEO-zz90.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .tickets/DAEO-zz90.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-engineer] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960287740>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_3/repo')
+role = 'engineer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .tickets/DAEO-zz90.md by engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .tickets/DAEO-zz90.md by engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-independent-test-designer] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960287100>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_4/repo')
+role = 'independent-test-designer', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .tickets/DAEO-zz90.md by independent-test-designer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .tickets/DAEO-zz90.md by independent-test-designer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-research] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602b04a0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_file_tool_write_to_the_5/repo')
+role = 'research', tool = 'Edit'
+
+    @pytest.mark.parametrize("role", support.WORKER_ROLES)
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard(guard, project, role, tool):
+        """ "Through a file tool": the guard's side, for each worker role on its fixture ticket."""
+        paths = TICKETS + CLAUDE + (() if role == TEST_DESIGNER else ACCEPTANCE)
+        for rel in paths:
+            result = guard(tool, w47.write_input(tool, project / rel), role)
+>           w47.assert_stopped(result, f"{tool} to {rel} by {role}")
+
+tests/acceptance/W1-46/test_w1_46_protected_trees.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .tickets/DAEO-zz90.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .tickets/DAEO-zz90.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder[Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602867a0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_resea0/repo')
+tool = 'Write'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder(guard, project, tool):
+        """KPI success 4, failure 5: "refused by the guard". Holds before implementation: the role is unknown to it."""
+        for rel in ("created-after-launch/new.txt", "experiments/spikes/exp-902/new.txt"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), support.RESEARCH)
+>           support.w47.assert_stopped(result, f"{tool} to the new path {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_fence.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to the new path created-after-launch/new.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to the new path created-after-launch/new.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder[Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602b0c20>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_resea1/repo')
+tool = 'Edit'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    def test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder(guard, project, tool):
+        """KPI success 4, failure 5: "refused by the guard". Holds before implementation: the role is unknown to it."""
+        for rel in ("created-after-launch/new.txt", "experiments/spikes/exp-902/new.txt"):
+            result = guard(tool, support.w47.write_input(tool, project / rel), support.RESEARCH)
+>           support.w47.assert_stopped(result, f"{tool} to the new path {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_fence.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to the new path created-after-launch/new.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to the new path created-after-launch/new.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602b0fe0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_guard_refuses_a_resea2/repo')
+
+    def test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder(guard, project):
+        for command in ("mkdir created-after-launch", "echo x > created-after-launch.txt",
+                        "cp README.md experiments/spikes/exp-902.txt"):
+            result = guard("Bash", support.w47.bash_input(command), support.RESEARCH)
+>           support.w47.assert_stopped(result, f"`{command}` by research")
+
+tests/acceptance/W1-46/test_w1_46_research_fence.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`mkdir created-after-launch` by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mkdir created-after-launch` by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602b1300>
+folder = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=0, stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionD... are refused here: raise the install as a P1 escalation to the CTO, who asks the owner (DEC-953 item 2)"}}', stderr='')
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "installs are refused here: raise the install as a P1 escalation to the CTO, who asks the owner (DEC-953 item 2)"}}' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:493: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[README.md-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c0900>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_0/repo')
+tool = 'Write', rel = 'README.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to README.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to README.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[README.md-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c2020>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_1/repo')
+tool = 'Edit', rel = 'README.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to README.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to README.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[src/gov/guard/decide.py-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c2ac0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_2/repo')
+tool = 'Write', rel = 'src/gov/guard/decide.py'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to src/gov/guard/decide.py by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to src/gov/guard/decide.py by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[src/gov/guard/decide.py-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c25c0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_3/repo')
+tool = 'Edit', rel = 'src/gov/guard/decide.py'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to src/gov/guard/decide.py by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to src/gov/guard/decide.py by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[experiments/spikes/exp-900/data.txt-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c2e80>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_4/repo')
+tool = 'Write', rel = 'experiments/spikes/exp-900/data.txt'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to experiments/spikes/exp-900/data.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to experiments/spikes/exp-900/data.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[experiments/spikes/exp-900/data.txt-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c3740>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_5/repo')
+tool = 'Edit', rel = 'experiments/spikes/exp-900/data.txt'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to experiments/spikes/exp-900/data.txt by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to experiments/spikes/exp-900/data.txt by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[experiments/notes.md-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602c3560>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_6/repo')
+tool = 'Write', rel = 'experiments/notes.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to experiments/notes.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to experiments/notes.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[experiments/notes.md-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960220220>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_7/repo')
+tool = 'Edit', rel = 'experiments/notes.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to experiments/notes.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to experiments/notes.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[.tickets/DAEO-zz97.md-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960220ea0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_8/repo')
+tool = 'Write', rel = '.tickets/DAEO-zz97.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to .tickets/DAEO-zz97.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to .tickets/DAEO-zz97.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[.tickets/DAEO-zz97.md-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960220ae0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_9/repo')
+tool = 'Edit', rel = '.tickets/DAEO-zz97.md'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to .tickets/DAEO-zz97.md by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to .tickets/DAEO-zz97.md by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[governance/project/held-out.yaml-Write] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960220fe0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_10/repo')
+tool = 'Write', rel = 'governance/project/held-out.yaml'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Write to governance/project/held-out.yaml by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write to governance/project/held-out.yaml by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_a_research_write_outside_its_experiment_folder_is_denied[governance/project/held-out.yaml-Edit] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089602219e0>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_write_outside_11/repo')
+tool = 'Edit', rel = 'governance/project/held-out.yaml'
+
+    @pytest.mark.parametrize("tool", ("Write", "Edit"))
+    @pytest.mark.parametrize("rel", ("README.md", "src/gov/guard/decide.py", "experiments/spikes/exp-900/data.txt",
+                                     "experiments/notes.md", "tests/acceptance/W1-90/test_fixture.py",
+                                     ".tickets/DAEO-zz97.md", "governance/project/held-out.yaml"))
+    def test_a_research_write_outside_its_experiment_folder_is_denied(guard, project, tool, rel):
+        """Holds before implementation, for another reason: the guard does not know the role yet."""
+>       w47.assert_stopped(guard(tool, w47.write_input(tool, project / rel), RESEARCH), f"{tool} to {rel} by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'Edit to governance/project/held-out.yaml by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit to governance/project/held-out.yaml by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+______ test_a_research_bash_write_outside_its_experiment_folder_is_denied ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960222480>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_research_bash_write_out0/repo')
+
+    def test_a_research_bash_write_outside_its_experiment_folder_is_denied(guard, project):
+        for command in ("echo x >> README.md", "rm experiments/notes.md", f"cp {FOLDER}/README.md src/gov/copied.md",
+                        "touch experiments/spikes/exp-900/new.txt"):
+>           w47.assert_stopped(guard("Bash", w47.bash_input(command), RESEARCH), f"`{command}` by research")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`echo x >> README.md` by research'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `echo x >> README.md` by research was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_________ test_the_research_role_has_no_scope_on_another_roles_ticket __________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960222c00>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_the_research_role_has_no_0/repo')
+
+    def test_the_research_role_has_no_scope_on_another_roles_ticket(guard, project):
+        """ "Its ticket's allowed_paths": a research session on an engineer's ticket gets neither scope."""
+        for rel in (support.OWN_PATH[support.ENGINEER], f"{FOLDER}/notes.md"):
+            result = guard("Write", w47.write_input("Write", project / rel), RESEARCH, support.TICKET_OF[support.ENGINEER])
+>           w47.assert_stopped(result, f"a Write to {rel} by research on the engineer's ticket")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = "a Write to src/gov/guard/new_module.py by research on the engineer's ticket"
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to src/gov/guard/new_module.py by research on the engineer's ticket was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+______ test_another_role_gains_nothing_from_the_research_ticket[engineer] ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x708960223420>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_another_role_gains_nothin0/repo')
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.EMPTY_ALLOWLIST_ROLES)
+    def test_another_role_gains_nothing_from_the_research_ticket(guard, project, role):
+        result = guard("Bash", w47.bash_input(f"echo x > {FOLDER}/notes.md"), role, support.RESEARCH_TICKET)
+        if role == support.TEST_DESIGNER:
+            return   # its scope is tests/acceptance/** whatever the ticket (W1-02)
+>       w47.assert_stopped(result, f"a Bash write into the experiment folder by {role} on the research ticket")
+
+tests/acceptance/W1-46/test_w1_46_research_role.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = 'a Bash write into the experiment folder by engineer on the research ticket'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Bash write into the experiment folder by engineer on the research ticket was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+________ test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7089603b1260>
+sandbox = Sandbox(base=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_write_deep_inside_a_clo0/w2-50'), home...), pycache=PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw0/test_a_write_deep_inside_a_clo0/w2-50/pycache'))
+
+    def test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed(guard, sandbox):
+>       own = support.open_own_folder(sandbox, MAIN)     # DEC-751
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/w2_50_support.py:642: in open_own_folder
+    result.session()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ... null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))\n"), calls=())
+
+    def session(self):
+>       assert self.run.returncode == 0 and len(self.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{self.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the resource gate is shut: cpu: reading null, limit 64 (an embedding server's CPU use over the last minute could not be sampled) (DEC-1088 (5))
+E       
+E       sessions recorded: 0
+
+tests/acceptance/W2-50/w2_50_support.py:535: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x74c0ff579300>
+project = PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-21/popen-gw7/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+        w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md"):
+            w47.assert_stopped(guard("Write", w47.write_input("Write", project / rel), support.AUDITOR),
+                               f"a Write to {rel} by the auditor")
+        other = guard("Write", w47.write_input("Write", project / report), support.AUDITOR,
+                      w47.TICKET_OF[support.ENGINEER])
+>       w47.assert_stopped(other, f"a Write to {report} by the auditor on an engineer's ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = "a Write to docs/audit/report.md by the auditor on an engineer's ticket"
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on an engineer's ticket was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x74c0ff57b7e0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "installs are refused here: raise the install as a P1 escalation to the CTO, who asks the owner (DEC-953 item 2)"}}' stderr=''
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-02/test_w1_02_protected_reads_open.py::test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed[Glob-from-the-root-for-python-files-engineer]
+FAILED tests/acceptance/W1-02/test_w1_02_bounded_time.py::test_the_bound_holds_for_every_role[engineer-who-may-not-write-the-file]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-independent-auditor]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Write-research]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-independent-test-designer]
+FAILED tests/acceptance/W1-30/test_w1_30_r11_declared_here.py::test_w1_16_s_daemon_cases_stay_serial_and_its_cases_that_start_no_daemon_are_not_declared
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-independent-auditor]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[Edit-research]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-independent-auditor]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_file_tool_write_outside_the_repository_is_refused_by_the_guard[NotebookEdit-research]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Write-research]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_role_settings.py::test_a_file_tool_write_under_gov_runtime_is_refused_by_the_guard[Edit-research]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start[orchestrator]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_file_tool_write_under_gov_runtime_to_the_roles_the_launcher_does_not_start[product-spec]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[orchestrator]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[product-spec]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role[research]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[outside-the-tickets-paths-hard]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[outside-the-tickets-paths-symbolic]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[the-runtime-directory-hard]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write[the-runtime-directory-symbolic]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[symbolic-forced-onto-the-findings]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[hard-forced-onto-the-records]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[into-the-snapshots-directory]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_onto_or_into_a_name_that_exists_under_gov_runtime[after-cd-into-the-runtime-directory]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role[orchestrator]
+FAILED tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py::test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_research_role[research]
+FAILED tests/acceptance/W1-46/test_w1_46_experiment_folder.py::test_a_research_ticket_on_the_runtime_directory_opens_nothing_there
+FAILED tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write[link-from-a-ticket]
+FAILED tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write[ln-from-the-freeze-flag]
+FAILED tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option[the-tickets]
+FAILED tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]
+FAILED tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]
+FAILED tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_a_link_and_a_write_through_it_in_one_command[freeze-flag-symbolic-then-touch]
+FAILED tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option[short]
+FAILED tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py::test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option[long-with-equals]
+FAILED tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py::test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination[install-long-mode-onto-a-ticket-after-cd]
+FAILED tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py::test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination[ln-forced-suffix-onto-an-acceptance-test-with-cwd-inside-the-paths]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Write-research]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-engineer]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-independent-test-designer]
+FAILED tests/acceptance/W1-46/test_w1_46_protected_trees.py::test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard[Edit-research]
+FAILED tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder[Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_write_to_a_new_path_outside_the_folder[Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_fence.py::test_the_guard_refuses_a_research_bash_write_to_a_new_path_outside_the_folder
+FAILED tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[README.md-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[README.md-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[src/gov/guard/decide.py-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[src/gov/guard/decide.py-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[experiments/spikes/exp-900/data.txt-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[experiments/spikes/exp-900/data.txt-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[experiments/notes.md-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[experiments/notes.md-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[.tickets/DAEO-zz97.md-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[.tickets/DAEO-zz97.md-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[governance/project/held-out.yaml-Write]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_write_outside_its_experiment_folder_is_denied[governance/project/held-out.yaml-Edit]
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_a_research_bash_write_outside_its_experiment_folder_is_denied
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_the_research_role_has_no_scope_on_another_roles_ticket
+FAILED tests/acceptance/W1-46/test_w1_46_research_role.py::test_another_role_gains_nothing_from_the_research_ticket[engineer]
+FAILED tests/acceptance/W2-50/test_w2_50_guard_own_folder.py::test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+ERROR tests/acceptance/W2-50/test_w2_50_link_replaced.py::test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read[cp-b-dashdash--other-ticket]
+ERROR tests/acceptance/W2-50/test_w2_50_extra_review.py::test_an_ordinary_copy_into_an_own_folder_folder_is_allowed[cp-of-several-sources]
+ERROR tests/acceptance/W2-50/test_w2_50_short_round.py::test_the_t_and_m_forms_stay_judged_as_before[install-m-separate-repository]
+ERROR tests/acceptance/W2-50/test_w2_50_link_replaced.py::test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read[install-T--acceptance]
+77 failed, 8521 passed, 6 errors in 1994.46s (0:33:14)

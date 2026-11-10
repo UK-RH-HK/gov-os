@@ -1,0 +1,74 @@
+........................................................................ [ 52%]
+.....................................................F.........F         [100%]
+=================================== FAILURES ===================================
+____________ test_a_warm_query_answers_within_half_a_second_at_p95 _____________
+
+measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...000562, 0.3925430139997843, 0.2872238179998021, 0.2889249010004278, 0.39328920299976744, 0.242168125999342, ...], ...}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        # The timed pass's times: no memory sampler ran in that process (W2-M332).
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 0.543 s over 52 queries (limit 0.5 s; the three slowest: [0.543, 0.544, 0.838])
+E       assert 0.5427838750001683 <= 0.5
+E        +  where 0.5427838750001683 = <function p95 at 0x79c2486e8720>([0.28122569999959524, 0.2587338189996444, 0.32945239299988316, 0.28603789800035884, 0.24623384099959367, 0.3031052220003403, ...])
+E        +    where <function p95 at 0x79c2486e8720> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:273: AssertionError
+_____ test_a_warm_retrieval_with_the_real_models_answers_within_the_budget _____
+
+box = <w2_13_support.Box object at 0x79c2483f81a0>
+real_tiers = {'A': PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-13/w2-13-real-a-dev0/a-dev'), 'B': PosixPath('/tmp/gov-d10/pytest-of-usain/pytest-13/w2-13-real-b-dev0/b-dev')}
+
+    @pytest.mark.needs("ollama", "reranker")
+    def test_a_warm_retrieval_with_the_real_models_answers_within_the_budget(box, real_tiers):
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        roots = {programme: (root, [query["query"] for query in queries if query.get("programme") == programme])
+                 for programme, root in real_tiers.items()}
+        env = box.real_env()
+>       _within_budget(_timed(box, roots, support.FUSION, "search", [None], {"refresh": False}, env=env))
+
+tests/acceptance/W2-13/test_w2_13_latency.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seconds = [0.36068283899930975, 0.3004936630004522, 0.36114649399951304, 0.3208337449996179, 0.2819621990001906, 0.3335407450003913, ...]
+
+    def _within_budget(seconds):
+        assert len(seconds) >= 20, f"only {len(seconds)} questions were timed"
+        slowest = [round(value, 3) for value in sorted(seconds)[-3:]]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} questions (limit " \
+            f"{support.WARM_P95_LIMIT_S} s; the three slowest: {slowest})"
+E       AssertionError: warm p95 is 0.591 s over 52 questions (limit 0.5 s; the three slowest: [0.591, 0.598, 0.856])
+E       assert 0.5907627340002364 <= 0.5
+E        +  where 0.5907627340002364 = <function p95 at 0x79c248739bc0>([0.36068283899930975, 0.3004936630004522, 0.36114649399951304, 0.3208337449996179, 0.2819621990001906, 0.3335407450003913, ...])
+E        +    where <function p95 at 0x79c248739bc0> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W2-13/test_w2_13_latency.py:56: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:243: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 85.00
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: at or above the S0b2 R1 baseline of 85 (+0.00); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=100.0, why=80.0
+W1-19 hit@5: missed (8): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+FAILED tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget
+2 failed, 134 passed, 39 deselected, 1 warning in 1429.21s (0:23:49)
