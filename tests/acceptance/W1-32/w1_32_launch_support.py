@@ -172,6 +172,7 @@ def signalled_launch(project, sandbox, cli, signum, role=ENGINEER, ticket=ENGINE
     ready, pid_file, release = (sandbox.elsewhere / name for name in
                                 ("session-is-running.json", "session-process.json", "session-may-end"))
     plan(cli, files=LEFT, ready=ready, pid=pid_file, release=release, wait=SESSION_LIMIT_S)
+    w46.plant_open_gate(sandbox)   # W2-20 S19 (DEC-1088 (5)(b)): the gate is planted open, its readings in the env
     before = listing(sandbox)
     script = cli_support.write_launcher(project, sandbox)
     # Files, not pipes: a session that lives on keeps a pipe open, and the launcher's end would not be seen.
