@@ -1,0 +1,109 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "34f97dfea528"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/reviews/D10-validator-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "head",
+   "before": "8414b58aee2a",
+   "after": "27ebacf6ae56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W1-19"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-54"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "cb5a3b1afb8e",
+   "after": "f5110dc51a58"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "34f97dfea528"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "a5dfa52bcab7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "34f97dfea528"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-138-d10-tests",
+   "change": "head",
+   "before": "de74c2d39b99",
+   "after": "d6472c9a41fd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-138-d10-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-54/test_w2_54_query_cache.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-139-d10",
+   "change": "head",
+   "before": "619da87f4ae1",
+   "after": "4b4ca0c122a2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-141-d10",
+   "change": "head",
+   "before": "adb4f6b4c156",
+   "after": "9536ea954be0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-141-d10",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-141-hook/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-141-d10",
+   "change": "status line gone",
+   "line": " M docs/changes/W2-141-hook/pretooluse.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-act2",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-f11",
+   "change": "head",
+   "before": "74767736eef3",
+   "after": "ee534d2bccf0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-d10-tests",
+   "change": "head",
+   "before": "a99d6869bfcb",
+   "after": "2fffdab24b68"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W2-55"
+  }
+ ]
+}

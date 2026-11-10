@@ -1,0 +1,3 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select/20261110-001045-4115075
+Landing select: RED after the landing d3e3017a572f..eb48fe2fd7bc on w2/integrate (commits outside a ticket on the trigger paths: eb48fe2fd7bcbb90db75db3152d4f943aba3c420): lead_verify W2-00 DAEO-sdxk head eb48fe2fd7bc: RED parallel exit 1 in 738 s (3727 tests 86 failed 0 errors 143 skipped); serial exit 1 in 6 s, 1 entries (9 tests 9 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261110-001045-4115075 (DEC-968: fix at once or revert)
+status: RED

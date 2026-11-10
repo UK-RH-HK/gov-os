@@ -159,3 +159,7 @@
 2026-11-10 00:27:31 run 20261110-001045-4115075 (d3e3017a572f..eb48fe2fd7bc): RED: lead_verify W2-00 DAEO-sdxk head eb48fe2fd7bc: RED parallel exit 1 in 738 s (3727 tests 86 failed 0 errors 143 skipped); serial exit 1 in 6 s, 1 entries (9 tests 9 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261110-001045-4115075 (DEC-968: fix at once or revert)
 2026-11-10 00:29:50 landing 7076ccd6ef1a..a5dfa52bcab7: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-10 00:39:43 landing a5dfa52bcab7..34f97dfea528: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 00:43:14 CTO triage of RED d3e3017a572f..eb48fe2fd7bc (ACT-CLAUDE-COPIES-1): 95 failing cases re-run alone in the kept clone: 78 pass (the parallel run's load: 3 heavy slots taken); 17 fail, the same 17 by name with the ACT's 19 files undone (base reds, not the ACT's): 4 W1-33, 10 W1-38 heldout_step, 1 W1-38 rulesync, 1 W2-66 live test map, 1 W2-141 search; to D-10's list
+2026-11-10 00:44:32 landing 34f97dfea528..63fbcb506750: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 00:44:47 landing 63fbcb506750..4bc040898467: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 00:45:30 landing 4bc040898467..e041e4ce6854: 1 commit(s); none outside a ticket on the trigger paths
