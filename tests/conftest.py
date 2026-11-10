@@ -60,8 +60,8 @@
   in a mark in its pytest temp base (``gov.codeintel.MARK``, removed at its
   end), so a ``gov`` process a case starts with an environment built anew, on
   a repository under that base, lands its daemon folder there too. The real tool
-  (``codebase-memory-mcp``) is on ``PATH`` only while a case of W1-16 or W1-20
-  runs; for every other case each ``PATH`` folder that held it when the
+  (``codebase-memory-mcp``) is on ``PATH`` only while a case of ``_CBM_SUITES``
+  runs (W1-16, W1-20, W1-41, W2-69, W1-06's digests file); for every other case each ``PATH`` folder that held it when the
   outermost run started (``CODEINTEL_OFF_PATH``, kept by a run started inside
   it) is replaced by a folder of this process's own with links to the rest of
   its entries. A stand-in a case puts on a nested run's ``PATH`` stays.
@@ -319,7 +319,9 @@ def pytest_collection_modifyitems(config, items):
 
 _CBM_TOOL = "codebase-memory-mcp"
 _CBM_MARK = ".gov-cbm-base"  # gov.codeintel.MARK
-_CBM_SUITES = frozenset({"W1-16", "W1-20"})  # the suites that run the real code-graph tool (T-8)
+# The suites (and the one file) that run the real code-graph tool (T-8); every other case runs without it, so none starts
+# a daemon outside the run's own folder. W1-41's adopt stage A3, W2-69's rebuild and W1-06's digest check need it (D-10).
+_CBM_SUITES = frozenset({"W1-16", "W1-20", "W1-41", "W2-69", "test_w1_06_digests.py"})
 _cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
 _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
 
@@ -558,7 +560,7 @@ def _without_tool(value: str) -> str | None:
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_protocol(item, nextitem):
-    """The code-graph tool off PATH for every case but W1-16's and W1-20's, fixtures included (W2-56 S1)."""
+    """The code-graph tool off PATH for every case but those of ``_CBM_SUITES``, fixtures included (W2-56 S1)."""
     before = os.environ.get("PATH")
     without = None
     if before and _CBM_SUITES.isdisjoint(Path(str(item.path)).parts):
