@@ -46,11 +46,13 @@ def test_a_ticket_with_no_frontmatter_is_a_named_failure(v, tmp_path):
         v.tickets()
 
 
-def _plan(root, card_ids, ticket_ids):
-    """A WBS whose §1 table holds W2-01 and whose §2 holds a card per id in `card_ids`; a ticket per id in `ticket_ids`."""
+def _plan(root, card_ids, ticket_ids, row_ids=()):
+    """A WBS whose §1 table holds W2-01 and a row per id in `row_ids`, and whose §2 holds a card per id in `card_ids`;
+    a ticket per id in `ticket_ids`."""
     cards = [f"#### {i} A later ticket (STANDARD, engineer)\n- **Why:** planted.\n" for i in card_ids]
+    rows = [f"| **{i}** | A row |" for i in row_ids]
     _w(root, "docs/plan/WAVE_2_WBS.md", "\n".join([
-        "# Wave 2", "", "## 1. Tickets", "", "| W2 | Title |", "|---|---|", "| **W2-01** | First |", "",
+        "# Wave 2", "", "## 1. Tickets", "", "| W2 | Title |", "|---|---|", "| **W2-01** | First |", *rows, "",
         "- The later tickets (W2-59 onwards) are in §2's cards only.", "", "## 2. Ticket cards", "",
         "#### W2-01 First (FULL, engineer)", "", "### Track C", "", *cards,
         "#### W2-81's held-out half (proposed companion)", "", "## 3. Order", "", "#### W2-98 not a card here", ""]))
@@ -63,7 +65,33 @@ def test_an_id_only_in_a_section_2_card_passes_wave2_tickets(v, tmp_path):
     _plan(tmp_path, ["W2-59", "W2-60a"], ["W2-01", "W2-59", "W2-60a"])
     ok, reason = v.check_wave2_tickets()
     assert ok, reason
-    assert "3 W2 ids" in reason and "1 in the §1 table" in reason and "2 in §2's cards only" in reason
+    assert reason == "3 W2 ids agree between the WBS (1 in the §1 table, 2 in §2's cards only) and .tickets/"
+
+
+def test_a_three_digit_ticket_with_no_wbs_entry_fails_wave2_tickets(v, tmp_path):
+    """D-10 review F1: a three-digit W2 id is read in .tickets/; with neither a row nor a card it fails, named."""
+    _plan(tmp_path, ["W2-59"], ["W2-01", "W2-59", "W2-139"])
+    ok, reason = v.check_wave2_tickets()
+    assert (ok, reason) == (False, "ids on one side only: W2-139 (.tickets/ only)")
+
+
+def test_a_three_digit_ticket_with_its_card_passes_wave2_tickets(v, tmp_path):
+    """D-10 review F1: a three-digit §2 card heading is read (and a three-digit card with no ticket fails, named)."""
+    _plan(tmp_path, ["W2-59", "W2-139", "W2-128a"], ["W2-01", "W2-59", "W2-139", "W2-128a"])
+    ok, reason = v.check_wave2_tickets()
+    assert (ok, reason) == (True, "4 W2 ids agree between the WBS (1 in the §1 table, 3 in §2's cards only) and .tickets/")
+    _plan(tmp_path, ["W2-59", "W2-139", "W2-128a", "W2-150"], [])
+    v.wbs_cards.cache_clear()
+    ok, reason = v.check_wave2_tickets()
+    assert (ok, reason) == (False, "ids on one side only: W2-150 (WBS §2 card only)")
+
+
+def test_a_three_digit_ticket_in_a_section_1_row_passes_wave2_tickets(v, tmp_path):
+    """D-10 review F1: a three-digit §1 row is read; a four-digit id is not a W2 id."""
+    _plan(tmp_path, [], ["W2-01", "W2-127"], row_ids=["W2-127"])
+    _w(tmp_path, ".tickets/x.md", "---\nwbs_id: W2-1270\n---\n# x\n")
+    ok, reason = v.check_wave2_tickets()
+    assert (ok, reason) == (True, "2 W2 ids agree between the WBS (2 in the §1 table, 0 in §2's cards only) and .tickets/")
 
 
 def test_a_card_id_with_no_ticket_fails_wave2_tickets(v, tmp_path):

@@ -17,10 +17,12 @@ from pathlib import Path
 
 import yaml
 
-W2_ID = re.compile(r"W2-[0-9]{2}[a-z]?")
+# A W2 id: two or three digits and an optional letter (W2-07, W2-15a, W2-139); read so in the tickets, §1's rows and §2's cards.
+W2_ID_RE = r"W2-[0-9]{2,3}[a-z]?"
+W2_ID = re.compile(W2_ID_RE)
 # A Contract id is a whole token: one preceded by a hyphen is part of a longer name (ACT-OLLAMA-CAP-1), not a Contract id.
 CAP = re.compile(r"(?<![A-Za-z0-9-])CAP-\d+(?:\.[a-z]+)?(?![A-Za-z0-9])")
-CARD = re.compile(r"^#### (W2-[0-9]{2}[a-z]?) ")  # a §2 card heading: `#### W2-59 The pinned judge: …`
+CARD = re.compile(rf"^#### ({W2_ID_RE}) ")  # a §2 card heading: `#### W2-59 The pinned judge: …`, `#### W2-139 …`
 ROW = re.compile(r"^\| W2-[HMLI]\d+ \|")
 SEVERITIES = ("high", "medium", "low", "info")
 NOT_RUN = (  # Wave 1's validator checks whose inputs live outside the tree (validate_s1.py)
@@ -107,7 +109,7 @@ def wbs():
     """(the W2 ids of §1's ticket table, the baseline Wave 2 item ids or None)."""
     rel = "docs/plan/WAVE_2_WBS.md"
     body = section(read(rel), "## 1.") or []
-    ids = {m.group(1) for m in (re.match(r"^\|\s*(?:\*\*)?(W2-[0-9]{2}[a-z]?)(?:\*\*)?\s*\|", l) for l in body) if m}
+    ids = {m.group(1) for m in (re.match(rf"^\|\s*(?:\*\*)?({W2_ID_RE})(?:\*\*)?\s*\|", l) for l in body) if m}
     if not ids:
         raise Unreadable(f"cannot parse {rel}: no W2 rows in the §1 ticket table")
     baseline, inside = None, False
@@ -123,7 +125,7 @@ def wbs():
 
 @functools.lru_cache(None)
 def wbs_cards():
-    """The W2 ids of §2's card headings (`#### W2-<id> <title>`): the later tickets (W2-59 onwards) are there only."""
+    """The W2 ids of §2's card headings (`#### W2-<id> <title>`): tickets with no §1 row are there only."""
     return {m.group(1) for m in map(CARD.match, section(read("docs/plan/WAVE_2_WBS.md"), "## 2.") or []) if m}
 
 
