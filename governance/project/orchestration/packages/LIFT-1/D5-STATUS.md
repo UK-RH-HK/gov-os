@@ -226,3 +226,16 @@ marked on W2-128.
 | W2-128 round 2b (round 2a's F1 to F4) | not started | — |
 | TPL-7 measures, TPL-8 pilot | not started (TPL-8 after W2-153 lands) | — |
 | Owner: templates' approval, ACT-CLAUDE-COPIES-1, Appendix A | prepared, not applied; ACT rebuilt after round 2a merges, then its G4 review | — |
+- 2026-11-09 23:20 UTC (git time; the earlier log lines dated 11-10 ran 2-3 h ahead): **ACT-CLAUDE-COPIES-1 ready for the
+  owner's yes.**
+  - Rebuilt on integrate `b0bbd373` (rounds 1 and 2a and W2-152 merged), with the builder fixed for review R2:
+    composed-role findings, the template-copy codes, and a clear stop on anything else.
+  - 19 files, manifest `5d3a18832b9b`, class (b).
+  - Rehearsed twice with a planted HOME, 0 failures each: the bundle's own run, and §5 literally with its commits and
+    undo.
+  - The operator's `validate_manifest`, `act_class` (b) and `path_rule` pass.
+  - The independent review under the operator's fixed reviewer brief: all six checks pass, READY by the pinned
+    `verdict.py` (`acts/ACT-CLAUDE-COPIES-1/review.md`).
+  - The message is in `../ACT-CLAUDE-COPIES-1.md` §5.
+  - Next, unchanged: W2-153's R1 (the fixtures), W2-128 round 2b, the link notices (item 4); W2-153 unmerged until
+    ACT-1 is applied, then the worktrees merge integrate (R3).

@@ -86,3 +86,5 @@ Rows:
   changer anywhere counts as marked (Wave 3 row).
 - **Out-of-date text naming `STATUS_RELATION_UNMARKED`:** W2-129's ticket and LINK-INTEGRITY. Rows.
 - **D-6 part 2 is complete** once those two branches merge.
+
+**Done 11-09 (the CTO):** F2 merged as a pair: `757cf3109` (W2-129 S18) then `336828354` (W2-55 S9). On integrate: `gov accept W2-129` 156/0; `gov accept W2-55` 55 passed, 3 failed (the three `test_w2_55_backfill.py` base reds above, on D-10's list). D-6 part 2 is complete. Row for Wave 3: `gov links` counts an entry as marked if its status line names the changer anywhere.
