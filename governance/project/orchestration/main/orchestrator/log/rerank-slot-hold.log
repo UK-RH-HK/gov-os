@@ -19,3 +19,5 @@
 2026-11-09 13:56:16 holding GPU reranker slot 1 (service pids [3629958])
 2026-11-09 14:14:08 released GPU reranker slot 1: no service for 60 s
 2026-11-09 23:15:54 holding GPU reranker slot 1 (service pids [3511848])
+2026-11-10 00:03:40 released GPU reranker slot 1: no service for 60 s
+2026-11-10 00:05:00 holding GPU reranker slot 1 (service pids [4053978])

@@ -1,0 +1,1 @@
+launch_worker product-spec DAEO-t8mp: session exit 1; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-128/.gov-runtime/scratch/lead/log/W2-128-product-spec-r2b-12.json
