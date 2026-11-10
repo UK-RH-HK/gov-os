@@ -83,7 +83,7 @@ def test_record_and_brake_by_hand_and_no_projection_never_brakes(tmp_path):
     assert "W2: W2-2\n" in item.read_text() and "never an alarm to the owner" in item.read_text()
     assert "BRAKED" in run(tmp_path, "sum").stdout
     assert run(tmp_path, "clear", "W2-2", "--projection-usd", "3").returncode == 0
-    assert "W2-2: 0.00 USD" in run(tmp_path, "sum").stdout and "projection 5.00" in run(tmp_path, "sum").stdout
+    assert "W2-2: 0.00 USD" in run(tmp_path, "sum").stdout and "projection 3.00" in run(tmp_path, "sum").stdout  # the clear sets it (review finding 1)
     lines = [json.loads(x) for x in (tmp_path / "orch/log/spend.jsonl").read_text().splitlines()]
     assert all(tuple(x) == S.KEYS for x in lines) and [x["kind"] for x in lines][-2:] == ["brake", "brake-clear"]
 
@@ -95,3 +95,38 @@ def test_the_brief_budget(tmp_path):
         b = tmp_path / "b.md"
         b.write_text(text)
         assert run(tmp_path, "brief-budget", str(b)).stdout.strip() == want, text
+
+
+def test_r1_relaunching_a_budgeted_brief_does_not_raise_the_brake(tmp_path):
+    """Review finding 1: the ticket's projection is its latest projection_usd, not a sum over its launches."""
+    for i in range(2):
+        run(tmp_path, "record", "--what", f"W2-5 launch {i}", "--kind", "launched", "--wbs", "W2-5", "--cost-usd",
+            "1.9", "--projection-usd", "1")
+    out = run(tmp_path, "check").stdout
+    assert out.startswith("BRAKE W2-5: W2-5 has spent 3.80 USD") and "brake at 2.00" in out
+    run(tmp_path, "clear", "W2-5")
+    for i in range(2):
+        run(tmp_path, "record", "--what", f"W2-5 relaunch {i}", "--kind", "launched", "--wbs", "W2-5",
+            "--cost-usd", "1.2", "--projection-usd", "1")
+    assert run(tmp_path, "check").stdout.startswith("BRAKE W2-5: W2-5 has spent 2.40 USD")  # after a clear: afresh
+    run(tmp_path, "clear", "W2-5", "--projection-usd", "10")
+    run(tmp_path, "record", "--what", "W2-5 big", "--kind", "launched", "--wbs", "W2-5", "--cost-usd", "15")
+    assert "no ticket past" in run(tmp_path, "check").stdout  # the clear's projection sets it: 15 < 20
+    assert "projection 10.00" in run(tmp_path, "sum").stdout
+
+
+def test_r6_a_number_before_its_label_is_still_a_cost():
+    d = S.normal({"at": "a", "what": "w", "kind": "worker", "cost": "total_cost_usd 3.90 as the CLI reports it"})
+    assert d["cost_usd"] == 3.90
+    already = {k: None for k in S.KEYS}
+    already.update(at="a", what="w", kind="worker", orig_cost="total_cost_usd 2.97 as the CLI reports it")
+    assert S.normal(already)["cost_usd"] == 2.97  # a normal line with a lost cost is repaired
+
+
+def test_r8_the_brake_file_is_created_once_even_when_it_appeared_meanwhile(tmp_path):
+    run(tmp_path, "record", "--what", "W2-6", "--kind", "launched", "--wbs", "W2-6", "--cost-usd", "5",
+        "--projection-usd", "1")
+    (tmp_path / "orch/log/brake").mkdir(parents=True)
+    (tmp_path / "orch/log/brake/W2-6.json").write_text("{}")  # another check won the race
+    assert "no ticket past" in run(tmp_path, "check").stdout
+    assert not list((tmp_path / "orch/dispatch/inbox").glob("*")) if (tmp_path / "orch/dispatch/inbox").exists() else True

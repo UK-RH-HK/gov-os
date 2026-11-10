@@ -59,9 +59,12 @@ if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, t
   echo "$rc" > "$base.exit.tmp" && mv "$base.exit.tmp" "$base.exit"; exit "$rc"
 fi
 fg="" proj=""
-while :; do case "${1:-}" in --fg) fg=1; shift;; --projection-usd) proj=${2:-}; shift 2 || shift;; *) break;; esac; done
+while :; do case "${1:-}" in
+  --fg) fg=1; shift;;
+  --projection-usd) [ $# -ge 2 ] || { say "--projection-usd needs a value in USD"; exit 2; }; proj=$2; shift 2
+    [[ "$proj" =~ ^[0-9]+([.][0-9]+)?$ ]] && ! [[ "$proj" =~ ^0+([.]0+)?$ ]] || { say "not a projection in USD above 0: $proj"; exit 2; };;
+  *) break;; esac; done
 [ $# = 3 ] || { sed -n 2,30p "$0"; exit 2; }
-[[ -z "$proj" || "$proj" =~ ^[0-9]+([.][0-9]+)?$ ]] || { say "not a projection in USD: $proj"; exit 2; }
 role=$1 effort=$2 brief=$3
 case "$role" in engineer|independent-test-designer|independent-auditor|research|product-spec) ;;
   *) say "not a worker role: $role"; exit 2;; esac
@@ -93,13 +96,16 @@ sys.stderr.write("" if len(pick) == 1 else f"candidates for {wbs} as {role}: {pi
 PY
 )}
 [ -n "$ID" ] || { say "no single in_progress ticket of $W2 for $role: set LAUNCH_TICKET"; exit 2; }
+# the spend line's and the brake's W2: the ticket file's own wbs_id, else the folder's (review finding 7)
+WBS=$(sed -n '1,40s/^wbs_id:[[:space:]]*//p' "$tree/.tickets/$ID.md" 2> /dev/null | head -n 1 | tr -d "\"' \r")
+[[ "$WBS" =~ ^[A-Za-z0-9._-]+$ ]] || WBS=$W2
 logdir=$tree/.gov-runtime/scratch/lead/log dest=$tree/.gov-runtime/scratch/brief
 mkdir -p "$logdir" "$dest" || exit 2
 name=$(basename "$brief" .md) n=1; stem=$name
 while [ -e "$logdir/$name.json" ] || [ -e "$logdir/$name.exit" ]; do n=$((n + 1)); name=$stem-$n; done
 base=$logdir/$name
 refuse() { say "$2"; echo "launch_worker: REFUSED: $2" > "$base.json"; echo "$1" > "$base.exit"; exit "$1"; }
-[ -e "$SPEND_ORCH/log/brake/$W2.json" ] && refuse 5 "the runaway brake holds $W2 (DEC-1091; $SPEND_ORCH/log/brake/$W2.json): the CTO clears it first (spend.py clear $W2)"
+[ -e "$SPEND_ORCH/log/brake/$WBS.json" ] && refuse 5 "the runaway brake holds $WBS (DEC-1091; $SPEND_ORCH/log/brake/$WBS.json): the CTO clears it first (spend.py clear $WBS)"
 bash "$GATE" 2>> "$base.json" || refuse 3 "the disk gate is shut (DEC-898): $(tail -n 1 "$base.json")"
 copy=$dest/$name.md
 python3 -I - "$brief" "$copy" "$COMMON_DIR" "$dest" <<'PY' || refuse 2 "the brief could not be copied to $copy"
@@ -141,8 +147,8 @@ PY
 ) || refuse 4 "the launcher's dry run refuses: $(tail -n 3 <<< "$dry" | tr '\n' ' ')"
 python3 "$TRIP" snapshot > "$base.tripwire-before.json" 2>> "$base.json" || refuse 4 "the tripwire snapshot failed"
 say "$role $ID in $tree: $dry; disk gate open; brief $copy; projection ${proj:-none}"
-if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$W2"; exit $?; fi
-setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$W2" < /dev/null > /dev/null 2>&1 &
+if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS"; exit $?; fi
+setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$WBS" < /dev/null > /dev/null 2>&1 &
 echo "$!" > "$base.pid"
 echo "launch_worker: started pid $! (its own process group) for $role $ID; log $base.json"
 echo "launch_worker: wait with: bash $HERE/wait_for.sh $base.exit"

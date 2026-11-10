@@ -31,7 +31,7 @@ Also:
 - Add an "F18-F23 (DEC-1112 (3))" section to `docs/changes/W2-149-evidence.md`.
 
 ## Where you work
-- `/home/usain/gov-os-worktrees/W2-149-sgx`, branch `w2/W2-149-sgx`, made from the designer's branch at `@HEAD@`.
+- `/home/usain/gov-os-worktrees/W2-149-sgx`, branch `w2/W2-149-sgx`, made from the designer's branch at `939da2755` (fast-forwarded; `w2/integrate` at `944f39165` with the F18-F23 cases).
   Your paths are the ticket's `allowed_paths`.
 - **You never read `tests/acceptance/W2-149/`.** You see only `gov accept`'s results and failure messages.
 - **The exclusion line:** recursive grep carries `--exclude-dir=W2-149`; Grep and Glob carry

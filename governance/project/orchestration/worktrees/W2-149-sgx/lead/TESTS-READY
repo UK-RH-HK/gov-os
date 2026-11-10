@@ -1,1 +1,1 @@
-TESTS-READY w2/W2-149-sgx-tests 59030819b (designer's cases: f65c0c992, 59030819b); red: gov accept 76 passed, 61 failed, 12 skipped (3 live, 9 bwrap); bwrap cases 9 failed at 10 outside the sandbox (lead, 01:46Z)
+TESTS-READY w2/W2-149-sgx-tests 939da2755 (F18-F23: 51 new, 6 revised); sandbox 32 red, 35 skipped; bwrap outside: 21 red, 11 green (lead, 11:49Z)

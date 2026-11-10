@@ -23,7 +23,7 @@ The one schema (every line has exactly these keys; unknown values are null, neve
 There is no `tokens` field: cached context is never summed into a token count (the 17,057,921 of 2026-11-09).
 
 The brake (DEC-1091): per ticket (the `wbs`, the W2 id; lines without one, all lines before this tool, never count), the
-cost since its first launch, or since the CTO's last clear, against twice the sum of its lines' projection_usd. Past
+cost since its first launch, or since the CTO's last clear, against twice its latest projection_usd. Past
 it: one line kind "brake" in the log, the file log/brake/<W2>.json (launch_worker.sh refuses a new launch for that W2
 while it exists), and one inbox item, dispatch/inbox/<stamp>-spend-brake.txt, with a `W2:` line (the dispatcher holds
 that W2's starts while it is unread). Usage stays record-only: nothing goes to the owner, no push, no alarm (DEC-1089
@@ -44,7 +44,7 @@ SPEND = Path(os.environ.get("SPEND") or ORCH / "log/spend.jsonl")
 BRAKES, INBOX = ORCH / "log/brake", ORCH / "dispatch/inbox"
 KEYS = ("at", "what", "kind", "ticket", "wbs", "role", "cost_usd", "cost_source", "input_tokens", "output_tokens",
         "cache_read_tokens", "cache_creation_tokens", "projection_usd", "note", "orig_tokens", "orig_cost", "extra")
-USD = re.compile(r"(\d+(?:\.\d+)?)\s*USD")
+USD = re.compile(r"(\d+(?:\.\d+)?)\s*USD|total_cost_usd\W{0,3}(\d+(?:\.\d+)?)")
 OLD_TOKEN_KINDS = {"input": "input_tokens", "output": "output_tokens", "cache_read": "cache_read_tokens",
                    "cache_creation": "cache_creation_tokens"}
 
@@ -63,7 +63,12 @@ def num(v):
 def normal(d):
     """One line in the schema. Idempotent: a normal line comes back unchanged."""
     if set(d) == set(KEYS):
-        return {k: d[k] for k in KEYS}
+        out = {k: d[k] for k in KEYS}
+        if out["cost_usd"] is None and isinstance(out["orig_cost"], str) and USD.search(out["orig_cost"]):
+            m = USD.search(out["orig_cost"])  # a cost an earlier pass missed (review finding 6)
+            out["cost_usd"] = float(m.group(1) or m.group(2))
+            out["cost_source"] = out["cost_source"] or "the line's cost text"
+        return out
     out = dict.fromkeys(KEYS)
     out["extra"] = {}
     for k, v in d.items():
@@ -87,7 +92,7 @@ def normal(d):
     if out["cost_usd"] is None and isinstance(out["orig_cost"], str):
         m = USD.search(out["orig_cost"])
         if m:
-            out["cost_usd"] = float(m.group(1))
+            out["cost_usd"] = float(m.group(1) or m.group(2))
             out["cost_source"] = out["cost_source"] or "the line's cost text"
     elif out["cost_usd"] is None and num(out["orig_cost"]) is not None:
         out["cost_usd"], out["cost_source"] = num(out["orig_cost"]), out["cost_source"] or "the line's cost number"
@@ -134,7 +139,8 @@ def inbox_item(name, body):
 
 
 def totals(lines):
-    """{W2: {cost, projection, since, launches}}: cost since the last clear; the projection over all its lines."""
+    """{W2: {cost, projection, since, launches}}: the cost since the last clear, against the ticket's latest
+    projection_usd (a relaunch of a budgeted brief does not raise it; a clear with --projection-usd sets it)."""
     t = {}
     for d in lines:
         w = d.get("wbs")
@@ -144,7 +150,7 @@ def totals(lines):
         if d["kind"] == "brake-clear":
             e["cost"], e["since"] = 0.0, d["at"]
         if num(d.get("projection_usd")):
-            e["projection"] += num(d["projection_usd"])
+            e["projection"] = num(d["projection_usd"])
         if d["kind"] not in ("brake", "brake-clear") and num(d.get("cost_usd")) is not None:
             e["cost"] += num(d["cost_usd"])
         e["launches"] += d["kind"] == "launched"
@@ -164,8 +170,12 @@ def check():
         why = (f"{w} has spent {e['cost']:.2f} USD since {e['since']}, past twice its projection "
                f"({e['projection']:.2f} USD, brake at {2 * e['projection']:.2f})")
         BRAKES.mkdir(parents=True, exist_ok=True)
-        brake.write_text(json.dumps({"wbs": w, "at": now_s(), "cost_usd": round(e["cost"], 4),
-                                     "projection_usd": e["projection"], "why": why}) + "\n")
+        try:  # created once: a check ending at the same moment finds it there (review finding 8)
+            with open(brake, "x") as f:
+                f.write(json.dumps({"wbs": w, "at": now_s(), "cost_usd": round(e["cost"], 4),
+                                    "projection_usd": e["projection"], "why": why}) + "\n")
+        except FileExistsError:
+            continue
         append({"at": now_s(), "what": f"runaway brake on {w}", "kind": "brake", "wbs": w,
                 "note": why + "; new launches stop until the CTO clears it (DEC-1091)"})
         item = inbox_item("spend-brake", (
@@ -218,7 +228,7 @@ def brief_budget(path):
     return v if v else None
 
 
-def normalise(swap):
+def normalise(swap, keep_as="orig"):
     stamp = time.strftime("%Y%m%d")
     for _ in range(5):  # a hand-written line appended meanwhile: start again
         before = SPEND.read_bytes()
@@ -237,7 +247,7 @@ def normalise(swap):
             return norm
         if SPEND.read_bytes() != before:
             continue
-        orig = SPEND.with_name(f"{SPEND.name}.orig-{stamp}")
+        orig = SPEND.with_name(f"{SPEND.name}.{keep_as}-{stamp}")
         if orig.exists():
             sys.exit(f"spend normalise: {orig} exists already; nothing swapped")
         os.link(SPEND, orig)  # the old file kept as it was, then the new one moved in
@@ -275,6 +285,7 @@ def main():
     s.add_argument("brief")
     s = sub.add_parser("normalise")
     s.add_argument("--swap", action="store_true")
+    s.add_argument("--keep-as", default="orig", help="the kept file's suffix word (orig, or pre-repair for a re-run)")
     a = ap.parse_args()
     if a.cmd in ("record", "from-log"):
         d = {"at": now_s(), "what": a.what, "kind": a.kind, "ticket": a.ticket, "wbs": a.wbs, "role": a.role,
@@ -310,7 +321,7 @@ def main():
         v = brief_budget(a.brief)
         print("" if v is None else f"{v:g}")
     elif a.cmd == "normalise":
-        normalise(a.swap)
+        normalise(a.swap, a.keep_as)
 
 
 if __name__ == "__main__":

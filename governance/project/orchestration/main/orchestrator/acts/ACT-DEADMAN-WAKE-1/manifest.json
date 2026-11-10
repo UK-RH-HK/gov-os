@@ -1,0 +1,33 @@
+{
+ "act": "ACT-DEADMAN-WAKE-1",
+ "dec": "DEC-998, DEC-1112",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/orchestration/tools/deadman.py",
+   "before": "b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68",
+   "after": "ebc94de1d3802c0f98c574bfa6b188ce0b3d9c888d96249f97497557ef3381f7"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/orchestration/tools/deadman.py": "b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68",
+  "after/repo/governance/project/orchestration/tools/deadman.py": "ebc94de1d3802c0f98c574bfa6b188ce0b3d9c888d96249f97497557ef3381f7",
+  "apply.sh": "6107995519fb124566fd11dc5e51a70e6310e22e4fef3a704e9c14b11d18e8d1",
+  "list.txt": "c39aa9db370be28ca40d98b7138e5416f1ed455995cf3574ea62e4e4da2be2d2"
+ },
+ "checks": [
+  {
+   "cmd": "ORCH=\"$(mktemp -d)\" python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T02:35:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 03:36' --channel nothing --state \"$T/st/state.json\" --log \"$T/deadman.log\" --session-file \"$T/none\" --standby \"$T/none\" --inbox-stale \"$T/none\" > \"$T/note.json\" && grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'",
+   "exit": 0,
+   "count": 1
+  }
+ ],
+ "commands": []
+}

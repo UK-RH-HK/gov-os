@@ -85,7 +85,10 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   `labels/audit/*.decisions.jsonl` names, sorted by id, the first 40; one line each, in that order: `{"id", "action":
   {role agent ticket wbs tool input cwd} (from the staged line), "x": {label rule_class clauses reason}, "y": {...}}`.
   **x/y:** `rng = random.Random(seed)`; for each case in that order, `rng.random() < 0.5` means x is labeller 1
-  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall.
+  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21) The reasons
+  blinded:** when either side's `reason` is `""` (labeller 1's script labels always carry `""`; labeller 2 may leave
+  one empty), both sides' `reason` are `""`; when both have one, both are kept as written. `label`, `rule_class` and
+  `clauses` are as in each file.
 - `tickets.jsonl`: one line per ticket a case's action names (its `ticket` matched to a ticket file's `id`, or its
   `wbs` to `wbs_id`), read from `.tickets/*.md` at `--commit`: `{"id", "role", "wbs_id", "allowed_paths"}` and nothing
   else; a name no ticket file holds gives no line; order free.
@@ -94,17 +97,29 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
 
 ### The rule script (S25; exit 18, reason `rules`)
 
+- **(F18) Twice:** at labeller 1's round-1 delivery the script runs the session's `out/label_rules.py` under the same
+  confined check, over the half's staged lines, before anything lands; any failure there (every case of the bullets
+  below, `bwrap` or the interpreter missing included) is **20**, `status: rejected`, reason `result`, nothing under
+  `H/labels/r1-sgx1-labeller/` (no file; the wall packed as for any rejection). Its output is not delivered or staged at
+  round 1. At round 2 it runs again on the delivered copy, refusing **18** as below.
 - At labeller 1's round 2 the script runs round 1's delivered `label_rules.py` under `bwrap`: the program
   `GOV_INDEP_BWRAP` names (an absolute path; tests and the trial only), else `bwrap` on `PATH`; the interpreter
   `GOV_INDEP_RULES_PYTHON` names (absolute; tests and the trial only), else the one on the first line of
   `~/.local/bin/gov`; `-I`. Every namespace unshared (no network), `--die-with-parent`, nothing bound but the
   interpreter's own files (and the rule script) read-only, nothing writable; no new process (a fork or an exec inside
   fails); caps on CPU, memory and output, a wall-clock cap of at most 60 s. Stdin: the half's staged lines.
-- The output must give every staged id exactly once: `{"id", "label": allow|refuse|ask, "rule_class": 1..14 (int),
-  "clauses": [strings], "uncertain": bool}`. Anything else (a non-zero exit, a cap reached, an id missing, repeated or
+- The output must give every staged id exactly once: `{"id", "label": allow|refuse|ask, "rule_class": 1..14 (the
+  forms of (F23) below), "clauses": [strings], "uncertain": bool}`; `script-labels.jsonl` carries each `rule_class` as
+  a JSON integer. Anything else (a non-zero exit, a cap reached, an id missing, repeated or
   unknown, a bad value; `bwrap` or the interpreter missing or unable to start): **18**, nothing staged (no
   `script-labels.jsonl` or `sample.json` in the wall or its tar), no session; it may run before or after the wall is
   built (a refusal after B1 leaves what 13 leaves).
+- **(F23) `rule_class`'s forms**, wherever a session's line carries it (the rule script's output, `hand-labels.jsonl`,
+  `labels-2.jsonl`, `decisions.jsonl`): a JSON integer 1-14, or a JSON string matching `^(?:[1-9]|1[0-4])$` (no sign,
+  no leading zero, no space). Refused, as that file's check refuses (18 at round 2 and 20 at round 1's delivery for the
+  rule script, 20 for the others): a boolean (`true`), a float (`7.0`), `0`, `15`, `"07"`, `" 7"`, `"+7"`, `"seven"`
+  and anything else. Every file the script writes carries an integer: `script-labels.jsonl`, `labels.jsonl`,
+  `labels-2.jsonl`, the delivered `<run>.decisions.jsonl`.
 
 ### The deliveries (S16, S26, S27): a temporary name, hashed, renamed; all or nothing
 
@@ -115,9 +130,14 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
 | `sgx1-labeller-1` | 1 | `rulebook.md`, `label_rules.py` | H `labels/r1-sgx1-labeller/` | `round1` |
 | `sgx1-labeller-1` | 2 | `hand-labels.jsonl`, merged | H `labels/labels.jsonl` | `labels` |
 | `sgx1-labeller-2` | 1 | `rulebook-2.md` | H `labels/r1-sgx1-labeller-2/` | `round1` |
-| `sgx1-labeller-2` | 2 | `labels-2.jsonl` (its bytes) | H `labels/labels-2.jsonl` | `labels` |
+| `sgx1-labeller-2` | 2 | `labels-2.jsonl`, checked (F20), `rule_class` an integer | H `labels/labels-2.jsonl` | `labels` |
 | `sgx1-overlap-auditor` | 1 | `decisions.jsonl`, mapped back | H `labels/audit/<run>.decisions.jsonl` (and below) | `decisions` |
 
+- **(F19) A result that says it stopped delivers nothing:** when a set-up A flow's `out/result.json` is valid against
+  its schema and its `stopped` is a word other than `none` (any flow, any round, whatever out/ holds): **20**,
+  `status: rejected`, reason `result`; `out.schema_ok` true and `out.stopped` the word in `counts.json`; nothing
+  delivered (every destination, the map and `owner.jsonl` unchanged; no `AUDITS.log` line); the out/ products (and the
+  brief's `conflicts.md`) in the wall's tar only. Labeller 1's round-1 rule-script check need not run then.
 - An existing destination file refuses **20** (the auditor's `labels.jsonl` and `owner.jsonl` excepted); nothing
   else changes under the sets root or `EXP` (the wall's tar aside). `out/aims.jsonl` stays in the tar only. A
   destination's missing folders are made (writer 1's case starts with no `EXP` at all; `labels/r1-<id>/` and
@@ -129,15 +149,22 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   must cover every id `script-labels.jsonl` marks uncertain, every id it puts in classes 1-13 and every `sample.json`
   id; else **20**, nothing written. The merge: one line per staged id, in the staged order, exactly `{"id", "label",
   "rule_class", "clauses", "reason", "how"}`: a hand line's values and `how: "hand"`, else the script's with
-  `reason: ""` and `how: "script"`.
+  `reason: ""` and `how: "script"`; `rule_class` an integer either way (F23).
+- **(F20) Labeller 2, round 2 (S30):** `out/labels-2.jsonl` must hold exactly one line per id of the wall's
+  `input/sample.jsonl` and no other id (none missing, none extra, none twice), each exactly `{"id", "label",
+  "rule_class", "clauses", "how", "reason"}` with `label` allow|refuse|ask, `rule_class` per (F23), `clauses` a list of
+  strings, `how` `"hand"`, `reason` a string (`""` allowed); else **20**, nothing written. Delivered: its lines in its
+  order, each as written but `rule_class` a JSON integer (key order and spacing free; no longer byte for byte).
 - **The overlap auditor (S27):** `out/decisions.jsonl` must hold one line per case, in the disputes' order, the same
-  ids, exactly `id label rule_class basis agrees_with flag reason` (`label` allow|refuse|ask, `rule_class` 1-14, `basis`
-  a list of strings, `agrees_with` x|y|neither, `flag` none|cannot-settle|may-change-verdict, `reason` empty exactly when
-  the flag is `none`); else **20**, nothing under H changes. Delivered: each line as the auditor wrote it, `agrees_with`
-  x or y replaced by `labeller-1` or `labeller-2` by the map; `labels/audit/<run>.map.json` = `{<id>: {"x": 1|2, "y":
-  2|1}}` for the run's cases, written at delivery only (never by a dry build or a rejection, never in the wall);
-  `labels.jsonl` rewritten, its old bytes first copied into `labels/history/` (one new file, its name free): flag `none`
-  → the auditor's `label` and `how: "audit"`; flagged → `how: "owner"`; every other line unchanged; `owner.jsonl` gains
+  ids, exactly `id label rule_class basis agrees_with flag reason` (`label` allow|refuse|ask, `rule_class` per (F23),
+  `basis` a list of strings, `agrees_with` x|y|neither, `flag` none|cannot-settle|may-change-verdict, `reason` empty
+  exactly when the flag is `none`); else **20**, nothing under H changes. Delivered: each line as the auditor wrote it,
+  `rule_class` a JSON integer (F23), `agrees_with` x or y replaced by `labeller-1` or `labeller-2` by the map;
+  `labels/audit/<run>.map.json` = `{<id>: {"x": 1|2, "y": 2|1}}` for the run's cases, written at delivery only (never
+  by a dry build or a rejection, never in the wall); `labels.jsonl` rewritten, its old bytes first copied into
+  `labels/history/` (one new file, its name free): **(F22)** flag `none` → the line becomes exactly `{"id", "label": the
+  auditor's, "rule_class": the auditor's (an integer), "clauses": its basis, "reason": its reason (so `""`), "how":
+  "audit"}`; flagged → labeller 1's line unchanged but `how: "owner"`; every other line unchanged; `owner.jsonl` gains
   one line per flagged case, in order, carrying its `id` (both labels and the decision; other keys free). **No
   `AUDITS.log` line, ever** (a memory writer's `last_audit` is untouched).
 

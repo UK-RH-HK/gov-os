@@ -1,0 +1,24 @@
+ACT-DEADMAN-WAKE-1 rehearsal 2026-11-10T11:53:33Z; clone of w2/integrate at bbe222c59e24 (live HEAD bbe222c59e24); HOME planted at /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/home; ORCH /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/orch
+manifest sha256 before finalize: b80922103ec007cdb1aaa3e4d27e80410e002271390c31fb28ae71b01c3f2322
+ok   apply.sh check: the clone's deadman.py is the before (exit 0)
+ok   apply.sh verify before the apply: not applied (exit 3)
+ok   apply.sh apply: exit 0
+ok   apply.sh verify: the after (exit 0)
+ok   the file's mode is 644
+ok   the changed set is exactly the touched file
+test_deadman_wake.py on the applied file: /usr/bin/python3: No module named pytest
+FAIL the wake's tests: 7 passed
+test_cto_safety_nets.py with the post-ACT ORCH fixture: /usr/bin/python3: No module named pytest
+FAIL the safety nets with the fixture: 9 passed
+ok   apply.sh undo: exit 0
+ok   undo: byte for byte the before
+ok   undo: the clone's tree clean
+ok   check after the undo: exit 0
+ok   a moved file: check refuses (exit 3, "moved: governance/project/orchestration/tools/deadman.py")
+ok   a tampered frozen copy: apply refuses (exit 4), the clone's file untouched
+ok   the bundle's after copy restored as listed
+live before: b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68 74a3190025ca87913545c4021d8ae1817d9e7569319b2ba8a26b19f60946ac5b e730e23ab0a58232c21021adb8fd74c51c7b991d01920f3c53bb834618f8fb79 26a4184cc501234e343e7a18a2cca4270a9f99295d62d34c072c26ad459ad918 1083 0 0 e3b0c44298fc
+live after:  b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68 74a3190025ca87913545c4021d8ae1817d9e7569319b2ba8a26b19f60946ac5b e730e23ab0a58232c21021adb8fd74c51c7b991d01920f3c53bb834618f8fb79 26a4184cc501234e343e7a18a2cca4270a9f99295d62d34c072c26ad459ad918 1083 0 0 e3b0c44298fc
+ok   the live files, the live inbox's wake items, the live wake key and the live tree as before; no planted line in the live log
+ok   nothing written to the planted HOME
+failures: 2

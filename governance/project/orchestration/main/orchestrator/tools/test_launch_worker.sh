@@ -173,6 +173,17 @@ printf -- '---\nbudget_usd: 3\n---\n# W2-99 engineer, budgeted\n' > "$W/briefs/W
 lw --fg engineer high "$W/briefs/W2-99-budget.md"
 check "spend: with no --projection-usd, the brief's budget is the projection" '[ "$(lastline "d[\"projection_usd\"]")" = 3.0 ] && grep -q "projection 3" "$W/stderr"'
 
+# 11. review findings 7 and 9: the brake is keyed on the ticket's own wbs_id; a bare or zero projection is refused
+lw --fg engineer high "$W/briefs/W2-99-eng.md" --projection-usd; check "a --projection-usd with no value: exit 2" '[ $? = 2 ]'
+lw --fg --projection-usd 0 engineer high "$W/briefs/W2-99-eng.md"; check "a projection of 0: exit 2" '[ $? = 2 ] && [ ! -e "$W/rec/argv" ]'
+lw --fg --projection-usd; check "--projection-usd last, no value: exit 2" '[ $? = 2 ]'
+LAUNCH_TICKET=T-other lw --fg engineer high "$W/briefs/W2-99-eng.md"
+check "the spend line's W2 is the ticket file's wbs_id (W2-98), not the folder's" '[ "$(lastline "(d[\"wbs\"], d[\"ticket\"])")" = "('"'"'W2-98'"'"', '"'"'T-other'"'"')" ]'
+mkdir -p "$BK"; echo '{}' > "$BK/W2-98.json"
+LAUNCH_TICKET=T-other lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "the brake on the ticket's own W2 refuses its launch from another folder (exit 5)" '[ $rc = 5 ] && [ ! -e "$W/rec/argv" ]'
+rm "$BK/W2-98.json"
+
 rm -rf "$W"
 echo "$([ $fails = 0 ] && echo PASS || echo "FAILED $fails") test_launch_worker.sh"
 [ $fails = 0 ]

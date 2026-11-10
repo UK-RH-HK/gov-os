@@ -101,6 +101,20 @@ def front_of(text):
     return text[:end + 4].rstrip("\n") + "\n"
 
 
+def composed(src):
+    """The clone's ``gov.adapters.portability.compose(root, role)`` for a ``.rulesync/subagents/<role>.md`` source, or
+    None when the clone's code has no compose() (before W2-153's S3 amendment)."""
+    if not src.startswith(".rulesync/subagents/"):
+        return None
+    probe = ("import sys, json; sys.path.insert(0, sys.argv[1] + '/src'); from gov.adapters import portability as p; "
+             "f = getattr(p, 'compose', None); from pathlib import Path; "
+             "print(json.dumps(None if f is None else f(Path(sys.argv[1]), sys.argv[2])))")
+    code, out = run([sys.executable, "-I", "-c", probe, str(gen), Path(src).stem], gen)
+    if code != 0:
+        raise SystemExit(f"compose() failed for {src}: {out[-300:]}")
+    return json.loads(out)
+
+
 for f in found:
     code, msg, src = f["code"], f.get("message", ""), f.get("file")
     if code in ("GENERATED_DIFFERS", "TEMPLATE_COPY_MISSING", "TEMPLATE_COPY_DIFFERS"):
@@ -109,6 +123,9 @@ for f in found:
         origin = msg.split("differs from ", 1)[1]
         if "/skills/" in origin:
             (gen / src).write_bytes((gen / origin).read_bytes())
+        elif ("/roles/" in origin or "/templates/role-" in origin) and composed(src) is not None:
+            # W2-153 S3 amended: the check's own compose() writes the source (one implementation, never two)
+            (gen / src).write_text(composed(src), encoding="utf-8")
         elif "/roles/" in origin or "/templates/role-" in origin:
             # a role source keeps its own rulesync front matter (tools, and claudecode.skills after W2-153) and takes
             # the body of what the check compares it with: the kernel role (before W2-153) or its role template
