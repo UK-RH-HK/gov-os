@@ -185,3 +185,8 @@ harness_allowed:
 - Write
 - Grep
 - Glob
+
+# The ready check inside `gov brief` (W2-152, DEC-1088 (3)): a ticket created on or after new_since must declare
+# reads:, needs: and waits_on: (an empty list is a declared none); an older ticket is not refused for them.
+ready:
+  new_since: "2026-11-10"

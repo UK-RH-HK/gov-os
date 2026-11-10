@@ -54,7 +54,7 @@ class Session:
     made: list = []
     plan, obeys = None, True
 
-    def __init__(self, argv, cwd, env):
+    def __init__(self, argv, cwd, env, **options):  # options: the process group (W2-56 S12)
         self.folder, self.returncode, self.calls = Path(env["TMPDIR"]), None, []
         assert self.folder.is_dir()
         Session.made.append(self)

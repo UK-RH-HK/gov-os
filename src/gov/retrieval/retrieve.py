@@ -36,7 +36,7 @@ import yaml
 from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
-from gov.guard import role_paths
+from gov.util import role_paths
 from gov.retrieval import authority, code_route, graph_route, lexical, pool, reverse_edges, routing, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import last_outcome, rerank

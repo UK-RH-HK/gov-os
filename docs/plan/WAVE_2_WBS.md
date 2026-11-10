@@ -1460,7 +1460,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are filed on 2026-10-29.
 
-#### W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
+#### Split: W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
 - **Why:** a launched session loads none of its role's text (lens E F2); no launch sets effort, and the compaction threshold was a user-level value (lens F F1); the model a subagent runs on is not the one recorded (lens E F14); the loaded skill copy has no version (lens E F15). The accepted plan (§4.3, §2 rows 5, CAP-35.c lite and CAP-36.a lite) adds W2-60 under the admission rule (iii): exit criterion 5. Until it lands, the prompt's launch forms carry the values by hand (prompt v3, §6; DEC-839 item 5).
 - **Split** so that each part fits one lead run: **W2-60a** (the role at launch and the launch record; FULL, engineer) and **W2-60b** (the per-session record; STANDARD, engineer, after W2-60a).
 - **Starts** as soon as filed, beside the memory work (DEC-941), stacked on `w2/integrate` (DEC-786): W2-58's launcher is merged there (`af5d1a25`). W2-60a runs beside W2-56 on `launcher.py`, each in modules of its own. W2-60b starts after W2-60a merges and after W2-07 (`DAEO-r9ss`) closes, since W2-07 holds `src/gov/telemetry/**`. W2-21 follows both on the launcher, and builds on W2-60a's launch record.
@@ -1759,6 +1759,16 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
   - EXAMIN's copy (W2-27) is its live trial.
 - **Depends on:** W2-03, W2-52 (`stages.py`, the adopt skill), W2-76 (`src/gov/rebuild/**`), W2-81 (its builders). W2-27 depends on it.
 - **Contract:** A9 lite comes into Wave 2 by a CIT-P note under DEC-105 option (a) (the owner's decision is DEC-954 Q9f).
+
+### Cards for tickets filed without one (2026-11-09; D-10's red-fix list, the plan validator's `wave2-tickets`)
+
+W2-60 above is a split parent with no ticket of its own: its heading says so, so it is not read as a ticket. The two tickets below were filed straight from a decision with no card; each card points at its ticket file, which holds the KPIs.
+
+#### W2-63 W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window (LITE, independent-test-designer; DEC-838, DEC-665, DEC-865)
+- **Ticket file:** `DAEO-pl6k` (closed).
+
+#### W2-66c W2-66's live-map suite pins ACT-SELECT-FIXES-1's lines (LITE, independent-test-designer; DEC-1100, DEC-1098, DEC-889, DEC-891)
+- **Ticket file:** `DAEO-btcs` (open); its KPIs and paths are there.
 
 ## 3. Order, layers and critical path
 

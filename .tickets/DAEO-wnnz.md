@@ -36,9 +36,9 @@ kpis:
   - 'A launched session gets a cleaned process environment: PATH, HOME, the locale, what the CLI needs to sign in, its identity and the launcher''s own values (TMPDIR, CLAUDE_CODE_TMPDIR); none of the parent''s CLAUDE* and GOV* variables (its session id, messaging socket and token, child-session mark, effort, compaction window, subagent model, GOV_DEV_TIERS) and no PYTHONPATH reach it, shown by a test that starts the launcher with each set [DEC-826 Q5, lens E F13, DEC-784, DEC-877 item 4, row W2-M393]'
   - 'The remaining arguments that drop the guard or add context are refused after --, beside DEC-313''s: --restricted, --safe-mode, --agents, --plugin-dir, --plugin-url, --mcp-config and --system-prompt, each in its spaced and = forms; the CIT-E weighs an accepted-arguments list against this refusal list (lens E R6) [DEC-826 Q5, DEC-313]'
   - 'Sandboxed sessions started together in worktrees that share one .git do not fail on a missing .git/*.lock source path: the launcher starts sessions one at a time per repository (a short start lock), or the CIT-E shows another way; a test starts at least three launches at once; the same fault arising per command inside running sessions, from the CLI''s own config.lock placeholders under the common .git (CIT-E section 4), is a Wave 3 row (a clone per concurrently sandboxed worker, or the CLI fixed upstream) [lens E F17] [changed, DEC-1112 (3): the engineer''s P-S7]'
-  - 'A session started by `gov launch` (sandboxed) can connect to the shared reranker service''s socket (W2-112: one path in the user''s own folder, mode 0600) and gets its answers: the sandbox block allows that one Unix socket path and no other; the path comes from the same setting the service uses, never a pattern wider than it [DEC-1035, P-W2-112-T2 (a)] [moved from W2-127 S1, DEC-1083]'
+  - 'A session started by `gov launch` (sandboxed) can connect to the shared reranker service''s socket (W2-112: one path in the user''s own folder, mode 0600) and gets its answers: the sandbox block allows that one Unix socket path and no other; the path comes from the same setting the service uses, never a pattern wider than it [DEC-1035, P-W2-112-T2 (a)] [moved from W2-127 S1, DEC-1083] [changed, DEC-1114 (1): the settings-level form (the one path, nothing wider) is built and inert on Linux; the reach on Linux is Wave 3, W3-P28]'
   - 'Nothing else in the sandbox widens: no other Unix socket, no network port, `allowUnsandboxedCommands` false and `strictAllowlist` as today; `sandbox_faults` still refuses any other change; a planted sandboxed session that opens another Unix socket is refused [DEC-1035] [moved from W2-127 S2, DEC-1083]'
-  - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035] [moved from W2-127 S3, DEC-1083]'
+  - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035] [moved from W2-127 S3, DEC-1083] [deferred, DEC-1114 (1): to Wave 3 with S8''s reach, W3-P28]'
   - 'A sandboxed session''s search that the shared service does not answer (W2-145: the order kept, named unavailable, one FALLBACK line, unranked) is counted where the service''s other FALLBACK lines are, so `gov status` shows it (today a sandboxed session cannot write that log and it shows 0); the sandbox''s write list widens by at most that one log file, named in the CIT-E, or the CIT-E shows another way [W2-112 review round 1, F3; the CTO as moderator, DEC-1010; W2-145] [moved from W2-127 S4, DEC-1083] [changed, DEC-1097 (8)]'
   - 'Signals reach the session''s process group, and temporary folders are removed on every ending [W2-M187, W2-M095, W2-L105]. [moved from W2-21 S5, DEC-1083]'
   - 'Launched sessions can run gov check and their own suite inside the sandbox; gov rebuild inside the sandbox (it writes .gov-runtime/rebuild/ and codeintel/, which S2''s literal deny rules keep read-only, DEC-180) is a Wave 3 row with set-up B [W2-M275, W2-M094, W2-M097, W2-M181]. [moved from W2-21 S6, DEC-1083] [changed, DEC-1112 (3): the engineer''s P-1 (b)]'
@@ -168,3 +168,18 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-56; DEC-799), widened by the accepted pl
   a time (emergency mode). The S7 real case is intermittent until then (red once, green twice outside the sandbox).
 - **Outside the sandbox on `466e279fb`:** `gov accept W2-56` with the real cases 260/0/0; `gov accept W1-20` 35/35;
   W1-27's W2-67 cases and `test_w2_20_round3.py` 41/41.
+
+**READY, not merged (the CTO, 2026-11-09):** `w2/W2-56` at `befa57695` (the engineer's round 2 `466e279fb`, integrate
+merged in; tests `w2/W2-56-tests` `85b28ef0f`). The review, round 1: READY by `verdict.py` (`reviews/w2-56.md`), every
+line pass, six findings for rows: R1 (the main repository's `.claude/settings.local.json` reaches worktree sessions:
+W2-60a's), R2 (the placeholder exclude lines repo-wide), R3 (a killed test run's `/tmp/gov-cbm-<uid>-XXXX` outside the
+weekly sweep), R4 (`sandbox.faults` does not check `allowWrite`'s or `allowedDomains`' contents), R5 (a lead no longer
+inherits `GOV_STORE`, `TERM`, `TMPDIR`), R6 (the CLI's `config.lock` placeholder on the host: P-S7). Outside the
+sandbox: `gov accept W2-56` with the real cases 260/0/0 (on `466e279fb`), 256/0/4 without them on `befa57695`;
+W1-20 35/35; W1-16 44/44 (representative rows); W1-27's W2-67 cases revised (D-2) and green. **Open before the close:**
+D-13's DEC-105 choice for the owner (S8's reach and S10 on Linux: a one-path socket allow is inert there); S10 then.
+
+**The owner's choice (DEC-1114 (1), 2026-11-09):** (b). S8's reach and S10 deferred to Wave 3 as a ticket (W3-P28);
+S8's one-path form stays built, inert on Linux; a sandboxed search stays unranked, named and counted (S11); S9 and F4
+unchanged. The rest merged now. **Before the close (delegated, DEC-1112 (3)):** R3 and R5 as follow-ups, tests first;
+R1 to W2-60a; R2 and R4 rows for the close review; R6 is W3-P29.

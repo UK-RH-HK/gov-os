@@ -32,6 +32,7 @@ kpis:
   - 'W2-61''s 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3]'
   - 'The backfill proposal stays current by a mechanism: the proposer gains an append mode that adds the rows of register entries the file lacks, in register order, and never rewrites an existing row; the orchestrator''s decision-recording tool runs it in the same commit as each new entry; the backfill''s acceptance case reads the register as of the proposal file''s own commit, not the moving base [DEC-1028 item 2] [lifted, DEC-1083; left in place because the acceptance README maps its tests by number]'
   - '`gov context --in-force` prints the digest of the decisions in force (one line each, superseded and done ones left out), generated from the register, and the kernel''s session-start hook loads it with RESUME HERE where the project turns that on (the hook''s injection is the owner''s CIT-P question, DEC-952 item 5) [DEC-953 item 7, DEC-983, DEC-982]'
+  - 'S9 One relation check (D-6 part 2 item F2; LINK-INTEGRITY §7; DEC-1109 (2)): an entry that supersedes or changes another whose status line does not name it is reported by gov links alone (W2-129''s UNMARKED_CHANGE, read through the loader''s register_statements); gov.decisions.tags.check_tags no longer gives STATUS_RELATION_UNMARKED, and its other codes (TAG_*, STATUS_SUCCESSOR_UNNAMED) are unchanged. Verify: the W2-55 cases that asked for STATUS_RELATION_UNMARKED are revised to its absence, and W2-129''s UNMARKED_CHANGE cases still pass [DEC-1109 (2), DEC-1073 (5)(b)]'
   failure:
   - An entry with no domain, status or scope fails the decisions validator, naming it.
   - A superseded entry that still reaches an agent's context fails a test.
@@ -39,6 +40,8 @@ kpis:
   - A backfill tag written to the register before the owner accepts it.
 profile: STANDARD
 sources:
+- DEC-1073
+- DEC-1109
 - DEC-791
 - DEC-825
 - DEC-866
@@ -70,3 +73,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-55), from P-W2-37 (owner, DEC-791 item 1
 **DEC-983 (the owner's order, SMART-WORK-1):** W2-55 runs before W2-115 (the smart close): its KPI 5 ("supersession propagates") finds the tests, code, skills and KPIs that still enforce a superseded or changed decision before the close is rebuilt on them. It also gives the digest of the decisions in force (its last success KPI).
 
 **D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: S1 (re-worded by DEC-1084 (2)), S3, S4 (built as `docs/research/W2-55-backfill.md`), F1, F2 and F4 (landed `e0cb7d13`); met in part: S5 (re-worded here per LINK-INTEGRITY §6.1; its second half is W2-130's clean-up), F3 (re-worded here per LINK-INTEGRITY §6.1), S6 (no measure recorded after the merge) and S8 (only `--in-force` built; the hook half is the owner's CIT-P); lifted: S2 and S7, left in place in `kpis.success` because the acceptance README maps its tests by line number. The CTO closes it at the lift (P1-13).
+
+**D-6 part 2 item F2 placed here (CTO, 2026-11-10; DEC-1109 (2)):** S9: `tags.py`'s narrower relation check is removed, now that `gov links` (W2-129, merged) reports the same relation from the one pattern source (LINK-INTEGRITY §7: "W2-55's duplicate relation check tidied"). Tests first (W2-55's designer revises its two relation cases), one engineer pass, one review; plan item F2 in `governance/project/orchestration/packages/LIFT-1/D6-PART2.md`.

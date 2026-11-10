@@ -188,3 +188,54 @@ marked on W2-128.
   - Rows kept: F7 (unfilled ticket keys in a brief), F8 (§C's size measure), F9 (tk's `deps:`), F10 (`waits_on` ids
     beyond tickets), F11 (other "until" spellings).
 - 2026-11-10: **W2-153 in progress**, its test designer launched (`w2/W2-153-tests`).
+- 2026-11-10: **W2-153 built**: `w2/W2-153` **`96e600d65`** (tests `0c73fd5a2cbe` and `2737423ba017`).
+  - The CTO's runs: `gov accept W2-153` 51/51, W2-128 92/92; `tests/unit/launch` and `tests/unit/adapters` 207
+    passed, 0 failed.
+  - Two delegated decisions (in the ticket): `skills` under `claudecode:`, because rulesync 24.0.0 drops a top-level
+    list; and the launcher unit tests' fixtures write the template copy.
+  - The branch's own launcher refused its fix worker for want of `.claude/templates/role-engineer.md`. That is S1
+    working, and the landing risk in one line. The CTO placed eight untracked byte copies in that worker tree only.
+  - Review launched.
+- **The landing order (the CTO's plan, for the merges):**
+  1. Merge W2-128 round 2a and W2-152.
+  2. Rebuild `ACT-CLAUDE-COPIES-1` on that integrate (about 19 files, `.claude/templates/` included), review it, get
+     the owner's yes, and the operator applies it. The copies are then committed, so every new worktree has them.
+  3. Then merge W2-153.
+  4. Then `ACT-CLAUDE-COPIES-2`, the same builder: the agents regenerated from W2-153's composed sources. Until then
+     the agents keep their old bodies, which is harmless.
+
+  Merging W2-153 before step 2 would refuse every `gov launch` until the ACT lands.
+- 2026-11-10: **W2-153 review READY by code** (`reviews/w2-153-r1.md`), **with three merge preconditions, not yet
+  met:**
+  - **R1:** about 110 cases in other suites start a launch in a fixture without the template copy: W2-20's unit
+    tests (36), and the acceptance cases of W2-20, W2-54, W2-136, W1-28, W1-32, W1-46, W2-58 and W1-50 (75). Their
+    fixtures must plant `.claude/templates/<stem>.md`. The unit files go to W2-153's engineer (paths widened); the
+    acceptance support files go to a test designer under DEC-866 (`Rewrite-Reason:`).
+  - **R2:** the ACT builder must accept `TEMPLATE_COPY_MISSING` and the composed roles' findings before the
+    post-W2-153 run (the CTO's tool).
+  - **R3:** at the merge, every live worktree merges integrate before leads resume or `gov` is re-pinned. W2-153's
+    own tree first drops the CTO's untracked copies.
+  The landing order above stands: ACT-1, then W2-153 with R1 done, then ACT-2.
+
+## State at 2026-11-10 04:50 (for the CTO)
+| item | state | head |
+|---|---|---|
+| W2-128 round 2a (TPL-6 S3, S4's kernel half, F6/F7, the checkpoint example) | READY, not merged | `w2/W2-128` `5c494e255960` |
+| W2-152 `gov brief`, the ready check (TPL-3, TPL-2 S3, TPL-5 S3, DEC-1088 (3)) | READY, not merged (review round 2) | `w2/W2-152` `09fc68645` |
+| W2-153 delivery (TPL-4) | READY by code; merge after R1 to R3 and ACT-1 | `w2/W2-153` `96e600d65` |
+| W2-128 round 2b (round 2a's F1 to F4) | not started | — |
+| TPL-7 measures, TPL-8 pilot | not started (TPL-8 after W2-153 lands) | — |
+| Owner: templates' approval, ACT-CLAUDE-COPIES-1, Appendix A | prepared, not applied; ACT rebuilt after round 2a merges, then its G4 review | — |
+- 2026-11-09 23:20 UTC (git time; the earlier log lines dated 11-10 ran 2-3 h ahead): **ACT-CLAUDE-COPIES-1 ready for the
+  owner's yes.**
+  - Rebuilt on integrate `b0bbd373` (rounds 1 and 2a and W2-152 merged), with the builder fixed for review R2:
+    composed-role findings, the template-copy codes, and a clear stop on anything else.
+  - 19 files, manifest `5d3a18832b9b`, class (b).
+  - Rehearsed twice with a planted HOME, 0 failures each: the bundle's own run, and §5 literally with its commits and
+    undo.
+  - The operator's `validate_manifest`, `act_class` (b) and `path_rule` pass.
+  - The independent review under the operator's fixed reviewer brief: all six checks pass, READY by the pinned
+    `verdict.py` (`acts/ACT-CLAUDE-COPIES-1/review.md`).
+  - The message is in `../ACT-CLAUDE-COPIES-1.md` §5.
+  - Next, unchanged: W2-153's R1 (the fixtures), W2-128 round 2b, the link notices (item 4); W2-153 unmerged until
+    ACT-1 is applied, then the worktrees merge integrate (R3).

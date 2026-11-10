@@ -2,7 +2,7 @@
 (``W2-15a``) and still refuses any other form. Its one definition is
 ``template/governance/kernel/schemas/common.schema.json``.
 
-The KPI line lists ``W2-15`` among the refused forms. DEC-730's own grammar (``^W[0-9]+-[0-9]{2,}[a-z]?$``)
+The KPI line lists the plain two-digit form (``W2-15a`` without its letter) among the refused forms. DEC-730's own grammar (``^W[0-9]+-[0-9]{2,}[a-z]?$``)
 accepts it, every ticket's ``wbs_id`` here has that form, and W1-08's acceptance test holds ``W1-08`` as a real
 id. That form is package P-1 and no case here holds it either way; see the README.
 

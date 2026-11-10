@@ -4,6 +4,10 @@ Every entry has a domain from the closed list, a scope, a lands-in tag naming a 
 says, and a status that names what superseded or changed it; ``gov.decisions.check_tags(root)`` and
 ``python3 -m gov.decisions.tags`` name each entry that has not. W2-03's ``gov.decisions.check(root)`` keeps its own
 codes.
+
+S9 (DEC-1109 (2)): an entry another supersedes or changes whose status line does not name it is reported by
+``gov links`` alone (W2-129's UNMARKED_CHANGE); ``check_tags`` no longer gives STATUS_RELATION_UNMARKED, and its
+other codes are unchanged.
 """
 
 from __future__ import annotations
@@ -130,22 +134,81 @@ def test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_nam
     assert_found(found, "STATUS_SUCCESSOR_UNNAMED", "DEC-113")
 
 
-def test_an_entry_another_supersedes_whose_status_does_not_name_it_is_named_old_first(api, tmp_path):
-    text = register_text(DEC_113={"status": "ACCEPTED · **Basis:** OWNER", "tags_line": s.tags("guard", "kernel", K)})
-    _, found = check(api, tmp_path, text)
-    hits = s.naming(found, "STATUS_RELATION_UNMARKED", "DEC-113")
-    assert hits and all(f["ids"][:2] == ["DEC-113", "DEC-114"] for f in hits), \
-        f"no STATUS_RELATION_UNMARKED finding with ids [DEC-113, DEC-114]:\n{s.show(found)}"
+# S9 (DEC-1109 (2)): an entry another supersedes or changes, whose status line does not name it, is reported by
+# `gov links` alone (W2-129's UNMARKED_CHANGE, from the loader's register_statements); check_tags reports nothing for
+# it, and its other codes stay as they were.
+
+def unmarked_supersession():
+    """DEC-114 supersedes DEC-113; DEC-113's status line does not name it (and DEC-113 is tagged as in force)."""
+    return {"DEC_113": {"status": "ACCEPTED · **Basis:** OWNER", "tags_line": s.tags("guard", "kernel", K)}}
+
+
+def unmarked_change(field):
+    """DEC-116 changes DEC-115 by ``**<field>:**``; DEC-115's status line does not name it."""
+    return {"DEC_115": {"status": "ACCEPTED · **Basis:** OWNER"},
+            "DEC_116": {"status": f"ACCEPTED · **Basis:** OWNER · **{field}:** DEC-115"}}
+
+
+def test_an_entry_another_supersedes_whose_status_does_not_name_it_is_left_to_gov_links(api, tmp_path):
+    _, found = check(api, tmp_path, register_text(**unmarked_supersession()))
+    assert not s.naming(found, "STATUS_RELATION_UNMARKED"), \
+        f"check_tags still reports the unmarked relation (S9: gov links alone reports it):\n{s.show(found)}"
+    assert found == [], f"check_tags reports the unmarked supersession under another code:\n{s.show(found)}"
 
 
 @pytest.mark.parametrize("field", ["Changes", "Settles", "Corrects", "Reverses", "Withdraws"])
-def test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first(api, tmp_path, field):
-    text = register_text(DEC_115={"status": "ACCEPTED · **Basis:** OWNER"},
-                         DEC_116={"status": f"ACCEPTED · **Basis:** OWNER · **{field}:** DEC-115"})
-    _, found = check(api, tmp_path, text)
-    hits = s.naming(found, "STATUS_RELATION_UNMARKED", "DEC-115")
-    assert hits and all(f["ids"][:2] == ["DEC-115", "DEC-116"] for f in hits), \
-        f"no STATUS_RELATION_UNMARKED finding with ids [DEC-115, DEC-116] for **{field}:**:\n{s.show(found)}"
+def test_an_entry_another_changes_whose_status_does_not_name_it_is_left_to_gov_links(api, tmp_path, field):
+    _, found = check(api, tmp_path, register_text(**unmarked_change(field)))
+    assert not s.naming(found, "STATUS_RELATION_UNMARKED"), \
+        f"check_tags still reports the unmarked **{field}:** relation (S9: gov links alone reports it):\n" \
+        f"{s.show(found)}"
+    assert found == [], f"check_tags reports the unmarked **{field}:** relation under another code:\n{s.show(found)}"
+
+
+# The other codes, planted beside the unmarked relation: each still names its entry, and nothing else is found.
+OTHER_DEFECTS = {
+    "DEC_103": {"tags_line": None},                                               # TAG_MISSING
+    "DEC_105": {"tags_line": s.tags("security", "kernel", K)},                    # TAG_DOMAIN_UNKNOWN
+    "DEC_106": {"tags_line": s.tags("context", "global", P)},                     # TAG_SCOPE_UNKNOWN
+    "DEC_107": {"tags_line": s.tags("launch", "kernel",
+                                    "template/governance/kernel/skills/nowhere/SKILL.md")},  # TAG_LANDS_IN_UNKNOWN
+    "DEC_108": {"tags_line": s.tags("plan", "kernel", P)},                        # TAG_LANDS_IN_MISPLACED
+    "DEC_117": {"status": "SUPERSEDED · **Basis:** OWNER"},                       # STATUS_SUCCESSOR_UNNAMED
+}
+OTHER_FOUND = {("TAG_MISSING", "DEC-103"), ("TAG_DOMAIN_UNKNOWN", "DEC-105"), ("TAG_SCOPE_UNKNOWN", "DEC-106"),
+               ("TAG_LANDS_IN_UNKNOWN", "DEC-107"), ("TAG_LANDS_IN_MISPLACED", "DEC-108"),
+               ("STATUS_SUCCESSOR_UNNAMED", "DEC-117")}
+
+
+@pytest.mark.parametrize("relation", ["supersedes", "changes"])
+def test_the_other_codes_are_unchanged_beside_an_unmarked_relation(api, tmp_path, relation):
+    planted = unmarked_supersession() if relation == "supersedes" else unmarked_change("Changes")
+    _, found = check(api, tmp_path, register_text(**OTHER_DEFECTS, **planted))
+    rest = [f for f in found if f["code"] != "STATUS_RELATION_UNMARKED"]
+    for code, entry_id in sorted(OTHER_FOUND):
+        assert s.naming(rest, code, entry_id), f"no {code} finding names {entry_id}:\n{s.show(found)}"
+    for finding in rest:
+        assert any(finding["code"] == code and entry_id in finding["ids"] for code, entry_id in OTHER_FOUND), \
+            f"a finding the planted defects do not explain:\n{s.show([finding])}"
+        assert s.REGISTER in finding["paths"], f"a finding does not name the register:\n{s.show([finding])}"
+
+
+# The relation is still reported, by one tool: `gov links --all --json` names the pair, old entry first. `Settles`
+# is left out here: the loader's register_statements classes it as "settle", which gov links does not count as a
+# change (its CHANGE_CLASSES are supersede and amend).
+@pytest.mark.parametrize("field", ["Supersedes", "Changes", "Corrects", "Reverses", "Withdraws"])
+def test_gov_links_reports_the_unmarked_relation_old_first(api, tmp_path, field):
+    if field == "Supersedes":
+        planted, old, new = unmarked_supersession(), "DEC-113", "DEC-114"
+    else:
+        planted, old, new = unmarked_change(field), "DEC-115", "DEC-116"
+    project = s.build_project(tmp_path / "repo", register_text(**planted))
+    answer = api.gov(project.root, "links", "--all")
+    found = answer.result.get("findings")
+    assert isinstance(found, list), f"gov links' result has no list of findings\n{answer.describe()}"
+    hits = [f for f in found if f.get("code") == "UNMARKED_CHANGE" and f.get("ids", [])[:2] == [old, new]]
+    assert hits, f"gov links reports no UNMARKED_CHANGE with ids [{old}, {new}] for **{field}:**\n{answer.describe()}"
+    assert all(f.get("path") == s.REGISTER for f in hits), f"the finding does not name the register\n{answer.describe()}"
 
 
 # --------------------------------------------------------------------------

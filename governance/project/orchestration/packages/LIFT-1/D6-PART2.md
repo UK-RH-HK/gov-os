@@ -61,3 +61,30 @@ Rows:
   UNKNOWN_ID left in the tests. For each ENFORCES_SUPERSEDED it decides between history (a Kept list for the
   register, the CTO's), an old citation of a current rule (re-cited), or a real finding (reported).
 - **F2 waits:** it starts when W2-150 merges (both touch `decisions/`).
+
+**State 11-10 01:20:**
+- **F is READY:** `w2/D6-F-tests`, head `2761682a2`. It changes comments, docstrings and READMEs in 53 acceptance
+  files; the AST shows no code change. The test designer's findings go from ENFORCES_SUPERSEDED 45 and UNKNOWN_ID 60 to
+  8 and 0. Its review is READY.
+  - W2-07's Kept lines are on DEC-876 (`6c8a24fc`), so 4 of those 8 are already gone on `w2/integrate`.
+  - **The rows:**
+    - F1/F2: three stale "wholly on the CPU (DEC-798)" comments (W1-19, W1-21, W1-22 support) and W2-108's README
+      line;
+    - three findings in `tests/unit` with no owner;
+    - the W2-54 `shared_gpu` case still asserts the CPU, against DEC-1033 (2)(b); a designer revision on D-10's list.
+- **F2 waits** for W2-150's merge.
+- **F3: none.**
+
+**State 11-09 23:30 (machine clock):**
+- **F2 is READY in two branches that merge together:**
+  - `w2/W2-55-f2`, head `2fe928a4c`: W2-55 S9 removes `tags.py`'s `STATUS_RELATION_UNMARKED`. Accept 55/3; the 3 are
+    the base's backfill reds.
+  - `w2/W2-129-f2`, head `c031faba0`: W2-129 S18 makes a `**Settles:**` label a change for UNMARKED_CHANGE. Accept
+    156/0; `--all` 1,404 → 1,405, adding DEC-026 ← DEC-086.
+- **The reviews:** round 1 found F1, blocking (an unmarked Settles was left unreported once the old check went).
+  Round 2 is READY. Its rows: R2-F1, a PROPOSED changer gives no finding (by design); R2-F2, a status line naming the
+  changer anywhere counts as marked (Wave 3 row).
+- **Out-of-date text naming `STATUS_RELATION_UNMARKED`:** W2-129's ticket and LINK-INTEGRITY. Rows.
+- **D-6 part 2 is complete** once those two branches merge.
+
+**Done 11-09 (the CTO):** F2 merged as a pair: `757cf3109` (W2-129 S18) then `336828354` (W2-55 S9). On integrate: `gov accept W2-129` 156/0; `gov accept W2-55` 55 passed, 3 failed (the three `test_w2_55_backfill.py` base reds above, on D-10's list). D-6 part 2 is complete. Row for Wave 3: `gov links` counts an entry as marked if its status line names the changer anywhere.

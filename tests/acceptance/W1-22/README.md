@@ -173,3 +173,5 @@ Cases: 24 in the full run, 1 in `breadth`, 0 in `lifted`.
 | S2: Each index has canaries run after reindex and in doctor; a canary miss sets FACET_UNAVAILABLE [CAP-17.c, CAP-55.a] | `test_w1_22_canaries.py::TestCanaryMiss::test_empty_project_canaries_fail_as_facet_unavailable`, `test_w1_22_canaries.py::TestCanaryMiss::test_deleted_store_canaries_fail_as_facet_unavailable` | the ticket's words |
 | F1: A bundle with an unresolvable citation passes | `test_w1_22_validator.py::TestF1::test_an_unresolvable_citation_does_not_pass` | the ticket's words |
 | F2: An empty index answers NOT_FOUND as absence | `test_w1_22_canaries.py::TestF2::test_empty_index_never_reports_not_found` | the ticket's words |
+
+**Citations (DEC-1109 (2), 2026-11-09):** `w1_22_support.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the `/api/ps` comment beside `Rewrite-Reason: W2-32's S10` keeps DEC-798 as the record of that rewrite; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

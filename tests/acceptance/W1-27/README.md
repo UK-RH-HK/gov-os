@@ -700,3 +700,5 @@ Inventory row M5 (DEC-1040 (1), applied at the cut): `test_w1_27_path_compliance
 `test_stale_path_in_live_document_not_sources_is_reported` and `test_stale_path_in_src_gov_cli_is_reported`
 are folded into `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` (one doctor run, the
 three planted paths); the older tables above that name them read as that case.
+
+**Citations (DEC-1109 (2), 2026-11-09):** `test_w1_27_rebuild_r8_no_embeddings.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

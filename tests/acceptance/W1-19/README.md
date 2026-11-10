@@ -567,3 +567,5 @@ Cases: 31 in the full run, 10 in `breadth`, 0 in `lifted`.
 Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061): memory
 is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32. It is applied
 after D-4b's measure 3; until then the hit@5 rows above judge against 80.
+
+**Citations (DEC-1109 (2), 2026-11-09):** `Api.scratch_env`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the `/api/ps` comment beside `Rewrite-Reason: W2-32's S10` keeps DEC-798 as the record of that rewrite; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

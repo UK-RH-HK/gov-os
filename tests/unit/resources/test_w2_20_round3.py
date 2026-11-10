@@ -17,6 +17,7 @@ import datetime
 import fcntl
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -82,10 +83,11 @@ def test_f1_launches_started_together_admit_only_those_the_memory_rule_admits(pl
     planted.memory(available=9 * GIB)  # 9 + the stand-ins' few MiB: n=2 needs 9 (opens), n=3 needs 11 (shuts)
     marks = planted.root / "marks"
     marks.mkdir()
-    monkeypatch.setenv("MARKS", str(marks))
     cli = planted.home / launcher.CLI_REL
     cli.parent.mkdir(parents=True)
-    cli.write_text(STAND_IN_CLI)
+    # The folder is written into the stand-in: the launcher passes the CLI a cleaned environment (W2-56 S5), so a
+    # variable of this process's would not reach it.
+    cli.write_text(STAND_IN_CLI.replace("#!/bin/sh\n", f"#!/bin/sh\nMARKS={shlex.quote(str(marks))}\n", 1))
     cli.chmod(0o755)
     real_check = launch_gate.check_start
 

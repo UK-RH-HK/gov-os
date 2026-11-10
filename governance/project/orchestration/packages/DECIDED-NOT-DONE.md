@@ -50,7 +50,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|---|
 | 28 | the sandbox experiment's seal | (1) Q6: a path-map entry sealing the held-out halves, an ACT for the operator | DONE 11-09: applied inside ACT-INDEP-WALLS-1 (`147706ae`) |
 | 29 | the sandbox experiment run | (1) beside D-10; brake at twice the projection; both results to the owner before W2-56 builds | WAITS: the seal, the labellers, D-10's window |
-| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone | IN PROGRESS: the second half's tests and the engineer (the first half's 157 tests done) |
+| 30 | W2-56 | DEC-1112 (1): builds on the path-map guard alone; DEC-1114 (1): S8's reach and S10 to Wave 3 | IN PROGRESS: READY 11-09 (`befa57695`, accept 260/0/0, review READY round 1); merged on DEC-1114 (row 79); next: R3 and R5 follow-ups, then the close at the lift |
 | 31 | W2-88's lines and paths | (2) S10-S17 and three failure lines into W2-88 (marked DEC-1099), the set tools and the practice record in its allowed paths; EXAMIN's copy the first full run | **DONE 11-09** (`663fa278`, `e0811c67`; W2-88 waits on W2-145 once the W2-137 cycle was broken) |
 | 32 | the nonexistent-id ticket | (2)(6) filed now, tests first | **Filed 11-09**: W2-146 `DAEO-f6x3` (`cbbe9733`); next: its test designer |
 | 33 | W2-82 after W2-27 | (3) its order changed (marked DEC-1099) | **DONE 11-09** (`75b88b22`; gov plan: W2-27 batch 14, W2-82 batch 15) |
@@ -102,15 +102,15 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|
 | 62 | ACT-OPERATOR-1: the operator brief's change, hashes and APPROVED rebuilt, the affected cases re-run, a new message | **DONE 11-09** (`0240833b`, `5f7641e6`); applied `2a646265` |
 | 63 | W2-139 and W2-140, one batch, before D-10 | **MERGED 11-09** (one batch; accept 160/160; review READY); close at the lift; the queue run sets GOV_TESTS_OPTIN=breadth,lifted |
-| 64 | D-5 (the templates) | IN PROGRESS: W2-128 round 1 merged 11-09 (`c6aefae9`, accept 92/92, review READY; the lead brief pointed at the role templates); next: round 2 (TPL-4, TPL-6, review F6-F8); WAITS: the owner on the templates' approval, the `.claude/` copies ACT and TPL-6's Appendix A |
-| 65 | D-6 part 2 (with its rows) | IN PROGRESS: A-D merged 11-09 (W2-129 S17, W2-92 S11, W2-151 MR records, W2-141 S4; gov links 1,502 standing); next: W2-150 with its follow-up (the copies removed) merged together, then F, F2, F3; four base reds onto D-10's list |
+| 64 | D-5 (the templates) | IN PROGRESS: W2-128 rounds 1 and 2a and W2-152 merged 11-09 (`010ecbc53`, `b0bbd373f`); ACT-CLAUDE-COPIES-1 READY (manifest `5d3a18832b9b`, class (b), review READY); WAITS: the owner's yes on it and on TPL-6's Appendix A; next: W2-153's R1 fixtures, W2-128 round 2b, the link notices; then TEMPLATES-APPROVAL-1 refreshed to that commit for one approval (only `checkpoint.md` moved since its table); then W2-153's merge and ACT-CLAUDE-COPIES-2 |
+| 65 | D-6 part 2 (with its rows) | **MERGED 11-09**: A-F, then F2 (`757cf3109` W2-129 S18, `336828354` W2-55 S9, merged together; accept W2-129 156/0, W2-55 55 with the 3 backfill base reds on D-10's list); D-6 part 2 complete; a Wave 3 row: gov links counts an entry marked if its status line names the changer anywhere |
 | 66 | the sandbox experiment | DEC-1112 (1): set-up A fully beside D-10; set-up B a Wave 3 row | WAITS: W2-149 (the launch script) and the labeller briefs' approval; then set-up A's corpus, labels, tuning and held-out run beside D-10 |
 | 67 | the launch script for the independent sessions, tests first | **MERGED 11-09** W2-149 (`b4de529b`, accept 77/77, review READY round 2) |
-| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | IN PROGRESS: rehearsed (0 failures; class (b), the hook changes too); next: runs/*/misses.jsonl added (delegated) and re-rehearsed, then the owner's yes and the operator |
-| 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | NOT STARTED: next after ACT-SETS-GLOBS-1 |
-| 77 | W2-149's F11 follow-up | the launch script passes `--setting-sources project` (defence in depth: the user's allow-all settings never load into a wall; delegated; S10's wording marked DEC-1088 (6)), tests first | NOT STARTED |
-| 78 | W2-141's hook rebuilt on the new hook | its staged change (docs/changes/W2-141-hook/) rebuilt on top of ACT-SETS-GLOBS-1's hook before the lift's re-pin ACT | WAITS: ACT-SETS-GLOBS-1 applied |
-| 76 | ACT-OPERATOR-2 | the operator agent re-installed to carry the replay check (`a170641e`) | NOT STARTED |
+| 74 | ACT-SETS-GLOBS-1 | the hidden globs for a new set's hidden/, the checker's notes, an audit's miss classes (W2-149's F2; delegated tightening); F11 judged | **APPLIED 11-09** by the owner's operator (`9cce7430d`; hook 74f8dbea4761, map 44f99ea563cb; check 8 → 12 ms); the live check cases PASS (385 run, 0 failed; R skipped, planted only); next: the helpers merge integrate into their worktrees at a safe point |
+| 75 | W2-149's install ACT | the launch script installed with its approved list (the five set-up A briefs, the operator's two) | IN PROGRESS 11-09 (helper of `ad44f5fe`): drafting `drafts/w2-149-install/`, built after ACT-SETS-GLOBS-1 and the F11 merge; **found: the five approved briefs cannot launch through the merged script** (no `model`/`result_schema` in any front matter, no `sample` in the labellers' and the auditor's: refusal 10; the labellers' two rounds, the overlap auditor's inputs and the deliveries' names are unbuilt, sandbox-exp README "none of it is built"); next: a W2-149 follow-up for set-up A's wiring, tests first (the CTO's to open), then this ACT rebuilt if the template changes; next: the package's review |
+| 77 | W2-149's F11 follow-up | the launch script passes `--setting-sources project` (defence in depth: the user's allow-all settings never load into a wall; delegated; S10's wording marked `[changed, DEC-1112 (3): F11]`, `5f8c85733`), tests first | **MERGED 11-09** in `ff1865184` (case `8bb4d9726`, change `b61815b72`; accept 78/0/3, live S9/S11/S12 3 passed at `99cdce97a`; narrow review READY, `reviews/W2-149-review-f11.md`); rows F16 (`--restricted` already ignores the user, project and local settings files per Claude Code 2.1.318's help: the flag is a second guard; the records' stated reason corrected when next touched) and F17 (the stub does not model `--restricted`'s settings rule), in the ticket `712ba8072` |
+| 78 | W2-141's hook rebuilt on the new hook | its staged change (docs/changes/W2-141-hook/) rebuilt on top of ACT-SETS-GLOBS-1's hook before the lift's re-pin ACT | IN PROGRESS: a helper rebuilding and re-checking it (11-10) |
+| 76 | ACT-OPERATOR-2 | the operator agent re-installed to carry the replay check (`a170641e`) | IN PROGRESS 11-09: drafts `drafts/operator-2/` (two install files, the settings' `calls`, APPROVED `157a9dc0` → `b4a15c8f`); next: the rehearsal, one review, the package; WAITS: the call log's 48 h (about 11-11 18:16Z) before a path-map ACT goes through the agent |
 | 68 | the replay set builder (DEC-1108 (2)) | IN PROGRESS: merged 11-09 (`a170641e`); next: ACT-OPERATOR-2 re-installs the agent to carry it; WAITS: the call log's 48 h of history (about 11-11 18:16Z) before path-map ACTs go through the agent |
 | 69 | D-10's red-fix list ready (W1-06, test_fusion, the three red-by-design cases) | **READY 11-09**: W1-06 on `w2/W2-130-d10-tests` (reviewed `284125776f04`, head `6ebe0b577f40`), test_fusion on `w2/W2-137-d10` (reviewed `a13fe809d802`, head `96e599ab9227`), both reviews READY, not merged; the three cases to the owner (`LIFT-1/D10-REDS.md`: keep report-only) |
 
@@ -121,6 +121,21 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | **APPLIED 11-09** (`115be191`; review READY round 2); live at the fresh session's start |
 | 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
 | 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
+
+## 0j. DEC-1114's items (2026-11-09)
+| # | item | state |
+|---|---|---|
+| 79 | W2-56 merged without S8's reach and S10 | **MERGED 11-09** in `cf23e9f8d` (that commit's subject is W2-153's review: a helper's commit took the CTO's staged merge); checked after on integrate: `gov accept W2-56` 256/0/4 (the real cases skip without the opt-in), launch units 182/182 |
+| 80 | W3-P28: ranked search for sandboxed workers without opening every Unix socket | DONE (parked) 11-09: `docs/plan/WAVE_3_PARKING.md` W3-P28; a ticket in Wave 3 |
+| 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3, R5 follow-ups before the close, tests first (NOT STARTED); R1 to W2-60a's rows (NOT STARTED); R2, R4 rows for the close review; R6 parked as W3-P29 (DONE) |
+| 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | **DONE 11-09**: `packages/FORECAST-W2-2.md`, sent to the owner |
+
+## 0k. DEC-1115's items (2026-11-09; item 4 standing until the lift)
+| # | item | state |
+|---|---|---|
+| 83 | ACT-CLAUDE-COPIES-1 by the operator agent, its first live run | IN PROGRESS: the owner's yes typed in the agent's form (11-10 00:0x); queued 00:03Z (`queue/ACT-CLAUDE-COPIES-1.req`); next: the agent's run; on a refusal the CTO tells the owner why and the operator applies §5 by hand |
+| 84 | TPL-6's Appendix A cut to the pointer | **DONE 11-09** (this commit) |
+| 85 | past 80 % of the week's usage before the lift, only the lift's critical path runs | STANDING until the lift (rule 6); usage 33 % at 22:41 11-09 |
 
 ## 1. Every item not done, partly done or waiting
 

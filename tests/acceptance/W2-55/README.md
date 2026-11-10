@@ -32,9 +32,15 @@ specification of this run (S1 to S6: the tags line, the check functions and thei
 
 ## KPI lines and their tests
 
-| KPI line | Tests | Red at the base because |
+The table below is the first run's description (its KPI numbers are the first run's, not the ticket's `S`/`F`
+lines); `gov accept` reads only the map in "KPI map after D-4's cut" below. Its column is headed "Cases", not
+"Tests", so that the runner does not take it for a map (its rows with an empty KPI cell made `gov accept` refuse
+with `ACCEPT_MAP_UNREADABLE`), and the D-4 map's case column is headed "Tests: …" so that the runner reads it (headed
+"case(s) …", it was no map to the runner; DEC-1109 (2)).
+
+| KPI line | Cases | Red at the base because |
 |---|---|---|
-| **KPI 1, failure 1**: every entry has a domain of the closed list, a status naming what superseded or changed it, a scope; the validator checks all three, naming the entry | `test_w2_55_tags.py`: `test_a_fully_tagged_register_passes` (all eleven domains, both scopes), `test_the_tags_command_exits_0_…`, `test_the_tags_command_exits_1_and_names_the_entry`, `test_an_entry_without_a_tags_line_is_named`, `test_a_tags_line_without_a_part_is_named_with_the_part[domain, scope, lands in]`, `test_a_domain_outside_the_closed_list_is_refused`, `test_a_scope_outside_the_two_is_refused`, `test_a_superseded_entry_naming_no_successor_is_named`, `test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_named`, `test_an_entry_another_supersedes_…_old_first`, `test_an_entry_another_changes_…_old_first[Changes, Settles, Corrects, Reverses, Withdraws]` | `gov.decisions.check_tags` does not exist ("cannot be imported"); `python3 -m gov.decisions.tags` is no module (exit 1 without naming the entry) |
+| **KPI 1, failure 1**: every entry has a domain of the closed list, a status naming what superseded or changed it, a scope; the validator checks all three, naming the entry | `test_w2_55_tags.py`: `test_a_fully_tagged_register_passes` (all eleven domains, both scopes), `test_the_tags_command_exits_0_…`, `test_the_tags_command_exits_1_and_names_the_entry`, `test_an_entry_without_a_tags_line_is_named`, `test_a_tags_line_without_a_part_is_named_with_the_part[domain, scope, lands in]`, `test_a_domain_outside_the_closed_list_is_refused`, `test_a_scope_outside_the_two_is_refused`, `test_a_superseded_entry_naming_no_successor_is_named`, `test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_named`; the two relation cases asked for `STATUS_RELATION_UNMARKED` until S9, which revised them (below) | `gov.decisions.check_tags` does not exist ("cannot be imported"); `python3 -m gov.decisions.tags` is no module (exit 1 without naming the entry) |
 | | `test_w2_03s_check_keeps_its_own_codes` | **green at the base by design**: a guard that W2-03's `check(root)` does not take the register checks into its list (S2) |
 | **KPI 2**: a lands-in tag, checked | `test_w2_55_tags.py`: `test_a_place_head_does_not_hold_is_named`, `test_a_place_only_in_the_working_tree_is_not_held_by_head`, `test_a_place_outside_where_its_scope_says_is_named[kernel, repository]`, `test_none_on_an_entry_in_force_is_named`, `test_none_on_a_done_or_superseded_entry_is_no_finding`; an entry with two places is in the fully tagged register (DEC-112) | `gov.decisions.check_tags` does not exist |
 | **KPI 3, failure 2**: `gov context` and `gov retrieve` leave out superseded and done entries and say how many; Lens B's Q05 no longer happens | `test_w2_55_left_out.py`: `test_retrieve_leaves_out_superseded_and_done_entries` (superseded by status word and by another's `**Supersedes:**`, done by tag; a changed entry still served), `test_retrieve_says_how_many_it_left_out`, `test_lens_b_q05_serves_the_decision_in_force_and_no_superseded_one`, `test_context_leaves_out_superseded_and_done_entries_from_the_supplementary_context`, `test_context_says_how_many_it_left_out` | the bundle and the packet serve DEC-101, DEC-103 and DEC-106 and have no `left_out`; Q05 serves DEC-138, DEC-148 and DEC-149 unmarked (F4) |
@@ -59,6 +65,27 @@ planted as `PYTHONPATH=judged/src`). The places: W1-49's `test_w1_49_threshold.p
 two `TestCanaryRunner` cases (W2-59's three); the lead brief template teaching `LEAD_CHECKPOINT`; and, giving no
 finding, W1-26's `test_w1_26_dec436.py` (kept, with the sweep's reason) and a closed Wave 1 ticket.
 
+## S9: one relation check (D-6 part 2 item F2; DEC-1109 (2))
+
+Rewrite-Reason: DEC-1109 (2)
+
+S9 removes `check_tags`' narrower relation check: an entry that supersedes or changes another whose status line does
+not name it is reported by `gov links` alone (W2-129's `UNMARKED_CHANGE`, from the loader's `register_statements`).
+The two relation cases that asked for `STATUS_RELATION_UNMARKED` are revised and renamed; a guard and a `gov links`
+case are added (`test_w2_55_tags.py`):
+
+| Case | Expects | At `b2b59cafff0d` |
+|---|---|---|
+| `test_an_entry_another_supersedes_whose_status_does_not_name_it_is_left_to_gov_links` (was `…_is_named_old_first`) | `check_tags` gives no `STATUS_RELATION_UNMARKED`, and no finding at all, for DEC-114 superseding an unmarked DEC-113 | red |
+| `test_an_entry_another_changes_whose_status_does_not_name_it_is_left_to_gov_links[Changes, Settles, Corrects, Reverses, Withdraws]` (was `…_is_named_old_first`) | the same for DEC-116 changing an unmarked DEC-115 by each field | red (5 of 5) |
+| `test_the_other_codes_are_unchanged_beside_an_unmarked_relation[supersedes, changes]` | beside the unmarked relation, the six other codes (`TAG_MISSING`, `TAG_DOMAIN_UNKNOWN`, `TAG_SCOPE_UNKNOWN`, `TAG_LANDS_IN_UNKNOWN`, `TAG_LANDS_IN_MISPLACED`, `STATUS_SUCCESSOR_UNNAMED`) each name their planted entry, and nothing else is found (`STATUS_RELATION_UNMARKED` set aside) | green by design |
+| `test_gov_links_reports_the_unmarked_relation_old_first[Supersedes, Changes, Corrects, Reverses, Withdraws]` | `gov links --all --json` on the planted repository reports `UNMARKED_CHANGE` with ids `[old, new]` in the register | green by design (W2-129, merged) |
+
+`**Settles:**` is not in the `gov links` case: `register_statements` classes it as "settle", which `gov links` does
+not count as a change, so after S9 no tool reports an unmarked settlement (named to the CTO in the designer's return).
+The breadth cut (`tests/optin-lifted-breadth.txt`: one row per parametrised function of this file) runs the first row
+of each in the full run; `--optin=breadth` runs them all.
+
 ## Red result at the base (`84c1d4277b9c`)
 
 76 tests: 69 failed, 7 passed (the seven green by design above), no error. The failures, by reason:
@@ -77,7 +104,7 @@ switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=l
 
 Cases: 56 in the full run, 20 in `breadth`, 0 in `lifted`.
 
-| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+| KPI line | Tests: case(s) in the full run (rows in the full run of the function's rows) | placed by |
 |---|---|---|
 | S1: Every register entry has a domain from the closed list (guard, close, retrieval, context, adopt, launch, checks, plan, roles, records, release)... | `test_w2_55_tags.py::test_a_domain_outside_the_closed_list_is_refused`, `test_w2_55_tags.py::test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_named`, `test_w2_55_tags.py::test_a_superseded_entry_naming_no_successor_is_named` | the ticket's words |
 | S2: Every entry also has a "lands in" tag (the kernel file, the prompt or the project brief that states it), which the decisions validator checks [... | `test_w2_55_propagation.py::test_a_project_with_nothing_enforcing_an_old_decision_passes`, `test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line` (7 of 7), `test_w2_55_propagation.py::test_the_path_map_that_enforces_an_old_decision_is_found` | the ticket's words |
@@ -87,6 +114,7 @@ Cases: 56 in the full run, 20 in `breadth`, 0 in `lifted`.
 | S6: W2-61's 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3] | `test_w2_55_backfill.py::test_the_branch_changes_nothing_in_the_register_against_its_base` | the ticket's words |
 | S7: The backfill proposal stays current by a mechanism: the proposer gains an append mode that adds the rows of register entries the file lacks, in... | `test_w2_55_backfill.py::test_one_row_per_register_entry_at_the_base_in_its_order`, `test_w2_55_backfill.py::test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_successor` | the ticket's words |
 | S8: `gov context --in-force` prints the digest of the decisions in force (one line each, superseded and done ones left out), generated from the reg... | `test_w2_55_in_force.py::test_the_digest_is_generated_from_the_register_not_a_hand_made_file`, `test_w2_55_in_force.py::test_one_line_per_entry_in_force_in_register_order_beginning_with_its_id`, `test_w2_55_in_force.py::test_superseded_and_done_entries_are_left_out_with_their_count` | the ticket's words |
+| S9: One relation check: an entry that supersedes or changes another whose status line does not name it is reported by gov links alone (W2-129's UNMARKED_CHANGE)... | `test_w2_55_tags.py::test_an_entry_another_supersedes_whose_status_does_not_name_it_is_left_to_gov_links`, `test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_left_to_gov_links`, `test_w2_55_tags.py::test_the_other_codes_are_unchanged_beside_an_unmarked_relation`, `test_w2_55_tags.py::test_gov_links_reports_the_unmarked_relation_old_first` | the designer (S9, DEC-1109 (2)) |
 | F1: An entry with no domain, status or scope fails the decisions validator, naming it. | `test_w2_55_tags.py::test_a_superseded_entry_naming_no_successor_is_named`, `test_w2_55_tags.py::test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_named`, `test_w2_55_tags.py::test_the_tags_command_exits_1_and_names_the_entry` | the ticket's words |
 | F2: A superseded entry that still reaches an agent's context fails a test. | `test_w2_55_left_out.py::test_context_leaves_out_superseded_and_done_entries_from_the_supplementary_context`, `test_w2_55_backfill.py::test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_successor`, `test_w2_55_in_force.py::test_one_line_per_entry_in_force_in_register_order_beginning_with_its_id` | the ticket's words |
 | F3: A test or check that enforces a superseded decision with no recorded reason fails the new check, naming both decisions and the place. | `test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line` (7 of 7), `test_w2_55_propagation.py::test_the_path_map_that_enforces_an_old_decision_is_found`, `test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding` (1 of 8) | the ticket's words |
