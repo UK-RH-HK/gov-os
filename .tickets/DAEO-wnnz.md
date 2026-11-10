@@ -26,7 +26,7 @@ allowed_paths:
 - tests/unit/resources/test_w2_20_round3.py  # its stand-in CLI reads MARKS from the environment S5 now cleans: the value written into the stand-in (the engineer's P-2) [added, DEC-1112 (3)]
 - template/.rulesync/permissions.jsonc  # the rulesync source of S14's allow rule, so a regeneration keeps it (the engineer's P-3) [added, DEC-1112 (3)]
 - template/governance/kernel/settings.json  # S14's one allow rule, Bash(gov launch:*) (DEC-715), moved here from W2-21 S7 without its path [added, DEC-1083]
-- tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]
+- tests/conftest.py  # S1's one daemon folder per test session and the tool off PATH (the designer's D-1) [added, DEC-1099 (1)]; also the run folders' owner record and the next run's removal of a killed run's folders (review R3, a follow-up under S1) [widened, DEC-1112 (3)]
 kpis:
   success:
   - 'A suite that builds the code graph uses one daemon folder per test session (DAEMON_BASE, src/gov/codeintel/__init__.py:35), cleaned when the session ends, so no daemon folder is left behind; the real code-graph daemon runs only in W1-16 and W1-20, and on a change under `src/gov/codeintel/**` or to the tool''s pin, and elsewhere the tool is off PATH (T-8); inside a launched, sandboxed worker the session''s daemon folder is under its own temporary folder, and the suite runs there [DEC-799 item 1, DEC-1052, P1-PLAN T-8, INVESTIGATION-1 T-8] [re-scoped, DEC-1083]'
@@ -183,3 +183,22 @@ D-13's DEC-105 choice for the owner (S8's reach and S10 on Linux: a one-path soc
 S8's one-path form stays built, inert on Linux; a sandboxed search stays unranked, named and counted (S11); S9 and F4
 unchanged. The rest merged now. **Before the close (delegated, DEC-1112 (3)):** R3 and R5 as follow-ups, tests first;
 R1 to W2-60a; R2 and R4 rows for the close review; R6 is W3-P29.
+
+**The follow-ups R3 and R5 (the CTO's ticket lead, 2026-11-10; delegated, DEC-1112 (3), listed in the digest):**
+tests `w2/W2-56-f-tests` (`473e8ad82`), engineer `w2/W2-56-f` (`bf13ef74f`, integrate merged in `1d5adb177`).
+- **R5 (S5):** a lead (`gov launch orchestrator|lead`) gets the launcher's own `GOV_STORE` exactly as a worker does
+  (W2-116 S3: the main repository's `integration_store`, as written; an unusable setting refuses the lead), never the
+  parent's; `TERM` and `TMPDIR` are not passed (S5's list; `-p` sessions; DEC-743 item 7). Within S5's "the launcher's
+  own values" (the CIT-E §6 names `GOV_STORE`): no DEC-105 choice.
+- **R3 (S1), D-15 (a):** the run's daemon folder and each `gov-path-*` folder hold an owner record held with `flock`
+  for the run's life; the next run, at configure, removes those of a dead owner (the lock free, in any pid namespace:
+  each sandboxed command runs in its own), and those with no record only past 24 hours (DEC-902); links, files, other
+  users' folders, other names, the shared `/tmp/gov-cbm-<uid>` and `gov-launch-*` never.
+- **Runs, outside the sandbox on `1d5adb177`:** `gov accept W2-56` (declared form, `GOV_W2_56_REAL=1`) 292/4/0, every
+  R3 and R5 case green (the real-`/tmp` and `bwrap --unshare-pid` cases included); the 4 reds the real sandboxed
+  sessions under the relative `PYTHONPATH=src` (S13's session finds no `gov`) or the resource gate (S7's three
+  sessions); with an absolute `PYTHONPATH`, S2, S9 and S13 green, S7 refused by the gate. In the sandbox: 283/0/13.
+- **Review (narrow, round 1):** READY by `verdict.py` (`reviews/w2-56-f.md`); rows: F1 (the 0500 clean-up's chmod
+  pass could follow a link swapped in after its check: a deliberate construction, Wave 3 hardening), F2 (a killed
+  run's `gov-path-*` under a one-off `TMPDIR` waits for a run with the same temp root), F3 (killed runs'
+  `gov-rebuild-<pid>-*.lock` files, W2-76's, not swept): F2 and F3 for the close review.
