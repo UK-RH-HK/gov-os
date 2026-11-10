@@ -14205,6 +14205,21 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) The owner's operator applies ACT-OPERATOR-2 once the agent has finished ACT-CLAUDE-COPIES-2.
 - **Basis:** question 2 (the templates one approved source for every brief).
 
+### DEC-1117 — The dead-man's night limit kept at 2 hours; the owner checks the phone's notification settings before any other push channel; a usage investigation (USAGE-1) and one unit in the spend log
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-998, DEC-1004, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-10), after the 02:19 network stop (three dead-man pushes "requested", none received)
+- **Decision:**
+  - (1) **(a)** The dead-man's push to the owner keeps its 2-hour limit inside the quiet hours. The CTO's own wake (an
+    inbox item at 60 minutes at any hour, and the helper watch) is built under DEC-1112 (3).
+  - (2) **(b)** The owner checks the phone's notification settings for the Claude app first; a push channel outside
+    Claude's Remote Control (ntfy or the like) only if that is not the cause.
+  - (3) **USAGE-1:** a short package breaking down the week's consumption since the reset (11-08 09:00) from the
+    transcripts' own usage fields, by source, ticket and day, in tokens of each kind and dollars at list price, set
+    against the weekly meter; the ten largest consumers and why; savings that keep quality, each with its expected
+    saving. Nothing changes until the owner decides.
+  - (4) **The spend log in one unit:** every line uses the same fields (cost in dollars; output and cache tokens kept
+    apart).
+- **Basis:** question 4 (the owner's time and allowance spent where they buy most).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14259,3 +14274,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.499 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1114. Next free id: DEC-1115. |
 | 0.500 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1115 (item 4 standing until the lift). Next free id: DEC-1116. |
 | 0.501 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1116. Next free id: DEC-1117. |
+| 0.502 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1117. Next free id: DEC-1118. |

@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1116 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1117 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -431,3 +431,6 @@ other restart is an ACT.
   load-sensitive route or the nightly, never a looser 0.5 s limit. W2-116's and W1-32's cases follow W2-56's S5/S15.
 - DEC-1116 (2026-11-10): W2-128's kernel templates approved at `1bf23a0b3e77`, promoted as version 1.0.0 (the CIT-P
   ACCEPTED); yes to ACT-CLAUDE-COPIES-2 (the operator agent); ACT-OPERATOR-2 by the owner's operator after it. Basis: 2.
+- DEC-1117 (2026-11-10): the dead-man's night limit stays 2 hours; the owner checks the phone's Claude notifications
+  before any other channel; USAGE-1 (the week's usage by source, ticket and day, the ten largest, savings to decide);
+  the spend log in one unit. Basis: 4.
