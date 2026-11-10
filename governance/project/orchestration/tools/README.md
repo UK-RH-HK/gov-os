@@ -138,13 +138,8 @@ the baseline and closes each ticket that lands in the same step.
   normal prompt appears). Any error inside the quiet hours still refuses.
 - `deadman.py` (cron every 15 minutes, ACT-DEADMAN-1) and `win_toast.ps1`: alerts when the CTO session's last
   `assistant` entry is over 60 minutes old (2 hours in the quiet hours), naming a tool call left waiting. Channels:
-  a Windows toast, a headless `claude -p` PushNotification, the pings log. Since DEC-998 the sentinel runs it as
-  `--watch` and pushes its ALERT lines. **The wake (DAEO-sdxk, 2026-11-10, DEC-1112 (3)):** at 60 minutes, at any
-  hour, it also writes one inbox item per stall (`dispatch/inbox/<stamp>-deadman-wake.txt`: "check the helpers and
-  resume them"), so the CTO's inbox waiter wakes the CTO; it writes only into the CTO's inbox, and the push keeps
-  the owner's limits (an unread wake, helper-watch or spend-brake item never makes an inbox-stale push).
-- Tests: `tests/unit/orchestration/test_cto_safety_nets.py`, `tests/unit/orchestration/test_merge_queue_base.py`;
-  the wake's, beside the tool: `test_deadman_wake.py` (run by hand).
+  a Windows toast, a headless `claude -p` PushNotification, the pings log.
+- Tests: `tests/unit/orchestration/test_cto_safety_nets.py`, `tests/unit/orchestration/test_merge_queue_base.py`.
 
 ### The queue's speed-ups (DEC-1001; reviewed 2026-11-01, PASS on the second round)
 
