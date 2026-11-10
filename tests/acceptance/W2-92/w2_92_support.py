@@ -840,9 +840,13 @@ class AtSrc(Api):
 
 def base_src(place, commit=LINKS_BASE):
     """``commit``'s ``src/`` (``LINKS_BASE`` unless named), taken from this repository's git into ``place``; its
-    path. S11 names its own base, ``D6_BASE``."""
-    archive = subprocess.run(["git", "-C", str(REPO_ROOT), "archive", "--format=tar", commit, "src"],
-                             capture_output=True)
+    path. S11 names its own base, ``D6_BASE``.
+
+    Limited to the named path ``src/`` in the call itself (DEC-385, W1-28's reading route): git runs in the root's
+    ``src`` folder, where ``git archive <commit>`` takes ``<commit>:src`` only, put back under ``src/`` by
+    ``--prefix``. Nothing outside ``src/`` is taken, the held-out file included."""
+    archive = subprocess.run(["git", "-C", str(REPO_ROOT / "src"), "archive", "--format=tar", "--prefix=src/",
+                              commit], capture_output=True)
     if archive.returncode != 0:
         raise AssertionError(f"the integrated code {commit[:12]} is not in this repository's git: "
                              f"{archive.stderr[-500:]!r}")

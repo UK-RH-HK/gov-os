@@ -185,14 +185,10 @@ def head(tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def base(head, tmp_path_factory):
-    """``BASE``'s ``src/``, taken from git into the session's folder (``git archive``), and an Api that runs it."""
+    """``BASE``'s ``src/``, taken from git into the session's folder (``support.base_src``: ``src/`` only, by its
+    path, DEC-385), and an Api that runs it."""
     place = tmp_path_factory.mktemp("w2-92-s6-base")
-    archive = subprocess.run(["git", "-C", str(support.REPO_ROOT), "archive", "--format=tar", BASE, "src"],
-                             capture_output=True)
-    if archive.returncode != 0:
-        pytest.fail(f"the integrated code {BASE[:12]} is not in this repository's git: {archive.stderr[-500:]!r}")
-    subprocess.run(["tar", "-x", "-C", str(place)], input=archive.stdout, check=True)
-    return Counting(place / "api", src=place / "src")
+    return Counting(place / "api", src=support.base_src(place, BASE))
 
 
 @pytest.fixture(scope="module")
