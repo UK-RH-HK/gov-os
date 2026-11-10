@@ -299,3 +299,4 @@
 2026-11-10 00:14:51 week (all models)=38% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 11017 requests · 178 sessions
 2026-11-10 00:46:01 week (all models)=40% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 11148 requests · 193 sessions
 2026-11-10 01:17:30 week (all models)=42% (resets Nov 15, 8:59am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 11416 requests · 204 sessions
+2026-11-10 01:49:10 week (all models)=44% (resets Nov 15, 9am (Europe/London));week (Fable)=0% (resets Nov 15, 9am (Europe/London)); last 24h: 11353 requests · 220 sessions
