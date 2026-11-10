@@ -24,8 +24,11 @@ Two kinds of case:
   repeated here. The malformed block's case is in ``test_w2_58_fails_closed.py``.
 - **Live cases** (``local_only``, as W1-46 marks its own): a real engineer
   session and a real test-designer session on T, each started once through
-  ``gov launch`` in a fixture project built from scratch, run one probe script
-  and leave its output in ``.gov-runtime/scratch/w2-58/``. They need the CLI at
+  ``gov launch`` in a fixture project built from scratch, run one probe
+  script by one call (``bash .gov-runtime/scratch/w2-58/probe.sh``, the form
+  the session's permissions allow) and leave its output there. The fixture's
+  hook names its interpreter and the product code, as ``gov launch`` hands the
+  session no ``PYTHONPATH``. They need the CLI at
   ``~/.local/bin/claude`` with the caller's credentials, ``bwrap``, ``socat``
   and the network to the model's API; they are skipped when one of the first
   three is missing (W1-46's conditions). A launched test designer cannot run
@@ -34,10 +37,13 @@ Two kinds of case:
 
 from __future__ import annotations
 
+import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -101,6 +107,12 @@ SESSION_TIMEOUT_S = 420.0
 NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
 NOT_INHERITED_PREFIX = "CLAUDE"   # DEC-784, as W1-46's live sessions launch
 
+# The probe is one script, run by one plain call, ``bash <probe.sh>``: the form W1-46's, W1-50's and W2-54's live
+# sessions run, and one the session's permissions allow (``--allowedTools Bash``). A long compound line in its place
+# (``;``, redirections, several programs) was refused by the CLI's permission layer before any of it ran (D-10,
+# round 1). Each step writes its output to the scratch folder and its exit status to results.txt.
+OUT = f"{SCRATCH}/results.txt"
+PROBE_CALL = f"bash {SCRATCH}/probe.sh"
 _HEAD = f"""#!/bin/bash
 # W2-58 acceptance probe (DEC-873). It reads and runs; it writes nothing outside {SCRATCH}.
 export PYTHONDONTWRITEBYTECODE=1
@@ -120,8 +132,29 @@ TEST_DESIGNER_PROBE = _HEAD + """PYTHONPATH=src python3 -c "import app.main, app
 print('value=%s added=%s' % (app.main.value(), app.added.ADDED))" > $D/import.txt 2>&1; echo "import=$?" >> "$OUT"
 """ + _TAIL
 PROMPT = ("Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not "
-          f"work around it. Run this Bash command as written: bash {SCRATCH}/probe.sh  Then run "
-          f"cat {SCRATCH}/results.txt and answer with its output.")
+          f"work around it. Run this Bash command as written: {PROBE_CALL}  Then run "
+          f"cat {OUT} and answer with its output.")
+
+
+def live_guard_command():
+    """The fixture's hook as the live session runs it. ``gov launch`` hands the session no ``PYTHONPATH`` (W2-56 S5,
+    DEC-826 Q5), so the hook names its interpreter and the product code it imports, as this repository's own hook
+    names the pinned interpreter: a bare ``python3`` hook cannot import ``gov`` there and refuses every call (exit 2,
+    no reason). As the repository's own hook does, a hook that cannot start or crashes refuses the call with a
+    reason (exit 2), never leaves it unguarded."""
+    py = shlex.quote(sys.executable)
+    return (f'h="$CLAUDE_PROJECT_DIR"/{s.GUARD_REL}; '
+            f'[ -x {py} ] || {{ echo "W2-58 fixture hook: no interpreter at {py}, so $h cannot run; refused" >&2; '
+            f'exit 2; }}; '
+            f'PYTHONPATH={shlex.quote(s.python_path())} PYTHONDONTWRITEBYTECODE=1 {py} "$h"; r=$?; '
+            f'case $r in 0|2) exit $r;; esac; '
+            f'echo "W2-58 fixture hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2')
+
+
+def live_settings_text():
+    return json.dumps({"hooks": {
+        "PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": live_guard_command()}]}],
+    }}, indent=2) + "\n"
 
 
 @dataclass(frozen=True)
@@ -152,14 +185,14 @@ def _start(tmp, role, probe):
     """Build the fixture project, start one real session through ``gov launch`` and return what its probe left."""
     _prerequisites()
     sandbox = s.make_sandbox(tmp)
-    project = s.make_project(sandbox, base=True)
+    project = s.make_project(sandbox, base=True, extra={s.SETTINGS_REL: live_settings_text()})
     s.write(project / SCRATCH / "probe.sh", probe)
     env = {key: value for key, value in os.environ.items()
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
     env.update({"PYTHONPATH": s.python_path(), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     # The real HOME's gate.json, with readings planted with room to spare (W2-20 S19, DEC-1088 (5)(b)).
     env.update(s.plant_open_gate(sandbox))
-    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT, "--permission-mode", "acceptEdits",
+    argv = s.gov_argv("launch", role, s.T.tk, "--", "-p", PROMPT,"--permission-mode", "acceptEdits",
                       "--model", "haiku", "--max-turns", "6", "--allowedTools", "Bash")
     try:
         done = subprocess.run(argv, cwd=str(project), env=env, capture_output=True, text=True,
