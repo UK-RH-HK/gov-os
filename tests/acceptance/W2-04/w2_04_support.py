@@ -62,6 +62,7 @@ K_TOKENS = "tokens"
 K_BUDGET = "budget"
 DETAILS = ("ticket", "limit", "mandatory_tokens")
 INDEX_UNAVAILABLE = "index unavailable"
+INDEX_UNREADABLE = "lexical index is unreadable"  # W2-13 S3: the facet's own words for a damaged index
 # The keys of a packet before this ticket (W1-24's eight), and the four the addendum adds (DEC-1005, "The packet's
 # keys"); ``external``, ``left_out`` and ``synthesis`` stand only where the project gives them cause.
 KEYS_BEFORE = ("ticket", "authority", "mandatory", "supplementary", "dropped", "hash", "tokens", "budget")

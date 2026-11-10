@@ -10,6 +10,9 @@ the file exists each fails at the ``cli`` fixture with that reason.
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 import pytest
 
 import w1_21_support as support
@@ -25,12 +28,21 @@ def answered(run):
 
 
 def test_the_command_returns_the_bundle_of_the_function(cli, api, project, ollama):
-    """The same arguments, the same bundle: the command is the function behind an envelope."""
+    """The same arguments, the same bundle: the command is the function behind an envelope (with the store it
+    answered from, W2-138 S1)."""
     run = answered(cli.command(project, "--ticket", support.TICKET_IN_SCOPE, "--radius", "2", "--batch-size", "3",
                                "--bundle-budget", str(support.BUDGET_SMALL), support.PHRASE, host=ollama.host))
     bundle = support.check_bundle(run.bundle(), root=project)
-    assert bundle == api.retrieve(project, support.PHRASE, host=ollama.host, ticket=support.TICKET_IN_SCOPE,
-                                  radius=2, batch_size=3, bundle_budget=support.BUDGET_SMALL)
+    # W2-138 S1 (dcda27011, DEC-1090 (3)): the command's result names the store it answered from, beside the
+    # bundle: ``store`` = {commit, root}; the function's bundle has no such key. The rest is the function's, whole.
+    store = bundle.get("store")
+    assert isinstance(store, dict) and set(store) == {"commit", "root"}, f"result.store is {store!r}"
+    assert re.fullmatch(r"[0-9a-f]{40}", str(store["commit"])), f"result.store.commit is {store['commit']!r}"
+    assert Path(store["root"]).resolve() == Path(project).resolve(), f"result.store.root is {store['root']!r}"
+    function = api.retrieve(project, support.PHRASE, host=ollama.host, ticket=support.TICKET_IN_SCOPE,
+                            radius=2, batch_size=3, bundle_budget=support.BUDGET_SMALL)
+    assert "store" not in function, "the function's bundle names no store (the command adds it)"
+    assert {key: value for key, value in bundle.items() if key != "store"} == function
 
 
 def test_the_command_without_options_answers_with_a_checked_bundle(cli, project, ollama):

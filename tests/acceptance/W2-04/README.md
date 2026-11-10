@@ -341,3 +341,5 @@ Cases: 74 in the full run, 16 in `breadth`, 0 in `lifted`.
 | S6: The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126]. | `test_w2_04_query.py::test_the_packet_carries_the_query_built_from_the_kpi_lines_and_the_title` | the ticket's words |
 | S7: Never one giant query or context: within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked i... | `test_w2_04_batches.py::test_when_the_room_ends_exactly_further_batch_names_what_is_left` (1 of 3) | the ticket's words |
 | F1: DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source. | `test_w2_04_refusal.py::test_daeo_03pw_shape_fits_or_refuses` | the ticket's words |
+
+**D-10 run 2 (W2-13 S3, `8550788b4`, DEC-260/W2-M071; DEC-1122 (3)):** `test_a_lookup_failure_is_named_in_dropped_by_its_kind` takes the facet's own words "the lexical index is unreadable" as naming a damaged index by its kind (beside "index unavailable"), and still refuses the generic "the lookup failed".

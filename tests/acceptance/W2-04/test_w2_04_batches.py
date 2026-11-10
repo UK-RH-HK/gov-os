@@ -311,8 +311,8 @@ def test_supplementary_batches_is_present_and_of_its_form(retrieval_api, ledger,
 
 
 def test_a_lookup_failure_is_named_in_dropped_by_its_kind(retrieval_api, tmp_path):
-    """A damaged index (its chunk table gone) is named as the index unavailable; the packet is built, nothing is
-    stacked, and the ticket's text stays whole. Passes today for the naming (W1-24's follow-up, DEC-552)."""
+    """A damaged index (its chunk table gone) is named as the index unavailable or unreadable; the packet is built,
+    nothing is stacked, and the ticket's text stays whole (W1-24's follow-up, DEC-552; W2-13 S3's wording)."""
     project = s.build_project(tmp_path / "repo", s.ledger_files(pages=4))
     retrieval_api.build(project.root)
     connection = sqlite3.connect(project.root / s.STORE_REL)
@@ -326,5 +326,12 @@ def test_a_lookup_failure_is_named_in_dropped_by_its_kind(retrieval_api, tmp_pat
 
     assert packet[s.K_SUPPLEMENTARY] == [], packet[s.K_SUPPLEMENTARY]
     reasons = [str(entry.get("reason", "")) for entry in packet[s.K_DROPPED]]
-    assert any(s.INDEX_UNAVAILABLE in reason.lower() for reason in reasons), \
+    # W2-13 S3 (8550788b4, DEC-260, W2-M071): the lexical search of a damaged index no longer raises, it answers
+    # unavailable with the reason "unreadable", and the supplementary lookup names that in the facet's own words,
+    # "the lexical index is unreadable". The failure is still named as the index's, by its kind, and never as the
+    # generic "the lookup failed ..." that the lookup keeps for a failure that is not the index's.
+    named = [reason.lower() for reason in reasons]
+    assert any(s.INDEX_UNAVAILABLE in reason or s.INDEX_UNREADABLE in reason for reason in named), \
         f"a damaged index is not named in `dropped` by its kind: {packet[s.K_DROPPED]}"
+    assert not any(reason.startswith("the lookup failed") for reason in named), \
+        f"a damaged index is named as a generic lookup failure: {packet[s.K_DROPPED]}"
