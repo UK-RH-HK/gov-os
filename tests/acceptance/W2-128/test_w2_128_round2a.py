@@ -196,8 +196,13 @@ def test_review_f6_orchestrator_role_names_no_retired_brief_text_as_content(path
     text = s.read(path)
     named = [(old, unit[:90]) for unit in s.units(text) for old in retired_in(unit)]
     assert not named, f"{rel} still starts a lead or worker from the retired texts: {named}"
-    assert TEMPLATE_REF.search(text) or "gov brief" in text, \
-        f"{rel} names no kernel template (role-lead.md or the templates folder) for a lead's brief"
+    # W2-153 S3 (DEC-866): the rulesync copy's body may be role-lead.md's own body (front matter stripped, the blank
+    # lines after it dropped, as portability's _split does), which names no template because it is the template.
+    is_lead_body = path == RULESYNC_ORCHESTRATOR_ROLE and \
+        s.split(text)[1].lstrip("\n") == s.split(s.template("role-lead"))[1].lstrip("\n")
+    assert TEMPLATE_REF.search(text) or "gov brief" in text or is_lead_body, \
+        f"{rel} names no kernel template (role-lead.md or the templates folder) for a lead's brief, " \
+        f"nor is its body role-lead.md's body"
 
 
 # --- TPL-6 S4's kernel half: JUDGEMENT's rules only in T-6 ----------------------------------------------------------
