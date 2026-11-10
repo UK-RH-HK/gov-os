@@ -1,6 +1,27 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-10 18:15 UTC: session `412a4e37` hands over during D-10 run 1 (DEC-1122 (2)); next free id DEC-1123
+## RESUME HERE — 2026-11-10 22:05 UTC: session `8ddb8b14` (cto-session.txt); D-10 between run 1 and run 2; next free id DEC-1124
+- **The machine restarted ~21:29-21:52 UTC** (WSL; uptime from 21:52): the sentinel's tmux gone (owner pushed 21:55;
+  restart is ACT-SENTINEL-1, the owner's operator), the user systemd manager not running (no login, no linger) so the
+  GPU servers (ollama, the reranker) are DOWN until the owner opens a WSL terminal or enables linger; cron is back.
+  Run 2 waits for the servers (its real-model cases).
+- **Run 1** (18:10-19:12): red 168, triage `drafts/d10-run1-triage/NOTES.md`. **Lifted step alone** (20:32-21:07,
+  `log/d10/run1-lifted/`): 8,225 passed, 166 failed, 213 errors (296 W2-50 = group B; ~77 the guard's lifted rules,
+  expected). Owner: DEC-1123 (committed `cbbff3f01`): run 2 option 1; context records (a); trailers a warning under Q-8
+  until W2-115; W1-01's exemptions by ACT (owner said yes to FIVE ids 21:30); stand-by expiry by ACT.
+- **Fixes (worktrees `/home/usain/gov-os-worktrees/<W2>-d10r2-tests`, branches `w2/<W2>-d10r2-tests` from c9742b089):**
+  A W2-112 `73e33d7b3`, C W2-56 `843777f66`, E/H W2-138 `3e403a285` (DONE), G W2-61h `a2104dc5f` (Q22/Q24 fixed; Q07/Q14
+  need RETIRED_ORIGINALS in tests/acceptance/W2-61, the CTO's P2; Q23 re-word to the owner), B W2-153 relaunched 21:57
+  (pid 7838; the first died in the restart, its partial edits kept), records `w2/W2-00-d10r2-records` `66303c373`
+  (context check green: 130 built, 88 refused). D (dead-man tests) merged `adeba3758`. A and C verified outside the
+  sandbox by the CTO (sandbox cannot do /tmp sockets or the real cbm tool). Merge each with its Task trailer, one command.
+- **ACTs:** ACT-DEADMAN-STANDBY-1 READY, owner's yes 21:2x, queued `~/gov-os-operator/queue/ACT-DEADMAN-STANDBY-1.req`
+  21:26 (not taken before the restart; cron */10 back); landing check after its commit; then commit the 15-case test
+  file from `drafts/act-deadman-standby-1/`. ACT-W1-01-EXEMPT-2: five entries, helper finishing the rehearsal; then the
+  message to the owner's operator (class O).
+- **Run 2:** `LIFTED_ONLY=0 bash tools/d10_start.sh run2 16` (short TMPDIR, clean signals) after the merges and servers.
+
+## RESUME HERE (history) — 2026-11-10 18:15 UTC: session `412a4e37` hands over during D-10 run 1 (DEC-1122 (2)); next free id DEC-1123
 - **D-10 run 1 RUNNING since 18:10:09 UTC** (the records' "after 18:20" is wrong: correct it in the next commit), head
   `afad23270a30`, 16 workers (nproc 20; 15.1 GB available at start), heavy slots lifted (`NIGHTLY_HEAVY` to no gate),
   detached: `bash tools/d10_run.sh run1 16`, pid `159396` (`log/d10/run1/pid`); ends when `log/d10/run1/exit` exists;

@@ -1,0 +1,18 @@
+=== BEFORE (clone at c9742b08910acf6ce9d9fd101f37aaf7da6e1f69) ===
+F.......................................F                                [100%]
+=================================== FAILURES ===================================
+E   AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
+      cade65dfe045 (merge: the merge commit itself changes tests/acceptance/W1-32/README.md)
+      04460404ea8a (merge: the merge commit itself changes tests/acceptance/W1-19/README.md)
+      15952bbfa576
+      8c512d7e7921 (merge: the merge commit itself changes tests/acceptance/W2-32/README.md)
+      ab169d051b82 (merge: the merge commit itself changes tests/acceptance/W2-32/README.md)
+    assert not ['cade65dfe045 (merge: the merge commit itself changes tests/acceptance/W1-32/README.md)', '04460404ea8a (merge: the m...acceptance/W2-32/README.md)', 'ab169d051b82 (merge: the merge commit itself changes tests/acceptance/W2-32/README.md)']
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/tests/acceptance/W1-01/test_w1_01_history.py:44: AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
+E   AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'cade65dfe045': ['the merge commit itself changes tests/acceptance/W1-32/README.md'], '04460404ea8a': ['the merge commit itself changes tests/acceptance/W1-19/README.md'], '8c512d7e7921': ['the merge commit itself changes tests/acceptance/W2-32/README.md'], 'ab169d051b82': ['the merge commit itself changes tests/acceptance/W2-32/README.md']}
+    assert not {'04460404ea8a': ['the merge commit itself changes tests/acceptance/W1-19/README.md'], '8c512d7e7921': ['the merge com...sts/acceptance/W2-32/README.md'], 'cade65dfe045': ['the merge commit itself changes tests/acceptance/W1-32/README.md']}
+/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/tests/acceptance/W1-01/test_w1_01_integration_merges.py:456: AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'cade65dfe045': ['the merge commit itself changes tests/acceptance/W1-32/README.md'], '04460404ea8a': ['the merge commit itself changes tests/acceptance/W1-19/README.md'], '8c512d7e7921': ['the merge commit itself changes tests/acceptance/W2-32/README.md'], 'ab169d051b82': ['the merge commit itself changes tests/acceptance/W2-32/README.md']}
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests
+FAILED tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
+2 failed, 39 passed in 130.27s (0:02:10)

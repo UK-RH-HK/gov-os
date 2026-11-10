@@ -18,7 +18,9 @@ passed with `--append-system-prompt` changes the argument list) and fix it only 
    make a case accept LAUNCH_NO_TEMPLATE.
 2. Run, through the heavy slot (`EMG-common.md`), with `PYTHONPATH=<your tree>/src`:
    `python3 -m pytest tests/acceptance/W2-50 tests/acceptance/W1-28 -q -p no:cacheprovider -o tmp_path_retention_policy=failed`.
-   Report counts before and after; a case red for another reason is named, not fixed.
+   Report counts before and after; a case red for another reason is named, not fixed. Then the same two suites with
+   `--optin=lifted` added: run 1's lifted step had **296 more W2-50 cases** red on the same LAUNCH_NO_TEMPLATE (the
+   lifted list keeps them out of the default run); they must turn green with the same fixture change.
 3. One line in each changed suite's README.
 
 ## Where you work

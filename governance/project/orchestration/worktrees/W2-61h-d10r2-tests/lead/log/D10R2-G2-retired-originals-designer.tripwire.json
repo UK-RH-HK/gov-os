@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/packages/ACT-W1-01-EXEMPT-2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-61h-d10r2-tests",
+   "change": "head",
+   "before": "a2104dc5f7c2",
+   "after": "35396225e07c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-61h-d10r2-tests",
+   "change": "acceptance folder",
+   "folder": "W2-61"
+  }
+ ]
+}

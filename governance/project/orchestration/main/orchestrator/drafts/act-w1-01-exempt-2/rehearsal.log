@@ -1,7 +1,4 @@
-=== BEFORE (clone at c9742b08910acf6ce9d9fd101f37aaf7da6e1f69) ===
-F.......................................F                                [100%]
-=================================== FAILURES ===================================
-E   AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
+=== BEFORE (clone at adeba37582c5dd9c0dc9e5d69184268188ce4ab0) ===
       cade65dfe045 (merge: the merge commit itself changes tests/acceptance/W1-32/README.md)
       04460404ea8a (merge: the merge commit itself changes tests/acceptance/W1-19/README.md)
       15952bbfa576
@@ -15,23 +12,9 @@ E   AssertionError: integration merges on HEAD's history do not pass the DEC-253
 =========================== short test summary info ============================
 FAILED tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests
 FAILED tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
-2 failed, 39 passed in 130.27s (0:02:10)
-=== AFTER the three entries (clone at fcaf2fcbef101819f6323fddcf03f91ddf903ff7) ===
-F.......................................F                                [100%]
-=================================== FAILURES ===================================
-E   AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
-      15952bbfa576
-      ab169d051b82 (merge: the merge commit itself changes tests/acceptance/W2-32/README.md)
-    assert not ['15952bbfa576', 'ab169d051b82 (merge: the merge commit itself changes tests/acceptance/W2-32/README.md)']
-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/tests/acceptance/W1-01/test_w1_01_history.py:44: AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
-E   AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'ab169d051b82': ['the merge commit itself changes tests/acceptance/W2-32/README.md']}
-    assert not {'ab169d051b82': ['the merge commit itself changes tests/acceptance/W2-32/README.md']}
-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/tests/acceptance/W1-01/test_w1_01_integration_merges.py:456: AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'ab169d051b82': ['the merge commit itself changes tests/acceptance/W2-32/README.md']}
-=========================== short test summary info ============================
-FAILED tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests
-FAILED tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
-2 failed, 39 passed in 52.81s
-yaml-ok
-=== EXTRA rehearsal: five entries (the three + ab169d051b82 + 15952bbfa576) ===
+2 failed, 39 passed in 67.20s (0:01:07)
+=== AFTER (clone at 2958b21955b332432b981ced0fd61c31e1224b01) ===
 .........................................                                [100%]
-41 passed in 51.02s
+41 passed in 96.91s (0:01:36)
+yaml-ok
+=== UNDO: git revert of the operator's commit; path-map.yaml identical to adeba3758's; yaml.safe_load ok ===

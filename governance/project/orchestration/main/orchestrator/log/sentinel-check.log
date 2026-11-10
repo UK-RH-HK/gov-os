@@ -4,3 +4,5 @@
 2026-11-10 11:43:57 CTO: inbox 'sentinel silent since 03:40' (11:43:11) was false: a helper's deadman tests appended planted lines (transcript s.jsonl, times 03:40-13:01) to the live deadman.log at 11:42; the real watch is alive (11:41:56); the helper told to isolate its tests
 2026-11-10 15:26:31 start: session cto-sentinel, stale after 600 s
 2026-11-10 18:37:34 start: session cto-sentinel, stale after 600 s
+2026-11-10 21:53:59 start: session cto-sentinel, stale after 600 s
+2026-11-10 21:53:59 DOWN: its tmux session cto-sentinel is gone

@@ -354,3 +354,9 @@
 2026-11-10 19:13:10 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-1855-outside-slot.md)
 2026-11-10 20:53:04 incident T1 opened: 19.91 busy cores above the band 14-18 -> 2026-11-10-2053-T1.md, inbox/20261110-205304-incident-T1-2053.txt
 2026-11-10 20:53:04 incident outside-slot opened: python3 -m pytest tests/acceptance/W1-02/test_w1_02_allow_list.py (pid 895211, 20 min, strator/log/d10/run1-lifted/lifted-clone) -> 2026-11-10-2053-outside-slot.md, inbox/20261110-205304-incident-outside-slot-2053.txt
+2026-11-10 21:16:03 incident T1 closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-2053-T1.md)
+2026-11-10 21:23:03 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-2053-outside-slot.md)
+2026-11-10 21:57:02 embedding server shared: NOT RUNNING since 2026-11-10 21:57:02 (nothing listens on port 11434 (3 passes))
+2026-11-10 21:57:02 embedding server query: NOT RUNNING since 2026-11-10 21:57:02 (nothing listens on port 11435 (3 passes))
+2026-11-10 22:01:01 embedding server shared: BUSY again after NOT RUNNING since 2026-11-10 21:57:02
+2026-11-10 22:01:01 embedding server query: IDLE again after NOT RUNNING since 2026-11-10 21:57:02
