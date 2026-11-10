@@ -107,7 +107,12 @@ launch writer "$BR/writer-tuning.md" 82134b3dd6b5a077abfc2eb6fa7481f0f5a73eab603
 
 say "this ACT: check, apply, a second apply, check, the commit"
 AP check > "$BASE/check1.txt" 2>&1; cat "$BASE/check1.txt"; expect "$BASE/check1.txt" "check: ready to apply" "check: ready"
+mkdir -p "$BASE/globcwd/runs/x" && : > "$BASE/globcwd/runs/x/misses.jsonl"   # review F3: the globs never expand in the caller's folder
+( cd "$BASE/globcwd" && bash "$D/apply.sh" check --sets-root "$PR" ) > "$BASE/check1b.txt" 2>&1
+expect "$BASE/check1b.txt" "check: ready to apply" "check from a folder holding runs/x/misses.jsonl: still ready (F3)"
+rm -rf "$R/governance/project/orchestration/tools/__pycache__"
 AP apply > "$BASE/apply1.txt" 2>&1; cat "$BASE/apply1.txt"; expect "$BASE/apply1.txt" "^state applied" "applied"
+[ ! -e "$R/governance/project/orchestration/tools/__pycache__" ] && echo "ok: no bytecode cache written into the tree (F1)" || bad "apply wrote a __pycache__ into the tree"
 expect "$BASE/apply1.txt" "6 template lines, 7 brief lines .* template mismatches 0; brief mismatches 0" "the launch script's parser reads the list"
 AP apply > "$BASE/apply2.txt" 2>&1 && bad "a second apply ran" || echo "a second apply: refused ($(tail -1 "$BASE/apply2.txt"))"
 AP check | tail -2 | tee "$BASE/check2.txt"; expect "$BASE/check2.txt" "already applied" "check: already applied"
@@ -115,7 +120,8 @@ git -C "$R" add "$BR"
 git -C "$R" diff --cached --name-status | tee "$BASE/staged.txt"
 [ "$(wc -l < "$BASE/staged.txt")" = 5 ] && [ "$(grep -c '^A' "$BASE/staged.txt")" = 5 ] && echo "ok: exactly 5 A" || bad "the staged set is not 5 A"
 git -C "$R" commit -q -m "ACT-W2-149-INSTALL-1: set-up A's five fixed briefs as the owner approved them (DEC-1113), and the launch script's approved list" \
-  --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" || bad "the commit"
+  --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" -- "$BR" || bad "the commit"
+git -C "$R" show --stat --format= HEAD | tail -1
 git -C "$R" log -1 --format='%h %s%n%(trailers)'
 sha256sum "$PR/indep-walls/APPROVED" | cut -c1-12 | sed 's/^/the planted list after: /'
 stat -c '%a %n' "$PR/indep-walls" "$PR/indep-walls/APPROVED" | sed "s#$PR#<root>#"
@@ -154,7 +160,7 @@ git -C "$R" reset -q --hard HEAD~1    # the clone's scratch control commit only
 say "undo: apply.sh undo, the removal committed, then check"
 AP undo > "$BASE/undo.txt" 2>&1; cat "$BASE/undo.txt"; expect "$BASE/undo.txt" "state before" "undone"
 git -C "$R" add -A "$BR" 2>/dev/null; git -C "$R" status --short | head -6
-git -C "$R" commit -q -m "ACT-W2-149-INSTALL-1 undone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" || bad "the undo commit"
+git -C "$R" commit -q -m "ACT-W2-149-INSTALL-1 undone" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1101, DEC-1112" --trailer "Role: owner" -- "$BR" || bad "the undo commit"
 [ "$(sha256sum "$PR/indep-walls/APPROVED" | cut -c1-64)" = 331e48fa336ef58ba5dc6fd4afcf9c1387ec4bd29e583eb955280a267626bbc9 ] && echo "ok: the list byte for byte as before" || bad "the list is not as before"
 AP check | tail -1 | tee "$BASE/check3.txt"; expect "$BASE/check3.txt" "ready to apply" "check: ready to apply again"
 

@@ -19,12 +19,24 @@ READY is computed by `verdict.py` from your block.
   own values", so no DEC-105 package.
 
 ## What to review
-- **The branch:** `w2/W2-56-f` in `/home/usain/gov-os-worktrees/W2-56-f`, head `HEAD_SHA`, from `w2/integrate` at
-  `336828354`. Read `git diff 336828354..HEAD_SHA`: the designer's cases (`tests/acceptance/W2-56/`, `473e8ad828d5`:
+- **The branch:** `w2/W2-56-f` in `/home/usain/gov-os-worktrees/W2-56-f`, head `1d5adb177` (the engineer's `bf13ef74f`, then
+  `w2/integrate` merged in at the coordinator's request, ACT-SETS-GLOBS-1). Read `git diff 336828354..bf13ef74f`: the designer's cases (`tests/acceptance/W2-56/`, `473e8ad828d5`:
   `test_w2_56_r3_sweep.py`, `test_w2_56_r5_lead_store.py`, the support and probe files, the README's new section) and
   the engineer's change (`src/gov/codeintel/__init__.py`, `tests/conftest.py`, `src/gov/launch/launcher.py`, the unit
   tests, the CIT-E).
-- **The runs:** RUNS_LINE
+- **The runs:** the lead's, outside the sandbox, on `1d5adb177`:
+  - `gov accept W2-56` (the declared form, `PYTHONPATH=src`, the pinned python, `GOV_W2_56_REAL=1`): 292 passed, 4
+    failed, 0 skipped; every R3 and R5 case passed, the six real-`/tmp` cases and the two pid-namespace cases
+    (`bwrap --unshare-pid`) included. The 4 reds are the real sandboxed-session cases (S2, S7, S9, S13).
+  - The same file alone with an absolute `PYTHONPATH`: S2, S9 and S13 pass (S13 runs a code-graph suite inside a real
+    sandbox, so the new clean-up runs in a launched session's temp folder); S7 refused by the resource gate (three
+    sessions at once), not a product failure. With the relative `PYTHONPATH=src`, S13 fails on `No module named 'gov'`
+    inside the session (the harness's path) and S7 once on `git add` of a `.bash_profile` placeholder (S4/P-S7, not
+    changed here).
+  - The engineer's, in its sandbox on `bf13ef74f`: `gov accept W2-56` 283/0/13 skipped (the base `52566b514`:
+    270/13/13, the 13 reds the new cases); `tests/unit/codeintel` + `tests/unit/launch` 243 passed; `tests/unit/optin`
+    and `tests/unit/rebuild/test_w2_76_lock_override.py` 26 passed; R5 with the W2-136 and W2-116 launch tests 61 passed.
+  - The designer's red check on integrate, outside the sandbox: the real R3 cases 3 red (as stated), 5 green.
 
 ## Check
 1. **R3, nothing live is ever removed:** a live run's folder (same or another pid namespace, an xdist worker's, a

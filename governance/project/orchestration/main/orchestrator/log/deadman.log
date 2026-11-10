@@ -6051,3 +6051,37 @@
 {"at": "2026-11-10 00:05:46", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:05:15", "pending_tool": null, "age_min": 0, "verdict": "alive"}
 {"at": "2026-11-10 00:07:50", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:05:15", "pending_tool": null, "age_min": 2, "verdict": "alive"}
 {"at": "2026-11-10 00:09:55", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:05:15", "pending_tool": null, "age_min": 4, "verdict": "alive"}
+{"at": "2026-11-10 00:12:00", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:14:05", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 2, "verdict": "alive"}
+{"at": "2026-11-10 00:16:09", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 4, "verdict": "alive"}
+{"at": "2026-11-10 00:18:15", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 6, "verdict": "alive"}
+{"at": "2026-11-01 04:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 133, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 133 min | approve or restart it", "sent": ["log: dry"]}
+{"at": "2026-11-01 03:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 73, "verdict": "alive"}
+{"at": "2026-11-01 12:59:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 12:00:00", "pending_tool": null, "age_min": 59, "verdict": "alive"}
+{"at": "2026-11-01 13:01:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 12:00:00", "pending_tool": null, "age_min": 61, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is idle since 12:00 (its turn ended and nothing woke it), 61 min | approve or restart it", "sent": ["log: dry"]}
+{"at": "2026-11-10 00:19:47", "verdict": "TEST", "sent": ["push: dry"]}
+{"at": "2026-11-01 04:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 133, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 133 min | approve or restart it", "sent": []}
+{"at": "2026-11-10 00:19:47", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 12873, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 12873 min | approve or restart it", "sent": []}
+{"at": "2026-11-10 00:19:47", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:47", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:48", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:47", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:49", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:47", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:49", "transcript": "cto.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 12873, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 12873 min | approve or restart it", "sent": []}
+{"at": "2026-11-10 00:19:49", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-10 00:19:50", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-10 00:19:52", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-10 00:19:52", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:53", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:54", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:54", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:55", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:19:56", "transcript": "s.jsonl", "last_assistant": "2026-11-10 00:19:52", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:20:18", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 8, "verdict": "alive"}
+{"at": "2026-11-10 00:22:21", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 11, "verdict": "alive"}
+{"at": "2026-11-10 00:24:25", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 13, "verdict": "alive"}
+{"at": "2026-11-10 00:26:28", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:11:19", "pending_tool": null, "age_min": 15, "verdict": "alive"}
+{"at": "2026-11-10 00:28:32", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:28:25", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:30:36", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:28:51", "pending_tool": "Bash", "age_min": 1, "verdict": "alive"}
+{"at": "2026-11-10 00:32:40", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:28:51", "pending_tool": "Bash", "age_min": 3, "verdict": "alive"}
+{"at": "2026-11-10 00:34:44", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:34:43", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-10 00:36:49", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:34:48", "pending_tool": "Bash", "age_min": 2, "verdict": "alive"}
+{"at": "2026-11-10 00:38:55", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 00:34:48", "pending_tool": "Bash", "age_min": 4, "verdict": "alive"}

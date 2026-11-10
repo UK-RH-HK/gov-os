@@ -1,0 +1,59 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "7076ccd6ef1a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "head",
+   "before": "8414b58aee2a",
+   "after": "27ebacf6ae56"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W1-19"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-54"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "7076ccd6ef1a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "f73e72d4a43b",
+   "after": "7076ccd6ef1a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-138-d10-tests",
+   "change": "head",
+   "before": "de74c2d39b99",
+   "after": "d6472c9a41fd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-138-d10-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-54/test_w2_54_query_cache.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-148-act2",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-f11",
+   "change": "head",
+   "before": "74767736eef3",
+   "after": "ee534d2bccf0"
+  }
+ ]
+}

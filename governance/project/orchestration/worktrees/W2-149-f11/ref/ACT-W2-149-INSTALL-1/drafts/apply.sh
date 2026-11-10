@@ -44,7 +44,7 @@ declare -A BRIEF=(
   [overlap-auditor.md]=b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab
 )
 NAMES="labeller.md labeller-2.md writer-tuning.md writer-heldout.md overlap-auditor.md"
-SETS_GLOBS='fixtures/evaluation/*/hidden/** fixtures/evaluation/*/XCHECK-r*.md runs/*/miss-classes.json runs/*/misses.jsonl'
+SETS_GLOBS=('fixtures/evaluation/*/hidden/**' 'fixtures/evaluation/*/XCHECK-r*.md' 'runs/*/miss-classes.json' 'runs/*/misses.jsonl')
 
 die() { echo "apply.sh: $*; nothing more is done" >&2; exit 1; }
 sha() { if [ -f "$1" ] && [ ! -L "$1" ]; then sha256sum "$1" | cut -c1-64; else echo none; fi; }
@@ -62,7 +62,7 @@ drafts_ok() {
 order_ok() {  # ACT-SETS-GLOBS-1 applied; the launch script W2-149 with F11
   [ "$(sha "$ROOT/$SCRIPT")" = "$LAUNCH_SHA" ] \
     || die "the tree's $SCRIPT is not W2-149 with its F11 follow-up (${LAUNCH_SHA:0:12}): merge it first"
-  python3 -I - "$ROOT/$MAP" $SETS_GLOBS <<'EOF' || die "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first"
+  python3 -I -B - "$ROOT/$MAP" "${SETS_GLOBS[@]}" <<'EOF' || die "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first"
 import sys, yaml
 d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
 have = set((d.get("sets_root_hidden") or {}).get("hidden") or [])
@@ -94,7 +94,7 @@ state() {
   else echo "other (briefs $t, list $l)"; fi
 }
 parse_check() {  # the launch script's own parser reads the list as the launch will: 6 templates, 7 briefs, each matching
-  python3 -I - "$ROOT/$SCRIPT" "$LIST" "$ROOT" <<'EOF'
+  python3 -I -B - "$ROOT/$SCRIPT" "$LIST" "$ROOT" <<'EOF'
 import hashlib, importlib.util, os, sys
 spec = importlib.util.spec_from_file_location("indep_launch_for_install", sys.argv[1])
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)

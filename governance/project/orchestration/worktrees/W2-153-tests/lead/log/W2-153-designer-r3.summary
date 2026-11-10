@@ -1,0 +1,1 @@
+launch_worker independent-test-designer DAEO-8s85: session exit 1; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-153-tests/.gov-runtime/scratch/lead/log/W2-153-designer-r3.json

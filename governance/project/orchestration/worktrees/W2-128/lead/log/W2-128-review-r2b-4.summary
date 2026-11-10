@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-t8mp: session exit 1; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-128/.gov-runtime/scratch/lead/log/W2-128-review-r2b-4.json
