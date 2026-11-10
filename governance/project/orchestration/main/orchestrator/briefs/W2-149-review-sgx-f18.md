@@ -13,12 +13,18 @@ must meet them: the overlap auditor's brief says the two labels arrive blind as 
 replaces both labels.
 
 ## What to review
-- **The branch:** `w2/W2-149-sgx` in `/home/usain/gov-os-worktrees/W2-149-sgx`, head `@HEAD@`. The change is the diff
+- **The branch:** `w2/W2-149-sgx` in `/home/usain/gov-os-worktrees/W2-149-sgx`, head `d388da2f2`. The change is the diff
   from `944f39165` (`w2/integrate`, the ticket changed) to the head.
   - The designer's cases: `939da2755` (51 new, six revised, with its `Rewrite-Reason`; the README's interface items for
     F18 to F23).
-  - The engineer's commits: @ENG@.
-- **The runs:** @RUNS@
+  - The engineer's commits: `6a959ffc5` (the build, F26 and the unit tests) and `d388da2f2` (the evidence).
+- **The runs:**
+  - The lead's, at `d388da2f2`, outside the sandbox (2026-11-10 12:0x UTC): the acceptance folder (but `live`) and the
+    two unit files with `GOV_W2_149_BWRAP=1`: **289 passed, 0 failed** (every `bwrap` case included). The 3 live cases
+    (haiku, planted roots): **3 passed**.
+  - The engineer's `gov accept W2-149` in the sandbox: 165 passed, 0 failed, 35 skipped (3 live, 32 `bwrap`).
+  - The designer's red check before the build: 32 red in the sandbox, and 21 more `bwrap` red outside it (lead), each
+    for its stated reason.
 - **Check:**
   1. **Each fix does what its line says, and only that.** Read the code path, not only the tests:
      - F18: the round-1 check;
