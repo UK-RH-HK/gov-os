@@ -115,6 +115,8 @@ FORECAST's two "merged" branches are merged: W1-06 in `dddf54782`, test_fusion i
 | 9 | W2-96's planted `gov accept` left orphaned (the CTO's incident 2026-11-10 00:43) | The r9/r12 cases ended their child only on the success path. | A reaper on a pipe only the case holds kills the planted groups on every ending, now in a shared `w2_96_reap.py`. Two rounds: `test_w2_96_accept.py`, `review3.py` and `review4.py` came under it too. Three proof cases. A designer under W2-96. `tests/unit/accept` 98 passed with `-n 4`. **W2-96's probe is now stale** (4 judged files). | `f7e63ae4e` |
 | 10 | Every acceptance case that starts `gov launch` read the live machine gate, W1-46's ~80 included (found on the way, and the CTO's 11-10 note) | W2-20 S19: a HOME with no `gate.json` shuts the gate; the live machine's gate shuts under load (tonight: `memory: reading 13873688576, limit 14179233792`). | An open gate planted in W1-28, W1-32, W1-38, W1-46, W1-50, W2-50, W2-54's sandboxed worker, W2-58 and W2-116 (not W2-56's). A designer under W2-20. Outside the sandbox, both opt-ins, `-n auto`: 643 reds at integrate turned green, none new. | `e74b551bc` |
 
+| 11 | W1-28 1 and W1-50 13: three whole-tree copies W1-28's check (DEC-385) cannot run (the alone run below) | W2-92's `base_src` and `test_w2_92_speed.py::base` (`5214e0f01`) and W2-13's `pre_s6_src` (`b6eb2267f`) ran `git -C REPO_ROOT archive <commit> src`. | Each limited to the named path: `git -C REPO_ROOT/src archive --prefix=src/`. A designer under W2-92. Outside the sandbox: W1-28, W1-50, W2-92 (with the tool) and W2-13 276 passed; 1 red, W2-13's real-model latency (13 below). | `f2e05e303` |
+
 Implementer tickets whose `allowed_paths` had gained acceptance paths for the designers were corrected (W2-126
 `8513a4935`, W2-145 and W2-138 on their branches): MR-3. A designer writes under `tests/acceptance/` without them.
 
@@ -122,9 +124,7 @@ Implementer tickets whose `allowed_paths` had gained acceptance paths for the de
 
 Of the 141 cases red both before and after item 10: 97 are on the opt-in lists (report-only or breadth). Of the 44
 gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). The other 33:
-- **W1-28 1, W1-50 13: in progress.** W1-28's whole-tree-copy rule (DEC-385) cannot run three copies, W2-92's
-  `base_src` and `test_w2_92_speed.py::base` (`5214e0f01`) and W2-13's `pre_s6_src` (`b6eb2267f`). A designer
-  under W2-92 brings them into the rule's form (`w2/W2-92-d10b-tests`), then review.
+- **W1-28 1, W1-50 13:** fixed, item 11.
 - **W2-116 6, W1-32 7: W2-56's (another helper's).**
   - W2-116: W2-56 S5's cleaned session environment (`8c399ea3e`) no longer passes `W2_116_SESSION_LOG` to the
     stand-in CLI (`KeyError`).
@@ -156,8 +156,16 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
   clean-project case, and W2-58's 3 setup errors.**
   - Cause: `SOURCE_DIFFERS .rulesync/subagents/orchestrator.md`. W2-128 round 2a changed the kernel's role file and
     not its rulesync source.
-  - **Green now:** W2-128 round 2b (`9d95279c9`, F1) fixed the copy. At `e74b551bc` W2-05, W1-38's two files and
-    W2-66's live map give 98 passed, 1 failed (item 12).
+  - **Green overnight:** W2-128 round 2b (`9d95279c9`, F1) fixed the copy. At `e74b551bc` W2-05, W1-38's two files
+    and W2-66's live map gave 98 passed, 1 failed (item 12).
+  - **Red again at `7b08bd12d` (09:40):** 8 W2-05 cases, 17 W1-38 cases, and
+    `W1-33/test_w1_33_agent_definitions.py` (`.claude/agents/research.md` is not the generated file).
+    `gov.adapters.portability` names:
+    - `SOURCE_DIFFERS` on `.rulesync/skills/orchestration/SKILL.md` and `.rulesync/skills/test-design/SKILL.md`
+      against the kernel's skills;
+    - `GENERATED_DIFFERS` on `.claude/agents/*.md`.
+    These come from W2-128's and W2-153's later skill and role changes. The `.claude/` copies need the operator's
+    regeneration ACT. **W2-128's, W2-153's and the operator's; not fixed here.**
 - **12. W2-66 `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`.**
   - W2-149's result schemas (`governance/project/orchestration/tools/indep-schemas/*.schema.json`, `6f811da36`) are
     `.json` under a DEC-891 place, so the case calls them records.
@@ -169,10 +177,18 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
     - (b) W2-149 moves the schemas out of DEC-891's places. About 1 h, W2-149's helper, and its paths and ACT change.
     - (c) List them as record-only. 5 min, but fails open. Not recommended.
   - Recommended (a), confidence medium-high.
+- **16. W1-46 2 cases** (`test_w1_46_guard_wiring.py::test_a_headless_workers_ordinary_arguments_pass_unchanged[engineer]`,
+  `test_w1_46_bypass_and_added_directories.py::test_a_harmless_permission_mode_is_launched[accept-edits]`).
+  - W2-153 (`27ab8f88d`) now passes the role template to the CLI after the worker's own arguments. The cases' "the
+    arguments unchanged, at the end" no longer holds.
+  - W2-153's R1 revised W1-46's other fixtures and missed these two. **W2-153's** (another helper's).
 - **13. Environment cases, not regressions.**
   - W2-54's `green_here` and `time_limit` need a store in the tree they run in (green in the main tree, which has
     one).
   - `test_a_warm_query_answers_within_half_a_second_at_p95` is on `load_sensitive`.
+  - `tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget`
+    is red alone at load 12.5 (warm p95 0.560 s against 0.5 s), and is not on `load_sensitive`. The CTO adds it to
+    the list (the ratchet entry), or the real-model latency moves to the nightly's measured runs.
 - **14. A coverage gap for W2-56's owner.** `tests/conftest.py` keeps the real code-graph tool off `PATH` for every
   suite but W1-16's and W1-20's (W2-56 S1, T-8). So W2-92's 30 tool cases skip in every full run.
 - **15. An incident in a designer's session (W1-33's, 01:00).** It ran `git worktree prune` from its sandbox. That
@@ -180,6 +196,6 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
   `W2-149-f11-tests`, `b56`). Only `commondir` and `config.worktree` are left. No branch or commit is affected.
   Later briefs forbid the command.
 
-**Cost:** about 26 launched sessions, about $75 (logged sums $49.05 for 17 and $10.93 for 2, plus the W2-145 review $3.36, its merge designer $0.66, the duplicate W2-141 engineer $0.79, the W2-96 review $5.94 and two designers' estimates), plus the CTO's helper
+**Cost:** about 28 launched sessions, about $85 (logged sums $49.05 for 17 and $10.93 for 2, plus the W2-145 review $3.36, its merge designer $0.66, the duplicate W2-141 engineer $0.79, the W2-96 review $5.94, the whole-tree designer $1.97 and review $4.76, and three designers' estimates; logs of removed worktrees went with them), plus the CTO's helper
 
 [DEC-1104 (1), DEC-1103 (2), DEC-1061 (2)-(3a), DEC-953 item 2, DEC-957, DEC-105, ACT-D4-RESTORE-1 §4-§5]
