@@ -49,15 +49,11 @@ The kernel's template set, version 1.0.0, as these bytes:
 Approving them means:
 1. The CIT-P record moves from PROPOSED to ACCEPTED, with your approval line.
 2. The set is promoted as version 1.0.0 of the kernel templates.
-3. The templates become the one source for briefs: the CTO prompt's Appendix A goes on your separate yes
-   (`TPL6-APPENDIX-A.md`), and `LEAD-w2-common.md` already points at them (`15c606f6`).
+3. The templates become the one source for briefs: the CTO prompt's Appendix A already points at them (your yes,
+   DEC-1115 (3), `74767736`), and so does `LEAD-w2-common.md` (`15c606f6`).
 
 ## What is still open (it does not wait on this approval)
 - **The test-design skill's five remaining CAP-38.b citations** (row 89), as a later 1.2.1 delta.
-- **Round 2a (text, W2-128):** review F6 (the orchestration skill and `roles/orchestrator.md` still describe the
-  retired brief texts), F7 (the test-design skill forbids the integrated code that T-4 and DEC-963 permit), and the
-  `DAEO-0000` in `checkpoint.md`'s example. These are kernel skill and role edits, so they join this CIT-P.
-- **The code half:** W2-152 (`gov brief`, the ready check) and W2-153 (delivery at launch), both engineer tickets.
 - **The measures and the pilot:** TPL-7 and TPL-8 (M1 to M6 against R2's baselines). These show whether the
   templates are read and followed; the approval does not wait on them.
 
