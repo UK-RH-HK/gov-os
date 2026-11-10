@@ -429,7 +429,7 @@ BAD_RULES = {
     "subprocess": "import subprocess\nsubprocess.run(['true'])\n",
     "exec": "import os\nos.execv('/bin/true', ['true'])\n",
     "socket": "import socket\nsocket.socket()\n",
-    "write": "open('/tmp/indep-rules-probe-w2-149', 'w').write('x' * 10)\n",
+    "write": "open('@TMP@/probe.txt', 'w').write('x' * 10)\n",
     "missing": "import sys\nsys.stdin.read()\nprint('{}')\n",
     "garbage": "print('not json')\n",
     "exit": "import sys\nsys.exit(3)\n",
@@ -457,19 +457,24 @@ def test_a_good_rule_script_gives_every_id_once(monkeypatch, tmp_path):
 @pytest.mark.parametrize("name", sorted(BAD_RULES))
 def test_a_rule_script_that_breaks_out_or_fails_is_18(monkeypatch, tmp_path, name):
     with pytest.raises(indep_launch.Refuse) as e:
-        rule_run(monkeypatch, tmp_path, BAD_RULES[name])
+        rule_run(monkeypatch, tmp_path, BAD_RULES[name].replace("@TMP@", str(tmp_path)))
     assert e.value.code == 18
-    assert not os.path.exists("/tmp/indep-rules-probe-w2-149") or os.path.getsize("/tmp/indep-rules-probe-w2-149") == 0
+    probe = tmp_path / "probe.txt"  # no byte written (RLIMIT_FSIZE 0; under bwrap the file is not even reachable)
+    assert not probe.exists() or probe.stat().st_size == 0
 
 
 def test_a_rule_script_past_the_wall_clock_is_stopped_18(monkeypatch, tmp_path):
     monkeypatch.setattr(indep_launch, "RULES_WALL_S", 2)
-    marker = tmp_path / "pid"
-    script = f"import os, time\nopen({str(marker)!r}, 'w')\ntime.sleep(60)\n"
     with pytest.raises(indep_launch.Refuse) as e:
         rule_run(monkeypatch, tmp_path, "import time\ntime.sleep(60)\n")
     assert e.value.code == 18 and e.value.word == "cap"
-    del script
+
+
+def test_a_rule_script_flooding_its_output_is_stopped_at_the_cap_18(monkeypatch, tmp_path):
+    monkeypatch.setattr(indep_launch, "RULES_OUT_BASE", 1 << 16)
+    with pytest.raises(indep_launch.Refuse) as e:
+        rule_run(monkeypatch, tmp_path, "import sys\nwhile True:\n    sys.stdout.write('x' * 65536)\n")
+    assert e.value.code == 18 and e.value.word == "cap"
 
 
 def test_rule_output_checks():
