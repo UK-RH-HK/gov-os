@@ -1,0 +1,36 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "29907d75048f",
+   "after": "89495ad154fd"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/reviews/D10-W2-13-review.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/reviews/D10-commands-review.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W2-13"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "26726eb52844",
+   "after": "89495ad154fd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "acceptance folder",
+   "folder": "W2-13"
+  }
+ ]
+}
