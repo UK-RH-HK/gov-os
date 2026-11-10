@@ -15,6 +15,14 @@
   - **A3 (DEC-1113 (2)): the overlap auditor.** The labellers' disagreements are decided by an independent auditor
     under its own fixed brief, `briefs/overlap-auditor.md`, from the decisions alone (§5).
   - **A4: the briefs' version 3 and the auditor's version 1,** with their sha256s in §12.
+  - **A5 (2026-11-10, the CTO, delegated under DEC-1112 (3)): the seeds.** §5's blank ("derived from this record's
+    commit id") is replaced: the launch script draws each wall's seed itself (W2-149 S6; DEC-1101 (2), "a seed recorded
+    before writing") and writes it to its `SEEDS.log` before any content is delivered; the blank is filled at the run
+    from that ledger. The overlap's SEED (§5's `sha256(SEED + "overlap" + id) mod 10 = 0`) is the seed of that half's
+    labeller-2 round-2 wall, the one labeller-2's brief calls "the declaration's overlap seed". Reason: a seed derived
+    from a commit id is knowable in advance by anyone holding the id (labeller 1's tree and the tuner among them), which
+    weakens the blind overlap; the script's own draw is unknowable before the run. No brief, label rule, bar or split
+    changes. Before set-up A's first extractor run.
 - **Sources:**
   - the approved design, `SANDBOX-GUARD-EXP-1.md`, with the owner's ten answers (DEC-1099 (1));
   - the seal, `ACT-SANDBOX-SEAL-1.md`;
