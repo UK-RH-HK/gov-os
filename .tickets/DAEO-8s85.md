@@ -24,6 +24,8 @@ allowed_paths:
 - tests/unit/launch/test_w1_28.py
 - tests/unit/launch/test_w1_32.py
 - tests/unit/launch/test_w2_136_plan_check.py
+- tests/unit/resources/test_w2_20_launch.py
+- tests/unit/resources/test_w2_20_round3.py
 - governance/project/orchestration/tools/dispatch/launch_now.sh
 - .rulesync/subagents/*.md
 - template/.rulesync/subagents/*.md
@@ -78,5 +80,19 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
     `test_w2_136_plan_check.py`) write the role's `.claude/templates/<stem>.md` in their fixture. W2-136's case that
     the caller's arguments end the argv now allows the one appended flag. Paths added. Refusing only when the folder
     exists was not taken: it would fail open against F1.
+
+- **The review's R1 (2026-11-09, the CTO, DEC-1112 (3)):**
+  - The CTO scanned the suites the review named, on a clean `w2/W2-153` checkout against its merge base: 58 cases
+    newly red.
+    - Unit, the engineer's (paths added): `tests/unit/resources/test_w2_20_launch.py` (29) and `test_w2_20_round3.py`
+      (7).
+    - Acceptance support files, a test designer's under DEC-866 (`Rewrite-Reason:`), in the same commit:
+      - W2-20: `test_w2_20_launch.py` (13), `test_w2_20_plan_source.py` (2), `test_w2_20_stale_samples.py` (1);
+      - W2-136: `test_w2_136_launch_check.py` (3);
+      - W1-46: `test_w1_46_held_out.py` (2), `test_w1_46_experiment_folder.py` (1).
+  - 141 cases in W1-28, W1-32, W1-46, W2-58, W1-50 and W2-54 are red on the base too. Their fixtures' machine gate
+    file is missing (W2-20's gate), so the launch stops before the template check. Their launch fixtures plant the
+    copy too, so W2-153 does not turn them red again once the gate files are fixed.
+  - Each fixture plants `.claude/templates/<stem>.md` for the role it launches (any byte content).
 
 **Not here:** the templates' text (W2-128); `gov brief` (W2-152).
