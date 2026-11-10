@@ -125,11 +125,12 @@ def test_s14_a_result_failing_its_kind_s_schema_is_rejected_20(world):
 
 DESTINATION = {"writer": "fixtures/evaluation/memory-verdict-4/hidden",
                "checker": "fixtures/evaluation/memory-verdict-3/XCHECK-r1.md",
-               "auditor": "runs/audit-1/miss-classes.json",
-               "labeller": support.SEALED + "/labels/{run}.jsonl"}
+               "auditor": "runs/audit-1/miss-classes.json"}
 
 
-@pytest.mark.parametrize("kind", support.KINDS)
+# Revised for DEC-1112 (3) (S16 changed): the labeller kind has set-up A's flows only, so its old destination
+# (labels/<run>.jsonl) is gone from this case; set-up A's deliveries are test_w2_149_setup_a_delivery.py's.
+@pytest.mark.parametrize("kind", ("writer", "checker", "auditor"))
 def test_s16_the_delivery_lands_only_where_the_kind_delivers(world, kind):
     before = world.hashes(world.sr)
     run = world.deliver(kind)

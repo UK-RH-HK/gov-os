@@ -71,6 +71,9 @@ if plan.get("wait"):
     _until = time.monotonic() + float(plan["wait"])
     while time.monotonic() < _until and not (plan.get("release") and os.path.exists(plan["release"])):
         time.sleep(0.05)
+if plan.get("sealed_parent"):
+    for folder in folders:
+        os.chmod(os.path.dirname(os.path.abspath(folder)), 0o500)
 '''
 
 
@@ -91,9 +94,13 @@ def install_stand_in_cli(sandbox):
     return cli
 
 
-def plan(cli, files=None, exit_code=0, sealed=(), ready=None, pid=None, release=None, wait=None):
-    """What the next stand-in session does in its temp folder, and how it ends."""
-    data = {"files": dict(files or {}), "links": {}, "exit": int(exit_code), "sealed": list(sealed)}
+def plan(cli, files=None, exit_code=0, sealed=(), ready=None, pid=None, release=None, wait=None, sealed_parent=False):
+    """What the next stand-in session does in its temp folder, and how it ends.
+
+    ``sealed_parent``: as its last act the session leaves the folder its temp folder is in read-only (``stuck_plan``).
+    """
+    data = {"files": dict(files or {}), "links": {}, "exit": int(exit_code), "sealed": list(sealed),
+            "sealed_parent": bool(sealed_parent)}
     for key, value in (("ready", ready), ("pid", pid), ("release", release)):
         if value is not None:
             data[key] = str(value)
@@ -112,8 +119,26 @@ def listing(sandbox):
     return sorted(os.listdir(sandbox.tmpdir))
 
 
+def stuck_plan(cli, exit_code):
+    """A session that ends with ``exit_code`` and leaves a temp folder the launcher cannot remove.
+
+    D-10's red fix (DEC-1112 (3); DEC-902, W2-M405): W2-56 removes the whole temp folder on every ending and restores
+    0700 on it first, so a read-only folder inside it (``sealed``) no longer makes the removal fail. The folder the
+    temp folder is in is left read-only too (``sealed_parent``): the launcher may empty its temp folder, but it
+    cannot unlink the temp folder from a folder it may not write, and it does not change the mode of a folder that
+    is not its temp folder. The premise a case checks is that the temp folder is still there (``removal_failed``).
+    """
+    plan(cli, files=LEFT, sealed=("sealed",), exit_code=exit_code, sealed_parent=True)
+
+
+def removal_failed(folder):
+    """The case's premise: the session's temp folder is still there after the launcher's end."""
+    return os.path.lexists(folder)
+
+
 def unseal(folder):
-    """Make every directory under ``folder`` writable again, so that the test's own folder can be removed."""
+    """Make ``folder`` and every directory under it writable again, so that the test's own folder can be removed."""
+    os.chmod(folder, 0o700)
     for current, names, _ in os.walk(folder):
         for name in names:
             path = os.path.join(current, name)
