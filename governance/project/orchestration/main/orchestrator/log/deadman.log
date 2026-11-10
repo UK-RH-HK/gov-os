@@ -6353,3 +6353,4 @@
 {"at": "2026-11-10 09:55:12", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 09:35:15", "pending_tool": null, "age_min": 19, "verdict": "alive"}
 {"at": "2026-11-10 09:57:26", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 09:35:15", "pending_tool": null, "age_min": 22, "verdict": "alive"}
 {"at": "2026-11-10 09:59:40", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 09:35:15", "pending_tool": null, "age_min": 24, "verdict": "alive"}
+{"at": "2026-11-10 10:01:50", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 10:01:26", "pending_tool": null, "age_min": 0, "verdict": "alive"}
