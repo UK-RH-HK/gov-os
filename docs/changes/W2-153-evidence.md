@@ -33,3 +33,21 @@ allows the one appended flag. Acceptance 51/51; W2-128 92/92.
 
 **Switch-over round (2026-11-10):** W2-128's round 2a is merged, so the test designer's sources and
 `portability.ROLE_SKILLS` list `test-design`; the exception and its comments are dropped.
+
+**S3 amended (2026-11-10, the CTO, DEC-1112 (3)):** the composed agents lacked the role file's labelled fields.
+- `portability.compose(root, role) -> str` is the expected source's full text: the source's own rulesync front matter
+  as written (with `claudecode.skills`), a blank line, the role template's body, one blank line, and the kernel role
+  file's body (its front matter, if any, stripped by `_split`). A role without a template: the role file's body alone.
+  It raises `FileNotFoundError` without a kernel, role file or source.
+- `_kernel_findings` compares each role source's body with `compose()`'s (the blank lines after the front matter stay
+  the one tolerated difference). A `SOURCE_DIFFERS` names both origins: "differs from its composition of
+  `<template>` and `<role file>`". The skills, tools and `TEMPLATE_COPY_*` checks are unchanged.
+- The twelve sources were written from `compose()` by a one-off scratch script: each only gained the role file's body.
+- Verified: `tests/unit/adapters/test_w2_153_compose.py` (15) and `test_w2_153_portability.py` (18), 33 passed;
+  `tests/unit/adapters` and `tests/unit/launch` 314 passed (126 left out by the repository's opt-in lists, none by
+  the real-model exclusion); acceptance `tests/acceptance/W2-153` 66 passed; portability with rulesync 24.0.0: only
+  the six `GENERATED_DIFFERS` for `.claude/agents/*.md`, which ACT-CLAUDE-COPIES-3 regenerates; W1-33 21 failed,
+  90 passed, 1 skipped, all 21 in `test_w1_33_agent_definitions.py`, which reads `.claude/agents/` (red until the ACT).
+- `rulesync generate --targets claudecode --features subagents` from a temporary copy into an empty folder writes the
+  six agents; the engineer's carries `skills: [test-driven-development]` and the labels Purpose, Allowed paths, Tools,
+  Network, Model tier, Authority level, Handoff format and Permission classes.
