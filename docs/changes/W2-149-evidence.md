@@ -264,6 +264,57 @@ the only fix was the docstring's five brief paths (and the unit test that pinned
   (success-9, -11, -12) and the `bwrap` cases (success-25 six, failure-11 five), run by the CTO outside the sandbox
   (the lead's measure there: 144 passed, 2 failed).
 
+## F18-F23 (DEC-1112 (3))
+
+The engineer, 2026-11-10, branch `w2/W2-149-sgx` from the designer's `939da2755` (build `6a959ffc5`). Built to the
+ticket's changed lines S25 and S27, the new lines S29, S30 and S31, and the interface's F18-F23 bullets
+(`.gov-runtime/scratch/lead/INTERFACE.md`); the wiring review's F26 rides along. Line numbers are `indep_launch.py`'s
+at `6a959ffc5`. Nothing else changed in behaviour; the template's two files and the schemas are unchanged.
+
+| Line | Finding | What | `indep_launch.py` |
+|---|---|---|---|
+| S25 | F18 | At labeller 1's round-1 delivery, after the outputs are read and the destinations checked and before anything lands, `out/label_rules.py` runs under the same confined check (`staged_rules` → `run_rules`) over the half's staged lines. Any failure there (each 18 case, `bwrap` or the interpreter missing included, or an `OSError`) becomes `Refuse(20, "rules")`: `rejected`, reason `result`, nothing under `H/labels/r1-sgx1-labeller/`, the wall packed. Its output is neither staged nor delivered. Round 2 keeps its own check (18). The protected list (HOME, sets root, runs, trees, repository) is computed once and kept on the plan. | `staged_rules` 1261-1265; round 1 1820-1824; round 2 2192-2195; protected 2191 |
+| S29 | F19 | `check_result` records the valid result's `stopped`; `deliver_sgx` refuses 20 (`stopped`) before any landing when it is not `none`, for every flow and round: `out.schema_ok` true, `out.stopped` the word, every destination, the map and `owner.jsonl` unchanged, no `AUDITS.log` line, the out/ products in the wall's tar only. The round-1 rule check is not reached then. | 1920; 1807-1808 |
+| S30 | F20 | `check_labels2`: one line per id of the wall's `input/sample.jsonl` (kept as `overlap_ids` when staged), none missing, extra or repeated, each exactly `id label rule_class clauses how reason` with `label` allow/refuse/ask, `rule_class` per S31, `clauses` a list of strings, `how` `hand`, `reason` a string; else 20 with nothing written. Delivered line by line in the file's order, each as written but with `rule_class` an integer. | `check_labels2` 1782-1802; `overlap_ids` 1017; called 1831 |
+| S27 | F21 | In each dispute, when either side's `reason` is empty (or absent), both sides get `""`. When both sides have one, both are kept. `label`, `rule_class` and `clauses` are as in each file. | `stage_sgx` 994-995 |
+| S27 | F22 | A settled case (`flag` `none`) becomes exactly `{"id", "label", "rule_class", "clauses": basis, "reason", "how": "audit"}` from the auditor's decision. A flagged case keeps labeller 1's line with `how: "owner"`, unchanged from before. | `deliver_audit` 1877-1881 |
+| S31 | F23 | `rule_class(v)`: a JSON integer 1-14 (not a boolean) or a string fully matching `(?:[1-9]\|1[0-4])`; anything else is `None`. It is used in the rule script's output check (18 at round 2, 20 at round 1's delivery), the hand labels, `labels-2.jsonl` and the decisions (20 each). Every file the script writes carries an integer: `script-labels.jsonl` (a line given as a string is re-serialised), the merged `labels.jsonl`, `labels-2.jsonl`, the delivered `<run>.decisions.jsonl` (and `owner.jsonl`'s decision, the rewritten settled lines). | `rule_class` 841-852; 1246-1253; `valid_hand`; `merge_labels`; `check_decisions` 1765-1775 |
+
+- **F26:** the unit test of the network wall now aims at a listener the test plants (`127.0.0.1:0`), and asserts that
+  no connection reached it. It no longer touches 127.0.0.1:11434.
+- **The unit stub** (`test_w2_149_indep_launch.py`'s `STUB`) gains `per_id`. With it the stand-in session can write
+  one line per id of a wall input, as labeller 2's round 2 needs, since that wall's sample is drawn from the script's
+  own seed.
+- **Unit tests changed for the new behaviour:**
+  - Writer 2's `not-sealed` result is now 20, not delivered (F19).
+  - The round-2 refusal (18) now uses a script that passes round 1's check and fails at round 2 on an action added
+    to the half since. A script that fails at round 1 no longer lands (F18).
+
+### Tests (F18-F23)
+
+- **Unit** (`tests/unit/orchestration/test_w2_149*`): **152 passed, 3 skipped** with every row
+  (`--optin=lifted --optin=breadth`), through the heavy slot, with `-m "not local_only" -k "not real and not
+  green_here and not time_limit"`, which leaves out none of them. The 3 skipped are the real-`bwrap` cases (now
+  including F26's planted listener). There are 36 new rows:
+  - F18: five round-1 rejections (subprocess, missing id, non-zero exit, no `bwrap`, `"07"`) and string classes
+    passing round 1, stored as integers at round 2.
+  - F19: one per flow and round, seven in all.
+  - F20: a good file, and nine bad forms (missing, extra, repeated, bad label, `how`, class, extra key, clauses,
+    reason).
+  - F21: the blinded reasons.
+  - F22 and F23: the settled line's form with string classes, eight bad decision classes, `rule_class`'s forms, and
+    the rule output and merge with string forms.
+- **`gov accept W2-149`** (in the sandbox, through the heavy slot, at `6a959ffc5`): **165 passed, 0 failed, 35
+  skipped.**
+  - Every line passes except success-26 (0 passed, 0 failed, 2 skipped), red only because both its cases are `bwrap`
+    cases skipped in the sandbox.
+  - The new lines: S29 5/0/2, S30 7/0/0, S31 17/0/17. The changed lines: S25 1/0/9, S27 15/0/0.
+  - The skips are the live cases (success-9, -11, -12) and the `bwrap` cases (success-16 2, -25 9, -26 2, -28 1,
+    -29 2, -31 17, failure-11 8). The lead runs them outside the sandbox.
+- **sha256** of `indep_launch.py` at `6a959ffc5`: `95fe78dd49bb493194e33cc6a832bc3674b6998ac06010cc5a5d4f7aade5f1d0`. The template's two files are unchanged:
+  `kinds.yaml` `734b26e261faa81a4de7d4305e33291291d2e0949b4a4ba1c6fadd11672cd6df` and `tree-exclude.txt`
+  `e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537`, as in the table above.
+
 ## Notes on the runs
 
 - `gov accept` strips `PYTHON*` from its child's environment, so it ran with the session's own HOME (pytest lives in
