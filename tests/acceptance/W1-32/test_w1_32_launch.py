@@ -38,12 +38,15 @@ def _name(number):
 
 @pytest.fixture()
 def stuck(launch_project, sandbox, cli):
-    """``stuck(code)``: a launch whose session ends with ``code`` and leaves a folder that cannot be removed."""
+    """``stuck(code)``: a launch whose session ends with ``code`` and leaves a folder that cannot be removed.
+
+    Rewritten for D-10 (DEC-1112 (3)): W2-56 restores 0700 on the temp folder before it removes it whole (DEC-902,
+    W2-M405), so the session now also leaves the folder its temp folder is in read-only (``support.stuck_plan``)."""
     if os.geteuid() == 0:
         pytest.skip("a read-only folder does not stop the removal for the superuser")
 
     def _stuck(code):
-        support.plan(cli, files=support.LEFT, sealed=("sealed",), exit_code=code)
+        support.stuck_plan(cli, code)
         return support.launch(launch_project, sandbox, cli)
 
     yield _stuck
@@ -52,10 +55,14 @@ def stuck(launch_project, sandbox, cli):
 
 @pytest.mark.parametrize("code", (0, 7))
 def test_a_failed_removal_keeps_the_sessions_exit_code(stuck, code):
-    """DEC-332 holds when the folder stays: the launcher ends with the session's exit code, 0 included."""
+    """DEC-332 holds when the folder stays: the launcher ends with the session's exit code, 0 included.
+
+    D-10's rewrite (DEC-902, W2-M405): the removal fails at the temp folder's read-only parent, not at a sealed
+    folder inside it, so the premise is that the temp folder stays (its contents may be gone); the exit code is
+    asserted as before."""
     result = stuck(code)
     folder = support.w28.temp_folder(result)
-    assert (folder / "sealed" / "kept.txt").is_file(), "the fixture's folder was removed: the removal did not fail"
+    assert support.removal_failed(folder), "the fixture's folder was removed: the removal did not fail"
     assert result.run.returncode == code, (
         f"the session ended with exit code {code}, its temp folder could not be removed, and gov launch ended with "
         f"{result.run.returncode}\n{result.describe()}"
@@ -64,9 +71,11 @@ def test_a_failed_removal_keeps_the_sessions_exit_code(stuck, code):
 
 @pytest.mark.parametrize("code", (0, 7))
 def test_a_failed_removal_writes_one_line_to_stderr_that_names_the_folder(stuck, code):
+    """D-10's rewrite (DEC-902, W2-M405): the removal fails at the temp folder's read-only parent (``stuck``); the
+    one stderr line naming the folder, and no traceback, are asserted as before."""
     result = stuck(code)
     folder = support.w28.temp_folder(result)
-    assert os.path.lexists(folder), "the fixture's folder was removed: the removal did not fail"
+    assert support.removal_failed(folder), "the fixture's folder was removed: the removal did not fail"
     lines = [line for line in result.run.stderr.splitlines() if line.strip()]
     assert "Traceback" not in result.run.stderr, f"a failed removal ends as a traceback\n{result.describe()}"
     assert len(lines) == 1, f"stderr holds {len(lines)} lines after a failed removal, not one\n{result.describe()}"

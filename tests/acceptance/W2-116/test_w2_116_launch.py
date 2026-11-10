@@ -1,7 +1,11 @@
 """W2-116 S3 (widened, DEC-1087 (3)) and F1: ``gov launch`` points every worker session's retrieval at the
 integration store, so a plain search from a worktree with no store answers from it; a designer's retrieval never
 reads a ticket worktree's store (README). The store here is hand-built as the CTO's script builds it today
-(``support.hand_built_store``), so these cases do not wait on S1's command."""
+(``support.hand_built_store``), so these cases do not wait on S1's command.
+
+D-10's red fix (DEC-1112 (3); DEC-826 Q5, DEC-877 item 4): W2-56's cleaned session environment passes no parent
+variable, so the stand-in CLI gets its log path, its question and the case's environment written into it
+(``support.install_cli``), and the project plants W2-153's role templates; every assertion below is unchanged."""
 
 from __future__ import annotations
 
