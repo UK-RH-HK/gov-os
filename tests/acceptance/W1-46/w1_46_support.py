@@ -490,6 +490,19 @@ def assert_refused(result, *words):
     )
 
 
+def caller_args_then_template_pair(argv, args):
+    """True when ``args`` are one contiguous, ordered run at the end of ``argv``, followed by nothing or by exactly
+    ``--append-system-prompt-file <...>/.claude/templates/<stem>.md`` (W2-153's S1, DEC-1050; DEC-866). The rule is
+    W2-56's revised S6. An extra argument, a dropped one or a reordering still fails."""
+    argv, args = list(argv), list(args)
+    if argv[-len(args):] == args:
+        return True
+    if len(argv) < len(args) + 2 or argv[-len(args) - 2:-2] != args or argv[-2] != "--append-system-prompt-file":
+        return False
+    head, sep, stem = argv[-1].replace("\\", "/").rpartition("/.claude/templates/")
+    return bool(sep and head and stem.endswith(".md") and len(stem) > 3 and "/" not in stem)
+
+
 # --------------------------------------------------------------------------
 # What the built settings say
 # --------------------------------------------------------------------------
