@@ -1,6 +1,25 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-10 ~16:20 UTC: session `412a4e37` (the fresh session, DEC-1110 (2)); next free id DEC-1122
+## RESUME HERE — 2026-11-10 18:15 UTC: session `412a4e37` hands over during D-10 run 1 (DEC-1122 (2)); next free id DEC-1123
+- **D-10 run 1 RUNNING since 18:10:09 UTC** (the records' "after 18:20" is wrong: correct it in the next commit), head
+  `afad23270a30`, 16 workers (nproc 20; 15.1 GB available at start), heavy slots lifted (`NIGHTLY_HEAVY` to no gate),
+  detached: `bash tools/d10_run.sh run1 16`, pid `159396` (`log/d10/run1/pid`); ends when `log/d10/run1/exit` exists;
+  `log/d10/run1/summary.txt` (wall times, swap max, min free), `vmstat.log`, `nightly.out`; then the lifted step runs
+  itself (278 paths, report-only, `lifted.xml`). Expected 1.3-1.5 h (4 h if the embedders fail as on 11-02:
+  `packages/D10-RUNTIME.md`); look at the first hour's parallel result early.
+- **NO commits on w2/integrate until `exit` exists** (sync_context to record/w2 is fine). No helpers, no workers.
+  Stopped for the run: the store backstop and the helper watch (re-arm both after it). Kept: the GPU servers, the
+  reranker, the sentinel, the dead-man, the inbox waiter, bare/sentinel checks, usage log.
+- **At its end, to the owner:** the worker count (16), the measured times (nightly wall, lifted wall), the swap figure
+  and min free memory; then **the triage of the reds by group** (re-run each alone; the 11-02 map
+  `P1-NIGHTLY-2026-11-02.md`), plus the two record reds (row 110); fixes by role under RUBRIC-2 and usage (A).
+- **Owner decisions today:** DEC-1120 (RUBRIC-2), DEC-1121, DEC-1122 ((A) from now; template 1.0.1 approved, merged
+  `6cc09c7ea`; D-10's go). Applied: INSTALL-1, DEADMAN-WAKE-1, CLAUDE-COPIES-3, PATHMAP-NS-2 `58211909f`,
+  EFFORT-HIGH-2 (HOME, no commit). Collection fix merged `f6222134c`. (B) extra usage: the owner checks.
+- **After the run, records to make:** the run's start time correction; DAEO-8s85's allowed_paths and the two evidence
+  docs' old test paths (renamed `*_unit_*`); landing P1 triaged (memory `merge-task-trailer`).
+
+## RESUME HERE (history) — 2026-11-10 ~16:20 UTC: session `412a4e37` (the fresh session, DEC-1110 (2)); next free id DEC-1122
 - **Start checks passed 15:26** (pin, guard PASS, hook `74f8dbea4761`, map `44f99ea563cb`, bare false); watchers armed;
   digests CronCreate `632cadb7` 09:02 and `50697231` 18:02 (session jobs). Phone push works (DEC-1117 (2) done).
 - **Decided today in this session:** DEC-1120 RUBRIC-2 (standing; changes DEC-839 (1)-(3); rule 11 rewritten);

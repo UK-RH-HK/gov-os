@@ -295,3 +295,11 @@
 2026-11-10 16:20:52 hook: waited 30s for the operator's commit freeze to clear
 2026-11-10 16:20:52 landing 905b82a3bf14..a4e703580bd1: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-10 16:30:22 landing a4e703580bd1..d160f2916b1a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 16:33:46 landing d160f2916b1a..3ebaa78b75f9: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 17:01:21 landing 3ebaa78b75f9..52e3f545bb89: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 17:34:26 landing 52e3f545bb89..58211909f744: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 17:35:34 landing 58211909f744..99419edb4a37: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 17:41:14 landing check: P1 6cc09c7ea644 (template/governance/kernel/templates/ticket.md): a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+2026-11-10 17:41:14 landing 99419edb4a37..6cc09c7ea644: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 17:53:37 landing 6cc09c7ea644..f6222134c826: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 18:10:01 landing f6222134c826..afad23270a30: 1 commit(s); none outside a ticket on the trigger paths

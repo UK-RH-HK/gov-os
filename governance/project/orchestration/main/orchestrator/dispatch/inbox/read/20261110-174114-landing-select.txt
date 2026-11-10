@@ -1,0 +1,5 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log
+Landing check (OPERATOR-AGENT-1 §3, S16) after the landing 99419edb4a37..6cc09c7ea644 on w2/integrate: commit 6cc09c7ea644 (Merge W2-128-tpl101 into w2/integrate: the kernel ticket template 1.0.1 with class (0aa20ac0c)) touches template/governance/kernel/templates/ticket.md: a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+status: P1
+
+triage (CTO 412a4e37, 2026-11-10 17:43:00): not a fault in substance. The merge 6cc09c7ea is the owner-approved template 1.0.1 (DEC-1122 (1)); its two commits carry Task: DAEO-t8mp (W2-128). The merge commit carried only Task: DAEO-sdxk, so the check read it as outside a ticket: a trailer slip by the CTO (ticket merges carry the ticket id, e.g. 13f15785f DAEO-8s85). No history rewrite; recorded in DECIDED-NOT-DONE row 108 with the next record commit.

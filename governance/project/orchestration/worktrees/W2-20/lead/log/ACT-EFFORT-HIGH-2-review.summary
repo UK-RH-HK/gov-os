@@ -1,0 +1,1 @@
+launch_worker independent-auditor DAEO-r30l: session exit 0; tripwire clean; sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-20/.gov-runtime/scratch/lead/log/ACT-EFFORT-HIGH-2-review.json; spend recorded (projection 6)
