@@ -1,13 +1,13 @@
-dispatcher 2026-11-10 01:52:05
+dispatcher 2026-11-10 01:53:05
 leads running (0, from the processes): none
-load 13.7/12.7/11.8; real busy cores 5.94 of 20 (the embedding server 0.08); memory available 14255 MB; gate_check (for comparison) open (OPEN leads=0 load=13.7/11.8 nproc=20 have=14590040kB need=5285964kB); disk open
-Balance: CPU 5.94/20 busy (band 14-18: below); RAM 13.9 GB available (floor 3.0 GB); GPU 6.5/15.9 GB used, 9.4 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared BUSY 13 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 0 (0.0 GB RSS; 0 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9612 samples since 2026-11-02 13:00))
-Forecast: lead: admits, binding CPU: CPU 14.5 of 18 cores (busy 5.94 + running jobs' peaks 6.6 + the newcomer's 2.0); slot: admits, binding CPU: CPU 17.4 of 18 cores (busy 5.94 + running jobs' peaks 6.6 + the newcomer's 4.95); rebuild: REFUSES, binding CPU: CPU 18.2 of 18 cores (busy 5.94 + running jobs' peaks 6.6 + the newcomer's 5.68); pairing loads CPU 0.69, GPU 0.47
-Jobs by phase: slot pid 1279397 test (3.05 cores, 0.6 GB); slot pid 1394155 test (0.3 cores, 0.1 GB)
-GPU rule: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 1499 MiB (floor 2048 MiB): no spill
+load 6.8/10.9/11.2; real busy cores 2.19 of 20 (the embedding server 0.0); memory available 14530 MB; gate_check (for comparison) open (OPEN leads=0 load=6.8/11.2 nproc=20 have=14875780kB need=5285964kB); disk open
+Balance: CPU 2.19/20 busy (band 14-18: below); RAM 14.2 GB available (floor 3.0 GB); GPU 6.5/15.9 GB used, 9.4 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 0 (0.0 GB RSS; 0 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9612 samples since 2026-11-02 13:00))
+Forecast: lead: admits, binding GPU: GPU memory 9.1 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 2.6; 2 GPU reranker slot(s) free); slot: admits, binding CPU: CPU 10.2 of 18 cores (busy 2.19 + running jobs' peaks 3.1 + the newcomer's 4.95); rebuild: admits, binding CPU: CPU 10.9 of 18 cores (busy 2.19 + running jobs' peaks 3.1 + the newcomer's 5.68); pairing loads CPU 0.29, GPU 0.47
+Jobs by phase: rebuild pid 1401163 rebuild.embedding (0.04 cores, 0.1 GB)
+GPU rule: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 1498 MiB (floor 2048 MiB): no spill
 Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
 Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 2), spill floor 2048 MiB; config.json overrides: gpu_shared_floor_mib 2048 (derived 1019)
-admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule "slots" in config.json read as the forecast); GPU memory 9647 MiB free >= 5632 MiB; forecast admits (binding CPU: CPU 14.5 of 18 cores (busy 5.94 + running jobs' peaks 6.6 + the newcomer's 2.0))
+admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule "slots" in config.json read as the forecast); GPU memory 9649 MiB free >= 5632 MiB; forecast admits (binding GPU: GPU memory 9.1 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 2.6; 2 GPU reranker slot(s) free))
 peaks 2026-11-09 22:32:03: a lead p95 2026 MB, max 3244 MB
 heavy steps outside a slot: none
 heavy slots held: gov-os-heavy-slot-1.lock; queue free; land: nothing to land; main tree NOT clean on w2/integrate
@@ -15,6 +15,6 @@ inbox unread: 0
 ready list: nothing waiting
 sentinel: watched
 guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
-embedding server: shared BUSY 13 tasks/min; query IDLE 0 tasks/min
-GPU: RTX 5070 Ti 6.5/15.9 GB, 1 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29
-heavy slot holders: slot 1 pid 1279397 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/ta) idle 2 min
+embedding server: shared IDLE 0 tasks/min; query IDLE 0 tasks/min
+GPU: RTX 5070 Ti 6.5/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29
+heavy slot holders: slot 1 pid 1401163 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/ta) idle 0 min
