@@ -168,3 +168,8 @@ The wiring review's F18-F23 merged in `90c1fea6c`: the designer's cases `939da27
 **2026-11-10T13:05:00Z**
 
 F36 and F38 closed rather than named (the CTO's decision, DEC-1112 (3); DEC-1113 (2): the auditor decides from the decisions alone, blind): S27 now blanks every dispute's reasons (x/y kept in the seeded order); S23 adds to the overlap auditor entry's `tree_exclude` every file that states the tell. Tests first, one review, merged in one command; then ACT-W2-149-INSTALL-1 rebuilt (its `kinds.yaml` line changes).
+
+**2026-11-10T13:45:00Z**
+
+F36 and F38 closed, merged in `2f98aecbc`: the designer's `be77be65a` (6 red for their reasons), the engineer's `c49799f77`, `bdda27d28`. `gov accept W2-149` at the merge, declared form with the `bwrap` opt-in: **pass, 206 passed, 0 failed, 3 skipped (live)**; outside the sandbox with the opt-ins 362 passed; live 3 passed. Script `90b943aef8be`, `kinds.yaml` `ddd84ae25910`. Narrow review READY by verdict.py (`reviews/W2-149-sgx-review-f36.md`): its search of the auditor's tree at the head found no file stating the sides. Row **F40** (in, ordinary work, other): the auditor's blind now rests on the excluded places; a later record restating the sides elsewhere (DECISIONS-IN-FORCE, the register, `governance/project/orchestration/reviews/`) would bring it back; before the auditor's first real run the CTO dry-builds its wall at the amended pin and searches its tree (option (a)), and until then records describing the dispute sides stay under `.tickets/`, `packages/` or `.gov-runtime/`.
+
