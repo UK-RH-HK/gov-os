@@ -133,6 +133,12 @@ for rel, text in cfg.get("out", {}).items():
     p = os.path.join(os.getcwd(), rel)
     os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w").write(text)
+for rel, spec in cfg.get("per_id", {}).items():  # one line per id of an input file (set-up A's labeller 2)
+    ids = [json.loads(x)["id"] for x in open(os.path.join(os.getcwd(), spec["src"])) if x.strip()]
+    ids = ids[spec.get("drop", 0):] + spec.get("extra", []) + ids[:1] * spec.get("repeat", 0)
+    p = os.path.join(os.getcwd(), rel)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    open(p, "w").write("".join(json.dumps(dict(spec["line"], id=i)) + "\n" for i in ids))
 if cfg.get("trace_drawn"):
     trace_drawn("session-env")
 if mode == "child":

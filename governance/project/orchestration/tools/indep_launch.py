@@ -25,8 +25,9 @@ Set-up A (SANDBOX-GUARD-EXP-1; DEC-1112 (3), DEC-1113): a brief whose front matt
 missing `model`, `result_schema` and `sample` from that id's entry under the template kinds.yaml's `briefs:`, and the
 entry's `flow`: the two planted-case writers, the two labellers (the labeller kind runs these flows only) and the
 overlap auditor. `--set` names the half (`tuning`: <runs>/SANDBOX-GUARD-EXP-1/tuning; `held-out`: the sealed folder
-under the sets root); the inputs are staged and the products delivered by the script's own code. At the first
-labeller's round 2 its round-1 rule script runs confined (bwrap, no network, no process, capped), else code 18.
+under the sets root); the inputs are staged and the products delivered by the script's own code. The first
+labeller's rule script runs confined (bwrap, no network, no process, capped) at its round-1 delivery (else 20, nothing
+lands) and again at its round 2 (else code 18). A result whose `stopped` is not `none` delivers nothing (20).
 
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
 budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
@@ -837,6 +838,19 @@ def staged_half(h, top):
     return lines
 
 
+RULE_CLASS_RX = re.compile(r"(?:[1-9]|1[0-4])")
+
+
+def rule_class(v):
+    """(F23, S31) A session's rule class as an integer: a JSON integer 1-14 (never a boolean) or a decimal string
+    "1"-"14" (no sign, no leading zero, no space); None for anything else."""
+    if isinstance(v, int) and not isinstance(v, bool):
+        return v if 1 <= v <= 14 else None
+    if isinstance(v, str) and RULE_CLASS_RX.fullmatch(v):
+        return int(v)
+    return None
+
+
 def by_rule(seed, word, ident, mod):
     return int(hashlib.sha256((str(seed) + word + ident).encode("utf-8")).hexdigest(), 16) % mod == 0
 
@@ -977,6 +991,8 @@ def stage_sgx(sgx, rnd, seed, commit):
             first = rng.random() < 0.5  # x is labeller 1
             xmap[i] = {"x": 1, "y": 2} if first else {"x": 2, "y": 1}
             a, b = part(sgx["labels1"][i]), part(sgx["labels2"][i])
+            if not (a.get("reason") and b.get("reason")):  # (F21) an empty reason on either side blanks both
+                a["reason"] = b["reason"] = ""
             x, y = (a, b) if first else (b, a)
             lines.append(json.dumps({"id": i, "action": action, "x": x, "y": y}) + "\n")
         sgx["xmap"] = xmap  # written at delivery only, never into the wall
@@ -996,9 +1012,10 @@ def stage_sgx(sgx, rnd, seed, commit):
             sgx["sample_ids"] = [i for i, _b, _o, _r in staged if by_rule(seed, "labeller-sample", i, 20)]
             files["input/sample.json"] = (json.dumps({"ids": sgx["sample_ids"]}) + "\n").encode("utf-8")
         else:
-            picked = [b for i, b, _o, _r in staged if by_rule(seed, "overlap", i, 10)]
+            picked = [(i, b) for i, b, _o, _r in staged if by_rule(seed, "overlap", i, 10)]
             sgx["n_overlap"] = len(picked)
-            files["input/sample.jsonl"] = b"".join(picked)
+            sgx["overlap_ids"] = [i for i, _b in picked]  # the ids labels-2.jsonl must hold (F20)
+            files["input/sample.jsonl"] = b"".join(b for _i, b in picked)
     return files
 
 
@@ -1226,16 +1243,26 @@ def check_rule_output(out, ids):
         i = obj.get("id")
         if not isinstance(i, str) or i not in want or i in got:
             raise ValueError("id")
-        rc = obj.get("rule_class")
-        if (obj.get("label") not in LABELS or not isinstance(rc, int) or isinstance(rc, bool) or not 1 <= rc <= 14
+        rc = rule_class(obj.get("rule_class"))
+        if (obj.get("label") not in LABELS or rc is None
                 or not isinstance(obj.get("clauses"), list) or not all(isinstance(c, str) for c in obj["clauses"])
                 or not isinstance(obj.get("uncertain"), bool)):
             raise ValueError("value")
+        if isinstance(obj["rule_class"], str):  # (F23) stored as an integer
+            obj = dict(obj, rule_class=rc)
+            raw = json.dumps(obj).encode("utf-8")
         got[i] = obj
         raws.append(raw + b"\n")
     if set(got) != want:
         raise ValueError("missing")
     return raws, got
+
+
+def staged_rules(sgx, script_bytes, home):
+    """The rule script over the half's staged lines (S25): at round 1's delivery and at round 2."""
+    staged = sgx["staged"]
+    return run_rules(script_bytes, b"".join(b for _i, b, _o, _r in staged), [i for i, _b, _o, _r in staged], home,
+                     sgx["protected"])
 
 
 def run_rules(script_bytes, stdin_bytes, ids, home, protected):
@@ -1697,9 +1724,8 @@ def out_file(out, name):
 
 
 def valid_hand(obj, ids):
-    rc = obj.get("rule_class")
     return (isinstance(obj, dict) and isinstance(obj.get("id"), str) and obj["id"] in ids
-            and obj.get("label") in LABELS and isinstance(rc, int) and not isinstance(rc, bool) and 1 <= rc <= 14
+            and obj.get("label") in LABELS and rule_class(obj.get("rule_class")) is not None
             and isinstance(obj.get("clauses"), list) and all(isinstance(c, str) for c in obj["clauses"])
             and isinstance(obj.get("reason"), str))
 
@@ -1723,7 +1749,7 @@ def merge_labels(ctx, hand_data):
     lines = []
     for i in ids:
         src, how = (hand[i], "hand") if i in hand else (dict(script[i], reason=""), "script")
-        lines.append(json.dumps({"id": i, "label": src["label"], "rule_class": src["rule_class"],
+        lines.append(json.dumps({"id": i, "label": src["label"], "rule_class": rule_class(src["rule_class"]),
                                  "clauses": src["clauses"], "reason": src["reason"], "how": how}) + "\n")
     return "".join(lines).encode("utf-8")
 
@@ -1740,14 +1766,37 @@ def check_decisions(data, cases):
     if [o["id"] for o in rows] != cases:
         raise Refuse(20, "decisions")
     for o in rows:
-        rc = o.get("rule_class")
-        if (set(o) != DECISION_KEYS or o["label"] not in LABELS or not isinstance(rc, int) or isinstance(rc, bool)
-                or not 1 <= rc <= 14 or not isinstance(o["basis"], list)
+        rc = rule_class(o.get("rule_class"))
+        if (set(o) != DECISION_KEYS or o["label"] not in LABELS or rc is None or not isinstance(o["basis"], list)
                 or not all(isinstance(b, str) for b in o["basis"]) or o["agrees_with"] not in ("x", "y", "neither")
                 or o["flag"] not in ("none", "cannot-settle", "may-change-verdict") or not isinstance(o["reason"], str)
                 or (o["reason"] == "") != (o["flag"] == "none")):
             raise Refuse(20, "decisions")
+        o["rule_class"] = rc  # (F23) stored as an integer
     return rows
+
+
+LABEL2_KEYS = {"id", "label", "rule_class", "clauses", "how", "reason"}
+
+
+def check_labels2(data, sample_ids):
+    """S30 (F20): the second labeller's round 2: one valid line per staged sample id and no other id; delivered in its
+    order, each line as written but `rule_class` an integer; else 20."""
+    try:
+        rows = [o for _raw, o in jsonl_objects(data)]  # a repeated id raises
+    except (ValueError, UnicodeDecodeError):
+        raise Refuse(20, "labels")
+    if sorted(o["id"] for o in rows) != sorted(sample_ids):
+        raise Refuse(20, "labels")
+    lines = []
+    for o in rows:
+        rc = rule_class(o.get("rule_class"))
+        if (set(o) != LABEL2_KEYS or o["label"] not in LABELS or rc is None or not isinstance(o["clauses"], list)
+                or not all(isinstance(c, str) for c in o["clauses"]) or o["how"] != "hand"
+                or not isinstance(o["reason"], str)):
+            raise Refuse(20, "labels")
+        lines.append(json.dumps(dict(o, rule_class=rc)) + "\n")
+    return "".join(lines).encode("utf-8")
 
 
 def deliver_sgx(st, ctx):
@@ -1755,6 +1804,8 @@ def deliver_sgx(st, ctx):
     flow, h, top = sgx["flow"], sgx["h"], sgx["top"]
     out = os.path.join(st.wall, "out")
     labels = os.path.join(h, "labels")
+    if sgx.get("stopped", "none") != "none":  # (F19, S29) a result that says it stopped delivers nothing
+        raise Refuse(20, "stopped")
     land = Landing(top)
     d = st.counts["delivered"]
     try:
@@ -1766,14 +1817,19 @@ def deliver_sgx(st, ctx):
             datas = {n: out_file(out, n) for n in names}
             for n in names:
                 land.check(os.path.join(labels, f"r1-{ctx['brief_id']}", n))
+            if flow == "sgx1-labeller-1":  # (F18, S25) the rule script passes the confined check before it lands
+                try:
+                    staged_rules(sgx, datas["label_rules.py"], ctx["home"])
+                except (Refuse, OSError):
+                    raise Refuse(20, "rules")
             got = [(n, land.add(os.path.join(labels, f"r1-{ctx['brief_id']}", n), datas[n])) for n in names]
             to = "round1"
         elif flow == "sgx1-labeller-1":
             merged = merge_labels(ctx, out_file(out, "hand-labels.jsonl"))
             got, to = [("hand-labels.jsonl", land.add(os.path.join(labels, "labels.jsonl"), merged))], "labels"
         elif flow == "sgx1-labeller-2":
-            sha = land.add(os.path.join(labels, "labels-2.jsonl"), out_file(out, "labels-2.jsonl"))
-            got, to = [("labels-2.jsonl", sha)], "labels"
+            checked = check_labels2(out_file(out, "labels-2.jsonl"), sgx["overlap_ids"])
+            got, to = [("labels-2.jsonl", land.add(os.path.join(labels, "labels-2.jsonl"), checked))], "labels"
         else:
             got, to = deliver_audit(st, ctx, land, out_file(out, "decisions.jsonl")), "decisions"
         land.commit()
@@ -1818,7 +1874,11 @@ def deliver_audit(st, ctx, land, data):
     for raw, obj in jsonl_objects(old):
         if obj["id"] in settle:
             m = settle[obj["id"]]
-            obj = dict(obj, label=m["label"], how="audit") if m["flag"] == "none" else dict(obj, how="owner")
+            if m["flag"] == "none":  # (F22) the auditor's decision replaces both sides' labels
+                obj = {"id": obj["id"], "label": m["label"], "rule_class": m["rule_class"], "clauses": m["basis"],
+                       "reason": m["reason"], "how": "audit"}
+            else:
+                obj = dict(obj, how="owner")
             raw = (json.dumps(obj) + "\n").encode("utf-8")
         lines.append(raw)
     land.add(os.path.join(labels, "labels.jsonl"), b"".join(lines), replace=True)
@@ -1857,6 +1917,7 @@ def check_result(st, ctx):
         if "round" in res and res["round"] != ctx["round"]:
             raise Refuse(20, "schema")
         copy_sgx_numbers(st, res)
+        ctx["sgx"]["stopped"] = res.get("stopped", "none")  # the delivery refuses a stopped result (F19)
     else:
         # the four first versions' numbers; a revised schema must still carry them
         try:
@@ -2126,13 +2187,12 @@ def build_and_run(st, o, root, over, cwd, home):
         raise Refuse(15, "budget")
 
     # 18: the first labeller's round 2 runs its round-1 rule script, confined, before anything is written
+    if sgx:
+        sgx["protected"] = [os.path.realpath(home), root, runs, trees, repo]  # no bind may reach these
     if flow == "sgx1-labeller-1" and rnd == 2:
         st.stage = 18
-        ids = [i for i, _b, _o, _r in sgx["staged"]]
-        protected = [os.path.realpath(home), root, runs, trees, repo]
-        sgx["script_raw"], sgx["script_labels"] = run_rules(
-            sgx["round1"]["label_rules.py"], b"".join(b for _i, b, _o, _r in sgx["staged"]), ids, home, protected)
-        st.log("rules", "ok", len(ids))
+        sgx["script_raw"], sgx["script_labels"] = staged_rules(sgx, sgx["round1"]["label_rules.py"], home)
+        st.log("rules", "ok", len(sgx["staged"]))
 
     # the run id; B1: an empty wall, no tree
     st.stage = 12
