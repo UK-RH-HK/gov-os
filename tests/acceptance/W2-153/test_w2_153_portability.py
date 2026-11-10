@@ -1,10 +1,11 @@
 """S3 and S4 for ``gov.adapters.portability`` on a fixture project, and S4's writer on this repository's templates.
 
 The fixture (``w2_153_support.PortabilityBed``) mirrors the unit tests' project (``tests/unit/adapters/
-test_portability.py``) in this repository's layout, with one kernel role (engineer) and S3's composition: its
-rulesync source is the rulesync front matter plus ``claudecode: skills: [test-driven-development]`` and the body of
-``templates/role-engineer.md``. The check runs as ``python3 -m gov.adapters.portability`` in the project, with a
-stand-in rulesync that writes the generated files the project holds.
+test_portability.py``) in this repository's layout, with one kernel role (engineer) and S3's composition as amended
+(DEC-1112 (3), 2026-11-10): its rulesync source is the rulesync front matter plus ``claudecode: skills:
+[test-driven-development]``, then the body of ``templates/role-engineer.md``, one blank line, and the body of
+``roles/engineer.md``. The check runs as ``python3 -m gov.adapters.portability`` in the project, with a stand-in
+rulesync that writes the generated files the project holds; ``compose`` is called in a child process.
 """
 
 from __future__ import annotations
@@ -31,11 +32,48 @@ def test_s3_s4_a_project_with_the_composed_source_and_the_eight_copies_is_report
 
 
 def test_s3_a_source_that_keeps_the_kernel_role_file_s_body_is_a_finding(bed):
-    """The source as it is today: the role file's body in place of the template's (with the skills list)."""
+    """The source as it was before W2-153: the role file's body alone, with no template's body before it (with the
+    skills list)."""
     support.write(bed.source(), support.composed_source(body=support.ROLE_BODY))
     code, printed, _ = bed.check()
     assert support.naming(printed["findings"], SOURCE), f"no finding names {SOURCE}: {printed}"
     assert code != 0
+
+
+def test_s3_a_source_with_the_template_s_body_alone_is_a_finding(bed):
+    """S3 amended (DEC-1112 (3)): the template's body without the role file's after it (W2-153's first composition)
+    leaves the agent without the role file's labelled fields, so it is a finding naming the source."""
+    support.write(bed.source(), support.composed_source(body=support.ENGINEER_TEMPLATE_BODY))
+    code, printed, _ = bed.check()
+    assert support.naming(printed["findings"], SOURCE), f"no finding names {SOURCE}: {printed}"
+    assert code != 0
+
+
+@pytest.mark.parametrize("held", ["composed", "template-body-alone"])
+def test_s3_compose_returns_the_source_s_full_text_and_the_check_accepts_it(bed, held):
+    """``gov.adapters.portability.compose(root, role)`` (S3 amended's interface) returns the expected source's full
+    text for the fixture's engineer: the source's rulesync front matter with ``claudecode.skills``, then the
+    template's body, one blank line and the role file's body. It is the same whether the source already holds that
+    text or still holds the template's body alone (the copies ACT's builder writes it over a stale source), and the
+    check, given that text as the source, names no finding on it."""
+    if held == "template-body-alone":
+        support.write(bed.source(), support.composed_source(body=support.ENGINEER_TEMPLATE_BODY))
+    made = bed.compose("engineer")
+    assert made["exit"] == 0, (f"gov.adapters.portability.compose(root, 'engineer') could not be called "
+                               f"(exit {made['exit']}):\n{made['stderr'][-1500:]}")
+    assert made["type"] == "str", f"compose returned a {made['type']}, not the source's text"
+    text = made["text"]
+    assert text.startswith("---\n"), f"compose's text does not open with front matter: {text[:200]!r}"
+    front, body = support.split_front(text)
+    expected_front, _ = support.split_front(support.composed_source())
+    assert front == expected_front, f"compose's front matter is {front!r}, not {expected_front!r}"
+    assert body == support.ENGINEER_COMPOSED_BODY, (
+        "compose's body is not the template's body, one blank line, then the role file's body\n"
+        f"got: {body!r}\nexpected: {support.ENGINEER_COMPOSED_BODY!r}")
+    support.write(bed.source(), text)
+    code, printed, stderr = bed.check()
+    assert support.naming(printed["findings"], SOURCE) == [], (
+        f"the check names the source compose wrote: {printed}\nstderr: {stderr}")
 
 
 def test_s3_the_skills_list_is_part_of_the_composition(bed):
