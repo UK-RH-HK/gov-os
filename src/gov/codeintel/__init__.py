@@ -129,7 +129,9 @@ def daemon_base(env=None, root=None) -> Path:
 
 def make_session_base(env=None) -> Path:
     """A new folder for one test session's daemon directories (W2-56 S1), short enough for the tool's socket: in the
-    launched session's temp folder, else under ``/tmp``, else under the temp folder. The caller removes it."""
+    launched session's temp folder, else under ``/tmp``, else under the temp folder. The caller removes it, and holds
+    its owner's record in it, by which the next session removes it after a kill (``tests/conftest.py``, W2-56 R3): a
+    change to these names is a change to the conftest's too."""
     import secrets
     import tempfile
 

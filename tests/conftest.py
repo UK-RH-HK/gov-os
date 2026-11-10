@@ -65,6 +65,21 @@
   outermost run started (``CODEINTEL_OFF_PATH``, kept by a run started inside
   it) is replaced by a folder of this process's own with links to the rest of
   its entries. A stand-in a case puts on a nested run's ``PATH`` stays.
+- A killed run's folders (W2-56 R3, S1): the run's daemon folder and each
+  ``gov-path-*`` links folder hold their owner's record inside them
+  (``.gov-owner``), a file the process that made the folder holds an
+  exclusive ``flock`` on (close-on-exec) for its life; the record appears
+  only once held. The kernel lets the lock go when that process dies, in
+  whatever pid namespace the next run sees it from, so a pid is never read.
+  The controlling process of the next run, at configure (before its first
+  case), removes the folders of the run folder's names in the place where it
+  made its own (``c???`` in a launched session's temp folder, else
+  ``gov-cbm-<uid>-XXXXXXXX``), and the ``gov-path-XXXXXXXX`` folders in its
+  temp root, whose record no process holds; a folder with no record only when
+  it and its entries were last modified more than 24 hours ago (DEC-902). A
+  link, a regular file, another user's folder and any other name are never
+  touched, nor is anything inside the shared ``/tmp/gov-cbm-<uid>``; what
+  cannot be opened or removed is left, and never fails or holds up the run.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -79,6 +94,7 @@ import re
 import shutil
 import stat
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -257,6 +273,133 @@ _CBM_SUITES = frozenset({"W1-16", "W1-20"})  # the suites that run the real code
 _cbm_base = None  # this run's daemon folder and CODEINTEL_DAEMON_BASE's former value (the controlling process only)
 _off_path: dict = {"folder": None, "links": {}}  # this process's folders of links, per PATH folder that has the tool
 
+# W2-56 R3 (S1): a killed run's folders, removed by the next run.
+_OWNER = ".gov-owner"  # the owner's record inside a run folder or a links folder: a file its maker holds flock'd
+_STALE_S = 24 * 3600  # a folder with no owner's record is removed only when older than this (DEC-902)
+_MKDTEMP = "[a-z0-9_]{8}"  # tempfile.mkdtemp's eight letters
+_LAUNCHED_NAMES = re.compile(r"c[a-z0-9]{3}")  # gov.codeintel.make_session_base, in a launched session's temp folder
+_LINKS_NAMES = re.compile(f"gov-path-{_MKDTEMP}")  # _without_tool's links folder, in the temp root
+_owners: dict = {}  # folder -> the descriptor of its owner's record, held by this process
+
+
+def _run_names(made: Path):
+    """The names of run folders in the place ``made`` (this run's folder) stands in: the form ``made`` itself has
+    (``make_session_base``'s short ``c???`` in a launched session's temp folder, else ``gov-cbm-<uid>-XXXXXXXX``); None
+    when it has neither."""
+    forms = [re.compile(f"gov-cbm-{os.getuid()}-{_MKDTEMP}")]
+    if made.parent.name.startswith("gov-launch-"):
+        forms.insert(0, _LAUNCHED_NAMES)
+    return next((form for form in forms if form.fullmatch(made.name)), None)
+
+
+def _own(folder) -> None:
+    """Put this process's owner's record in ``folder``, held (``flock``, close-on-exec) until ``_disown``. Staged under
+    another name and renamed once held, so no other run ever sees the record free while its owner lives."""
+    staged = os.path.join(folder, f"{_OWNER}.{os.getpid()}")
+    try:
+        fd = os.open(staged, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
+    except OSError:
+        return  # no record: the folder is kept by the next run for 24 hours
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        os.write(fd, json.dumps({"pid": os.getpid()}).encode())  # for a reader only: the lock decides
+        os.rename(staged, os.path.join(folder, _OWNER))
+    except OSError:
+        os.close(fd)
+        try:
+            os.unlink(staged)
+        except OSError:
+            pass
+        return
+    _owners[str(folder)] = fd
+
+
+def _disown(folder) -> None:
+    fd = _owners.pop(str(folder), None)
+    if fd is not None:
+        os.close(fd)
+
+
+def _owner_gone(path: str):
+    """``(gone, fd)`` for a run's folder: ``(True, fd)`` with its record locked here when no process holds it (its
+    owner is gone); ``(None, None)`` when it holds no record; ``(False, None)`` when the record is held, or is no
+    regular file, or cannot be opened."""
+    try:
+        fd = os.open(os.path.join(path, _OWNER), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+    except FileNotFoundError:
+        return None, None
+    except OSError:
+        return False, None
+    try:
+        if stat.S_ISREG(os.fstat(fd).st_mode):
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return True, fd
+    except OSError:
+        pass
+    os.close(fd)
+    return False, None
+
+
+def _stale(path: str, seen: os.stat_result) -> bool:
+    """True when the folder and every entry in it were last modified more than ``_STALE_S`` ago."""
+    newest = seen.st_mtime
+    try:
+        with os.scandir(path) as entries:
+            for entry in entries:
+                try:
+                    newest = max(newest, entry.stat(follow_symlinks=False).st_mtime)
+                except OSError:
+                    continue
+    except OSError:
+        pass
+    return time.time() - newest > _STALE_S
+
+
+def _remove_folder(path: str) -> None:
+    """Remove a killed run's folder of this user's; its folders are opened to their owner first when that is needed
+    (a 0500 folder). Whatever cannot be removed is left."""
+    shutil.rmtree(path, ignore_errors=True)
+    if not os.path.lexists(path):
+        return
+    try:
+        os.chmod(path, 0o700)
+        for top, folders, _files in os.walk(path):
+            for name in folders:
+                inner = os.path.join(top, name)
+                if stat.S_ISDIR(os.lstat(inner).st_mode):  # a link is removed as a link, never followed
+                    os.chmod(inner, 0o700)
+    except OSError:
+        pass
+    shutil.rmtree(path, ignore_errors=True)
+
+
+def _sweep_killed(place, names, keep=()) -> None:
+    """W2-56 R3: remove the folders in ``place`` whose names ``names`` matches whole, but those in ``keep``: each that
+    is a real folder of this user's whose owner's record no process holds, or that holds no record and is stale
+    (``_stale``). Never fails: a place or a folder that cannot be read or removed is left as it is."""
+    try:
+        with os.scandir(place) as entries:
+            found = [entry.path for entry in entries if names.fullmatch(entry.name)]
+    except OSError:
+        return
+    uid = os.getuid()
+    for path in found:
+        if path in keep:
+            continue
+        try:
+            seen = os.lstat(path)
+            if not stat.S_ISDIR(seen.st_mode) or seen.st_uid != uid:
+                continue  # a link, a regular file, another user's folder
+            gone, fd = _owner_gone(path)
+            try:
+                if gone or (gone is None and _stale(path, seen)):
+                    _remove_folder(path)
+            finally:
+                if fd is not None:
+                    os.close(fd)
+        except Exception:  # noqa: BLE001 -- the clean-up never stops the run
+            continue
+
 
 def _own_cbm_base():
     """W2-56 S1: one folder for this run's code-graph daemon folders, named in ``CODEINTEL_DAEMON_BASE``; None without one.
@@ -277,6 +420,10 @@ def _own_cbm_base():
             return None
     except Exception:  # noqa: BLE001 -- no place: the code index keeps its own default
         return None
+    _own(made)  # W2-56 R3: this run's record first, then a killed run's folders beside it
+    names = _run_names(made)
+    if names is not None:
+        _sweep_killed(made.parent, names, keep={str(made)})
     former = os.environ.get("CODEINTEL_DAEMON_BASE")
     os.environ["CODEINTEL_DAEMON_BASE"] = str(made)
     return made, former
@@ -309,6 +456,7 @@ def _drop_cbm_base(made: Path, former: str | None) -> None:
     else:
         os.environ["CODEINTEL_DAEMON_BASE"] = former
     shutil.rmtree(made, ignore_errors=True)
+    _disown(made)
 
 
 def _tool_folders(value: str) -> list[str]:
@@ -348,6 +496,7 @@ def _without_tool(value: str) -> str | None:
         if links is None:
             if _off_path["folder"] is None:
                 _off_path["folder"] = tempfile.mkdtemp(prefix="gov-path-")
+                _own(_off_path["folder"])  # W2-56 R3
             links = tempfile.mkdtemp(dir=_off_path["folder"])
             for name in os.listdir(part):
                 if name != _CBM_TOOL:
@@ -383,6 +532,7 @@ def pytest_configure(config):
         _rebuild_lock = _own_rebuild_lock()
     if _cbm_base is None and not _is_worker(config):
         _cbm_base = _own_cbm_base()
+        _sweep_killed(tempfile.gettempdir(), _LINKS_NAMES, keep=set(_owners))  # W2-56 R3: a killed run's links folders
         _off_path["set"] = _own_off_path()
 
 
@@ -528,6 +678,7 @@ def pytest_unconfigure(config):
         os.environ.pop("CODEINTEL_OFF_PATH", None)
     if _off_path["folder"] is not None:
         shutil.rmtree(_off_path["folder"], ignore_errors=True)
+        _disown(_off_path["folder"])
         _off_path["folder"], _off_path["links"] = None, {}
     if _refused or _is_worker(config):
         return
