@@ -82,7 +82,11 @@ tests/acceptance/W1-16/test_w1_16_paths_and_roots.py::test_the_secrets_indexing_
 tests/acceptance/W1-16/test_w1_16_secret_exclusion.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_reaches_the_index  # serial: daemon: it starts or asks the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_stays_out_of_the_index  # serial: daemon: it starts or asks the codebase-memory daemon
-tests/acceptance/W1-16/test_w1_16_ui_off.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
+# D-10 (DEC-1112 (3), the CTO's (a)): out while D-4's cut keeps every case of the file in breadth (DEC-1061;
+# tests/optin-lifted-breadth.txt, `# cap`): a default run collects none of them, and an entry that names no case
+# stops the close's serial phase (exit 4). In a run with --optin=breadth its seven cases run in the parallel phase,
+# not serially, until the plugin fix (b) treats an entry out of the run as not in it and this line returns. Was:
+# tests/acceptance/W1-16/test_w1_16_ui_off.py  # serial: daemon: every case of the file starts or asks the codebase-memory daemon
 
 # --- live-session: routed to the nightly (DEC-889 item 5; I1 F-1, F-2; I3 F6)
 tests/acceptance/W1-46/test_w1_46_live_sessions.py  # nightly: live-session: launched engineer and research sessions; the host cases need the network

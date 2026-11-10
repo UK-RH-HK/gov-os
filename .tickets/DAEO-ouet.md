@@ -27,6 +27,8 @@ kpis:
   - 'A collection error, a timeout or a crash is reported as error for the run with its kind only (collection, timeout, crash), never its message [DEC-959 item 6]'
   - 'The exit code is 0 when every mapped line passes, a declared code when any fails, another when the run errors; the command is a read command and writes nothing in the repository [DEC-317]'
   - 'The common lead brief and the engineer''s brief template name gov accept as the engineer''s only way to run the acceptance tests (the brief change is the orchestrator''s, recorded with this ticket''s merge) [DEC-959 items 6 and 7]'
+  - 'S-D10a gov accept runs the opt-in groups (tests/optin-lifted*.txt suites) that its own map''s cases need, and only for that ticket''s cases, so a KPI line whose mapped cases an opt-in list leaves out of a default run is measured, not failed with no failed case; a line whose mapped cases still run zero stays a fail; the report names which opt-in groups it enabled [DEC-1112 (3), DEC-1061, DEC-959 item 6] [added, DEC-1112 (3)]'
+  - 'S-D10b The map reader reads every KPI line a map cell lists (a cell such as Success 4, failures 4, 5 names success-4, failure-4 and failure-5), or refuses the map naming the cell; it never keeps the first line and drops the rest silently [DEC-1112 (3), DEC-959 item 6] [added, DEC-1112 (3)]'
   failure:
   - 'Any test source, assertion text, value, traceback or captured output in the output, the JSON or a file left behind.'
   - 'An unmapped test named, or a README without a map answered with raw output.'
@@ -34,6 +36,8 @@ kpis:
   - 'A write in the repository.'
 profile: FULL
 sources:
+- DEC-1112
+- DEC-1061
 - DEC-866
 - DEC-1109
 - DEC-959
