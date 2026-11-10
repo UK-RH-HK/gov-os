@@ -1566,3 +1566,5 @@ DEC-266 a merge in any caller's call other than an orchestrator session's own st
 it stands and is unchanged. No test of W1-03, W1-45 or W1-47 makes a commit with trailers or a merge by the
 orchestrator, so no other test of those suites is touched by the KPIs or the decisions. None makes a commit with
 `Role: owner` either, so KPI success 5 touches none.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** the launches through W1-46's `launch` get W1-46's open gate (`plant_open_gate`); the two live sessions keep the real HOME's `gate.json` and take the planted readings. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
