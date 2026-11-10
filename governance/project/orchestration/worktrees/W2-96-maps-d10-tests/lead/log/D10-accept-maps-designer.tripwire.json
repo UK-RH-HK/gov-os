@@ -1,0 +1,161 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/reviews/D10-W2-66-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "head",
+   "before": "9ca161a6fe38",
+   "after": "e8217d5ef159"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W1-32"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-116"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-13"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-58"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge",
+   "change": "acceptance folder",
+   "folder": "W2-66"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/D10-merge2",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-d10-tests",
+   "change": "head",
+   "before": "b0384ac62fdc",
+   "after": "2e316b5a3469"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-116-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-d10-tests",
+   "change": "head",
+   "before": "1d3cdeb1f397",
+   "after": "5452875d224b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c",
+   "change": "head",
+   "before": "1732686b30b9",
+   "after": "97efe2a1dfd5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "head",
+   "before": "9ca161a6fe38",
+   "after": "bc772b14a2d1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/test_w1_07_recorded_commands.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-07/w1_07_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-26/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-26/test_w1_26_recorded_commands.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-32/test_w1_32_command_set.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-20-d10c-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58-d10-tests",
+   "change": "head",
+   "before": "9d99dbaca69e",
+   "after": "063660c57e5c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66c-d10-tests",
+   "change": "head",
+   "before": "dc5c0fd87278",
+   "after": "2979f360721c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-d10-tests",
+   "change": "head",
+   "before": "7b422979c617",
+   "after": "48c2cd33b921"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-27"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-d10-tests",
+   "change": "acceptance folder",
+   "folder": "W1-46"
+  }
+ ]
+}
