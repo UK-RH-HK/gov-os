@@ -166,3 +166,110 @@ Reversed by: reading S-D10a as covering item forms (it would still be "other").
 ```verdict
 {"kpis": [{"kpi": "s-d10a-optin", "verdict": "pass", "findings": [{"id": "F2", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}, {"id": "F4", "scope": "out", "ordinary_work": "yes", "consequence": "other"}, {"id": "F5", "scope": "out", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "s-d10b-reader", "verdict": "fail", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "fails open"}]}]}
 ```
+
+---
+
+# Round 2 (the last, DEC-1010): head `bb71be1cf` (w2/W2-96-d10b)
+
+- Brief: `.gov-runtime/scratch/orchestrator/briefs/D10-W2-96-r2-review.md`; tests `5e36c7fc5`, `51f1f547a`; code `dac10e5df`, `1df7ccd60`; reviewer log `/home/usain/gov-os-worktrees/W2-96-d10b/.gov-runtime/scratch/lead/log/D10-W2-96-r2-review.json`.
+- verdict.py: READY (no blocking finding). F1, F2: rows (fail open, not ordinary work); F3, F4: recorded rows (fail closed).
+
+## Review record: W2-96 D-10, round 2 (S-D10a, S-D10b), head `bb71be1cf`
+
+**Sandbox check (step 0):** (a) the write to `/home/usain/gov-os-worktrees/.sandbox-trial-W2-96` was refused (`OSError: [Errno 30] Read-only file system`), as it should be. (b) `git hash-object -w --stdin` worked (`1ae28402a109…`) and `git update-index --refresh` returned rc=0. **`ps` check:** `ps -eo pid,args | grep -iE "[o]llama|[l]lama-server"` showed nothing of mine.
+
+- **task:** DAEO-ouet (W2-96). D-10 review, round 2 of 2.
+- **status:** DONE. Neither KPI line has a blocking finding.
+- **work_completed:**
+  - Identity: HEAD is `bb71be1cf`, the tree is clean, and `GOV_TICKET` is DAEO-ouet.
+  - Read the ticket's KPI lines, the round-1 brief, the engineer's round-2 brief, the round-2 diff of `runner.py`, the root `tests/conftest.py` deselection, the D-10 test names and the README rows 76–78.
+  - Ran the D-10 and premises files, then `tests/unit/accept`, then `gov accept W2-96` the declared way.
+  - Probed `line_names` with 87 cell forms: round 1's F1 forms plus my own.
+  - Surveyed the 115 READMEs and every `.md` in the repo for how ranges are written.
+- **files_changed:** none. `git status --porcelain` is empty and HEAD is unchanged.
+- **evidence:**
+  - D-10 files plus premises: **91 passed** (9.4 s).
+  - `tests/unit/accept`: **206 passed** (24.5 s).
+  - `gov accept W2-96`: **pass**, exit 0, 190 passed and 0 failed. Lines S1–S5, S7, S8 and F1–F4 all pass; 42 unmapped cases passed; `"optin": ["breadth"]`.
+  - Scratch was 16K and 5 inodes, now removed.
+- **tests:** every run used both opt-ins, `-n 4`, the heavy slot, an empty HOME with a `.local` link, `-m "not local_only" -k "not real and not green_here and not time_limit"`, `-p no:cacheprovider` and `-o tmp_path_retention_policy=failed`. The exclusion left out nothing: no run reported a deselected count.
+- **discoveries:**
+  - (i) While a feature is lifted, the six tickets lifted as whole suites (W2-01, W2-07, W2-53, W2-68, W2-69, W2-107) can never pass a formal accept (F3).
+  - (ii) The scratch commit `08c31e7ff` from round 1 ("not for merge", no trailers) is an ancestor of HEAD. It will travel with the branch unless the CTO's merge drops it.
+- **risks:** F1 and F2 below are both fail-open shapes. They are rows, not rounds.
+- **lessons:** the "read or refuse every further name" rule covers named lines. It does not cover a bare number after a word that is not a join.
+- **proposed_decisions:** none.
+- **unresolved:** I did not reproduce F2 in a planted project. It comes from reading the code.
+- **recommended_next_action:** READY on this verdict. Record F1–F4 as Wave 3 rows or map-fix rows (W1-49, and W2-92 row 128).
+
+### Answers to the checks
+
+**1. Counts.** 91 passed, then 206 passed, then `gov accept W2-96` passed with 190/0 and `optin ["breadth"]`.
+
+**2. No fail-open.**
+- **Round 1's F1 forms all read in full:**
+  - W1-49 rows 88/89 give success-5 plus failure-1 or failure-2.
+  - `Success 6 with success 4.` gives both lines.
+  - `S2-S4` and `Success 2–Success 4` give lines 2–4.
+  - `Success 1 to 3` gives lines 1–3.
+  - `or`, `(and failure 2)`, `— and failure 2` and `failures 4, 5` all read in full.
+- **My own forms that refuse correctly:** `plus`, `as well as`, `also`, `|`, `vs`, `see`, `--`, `→`, `but not`, `then`, `S1 – S3`, `S1...S3`, `S1 through S3`, `Success 1 – failure 2`, `Success 1-F3`, `Success 1 to failure 3`, `[F14]`, `F2's fixture`, `failure case 2`, `Failure #2`, `success two`, and `Success 1, 2 cases`.
+- **Forms that read more, never less:** `(F2)`, `[S1]`, `, KPI 3`, `, s3`, `/S3` and `failure 2's half`.
+- **The exception is F1 below:** some ranges written with a bare number after a spaced dash or a word.
+- **Report-only lines:**
+  - A report-only line cannot pass the run alone: a run with no measured line fails.
+  - It cannot hide a red: `not totals["failed"]` still applies, and a report-only line has zero run cases by construction.
+  - `lifted` never reaches the child's `GOV_TESTS_OPTIN` (`runner.py:726`).
+  - A line that runs zero for any other reason still fails. The only gap is F2.
+  - Groups are named on every error once they are set: the error result is rebuilt with them before `_run` (`runner.py:728`) and again for timeout and collection errors (`:733`).
+  - The deselection record holds only file and node name, so no test content leaks.
+
+**3. Decisions and the engineer's choices.**
+- F2 is closed as scope (b) and F3 is closed.
+- "A run whose every line is report-only fails" is sound: it fails closed. Its cost is F3.
+- "A possessive refuses" is sound: it fails closed. Its cost is F4.
+
+**4. Trailers.** All present: `Task: DAEO-ouet`, `Implements: DEC-1112, DEC-1061`, the right `Role` and `Co-Authored-By`.
+- Engineer commits: `dac10e5df`, `1df7ccd60`.
+- Designer commits: `5e36c7fc5`, `51f1f547a`, each with a `Rewrite-Reason`.
+- Merge commits: `443ce88f5`, `bb71be1cf`.
+
+### Findings
+
+**F1: some ranges silently drop the lines between (S-D10b).**
+- **What happens:** a cell that writes a range with a spaced dash, or with "through", "thru", "up to", "…" or "~" before a bare number is read as its first line alone. `Success 1 – 3`, `Success 1 - 3`, `Success 1 through 3`, `Successes 1 thru 3`, `Success 1 up to 3`, `Successes 1 … 3` and `Success 1 ~ 3` each give only success-1. `Success 1 and F#2` likewise gives only success-1.
+- **What should happen:** the cell reads all its lines or the map is refused.
+- Ordinary work: no, because across all 115 maps and every `.md` in the repo, ranges are written unspaced (`S2–S4`, 7 times in 5 READMEs) or with "to" (`S1 to S5`, which is read). A spaced dash or "through" range occurs nowhere in any map.
+- Consequence: fails open.
+- Scope: in.
+- **What would reverse it:** a map in use, or a designer's ordinary draft, writing such a range.
+
+**F2: any deselected case can make a line report-only (S-D10a).**
+- **What happens:** the report-only label rests on every case the child run deselects, whatever the cause, not only on the lifted list. A folder whose own conftest also deselects cases (W2-54's `shared_gpu` hook) and that also holds a lifted entry would show a line resting on those other cases as "report-only (lifted)".
+- **What should happen:** that line should fail with zero run.
+- Ordinary work: no, because no folder today has both. W2-54 has only breadth entries, and the lifted list changes only by moving entries, never in ordinary ticket work (DEC-953).
+- Consequence: fails open.
+- Scope: in.
+- **What would reverse it:** a folder holding both a deselecting hook and a lifted entry.
+
+**F3: whole-suite lifted tickets cannot pass a formal accept.**
+- **What happens:** the six tickets lifted as whole suites have every line report-only, so their formal accept always fails while the feature is lifted.
+- **What should happen:** this follows from the engineer's choice. The CTO should know it.
+- Ordinary work: yes, because those tickets' formal accepts will run.
+- Consequence: other (fails closed).
+- Scope: in.
+- **What would reverse it:** a decision that such a run should end as report-only rather than fail.
+
+**F4: maps newly refused.**
+- **What happens:** W2-92 row 128 is now refused because of the possessive "S1's record route", which is a mention, not a listing. W1-49 is refused on its older `Edge:` and `DEC-259:` rows.
+- **What should happen:** fix the maps (map-fix rows).
+- Ordinary work: yes, because these are maps in use.
+- Consequence: other (fails closed).
+- Scope: in.
+- **What would reverse it:** either map read without a refusal at this head.
+
+**Classification:** 4 findings, none blocking. F1 and F2 are ordinary work no and fail open, so they are Wave 3 rows. F3 and F4 fail closed, so they are recorded rows.
+
+```verdict
+{"kpis": [{"kpi": "s-d10a-optin", "verdict": "pass", "findings": [{"id": "F2", "scope": "in", "ordinary_work": "no", "consequence": "fails open"}, {"id": "F3", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "s-d10b-reader", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "no", "consequence": "fails open"}, {"id": "F4", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}]}
+```
