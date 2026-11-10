@@ -25,7 +25,7 @@
   kept in `drafts/w2-149-install-v1/`.
 
 ## 0. Class: (O); your yes, then your operator by hand
-**(O), with your yes, then your operator by hand.** The yes line: **`yes ACT-W2-149-INSTALL-1 @SHA8@`**
+**(O), with your yes, then your operator by hand.** The yes line: **`yes ACT-W2-149-INSTALL-1 0edc1eb9`** (`0edc1eb9`: the commit that records this package ready)
 
 **Your yes also approves the walls' `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1's
 table: what each change turns on). The template's own header says a change to it needs your approval. The CTO's
@@ -173,7 +173,7 @@ approved.
 
 ## 5. The operator's steps: the message
 > **ACT-W2-149-INSTALL-1 (DEC-1101, DEC-1112 (3), DEC-1113): the launch script's approved list.** Class (O), by hand:
-> your yes first: **`yes ACT-W2-149-INSTALL-1 @SHA8@`** (the form of DEC-1115 (1)). **Your yes also approves the walls'
+> your yes first: **`yes ACT-W2-149-INSTALL-1 0edc1eb9`** (the form of DEC-1115 (1)). **Your yes also approves the walls'
 > `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1). It comes after ACT-SETS-GLOBS-1 and
 > after W2-149's set-up A wiring is merged (`7f0e71519`). In the main tree, about one minute:
 > ```
