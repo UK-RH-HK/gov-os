@@ -1,13 +1,31 @@
-# Re-worded by the owner's DEC-1069 (1) (2026-11-04; the audit's R1-DETAIL), checked blind at cc9c94d42a54 by a session
-# independent of the retrieval work: the gold answer's line number (26; MAP_REL is at line 27 there, its value
-# unchanged) is dropped: the source's heading locates it. The question, its commit and the source are kept. The
-# label before is in ../retired/q23-pre-dec1069.yaml.
+# Re-worded to a stable fact by the owner's DEC-1124 (2026-11-10), by the process of DEC-1070 (13) (R11) that re-worded
+# Q07 and Q14 on 2026-11-09: by a session independent of the retrieval work, blind (from the rubric, the retired
+# files, this file and the repository at 0edfcda88845; no search, no result read).
+# The question before asked which constant holds the test map's path (MAP_REL) and its value. Its one source was a
+# line of src/gov/close/select.py that moved when W2-150 put the name behind an import from gov.store.loader, so its
+# heading was no longer a line of the file (volatile, R11). It now asks a decided rule with a defined name: what the
+# close's test selection does when a selected test-map target is no longer in the tree, and the reason code it
+# records. The rule changes only by a decision (DEC-912 item 3, W2-66's P1), and the code name is part of the close
+# record's form. Category kept (exact-string: the answer is the reason code's exact string). Two entries, each of
+# alternatives holding the whole piece: the rule (DEC-912's entry, found by its ### heading, and W2-66's KPI line)
+# and the code name (the module's docstring, and the line that records it).
+# The label before is in ../retired/q23-pre-reword-2026-11-10.yaml (and before that q23-pre-dec1069.yaml).
+id: Q23
 category: exact-string
-commit: f46b96537d74
-question: "Which constant in the close's test selection holds the test map's path, and what is its exact value?"
+commit: 0edfcda88845
+question: "When a close's test selection finds that a selected test-map target is no longer in the tree, what does it do, and under which reason code does it name the target?"
 gold_answer: >-
-  MAP_REL = "governance/project/test-map.yaml", in src/gov/close/select.py.
+  It widens the run to the full regression instead of running less, and the close record names the target and the
+  reason: UNRESOLVED_TARGET (DEC-912 item 3; in src/gov/close/select.py, with a detail such as FILE_GONE or CASE_GONE).
 sources:
-  - path: src/gov/close/select.py
-    heading: 'MAP_REL = "governance/project/test-map.yaml"'
-    lines: [26, 26]
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-912 — W1-01's merge rule passes a merge whose acceptance files equal git's own merge of its parents; W2-66's third and last review for P1 and P2"
+    - path: .tickets/DAEO-c1uz.md
+      heading: "  - 'A selected test-map target (record-reading, every-close or coupling) that cannot be resolved at the head (its file or test function renamed or gone) widens the run to the full regression, and the record names the target and the reason [DEC-912 item 3, P1]'"
+      lines: [46, 46]
+  - - path: src/gov/close/select.py
+      heading: "(``TEST_MAP_MISSING``, ``TEST_MAP_UNREADABLE``), a selected map target the head does not hold"
+      lines: [11, 12]
+    - path: src/gov/close/select.py
+      heading: '        why_full.extend({"reason": "UNRESOLVED_TARGET", "target": target, "detail": detail}'
+      lines: [379, 380]

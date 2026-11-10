@@ -30,7 +30,8 @@ import w2_61h_support as s  # noqa: E402
 ANCHORS = {
     "q21.yaml": [["DEC-838", "300k", "compact"]],
     "q22.yaml": [["set_fault("], ["set_fault("], ["set_fault("]],
-    "q23.yaml": [['MAP_REL = "governance/project/test-map.yaml"']],
+    # q23 (re-worded 2026-11-10, DEC-1124): the rule (the run widens to the full regression) and the reason code's name
+    "q23.yaml": [["widens the run to the full regression"], ["UNRESOLVED_TARGET"]],
     "q24.yaml": [["1800"], ["30"]],
 }
 
