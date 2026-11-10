@@ -4,7 +4,7 @@ type: checkpoint
 status: ACTIVE
 state_class: NARRATIVE
 title: Short title of the checkpoint
-task: '{ID}'            # the ticket's DAEO-… id (DEC-1073)
+task: ''                # fill with the ticket's DAEO-… id, {ID} (DEC-1073)
 decisions_applied: []   # the ids the work applied (DEC-1073)
 task_status: in_progress
 trigger: stop
