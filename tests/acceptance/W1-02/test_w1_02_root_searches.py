@@ -5,7 +5,8 @@ refusal existed for the two protected files' sake; Policy 2 (DEC-820) narrows it
 away, so every case below that held such a search as refused now holds it as
 allowed. One exception, for (c) and not for the files: an engineer's search
 from the root takes in its own ticket's acceptance folder
-(``tests/acceptance/W1-90/``), so it stays refused (W2-58 KPI success 1).
+(``tests/acceptance/<TICKET_WBS_ID>/``, ``w1_02_support``'s planted ticket),
+so it stays refused (W2-58 KPI success 1).
 The cases of what stays allowed are unchanged.
 
 Before Policy 2 (DEC-557, P-23):
@@ -243,7 +244,7 @@ def test_a_search_with_no_path_or_glob_is_allowed_for_every_role_but_the_enginee
     """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above).
 
     Allowed under Policy 2, but the engineer's from the root: the root holds its ticket's acceptance folder
-    (``tests/acceptance/W1-90/``), so (c) refuses that search (W2-58 KPI success 1), whatever its reason says.
+    (``tests/acceptance/<TICKET_WBS_ID>/``), so (c) refuses that search (W2-58 KPI success 1), whatever its reason says.
     """
     result = rnd.ask_form(world, ROLE_FORMS[form], start, who)
     what = f"{form} from '{start}' by '{who}'"
@@ -254,15 +255,15 @@ def test_a_search_with_no_path_or_glob_is_allowed_for_every_role_but_the_enginee
 
 
 SUBAGENT = "engineer-subagent-of-the-orchestrator"
-SUBAGENT_ACCEPTANCE_REL = "tests/acceptance/W1-91"   # the acceptance folder of the session's ticket (wbs_id W1-91)
+SUBAGENT_ACCEPTANCE_REL = "tests/acceptance/W1-91"   # the acceptance folder of the session's ticket (its wbs_id)
 
 
 @pytest.mark.parametrize("form", ("the-root-as-an-absolute-path", "a-type-filter-only-and-no-path"))
 def test_a_search_tool_call_from_the_root_by_a_role_subagent_is_allowed_when_its_tests_do_not_exist(world, form):
     """Rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3; the lead's readings of P-W2-58-TD-2 (iv) and TD-5).
 
-    An engineer subagent of the orchestrator acts as an engineer on the session's ticket (``W1-91``). This fixture
-    holds no ``tests/acceptance/W1-91/``: a search from a folder above takes in a protected part only when it exists,
+    An engineer subagent of the orchestrator acts as an engineer on the session's ticket (the planted wbs_id in
+    ``SUBAGENT_ACCEPTANCE_REL``). This fixture holds no ``SUBAGENT_ACCEPTANCE_REL`` folder: a search from a folder above takes in a protected part only when it exists,
     so (c) refuses nothing here, and the protected files no longer refuse the search: allowed.
     """
     assert not (world.project / SUBAGENT_ACCEPTANCE_REL).exists(), "premise: the ticket's acceptance folder is absent"
@@ -343,7 +344,7 @@ def test_the_daily_shell_forms_stay_allowed(world, form, who):
     """A search of a source folder, a named file, a listing of the root without recursion: as today, for every role.
 
     Rewritten by W2-58 for one cell (DEC-821 item 1): ``grep -rn VALUE src tests`` by the engineer searches ``tests/``,
-    which holds its ticket's acceptance folder (``tests/acceptance/W1-90/``): refused for (c).
+    which holds its ticket's acceptance folder (``tests/acceptance/<TICKET_WBS_ID>/``): refused for (c).
     """
     result = rnd.ask_form(world, DAILY_SHELL[form], ROOT, who)
     what = f"the shell form '{form}' by '{who}'"
@@ -360,8 +361,8 @@ def test_the_daily_shell_forms_stay_allowed(world, form, who):
                                   "no-path-a-type-filter-and-a-glob-by-an-extension-at-any-depth"))
 def test_the_daily_search_tool_forms_stay_allowed_for_every_role(world, form, who):
     """Rewritten by W2-58 for the engineer (DEC-821 item 1, brief item 3, TD-5): from the root, a glob by an extension
-    (``*.py``, ``**/*.py``) takes in its own ticket's existing acceptance test (``tests/acceptance/W1-90/``): refused
-    for (c), with a reason. A source folder keeps it out: allowed. Every other role: allowed, as before."""
+    (``*.py``, ``**/*.py``) takes in its own ticket's existing acceptance test
+    (``tests/acceptance/<TICKET_WBS_ID>/``): refused for (c), with a reason. A source folder keeps it out: allowed. Every other role: allowed, as before."""
     result = rnd.ask_form(world, DAILY_TOOL[form], ROOT, who)
     what = f"a search tool call with {form} by '{who}'"
     if who == folders.NOT_A_WRITER and form in ("the-root-as-path-and-a-glob-by-an-extension",

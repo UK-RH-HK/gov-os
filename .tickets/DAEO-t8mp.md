@@ -93,6 +93,7 @@ sources:
 - DEC-1059
 - DEC-1109
 - DEC-1112
+- DEC-820
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-128/
@@ -166,3 +167,16 @@ Appendix), shaped by R2's evidence (P1-PLAN P1-7), plus LINK-INTEGRITY.md §6.1'
     row, so it is a ticket path, not the ACT's; path added, DEC-1112 (3)).
   - Each changed skill's version raised one minor; the skills validator passes.
   - The generated `.claude/` and `.rulesync/` copies are the ACT's (`ACT-CLAUDE-COPIES-1`).
+- **Round 2b (text, product-spec; stated 2026-11-09, DEC-1112 (3)): round 2a's review findings F1-F4 and one link
+  notice** (`reviews/w2-128-r2a.md`):
+  - F1: `template/.rulesync/subagents/orchestrator.md` takes the kernel role's retired-briefs line (the `.rulesync/`
+    copy is the ACT's);
+  - F2: the orchestration skill's lifted or expired rules restated, or dropped:
+    - the per-round `gov checkpoint` (DEC-511, lifted by DEC-1057 R-6);
+    - "never two writing sessions in one tree" cited to DEC-963 item 1, not DEC-254;
+    - "nothing … read from another session's folders" read against DEC-820;
+  - F3: round 2a's two weak cases strengthened (the designer's);
+  - F4: the test-design skill's read rule cites CAP-38.c (independent authorship), not CAP-38.b or DEC-136;
+  - the checkpoint template's example `task:` left empty (its comment says to fill it with the ticket's id), so
+    `gov links` reads no unknown id in the template;
+  - each changed skill one more minor up; the skills validator passes; the generated copies are the next ACT's.

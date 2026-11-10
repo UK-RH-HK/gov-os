@@ -150,7 +150,7 @@ def gov(tiny, sandbox, endpoint, program):
         "PYTHONPATH": str(support.REPO_ROOT / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
         "OLLAMA_HOST": endpoint.host,
-        # W2-54, DEC-798: the CPU-only embedder's address is the same stand-in.
+        # W2-54, DEC-1033: the query embedder's address is the same stand-in.
         "GOV_QUERY_OLLAMA_HOST": endpoint.host,
         "GOV_OLLAMA_BIN": str(program),
         **({"PYTHONUSERBASE": site.getuserbase()} if site.ENABLE_USER_SITE else {}),

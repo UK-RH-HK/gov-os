@@ -129,6 +129,30 @@ CTO's rows) and F2, F11 (outside this ticket) were left as they were. Lines are 
 - **For the CTO's live run:** S12 live now searches under the drawn id as well; the live session's command line ends
   with `--session-id <uuid>` before the prompt.
 
+## F11 (DEC-1112 (3)): `--setting-sources project`
+
+The engineer, 2026-11-09, from head `5e3c9abf4c8e` (the designer's F11 case merged). The review's F11: a wall session
+started with the real HOME could load the user's own `~/.claude/settings.json` (allow-all lines, `acceptEdits`, any
+later user hook or `CLAUDE.md`), because the launch line named no `--setting-sources`. The CTO's decision, as defence
+in depth: S10's flag list carries `--setting-sources project`.
+
+- **What changed:** `session_flags` (`indep_launch.py` 721-730; the flag at 722-724) now opens with
+  `-p --restricted --setting-sources project --settings <wall>/.claude/settings.json --add-dir <tree>`. Both the
+  session (`run_session`, 841-842) and the canary (`run_canary`, 803-804) take their flags from `session_flags`, so
+  each carries the flag exactly once, beside `--restricted`. Only the wall's own project settings load; that file is
+  also passed by `--settings`, so nothing the wall needs is lost.
+- **What did not change:** the order of every other flag, the canary's difference from the session (its own
+  `--add-dir` and its own drawn `--session-id`), the prompt and `PROMPT_SHA256`, the environment, and everything after
+  the session.
+- **Unit tests:** the stub `claude` parses `--setting-sources` as a value flag;
+  `test_writer_session_is_closed_and_delivers_counts_only` checks the session's `a[:8]` (with the new flag), the flag
+  once, and the unchanged `a[8:-3]`; `test_canary_runs_with_the_session_flags_plus_its_folder` checks that both lines
+  carry `--setting-sources project` once, at `argv[1:4]` after `-p`, besides the existing canary-against-session
+  comparison (equal but for `--session-id`). **74 passed** (`--optin=lifted --optin=breadth`, through the heavy slot,
+  with `-m "not local_only" -k "not real and not green_here and not time_limit"`, which leaves out none of the 74).
+- **`gov accept W2-149`:** **pass; 78 passed, 0 failed, 3 skipped**; success-10 is now 5/5 (4/5 before, the
+  designer's F11 case red); the 3 skipped are the live cases (success-9, -11, -12). No red.
+
 ## Notes on the runs
 
 - `gov accept` strips `PYTHON*` from its child's environment, so it ran with the session's own HOME (pytest lives in

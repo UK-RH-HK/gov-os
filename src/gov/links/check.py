@@ -10,8 +10,8 @@ The eight kinds (``CODES``), each finding carrying its code, ids, path and line,
 commit's finding: its ``Role:``, and once landed the lead, ``commit_role_field``) and a one-line fix, ``text`` when
 a free-text pattern found it:
 
-- UNMARKED_CHANGE: a register entry another entry, the register's change log or ARCHIVE-SUPERSEDED §A supersedes or
-  amends, whose status line does not name that changer. The statements are the loader's ``register_statements``
+- UNMARKED_CHANGE: a register entry another entry, the register's change log or ARCHIVE-SUPERSEDED §A supersedes,
+  amends or settles (S18), whose status line does not name that changer. The statements are the loader's ``register_statements``
   (one pattern set); §A is read with the loader's own ``_BY`` pattern, as W2-92's drift script reads it.
 - UNKNOWN_ID: an id or path in a typed place that names nothing that exists.
 - UNLINKED_ID: an id a ticket's KPI brackets name, or a worker commit's ``Implements:`` names, missing from the
@@ -72,7 +72,11 @@ OPEN = ("open", "in_progress")  # a ticket whose sources and KPI brackets bear a
 ACCEPTANCE_JUDGED = ("in_progress", "closed")  # a ticket whose acceptance_tests.path must exist
 CLOSE_NOT_DONE = ("SUPERSEDED", "WITHDRAWN", "REJECTED", "REVOKED", "REFUSED")  # a close record that closed nothing
 EXEMPT_TASKS = ("decision-record",)  # DEC-861
-CHANGE_CLASSES = ("supersede", "amend")
+# A settlement (``**Settles:** DEC-x`` in DEC-y's status line) is a change, DEC-866 (1); S18, DEC-1109 (2). It is
+# never whole: its mark is a ``**Changed by:**``, as an amendment's. Only the label counts (``SETTLES_FORM``): a free
+# "settled by" names a package item or a residual far more often than the entry ("P-4 is settled by DEC-762").
+CHANGE_CLASSES = ("supersede", "amend", "settle")
+SETTLES_FORM = "**Settles:**"
 RECORD_KEYS = loader.CITE_KEYS + ("constrains",)  # a record's id keys; ``task`` apart
 TICKET_KEYS = ("sources", "closes", "links", "parent")  # depends_on is core-graph's (LINK-INTEGRITY §4.1)
 
@@ -459,6 +463,8 @@ def unmarked(repo: _Repo, statements: list[dict]) -> list[dict]:
     for statement in statements:
         target, source = statement["target"], statement["source"]
         if statement["cls"] not in CHANGE_CLASSES or target not in repo.entry or source == target:
+            continue
+        if statement["cls"] == "settle" and statement["form"] != SETTLES_FORM:
             continue
         if repo.status.get(source) in NOT_A_CHANGER:
             continue

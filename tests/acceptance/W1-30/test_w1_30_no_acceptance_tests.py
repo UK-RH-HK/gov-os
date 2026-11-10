@@ -15,9 +15,9 @@ acceptance tests.
 
 Revised for W2-07 (DEC-892 item 1, DEC-896 item 3): the close reads the folder a ticket's file declares in
 ``acceptance_tests.path``, not a folder derived from its WBS id. The ticket here is an implementation ticket
-(judged on its acceptance tests, W2-07's KPI 1) that declares ``tests/acceptance/W1-920-declared/``; that folder
-holds no test, while ``tests/acceptance/W1-920/`` holds a passing one, which is not the ticket's declared
-acceptance test and does not stand in for it. The expectations are unchanged.
+(judged on its acceptance tests, W2-07's KPI 1) that declares ``DECLARED`` (the planted ``WBS`` with
+``-declared``); that folder holds no test, while ``tests/acceptance/<WBS>/`` holds a passing one, which is not the
+ticket's declared acceptance test and does not stand in for it. The expectations are unchanged.
 """
 
 import shutil

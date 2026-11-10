@@ -14161,6 +14161,39 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   The CTO brings the new hashes and the auditor's brief.
 - **Basis:** question 2 (the labels judged by every rule in force, and their disagreements settled independently).
 
+### DEC-1114 — W2-56's S8 on Linux (DEC-105, against DEC-1035 (2)): (b), S8's reach and S10 deferred to Wave 3 as a ticket; the rest of W2-56 merged now; a re-estimate at today's measured pace
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`) · **Under:** DEC-1035 (2), DEC-1112 (1), DEC-1097 (8), DEC-105 · **Source:** the owner's message (chat, 2026-11-09), on W2-56's D-13 (measured: on Linux a one-path `network.allowUnixSockets` leaves the connect refused; only `allowAllUnixSockets` connects, which S9 and F4 refuse)
+- **Decision:**
+  - (1) **(b).** S8's reach (a sandboxed session connecting to the shared reranker's one socket) and S10 (its
+    measurement) are deferred to Wave 3, as a ticket to give sandboxed workers ranked search without opening every Unix
+    socket (`docs/plan/WAVE_3_PARKING.md` W3-P28). S8's settings-level form (the one path, nothing wider) stays built,
+    inert on Linux. Until then a sandboxed worker's search is unranked, named and counted (S11). S9 and F4 stand
+    unchanged. The rest of W2-56 merges now; leads and in-session agents, which are not sandboxed, keep ranked search.
+  - (2) **A re-estimate** as a short package (FORECAST-W2-2): for the lift, EXAMIN's copy and Wave 2's end, both (a)
+    elapsed time from today's measured agent pace and (b) FORECAST-W2-1's lead-hour method, with which the CTO trusts
+    and why; the share done by tickets and by what the lift needs; what remains before the lift, item by item, with its
+    critical path; and how much of each date waits on the owner rather than on agents.
+- **Basis:** question 2 (containment kept: S9 forbids opening every socket) and question 4 (the dates told from what
+  is measured now).
+
+
+### DEC-1115 — Yes to ACT-SETS-GLOBS-1 (by hand) and ACT-CLAUDE-COPIES-1 (by the operator agent, its first live run); TPL-6's Appendix A applied now; before the lift, past 80 % of the week's usage only the lift's critical path runs
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5
+- **Decision:**
+  - (1) **ACT-SETS-GLOBS-1: yes** (`yes ACT-SETS-GLOBS-1 1f93d6ef`, class (b)); the owner's operator applies it by
+    hand now (the package's §5).
+  - (2) **ACT-CLAUDE-COPIES-1: yes** at manifest `5d3a18832b9b`, class (b), run by the operator agent from its queue,
+    its first live run. If the agent refuses, the CTO tells the owner why and the owner's operator applies it by hand
+    (§5). The agent reads a yes only in its fixed form, `yes ACT-<id> <manifest sha8>` on a line of its own (G6); the
+    package had given another form, so the owner types `yes ACT-CLAUDE-COPIES-1 5d3a1883` before the CTO queues it.
+  - (3) **TPL-6's Appendix A as proposed, now:** the CTO prompt's Appendix A becomes the 466-character pointer to the
+    kernel templates (TPL6-APPENDIX-A).
+  - (4) **Standing until the lift:** if the week's usage passes 80 % before the lift, the lift's critical path comes
+    first and work outside it waits for the weekly reset. Usage stays recorded, not an alarm (DEC-1089 (3)); this is
+    a priority rule, not a cap. It joins rule 6 of the standing-rules list.
+- **Basis:** question 2 (the hidden sets hidden before the first writer run; the templates one source) and question 4
+  (the lift's date protected if the week's allowance runs short).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14212,3 +14245,5 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.496 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1111 (item 2 open). Next free id: DEC-1112. |
 | 0.497 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1112 (item 3 standing); DEC-1098 (4) narrowed to set-up A. Next free id: DEC-1113. |
 | 0.498 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1113. Next free id: DEC-1114. |
+| 0.499 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1114. Next free id: DEC-1115. |
+| 0.500 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1115 (item 4 standing until the lift). Next free id: DEC-1116. |

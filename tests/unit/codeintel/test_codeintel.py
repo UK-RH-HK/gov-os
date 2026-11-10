@@ -43,8 +43,14 @@ STAND_IN = ("#!/bin/sh\n"
             "cat \"$here/answer.json\"\n")
 
 
+SOCKET_TAIL = len(f"/cbm-daemon-{os.getuid()}/cbm-{'0' * 16}.sock.pending")  # the tool's socket under its folder
+
+
 @pytest.fixture(autouse=True)
 def daemon_base(tmp_path, monkeypatch):
+    """The daemon directories in this test's folder: no test session's folder, no launched session's (W2-56 S1)."""
+    monkeypatch.delenv(codeintel.BASE_ENV, raising=False)
+    monkeypatch.delenv(codeintel.LAUNCH_TMP_ENV, raising=False)
     monkeypatch.setattr(codeintel, "DAEMON_BASE", tmp_path / "daemons")
     return tmp_path / "daemons"
 
@@ -112,11 +118,54 @@ def test_the_ui_is_turned_off_in_the_home_before_every_call_and_a_refusal_fails_
 
 
 def test_the_daemon_directory_is_short_and_one_per_repository(tmp_path, monkeypatch):
-    monkeypatch.undo()  # the place the wrapper uses when no test moves it; nothing is made there
+    monkeypatch.setattr(codeintel, "DAEMON_BASE", Path(f"/tmp/gov-cbm-{os.getuid()}"))  # the place outside a test
     first, second = codeintel.daemon_dir(tmp_path / "one"), codeintel.daemon_dir(tmp_path / "two")
     assert first != second and first.parent == second.parent == Path(f"/tmp/gov-cbm-{os.getuid()}")
-    assert len(str(first)) <= 107 - len(f"/cbm-daemon-{os.getuid()}/cbm-{'0' * 16}.sock.pending")
+    assert len(str(first)) <= 107 - SOCKET_TAIL
     assert not first.exists() and not second.exists()
+
+
+def test_a_test_sessions_folder_holds_its_daemon_directories(tmp_path, monkeypatch):
+    """W2-56 S1: ``CODEINTEL_DAEMON_BASE`` (the conftest's folder for one test session) comes first, whatever else is set."""
+    monkeypatch.setenv(codeintel.BASE_ENV, str(tmp_path / "session"))
+    monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, "/tmp/gov-launch-abcd1234/claude-1000")
+    assert codeintel.daemon_dir(tmp_path / "one").parent == tmp_path / "session"
+
+
+@pytest.mark.parametrize("given", ("/tmp/gov-launch-abcd1234", "/tmp/gov-launch-abcd1234/claude-1000",
+                                   "/tmp/gov-launch-abcd1234/claude-1000/"))
+def test_a_launched_sessions_daemon_directory_is_under_its_own_temp_folder(tmp_path, monkeypatch, given):
+    """W2-56 S1, D-12: found from CLAUDE_CODE_TMPDIR (the launcher's folder, or the CLI's claude-<uid> in it), whatever
+    TMPDIR says; short enough for the tool's socket."""
+    monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, given)
+    monkeypatch.setenv("TMPDIR", "/tmp/gov-launch-abcd1234/claude-1000/pytest/deeper")
+    made = codeintel.daemon_dir(tmp_path / "one")
+    assert made.parent == Path("/tmp/gov-launch-abcd1234") / codeintel.LAUNCH_SUB
+    assert len(str(made)) + SOCKET_TAIL <= 107
+
+
+@pytest.mark.parametrize("given", ("", "relative/gov-launch-x", "/tmp/claude-1000", "/tmp/other/claude-1000/deep"))
+def test_outside_a_launched_session_the_default_place_holds(monkeypatch, tmp_path, daemon_base, given):
+    monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, given)
+    assert codeintel.daemon_dir(tmp_path / "one").parent == daemon_base
+
+
+def test_a_test_sessions_folder_is_short_and_made_in_the_launched_sessions_folder(tmp_path, monkeypatch):
+    launched = tmp_path / "gov-launch-abcd1234"
+    launched.mkdir()
+    monkeypatch.setenv(codeintel.LAUNCH_TMP_ENV, str(launched / "claude-1000"))
+    made = codeintel.make_session_base()
+    assert made.parent == launched and made.is_dir() and len(made.name) == 4
+    older = "/tmp/gov-launch-engineer-abcd1234"  # an engineer's folder of the older name (role and 8 letters)
+    assert len(older) + len("/cxyz") + 17 + SOCKET_TAIL <= 107
+
+
+def test_the_running_suite_has_a_folder_of_its_own_and_no_code_graph_tool_on_path(monkeypatch):
+    """W2-56 S1, through tests/conftest.py: this session's folder is named, and the real tool is off PATH here."""
+    monkeypatch.undo()
+    base = os.environ.get(codeintel.BASE_ENV)
+    assert base and Path(base).is_dir()
+    assert shutil.which(codeintel.TOOL) is None
 
 
 def test_a_daemon_directory_that_is_not_the_users_own_is_refused(tmp_path, daemon_base):

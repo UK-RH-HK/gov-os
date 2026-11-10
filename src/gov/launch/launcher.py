@@ -39,7 +39,9 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
+from subprocess import SubprocessError
 
 import yaml
 
@@ -49,6 +51,7 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
+from gov.launch import environ, sandbox
 from gov.launch.store import ENV as STORE_ENV, StoreSettingError, configured as configured_store
 from gov.launch.store import main_root as main_store_root
 
@@ -89,6 +92,13 @@ EXPERIMENTS_ROOT = "experiments"
 # DEC-313: arguments that take the permission checks away or add a writable directory.
 BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
 BYPASS_MODE = "bypassPermissions"
+# W2-56 S6 (DEC-826 Q5): arguments that drop the guard or add context, beside DEC-313's; refused alone, with a spaced
+# value and in the ``=`` form, wherever they stand after ``--``.
+GUARD_FLAGS = ("--restricted", "--safe-mode", "--agents", "--plugin-dir", "--plugin-url", "--mcp-config",
+               "--system-prompt")
+# W2-56 D-12: a worker's temp folder, short enough that its code-graph daemon folders fit the tool's socket (107
+# bytes, DEC-338); the prefix is what the weekly sweep (DEC-902) and the code index (``gov.codeintel``) look for.
+TEMP_PREFIX = "gov-launch-"
 # Open package DP-9: both files hold a list of host names under this key; the
 # project's file extends the kernel default, and may be absent (DEC-241).
 ALLOWLIST_KEY = "hosts"
@@ -98,6 +108,7 @@ PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 INTERRUPT_EXIT = 130
 END_WAIT_S = 5  # whole seconds a session that was asked to end may still run before it is killed
+REAP_WAIT_S = 3.0  # seconds the launcher waits, after the kill, for the session's group to be gone (W2-56 S12)
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 
 
@@ -210,7 +221,8 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
             "enabled": True,
             "failIfUnavailable": True,
             "allowUnsandboxedCommands": False,
-            "network": {"strictAllowlist": True, "allowedDomains": domains},
+            # W2-56 S8 (DEC-1035 (2)): the reranker's one socket, from the service's own setting (gov.launch.sandbox)
+            "network": sandbox.network(domains),
         },
     }
 
@@ -223,19 +235,9 @@ def build_lead_settings(ticket_id: str) -> dict:
 
 
 def sandbox_faults(settings: dict) -> list[str]:
-    """Why the settings are not on, strict and fail-closed (CAP-61.a); empty when they are."""
-    block = settings.get("sandbox")
-    block = block if isinstance(block, dict) else {}
-    network = block.get("network")
-    checks = {
-        "sandbox.enabled is not true": block.get("enabled") is True,
-        "sandbox.failIfUnavailable is not true": block.get("failIfUnavailable") is True,
-        "sandbox.allowUnsandboxedCommands is not false": block.get("allowUnsandboxedCommands") is False,
-        "sandbox.network.strictAllowlist is not true":
-            isinstance(network, dict) and network.get("strictAllowlist") is True,
-        "sandbox.excludedCommands is set (DEC-164)": "excludedCommands" not in block,
-    }
-    return [fault for fault, holds in checks.items() if not holds]
+    """Why the settings are not on, strict and fail-closed, or wider than the launcher's (CAP-61.a, DEC-1035); empty
+    when they are. The reranker's socket is read from this process's HOME (``gov.launch.sandbox.faults``)."""
+    return sandbox.faults(settings)
 
 
 def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
@@ -315,6 +317,10 @@ def _check_cli_args(cli_args: list[str]) -> None:
         if arg == "--setting-sources" or arg.startswith("--setting-sources="):
             raise _refuse("the CLI arguments carry --setting-sources: without the project's settings the session "
                           "would have no guard hook")
+        name = arg.split("=", 1)[0]
+        if name in GUARD_FLAGS:
+            raise _refuse(f"the CLI arguments carry {name}: it drops the guard or adds context to a worker session "
+                          f"(DEC-826 Q5)")
 
 
 def template_args(root: Path, role: str) -> list[str]:
@@ -450,6 +456,13 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
+    # W2-56 S4 (DEC-402): the names the sandbox puts placeholders at are kept out of git's way, for the session and
+    # for its caller in the same worktree; a repository whose exclude file cannot be written is not launched into.
+    try:
+        sandbox.exclude_placeholders(root, settings["permissions"]["deny"])
+    except OSError as error:
+        raise _refuse(f"the sandbox's placeholder names cannot be kept out of the repository's commits "
+                      f"({error.strerror or error}) (DEC-402)") from None
     lock = StartLock()
     try:
         _admit_start(root, role, ticket_id, gate_override, gpu_need_mib)
@@ -461,7 +474,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str], gate_over
         if name is not None and not os.path.lexists(name):
             runs.make(name, str(root))
         own = runs.own_folder(str(root), ticket_id, role)
-        return _run(root, cli, settings, [*cli_args, *template], temp_prefix=f"gov-launch-{role}-", own=own,
+        return _run(root, cli, settings, [*cli_args, *template], temp_prefix=TEMP_PREFIX, own=own,
                     entry=(ticket_id, role), lock=lock)
     finally:
         lock.release()
@@ -476,35 +489,46 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
     review F1) is given back once the session is registered, or when the launch ends without one."""
     from gov.resources import registry
 
-    state = {"session": None, "ended": False, "asked": False, "registered": None}
+    state = {"session": None, "ended": False, "asked": False, "registered": None, "deadline": None}
 
     def end(signum=None, frame=None):
-        """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session. It is asked first, and killed when a second
-        signal arrives or it still runs END_WAIT_S later. Nothing is raised here, so no clean-up is cut short."""
+        """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session's whole process group (W2-56 S12). It is asked
+        first, and killed when a second signal arrives or it still runs END_WAIT_S later. Nothing is raised here, so
+        no clean-up is cut short."""
         session, asked = state["session"], state["asked"]
         state["ended"] = True
-        if session is not None and session.poll() is None:
+        if session is not None and (session.poll() is None or _group_alive(session)):
             state["asked"] = True
             if asked:
-                session.kill()
+                _signal_session(session, signal.SIGKILL)
             else:
-                session.terminate()
+                _signal_session(session, signal.SIGTERM)
+                state["deadline"] = time.monotonic() + END_WAIT_S
                 signal.alarm(END_WAIT_S)
 
     previous = {number: signal.signal(number, end) for number in END_SIGNALS
                 if signal.getsignal(number) is not signal.SIG_IGN}  # a signal the caller ignores stays ignored
-    alarm, tmpdir, code = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT
+    alarm, tmpdir, code, terminal = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT, None
     try:
+        own_env = dict(settings["env"])
         if temp_prefix is not None:  # DEC-159: a temp directory of the session's own, for the CLI and its commands
             tmpdir = tempfile.mkdtemp(prefix=temp_prefix)
-            settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-            settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
-        env = {**os.environ, **settings["env"]}
+            own_env.update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+            # W2-56 S2, S11: the temp folder, the run folder and the reranker's log, nothing else
+            settings["sandbox"]["filesystem"] = sandbox.filesystem(tmpdir, own)
+            faults = sandbox_faults(settings)
+            if faults:
+                raise _refuse("the built settings are not strict: " + "; ".join(faults))
+        # W2-56 S5: the cleaned environment for the CLI process (gov.launch.environ), and in a worker's --settings (a
+        # lead's keeps its role and ticket alone, W2-136 S9)
+        settings["env"] = environ.settings_env(os.environ, own_env) if temp_prefix is not None else own_env
+        env = environ.session_env(os.environ, own_env)
         if not state["ended"]:  # a signal that came first: no session is started
-            try:
-                state["session"] = subprocess.Popen([str(cli), "--settings", json.dumps(settings), *cli_args],
-                                                    cwd=root, env=env)
-            except OSError:
+            terminal = _terminal()
+            try:  # W2-56 S12: the session leads a process group of its own, which the ending signals reach
+                state["session"] = _start([str(cli), "--settings", json.dumps(settings), *cli_args], root, env,
+                                          terminal)
+            except (OSError, SubprocessError):
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
             pid = getattr(state["session"], "pid", None)  # a started process always has one
             if entry is not None and isinstance(pid, int) and pid > 0:
@@ -519,22 +543,27 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             if state["ended"]:  # a signal that came while the session was started
                 end()
             code = state["session"].wait()
+            _end_group(state)  # W2-56 S12: what the session left in its group ends with it
             if state["ended"]:
                 code = INTERRUPT_EXIT
         return code
     finally:
         session = state["session"]
         if session is not None and session.poll() is None:  # only an error on the way here: no session is left
-            session.kill()
+            _signal_session(session, signal.SIGKILL)
             session.wait()
+        if session is not None and _group_alive(session):
+            _signal_session(session, signal.SIGKILL)
+        if terminal is not None:
+            _take_terminal(terminal)
         if state["registered"] is not None:
             registry.unregister(state["registered"])
         if lock is not None:
             lock.release()
-        # DEC-386: the folder goes when the session ends, whole; a link in it is removed as a link.
+        # DEC-386, W2-56 S15: the folder goes when the session ends, whole; a link in it is removed as a link.
         try:
             if tmpdir is not None:
-                shutil.rmtree(tmpdir)
+                _remove(tmpdir)
         except OSError as error:  # DEC-392: the session's exit code is kept, and one line names what stayed
             _say(f"gov launch: the temp folder {tmpdir} could not be removed and stays: "
                  f"{' '.join(str(error).split())}\n")
@@ -542,3 +571,119 @@ def _run(root: Path, cli: Path, settings: dict, cli_args: list[str], *, temp_pre
             signal.signal(number, handler or signal.SIG_DFL)
         signal.alarm(0)
         signal.signal(signal.SIGALRM, alarm or signal.SIG_DFL)
+
+
+def _terminal() -> int | None:
+    """Standard input's descriptor when it is a terminal whose foreground group is the launcher's, else None."""
+    try:
+        if os.isatty(0) and os.tcgetpgrp(0) == os.getpgrp():
+            return 0
+    except OSError:
+        pass
+    return None
+
+
+def _group_options(terminal: int | None) -> dict:
+    """``Popen`` options that make the session the leader of a process group of its own (W2-56 S12). On a terminal
+    the session's group is also made the terminal's foreground group, so that an interactive session can read it."""
+    if terminal is None:
+        return {"process_group": 0}
+
+    def foreground() -> None:  # in the child, before the CLI is started
+        os.setpgid(0, 0)
+        signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+        os.tcsetpgrp(terminal, os.getpgrp())
+        signal.signal(signal.SIGTTOU, signal.SIG_DFL)
+
+    return {"preexec_fn": foreground}
+
+
+def _start(argv: list[str], root: Path, env: dict, terminal: int | None):
+    """The session, started as the leader of its own process group. A ``Popen`` put in the real one's place that
+    takes no process options (the suites' in-process stand-ins) is called without them: it starts no process."""
+    try:
+        return subprocess.Popen(argv, cwd=root, env=env, **_group_options(terminal))
+    except TypeError as error:
+        if "unexpected keyword argument" not in str(error):
+            raise
+        return subprocess.Popen(argv, cwd=root, env=env)
+
+
+def _take_terminal(terminal: int) -> None:
+    """The terminal back to the launcher's group once the session has ended."""
+    former = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+    try:
+        os.tcsetpgrp(terminal, os.getpgrp())
+    except OSError:
+        pass
+    finally:
+        signal.signal(signal.SIGTTOU, former)
+
+
+def _pgid(session) -> int | None:
+    pid = getattr(session, "pid", None)
+    return pid if isinstance(pid, int) and not isinstance(pid, bool) and pid > 0 else None
+
+
+def _group_alive(session) -> bool:
+    """True while a process of the session's group runs (its leader, or one it left behind)."""
+    pgid = _pgid(session)
+    if pgid is None:
+        return False
+    try:
+        os.killpg(pgid, 0)
+    except (ProcessLookupError, PermissionError):
+        return False
+    return True
+
+
+def _signal_session(session, number: int) -> None:
+    """``number`` to the session's whole process group; to the session alone when it leads no group."""
+    pgid = _pgid(session)
+    if pgid is not None:
+        try:
+            os.killpg(pgid, number)
+            return
+        except (ProcessLookupError, PermissionError):
+            pass
+    if session.poll() is None:
+        session.kill() if number == signal.SIGKILL else session.terminate()
+
+
+def _end_group(state: dict) -> None:
+    """After the session's leader has ended: the rest of its group is asked to end, and killed when it still runs
+    END_WAIT_S after the first ask (D-5: the kill reaches the group, not only a leader that has ended)."""
+    session = state["session"]
+    if not _group_alive(session):
+        return
+    if not state["asked"]:
+        state["asked"] = True
+        _signal_session(session, signal.SIGTERM)
+        state["deadline"] = time.monotonic() + END_WAIT_S
+    deadline = state["deadline"] if state["deadline"] is not None else time.monotonic()
+    while _group_alive(session) and time.monotonic() < deadline:
+        time.sleep(0.05)
+    if _group_alive(session):
+        _signal_session(session, signal.SIGKILL)
+        reaped = time.monotonic() + REAP_WAIT_S  # a killed orphan stays in the group until its new parent reaps it
+        while _group_alive(session) and time.monotonic() < reaped:
+            time.sleep(0.05)
+
+
+def _remove(folder: str) -> None:
+    """The session's temp folder, whole (W2-56 S15): also when it holds folders its owner may not write or list (mode
+    0500 or 0000, as a module cache leaves them), a fifo, or a link (removed as a link; its target is untouched)."""
+    try:
+        if not os.path.islink(folder):
+            os.chmod(folder, 0o700)
+    except OSError:
+        pass
+    for here, folders, _files in os.walk(folder):  # links are not followed
+        for name in folders:
+            path = os.path.join(here, name)
+            if not os.path.islink(path):
+                try:
+                    os.chmod(path, 0o700)
+                except OSError:
+                    pass
+    shutil.rmtree(folder)

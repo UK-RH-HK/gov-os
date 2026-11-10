@@ -14,7 +14,7 @@ import w2_141_support as s
 
 W = s.WORD
 
-# An engineer on DAEO-zz41 (W2-941): calls that cannot reach tests/acceptance/W2-941/.
+# An engineer on DAEO-zz41 (``s.WBS``): calls that cannot reach the planted ``s.OWN``.
 ENGINEER_ALLOWED = [
     s.grep("Grep from src/", path="src"),
     s.grep("Grep from the root, glob src/**/*.py", glob="src/**/*.py"),

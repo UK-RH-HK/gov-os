@@ -7,8 +7,8 @@ from pathlib import Path
 
 from gov.util.frontmatter import of_file
 from gov.util.gitenv import git_env
+from gov.util.tickets import TICKETS_REL
 
-TICKETS_REL = ".tickets"
 TK_REL = "governance/kernel/bin/tk"  # where an adopted project holds the vendored script (ADR-0002 section 5)
 
 

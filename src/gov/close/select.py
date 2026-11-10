@@ -23,10 +23,11 @@ import re
 from pathlib import Path
 
 from gov.close.repo import git as _git
+# W2-150: the test map's places live with the fingerprints in gov.store.loader; the names stay this module's
+from gov.store.loader import SCHEMA_DIRS
+from gov.store.loader import TEST_MAP_REL as MAP_REL
+from gov.store.loader import TEST_MAP_SCHEMA as SCHEMA_NAME
 
-MAP_REL = "governance/project/test-map.yaml"
-SCHEMA_NAME = "test-map.schema.json"
-SCHEMA_DIRS = ("template/governance/kernel/schemas", "governance/kernel/schemas")
 DEFAULT_PER_TEST_TIMEOUT = 900
 DEFAULT_DISTRIBUTION = "load"
 RETENTION_POLICY = "failed"  # DEC-905: every test run's tmp_path_retention_policy; a failing test's folder stays

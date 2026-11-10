@@ -2371,3 +2371,5 @@ Cases: 7 in the full run, 0 in `breadth`, 530 in `lifted`.
 | F1: A ticket closes with a failing acceptance test | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | the ticket's words |
 | F2: A fourth consecutive non-converging iteration starts without an owner decision | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_fourth_non_converging_blocked_without_owner` \| README (lifted) | lifted |
 | F3: The iteration count or budget appears in any output seen by the looping session [CAP-59.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_iteration_count_not_in_output`, `test_budget_not_in_output` \| README (lifted) | lifted |
+
+**Citations (DEC-1109 (2), 2026-11-09):** `test_w1_30_r11_rebuild_mode.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the comments and docstrings that wrote the planted base decision and the planted WBS id now name `BASE_SOURCE`, `WBS` and `DECLARED`; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
