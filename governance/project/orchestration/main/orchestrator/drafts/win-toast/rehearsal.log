@@ -1,4 +1,4 @@
-== clone at c906619646da
+== clone at 13f15785f91f
 == check
 state before
 check: ready to apply
@@ -17,9 +17,16 @@ exit 0
 record_only entries: 16 | win_toast.ps1 listed: False
 == W2-66's live test map suite (both opt-ins)
 .................                                                        [100%]
-89 passed in 3.23s
+89 passed in 2.48s
 == undo
 state before
 exit 0
 (empty diff after undo)
+== F3: apply refuses a changed candidate
+apply: the candidate is not the reviewed one; nothing changed
+exit 1 (expected 1)
+== F2: undo refuses after a later change
+undo: the map is not as this ACT left it (unknown (14d3f45dfd3e95d6ef414812a6240cf5daaa7a7be0b479f3fa415eba9b193560)): a later change would be lost; nothing changed (use git revert)
+exit 1 (expected 1)
+# later
 == done

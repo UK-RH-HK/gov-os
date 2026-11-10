@@ -29,12 +29,15 @@ case "$cmd" in
     case "$s" in before) echo "check: ready to apply";; applied) echo "check: already applied";; *) echo "check: the map changed since this ACT was built; rebuild it" >&2; exit 1;; esac ;;
   apply)
     [ "$(state)" = before ] || { echo "apply: the map is not in the state this ACT was built on: $(state)" >&2; exit 1; }
+    [ "$(sum "$HERE/test-map.candidate.yaml")" = "$AFTER" ] || { echo "apply: the candidate is not the reviewed one; nothing changed" >&2; exit 1; }
     mkdir -p "$BACKUP"; cp -p "$ROOT/$MAP" "$BACKUP/test-map.yaml"; sum "$BACKUP/test-map.yaml" > "$BACKUP/test-map.yaml.sha256"
     cp "$HERE/test-map.candidate.yaml" "$ROOT/$MAP"
+    [ "$(state)" = applied ] || { cp -p "$BACKUP/test-map.yaml" "$ROOT/$MAP"; echo "apply: the result is not the reviewed map; restored the backup" >&2; exit 1; }
     echo "state $(state)" ;;
   undo)
     [ -f "$BACKUP/test-map.yaml" ] || { echo "undo: no backup" >&2; exit 1; }
     [ "$(sum "$BACKUP/test-map.yaml")" = "$(cat "$BACKUP/test-map.yaml.sha256")" ] || { echo "undo: the backup does not match its hash" >&2; exit 1; }
+    [ "$(state)" = applied ] || { echo "undo: the map is not as this ACT left it ($(state)): a later change would be lost; nothing changed (use git revert)" >&2; exit 1; }
     cp -p "$BACKUP/test-map.yaml" "$ROOT/$MAP"
     echo "state $(state)" ;;
   *) echo "usage: bash apply.sh check|apply|undo" >&2; exit 2 ;;

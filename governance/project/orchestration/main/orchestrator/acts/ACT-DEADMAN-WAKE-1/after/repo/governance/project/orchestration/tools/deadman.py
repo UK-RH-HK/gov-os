@@ -25,11 +25,17 @@ waiter wakes the CTO. The wake writes only into the CTO's inbox: it pushes nothi
 minutes by day, 2 hours in the quiet hours) and its reminders are unchanged. Not in a stand-by, not with --dry. The
 inbox is ORCH/dispatch/inbox when the state is the live one, else a folder `inbox` beside --state (a replay or a test
 never writes the live inbox), or --inbox. Because an item unread 30 minutes makes the dispatcher's inbox-stale line,
-the watch leaves out the dispatcher's `inbox:` line only when every item in the inbox folder (the stale file's
-sibling `inbox/`) unread past 30 minutes (--stale-s) is one of the CTO's own wake items (a name ending -deadman-wake,
--helper-watch or -spend-brake, with an optional -<n>): their staleness never brings a push forward, and any other
-stale item pushes exactly as before; the stall's own ALERT stays the backstop. The stall's key is written before
-the item, so a key that cannot be written gives no item rather than one on every pass.
+the watch re-reads the inbox folder (the stale file's sibling `inbox/`) before it uses the dispatcher's `inbox:` line:
+  - no item there unread past 30 minutes (--stale-s, kept equal to the dispatcher's STALE_S, 1800 s): the line is
+    from before a read and is left out (review F1); a missing or unreadable folder keeps it (fail toward the push);
+  - outside a CTO stand-by: left out when every stale item is one of the CTO's own wake items (a name ending
+    -deadman-wake, -helper-watch or -spend-brake, with an optional -<n>), whose staleness the stall's own ALERT
+    already covers (it is silent only in a stand-by);
+  - in a stand-by, when the ALERT is silent by design: left out only when every stale item is a -spend-brake item
+    (DEC-1089 (3): usage never alarms the owner); a stale -helper-watch or -deadman-wake item pushes (review F2);
+  - any other stale item pushes exactly as before.
+The stall's key is written before the item, so a key that cannot be written gives no item rather than one on every
+pass; a key that is not an object is read as no key (review F3).
 ORCH (environment) moves the whole scratch root; --log, --state, --inbox, --session-file, --standby and --inbox-stale
 move each file, so a test or rehearsal never touches the live ones.
 """
@@ -50,7 +56,8 @@ STATE = ORCH / "log/deadman-state.json"
 SESSION_FILE = ORCH / "log/cto-session.txt"
 STANDBY = ORCH / "log/cto-standby.txt"  # while it exists, the CTO stands by on purpose: no alert (DEC-998)
 # The dispatcher writes this file while an inbox item has been unread 30 minutes (the owner, 2026-11-01); its
-# content is stable for one stall, so the watch alerts once per stall. It also alerts during a CTO stand-by (intended).
+# content is stable for one stall, so the watch alerts once per stall. It also alerts during a CTO stand-by (intended);
+# the CTO's own wake items are left out outside a stand-by, and -spend-brake items always (ACT-DEADMAN-WAKE-1).
 INBOX_STALE = ORCH / "dispatch/inbox-stale.txt"
 LOG = ORCH / "log/deadman.log"
 PINGS = Path.home() / ".config/gov-os-notify/pings.log"
@@ -59,6 +66,7 @@ PS = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
 DAY_LIMIT, NIGHT_LIMIT, REMIND = timedelta(minutes=60), timedelta(hours=2), timedelta(hours=2)
 WAKE_LIMIT = timedelta(minutes=60)  # the wake, at any hour (DEC-1112 (3)); the push keeps the owner's limits above
 WAKE_ITEM = re.compile(r"-(?:deadman-wake|helper-watch|spend-brake)(?:-\d+)?\.txt$")  # the CTO's own wake items
+BRAKE_ITEM = re.compile(r"-spend-brake(?:-\d+)?\.txt$")  # never an alarm to the owner, stand-by or not (DEC-1089 (3))
 
 
 def quiet(t):
@@ -147,7 +155,7 @@ def wake(a, stall, line, now):
     try:
         if json.loads(key_f.read_text()).get("stall") == stall:
             return "woken already"
-    except (OSError, ValueError):
+    except (OSError, ValueError, AttributeError, TypeError):  # missing, unreadable or not an object: no key (F3)
         pass
     box = inbox_dir(a)
     try:
@@ -171,15 +179,19 @@ def wake(a, stall, line, now):
         return f"wake failed {exc.__class__.__name__}"
 
 
-def only_wake_items_stale(box, stale_s):
-    """True only when the inbox folder holds items unread past stale_s and every one of them is a CTO wake item;
-    an unreadable folder, or none stale, keeps the dispatcher's line (fail toward the push)."""
+def leave_out_inbox_line(box, stale_s, standby):
+    """Whether the dispatcher's `inbox:` line is left out: the folder holds no item unread past stale_s (the line is
+    from before a read), or every stale item is exempt (outside a stand-by the CTO's wake items, in a stand-by only
+    -spend-brake items). A missing or unreadable folder keeps the line (fail toward the push)."""
     try:
+        if not box.is_dir():
+            return False
         cut = time.time() - stale_s
         old = [p.name for p in box.glob("*.txt") if p.stat().st_mtime <= cut]
     except OSError:
         return False
-    return bool(old) and all(WAKE_ITEM.search(n) for n in old)
+    exempt = BRAKE_ITEM if standby else WAKE_ITEM
+    return all(exempt.search(n) for n in old)
 
 
 def check(a, now_s, channels):
@@ -256,8 +268,8 @@ def main():
             stale, seen_f = Path(a.inbox_stale), Path(a.state).with_name("deadman-inbox-stale-seen.txt")
             try:  # the dispatcher may remove it between the check and the read (review of 2026-11-01, L3)
                 text = stale.read_text() if stale.is_file() else ""
-                kept = [x for x in text.splitlines()  # the CTO's own wake items never push on staleness
-                        if not (x.startswith("inbox:") and only_wake_items_stale(stale.parent / "inbox", a.stale_s))]
+                drop = leave_out_inbox_line(stale.parent / "inbox", a.stale_s, Path(a.standby).is_file())
+                kept = [x for x in text.splitlines() if not (x.startswith("inbox:") and drop)]
                 line = "\n".join(kept).strip()[:150] or None
             except OSError:
                 line = None

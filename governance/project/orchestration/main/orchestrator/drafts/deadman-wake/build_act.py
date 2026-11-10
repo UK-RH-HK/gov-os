@@ -36,17 +36,23 @@ WATCH = ("T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && "
          "\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && {plant}"
          "printf 'inbox: {n} item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && "
          "ORCH=\"$T/o\" python3 " + PATH + " --watch --every 1 --max 1 --projects \"$T\" --inbox-stale "
-         "\"$T/d/inbox-stale.txt\" " + OWN)
+         "\"$T/d/inbox-stale.txt\" " + OWN + "{extra}")
 WAKE_ITEM = "touch -d '40 minutes ago' \"$T/d/inbox/20261110-033600-deadman-wake.txt\" && "
 GUARD_ITEM = "touch -d '35 minutes ago' \"$T/d/inbox/20261110-034000-guard-131.txt\" && "
+HELPER_ITEM = "touch -d '40 minutes ago' \"$T/d/inbox/20261110-023100-helper-watch.txt\" && "
+STANDBY = "printf 'waiting on the owner\\n' > \"$T/sb\" && "
 CHECKS = [
     {"cmd": ONE.format(j=WAKE_JSON, now="2026-11-10 03:36") + "grep -q '\"verdict\": \"alive\"' \"$T/note.json\" && "
             "ls \"$T/st/inbox\" | grep -c -- '-deadman-wake.txt$'", "exit": 0, "count": 1},
     {"cmd": ONE.format(j=DAY_JSON, now="2026-11-10 13:01") + "grep -cF '\"line\": \"P1 DEADMAN | the CTO session is "
             "idle since 12:00 (its turn ended and nothing woke it), 61 min | approve or restart it\"' \"$T/note.json\"",
      "exit": 0, "count": 1},
-    {"cmd": WATCH.format(plant=WAKE_ITEM, n=1), "exit": 0, "count": None},
-    {"cmd": WATCH.format(plant=WAKE_ITEM + GUARD_ITEM, n=2), "exit": 10, "count": None},
+    {"cmd": WATCH.format(plant=WAKE_ITEM, n=1, extra=""), "exit": 0, "count": None},
+    {"cmd": WATCH.format(plant=WAKE_ITEM + GUARD_ITEM, n=2, extra=""), "exit": 10, "count": None},
+    # review F1: the item already read, the dispatcher's line still there: no push
+    {"cmd": WATCH.format(plant="", n=1, extra=""), "exit": 0, "count": None},
+    # review F2: in a stand-by (the ALERT silent), a stale helper-watch item pushes as before
+    {"cmd": WATCH.format(plant=HELPER_ITEM + STANDBY, n=1, extra=' --standby "$T/sb"'), "exit": 10, "count": None},
 ]
 APPLY = r'''#!/bin/bash
 # ACT-DEADMAN-WAKE-1's apply.sh: check | apply | undo | verify, by list.txt (root|path|before sha256|after sha256),

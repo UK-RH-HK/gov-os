@@ -121,8 +121,8 @@ def test_r4_a_key_that_cannot_be_written_gives_no_item_rather_than_one_each_pass
         os.chmod(tmp_path / "st", 0o700)
 
 
-def watch(tmp_path, stale_text, unread):
-    """unread: {name: age in minutes} planted in the inbox folder beside the stale file."""
+def watch(tmp_path, stale_text, unread, standby=False):
+    """unread: {name: age in minutes} planted in the inbox folder beside the stale file; standby: a stand-by file."""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     p = plant(tmp_path, [{"type": "assistant", "timestamp": now, "message": {"content": [{"type": "text"}]}}])
     d = tmp_path / "d"
@@ -137,7 +137,11 @@ def watch(tmp_path, stale_text, unread):
     (d / "inbox-stale.txt").write_text(stale_text)
     for f in (tmp_path / "st").glob("deadman-inbox-stale-seen.txt"):
         f.unlink()
-    return run(tmp_path, "--watch", "--every", "1", "--max", "2", "--projects", str(p), *own(tmp_path))
+    extra = []
+    if standby:
+        (tmp_path / "standby.txt").write_text("waiting on the owner\n")
+        extra = ["--standby", str(tmp_path / "standby.txt")]
+    return run(tmp_path, "--watch", "--every", "1", "--max", "2", "--projects", str(p), *own(tmp_path), *extra)
 
 
 def test_a_stale_wake_item_never_pushes_but_any_other_stale_item_still_does(tmp_path):
@@ -170,3 +174,43 @@ def test_a_stale_wake_item_never_pushes_but_any_other_stale_item_still_does(tmp_
     r = watch(tmp_path, "inbox: 1 item(s) unread; the oldest 20261110-033600-guard-131.txt\n",
               {"20261110-033600-guard-131.txt": 40})
     assert r.returncode == 10 and "guard-131" in r.stdout  # any other item alerts exactly as before
+
+
+def test_r1_f1_an_item_already_read_while_the_dispatchers_line_remains_never_pushes(tmp_path):
+    """ACT review round 1, F1: the line comes from before the read; the folder holds no stale item: no push."""
+    for name in ("20261110-033600-deadman-wake.txt", "20261110-023100-helper-watch.txt",
+                 "20261110-120000-spend-brake.txt", "20261110-033600-guard-131.txt"):
+        r = watch(tmp_path, f"inbox: 1 item(s) unread; the oldest {name}\n", {})
+        assert r.returncode == 0 and r.stdout.startswith("HEARTBEAT alive"), (name, r.stdout)
+    r = watch(tmp_path, "inbox: 1 item(s) unread; the oldest 20261110-120000-spend-brake.txt\n",
+              {"20261110-125000-guard-140.txt": 5})  # a fresh item only: still nothing stale
+    assert r.returncode == 0
+
+
+def test_r1_f1_a_missing_inbox_folder_keeps_the_push(tmp_path):
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    p = plant(tmp_path, [{"type": "assistant", "timestamp": now, "message": {"content": [{"type": "text"}]}}])
+    (tmp_path / "d").mkdir()
+    (tmp_path / "d/inbox-stale.txt").write_text("inbox: 1 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\n")
+    r = run(tmp_path, "--watch", "--every", "1", "--max", "2", "--projects", str(p), *own(tmp_path))
+    assert r.returncode == 10  # no folder to read: fail toward the push, as before
+
+
+def test_r1_f2_in_a_stand_by_only_a_spend_brake_item_is_kept_from_the_owner(tmp_path):
+    """ACT review round 1, F2: in a stand-by the ALERT is silent, so it is no backstop: wake items push as before."""
+    for name in ("20261110-023100-helper-watch.txt", "20261110-033600-deadman-wake.txt"):
+        r = watch(tmp_path, f"inbox: 1 item(s) unread; the oldest {name}\n", {name: 40}, standby=True)
+        assert r.returncode == 10 and "P1 INBOX" in r.stdout, (name, r.stdout)
+    r = watch(tmp_path, "inbox: 1 item(s) unread; the oldest 20261110-120000-spend-brake.txt\n",
+              {"20261110-120000-spend-brake.txt": 40}, standby=True)
+    assert r.returncode == 0 and r.stdout.startswith("HEARTBEAT standby"), r.stdout  # DEC-1089 (3)
+    r = watch(tmp_path, "inbox: 2 item(s) unread; the oldest 20261110-120000-spend-brake.txt\n",
+              {"20261110-120000-spend-brake.txt": 40, "20261110-121000-helper-watch.txt": 35}, standby=True)
+    assert r.returncode == 10
+
+
+def test_r1_f3_a_wake_key_that_is_not_an_object_is_read_as_no_key(tmp_path):
+    (tmp_path / "st").mkdir()
+    (tmp_path / "st/deadman-wake-state.json").write_text("[]")
+    note = once(tmp_path, "2026-11-10 03:40")
+    assert note["wake"].endswith("-deadman-wake.txt") and len(items(tmp_path / "st/inbox")) == 1

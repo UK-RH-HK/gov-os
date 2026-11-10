@@ -8,15 +8,15 @@
    "root": "repo",
    "path": "governance/project/orchestration/tools/deadman.py",
    "before": "b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68",
-   "after": "ebc94de1d3802c0f98c574bfa6b188ce0b3d9c888d96249f97497557ef3381f7"
+   "after": "5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be"
   }
  ],
  "files": {
   "before/repo/governance/project/orchestration/tools/deadman.py": "b425895b3aba5c90b214b43c4a2c80e7d71653f481a57e235c6081ad5bcc2a68",
-  "after/repo/governance/project/orchestration/tools/deadman.py": "ebc94de1d3802c0f98c574bfa6b188ce0b3d9c888d96249f97497557ef3381f7",
+  "after/repo/governance/project/orchestration/tools/deadman.py": "5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be",
   "apply.sh": "6107995519fb124566fd11dc5e51a70e6310e22e4fef3a704e9c14b11d18e8d1",
-  "list.txt": "c39aa9db370be28ca40d98b7138e5416f1ed455995cf3574ea62e4e4da2be2d2",
-  "rehearsal.log": "b5ba5eee7e708b397437b0bd491fe8fd6eba3219efd21586c06912e17f74ff6e"
+  "list.txt": "dd2282b8a8e3f0f60e3c70625f193bc65fb0b5c845f15b985e89c46d77d5a044",
+  "rehearsal.log": "0d4839ba932d695d16933b01b3fe88a46a6fa02319f60e8df964b3c55656eef3"
  },
  "checks": [
   {
@@ -38,11 +38,21 @@
    "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && printf '{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{\"content\":[{\"type\":\"text\"}]}}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && touch -d '40 minutes ago' \"$T/d/inbox/20261110-033600-deadman-wake.txt\" && touch -d '35 minutes ago' \"$T/d/inbox/20261110-034000-guard-131.txt\" && printf 'inbox: 2 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --inbox-stale \"$T/d/inbox-stale.txt\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\"",
    "exit": 10,
    "count": null
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && printf '{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{\"content\":[{\"type\":\"text\"}]}}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && printf 'inbox: 1 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --inbox-stale \"$T/d/inbox-stale.txt\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\"",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" \"$T/d/inbox\" && printf '{\"type\":\"assistant\",\"timestamp\":\"%s\",\"message\":{\"content\":[{\"type\":\"text\"}]}}\\n' \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" > \"$T/s.jsonl\" && touch -d '40 minutes ago' \"$T/d/inbox/20261110-023100-helper-watch.txt\" && printf 'waiting on the owner\\n' > \"$T/sb\" && printf 'inbox: 1 item(s) unread; the oldest 20261110-033600-deadman-wake.txt\\n' > \"$T/d/inbox-stale.txt\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --inbox-stale \"$T/d/inbox-stale.txt\" --session-file \"$T/none\" --standby \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --standby \"$T/sb\"",
+   "exit": 10,
+   "count": null
   }
  ],
  "commands": [],
  "rehearsal": {
   "log": "rehearsal.log",
-  "sha256": "b5ba5eee7e708b397437b0bd491fe8fd6eba3219efd21586c06912e17f74ff6e"
+  "sha256": "0d4839ba932d695d16933b01b3fe88a46a6fa02319f60e8df964b3c55656eef3"
  }
 }

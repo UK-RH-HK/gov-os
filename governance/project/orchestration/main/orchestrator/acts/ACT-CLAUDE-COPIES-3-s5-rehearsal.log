@@ -1,0 +1,40 @@
+$ test -z 
+exit 0
+$ test ! -e .git/MERGE_HEAD
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-3/apply.sh check
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-3/apply.sh apply
+exit 0
+$ bash -c cmp -s template/governance/kernel/templates/brief.md .claude/templates/brief.md && cmp -s template/governance/kernel/templates/role-research.md .claude/templates/role-research.md && cmp -s template/governance/kernel/templates/role-product-spec.md .claude/templates/role-product-spec.md && cmp -s template/governance/kernel/templates/role-test-designer.md .claude/templates/role-test-designer.md && cmp -s template/governance/kernel/templates/role-engineer.md .claude/templates/role-engineer.md && cmp -s template/governance/kernel/templates/role-reviewer.md .claude/templates/role-reviewer.md && cmp -s template/governance/kernel/templates/role-lead.md .claude/templates/role-lead.md && cmp -s template/governance/kernel/templates/role-cto.md .claude/templates/role-cto.md
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/independent-auditor.md .claude/agents/independent-test-designer.md .claude/agents/orchestrator.md .claude/agents/product-spec.md .claude/agents/research.md
+exit 0
+staged 6 files
+$ git commit -q -m ACT-CLAUDE-COPIES-3: the generated .claude/ and .rulesync/ copies : the six agents with the role file's fields (W2-153 S3 amended; 6 files) --trailer Task: DAEO-sdxk --trailer Implements: DEC-1109, DEC-1050 --trailer Role: owner
+exit 0
+$ test -z 
+exit 0
+ACT-CLAUDE-COPIES-3: the generated .claude/ and .rulesync/ copies : the six agents with the role file's fields (W2-153 S3 amended; 6 files)
+Task: DAEO-sdxk
+Implements: DEC-1109, DEC-1050
+Role: owner
+
+
+ .claude/agents/engineer.md                  | 27 +++++++++++++
+ .claude/agents/independent-auditor.md       | 30 ++++++++++++++
+ .claude/agents/independent-test-designer.md | 30 ++++++++++++++
+ .claude/agents/orchestrator.md              | 63 +++++++++++++++++++++++++++++
+ .claude/agents/product-spec.md              | 30 ++++++++++++++
+ .claude/agents/research.md                  | 20 +++++++++
+ 6 files changed, 200 insertions(+)
+portability after the commit: []
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-3/apply.sh undo
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/independent-auditor.md .claude/agents/independent-test-designer.md .claude/agents/orchestrator.md .claude/agents/product-spec.md .claude/agents/research.md
+exit 0
+$ git commit -q -m ACT-CLAUDE-COPIES-3 undone --trailer Task: DAEO-sdxk --trailer Role: owner
+exit 0
+$ test 0 = 0
+exit 0
+failures: 0

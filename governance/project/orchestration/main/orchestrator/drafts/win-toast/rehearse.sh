@@ -27,5 +27,7 @@ PY
 echo "== W2-66's live test map suite (both opt-ins)"
 PYTHONPATH=$WORK/clone/src python3 -m pytest -q -p no:cacheprovider -o tmp_path_retention_policy=failed --optin=lifted,breadth tests/acceptance/W2-66/test_w2_66_live_test_map.py 2>&1 | tail -2
 echo "== undo"; bash "$D/apply.sh" undo; echo "exit $?"; git diff --stat | tail -1; echo "(empty diff after undo)"
+echo "== F3: apply refuses a changed candidate"; cp "$D/test-map.candidate.yaml" "$WORK/cand.bak"; echo "# x" >> "$D/test-map.candidate.yaml"; bash "$D/apply.sh" apply; echo "exit $? (expected 1)"; git diff --stat | tail -1; cp "$WORK/cand.bak" "$D/test-map.candidate.yaml"
+echo "== F2: undo refuses after a later change"; bash "$D/apply.sh" apply >/dev/null; echo "# later" >> governance/project/test-map.yaml; bash "$D/apply.sh" undo; echo "exit $? (expected 1)"; tail -1 governance/project/test-map.yaml; git checkout -q -- governance/project/test-map.yaml
 cd /; rm -rf "$WORK"
 echo "== done"

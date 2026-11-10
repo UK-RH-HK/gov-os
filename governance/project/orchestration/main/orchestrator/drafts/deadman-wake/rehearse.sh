@@ -58,7 +58,7 @@ for c in json.load(open(sys.argv[1]))["checks"]:
 # --state, ORCH), and the live-state comparison at the end proves it
 out=$(cd "$D" && DEADMAN=$C/$P python3 -m pytest -q -p no:cacheprovider test_deadman_wake.py 2>&1 | tail -n 1)
 say "test_deadman_wake.py on the applied file: $out"
-t "the wake's tests: 7 passed" 'grep -q "^7 passed" <<< "$out"'
+t "the wake's tests: all passed (11)" 'grep -qE "^11 passed" <<< "$out" && ! grep -q failed <<< "$out"'
 cp "$D/test_cto_safety_nets.py" "$C/tests/unit/orchestration/test_cto_safety_nets.py"
 out=$(cd "$C" && python3 -m pytest -q -p no:cacheprovider tests/unit/orchestration/test_cto_safety_nets.py 2>&1 | tail -n 1)
 say "test_cto_safety_nets.py with the post-ACT ORCH fixture: $out"

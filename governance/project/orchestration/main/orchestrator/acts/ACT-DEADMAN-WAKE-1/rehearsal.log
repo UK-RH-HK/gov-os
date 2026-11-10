@@ -1,5 +1,5 @@
-ACT-DEADMAN-WAKE-1 rehearsal 2026-11-10T11:54:34Z; clone of w2/integrate at c906619646da (live HEAD c906619646da); HOME planted at /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/home; ORCH /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/orch
-manifest sha256 before finalize: c1a72cd383a70a941edbbd2ed773d60464e51a6bb08fa0df96c0a6a27c7fe657
+ACT-DEADMAN-WAKE-1 rehearsal 2026-11-10T12:22:50Z; clone of w2/integrate at 13f15785f91f (live HEAD 13f15785f91f); HOME planted at /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/home; ORCH /home/usain/gov-os-runs/DEADMAN-WAKE-1-rehearsal/orch
+manifest sha256 before finalize: 9ffaf2f7275b8eaeca433eb9523c742bae36923afa1f4e9f28ca25539acd55cc
 ok   apply.sh check: the clone's deadman.py is the before (exit 0)
 ok   apply.sh verify before the apply: not applied (exit 3)
 ok   apply.sh apply: exit 0
@@ -14,9 +14,13 @@ check 3: exit 0; last line: HEARTBEAT alive age 0 min
 ok   check 3: exit 0
 check 4: exit 10; last line: ALERT P1 INBOX | the dispatcher's inbox: inbox: 2 item(s) unread; the oldest 20261110-033600-deadman-wake.txt | read it 
 ok   check 4: exit 10
-test_deadman_wake.py on the applied file: 7 passed in 9.24s
-ok   the wake's tests: 7 passed
-test_cto_safety_nets.py with the post-ACT ORCH fixture: 9 passed in 9.03s
+check 5: exit 0; last line: HEARTBEAT alive age 0 min
+ok   check 5: exit 0
+check 6: exit 10; last line: ALERT P1 INBOX | the dispatcher's inbox: inbox: 1 item(s) unread; the oldest 20261110-033600-deadman-wake.txt | read it 
+ok   check 6: exit 10
+test_deadman_wake.py on the applied file: 11 passed in 20.91s
+ok   the wake's tests: all passed (11)
+test_cto_safety_nets.py with the post-ACT ORCH fixture: 9 passed in 8.88s
 ok   the safety nets with the fixture: 9 passed
 ok   apply.sh undo: exit 0
 ok   undo: byte for byte the before
