@@ -37,10 +37,12 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
     Every other P2 is the CTO's, recorded and listed in the digest (DEC-1112 (3)).
 11. **Context and models (DEC-1118):** (A) a helper or lead hands over through its record and a fresh one continues
     once its context passes about 200k tokens; the CTO checkpoints and clears at the same limit; (B) the CTO
-    checkpoints and clears before any planned idle of more than an hour; (C) helpers that prepare ACTs (drafting,
-    rehearsing) run on Sonnet at effort high (DEC-1119 (3)); every other launch's and helper's model and effort follow
-    the owner's tiered rubric once found (DEC-1119 (1)-(2)); until then reviews, test design and engineering stay on Opus. Every session's cost is logged
-    at list price in `log/spend.jsonl`. E and F (Sonnet test designers, reviewers at high) only as trials after the lift.
+    checkpoints and clears before any planned idle of more than an hour; (C) every launch's and helper's model and
+    effort follow **RUBRIC-2 (DEC-1120)**, by role and criticality class (C3/C2/C1/C0): every spawn names its model and
+    effort; ACT preparers, product-spec, research and helpers on Sonnet, high; C3 work, leads, auditors and checkers on
+    Opus, high; through D-10 engineers on C2/C1 tickets stay on Opus, high; promotion to Opus after two failed reviews
+    or a fail-open finding; max only with a recorded reason. Every session's cost is logged at list price in
+    `log/spend.jsonl`, with its tier, class and any promotion.
 
 ## 0. What holds: DECISIONS-IN-FORCE (owner, DEC-1052 R-9) — that list overrides everything below
 

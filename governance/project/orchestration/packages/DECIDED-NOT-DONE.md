@@ -166,9 +166,10 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 ## 0n. DEC-1119's items (2026-11-10)
 | # | item | state |
 |---|---|---|
-| 103 | find the owner's tiered rubric of model and effort (the fresh session's first task) | IN PROGRESS: FOUND 11-10 15:45: OWNER-DECISION-P2-0008 §11 (ACCEPTED, HISTORICAL; never in the register), five conflicts with DEC-839 (`packages/RUBRIC-1.md`); next: the owner's choice (a), (b) or (c) |
-| 104 | apply the rubric in practice (launch_worker.sh, the Agent call, spend.jsonl) | WAITS: the owner's choice on RUBRIC-1; ACT-preparation helpers on Sonnet at high from 11-10 15:35 (rule 11); DEC-839's models and efforts meanwhile |
-| 105 | apply the rubric in the product (W2-33, W2-60a, a trial exception) before EXAMIN's copy | WAITS: row 103 |
+| 103 | find the owner's tiered rubric of model and effort (the fresh session's first task) | DONE 11-10: found (RUBRIC-1), then replaced by the owner's RUBRIC-2 (DEC-1120, committed with this row) |
+| 104 | apply the rubric in practice (launch_worker.sh, the Agent call, spend.jsonl) | IN PROGRESS: RUBRIC-2 in practice from 11-10 16:15 (rule 11; every spawn names model and effort); next: the class of this week's tickets and ACTs, the sweep of DEC-839's citations (DEC-866), the spend log's tier/class/promotion fields, and the usage estimate for the owner |
+| 105 | apply the rubric in the product (W2-33, W2-60a, a trial exception) before EXAMIN's copy | NOT STARTED: next: W2-33's role defaults and W2-60a's launch revised to RUBRIC-2 (tickets' KPIs, test designer, engineer, review), beside D-10, before EXAMIN's copy |
+| 108 | DEC-1121: the ticket template 1.0.1 with `class` (W1-08's DEC-105 case) | NOT STARTED: next: product-spec on W2-128, a C3 review, its hash to the owner, then the merge |
 | 106 | the default effort xhigh to high in ~/.claude/settings.json, a small ACT | IN PROGRESS: ACT-EFFORT-HIGH-1 prepared (class (b), manifest `d7dcf753`, rehearsal 0 failures); review running 11-10 15:55; next: the owner's yes as a fresh message |
 | 107 | EMERGENCY-TOOLS-1: the inventory of the emergency's tools and their routes into the product | DONE 11-10 (`packages/EMERGENCY-TOOLS-1.md`: 71 rows; 7 groups before EXAMIN's copy; gaps: `.claude/settings.local.json` uncommitted, the reranker venv's slot module behind integrate); next: the CTO's routes for its §2 and §4 |
 

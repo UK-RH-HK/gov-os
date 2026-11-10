@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1119 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1121 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -457,3 +457,13 @@ other restart is an ACT.
   exception before EXAMIN's copy; ACT-preparation helpers on Sonnet at high now; trials only where the rubric leaves a
   role open; not options 4 or 5 unless the rubric calls for them; option 6 as guidance; the default effort to high by
   an ACT; an inventory of the emergency's tools. Basis: 4 and 1.
+- DEC-1120 (2026-11-10, standing): RUBRIC-2 replaces RUBRIC-1 and changes DEC-839 (1)-(3). Classes C3 (controls,
+  kernel, Contract, (b)/(O) ACTs, re-pins, verdicts), C2 (product code, launch, gate, plan, test maps, schemas), C1
+  (records, docs, scratch tools, tickets), C0 (mechanical). Opus high: the CTO, leads, senior engineers, C3 engineers
+  and test designers, C3 reviewers, C2 FULL reviewers, auditors, adjudicators, checkers. Sonnet high: engineers
+  (after the lift; through D-10 C2/C1 engineers stay Opus), C2/C1 test designers, other reviewers, product-spec,
+  research, ACT preparers, helpers, writers, labellers, the operator agent. Haiku: watchers and C0. Promotion to Opus
+  after two failed reviews or a fail-open finding; lower only by a trial on two or more tickets; max only with a
+  reason; every spawn names model and effort; the spend log records tier, class and promotion. Basis: 4.
+- DEC-1121 (2026-11-10): the ticket template gains `class` as version 1.0.1 (W1-08's DEC-105 case, (a)); its hash to
+  the owner before it lands. Basis: 2.

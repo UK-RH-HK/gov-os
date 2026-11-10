@@ -1,5 +1,7 @@
 # RUBRIC-1 — DEC-1119 (1): the owner's tiered rubric of model and effort, found (2026-11-10)
 
+**Replaced (2026-11-10): the owner chose RUBRIC-2, DEC-1120, which replaces OD-P2-08 §11 and changes DEC-839 (1)-(3).**
+
 For the owner. Found by a research helper (Opus, high) and checked by the CTO against the sources. The CTO writes no
 rubric (DEC-1119 (1)); the choice below is the owner's.
 

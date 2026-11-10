@@ -9143,7 +9143,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. The checkpoint at every handover (DEC-837 item 3) stays, whatever the window.
 
 ### DEC-839 — Lens F's other values: model, effort and subagents per launch; agent teams off; prompt v3 (plan §11 item 5; item 3)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with prompt v3 and the common lead brief, in the next batch) · **Under:** DEC-826 Q6, DEC-460, DEC-715, DEC-724 · **Basis:** OWNER, 2026-10-19; lens F (`docs/assessment/2026-10/F-models-context.md`) Table 3, R7, R9. · **Changed by:** DEC-957 (effort)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with prompt v3 and the common lead brief, in the next batch) · **Under:** DEC-826 Q6, DEC-460, DEC-715, DEC-724 · **Basis:** OWNER, 2026-10-19; lens F (`docs/assessment/2026-10/F-models-context.md`) Table 3, R7, R9. · **Changed by:** DEC-957 (effort); DEC-1120 ((1)-(3): RUBRIC-2's models and efforts by role and class replace the table, the single model and the global subagent model)
 - **Decision:**
   1. **Model:** `claude-opus-5-5` for every role.
   2. **Effort, set on every launch** (`--effort`, CLI 2.1.292):
@@ -14240,7 +14240,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (the week's allowance spent where it buys most, with no quality gate moved off Opus).
 
 ### DEC-1119 — MODEL-TIERS-1 with one change: the owner's tiered rubric of model and effort by task is found and applied; ACT-preparation helpers on Sonnet at high now; trials only where the rubric leaves a role open; the default effort to high; an inventory of the emergency's tools
-- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1118, DEC-839, DEC-957 · **Source:** the owner's message (chat, 2026-11-10), on MODEL-TIERS-1
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1118, DEC-839, DEC-957 · **Changed by:** DEC-1120 ((1): the rubric found, OD-P2-08 §11, replaced by RUBRIC-2) · **Source:** the owner's message (chat, 2026-11-10), on MODEL-TIERS-1
 - **Decision:**
   - (1) **The rubric first (the fresh session's first task, before the lift's other steps):** the owner decided a
     tiered rubric of model and effort by task long ago, and it is in this repository. Find it: the register, the
@@ -14264,6 +14264,42 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     ticket), with which must land before EXAMIN's copy.
 - **Basis:** question 4 (each task on the model and effort its tier calls for, as the owner decided) and question 1
   (what the emergency built reaches the product by its own route).
+
+### DEC-1120 — RUBRIC-2: the owner's rubric of model and effort by role and criticality class, replacing OWNER-DECISION-P2-0008 §11 (RUBRIC-1); changes DEC-839 (1)-(3)
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`; standing) · **Under:** DEC-1119, DEC-1118, DEC-957 · **Changes:** DEC-839 (1)-(3); DEC-1119 (1) (the rubric found, `packages/RUBRIC-1.md`, is replaced) · **Source:** the owner's message (chat, 2026-11-10), on RUBRIC-1
+- **Decision:**
+  - (1) **Criticality classes.** C3 critical: the guard, hooks, permissions, the path map, hidden sets, the operator
+    agent, class (b) and (O) ACTs, the kernel and the Contract, re-pins, measurement verdicts. C2 significant: product
+    code outside the controls, launch, gate and plan, test maps, schemas. C1 routine: records, docs, briefs' wording,
+    scratch tools, ticket edits. C0 mechanical: counting, formatting, log triage, watching. Taken from the ticket's
+    profile and paths and the ACT's class.
+  - (2) **Models and effort.** Master orchestrator, sub-orchestrators (leads) and senior engineers: Opus, high.
+    Engineers: Sonnet, high; on a C3 ticket, Opus, high. Independent test designers: C3 Opus, high; C2 and C1 Sonnet,
+    high. Reviewers: C3 Opus, high (max only for a FULL ticket's probes or after a fail-open finding); C2 Opus, high on
+    FULL, Sonnet, high otherwise; C1 Sonnet, high. Auditors and adjudicators: Opus, high. Product-spec, research, ACT
+    preparers and other helpers: Sonnet, high. Independent writers and labellers: Sonnet, high; their checkers: Opus,
+    high. The operator agent: Sonnet, high. Watchers, sentinel, dead-man and C0 helpers: Haiku, effort as needed.
+    Build, test and schema: deterministic tools.
+  - (3) **Promotion on evidence:** work that fails review twice, or any fail-open finding, moves that ticket's next
+    round to Opus, with the reason recorded. Any move below this table only by a trial on two or more tickets, judged
+    by an Opus reviewer. Effort high is the floor for judgement work; max only with a recorded reason; low or medium
+    for C0. Hand over to a fresh session past about 200k tokens. Every spawn names its model and effort; the spend log
+    records the tier, the class and any promotion.
+  - (4) **Through D-10** (transitional, in the owner's brackets): engineers on C2 and C1 tickets stay on Opus, high;
+    they move to Sonnet after the lift.
+  - (5) **Applied:** checked against this week's tickets and ACTs (the class of each, any conflict with standing
+    decisions); in practice at once for every spawn; into the product through W2-33's role defaults and W2-60a's
+    launch, with the trial exception, before EXAMIN's copy, so the dispatcher, `gov launch` and the CTO's own spawns
+    route by it. The next report carries an estimate of usage under RUBRIC-2 (this week re-priced by tier; the saving
+    in dollars and meter points by role and in total; the week's projected end with and without it; the confidence).
+- **Basis:** question 4 (each task on the model and effort its class calls for).
+
+### DEC-1121 — W1-08's `class` case: option (a), `class` added to the kernel ticket template as version 1.0.1; the owner approves its hash
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1116, DEC-105, CAP-31.a, CAP-33 · **Source:** the owner's message (chat, 2026-11-10), on the DEC-105 contradiction found by W1-08's designer (`reviews/D10-W1-08-review.md`)
+- **Decision:** (a) apply now: the 1.0.0 ticket template's record block gains `class` (CAP-31.a names it; the schema
+  keeps it optional), promoted as version 1.0.1 of the ticket template under W2-128; the CTO brings the template's
+  hash for the owner's approval before it lands; `test_the_ticket_template_carries_the_nine_fields` then passes.
+- **Basis:** question 2 (the templates one approved source, matching the Contract).
 
 | Version | Date | Change |
 |---|---|---|
@@ -14322,3 +14358,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.502 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1117. Next free id: DEC-1118. |
 | 0.503 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1118 (items 1 and 2 standing). Next free id: DEC-1119. |
 | 0.504 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1119. Next free id: DEC-1120. |
+| 0.505 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1120 (RUBRIC-2, standing; DEC-839 (1)-(3) and DEC-1119 (1) changed), DEC-1121 (the ticket template 1.0.1 with `class`). Next free id: DEC-1122. |
