@@ -712,7 +712,13 @@ def ask_guard(project, sandbox, tool_name, tool_input, role, ticket, cwd=None, m
     The commands are run through the shell, as the harness runs them, with
     ``GOV_ROLE`` and ``GOV_TICKET`` in the environment and ``cwd`` as the
     session's working directory. No tool call is ever made.
+
+    Rewrite-Reason: DEC-866, W2-106. The committed lines take the pinned form (``$HOME/.local/bin/gov``, else
+    ``gov`` on ``PATH``); the sandbox's HOME is given a pinned ``gov`` of this tree first (W1-47's
+    ``plant_pinned_gov``), here, where every case of this support and of W1-33's runs a hook line, so no case
+    depends on the runner's ``PATH``: not refused where none is on it, not judging the owner's pin where it is.
     """
+    w47.plant_pinned_gov(sandbox.home)
     settings = project_settings(project)
     rule = live_support.denied_by_settings(settings, tool_name, tool_input, project)
     if rule is not None:
