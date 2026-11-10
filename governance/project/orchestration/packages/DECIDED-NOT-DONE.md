@@ -127,7 +127,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|
 | 79 | W2-56 merged without S8's reach and S10 | **MERGED 11-09** in `cf23e9f8d` (that commit's subject is W2-153's review: a helper's commit took the CTO's staged merge); checked after on integrate: `gov accept W2-56` 256/0/4 (the real cases skip without the opt-in), launch units 182/182 |
 | 80 | W3-P28: ranked search for sandboxed workers without opening every Unix socket | DONE (parked) 11-09: `docs/plan/WAVE_3_PARKING.md` W3-P28; a ticket in Wave 3 |
-| 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3, R5 follow-ups before the close, tests first (NOT STARTED); R1 to W2-60a's rows (NOT STARTED); R2, R4 rows for the close review; R6 parked as W3-P29 (DONE) |
+| 81 | W2-56's review rows R1-R6 | IN PROGRESS: R3 and R5 **MERGED 11-10** (`4bc040898`; review READY round 1; accept 292/4 with the real cases, the 4 the sandboxed real cases' relative PYTHONPATH and the gate; S2, S9, S13 pass alone); R6 parked as W3-P29 (DONE); next: R1 to W2-60a's rows; R2, R4 and the follow-up review's F2, F3 for W2-56's close review; S7's real case re-run alone when the gate is open; W2-05's fresh probe (probe_impact flags `src/gov/codeintel/__init__.py`, docstring only) |
 | 82 | FORECAST-W2-2: the re-estimate at today's measured pace beside the lead-hour method | **DONE 11-09**: `packages/FORECAST-W2-2.md`, sent to the owner |
 
 ## 0k. DEC-1115's items (2026-11-09; item 4 standing until the lift)
