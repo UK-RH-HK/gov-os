@@ -139,13 +139,29 @@ def split_front(text: str):
     return yaml.safe_load(text[3:end]), text[end + 4:].partition("\n")[2].lstrip("\n")
 
 
+def record_pointer(stub: Path) -> Path:
+    """The file beside a stand-in ``claude`` that names where it records (``<stub>.record``)."""
+    return stub.with_name(stub.name + ".record")
+
+
+def point_record(stub: Path, record: Path) -> None:
+    """From now on the stand-in at ``stub`` appends its calls to ``record``."""
+    write(record_pointer(stub), str(record))
+
+
 def stub_cli(path: Path) -> Path:
     """A stand-in ``claude``: appends one JSON line (its arguments, its working folder, its TMPDIR) to the file
-    ``$W2_153_RECORD`` names, and ends with 0. It reads nothing and starts nothing."""
+    named in ``<its own path>.record`` (``point_record``), and ends with 0. It reads nothing else and starts nothing.
+
+    The record's path sits in a file beside the stand-in, not in the environment: the launcher passes the session a
+    cleaned environment (W2-56 S5, ``gov.launch.environ``: ``PATH``, ``HOME``, the locale and the identity, beside
+    its own values), so a variable of the test's would never reach it."""
     write(path, (
         f"#!{sys.executable}\n"
         "import json, os, sys\n"
-        "with open(os.environ['W2_153_RECORD'], 'a', encoding='utf-8') as f:\n"
+        f"with open({str(record_pointer(path))!r}, encoding='utf-8') as pointer:\n"
+        "    record = pointer.read().strip()\n"
+        "with open(record, 'a', encoding='utf-8') as f:\n"
         "    f.write(json.dumps({'argv': sys.argv[1:], 'cwd': os.getcwd(),\n"
         "                        'tmpdir': os.environ.get('TMPDIR')}) + '\\n')\n"
     ))
@@ -289,9 +305,10 @@ class LaunchBed:
         spec = self.base / f"spec-{self._runs}.json"
         write(spec, json.dumps({"root": str(self.root), "role": role, "ticket": ticket or TICKET_OF[role],
                                 "cli_args": list(cli_args), "out": str(out)}))
+        point_record(self.cli, record)
         env = {"PATH": SAFE_PATH, "HOME": str(self.home), "TMPDIR": str(self.tmp), "LC_ALL": "C",
                "PYTHONPATH": str(src), "PYTHONDONTWRITEBYTECODE": "1", "GIT_CONFIG_NOSYSTEM": "1",
-               "W2_153_RECORD": str(record), **self.gate_env}
+               **self.gate_env}
         done = subprocess.run([sys.executable, str(HARNESS), str(spec)], cwd=str(self.base), env=env,
                               capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
         assert out.exists(), (f"the launch harness wrote no result (exit {done.returncode})\n"
@@ -338,7 +355,7 @@ class DispatchBed:
         for stem in TEMPLATE_STEMS:
             write(self.tree / ".claude" / "templates" / f"{stem}.md", template_text(stem))
         self.cli = stub_cli(self.bin / "claude")
-        stub_cli(self.home / ".local" / "bin" / "claude")
+        self.home_cli = stub_cli(self.home / ".local" / "bin" / "claude")
         self._runs = 0
 
     def expected_path(self) -> str:
@@ -357,8 +374,9 @@ class DispatchBed:
         self._runs += 1
         script = write(self.base / f"launch_now-{self._runs}.sh", self.rewrite(script_text))
         record = self.base / f"calls-{self._runs}.jsonl"
-        env = {"PATH": f"{self.bin}:{SAFE_PATH}", "HOME": str(self.home), "TMPDIR": str(self.base), "LC_ALL": "C",
-               "W2_153_RECORD": str(record)}
+        for stub in (self.cli, self.home_cli):
+            point_record(stub, record)
+        env = {"PATH": f"{self.bin}:{SAFE_PATH}", "HOME": str(self.home), "TMPDIR": str(self.base), "LC_ALL": "C"}
         done = subprocess.run(["bash", str(script), DISPATCH_W2, DISPATCH_TICKET, "brief.md", f"out-{self._runs}.json"],
                               cwd=str(self.base), env=env, capture_output=True, text=True,
                               timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
