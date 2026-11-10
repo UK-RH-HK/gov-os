@@ -1,0 +1,3 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/landing-select.log
+Landing check (OPERATOR-AGENT-1 §3, S16) after the landing b0eb21f1a381..09e1ff6e1bdc on w2/integrate: commit 09e1ff6e1bdc (Revert "The dead-man's wake" (b0eb21f1a): deadman.py is a control path; it comes back as ACT-DEADMAN-WAKE-1 (the landing) touches governance/project/orchestration/tools/deadman.py: a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
+status: P1
