@@ -80,7 +80,7 @@ pinned `verdict.py`. The operator agent's G4 reads the same block.
 > **Undo:** `bash $G/apply.sh undo`, then `git add $F` and commit with `--trailer "Role: owner"`. Every file goes
 > back byte for byte (rehearsed).
 >
-> **Or by the operator agent:** after the owner's yes ("yes, ACT-CLAUDE-COPIES-1 at manifest `5d3a18832b9b`"), the
+> **Or by the operator agent:** after the owner's yes (`yes ACT-CLAUDE-COPIES-1 5d3a1883` on a line of its own, G6), the
 > CTO writes the request line in `~/gov-os-operator/queue/`, and the agent runs the same bundle through its gates.
 
 **Then the CTO**, the same day:
@@ -89,5 +89,7 @@ pinned `verdict.py`. The operator agent's G4 reads the same block.
 - start W2-153's merge preconditions (R1), then its merge, then ACT-CLAUDE-COPIES-2.
 
 ## 6. What the owner says
-"Yes, ACT-CLAUDE-COPIES-1 at manifest `5d3a18832b9b`" (OPERATOR-AGENT-1 §4, class (b)), and who runs it: the
-operator by hand (§5) or the operator agent.
+`yes ACT-CLAUDE-COPIES-1 5d3a1883` on a line of its own: the fixed form the operator agent reads at G6 (OPERATOR-AGENT-1
+§4, class (b); `yes ACT-<id> <manifest sha8>`), and who runs it: the operator by hand (§5) or the operator agent.
+**Corrected 11-09 (DEC-1115 (2)):** this section first gave "Yes, ACT-CLAUDE-COPIES-1 at manifest `5d3a18832b9b`", which
+the agent does not read.
