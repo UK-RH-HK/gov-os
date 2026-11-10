@@ -10,6 +10,7 @@ proves fails, and a README with no map refuses rather than falling back to raw o
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import signal
@@ -25,14 +26,19 @@ from gov.cli.errors import GovError
 KIND = r"(successes|success|failures|failure|kpis|kpi|s|f|k)"
 NAME = re.compile(KIND + r"[ \t-]*(\d+)(?!\w)", re.I)
 NAMING = re.compile(r"(success|failure|kpi)\b", re.I)  # a heading that means to name lines
-JOINED = r"\s*(?:[/,;&+]\s*(?:and\b)?|\band\b)\s*"  # S1 / S2, S1, and S2, S1 and S2
+JOINED = r"\s*(?:[/,;&+]\s*(?:(?:and|or)\b)?|\b(?:and|or)\b)\s*"  # S1 / S2, S1, and S2, S1 and S2, S1 or F2
 JOIN = re.compile(JOINED, re.I)
 NUMBER = re.compile(r"(\d+)(?!\w)(?![ \t]+(?!and\b)[a-z])", re.I)  # a bare number after a join: one more line of
 #                                                                   the kind before it ("failures 4, 5"), not a count
-UPTO = re.compile(r"(?:–|\.\.|-)(\d+)(?!\w)")  # a range: Success 3–7, S3-7, F1..3
+UPTO = re.compile(r"(?:–|\.\.|-)(?:" + KIND + r"[ \t]*)?(\d+)(?!\w)"  # a range: Success 3–7, S3-7, F1..3, S2-S4
+                  r"|[ \t]+to[ \t]+(?:" + KIND + r"[ \t]*)?(\d+)(?!\w)(?![ \t]+(?!and\b)[a-z])", re.I)  # S1 to 3
 NOTE = re.compile(r"\s*(?:\[[^\]\n]*\]|\([^)\n]*\))")  # a bracketed note between lines: [CAP-61.c], (R3)
 MORE = re.compile(JOINED + r"(?:(?:successes|success|failures|failure|kpis|kpi)\b|[sfk]?[ \t-]*\d)"
                   r"|(?:–|\.\.|-)\d", re.I)  # what still lists a line the reader did not read: the cell is refused
+FURTHER = re.compile(r"(?<![\w'’-])" + KIND + r"[ \t-]*(\d+)(?!\w)", re.I)  # a line named anywhere after the list
+LEADS = re.compile(r"(?:[/,;&+(\[]|\b(?:and|or|with)\b)[ \t]*$", re.I)  # what before a further name lists it
+POSSESSIVE = re.compile(r"['’]s\b", re.I)  # "F1's fixture": a reference to something of the line's, not a listing
+CODE = re.compile(r"`[^`\n]*`")  # a test or file name in the cell: never read for line names
 RANGE_MAX = 50  # the widest range read as lines; a wider one is refused
 ITEM = re.compile(r"`([^`]+)`")
 WORD = re.compile(r"\w+")
@@ -68,29 +74,60 @@ def line_names(text: str) -> list[str]:
     A cell lists lines as kinds and numbers joined by ``/``, ``,``, ``;``, ``&``, ``+`` or ``and``: ``Success 4
     [CAP-61.c], failures 4, 5`` is success-4, failure-4 and failure-5 (a bare number is one more line of the kind
     before it; a bracketed note between lines is passed over), and ``Success 3–7`` is the five lines of the range.
-    What follows the lines is the cell's prose. Raises ``Unlisted`` when what follows still lists a line the reader
-    cannot read, so that no line is ever dropped silently.
+    What follows the lines is the cell's prose. Every further line name in it, notes included (test and file names
+    in backticks aside), is read or refused, never dropped: one a join leads (``, and failure 1``, ``with success
+    4``, ``(and failure 2)``, ``— and F2``, ``(S1)``) is read, with any list it starts; one that names only lines
+    already read (``KPI 1 (S1; …)``) changes nothing; any other (``item F2``, ``F1's fixture``) refuses the cell.
+    Raises ``Unlisted`` when the cell lists a line the reader cannot read, so that no line is ever dropped silently.
     """
     text = text.replace("*", "").strip()
-    names, found, kind, end = [], NAME.match(text), "success", 0
+    if not NAME.match(text):
+        return []
+    names: list[str] = []
+    spans: list[tuple[int, int]] = []  # the stretches of the cell its line names were read from
+    _read_list(text, 0, names, spans)
+    scan = CODE.sub(lambda code: " " * len(code.group()), text)
+    for further in FURTHER.finditer(scan, spans[0][1]):
+        if any(start <= further.start() < stop for start, stop in spans):
+            continue
+        if LEADS.search(scan, 0, further.start()) and not POSSESSIVE.match(scan, further.end()):
+            _read_list(text, further.start(), names, spans)
+        elif not set(_read_name(text, further, "success")[1]) <= set(names):
+            raise Unlisted(text)
+    return list(dict.fromkeys(names))
+
+
+def _read_name(text: str, found: re.Match, kind: str) -> tuple[str, list[str], int]:
+    """A name (or a bare number of the kind before it) and any range after it: its kind, lines and end."""
+    if found.re is not NUMBER:
+        kind = "failure" if found.group(1).lower().startswith("f") else "success"
+    first = last = int(found.group(found.re.groups))
+    upto = UPTO.match(text, found.end())
+    if upto:
+        again, number = (upto.group(1), upto.group(2)) if upto.group(2) else (upto.group(3), upto.group(4))
+        if again and ("failure" if again.lower().startswith("f") else "success") != kind:
+            raise Unlisted(text)  # S1-F3: a range across kinds
+        last = int(number)
+        if not first < last <= first + RANGE_MAX:
+            raise Unlisted(text)
+    return kind, [f"{kind}-{number}" for number in range(first, last + 1)], (upto or found).end()
+
+
+def _read_list(text: str, at: int, names: list[str], spans: list[tuple[int, int]]) -> None:
+    """Read the list of lines that starts with the name at ``at`` into ``names``, and its stretch into ``spans``;
+    raises ``Unlisted`` when what follows it still lists a line it cannot read."""
+    found, kind, end = NAME.match(text, at), "success", at
     while found:
-        if found.re is NAME:
-            kind = "failure" if found.group(1).lower().startswith("f") else "success"
-        first = last = int(found.group(found.re.groups))
-        upto = UPTO.match(text, found.end())
-        if upto:
-            last = int(upto.group(1))
-            if not first < last <= first + RANGE_MAX:
-                raise Unlisted(text)
-        names += [f"{kind}-{number}" for number in range(first, last + 1)]
-        end = (upto or found).end()
+        kind, lines, stop = _read_name(text, found, kind)
+        names += lines
+        spans.append((found.start(), stop))
+        end = stop
         while note := NOTE.match(text, end):
             end = note.end()
         joined = JOIN.match(text, end)
         found = joined and (NAME.match(text, joined.end()) or NUMBER.match(text, joined.end()))
-    if names and MORE.match(text, end):
+    if MORE.match(text, end):
         raise Unlisted(text)
-    return names
 
 
 def _cells(row: str) -> list[str]:
@@ -451,8 +488,31 @@ def _stop(signum, _frame):
 STOPS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 
 
-def _run(root: Path, folder: Path, timeout: float, optins: list[str] = ()) -> tuple[str | None, list[Case]]:
+LEFT_OUT_PLUGIN = "gov_accept_left_out"  # the child's plugin that records the cases a list leaves out of the run
+LEFT_OUT_SOURCE = '''import json
+
+
+def pytest_deselected(items):
+    with open({path!r}, "a", encoding="utf-8") as out:
+        for item in items:
+            out.write(json.dumps([item.nodeid.split("::")[0], item.name]) + "\\n")
+'''
+
+
+def _left_out(path: Path) -> list[Case]:
+    """The cases the child left out of the run, by file and name, as its plugin recorded them."""
+    if not path.is_file():
+        return []
+    return [Case(str(file), str(name), "left out")
+            for file, name in (json.loads(row) for row in path.read_text(encoding="utf-8").splitlines() if row)]
+
+
+def _run(root: Path, folder: Path, timeout: float, optins: list[str] = (),
+         left_out: list | None = None) -> tuple[str | None, list[Case]]:
     """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after.
+
+    With a ``left_out`` list, the cases the run leaves out (an opt-in list's, as ``pytest_deselected`` names them)
+    are added to it by file and name, read like the cases themselves: never their content.
 
     SIGINT, SIGTERM and SIGHUP stop the run; one that arrives before the private folder is in the try's hands, or
     during the clean-up, is held back and acted on once the clean-up is done. A signal the caller set to be
@@ -483,6 +543,13 @@ def _run(root: Path, folder: Path, timeout: float, optins: list[str] = ()) -> tu
         command = [sys.executable, "-B", "-m", "pytest", str(folder), f"--rootdir={root}", "-p", "no:cacheprovider",
                    f"--junitxml={report}", "-o", "junit_family=xunit1", "-o", "junit_logging=no",
                    "-o", "junit_log_passing_tests=false", f"--log-file={os.devnull}"]
+        if left_out is not None:  # the plugin sits in the private folder, removed with it
+            plugins, recorded = private / "plugins", private / "left-out.jsonl"
+            plugins.mkdir()
+            (plugins / f"{LEFT_OUT_PLUGIN}.py").write_text(LEFT_OUT_SOURCE.format(path=str(recorded)),
+                                                           encoding="utf-8")
+            env["PYTHONPATH"] += os.pathsep + str(plugins)
+            command += ["-p", LEFT_OUT_PLUGIN]
         before, subreaper = _children(os.getpid()), _subreaper(1)  # an orphan of the run comes to gov, not to init
         process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, start_new_session=True)
@@ -499,6 +566,8 @@ def _run(root: Path, folder: Path, timeout: float, optins: list[str] = ()) -> tu
             return "collection", []
         if code == 1 and all(case.outcome != "failed" for case in cases):  # "tests failed" with none failed
             return "crash", []
+        if left_out is not None:
+            left_out.extend(_left_out(recorded))
         return None, cases
     except Stopped as error:
         stopped = error
@@ -566,16 +635,25 @@ def _zero() -> dict:
     return dict.fromkeys(OUTCOMES, 0)
 
 
+REPORT_ONLY = "lifted"  # the suite a formal accept never enables: its cases are report-only (DEC-1061 (2), DEC-1112 (3))
+
+
 def _result(ticket: str, outcome: str, kind: str | None, lines: list, unmapped: dict, totals: dict,
-            optins: list[str] = ()) -> dict:
+            optins: list[str] = (), report_only: list[str] = ()) -> dict:
     result = {"ticket": ticket, "outcome": outcome, "error_kind": kind, "lines": lines, "unmapped": unmapped,
               "totals": totals}
     if optins:  # the opt-in suites the run enabled for the map's cases, by name (S-D10a)
         result["optin"] = list(optins)
+    if report_only:  # the suites the map's cases need that the run leaves out, their lines report-only (scope (b))
+        result["report_only"] = list(report_only)
     return result
 
 
-def _report(ticket: str, mapping: dict, cases: list[Case], optins: list[str] = ()) -> tuple[dict, int]:
+def _report(ticket: str, mapping: dict, cases: list[Case], optins: list[str] = (), left_out: list[Case] = (),
+            report_only: list[str] = ()) -> tuple[dict, int]:
+    """The result: per line, pass or fail on the cases that ran; ``report-only`` for a line that ran none and whose
+    every item names a case the ``lifted`` list left out (``left_out``), which fails nothing by itself. A line
+    with cases left out and others run is measured on those that ran; a line that ran none otherwise fails."""
     counts, unmapped, totals = {name: _zero() for name in mapping}, _zero(), _zero()
     for case in cases:
         totals[case.outcome] += 1
@@ -584,12 +662,25 @@ def _report(ticket: str, mapping: dict, cases: list[Case], optins: list[str] = (
             counts[name][case.outcome] += 1
         if not hits:
             unmapped[case.outcome] += 1
+
+    def held(item: str) -> bool:  # the item names a case the run left out
+        return any(matches(item, case) for case in left_out)
+
     missing = {name for name, items in mapping.items()  # a named test no case matches fails its line, unnamed;
-               if any(names_a_test(item) and not any(matches(item, case) for case in cases) for item in items)}
-    lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"]
-              and name not in missing else "fail", **counts[name]} for name in ordered(mapping)]  # counts: tests run
-    passed = all(line["outcome"] == "pass" for line in lines) and not totals["failed"]  # any failed case, mapped or not
-    return (_result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals, optins),
+               if any(names_a_test(item) and not held(item) and not any(matches(item, case) for case in cases)
+                      for item in items)}
+    lines = []
+    for name in ordered(mapping):  # counts: tests run
+        count = counts[name]
+        if not any(count.values()) and mapping[name] and all(held(item) for item in mapping[name]):
+            lines.append({"kpi": name, "outcome": "report-only", "note": f"report-only ({REPORT_ONLY})", **count})
+            continue
+        good = count["passed"] and not count["failed"] and name not in missing
+        lines.append({"kpi": name, "outcome": "pass" if good else "fail", **count})
+    measured = [line for line in lines if line["outcome"] != "report-only"]
+    passed = (bool(measured) and all(line["outcome"] == "pass" for line in measured)  # a run measuring no line fails
+              and not totals["failed"])  # any failed case, mapped or not
+    return (_result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals, optins, report_only),
             0 if passed else EXIT_FAIL)
 
 
@@ -630,11 +721,15 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
         raise GovError("ACCEPT_NO_MAP", f"ticket {ticket}: the README of {declared} maps no KPI line",
                        {"ticket": ticket, "path": declared})
     try:
-        optins = needed_optins(root, folder, mapping)
-        kind, cases = _run(root, folder, timeout, optins)
+        needed = needed_optins(root, folder, mapping)
+        optins = [suite for suite in needed if suite != REPORT_ONLY]  # breadth only, never lifted (scope (b))
+        report_only = [REPORT_ONLY] if REPORT_ONLY in needed else []
+        error = _result(ticket, "error", "crash", [], _zero(), _zero(), optins, report_only), EXIT_ERROR  # F3
+        left_out: list[Case] | None = [] if report_only else None
+        kind, cases = _run(root, folder, timeout, optins, left_out)
         if kind is None:
-            return _report(ticket, mapping, cases, optins)
-        error = _result(ticket, "error", kind, [], _zero(), _zero(), optins), EXIT_ERROR
+            return _report(ticket, mapping, cases, optins, left_out or [], report_only)
+        error = _result(ticket, "error", kind, [], _zero(), _zero(), optins, report_only), EXIT_ERROR
     except Stopped as stopped:  # the run is stopped and cleaned up: gov ends as the signal asked
         raise SystemExit(128 + stopped.args[0]) from None
     except Exception:  # any exception of the runner's own is a crash, with no message
