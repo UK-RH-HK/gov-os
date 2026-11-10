@@ -55,6 +55,12 @@ RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry", "accept")
 # W2-20's KPI (DAEO-r30l, plan approved by DEC-729) adds the ``gov`` command ``resources``, recorded here with one
 # line in the form of DEC-542. The set stays exact (W1-32's suite).
 RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("resources",)
+
+# Revised for D-10's red fix (W2-20, DAEO-r30l; DEC-753, a fresh test designer with a Rewrite-Reason; DEC-1109):
+# three approved ``gov`` commands are recorded, one line each in the form of DEC-542: ``brief`` (W2-152,
+# DEC-1088 (3)), ``links`` (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and ``plan`` (W2-136, DEC-1088). The set stays
+# exact (W1-32's suite).
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 RECORDED_MODULE_COMMANDS = ("lock",)
 
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).
