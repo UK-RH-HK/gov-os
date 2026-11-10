@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 137
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Q5PuEiVuujCfwUELjjh7nE", "time": "2026-11-10T02:12:01.886Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/subagents/agent-abc872ed646039e63.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "R=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/scratchpad/reh; cd $R/clone && HOME=$R/home bash -c \"$(python3 -c 'import json,sys;print(json.load(op", "rule": "the call reads files whose names another command gives at run tim

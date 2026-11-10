@@ -1,0 +1,36 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/reviews/D10-whole-tree-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "head",
+   "before": "74dcbd3d29dd",
+   "after": "499fb8fc143f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M tests/unit/orchestration/test_w2_149_setup_a.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx-tests",
+   "change": "head",
+   "before": "27d1ad7d9679",
+   "after": "45fa65963f6f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx-tests",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-149/w2_149_setup_a.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx-tests",
+   "change": "acceptance folder",
+   "folder": "W2-149"
+  }
+ ]
+}

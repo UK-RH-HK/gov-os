@@ -1,0 +1,44 @@
+$ test -z 
+exit 0
+$ test ! -e .git/MERGE_HEAD
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-2/apply.sh check
+exit 0
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-2/apply.sh apply
+exit 0
+$ bash -c cmp -s template/governance/kernel/templates/brief.md .claude/templates/brief.md && cmp -s template/governance/kernel/templates/role-research.md .claude/templates/role-research.md && cmp -s template/governance/kernel/templates/role-product-spec.md .claude/templates/role-product-spec.md && cmp -s template/governance/kernel/templates/role-test-designer.md .claude/templates/role-test-designer.md && cmp -s template/governance/kernel/templates/role-engineer.md .claude/templates/role-engineer.md && cmp -s template/governance/kernel/templates/role-reviewer.md .claude/templates/role-reviewer.md && cmp -s template/governance/kernel/templates/role-lead.md .claude/templates/role-lead.md && cmp -s template/governance/kernel/templates/role-cto.md .claude/templates/role-cto.md && cmp -s template/governance/kernel/skills/orchestration/SKILL.md .rulesync/skills/orchestration/SKILL.md && cmp -s template/governance/kernel/skills/test-design/SKILL.md .rulesync/skills/test-design/SKILL.md
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/independent-auditor.md .claude/agents/independent-test-designer.md .claude/agents/orchestrator.md .claude/agents/product-spec.md .claude/agents/research.md .claude/skills/orchestration/SKILL.md .claude/skills/test-design/SKILL.md .rulesync/skills/orchestration/SKILL.md .rulesync/skills/test-design/SKILL.md
+exit 0
+staged 10 files
+$ git commit -q -m ACT-CLAUDE-COPIES-2: the generated .claude/ and .rulesync/ copies from W2-153's composed sources and W2-128 round 2b's skills (10 files) --trailer Task: DAEO-sdxk --trailer Implements: DEC-1109, DEC-1050 --trailer Role: owner
+exit 0
+$ test -z 
+exit 0
+ACT-CLAUDE-COPIES-2: the generated .claude/ and .rulesync/ copies from W2-153's composed sources and W2-128 round 2b's skills (10 files)
+Task: DAEO-sdxk
+Implements: DEC-1109, DEC-1050
+Role: owner
+
+
+ .claude/agents/engineer.md                  |  38 ++++-----
+ .claude/agents/independent-auditor.md       |  56 ++++++-------
+ .claude/agents/independent-test-designer.md |  44 ++++------
+ .claude/agents/orchestrator.md              | 119 +++++++++++++++-------------
+ .claude/agents/product-spec.md              |  42 ++++------
+ .claude/agents/research.md                  |  30 +++----
+ .claude/skills/orchestration/SKILL.md       |   6 +-
+ .claude/skills/test-design/SKILL.md         |   4 +-
+ .rulesync/skills/orchestration/SKILL.md     |   8 +-
+ .rulesync/skills/test-design/SKILL.md       |   6 +-
+ 10 files changed, 164 insertions(+), 189 deletions(-)
+portability after the commit: []
+$ bash .gov-runtime/scratch/orchestrator/acts/ACT-CLAUDE-COPIES-2/apply.sh undo
+exit 0
+$ git add .claude/agents/engineer.md .claude/agents/independent-auditor.md .claude/agents/independent-test-designer.md .claude/agents/orchestrator.md .claude/agents/product-spec.md .claude/agents/research.md .claude/skills/orchestration/SKILL.md .claude/skills/test-design/SKILL.md .rulesync/skills/orchestration/SKILL.md .rulesync/skills/test-design/SKILL.md
+exit 0
+$ git commit -q -m ACT-CLAUDE-COPIES-2 undone --trailer Task: DAEO-sdxk --trailer Role: owner
+exit 0
+$ test 0 = 0
+exit 0
+failures: 0

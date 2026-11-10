@@ -1,0 +1,76 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "1c4c47db3444",
+   "after": "7b08bd12d2b1"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "head",
+   "before": "59030819b91b",
+   "after": "1f6051e122b0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line added",
+   "line": " M tests/unit/orchestration/test_w2_149_setup_a.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/indep-walls/kinds.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/indep-walls/tree-exclude.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/indep-schemas/indep-counts.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/indep_launch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M tests/unit/orchestration/test_w2_149_indep_launch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/tools/indep-schemas/sgx1-labeller-2-result.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/tools/indep-schemas/sgx1-labeller-result.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/tools/indep-schemas/sgx1-overlap-auditor-result.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/tools/indep-schemas/sgx1-writer-heldout-result.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/tools/indep-schemas/sgx1-writer-tuning-result.schema.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": "?? tests/unit/orchestration/test_w2_149_setup_a.py"
+  }
+ ]
+}

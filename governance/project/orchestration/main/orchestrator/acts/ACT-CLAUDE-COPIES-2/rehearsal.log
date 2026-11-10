@@ -1,0 +1,14 @@
+ACT-CLAUDE-COPIES-2 rehearsal; live HEAD 1bf23a0b3e77; rulesync 24.0.0
+portability at HEAD: exit 1; 8 findings: SOURCE_DIFFERS .rulesync/skills/orchestration/SKILL.md; SOURCE_DIFFERS .rulesync/skills/test-design/SKILL.md; GENERATED_DIFFERS .claude/agents/engineer.md; GENERATED_DIFFERS .claude/agents/independent-auditor.md; GENERATED_DIFFERS .claude/agents/independent-test-designer.md; GENERATED_DIFFERS .claude/agents/orchestrator.md; GENERATED_DIFFERS .claude/agents/product-spec.md; GENERATED_DIFFERS .claude/agents/research.md
+portability in the generation clone after the copies: exit 0; findings []
+generation clone: 10 files changed or new: .claude/agents/engineer.md, .claude/agents/independent-auditor.md, .claude/agents/independent-test-designer.md, .claude/agents/orchestrator.md, .claude/agents/product-spec.md, .claude/agents/research.md, .claude/skills/orchestration/SKILL.md, .claude/skills/test-design/SKILL.md, .rulesync/skills/orchestration/SKILL.md, .rulesync/skills/test-design/SKILL.md
+rehearsal clone at the live HEAD; HOME planted at a fresh empty folder
+ok   apply.sh check (the live state as stated): exit 0
+ok   apply.sh apply: exit 0
+ok   check 1: exit 0
+ok   portability after the apply: exit 0; findings []
+ok   the changed set equals the touched list (10 files)
+ok   apply.sh undo: exit 0
+ok   undo: every file byte for byte back, the tree clean
+ok   the live files unchanged by the rehearsal, and nothing written to the planted HOME
+failures: 0

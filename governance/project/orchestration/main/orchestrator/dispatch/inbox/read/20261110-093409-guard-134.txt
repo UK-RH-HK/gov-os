@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 135
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01VLdjA19pt8DzHCB6EpANfg", "time": "2026-11-10T00:34:08.544Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "C=/home/usain/gov-os-runs/W2-00/landing-select/20261110-001045-4115075; S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/ad44f5fe-276d-46b7-85cd-df9f8d97a3ec/scratchpad; grep '^FAILED' $S", "rule": "the call reads files whose names another command gives at run time, from a listing whose start the g

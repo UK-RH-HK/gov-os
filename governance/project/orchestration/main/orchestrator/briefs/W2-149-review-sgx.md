@@ -13,11 +13,22 @@ template supplies what their front matter lacks. Their text is in your worktree 
 `b212a424…`; the declaration §12). Their inputs, outputs and result forms are the spec the wiring must meet.
 
 ## What to review
-- **The branch:** `w2/W2-149-sgx` in `/home/usain/gov-os-worktrees/W2-149-sgx`, head `@HEAD@`, from `w2/integrate` at
-  `ce1e9d0df`: `git diff ce1e9d0df..@HEAD@`. The designer's cases (`tests/acceptance/W2-149/`, commits `f65c0c992`,
+- **The branch:** `w2/W2-149-sgx` in `/home/usain/gov-os-worktrees/W2-149-sgx`, head `7df7c35e3`, with `w2/integrate`
+  (`7b08bd12d`) merged in: the change is the diff from `7b08bd12d` to `7df7c35e3`. The designer's cases (`tests/acceptance/W2-149/`, commits `f65c0c992`,
   `59030819b`; the README's "Set-up A's wiring: the interface"); the engineer's commits (`indep_launch.py`, the
-  template's `kinds.yaml` and `tree-exclude.txt`, the new schemas in `indep-schemas/`, the unit tests, the evidence).
-- **The runs:** @RUNS@
+  template's `kinds.yaml` and `tree-exclude.txt`, the new schemas in `indep-schemas/`, the unit tests, the evidence):
+  `1f6051e12` (the build; its session ended on a network error after committing it), `0d21a1dca` and `499fb8fc1` (a
+  fresh engineer's finish); the designer's fix of S16's writer case `45fa65963` (a `str`/`Path` skip compare in the
+  cases' helper, found by the lead), merged at `7df7c35e3`.
+- **The runs:** the lead's, at `7df7c35e3`, outside the sandbox (2026-11-10 09:5x UTC): the acceptance folder (but
+  `live`) and the two unit files with `GOV_W2_149_BWRAP=1`: **227 passed, 0 failed** (the 9 `bwrap` cases included);
+  the 3 live cases (`GOV_W2_149_LIVE=1`, haiku, planted roots, the real HOME for the login): **3 passed**. The
+  engineer's `gov accept W2-149` in the sandbox before the S16 fix: 135 passed, 2 failed (S16's writer case), 12
+  skipped (3 live, 9 `bwrap`). The designer's red check before the build: 61 red for their stated reasons.
+- **The engineer's own notes, for you to weigh** (none is in the interface; judge each): labeller 2's `labels-2.jsonl`
+  is delivered byte for byte with no line check (a malformed file surfaces only as the auditor's 10); a writer whose
+  `result.json` says `stopped` other than `none` but leaves a partial `out/cases.jsonl` still has it delivered; writer 2
+  stopping `not-sealed` with no `cases.jsonl` ends `rejected` (20), not `stopped`.
 - **Check:**
   1. **The briefs pass unchanged:** each of the five passes stage 10 from the template's values (S22) and gets exactly
      the inputs its brief names, and its outputs land where its brief says (S16, S24 to S27); no brief needs a change
