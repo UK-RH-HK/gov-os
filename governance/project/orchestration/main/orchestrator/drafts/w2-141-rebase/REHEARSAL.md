@@ -35,3 +35,11 @@ rehearsal's own call log, 0 to the live one. The real sets root was never opened
   the ACT (as `test_live_hook.py`'s `G14_PASSED` case was in W2-141), or the ACT's g14 step expects them red.
 - `guard4_check.py`: 501/0 with the staged pair, so its case `sets G5` did not trip here (its engineer's ticket has no
   acceptance folder with files in the clone).
+
+## The review (one round): READY by verdict.py
+`reviews/W2-141-rebase-review.md` (independent auditor, session `da8eb072`, worktree at `beec1f2f8`, removed after):
+R1–R4 pass; F1 (in, ordinary no: the README's rebuild note names 2b, 2c, 2d but not the call log and `Narrow`), F2
+(in, ordinary yes, other: "failures: 0" does not count the suites or the replay compare's exit; the four test_g14
+cases above are not in the README's "Before the ACT"), F3 (out: the README's rollback does not say to commit and merge
+it into the worktrees), F4 (out: the pair is rehearsed with today's pin, not the re-pin's); D1 (the guard refuses
+`git diff <rev>:<path> <rev>:<path>`, a false refusal). None blocks. The clone (288M, 20,003 inodes) is removed.
