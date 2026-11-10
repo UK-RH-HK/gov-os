@@ -131,6 +131,8 @@ namespaces:
       - "governance/project/prompts/**"
       # ACT-PATHMAP-NS-1 (DEC-1101 (1)): the walls' template (ACT-INDEP-WALLS-1) and the operator agent's install (W2-148)
       - "governance/project/indep-walls/**"
+      # ACT-PATHMAP-NS-2 (DEC-1101, DEC-1113): the walled sessions' fixed briefs (ACT-W2-149-INSTALL-1)
+      - "governance/project/indep-briefs/**"
       - "governance/project/operator/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
