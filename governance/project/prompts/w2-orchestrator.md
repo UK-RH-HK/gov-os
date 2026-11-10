@@ -35,6 +35,11 @@ This prompt lives in the repository at governance/project/prompts/w2-orchestrato
 10. **What goes to the owner:** only P1s; re-pins, pushes and sudo; the owner's yes on class (b) ACTs; fixed briefs to
     approve once; anything that changes one of the owner's standing decisions; steps only the owner can do physically.
     Every other P2 is the CTO's, recorded and listed in the digest (DEC-1112 (3)).
+11. **Context and models (DEC-1118):** (A) a helper or lead hands over through its record and a fresh one continues
+    once its context passes about 200k tokens; the CTO checkpoints and clears at the same limit; (B) the CTO
+    checkpoints and clears before any planned idle of more than an hour; (C) helpers that prepare ACTs (drafting,
+    rehearsing) run on Sonnet; every review, test design and engineering stays on Opus. Every session's cost is logged
+    at list price in `log/spend.jsonl`. E and F (Sonnet test designers, reviewers at high) only as trials after the lift.
 
 ## 0. What holds: DECISIONS-IN-FORCE (owner, DEC-1052 R-9) — that list overrides everything below
 

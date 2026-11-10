@@ -14220,6 +14220,25 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     apart).
 - **Basis:** question 4 (the owner's time and allowance spent where they buy most).
 
+### DEC-1118 — USAGE-1's savings A, B and C now, D once verified, E and F as trials after the lift; every session's list-price cost logged; a model-tier investigation for the fresh session
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`); items (1) and (2) standing · **Under:** DEC-1117 (3), DEC-1089 (3), DEC-1091, DEC-1110 (2) · **Source:** the owner's message (chat, 2026-11-10), on USAGE-1 §6 and §7
+- **Decision:**
+  - (1) **Now:** (A) fresh sessions at about 200k tokens of context (a helper or lead hands over through its record;
+    the CTO checkpoints and clears at the same limit); (B) the CTO checkpoints and clears before a planned idle of more
+    than an hour; (C) Sonnet for the helpers that prepare ACTs, reviews staying on Opus. They join the standing rules
+    as rule 11.
+  - (2) **(D)** the 5-minute cache for launched workers once the CTO has confirmed the setting works on this CLI;
+    **(E)** Sonnet test designers and **(F)** reviewers at effort high only as trials, after the lift.
+  - (3) **Every session's cost is logged at list price** in `log/spend.jsonl`, helpers and the CTO included, from the
+    transcripts' own usage; never a summed token count.
+  - (4) **A model-tier investigation** (read-only, a short package for the fresh session to finish): the decisions and
+    tickets that set each role's and tier's model and effort; whether they are in effect and where they would apply
+    (launch_worker.sh, gov launch, the dispatcher, the resource gate, the CTO's Agent-tool helpers); why USAGE-1 shows
+    99.7 % Opus at high or max; what applying the map would take, its saving at USAGE-1's prices and the quality risk
+    per role; and whether more memory search in place of file reads and long outputs would cut context. Nothing
+    changes until the owner decides.
+- **Basis:** question 4 (the week's allowance spent where it buys most, with no quality gate moved off Opus).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14275,3 +14294,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.500 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1115 (item 4 standing until the lift). Next free id: DEC-1116. |
 | 0.501 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1116. Next free id: DEC-1117. |
 | 0.502 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1117. Next free id: DEC-1118. |
+| 0.503 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1118 (items 1 and 2 standing). Next free id: DEC-1119. |

@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1117 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1118 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -448,3 +448,7 @@ other restart is an ACT.
   is report-only fails (stricter; the six whole-suite lifted tickets wait for their features to return); a possessive
   or other further line name refuses the cell; a line whose only case is listed in lifted but defined nowhere fails
   (a row, tests first, after the lift). W2-92's map row 128 fixed before the lift (it closes there).
+- DEC-1118 (2026-11-10): **standing (rule 11):** fresh sessions at ~200k context; the CTO clears at ~200k and before
+  idles over an hour; ACT-preparation helpers on Sonnet, reviews, test design and engineering on Opus; every session's
+  list-price cost logged. D (5-minute worker cache) once verified on this CLI; E and F trials after the lift. A
+  model-tier investigation for the fresh session to finish (MODEL-TIERS-1). Basis: 4.

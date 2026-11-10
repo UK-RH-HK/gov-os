@@ -153,6 +153,15 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 | 95 | W1-46's two argument-order cases (D10-REDS §6 item 16) | **DONE** before the listing: `23f63f49eccc` merged; with the opt-ins both files pass, 49 of 49; D10-REDS item 16 stale |
 | 96 | rows from the S3 and ACT-3 reviews: a missing role template is reported against the role file alone (S3 review F1); the designer's S3 case copies W1-33's `fields()` instead of importing it (F2); the copies builder's check should come from the touched list, as a `sha256sum -c` of the after hashes (ACT-3 review F1) | NOT STARTED: small; the builder's check is the CTO's tool, at the next copies ACT |
 
+## 0m. DEC-1118's items (2026-11-10; items 1 and 2 standing)
+| # | item | state |
+|---|---|---|
+| 98 | A, B, C: fresh sessions at ~200k; the CTO clears before idles over 1 h; Sonnet for ACT-preparation helpers | **DONE 11-10**: rule 11 in the prompt's standing list and START-NEXT-SESSION §1b; in force from now |
+| 99 | D: the 5-minute cache for launched workers | NOT STARTED: next: the fresh session confirms the setting on this CLI, then sets it in launch_worker.sh |
+| 100 | every session's list-price cost logged in spend.jsonl | NOT STARTED: next: a daily job from USAGE-1's collect.py for the CTO and the helpers |
+| 101 | MODEL-TIERS-1, a read-only package | IN PROGRESS: a research helper from `drafts/model-tiers/BRIEF.md` (11-10 ~14:45); next: the fresh session checks, commits and brings it |
+| 102 | E and F trials | WAITS: after the lift |
+
 ## 1. Every item not done, partly done or waiting
 
 ### 1a. Overdue: should already have happened by its own terms

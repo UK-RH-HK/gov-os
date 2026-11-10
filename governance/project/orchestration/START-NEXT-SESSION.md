@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1118.**
+the register and the owner's word hold over both. **Next free id: DEC-1119.**
 
 ## 0. Where things stand (2026-11-10 ~14:30 UTC)
 - **The lift is next:** about 11-11 (FORECAST-W2-2: lift 11-11, EXAMIN's copy 11-15, Wave 2's end 11-22, E). Its
@@ -30,8 +30,16 @@ the register and the owner's word hold over both. **Next free id: DEC-1118.**
    `ACT-<id> <64-hex manifest sha>`); the install ACT goes to the owner's operator by hand (package §5).
 2. **By the owner's operator, by hand:** ACT-OPERATOR-2 (class (O), no yes line; the agent's install with the replay
    check), then ACT-WIN-TOAST-1 (class (b); test-map line), then ACT-W2-149-INSTALL-1 after its yes.
-3. **USAGE-1's savings A–H** (recommended A, B, C now; D after the setting is checked; E, F trials), and yes/no to
-   logging every session's list-price cost.
+3. **USAGE-1 decided (DEC-1118):** A, B, C in force (rule 11). **Yours to do:** (D) confirm on this CLI that
+   `FORCE_PROMPT_CACHING_5M=1` gives launched workers the 5-minute cache (check `claude --version`, the official
+   env-vars page, one planted worker's usage fields), then set it in `launch_worker.sh` and record it; (E, F) trials
+   only after the lift. **Every session's list-price cost logged** (DEC-1118 (3)): a daily job from USAGE-1's scripts
+   (`drafts/usage-1/collect.py`) appends the CTO's and the helpers' costs to `log/spend.jsonl` in its schema.
+6. **MODEL-TIERS-1 (DEC-1118 (4)), for you to finish:** a read-only research helper started 11-10 ~14:45 from
+   `.gov-runtime/scratch/orchestrator/drafts/model-tiers/BRIEF.md`; its draft lands as `drafts/model-tiers/MODEL-TIERS-1.md`.
+   If the draft is missing or incomplete when you start (the old session's helper dies with it), relaunch a research
+   agent on the same brief. Check the draft, commit it to `packages/MODEL-TIERS-1.md`, bring it to the owner; nothing
+   changes until the owner decides.
 4. **D-10's word** (the full suite), after ACT-CLAUDE-COPIES-3 and this fresh session.
 5. The owner's phone check of Claude notifications (DEC-1117 (2)); ntfy only if that is not the cause.
 
@@ -46,6 +54,9 @@ physical steps go to the owner, every other P2 is the CTO's (DEC-1112 (3)).
 **Learned 11-09/10 (memory files hold them):** never leave a merge staged in the shared tree (merge in one command
 with the ticket's trailer); before a brief edits a committed tool, check `class-rules.yaml`: (b)/(O) paths go by ACT;
 give each round's spend projection in its brief (`launch_worker.sh --projection-usd`).
+**Rule 11 (DEC-1118):** helpers hand over past ~200k context; the CTO checkpoints and clears at ~200k and before any
+planned idle over an hour; ACT-preparation helpers on Sonnet (`model: "sonnet"` in the Agent call), reviews, test
+design and engineering on Opus; every session's list-price cost logged.
 
 ## 2. The emergency: in force
 - **What holds it:** DEC-1047; DEC-1049 (no nightly or full suite until the owner's word); DEC-1050 and DEC-1051;
