@@ -2,7 +2,7 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1124.**
+the register and the owner's word hold over both. **Next free id: DEC-1125.**
 
 ## 00. NOW (17:45 UTC 11-10): read this first; the sections below it are the 14:30 handover, still valid where not replaced
 - **Usage (A) is in force (DEC-1122 (2)): only the lift's critical path runs until the reset 11-15 09:00.** 60 % at

@@ -14336,6 +14336,14 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** `packages/D10-RECORD-REDS.md` (§1 (a), §2 (c), §3); run 1's triage
   (`.gov-runtime/scratch/orchestrator/drafts/d10-run1-triage/NOTES.md`).
 
+### DEC-1124 — Q23 of the visible half re-worded to a stable fact by an independent session, as Q07 and Q14 were; its cases may stay red in D-10 run 2
+- **Status:** ACCEPTED (owner, 2026-11-10, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-10)`) · **Under:** DEC-1070 (13), DEC-1097 (12), DEC-1098 (6), DEC-1123 (1) · **Source:** the owner's answer to group G's open point (chat, 2026-11-10 ~22:05 UTC)
+- **Decision:** Q23 (`fixtures/evaluation/memory-retrieval/visible/q23.yaml`, its cited `MAP_REL` line moved at HEAD)
+  is re-worded **by the process used for Q07 and Q14**: an independent session re-words it to a stable fact; the CTO
+  does not choose its wording. The original is kept in `retired/` with its README entry. Its 3 cases may stay red in
+  D-10 run 2; they are fixed and re-checked with a scoped run after.
+- **Applied:** the independent session launched 22:06 (`w2/W2-61h-q23-tests`, DAEO-h2k3, Sonnet high, C1).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14396,3 +14404,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.505 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1120 (RUBRIC-2, standing; DEC-839 (1)-(3) and DEC-1119 (1) changed), DEC-1121 (the ticket template 1.0.1 with `class`). Next free id: DEC-1122. |
 | 0.506 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1122 (the template 1.0.1 approved; usage (A) from now, DEC-1115 (4) changed; D-10's go on a condition). Next free id: DEC-1123. |
 | 0.507 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1123 (items 3 and 5 standing; trailers a warning under Q-8 until W2-115). Next free id: DEC-1124. |
+| 0.508 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1124 (Q23 re-worded by an independent session). Next free id: DEC-1125. |

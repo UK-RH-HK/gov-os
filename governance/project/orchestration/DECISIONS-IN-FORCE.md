@@ -476,3 +476,5 @@ other restart is an ACT.
   `product-traceability-trailers` counts as a warning, not a hard block (Q-8), for D-10, the re-pin and the lift**;
   W1-01's three merges exempted by the owner's commit (ACT-W1-01-EXEMPT-2); **standing: a stand-by note expires after
   a set time** (ACT-DEADMAN-STANDBY-1, class (b)). Basis: D10-RECORD-REDS.
+- DEC-1124 (2026-11-10): Q23 re-worded to a stable fact by an independent session (the Q07/Q14 process), not by the
+  CTO; its 3 cases may stay red in D-10 run 2, fixed and re-checked by a scoped run after.
