@@ -6104,3 +6104,5 @@
 {"at": "2026-11-10 01:14:26", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 01:14:23", "pending_tool": null, "age_min": 0, "verdict": "alive"}
 {"at": "2026-11-10 01:16:31", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 01:14:47", "pending_tool": null, "age_min": 1, "verdict": "alive"}
 {"at": "2026-11-10 01:18:37", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 01:14:47", "pending_tool": null, "age_min": 3, "verdict": "alive"}
+{"at": "2026-11-10 01:20:44", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 01:14:47", "pending_tool": null, "age_min": 5, "verdict": "alive"}
+{"at": "2026-11-10 01:20:49", "transcript": "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec.jsonl", "last_assistant": "2026-11-10 01:14:47", "pending_tool": null, "age_min": 6, "verdict": "alive"}
