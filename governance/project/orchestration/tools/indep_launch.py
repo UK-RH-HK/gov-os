@@ -991,8 +991,7 @@ def stage_sgx(sgx, rnd, seed, commit):
             first = rng.random() < 0.5  # x is labeller 1
             xmap[i] = {"x": 1, "y": 2} if first else {"x": 2, "y": 1}
             a, b = part(sgx["labels1"][i]), part(sgx["labels2"][i])
-            if not (a.get("reason") and b.get("reason")):  # (F21) an empty reason on either side blanks both
-                a["reason"] = b["reason"] = ""
+            a["reason"] = b["reason"] = ""  # (F36) every side's reason blanked: no labeller's text enters the wall
             x, y = (a, b) if first else (b, a)
             lines.append(json.dumps({"id": i, "action": action, "x": x, "y": y}) + "\n")
         sgx["xmap"] = xmap  # written at delivery only, never into the wall

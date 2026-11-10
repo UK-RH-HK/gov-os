@@ -274,10 +274,9 @@ def stopped_out(out: dict, word: str) -> dict:
 
 
 def blind(one: dict, two: dict):
-    """S27 (F21): both sides' reasons as staged: when either is empty, both are empty."""
-    if one["reason"] == "" or two["reason"] == "":
-        return dict(one, reason=""), dict(two, reason="")
-    return one, two
+    """S27 (F21, F36): both sides' reasons as staged: every side's reason is empty, whatever the labellers wrote; the
+    other label fields stay as each file has them."""
+    return dict(one, reason=""), dict(two, reason="")
 
 
 def settled_line(decision: dict) -> dict:

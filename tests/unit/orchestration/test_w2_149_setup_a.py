@@ -226,6 +226,16 @@ def test_the_five_briefs_pass_stage_ten_in_dry_builds(s):
         assert json.loads((s.wall(counts) / ".claude" / "settings.json").read_text())["model"] == "claude-opus-5-5"
 
 
+GUARD_GLOBS = [".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**"]
+AUDITOR_TELL_GLOBS = [".tickets/**", "governance/project/orchestration/packages/**",
+                      "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/**",
+                      "tests/unit/orchestration/test_w2_149*", "docs/changes/W2-149-evidence.md"]
+# One planted file under each of the six globs above (F38).
+AUDITOR_TELL_FILES = ["governance/project/orchestration/packages/sgx1/README.md",
+                      "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/t.py",
+                      "tests/unit/orchestration/test_w2_149_x.py", "docs/changes/W2-149-evidence.md"]
+
+
 def test_template_kinds_yaml_holds_the_five_entries():
     data = (TEMPLATE / "kinds.yaml").read_bytes()
     kinds, briefs = indep_launch.load_kinds(data), indep_launch.load_briefs(data)
@@ -235,8 +245,11 @@ def test_template_kinds_yaml_holds_the_five_entries():
     for bid, e in briefs.items():
         assert e["kind"] == FRONT[bid][0] and e["flow"] in indep_launch.FLOWS
         assert (SCHEMAS / e["result_schema"]).is_file()
-        assert e["tree_exclude"] == [".claude/**", "src/gov/guard/**", "src/gov/launch/**",
-                                     "governance/project/indep-walls/**"]
+        if bid == "sgx1-overlap-auditor":  # F38: also every file that tells the dispute sides apart
+            assert sorted(e["tree_exclude"]) == sorted(GUARD_GLOBS + AUDITOR_TELL_GLOBS)
+            assert len(e["tree_exclude"]) == 10
+        else:
+            assert e["tree_exclude"] == GUARD_GLOBS
         if FRONT[bid][0] != "writer":
             assert e["sample"] == 0
     assert "governance/project/indep-briefs/**" in (TEMPLATE / "tree-exclude.txt").read_text().splitlines()
@@ -256,6 +269,32 @@ def test_trees_leave_out_the_briefs_and_set_up_a_also_the_guard(s):
     sel = json.loads((s.wall(sgx) / "input" / "selection.json").read_text())
     assert ".claude/settings.json" in sel["sample"]
     assert not [p for p in sel["sample"] if p.startswith("governance/project/indep-briefs/")]
+
+
+def test_auditor_tree_leaves_out_every_file_that_tells_the_sides_apart(s):
+    """F38 (S23): the overlap auditor's tree holds no ticket, package, launcher, W2-149 test or evidence file; a
+    set-up A writer's and a memory writer's trees hold every one; the auditor's tickets.jsonl is still staged."""
+    for rel in AUDITOR_TELL_FILES:
+        s.put(rel, "TELL_MARK\n")
+    s.commit = s.commit_all("the tells")
+    s.approve()
+    plant_labels(s, n=3)
+    rc, aud, p = s.go("sgx1-overlap-auditor", seed=7, dry=True)
+    rc2, wri, _ = s.go("sgx1-writer-tuning", seed=7, dry=True)
+    rc3, mem, _ = s.launch(seed=7, dry=True)
+    assert rc == rc2 == rc3 == 0, (aud, p.stderr)
+    tells = AUDITOR_TELL_FILES + [".tickets/DAEO-aaaa.md", ".tickets/DAEO-bbbb.md"]
+    a = tree_hash(s.tree(aud))
+    assert not [t for t in tells if t in a]
+    assert not [x for x in a if x.startswith((".tickets/", "governance/project/orchestration/packages/",
+                                               "tests/acceptance/W2-149/", "tests/unit/orchestration/test_w2_149"))]
+    for other in (wri, mem):
+        t = tree_hash(s.tree(other))
+        assert [x for x in tells if x not in t] == [], other["kind"]
+    tickets = [json.loads(x) for x in (s.wall(aud) / "input" / "tickets.jsonl").read_text().splitlines()]
+    assert tickets == [{"id": "DAEO-aaaa", "role": "engineer", "wbs_id": "W2-1", "allowed_paths": ["src/a/**"]}]
+    walled = [q for q in s.wall(aud).rglob("*") if q.is_file()] + [q for q in s.tree(aud).rglob("*") if q.is_file()]
+    assert not [q for q in walled if b"TELL_MARK" in q.read_bytes() or b"title: one" in q.read_bytes()]
 
 
 # -- S24: --set, --round and the staged inputs ---------------------------------------------------------------------
@@ -832,28 +871,31 @@ def test_auditor_bad_decisions_are_20_nothing_under_h_changes(s, change):
     assert tree_hash(h) == before
 
 
-def test_auditor_disputes_blind_the_reasons_when_either_is_empty(s):
-    """F21 (S27): when either side's reason is empty, both are empty; when both have one, both are kept."""
+def test_auditor_disputes_blank_every_reason_and_keep_the_seeded_order(s):
+    """F36 (S27): every side's reason is "", whatever either labeller wrote; label, rule_class and clauses as in
+    each file, x/y in the seeded order."""
     h = plant_labels(s, n=6)
     lab = h / "labels"
     l1 = [json.loads(x) for x in (lab / "labels.jsonl").read_text().splitlines()]
     l2 = [json.loads(x) for x in (lab / "labels-2.jsonl").read_text().splitlines()]
     for k, x in enumerate(l1):
         if k % 2 == 0:
-            x.update(reason=f"one-{k}", how="hand")
-    l2[2]["reason"] = ""  # a-002: labeller 1 has a reason, labeller 2 none
+            x.update(reason=f"one-{k}", how="hand")  # both sides with a reason on a-000, a-002 (below), a-004
+    l2[1]["reason"] = ""  # a-001: neither side has one
     (lab / "labels.jsonl").write_text("".join(json.dumps(x) + "\n" for x in l1))
     (lab / "labels-2.jsonl").write_text("".join(json.dumps(x) + "\n" for x in l2))
     rc, counts, _ = s.go("sgx1-overlap-auditor", seed=11, dry=True)
     assert rc == 0, counts
-    rows = {json.loads(x)["id"]: json.loads(x) for x in
-            (s.wall(counts) / "input" / "disputes.jsonl").read_text().splitlines()}
-    assert len(rows) == 6
-    for k in range(6):
-        r = rows[f"a-{k:03d}"]
-        got = {r["x"]["reason"], r["y"]["reason"]}
-        assert got == ({f"one-{k}", "r2"} if k in (0, 4) else {""}), (k, got)
-        assert {r["x"]["label"], r["y"]["label"]} == {"allow", "refuse"}  # labels as in each file
+    text = (s.wall(counts) / "input" / "disputes.jsonl").read_text()
+    assert "one-" not in text and "r2" not in text  # no reason text of either labeller enters the wall
+    rows = [json.loads(x) for x in text.splitlines()]
+    assert [r["id"] for r in rows] == [f"a-{k:03d}" for k in range(6)]
+    rng = random.Random(11)
+    for k, r in enumerate(rows):
+        one = {"label": l1[k]["label"], "rule_class": l1[k]["rule_class"], "clauses": l1[k]["clauses"], "reason": ""}
+        two = {"label": l2[k]["label"], "rule_class": l2[k]["rule_class"], "clauses": l2[k]["clauses"], "reason": ""}
+        want = (one, two) if rng.random() < 0.5 else (two, one)
+        assert (r["x"], r["y"]) == want, k
 
 
 def test_auditor_settled_case_takes_the_decision_and_string_classes_are_integers(s):

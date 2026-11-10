@@ -315,6 +315,41 @@ at `6a959ffc5`. Nothing else changed in behaviour; the template's two files and 
   `kinds.yaml` `734b26e261faa81a4de7d4305e33291291d2e0949b4a4ba1c6fadd11672cd6df` and `tree-exclude.txt`
   `e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537`, as in the table above.
 
+## F36, F38 (DEC-1112 (3))
+
+The engineer, 2026-11-10, branch `w2/W2-149-sgx` from the designer's `be77be65a` (build `c49799f77`). Built to the
+ticket's changed lines S23 and S27 (DEC-1113 (2): the auditor decides from the decisions alone, blind) and the
+interface's F36 and F38 bullets. Nothing else changed in behaviour; `tree-exclude.txt` and the schemas are unchanged.
+
+| Line | Finding | What | Where |
+|---|---|---|---|
+| S27 | F36 | Every side's `reason` in `input/disputes.jsonl` is `""`, whatever either labeller wrote: F21's "both kept when both have one" is withdrawn. `label`, `rule_class` and `clauses` are as in each file; the x/y order is the seeded one, unchanged. | `indep_launch.py` `stage_sgx` 994 |
+| S23 | F38 | The `sgx1-overlap-auditor` entry's `tree_exclude` gains `.tickets/**`, `governance/project/orchestration/packages/**`, `governance/project/orchestration/tools/indep_launch.py`, `tests/acceptance/W2-149/**`, `tests/unit/orchestration/test_w2_149*` and `docs/changes/W2-149-evidence.md` (ten globs in all). The other four entries keep the four. The script is unchanged here: it already drops an entry's globs from the tree (fnmatch on the repository path). The auditor's `input/tickets.jsonl` is still read from `.tickets/` at `--commit` by the script's code, and the selection stays "less `tree-exclude.txt`". | `kinds.yaml` `briefs.sgx1-overlap-auditor` |
+
+### Tests (F36, F38)
+
+- **Unit** (`tests/unit/orchestration/test_w2_149*`): **153 passed, 3 skipped** with every row
+  (`--optin=lifted,breadth`), through the heavy slot, with `-m "not local_only" -k "not real and not green_here and
+  not time_limit"`, which leaves out none of them. The 3 skipped are the real-`bwrap` cases. Changed or new:
+  - F36: `test_auditor_disputes_blank_every_reason_and_keep_the_seeded_order` replaces F21's test. Both sides have a
+    reason on some cases and neither does on one. No reason text is in the file, and each side equals its labeller's
+    line with `reason` `""`, in the order `random.Random(seed)` gives.
+  - F38: `test_auditor_tree_leaves_out_every_file_that_tells_the_sides_apart`. One planted `TELL_MARK` file goes under
+    each glob, with the planted tickets. These files are absent from the auditor's dry-built tree, and no `TELL_MARK`
+    or ticket text appears in its wall or tree. A set-up A writer's tree and a memory writer's tree each hold every
+    one. The auditor's `tickets.jsonl` is still staged. `test_template_kinds_yaml_holds_the_five_entries` now checks
+    the auditor's ten globs (as a set) and the four on each other entry.
+- **`gov accept W2-149`** (in the sandbox, through the heavy slot, at `c49799f77`): **174 passed, 0 failed, 35
+  skipped.**
+  - Every line passes except success-26 (0 passed, 0 failed, 2 skipped). It is red only because both its cases are
+    `bwrap` cases, which skip in the sandbox.
+  - The changed lines: S23 11/0/0, S27 16/0/0.
+  - The skips are the live cases (success-9, -11 and -12, one each) and the `bwrap` cases (success-16 2, -25 9, -26 2,
+    -28 1, -29 2, -31 17, failure-11 8). The lead runs them outside the sandbox.
+- **sha256** at `c49799f77`: `indep_launch.py` `90b943aef8be33f6e282dbd8527382683c6c3cfab6831e620daf4f7047d83c6e`,
+  `kinds.yaml` `ddd84ae2591061327e1730517ffbce987be7a272a72311bb3b6e79e4bf2401a7`, `tree-exclude.txt` (unchanged)
+  `e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537`.
+
 ## Notes on the runs
 
 - `gov accept` strips `PYTHON*` from its child's environment, so it ran with the session's own HOME (pytest lives in

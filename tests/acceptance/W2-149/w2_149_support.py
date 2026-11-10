@@ -100,7 +100,37 @@ PATH_MAP = """# Planted path map (W2-149 acceptance tests): the block the launch
 # -- set-up A's wiring (DEC-1112 (3), DEC-1113): the planted template's kinds.yaml and the five approved briefs' front
 # matter, byte for byte (their bodies are never planted: each planted brief carries a short body of the tests' own).
 SGX1_TREE_EXCLUDE = (".claude/**", "src/gov/guard/**", "src/gov/launch/**", "governance/project/indep-walls/**")
-_TX = "[" + ", ".join(f'"{g}"' for g in SGX1_TREE_EXCLUDE) + "]"
+# S23 (F38; DEC-1113 (2): the overlap auditor decides from the decisions alone): its entry also leaves out every file
+# that states which dispute side is which labeller's. The other four set-up A entries keep SGX1_TREE_EXCLUDE.
+AUDITOR_TREE_EXCLUDE = (".tickets/**", "governance/project/orchestration/packages/**",
+                        "governance/project/orchestration/tools/indep_launch.py", "tests/acceptance/W2-149/**",
+                        "tests/unit/orchestration/test_w2_149*", "docs/changes/W2-149-evidence.md")
+SGX1_IDS = ("sgx1-writer-tuning", "sgx1-writer-heldout", "sgx1-labeller", "sgx1-labeller-2", "sgx1-overlap-auditor")
+
+
+def _flow_list(globs) -> str:
+    return "[" + ", ".join(json.dumps(g) for g in globs) + "]"
+
+
+def template_entry_excludes() -> dict:
+    """Set-up A's five entries' ``tree_exclude`` as this tree's own template (``kinds.yaml``) states them (S23, F38):
+    the planted ``kinds.yaml`` carries them, so a dry build exercises the template's entries as the engineer leaves
+    them. An entry missing or malformed falls back to the four globs (S22's and S23's template cases catch it)."""
+    try:
+        import yaml
+        briefs = (yaml.safe_load((TEMPLATE_SRC / "kinds.yaml").read_text()) or {}).get("briefs") or {}
+    except Exception:  # noqa: BLE001 - a template that does not parse is the template cases' finding
+        briefs = {}
+    out = {}
+    for bid in SGX1_IDS:
+        tx = (briefs.get(bid) or {}).get("tree_exclude") if isinstance(briefs, dict) else None
+        ok = isinstance(tx, list) and tx and all(isinstance(g, str) for g in tx)
+        out[bid] = tuple(tx) if ok else SGX1_TREE_EXCLUDE
+    return out
+
+
+_TX = _flow_list(SGX1_TREE_EXCLUDE)
+_TXE = {bid: _flow_list(g) for bid, g in template_entry_excludes().items()}
 KINDS_YAML = f"""# Planted kinds.yaml (W2-149 acceptance tests, set-up A's wiring): the template's four kinds as they stand, each
 # with a model, and the briefs: map a brief's missing model, result_schema and sample are taken from (DEC-1112 (3)).
 kinds:
@@ -139,33 +169,33 @@ briefs:
     flow: sgx1-writer-1
     model: claude-entry-writer-tuning
     result_schema: sgx1-writer-tuning-result.schema.json
-    tree_exclude: {_TX}
+    tree_exclude: {_TXE['sgx1-writer-tuning']}
   sgx1-writer-heldout:
     kind: writer
     flow: sgx1-writer-2
     result_schema: sgx1-writer-heldout-result.schema.json
-    tree_exclude: {_TX}
+    tree_exclude: {_TXE['sgx1-writer-heldout']}
   sgx1-labeller:
     kind: labeller
     flow: sgx1-labeller-1
     model: claude-entry-labeller
     result_schema: sgx1-labeller-result.schema.json
     sample: 0
-    tree_exclude: {_TX}
+    tree_exclude: {_TXE['sgx1-labeller']}
   sgx1-labeller-2:
     kind: labeller
     flow: sgx1-labeller-2
     model: claude-entry-labeller-2
     result_schema: sgx1-labeller-2-result.schema.json
     sample: 0
-    tree_exclude: {_TX}
+    tree_exclude: {_TXE['sgx1-labeller-2']}
   sgx1-overlap-auditor:
     kind: auditor
     flow: sgx1-overlap-auditor
     model: claude-entry-overlap-auditor
     result_schema: sgx1-overlap-auditor-result.schema.json
     sample: 0
-    tree_exclude: {_TX}
+    tree_exclude: {_TXE['sgx1-overlap-auditor']}
   w2-149-no-schema:
     kind: writer
     flow: sgx1-writer-1
@@ -244,6 +274,17 @@ SETUP_A_FILES = {
     "src/gov/launch/run.py": "# planted launcher code (W2-149 S23)\n",
 }
 SETUP_A_FILES.update({f".tickets/{t}.md": ticket_text(t, *v) for t, v in PLANTED_TICKETS.items()})
+# S23 (F38): one file under each of the overlap auditor's further globs but .tickets/** (the tickets above), each
+# holding TELL_MARK; tree-exclude.txt leaves none of them out, so every tree but the overlap auditor's holds them.
+TELL_MARK = "TELL-W2149-WHICH-SIDE"
+TELL_FILES = {
+    "governance/project/orchestration/packages/ACT-W2-149-PLANTED.md": f"# planted package (W2-149 S23, {TELL_MARK})\n",
+    "governance/project/orchestration/tools/indep_launch.py": f"# planted launcher (W2-149 S23, {TELL_MARK})\n",
+    "tests/acceptance/W2-149/planted.md": f"# planted acceptance notes (W2-149 S23, {TELL_MARK})\n",
+    "tests/unit/orchestration/test_w2_149_planted.py": f"# planted unit test (W2-149 S23, {TELL_MARK})\n",
+    "docs/changes/W2-149-evidence.md": f"# planted evidence (W2-149 S23, {TELL_MARK})\n",
+}
+SETUP_A_FILES.update(TELL_FILES)
 GIT_ENV = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "W2-149 tests",
            "GIT_AUTHOR_EMAIL": "w2-149@example.invalid", "GIT_COMMITTER_NAME": "W2-149 tests",
            "GIT_COMMITTER_EMAIL": "w2-149@example.invalid", "PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"}
