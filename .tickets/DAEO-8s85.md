@@ -26,6 +26,7 @@ allowed_paths:
 - tests/unit/launch/test_w2_136_plan_check.py
 - tests/unit/resources/test_w2_20_launch.py
 - tests/unit/resources/test_w2_20_round3.py
+- tests/unit/launch/test_w2_56.py
 - governance/project/orchestration/tools/dispatch/launch_now.sh
 - .rulesync/subagents/*.md
 - template/.rulesync/subagents/*.md
@@ -94,5 +95,11 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
     file is missing (W2-20's gate), so the launch stops before the template check. Their launch fixtures plant the
     copy too, so W2-153 does not turn them red again once the gate files are fixed.
   - Each fixture plants `.claude/templates/<stem>.md` for the role it launches (any byte content).
+  - After W2-56 merged into integrate, and with it into this branch (`a67fd010`, one conflict resolved by the CTO),
+    two more groups (rescanned 2026-11-10, DEC-1112 (3)):
+    - W2-56's acceptance folder: 136 of 256 newly red; it goes to the test designer.
+    - `tests/unit/launch/test_w2_56.py` (3): the engineer's; path added.
+    - W2-153's own launch cases read the stub's record path from an environment variable (`W2_153_RECORD`), which
+      W2-56's cleaned environment (its S5) now removes. The designer moves that harness to a path W2-56 keeps.
 
 **Not here:** the templates' text (W2-128); `gov brief` (W2-152).
