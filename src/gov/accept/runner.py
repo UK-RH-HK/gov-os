@@ -22,9 +22,17 @@ from typing import NamedTuple
 
 from gov.cli.errors import GovError
 
-NAME = re.compile(r"(success|failure|kpi|s|f|k)[ \t-]*(\d+)(?!\w)", re.I)
+KIND = r"(successes|success|failures|failure|kpis|kpi|s|f|k)"
+NAME = re.compile(KIND + r"[ \t-]*(\d+)(?!\w)", re.I)
 NAMING = re.compile(r"(success|failure|kpi)\b", re.I)  # a heading that means to name lines
-JOIN = re.compile(r"\s*(?:/|,|;|\band\b)\s*", re.I)
+JOIN = re.compile(r"\s*(?:/|,|;|&|\+|\band\b)\s*", re.I)
+NUMBER = re.compile(r"(\d+)(?!\w)(?![ \t]+(?!and\b)[a-z])", re.I)  # a bare number after a join: one more line of
+#                                                                   the kind before it ("failures 4, 5"), not a count
+UPTO = re.compile(r"(?:–|\.\.|-)(\d+)(?!\w)")  # a range: Success 3–7, S3-7, F1..3
+NOTE = re.compile(r"\s*(?:\[[^\]\n]*\]|\([^)\n]*\))")  # a bracketed note between lines: [CAP-61.c], (R3)
+MORE = re.compile(r"\s*(?:/|,|;|&|\+|\band\b)\s*(?:(?:successes|success|failures|failure|kpis|kpi)\b|[sfk]?[ \t-]*\d)"
+                  r"|(?:–|\.\.|-)\d", re.I)  # what still lists a line the reader did not read: the cell is refused
+RANGE_MAX = 50  # the widest range read as lines; a wider one is refused
 ITEM = re.compile(r"`([^`]+)`")
 WORD = re.compile(r"\w+")
 SEPARATOR = re.compile(r":?-+:?")
@@ -49,15 +57,38 @@ class Stopped(BaseException):
 
 # --- the README map -------------------------------------------------------------------------------------------------
 
+class Unlisted(Unreadable):
+    """A cell that lists a KPI line the reader cannot read (S-D10b): the map is refused, naming the cell."""
+
+
 def line_names(text: str) -> list[str]:
-    """The KPI lines named at the start of ``text``, in the normal form ``success-N`` / ``failure-N``."""
+    """Every KPI line named at the start of ``text``, in the normal form ``success-N`` / ``failure-N`` (S-D10b).
+
+    A cell lists lines as kinds and numbers joined by ``/``, ``,``, ``;``, ``&``, ``+`` or ``and``: ``Success 4
+    [CAP-61.c], failures 4, 5`` is success-4, failure-4 and failure-5 (a bare number is one more line of the kind
+    before it; a bracketed note between lines is passed over), and ``Success 3–7`` is the five lines of the range.
+    What follows the lines is the cell's prose. Raises ``Unlisted`` when what follows still lists a line the reader
+    cannot read, so that no line is ever dropped silently.
+    """
     text = text.replace("*", "").strip()
-    names, found = [], NAME.match(text)
+    names, found, kind, end = [], NAME.match(text), "success", 0
     while found:
-        kind = "failure" if found.group(1).lower() in ("failure", "f") else "success"
-        names.append(f"{kind}-{int(found.group(2))}")
-        joined = JOIN.match(text, found.end())
-        found = NAME.match(text, joined.end()) if joined else None
+        if found.re is NAME:
+            kind = "failure" if found.group(1).lower().startswith("f") else "success"
+        first = last = int(found.group(found.re.groups))
+        upto = UPTO.match(text, found.end())
+        if upto:
+            last = int(upto.group(1))
+            if not first < last <= first + RANGE_MAX:
+                raise Unlisted(text)
+        names += [f"{kind}-{number}" for number in range(first, last + 1)]
+        end = (upto or found).end()
+        while note := NOTE.match(text, end):
+            end = note.end()
+        joined = JOIN.match(text, end)
+        found = joined and (NAME.match(text, joined.end()) or NUMBER.match(text, joined.end()))
+    if names and MORE.match(text, end):
+        raise Unlisted(text)
     return names
 
 
@@ -69,13 +100,15 @@ def parse_map(text: str) -> dict[str, list[str]]:
     """``{line: [item, ...]}`` from the README's tables, in row form (a KPI column) or heading form.
 
     Raises ``Unreadable`` for a row with items whose KPI cell names no line, or a table under a heading that
-    begins with ``success``, ``failure`` or ``KPI`` but names no line.
+    begins with ``success``, ``failure`` or ``KPI`` but names no line; and ``Unlisted``, carrying the README's line
+    number and the cell, for a row with items whose KPI cell (or heading) lists a line it cannot read (S-D10b).
     """
     mapping: dict[str, list[str]] = {}
     heading: list[str] = []
+    unlisted = None  # the nearest heading's refusal, raised only if a row under it maps items
     naming = False  # the nearest heading means to name lines
     fenced, table = False, None  # table: None before a header row, False when ignored, else (kpi, test, names)
-    for raw in text.splitlines():
+    for number, raw in enumerate(text.splitlines(), 1):
         line = raw.strip()
         if line.startswith(("```", "~~~")):
             fenced, table = not fenced, None
@@ -86,24 +119,35 @@ def parse_map(text: str) -> dict[str, list[str]]:
             table = None
             if line.startswith("#"):
                 title = line.lstrip("#").replace("*", "").strip()
-                heading, naming = line_names(title), bool(NAMING.match(title))
+                try:
+                    heading, unlisted = line_names(title), None
+                except Unlisted:
+                    heading, unlisted = [], Unlisted(number, title)
+                naming = bool(NAMING.match(title))
             continue
         cells = _cells(line)
         if table is None:
             titles = [cell.lower() for cell in cells]
             kpi = next((i for i, title in enumerate(titles) if title.startswith("kpi")), None)
             test = next((i for i, title in enumerate(titles) if title.startswith(("test", "file"))), None)
-            table = False if test is None else (kpi, test, heading)
+            table = False if test is None else (kpi, test, heading, unlisted)
             continue
         if not table or all(SEPARATOR.fullmatch(cell) for cell in cells):
             continue
-        kpi, test, names = table
-        if kpi is not None:
-            names = line_names(cells[kpi]) if kpi < len(cells) else []
+        kpi, test, names, refusal = table
         items = ITEM.findall(cells[test]) if test < len(cells) else []
-        if items and not names and (kpi is not None or naming):
+        if not items:
+            continue
+        if kpi is not None:
+            try:
+                names = line_names(cells[kpi]) if kpi < len(cells) else []
+            except Unlisted:
+                raise Unlisted(number, cells[kpi]) from None
+        elif refusal is not None:
+            raise refusal
+        if not names and (kpi is not None or naming):
             raise Unreadable
-        for name in names if items else []:
+        for name in names:
             mapping.setdefault(name, []).extend(items)
     return mapping
 
@@ -135,6 +179,106 @@ def names_a_test(item: str) -> bool:
     """Whether the item names a test, so that matching no collected case fails its line."""
     item = item.strip()
     return "::" in item or item.rsplit("/", 1)[-1].startswith("test_")
+
+
+# --- the opt-in suites the map's cases need (S-D10a, DEC-1112 (3), DEC-1061) -----------------------------------------
+
+OPTIN_ENV = "GOV_TESTS_OPTIN"  # tests/conftest.py's variable: the suites a run opts in to, comma-separated
+OPTIN_GLOB = "optin-lifted*.txt"
+
+
+def optin_name(listing: str) -> str:
+    """The suite a list belongs to, as ``tests/conftest.py`` names it: ``breadth`` for every
+    ``optin-lifted*breadth*.txt``, ``lifted`` for every other ``optin-lifted*.txt``."""
+    return "breadth" if "breadth" in listing else "lifted"
+
+
+def optin_entries(tests: Path) -> list[tuple[str, str]]:
+    """``(suite, target)`` for every entry of the project's opt-in lists, read as ``tests/conftest.py`` reads them
+    (a ``rep:`` entry's target too: its rows past the first are the suite's). A list it cannot read gives none."""
+    entries = []
+    for listing in sorted(tests.glob(OPTIN_GLOB)):
+        try:
+            text = listing.read_text(encoding="utf-8")
+        except (OSError, ValueError):
+            continue
+        for raw in text.splitlines():
+            line = raw.split("#", 1)[0].strip()
+            if line.startswith("rep:"):
+                line = line[len("rep:"):].strip()
+            if line:
+                entries.append((optin_name(listing.name), line))
+    return entries
+
+
+def _item_parts(item: str) -> tuple[str | None, str | None, bool] | None:
+    """A map item as ``(file, function, bare word)`` (``None`` for any), as ``matches`` reads it; ``None`` for an
+    item that names no case."""
+    item = item.strip()
+    if "::" in item:
+        path, *rest = item.split("::")
+        return (path if path.endswith(".py") else None), rest[-1], False
+    if item.endswith(".py"):
+        return item, None, False
+    return (None, item, True) if WORD.fullmatch(item) else None
+
+
+def _files_under(root: Path, target: Path, file: str) -> bool:
+    """Whether a test file under the folder ``target`` is one the item's ``file`` names."""
+    try:
+        return any(_same_file(file, path.relative_to(root).as_posix()) for path in target.rglob("*.py"))
+    except (OSError, ValueError):
+        return True  # cannot tell: the suite is taken, which only runs more of the ticket's own cases
+
+
+def _needs(root: Path, item: str, target: Path, part: str) -> bool:
+    """Whether the entry (its path ``target``, its node part ``part``) may leave out a case the item names."""
+    parts = _item_parts(item)
+    if parts is None:
+        return False
+    file, function, word = parts
+    if file is not None:
+        relative = target.relative_to(root).as_posix()
+        if target.suffix == ".py" or part:
+            if not _same_file(file, relative):
+                return False
+        elif not _files_under(root, target, file):
+            return False
+    if not part or function is None:
+        return True
+    last = part.split("::")[-1]
+    if "::" not in part and not last.startswith("test"):
+        return True  # a class: any of its functions
+    entry = last.split("[")[0]
+    if word:
+        return entry in (function, "test_" + function)
+    if entry != function.split("[")[0]:
+        return False
+    return "[" not in last or "[" not in function or last == function
+
+
+def needed_optins(root: Path, folder: Path, mapping: dict) -> list[str]:
+    """The opt-in suites whose lists leave out of a default run a case the map names (S-D10a): an entry that is the
+    ticket's folder or a folder above it leaves out every case; one inside it, the cases it names. Only the ticket's
+    folder is run with them, so they reach no other ticket's cases. Wider, never narrower: a suite taken that
+    leaves out none of the named cases only runs more of the ticket's own."""
+    items = {item for listed in mapping.values() for item in listed}
+    suites: set[str] = set()
+    for suite, entry in optin_entries(root / "tests"):
+        if suite in suites:
+            continue
+        path, _, part = entry.partition("::")
+        try:
+            target = (root / path.rstrip("/")).resolve()
+        except (OSError, RuntimeError, ValueError):
+            continue
+        if not part and (target == folder or folder.is_relative_to(target)):
+            if any(_item_parts(item) is not None for item in items):
+                suites.add(suite)
+        elif target != folder and target.is_relative_to(folder):
+            if any(_needs(root, item, target, part) for item in items):
+                suites.add(suite)
+    return sorted(suites)
 
 
 # --- the child run --------------------------------------------------------------------------------------------------
@@ -306,7 +450,7 @@ def _stop(signum, _frame):
 STOPS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 
 
-def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Case]]:
+def _run(root: Path, folder: Path, timeout: float, optins: list[str] = ()) -> tuple[str | None, list[Case]]:
     """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after.
 
     SIGINT, SIGTERM and SIGHUP stop the run; one that arrives before the private folder is in the try's hands, or
@@ -332,6 +476,9 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
         temp.mkdir()
         env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "PYTHON"))}
         env.update(PYTHONPATH=str(root / "src"), PYTHONDONTWRITEBYTECODE="1", TMPDIR=str(temp))
+        env.pop(OPTIN_ENV, None)  # exactly the suites the map's cases need, none of the caller's (S-D10a)
+        if optins:
+            env[OPTIN_ENV] = ",".join(optins)
         command = [sys.executable, "-B", "-m", "pytest", str(folder), f"--rootdir={root}", "-p", "no:cacheprovider",
                    f"--junitxml={report}", "-o", "junit_family=xunit1", "-o", "junit_logging=no",
                    "-o", "junit_log_passing_tests=false", f"--log-file={os.devnull}"]
@@ -418,12 +565,16 @@ def _zero() -> dict:
     return dict.fromkeys(OUTCOMES, 0)
 
 
-def _result(ticket: str, outcome: str, kind: str | None, lines: list, unmapped: dict, totals: dict) -> dict:
-    return {"ticket": ticket, "outcome": outcome, "error_kind": kind, "lines": lines, "unmapped": unmapped,
-            "totals": totals}
+def _result(ticket: str, outcome: str, kind: str | None, lines: list, unmapped: dict, totals: dict,
+            optins: list[str] = ()) -> dict:
+    result = {"ticket": ticket, "outcome": outcome, "error_kind": kind, "lines": lines, "unmapped": unmapped,
+              "totals": totals}
+    if optins:  # the opt-in suites the run enabled for the map's cases, by name (S-D10a)
+        result["optin"] = list(optins)
+    return result
 
 
-def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
+def _report(ticket: str, mapping: dict, cases: list[Case], optins: list[str] = ()) -> tuple[dict, int]:
     counts, unmapped, totals = {name: _zero() for name in mapping}, _zero(), _zero()
     for case in cases:
         totals[case.outcome] += 1
@@ -437,11 +588,23 @@ def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
     lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"]
               and name not in missing else "fail", **counts[name]} for name in ordered(mapping)]  # counts: tests run
     passed = all(line["outcome"] == "pass" for line in lines) and not totals["failed"]  # any failed case, mapped or not
-    return _result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals), 0 if passed else EXIT_FAIL
+    return (_result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals, optins),
+            0 if passed else EXIT_FAIL)
+
+
+TEST_NAME = re.compile(r"`[^`]*`|[^\s,;]*(?:\.py\b|::)[^\s,;]*|\btest_\w*")
+CELL_MAX = 120
+
+
+def _masked(cell: str) -> str:
+    """The refused cell as named to the caller: its KPI lines and prose, never a test or file name it holds."""
+    cell = TEST_NAME.sub("…", cell)
+    return cell if len(cell) <= CELL_MAX else cell[:CELL_MAX - 1] + "…"
 
 
 def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
-    """``gov accept``'s result and exit code; a refusal is a ``GovError`` naming only the ticket and its path."""
+    """``gov accept``'s result and exit code; a refusal is a ``GovError`` naming only the ticket and its path (and,
+    for a map cell listing a line it cannot read, the README's line number and the cell, test names masked)."""
     root = Path(root).resolve()
     ticket, front = _ticket(root, ticket)
     folder, declared = _folder(root, ticket, front)
@@ -449,6 +612,12 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
     try:
         readme = folder / "README.md"
         mapping = parse_map(readme.read_text(encoding="utf-8")) if readme.is_file() else {}
+    except Unlisted as refusal:
+        number, cell = refusal.args
+        cell = _masked(cell)
+        raise GovError("ACCEPT_MAP_UNREADABLE", f"ticket {ticket}: the README of {declared} has a map cell listing "
+                       f"a KPI line it cannot read (README line {number}: {cell!r})",
+                       {"ticket": ticket, "path": declared, "line": number, "cell": cell}) from None
     except Unreadable:
         mapping = None
     except Exception:  # a README it cannot read or decode: never its message
@@ -460,10 +629,11 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
         raise GovError("ACCEPT_NO_MAP", f"ticket {ticket}: the README of {declared} maps no KPI line",
                        {"ticket": ticket, "path": declared})
     try:
-        kind, cases = _run(root, folder, timeout)
+        optins = needed_optins(root, folder, mapping)
+        kind, cases = _run(root, folder, timeout, optins)
         if kind is None:
-            return _report(ticket, mapping, cases)
-        error[0]["error_kind"] = kind
+            return _report(ticket, mapping, cases, optins)
+        error = _result(ticket, "error", kind, [], _zero(), _zero(), optins), EXIT_ERROR
     except Stopped as stopped:  # the run is stopped and cleaned up: gov ends as the signal asked
         raise SystemExit(128 + stopped.args[0]) from None
     except Exception:  # any exception of the runner's own is a crash, with no message
