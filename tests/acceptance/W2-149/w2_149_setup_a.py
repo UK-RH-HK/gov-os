@@ -274,13 +274,19 @@ def wall_bytes(wall) -> bytes:
 
 
 def files_holding(roots, needle: str, skip=()):
-    """Every file under ``roots`` whose bytes hold ``needle`` (tars included: they are not compressed)."""
+    """Every file under ``roots`` whose bytes hold ``needle`` (tars included: they are not compressed).
+
+    A ``skip`` entry (a ``str`` or a ``Path``) leaves out its own file and anything under it; both sides are compared
+    as resolved path strings, so a ``Path`` entry matches the walked ``str`` it names.
+    """
     hits, raw = [], needle.encode()
+    skips = [os.path.realpath(os.fspath(s)) for s in skip]
     for root in roots:
         for dp, _dn, fn in os.walk(root):
             for n in fn:
                 p = os.path.join(dp, n)
-                if any(p == s or p.startswith(str(s).rstrip("/") + "/") for s in skip):
+                rp = os.path.realpath(p)
+                if any(rp == s or rp.startswith(s.rstrip("/") + "/") for s in skips):
                     continue
                 try:
                     if raw in Path(p).read_bytes():
