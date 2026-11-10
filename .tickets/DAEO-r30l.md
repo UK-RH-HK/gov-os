@@ -68,6 +68,7 @@ kpis:
   - 'A worker''s memory charged twice (in its lead''s tree and as its own session).'
 profile: STANDARD
 sources:
+- DEC-866
 - DEC-753
 - DEC-1109
 - DEC-729
