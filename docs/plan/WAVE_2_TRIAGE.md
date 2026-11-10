@@ -18,12 +18,12 @@ decisions: [DEC-105, DEC-136, DEC-718, DEC-722, DEC-725, DEC-726, DEC-728, DEC-7
 | Severity | Wave 2 | Wave 3 | backlog | Total |
 |---|---|---|---|---|
 | high | 49 | 6 | 0 | 55 |
-| medium | 310 | 34 | 15 | 359 |
+| medium | 310 | 35 | 14 | 359 |
 | low | 171 | 41 | 131 | 343 |
 | info | 11 | 7 | 23 | 41 |
-| **all** | **541** | **88** | **169** | **798** |
+| **all** | **541** | **89** | **168** | **798** |
 
-The counts include the rows added after the plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), and W2-L343 (DEC-741). The 791 rows named elsewhere are the rows at approval.
+The counts include the rows added after the plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), and W2-L343 (DEC-741). The 791 rows named elsewhere are the rows at approval. W2-M332 moved from backlog to Wave 3 by DEC-762 (`1330e0e2`); its counts were brought in line on 2026-11-09 (D-10's red-fix list, the validator's `triage-counts`).
 
 **Rows per Wave 2 ticket:** W2-01 13 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 27 · W2-08 6 · W2-09 6 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 37 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 2 · W2-50 1.
 

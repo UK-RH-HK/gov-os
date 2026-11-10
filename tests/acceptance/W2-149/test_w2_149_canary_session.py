@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import subprocess
 import time
 
 import pytest
@@ -161,6 +162,71 @@ def test_s10_tools_budget_and_timeout_come_from_kinds_yaml_when_the_brief_names_
     assert tools == support.KIND_TOOLS["checker"]
     assert float(s["flags"]["--max-budget-usd"]) == support.KIND_BUDGET["checker"]
     assert timeout_duration(s["parent"])[0] == support.KIND_TIMEOUT["checker"]
+
+
+def setting_sources(argv):
+    """Every value the argv gives --setting-sources (both forms), in order."""
+    vals = []
+    for i, a in enumerate(argv):
+        if a == "--setting-sources":
+            vals.append(argv[i + 1] if i + 1 < len(argv) else None)
+        elif a.startswith("--setting-sources="):
+            vals.append(a.partition("=")[2])
+    return vals
+
+
+def plant_user_settings(world):
+    """A user settings file in the planted HOME, as F11 found the real one: allow-all lines, acceptEdits, and (added
+    here to make its loading visible) a SessionStart and a PreToolUse hook that each append a line to a log."""
+    log = world.rec / "user-hook.log"
+
+    def hook(event):
+        return {"type": "command", "command": f"printf '%s\\n' {event} >> {log}"}
+
+    doc = {"permissions": {"allow": ["Bash(*)", "Read(*)", "Edit(*)", "Write(*)"], "defaultMode": "acceptEdits"},
+           "hooks": {"SessionStart": [{"hooks": [hook("SessionStart")]}],
+                     "PreToolUse": [{"matcher": "*", "hooks": [hook("PreToolUse")]}]}}
+    path = world.home / ".claude" / "settings.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(doc, indent=2) + "\n")
+    return path, log
+
+
+def test_s10_the_session_and_the_canary_carry_setting_sources_project_and_no_user_settings_load(world):
+    """S10 [changed, DEC-1112 (3): F11]: both calls carry ``--setting-sources project`` exactly, so the planted HOME's
+    ``~/.claude/settings.json`` never loads into the wall; the launch still delivers and the wall's own settings (by
+    ``--settings``) still refuse the canary."""
+    path, log = plant_user_settings(world)
+    world.write_stub()
+    probe = world.scratch / "probe"
+    probe.mkdir()
+    env = {"PATH": f"{world.bin}:/usr/bin:/bin", "HOME": str(world.home), "LANG": "C.UTF-8"}
+    # The premise: the stub loads the planted user file unless --setting-sources leaves "user" out.
+    for extra, loads in (([], True), (["--setting-sources", "user,project"], True),
+                         (["--setting-sources", "project"], False)):
+        subprocess.run([str(world.bin / "claude"), "-p", *extra, "--output-format", "json", "say ok"],
+                       cwd=str(probe), env=env, capture_output=True, text=True, timeout=60)
+        (call,) = world.calls()
+        assert call["user_settings"]["present"] is True and call["user_settings"]["loaded"] is loads, (extra, call)
+        assert log.exists() is loads, (extra, "the user's SessionStart hook ran" if log.exists() else "did not run")
+        for name in ("calls.jsonl", "outcomes.jsonl", "user-hook.log"):
+            (world.rec / name).unlink(missing_ok=True)
+
+    run = world.deliver("writer")
+    calls = world.calls()
+    for call in calls:
+        kind = "canary" if call["canary"] else "session"
+        vals = setting_sources(call["argv"])
+        assert vals == ["project"], f"the {kind}'s line gives --setting-sources {vals}; want exactly ['project']"
+        assert call["user_settings"]["loaded"] is False, f"the {kind} loaded {path}"
+    assert not log.exists(), f"the user's hooks ran in the wall: {log.read_text()!r}"
+    assert run.code == 0 and run.line and run.line["status"] == "delivered", run.why()
+    assert len(world.canary_calls()) == 1 and len(world.session_calls()) == 1, [c["canary"] for c in calls]
+    outcomes = [json.loads(x) for x in (world.rec / "outcomes.jsonl").read_text().splitlines() if x.strip()]
+    (canary,) = [o for o in outcomes if o["canary"]]
+    assert canary["settings_loaded"] is True and canary["why"] == "hook", \
+        f"the canary was not refused by the wall's own settings: {canary}"
+    assert canary["user_settings_loaded"] is False
 
 
 def test_s10_a_brief_asking_more_than_the_kind_s_budget_refuses_10(world):

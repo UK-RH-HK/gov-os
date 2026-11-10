@@ -719,7 +719,9 @@ def clean_env(home):
 
 
 def session_flags(wall, tree, tools, model, budget, session_id, extra_dir=None):
-    flags = ["-p", "--restricted", "--settings", os.path.join(wall, ".claude", "settings.json"), "--add-dir", tree]
+    # --setting-sources project (F11, DEC-1112 (3)): only the wall's own settings load, never the user's or local ones
+    flags = ["-p", "--restricted", "--setting-sources", "project",
+             "--settings", os.path.join(wall, ".claude", "settings.json"), "--add-dir", tree]
     if extra_dir:
         flags += ["--add-dir", extra_dir]
     return flags + ["--tools", ",".join(tools), "--no-session-persistence", "--strict-mcp-config",

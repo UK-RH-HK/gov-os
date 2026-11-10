@@ -44,6 +44,7 @@ acceptance_tests:
 track: A
 closes:
 - DEC-741 (H)
+- CAP-44.f  # the lite A7 and A10 gates DEC-741 (H) brings into Wave 2; no Wave 2 ticket named it (the plan validator's contract-items-delivered; D-10's red-fix list, DEC-1109 (2), DEC-1112 (3))
 list_rows: []
 ---
 # W2-52 The lite A7 and A10 stage records

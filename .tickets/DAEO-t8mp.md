@@ -93,6 +93,7 @@ sources:
 - DEC-1059
 - DEC-1109
 - DEC-1112
+- DEC-820
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-128/
