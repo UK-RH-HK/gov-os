@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": "?? governance/project/orchestration/packages/RUBRIC-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-w108-tests",
+   "change": "head",
+   "before": "95f4c0348dea",
+   "after": "a0957eb56e8b"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-128-w108-tests",
+   "change": "acceptance folder",
+   "folder": "W1-08"
+  }
+ ]
+}

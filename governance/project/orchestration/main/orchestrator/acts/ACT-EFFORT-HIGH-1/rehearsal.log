@@ -1,0 +1,130 @@
+ACT-EFFORT-HIGH-1 rehearsal 2026-11-10T15:39:37Z; bundle /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1; HOME planted at /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/412a4e37-2f72-42fc-8da2-6310c385f8f1/scratchpad/effort-high-1/home (a copy of the live settings file, read only)
+planted file sha256 bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052
+ok   the planted file is the manifest's before
+nested effortLevel before: high
+--- 1. check (before)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   check on the before: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh verify
+not applied: .claude/settings.json (sha256 bc0dde042f00)
+(exit 3)
+ok   verify before the apply: refused (exit 3)
+--- 2. apply with the extra backup beside the file
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+backup /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/412a4e37-2f72-42fc-8da2-6310c385f8f1/scratchpad/effort-high-1/home/.claude/settings.json.bak-20261110T153937Z-ACT-EFFORT-HIGH-1 (sha256 bc0dde042f00)
+state applied (sha256 ec0113a8902a)
+(exit 0)
+ok   apply: exit 0
+--- 3. check shows applied
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state applied (sha256 ec0113a8902a)
+(exit 0)
+ok   check after the apply: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh verify
+(exit 0)
+ok   verify: the after hash (exit 0)
+--- 4. the diff against the backup beside the file
+backup file: settings.json.bak-20261110T153937Z-ACT-EFFORT-HIGH-1
+ok   the backup beside the file is byte for byte the original
+$ diff <backup> <result>
+24c24
+<   "effortLevel": "xhigh",
+---
+>   "effortLevel": "high",
+ok   the diff is exactly one changed line (one < and one >)
+ok   one hunk
+$ python3 -m json.tool <result> (stands in for jq, which is not installed here)
+ok   the result parses as JSON
+top-level effortLevel: high; nested effortLevel: high
+ok   top-level effortLevel is high
+ok   nested effortLevel unchanged (high)
+ok   the result hashes as the manifest's after
+ok   the mode is kept (644)
+ok   key order kept; every other key equal
+--- 5. apply again (idempotent)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+state applied (sha256 ec0113a8902a); nothing to do
+(exit 0)
+ok   a second apply: exit 0, no change
+ok   the file is unchanged by the second apply
+--- 6. undo
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   undo: exit 0
+ok   undo: byte for byte the original (bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   check after the undo: before (exit 0)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+state before (sha256 bc0dde042f00); nothing to undo
+(exit 0)
+ok   a second undo: exit 0, nothing to undo
+--- 7. apply, then a later change, then undo is refused (nothing is lost)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+state applied (sha256 ec0113a8902a)
+(exit 0)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+refused: .claude/settings.json is not as this ACT left it (sha256 631b2ce3185c); a later change is not overwritten
+(exit 3)
+ok   undo refused (exit 3) on a file changed after the apply
+ok   the later change is untouched
+--- 8. a planted file with effortLevel max is refused
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state other: top-level effortLevel is 'max', neither xhigh nor high (sha256 9e7c282d29d0)
+(exit 3)
+ok   check refuses max (exit 3)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+refused: top-level effortLevel is 'max', neither xhigh nor high (sha256 9e7c282d29d0)
+(exit 3)
+ok   apply refuses max (exit 3)
+ok   the max file is untouched
+--- 9. a nested-only file (top-level key absent) and a missing file are refused
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state other: no single top-level string effortLevel (sha256 ca574695cd67)
+(exit 3)
+ok   check refuses a file with no top-level effortLevel
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state other: cannot be read as a settings object (FileNotFoundError) (sha256 null)
+(exit 3)
+ok   check refuses a missing file
+--- 10. a tampered frozen before copy: undo refuses
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+state applied (sha256 ec0113a8902a)
+(exit 0)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/before/home/.claude/settings.json
+(exit 4)
+ok   undo refuses a frozen copy that does not hash as listed (exit 4)
+ok   the bundle's before copy restored as listed
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   undo with the restored copy: byte for byte the original
+--- 11. the operator agent's dry-run shape: no extra backup, the changed set is exactly the touched file, the manifest's checks
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh check
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   dry run: check exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh apply
+state applied (sha256 ec0113a8902a)
+(exit 0)
+ok   dry run: apply exit 0
+files changed or added in the planted HOME by the apply: 1 (the touched list has 1)
+ok   the changed set is exactly the one touched file; no file added
+$ (manifest check 0) python3 -I -c 'import json,os,sys; d=json.load(open(os.environ["HOME"]+"/.claude/settings.json")); sys.exit(0 if d["effortLevel"]=="high" and d["modelSettings"]["claude-opus-5-5"]["effortLevel"]=="high" and d["permissions"]["defaultMode"]=="acceptEdits" else 1)'
+(exit 0)
+$ (manifest check 1) python3 -I -m json.tool "$HOME/.claude/settings.json" > /dev/null
+(exit 0)
+ok   the manifest's two checks are green after the apply
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/acts/ACT-EFFORT-HIGH-1/apply.sh undo
+state before (sha256 bc0dde042f00)
+(exit 0)
+ok   dry run: undo exit 0
+ok   after the undo the planted HOME is byte for byte as before
+--- 12. the live settings file was only read
+ok   the live ~/.claude/settings.json is as before (bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052)
+failures: 0

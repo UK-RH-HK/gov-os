@@ -1,0 +1,34 @@
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "WebFetch(*)",
+      "WebSearch(*)"
+    ],
+    "deny": [],
+    "ask": [
+      "Bash(owner-ping:*)",
+      "Bash(owner-ping *)",
+      "Bash(~/.local/bin/owner-ping:*)",
+      "Bash(/home/usain/.local/bin/owner-ping:*)"
+    ],
+    "disableAutoMode": "disable",
+    "defaultMode": "acceptEdits"
+  },
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "tui": "fullscreen",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
+}

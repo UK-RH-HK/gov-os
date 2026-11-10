@@ -286,3 +286,6 @@
 2026-11-10 15:16:22 run 20261110-150429-3901864 (19988dd704b9..3849c1ca2223): RED: lead_verify W2-00 DAEO-sdxk head 3849c1ca2223: RED parallel exit 1 in 663 s (3671 tests 32 failed 0 errors 7 skipped); serial exit 0 in 0 s, 0 entries (0 tests 0 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261110-150429-3901864 (DEC-968: fix at once or revert)
 2026-11-10 15:18:34 CTO triage of RED 19988dd704b9..3849c1ca2223 (ACT-WIN-TOAST-1, a test-map line): W1-33 (22) the known agent fields (ACT-CLAUDE-COPIES-3 clears them); unit.accept (6) the load family seen before; W1-08 (4 here, 10 on integrate alone) red since W2-128's templates: the ticket and checkpoint templates no longer validate as sample records against the schemas: not the ACT's; on D-10's list (test designer, DEC-866; the approved templates unchanged)
 2026-11-10 15:18:34 landing 82207092ea0f..95f4c0348dea: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 15:41:25 landing 95f4c0348dea..baac0b2c2f61: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 15:48:48 landing baac0b2c2f61..34b7815f91d6: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 15:49:10 landing 34b7815f91d6..5f5998bab0d6: 1 commit(s); none outside a ticket on the trigger paths

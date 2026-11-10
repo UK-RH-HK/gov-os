@@ -1,0 +1,39 @@
+{
+ "act": "ACT-EFFORT-HIGH-1",
+ "dec": "DEC-1119, DEC-957",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "home",
+   "path": ".claude/settings.json",
+   "before": "bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052",
+   "after": "ec0113a8902a899111b41fb100c4acfe58a905af0081be1cb9375eedc7b89baa"
+  }
+ ],
+ "files": {
+  "before/home/.claude/settings.json": "bc0dde042f00bccf53e703d0c6cfa860b7ea4ca3a0cf1ac19b70dd4d3a9e9052",
+  "after/home/.claude/settings.json": "ec0113a8902a899111b41fb100c4acfe58a905af0081be1cb9375eedc7b89baa",
+  "apply.sh": "4e808688368e206ff3127fc77c820286937e27b759b19132b052e64838999669",
+  "effort.py": "28f53e218033b0eb1acd3983c7050aea4752abb6d35b9d686f90eccf63d2d025",
+  "list.txt": "16fd89b2fdeebab1e4ecb3491224c9f3aa68ba6f4cc7583c2d523b9d15073345",
+  "rehearsal.log": "6dcd9c84ebd7eab2247e89e053a9cd4937f4fb83564950b19e30f85722b81d00"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -c 'import json,os,sys; d=json.load(open(os.environ[\"HOME\"]+\"/.claude/settings.json\")); sys.exit(0 if d[\"effortLevel\"]==\"high\" and d[\"modelSettings\"][\"claude-opus-5-5\"][\"effortLevel\"]==\"high\" and d[\"permissions\"][\"defaultMode\"]==\"acceptEdits\" else 1)'",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -m json.tool \"$HOME/.claude/settings.json\" > /dev/null",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "6dcd9c84ebd7eab2247e89e053a9cd4937f4fb83564950b19e30f85722b81d00"
+ }
+}

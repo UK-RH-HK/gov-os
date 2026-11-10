@@ -1,2 +1,1 @@
-ERROR: DAEO-gdzh: .tickets/DAEO-gdzh.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
-context-reproducibility: 0 ticket(s) failed, 1 error(s)
+unmeasured: stale store: the store was built from b05f62b8f5df, not from HEAD baac0b2c2f61; rebuild it from HEAD before the context is measured
