@@ -112,22 +112,35 @@ FORECAST's two "merged" branches are merged: W1-06 in `dddf54782`, test_fusion i
 | 6 | W1-19 `test_the_default_reranker_is_a_process_of_its_own_…` (`local_only`; found on the way) | It looked for a reranker process started under the caller. Since DEC-982 (W2-112, W2-145) the shared service serves every session. With the service up: 1 failed. | The process of its own is the service at its socket, started from the reranker environment. A designer under W2-145. The README conflict with 2 was settled by the designer (blob `7dfd250886e2`) and committed by commit-tree as `04460404e`, since the sandbox cannot write a merge's `.claude/` and `.tickets/`. The case alone: 1 passed. | `c570a4cc0` |
 | 7 | W2-54 `test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` (found on the way) | It compared two folders' `gov retrieve` results whole, and W2-138 S1 (`dcda27011`, DEC-1090 (3)) puts `store.root` in each. | Compares them less `store.root`. A designer under W2-138. W2-54, W2-138, W2-55: 202 passed. | `54ab0528c` |
 | 8 | W1-33's four launcher cases (the CTO's base 17) | **Not DEC-1111's.** (a) The 3 network-profile rows: W2-20 S19 (`d4ceacc1e`) makes every launch pass the gate, and the case's HOME had none. (b) The orchestrator row: W2-136 S9 (`69aa361ab`) makes it a lead launch, refused for the ready list, not "worker role". | An open gate planted; the orchestrator row checks today's lead refusal (DEC-1088 (5)). A designer under W2-20. W1-33: 112 passed. With the opt-ins only DEC-1111's two remain. | `cfe4ed605` |
+| 9 | W2-96's planted `gov accept` left orphaned (the CTO's incident 2026-11-10 00:43) | The r9/r12 cases ended their child only on the success path. | A reaper on a pipe only the case holds kills the planted groups on every ending, now in a shared `w2_96_reap.py`. Two rounds: `test_w2_96_accept.py`, `review3.py` and `review4.py` came under it too. Three proof cases. A designer under W2-96. `tests/unit/accept` 98 passed with `-n 4`. **W2-96's probe is now stale** (4 judged files). | `f7e63ae4e` |
+| 10 | Every acceptance case that starts `gov launch` read the live machine gate, W1-46's ~80 included (found on the way, and the CTO's 11-10 note) | W2-20 S19: a HOME with no `gate.json` shuts the gate; the live machine's gate shuts under load (tonight: `memory: reading 13873688576, limit 14179233792`). | An open gate planted in W1-28, W1-32, W1-38, W1-46, W1-50, W2-50, W2-54's sandboxed worker, W2-58 and W2-116 (not W2-56's). A designer under W2-20. Outside the sandbox, both opt-ins, `-n auto`: 643 reds at integrate turned green, none new. | `e74b551bc` |
 
 Implementer tickets whose `allowed_paths` had gained acceptance paths for the designers were corrected (W2-126
 `8513a4935`, W2-145 and W2-138 on their branches): MR-3. A designer writes under `tests/acceptance/` without them.
 
-### 6.2 In progress at this writing
+### 6.2 Left after the fixes: alone and serial at integrate `e74b551bc`, outside the sandbox
 
-- **9. W2-96's planted `gov accept` left orphaned** (the CTO's incident 2026-11-10 00:43).
-  - Round 1, `6bcbbcdd5` on `w2/W2-96-d10-tests`: a reaper on a pipe kills the planted groups on every ending, with
-    two proof cases (one by SIGKILL). 23 passed serial and `-n 4`; nothing left over.
-  - Round 2 brings `test_w2_96_accept.py`, `review3.py` and `review4.py`, which have the same pattern, under it.
-  - Then one review.
-- **10. Every acceptance case that starts `gov launch` reads the live machine gate** (found on the way: W1-46 and
-  W2-54's sandboxed-worker case were refused tonight by `memory: reading 13873688576, limit 14179233792`).
-  - D-10's own load would shut the gate, so these cases would turn red by load.
-  - A designer under W2-20 plants an open gate in each suite (W1-07, W1-28, W1-32, W1-46, W2-50, W2-54, W2-58,
-    W2-116), on `w2/W2-20-d10b-tests`. Not W2-56's.
+Of the 141 cases red both before and after item 10: 97 are on the opt-in lists (report-only or breadth). Of the 44
+gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). The other 33:
+- **W1-28 1, W1-50 13: in progress.** W1-28's whole-tree-copy rule (DEC-385) cannot run three copies, W2-92's
+  `base_src` and `test_w2_92_speed.py::base` (`5214e0f01`) and W2-13's `pre_s6_src` (`b6eb2267f`). A designer
+  under W2-92 brings them into the rule's form (`w2/W2-92-d10b-tests`), then review.
+- **W2-116 6, W1-32 7: W2-56's (another helper's).**
+  - W2-116: W2-56 S5's cleaned session environment (`8c399ea3e`) no longer passes `W2_116_SESSION_LOG` to the
+    stand-in CLI (`KeyError`).
+  - W1-32: W2-56 S15 removes the whole temp folder, restoring 0700 first, so the sealed folder no longer resists
+    removal ("the removal did not fail").
+  - Both need revisions with Rewrite-Reason from W2-56's designer.
+- **W1-32 `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`: the CTO's record first.**
+  - `gov --help` offers `brief`, `links` and `plan`, which the command lists do not record.
+  - As with `release` (DEC-753), the lists record them, then a designer adds them to W1-07's
+    `RECORDED_GOV_COMMANDS` (W2-152, W2-129 and W2-136's commands, approved by DEC-1088 and the LINK-INTEGRITY
+    decisions).
+- **W2-58 `test_w2_58_launched_sessions.py` 5: to trace (live sessions, real Claude usage).**
+  - The launched engineer's own guard hook blocks its probe (`bash .gov-runtime/scratch/w2-58/probe.sh`).
+  - Likely W2-141's S1/S2 refusing an engineer's search that can reach its own acceptance folder. The CTO notes
+    four test_g14 reds of that kind, tracked for the re-pin ACT.
+  - To be confirmed before D-10 by reading the probe, not by re-running live sessions.
 
 ### 6.3 Out of reach, by design, or another owner's
 
@@ -139,19 +152,17 @@ Implementer tickets whose `allowed_paths` had gained acceptance paths for the de
     P1-11's Contract re-baseline, into which DEC-1083 retired W2-109.
   - CAP-33.b/g are cited by W2-37's tests on its unmerged branch (a held merge-back).
   - `CAP-1 (W2-134)` is prose in W2-134's KPI ("CAP-1 never matches CAP-10"), the CTO's record to word.
-- **11. The adapter-portability family: 8 W2-05 cases, 10 W1-38 `test_w1_38_heldout_step.py` cases, and
-  `test_w1_38_rulesync.py::…::test_gov_check_is_green_on_a_clean_generated_project`.**
-  - Same root cause for all: `SOURCE_DIFFERS .rulesync/subagents/orchestrator.md` against
-    `governance/kernel/roles/orchestrator.md`, in this repository and in every generated project.
-  - W2-128 round 2a (`5c494e255`, merged `010ecbc53`) changed `template/governance/kernel/roles/orchestrator.md`
-    and not `template/.rulesync/subagents/orchestrator.md` (last changed `9ca2c9cbd`, 10-09), nor the root copies.
-  - Red at integrate and on every D-10 branch alike.
-  - **W2-128's to fix** (another helper's), by regenerating the rulesync source from the role file.
+- **11. The adapter-portability family: 8 W2-05 cases, 10 W1-38 `test_w1_38_heldout_step.py` cases, W1-38's
+  clean-project case, and W2-58's 3 setup errors.**
+  - Cause: `SOURCE_DIFFERS .rulesync/subagents/orchestrator.md`. W2-128 round 2a changed the kernel's role file and
+    not its rulesync source.
+  - **Green now:** W2-128 round 2b (`9d95279c9`, F1) fixed the copy. At `e74b551bc` W2-05, W1-38's two files and
+    W2-66's live map give 98 passed, 1 failed (item 12).
 - **12. W2-66 `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`.**
   - W2-149's result schemas (`governance/project/orchestration/tools/indep-schemas/*.schema.json`, `6f811da36`) are
     `.json` under a DEC-891 place, so the case calls them records.
-  - But `indep_launch.py` reads them, so they are not records. Making them record-only would skip their tests on a
-    change, which fails open for the selection.
+  - But `indep_launch.py` reads them. Making them record-only would skip their tests on a change, which fails open
+    for the selection.
   - **For the CTO**, three options (DEC-105):
     - (a) W2-66c's designer revises the case: a file the test map couples to a suite, or one under
       `orchestration/tools/` that code reads, is not a record. About 30 min and a review.
@@ -164,7 +175,11 @@ Implementer tickets whose `allowed_paths` had gained acceptance paths for the de
   - `test_a_warm_query_answers_within_half_a_second_at_p95` is on `load_sensitive`.
 - **14. A coverage gap for W2-56's owner.** `tests/conftest.py` keeps the real code-graph tool off `PATH` for every
   suite but W1-16's and W1-20's (W2-56 S1, T-8). So W2-92's 30 tool cases skip in every full run.
+- **15. An incident in a designer's session (W1-33's, 01:00).** It ran `git worktree prune` from its sandbox. That
+  partly removed the metadata of three registered worktrees whose folders were already gone (`W2-148-act2`,
+  `W2-149-f11-tests`, `b56`). Only `commondir` and `config.worktree` are left. No branch or commit is affected.
+  Later briefs forbid the command.
 
-**Cost:** so far 21 launched sessions, about $56 and 200 session-minutes (17 logged: $49.05, 187 min; the W2-145 designer, its review $3.36, its merge designer $0.66 and the duplicate W2-141 engineer $0.79 besides), plus the CTO's helper
+**Cost:** about 26 launched sessions, about $75 (logged sums $49.05 for 17 and $10.93 for 2, plus the W2-145 review $3.36, its merge designer $0.66, the duplicate W2-141 engineer $0.79, the W2-96 review $5.94 and two designers' estimates), plus the CTO's helper
 
 [DEC-1104 (1), DEC-1103 (2), DEC-1061 (2)-(3a), DEC-953 item 2, DEC-957, DEC-105, ACT-D4-RESTORE-1 §4-§5]
