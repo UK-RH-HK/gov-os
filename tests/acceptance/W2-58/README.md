@@ -236,12 +236,16 @@ Readings these cases take:
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
 credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe command line in a
-single Bash call: plain commands the guard can place (DEC-953 item 2), never a script file. Each command writes its
-output to `.gov-runtime/scratch/w2-58/` and its exit status to `results.txt` there. The test reads those files from
-outside. `gov launch` hands the session no `PYTHONPATH` (W2-56 S5, DEC-826 Q5), so the fixture's hook names its
-interpreter and the product code (`live_guard_command`), as this repository's hook names the pinned interpreter. A
-bare `python3` hook cannot import `gov` there and refuses every call with exit 2 and no reason; that was D-10's red. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
+(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script by one call,
+`bash .gov-runtime/scratch/w2-58/probe.sh`, the form W1-46's, W1-50's and W2-54's live sessions run and one the
+session's permissions allow (`--allowedTools Bash`; the fixture's settings carry no permission rules). A long
+compound line in its place (`;`, redirections, several programs) was refused by the CLI's permission layer before
+any of it ran (D-10, round 1). Each step writes its output to `.gov-runtime/scratch/w2-58/` and its exit status to
+`results.txt` there. The test reads those files from outside. `gov launch` hands the session no `PYTHONPATH`
+(W2-56 S5, DEC-826 Q5), so the fixture's hook names its interpreter and the product code (`live_guard_command`), as
+this repository's hook names the pinned interpreter. A bare `python3` hook cannot import `gov` there and refuses
+every call with exit 2 and no reason; that was D-10's red. As the repository's hook does, the fixture's hook refuses
+a call with a reason (exit 2) when it cannot start or crashes, never leaves it unguarded. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
 fails with "did not run the probe to its end" when the session could not run (no network to the model's API).
 Each session runs once per module, and its sandbox, HOME and project are temporary.
 
