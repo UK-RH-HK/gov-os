@@ -227,6 +227,28 @@ sandbox, then merged in one command.
       the class.
     - (c) W1-16's ui_off cases out of `breadth`: an opt-in list edit, an operator ACT, about 30 min.
   - Recommended (b), with (a) as the quick stopgap before D-10's run. Confidence medium-high.
+- **After ACT-CLAUDE-COPIES-2 (`2059048f2`), re-run at integrate `5ee374ea1`, outside the sandbox: 47 red, none green.**
+  The re-run covered W2-05, W1-38, W1-33's agent definitions and W2-57's rulesync probe. There are two causes.
+  - **(i) 27 cases: the regenerated agents lack the role file's six fields.**
+    - The cases: `W1-33/test_w1_33_agent_definitions.py`, 21 (new since the ACT), and W1-38's
+      `TestRoleFieldAgreement`, 6.
+    - The failures: `.claude/agents/engineer.md lacks ['purpose', 'allowed-path pattern', 'tools', 'model tier',
+      'authority level', 'handoff format']`, and `research.md is missing the 'purpose' field`.
+    - Since W2-153, the subagent sources are composed from `template/governance/kernel/templates/role-*.md`, which
+      carry none of the six fields that the kernel role files (`template/governance/kernel/roles/*.md`) state and
+      that W1-33's KPI (DEC-066, MR-5) and W1-38's field agreement require.
+    - **A DEC-105 choice for the CTO:**
+      - (a) the role templates carry the six fields, the template helper re-composes, and ACT-CLAUDE-COPIES-3
+        follows; about 1-2 h and an ACT; the KPIs are kept;
+      - (b) re-baseline W1-33's and W1-38's KPIs to the template form; an owner decision;
+      - (c) defer, with these cases report-only until W2-153's design settles.
+      - Recommended (a), confidence medium-high.
+  - **(ii) 20 cases: the generated projects have no `templates/`.**
+    - The cases: W2-05's 8, W1-38's heldout-step 10 and clean-project case, and W2-57's rulesync probe 1.
+    - W1-38's `build_project_from_template` copies only hooks, roles and skills, so the portability control finds the
+      template-composed sources differing (W2-05 probe F1).
+    - The fix is a designer revision of W1-38's builder to copy `templates/` and its `.claude/templates/` copies.
+      For the template helper.
 - **The product nightly** (`python3 -m gov.close.nightly`) **never runs a case routed to the nightly** (W2-13 review
   F4, W2-57's and W2-66's): only `nightly.sh` does. A row.
 - **The adapter-portability family is not fixed by ACT-CLAUDE-COPIES-2 alone** (W2-05 probe F1).
