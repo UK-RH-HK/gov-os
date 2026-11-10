@@ -1,13 +1,13 @@
-dispatcher 2026-11-10 01:18:05
+dispatcher 2026-11-10 01:20:04
 leads running (0, from the processes): none
-load 20.3/14.4/10.8; real busy cores 11.44 of 20 (the embedding server 0.03); memory available 11940 MB; gate_check (for comparison) open (OPEN leads=0 load=20.3/10.8 nproc=20 have=12961468kB need=5285964kB); disk open
-Balance: CPU 11.44/20 busy (band 14-18: below); RAM 11.7 GB available (floor 3.0 GB); GPU 7.9/15.9 GB used, 8.0 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared BUSY 1 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 1 (1.6 GB RSS; 2 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9601 samples since 2026-11-02 13:00))
-Forecast: lead: REFUSES, binding CPU: CPU 24.8 of 18 cores (busy 11.44 + running jobs' peaks 11.4 + the newcomer's 2.0); slot: REFUSES, binding CPU: CPU 27.8 of 18 cores (busy 11.44 + running jobs' peaks 11.4 + the newcomer's 4.92); rebuild: REFUSES, binding CPU: CPU 28.5 of 18 cores (busy 11.44 + running jobs' peaks 11.4 + the newcomer's 5.68); pairing loads CPU 1.27, GPU 0.57
-Jobs by phase: slot pid 836494 test (5.85 cores, 0.5 GB); slot pid 847661 test (0.26 cores, 0.1 GB); rebuild pid 857797 rebuild.embedding (0.3 cores, 0.1 GB); slot pid 861337 test (0.16 cores, 0.1 GB)
+load 11.8/13.2/10.7; real busy cores 8.75 of 20 (the embedding server 0.02); memory available 12271 MB; gate_check (for comparison) open (OPEN leads=0 load=11.8/10.7 nproc=20 have=12564676kB need=5285964kB); disk open
+Balance: CPU 8.75/20 busy (band 14-18: below); RAM 12.0 GB available (floor 3.0 GB); GPU 7.9/15.9 GB used, 8.0 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared BUSY 2 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 1 (1.6 GB RSS; 2 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9603 samples since 2026-11-02 13:00))
+Forecast: lead: REFUSES, binding CPU: CPU 28.3 of 18 cores (busy 8.75 + running jobs' peaks 17.6 + the newcomer's 2.0); slot: REFUSES, binding CPU: CPU 31.2 of 18 cores (busy 8.75 + running jobs' peaks 17.6 + the newcomer's 4.92); rebuild: REFUSES, binding CPU: CPU 32.0 of 18 cores (busy 8.75 + running jobs' peaks 17.6 + the newcomer's 5.68); pairing loads CPU 1.46, GPU 0.57
+Jobs by phase: slot pid 871843 test (0.71 cores, 0.0 GB); slot pid 876156 test (0.3 cores, 0.1 GB); slot pid 879640 test (1.63 cores, 0.5 GB); rebuild pid 879897 rebuild.lexical (0.23 cores, 0.1 GB)
 GPU rule: GPU memory 7.9 of 13.9 GB (used 7.9 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 1580 MiB (floor 2048 MiB): no spill
 Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
 Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 2), spill floor 2048 MiB; config.json overrides: gpu_shared_floor_mib 2048 (derived 1019)
-admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): forecast refuses (CPU binding): CPU 24.8 of 18 cores (busy 11.44 + running jobs' peaks 11.4 + the newcomer's 2.0)
+admission (memory by the Load Balancer's forecast, the slots rule lifted: DEC-1052 O-A1): forecast refuses (CPU binding): CPU 28.3 of 18 cores (busy 8.75 + running jobs' peaks 17.6 + the newcomer's 2.0)
 peaks 2026-11-09 22:32:03: a lead p95 2026 MB, max 3244 MB
 heavy steps outside a slot: none
 heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: nothing to land; main tree NOT clean on w2/integrate
@@ -15,6 +15,6 @@ inbox unread: 0
 ready list: nothing waiting
 sentinel: watched
 guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
-embedding server: shared BUSY 1 tasks/min; query IDLE 0 tasks/min
+embedding server: shared BUSY 2 tasks/min; query IDLE 0 tasks/min
 GPU: RTX 5070 Ti 7.9/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29
-heavy slot holders: slot 2 pid 836494 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock /usr/bin/ta) idle 0 min; slot 3 pid 861337 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock /usr/bin/ta) idle 0 min
+heavy slot holders: slot 1 pid 879640 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/ta) idle 0 min; slot 2 pid 879897 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock /usr/bin/ta) idle 0 min; slot 3 pid 876156 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock /usr/bin/ta) idle 0 min
