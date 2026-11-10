@@ -150,3 +150,5 @@ freshness case, the killed build (the ready half moved) and the model-less re-in
 - `conftest.py`: the case's box, the two endpoints, the environment, the project.
 - `test_w2_116_double_buffer.py` (S1, F2, F3, freshness), `test_w2_116_launch.py` (S3, F1),
   `test_w2_116_refresh.py` (S4), `test_w2_116_reindex.py` (S5, F2, F3).
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w2_116_support.launch_and_search` plants an open gate (`plant_open_gate`, W2-136's form) in the box's HOME and adds its readings to the launch's environment. Its six launch cases stay red after it, for another reason reported to the CTO: the session's cleaned environment (W2-56 S5) no longer carries `W2_116_SESSION_LOG` to the stand-in CLI. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.
