@@ -1,0 +1,44 @@
+ACT-DEADMAN-STANDBY-1 rehearsal 2026-11-10T20:46:54Z; clone of w2/integrate at c9742b08910a (live HEAD c9742b08910a); HOME planted at /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-deadman-standby-1/run/home; ORCH /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-deadman-standby-1/run/orch
+manifest sha256 before finalize: db60fd58ae02771702d4cfed7362bff21ee6ef6c2574b7618b10b2ad92255792
+ok   apply.sh check: the clone's deadman.py is the before (exit 0)
+ok   apply.sh verify before the apply: not applied (exit 3)
+ok   apply.sh apply: exit 0
+ok   apply.sh verify: the after (exit 0)
+ok   the file's mode is 644
+ok   the changed set is exactly the touched file
+check 1: exit 0; last line: 1
+ok   check 1: exit 0, count 1
+check 2: exit 0; last line: 1
+ok   check 2: exit 0, count 1
+check 3: exit 0; last line: 1
+ok   check 3: exit 0, count 1
+check 4: exit 0; last line: 1
+ok   check 4: exit 0, count 1
+check 5: exit 0; last line: HEARTBEAT standby: 2026-11-10 20:46:56 CTO waits on the owner age None min
+ok   check 5: exit 0
+check 6: exit 10; last line: ALERT P1 DEADMAN | the CTO session is idle since 01:46 (its turn ended and nothing woke it), 14100 min | approve or rest
+ok   check 6: exit 10
+the existing safety-net cases on the applied file: 9 passed in 13.14s
+ok   the existing cases: 9 passed
+the safety nets with the new stand-by cases on the applied file: 15 passed in 21.95s
+ok   the safety nets with the new cases: 15 passed
+ok   apply.sh undo: exit 0
+ok   undo: byte for byte the before
+the new cases on the before file:
+FAILED tests/unit/orchestration/test_cto_safety_nets.py::test_an_expired_standby_note_no_longer_mutes_and_the_alert_says_why
+FAILED tests/unit/orchestration/test_cto_safety_nets.py::test_an_expired_standby_note_of_a_live_session_changes_only_the_logged_note
+FAILED tests/unit/orchestration/test_cto_safety_nets.py::test_a_standby_note_without_a_time_is_aged_by_the_files_mtime
+FAILED tests/unit/orchestration/test_cto_safety_nets.py::test_a_time_ahead_of_the_clock_never_mutes_for_good
+FAILED tests/unit/orchestration/test_cto_safety_nets.py::test_the_watch_alerts_on_an_expired_note_and_the_inbox_exemptions_follow_the_note
+5 failed, 10 passed in 17.72s
+ok   red first: the 5 expiry cases fail on the before, the 10 others pass
+ok   red first: the fresh-note case passes on the before (it keeps the old behaviour)
+ok   check after the undo: exit 0
+ok   a moved file: check refuses (exit 3, "moved: governance/project/orchestration/tools/deadman.py")
+ok   a tampered frozen copy: apply refuses (exit 4), the clone's file untouched
+ok   the bundle's after copy restored as listed
+live before: 5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be 74a3190025ca87913545c4021d8ae1817d9e7569319b2ba8a26b19f60946ac5b e730e23ab0a58232c21021adb8fd74c51c7b991d01920f3c53bb834618f8fb79 993e0a70800304abb9f58f78ea5ec60e66c4ca1cedb8882970896f749c78b90d 1123 0 0 5d3ceabe3151
+live after:  5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be 74a3190025ca87913545c4021d8ae1817d9e7569319b2ba8a26b19f60946ac5b e730e23ab0a58232c21021adb8fd74c51c7b991d01920f3c53bb834618f8fb79 993e0a70800304abb9f58f78ea5ec60e66c4ca1cedb8882970896f749c78b90d 1123 0 0 5d3ceabe3151
+ok   the live files, the live inbox's wake items, the live wake key and the live tree as before; no planted line in the live log
+ok   nothing written to the planted HOME
+failures: 0

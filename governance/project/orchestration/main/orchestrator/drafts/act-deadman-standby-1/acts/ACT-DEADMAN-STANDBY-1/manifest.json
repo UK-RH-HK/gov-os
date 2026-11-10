@@ -1,0 +1,58 @@
+{
+ "act": "ACT-DEADMAN-STANDBY-1",
+ "dec": "DEC-998, DEC-1112",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/orchestration/tools/deadman.py",
+   "before": "5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be",
+   "after": "040b4d710f815538e1f85e60dd6a5ab29643099302cda96a1246745d34bee192"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/orchestration/tools/deadman.py": "5d770bfbfa52160b71ab59427d346d4ca7567b3fd28ae194ba4c558a5de884be",
+  "after/repo/governance/project/orchestration/tools/deadman.py": "040b4d710f815538e1f85e60dd6a5ab29643099302cda96a1246745d34bee192",
+  "apply.sh": "2f3f86f5551dab98efb88a2ff7c4d2feff8231e9196bd8549ffba951f7ce2fac",
+  "list.txt": "03d67ce9d7f647c8954e2b4192c8c5f90b49f1c1715a546d7e42e6c260ac5f3f",
+  "rehearsal.log": "8b9d7b4fa2f2288e1f7870568906967985548e7bce282db205b336945e9913b5"
+ },
+ "checks": [
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T15:49:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && printf '%s\\n' '2026-11-10 15:49:50 CTO 412a4e37 waits on the owner: the ACT yes lines' > \"$T/sb\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 17:00' --channel nothing --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\" > \"$T/note.json\" && grep -cF '\"verdict\": \"standby: 2026-11-10 15:49:50 CTO 412a4e37 waits on the owner: the ACT yes lines\"' \"$T/note.json\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T15:49:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && printf '%s\\n' '2026-11-10 15:49:50 CTO 412a4e37 waits on the owner: the ACT yes lines' > \"$T/sb\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 19:18' --channel nothing --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\" > \"$T/note.json\" && grep -cF '\"line\": \"P1 DEADMAN | the CTO session is idle since 15:49 (its turn ended and nothing woke it), 209 min | approve or restart it | its stand-by note had expired (written 2026-11-10 15:49 UTC, 208 min ago)\"' \"$T/note.json\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T15:49:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && printf 'waiting on the owner\\n' > \"$T/sb\" && touch -d '2026-11-10 15:49:50 UTC' \"$T/sb\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 19:00' --channel nothing --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\" > \"$T/note.json\" && grep -cF '\"standby\": \"expired (written 2026-11-10 15:49 UTC, 190 min ago)\"' \"$T/note.json\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-10T15:49:00Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && TZ=UTC ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --projects \"$T\" --now '2026-11-10 17:00' --channel nothing --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\" > \"$T/note.json\" && grep -cF '\"line\": \"P1 DEADMAN | the CTO session is idle since 15:49 (its turn ended and nothing woke it), 71 min | approve or restart it\"' \"$T/note.json\"",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-01T01:46:20Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && printf '%s CTO waits on the owner\\n' \"$(date -u -d 'now' '+%F %T')\" > \"$T/sb\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\"",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "T=\"$(mktemp -d)\" && mkdir -p \"$T/st\" && printf '%s\\n' '{\"type\":\"assistant\",\"timestamp\":\"2026-11-01T01:46:20Z\",\"message\":{\"content\":[{\"type\":\"text\"}]}}' > \"$T/s.jsonl\" && printf '%s CTO waits on the owner\\n' \"$(date -u -d '3 hours ago' '+%F %T')\" > \"$T/sb\" && ORCH=\"$T/o\" python3 governance/project/orchestration/tools/deadman.py --watch --every 1 --max 1 --projects \"$T\" --session-file \"$T/none\" --state \"$T/st/state.json\" --log \"$T/deadman.log\" --inbox \"$T/st/inbox\" --inbox-stale \"$T/none\" --standby \"$T/sb\"",
+   "exit": 10,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "8b9d7b4fa2f2288e1f7870568906967985548e7bce282db205b336945e9913b5"
+ }
+}

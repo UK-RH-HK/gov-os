@@ -13,9 +13,11 @@ ROOT=/home/usain/Dynamic-Agentic-Engineering-OS
 ORCH=$ROOT/.gov-runtime/scratch/orchestrator
 D=$ORCH/log/d10/$RUN
 mkdir -p "$D"
+# Setup fix after run 1 (group A): a short TMPDIR below /tmp, so the socket helpers find a folder (they refuse /tmp itself).
+export TMPDIR=${D10_TMPDIR:-/tmp/gov-d10}; mkdir -p "$TMPDIR"
 echo "$$" > "$D/pid"
 head=$(git -C "$ROOT" rev-parse HEAD)
-{ echo "run: $RUN"; echo "head: ${head:0:12}"; echo "workers: $W (nproc $(nproc))"; date -u "+start: %F %T UTC"; } > "$D/summary.txt"
+{ echo "run: $RUN"; echo "tmpdir: $TMPDIR"; grep -E "^Sig(Ign|Blk)" /proc/$$/status | tr "\n" " "; echo; echo "head: ${head:0:12}"; echo "workers: $W (nproc $(nproc))"; date -u "+start: %F %T UTC"; } > "$D/summary.txt"
 free -m > "$D/free-before.txt"
 ( vmstat -t 30 > "$D/vmstat.log" 2>&1 ) & VM=$!
 t0=$(date +%s)
