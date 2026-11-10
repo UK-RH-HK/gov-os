@@ -315,3 +315,6 @@ fails on its own assertion, none on a premise.
   (S10).
 - `test_w2_92_verbless_labels.py` (S11, DEC-1109 (2)): its two planted registers, the planted repository for
   `gov links`, and its fixtures; `w2_92_support.D6_BASE` and `base_src(place, commit)` name its base.
+- **The base trees by a named path (D-10, DEC-385).** `base_src`, also behind `test_w2_92_speed.py`'s `base`, takes
+  `src/` only: `git -C <root>/src archive --prefix=src/ <commit>`, so W1-28's reading route sees a named folder, not
+  a whole-tree copy (W1-28's and W1-50's checks flagged the old `git -C <root> archive <commit> src`); same tree, same cases.

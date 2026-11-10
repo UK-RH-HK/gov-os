@@ -262,12 +262,16 @@ PRE_S6_COMMIT = "68ce354a74c77d74560ce696c03982bd9e004b2a"
 
 def pre_s6_src(workdir):
     """``src/`` of ``PRE_S6_COMMIT``, taken from this repository's history into ``workdir``: the folder to put on
-    ``PYTHONPATH``. Fails, naming the commit, where the history does not hold it."""
+    ``PYTHONPATH``. Fails, naming the commit, where the history does not hold it.
+
+    Limited to the named path ``src/`` in the call itself (DEC-385, W1-28's reading route): git runs in the root's
+    ``src`` folder, where ``git archive <commit>`` takes ``<commit>:src`` only, put back under ``src/`` by
+    ``--prefix``. Nothing outside ``src/`` is taken, the held-out file included."""
     import io
     import tarfile
 
-    done = subprocess.run(["git", "-C", str(support.REPO_ROOT), "archive", "--format=tar", PRE_S6_COMMIT, "src"],
-                          capture_output=True)
+    done = subprocess.run(["git", "-C", str(support.REPO_ROOT / "src"), "archive", "--format=tar", "--prefix=src/",
+                           PRE_S6_COMMIT], capture_output=True)
     assert done.returncode == 0, \
         f"premise: this repository's history does not hold the pre-S6 commit {PRE_S6_COMMIT[:12]}: " \
         f"{done.stderr.decode(errors='replace')[-500:]}"

@@ -381,7 +381,9 @@ holding the files as indexed:
 
 1. The pre-S6 code is taken from this repository's history: `src/` of `68ce354a74c7` (`w2/integrate` at DEC-1066's
    placing; its `src/gov` names no `lexical_policy`), extracted with `git archive` into the case's temporary folder.
-   The case fails, naming the commit, where the history does not hold it.
+   The case fails, naming the commit, where the history does not hold it. **By a named path (D-10, DEC-385):**
+   `pre_s6_src` runs `git -C <root>/src archive --prefix=src/ <commit>`, `src/` only, so W1-28's reading route sees a
+   named folder, not a whole-tree copy (W1-28's and W1-50's checks flagged the old `git -C <root> archive <commit> src`).
 2. The planted project with no `lexical_policy` anywhere is rebuilt by that code (`gov rebuild --json
    --no-embeddings`): every file indexed.
 3. The two namespaces are marked `not indexed`, `not embedded` and committed; the pre-S6 code rebuilds again. Premise,
