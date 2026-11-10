@@ -38,6 +38,9 @@ kpis:
   - 'A test run that appends to, creates or reads the real ~/.gov-os/guard-calls (S4) [DEC-1108 (5)]'
 profile: STANDARD
 sources:
+- DEC-820
+- DEC-826
+- DEC-877
 - DEC-1109
 - DEC-1108
 - DEC-1093
