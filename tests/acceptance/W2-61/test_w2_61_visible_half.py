@@ -59,7 +59,14 @@ RETIRED_Q09 = s.REAL_VISIBLE.parent / "retired" / "q09-lens-b.yaml"
 # the question re-worded to the launch gate's rule in force), lens B's label retired unchanged; 8d09eb40 wrote it too.
 REWRITTEN_Q16 = "q16.yaml"
 RETIRED_Q16 = s.REAL_VISIBLE.parent / "retired" / "q16-pre-dec1067.yaml"
-RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09, REWRITTEN_Q16: RETIRED_Q16}
+# Q07 and Q14 re-worded 2026-11-09 (DEC-1070 (13), DEC-1097 (12), DEC-1098 (6); 55d1c0297): Table 2, a dated report
+# kept as written, is matched by their originals as retired/ keeps them (the DEC-1069 labels, lens B's command).
+REWORDED_Q07 = "q07.yaml"
+RETIRED_Q07 = s.REAL_VISIBLE.parent / "retired" / "q07-pre-reword-2026-11-09.yaml"
+REWORDED_Q14 = "q14.yaml"
+RETIRED_Q14 = s.REAL_VISIBLE.parent / "retired" / "q14-pre-reword-2026-11-09.yaml"
+RETIRED_ORIGINALS = {REWRITTEN: RETIRED, RELABELLED: RETIRED_Q09, REWRITTEN_Q16: RETIRED_Q16,
+                     REWORDED_Q07: RETIRED_Q07, REWORDED_Q14: RETIRED_Q14}
 
 
 def _files():
@@ -158,7 +165,9 @@ def test_each_question_is_table_2_s_command_with_its_options():
     full strength, with the retired originals in the rewritten ``q03.yaml``'s and the re-labelled ``q09.yaml``'s
     places (``q09.yaml`` keeps lens B's question, which its own case checks); a visible file beyond them, and
     the rewritten ``q03.yaml``, is not required to be a Table 2 command, and none repeats a Table 2 query (failure
-    KPI: no question copied from lens B's 20). Failure messages name files and Table 2 rows by id only, never a
+    KPI: no question copied from lens B's 20). ``q07.yaml`` and ``q14.yaml`` were re-worded on 2026-11-09
+    (DEC-1070 (13), DEC-1097 (12), DEC-1098 (6)); Table 2 is matched by their pre-reword originals in ``retired/``.
+    Failure messages name files and Table 2 rows by id only, never a
     question's text [DEC-954 (Q9a), DEC-1009, DEC-820 (d); the owner's q03 decision of 2026-11-03]."""
     table = s.lens_b_commands()
     assert len(table) == 20, f"Table 2 of lens B's report parsed to {len(table)} commands, not 20"
