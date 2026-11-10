@@ -1,0 +1,20 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-lift-tests",
+   "change": "head",
+   "before": "1905b29699a7",
+   "after": "ba5cf0f877b5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-lift-tests",
+   "change": "acceptance folder",
+   "folder": "W2-05"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-maps-lift-tests",
+   "change": "acceptance folder",
+   "folder": "W2-92"
+  }
+ ]
+}

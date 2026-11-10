@@ -1,0 +1,8 @@
+log: spend.jsonl
+W2: W2-96
+Brake: runaway (DEC-1091)
+status: W2-96 has spent 21.44 USD since 2026-11-10 12:40, past twice its projection (3.00 USD, brake at 6.00)
+
+New launches for W2-96 stop (launch_worker.sh refuses while /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/brake/W2-96.json exists) until the CTO clears it:
+  python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/spend.py clear W2-96 [--projection-usd <more>] --note '<why>'
+Record only: never an alarm to the owner (DEC-1089 (3)).
