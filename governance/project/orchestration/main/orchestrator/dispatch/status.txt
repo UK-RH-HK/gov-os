@@ -1,8 +1,8 @@
-dispatcher 2026-11-10 14:17:09
+dispatcher 2026-11-10 14:18:09
 leads running (0, from the processes): none
-load 4.3/2.5/2.0; real busy cores 1.77 of 20 (the embedding server 0.0); memory available 16320 MB; gate_check (for comparison) open (OPEN leads=0 load=4.3/2.0 nproc=20 have=16708508kB need=5285964kB); disk open
-Balance: CPU 1.77/20 busy (band 14-18: below); RAM 15.9 GB available (floor 3.0 GB); GPU 6.5/15.9 GB used, 9.4 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared IDLE 0 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 0 (0.0 GB RSS; 0 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9696 samples since 2026-11-02 13:00))
-Forecast: lead: admits, binding GPU: GPU memory 7.8 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 1.3; 2 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free); pairing loads CPU 0.1, GPU 0.47
+load 4.8/2.9/2.1; real busy cores 1.65 of 20 (the embedding server 0.04); memory available 16310 MB; gate_check (for comparison) open (OPEN leads=0 load=4.8/2.1 nproc=20 have=16698504kB need=5285964kB); disk open
+Balance: CPU 1.65/20 busy (band 14-18: below); RAM 15.9 GB available (floor 3.0 GB); GPU 6.5/15.9 GB used, 9.4 free (headroom 2.0 GB; embedders' layers: query 29/29, shared 29/29; holders: embedder query 1); embedders: shared BUSY 6 tasks/min; query IDLE 0 tasks/min; slots 3 by device (gpu 29/29); no lead cap (memory by the forecast: DEC-1052 O-A1); rerankers 0 (0.0 GB RSS; 0 of 2 GPU slots held; reserve 3.0 GB: the rerankers' p95, under 2 x the 3589 MB peak (9696 samples since 2026-11-02 13:00))
+Forecast: lead: admits, binding GPU: GPU memory 7.8 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 1.3; 2 GPU reranker slot(s) free); slot: admits, binding GPU: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free); rebuild: admits, binding GPU: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free); pairing loads CPU 0.09, GPU 0.47
 Jobs by phase: none
 GPU rule: GPU memory 6.5 of 13.9 GB (used 6.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free): within total minus headroom; shared GPU memory 1498 MiB (floor 2048 MiB): no spill
 Targets: T1 met, T2 met, T3 met, T4 met, T5 met, outside-slot met; incidents open: none
@@ -15,6 +15,6 @@ inbox unread: 0
 ready list: nothing waiting
 sentinel: watched
 guard harvest: last 2026-11-02 22:38:40, rc 0, 36.6 s of 300 s
-embedding server: shared IDLE 0 tasks/min; query IDLE 0 tasks/min
+embedding server: shared BUSY 6 tasks/min; query IDLE 0 tasks/min
 GPU: RTX 5070 Ti 6.5/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (0); layers: shared 29/29, query 29/29
 heavy slot holders: none

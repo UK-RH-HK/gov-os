@@ -1,6 +1,21 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-08: session `ad44f5fe` compacts; HOLD on the owner's decisions
+## RESUME HERE — 2026-11-10 ~14:30 UTC: session `ad44f5fe` hands over to a FRESH session (DEC-1110 (2))
+
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-10: §0 the state, §1 what is
+with the owner, §3 the open rows, §5 the order, §6 the watchers, §7 the checks). **Next free id DEC-1118.**
+- **State:** D-5 and D-6 part 2 complete; D-10's red-fix list ready but for the portability family, which
+  ACT-CLAUDE-COPIES-3 clears (with the owner for a yes). No helper is running. Usage 58 % of the week at 13:56.
+- **With the owner:** three yes lines (ACT-CLAUDE-COPIES-3 `7368f4f2`, ACT-DEADMAN-WAKE-1 `25c3af62`,
+  ACT-W2-149-INSTALL-1 `dec93288`); ACT-OPERATOR-2 and ACT-WIN-TOAST-1 by hand; USAGE-1's savings; the spend-log
+  question; D-10's word.
+- **The day's faults, all closed:** the 02:19 network stop (7 h lost; the helper watch now armed, the wake as an ACT);
+  W2-56's merge taken by a helper's commit (`f3477a239`); deadman.py changed outside an ACT, reverted (`09e1ff6e1`);
+  a helper's tests wrote the live deadman.log (a false "sentinel silent"); the first brake fire on W2-96 (cleared,
+  projection 15).
+- The blocks below are newest first; older ones are history, kept for their figures.
+
+## RESUME HERE (history) — 2026-11-08: session `ad44f5fe` compacts; HOLD on the owner's decisions
 
 **START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (rewritten 2026-11-08: §0 the state, §1 the
 owner's hold, §2 the emergency, §3 decided but not done, §5 the order after the owner decides, §6 the watchers). Next
