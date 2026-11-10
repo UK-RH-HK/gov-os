@@ -661,3 +661,5 @@ Batch 7 opened no package: MR-3, DEC-334 and DEC-311 decide the described behavi
 - Reversibility: high. Cost: a few lines in the launcher and the guard's folder check.
 - Recommendation: (a). Experiments "run outside production paths" (DEC-102), and one root is simpler to check
   than a list. Confidence: medium.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w1_46_support.plant_open_gate` plants an open gate (W2-136's form: a dated `gate.json` in the case's HOME, readings with room to spare under `<elsewhere>/open-gate` through `GOV_RESOURCES_*`); `launch` plants it and `gov_environment` carries its readings once planted; the live sessions keep the real HOME's `gate.json` and take the planted readings. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.

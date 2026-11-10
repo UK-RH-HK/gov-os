@@ -261,3 +261,5 @@ runner's own value, else the `src/` of the worktree that holds this suite (DEC-7
 kernel template's, copied from this worktree. `test_w2_58_code_under_test.py` shows which `gov` a child imports.
 
 - **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_58_support.base_environment` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.
+
+**D-10's red fix (2026-11-10, W2-20 `DAEO-r30l`, DEC-1088 (5)(b), DEC-1109):** `w2_58_support.launch` and the review case's launch run with `launch_environment` (`base_environment` and the readings of `plant_open_gate`, W2-136's form; `run_gov` takes an `env`); the live sessions keep the real HOME's `gate.json` and take the planted readings. The gate is W2-20's, not under test here; no expectation changes. W2-20 S19 runs the resource gate on every `gov launch`; with no `gate.json` in the case's HOME it shuts, and with the machine's own it shuts under load.

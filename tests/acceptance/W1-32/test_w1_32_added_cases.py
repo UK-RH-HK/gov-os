@@ -181,6 +181,7 @@ def _close_stderr():
 def _launch_without_stderr(launch_support, project, sandbox, cli, way):
     """``gov launch`` to its end, with a stderr that cannot be written. Returns W1-46's ``Launch``."""
     w46 = launch_support.w46
+    w46.plant_open_gate(sandbox)   # W2-20 S19 (DEC-1088 (5)(b)): the gate is planted open, its readings in the env
     before = len(w46.calls(cli))
     script = launch_support.cli_support.write_launcher(project, sandbox)
     out_path = sandbox.elsewhere / "launch-stdout.txt"
