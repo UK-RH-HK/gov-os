@@ -4,7 +4,9 @@
 # `-n auto` takes PYTEST_XDIST_AUTO_NUM_WORKERS), the parallel workers sized to memory and cores, then the `lifted`
 # suite once, report-only (D4-LIST §2). A vmstat sampler records swap activity every 30 s. Writes only under
 # log/d10/<run>/. No commits on w2/integrate while it runs.
-#   d10_run.sh <run name, e.g. run1> <workers>
+#   d10_run.sh <run name, e.g. run1> <workers>        (LIFTED_ONLY=1: the lifted step alone, no nightly)
+# Fix 2026-11-10 19:2x (session 8ddb8b14): run 1's lifted step ran nothing (exit 5): the guard list's `rep:` lines were
+# passed to pytest as a path. Now the prefix is stripped and d10_lifted_only.py keeps only the lifted cases (~8,604).
 set -u
 RUN=${1:?run name}; W=${2:?workers}
 ROOT=/home/usain/Dynamic-Agentic-Engineering-OS
@@ -17,9 +19,11 @@ head=$(git -C "$ROOT" rev-parse HEAD)
 free -m > "$D/free-before.txt"
 ( vmstat -t 30 > "$D/vmstat.log" 2>&1 ) & VM=$!
 t0=$(date +%s)
+if [ "${LIFTED_ONLY:-0}" = 1 ]; then echo "nightly: skipped (LIFTED_ONLY=1)" >> "$D/summary.txt"; n_exit=skipped; else
 env NIGHTLY_HEAVY=/nonexistent/no-heavy-gate PYTEST_XDIST_AUTO_NUM_WORKERS="$W" \
   bash "$ROOT/governance/project/orchestration/nightly/nightly.sh" day > "$D/nightly.out" 2>&1
 n_exit=$?
+fi
 t1=$(date +%s)
 { echo "nightly exit: $n_exit"; echo "nightly wall_s: $((t1 - t0))"; } >> "$D/summary.txt"
 # The lifted suite once, report-only, on the same head, from the nightly's clone if it was kept, else the main tree's
@@ -30,10 +34,10 @@ t2=$(date +%s)
 # Only the paths the lifted lists name (folders, files or cases; there is no lifted-only switch), so the default cases
 # are not run a second time except those sharing a file with a lifted entry.
 mapfile -t LIFTED < <(cat "$LC"/tests/optin-lifted.txt "$LC"/tests/optin-lifted-guard.txt | grep -v '^#' | grep -v '^[[:space:]]*$' \
-  | sed 's/[[:space:]].*//; s/::.*//' | sort -u)
+  | sed -E 's/^[a-z-]+:[[:space:]]+//; s/[[:space:]].*//; s/::.*//' | sort -u)
 echo "lifted paths: ${#LIFTED[@]}" >> "$D/summary.txt"
-( cd "$LC" && env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$LC/src" PYTEST_XDIST_AUTO_NUM_WORKERS="$W" \
-  python3 -m pytest "${LIFTED[@]}" -n auto -q -p no:cacheprovider --no-header --optin=lifted -o tmp_path_retention_policy=failed \
+( cd "$LC" && env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$LC/src:$ORCH/tools" PYTEST_XDIST_AUTO_NUM_WORKERS="$W" \
+  python3 -m pytest "${LIFTED[@]}" -n auto -q -p no:cacheprovider -p d10_lifted_only --no-header --optin=lifted -o tmp_path_retention_policy=failed \
   --junitxml="$D/lifted.xml" ) > "$D/lifted.out" 2>&1
 l_exit=$?
 t3=$(date +%s)

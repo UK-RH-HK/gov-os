@@ -1,6 +1,6 @@
-Status at 2026-11-10 16:13:06 (the last report's block)
+Status at 2026-11-10 18:32:37 (the last report's block)
 - Progress: 74 closed / 27 merged-not-closed / 4 built-and-held / 17 in flight / 39 not started, of 161.
-- Leads: 0 running (none); queued next: none; the gate: open.
+- Leads: 0 running (none); queued next: none; the gate: shut on load 22, limit 20.
 - Closes: none running; next: none: the refactoring (DEC-1052); merges as built, formal closes at the lift (P1-13); refused since the last report: none.
 - Memory chain: W2-61 closed; W2-61h MERGED in D-4b (w2/W2-61h-d8); S7 (source families) MERGED with W2-134 (50d79efe); formal close at the lift; W2-84 closed; W2-86 closed; W2-87 closed; W2-03 closed; W2-05 merged, closing; W2-55 merged, closing; W2-64 closed; W2-04 MERGED as built (D-1, M-1); formal close at the lift; W2-06 closed; W2-13 MERGED in D-4b; formal close at the lift; W2-15a not started.
 - Toward EXAMIN's copy: AT RISK, re-estimated (11-10 09:40): the lift about 11-11, EXAMIN's copy about 11-15, Wave 2's end about 11-22 (FORECAST-W2-2; 7 h lost overnight to a network stop).

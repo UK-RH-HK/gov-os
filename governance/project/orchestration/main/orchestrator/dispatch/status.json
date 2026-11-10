@@ -1,40 +1,41 @@
 {
- "time": "2026-11-10 18:10:04",
+ "time": "2026-11-10 19:19:08",
  "leads": [],
  "lead_count": 0,
  "load": [
-  0.44,
-  0.69,
-  1.42
+  0.52,
+  2.07,
+  4.3
  ],
- "mem_available_mb": 15069,
+ "mem_available_mb": 16381,
  "gate_open": true,
- "gate": "OPEN leads=0 load=0.4/1.4 nproc=20 have=15431696kB need=5285964kB",
+ "gate": "OPEN leads=0 load=0.5/4.3 nproc=20 have=16774568kB need=5285964kB",
  "disk_open": true,
- "disk": "disk gate open: 801 GiB free, 62869681 inodes free",
- "slots_held": [
-  "gov-os-heavy-slot-1.lock"
- ],
+ "disk": "disk gate open: 805 GiB free, 63297690 inodes free",
+ "slots_held": [],
  "land_running": false,
  "close_running": false,
  "closing_w2s": [],
  "queue_busy": false,
- "main_clean": true,
- "main_dirty": [],
+ "main_clean": false,
+ "main_dirty": [
+  "governance/project/orchestration/START-NEXT-SESSION.md",
+  "governance/project/orchestration/packages/DECIDED-NOT-DONE.md"
+ ],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [],
  "lead_rss_kb": {},
  "outside_slot": [],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1188120,
+  "embedding": 1283556,
   "codegraph": 0
  },
- "busy_cores": 0.38,
+ "busy_cores": 0.37,
  "embedding_cores": 0.0,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 1464728,
+ "rerankers_outside_kb": 1465512,
  "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-09 22:32:03",
@@ -43,27 +44,27 @@
  },
  "rerankers": {
   "n": 1,
-  "rss_kb": 1464728,
+  "rss_kb": 1465512,
   "each_kb": [
-   1464728
+   1465512
   ],
-  "outside_kb": 1464728,
+  "outside_kb": 1465512,
   "gpu_held": 2,
   "gpu_slots": 2
  },
  "reranker_reserve": {
   "kb": 3138908,
-  "how": "the rerankers' p95, under 2 x the 3589 MB peak (9744 samples since 2026-11-02 13:00)",
-  "samples": 9744,
-  "span_s": 706920,
+  "how": "the rerankers' p95, under 2 x the 3589 MB peak (9803 samples since 2026-11-02 13:00)",
+  "samples": 9803,
+  "span_s": 711063,
   "peak_kb": 3675196,
   "allowed": 2
  },
  "gpu_last": {
-  "used_mib": 7855,
+  "used_mib": 7687,
   "total_mib": 16303,
-  "free_mib": 8448,
-  "age_s": 57,
+  "free_mib": 8616,
+  "age_s": 63,
   "holders": {
    "reranker": 1,
    "embedder query": 1
@@ -72,110 +73,100 @@
  "slots_target": 3,
  "slots_device": "gpu 29/29",
  "rr_gpu": 1,
- "jobs": [
-  {
-   "kind": "rebuild",
-   "name": "pid 159046",
-   "pid": 159046,
-   "phase": "rebuild.lexical",
-   "cpu": 0.05,
-   "rss_kb": 97176,
-   "rr": 0
-  }
- ],
+ "jobs": [],
  "forecast": {
   "lead": {
    "ok": true,
    "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 8.1,
+     "need": 2.4,
      "cap": 18,
      "ok": true,
-     "frac": 0.44777777777777783,
-     "text": "CPU 8.1 of 18 cores (busy 0.38 + running jobs' peaks 5.7 + the newcomer's 2.0)"
+     "frac": 0.13166666666666668,
+     "text": "CPU 2.4 of 18 cores (busy 0.37 + running jobs' peaks 0.0 + the newcomer's 2.0)"
     },
     "ram": {
-     "need": 3214988.0,
-     "cap": 12284928,
+     "need": 2180248.0,
+     "cap": 13628416,
      "ok": true,
-     "frac": 0.26170181868383763,
-     "text": "RAM 11.6 GB left of 14.7 available (floor 3.0; running jobs' peaks 1.0 + the newcomer's 2.1)"
+     "frac": 0.15997809283191824,
+     "text": "RAM 13.9 GB left of 16.0 available (floor 3.0; running jobs' peaks 0.0 + the newcomer's 2.1)"
     },
     "gpu": {
-     "need": 7855,
+     "need": 7687,
      "cap": 14255,
      "ok": true,
-     "frac": 0.5510347246580147,
-     "text": "GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
+     "frac": 0.5392493861802876,
+     "text": "GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
     }
    },
    "newcomer": {
     "cpu": 2.0,
     "ram_kb": 2180248,
-    "gpu": 1358,
+    "gpu": 1360,
     "util": 10
    },
-   "reason": "forecast admits (binding GPU: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
+   "reason": "forecast admits (binding GPU: GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
   },
   "slot": {
    "ok": true,
-   "binding": "CPU",
+   "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 11.0,
+     "need": 5.3,
      "cap": 18,
      "ok": true,
-     "frac": 0.6116666666666668,
-     "text": "CPU 11.0 of 18 cores (busy 0.38 + running jobs' peaks 5.7 + the newcomer's 4.95)"
+     "frac": 0.2961111111111111,
+     "text": "CPU 5.3 of 18 cores (busy 0.37 + running jobs' peaks 0.0 + the newcomer's 4.96)"
     },
     "ram": {
-     "need": 1957264.0,
-     "cap": 12284928,
+     "need": 963160.0,
+     "cap": 13628416,
      "ok": true,
-     "frac": 0.1593223826790031,
-     "text": "RAM 12.8 GB left of 14.7 available (floor 3.0; running jobs' peaks 1.0 + the newcomer's 0.9)"
+     "frac": 0.0706729233977008,
+     "text": "RAM 15.1 GB left of 16.0 available (floor 3.0; running jobs' peaks 0.0 + the newcomer's 0.9)"
     },
     "gpu": {
-     "need": 7855,
+     "need": 7687,
      "cap": 14255,
      "ok": true,
-     "frac": 0.5510347246580147,
-     "text": "GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
+     "frac": 0.5392493861802876,
+     "text": "GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
     }
    },
    "newcomer": {
-    "cpu": 4.95,
-    "ram_kb": 922524,
+    "cpu": 4.96,
+    "ram_kb": 963160,
     "gpu": 0,
     "util": 0
    },
-   "reason": "forecast admits (binding CPU: CPU 11.0 of 18 cores (busy 0.38 + running jobs' peaks 5.7 + the newcomer's 4.95))"
+   "reason": "forecast admits (binding GPU: GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
   },
   "rebuild": {
    "ok": true,
-   "binding": "CPU",
+   "binding": "GPU",
    "resources": {
     "cpu": {
-     "need": 11.8,
+     "need": 6.1,
      "cap": 18,
      "ok": true,
-     "frac": 0.655,
-     "text": "CPU 11.8 of 18 cores (busy 0.38 + running jobs' peaks 5.7 + the newcomer's 5.73)"
+     "frac": 0.3388888888888889,
+     "text": "CPU 6.1 of 18 cores (busy 0.37 + running jobs' peaks 0.0 + the newcomer's 5.73)"
     },
     "ram": {
-     "need": 2166656.0,
-     "cap": 12284928,
+     "need": 1131916.0,
+     "cap": 13628416,
      "ok": true,
-     "frac": 0.17636700841877137,
-     "text": "RAM 12.6 GB left of 14.7 available (floor 3.0; running jobs' peaks 1.0 + the newcomer's 1.1)"
+     "frac": 0.08305558034037118,
+     "text": "RAM 14.9 GB left of 16.0 available (floor 3.0; running jobs' peaks 0.0 + the newcomer's 1.1)"
     },
     "gpu": {
-     "need": 7855,
+     "need": 7687,
      "cap": 14255,
      "ok": true,
-     "frac": 0.5510347246580147,
-     "text": "GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
+     "frac": 0.5392493861802876,
+     "text": "GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
     }
    },
    "newcomer": {
@@ -184,12 +175,12 @@
     "gpu": 0,
     "util": 1
    },
-   "reason": "forecast admits (binding CPU: CPU 11.8 of 18 cores (busy 0.38 + running jobs' peaks 5.7 + the newcomer's 5.73))"
+   "reason": "forecast admits (binding GPU: GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))"
   }
  },
  "pair_load": {
-  "cpu": 0.34,
-  "gpu": 0.55
+  "cpu": 0.02,
+  "gpu": 0.54
  },
  "machine": {
   "cpus": 20,
@@ -201,20 +192,20 @@
   "gpu_known": true
  },
  "admit": true,
- "admit_reason": "memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule \"slots\" in config.json read as the forecast); GPU memory 8448 MiB free >= 2048 MiB; forecast admits (binding GPU: GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))",
+ "admit_reason": "memory by the Load Balancer's forecast above the floor 3072 MB (the out-of-memory trip-wire's; the slots rule lifted, DEC-1052 O-A1; memory_rule \"slots\" in config.json read as the forecast); GPU memory 8616 MiB free >= 2048 MiB; forecast admits (binding GPU: GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free))",
  "lead_cap": null,
  "gpu_rule": {
   "budget": {
-   "used": 7870,
-   "need": 7870,
+   "used": 7685,
+   "need": 7685,
    "cap": 14255,
    "ok": true,
-   "text": "GPU memory 7.7 of 13.9 GB (used 7.7 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
+   "text": "GPU memory 7.5 of 13.9 GB (used 7.5 + running jobs' peaks 0.0 + the newcomer's 0.0; 0 GPU reranker slot(s) free)"
   },
   "shared": {
    "ok": true,
-   "shared_mib": 1582,
-   "dedicated_mib": 7895,
+   "shared_mib": 1589,
+   "dedicated_mib": 7704,
    "adapter": "luid_0x00000000_0x00010eaf_phys_0"
   },
   "spill": false
@@ -229,19 +220,19 @@
  "last_start": "2026-11-02 22:17:55 W2-112",
  "failures": [],
  "balance": {
-  "busy_cores": 0.38,
+  "busy_cores": 0.37,
   "nproc": 20,
   "cpu_band": [
    14,
    18
   ],
   "cpu_in_band": "below",
-  "mem_available_mb": 15069,
+  "mem_available_mb": 16381,
   "floor_kb": 3145728,
   "gpu": {
-   "used_mib": 7870,
+   "used_mib": 7685,
    "total_mib": 16303,
-   "free_mib": 8433,
+   "free_mib": 8618,
    "age_s": 1,
    "holders": {
     "reranker": 1,
@@ -266,14 +257,14 @@
     "judged": true,
     "tasks_per_min": 0,
     "waiting": 0,
-    "quiet_s": 1679
+    "quiet_s": 1744
    },
    "query": {
     "state": "IDLE",
     "judged": true,
     "tasks_per_min": 0,
     "waiting": 0,
-    "quiet_s": 28916
+    "quiet_s": 359
    }
   },
   "embedder_state": "IDLE",
@@ -282,19 +273,19 @@
   "lead_cap": null,
   "rerankers": {
    "n": 1,
-   "rss_kb": 1464728,
+   "rss_kb": 1465512,
    "each_kb": [
-    1464728
+    1465512
    ],
-   "outside_kb": 1464728,
+   "outside_kb": 1465512,
    "gpu_held": 2,
    "gpu_slots": 2
   },
   "reranker_reserve": {
    "kb": 3138908,
-   "how": "the rerankers' p95, under 2 x the 3589 MB peak (9744 samples since 2026-11-02 13:00)",
-   "samples": 9744,
-   "span_s": 706920,
+   "how": "the rerankers' p95, under 2 x the 3589 MB peak (9803 samples since 2026-11-02 13:00)",
+   "samples": 9803,
+   "span_s": 711063,
    "peak_kb": 3675196,
    "allowed": 2
   }
@@ -302,15 +293,15 @@
  "targets": {
   "T1": {
    "breached": false,
-   "detail": "0.38 busy cores (band 14-18)"
+   "detail": "0.37 busy cores (band 14-18)"
   },
   "T2": {
    "breached": false,
-   "detail": "14.7 GB available (floor 3.0 GB)"
+   "detail": "16.0 GB available (floor 3.0 GB)"
   },
   "T3": {
    "breached": false,
-   "detail": "GPU 7870 MiB used of 16303 (at most 14255)"
+   "detail": "GPU 7685 MiB used of 16303 (at most 14255)"
   },
   "T4": {
    "breached": false,
@@ -335,7 +326,7 @@
   "tail": "guard refusals since ACT 1: 87 total, 79 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 12094,
+  "passes": 12163,
   "last_check_at": 1793624949.9938116,
   "last_result": "ok",
   "last_secs": 0.21,
@@ -343,22 +334,22 @@
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1794332525.6546702,
+  "last_ok_at": 1794336605.0970438,
   "state": "IDLE",
   "servers": {
    "shared": {
     "off": {
      "path": "/home/usain/.ollama/serve-11434.log",
-     "off": 80421298,
+     "off": 81077875,
      "ino": 1239422
     },
     "tasks_per_min": 0,
     "requests_per_min": 0,
-    "read_at": 1794334205.148366,
-    "last_progress_at": 1794332525.6546702,
+    "read_at": 1794338348.617133,
+    "last_progress_at": 1794336605.0970438,
     "judged": true,
     "why": "",
-    "quiet_s": 1679,
+    "quiet_s": 1744,
     "waiting": 0,
     "oldest_wait_s": 0.0,
     "listening": true,
@@ -372,22 +363,22 @@
     "client_errors": 0,
     "t4_new": [],
     "t4_n": 0,
-    "t4_at": 1794334205.148366,
+    "t4_at": 1794338348.617133,
     "hung_since": null
    },
    "query": {
     "off": {
      "path": "/home/usain/.ollama/serve-11435.log",
-     "off": 26602871,
+     "off": 26945478,
      "ino": 610161
     },
     "tasks_per_min": 0,
     "requests_per_min": 0,
-    "read_at": 1794334205.1484141,
-    "last_progress_at": 1794305289.181289,
+    "read_at": 1794338348.617163,
+    "last_progress_at": 1794337989.4036043,
     "judged": true,
     "why": "",
-    "quiet_s": 28916,
+    "quiet_s": 359,
     "waiting": 0,
     "oldest_wait_s": 0.0,
     "listening": true,
@@ -401,35 +392,25 @@
     "client_errors": 0,
     "t4_new": [],
     "t4_n": 0,
-    "t4_at": 1794334205.1484141,
+    "t4_at": 1794338348.617163,
     "hung_since": null
    }
   },
   "how": "progress"
  },
- "slot_holders": [
-  {
-   "slot": "1",
-   "pid": 159046,
-   "cpu": 469,
-   "since": 1794334206.5627604,
-   "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/taskset -c 0,1,2,3,4,5 /home/usain/.local/bin/gov rebuild --integration w2/integrate",
-   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS"
-  }
- ],
+ "slot_holders": [],
  "gpu": {
-  "line": "GPU: RTX 5070 Ti 7.7/15.9 GB, 1 %; holders: embedder shared (0), embedder query (1), reranker (1); layers: shared 29/29, query 29/29",
+  "line": "GPU: RTX 5070 Ti 7.5/15.9 GB, 0 %; holders: embedder shared (0), embedder query (1), reranker (1); layers: shared 29/29, query 29/29",
   "state": {
    "ok": true,
-   "at": 1794334205.181908,
+   "at": 1794338348.6482484,
    "name": "NVIDIA GeForce RTX 5070 Ti",
-   "used_mib": 7870,
+   "used_mib": 7685,
    "total_mib": 16303,
-   "util": 1,
+   "util": 0,
    "holders": [
     {
-     "pid": 53471,
+     "pid": 326562,
      "name": "[Not Found]",
      "mib": null,
      "kind": "reranker"

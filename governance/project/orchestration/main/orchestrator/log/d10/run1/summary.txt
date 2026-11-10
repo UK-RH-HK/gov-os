@@ -2,3 +2,11 @@ run: run1
 head: afad23270a30
 workers: 16 (nproc 20)
 start: 2026-11-10 18:10:09 UTC
+nightly exit: 0
+nightly wall_s: 3749
+lifted paths: 278
+lifted exit: 5 (report-only)
+lifted wall_s: 1
+end: 2026-11-10 19:12:42 UTC
+swap in/out (vmstat si+so, KB/s, max of 30 s samples): 3264
+min free memory MB (vmstat free+cache): 9268

@@ -1,0 +1,262 @@
+...................................FFF.................................. [ 52%]
+.............................................................FFF         [100%]
+=================================== FAILURES ===================================
+_ test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-474/test_the_code_graph_store_hold0/w2-69'), home=PosixPath('/tmp/.../w2-69/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-474/test_the_code_graph_store_hold0/w2-69/pycache'))
+embedder = <w2_69_support.EmbedderStandIn object at 0x7cc0a8441640>
+
+    @pytest.mark.skipif(support.CODE_TOOL is None, reason="codebase-memory-mcp is not on PATH: no code-graph store")
+    @needs_vectors
+    def test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild(sandbox, embedder):
+        """Runs the code-graph tool's daemon: one of the cases that run alone (README)."""
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=True)
+        daemon = support.code_daemon_dir(project)
+        try:
+>           _assert_rebuilt(support.rebuild(project, env), "the first rebuild", code=True)
+
+tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = GovRun(args=('rebuild', '--json'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": {"digest": "578c...low_after_s": 1800, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}\n', stderr='')
+what = 'the first rebuild', code = True
+
+    def _assert_rebuilt(run, what, code=False):
+        assert support.store_status(run, "lexical") == "recreated", f"{what}: the lexical index was not recreated"
+        assert support.store_status(run, "semantic") == "recreated", (
+            f"{what}: the semantic index was not recreated against the stand-in embedder\n{run.describe()}")
+        if code:
+>           assert support.store_status(run, "codeintel") == "recreated", (
+                f"{what}: the code-graph store was not recreated\n{run.describe()}")
+E           AssertionError: the first rebuild: the code-graph store was not recreated
+E             gov rebuild --json
+E             exit code: 0
+E             stdout:
+E             {"ok": true, "command": "rebuild", "result": {"digest": "578c76d36349ca123f0db12150fd014c56efbddd787801efd333aafc175ef725", "store": {"digest": "578c76d36349ca123f0db12150fd014c56efbddd787801efd333aafc175ef725", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 41, "remembered": 41}, "path": {"scanned": 41, "remembered": 0}}, "timing": {"record_s": 0.1, "lexical_s": 2.6, "secrets_s": 5.4, "semantic_s": 0.4, "codeintel_s": 2.8, "compaction_s": 0.0, "total_s": 6.0}, "lock": {"path": "/tmp/gov-rebuild-548989-3h8zq9jz.lock", "source": "GOV_REBUILD_LOCK", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-10T18:38:27.071001+00:00", "released_at": "2026-11-10T18:38:33.106780+00:00"}, "slow": false, "slow_after_s": 1800, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E             
+E             stderr:
+E             
+E           assert 'not_recreated' == 'recreated'
+E             
+E             - recreated
+E             + not_recreated
+E             ? ++++
+
+tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py:68: AssertionError
+_ test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-474/test_a_rebuild_given_the_proje0/w2-69'), home=PosixPath('/tmp/.../w2-69/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-474/test_a_rebuild_given_the_proje0/w2-69/pycache'))
+embedder = <w2_69_support.EmbedderStandIn object at 0x7cc0a8605cd0>
+how = 'dot-from-the-project'
+
+    @needs_vectors
+    @pytest.mark.parametrize("how", HOW)
+    def test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store(sandbox, embedder, how):
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=REAL_TOOL)
+        if not REAL_TOOL:
+            env = review.with_code_stand_in(env, review.install_code_stand_in(sandbox))
+        daemon = support.code_daemon_dir(project)
+        try:
+            first = support.rebuild(project, env)
+>           assert support.store_status(first, "codeintel") == "recreated", (
+                f"premise: the code-graph store was built by the rebuild given the absolute path\n{first.describe()}")
+E               AssertionError: premise: the code-graph store was built by the rebuild given the absolute path
+E                 gov rebuild --json
+E                 exit code: 0
+E                 stdout:
+E                 {"ok": true, "command": "rebuild", "result": {"digest": "a6af2481cc75177e08115bd5252e18b1b05568f1da437c760aa7ddf68e64a99b", "store": {"digest": "a6af2481cc75177e08115bd5252e18b1b05568f1da437c760aa7ddf68e64a99b", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 25, "remembered": 25}, "path": {"scanned": 25, "remembered": 0}}, "timing": {"record_s": 0.2, "lexical_s": 1.8, "secrets_s": 3.3, "semantic_s": 0.3, "codeintel_s": 1.7, "compaction_s": 0.0, "total_s": 4.0}, "lock": {"path": "/tmp/gov-rebuild-548989-3h8zq9jz.lock", "source": "GOV_REBUILD_LOCK", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-10T18:38:33.433615+00:00", "released_at": "2026-11-10T18:38:37.401308+00:00"}, "slow": false, "slow_after_s": 1800, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E                 
+E                 stderr:
+E                 
+E               assert 'not_recreated' == 'recreated'
+E                 
+E                 - recreated
+E                 + not_recreated
+E                 ? ++++
+
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py:90: AssertionError
+_ test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-474/test_a_rebuild_given_the_proje1/w2-69'), home=PosixPath('/tmp/.../w2-69/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-474/test_a_rebuild_given_the_proje1/w2-69/pycache'))
+embedder = <w2_69_support.EmbedderStandIn object at 0x7cc0a8604080>
+how = 'a-relative-path-from-its-parent'
+
+    @needs_vectors
+    @pytest.mark.parametrize("how", HOW)
+    def test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store(sandbox, embedder, how):
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=REAL_TOOL)
+        if not REAL_TOOL:
+            env = review.with_code_stand_in(env, review.install_code_stand_in(sandbox))
+        daemon = support.code_daemon_dir(project)
+        try:
+            first = support.rebuild(project, env)
+>           assert support.store_status(first, "codeintel") == "recreated", (
+                f"premise: the code-graph store was built by the rebuild given the absolute path\n{first.describe()}")
+E               AssertionError: premise: the code-graph store was built by the rebuild given the absolute path
+E                 gov rebuild --json
+E                 exit code: 0
+E                 stdout:
+E                 {"ok": true, "command": "rebuild", "result": {"digest": "62f4ad9764046a3d344a82a0c6ec2afb033d22dd690f486b041b78479b7031d2", "store": {"digest": "62f4ad9764046a3d344a82a0c6ec2afb033d22dd690f486b041b78479b7031d2", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 25, "remembered": 25}, "path": {"scanned": 25, "remembered": 0}}, "timing": {"record_s": 0.2, "lexical_s": 1.9, "secrets_s": 3.3, "semantic_s": 0.3, "codeintel_s": 1.5, "compaction_s": 0.0, "total_s": 3.9}, "lock": {"path": "/tmp/gov-rebuild-548989-3h8zq9jz.lock", "source": "GOV_REBUILD_LOCK", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-10T18:38:37.681978+00:00", "released_at": "2026-11-10T18:38:41.615822+00:00"}, "slow": false, "slow_after_s": 1800, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E                 
+E                 stderr:
+E                 
+E               assert 'not_recreated' == 'recreated'
+E                 
+E                 - recreated
+E                 + not_recreated
+E                 ? ++++
+
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py:90: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/nightly/20261110-1810/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds < limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+>       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (127.9 s)
+E         stdout:
+E         ry input 'W2-H026' not found in the store
+E         ERROR: DAEO-k7hz: mandatory input 'W2-L256' not found in the store
+E         REFUSED: DAEO-kiar: 6328 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-kmcr: mandatory input 'W2-H035' not found in the store
+E         REFUSED: DAEO-l4gf: 6354 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-l78m: 23150 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-lrre: 14213 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-lxzn: 6873 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-m1u3: 9254 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-m4rq: mandatory input 'W2-61h' not found in the store
+E         ERROR: DAEO-mb2t: mandatory input 'W2-26' not found in the store
+E         REFUSED: DAEO-mc6n: 18227 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-n0wb: 15578 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-neam: mandatory input 'W2-H018' not found in the store
+E         ERROR: DAEO-nn1s: mandatory input 'W2-24' not found in the store
+E         ERROR: DAEO-nqa2: mandatory input 'W2-106' not found in the store
+E         REFUSED: DAEO-o5x1: 7040 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-ouet: 10370 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-p3ln: 16282 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-q7lk: 18621 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-q8cl: 17785 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-qzca: mandatory input 'W2-129' not found in the store
+E         REFUSED: DAEO-qzrq: 7261 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-r30l: mandatory input 'W2-M188' not found in the store
+E         REFUSED: DAEO-r9ss: 13470 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-rd0g: mandatory input 'W2-15b' not found in the store
+E         REFUSED: DAEO-rmbe: 8171 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-s9qc: 12786 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-sdhj: mandatory input 'W2-M176' not found in the store
+E         REFUSED: DAEO-sdxk: 18713 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-swdu: mandatory input 'DEC-798' is SUPERSEDED and cannot satisfy a current requirement
+E         ERROR: DAEO-t8mp: mandatory input 'W2-11b' not found in the store
+E         REFUSED: DAEO-tgk2: 7486 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-u4oz: mandatory input 'W2-H034' not found in the store
+E         REFUSED: DAEO-uzme: 9961 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-v4is: 10041 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-w19l: mandatory input 'W2-M284' not found in the store
+E         REFUSED: DAEO-wi46: 7996 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-wnnz: mandatory input 'W2-112' not found in the store
+E         REFUSED: DAEO-wq2b: 7157 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-wqd6: 8340 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-xafn: 12521 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-xwro: 9288 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-yadm: mandatory input 'W2-H015' not found in the store
+E         REFUSED: DAEO-zflj: 6749 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         REFUSED: DAEO-zkr9: 8174 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         ERROR: DAEO-zqvn: mandatory input 'W2-L233' not found in the store
+E         context-reproducibility: 0 ticket(s) failed, 34 error(s)
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x7cc0a8353740>.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x7cc0a7fe7890>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': 'afad23270a30cfa77d4338d2f61372b6b672a338', 'inputs_hash': '80f42e45bc6b672f'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "REFUSED: DAEO-03dg: 16469 tokens of its own text and mandatory inputs, over the ceiling of 6000\nERROR: DAEO-057v: mandatory input 'W2-H021' not found in the store\nREFUSED: DAEO-0i6h: 7414 tokens of it"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError
+_____ test_a_warm_retrieval_with_the_real_models_answers_within_the_budget _____
+
+box = <w2_13_support.Box object at 0x7cc0a8440500>
+real_tiers = {'A': PosixPath('/tmp/pytest-of-usain/pytest-474/w2-13-real-a-dev0/a-dev'), 'B': PosixPath('/tmp/pytest-of-usain/pytest-474/w2-13-real-b-dev0/b-dev')}
+
+    @pytest.mark.needs("ollama", "reranker")
+    def test_a_warm_retrieval_with_the_real_models_answers_within_the_budget(box, real_tiers):
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        roots = {programme: (root, [query["query"] for query in queries if query.get("programme") == programme])
+                 for programme, root in real_tiers.items()}
+        env = box.real_env()
+>       _within_budget(_timed(box, roots, support.FUSION, "search", [None], {"refresh": False}, env=env))
+
+tests/acceptance/W2-13/test_w2_13_latency.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seconds = [0.2868948809336871, 0.26593465299811214, 0.3585123799275607, 0.2955990810878575, 0.2553208200260997, 0.2992317270254716, ...]
+
+    def _within_budget(seconds):
+        assert len(seconds) >= 20, f"only {len(seconds)} questions were timed"
+        slowest = [round(value, 3) for value in sorted(seconds)[-3:]]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} questions (limit " \
+            f"{support.WARM_P95_LIMIT_S} s; the three slowest: {slowest})"
+E       AssertionError: warm p95 is 0.577 s over 52 questions (limit 0.5 s; the three slowest: [0.577, 0.596, 0.79])
+E       assert 0.5766654990147799 <= 0.5
+E        +  where 0.5766654990147799 = <function p95 at 0x7cc0a8781c60>([0.2868948809336871, 0.26593465299811214, 0.3585123799275607, 0.2955990810878575, 0.2553208200260997, 0.2992317270254716, ...])
+E        +    where <function p95 at 0x7cc0a8781c60> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W2-13/test_w2_13_latency.py:56: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:243: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 85.00
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: at or above the S0b2 R1 baseline of 85 (+0.00); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=100.0, why=80.0
+W1-19 hit@5: missed (8): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py::test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild
+FAILED tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project]
+FAILED tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent]
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+FAILED tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget
+6 failed, 130 passed, 39 deselected, 1 warning in 1220.00s (0:20:20)

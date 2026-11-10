@@ -1,0 +1,182 @@
+2026-11-10 18:15:38 nightly day: quiet
+head afad23270a30
+seed: seeded (copy): vectors only, 24619 vectors from /home/usain/gov-os-worktrees/W2-00-store-b at afad23270a30 in 0.8 s
+secrets full scan: off by configuration (DEC-1045)
+clone rebuilt
+gate: OPEN full-run leads=0 load=2.6/1.4 nproc=20 have=16869608kB need=10550220kB
+heavy-job slots held: 3 of 3 (waited 0 s)
+the suites run WITHOUT the slots' thread budget and CPU sets: no gate with --held at /nonexistent/no-heavy-gate
+heavy-job slots released after the suites
+parallel exit 1 in 1082 s: 118 failed, 9449 passed, 87 skipped, 1 xfailed, 6 warnings, 44 errors in 991.43s (0:16:31)
+serial exit 1 in 1349 s: 6 failed, 130 passed, 39 deselected, 1 warning in 1220.00s (0:20:20)
+red-alone tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests: 1 failed in 14.19s
+red-alone tests/acceptance/W1-06/test_w1_06_digests.py::test_a_single_file_tool_is_recorded_with_the_sha256_of_its_binary[codebase-memory-mcp]: 1 failed in 0.16s
+red-alone tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass: 1 failed in 28.50s
+red-alone tests/acceptance/W1-21/test_w1_21_command.py::test_the_command_returns_the_bundle_of_the_function: 1 failed in 3.27s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[start-refused-no-gpu-slot]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[start-refused-below-gpu-share]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[start-refused-no-gpu]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[start-refused-gpu-hidden]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[socket-refused-eperm]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[no-connection-within-connect-s]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[no-answer-within-the-time-limit]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[an-error-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[closed-without-an-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[not-an-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[too-few-scores]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_an_unreachable_service_leaves_the_order_given_named_and_starts_no_other_reranker[too-many-scores]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[start-refused-no-gpu-slot]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[start-refused-below-gpu-share]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[start-refused-no-gpu]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[start-refused-gpu-hidden]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[socket-refused-eperm]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[no-connection-within-connect-s]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[no-answer-within-the-time-limit]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[an-error-answer]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[closed-without-an-answer]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[not-an-answer]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[too-few-scores]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s1_unreachable.py::test_s1_the_bundle_of_an_unreachable_service_is_unranked_and_names_it_unavailable_with_the_reason[too-many-scores]: 1 error in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_rerank_worker_run_as_a_program_ends_at_once_named_before_torch_or_the_model[plain]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_rerank_worker_run_as_a_program_ends_at_once_named_before_torch_or_the_model[gpu-rerank-allow-cpu]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_rerank_worker_run_as_a_program_ends_at_once_named_before_torch_or_the_model[every-slot-held-long-wait]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_rerank_worker_run_as_a_program_ends_at_once_named_before_torch_or_the_model[gpu-hidden]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_rerank_worker_run_as_a_program_ends_at_once_named_before_torch_or_the_model[interim-module-slot-set]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_gov_rerank_allow_cpu_opens_no_cpu_path_in_a_search[service-blocked-no-gpu]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_gov_rerank_allow_cpu_opens_no_cpu_path_in_a_search[service-refuses-no-gpu]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s2_no_private.py::test_s2_gov_rerank_allow_cpu_opens_no_cpu_path_in_a_search[gpu-hidden]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_the_running_service_holds_every_gpu_slot: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_a_slot_another_process_held_is_held_by_the_service_within_3_s_of_its_release: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_a_private_reranker_under_the_slot_rule_beside_the_running_service_ends_75_within_its_wait: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_after_the_service_ends_every_slot_is_free[sigterm]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_after_the_service_ends_every_slot_is_free[crash]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_after_the_service_ends_every_slot_is_free[idle]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s3_slots.py::test_s3_the_service_first_waits_for_a_slot_on_the_gpu_then_holds_every_slot: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[start-refused-no-gpu-slot]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[start-refused-below-gpu-share]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[start-refused-no-gpu]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[start-refused-gpu-hidden]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[socket-refused-eperm]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[no-connection-within-connect-s]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[no-answer-within-the-time-limit]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[an-error-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[closed-without-an-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[not-an-answer]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[too-few-scores]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_an_unanswered_search_comes_back_within_its_bound_and_logs_one_fallback_line_unranked[too-many-scores]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_a_search_that_cannot_write_the_log_still_searches[socket-refused-eperm]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_a_search_that_cannot_write_the_log_still_searches[an-error-answer]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_a_search_that_cannot_write_the_log_still_searches[no-answer-within-the-time-limit]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-145/test_w2_145_s4_bounds.py::test_s4_gov_status_counts_every_unranked_search_as_a_fallback: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_nothing_is_started_before_a_search_needs_the_reranker: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_the_first_search_starts_one_service_that_outlives_it_and_serves_the_next_session: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_runs_the_pinned_model_from_the_reranker_environment_offline: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_two_searches_starting_together_start_one_service: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_ends_itself_after_its_idle_time_and_the_next_search_starts_it_again: 1 failed in 0.14s
+red-alone tests/acceptance/W2-112/test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_with_a_gpu_slot_free_and_the_service_unable_to_start_no_private_reranker_loads: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_gpu_slots_held_and_the_service_unable_to_start_the_search_goes_on_unranked_without_waiting: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_a_slot_that_frees_while_the_search_runs_is_taken_by_no_private_reranker: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_the_service_holds_every_gpu_slot: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_with_the_service_up_no_slot_is_left_and_a_failing_service_leaves_the_search_unranked_at_once: 1 failed in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded: 1 failed in 0.13s
+red-alone tests/acceptance/W2-135/test_w2_135_unchanged.py::test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[almanac-batched]: 1 failed in 0.25s
+red-alone tests/acceptance/W2-135/test_w2_135_unchanged.py::test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[every-file-batched]: 1 failed in 0.27s
+red-alone tests/acceptance/W2-135/test_w2_135_unchanged.py::test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[almanac-batched-budget-1000]: 1 failed in 0.26s
+red-alone tests/acceptance/W2-135/test_w2_135_unchanged.py::test_s3_the_bundles_are_today_s_but_for_the_cut_lines_and_cut_key[register-every-chunk-batched-gov-retrieve]: 1 failed in 0.26s
+red-alone tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_an_ending_signal_to_the_launcher_reaches_the_sessions_process_group[SIGHUP]: 1 failed in 83.63s (0:01:23)
+red-alone tests/acceptance/W1-41/test_w1_41_migration.py::test_every_moved_file_is_byte_for_byte_what_it_was: 1 failed in 2.91s
+red-alone tests/acceptance/W1-41/test_w1_41_migration.py::test_no_other_tracked_file_changes_content_during_a_move_batch: 1 failed in 2.90s
+red-alone tests/acceptance/W1-41/test_w1_41_migration.py::test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay: 1 failed in 2.87s
+red-alone tests/acceptance/W1-41/test_w1_41_path_map.py::test_every_artefact_to_be_moved_carries_importers_references_and_consumers: 1 failed in 2.90s
+red-alone tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_importer_of_a_moved_module_is_read_from_the_code_graph: 1 failed in 2.94s
+red-alone tests/acceptance/W2-04/test_w2_04_batches.py::test_a_lookup_failure_is_named_in_dropped_by_its_kind: 1 failed in 1.51s
+red-alone tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_references_and_consumers_of_a_moved_record_are_read_from_the_record_graph: 1 failed in 2.90s
+red-alone tests/acceptance/W1-41/test_w1_41_path_map.py::test_the_plan_rewrites_or_flags_every_importer_reference_and_consumer: 1 failed in 3.02s
+red-alone tests/acceptance/W2-32/test_w2_32_s4_reranker_dies.py::test_the_default_reranker_whose_shared_service_dies_after_accepting_is_reported_not_raised: 1 failed in 0.18s
+red-alone tests/acceptance/W2-56/test_w2_56_endings.py::test_s12_the_temp_folder_is_removed_when_the_launcher_is_signalled[SIGHUP]: 1 failed in 80.03s (0:01:20)
+red-alone tests/acceptance/W2-131/test_w2_131_unchanged.py::test_s3_the_bundle_is_todays_but_for_the_ids_of_register_items[a-ticket-batched]: 1 failed in 0.21s
+red-alone tests/acceptance/W2-131/test_w2_131_unchanged.py::test_s3_the_continued_pages_are_todays_but_for_the_ids_of_register_items: 1 failed in 0.25s
+red-alone tests/acceptance/W2-32/test_w2_32_s4_reranker_dies.py::test_retrieve_with_a_dying_reranker_cites_its_evidence_and_reports_the_rerank_unavailable[None]: 1 failed in 0.81s
+red-alone tests/acceptance/W1-41/test_w1_41_path_map.py::test_a_justified_move_out_of_a_native_layout_is_recorded_with_both_grounds: 1 failed in 2.94s
+red-alone tests/acceptance/W1-41/test_w1_41_unknown.py::test_an_unknown_artefact_blocks_the_whole_destructive_migration: 1 failed in 2.94s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a6_without_any_verdict_moves_nothing: 1 failed in 2.95s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a5_names_a_verdict_file_that_does_not_exist: 1 failed in 3.02s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_that_is_not_a_pass_moves_nothing[fail]: 1 failed in 2.93s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_verdict_from_the_session_that_made_the_path_map_moves_nothing: 1 failed in 2.94s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed[another-target]: 1 failed in 3.00s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed[a-move-of-a-kept-artefact]: 1 failed in 3.02s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_the_sandbox_may_write_the_sessions_own_folder[engineer]: 1 failed in 0.39s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_the_sandbox_adds_exactly_the_own_folder_under_the_root[engineer]: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_the_sandbox_may_not_write_another_tickets_folder_the_workbench_or_other_worktrees: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_the_sandbox_keeps_the_sessions_temp_folder: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_a_ticket_without_a_w2_id_gets_the_folder_named_by_its_tk_id: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written: 1 failed in 0.37s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_the_own_folder_exists_when_the_session_starts: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_a_launch_keeps_what_the_folder_already_holds: 1 failed in 0.38s
+red-alone tests/acceptance/W1-41/test_w1_41_verdict.py::test_a_passing_verdict_of_the_independent_auditor_is_recorded_by_a5: 1 failed in 2.91s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_a_clone_made_in_the_own_folder_survives_the_sessions_end_and_the_next_session_finds_it: 1 failed in 0.39s
+red-alone tests/acceptance/W2-50/test_w2_50_launcher.py::test_a_launch_of_another_ticket_leaves_the_folder_alone: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_owner_answers.py::test_the_first_launch_makes_the_root_with_the_own_folder_and_nothing_else: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_owner_answers.py::test_a_launch_into_an_existing_root_makes_only_the_own_folder_and_leaves_the_rest_alone: 1 failed in 0.39s
+red-alone tests/acceptance/W2-50/test_w2_50_review_findings.py::test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-star]: 1 failed in 0.39s
+red-alone tests/acceptance/W2-50/test_w2_50_review_findings.py::test_the_launcher_adds_the_folder_of_a_plain_name_with_dot_and_underscore: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_review_findings.py::test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name[an-external-ref-equal-to-the-tk-id]: 1 failed in 0.38s
+red-alone tests/acceptance/W2-50/test_w2_50_review_findings.py::test_the_launcher_keeps_the_folder_of_a_ticket_whose_name_no_other_shares: 1 failed in 0.40s
+red-alone tests/acceptance/W2-112/test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_answers.py::test_candidates_the_service_scores_alike_keep_the_order_given: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason[service-down]: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[less-than-its-share-free]: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_is_unranked_and_names_the_service_unavailable_when_the_service_is_down: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_bundle.py::test_gov_status_counts_the_searches_that_fell_back: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_requests_are_answered_in_arrival_order: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_search_with_more_texts_than_the_cap_still_answers: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_goes_on_unranked_and_starts_no_private_reranker: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_services_model_cannot_load_the_search_goes_on_unranked_named: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_does_not_answer_leaves_the_search_unranked[full]: 1 failed in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_answers_with_an_error_leaves_the_search_unranked[error]: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_goes_on_unranked: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_where_no_reranker_can_load_the_order_given_is_kept_unscored[no reranker environment]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_goes_on_unranked_quickly_without_an_error: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_fallback.py::test_each_fallback_is_logged_under_the_users_cache_folder: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_gpu.py::test_with_room_on_the_gpu_the_service_runs_its_one_model_there: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[less-than-its-share-free]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder[less-than-its-share-free]: 1 failed in 0.12s
+red-alone tests/acceptance/W2-50/test_w2_50_short_round.py::test_the_acceptance_test_named_directly_is_refused: 1 error in 0.38s
+red-alone tests/acceptance/W2-112/test_w2_112_gpu.py::test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu: 1 failed in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_memory_release.py::test_each_request_the_service_answers_is_followed_by_its_own_release_of_the_gpu_memory: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_memory_release.py::test_each_request_writes_one_line_to_rerank_log_with_the_allocated_and_reserved_mib: 1 error in 0.13s
+red-alone tests/acceptance/W2-112/test_w2_112_memory_release.py::test_a_request_that_fails_still_releases_its_gpu_memory_and_writes_its_line: 1 error in 0.12s
+red-alone tests/acceptance/W2-112/test_w2_112_memory_release.py::test_the_release_comes_after_the_answer_and_never_holds_it: 1 error in 0.12s
+red-alone tests/acceptance/W2-96/test_w2_96_at_review_1.py::test_r2_a_sigterm_or_sighup_to_gov_alone_stops_the_run_leaves_nothing_and_exits_128_plus_the_signal[SIGHUP]: 1 failed in 60.62s (0:01:00)
+red-alone tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal[SIGHUP-twice-5-ms-apart]: 1 failed in 60.60s (0:01:00)
+red-alone tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_names_a_tool_call_waiting_since_its_time: 1 failed in 0.17s
+red-alone tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_counts_a_tool_result_as_an_answered_call_and_alerts_by_day_after_an_hour: 1 failed in 0.15s
+red-alone tests/unit/orchestration/test_cto_safety_nets.py::test_a_forced_test_alert_goes_through_the_channel_and_a_replay_keeps_its_own_state: 1 failed in 0.17s
+red-alone tests/unit/orchestration/test_cto_safety_nets.py::test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise: 1 failed in 2.17s
+red-alone tests/unit/orchestration/test_cto_safety_nets.py::test_the_named_session_is_watched_not_the_newest_transcript: 1 failed in 2.20s
+red-alone tests/acceptance/W2-96/test_w2_96_at_run_2.py::test_premise_r11_a_process_started_this_way_begins_with_the_signal_ignored: 1 failed in 0.17s
+red-alone tests/acceptance/W1-28/test_w1_28_launch_product_spec.py::test_the_extra_cli_arguments_reach_the_product_spec_session: 1 failed in 0.98s
+red-alone tests/acceptance/W2-61/test_w2_61_visible_half.py::test_each_question_is_table_2_s_command_with_its_options: 1 failed in 0.16s
+red-alone tests/acceptance/W2-61/test_w2_61_visible_half.py::test_every_source_exists_at_head_and_every_heading_is_found_there: 1 failed in 0.48s
+red-alone tests/acceptance/W2-61h/test_w2_61h_visible_new.py::test_s4_f3_every_new_visible_gold_source_resolves_at_head: 1 failed in 0.16s
+red-alone tests/acceptance/W2-61h/test_w2_61h_visible_new.py::test_f3_each_new_visible_gold_source_holds_its_answer: 1 failed in 0.16s
+red-alone tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py::test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild: 1 failed in 5.82s
+red-alone tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project]: 1 failed in 4.03s
+red-alone tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent]: 1 failed in 4.03s
+red-alone tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit: 1 failed in 127.58s (0:02:07)
+red-alone tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here: 1 failed in 213.90s (0:03:33)
+red-alone tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget: 1 failed in 51.04s
+verdict: red 168
+duration: estimate none s, actual 3420 s (setup 41 s, lock wait 0 s)
+2026-11-10 19:12:38 done
