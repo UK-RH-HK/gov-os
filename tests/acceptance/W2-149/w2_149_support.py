@@ -279,7 +279,11 @@ stdin, its parent's command line) and plays Claude Code:
   - a --settings file it cannot read, parse or validate is ignored without a word;
   - with the settings loaded, the Read is refused only when a PreToolUse hook in them refuses it (run as Claude Code
     runs a command hook: sh -c, the event on stdin, exit 2 or a "deny" decision refuses);
-  - the real session plays the case's script (out/ files, a sleep, a child, the budget's end, a trace file)."""
+  - the real session plays the case's script (out/ files, a sleep, a child, the budget's end, a trace file);
+  - the user's settings source (S10, DEC-1112 (3)): with no --setting-sources, or a list naming "user", it loads
+    $HOME/.claude/settings.json when that file is valid: its SessionStart hooks run at every call's start and its
+    PreToolUse hooks run beside the --settings file's on the canary's Read (allow lines never lift a refusal: Claude
+    Code's deny-over-allow); a list that leaves "user" out loads nothing from it. Each call records which."""
 import hashlib, json, os, re, subprocess, sys, time, uuid
 
 CFG = __CFG__
@@ -409,6 +413,27 @@ def hook_denies(settings, tool, tin, cwd, sid):
     return False
 
 
+def user_source(flags):
+    """The user's settings source: on with no --setting-sources or a list naming "user"; its file loaded when valid."""
+    src = flags.get("--setting-sources")
+    on = src is None or "user" in [x.strip() for x in str(src).split(",")]
+    path = os.path.join(os.environ.get("HOME", "/nonexistent"), ".claude", "settings.json")
+    present = os.path.isfile(path)
+    loaded = settings_ok(path) if (on and present) else None
+    return {"sources": src, "user_on": on, "path": path, "present": present, "loaded": loaded is not None}, loaded
+
+
+def run_hooks(settings, event_name, cwd, sid, **extra):
+    for e in settings.get("hooks", {}).get(event_name, []):
+        for x in e["hooks"]:
+            event = dict({"session_id": sid, "transcript_path": "", "cwd": cwd, "hook_event_name": event_name}, **extra)
+            try:
+                subprocess.run(["/bin/sh", "-c", x["command"]], input=json.dumps(event), capture_output=True,
+                               text=True, cwd=cwd, timeout=x.get("timeout", 60))
+            except Exception:
+                pass
+
+
 def record(name, data):
     with open(os.path.join(REC, name), "a") as f:
         f.write(json.dumps(data) + "\n")
@@ -439,10 +464,13 @@ def main():
                 listing[os.path.relpath(fp, os.path.join(cwd, "input"))] = hashlib.sha256(f.read()).hexdigest()
     sid = (cfg.get("canary_session_id") if canary else (cfg.get("session") or {}).get("session_id")) \
         or str(uuid.uuid4())
+    user_rec, user = user_source(flags)
     record("calls.jsonl", {"argv": argv, "flags": flags, "adds": adds, "prompt": prompt, "cwd": cwd,
                            "env": dict(os.environ), "pid": os.getpid(), "pgid": os.getpgrp(), "ppid": os.getppid(),
                            "parent": parent, "stdin_devnull": devnull, "canary": canary, "target": target,
-                           "input": listing, "session_id": sid, "t": time.time_ns()})
+                           "input": listing, "session_id": sid, "user_settings": user_rec, "t": time.time_ns()})
+    if user is not None:
+        run_hooks(user, "SessionStart", cwd, sid, source="startup")
     if canary:
         mode = cfg.get("canary", "model")
         if mode == "sleep":
@@ -457,7 +485,7 @@ def main():
         why = None
         if flags.get("--restricted") and not any(inside(rt, d) for d in dirs):
             why = "restricted"
-        elif loaded is not None and hook_denies(loaded, "Read", {"file_path": target}, cwd, sid):
+        elif any(s is not None and hook_denies(s, "Read", {"file_path": target}, cwd, sid) for s in (user, loaded)):
             why = "hook"
         denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_canary", "tool_input": {"file_path": target}}] \
             if why else []
@@ -465,7 +493,7 @@ def main():
             denials = [{"tool_name": "Read", "tool_use_id": "toolu_stub_other",
                         "tool_input": {"file_path": "/etc/hostname"}}]
         record("outcomes.jsonl", {"pid": os.getpid(), "canary": True, "settings_loaded": loaded is not None,
-                                  "why": why, "mode": mode})
+                                  "user_settings_loaded": user is not None, "why": why, "mode": mode})
         print(json.dumps({"type": "result", "subtype": "success", "is_error": False, "session_id": sid,
                           "num_turns": 2, "total_cost_usd": 0.0005, "duration_ms": 40,
                           "permission_denials": denials, "result": "done"}))
