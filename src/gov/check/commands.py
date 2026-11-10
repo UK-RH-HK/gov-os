@@ -12,6 +12,8 @@ RESERVED_COMMANDS = (
 )
 # Recorded in the command list beside the twelve (DEC-542).
 RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "resources", "telemetry")
+# brief (W2-152, DEC-1088 (3)), links (W2-129, LINK-INTEGRITY, DEC-1074 (7)) and plan (W2-136, DEC-1088).
+RECORDED_GOV_COMMANDS = RECORDED_GOV_COMMANDS + ("brief", "links", "plan")
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 
