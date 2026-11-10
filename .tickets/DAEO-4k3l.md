@@ -65,7 +65,7 @@ sources:
 - DEC-1083
 - DEC-968
 - DEC-982
-- W2-128
+- DAEO-t8mp
 - DEC-1099
 est_loc: 200
 acceptance_tests:

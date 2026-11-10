@@ -50,10 +50,6 @@ sources:
 - DEC-953
 - DEC-970
 - DEC-980
-- W2-L160
-- W2-M105
-- W2-M113
-- W2-M161
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-05/

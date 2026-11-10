@@ -61,11 +61,6 @@ sources:
 - DEC-1074
 - DEC-1083
 - DEC-1086
-- W2-L065
-- W2-M073
-- W2-M103
-- W2-M104
-- W2-M191
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-32/

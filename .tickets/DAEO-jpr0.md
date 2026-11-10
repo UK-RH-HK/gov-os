@@ -55,7 +55,7 @@ sources:
 - DEC-1042
 - DEC-1046
 - DEC-1052
-- W2-123
+- DAEO-qzrq
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-126/

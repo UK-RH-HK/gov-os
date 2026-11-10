@@ -35,14 +35,6 @@ kpis:
 profile: STANDARD
 sources:
 - CAP-43
-- W2-H021
-- W2-H032
-- W2-L172
-- W2-L173
-- W2-L174
-- W2-L230
-- W2-M123
-- W2-M279
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-18/

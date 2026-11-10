@@ -41,12 +41,6 @@ sources:
 - CAP-15.b
 - DEC-1025
 - DEC-1052
-- W2-H034
-- W2-M126
-- W2-M215
-- W2-M239
-- W2-M294
-- W2-M330
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-04/

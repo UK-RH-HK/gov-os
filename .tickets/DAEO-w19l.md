@@ -29,7 +29,6 @@ profile: STANDARD
 sources:
 - CAP-32.d
 - DEC-166
-- W2-M284
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-36/

@@ -46,13 +46,7 @@ sources:
 - DEC-1055
 - DEC-1072
 - DEC-1083
-- W2-15b
-- W2-L102
-- W2-L321
-- W2-L322
-- W2-L329
-- W2-M340
-- W2-M342
+- DAEO-swdu
 est_loc: 100
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'

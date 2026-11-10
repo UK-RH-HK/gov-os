@@ -55,19 +55,8 @@ sources:
 - DEC-954
 - DEC-957
 - DEC-1083
-- DEC-798
-- W2-15a
-- W2-61
-- W2-L102
-- W2-L317
-- W2-L320
-- W2-L321
-- W2-L322
-- W2-M017
-- W2-M089
-- W2-M340
-- W2-M342
-- W2-M351
+- DAEO-rd0g
+- DAEO-iw1f
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
@@ -81,6 +70,11 @@ list_rows:
 - W2-M017
 - W2-M089
 - W2-M351
+- W2-L102
+- W2-L321
+- W2-L322
+- W2-M340
+- W2-M342
 ---
 # W2-15b EXP-003, pass 2: the final measurement against 99 %
 

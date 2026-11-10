@@ -32,17 +32,6 @@ sources:
 - CAP-61.f
 - DEC-160
 - DEC-1083
-- W2-H052
-- W2-L316
-- W2-L328
-- W2-M334
-- W2-M335
-- W2-M336
-- W2-M337
-- W2-M338
-- W2-M344
-- W2-M347
-- W2-M350
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'

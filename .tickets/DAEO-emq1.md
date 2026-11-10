@@ -76,7 +76,7 @@ sources:
 - DEC-959
 - DEC-988
 - DEC-989
-- W2-117
+- DAEO-zkr9
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-115/

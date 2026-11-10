@@ -72,15 +72,15 @@ sources:
 - DEC-983
 - DEC-989
 - DEC-995
-- W2-118
-- W2-21
-- W2-H046
+- DAEO-ts4y
+- DAEO-1ahb
 est_loc: 500
 acceptance_tests:
   path: tests/acceptance/W2-121/
   author: independent-test-designer (MR-3)
 track: A
-list_rows: []
+list_rows:
+- W2-H046
 ---
 # W2-121 gov dispatch
 

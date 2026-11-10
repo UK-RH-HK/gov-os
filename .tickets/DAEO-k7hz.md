@@ -96,10 +96,6 @@ sources:
 - DEC-994
 - DEC-995
 - DEC-996
-- W2-L256
-- W2-L257
-- W2-L258
-- W2-L268
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/

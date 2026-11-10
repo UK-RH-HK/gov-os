@@ -32,14 +32,6 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-729
-- W2-H018
-- W2-M129
-- W2-M130
-- W2-M151
-- W2-M211
-- W2-M212
-- W2-M259
-- W2-M265
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-45/
