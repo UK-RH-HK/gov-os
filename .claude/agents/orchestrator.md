@@ -49,8 +49,8 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 A ticket lead is not a seventh role. It is a session of this role, `GOV_ROLE=orchestrator`, bound to one ticket,
 whose id is in `GOV_TICKET`, and to that ticket's worktree (DEC-236). The fields above hold for it unchanged: this
 section adds no role, no permission class and no scope, and it grants nothing. The guard confines the lead and its
-workers to that worktree. The main orchestrator starts a lead by hand, from the kernel template `brief-lead.md`;
-no mechanism starts one yet (DEC-537).
+workers to that worktree. The main orchestrator starts a lead by hand, from the kernel templates `brief.md` and `role-lead.md`;
+no mechanism starts one yet (DEC-537, DEC-1050).
 
 What a lead does. It runs the ticket loop for its one ticket: tests first by a fresh test designer, checked red,
 then a fresh implementer, then the verification, and for a FULL ticket a fresh reviewer before the merge (MR-3,
