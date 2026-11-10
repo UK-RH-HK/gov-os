@@ -15,7 +15,8 @@ baseline commit in the repository's history.
 
 - **`gov launch` (S1, F1, F2).** Each case runs `gov.launch.launcher.launch` (the launcher's public entry) in a child
   process (`w2_153_launch_harness.py`) with `HOME` set to a temporary folder. There `.local/bin/claude` is a stand-in
-  that writes down its arguments, its working folder and its `TMPDIR`, then ends. The fixture repository has four
+  that writes down its arguments, its working folder and its `TMPDIR`, then ends. It finds where to write in
+  `claude.record` beside it, as the launcher passes the session a cleaned environment (W2-56 S5). The fixture repository has four
   `in_progress` tickets, the guard's settings and the eight `.claude/templates/` copies. The resource gate is planted
   open the way W2-136's launcher cases plant it (`gate.json` and the `GOV_RESOURCES_*` readings). The gate, the start
   lock, the registry and the session's temp folder all run as written, inside that home. One thing is replaced, the
