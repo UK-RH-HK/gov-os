@@ -70,6 +70,19 @@ editable install's `gov` script at `.local/bin/gov`, its first line naming the t
 --user -e` leaves it (DEC-605): the pinned line starts that interpreter, and the path file gives this worktree's
 package, as before (DEC-732). On lines that run a bare `python3` the script is never read.
 
+**The revision of W2-153 (2026-11-10, ticket `DAEO-8s85`, DEC-1112 (3), DEC-866; `Rewrite-Reason: W2-153 S3
+amended ... and generated projects carry templates/`)** adds no case, removes none and changes no expectation. Only the
+project builder (`w1_38_support.build_project_from_template`) changes. W2-153 composes each rulesync role source from
+its kernel role template and its kernel role file, and the portability check compares a source with that composition
+and requires the eight `.claude/templates/` copies (W2-153 S3, S4). The builder copied no `templates/`, so the check
+fell back to comparing the sources with the role files alone and every generated project was red on the six role
+sources. The builder now also copies `template/governance/kernel/templates/` file by file into
+`governance/kernel/templates/`, as it copies `roles/` and `skills/`. It also writes the eight byte copies under
+`.claude/templates/` that an adopted project holds from the copies ACT (DEC-315; rulesync never writes them). On
+integrate's code (the first composition, the template's body alone) the portability cases turn green with it. The six
+`TestRoleFieldAgreement` cases stay red until the sources carry the role file's body after the template's (S3
+amended): the generated agent then holds the role file's fields.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -86,7 +99,8 @@ rulesync command runs in it.
 | In the project | From | Source |
 |---|---|---|
 | `.rulesync/**` | `template/.rulesync/**` | ADR-0002 §5 |
-| `governance/kernel/hooks/*.py`, `governance/kernel/roles/*.md`, `governance/kernel/skills/**` | `template/governance/kernel/{hooks,roles,skills}` | ADR-0002 §5 |
+| `governance/kernel/hooks/*.py`, `governance/kernel/roles/*.md`, `governance/kernel/skills/**`, `governance/kernel/templates/*` | `template/governance/kernel/{hooks,roles,skills,templates}` | ADR-0002 §5; `templates/` since W2-153 (S3 amended, DEC-1112 (3)): the role sources are composed from the role templates and the role files, so without it the portability check has nothing to compose |
+| `.claude/templates/<stem>.md` for `brief`, `role-research`, `role-product-spec`, `role-test-designer`, `role-engineer`, `role-reviewer`, `role-lead`, `role-cto` | byte copies of `template/governance/kernel/templates/<stem>.md` | W2-153 S4 (DEC-1050): an adopted project holds them from the copies ACT (DEC-315), never from rulesync, and the portability check reports a missing one |
 | `governance/project/tool-registry.yaml`, holding the `rulesync` entry | this repository's own registry entry, unchanged | DEC-127 |
 | `template/governance/kernel/checks/adapter-portability.yaml` | the ticket's declaration | DEC-186 (the path `gov check` reads) |
 | `CLAUDE.md`, `AGENTS.md`, `.claude/**` | `rulesync generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills`, run in the temporary project | KPI success 1 |

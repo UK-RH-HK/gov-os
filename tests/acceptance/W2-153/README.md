@@ -10,7 +10,7 @@ integrate's code (DEC-963). The ticket's implementation was never read.
     PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-153 -q -p no:cacheprovider \
       -o tmp_path_retention_policy=failed
 
-About 6 s, 51 cases. No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
+About 6 s, 66 cases (revision 4). No model, network, GPU or store, and no real Claude session. Needs `git`, `bash` and the
 baseline commit in the repository's history.
 
 - **`gov launch` (S1, F1, F2).** Each case runs `gov.launch.launcher.launch` (the launcher's public entry) in a child
@@ -60,11 +60,50 @@ baseline commit in the repository's history.
   research `[discovery]`, orchestrator `[orchestration]`. The test designer gets `[test-design]` only once W2-128 has
   reconciled that skill with DEC-963, which the case reads as "the kernel skill names DEC-963". Until then the list
   leaves `test-design` out, so it is empty or absent. On integrate today the skill does not name DEC-963.
+- **The composition (S3 amended, 2026-11-10, the CTO, DEC-1112 (3); revision 4).** Each `.rulesync/subagents/<role>.md`
+  and its `template/.rulesync/` copy is the rulesync front matter (with `claudecode.skills`), then the role template's
+  body, then one blank line, then the kernel role file's body (`template/governance/kernel/roles/<role>.md`
+  verbatim, its front matter, if any, stripped). Each body is read by portability's `_split` rule (front matter
+  stripped, the blank lines after it dropped). The templates end with one newline, so the blank line is one more
+  `\n` (`w2_153_support.composed_body`). The agent's labelled fields are then exactly the role file's (W1-33, MR-5;
+  W1-38), the templates carrying none. **Interface:** `gov.adapters.portability.compose(root, role) -> str`, the
+  expected source's full text. The cases call it as `compose(Path(<project root>), "engineer")` in a child process
+  on this tree's code.
 - **Copies:** `brief`, `role-research`, `role-product-spec`, `role-test-designer`, `role-engineer`, `role-reviewer`,
   `role-lead`, `role-cto`, byte copies of `template/governance/kernel/templates/<stem>.md`. `ticket.md` and the
   kernel's other templates are not copied.
 
+## Revision 4: S3 amended (2026-11-10, DEC-1112 (3), DEC-866 `Rewrite-Reason:`)
+
+After ACT-CLAUDE-COPIES-2 the composed agents lacked the role file's fields, which W1-33 (MR-5) and W1-38 require.
+The CTO amended S3 (the ticket's body, "S3 amended"): the role file's body follows the template's. This revision was
+written on integrate `bbe222c59`, which holds W2-153's first composition (the template's body alone, the check
+comparing against it).
+
+- **Changed:** the sources case (renamed to `test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body`)
+  expects the template's body, one blank line and the role file's body; the rest of its assertions is unchanged. The
+  portability bed's source (`w2_153_support.composed_source`, `ENGINEER_COMPOSED_BODY`) is composed the same way.
+  That is fixture text only: no assertion of the bed's cases changes.
+- **Added:** `test_s3_compose_returns_the_source_s_full_text_and_the_check_accepts_it` (2 cases),
+  `test_s3_a_source_with_the_template_s_body_alone_is_a_finding` (1), and
+  `test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none` (12). The last
+  reproduces W1-33's `fields()` rule in `w2_153_support.fields` (no import of W1-33's support, which pulls in W1-46's).
+- **Outside this folder (the same commit):** W1-38's `build_project_from_template` copies the kernel's `templates/`
+  and writes the eight `.claude/templates/` copies (see W1-38's README, "The revision of W2-153"). W2-05's hooks-source
+  cases move `templates` with the rest of the kernel. W2-57 uses W1-38's builder unchanged.
+- **Self-check (a scratch copy of integrate's `src/gov`, never committed):** a reference `compose` and the check
+  comparing against the amended composition passed all ten bed cases (the writer case left out). In memory, each
+  source composed from this repository's front matter, template and role file passed both sources cases for the six
+  roles.
+
 ## KPI lines, tests, and the outcome on `w2/integrate` (`f73e72d4a43b`)
+
+**Revision 4, on integrate `bbe222c59` (W2-153's first composition merged):** 66 cases, 30 failed, 36 passed. The 30
+reds: S3's sources case (12) and labelled-fields case (12), compose (2), the template's body alone (1), and the three
+bed cases whose consistent source is now the amended composition (3). Every other case is green there, W2-153's first
+build (S1, S2, S4 and the first S3) being merged. The table's "On integrate" column is revision 3's (`f73e72d4a43b`,
+before that build), except for the rows marked "revision 4", and the paragraph that follows is revision 3's, kept for
+its history.
 
 Run in the launch sandbox on integrate's code (this branch, integrate merged, launcher `91033723374d`, revision 3,
 2026-11-10): **51 cases, 38 failed, 13 passed** (about 5 s). F2's eleven cases are green here, the tree's launcher being
@@ -85,14 +124,17 @@ what its KPI line asks for, none on a premise. A reference build (below) passed 
 | F1 | `test_w2_153_dispatch.py::test_f1_the_lead_line_refuses_when_role_lead_md_is_missing` | red | the lead line starts the stand-in (exit 0) without `role-lead.md` |
 | F2 | `test_w2_153_dispatch.py::test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag` | green (guard) | the script is integrate's; with the flag taken out its arguments and working folder must stay integrate's |
 | F2 | `test_w2_153_dispatch.py::test_f2_guard_integrate_s_lead_line_starts_on_the_same_bed_without_the_flag` | green (guard) | the baseline runs on the bed, in the lead's tree, with the lead's settings and no flag |
-| S3, S4 | `test_w2_153_portability.py::test_s3_s4_a_project_with_the_composed_source_and_the_eight_copies_is_reported_consistent` | red | `SOURCE_DIFFERS`: integrate compares the source with the role file's body, not the template's |
-| S3 | `test_w2_153_portability.py::test_s3_a_source_that_keeps_the_kernel_role_file_s_body_is_a_finding` | red | today's form (the role file's body) is no finding on integrate |
+| S3, S4 | `test_w2_153_portability.py::test_s3_s4_a_project_with_the_composed_source_and_the_eight_copies_is_reported_consistent` | red (revision 4: the reason) | `SOURCE_DIFFERS`: integrate (`bbe222c59`) compares the source with the template's body alone, not the template's body, a blank line and the role file's body (S3 amended) |
+| S3 | `test_w2_153_portability.py::test_s3_a_source_that_keeps_the_kernel_role_file_s_body_is_a_finding` | red on `f73e72d4a43b`; green (guard) in revision 4 | the role file's body alone is a finding on `bbe222c59` too (it compares the template's body); it must stay one under the amended composition |
+| S3 | `test_w2_153_portability.py::test_s3_a_source_with_the_template_s_body_alone_is_a_finding` | red (revision 4) | the template's body alone (W2-153's first composition, integrate's) is no finding on integrate; amended, it lacks the role file's fields |
+| S3 | `test_w2_153_portability.py::test_s3_compose_returns_the_source_s_full_text_and_the_check_accepts_it` | red (revision 4; 2: `composed`, `template-body-alone`) | `ImportError`: integrate's `gov.adapters.portability` has no `compose` |
 | S3 | `test_w2_153_portability.py::test_s3_the_skills_list_is_part_of_the_composition` | red | the composed source is a finding on integrate (its first half) |
 | S3 | `test_w2_153_portability.py::test_s3_a_skills_list_at_the_top_level_is_a_finding` | red | the composed source (list under `claudecode`) is a finding on integrate (its first half); its second half makes the same list at the top level, with none under `claudecode`, a finding (DEC-1112 (3)) |
 | S4 | `test_w2_153_portability.py::test_s4_a_changed_copy_and_a_missing_copy_are_findings` | red | integrate does not look at `.claude/templates/` |
 | S4 | `test_w2_153_portability.py::test_s4_a_copy_differing_by_one_byte_is_a_finding` | red (2: trailing newline, line ending) | the same; the two cases make sure the copy is compared byte for byte |
 | S4 | `test_w2_153_portability.py::test_s4_the_writer_writes_the_eight_copies_byte_for_byte` | red | integrate's `main()` takes no arguments: it runs the check and writes nothing |
-| S3 | `test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_and_its_template_s_body` | red (6 roles × 2 trees) | the sources hold the role files' bodies and no `claudecode.skills` list; a top-level `skills` is refused, and the front matter must equal integrate's but for `claudecode.skills` (the rest of `claudecode`, such as `tools`, unchanged) |
+| S3 | `test_w2_153_sources.py::test_s3_each_role_source_is_its_front_matter_its_skills_its_template_s_body_and_its_role_file_s_body` | red (6 roles × 2 trees; renamed in revision 4) | the sources hold the template's body alone (W2-153's first composition, on integrate), not the template's body, a blank line and the role file's body; the `claudecode.skills` list and the front matter checks are unchanged (a top-level `skills` refused; the front matter equal to integrate's but for `claudecode.skills`) |
+| S3 | `test_w2_153_sources.py::test_s3_the_source_s_labelled_fields_are_its_role_file_s_and_the_template_contributes_none` | red (revision 4; 6 roles × 2 trees) | the sources carry none of the role file's labelled fields (W1-33's `fields()` rule): missing purpose, allowed paths, tools, network, model tier, authority level, handoff format and permission classes (research: seven, it has no permission classes field); each role template carries none, as the case requires |
 | S3 | `test_w2_153_sources.py::test_s3_guard_the_check_finds_no_role_source_drift_in_this_repository` | green (guard) | the check, run from this repository's root without rulesync, names no `subagents` source; it must stay so once the sources and the check change together |
 | S5 | untestable here | none | the CTO's evidence: see below |
 
@@ -139,10 +181,22 @@ the dispatcher without its file check failed its F1.
   commit (`w2_153_support.BASELINE_COMMIT` and its blob ids) then moves to a commit holding that change, a one-line
   edit by the test designer. Done once in revision 3 for W2-56's launcher (`1ef1a7a48c53` → `f73e72d4a43b`).
 
+- **D-7. `compose`'s arguments (revision 4).** The ticket states `compose(root, role) -> str`. The cases pass `root`
+  as a `pathlib.Path` and `role` as the kernel role file's stem (`engineer`), and require a `str`. They check the
+  returned text's front matter as a mapping (the YAML's layout is not compared) and its body exactly. The front
+  matter expected is the fixture source's own (`name`, `targets`, `description`, `claudecode.tools`) with
+  `claudecode.skills`. The case's second form plants a stale source (the template's body alone) and requires the
+  same text, because the copies ACT's builder writes `compose`'s text over the sources. A `compose` that reads the
+  front matter from elsewhere than the source passes if the mapping is the same.
+- **D-8. The template's contribution (revision 4).** "The template contributes none" is read as: W1-33's `fields()`
+  finds no labelled field in the role template's text. On integrate all six templates hold none. A template that
+  gains one fails the labelled-fields case on its premise line, naming the template, not the source.
+
 ## Files
 
 - `w2_153_support.py`: the map, the skills lists, the eight stems, the baseline commit and blobs, the three beds
-  (`LaunchBed`, `DispatchBed`, `PortabilityBed`), the stand-in CLI and the helpers.
+  (`LaunchBed`, `DispatchBed`, `PortabilityBed`, which also calls `compose`), S3 amended's `composed_body`, W1-33's
+  `fields()` rule reproduced, the stand-in CLI and the helpers.
 - `w2_153_launch_harness.py`: one `launch()` call in a child process, its outcome written as JSON.
 - `conftest.py`: puts this folder on the import path, and unpacks integrate's `src/gov` once per session.
 - `test_w2_153_launch.py` (S1, F1, F2), `test_w2_153_dispatch.py` (S2, F1, F2), `test_w2_153_portability.py` (S3,

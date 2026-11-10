@@ -2,8 +2,10 @@
 
 W2-153 delivers the role template at launch (W2-128 TPL-4): ``gov launch`` and the dispatcher's lead line pass
 ``--append-system-prompt-file <root>/.claude/templates/<stem>.md`` and refuse without the file; the rulesync role
-sources are composed from the kernel role templates with a ``skills:`` list; the ``.claude/templates/`` copies are
-checked byte for byte and written by ``python3 -m gov.adapters.portability --write-templates <dir>``.
+sources are composed (S3 amended, DEC-1112 (3): the rulesync front matter with ``claudecode.skills``, the kernel role
+template's body, one blank line, the kernel role file's body; ``gov.adapters.portability.compose(root, role)``); the
+``.claude/templates/`` copies are checked byte for byte and written by ``python3 -m gov.adapters.portability
+--write-templates <dir>``.
 
 How the code under test is chosen (DEC-732): every command runs with ``PYTHONPATH`` set to the ``src/`` folder of the
 working tree this file is in. The baseline for the failure line F2 is integrate's code at ``BASELINE_COMMIT``, read
@@ -206,6 +208,63 @@ def flag_values(argv: list[str]) -> list[str]:
 
 def template_text(stem: str) -> str:
     return f"---\nname: {stem}\nversion: 1.0.0\n---\n# W2-153 fixture template {stem}\n"
+
+
+def composed_body(template_body: str, role_body: str) -> str:
+    """S3 amended (DEC-1112 (3), 2026-11-10): the composed source's body is the role template's body, then one
+    blank line, then the kernel role file's body. Each body is read by ``split_front`` (portability's ``_split``
+    rule: front matter, if any, stripped, and the blank lines after it dropped). The templates end with one newline,
+    so the blank line is one more newline; a template body that does not end so fails here, not in the case."""
+    assert template_body.endswith("\n") and not template_body.endswith("\n\n"), (
+        "the fixture's premise: a role template body ends with exactly one newline")
+    return template_body + "\n" + role_body
+
+
+# --- W1-33's labelled fields (MR-5, DEC-066), reproduced from tests/acceptance/W1-33/w1_33_support.py ---------------
+
+_LABELLED = re.compile(r"^[-*]\s+\*\*(?P<label>[^*]+?):?\*\*:?\s*(?P<rest>.*)$")
+
+
+def _w1_33_body(text: str) -> str:
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end >= 0:
+            rest = text[end + 4:]
+            return rest.split("\n", 1)[1] if "\n" in rest else ""
+    return text
+
+
+def fields(text: str) -> dict:
+    """``{label in lower case: text}`` for every labelled list item of a Markdown text (front matter left out),
+    as W1-33's ``fields()`` reads a role file or an agent definition: a field is a list item that starts with a bold
+    label, up to the next labelled item, a heading, or a blank line followed by text that is not indented; its text
+    is whitespace-collapsed."""
+    lines = _w1_33_body(text).splitlines()
+    spans, start, label = [], None, None
+
+    def close(end):
+        if start is not None:
+            first = _LABELLED.match(lines[start]).group("rest")
+            spans.append((label, " ".join("\n".join([first, *lines[start + 1:end]]).split())))
+
+    for index, line in enumerate(lines):
+        match = _LABELLED.match(line)
+        ends = False
+        if match or line.startswith("#"):
+            ends = True
+        elif start is not None and line.strip() and not line[0].isspace():
+            ends = index > 0 and not lines[index - 1].strip()
+        if ends:
+            end = index
+            while end > 0 and start is not None and end - 1 > start and not lines[end - 1].strip():
+                end -= 1
+            close(end)
+            start, label = (index, match.group("label").strip()) if match else (None, None)
+    end = len(lines)
+    while start is not None and end - 1 > start and not lines[end - 1].strip():
+        end -= 1
+    close(end)
+    return {name.lower(): value for name, value in spans}
 
 
 # --- the launch bed (S1, F1, F2) ---------------------------------------------------------------------------------------
@@ -413,10 +472,14 @@ def kernel_template_text(stem: str) -> str:
     return f"---\nname: {stem}\nversion: 1.0.0\n---\n# {stem} (fixture)\n"
 
 
-def composed_source(*, skills: list[str] | None = ("test-driven-development",), body: str = ENGINEER_TEMPLATE_BODY,
+ENGINEER_COMPOSED_BODY = composed_body(ENGINEER_TEMPLATE_BODY, ROLE_BODY)
+
+
+def composed_source(*, skills: list[str] | None = ("test-driven-development",), body: str = ENGINEER_COMPOSED_BODY,
                     top_level: bool = False) -> str:
     """S3's source: the list sits under ``claudecode: skills:`` (DEC-1112 (3): rulesync 24.0.0 drops a top-level
-    ``skills``). ``top_level=True`` plants it at the top level instead, with none under ``claudecode``."""
+    ``skills``). ``top_level=True`` plants it at the top level instead, with none under ``claudecode``. Its body is
+    S3 amended's (the template's body, a blank line, the role file's body) unless ``body`` names another."""
     front = RULESYNC_FRONT
     if skills is not None:
         listed = f"skills: [{', '.join(skills)}]\n"
@@ -462,6 +525,19 @@ class PortabilityBed:
 
     def source(self) -> Path:
         return self.root / ".rulesync/subagents/engineer.md"
+
+    def compose(self, role: str = "engineer") -> dict:
+        """``gov.adapters.portability.compose(<project root as a Path>, role)`` in a child process on this tree's
+        code: ``{"exit": n, "text": str | None, "stderr": str}``."""
+        program = ("import json, sys\nfrom pathlib import Path\nfrom gov.adapters.portability import compose\n"
+                   "text = compose(Path(sys.argv[1]), sys.argv[2])\n"
+                   "sys.stdout.write(json.dumps({'type': type(text).__name__, 'text': text}))\n")
+        done = subprocess.run([sys.executable, "-c", program, str(self.root), role], cwd=str(self.base),
+                              env=portability_env(self.base, RULESYNC_BIN=str(self.rulesync)),
+                              capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        printed = json.loads(done.stdout) if done.returncode == 0 and done.stdout.strip() else {}
+        return {"exit": done.returncode, "type": printed.get("type"), "text": printed.get("text"),
+                "stderr": done.stderr}
 
     def check(self) -> tuple[int, dict, str]:
         """``python3 -m gov.adapters.portability`` in the project: ``(exit code, printed JSON, stderr)``."""
