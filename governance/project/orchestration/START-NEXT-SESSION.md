@@ -1,4 +1,4 @@
-# Start here — the next CTO session (written 2026-11-10 ~14:30 UTC by session ad44f5fe, the fresh-session handover of DEC-1110 (2))
+# Start here — the next CTO session (written 2026-11-10, final at ~15:15 UTC, by session ad44f5fe: the fresh-session handover of DEC-1110 (2))
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
@@ -53,8 +53,8 @@ the register and the owner's word hold over both. **Next free id: DEC-1120.**
    `yes ACT-W2-149-INSTALL-1 dec93288` (set-up A's briefs and the launch script's list; class (O), by hand).
    After a yes: queue the two (b) bundles for the operator agent (`~/gov-os-operator/queue/<ACT>.req`, one line
    `ACT-<id> <64-hex manifest sha>`); the install ACT goes to the owner's operator by hand (package §5).
-2. **By the owner's operator, by hand:** ACT-OPERATOR-2 (class (O), no yes line; the agent's install with the replay
-   check), then ACT-WIN-TOAST-1 (class (b); test-map line), then ACT-W2-149-INSTALL-1 after its yes.
+2. **By the owner's operator, by hand:** ACT-W2-149-INSTALL-1 after its yes. (ACT-OPERATOR-2 applied 11-10 15:04:20,
+   APPROVED `b4a15c8f…`; ACT-WIN-TOAST-1 applied as `3849c1ca2`.)
 3. **USAGE-1 decided (DEC-1118):** A, B, C in force (rule 11). **Yours to do:** (D) confirm on this CLI that
    `FORCE_PROMPT_CACHING_5M=1` gives launched workers the 5-minute cache (check `claude --version`, the official
    env-vars page, one planted worker's usage fields), then set it in `launch_worker.sh` and record it; (E, F) trials

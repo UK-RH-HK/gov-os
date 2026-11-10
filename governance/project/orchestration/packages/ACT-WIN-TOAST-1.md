@@ -53,3 +53,5 @@ git commit -m "ACT-WIN-TOAST-1: tools/win_toast.ps1 out of the test map's record
   - `undo` now refuses unless the map is as this ACT left it, so a later change is not lost.
 - **Round 2:** READY. F2 and F3 are closed. Its F1 (route) is answered above: by hand. Its F2 (the tree rule) applies only to
   the agent's route.
+
+**Applied** (2026-11-10, by the owner's operator, by hand): committed as `3849c1ca2`; `apply.sh check` now reads "already applied".

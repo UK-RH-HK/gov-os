@@ -189,3 +189,5 @@ today); the owner's minute. No install, no GPU.
 
 **Basis:** question 2 (an operator that cannot be shown a curated replay: every path-map ACT's replay is the guard's own
 record of the calls).
+
+**Applied** (2026-11-10 15:04:20 UTC, by the owner's operator, by hand): every line as expected; no commit (as §5 says); the install's APPROVED now `b4a15c8f3b7c769259f25b8d71406e6c7d387d30c021343f26f4bad6e3831fa4`, accepted by the agent's next launch; applied after the 15:00 launch ended, `launch.lock` free; the expected `install/__pycache__/opcommon.cpython-312.pyc` rewrite (review F1).
