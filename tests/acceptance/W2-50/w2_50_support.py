@@ -244,6 +244,15 @@ PROJECT_FILES = {
     "docs/audit/earlier.md": "audit\n",
     "experiments/spikes/exp-901/README.md": "# Experiment 901\n",
 }
+# W2-153 (DEC-1050, DEC-1116): ``gov launch`` refuses a session without ``.claude/templates/<stem>.md`` for its role
+# (LAUNCH_NO_TEMPLATE), so the fixture project holds the eight copies, byte for byte the kernel's own
+# ``template/governance/kernel/templates/<stem>.md`` (what the ACT installs, W2-153 S4). The cases that launch a
+# session test what they tested before; none accepts the refusal.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+KERNEL_TEMPLATES = REPO_ROOT / "template/governance/kernel/templates"
+PROJECT_FILES.update({f".claude/templates/{stem}.md": (KERNEL_TEMPLATES / f"{stem}.md").read_text(encoding="utf-8")
+                      for stem in TEMPLATE_STEMS})
 # Single named files of this repository the fixture project holds where a product repository has them.
 COPIED_FILES = {
     GUARD_REL: GUARD_SOURCE,
