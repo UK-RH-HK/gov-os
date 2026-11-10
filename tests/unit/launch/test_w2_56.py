@@ -43,6 +43,14 @@ def _open_gate(home: Path, monkeypatch) -> None:
         monkeypatch.setenv(name, str(value))
 
 
+def _plant_templates(root: Path) -> None:
+    """Every role's template copy a session starts with (W2-153 S1, DEC-1112 (3)): any content will do."""
+    for stem in set(launcher.ROLE_TEMPLATES.values()):
+        path = root / launcher.TEMPLATES_REL / f"{stem}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {stem}\n", encoding="utf-8")
+
+
 # --- S5: the cleaned environment -------------------------------------------------------------------------------------
 
 PARENT = {"PATH": "/a:/b", "HOME": "/home/x", "LANG": "C.UTF-8", "LC_ALL": "C", "USER": "x", "LOGNAME": "x",
@@ -325,7 +333,8 @@ CLI = textwrap.dedent("""\
     os.chmod(os.path.join(os.environ["TMPDIR"], "cache"), 0o500)
     with open({out!r}, "w") as out:
         json.dump({{"env": dict(os.environ), "settings": settings, "pgid": os.getpgrp(), "pid": os.getpid()}}, out)
-    sys.exit(int(sys.argv[-1]))
+    args = sys.argv[:-2] if sys.argv[-2:-1] == ["--append-system-prompt-file"] else sys.argv  # W2-153's appended pair
+    sys.exit(int(args[-1]))
 """)
 
 
@@ -340,6 +349,7 @@ def launched(tmp_path, monkeypatch):
     cli.chmod(0o755)
     (project / ".tickets/TST-a001.md").write_text(
         "---\nid: TST-a001\nwbs_id: W2-90\nstatus: in_progress\nrole: engineer\n---\n", encoding="utf-8")
+    _plant_templates(project)
     monkeypatch.setenv("HOME", str(home))
     _open_gate(home, monkeypatch)
     for name, value in (("GOV_DEV_TIERS", "1"), ("PYTHONPATH", "/x"), ("CLAUDE_CODE_SESSION_ID", "s"),
@@ -421,6 +431,7 @@ def test_a_worktree_sessions_settings_name_no_path_under_a_git_folder(tmp_path, 
     worktree = tmp_path / "W2-77"
     subprocess.run(["git", "-C", str(main), "worktree", "add", "-q", str(worktree)], check=True, env=git)
     (worktree / ".gov-runtime/scratch").mkdir(parents=True)
+    _plant_templates(worktree)
     for lock in ("config.lock", "index.lock", "HEAD.lock"):  # a git command in another worktree holds its locks now
         (main / ".git" / lock).write_text("", encoding="utf-8")
     out = tmp_path / "out.json"

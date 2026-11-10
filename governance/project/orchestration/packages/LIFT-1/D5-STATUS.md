@@ -270,3 +270,14 @@ marked on W2-128.
   `32b89d25a` (the link-notice comment). **Next, the CTO's order:** merge round 2b, W2-152-tests and W2-153; then
   ACT-CLAUDE-COPIES-2 (the same builder, on that integrate: the six agents from W2-153's composed sources and round
   2b's 1.2.0 skills), rehearsed, reviewed, and §6 with the line `yes ACT-CLAUDE-COPIES-2 <manifest sha8>`.
+- 2026-11-10 02:03 UTC: **W2-153 READY to merge at `c82ff5c18`.** Integrate merged in after round 2b (`f3c15908d`) and
+  W2-152-tests (`dea78270a`).
+  - The conflict in `template/.rulesync/subagents/orchestrator.md`: kept W2-153's composition. Round 2b's one-line
+    fix lived in the old body, which the composition replaces; the composed `role-lead.md` body names no retired
+    brief text.
+  - Round 2a's F6 `[rulesync]` case now also accepts the composed body (a test designer, `a3a0eb7a76b8`,
+    `Rewrite-Reason:`).
+  - On the merge result: `gov accept` W2-153 51/51, W2-128 121/121, W2-152 67/67; W2-56 284, W2-20 170, W2-136 76
+    and W2-54 67, all passed; unit tests 486/0; no new failure against integrate (W1-46's 80 gate-file reds are on
+    integrate too). Links ok.
+  - Portability NOTICE: 8 findings, ACT-2's (round 2b's two skill sources and the six agents).
