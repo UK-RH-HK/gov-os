@@ -63,7 +63,8 @@ def test_a_headless_workers_ordinary_arguments_pass_unchanged(launch, role):
     result = launch(role, None, *HEADLESS)
     assert result.run.returncode == 0, f"gov launch refused a headless worker's ordinary arguments\n{result.describe()}"
     args = result.session()["args"]
-    assert tuple(args[-len(HEADLESS):]) == HEADLESS, f"the CLI did not get the arguments unchanged, in order: {args}"
+    assert support.caller_args_then_template_pair(args, HEADLESS), (
+        f"the CLI did not get the arguments unchanged, in order, followed by nothing or the one template pair: {args}")
     assert support.sandbox_faults(result.settings()) == []
 
 
