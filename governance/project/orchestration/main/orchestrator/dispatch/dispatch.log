@@ -346,3 +346,5 @@
 2026-11-10 00:43:05 incident outside-slot opened: /usr/bin/python3 -B -m pytest (pid 124127, 21 min, gw4/test_w2_96_r9_r12_a_signal_dur1/proj); /usr/bin/python3 -B -m pytest (pid 155399, 20 min, gw4/test_w2_96_r9_r12_ctrl_c_durin0/proj) -> 2026-11-10-0043-outside-slot.md, inbox/20261110-004305-incident-outside-slot-0043.txt
 2026-11-10 00:57:03 interim result: D10-merge 389867fe6 W2-138 D-10 (DEC-1109 (2)): W2-54's query-cache case in its paths: it compares g
 2026-11-10 01:00:07 incident outside-slot closed (/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/incidents/2026-11-10-0043-outside-slot.md)
+2026-11-10 01:14:05 interim result: W2-153 a922f79e4 W2-153: F2's baseline revision merged (TESTS-READY ac0409a40)
+2026-11-10 01:14:05 interim result: W2-153 ac0409a40 W2-153-tests R3: F2's baseline moves to the merge base f73e72d4a43b (launcher 91
