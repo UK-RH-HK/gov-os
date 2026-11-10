@@ -425,3 +425,7 @@ other restart is an ACT.
   labeller 1's round-2 delivery refused (20) unless every hand-label action has one; S16 and S20 to set-up A's
   deliveries and the declaration's overlap rule; the overlap auditor never appends to AUDITS.log; exit 18 for a rule
   script that cannot run confined. The pin amendment follows the wiring's merge and the rebuilt install ACT's apply.
+- Delegated (CTO, 2026-11-10, DEC-1112 (3)): W2-66's DEC-891 record case, (a): files read by code (W2-149's
+  indep-schemas/*.json) are not counted as records; a test designer revises the case (not (b), moving W2-149's
+  schemas and its ACT; not (c), record-only, which fails open). W2-13's real-model latency under load: the existing
+  load-sensitive route or the nightly, never a looser 0.5 s limit. W2-116's and W1-32's cases follow W2-56's S5/S15.
