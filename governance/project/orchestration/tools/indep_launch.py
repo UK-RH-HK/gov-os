@@ -9,7 +9,11 @@ Standard library, PyYAML and git; no gov import. The CTO runs it, from the repos
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/writer.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --round 1
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind checker --brief governance/project/indep-briefs/checker.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --round 1
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --brief governance/project/indep-briefs/auditor.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --audit e0
-  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/labeller.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set sandbox-labels --round 2
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/sgx1-writer-tuning.md --brief-sha256 82134b3dd6b5a077abfc2eb6fa7481f0f5a73eab60396cfbd655042d53027c57 --commit 6ff398a28 --set tuning --round 1
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --brief governance/project/indep-briefs/sgx1-writer-heldout.md --brief-sha256 137a73d1df4c265fd5ce4e24716797703e2b12dcaeb90663c0170834a60fafe6 --commit 6ff398a28 --set held-out --round 1
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1-labeller.md --brief-sha256 bbff1249953bd9d3b2596b33a108712bdddd79a7e86723b9e6955e3d6b0e9068 --commit 6ff398a28 --set tuning --round 2
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind labeller --brief governance/project/indep-briefs/sgx1-labeller-2.md --brief-sha256 e13b5f96d0e058277f3ec3014f13205d7fe0bc950cfc308e81b3ee3d742ac904 --commit 6ff398a28 --set held-out --round 2
+  python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind auditor --brief governance/project/indep-briefs/sgx1-overlap-auditor.md --brief-sha256 b212a424062e402b0a25ee4a157ae14a0af798d0ad973aa33dacd730782be6ab --commit 6ff398a28 --set held-out --audit sgx1-overlap
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root /tmp/planted-sets --kind writer --brief governance/project/indep-briefs/writer.md --brief-sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --commit 6ff398a28 --set memory-recall-3 --seed 17 --dry
   python3 governance/project/orchestration/tools/indep_launch.py --sets-root ~/gov-os-eval --kind writer --run 20261109T120000Z-memory-recall-3-r1 --counts-only
 
@@ -17,10 +21,17 @@ The line names only --sets-root <root>: never a folder under it (the guard's lin
 derives every folder under the root in its own code. --dry belongs on planted sets roots only: it leaves its wall and
 tree in place for inspection (P-W2-149-DRY, option (a)).
 
+Set-up A (SANDBOX-GUARD-EXP-1; DEC-1112 (3), DEC-1113): a brief whose front matter names a `brief:` id takes its
+missing `model`, `result_schema` and `sample` from that id's entry under the template kinds.yaml's `briefs:`, and the
+entry's `flow`: the two planted-case writers, the two labellers (the labeller kind runs these flows only) and the
+overlap auditor. `--set` names the half (`tuning`: <runs>/SANDBOX-GUARD-EXP-1/tuning; `held-out`: the sealed folder
+under the sets root); the inputs are staged and the products delivered by the script's own code. At the first
+labeller's round 2 its round-1 rule script runs confined (bwrap, no network, no process, capped), else code 18.
+
 Exit codes: 0 delivered or dry; 10 brief; 11 template; 12 wall or tree exists; 13 seed not first; 14 commit; 15 file
-budget; 16 canary; 17 argument; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is the counts object
-(indep-schemas/indep-counts.schema.json), also written as <runs>/indep/<kind>/<run>/counts.json once a run id exists.
-No text from the session or out/ is printed or logged, and no path under the wall.
+budget; 16 canary; 17 argument; 18 the rule script; 20 result rejected; 21 stopped; 22 a trace. Stdout's last line is
+the counts object (indep-schemas/indep-counts.schema.json), also written as <runs>/indep/<kind>/<run>/counts.json
+once a run id exists. No text from the session or out/ is printed or logged, and no path under the wall.
 """
 import argparse
 import fnmatch
@@ -32,6 +43,7 @@ import posixpath
 import random
 import re
 import secrets
+import selectors
 import shutil
 import signal
 import stat
@@ -65,7 +77,7 @@ SCHEMA_NAME_RX = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\.schema\.json")
 COMMIT_RX = re.compile(r"[0-9A-Za-z][0-9A-Za-z._/~^-]{0,255}")
 SESSION_ID_RX = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{7,127}")
 CODES = {10: "brief", 11: "template", 12: "wall_exists", 13: "seed_order", 14: "commit", 15: "file_budget",
-         16: "canary", 17: "argument", 20: "result", 21: "stopped", 22: "trace"}
+         16: "canary", 17: "argument", 18: "rules", 20: "result", 21: "stopped", 22: "trace"}
 DELIVERS = {"writer": "set", "checker": "notes", "auditor": "classes", "labeller": "labels"}
 OUT_KEYS = {"writer": ("questions", "by_kind", "by_area"),
             "checker": ("checked", "accepted", "revise", "rejected"),
@@ -74,7 +86,33 @@ OUT_KEYS = {"writer": ("questions", "by_kind", "by_area"),
 BY_KIND = ("fact", "procedure", "decision", "location", "negative")
 BY_AREA = ("contract", "decisions", "kernel", "code", "tests", "operations", "docs")
 MISS_CLASSES = ("gold_wrong", "question_ambiguous", "retrieval_miss", "answer_wrong", "out_of_scope")
-SEAL = "fixtures/evaluation/sandbox-guard-exp-1/hidden"  # the labellers' sealed folder under the sets root
+SEAL = "fixtures/evaluation/sandbox-guard-exp-1/hidden"  # the held-out half's sealed folder under the sets root
+# Set-up A (DEC-1112 (3), DEC-1113): each flow's kind, the halves --set may name and the rounds --round may name.
+FLOWS = {"sgx1-writer-1": ("writer", ("tuning",), (1,)),
+         "sgx1-writer-2": ("writer", ("held-out",), (1,)),
+         "sgx1-labeller-1": ("labeller", ("tuning", "held-out"), (1, 2)),
+         "sgx1-labeller-2": ("labeller", ("tuning", "held-out"), (1, 2)),
+         "sgx1-overlap-auditor": ("auditor", ("tuning", "held-out"), (1,))}
+EXP = "SANDBOX-GUARD-EXP-1"       # <runs>/SANDBOX-GUARD-EXP-1: the experiment's folder (the tuning half under it)
+SEAL_SET = "sandbox-guard-exp-1"  # the evaluation set the seal's path-map entry names
+ROUND1_FILES = {"sgx1-labeller-1": ("label_rules.py", "rulebook.md"), "sgx1-labeller-2": ("rulebook-2.md",)}
+ACTION_FIELDS = ("id", "role", "agent", "ticket", "wbs", "tool", "input", "cwd", "executable", "strata", "source")
+DISPUTE_ACTION = ("role", "agent", "ticket", "wbs", "tool", "input", "cwd")
+LABEL_PART = ("label", "rule_class", "clauses", "reason")
+LABELS = ("allow", "refuse", "ask")
+AUDIT_SPLIT = 40                  # the overlap auditor's cases per run (the CTO's delegated split)
+SGX_OUT = ("round", "cases", "copies", "near_miss", "not_executable", "rules", "hand_labelled", "ask", "by_class",
+           "uncertain_seen", "sample", "decided", "agrees_x", "agrees_y", "neither", "cannot_settle",
+           "may_change_verdict", "instructions_ignored", "stopped", "labelled", "allow", "refuse")
+STOPPED = ("none", "input-missing", "input-malformed", "decisions-conflict", "forbidden-read-needed",
+           "form-not-writable", "not-sealed")
+# The confined rule script (S25): its caps; the prelude below sets them inside the sandbox before the script's code runs.
+RULES_WALL_S = 20                 # wall-clock seconds (at most 60)
+RULES_CPU_S = 15
+RULES_AS = 1 << 30                # address space, bytes
+RULES_NOFILE = 32
+RULES_OUT_BASE = 1 << 20          # stdout cap: this much plus RULES_OUT_PER_ID per staged id
+RULES_OUT_PER_ID = 4096
 FILE_BUDGET = 8000
 WALL_FIXED = 7  # seed.txt brief.md CLAUDE.md WALL.json input/selection.json .claude/settings.json .claude/wall_hook.py
 RUN_EXTRA = 3   # beside the fixed files and the staged copies: <run>.session.json, out/result.json, the delivered file
@@ -92,6 +130,39 @@ TRACE_DIRS = ("projects", "file-history", "session-env", "todos")
 PROMPT = ("Follow brief.md in this folder exactly, and finish by writing out/result.json in the schema the brief "
           "names.")
 PROMPT_SHA256 = "b86c5a8e5953db3e02c6e5b0128f66e75f0eed8e0b6429e62f71d103042b0189"
+# The rule script's prelude, run by the pinned interpreter inside bwrap (`-I -X utf8 -c <prelude> <script>`): it reads
+# the script, sets every cap as a hard limit (no process: RLIMIT_NPROC 0; no file written: RLIMIT_FSIZE 0), installs a
+# seccomp filter that refuses exec, fork/clone, socket and namespace calls (any other architecture: killed), and only
+# then runs the script's code. A failure anywhere exits non-zero, which the launcher takes as code 18.
+RULES_PRELUDE = r'''
+import ctypes, os, resource, struct, sys
+path = sys.argv[1]
+with open(path, "rb") as f:
+    src = f.read()
+for r, v in ((resource.RLIMIT_NPROC, 0), (resource.RLIMIT_FSIZE, 0), (resource.RLIMIT_CORE, 0),
+             (resource.RLIMIT_NOFILE, @NOFILE@), (resource.RLIMIT_CPU, @CPU@), (resource.RLIMIT_AS, @AS@)):
+    resource.setrlimit(r, (v, v))
+if os.uname().machine != "x86_64":
+    sys.exit(70)
+DENY = (41, 53, 56, 57, 58, 59, 272, 308, 322, 435)  # socket socketpair clone fork vfork execve unshare setns execveat clone3
+def ins(code, jt, jf, k):
+    return struct.pack("=HBBI", code, jt, jf, k)
+d = 6 + len(DENY)
+prog = [ins(0x20, 0, 0, 4), ins(0x15, 1, 0, 0xC000003E), ins(0x06, 0, 0, 0x80000000), ins(0x20, 0, 0, 0),
+        ins(0x35, d - 5, 0, 0x40000000)]
+prog += [ins(0x15, d - (6 + i), 0, nr) for i, nr in enumerate(DENY)]
+prog += [ins(0x06, 0, 0, 0x7FFF0000), ins(0x06, 0, 0, 0x00050001)]
+buf = ctypes.create_string_buffer(b"".join(prog))
+class Prog(ctypes.Structure):
+    _fields_ = [("len", ctypes.c_ushort), ("filter", ctypes.c_void_p)]
+fprog = Prog(len(prog), ctypes.addressof(buf))
+libc = ctypes.CDLL(None, use_errno=True)
+libc.prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong]
+if libc.prctl(38, 1, 0, 0, 0) != 0 or libc.prctl(22, 2, ctypes.addressof(fprog), 0, 0) != 0:
+    sys.exit(71)
+sys.argv = [path]
+exec(compile(src, path, "exec"), {"__name__": "__main__", "__file__": path, "__builtins__": __builtins__})
+'''.replace("@NOFILE@", str(RULES_NOFILE)).replace("@CPU@", str(RULES_CPU_S)).replace("@AS@", str(RULES_AS))
 
 
 class Refuse(Exception):
@@ -560,7 +631,54 @@ def load_kinds(data):
         if not (is_number(spec.get("budget_usd")) and spec["budget_usd"] > 0
                 and is_number(spec.get("timeout_s")) and spec["timeout_s"] > 0):
             return None
+        if "model" in spec and not full(MODEL_RX, spec["model"]):
+            return None
     return kinds
+
+
+def load_briefs(data):
+    """The template's `briefs:` map (brief id -> entry), {} when absent; None when it is not a map of maps. Each
+    entry's values are checked at stage 10, when a brief names it."""
+    try:
+        k = yaml.safe_load(data.decode("utf-8"))
+    except (UnicodeDecodeError, yaml.YAMLError):
+        return None
+    briefs = k.get("briefs", {}) if isinstance(k, dict) else None
+    if briefs is None:
+        return {}
+    if not isinstance(briefs, dict) or not all(isinstance(v, dict) for v in briefs.values()):
+        return None
+    return briefs
+
+
+def resolve_brief(fm, kind, spec, briefs):
+    """S22, stage 10: (model, result schema name, sample, brief id, entry or None). Each value from the front matter,
+    else from the `briefs:` entry its `brief:` id names (whose kind must be the brief's), else (the model only) from
+    the kind's; a value found nowhere, a bad entry, or a labeller brief without an entry: 10."""
+    bid, entry = fm.get("brief"), None
+    if bid is not None:
+        if not isinstance(bid, str) or bid not in briefs:
+            raise Refuse(10, "entry")
+        entry = briefs[bid]
+        flow = entry.get("flow")
+        if entry.get("kind") != kind or flow not in FLOWS or FLOWS[flow][0] != kind:
+            raise Refuse(10, "entry")
+        tex = entry.get("tree_exclude", [])
+        if not isinstance(tex, list) or not all(isinstance(g, str) and g for g in tex):
+            raise Refuse(10, "entry")
+    elif kind == "labeller":
+        raise Refuse(10, "entry")  # the labeller kind runs set-up A's flows only
+
+    def pick(key, kind_too=False):
+        for src in (fm, entry or {}, spec if kind_too else {}):
+            if key in src:
+                return src[key]
+        return None
+
+    model, schema_name, sample_n = pick("model", True), pick("result_schema"), pick("sample")
+    if not is_count(sample_n) or not full(MODEL_RX, model) or not full(SCHEMA_NAME_RX, schema_name):
+        raise Refuse(10, "front_matter")
+    return model, schema_name, sample_n, bid, entry
 
 
 def excludes_of(data):
@@ -622,23 +740,6 @@ def real_inside(path, root):
     return os.path.realpath(path) == os.path.normpath(path) and at_or_under(path, root)
 
 
-def read_jsonl_ids(path):
-    ids, lines = [], {}
-    with open(path, "rb") as f:
-        for raw in f:
-            if not raw.strip():
-                continue
-            obj = load_json_strict(raw.decode("utf-8"))
-            if not isinstance(obj, dict) or not isinstance(obj.get("id"), (str, int)) or isinstance(obj["id"], bool):
-                raise ValueError("id")
-            key = json.dumps(obj["id"])
-            if key in lines:
-                raise ValueError("duplicate")
-            ids.append(obj["id"])
-            lines[key] = raw if raw.endswith(b"\n") else raw + b"\n"
-    return ids, lines
-
-
 def plan_inputs(kind, rnd, root, set_name, audit):
     """The staged copies: (source, wall-relative destination) pairs, each source a plain file under the root;
     a missing input refuses with 10 before anything is written."""
@@ -673,17 +774,267 @@ def plan_inputs(kind, rnd, root, set_name, audit):
         plan += set_copies()
         plan.append((need_file(os.path.join(root, "runs", audit, "misses.jsonl")), "input/misses.jsonl"))
     else:
-        seal = os.path.join(root, *SEAL.split("/"))
-        plan.append((need_file(os.path.join(seal, "rulebook.md")), "input/rulebook.md"))
-        r1 = need_file(os.path.join(seal, "corpus", "actions-r1.jsonl"))
-        try:
-            read_jsonl_ids(r1)
-            if rnd == 2:
-                read_jsonl_ids(need_file(os.path.join(seal, "corpus", "actions-r2.jsonl")))
-        except (ValueError, OSError, UnicodeDecodeError):
-            raise Refuse(10, "input")
-        plan.append((None, "input/actions.jsonl"))  # built at B4
+        raise Refuse(10, "entry")  # the labeller kind runs set-up A's flows only
     return plan
+
+
+# -- set-up A's inputs (S20, S24, S27): read and checked before anything is written ---------------------------------
+def half_folder(half, root, runs):
+    """H: the tuning half's folder under the experiment's, or the held-out half's sealed folder (and its top)."""
+    if half == "tuning":
+        return os.path.join(runs, EXP, "tuning"), runs
+    return os.path.join(root, *SEAL.split("/")), root
+
+
+def read_plain(path, top):
+    """A plain file's bytes (no link on the way, under *top*); None when missing or not plain."""
+    if not real_inside(path, top) or not regular(path):
+        return None
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd, "rb") as f:
+        return f.read()
+
+
+def jsonl_objects(data):
+    """[(raw line with its newline, object)] for each non-blank line; a line that is not an object with a string id,
+    or a repeated id, raises ValueError."""
+    out, seen = [], set()
+    for raw in data.split(b"\n"):
+        if not raw.strip():
+            continue
+        obj = load_json_strict(raw.decode("utf-8"))
+        if not isinstance(obj, dict) or not isinstance(obj.get("id"), str) or obj["id"] in seen:
+            raise ValueError("line")
+        seen.add(obj["id"])
+        out.append((raw + b"\n", obj))
+    return out
+
+
+def project(raw, obj, keep):
+    """A staged line kept to the brief's fields: the line's own bytes when it holds no other field."""
+    if all(k in keep for k in obj):
+        return raw
+    return (json.dumps({k: v for k, v in obj.items() if k in keep}) + "\n").encode("utf-8")
+
+
+def staged_half(h, top):
+    """The half's staged lines (the actions', then the cases'): [(id, staged bytes, projected object)]; 10 when
+    either file is missing or malformed, or an id repeats."""
+    lines, seen = [], set()
+    for rel, keep in (("corpus/actions.jsonl", ACTION_FIELDS), ("planted/cases.jsonl", ACTION_FIELDS + ("rule_class",))):
+        data = read_plain(os.path.join(h, *rel.split("/")), top)
+        if data is None:
+            raise Refuse(10, "input")
+        try:
+            for raw, obj in jsonl_objects(data):
+                if obj["id"] in seen:
+                    raise ValueError("repeat")
+                seen.add(obj["id"])
+                b = project(raw, obj, keep)
+                lines.append((obj["id"], b, {k: v for k, v in obj.items() if k in keep}, rel))
+        except (ValueError, UnicodeDecodeError):
+            raise Refuse(10, "input")
+    return lines
+
+
+def by_rule(seed, word, ident, mod):
+    return int(hashlib.sha256((str(seed) + word + ident).encode("utf-8")).hexdigest(), 16) % mod == 0
+
+
+def round1_files(flow, bid, half, h, top, runs_indep, brief_sha):
+    """Round 2's copy of round 1: H/labels/r1-<brief id>/'s files, each sha256 equal to the latest delivered round-1
+    run's (same brief sha256 and half) counts.json; 10 otherwise."""
+    best = None
+    folder = os.path.join(runs_indep, "labeller")
+    for run in sorted(os.listdir(folder)) if os.path.isdir(folder) else []:
+        try:
+            with open(os.path.join(folder, run, "counts.json"), encoding="utf-8") as f:
+                c = load_json_strict(f.read())
+        except (OSError, ValueError, UnicodeDecodeError):
+            continue
+        if (isinstance(c, dict) and c.get("status") == "delivered" and c.get("round") == 1 and c.get("set") == half
+                and c.get("brief_sha256") == brief_sha and isinstance(c.get("delivered"), dict)
+                and c["delivered"].get("to") == "round1"):
+            best = c
+    shas = best["delivered"].get("files_sha256") if best else None
+    if not isinstance(shas, dict) or set(shas) != set(ROUND1_FILES[flow]):
+        raise Refuse(10, "round1")
+    files = {}
+    for name in ROUND1_FILES[flow]:
+        data = read_plain(os.path.join(h, "labels", f"r1-{bid}", name), top)
+        if data is None or sha_bytes(data) != shas[name]:
+            raise Refuse(10, "round1")
+        files[name] = data
+    if delivered_sha([(n, sha_bytes(b)) for n, b in files.items()]) != best["delivered"].get("sha256"):
+        raise Refuse(10, "round1")
+    return files
+
+
+def label_lines(data):
+    """{id: object} of a labels file; ValueError when malformed."""
+    out = {}
+    for _raw, obj in jsonl_objects(data):
+        if obj.get("label") not in LABELS:
+            raise ValueError("label")
+        out[obj["id"]] = obj
+    return out
+
+
+def decided_ids(audit_dir, top):
+    """The ids the earlier audit runs' decisions files name."""
+    ids = set()
+    if not os.path.lexists(audit_dir):
+        return ids
+    if not real_inside(audit_dir, top) or not os.path.isdir(audit_dir):
+        raise ValueError("audit")
+    for n in sorted(os.listdir(audit_dir)):
+        if n.endswith(".decisions.jsonl"):
+            data = read_plain(os.path.join(audit_dir, n), top)
+            if data is None:
+                raise ValueError("audit")
+            ids.update(o["id"] for _r, o in jsonl_objects(data))
+    return ids
+
+
+def ticket_lines(repo, commit, names):
+    """For each ticket file in .tickets/ at the commit whose id or wbs_id is among *names*: {id, role, wbs_id,
+    allowed_paths}, nothing else; read in one git cat-file call."""
+    lt = git(repo, "ls-tree", "-z", "--name-only", commit, "--", ".tickets/")
+    if lt.returncode != 0:
+        raise Refuse(14, "tickets")
+    paths = [p for p in z_list(lt.stdout) if p.endswith(".md") and "\n" not in p]
+    if not paths or not names:
+        return []
+    cat = git(repo, "cat-file", "--batch", stdin="".join(f"{commit}:{p}\n" for p in paths).encode("utf-8"))
+    if cat.returncode != 0:
+        raise Refuse(14, "tickets")
+    out, data, pos = [], cat.stdout, 0
+    for _p in paths:
+        nl = data.index(b"\n", pos)
+        head = data[pos:nl].split()
+        pos = nl + 1
+        if len(head) != 3 or head[1] != b"blob":
+            continue
+        size = int(head[2])
+        fm = front_matter(data[pos:pos + size])
+        pos += size + 1
+        if fm and any(isinstance(fm.get(k), str) and fm[k] in names for k in ("id", "wbs_id")):
+            out.append({"id": fm.get("id"), "role": fm.get("role"), "wbs_id": fm.get("wbs_id"),
+                        "allowed_paths": fm.get("allowed_paths")})
+    return out
+
+
+def plan_sgx(flow, rnd, half, root, runs, runs_indep, bid, brief_sha, repo, commit):
+    """Everything set-up A's flow reads, checked now (a missing input refuses 10 before anything is written):
+    a dict the build (B4) and the delivery use."""
+    h, top = half_folder(half, root, runs)
+    p = {"flow": flow, "half": half, "h": h, "top": top, "staged": None, "round1": None, "labels1": None,
+         "labels2": None, "disputes": None, "tickets": None, "seal": None}
+    if flow == "sgx1-writer-2":
+        p["seal"] = sealed(repo, commit)
+    if flow == "sgx1-labeller-1" or (flow == "sgx1-labeller-2" and rnd == 2) or flow == "sgx1-overlap-auditor":
+        p["staged"] = staged_half(h, top)
+    if rnd == 2:
+        p["round1"] = round1_files(flow, bid, half, h, top, runs_indep, brief_sha)
+    if flow == "sgx1-overlap-auditor":
+        try:
+            l1 = read_plain(os.path.join(h, "labels", "labels.jsonl"), top)
+            l2 = read_plain(os.path.join(h, "labels", "labels-2.jsonl"), top)
+            if l1 is None or l2 is None:
+                raise Refuse(10, "input")
+            p["labels1_bytes"] = l1
+            p["labels1"], p["labels2"] = label_lines(l1), label_lines(l2)
+            done = decided_ids(os.path.join(h, "labels", "audit"), top)
+        except (ValueError, UnicodeDecodeError):
+            raise Refuse(10, "input")
+        actions = {i: obj for i, _b, obj, _rel in p["staged"]}
+        ids = sorted(i for i in p["labels1"] if i in p["labels2"] and i not in done
+                     and p["labels1"][i]["label"] != p["labels2"][i]["label"])[:AUDIT_SPLIT]
+        if not ids or any(i not in actions for i in ids):
+            raise Refuse(10, "input")
+        p["disputes"] = [(i, {k: actions[i][k] for k in DISPUTE_ACTION if k in actions[i]}) for i in ids]
+        names = set()
+        for _i, act in p["disputes"]:
+            names.update(v for v in (act.get("ticket"), act.get("wbs")) if isinstance(v, str))
+        p["tickets"] = ticket_lines(repo, commit, names)
+    return p
+
+
+def stage_sgx(sgx, rnd, seed, commit):
+    """B4 for set-up A, after the seed: {wall-relative path: bytes} of the flow's input/ (the writers' selection.json
+    is added by the caller). Draws by the seed: labeller 1's sample, labeller 2's overlap, the auditor's x/y order."""
+    flow, files = sgx["flow"], {}
+    half = {"half": sgx["half"], "pin": commit}
+    if flow == "sgx1-writer-2":
+        files["input/seal.json"] = (json.dumps({"sealed": bool(sgx["seal"])}) + "\n").encode()
+        return files
+    if flow == "sgx1-writer-1":
+        return files
+    if flow == "sgx1-overlap-auditor":
+        rng = random.Random(seed)
+        xmap, lines = {}, []
+        for i, action in sgx["disputes"]:
+            first = rng.random() < 0.5  # x is labeller 1
+            xmap[i] = {"x": 1, "y": 2} if first else {"x": 2, "y": 1}
+            a, b = part(sgx["labels1"][i]), part(sgx["labels2"][i])
+            x, y = (a, b) if first else (b, a)
+            lines.append(json.dumps({"id": i, "action": action, "x": x, "y": y}) + "\n")
+        sgx["xmap"] = xmap  # written at delivery only, never into the wall
+        half["cases"] = len(sgx["disputes"])
+        files["input/disputes.jsonl"] = "".join(lines).encode("utf-8")
+        files["input/tickets.jsonl"] = "".join(json.dumps(t) + "\n" for t in sgx["tickets"]).encode("utf-8")
+    files["input/half.json"] = (json.dumps(half) + "\n").encode()
+    staged = sgx["staged"] or []
+    if flow == "sgx1-labeller-1":
+        files["input/actions.jsonl"] = b"".join(b for _i, b, _o, rel in staged if rel.startswith("corpus/"))
+        files["input/cases.jsonl"] = b"".join(b for _i, b, _o, rel in staged if rel.startswith("planted/"))
+    if rnd == 2:
+        for name, data in sgx["round1"].items():
+            files[f"input/round1/{name}"] = data
+        if flow == "sgx1-labeller-1":
+            files["input/script-labels.jsonl"] = b"".join(sgx["script_raw"])
+            sgx["sample_ids"] = [i for i, _b, _o, _r in staged if by_rule(seed, "labeller-sample", i, 20)]
+            files["input/sample.json"] = (json.dumps({"ids": sgx["sample_ids"]}) + "\n").encode("utf-8")
+        else:
+            picked = [b for i, b, _o, _r in staged if by_rule(seed, "overlap", i, 10)]
+            sgx["n_overlap"] = len(picked)
+            files["input/sample.jsonl"] = b"".join(picked)
+    return files
+
+
+SGX_INPUTS = {("sgx1-writer-1", 1): 1, ("sgx1-writer-2", 1): 2, ("sgx1-labeller-1", 1): 3,
+              ("sgx1-labeller-1", 2): 7, ("sgx1-labeller-2", 1): 1, ("sgx1-labeller-2", 2): 3,
+              ("sgx1-overlap-auditor", 1): 3}
+SGX_LANDS = {("sgx1-writer-1", 1): 1, ("sgx1-writer-2", 1): 1, ("sgx1-labeller-1", 1): 2, ("sgx1-labeller-1", 2): 1,
+             ("sgx1-labeller-2", 1): 1, ("sgx1-labeller-2", 2): 1, ("sgx1-overlap-auditor", 1): 4}
+
+
+def sgx_expected(sgx, rnd):
+    """S18 for set-up A: the wall's six fixed files, its staged inputs, the run's extras, and what lands in the
+    sealed folder when the half is the held-out one."""
+    key = (sgx["flow"], rnd)
+    return 6 + SGX_INPUTS[key] + RUN_EXTRA + (SGX_LANDS[key] if sgx["half"] == "held-out" else 0)
+
+
+def sealed(repo, commit):
+    """writer 2's seal.json: true when the path map at the commit holds the set's hidden glob and a sets root hidden
+    glob covers it (the same glob, or one matching a path under that folder)."""
+    want = SEAL + "/**"
+    data = blob(repo, commit, PATH_MAP)
+    try:
+        m = yaml.safe_load(data.decode("utf-8")) if data is not None else None
+    except (UnicodeDecodeError, yaml.YAMLError):
+        m = None
+    if not isinstance(m, dict):
+        return False
+    es = m.get("evaluation_sets")
+    entry = es.get(SEAL_SET) if isinstance(es, dict) else None
+    globs = entry.get("hidden") if isinstance(entry, dict) else None
+    if not isinstance(globs, list) or want not in globs:
+        return False
+    hidden = hidden_globs(data) or []
+    probe = SEAL + "/probe"
+    return any(g == want or fnmatch.fnmatchcase(probe, g) for g in hidden)
 
 
 def last_audit(runs_indep):
@@ -769,6 +1120,169 @@ def stop_group(pgid):
             return False
         time.sleep(0.05)
     return False
+
+
+# -- the confined rule script (S25; code 18) -----------------------------------------------------------------------
+def rules_programs(home):
+    """(bwrap, the interpreter's real path): GOV_INDEP_BWRAP / GOV_INDEP_RULES_PYTHON (absolute; tests and the trial
+    only), else bwrap on PATH and the interpreter on the first line of ~/.local/bin/gov. Anything missing: 18."""
+    bwrap = os.environ.get("GOV_INDEP_BWRAP")
+    if bwrap is None:
+        bwrap = shutil.which("bwrap")
+    py = os.environ.get("GOV_INDEP_RULES_PYTHON")
+    if py is None:
+        try:
+            with open(os.path.join(home, ".local", "bin", "gov"), "rb") as f:
+                first = f.readline(4096).decode("utf-8")
+        except (OSError, UnicodeDecodeError):
+            raise Refuse(18, "python")
+        words = first[2:].split() if first.startswith("#!") else []
+        py = words[0] if len(words) == 1 else None
+    for p in (bwrap, py):
+        if not p or not os.path.isabs(p) or not os.path.isfile(p) or not os.access(p, os.X_OK):
+            raise Refuse(18, "program")
+    return bwrap, os.path.realpath(py)
+
+
+def rules_binds(py_real, protected):
+    """The read-only binds the interpreter needs: /usr (the interpreter, its standard library and the libraries it
+    loads), the host's /lib, /lib32, /lib64 as their links (or binds) and the loader's cache; the interpreter's own
+    prefix when it lies outside /usr. A bind at, under or above a protected folder (HOME, the sets root, the runs and
+    trees folders, the repository): 18."""
+    args, sources = [], ["/usr"]
+    args += ["--ro-bind", "/usr", "/usr"]
+    for top in ("/lib", "/lib32", "/lib64"):
+        if os.path.islink(top):
+            args += ["--symlink", os.readlink(top), top]
+        elif os.path.isdir(top):
+            args += ["--ro-bind", top, top]
+            sources.append(top)
+    args += ["--ro-bind-try", "/etc/ld.so.cache", "/etc/ld.so.cache"]
+    if not at_or_under(py_real, "/usr"):
+        prefix = os.path.dirname(os.path.dirname(py_real))
+        args += ["--ro-bind", prefix, prefix]
+        sources.append(prefix)
+    for s in sources:
+        if s == "/" or any(at_or_under(s, p) or at_or_under(p, s) for p in protected if p):
+            raise Refuse(18, "bind")
+    return args
+
+
+def rules_argv(bwrap, py_real, script, protected):
+    """bwrap: every namespace unshared (no network), no capability, a new session, killed with its parent; nothing
+    bound but the interpreter's files and the script, read-only; the root read-only."""
+    return ([bwrap, "--unshare-user", "--unshare-ipc", "--unshare-pid", "--unshare-net", "--unshare-uts",
+             "--unshare-cgroup-try", "--die-with-parent", "--new-session", "--cap-drop", "ALL"]
+            + rules_binds(py_real, protected)
+            + ["--dev", "/dev", "--proc", "/proc", "--ro-bind", script, script, "--remount-ro", "/", "--chdir", "/",
+               py_real, "-I", "-X", "utf8", "-c", RULES_PRELUDE, script])
+
+
+def pump(proc, data, cap, deadline):
+    """Feed stdin and read stdout until both end: the output, or None past the deadline or the cap."""
+    sel = selectors.DefaultSelector()
+    out, pos, view = bytearray(), 0, memoryview(data)
+    os.set_blocking(proc.stdin.fileno(), False)
+    sel.register(proc.stdin, selectors.EVENT_WRITE)
+    sel.register(proc.stdout, selectors.EVENT_READ)
+    try:
+        while sel.get_map():
+            left = deadline - time.monotonic()
+            if left <= 0:
+                return None
+            for key, _ev in sel.select(left):
+                if key.fileobj is proc.stdin:
+                    try:
+                        pos += os.write(proc.stdin.fileno(), view[pos:pos + 65536])
+                    except BlockingIOError:
+                        continue
+                    except OSError:
+                        pos = len(data)
+                    if pos >= len(data):
+                        sel.unregister(proc.stdin)
+                        proc.stdin.close()
+                else:
+                    chunk = os.read(proc.stdout.fileno(), 65536)
+                    if not chunk:
+                        sel.unregister(proc.stdout)
+                    else:
+                        out += chunk
+                        if len(out) > cap:
+                            return None
+    finally:
+        sel.close()
+    return bytes(out)
+
+
+def check_rule_output(out, ids):
+    """Every staged id exactly once: (the raw lines in order, {id: line}); anything else raises ValueError."""
+    want, raws, got = set(ids), [], {}
+    for raw in out.split(b"\n"):
+        if not raw.strip():
+            continue
+        obj = load_json_strict(raw.decode("utf-8"))
+        if not isinstance(obj, dict):
+            raise ValueError("line")
+        i = obj.get("id")
+        if not isinstance(i, str) or i not in want or i in got:
+            raise ValueError("id")
+        rc = obj.get("rule_class")
+        if (obj.get("label") not in LABELS or not isinstance(rc, int) or isinstance(rc, bool) or not 1 <= rc <= 14
+                or not isinstance(obj.get("clauses"), list) or not all(isinstance(c, str) for c in obj["clauses"])
+                or not isinstance(obj.get("uncertain"), bool)):
+            raise ValueError("value")
+        got[i] = obj
+        raws.append(raw + b"\n")
+    if set(got) != want:
+        raise ValueError("missing")
+    return raws, got
+
+
+def run_rules(script_bytes, stdin_bytes, ids, home, protected):
+    """S25: round 1's label_rules.py under bwrap on the pinned interpreter, stdin the half's staged lines; its group
+    stopped by pgid on every exit. Returns (the output's lines, {id: label}); any failure, cap or bad output: 18."""
+    bwrap, py_real = rules_programs(home)
+    tmp = os.path.realpath(tempfile.mkdtemp(prefix="indep-rules-"))
+    proc = None
+    try:
+        if any(at_or_under(tmp, p) or at_or_under(p, tmp) for p in protected if p):
+            raise Refuse(18, "place")
+        script = os.path.join(tmp, "label_rules.py")
+        write_new(script, script_bytes, 0o444)
+        argv = rules_argv(bwrap, py_real, script, protected)
+        try:
+            proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                    env={}, cwd="/", start_new_session=True, close_fds=True)
+        except OSError:
+            raise Refuse(18, "start")
+        deadline = time.monotonic() + RULES_WALL_S
+        out = pump(proc, stdin_bytes, RULES_OUT_BASE + RULES_OUT_PER_ID * len(ids), deadline)
+        if out is None:
+            raise Refuse(18, "cap")
+        try:
+            rc = proc.wait(timeout=max(0.1, deadline - time.monotonic()))
+        except subprocess.TimeoutExpired:
+            raise Refuse(18, "cap")
+        if rc != 0:
+            raise Refuse(18, "exit")
+        try:
+            return check_rule_output(out, ids)
+        except (ValueError, UnicodeDecodeError):
+            raise Refuse(18, "output")
+    finally:
+        if proc is not None:  # by its group id, never a name: the group killed, the leader reaped, the group gone
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+            for f in (proc.stdin, proc.stdout):
+                try:
+                    f.close()
+                except (OSError, ValueError):
+                    pass
+            proc.wait()
+            stop_group(proc.pid)
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def parse_output(data):
@@ -943,6 +1457,20 @@ def copy_numbers(st, kind, res):
             o[k] = v if is_count(v) else None
 
 
+def copy_sgx_numbers(st, res):
+    """S28: each number of a set-up A result under its own key in `out`; an object as an object of its numbers keyed
+    "1".."14"; `stopped` as its fixed word. Anything else is left out (the result's schema is closed already)."""
+    o = st.counts["out"]
+    for k in SGX_OUT:
+        v = res.get(k)
+        if is_count(v):
+            o[k] = v
+        elif isinstance(v, dict) and all(re.fullmatch(r"[1-9]|1[0-4]", x) and is_count(n) for x, n in v.items()):
+            o[k] = {x: v[x] for x in sorted(v, key=int)}
+        elif k == "stopped" and v in STOPPED:
+            o[k] = v
+
+
 def regular(path):
     try:
         return stat.S_ISREG(os.lstat(path).st_mode)
@@ -953,6 +1481,11 @@ def regular(path):
 def bundle_sha(files):
     """files: (relative path, sha256) pairs: the sha256 of '<sha256>  <path>\\n' lines sorted by path."""
     return sha_bytes("".join(f"{h}  {p}\n" for p, h in sorted(files)).encode("utf-8"))
+
+
+def delivered_sha(files):
+    """`delivered.sha256` of set-up A's flows: one file's own sha256, several files' bundle sha256."""
+    return files[0][1] if len(files) == 1 else bundle_sha(files)
 
 
 def copy_set(src, dst):
@@ -1071,40 +1604,238 @@ def deliver(st, ctx):
         dest_dir = os.path.join(root, "runs", ctx["audit"])
         dst = os.path.join(dest_dir, "miss-classes.json")
     else:
-        src = os.path.join(out, "labels.jsonl")
-        seal = os.path.join(root, *SEAL.split("/"))
-        if not real_inside(seal, root) or not os.path.isdir(seal):
-            raise Refuse(20, "destination")
-        dest_dir = os.path.join(seal, "labels")
-        dst = os.path.join(dest_dir, f"{st.run}.jsonl")
+        raise Refuse(20, "destination")  # the labeller kind runs set-up A's flows only
     if not regular(src):
         raise Refuse(20, "missing")
-    made_dir = False
-    if kind == "labeller" and not os.path.lexists(dest_dir):
-        # labels/ is made only after every check has passed, and removed again if the copy fails (F5)
-        try:
-            os.mkdir(dest_dir, 0o755)
-        except OSError:
-            raise Refuse(20, "destination")
-        made_dir = True
-    try:
-        if not real_inside(dest_dir, root) or not os.path.isdir(dest_dir) or os.path.islink(dest_dir):
-            raise Refuse(20, "destination")
-        if kind == "labeller" and os.path.lexists(dst):
-            raise Refuse(20, "destination")
-        h = deliver_file(src, dst)
-    except BaseException:
-        if made_dir:
-            try:
-                os.rmdir(dest_dir)
-            except OSError:
-                pass
-        raise
+    if not real_inside(dest_dir, root) or not os.path.isdir(dest_dir) or os.path.islink(dest_dir):
+        raise Refuse(20, "destination")
+    h = deliver_file(src, dst)
     d.update(files=1, sha256=h, to=DELIVERS[kind])
     if kind == "auditor":
         with open(os.path.join(ctx["runs_indep"], "AUDITS.log"), "a", encoding="utf-8") as f:
             f.write(json.dumps({"time": utc_iso(), "commit": ctx["commit"], "run": st.run,
                                 "audit": ctx["audit"]}) + "\n")
+
+
+# -- set-up A's deliveries (S16, S26, S27): every check first, then a temporary name, hashed, renamed; all or nothing --
+class Landing:
+    """New files (an existing one refuses 20) and replaced files (the auditor's labels.jsonl and owner.jsonl), each
+    written beside its destination under a temporary name and read back; then all renamed in turn. On any failure
+    every rename done is undone, every temporary file and every folder this landing made removed: 20."""
+
+    def __init__(self, top):
+        self.top, self.made, self.items = top, [], []
+
+    def folder(self, path):
+        missing, have = [], path
+        while not os.path.lexists(have):
+            missing.append(have)
+            have = os.path.dirname(have)
+        if not real_inside(have, self.top) or not os.path.isdir(have) or os.path.islink(have):
+            raise Refuse(20, "destination")
+        for f in reversed(missing):
+            os.mkdir(f, 0o755)
+            self.made.append(f)
+
+    def check(self, dst, replace=False):
+        if not real_inside(os.path.dirname(dst), self.top) and os.path.lexists(os.path.dirname(dst)):
+            raise Refuse(20, "destination")
+        if os.path.lexists(dst) and (not replace or not regular(dst)):
+            raise Refuse(20, "destination")
+
+    def add(self, dst, data, replace=False):
+        self.check(dst, replace)
+        self.folder(os.path.dirname(dst))
+        tmp = os.path.join(os.path.dirname(dst), "." + os.path.basename(dst) + f".{secrets.token_hex(4)}.tmp")
+        write_new(tmp, data, 0o644)
+        self.items.append((tmp, dst, replace))
+        if sha_file(tmp) != sha_bytes(data):
+            raise Refuse(20, "copy")
+        return sha_bytes(data)
+
+    def commit(self):
+        done = []
+        try:
+            for tmp, dst, replace in self.items:
+                old = read_plain(dst, self.top) if replace and os.path.lexists(dst) else None
+                if replace:
+                    os.replace(tmp, dst)
+                else:
+                    os.link(tmp, dst)  # never over an entry made meanwhile
+                    os.unlink(tmp)
+                done.append((dst, old))
+        except BaseException:
+            for dst, old in reversed(done):
+                try:
+                    if old is None:
+                        os.unlink(dst)
+                    else:
+                        back = dst + f".{secrets.token_hex(4)}.back"
+                        write_new(back, old, 0o644)
+                        os.replace(back, dst)
+                except OSError:
+                    pass
+            self.abort()
+            raise Refuse(20, "copy")
+
+    def abort(self):
+        for tmp, _dst, _r in self.items:
+            if os.path.lexists(tmp):
+                os.unlink(tmp)
+        for f in reversed(self.made):
+            try:
+                os.rmdir(f)
+            except OSError:
+                pass
+
+
+def out_file(out, name):
+    data = read_plain(os.path.join(out, name), out)
+    if data is None:
+        raise Refuse(20, "missing")
+    return data
+
+
+def valid_hand(obj, ids):
+    rc = obj.get("rule_class")
+    return (isinstance(obj, dict) and isinstance(obj.get("id"), str) and obj["id"] in ids
+            and obj.get("label") in LABELS and isinstance(rc, int) and not isinstance(rc, bool) and 1 <= rc <= 14
+            and isinstance(obj.get("clauses"), list) and all(isinstance(c, str) for c in obj["clauses"])
+            and isinstance(obj.get("reason"), str))
+
+
+def merge_labels(ctx, hand_data):
+    """S26: the first labeller's round 2: every required id hand-labelled, then one line per staged id."""
+    sgx = ctx["sgx"]
+    ids = [i for i, _b, _o, _r in sgx["staged"]]
+    script = sgx["script_labels"]
+    try:
+        hand = {}
+        for _raw, obj in jsonl_objects(hand_data):
+            if not valid_hand(obj, set(ids)):
+                raise ValueError("hand")
+            hand[obj["id"]] = obj
+    except (ValueError, UnicodeDecodeError):
+        raise Refuse(20, "hand")
+    need = {i for i in ids if script[i]["uncertain"] or script[i]["rule_class"] <= 13} | set(sgx["sample_ids"])
+    if not need <= set(hand):
+        raise Refuse(20, "hand")
+    lines = []
+    for i in ids:
+        src, how = (hand[i], "hand") if i in hand else (dict(script[i], reason=""), "script")
+        lines.append(json.dumps({"id": i, "label": src["label"], "rule_class": src["rule_class"],
+                                 "clauses": src["clauses"], "reason": src["reason"], "how": how}) + "\n")
+    return "".join(lines).encode("utf-8")
+
+
+DECISION_KEYS = {"id", "label", "rule_class", "basis", "agrees_with", "flag", "reason"}
+
+
+def check_decisions(data, cases):
+    """S27: one line per case, in the disputes' order, the brief's fields and values; else 20."""
+    try:
+        rows = [o for _raw, o in jsonl_objects(data)]
+    except (ValueError, UnicodeDecodeError):
+        raise Refuse(20, "decisions")
+    if [o["id"] for o in rows] != cases:
+        raise Refuse(20, "decisions")
+    for o in rows:
+        rc = o.get("rule_class")
+        if (set(o) != DECISION_KEYS or o["label"] not in LABELS or not isinstance(rc, int) or isinstance(rc, bool)
+                or not 1 <= rc <= 14 or not isinstance(o["basis"], list)
+                or not all(isinstance(b, str) for b in o["basis"]) or o["agrees_with"] not in ("x", "y", "neither")
+                or o["flag"] not in ("none", "cannot-settle", "may-change-verdict") or not isinstance(o["reason"], str)
+                or (o["reason"] == "") != (o["flag"] == "none")):
+            raise Refuse(20, "decisions")
+    return rows
+
+
+def deliver_sgx(st, ctx):
+    sgx, rnd = ctx["sgx"], ctx["round"]
+    flow, h, top = sgx["flow"], sgx["h"], sgx["top"]
+    out = os.path.join(st.wall, "out")
+    labels = os.path.join(h, "labels")
+    land = Landing(top)
+    d = st.counts["delivered"]
+    try:
+        if flow in ("sgx1-writer-1", "sgx1-writer-2"):
+            sha = land.add(os.path.join(h, "planted", "cases.jsonl"), out_file(out, "cases.jsonl"))
+            got, to = [("cases.jsonl", sha)], "cases"
+        elif flow in ROUND1_FILES and rnd == 1:  # a labeller's round 1: its files kept for round 2
+            names = sorted(ROUND1_FILES[flow])
+            datas = {n: out_file(out, n) for n in names}
+            for n in names:
+                land.check(os.path.join(labels, f"r1-{ctx['brief_id']}", n))
+            got = [(n, land.add(os.path.join(labels, f"r1-{ctx['brief_id']}", n), datas[n])) for n in names]
+            to = "round1"
+        elif flow == "sgx1-labeller-1":
+            merged = merge_labels(ctx, out_file(out, "hand-labels.jsonl"))
+            got, to = [("hand-labels.jsonl", land.add(os.path.join(labels, "labels.jsonl"), merged))], "labels"
+        elif flow == "sgx1-labeller-2":
+            sha = land.add(os.path.join(labels, "labels-2.jsonl"), out_file(out, "labels-2.jsonl"))
+            got, to = [("labels-2.jsonl", sha)], "labels"
+        else:
+            got, to = deliver_audit(st, ctx, land, out_file(out, "decisions.jsonl")), "decisions"
+        land.commit()
+    except BaseException:
+        land.abort()
+        raise
+    d.update(files=len(got), sha256=delivered_sha(got), to=to)
+    if to == "round1":  # round 2 checks each file against these
+        d["files_sha256"] = dict(got)
+
+
+def deliver_audit(st, ctx, land, data):
+    """S27: the decisions mapped back, the map, labels.jsonl rewritten (its old bytes kept in history/), the flagged
+    cases appended to owner.jsonl. No AUDITS.log line."""
+    sgx = ctx["sgx"]
+    labels = os.path.join(sgx["h"], "labels")
+    cases = [i for i, _a in sgx["disputes"]]
+    rows = check_decisions(data, cases)
+    xmap = sgx["xmap"]
+    who = {1: "labeller-1", 2: "labeller-2"}
+    mapped, owner, settle = [], [], {}
+    for o in rows:
+        m = dict(o)
+        if o["agrees_with"] in ("x", "y"):
+            m["agrees_with"] = who[xmap[o["id"]][o["agrees_with"]]]
+        mapped.append(m)
+        settle[o["id"]] = m
+        if o["flag"] != "none":
+            owner.append({"id": o["id"], "labeller-1": part(sgx["labels1"][o["id"]]),
+                          "labeller-2": part(sgx["labels2"][o["id"]]), "decision": m})
+    dec_bytes = "".join(json.dumps(m) + "\n" for m in mapped).encode("utf-8")
+    for p in (f"{st.run}.decisions.jsonl", f"{st.run}.map.json"):
+        land.check(os.path.join(labels, "audit", p))
+    sha = land.add(os.path.join(labels, "audit", f"{st.run}.decisions.jsonl"), dec_bytes)
+    land.add(os.path.join(labels, "audit", f"{st.run}.map.json"),
+             (json.dumps({i: xmap[i] for i in cases}) + "\n").encode("utf-8"))
+    old = read_plain(os.path.join(labels, "labels.jsonl"), sgx["top"])
+    if old is None or old != sgx["labels1_bytes"]:
+        raise Refuse(20, "destination")  # labels.jsonl changed since the wall was built
+    land.add(os.path.join(labels, "history", f"labels.{st.run}.jsonl"), old)
+    lines = []
+    for raw, obj in jsonl_objects(old):
+        if obj["id"] in settle:
+            m = settle[obj["id"]]
+            obj = dict(obj, label=m["label"], how="audit") if m["flag"] == "none" else dict(obj, how="owner")
+            raw = (json.dumps(obj) + "\n").encode("utf-8")
+        lines.append(raw)
+    land.add(os.path.join(labels, "labels.jsonl"), b"".join(lines), replace=True)
+    if owner:
+        prev = read_plain(os.path.join(labels, "owner.jsonl"), sgx["top"])
+        if prev is None and os.path.lexists(os.path.join(labels, "owner.jsonl")):
+            raise Refuse(20, "destination")
+        prev = prev or b""
+        if prev and not prev.endswith(b"\n"):
+            prev += b"\n"
+        land.add(os.path.join(labels, "owner.jsonl"),
+                 prev + "".join(json.dumps(x) + "\n" for x in owner).encode("utf-8"), replace=True)
+    return [("decisions.jsonl", sha)]
+
+
+def part(obj):
+    return {k: obj[k] for k in LABEL_PART if k in obj}
 
 
 def check_result(st, ctx):
@@ -1121,11 +1852,17 @@ def check_result(st, ctx):
         raise Refuse(20, "unreadable")
     if not isinstance(res, dict) or not schema_ok(res, ctx["result_schema"]):
         raise Refuse(20, "schema")
-    # the four first versions' numbers; a revised schema must still carry them
-    try:
-        copy_numbers(st, st.kind, res)
-    except (KeyError, AttributeError, TypeError):
-        raise Refuse(20, "schema")
+    if ctx.get("sgx"):
+        # set-up A: each round's own form; numbers (an object of numbers as an object) and the fixed `stopped` word
+        if "round" in res and res["round"] != ctx["round"]:
+            raise Refuse(20, "schema")
+        copy_sgx_numbers(st, res)
+    else:
+        # the four first versions' numbers; a revised schema must still carry them
+        try:
+            copy_numbers(st, st.kind, res)
+        except (KeyError, AttributeError, TypeError):
+            raise Refuse(20, "schema")
     st.counts["out"]["schema_ok"] = True
     st.log("result", "schema", "ok")
 
@@ -1316,11 +2053,12 @@ def build_and_run(st, o, root, over, cwd, home):
             raise Refuse(11, "template")
         tmpl[name] = data
     kinds = load_kinds(tmpl["kinds.yaml"])
-    if kinds is None or kind not in kinds:
+    briefs = load_briefs(tmpl["kinds.yaml"])
+    if kinds is None or kind not in kinds or briefs is None:
         raise Refuse(11, "kinds")
     spec = kinds[kind]
     ex_globs = excludes_of(tmpl["tree-exclude.txt"])
-    excluded = excluded_by(ex_globs)
+    excluded = excluded_by(ex_globs)  # the selection's rule (S5): less tree-exclude.txt only
     c["template_ok"] = True
 
     # 10: the brief, as approved, and its front matter; the inputs it needs
@@ -1338,9 +2076,8 @@ def build_and_run(st, o, root, over, cwd, home):
     fm = front_matter(brief)
     if fm is None or fm.get("kind") != kind:
         raise Refuse(10, "front_matter")
-    sample_n, model, schema_name = fm.get("sample"), fm.get("model"), fm.get("result_schema")
-    if not is_count(sample_n) or not full(MODEL_RX, model) or not full(SCHEMA_NAME_RX, schema_name):
-        raise Refuse(10, "front_matter")
+    model, schema_name, sample_n, brief_id, entry = resolve_brief(fm, kind, spec, briefs)
+    flow = entry["flow"] if entry else None
     budget, timeout_s = fm.get("budget_usd", spec["budget_usd"]), fm.get("timeout_s", spec["timeout_s"])
     if not (is_number(budget) and 0 < budget <= spec["budget_usd"]):
         raise Refuse(10, "budget")
@@ -1349,7 +2086,19 @@ def build_and_run(st, o, root, over, cwd, home):
     result_schema_sha, result_schema = read_schema(schema_name)  # read once; checked from these bytes (F8)
     if result_schema is None:
         raise Refuse(10, "schema")
-    plan = plan_inputs(kind, rnd, root, set_name, o.audit)
+    sgx = None
+    if flow:
+        # the half and the round the flow allows (17, nothing built), then its inputs (10 before anything is written)
+        if set_name not in FLOWS[flow][1]:
+            raise Refuse(17, "set")
+        if rnd not in FLOWS[flow][2]:
+            raise Refuse(17, "round")
+        sgx = plan_sgx(flow, rnd, set_name, root, runs, runs_indep, brief_id, want, repo, commit)
+        plan = []
+        tree_ex = excluded_by(ex_globs + list(entry.get("tree_exclude", [])))  # S23: the entry's globs too
+    else:
+        plan = plan_inputs(kind, rnd, root, set_name, o.audit)
+        tree_ex = excluded
     try:
         last = last_audit(runs_indep)
     except (OSError, ValueError, UnicodeDecodeError):
@@ -1372,9 +2121,18 @@ def build_and_run(st, o, root, over, cwd, home):
     globs = hidden_globs(pm) if pm is not None else None
     if globs is None:
         raise Refuse(15, "path_map")
-    expected = WALL_FIXED + len(plan) + RUN_EXTRA
+    expected = WALL_FIXED + len(plan) + RUN_EXTRA if not sgx else sgx_expected(sgx, rnd)
     if hidden_count(root, globs) + expected > FILE_BUDGET:
         raise Refuse(15, "budget")
+
+    # 18: the first labeller's round 2 runs its round-1 rule script, confined, before anything is written
+    if flow == "sgx1-labeller-1" and rnd == 2:
+        st.stage = 18
+        ids = [i for i, _b, _o, _r in sgx["staged"]]
+        protected = [os.path.realpath(home), root, runs, trees, repo]
+        sgx["script_raw"], sgx["script_labels"] = run_rules(
+            sgx["round1"]["label_rules.py"], b"".join(b for _i, b, _o, _r in sgx["staged"]), ids, home, protected)
+        st.log("rules", "ok", len(ids))
 
     # the run id; B1: an empty wall, no tree
     st.stage = 12
@@ -1425,7 +2183,7 @@ def build_and_run(st, o, root, over, cwd, home):
 
     # B3: the plain tree
     st.stage = 14
-    tree_files = build_tree(st, repo, commit, excluded)
+    tree_files = build_tree(st, repo, commit, tree_ex)
     st.log("B3", "files", tree_files)
     hook(st, "after_tree")
 
@@ -1444,34 +2202,33 @@ def build_and_run(st, o, root, over, cwd, home):
     sample = random.Random(seed).sample(others, min(sample_n, len(others)))
     selection = {"commit": commit, "last_audit": last, "seed_sha256": seed_sha, "changed": changed,
                  "sample": sample}
-    actions = None
-    if kind == "labeller":
-        corpus = os.path.join(root, *SEAL.split("/"), "corpus")
-        ids1, lines1 = read_jsonl_ids(os.path.join(corpus, "actions-r1.jsonl"))
-        if rnd == 1:
-            with open(os.path.join(corpus, "actions-r1.jsonl"), "rb") as f:
-                actions = f.read()
-        else:
-            _ids2, lines2 = read_jsonl_ids(os.path.join(corpus, "actions-r2.jsonl"))
-            overlap = random.Random(seed).sample(ids1, math.ceil(len(ids1) / 10))
-            selection["overlap"] = overlap
-            actions = b"".join(lines2.values()) + b"".join(lines1[json.dumps(i)] for i in overlap)
+    sel_counts = {"changed": len(changed), "sample": len(sample), "overlap": 0}
+    staged = {}  # set-up A's files: wall-relative path -> bytes
+    if sgx:
+        staged = stage_sgx(sgx, rnd, seed, commit)
+        if kind == "writer":
+            staged["input/selection.json"] = (json.dumps(selection, indent=1) + "\n").encode()
+        else:  # no selection in a labeller's or the auditor's wall: its sample and overlap counted instead
+            sel_counts = {"changed": 0, "sample": len(sgx.get("sample_ids", [])),
+                          "overlap": sgx.get("n_overlap", 0)}
     inp = os.path.join(st.wall, "input")
     if os.path.lexists(inp):
         raise Refuse(13, "order")  # something wrote input/ before the script chose it
     os.mkdir(inp, 0o700)
-    write_new(os.path.join(inp, "selection.json"), (json.dumps(selection, indent=1) + "\n").encode(), 0o444)
+    if not sgx:
+        write_new(os.path.join(inp, "selection.json"), (json.dumps(selection, indent=1) + "\n").encode(), 0o444)
+    for rel, data in sorted(staged.items()):
+        dst = os.path.join(st.wall, rel)
+        os.makedirs(os.path.dirname(dst), mode=0o700, exist_ok=True)
+        write_new(dst, data, 0o444)
     for src, rel in plan:
         dst = os.path.join(st.wall, rel)
         os.makedirs(os.path.dirname(dst), mode=0o700, exist_ok=True)
-        if src is None:
-            write_new(dst, actions, 0o444)
-        else:
-            copy_new(src, dst, 0o444)
+        copy_new(src, dst, 0o444)
     for folder, _dirs, _names in os.walk(inp, topdown=False):
         os.chmod(folder, 0o555)
-    c["selection"] = {"changed": len(changed), "sample": len(sample), "overlap": len(selection.get("overlap", []))}
-    st.log("B4", "changed", len(changed), "sample", len(sample), "staged", len(plan))
+    c["selection"] = dict(sel_counts)
+    st.log("B4", "changed", sel_counts["changed"], "sample", sel_counts["sample"], "staged", len(plan) + len(staged))
     hook(st, "after_input")
 
     # 13: the seed came first
@@ -1509,8 +2266,8 @@ def build_and_run(st, o, root, over, cwd, home):
                 "template_sha256": {n: sha_bytes(tmpl[n]) for n in TEMPLATE_FILES},
                 "approved_sha256": c["approved_sha256"], "model": model, "tools": list(spec["tools"]),
                 "budget_usd": budget, "timeout_s": timeout_s, "prompt_sha256": PROMPT_SHA256,
-                "selection": {"changed": len(changed), "sample": len(sample),
-                              "overlap": len(selection.get("overlap", []))},
+                "result_schema": schema_name, "brief_id": brief_id if entry else None, "flow": flow,
+                "selection": dict(sel_counts),
                 "tree_files": tree_files, "seeded_before_content": True,
                 "runs_override": bool(over.get("GOV_INDEP_RUNS_DIR")),
                 "trees_override": bool(over.get("GOV_INDEP_TREES_DIR")), "dry": bool(o.dry),
@@ -1525,7 +2282,8 @@ def build_and_run(st, o, root, over, cwd, home):
 
     ctx = {"root": root, "trees": trees, "runs": runs, "runs_indep": runs_indep, "repo": repo, "home": home,
            "tools": list(spec["tools"]), "model": model, "budget": budget, "timeout": timeout_s,
-           "result_schema": result_schema, "set": set_name, "round": rnd, "audit": o.audit, "commit": commit}
+           "result_schema": result_schema, "set": set_name, "round": rnd, "audit": o.audit, "commit": commit,
+           "sgx": sgx, "brief_id": brief_id}
     # the canary, then the session
     st.stage = 16
     hook(st, "before_canary")
@@ -1546,7 +2304,10 @@ def build_and_run(st, o, root, over, cwd, home):
         st.stage = 20
         try:
             check_result(st, ctx)
-            deliver(st, ctx)
+            if sgx:
+                deliver_sgx(st, ctx)
+            else:
+                deliver(st, ctx)
             c["status"] = "delivered"
             st.log("delivered", c["delivered"]["files"])
         except Refuse as r:
