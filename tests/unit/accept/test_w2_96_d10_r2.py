@@ -52,6 +52,7 @@ def test_w2_96_d10r2_every_further_line_is_read(cell, names):
     "S9: one relation check (D-6 part 2 item F2; DEC-1109 (2))",
     "S2 a hidden worktree keeps its index; F1's fixture keeps them",
     "S4: the ratchet's reading of both lists [I4 F14]",
+    "S4 [F14]",
     "Success 6 with success 4. S1's record route answers as before",
     "S1-F3",
     "Success 2–Failure 4",

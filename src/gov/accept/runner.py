@@ -36,7 +36,8 @@ NOTE = re.compile(r"\s*(?:\[[^\]\n]*\]|\([^)\n]*\))")  # a bracketed note betwee
 MORE = re.compile(JOINED + r"(?:(?:successes|success|failures|failure|kpis|kpi)\b|[sfk]?[ \t-]*\d)"
                   r"|(?:–|\.\.|-)\d", re.I)  # what still lists a line the reader did not read: the cell is refused
 FURTHER = re.compile(r"(?<![\w'’-])" + KIND + r"[ \t-]*(\d+)(?!\w)", re.I)  # a line named anywhere after the list
-LEADS = re.compile(r"(?:[/,;&+(\[]|\b(?:and|or|with)\b)[ \t]*$", re.I)  # what before a further name lists it
+LEADS = re.compile(r"(?:[/,;&+(]|\b(?:and|or|with)\b)[ \t]*$", re.I)  # what before a further name lists it; a
+#                                                   square bracket cites (``[I4 F14]``, a review's finding): not one
 POSSESSIVE = re.compile(r"['’]s\b", re.I)  # "F1's fixture": a reference to something of the line's, not a listing
 CODE = re.compile(r"`[^`\n]*`")  # a test or file name in the cell: never read for line names
 RANGE_MAX = 50  # the widest range read as lines; a wider one is refused
