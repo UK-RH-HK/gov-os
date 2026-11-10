@@ -245,3 +245,6 @@
 2026-11-10 11:41:19 hook: w2/integrate moved off ee8532e5283e (not an ancestor of 09e1ff6e1bdc): examining from the merge base b0eb21f1a381
 2026-11-10 11:41:19 landing check: P1 09e1ff6e1bdc (governance/project/orchestration/tools/deadman.py): a commit outside a ticket touches a (b) or (O) control path, neither Role: owner nor Role: operator with Act:
 2026-11-10 11:41:19 landing b0eb21f1a381..09e1ff6e1bdc: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 11:41:52 CTO: the P1s on b0eb21f1a (deadman.py changed outside an ACT; the CTO's brief's fault) and on its revert: reverted in 09e1ff6e1 (ee8532e52 was the same revert before its message was amended, on no branch); deadman.py equals af850b6f2 again; the sentinel's watch never loaded the change; the wake returns as ACT-DEADMAN-WAKE-1 for the owner's yes
+2026-11-10 11:45:52 landing 09e1ff6e1bdc..381cfaddce6a: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 11:45:55 landing 381cfaddce6a..bbe222c59e24: 1 commit(s); none outside a ticket on the trigger paths

@@ -3,37 +3,37 @@
 | key | calls | input | output | cache read | cache write | $ list |
 |---|---|---|---|---|---|---|
 | 1 CTO session | 630 | 1,524 | 0.5 M | 310.4 M | 4.6 M | 109.69 |
-| 2 CTO helpers | 5,134 | 10,636 | 4.6 M | 1,286.3 M | 23.4 M | 467.44 |
-| 3 launched workers | 8,744 | 17,698 | 10.2 M | 1,271.5 M | 28.5 M | 686.30 |
+| 2 CTO helpers | 5,110 | 10,588 | 4.6 M | 1,280.0 M | 23.4 M | 465.53 |
+| 3 launched workers | 8,741 | 17,692 | 10.2 M | 1,270.9 M | 28.5 M | 685.99 |
 | 4 experiments (writer) | 1 | 2 | 0.0 M | 0.0 M | 0.4 M | 3.24 |
 | 5 sentinel | 122 | 312 | 0.0 M | 12.2 M | 2.5 M | 3.14 |
 | 6 dead-man pushes | 6 | 12 | 0.0 M | 0.1 M | 0.0 M | 0.01 |
 | 8 operator folder session | 70 | 164 | 0.0 M | 12.7 M | 0.6 M | 8.09 |
 | 9 live tests (pytest) | 194 | 388 | 0.1 M | 4.5 M | 1.6 M | 0.40 |
-| total | 14,901 | 30,736 | 15.5 M | 2,897.7 M | 61.8 M | 1,278.31 |
+| total | 14,874 | 30,682 | 15.5 M | 2,890.9 M | 61.7 M | 1,276.08 |
 
 ## by source and model
 | key | calls | input | output | cache read | cache write | $ list |
 |---|---|---|---|---|---|---|
 | ('1 CTO session', 'opus-5-5') | 630 | 1,524 | 0.5 M | 310.4 M | 4.6 M | 109.69 |
-| ('2 CTO helpers', 'opus-5-5') | 5,134 | 10,636 | 4.6 M | 1,286.3 M | 23.4 M | 467.44 |
-| ('3 launched workers', 'opus-5-5') | 8,744 | 17,698 | 10.2 M | 1,271.5 M | 28.5 M | 686.30 |
+| ('2 CTO helpers', 'opus-5-5') | 5,110 | 10,588 | 4.6 M | 1,280.0 M | 23.4 M | 465.53 |
+| ('3 launched workers', 'opus-5-5') | 8,741 | 17,692 | 10.2 M | 1,270.9 M | 28.5 M | 685.99 |
 | ('4 experiments (writer)', 'opus-5-5') | 1 | 2 | 0.0 M | 0.0 M | 0.4 M | 3.24 |
 | ('5 sentinel', 'haiku-5-5') | 122 | 312 | 0.0 M | 12.2 M | 2.5 M | 3.14 |
 | ('6 dead-man pushes', 'haiku-5-5') | 6 | 12 | 0.0 M | 0.1 M | 0.0 M | 0.01 |
 | ('8 operator folder session', 'opus-5-5') | 70 | 164 | 0.0 M | 12.7 M | 0.6 M | 8.09 |
 | ('9 live tests (pytest)', 'haiku-5-5') | 194 | 388 | 0.1 M | 4.5 M | 1.6 M | 0.40 |
-| total | 14,901 | 30,736 | 15.5 M | 2,897.7 M | 61.8 M | 1,278.31 |
+| total | 14,874 | 30,682 | 15.5 M | 2,890.9 M | 61.7 M | 1,276.08 |
 external: {'source': 'experiments', 'ticket': 'W2-88/K9 fresh 80', 'day': '2026-11-08', 'cost': 109.05, 'start': '2026-11-08T19:32', 'end': '2026-11-08T21:46', 'note': 'FRESH-80-RESULT.md cost table'}
 
 ## by ticket
 | ticket | calls | $ | sources |
-| W2-149 | 1531 | 157.05 | launched workers 95, CTO helpers 62 |
+| W2-149 | 1521 | 156.30 | launched workers 94, CTO helpers 62 |
 | (CTO) | 630 | 109.69 | CTO session 110 |
 | W2-20 | 1208 | 95.01 | launched workers 95 |
 | W2-148 | 982 | 92.55 | launched workers 79, CTO helpers 14 |
 | W2-56 | 1160 | 83.30 | launched workers 64, CTO helpers 19, live tests (pytest) 0 |
-| D-10 | 699 | 73.01 | CTO helpers 73 |
+| D-10 | 693 | 71.96 | CTO helpers 72 |
 | D-5 | 491 | 57.44 | CTO helpers 57 |
 | W2-141 | 719 | 52.74 | launched workers 46, CTO helpers 7 |
 | W2-121 | 396 | 44.10 | CTO helpers 44 |
@@ -63,9 +63,9 @@ external: {'source': 'experiments', 'ticket': 'W2-88/K9 fresh 80', 'day': '2026-
 | W2-13 | 97 | 6.20 | launched workers 6 |
 | D-4 | 85 | 5.72 | CTO helpers 6 |
 | W2-116 | 86 | 5.52 | launched workers 6 |
-| (helper, no id) | 55 | 5.30 | CTO helpers 5 |
 | W2-147 | 75 | 5.30 | launched workers 5 |
 | W2-140 | 46 | 5.24 | launched workers 5 |
+| (helper, no id) | 44 | 4.86 | CTO helpers 5 |
 | W2-138 | 80 | 4.79 | launched workers 5 |
 | W2-142 | 75 | 4.11 | launched workers 4 |
 | W2-1 | 60 | 3.43 | CTO helpers 3 |
@@ -89,11 +89,11 @@ external: {'source': 'experiments', 'ticket': 'W2-88/K9 fresh 80', 'day': '2026-
 |---|---|---|---|---|---|---|
 | 2026-11-08 | 160 | 374 | 0.1 M | 52.1 M | 2.5 M | 26.38 |
 | 2026-11-09 | 10,647 | 21,976 | 11.0 M | 2,043.2 M | 43.6 M | 904.83 |
-| 2026-11-10 | 4,094 | 8,386 | 4.5 M | 802.4 M | 15.7 M | 347.10 |
-| total | 14,901 | 30,736 | 15.5 M | 2,897.7 M | 61.8 M | 1,278.31 |
+| 2026-11-10 | 4,067 | 8,332 | 4.4 M | 795.6 M | 15.6 M | 344.87 |
+| total | 14,874 | 30,682 | 15.5 M | 2,890.9 M | 61.7 M | 1,276.08 |
 2026-11-08 {'1 CTO session': 20.37, '2 CTO helpers': 1.99, '4 experiments (writer)': 3.24, '5 sentinel': 0.77}
 2026-11-09 {'1 CTO session': 74.82, '2 CTO helpers': 342.86, '3 launched workers': 477.38, '5 sentinel': 1.53, '8 operator folder session': 8.09, '9 live tests (pytest)': 0.15}
-2026-11-10 {'1 CTO session': 14.49, '2 CTO helpers': 122.59, '3 launched workers': 208.92, '5 sentinel': 0.84, '6 dead-man pushes': 0.01, '9 live tests (pytest)': 0.24}
+2026-11-10 {'1 CTO session': 14.49, '2 CTO helpers': 120.67, '3 launched workers': 208.61, '5 sentinel': 0.84, '6 dead-man pushes': 0.01, '9 live tests (pytest)': 0.24}
 
 ## meter intervals
 | from | to | pct | $ | $ incl. exp | out M | cr M | cw M | calls | $/pt |
@@ -138,8 +138,8 @@ external: {'source': 'experiments', 'ticket': 'W2-88/K9 fresh 80', 'day': '2026-
 
 ## top transcripts
 | # | source | ticket | role | label | calls | turns | ctx med/max k | cr M | out k | cw M | effort | compact | reads/distinct | $ |
-| 1 | CTO session | (CTO) |  |  | 630 | 130 | 451/964 | 310.4 | 522 | 4.65 | high:630 | 1 | 22/21 | 109.69 |
-| 2 | CTO helpers | D-10 | orchestrator | D-10 red-fix list, open items | 612 | 1 | 439/772 | 262.0 | 407 | 1.68 | high:612 | 0 | 5/5 | 68.92 |
+| 1 | CTO session | (CTO) |  |  | 630 | 134 | 451/964 | 310.4 | 522 | 4.65 | high:630 | 1 | 22/21 | 109.69 |
+| 2 | CTO helpers | D-10 | orchestrator | D-10 red-fix list, open items | 606 | 1 | 437/765 | 257.3 | 402 | 1.67 | high:606 | 0 | 5/5 | 67.87 |
 | 3 | CTO helpers | D-5 | general-purpose | D-5: the templates | 491 | 1 | 381/664 | 182.2 | 348 | 2.81 | high:491 | 0 | 3/3 | 57.44 |
 | 4 | CTO helpers | W2-121 | general-purpose | Item 8: tickets, tests first | 396 | 1 | 364/613 | 137.0 | 289 | 2.19 | high:396 | 0 | 1/1 | 44.10 |
 | 5 | CTO helpers | ACT-OPERATOR-1 | general-purpose | Prepare ACT-OPERATOR-1 | 164 | 1 | 375/530 | 54.7 | 216 | 1.92 | high:164 | 0 | 9/9 | 24.86 |
@@ -167,20 +167,21 @@ external: {'source': 'experiments', 'ticket': 'W2-88/K9 fresh 80', 'day': '2026-
 ## check: 188 sessions with own result: total_cost_usd 683.39 vs priced here 683.11 (ratio 1.000)
 
 ## tool calls / result chars
-Read 3525 28.1 M chars
-Bash 10546 15.8 M chars
-Grep 2073 3.4 M chars
-Edit 1974 0.3 M chars
-Write 1007 0.2 M chars
-Glob 211 0.1 M chars
+Read 3564 28.1 M chars
+Bash 10663 16.2 M chars
+Grep 2081 3.4 M chars
+Edit 1992 0.3 M chars
+Write 1016 0.2 M chars
+Glob 212 0.1 M chars
 WebFetch 9 0.1 M chars
 Agent 42 0.1 M chars
-Monitor 66 0.0 M chars
-SendMessage 62 0.0 M chars
+Monitor 69 0.0 M chars
+SendMessage 67 0.0 M chars
 1 CTO session {'Bash': '0.4M', 'Read': '0.1M', 'Agent': '0.0M', 'SendMessage': '0.0M'}
-2 CTO helpers {'Bash': '8.5M', 'Read': '4.1M', 'Write': '0.1M', 'WebFetch': '0.1M'}
-3 launched workers {'Read': '23.6M', 'Bash': '6.9M', 'Grep': '3.4M', 'Edit': '0.3M'}
+2 CTO helpers {'Bash': '8.6M', 'Read': '4.1M', 'Write': '0.1M', 'WebFetch': '0.1M'}
+3 launched workers {'Read': '23.7M', 'Bash': '6.9M', 'Grep': '3.4M', 'Edit': '0.3M'}
 5 sentinel {'Bash': '0.0M', 'Read': '0.0M', 'PushNotification': '0.0M'}
 6 dead-man pushes {'PushNotification': '0.0M', 'ToolSearch': '0.0M'}
+7 usage recorder {'Bash': '0.1M'}
 8 operator folder session {'Read': '0.2M', 'Bash': '0.0M'}
 9 live tests (pytest) {'Bash': '0.0M', 'Write': '0.0M', 'Read': '0.0M'}

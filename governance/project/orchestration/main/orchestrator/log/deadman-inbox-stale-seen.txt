@@ -1,1 +1,1 @@
-server: the embedding server HUNG since 2026-11-02 10:54:38
+sentinel: the sentinel's watch is silent since 2026-11-10 03:40:00

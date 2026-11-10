@@ -20,6 +20,7 @@ HERE = Path(__file__).resolve().parent
 PROJ = Path.home() / ".claude/projects"
 RESET = datetime(2026, 11, 8, 9, 0, tzinfo=timezone.utc)
 RESET_TS = RESET.timestamp()
+CUTOFF = os.environ.get("USAGE_CUTOFF", "2026-11-10T11:36:43")  # the last meter reading used (UTC)
 SKIP = "gov-os-" + "eval"  # never opened
 MAIN = "-home-usain-Dynamic-Agentic-Engineering-OS"
 CTO = "ad44f5fe-276d-46b7-85cd-df9f8d97a3ec"
@@ -193,7 +194,7 @@ def main():
                         seen.add(mid)
                         u = msg.get("usage")
                         model = msg.get("model")
-                        if not u or model == "<synthetic>" or not ts or ts < "2026-11-08T09:00":
+                        if not u or model == "<synthetic>" or not ts or ts < "2026-11-08T09:00" or ts[:19] > CUTOFF:
                             continue
                         cc = u.get("cache_creation") or {}
                         w5 = cc.get("ephemeral_5m_input_tokens")
@@ -206,9 +207,10 @@ def main():
                         cr = u.get("cache_read_input_tokens") or 0
                         out = u.get("output_tokens") or 0
                         speed = u.get("speed")
+                        think = (u.get("output_tokens_details") or {}).get("thinking_tokens") or 0
                         cost = price(model, inp, w5, w1, cr, out, speed)
                         calls.append(dict(key=key, kind=kind, ts=ts, model=model, inp=inp, w5=w5, w1=w1, cr=cr,
-                                          out=out, cost=cost, speed=speed, effort=d.get("effort")))
+                                          out=out, think=think, cost=cost, speed=speed, effort=d.get("effort")))
                         s["calls"] += 1
                         s["models"][model] = s["models"].get(model, 0) + 1
                         e = str(d.get("effort"))
