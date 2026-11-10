@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: []
 allowed_paths:
-- tests/acceptance/W1-19/test_w1_19_real_models.py  # the default reranker's case: the process of its own is the shared service, started by this call or already running (D-10's red-fix list) [DEC-982, DEC-397, DEC-1109 (2)]
 - src/gov/retrieval/rerank.py
 - src/gov/retrieval/rerank_worker.py
 - src/gov/retrieval/rerank_service.py
@@ -44,6 +43,7 @@ kpis:
   - 'The interim gov-reranker-gpu-slot.pth, the reranker environment, or a CTO tool changed by this ticket.'
 profile: FULL
 sources:
+- DEC-1109
 - DEC-1097
 - DEC-1048
 - DEC-1046
