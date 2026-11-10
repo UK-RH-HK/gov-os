@@ -1,0 +1,2 @@
+seed: deferred (product): gov rebuild --seed /home/usain/gov-os-worktrees/W2-00-store-a
+heavy_slot: all 3 slots taken; waiting (2026-11-10 00:10:46)
