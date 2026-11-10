@@ -68,6 +68,8 @@ profile: FULL
 sources:
 - DEC-1101
 - DEC-1112
+- DEC-1113
+- DEC-803
 - DEC-1109
 - DEC-1099
 - DEC-1097
