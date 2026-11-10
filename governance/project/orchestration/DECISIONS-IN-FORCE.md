@@ -440,3 +440,7 @@ other restart is an ACT.
   cases need; its map reader refuses or reads every listed id. The composed agents carry the role file's six fields
   through W2-153's composition, the approved 1.0.0 templates unchanged; W1-38's builder copies templates/; then
   ACT-CLAUDE-COPIES-3 for the owner's yes.
+- Delegated (CTO, 2026-11-10, DEC-1112 (3)): PKG-D10a-scope, (b): gov accept enables only the `breadth` group its
+  map's cases need; a KPI line resting only on `lifted` cases is reported report-only, not failed (DEC-1061 (2)); the
+  map reader reads every listed id or refuses (no form dropped silently). W2-154 (the serial plugin, nightly.sh's
+  serial count, the brief citation) after the lift.

@@ -39,7 +39,7 @@ cd /home/usain/Dynamic-Agentic-Engineering-OS
 D=.gov-runtime/scratch/orchestrator/drafts/win-toast
 bash $D/apply.sh check     # "state before", then "check: ready to apply" (exit 0)
 bash $D/apply.sh apply     # backup with its sha256, the map replaced, "state applied"
-git commit -m "ACT-WIN-TOAST-1: tools/win_toast.ps1 out of the test map's record_only list (DEC-1112 (3); deadman.py runs it)" --trailer "Task: decision-record" --trailer "Role: owner" -- governance/project/test-map.yaml
+git commit -m "ACT-WIN-TOAST-1: tools/win_toast.ps1 out of the test map's record_only list (DEC-1112 (3); deadman.py runs it)" --trailer "Task: DAEO-sdxk" --trailer "Implements: DEC-1112" --trailer "Role: owner" -- governance/project/test-map.yaml
 ```
 - **Check:** `bash $D/apply.sh check` prints "state applied".
 - **Undo:** `bash $D/apply.sh undo` (byte for byte from the backup), or `git revert` of the operator's commit.
