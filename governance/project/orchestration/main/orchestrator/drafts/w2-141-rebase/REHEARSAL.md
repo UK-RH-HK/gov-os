@@ -17,7 +17,7 @@ rehearsal's own call log, 0 to the live one. The real sets root was never opened
 ## Results
 | Step | Before (live hook) | After (staged pair) |
 |---|---|---|
-| `tests/unit/guard/test_w2_141_search.py` (main tree) | 203 passed, 1 failed (the pin case: the base moved) | **204 passed** (no test changed) |
+| `tests/unit/guard/test_w2_141_search.py` (main tree) | the pin case, run alone: 1 failed (the base moved); the D-10 helper's whole run at `adb4f6b4c`: 203 passed, 1 failed | **204 passed** (no test changed) |
 | `gov accept W2-141` (pin `bcea09060ebc`) | — | **184 passed, 0 failed, 0 skipped** |
 | `sets_globs_check.py` (planted HOME, SG_EXPECT=after) | 573 run, 0 failed, PASS | **573 run, 0 failed, PASS** |
 | `walls_check.py repo` | 331, 0 failed | **331, 0 failed** |
