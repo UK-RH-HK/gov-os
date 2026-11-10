@@ -339,6 +339,7 @@ its `gov_check_here` fixture) left the `record_reading` list, which now holds th
 - **Not red:** the rest of W2-66 (167 passed, 1 skipped, the two above failed, on `d7b25cf3c605`); `every_close`'s
   three W1-07 files are still listed (`test_w1_07_s_three_contract_files_run_on_every_close`, green); when they join
   is the selector's, which the fixture-map cases of Part 1 exercise and T-4 left green.
+- **W2-66c (`Rewrite-Reason: DEC-891, DEC-1112 (3)`, option (a)):** `test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only` no longer counts as a record a file under a `tools/` folder that a tracked `.py` directly in that folder names by a whole string literal (its path relative to the folder, or a leading folder): W2-149's `indep-schemas/*.schema.json` (read by `indep_launch.py`), so they need not be record-only (record-only would skip their tests); `.md` files, tickets, probes, close records and checkpoints are still required record-only, and `deadman.py` names `win_toast.ps1` too (record-only today: reported, not changed).
 
 ## KPI map after D-4's cut (DEC-1061)
 
