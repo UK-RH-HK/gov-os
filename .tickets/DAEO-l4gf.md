@@ -17,17 +17,16 @@ role: engineer
 depends_on: []
 allowed_paths:
 - src/gov/close/serial.py
-- src/gov/close/serial_only/**
+- src/gov/close/pytest_plugin/gov_close_serial_only.py
 - src/gov/close/command.py  # the serial-afterwards run's line only
 - governance/project/orchestration/nightly/nightly.sh
 - tests/unit/close/test_serial*
-- tests/acceptance/serial-only.txt  # the W1-16 ui_off entry restored, by the test designer, once S1 holds
 kpis:
   success:
   - 'S1 An entry of tests/acceptance/serial-only.txt whose every case an opt-in list (tests/optin-lifted*.txt) leaves out of the run is "not in this run": the close''s serial plugin neither stops the serial phase on it (today exit 4, "no case is named by the entry") nor runs its cases elsewhere, and the run''s record names each such entry; an entry that names no case at all (no opt-in list explains it) still stops the phase, as today [DEC-1112 (3), DEC-1061, DEC-549]'
   - 'S2 In a run that opts in to the list that holds such an entry''s cases, the entry is back in the serial phase: its cases run serially, never in the parallel phase [DEC-1112 (3), DEC-889 item 5]'
-  - 'S3 nightly.sh reports "serial: N cases run" for its serial phase, and a night whose serial phase ran no case (or ended with a collection error) is red, whatever its JUnit files say; a phase with nothing declared reads "serial: 0 declared" and is not red [DEC-1112 (3), W2-13 review F1]'
-  - 'S4 Once S1 holds, W1-16''s ui_off entry returns to serial-only.txt (commented out on 2026-11-10 by the D-10 gate, b78f862a9), restored by a test designer with its Rewrite-Reason [DEC-1112 (3)]'
+  - 'S3 nightly.sh reports "serial: N cases run" for its serial phase, and a night whose serial phase ran no case (or ended with a collection error) is red, whatever its JUnit files say; a phase with nothing declared reads "serial: 0 declared" and is not red [DEC-1112 (3), the D-10 W2-13 review F1]'
+  - 'S4 Once S1 holds, W1-16''s ui_off entry returns to serial-only.txt (commented out on 2026-11-10 by the D-10 gate, b78f862a9), restored by a test designer with its Rewrite-Reason; the designer writes tests/acceptance/serial-only.txt, never the implementer [DEC-1112 (3), MR-3]'
   failure:
   - 'An entry that names no case and no opt-in list explains passes silently.'
   - 'A night with a serial phase that ran nothing reads green.'
