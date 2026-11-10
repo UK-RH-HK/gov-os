@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Starts one worker through `gov launch` (TPL-3b: R3-TEMPLATES D, TPL-3 S5; R2-6, R2-9; DEC-1052, DEC-1079), with the
 # checks every launch needs, so no lead or CTO writes the line by hand (LEAD-w2-common, DEC-789, DEC-799, DEC-898).
-#   launch_worker.sh [--fg] <role> <effort> <brief>
+#   launch_worker.sh [--fg] [--projection-usd <N>] <role> <effort> <brief>
 # Run it in the worker's worktree (or name it with LAUNCH_TREE); never the main tree. In order:
 #  1. the ticket: LAUNCH_TICKET, else the one in_progress ticket of the tree's W2 (the folder's name less -tests) whose
 #     role is <role> (a test designer or reviewer with none of its own: the W2's one in_progress implementer ticket);
@@ -20,11 +20,18 @@
 # this prints the log, the exit file and the pid: wait with `wait_for.sh <exit file>`. --fg runs it here and exits
 # with the session's code. A refusal before the launch exits 2 (usage, ticket), 3 (disk gate) or 4 (sandbox check),
 # with its reason in the log and that code in the exit file once their names are known.
+# Spend and the brake (DAEO-sdxk, 2026-11-10; DEC-1091, DEC-1112 (3)): the projection is --projection-usd, else the
+# brief's budget (spend.py brief-budget), else none; when the session ends, spend.py from-log appends one line to the
+# CTO's log/spend.jsonl (cost_usd, output_tokens, cache tokens each in their own field; no `tokens` sum), with the
+# ticket, its W2 and the projection, then runs spend.py check (the runaway brake at twice the projection; record only,
+# never to the owner). A launch for a W2 whose brake file (log/brake/<W2>.json) exists is refused with exit 5 until
+# the CTO clears it (spend.py clear <W2>). Env: LAUNCH_ORCH (the CTO's scratch root), LAUNCH_SPEND_TOOL.
 # Env (tests): LAUNCH_TREE, LAUNCH_TICKET, LAUNCH_MODEL, LAUNCH_DISK_GATE, LAUNCH_TRIPWIRE, LAUNCH_TRIAL_DIR,
 # LAUNCH_COMMON_DIR, LAUNCH_MAIN.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 MAIN=${LAUNCH_MAIN:-/home/usain/Dynamic-Agentic-Engineering-OS}
+SPEND_ORCH=${LAUNCH_ORCH:-$MAIN/.gov-runtime/scratch/orchestrator} SPEND_TOOL=${LAUNCH_SPEND_TOOL:-$HERE/spend.py}
 COMMON_DIR=${LAUNCH_COMMON_DIR:-$MAIN/.gov-runtime/scratch/orchestrator/briefs}
 GATE=${LAUNCH_DISK_GATE:-$HERE/disk_gate.sh} TRIP=${LAUNCH_TRIPWIRE:-$HERE/tripwire.py}
 TRIAL_DIR=${LAUNCH_TRIAL_DIR:-/home/usain/gov-os-worktrees} MODEL=${LAUNCH_MODEL:-claude-opus-5-5}
@@ -34,7 +41,7 @@ cli() {  # the CLI arguments after `--` (LEAD-w2-common's form; the reviewer get
   if [ "$1" = independent-auditor ]; then CLI+=("Bash" "Read" "Grep" "Glob"); else CLI+=("Bash" "Read" "Edit" "Write" "Grep" "Glob"); fi
 }
 if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, tripwire, sandbox check, summary, exit
-  shift; tree=$1 ID=$2 role=$3 effort=$4 copy=$5 base=$6
+  shift; tree=$1 ID=$2 role=$3 effort=$4 copy=$5 base=$6 proj=${7:-} W2=${8:-}
   echo "$$" > "$base.pid"; cd "$tree" || exit 2
   cli "$role" "$effort"
   PYTHONPATH="$tree/src" python3 -m gov.cli.main launch "$role" "$ID" -- "${CLI[@]}" < "$copy" > "$base.json" 2>&1
@@ -42,17 +49,26 @@ if [ "${1:-}" = --run ]; then  # the session itself (detached or not): launch, t
   python3 "$TRIP" compare "$base.tripwire-before.json" > "$base.tripwire.json" 2>&1; trc=$?
   tw="tripwire clean"; [ $trc = 0 ] || tw="tripwire CHANGED (exit $trc; $base.tripwire.json: attribute each change)"
   sb="sandbox trial file absent"; [ -e "$TRIAL_DIR/.sandbox-trial-$ID" ] && sb="SANDBOX BREACH: $TRIAL_DIR/.sandbox-trial-$ID exists (never delete it; report it)"
-  echo "launch_worker $role $ID: session exit $rc; $tw; $sb; log $base.json" | tee "$base.summary"
+  if err=$(ORCH=$SPEND_ORCH python3 -I "$SPEND_TOOL" from-log "$base.json" --kind launched \
+      --what "$W2 $role (launched, $effort) $(basename "$base")" --ticket "$ID" --wbs "$W2" --role "$role" \
+      --effort "$effort" --exit "$rc" ${proj:+--projection-usd "$proj"} 2>&1 > /dev/null); then
+    sp="spend recorded (projection ${proj:-none})"
+    bk=$(ORCH=$SPEND_ORCH python3 -I "$SPEND_TOOL" check 2>&1 | grep -m1 "^BRAKE $W2:") && sp="$sp; $bk"
+  else sp="spend NOT recorded: $(tail -n 1 <<< "$err" | cut -c1-160)"; fi
+  echo "launch_worker $role $ID: session exit $rc; $tw; $sb; log $base.json; $sp" | tee "$base.summary"
   echo "$rc" > "$base.exit.tmp" && mv "$base.exit.tmp" "$base.exit"; exit "$rc"
 fi
-fg=""; [ "${1:-}" = --fg ] && { fg=1; shift; }
-[ $# = 3 ] || { sed -n 2,24p "$0"; exit 2; }
+fg="" proj=""
+while :; do case "${1:-}" in --fg) fg=1; shift;; --projection-usd) proj=${2:-}; shift 2 || shift;; *) break;; esac; done
+[ $# = 3 ] || { sed -n 2,30p "$0"; exit 2; }
+[[ -z "$proj" || "$proj" =~ ^[0-9]+([.][0-9]+)?$ ]] || { say "not a projection in USD: $proj"; exit 2; }
 role=$1 effort=$2 brief=$3
 case "$role" in engineer|independent-test-designer|independent-auditor|research|product-spec) ;;
   *) say "not a worker role: $role"; exit 2;; esac
 case "$effort" in low|medium|high|xhigh|max) ;; *) say "not an effort: $effort"; exit 2;; esac
 [ -s "$brief" ] || { say "no brief (or an empty one): $brief"; exit 2; }
 brief=$(readlink -f "$brief")
+[ -n "$proj" ] || proj=$(python3 -I "$SPEND_TOOL" brief-budget "$brief" 2> /dev/null)
 tree=$(readlink -f "${LAUNCH_TREE:-$(git rev-parse --show-toplevel 2>/dev/null)}")
 [ -n "$tree" ] && [ -d "$tree/.tickets" ] || { say "no tree here: run it in the worktree or set LAUNCH_TREE"; exit 2; }
 [ "$tree" = "$(readlink -f "$MAIN")" ] && { say "the main tree is no worker's tree: $tree"; exit 2; }
@@ -83,6 +99,7 @@ name=$(basename "$brief" .md) n=1; stem=$name
 while [ -e "$logdir/$name.json" ] || [ -e "$logdir/$name.exit" ]; do n=$((n + 1)); name=$stem-$n; done
 base=$logdir/$name
 refuse() { say "$2"; echo "launch_worker: REFUSED: $2" > "$base.json"; echo "$1" > "$base.exit"; exit "$1"; }
+[ -e "$SPEND_ORCH/log/brake/$W2.json" ] && refuse 5 "the runaway brake holds $W2 (DEC-1091; $SPEND_ORCH/log/brake/$W2.json): the CTO clears it first (spend.py clear $W2)"
 bash "$GATE" 2>> "$base.json" || refuse 3 "the disk gate is shut (DEC-898): $(tail -n 1 "$base.json")"
 copy=$dest/$name.md
 python3 -I - "$brief" "$copy" "$COMMON_DIR" "$dest" <<'PY' || refuse 2 "the brief could not be copied to $copy"
@@ -123,9 +140,9 @@ print("sandbox settings strict")
 PY
 ) || refuse 4 "the launcher's dry run refuses: $(tail -n 3 <<< "$dry" | tr '\n' ' ')"
 python3 "$TRIP" snapshot > "$base.tripwire-before.json" 2>> "$base.json" || refuse 4 "the tripwire snapshot failed"
-say "$role $ID in $tree: $dry; disk gate open; brief $copy"
-if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base"; exit $?; fi
-setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" < /dev/null > /dev/null 2>&1 &
+say "$role $ID in $tree: $dry; disk gate open; brief $copy; projection ${proj:-none}"
+if [ -n "$fg" ]; then bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$W2"; exit $?; fi
+setsid bash "$HERE/$(basename "$0")" --run "$tree" "$ID" "$role" "$effort" "$copy" "$base" "$proj" "$W2" < /dev/null > /dev/null 2>&1 &
 echo "$!" > "$base.pid"
 echo "launch_worker: started pid $! (its own process group) for $role $ID; log $base.json"
 echo "launch_worker: wait with: bash $HERE/wait_for.sh $base.exit"

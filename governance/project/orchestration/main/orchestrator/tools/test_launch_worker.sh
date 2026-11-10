@@ -25,7 +25,12 @@ if os.environ.get("STUB_BREACH"):
     open(os.path.join(os.environ["LAUNCH_TRIAL_DIR"], ".sandbox-trial-" + sys.argv[3]), "w").write("x")
 time.sleep(float(os.environ.get("STUB_SLEEP", "0")))
 print("gov launch: a launcher line")
-print('{"type":"result","is_error":false,"num_turns":3,"session_id":"stub-1","result":"task: stub\\nstatus: DONE"}')
+import json
+r = {"type": "result", "is_error": False, "num_turns": 3, "session_id": "stub-1", "result": "task: stub\nstatus: DONE"}
+if os.environ.get("STUB_COST"):
+    r.update(total_cost_usd=float(os.environ["STUB_COST"]), usage={"input_tokens": 7, "output_tokens": 100,
+             "cache_read_input_tokens": 9000, "cache_creation_input_tokens": 500})
+print(json.dumps(r))
 sys.exit(int(os.environ.get("STUB_RC", "0")))
 PY
 cat > "$R/src/gov/launch/launcher.py" <<'PY'
@@ -142,6 +147,31 @@ check "detached: wait_for.sh gives DONE exit 0, the result and the summary" '[ $
 # 9. the form: never --settings, never a name match
 ! grep -q -- '--settings' "$T"; check "no --settings in the launch line" '[ $? = 0 ]'
 ! grep -Eq '(^|[^a-z_])(pgrep|pkill|killall)([^a-z_]|$)' "$T"; check "no pgrep, pkill or killall" '[ $? = 0 ]'
+
+# 10. spend in one unit and the runaway brake (DAEO-sdxk, DEC-1091): the line, the brake, the refusal, the clear
+SP=$W/main/.gov-runtime/scratch/orchestrator/log/spend.jsonl BK=$W/main/.gov-runtime/scratch/orchestrator/log/brake
+IB=$W/main/.gov-runtime/scratch/orchestrator/dispatch/inbox
+lastline() { tail -n 1 "$SP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(eval(sys.argv[1]))" "$1"; }
+check "spend: every session so far has its line, no cost for a session that reports none" '[ "$(lastline "d[\"cost_usd\"]")" = None ] && [ "$(lastline "d[\"wbs\"]")" = W2-99 ]'
+lw --fg --projection-usd x engineer high "$W/briefs/W2-99-eng.md"; check "spend: a projection that is not a number: exit 2" '[ $? = 2 ]'
+STUB_COST=1.5 lw --fg --projection-usd 1 engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+last=$(ls -t "$LOG"/*.summary | head -n 1)
+check "spend: the line carries cost_usd, output and cache tokens apart, the ticket, the projection" '[ $rc = 0 ] && [ "$(lastline "(d[\"cost_usd\"], d[\"output_tokens\"], d[\"cache_read_tokens\"], d[\"cache_creation_tokens\"], d[\"input_tokens\"], d[\"ticket\"], d[\"projection_usd\"], d[\"kind\"])")" = "(1.5, 100, 9000, 500, 7, '"'"'T-eng'"'"', 1.0, '"'"'launched'"'"')" ]'
+check "spend: no line has a tokens field" '! grep -q "\"tokens\"" "$SP"'
+check "spend: the summary says it was recorded; under twice the projection, no brake" 'grep -q "spend recorded (projection 1)" "$last" && [ ! -e "$BK/W2-99.json" ] && ! ls "$IB"/*-spend-brake.txt > /dev/null 2>&1'
+STUB_COST=0.6 lw --fg engineer high "$W/briefs/W2-99-eng.md"
+last=$(ls -t "$LOG"/*.summary | head -n 1)
+check "brake: past twice the projection (2.1 > 2.0): the brake file, one inbox item with its W2 line, named in the summary" '[ -e "$BK/W2-99.json" ] && [ $(ls "$IB"/*-spend-brake.txt | wc -l) = 1 ] && grep -q "^W2: W2-99$" "$IB"/*-spend-brake.txt && grep -q "BRAKE W2-99" "$last"'
+lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "brake: the next launch for W2-99 is refused (exit 5), nothing started" '[ $rc = 5 ] && [ ! -e "$W/rec/argv" ] && grep -q "runaway brake holds W2-99" "$W/stderr"'
+ORCH=$W/main/.gov-runtime/scratch/orchestrator python3 "$HERE/spend.py" check > /dev/null
+check "brake: a second check writes no second item" '[ $(ls "$IB"/*-spend-brake.txt | wc -l) = 1 ]'
+ORCH=$W/main/.gov-runtime/scratch/orchestrator python3 "$HERE/spend.py" clear W2-99 --note "test" > /dev/null
+lw --fg engineer high "$W/briefs/W2-99-eng.md"; rc=$?
+check "brake: cleared by the CTO, the launch goes on and the cost counts afresh" '[ $rc = 0 ] && [ ! -e "$BK/W2-99.json" ] && [ -e "$W/rec/argv" ]'
+printf -- '---\nbudget_usd: 3\n---\n# W2-99 engineer, budgeted\n' > "$W/briefs/W2-99-budget.md"
+lw --fg engineer high "$W/briefs/W2-99-budget.md"
+check "spend: with no --projection-usd, the brief's budget is the projection" '[ "$(lastline "d[\"projection_usd\"]")" = 3.0 ] && grep -q "projection 3" "$W/stderr"'
 
 rm -rf "$W"
 echo "$([ $fails = 0 ] && echo PASS || echo "FAILED $fails") test_launch_worker.sh"

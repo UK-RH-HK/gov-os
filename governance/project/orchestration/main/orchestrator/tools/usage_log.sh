@@ -5,8 +5,9 @@
 # the last 24 h's request and session counts. The digests show the latest line and the change since the last digest.
 #   bash usage_log.sh            run until stopped
 #   bash usage_log.sh --once     one reading, then exit
+# Each reading also runs spend.py check, the runaway brake (DEC-1091), whose items go to the CTO's inbox only.
 set -u
-ORCH=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
+ORCH=${ORCH:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator}  # ORCH: rehearsals
 LOG=${USAGE_LOG:-$ORCH/log/usage.txt}
 EVERY=${EVERY:-1800}
 read_once() {
@@ -15,6 +16,9 @@ read_once() {
   cur=$(printf '%s\n' "$out" | sed -n 's/^Current \(.*\): \([0-9]*\)% used · resets \(.*\)$/\1=\2% (resets \3)/p' | paste -sd ';' -)
   day=$(printf '%s\n' "$out" | sed -n 's/^Last 24h · \(.*\)$/\1/p' | head -1)
   echo "$(date '+%F %T') ${cur:-unread}; last 24h: ${day:-unread}" >> "$LOG"
+  # the runaway brake (DEC-1091; DAEO-sdxk, 2026-11-10): one inbox item per ticket past twice its projection, to the
+  # CTO only (record only, never the owner, DEC-1089 (3)); SPEND_CHECK=0 leaves it out
+  [ "${SPEND_CHECK:-1}" = 0 ] || python3 -I "$(dirname "$0")/spend.py" check >> "${SPEND_CHECK_LOG:-$ORCH/log/spend-check.log}" 2>&1
 }
 read_once
 [ "${1:-}" = --once ] && exit 0
