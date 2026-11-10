@@ -3,7 +3,8 @@
 - **For:** the owner's yes, then the owner's operator by hand, as the message in §5 (DEC-1104 (4)). About one minute in
   the main tree.
 - **By:** a ticket lead for the CTO (orchestrator `DAEO-sdxk`). Built 2026-11-09, **rebuilt 2026-11-10 on the merged
-  set-up A wiring** (W2-149, `7f0e71519`). Rehearsed in a clone with a planted HOME and a planted sets root. **Nothing
+  set-up A wiring** (W2-149, `7f0e71519`), **and again on its review's F18-F23 fixes** (`90c1fea6c`), as the CTO decided
+  before asking you. Rehearsed in a clone with a planted HOME and a planted sets root. **Nothing
   live changes** until the operator runs §5, and the real sets root was never opened. Reviewed independently (§7).
 - **Under:**
   - DEC-1101 (2)-(3): fixed briefs the owner approves once, hashed; the launch script checks them and the walls'
@@ -17,15 +18,17 @@
   - DEC-1057: rehearsed.
 - **Sources:**
   - W2-149 (`DAEO-52ku`): merged `b4de529b`; F11 `ff1865184`; set-up A's wiring `7f0e71519` (review READY round 1,
-    `.gov-runtime/scratch/orchestrator/reviews/W2-149-sgx-review-r1.md`; `gov accept W2-149` pass, 146/0/3).
+    `.gov-runtime/scratch/orchestrator/reviews/W2-149-sgx-review-r1.md`; `gov accept W2-149` pass, 146/0/3); its
+    review's F18-F23 fixed `90c1fea6c` (review READY, `reviews/W2-149-sgx-review-f18.md`; `gov accept W2-149` pass,
+    197/0/3).
   - ACT-INDEP-WALLS-1: the list as first written, `331e48fa…`, with six template lines.
   - ACT-SETS-GLOBS-1, applied `9cce7430d`.
   - SANDBOX-GUARD-EXP-DECLARATION §12 and its amendment A5.
-- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/w2-149-install/` (§4). The first build's reviewed drafts are
-  kept in `drafts/w2-149-install-v1/`.
+- **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/w2-149-install/` (§4). The first and second builds' reviewed
+  drafts are kept in `drafts/w2-149-install-v1/` and `drafts/w2-149-install-v2/`.
 
 ## 0. Class: (O); your yes, then your operator by hand
-**(O), with your yes, then your operator by hand.** The yes line: **`yes ACT-W2-149-INSTALL-1 0edc1eb9`** (`0edc1eb9`: the commit that records this package ready)
+**(O), with your yes, then your operator by hand.** The yes line: **`yes ACT-W2-149-INSTALL-1 @SHA8@`** (`@SHA8@`: the commit that records this package ready)
 
 **Your yes also approves the walls' `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1's
 table: what each change turns on). The template's own header says a change to it needs your approval. The CTO's
@@ -65,8 +68,9 @@ approved.
      delivers each wall's products by its own code into that half's folder; for the held-out half that is the sealed
      folder (planted cases, round-1 files, labels, the overlap auditor's decisions and x/y map, a rewritten
      `labels.jsonl`, `owner.jsonl`);
-   - **at labeller 1's round 2, the script runs that session's own rule script on this machine,** confined by `bwrap`
-     (no network, no files, no process, capped; any failure is 18);
+   - **at labeller 1's round-1 delivery and again at its round 2, the script runs that session's own rule script on
+     this machine,** confined by `bwrap` (no network, no files, no process, capped; a failure rejects round 1's delivery
+     with 20, and refuses round 2 with 18);
    - **a set-up A wall's tree loses** `.claude/`, `src/gov/guard/`, `src/gov/launch/` and the template folder (a
      tightening).
 
@@ -76,7 +80,7 @@ approved.
    ```
    # ACT-W2-149-INSTALL-1 … the two template lines above … replace 8b50a78f01b3 and 21660e1ee5ad (ACT-INDEP-WALLS-1's).
    # ACT-W2-149-INSTALL-1 … for the launch script governance/project/orchestration/tools/indep_launch.py
-   # a5f2e8f5d9c9b79a7a3e61e475b71da45b071eb868640953577dd7f54adad695 (W2-149 with set-up A's wiring, 7f0e71519f83) …
+   # 95fe78dd49bb493194e33cc6a832bc3674b6998ac06010cc5a5d4f7aade5f1d0 (W2-149 with set-up A's wiring, 90c1fea6c7e5) …
    bbff1249…  brief labeller governance/project/indep-briefs/sgx1/labeller.md
    e13b5f96…  brief labeller governance/project/indep-briefs/sgx1/labeller-2.md
    82134b3d…  brief writer governance/project/indep-briefs/sgx1/writer-tuning.md
@@ -87,7 +91,7 @@ approved.
    e8670330…  brief operator governance/project/operator/reviewer-brief.md
    ```
    `drafts/w2-149-install/APPROVED.after` gives it in full: 23 lines, sha256
-   `a0af30f840dba01fbb6129fbb07841af0858d5b2ea2961a7340efffbf457a65d`. A template line must be replaced, not added
+   `32f1aab70bc24ac7133f720f4fab071426400e081b8727f4908513fa172de5f6`. A template line must be replaced, not added
    beside the old one: the launch script requires exactly one hash per template file.
    - Each brief's kind is its front matter's `kind`.
    - The operator's two briefs are kept on the one list of what you approved. The launch script knows no kind
@@ -95,11 +99,11 @@ approved.
      "the operator's two"** (row 75 of DECIDED-NOT-DONE), say so before your yes: the CTO drops the two lines and
      re-rehearses.
 3. **Nothing else.** The launch script, the template files and the schemas are already in the repository (the wiring's
-   merge, `7f0e71519`). The guard, the path map and the settings are untouched.
+   merges, `7f0e71519` and `90c1fea6c`). The guard, the path map and the settings are untouched.
 
 ## 2. The order
-1. **W2-149 with set-up A's wiring merged** (`7f0e71519`). `apply.sh` refuses unless the tree's launch script hashes
-   `a5f2e8f5d9c9` and its `kinds.yaml` and `tree-exclude.txt` hash `734b26e261fa` and `e8395088167e` ("merge it
+1. **W2-149 with set-up A's wiring and its F18-F23 fixes merged** (`90c1fea6c`). `apply.sh` refuses unless the tree's
+   launch script hashes `95fe78dd49bb` and its `kinds.yaml` and `tree-exclude.txt` hash `734b26e261fa` and `e8395088167e` ("merge it
    first"). After the apply, the list holds the template and the briefs by their template and brief lines. **It holds
    the script only until the apply:** the script's hash in the list is a comment, which the launch script's parser
    skips (the rebuilt ACT's review, F34).
@@ -128,34 +132,43 @@ approved.
   - a later change to the launch script launches under this list unchanged, as reviewed code without a new yes (the
     list's comment then names an older script). `check` then says "merge it first", though the ACT is applied; `undo`
     still works.
-- **The wiring's review rows F18 to F23** (W2-149's file; none in scope, reachable in ordinary work and fail-open or
-  work-losing) are such later script changes. Fixed before the apply, they rebuild this ACT; fixed after it, they run
-  without one:
-  - a broken rule script is first caught at round 2 (F18);
-  - a result that says it stopped is still delivered (F19);
-  - labeller 2's labels land unchecked (F20);
-  - an empty script reason tells the auditor which side is labeller 1's (F21);
-  - a settled case keeps labeller 1's class (F22);
-  - `rule_class` is accepted only as an integer (F23).
-
-  Each of these is a possible stall or a weakened blind in set-up A's first real runs, not a failure of the list.
-  Whether to fix them before asking you (one more rebuild, scripted: `freeze.py`, `rehearse.sh`) or after the apply is
-  the CTO's call.
+- **The wiring's review rows F18 to F23 are fixed** (`90c1fea6c`; the CTO's decision, DEC-1112 (3), to fix them before
+  asking you), so this build's script holds them:
+  - the rule script is checked at round 1's delivery, and a broken one never lands (F18);
+  - a result that says it stopped delivers nothing (F19);
+  - labeller 2's labels are checked before they land (F20);
+  - when either side's reason is empty, both are blanked in the auditor's disputes (F21);
+  - a settled case takes the auditor's whole decision (F22);
+  - `rule_class` is accepted as an integer or a decimal string 1-14 and stored as an integer (F23).
+- **Two rows of that fix's review stay** (W2-149's file; neither in scope, reachable in ordinary work and fail-open or
+  work-losing):
+  - **F36, named to you here.** In the disputes F21 blanks, the first labeller's script side can still be picked out:
+    it is the class-14 side with no clause, against the second labeller's refuse or ask. The auditor cannot name a
+    labeller from anything it may read, but its brief says it does not know which wrote which. Blanking every
+    dispute's reasons would hide it, at the cost of the second labeller's arguments; that would be a script change and
+    one more rebuild. The reviewer recommends accepting it as a named limit (confidence medium), and so does the lead.
+    **Where that blind rests** (the third build's review, F38): every set-up A wall's tree, the auditor's included, holds
+    text that states this tell: W2-149's ticket, this package and its earlier build, and the launch script's code, tests
+    and evidence. The auditor's brief forbids reading any package, draft or ticket file, so for those copies its not
+    knowing which side is which rests on that instruction, as for the guard's code (§8 item 5). The labellers' own clause
+    wording would also remain even with every reason blanked.
+  - **F37:** a round-1 rejection by the rule check logs `rejected rules` without the check's own word, so a missing
+    `bwrap` looks like a broken script until it is checked by hand.
 - **The experiment's pin moves** (first build's review F6). The launch script reads each brief and template file at
   `--commit`, the same commit it builds each wall's tree from. The declaration pins every tree at `f000adda4`, where no
   brief exists and the template is the old one. A launch there is refused with 10 today, and with **11** once this list
   is applied, since its `kinds.yaml` and `tree-exclude.txt` are the two lines this list replaces (the rebuilt ACT's
-  review, F33). The new pin is the first `w2/integrate` commit at or after both the wiring's merge
-  (`7f0e71519`) and your operator's commit of §5 (and after W2-141's hook, if that lands first). The CTO records it as
+  review, F33). The new pin is the first `w2/integrate` commit at or after both the wiring's last merge
+  (`90c1fea6c`) and your operator's commit of §5 (and after W2-141's hook, if that lands first). The CTO records it as
   an amendment before the extractor runs.
 
 ## 4. The files (drafts; checked by hash before they apply)
 | File (`drafts/w2-149-install/`) | sha256 (first 12) |
 |---|---|
 | `briefs/` the five, byte for byte §12's | `bbff1249953b`, `e13b5f96d0e0`, `82134b3dd6b5`, `137a73d1df4c`, `b212a424062e` |
-| `APPROVED.before` (rebuilt from ACT-INDEP-WALLS-1's own text; equals its recorded `331e48fa…`), `APPROVED.after` | `331e48fa336e`, `a0af30f840db` |
-| `apply.sh`: `check`, `apply`, `undo` | `53c2c68122d2` (the first build's reviewed `871d2c9db3dc`; now pinned to the wiring's script and two template files, and its head check is the before list with the two template lines changed) |
-| `freeze.py` (builds the two lists and writes the hashes into `apply.sh`), `install_check.py` (stage 10's values and their source per brief line), `rehearse.sh`, `rehearsal.log` | `2843bd193cc8`, `0dc77d5ce966`, `e0da436ef120`, `780d8ddb9594` |
+| `APPROVED.before` (rebuilt from ACT-INDEP-WALLS-1's own text; equals its recorded `331e48fa…`), `APPROVED.after` | `331e48fa336e`, `32f1aab70bc2` |
+| `apply.sh`: `check`, `apply`, `undo` | `e3943ad4e243` (the second build's reviewed `53c2c68122d2` with only `LAUNCH_SHA` and `LIST_AFTER` re-frozen by `freeze.py`; the first build's reviewed `871d2c9db3dc`) |
+| `freeze.py` (builds the two lists and writes the hashes into `apply.sh`), `install_check.py` (stage 10's values and their source per brief line), `rehearse.sh`, `rehearsal.log` | `2843bd193cc8`, `0dc77d5ce966`, `e0da436ef120`, `5fb57e916221` (the first three unchanged since the second build's review) |
 
 - **What `check` and `apply` require.** They stop unless:
   - every draft hashes as built;
@@ -173,9 +186,9 @@ approved.
 
 ## 5. The operator's steps: the message
 > **ACT-W2-149-INSTALL-1 (DEC-1101, DEC-1112 (3), DEC-1113): the launch script's approved list.** Class (O), by hand:
-> your yes first: **`yes ACT-W2-149-INSTALL-1 0edc1eb9`** (the form of DEC-1115 (1)). **Your yes also approves the walls'
+> your yes first: **`yes ACT-W2-149-INSTALL-1 @SHA8@`** (the form of DEC-1115 (1)). **Your yes also approves the walls'
 > `kinds.yaml` and `tree-exclude.txt` as set-up A's wiring changed them** (§1). It comes after ACT-SETS-GLOBS-1 and
-> after W2-149's set-up A wiring is merged (`7f0e71519`). In the main tree, about one minute:
+> after W2-149's set-up A wiring and its F18-F23 fixes are merged (`7f0e71519`, `90c1fea6c`). In the main tree, about one minute:
 > ```
 > cd /home/usain/Dynamic-Agentic-Engineering-OS
 > G=.gov-runtime/scratch/orchestrator/drafts/w2-149-install
@@ -203,9 +216,9 @@ approved.
   auditor).
 
 ## 6. The rehearsal (DEC-1057): `rehearsal.log`
-One clean run, 2026-11-10 10:51:49–10:51:57 UTC, from a fresh `env -i` shell. **Failures: 0.**
-- **Where:** a `--no-hardlinks` clone of the main tree at `29907d750` (W2-149 with set-up A's wiring merged at
-  `7f0e71519`, and its ticket record).
+One clean run, 2026-11-10 12:30:47–12:30:53 UTC, from a fresh `env -i` shell. **Failures: 0.**
+- **Where:** a `--no-hardlinks` clone of the main tree at `067a8b79c` (W2-149 with set-up A's wiring and its F18-F23
+  fixes merged at `90c1fea6c`; later commits by other sessions, which touch neither the script nor the template).
 - **What was already live:** ACT-SETS-GLOBS-1 applied by your operator at `9cce7430d` (hook `74f8dbea4761`, map
   `44f99ea563cb`).
 - **What was planted:** a HOME, and a sets root whose `indep-walls/APPROVED` is ACT-INDEP-WALLS-1's list rebuilt
@@ -213,14 +226,15 @@ One clean run, 2026-11-10 10:51:49–10:51:57 UTC, from a fresh `env -i` shell. 
   labels with one dispute.
 - The real sets root was never opened.
 
-A trial at the branch head (`7df7c35e3`, before the merge) gave the same results. Its output is beside the log as
-`rehearsal-trial-7df7c35e3.log`; the drafts it ran were frozen at the branch head, so its hashes differ.
+Trials at each branch head before its merge gave the same results: `rehearsal-trial-7df7c35e3.log` (the second build)
+and `rehearsal-trial-d388da2f2.log` (this build), beside the log. Their drafts were frozen at those heads, so their
+hashes differ.
 
 | Step | Result |
 |---|---|
 | **Order:** the clone's hook and map put back to before ACT-SETS-GLOBS-1 (`97a84e770058`, `40085090306e`) | `check` **refused**: "ACT-SETS-GLOBS-1 is not applied (its globs are not in the map's sets_root_hidden): apply it first". The files were then put back (`74f8dbea4761`, `44f99ea563cb`) |
 | Before this ACT: a launch under writer-tuning | refused **11** (template: the two changed files are not on the list) |
-| `apply.sh` | check: "ready to apply" (also from a folder holding `runs/x/misses.jsonl`, first build's F3). Apply: "6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0", the list `a0af30f840db`, "state applied", no `__pycache__` in the tree (F1). A second apply was refused. Check: "already applied" |
+| `apply.sh` | check: "ready to apply" (also from a folder holding `runs/x/misses.jsonl`, first build's F3). Apply: "6 template lines, 7 brief lines (auditor, labeller, operator, writer); template mismatches 0; brief mismatches 0", the list `32f1aab70bc2`, "state applied", no `__pycache__` in the tree (F1). A second apply was refused. Check: "already applied" |
 | The operator's commit | exactly **5 A** (the five briefs), with §5's three trailers |
 | The list on disk | folder 0700, file 0400 |
 | **Stage 10 per line** (`install_check.py`) | **7 of 7** lines match their bytes at the commit. The five set-up A briefs' front matter is ok: model from the kind, result schema from the entry, sample from the front matter (writers) or the entry. The operator's two are a record only (`--kind operator` is refused with 17) |
@@ -244,7 +258,20 @@ A trial at the branch head (`7df7c35e3`, before the merge) gave the same results
 - **The first build** (2026-11-09; `reviews/ACT-W2-149-INSTALL-1-review-r1.md`, `-r2.md`): READY by `verdict.py` in
   round 2, class vote (O), findings F1 to F9. Its fixes are carried into this build: F1 `-B`, F2 the `--` path, F3 the
   globs quoted. F4, F6 and F7 are answered by the wiring and §3. F9 is answered in §5.
-- **This build** (`.gov-runtime/scratch/orchestrator/reviews/ACT-W2-149-INSTALL-1-review-v2-r1.md`): **READY by
+- **This build (the third, on F18-F23's fixes)** (`.gov-runtime/scratch/orchestrator/reviews/ACT-W2-149-INSTALL-1-review-v3-r1.md`):
+  **READY by `verdict.py` in round 1.**
+  - A fresh read-only session (`independent-auditor` on `DAEO-52ku`, effort max), class vote **(O)**. It read
+    `apply.sh` `e3943ad4e243…` and found all 14 draft files as §4 states, byte for byte as in the main tree.
+  - Its diff from the second build: only `LAUNCH_SHA` and `LIST_AFTER` in `apply.sh`, two comment lines in the list,
+    and the log's heads, hashes and times. Every template line, brief line, check line and count is identical.
+  - It checked F18-F23 in the code at `95fe78dd`, re-ran check, apply and undo in its own sparse clone, and probed stage
+    10's resolver over the five drafts.
+  - K1-K7 pass. K8 was marked fail with no blocking finding. Two findings:
+    - **F38** (in, ordinary work, other): the text that states F36's tell is in every set-up A tree. It is carried as a
+      text fix to §3 and §8 item 1 (DEC-802); `apply.sh`, the drafts and §5's commands are unchanged;
+    - **F39** (in, not ordinary work, other): `check` does not read the whole list back against the tree. It is §8
+      item 7.
+- **The second build** (`.gov-runtime/scratch/orchestrator/reviews/ACT-W2-149-INSTALL-1-review-v2-r1.md`): **READY by
   `verdict.py` in round 1.**
   - A fresh read-only session (`independent-auditor` on `DAEO-52ku`, effort max), class vote **(O)**. It read
     `apply.sh` `53c2c68122d2…` and found all 12 drafts as §4 states, byte for byte as in the main tree.
@@ -266,9 +293,12 @@ A trial at the branch head (`7df7c35e3`, before the merge) gave the same results
     only); the trial's log, now beside the log.
 
 ## 8. Residuals
-1. **F18 to F23 of the wiring's review** (§3): each changes the launch script. Fixed before the apply, a fix rebuilds
-   this ACT. Fixed after it, it runs under this list without a new yes, because the list holds the script only until
-   the apply (F34).
+1. **F36 and F37 of the F18-F23 fix's review** (§3). F36 is named to you as a limit of the overlap auditor's blind,
+   and that blind also rests on the auditor's brief for the text in its tree that states the tell (F38, §3). Leaving
+   `.tickets/**` and `governance/project/orchestration/packages/**` out of the auditor entry's `tree_exclude` (its
+   tickets arrive in `input/`) would remove those copies. That is a template change, so a rebuild of this ACT.
+   Any later change to the launch script runs under this list without a new yes, because the list holds the script
+   only until the apply (F34).
 2. **The declaration's pin amendment** (§3): recorded by the CTO after your operator's commit, before the extractor.
 3. **The list's live state is checked only at your apply** (§4): the CTO never opens the sets root.
 4. **The briefs in every worktree:** once committed, the five briefs are in every worktree (reads there are open by
@@ -287,6 +317,11 @@ A trial at the branch head (`7df7c35e3`, before the merge) gave the same results
 6. **The operator agent's two briefs are in every wall's tree** (F32). `tree-exclude.txt` leaves out only
    `indep-briefs/**`. These two briefs say nothing of set-up A's labels, cases or the guard. Leaving them out is a
    template change, and so a rebuild.
+7. **`check` tests only the script and the two changed template files** (the third build's review, F39). A later
+   change to another template file or to the operator agent's briefs passes `check`, and `apply` then writes before
+   its read-back stops it ("run 'bash apply.sh undo'"). It fails closed: the briefs are not committed, every launch is
+   refused, and `undo` restores the list byte for byte. Its stop message says "nothing more is done" after a write. It
+   needs an owner-approved change to one of those files to merge between the freeze and the apply.
 
 **What it costs:** five files in the repository; in the list, two template lines changed and fifteen lines added. No install, no GPU. Your
 yes and one minute.
