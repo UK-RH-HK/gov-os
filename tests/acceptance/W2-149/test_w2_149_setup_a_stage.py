@@ -45,7 +45,8 @@ def test_s22_premise_the_planted_briefs_carry_the_approved_front_matter_byte_for
 def test_s22_the_template_s_kinds_yaml_gives_a_model_per_kind_and_the_five_briefs_entries():
     """The repository's own template (what the engineer changes): a model per kind; the briefs: map holding the five
     entries with their kind, flow, result schema (a file beside the script), sample (0 for the labellers and the
-    auditor) and tree_exclude (the guard's and the launcher's code)."""
+    auditor) and tree_exclude (the guard's and the launcher's code; the overlap auditor's also every file that tells
+    the dispute sides apart, S23 revised for F38)."""
     doc = yaml.safe_load((support.TEMPLATE_SRC / "kinds.yaml").read_text())
     for kind in support.KINDS:
         model = (doc.get("kinds") or {}).get(kind, {}).get("model")
@@ -59,7 +60,8 @@ def test_s22_the_template_s_kinds_yaml_gives_a_model_per_kind_and_the_five_brief
         assert e.get("kind") == kind and e.get("flow") == flow, (bid, e)
         assert e.get("result_schema") == sa.SCHEMA[f], (bid, e)
         assert (support.SCHEMAS / sa.SCHEMA[f]).is_file(), f"indep-schemas/{sa.SCHEMA[f]} does not exist"
-        assert set(e.get("tree_exclude") or []) == set(support.SGX1_TREE_EXCLUDE), (bid, e)
+        tx = support.SGX1_TREE_EXCLUDE + (support.AUDITOR_TREE_EXCLUDE if bid == "sgx1-overlap-auditor" else ())
+        assert set(e.get("tree_exclude") or []) == set(tx), (bid, e)
         if kind != "writer":
             assert e.get("sample") == 0 and not isinstance(e.get("sample"), bool), (bid, e)
         elif "sample" in e:

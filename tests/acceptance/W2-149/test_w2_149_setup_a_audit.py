@@ -72,7 +72,7 @@ def test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule(world
     cases take the auditor's label, rule_class, clauses (its basis) and reason with `audit`, flagged ones keep
     labeller 1's line with `owner` and are appended to owner.jsonl; the old labels.jsonl in history/; nothing else
     changes (S16); no AUDITS.log line and a memory writer's selection unchanged. The disputes' reasons are blinded
-    (either empty, both empty)."""
+    (every side's reason empty, F36)."""
     planted = plant(world)
     h = world.half("tuning")
     old_labels = (h / "labels/labels.jsonl").read_bytes()

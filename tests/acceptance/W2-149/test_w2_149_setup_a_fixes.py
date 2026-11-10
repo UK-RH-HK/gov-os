@@ -227,9 +227,11 @@ def test_s30_a_good_labels_2_file_lands_with_rule_class_an_integer(world):
 
 # -- S27 (F21): the disputes' reasons blinded --------------------------------------------------------------------------
 
-def test_s27_an_empty_reason_on_either_side_blanks_both_and_two_reasons_are_kept(world):
+def test_s27_an_empty_reason_on_either_side_blanks_both(world):
     """Labeller 1's script labels carry reason "" and labeller 2 leaves three reasons empty: in input/disputes.jsonl
-    such a case has both reasons "", so no side is told apart by it; a case where both have a reason keeps both."""
+    such a case has both reasons "", so no side is told apart by it; its other label fields stay, in the seeded x/y
+    order. (Revised for F36: a case where both sides have a reason is now blanked too; that is
+    test_w2_149_setup_a_blind.py's case, so this one checks only the cases with an empty side.)"""
     sa.plant_half(world, "tuning", n_actions=48, n_cases=12)
     planted = sa.plant_labels(world, "tuning")
     ids_run = sorted(planted["undecided"])[:40]
@@ -239,20 +241,18 @@ def test_s27_an_empty_reason_on_either_side_blanks_both_and_two_reasons_are_kept
     support.write_file(world.half("tuning"), "labels/labels-2.jsonl", sa.jsonl(planted["lines2"]))
     two = {x["id"]: x for x in planted["lines2"]}
     script_side = [i for i in ids_run if one[i]["reason"] == ""]
-    both = [i for i in ids_run if one[i]["reason"] and two[i]["reason"]]
-    assert script_side and len(blank2) == 3 and both, "premise: each kind of case is in the run"
+    assert script_side and len(blank2) == 3, "premise: each kind of case is in the run"
     run = sa.dry(world, "overlap-auditor", "tuning", seed=5150)
     assert run.code == 0, run.why()
     rows = sa.read_jsonl(world.wall(run.line) / "input/disputes.jsonl")
     got = {x["id"]: x for x in rows}
+    order = sa.xy(5150, ids_run)
     for i in script_side + sorted(blank2):
         assert got[i]["x"]["reason"] == "" and got[i]["y"]["reason"] == "", ("a reason tells the sides apart", got[i])
-    order = sa.xy(5150, ids_run)
-    for i in both:
         side = {1: one[i], 2: two[i]}
         a, b = order[i]
-        assert (got[i]["x"]["reason"], got[i]["y"]["reason"]) == (side[a]["reason"], side[b]["reason"]), got[i]
-    assert rows == sa.expected_disputes(world, "tuning", planted, 5150, ids_run)
+        for k in ("label", "rule_class", "clauses"):
+            assert (got[i]["x"][k], got[i]["y"][k]) == (side[a][k], side[b][k]), (k, got[i])
 
 
 # -- S31 (F23): rule_class an integer or a decimal string 1-14, stored as an integer ----------------------------------

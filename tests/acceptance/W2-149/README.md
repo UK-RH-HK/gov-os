@@ -19,6 +19,11 @@ stopped delivers nothing; labeller 2's labels checked; the disputes' reasons bli
 decision; `rule_class` an integer or a decimal string 1-14, stored as an integer. The interface below carries them,
 each marked **(F18)** to **(F23)**.
 
+**F36 and F38 closed** (DEC-1112 (3), the CTO's decision; DEC-1113 (2): the overlap auditor decides from the decisions
+alone, blind; S23 and S27 changed; written at `9699bbbc9` from those lines and the ticket's last note): every dispute
+side's `reason` is staged as `""`; the overlap auditor's `briefs:` entry also leaves out of its tree every file that
+states which dispute side is which labeller's. The interface below carries them, marked **(F36)** and **(F38)**.
+
 ## How they run
 
     PYTHONPATH=<worktree>/src TMPDIR=<scratch> python3 -m pytest tests/acceptance/W2-149 -q -p no:cacheprovider \
@@ -56,7 +61,13 @@ default run; its round-2 twin now needs a delivered round 1, hence `bwrap`.
   template files stay this tree's); the path map also holds the `sandbox-guard-exp-1` evaluation set; the five set-up A
   briefs at `governance/project/indep-briefs/sgx1/<name>.md` (front matter byte for byte, checked against the approved
   sha256s; a planted body), six S22 variants under `sgx1x/`; one file under each of `.claude/**`, `src/gov/guard/**`,
-  `src/gov/launch/**`; three tickets in `.tickets/`. Two more one-change commits from B: PU (the path map without the
+  `src/gov/launch/**`; three tickets in `.tickets/`; **(F38)** one file under each of the overlap auditor's further
+  globs (`w2_149_support.TELL_FILES`, each holding `TELL_MARK`: a planted package, a planted
+  `governance/project/orchestration/tools/indep_launch.py`, `tests/acceptance/W2-149/planted.md`,
+  `tests/unit/orchestration/test_w2_149_planted.py`, `docs/changes/W2-149-evidence.md`), none of them left out by
+  `tree-exclude.txt`. The planted `kinds.yaml`'s five set-up A entries carry **this tree's own template entries'
+  `tree_exclude`** (`w2_149_support.template_entry_excludes`; the four globs if an entry is missing or malformed), so a
+  dry build exercises the template's entries as the engineer leaves them. Two more one-change commits from B: PU (the path map without the
   set's entry) and PC (`sets_root_hidden` no longer covering the set's hidden glob).
 - **The stub `claude`** (`w2_149_support.STUB`) and **the test hook** (`HOOK`): their contracts are below.
 - **The oracles** (the selection, the tree, the filled settings and standing note, the F checks, the counts' shape)
@@ -307,7 +318,10 @@ written at delivery only; the rule script's two overrides and caps named; the se
 | `sgx1-overlap-auditor` | auditor | `sgx1-overlap-auditor` | `sgx1-overlap-auditor-result.schema.json` | 0 |
 
   Each entry's `tree_exclude`: `.claude/**`, `src/gov/guard/**`, `src/gov/launch/**`,
-  `governance/project/indep-walls/**`. The models are the CTO's to choose (the cases read the planted ones). The
+  `governance/project/indep-walls/**`. **(F38)** The `sgx1-overlap-auditor` entry's also: `.tickets/**`,
+  `governance/project/orchestration/packages/**`, `governance/project/orchestration/tools/indep_launch.py`,
+  `tests/acceptance/W2-149/**`, `tests/unit/orchestration/test_w2_149*`, `docs/changes/W2-149-evidence.md` (the ten as a
+  set, order free); the other four entries exactly the four. The models are the CTO's to choose (the cases read the planted ones). The
   planted `kinds.yaml` adds two test-only entries (`w2-149-no-schema`, `w2-149-no-sample`) and an entry `model` on four
   of the five; the script must take any entry of this form.
 
@@ -327,6 +341,12 @@ written at delivery only; the rule script's two overrides and caps named; the se
 Every tree: the archive less `tree-exclude.txt`. A brief with an entry: also less the entry's `tree_exclude` (fnmatch
 on the repository path, as `tree-exclude.txt`). The selection (S5) stays "less `tree-exclude.txt`": the entry's globs
 limit what a wall may read, not the writer's pool of places (a place is a name).
+
+**(F38)** The overlap auditor's tree is therefore the archive less `tree-exclude.txt`, the four globs and the six
+further ones: no ticket, package, launcher, W2-149 test or evidence file; no `TELL_MARK` or ticket body anywhere in its
+wall or tree. Its `input/tickets.jsonl` is unchanged (read from `.tickets/` at `--commit` by the script's code: the
+exclusion limits the tree, not the staging). Every other tree (the writers' and labellers' under their entries, and
+any brief with no entry, a memory auditor's included) holds every one of those files.
 
 ### Places (S16, S24)
 
@@ -372,10 +392,10 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   `labels/audit/*.decisions.jsonl` names, sorted by id, the first 40; one line each, in that order: `{"id", "action":
   {role agent ticket wbs tool input cwd} (from the staged line), "x": {label rule_class clauses reason}, "y": {...}}`.
   **x/y:** `rng = random.Random(seed)`; for each case in that order, `rng.random() < 0.5` means x is labeller 1
-  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21) The reasons
-  blinded:** when either side's `reason` is `""` (labeller 1's script labels always carry `""`; labeller 2 may leave
-  one empty), both sides' `reason` are `""`; when both have one, both are kept as written. `label`, `rule_class` and
-  `clauses` are as in each file.
+  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21, F36) The reasons
+  blinded:** every side's `reason` is `""`, whatever the labellers wrote (F21's "both kept when both have one" is
+  withdrawn: no reason text of either labeller enters the wall). `label`, `rule_class` and `clauses` are as in each
+  file, x/y in the seeded order.
 - `tickets.jsonl`: one line per ticket a case's action names (its `ticket` matched to a ticket file's `id`, or its
   `wbs` to `wbs_id`), read from `.tickets/*.md` at `--commit`: `{"id", "role", "wbs_id", "allowed_paths"}` and nothing
   else; a name no ticket file holds gives no line; order free.
@@ -690,7 +710,7 @@ byte, passes each side's reason through, keeps labeller 1's class, clauses and r
 | S29 | `test_w2_149_setup_a_fixes.py::test_s29_a_result_that_says_it_stopped_delivers_nothing` | red (5), skipped (`bwrap`, 2; red outside) | each flow delivers (exit 0, not 20) though `stopped` is not `none` |
 | S30 | `test_w2_149_setup_a_fixes.py::test_s30_labeller_2_s_labels_out_of_rule_are_rejected_20` | red (6) | `labels-2.jsonl` lands unchecked (exit 0, not 20) |
 | S30 | `test_w2_149_setup_a_fixes.py::test_s30_a_good_labels_2_file_lands_with_rule_class_an_integer` | red | delivered byte for byte: `rule_class` stays a string |
-| S27 | `test_w2_149_setup_a_fixes.py::test_s27_an_empty_reason_on_either_side_blanks_both_and_two_reasons_are_kept` | red | a script-labelled side's `""` beside the other side's reason: the reasons pass through |
+| S27 | `test_w2_149_setup_a_fixes.py::test_s27_an_empty_reason_on_either_side_blanks_both` | red (then; renamed and revised for F36, below) | a script-labelled side's `""` beside the other side's reason: the reasons pass through |
 | S27 | `test_w2_149_setup_a_audit.py::test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule` | red (revised) | the disputes' reasons are not blinded |
 | S27 | `test_w2_149_setup_a_audit.py::test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule` | red (revised) | the staged disputes' reasons not blinded (and a settled line keeps labeller 1's class, clauses and reason) |
 | S27 | `test_w2_149_setup_a_fixes.py::test_s31_the_auditor_s_decisions_take_rule_class_as_an_integer_or_a_decimal_string` | red (8) | the settled-line form with the string form (below) |
@@ -752,6 +772,57 @@ each refused form lands on the first id (`bad_on="first"`) or only on the trigge
 file's, the listener's, the child's), never ends (the loop) or gives one id fewer (the drop); no marker in any source.
 No sketch of the script was written: the green side is unproven until the engineer's script runs them.
 
+### F36 and F38 closed (DEC-1112 (3), DEC-1113 (2)), on `9699bbbc9` (F18-F23 merged, `90c1fea6c`)
+
+New cases in `test_w2_149_setup_a_blind.py`, and four revised (below). "Today" is the merged script and template: the
+disputes keep both reasons when both sides have one (F21's rule), and the overlap auditor's entry leaves out the four
+globs only.
+
+| KPI line | Test (node id) | Today | Why red |
+|---|---|---|---|
+| S27 | `test_w2_149_setup_a_blind.py::test_s27_two_reasons_are_both_blanked_and_the_other_label_fields_stay_in_the_seeded_order` | red | a dispute where both sides carry a reason is staged with both reasons as written |
+| S27 | `test_w2_149_setup_a_fixes.py::test_s27_an_empty_reason_on_either_side_blanks_both` | green (revised; guard) | the cases with an empty side are blanked today (F21) and stay so |
+| S27 | `test_w2_149_setup_a_audit.py::test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule` | red (through `sa.blind`) | the both-reasons disputes keep their reasons |
+| S27 | `test_w2_149_setup_a_audit.py::test_s27_a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule` | red (through `sa.blind`) | the packed wall's `input/disputes.jsonl` keeps the both-reasons disputes' reasons |
+| S23 | `test_w2_149_setup_a_blind.py::test_s23_the_template_s_overlap_auditor_entry_also_leaves_out_every_file_that_tells_the_sides_apart` | red | the template's overlap auditor entry lacks the six globs |
+| S23 | `test_w2_149_setup_a_blind.py::test_s23_the_overlap_auditor_s_tree_holds_none_of_the_files_that_tell_the_sides_apart` | red | the auditor's dry-built tree holds all 8 planted tells (the 3 tickets and the 5 `TELL_FILES`) |
+| S23 | `test_w2_149_setup_a_blind.py::test_s23_every_other_tree_still_holds_the_files_the_overlap_auditor_s_leaves_out` | green (guard, 6) | writer 1, writer 2, labeller 1, labeller 2, a memory writer, a memory auditor: each tree holds every tell today and must still |
+| S23 | `test_w2_149_setup_a_stage.py::test_s22_the_template_s_kinds_yaml_gives_a_model_per_kind_and_the_five_briefs_entries` | red (revised) | the overlap auditor's entry lacks the six globs |
+| S22 | `test_w2_149_setup_a_stage.py::test_s22_the_template_s_kinds_yaml_gives_a_model_per_kind_and_the_five_briefs_entries` | red (revised) | as above (the S22 template case also checks each entry's `tree_exclude`) |
+| F11 | `test_w2_149_setup_a_blind.py::test_s23_the_overlap_auditor_s_tree_holds_none_of_the_files_that_tell_the_sides_apart` | red | a labeller's other work (which side is whose, by the tickets, the packages, the launcher, the tests, the evidence) inside the auditor's wall |
+| F11 | `test_w2_149_setup_a_blind.py::test_s27_two_reasons_are_both_blanked_and_the_other_label_fields_stay_in_the_seeded_order` | red | a labeller's reason inside the auditor's wall |
+
+**Revised cases** (the commit carries `Rewrite-Reason: DEC-1112 (3) (F36, F38 closed: S23, S27 changed)`); each changed
+only as far as S23 or S27 require:
+
+1. `w2_149_setup_a.blind` (the helper the S27 cases share): every side's reason `""`, whatever was written (F36).
+   Through it `test_w2_149_setup_a_audit.py::test_s27_the_disputes_their_x_y_order_and_the_tickets_are_staged_by_rule`
+   and `..._a_delivered_audit_maps_x_y_back_and_writes_the_labels_by_rule` (its docstring too) now expect every reason
+   blanked. Red today.
+2. `test_w2_149_setup_a_fixes.py::test_s27_an_empty_reason_on_either_side_blanks_both_and_two_reasons_are_kept` renamed
+   `test_s27_an_empty_reason_on_either_side_blanks_both`: its "both kept" half and its whole-file comparison removed
+   (the new case covers them); it now also checks the blanked cases' `label`, `rule_class` and `clauses` in the seeded
+   order. Green today, as before for these cases.
+3. `test_w2_149_setup_a_stage.py::test_s22_the_template_s_kinds_yaml_gives_a_model_per_kind_and_the_five_briefs_entries`:
+   the overlap auditor entry's `tree_exclude` is now the four globs and the six; the other four entries exactly the
+   four, as before. Red today.
+
+**Support changes**: `w2_149_support` gains `AUDITOR_TREE_EXCLUDE`, `SGX1_IDS`, `template_entry_excludes` (the planted
+`kinds.yaml`'s five set-up A entries now carry this tree's template entries' `tree_exclude`; today the four globs each,
+as before), `TELL_MARK` and `TELL_FILES` (five more files in commit A, so the A..B diff is unchanged; every tree that
+does not exclude them is five files larger, and every earlier case computes its expectation from the tracked list).
+
+**Outcome** (the launch sandbox, the heavy slot, at `9699bbbc9` plus these cases): the pytest run with
+`-m "not local_only" -k "not real and not green_here and not time_limit"` gives **209 cases: 6 failed, 167 passed, 35
+skipped (3 `live`, 32 `bwrap`), 1 deselected** (`test_s6_two_real_builds_draw_different_63_bit_seeds`). The 6 red are
+exactly the new and revised red cases above, each for its reason: the new S27 case and the two S27 audit cases on a
+kept reason in `input/disputes.jsonl`; the two S23 template cases (the new one and S22's revised one) on the entry
+lacking the six globs; the S23 tree case on the auditor's tree holding all 8 tells. No new case needs `bwrap`, and no
+earlier case went red (the 32 `bwrap` cases were not run here: they stage no disputes, and their trees only grow by the
+five planted files). `gov accept W2-149` (exit 3): **168 passed, 6 failed, 35 skipped, unmapped 0**; the lines failing
+are S16 (1, the delivered-audit case it maps), S22 (1), S23 (3), S26 (0 failed, 2 skipped: all `bwrap`, as before),
+S27 (3) and F11 (4); every other line passes.
+
 ## Notes and limits
 
 - **N-1. `--dry` leaves its wall.** The cases inspect a built wall (S4, S5, S7, S8, S20) through `--dry`. On the real
@@ -779,7 +850,8 @@ No sketch of the script was written: the green side is unproven until the engine
 - Set-up A's wiring: `w2_149_setup_a.py` (the planted halves, the planted rule scripts, the flows' launches, the
   oracles), `test_w2_149_setup_a_stage.py` (S22-S24), `test_w2_149_setup_a_rules.py` (S25, S26),
   `test_w2_149_setup_a_audit.py` (S27), `test_w2_149_setup_a_delivery.py` (S16's set-up A flows, S28),
-  `test_w2_149_setup_a_fixes.py` (the wiring review's F18-F23: S25's round-1 check, S27's blinding, S29, S30, S31).
+  `test_w2_149_setup_a_fixes.py` (the wiring review's F18-F23: S25's round-1 check, S27's blinding, S29, S30, S31),
+  `test_w2_149_setup_a_blind.py` (F36 and F38: S27's every reason blanked, S23's overlap auditor tree).
 - **N-5. S19's documented labeller line** still names the generic `labeller.md` and `--set sandbox-guard-exp-1`: those
   cases drive only the guard hook (no launch), so S16, S20 and S22 do not reach them and they are unchanged; the CTO's
   real set-up A lines name `indep-briefs/sgx1/<name>.md` and `--set tuning|held-out`.
