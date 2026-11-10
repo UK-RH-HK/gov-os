@@ -14176,6 +14176,24 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (containment kept: S9 forbids opening every socket) and question 4 (the dates told from what
   is measured now).
 
+
+### DEC-1115 — Yes to ACT-SETS-GLOBS-1 (by hand) and ACT-CLAUDE-COPIES-1 (by the operator agent, its first live run); TPL-6's Appendix A applied now; before the lift, past 80 % of the week's usage only the lift's critical path runs
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); item (4) standing until the lift · **Under:** DEC-1104 (4), DEC-1112 (3), DEC-1050, DEC-1052, DEC-1089 (3), DEC-1091 · **Source:** the owner's message (chat, 2026-11-09), on ACT-SETS-GLOBS-1, ACT-CLAUDE-COPIES-1, TPL6-APPENDIX-A and FORECAST-W2-2 §5
+- **Decision:**
+  - (1) **ACT-SETS-GLOBS-1: yes** (`yes ACT-SETS-GLOBS-1 1f93d6ef`, class (b)); the owner's operator applies it by
+    hand now (the package's §5).
+  - (2) **ACT-CLAUDE-COPIES-1: yes** at manifest `5d3a18832b9b`, class (b), run by the operator agent from its queue,
+    its first live run. If the agent refuses, the CTO tells the owner why and the owner's operator applies it by hand
+    (§5). The agent reads a yes only in its fixed form, `yes ACT-<id> <manifest sha8>` on a line of its own (G6); the
+    package had given another form, so the owner types `yes ACT-CLAUDE-COPIES-1 5d3a1883` before the CTO queues it.
+  - (3) **TPL-6's Appendix A as proposed, now:** the CTO prompt's Appendix A becomes the 466-character pointer to the
+    kernel templates (TPL6-APPENDIX-A).
+  - (4) **Standing until the lift:** if the week's usage passes 80 % before the lift, the lift's critical path comes
+    first and work outside it waits for the weekly reset. Usage stays recorded, not an alarm (DEC-1089 (3)); this is
+    a priority rule, not a cap. It joins rule 6 of the standing-rules list.
+- **Basis:** question 2 (the hidden sets hidden before the first writer run; the templates one source) and question 4
+  (the lift's date protected if the week's allowance runs short).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14228,3 +14246,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.497 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1112 (item 3 standing); DEC-1098 (4) narrowed to set-up A. Next free id: DEC-1113. |
 | 0.498 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1113. Next free id: DEC-1114. |
 | 0.499 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1114. Next free id: DEC-1115. |
+| 0.500 | 2026-11-09 | Owner (recorded by the orchestrator, DEC-861): DEC-1115 (item 4 standing until the lift). Next free id: DEC-1116. |
