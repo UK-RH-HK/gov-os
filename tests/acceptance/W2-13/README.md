@@ -71,6 +71,9 @@ names a column, a weight or a private function of the index.
 - **Latency cases (DEC-372).** `test_w2_13_latency.py` holds the two timed cases: run that file alone, never beside
   another suite; a case that fails under parallel load is re-run alone. The real-model one shares the session's
   `real_tiers` (both dev tiers rebuilt once with the real embedder) with RETR-A-04's case.
+- **Their routes in `tests/acceptance/serial-only.txt` (DEC-889 item 5, D-10).** The lexical case is `serial:
+  latency` (the close's serial phase, alone); the real-model case is `nightly: real-model`, beside W1-19's warm p95,
+  red alone on 11-10 (0.543-0.578 s), the 0.5 s budget unchanged and the latency filed against W2-13.
 
 ## KPI lines and their tests
 
