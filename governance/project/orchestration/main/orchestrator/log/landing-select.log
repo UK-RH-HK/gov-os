@@ -235,3 +235,5 @@
 2026-11-10 11:33:18 landing 5ee374ea1011..ac9d127167c6: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-10 11:37:28 landing ac9d127167c6..357ceb035eef: 1 commit(s); none outside a ticket on the trigger paths
 2026-11-10 11:38:04 landing 357ceb035eef..e7f6fb26afff: 1 commit(s); none outside a ticket on the trigger paths
+2026-11-10 11:39:17 run 20261110-113051-2861407 (944f39165db8..2059048f2eb4): RED: lead_verify W2-00 DAEO-sdxk head 2059048f2eb4: RED parallel exit 1 in 475 s (3852 tests 125 failed 0 errors 146 skipped); serial exit 1 in 3 s, 1 entries (9 tests 9 failed 0 errors 0 skipped); the clone kept: /home/usain/gov-os-runs/W2-00/landing-select/20261110-113051-2861407 (DEC-968: fix at once or revert)
+2026-11-10 11:39:18 landing e7f6fb26afff..af850b6f216d: 1 commit(s); none outside a ticket on the trigger paths

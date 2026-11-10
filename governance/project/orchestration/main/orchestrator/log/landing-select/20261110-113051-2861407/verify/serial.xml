@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="9" time="2.934" timestamp="2026-11-10T11:39:14.598983+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]" time="2.702"><failure message="AssertionError: the timed Edit was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Edit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Edit was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]" time="0.004"><failure message="AssertionError: the timed Glob was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Glob was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]" time="0.003"><failure message="AssertionError: the timed Glob was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Glob was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]" time="0.003"><failure message="AssertionError: the timed Grep was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Grep was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]" time="0.003"><failure message="AssertionError: the timed Grep was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Grep was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]" time="0.003"><failure message="AssertionError: the timed NotebookEdit was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'NotebookEdit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed NotebookEdit was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]" time="0.004"><failure message="AssertionError: the timed Read was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Read-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Read was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]" time="0.003"><failure message="AssertionError: the timed Read was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Read-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Read was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]" time="0.003"><failure message="AssertionError: the timed Write was not allowed: decision=deny (`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; g=&quot;$HOME/.local/bin/gov&quot;; [ -f &quot;$g&quot; ] || g=&quot;$(command -v gov)&quot; || { echo &quot;gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; read -r p &lt; &quot;$g&quot;; p=&quot;${p#'#!'}&quot;; [ -x &quot;$p&quot; ] || { echo &quot;gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused&quot; &gt;&amp;2; exit 2; }; &quot;$p&quot; -E &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')&#10;assert 'deny' == 'allow'&#10;  &#10;  - allow&#10;  + deny">kernel_live = PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...w': ['Bash(gov launch:*)'], 'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/systmp'))
+name = 'Write-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in &lt; 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+&gt;               assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+E               AssertionError: the timed Write was not allowed: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" &gt;&amp;2; exit 2; }; read -r p &lt; "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" &gt;&amp;2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=2 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-sandbox0/home/.local/bin/gov or on PATH, so /tmp/gov-os-ls-crbdx0/pytest-of-usain/pytest-13/w2-90-w1-05-live0/repo/governance/kernel/hooks/pretooluse.py cannot run; refused')
+E               assert 'deny' == 'allow'
+E                 
+E                 - allow
+E                 + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:223: AssertionError</failure></testcase></testsuite></testsuites>
