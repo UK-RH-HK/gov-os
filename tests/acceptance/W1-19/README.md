@@ -569,3 +569,5 @@ is near 55 % today, so raising the pass line now would turn the real-model hit@5
 after D-4b's measure 3; until then the hit@5 rows above judge against 80.
 
 **Citations (DEC-1109 (2), 2026-11-09):** `Api.scratch_env`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the `/api/ps` comment beside `Rewrite-Reason: W2-32's S10` keeps DEC-798 as the record of that rewrite; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).
+
+**The test's own vector cache (DEC-1042, DEC-1109 (2), 2026-11-09):** `Api.scratch_env` carries `GOV_VECTOR_CACHE_DIR` from the running test's environment (read at each call; left out when unset, so the cache falls back under the empty HOME); before, it dropped it, so every test of one process shared one cache under the session's HOME and `test_w1_19_embedding_policy.py::test_only_the_namespace_that_says_embedded_reaches_the_vectors` was served the earlier case's vectors (red under `-n auto` and serially: 1 failed, 24 passed; after: 25 passed both ways; no expectation changed; `Rewrite-Reason: DEC-1042`).
