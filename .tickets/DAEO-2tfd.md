@@ -43,6 +43,7 @@ kpis:
   - 'The interim gov-reranker-gpu-slot.pth, the reranker environment, or a CTO tool changed by this ticket.'
 profile: FULL
 sources:
+- DEC-1109
 - DEC-1097
 - DEC-1048
 - DEC-1046
