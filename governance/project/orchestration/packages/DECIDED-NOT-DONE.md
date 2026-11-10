@@ -119,7 +119,7 @@ FRESH-80-READINESS). Nothing under `~/gov-os-eval/` and no question file was ope
 |---|---|---|
 | 70 | the standing-rules list at the top of the prompt and in START-NEXT-SESSION §2 | **DONE 11-09** |
 | 71 | the stop-hook check against idling, an ACT for the operator, rehearsed | **APPLIED 11-09** (`115be191`; review READY round 2); live at the fresh session's start |
-| 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | WAITS: the seven helpers |
+| 72 | a fresh CTO session after the seven helpers report, before D-10, the handover to the 11-08 standard | **READY 11-10 ~14:30**: START-NEXT-SESSION rewritten, RESUME HERE, DECISIONS-IN-FORCE to DEC-1117, this list to row 97; next: the owner switches when ready |
 | 73 | after the lift, ready lists covering several of gov plan's batches | STANDING (from the lift) |
 
 ## 0j. DEC-1114's items (2026-11-09)
