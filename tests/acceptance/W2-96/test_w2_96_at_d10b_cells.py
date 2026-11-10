@@ -10,6 +10,13 @@ and drops the rest silently.
   and 94, a citation and words between the names; W2-87's row 36, a parenthesis between; bare numbers after a
   singular word; a plural with ``and``; the KPI line's form as a heading) are read in full or refused naming the
   cell (``ACCEPT_MAP_UNREADABLE``, review 1's R4 code); never read as their first line alone.
+  Round 2 (the review's F1) adds one variant per listed form still read as its first line: W1-49's row 89
+  (``…, second half, and failure 2``), W2-92's row 128 (``Success 6 with success 4.``), the ranges ``S2-S4``,
+  ``Success 2–Success 4`` and ``Success 1 to 3`` (each naming the lines between), ``or``, ``(and …)`` and ``— and``
+  between two names.
+- **The fail-open shape** (round 2): each listed line after the first is also mapped on a passing row of its own
+  while the cell's case fails; each such line reads ``fail``, or the map is refused naming the cell, never ``pass``.
+  (The other shape, the listed line mapped nowhere else, is the variants above: a dropped line is missing.)
 - **A cell the reader cannot read in full** (a listed name whose number is followed by a letter, mid-list or last)
   refuses the map, naming the cell, before any test runs.
 - **Every readable form of the maps in use still reads as before** (a guard, green before the change): a citation
@@ -66,11 +73,45 @@ IN_USE_FORMS = {
     "a-bare-number-after-a-singular-word": ("Success 2, 3", ["success-2", "success-3"], "rows"),
     "a-plural-word-with-and": ("Successes 2 and 3, failure 2", ["success-2", "success-3", "failure-2"], "rows"),
     "the-kpi-lines-form-as-a-heading": ("Success 4, failures 4, 5", KPI_LINE_NAMES, "heading"),
+    # Round 2 (the review's F1): every listed form of the maps in use, one variant each.
+    "words-between-the-names-second-half": ("Success 5 [CAP-37.g], second half, and failure 2",
+                                            ["success-5", "failure-2"], "rows"),
+    "with-between-the-names": ("Success 6 with success 4.", ["success-6", "success-4"], "rows"),
+    "a-range-with-a-hyphen": ("S2-S4", ["success-2", "success-3", "success-4"], "rows"),
+    "a-range-with-an-en-dash": ("Success 2–Success 4", ["success-2", "success-3", "success-4"], "rows"),
+    "a-range-with-to": ("Success 1 to 3", ["success-1", "success-2", "success-3"], "rows"),
+    "or-between-the-names": ("Success 1 or failure 2", ["success-1", "failure-2"], "rows"),
+    "and-in-a-parenthesis": ("Success 1 (and failure 2)", ["success-1", "failure-2"], "rows"),
+    "a-dash-then-and": ("Success 1 — and failure 2", ["success-1", "failure-2"], "rows"),
 }
 
 
 def _in_use_readme(cell, form):
     return support.cell_readme(cell) if form == "rows" else support.heading_cell_readme(cell)
+
+
+OTHER_FILE = "test_qzv96leak_cells_other.py"
+OTHER_CASE = "test_qzv96leak_cells_other_case"
+
+
+def _expected(names, kind, also=()):
+    """The result for ``cell_readme`` (and its fail-open form): success 1 with ALPHA's three passing cases, each line
+    of ``names`` with the cell's one case of ``kind``, each line of ``also`` with ``OTHER_CASE`` (passing). Equal to
+    ``support.cells_expected`` when neither names success 1 nor ``also`` is given; a line named twice adds up."""
+    tally = {"success-1": [3, 0]}
+    for name in also:
+        tally.setdefault(name, [0, 0])[0] += 1
+    for name in names:
+        tally.setdefault(name, [0, 0])[0 if kind == "pass" else 1] += 1
+    lines = sorted((line(name, "fail" if failed else "pass", passed, failed) for name, (passed, failed) in tally.items()),
+                   key=lambda item: support.line_order(item["kpi"]))
+    passed, failed = 3 + (1 if also else 0) + (kind == "pass"), int(kind == "fail")
+    return result("fail" if failed else "pass", lines, totals=counts(passed, failed))
+
+
+def _label(name):
+    word, number = name.split("-")
+    return f"{word.capitalize()} {number}: qzv96leak"
 
 
 @pytest.mark.parametrize("variant", list(IN_USE_FORMS))
@@ -87,11 +128,50 @@ def test_s_d10b_a_cell_of_the_maps_in_use_reads_every_line_or_refuses_naming_the
         assert project.ran() == {}, f"a planted test ran: the refusal comes before any test runs\n{run.describe()}"
         support.assert_no_raw_output(run)
         return
-    expected = support.cells_expected(names, "pass")
+    expected = _expected(names, "pass")
     got = support.projection(envelope["result"])
     assert got == expected, (f"the cell {cell!r} was neither read in full nor refused naming it\n"
                              f"expected (read in full): {expected}\ngot: {got}\n{run.describe()}")
     assert run.returncode == support.EXIT_PASS, f"exit code {run.returncode}, expected 0\n{run.describe()}"
+
+
+# The fail-open shape: a listed line also mapped on another, passing row -------------------------------------------
+
+FAIL_OPEN_FORMS = {"the-kpi-lines-form": ("Success 4, failures 4, 5", KPI_LINE_NAMES),
+                   **{name: (cell, names) for name, (cell, names, form) in IN_USE_FORMS.items() if form == "rows"}}
+
+
+@pytest.mark.parametrize("variant", list(FAIL_OPEN_FORMS))
+def test_s_d10b_a_listed_line_also_mapped_on_a_passing_row_never_reads_pass_when_this_rows_case_fails(tmp_path,
+                                                                                                       variant):
+    """Each line the cell lists after its first is also mapped on a row of its own over a passing case, and the
+    cell's own case fails: a reader that kept the first line alone would report those lines ``pass``. Each must
+    read ``fail`` (the passing case and the failing one), or the map is refused naming the cell."""
+    cell, names = FAIL_OPEN_FORMS[variant]
+    also = [name for name in names[1:] if name != "success-1"]
+    files = {**support.cells_files("fail"), OTHER_FILE: support.planted_file(("pass", OTHER_CASE))}
+    readme = support.rows_readme(("Success 1: qzv96leak", "`test_qzv96leak_alpha.py`"),
+                                 *[(_label(name), f"`{OTHER_FILE}`") for name in also],
+                                 (cell, f"`{support.CELLS_FILE}`"))
+    project = support.Project(tmp_path, files, readme)
+    run = project.run(support.TICKET_ID)
+    support.assert_clean(run)
+    envelope = run.envelope()
+    if envelope["ok"] is False:
+        error = support.assert_refusal(run, support.MAP_UNREADABLE)
+        assert support.names_cell(support.strings_of(error), cell), \
+            f"the refusal does not name the cell {cell!r}\n{run.describe()}"
+        assert project.ran() == {}, f"a planted test ran: the refusal comes before any test runs\n{run.describe()}"
+        support.assert_no_raw_output(run)
+        return
+    expected = _expected(names, "fail", also)
+    got = support.projection(envelope["result"])
+    passing = [item["kpi"] for item in got.get("lines", []) if isinstance(item, dict)
+               and item.get("kpi") in also and item.get("outcome") == "pass"]
+    assert got == expected, (f"the cell {cell!r} was neither read in full nor refused naming it"
+                             f"{f' (fails open: {passing} read pass)' if passing else ''}\n"
+                             f"expected (read in full): {expected}\ngot: {got}\n{run.describe()}")
+    assert run.returncode == support.EXIT_FAIL, f"exit code {run.returncode}, expected 3\n{run.describe()}"
 
 
 # A cell the reader cannot read in full refuses the map, naming it --------------------------------------------------

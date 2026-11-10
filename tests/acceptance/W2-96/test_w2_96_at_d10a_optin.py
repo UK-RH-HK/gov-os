@@ -18,10 +18,27 @@ and whose ``tests/optin-lifted*.txt`` lists name planted cases, of this ticket (
 - the report names the groups it enabled (``support.groups_named``), in ``--json`` and in text;
 - nothing of the tests' content reaches the caller: every case runs the suite's leak probe (the lists, whose node
   ids carry the marker, included).
+
+Scope (b) (the CTO's PKG-D10a-scope (b), DEC-1112 (3); DEC-1061 (2): lifted is report-only). A formal accept enables
+only ``breadth`` for its map's cases, never ``lifted``:
+
+- a line whose mapped cases rest only on ``lifted`` cases is ``"outcome": "report-only"`` (no case counted), neither
+  pass nor fail, and does not by itself fail the run; the text form prints ``report-only (lifted)`` for it; the
+  result's top-level ``"report_only"`` is ``["lifted"]`` and its ``"optin"`` never holds ``lifted``;
+- a line with cases in ``lifted`` and elsewhere is measured on the cases that run;
+- a line whose cases run zero for any other reason still fails, beside a report-only line;
+- a ``lifted`` case never runs (a failing one changes nothing);
+- a run that enables a group and ends in an ``error`` (a collection error, a crash) still names the groups it
+  enabled in ``"optin"``, in ``--json`` and in text (round 1's F3).
+
+The two variants that read ``lifted`` as enabled (``a-case-in-lifted-passes``, ``lines-in-both-groups-through-every-
+list-name``) and the unneeded-group variant whose mapped case sat in ``lifted`` were revised to this reading
+(``Rewrite-Reason: PKG-D10a-scope (b)``).
 """
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -60,9 +77,36 @@ def _check(project, run, expected, exit_code, ran, groups):
                                   f"expected: {ran}\ngot:      {project.ran()}\n"
                                   f"groups the child saw: {[r.get('opted') for r in project.records('optin')]}\n"
                                   f"{run.describe()}")
-    named = support.groups_named(found)
+    named = _enabled(found)
     assert named == set(groups), (f"the report names the opt-in groups {sorted(named)}, expected {sorted(groups)} "
                                   f"(the groups it enabled)\n{run.describe()}")
+
+
+def _enabled(found):
+    """The groups the report names as enabled: anywhere in the result but its ``report_only`` key, which names the
+    group a formal accept leaves report-only (scope (b))."""
+    if isinstance(found, dict):
+        found = {key: value for key, value in found.items() if key != "report_only"}
+    return support.groups_named(found)
+
+
+def _check_b(project, run, expected, exit_code, ran, enabled, report_only):
+    """Scope (b): the leak probe, the result, the exit code and what ran; ``"optin"`` names exactly ``enabled`` and
+    never ``lifted``; ``"report_only"`` is ``report_only`` (not judged when None)."""
+    support.assert_clean(run)
+    found = support.assert_outcome(run, expected, exit_code)
+    assert project.ran() == ran, (f"the planted functions that ran (and how often) are not the expected ones "
+                                  f"(a lifted case never runs in a formal accept)\nexpected: {ran}\n"
+                                  f"got:      {project.ran()}\n"
+                                  f"groups the child saw: {[r.get('opted') for r in project.records('optin')]}\n"
+                                  f"{run.describe()}")
+    optin = support.groups_named(found.get("optin"))
+    assert optin == set(enabled), (f"\"optin\" names {sorted(optin)}, expected {sorted(enabled)} (never lifted)\n"
+                                   f"{run.describe()}")
+    if report_only is not None:
+        assert found.get("report_only") == report_only, \
+            f"\"report_only\" is {found.get('report_only')!r}, expected {report_only!r}\n{run.describe()}"
+    return found
 
 
 # A line whose cases sit only in an opt-in list is measured --------------------------------------------------------
@@ -84,11 +128,6 @@ MEASURED = {
         [("Success 2: qzv96leak", f"`{support.OPTIN_FILE}::{WIDE}`")],
         result("fail", [line("success-1", "pass", 3), line("success-2", "fail", 0, 1)], totals=counts(3, 1)),
         support.EXIT_FAIL, {WIDE: 1}, {"breadth"}),
-    "a-case-in-lifted-passes": (
-        [("pass", WIDE)], {LIFTED: [entry(WIDE)]},
-        [("Success 2: qzv96leak", f"`{WIDE}`")],
-        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1)], totals=counts(4)),
-        support.EXIT_PASS, {WIDE: 1}, {"lifted"}),
     "a-whole-file-in-breadth": (
         [("pass", WIDE), ("pass", NARROW)], {BREADTH: [entry()]},
         [("Failure 1: qzv96leak", f"`{support.OPTIN_FILE}`")],
@@ -99,13 +138,6 @@ MEASURED = {
         [("Success 2: qzv96leak", f"`{ROWS}`")],
         result("fail", [line("success-1", "pass", 3), line("success-2", "fail", 1, 1)], totals=counts(4, 1)),
         support.EXIT_FAIL, {ROWS: 2}, {"breadth"}),
-    "lines-in-both-groups-through-every-list-name": (
-        [("pass", WIDE), ("pass", DEEP)],
-        {"tests/optin-lifted-guard-breadth.txt": [entry(WIDE)], "tests/optin-lifted-guard.txt": [entry(DEEP)]},
-        [("Success 2: qzv96leak", f"`{support.OPTIN_FILE}::{WIDE}`"), ("Success 3: qzv96leak", f"`{DEEP}`")],
-        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1), line("success-3", "pass", 1)],
-               totals=counts(5)),
-        support.EXIT_PASS, {WIDE: 1, DEEP: 1}, {"breadth", "lifted"}),
 }
 
 
@@ -193,11 +225,13 @@ STRAY = "test_qzv96leak_optin_stray"
 
 UNNEEDED = {
     # name: (cases of OPTIN_FILE, lists, rows after ALPHA's, expected, ran, groups)
-    "a-group-no-mapped-case-needs-beside-one-that-is-needed": (
+    # Revised for scope (b): the mapped case sits in lifted, so its line is report-only and lifted is not enabled;
+    # breadth, which only the unmapped failing case needs, is not enabled either.
+    "an-unneeded-breadth-beside-a-report-only-line": (
         [("pass", WIDE), ("fail", STRAY)], {LIFTED: [entry(WIDE)], BREADTH: [entry(STRAY)]},
         [("Success 2: qzv96leak", f"`{WIDE}`")],
-        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1)], totals=counts(4)),
-        {WIDE: 1}, {"lifted"}),
+        result("pass", [line("success-1", "pass", 3), line("success-2", "report-only")], totals=counts(3)),
+        {}, set()),
     "no-mapped-case-needs-a-group": (
         [("fail", STRAY)], {BREADTH: [entry(STRAY)], LIFTED: [entry(file="test_qzv96leak_other.py",
                                                                       folder=support.OTHER_FOLDER)]},
@@ -215,6 +249,180 @@ def test_s_d10a_a_group_no_mapped_case_needs_is_not_enabled(tmp_path, variant):
     project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
     run = project.run(support.TICKET_ID)
     _check(project, run, expected, support.EXIT_PASS, {**ALPHA_RAN, **ran}, groups)
+
+
+# Scope (b): lifted is report-only in a formal accept (PKG-D10a-scope (b), DEC-1061 (2)) ----------------------------
+
+GUARD_BREADTH, GUARD_LIFTED = "tests/optin-lifted-guard-breadth.txt", "tests/optin-lifted-guard.txt"
+
+REPORT_ONLY = {
+    # name: (cases of OPTIN_FILE, lists, rows after ALPHA's, expected, exit code, ran, "optin", "report_only")
+    "a-case-in-lifted-passes": (
+        [("pass", WIDE)], {LIFTED: [entry(WIDE)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`")],
+        result("pass", [line("success-1", "pass", 3), line("success-2", "report-only")], totals=counts(3)),
+        support.EXIT_PASS, {}, set(), ["lifted"]),
+    "a-case-in-lifted-fails": (
+        [("fail", WIDE)], {LIFTED: [entry(WIDE)]},
+        [("Success 2: qzv96leak", f"`{support.OPTIN_FILE}::{WIDE}`")],
+        result("pass", [line("success-1", "pass", 3), line("success-2", "report-only")], totals=counts(3)),
+        support.EXIT_PASS, {}, set(), ["lifted"]),
+    "a-whole-file-in-lifted": (
+        [("fail", WIDE), ("pass", NARROW)], {LIFTED: [entry()]},
+        [("Failure 1: qzv96leak", f"`{support.OPTIN_FILE}`")],
+        result("pass", [line("success-1", "pass", 3), line("failure-1", "report-only")], totals=counts(3)),
+        support.EXIT_PASS, {}, set(), ["lifted"]),
+    "lines-in-both-groups-through-every-list-name": (
+        [("pass", WIDE), ("fail", DEEP)], {GUARD_BREADTH: [entry(WIDE)], GUARD_LIFTED: [entry(DEEP)]},
+        [("Success 2: qzv96leak", f"`{support.OPTIN_FILE}::{WIDE}`"), ("Success 3: qzv96leak", f"`{DEEP}`")],
+        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1), line("success-3", "report-only")],
+               totals=counts(4)),
+        support.EXIT_PASS, {WIDE: 1}, {"breadth"}, ["lifted"]),
+}
+
+
+@pytest.mark.parametrize("variant", list(REPORT_ONLY))
+def test_s_d10a_a_line_whose_cases_rest_only_on_lifted_is_report_only(tmp_path, variant):
+    """The lifted case never runs (passing or failing, it changes nothing); its line is report-only, neither pass
+    nor fail, and does not fail the run; ``"optin"`` never holds lifted, ``"report_only"`` names it."""
+    cases, lists, rows, expected, exit_code, ran, enabled, report_only = REPORT_ONLY[variant]
+    project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
+    run = project.run(support.TICKET_ID)
+    _check_b(project, run, expected, exit_code, {**ALPHA_RAN, **ran}, enabled, report_only)
+
+
+def test_s_d10a_the_text_form_prints_a_report_only_line_as_report_only_lifted(tmp_path):
+    cases, lists, rows, expected, exit_code, _, _, _ = REPORT_ONLY["lines-in-both-groups-through-every-list-name"]
+    project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
+    run = project.run(support.TICKET_ID, json_mode=False)
+    support.assert_clean(run)
+    assert run.returncode == exit_code, f"exit code {run.returncode}, expected {exit_code}\n{run.describe()}"
+    try:
+        printed = json.loads(run.stdout)
+    except ValueError:
+        printed = None
+    if isinstance(printed, dict):
+        # The command line printed the result as JSON: the result as expected, and the report-only line's own
+        # object holds the words.
+        problems = support.text_problems(run.stdout, expected)
+        items = [item for item in printed.get("lines") or [] if isinstance(item, dict)
+                 and item.get("kpi") == "success-3"]
+        shown = [support.strings_of(item) for item in items]
+    else:
+        # A text form of the runner's own: the measured lines as the other text cases read them, and the report-only
+        # line on a printed line of its own.
+        measured = {**expected, "lines": [item for item in expected["lines"] if item["outcome"] != "report-only"]}
+        problems = support.text_problems(run.stdout, measured)
+        pattern = re.compile(r"(?<![\w-])success-3(?![\w-])")
+        shown = [row for row in run.stdout.splitlines() if pattern.search(row)]
+    assert not problems, "\n".join(problems) + "\n" + run.describe()
+    assert any("report-only (lifted)" in text.lower() for text in shown), \
+        f"the line of success-3 does not print 'report-only (lifted)': {shown}\n{run.describe()}"
+
+
+MIXED = {
+    # name: (cases of OPTIN_FILE, lists, rows after ALPHA's, expected, exit code, ran, "optin")
+    "lifted-and-breadth": (
+        [("pass", WIDE), ("fail", DEEP)], {BREADTH: [entry(WIDE)], LIFTED: [entry(DEEP)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`, `{DEEP}`")],
+        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1)], totals=counts(4)),
+        support.EXIT_PASS, {WIDE: 1}, {"breadth"}),
+    "lifted-and-in-no-list": (
+        [("pass", WIDE), ("fail", DEEP)], {LIFTED: [entry(DEEP)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`, `{support.OPTIN_FILE}::{DEEP}`")],
+        result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1)], totals=counts(4)),
+        support.EXIT_PASS, {WIDE: 1}, set()),
+    "lifted-and-a-failing-breadth-case": (
+        [("fail", WIDE), ("pass", DEEP)], {BREADTH: [entry(WIDE)], LIFTED: [entry(DEEP)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`, `{DEEP}`")],
+        result("fail", [line("success-1", "pass", 3), line("success-2", "fail", 0, 1)], totals=counts(3, 1)),
+        support.EXIT_FAIL, {WIDE: 1}, {"breadth"}),
+}
+
+
+@pytest.mark.parametrize("variant", list(MIXED))
+def test_s_d10a_a_line_with_cases_in_lifted_and_elsewhere_is_measured_on_the_cases_that_run(tmp_path, variant):
+    """The line's lifted case never runs (it would fail, or pass, the line otherwise); the line is measured on its
+    other case alone."""
+    cases, lists, rows, expected, exit_code, ran, enabled = MIXED[variant]
+    project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
+    run = project.run(support.TICKET_ID)
+    _check_b(project, run, expected, exit_code, {**ALPHA_RAN, **ran}, enabled, None)
+
+
+ZERO_B = {
+    # name: (cases of OPTIN_FILE, lists, rows after ALPHA's, expected, "optin" or None when not judged)
+    "a-case-named-nowhere-beside-a-report-only-line": (
+        [("pass", WIDE)], {LIFTED: [entry(WIDE)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`"), ("Success 3: qzv96leak", f"`{support.OPTIN_FILE}::{GHOST}`")],
+        result("fail", [line("success-1", "pass", 3), line("success-2", "report-only"), line("success-3", "fail")],
+               totals=counts(3)),
+        set()),
+    "a-case-a-breadth-list-names-but-no-file-defines-beside-a-report-only-line": (
+        [("pass", WIDE)], {LIFTED: [entry(WIDE)], BREADTH: [entry(GHOST)]},
+        [("Success 2: qzv96leak", f"`{WIDE}`"), ("Success 3: qzv96leak", f"`{support.OPTIN_FILE}::{GHOST}`")],
+        result("fail", [line("success-1", "pass", 3), line("success-2", "report-only"), line("success-3", "fail")],
+               totals=counts(3)),
+        None),
+}
+
+
+@pytest.mark.parametrize("variant", list(ZERO_B))
+def test_s_d10a_a_line_that_runs_zero_for_another_reason_still_fails_beside_a_report_only_line(tmp_path, variant):
+    """A report-only line beside does not turn a line whose case exists nowhere into report-only or pass."""
+    cases, lists, rows, expected, enabled = ZERO_B[variant]
+    project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
+    run = project.run(support.TICKET_ID)
+    support.assert_clean(run)
+    found = support.assert_outcome(run, expected, support.EXIT_FAIL)
+    assert project.ran() == ALPHA_RAN, \
+        f"what ran is not the expected\nexpected: {ALPHA_RAN}\ngot: {project.ran()}\n{run.describe()}"
+    assert "lifted" not in support.groups_named(found.get("optin")), f"\"optin\" holds lifted\n{run.describe()}"
+    if enabled is not None:
+        optin = support.groups_named(found.get("optin"))
+        assert optin == enabled, f"\"optin\" names {sorted(optin)}, expected {sorted(enabled)}\n{run.describe()}"
+
+
+# Round 1's F3: a run that ends in an error still names the groups it enabled -----------------------------------------
+
+ERROR_FILE = "test_qzv96leak_second.py"
+
+
+def _error_files(kind):
+    """``OPTIN_FILE`` with a passing case only ``breadth`` holds (mapped, so breadth is enabled), beside a file that
+    breaks the run: an import error (kind ``collection``) or pytest's internal-error exit (kind ``crash``)."""
+    if kind == "collection":
+        broken = support.planted_file(("pass", "test_qzv96leak_import_victim"), extra=support._IMPORT_ERROR)
+    else:
+        broken = support.planted_file(("crash_internal", "test_qzv96leak_crash_internal"))
+    return {**_optin_file(("pass", WIDE)), ERROR_FILE: broken}
+
+
+ERROR_README_ROWS = [("Success 2: qzv96leak", f"`{WIDE}`"), ("Success 3: qzv96leak", f"`{ERROR_FILE}`")]
+
+
+@pytest.mark.parametrize("kind", ["collection", "crash"])
+def test_s_d10a_an_error_result_still_names_the_groups_it_enabled(tmp_path, kind):
+    project = _project(tmp_path, _error_files(kind), support.rows_readme(ALPHA_ROW, *ERROR_README_ROWS),
+                       {BREADTH: [entry(WIDE)]})
+    run = project.run(support.TICKET_ID)
+    support.assert_clean(run)
+    found = support.assert_outcome(run, support.error_result(kind), support.EXIT_ERROR)
+    optin = support.groups_named(found.get("optin"))
+    assert optin == {"breadth"}, (f"the error result's \"optin\" names {sorted(optin)}, expected ['breadth'] (the "
+                                  f"group the run enabled)\n{run.describe()}")
+
+
+def test_s_d10a_the_text_form_of_an_error_result_names_the_groups_it_enabled(tmp_path):
+    project = _project(tmp_path, _error_files("collection"), support.rows_readme(ALPHA_ROW, *ERROR_README_ROWS),
+                       {BREADTH: [entry(WIDE)]})
+    run = project.run(support.TICKET_ID, json_mode=False)
+    support.assert_clean(run)
+    assert run.returncode == support.EXIT_ERROR, f"exit code {run.returncode}, expected 4\n{run.describe()}"
+    problems = support.text_problems(run.stdout, support.error_result("collection"))
+    assert not problems, "\n".join(problems) + "\n" + run.describe()
+    assert re.search(r"(?<![\w-])breadth(?![\w-])", run.stdout.lower()), \
+        f"the error's text does not name the opt-in group the run enabled (breadth)\n{run.describe()}"
 
 
 # Premises: the planted projects do what the cases above rely on (green before the implementation, by design) -----
@@ -258,6 +466,42 @@ def test_premise_s_d10a_a_default_run_leaves_the_listed_cases_out_and_the_groups
         assert {key.split("::")[1].split("[")[0] for key in listed} == names, (how, opted)
         if variant == "the-other-rows-of-a-rep-function":
             assert sorted(listed.values()) == ["failed", "passed"], (how, opted)
+
+
+SCOPE_B = {**{name: spec[:3] for name, spec in REPORT_ONLY.items()},
+           **{name: spec[:3] for name, spec in MIXED.items()},
+           **{name: spec[:3] for name, spec in ZERO_B.items()},
+           **{f"unneeded:{name}": spec[:3] for name, spec in UNNEEDED.items()}}
+
+
+def _lifted_names(cases, lists):
+    """The planted functions a ``lifted`` list (a file name without ``breadth``) holds."""
+    names = set()
+    for path, entries in lists.items():
+        if "breadth" in Path(path).name:
+            continue
+        for item in entries:
+            path_part, _, name = item.removeprefix("rep:").strip().partition("::")
+            if Path(path_part).name != support.OPTIN_FILE:
+                continue
+            names |= {case for _, case in cases if not name or case == name}
+    return names
+
+
+@pytest.mark.parametrize("variant", list(SCOPE_B))
+def test_premise_s_d10a_a_lifted_case_is_left_out_by_default_and_would_run_were_lifted_enabled(tmp_path, variant):
+    """What makes "a lifted case never runs" discriminating: each planted lifted case is out of a default run and
+    in a run opting in to both groups."""
+    cases, lists, rows = SCOPE_B[variant]
+    project = _project(tmp_path, _optin_file(*cases), support.rows_readme(ALPHA_ROW, *rows), lists)
+    lifted = _lifted_names(cases, lists)
+    stem = support.OPTIN_FILE[:-3]
+    ran = lambda outcomes: {key.split("::")[1].split("[")[0] for key in outcomes if key.startswith(stem + "::")}  # noqa: E731
+    default = _raw(project)
+    assert default is not None, "raw pytest wrote no report"
+    assert not (ran(default) & lifted), (lifted, default)
+    opted = _raw(project, "--optin=breadth", "--optin=lifted")
+    assert lifted <= ran(opted), (lifted, opted)
 
 
 def test_premise_s_d10a_the_other_tickets_twin_would_fail_and_runs_in_its_own_folder(tmp_path):
