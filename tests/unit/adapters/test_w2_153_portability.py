@@ -93,13 +93,14 @@ def test_a_top_level_skills_list_is_a_finding(project, under):
 
 def test_the_skills_lists_are_the_tickets():
     assert portability.ROLE_SKILLS == {
-        "engineer": ["test-driven-development"], "independent-test-designer": [], "independent-auditor": ["audit"],
-        "product-spec": ["change"], "research": ["discovery"], "orchestrator": ["orchestration"]}
+        "engineer": ["test-driven-development"], "independent-test-designer": ["test-design"],
+        "independent-auditor": ["audit"], "product-spec": ["change"], "research": ["discovery"],
+        "orchestrator": ["orchestration"]}
 
 
-def test_the_test_designer_lists_no_test_design_until_w2_128():
-    """The ticket's rule: test-design is left out until W2-128 reconciles that skill with DEC-963."""
-    assert "test-design" not in portability.ROLE_SKILLS["independent-test-designer"]
+def test_the_test_designer_lists_test_design_now_w2_128_reconciled_it():
+    """The ticket's rule: W2-128 has reconciled test-design with DEC-963, so the test designer preloads it."""
+    assert portability.ROLE_SKILLS["independent-test-designer"] == ["test-design"]
 
 
 def test_this_repositorys_sources_are_the_composition():

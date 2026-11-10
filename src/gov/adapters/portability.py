@@ -56,10 +56,10 @@ TOOLS_FIELD = re.compile(r"^[-*]\s+\*\*Tools:?\*\*:?(.*(?:\n[ \t]+\S.*)*)", re.M
 # so a call that never answers ends the check red with its own finding, not cut off by the runner.
 TIME_LIMIT = 25
 # W2-153 S3 (DEC-1050): the kernel skills each role's subagent preloads, from the ticket (not the templates' own
-# front matter). The test designer's test-design is left out until W2-128 reconciles that skill with DEC-963.
+# front matter).
 ROLE_SKILLS = {
     "engineer": ["test-driven-development"],
-    "independent-test-designer": [],
+    "independent-test-designer": ["test-design"],
     "independent-auditor": ["audit"],
     "product-spec": ["change"],
     "research": ["discovery"],
