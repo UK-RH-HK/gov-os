@@ -125,18 +125,18 @@ Implementer tickets whose `allowed_paths` had gained acceptance paths for the de
 Of the 141 cases red both before and after item 10: 97 are on the opt-in lists (report-only or breadth). Of the 44
 gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). The other 33:
 - **W1-28 1, W1-50 13:** fixed, item 11.
-- **W2-116 6, W1-32 7: W2-56's (another helper's).**
+- **W2-116 6, W1-32 7:** fixed in §6.4 item 2 (the CTO gave them to this helper).
   - W2-116: W2-56 S5's cleaned session environment (`8c399ea3e`) no longer passes `W2_116_SESSION_LOG` to the
     stand-in CLI (`KeyError`).
   - W1-32: W2-56 S15 removes the whole temp folder, restoring 0700 first, so the sealed folder no longer resists
     removal ("the removal did not fail").
   - Both need revisions with Rewrite-Reason from W2-56's designer.
-- **W1-32 `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`: the CTO's record first.**
+- **W1-32 `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`:** fixed in §6.4 item 3.
   - `gov --help` offers `brief`, `links` and `plan`, which the command lists do not record.
   - As with `release` (DEC-753), the lists record them, then a designer adds them to W1-07's
     `RECORDED_GOV_COMMANDS` (W2-152, W2-129 and W2-136's commands, approved by DEC-1088 and the LINK-INTEGRITY
     decisions).
-- **W2-58 `test_w2_58_launched_sessions.py` 5: to trace (live sessions, real Claude usage).**
+- **W2-58 `test_w2_58_launched_sessions.py` 5:** traced and fixed in §6.4 item 4. The guess below, W2-141 S1/S2, was wrong: the cause was the fixture hook's missing `PYTHONPATH`.
   - The launched engineer's own guard hook blocks its probe (`bash .gov-runtime/scratch/w2-58/probe.sh`).
   - Likely W2-141's S1/S2 refusing an engineer's search that can reach its own acceptance folder. The CTO notes
     four test_g14 reds of that kind, tracked for the re-pin ACT.
@@ -151,7 +151,7 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
   - CAP-22.c (`contract-items-delivered`) and eight of DEC-841's nine (`contract-items-cited-by-tests`) wait on
     P1-11's Contract re-baseline, into which DEC-1083 retired W2-109.
   - CAP-33.b/g are cited by W2-37's tests on its unmerged branch (a held merge-back).
-  - `CAP-1 (W2-134)` is prose in W2-134's KPI ("CAP-1 never matches CAP-10"), the CTO's record to word.
+  - `CAP-1 (W2-134)`: reworded, §6.4 item 6.
 - **11. The adapter-portability family: 8 W2-05 cases, 10 W1-38 `test_w1_38_heldout_step.py` cases, W1-38's
   clean-project case, and W2-58's 3 setup errors.**
   - Cause: `SOURCE_DIFFERS .rulesync/subagents/orchestrator.md`. W2-128 round 2a changed the kernel's role file and
@@ -166,7 +166,7 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
     - `GENERATED_DIFFERS` on `.claude/agents/*.md`.
     These come from W2-128's and W2-153's later skill and role changes. The `.claude/` copies need the operator's
     regeneration ACT. **W2-128's, W2-153's and the operator's; not fixed here.**
-- **12. W2-66 `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`.**
+- **12. W2-66 `test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]`:** decided (a) by the CTO and fixed, §6.4 item 1.
   - W2-149's result schemas (`governance/project/orchestration/tools/indep-schemas/*.schema.json`, `6f811da36`) are
     `.json` under a DEC-891 place, so the case calls them records.
   - But `indep_launch.py` reads them. Making them record-only would skip their tests on a change, which fails open
@@ -187,14 +187,65 @@ gated, 11 (W1-38) turned green with W2-128 round 2b (another helper's, below). T
     one).
   - `test_a_warm_query_answers_within_half_a_second_at_p95` is on `load_sensitive`.
   - `tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget`
-    is red alone at load 12.5 (warm p95 0.560 s against 0.5 s), and is not on `load_sensitive`. The CTO adds it to
-    the list (the ratchet entry), or the real-model latency moves to the nightly's measured runs.
+    was red alone (0.543-0.578 s against 0.5 s): routed to the nightly by `serial-only.txt`, §6.4 item 5; its latency is an open item in W2-13's file.
 - **14. A coverage gap for W2-56's owner.** `tests/conftest.py` keeps the real code-graph tool off `PATH` for every
   suite but W1-16's and W1-20's (W2-56 S1, T-8). So W2-92's 30 tool cases skip in every full run.
 - **15. An incident in a designer's session (W1-33's, 01:00).** It ran `git worktree prune` from its sandbox. That
   partly removed the metadata of three registered worktrees whose folders were already gone (`W2-148-act2`,
   `W2-149-f11-tests`, `b56`). Only `commondir` and `config.worktree` are left. No branch or commit is affected.
   Later briefs forbid the command.
+
+
+### 6.4 The CTO's seven items of 11-10 (delegated, DEC-1112 (3)), and gov accept's maps
+
+Each item was reproduced, fixed by its role, reviewed (READY by verdict.py), re-run on a scratch merge outside the
+sandbox, then merged in one command.
+
+| # | Item | Fix | Merged |
+|---|---|---|---|
+| 1 | W2-66's DEC-891 record case counted W2-149's code-read schemas as records | (a): a file under a `tools/` folder that a `.py` there names by a string literal is not a record. A designer under W2-66c, which was reopened, with the delegated decision recorded in its file. Review rows: other read routes; `tools/win_toast.ps1` is record-only while `deadman.py` runs it, which fails open for the selection (the test map's owner). | `7b14fed34` |
+| 2 | W2-116 (6) and W1-32 (7) after W2-56 S5/S15 (and W2-153's templates) | W2-116's stand-in carries its log path and environment, and the fixture plants the eight launch templates. W1-32's failed removal now comes from a read-only parent. A designer under W2-116. | `9a1b21cf1` |
+| 3 | W1-32's command set: `brief`, `links`, `plan` unrecorded | **The lists:** DEC-753 names two, `RECORDED_GOV_COMMANDS` in `src/gov/check/commands.py` and W1-07's tests' list. **Neither is a control path** (not the tool registry, the settings or the test map), so no ACT. An engineer recorded the three in the code list (`fb4b7a05d`). A designer did the same in W1-07's, W1-26's and W1-32's lists (`c3bf5a547`); its README conflict was settled by a designer and committed with commit-tree (`cade65dfe`). W1-07, W1-26 and W1-32: 736 passed. Review row: the citation for `brief` should be W2-152 / W2-128 TPL-3, DEC-1052, DEC-1112 (3), not DEC-1088 (3). | `fb4b7a05d`, `c3bf5a547` |
+| 4 | W2-58's 5 live-session cases | **Traced:** the hook does allow `bash probe.sh`. The real cause is that `gov launch` passes no `PYTHONPATH` (W2-56 S5), so the live fixture's bare `python3 …/pretooluse.py` could not import `gov` and refused every call. The cause is not W2-141 S1/S2, as §6.2 first guessed. **Fix:** the fixture's hook names its interpreter and code, and refuses when it cannot run, as the kernel's settings do. A designer under W2-141, two rounds: round 1's long line failed at the CLI's permission layer live. Live outside the sandbox: 12 passed, the five sessions included. | `2d4cc60f2` |
+| 5 | W2-13's real-model warm p95 (0.543-0.578 s alone, against 0.5 s) | **The existing mechanism:** `tests/acceptance/serial-only.txt` (DEC-889 item 5), whose `real-model` kind takes the `nightly` route, as W1-19's real-model file does. It is an ordinary test file, a designer's, so no ACT. The no-model latency case took the `serial` route. The 0.5 s budget is unchanged, and the latency is an open item in W2-13's file. (The path map's `load_sensitive` is a control path, and it reruns a case alone, where this one is red too.) | `89495ad15` |
+| 6 | W2-134's KPI prose "CAP-1 never matches CAP-10" | Reworded with its meaning kept ("an id never matches a longer id it begins, as item 1 never matches item 10"), marked `[changed, DEC-1112 (3)]`. The validator's `ticket-contract-ids-exist` passes; 2 FAIL left (P1-11, W2-37). | `7ffe6f89c` |
+| 7 | The stale probes of W2-05 and W2-96 | Fresh FULL probes, both pass, recorded at `docs/probes/DAEO-0z8c/PR-DAEO-0z8c-d10.md` (`327f63e55`) and `docs/probes/DAEO-ouet/PR-DAEO-ouet-d10.md` (`26726eb52`). W2-96's went stale again with item 3's merge; its second fresh probe is below. | see below |
+| 8 | `gov accept W1-46` and `W1-27`: `ACCEPT_MAP_UNREADABLE` | Rows and headings named their KPI lines in the form the reader takes. Both maps read now, and every line is mapped. A designer under W2-96. | `8b31965ed` |
+
+**Found by these reviews and probes, for the CTO (not fixed here):**
+- **A probable D-10 blocker: the close's serial phase can stop before running anything** (W2-13 review F1).
+  - `serial-only.txt` line 84 names `tests/acceptance/W1-16/test_w1_16_ui_off.py`, whose cases D-4's cut moved
+    whole to `breadth`. In a run without the opt-ins the entry names no case, and the close's plugin stops the
+    whole serial phase at collection (exit 4; `gov_close_serial_only.py:54-60`).
+  - A full close refuses on it (it fails closed). `nightly.sh` counts only JUnit failures, so a night can read green
+    with no serial case run (fails open). The nightly has had no run since 11-02.
+  - Three options:
+    - (a) a designer points the entry at the cases the default run collects, or comments it out while ui_off stays
+      breadth-only. About 15 min and a review.
+    - (b) the plugin treats an entry whose every case an opt-in list leaves out as "not in this run" rather than an
+      error, with the run naming it. Shared close code (W2-57's), an engineer, about 1 h and a FULL review. It fixes
+      the class.
+    - (c) W1-16's ui_off cases out of `breadth`: an opt-in list edit, an operator ACT, about 30 min.
+  - Recommended (b), with (a) as the quick stopgap before D-10's run. Confidence medium-high.
+- **The product nightly** (`python3 -m gov.close.nightly`) **never runs a case routed to the nightly** (W2-13 review
+  F4, W2-57's and W2-66's): only `nightly.sh` does. A row.
+- **The adapter-portability family is not fixed by ACT-CLAUDE-COPIES-2 alone** (W2-05 probe F1).
+  - Since W2-153 the template's six subagent sources are composed from `template/governance/kernel/templates/role-*.md`.
+  - W1-38's `build_project_from_template` copies only hooks, roles and skills, so every generated project falls
+    back to the role files and fails its portability control.
+  - With `templates/` and its `.claude/templates/` copies added to that project, the W2-05 cases pass (the probe's
+    trial).
+  - It affects W2-05's 24 hooks-source cases, W1-38's and W2-57's two rulesync-probe cases. For the template helper:
+    a designer revision of W1-38's builder.
+- **`gov accept` against D-4's cut** (W2-96 probe F1, the maps review). A KPI line fails with no failed case when
+  every case its map names was moved to an opt-in list. Examples: W2-96's success-2, success-5, failure-1 and
+  failure-4; W1-27's success-8; W1-46's success-10. With both opt-ins, W2-96 passes 109 of 109. Two possible fixes:
+  `gov accept` runs a ticket's own cases with the opt-ins, or the maps name what the default run collects. A choice
+  for the CTO; it touches W2-96's code or many maps.
+- **The map reader drops "failures 4, 5" after a comma** with no refusal (maps review F1; it fails open). Same shape:
+  W1-49 rows 88, 89, 94 and W2-87 row 36. A row for W2-96.
+- **W1-30 r11's two reds** (`test_w1_30_r11_declared_here.py`) are on the opt-in lists. They are red only when the
+  opt-ins are named, and have the same cause as the ui_off entry. Not in the default run.
 
 **Cost:** about 28 launched sessions, about $85 (logged sums $49.05 for 17 and $10.93 for 2, plus the W2-145 review $3.36, its merge designer $0.66, the duplicate W2-141 engineer $0.79, the W2-96 review $5.94, the whole-tree designer $1.97 and review $4.76, and three designers' estimates; logs of removed worktrees went with them), plus the CTO's helper
 
