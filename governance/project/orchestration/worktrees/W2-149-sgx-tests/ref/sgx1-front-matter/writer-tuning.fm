@@ -1,0 +1,11 @@
+---
+brief: sgx1-writer-tuning
+kind: writer
+version: 3
+experiment: SANDBOX-GUARD-EXP-1
+rounds: 1
+tools: [Read, Grep, Glob, Write, Edit, TodoWrite]
+sample: 400
+budget_usd: 25
+timeout_s: 7200
+---

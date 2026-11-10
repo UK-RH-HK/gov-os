@@ -1,0 +1,11 @@
+---
+brief: sgx1-overlap-auditor
+kind: auditor
+version: 1
+experiment: SANDBOX-GUARD-EXP-1
+rounds: 1
+tools: [Read, Grep, Glob, Write, TodoWrite]
+budget_usd: 10
+timeout_s: 3600
+budget_basis: "the labellers' figures (30 USD, 10800 s per half: a rulebook, then several hundred actions by hand) scaled to the overlap's disputes, about 40 cases (10 % of 400), one round, no rulebook or script; the declaration's brake at twice the projection applies"
+---

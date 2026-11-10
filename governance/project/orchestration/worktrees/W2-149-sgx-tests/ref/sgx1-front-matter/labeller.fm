@@ -1,0 +1,10 @@
+---
+brief: sgx1-labeller
+kind: labeller
+version: 3
+experiment: SANDBOX-GUARD-EXP-1
+rounds: 2
+tools: [Read, Grep, Glob, Write, TodoWrite]
+budget_usd: 30
+timeout_s: 10800
+---
