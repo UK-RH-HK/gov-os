@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-96-d10b
+status: interim result 5e36c7fc5: W2-96 tests, round 2 for S-D10a and S-D10b: scope (b), lifted report-only (a lifted-only line is report-only, never run, "optin" never lifted, "report_only": ["lifted"]; mixed lines measured on what r

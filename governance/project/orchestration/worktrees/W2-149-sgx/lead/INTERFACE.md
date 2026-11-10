@@ -20,7 +20,10 @@ written at delivery only; the rule script's two overrides and caps named; the se
 | `sgx1-overlap-auditor` | auditor | `sgx1-overlap-auditor` | `sgx1-overlap-auditor-result.schema.json` | 0 |
 
   Each entry's `tree_exclude`: `.claude/**`, `src/gov/guard/**`, `src/gov/launch/**`,
-  `governance/project/indep-walls/**`. The models are the CTO's to choose (the cases read the planted ones). The
+  `governance/project/indep-walls/**`. **(F38)** The `sgx1-overlap-auditor` entry's also: `.tickets/**`,
+  `governance/project/orchestration/packages/**`, `governance/project/orchestration/tools/indep_launch.py`,
+  `tests/acceptance/W2-149/**`, `tests/unit/orchestration/test_w2_149*`, `docs/changes/W2-149-evidence.md` (the ten as a
+  set, order free); the other four entries exactly the four. The models are the CTO's to choose (the cases read the planted ones). The
   planted `kinds.yaml` adds two test-only entries (`w2-149-no-schema`, `w2-149-no-sample`) and an entry `model` on four
   of the five; the script must take any entry of this form.
 
@@ -40,6 +43,12 @@ written at delivery only; the rule script's two overrides and caps named; the se
 Every tree: the archive less `tree-exclude.txt`. A brief with an entry: also less the entry's `tree_exclude` (fnmatch
 on the repository path, as `tree-exclude.txt`). The selection (S5) stays "less `tree-exclude.txt`": the entry's globs
 limit what a wall may read, not the writer's pool of places (a place is a name).
+
+**(F38)** The overlap auditor's tree is therefore the archive less `tree-exclude.txt`, the four globs and the six
+further ones: no ticket, package, launcher, W2-149 test or evidence file; no `TELL_MARK` or ticket body anywhere in its
+wall or tree. Its `input/tickets.jsonl` is unchanged (read from `.tickets/` at `--commit` by the script's code: the
+exclusion limits the tree, not the staging). Every other tree (the writers' and labellers' under their entries, and
+any brief with no entry, a memory auditor's included) holds every one of those files.
 
 ### Places (S16, S24)
 
@@ -85,10 +94,10 @@ destination); `labels/r1-sgx1-labeller/{rulebook.md,label_rules.py}`; `labels/r1
   `labels/audit/*.decisions.jsonl` names, sorted by id, the first 40; one line each, in that order: `{"id", "action":
   {role agent ticket wbs tool input cwd} (from the staged line), "x": {label rule_class clauses reason}, "y": {...}}`.
   **x/y:** `rng = random.Random(seed)`; for each case in that order, `rng.random() < 0.5` means x is labeller 1
-  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21) The reasons
-  blinded:** when either side's `reason` is `""` (labeller 1's script labels always carry `""`; labeller 2 may leave
-  one empty), both sides' `reason` are `""`; when both have one, both are kept as written. `label`, `rule_class` and
-  `clauses` are as in each file.
+  (`labels.jsonl`), else x is labeller 2. Nothing else of either labeller enters the wall. **(F21, F36) The reasons
+  blinded:** every side's `reason` is `""`, whatever the labellers wrote (F21's "both kept when both have one" is
+  withdrawn: no reason text of either labeller enters the wall). `label`, `rule_class` and `clauses` are as in each
+  file, x/y in the seeded order.
 - `tickets.jsonl`: one line per ticket a case's action names (its `ticket` matched to a ticket file's `id`, or its
   `wbs` to `wbs_id`), read from `.tickets/*.md` at `--commit`: `{"id", "role", "wbs_id", "allowed_paths"}` and nothing
   else; a name no ticket file holds gives no line; order free.

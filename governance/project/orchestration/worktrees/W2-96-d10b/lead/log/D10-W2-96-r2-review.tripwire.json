@@ -1,0 +1,25 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "head",
+   "before": "be77be65a7f1",
+   "after": "bdda27d28148"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/indep-walls/kinds.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/tools/indep_launch.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-149-sgx",
+   "change": "status line gone",
+   "line": " M tests/unit/orchestration/test_w2_149_setup_a.py"
+  }
+ ]
+}

@@ -1,3 +1,8 @@
 {"at": "2026-11-10T12:49:24.286101+00:00", "conditions": 2, "items": ["20261110-124924-helper-watch.txt", "20261110-124924-helper-watch-2.txt"]}
 2026-11-10 12:49:46 CTO: W2-149-review-sgx (pid 2340179) and W2-149-review-f11 (pid 3693772) gone without exit files: both reviews are recorded READY and merged (7f0e71519, ff1865184); no resume needed
 {"at": "2026-11-10T12:55:00.466888+00:00", "conditions": 2, "items": []}
+{"at": "2026-11-10T13:00:32.493156+00:00", "conditions": 2, "items": []}
+{"at": "2026-11-10T13:06:05.106384+00:00", "conditions": 2, "items": []}
+{"at": "2026-11-10T13:11:37.728988+00:00", "conditions": 2, "items": []}
+{"at": "2026-11-10T13:17:13.896186+00:00", "conditions": 2, "items": []}
+{"at": "2026-11-10T13:22:46.157653+00:00", "conditions": 2, "items": []}

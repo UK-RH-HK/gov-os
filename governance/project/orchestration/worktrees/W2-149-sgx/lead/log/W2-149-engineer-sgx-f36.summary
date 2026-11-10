@@ -1,0 +1,1 @@
+launch_worker engineer DAEO-52ku: session exit 0; tripwire CHANGED (exit 1; /home/usain/gov-os-worktrees/W2-149-sgx/.gov-runtime/scratch/lead/log/W2-149-engineer-sgx-f36.tripwire.json: attribute each change); sandbox trial file absent; log /home/usain/gov-os-worktrees/W2-149-sgx/.gov-runtime/scratch/lead/log/W2-149-engineer-sgx-f36.json; spend recorded (projection none)
