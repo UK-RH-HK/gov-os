@@ -62,6 +62,11 @@ Two forms, both valid once the implementation lands:
    `436a7520`) gives every bundle that field. None of these questions expands a parent, so it is `[]` in each, and
    it is pinned so, as part of the baseline, not a W2-92 change. Every other field is as before, and any other
    change still fails `test_u1`.
+   **Revised under DEC-1109 (2) for D-10's red-fix list** (DEC-1106 (3), DEC-1108 (5): the live path map's
+   `write_refused` block, `~/.gov-os/guard-calls` and its `why`, made the planted copy match "who calls
+   w92_nowhere"): `support.path_map()` now writes the kernel schema's required keys only, with the live map's closed
+   values (`state_class`, `capabilities`, the `policies` strengths, each system's `status`) and none of its paths or
+   prose, so only the planted corpus answers; no pinned bundle changes.
 2. **Live** (`test_u2`): the plain question's evidence is the plain fused order of the lexical route, the only route
    of today that answers in these projects (`gov.retrieval.lexical.search` then `gov.retrieval.fusion.rrf`, as W2-87
    does), and the pinned answer is that order. Since W2-13's S2 the route's list for the fusion is its `ranked`
