@@ -25,12 +25,13 @@ from gov.cli.errors import GovError
 KIND = r"(successes|success|failures|failure|kpis|kpi|s|f|k)"
 NAME = re.compile(KIND + r"[ \t-]*(\d+)(?!\w)", re.I)
 NAMING = re.compile(r"(success|failure|kpi)\b", re.I)  # a heading that means to name lines
-JOIN = re.compile(r"\s*(?:/|,|;|&|\+|\band\b)\s*", re.I)
+JOINED = r"\s*(?:[/,;&+]\s*(?:and\b)?|\band\b)\s*"  # S1 / S2, S1, and S2, S1 and S2
+JOIN = re.compile(JOINED, re.I)
 NUMBER = re.compile(r"(\d+)(?!\w)(?![ \t]+(?!and\b)[a-z])", re.I)  # a bare number after a join: one more line of
 #                                                                   the kind before it ("failures 4, 5"), not a count
 UPTO = re.compile(r"(?:–|\.\.|-)(\d+)(?!\w)")  # a range: Success 3–7, S3-7, F1..3
 NOTE = re.compile(r"\s*(?:\[[^\]\n]*\]|\([^)\n]*\))")  # a bracketed note between lines: [CAP-61.c], (R3)
-MORE = re.compile(r"\s*(?:/|,|;|&|\+|\band\b)\s*(?:(?:successes|success|failures|failure|kpis|kpi)\b|[sfk]?[ \t-]*\d)"
+MORE = re.compile(JOINED + r"(?:(?:successes|success|failures|failure|kpis|kpi)\b|[sfk]?[ \t-]*\d)"
                   r"|(?:–|\.\.|-)\d", re.I)  # what still lists a line the reader did not read: the cell is refused
 RANGE_MAX = 50  # the widest range read as lines; a wider one is refused
 ITEM = re.compile(r"`([^`]+)`")

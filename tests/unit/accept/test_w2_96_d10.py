@@ -230,6 +230,9 @@ def test_w2_96_d10a_an_errored_run_names_the_suites_it_enabled(project, capsys):
     ("S3-5", ["success-3", "success-4", "success-5"]),
     ("F1..2", ["failure-1", "failure-2"]),
     ("S1, 2 and F3", ["success-1", "success-2", "failure-3"]),
+    ("Success 4 [CAP-37.g], failure 4, and failure 1 in a real session: after", ["success-4", "failure-4",
+                                                                               "failure-1"]),
+    ("S1; and 2", ["success-1", "success-2"]),
     ("S5, DEC-447", ["success-5"]),
     ("Success 2, second half. Every pin", ["success-2"]),
     ("S7 (DEC-439)", ["success-7"]),
@@ -244,7 +247,7 @@ def test_w2_96_d10b_every_listed_line_is_read(cell, names):
 
 @pytest.mark.parametrize("cell", [
     "S1, 2 cases", "Success 2 and failure line", "Success 4 and failures 4a", "S3-2", "S1-90", "S1 / F2, S3c",
-    "Success 4 [CAP-61.c], failure 4b", "S1 (note); failures four", "S1 and 5x",
+    "Success 4 [CAP-61.c], failure 4b", "S1 (note); failures four", "S1 and 5x", "S1, and failure line",
 ])
 def test_w2_96_d10b_a_cell_listing_a_line_it_cannot_read_is_refused(cell):
     with pytest.raises(runner.Unlisted):
