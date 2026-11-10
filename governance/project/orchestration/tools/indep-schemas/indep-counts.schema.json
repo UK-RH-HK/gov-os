@@ -465,8 +465,408 @@
             "null"
           ],
           "minimum": 0
+        },
+        "round": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "enum": [
+            1,
+            2,
+            null
+          ]
+        },
+        "cases": {
+          "type": [
+            "object",
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "additionalProperties": false,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^([1-9]|1[0-4])$"
+          },
+          "properties": {
+            "1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "3": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "4": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "5": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "6": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "7": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "8": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "9": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "10": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "11": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "12": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "13": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "14": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "copies": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "minimum": 0,
+          "additionalProperties": false,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^([1-9]|1[0-4])$"
+          },
+          "properties": {
+            "1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "3": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "4": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "5": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "6": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "7": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "8": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "9": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "10": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "11": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "12": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "13": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "14": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "near_miss": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "minimum": 0,
+          "additionalProperties": false,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^([1-9]|1[0-4])$"
+          },
+          "properties": {
+            "1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "3": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "4": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "5": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "6": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "7": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "8": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "9": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "10": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "11": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "12": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "13": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "14": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "not_executable": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "rules": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "hand_labelled": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ask": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "by_class": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "minimum": 0,
+          "additionalProperties": false,
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^([1-9]|1[0-4])$"
+          },
+          "properties": {
+            "1": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "2": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "3": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "4": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "5": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "6": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "7": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "8": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "9": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "10": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "11": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "12": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "13": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "14": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "uncertain_seen": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "sample": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "decided": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "agrees_x": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "agrees_y": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "neither": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cannot_settle": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "may_change_verdict": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "instructions_ignored": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "stopped": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "none",
+            "input-missing",
+            "input-malformed",
+            "decisions-conflict",
+            "forbidden-read-needed",
+            "form-not-writable",
+            "not-sealed",
+            null
+          ]
         }
-      }
+      },
+      "description": "Every key of required is on every result; set-up A's flows (DEC-1112 (3), DEC-1113) add the numbers of their own result under the other keys, each only when the result gives it."
     },
     "delivered": {
       "type": "object",
@@ -501,10 +901,35 @@
             "notes",
             "classes",
             "labels",
+            "cases",
+            "round1",
+            "decisions",
             null
           ]
+        },
+        "files_sha256": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "rulebook.md": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "label_rules.py": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rulebook-2.md": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
         }
-      }
+      },
+      "description": "files_sha256: a labeller's round 1 only, each delivered file's sha256 (round 2 checks them)."
     },
     "traces": {
       "type": "integer",
@@ -532,6 +957,7 @@
         15,
         16,
         17,
+        18,
         20,
         21,
         22
@@ -551,6 +977,7 @@
         "file_budget",
         "canary",
         "argument",
+        "rules",
         "result",
         "stopped",
         "trace",

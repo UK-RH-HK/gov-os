@@ -371,7 +371,14 @@ def test_no_name_matched_stop_in_the_script():
 
 def test_documented_lines_name_only_the_sets_root():
     lines = [x.strip() for x in indep_launch.__doc__.splitlines() if x.strip().startswith("python3 ")]
-    assert len(lines) == 6
+    # the memory writer, checker and auditor; one per set-up A brief (DEC-1112 (3)); --dry; --counts-only
+    assert len(lines) == 10
+    briefs = [ln.split("--brief ")[1].split()[0] for ln in lines if "--brief " in ln]
+    # the five set-up A briefs at their real paths (ACT-W2-149-INSTALL-1): governance/project/indep-briefs/sgx1/<name>.md
+    sgx = sorted(b for b in briefs if b.startswith("governance/project/indep-briefs/sgx1/"))
+    assert sgx == sorted(f"governance/project/indep-briefs/sgx1/{n}.md"
+                         for n in ("labeller", "labeller-2", "overlap-auditor", "writer-heldout", "writer-tuning"))
+    assert not any("/sgx1-" in b for b in briefs)
     for ln in lines:
         assert WALLS + "/" not in ln and "$" not in ln and not any(c in ln for c in "*?[{<>|;&`")
 
@@ -940,14 +947,17 @@ def test_f3_the_test_hook_is_recorded(w):
     assert m["test_hook"] is True and "test_hook set" in log
 
 
-def test_f5_a_rejected_labeller_leaves_no_labels_folder(w):
+def test_a_labeller_brief_without_an_entry_is_refused_10_nothing_built(w):
+    # the labeller kind runs set-up A's flows only (DEC-1112 (3)): the old sealed-folder flow is gone
     seal = w.plant_seal()
     before = tree_hash(w.sets / "fixtures")
     w.stub({"session": "write", "out": {"out/result.json": json.dumps({"labelled": 3, "allow": 2, "refuse": 1})}})
-    rc, counts, _ = w.launch("labeller")
-    assert rc == 20 and counts["status"] == "rejected"
-    assert not (seal / "labels").exists()
+    for kw in ({}, {"rnd": 2, "seed": 4242, "dry": True}):
+        rc, counts, _ = w.launch("labeller", **kw)
+        assert rc == 10 and counts["status"] == "refused"
+    assert not (seal / "labels").exists() and w.calls() == []
     assert tree_hash(w.sets / "fixtures") == before
+    nothing_built(w)
 
 
 def test_f5_a_rejected_writer_round_one_leaves_no_set_folder(w):
@@ -1000,33 +1010,6 @@ def test_auditor_delivers_its_classes_and_the_audit_is_logged(w):
     line = json.loads((w.runs / "AUDITS.log").read_text().splitlines()[-1])
     assert line["commit"] == w.commit and line["run"] == counts["run"] and line["audit"] == "e0"
     assert counts["out"]["misses"] == {"retrieval_miss": 2}
-
-
-def test_labeller_delivers_into_the_sealed_folder(w):
-    seal = w.plant_seal()
-    w.stub({"session": "write", "out": {"out/result.json": json.dumps({"labelled": 3, "allow": 2, "refuse": 1}),
-                                        "out/labels.jsonl": '{"id": "a000"}\n'}})
-    rc, counts, _ = w.launch("labeller")
-    assert rc == 0, counts
-    assert (seal / "labels" / f"{counts['run']}.jsonl").read_text() == '{"id": "a000"}\n'
-    assert counts["delivered"]["to"] == "labels" and counts["out"]["agree"] is None
-
-
-def test_second_labeller_overlap_is_ten_percent_by_the_seed(w):
-    seal = w.plant_seal(n1=23, n2=5)
-    rc1, a, _ = w.launch("labeller", rnd=2, seed=4242, dry=True)
-    rc2, b, _ = w.launch("labeller", rnd=2, seed=4242, dry=True)
-    assert rc1 == rc2 == 0
-    sa = json.loads((w.wall(a) / "input" / "selection.json").read_text())
-    sb = json.loads((w.wall(b) / "input" / "selection.json").read_text())
-    ids1 = [f"a{i:03d}" for i in range(23)]
-    assert sa["overlap"] == sb["overlap"] == random.Random(4242).sample(ids1, math.ceil(23 / 10))
-    assert a["selection"]["overlap"] == 3
-    acts = (w.wall(a) / "input" / "actions.jsonl").read_text().splitlines()
-    assert [json.loads(x)["id"] for x in acts] == [f"b{i:03d}" for i in range(5)] + sa["overlap"]
-    assert (w.wall(a) / "input" / "rulebook.md").read_text() == (seal / "rulebook.md").read_text()
-    rc, one, _ = w.launch("labeller", seed=4242, dry=True, set_name="labels-one")
-    assert (w.wall(one) / "input" / "actions.jsonl").read_bytes() == (seal / "corpus" / "actions-r1.jsonl").read_bytes()
 
 
 def test_writer_round_two_replaces_its_set_inside_hidden(w):
@@ -1082,7 +1065,12 @@ def test_schema_checker_is_strict():
 def test_counts_schema_closes_every_object_and_string():
     whole = schema()
     out = whole["properties"]["out"]["properties"]
-    as_given = [out["by_kind"], out["by_area"], out["misses"]]  # the result's own counts, copied as given
+    # the result's own counts, copied as given (set-up A's objects keyed "1".."14" too)
+    as_given = [out[k] for k in ("by_kind", "by_area", "misses", "cases", "copies", "near_miss", "by_class")]
+    as_given.append(whole["properties"]["delivered"]["properties"]["files_sha256"])
+    # set-up A's numbers are optional keys of `out` (and files_sha256 of `delivered`): present only when given
+    optional = {id(whole["properties"]["out"]): set(indep_launch.SGX_OUT) - {"labelled", "allow", "refuse"},
+                id(whole["properties"]["delivered"]): {"files_sha256"}}
 
     def walk(node):
         if isinstance(node, dict):
@@ -1091,7 +1079,8 @@ def test_counts_schema_closes_every_object_and_string():
             if "object" in types:
                 assert node.get("additionalProperties") is False, node
                 if not any(node is x for x in as_given):
-                    assert set(node.get("required", [])) == set(node.get("properties", {})), node
+                    want = set(node.get("properties", {})) - optional.get(id(node), set())
+                    assert set(node.get("required", [])) == want, node
             if "string" in types:
                 assert "enum" in node or "const" in node or node.get("pattern", "").startswith("^"), node
                 if "pattern" in node:

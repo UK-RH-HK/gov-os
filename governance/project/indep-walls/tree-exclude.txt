@@ -16,3 +16,5 @@ docs/audit/memory-recall-diagnosis-*
 governance/project/orchestration/packages/LIFT-1/D4B-*
 tests/acceptance/W2-61*/**
 .gov-runtime/**
+# The fixed briefs themselves (DEC-1112 (3), F7): a wall reads its own brief.md only, never another job's brief.
+governance/project/indep-briefs/**
