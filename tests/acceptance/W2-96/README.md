@@ -9,7 +9,9 @@ as described behaviours (DEC-136) in an addendum that overrides the design note 
 N8), given the same way as R8 to R12; they override both earlier texts where they differ. Review 3's cases
 (`test_w2_96_at_review_3.py`) were added by a fourth, from review 3's V1 and V2, given the same way as R14 and
 R15. Review 4's cases (`test_w2_96_at_review_4.py`) were added by a fifth, from review 4's W1, given the same way
-as R16 (DEC-987). The implementation (`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by none of them.
+as R16 (DEC-987). D-10's cases (`test_w2_96_at_d10a_optin.py`, `test_w2_96_at_d10b_cells.py`) were added by a
+sixth, from the ticket's two added KPI lines S-D10a and S-D10b (DEC-1112 (3)), the brief's measured reasons and the
+maps review's F1. The implementation (`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by none of them.
 
 ## How the tests run the merged tree's code (DEC-732)
 
@@ -71,7 +73,9 @@ outside the given `TMPDIR`; the cases read it to check what ran, where, and that
 | Success 2 / Failure 1 (review 3, R15) | `test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound` | Seen on run 2's code: "the clean-up took N s from the folders' making to gov's end, more than 3 s for 8000 empty sibling folders" (9.7 s to 12.4 s here), and mostly "the run took N s, more than 10 s" too (7.1 s to 13.3 s here; review 3 measured 22.7 s for the removal alone); the result and the given `TMPDIR` are right. |
 | Success 2 / Success 5 / Failure 1 / Failure 4 (review 4, R16) | `test_r16_a_sigterm_to_gov_alone_while_a_nested_run_sleeps_leaves_no_process_and_nothing_later` | Seen on run 3's head (`943543cea0e8`): "2 processes of the run still run once gov accept ended" (the nested gov and its pytest), and "the given TMPDIR holds 6 entries N s after gov accept ended (it held none when gov ended)" (`gov-accept-…/tmp/pytest-of-<user>/pytest-0/<the outer test's folder>/qzv96leak-given-1`, names holding the marker); exit code 143 and the given `TMPDIR` empty when gov ends, as R14 requires. Red at the first race in 4 runs of 4 here. |
 | Success 2 / Success 5 / Failure 1 (review 4, R16) | `test_r16_a_test_that_leaves_a_nested_run_going_passes_and_leaves_no_process_and_nothing_later` | Seen on run 3's head: the same two findings (the nested gov and its pytest still running when gov ends; 6 entries in the given `TMPDIR` afterwards); the result (both lines passing, exit 0) and the given `TMPDIR` when gov ends are right. Red at the first race in 4 runs of 4 here. |
-| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1, run 2, review 3 and review 4 files, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5 and failure 1 to 4 and every test here (a file whole, or a review 1 or run 2 case by its function name), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. Run 2's premises: W1-30's two forms map the passing cases in one Test table and hold the failing case in no Test or File table under a header row; raw pytest leaves the planted chain, 1,200 folders deep (more than 1,100 and than Python's recursion limit), with its deepest three folders at 0500, 0300 and 0000, and the cases' own removal without recursion takes it away; a process started as the R11 case starts `gov` begins with the signal ignored. Review 3's premises: a churner keeps going until its canary file is removed, then ends at once and its folder stays still (a plain removal then takes it); a plain `shutil.rmtree` removes 8,000 empty sibling folders in under 2 s. Review 4's premise: the token search finds a process of a session of its own carrying the token in its environment, and its child, finds nothing for another token, and nothing once they are gone. |
+| Success 7: S-D10a, the opt-in groups the map's cases need (DEC-1112 (3)) | `test_w2_96_at_d10a_optin.py::test_s_d10a_a_line_whose_cases_only_an_opt_in_list_holds_is_measured`, `test_w2_96_at_d10a_optin.py::test_s_d10a_the_text_form_gives_the_measured_line_and_names_the_group`, `test_w2_96_at_d10a_optin.py::test_s_d10a_a_line_whose_named_case_exists_nowhere_still_fails`, `test_w2_96_at_d10a_optin.py::test_s_d10a_the_other_tickets_cases_in_an_opt_in_list_are_not_run`, `test_w2_96_at_d10a_optin.py::test_s_d10a_a_group_no_mapped_case_needs_is_not_enabled`, `test_w2_96_at_d10a_optin.py::test_s_d10a_a_line_whose_cases_rest_only_on_lifted_is_report_only`, `test_w2_96_at_d10a_optin.py::test_s_d10a_the_text_form_prints_a_report_only_line_as_report_only_lifted`, `test_w2_96_at_d10a_optin.py::test_s_d10a_a_line_with_cases_in_lifted_and_elsewhere_is_measured_on_the_cases_that_run`, `test_w2_96_at_d10a_optin.py::test_s_d10a_a_line_that_runs_zero_for_another_reason_still_fails_beside_a_report_only_line`, `test_w2_96_at_d10a_optin.py::test_s_d10a_an_error_result_still_names_the_groups_it_enabled`, `test_w2_96_at_d10a_optin.py::test_s_d10a_the_text_form_of_an_error_result_names_the_groups_it_enabled` | Seen at integrate (`bbe222c59`): the default run leaves the listed cases out, so each line they alone cover is `fail` with 0 passed and 0 failed: "the result is not the expected one" (the rep variant: `pass` with 1, its failing second row never run; the text case: "the printed result differs"). Round 2, scope (b) (PKG-D10a-scope (b)), seen at `88c0772ff`'s code: a lifted-only line reads `fail` with 0 and 0, not `report-only`, and the run exits 3: "the result is not the expected one" (the text case: "exit code 3, expected 0"); a mixed line and a breadth case beside a report-only line, likewise; an error result (collection, crash) carries no `optin`: "the error result's "optin" names [], expected ['breadth']" (text: "does not name the opt-in group"). **Passes already** (guards): `only-a-case-a-list-names-but-no-file-defines` (zero cases still fail) and `no-mapped-case-needs-a-group` (no group enabled, none named). |
+| Success 8: S-D10b, every line a map cell lists (DEC-1112 (3)) | `test_w2_96_at_d10b_cells.py::test_s_d10b_the_kpi_lines_own_cell_form_reads_every_line_it_lists`, `test_w2_96_at_d10b_cells.py::test_s_d10b_a_cell_of_the_maps_in_use_reads_every_line_or_refuses_naming_the_cell`, `test_w2_96_at_d10b_cells.py::test_s_d10b_a_cell_the_reader_cannot_read_in_full_refuses_the_map_naming_it`, `test_w2_96_at_d10b_cells.py::test_s_d10b_the_text_form_of_the_refusal_gives_its_code_and_the_cell`, `test_w2_96_at_d10b_cells.py::test_s_d10b_every_readable_form_of_the_maps_in_use_still_reads_as_before`, `test_w2_96_at_d10b_cells.py::test_s_d10b_a_listed_line_also_mapped_on_a_passing_row_never_reads_pass_when_this_rows_case_fails` | Round 2 (F1), seen at `88c0772ff`'s code: each added form is read as its first line alone, "was neither read in full nor refused naming it"; the fail-open case adds which listed lines read `pass` though the row's case fails ("fails open: ['failure-2'] read pass", for a range "['success-3', 'success-4']"). Seen at integrate: each multi-line cell is read as its first line alone, with no refusal: "the result is not the expected one" (success-4 only), "was neither read in full nor refused naming it", or for the unreadable cells "a refusal must answer ok: false" (the text case: "exit code 3, expected 1"). `a-plural-word-with-and` is refused today (R4: `Successes` names no line) but the refusal does not name the cell. **Passes already** (a guard): `test_s_d10b_every_readable_form_of_the_maps_in_use_still_reads_as_before`. |
+| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1, run 2, review 3, review 4 and D-10 files, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5, 7 and 8 and failure 1 to 4 and every test here (a file whole, a review 1 or run 2 case by its function name, or a D-10 case by its full node id), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. Run 2's premises: W1-30's two forms map the passing cases in one Test table and hold the failing case in no Test or File table under a header row; raw pytest leaves the planted chain, 1,200 folders deep (more than 1,100 and than Python's recursion limit), with its deepest three folders at 0500, 0300 and 0000, and the cases' own removal without recursion takes it away; a process started as the R11 case starts `gov` begins with the signal ignored. Review 3's premises: a churner keeps going until its canary file is removed, then ends at once and its folder stays still (a plain removal then takes it); a plain `shutil.rmtree` removes 8,000 empty sibling folders in under 2 s. Review 4's premise: the token search finds a process of a session of its own carrying the token in its environment, and its child, finds nothing for another token, and nothing once they are gone. |
 
 What each file holds:
 
@@ -321,6 +325,110 @@ No earlier case changed. The support module gained, without changing what the ea
 `R16_RUN_VAR`, `run_nested_r16_extra` (the nested runner's module code), the planted kinds `r16_nested_waits`,
 `r16_nested_returns` and `r16_sleep_then_pass`, `R16_NESTED_FILES`, `R16_NESTED_README`, and `processes_carrying`
 and `command_line`.
+
+## D-10's cases (S-D10a, S-D10b; DEC-1112 (3))
+
+The ticket's seventh and eighth success lines, added by the CTO's delegated decisions. Measured on integrate by the
+brief: `gov accept W2-96` exits 3 with every case passing, since D-4's cut (DEC-1061) moved the cases its map names
+for four lines into `breadth` (likewise W1-27's success 8 and W1-46's success 10); and a cell such as "Success 4
+[CAP-61.c], failures 4, 5" is read as success 4 alone, without a refusal (the maps review's F1; W1-49's rows 88, 89
+and 94, W2-87's row 36). Every case runs the leak probe.
+
+**S-D10a** (`test_w2_96_at_d10a_optin.py`). Each planted project holds, as `tests/conftest.py`, this repository's
+opt-in rules as its own `tests/conftest.py` states them (`support.OPTIN_CONFTEST`: `--optin=<group>` or
+`GOV_TESTS_OPTIN`, a list whose file name holds `breadth` is the group `breadth` and every other `lifted`, `rep:`
+keeping a parametrised function's first row, a node id named on the command line always run), and its own
+`tests/optin-lifted*.txt` lists, whose node ids carry the marker.
+
+- *Measured* (six variants): a mapped case only `breadth` holds, passing or failing; one only `lifted` holds; a whole
+  file in `breadth`, mapped as a file; the second, failing row of a `rep:` function, mapped by function name; lines
+  in both groups through `optin-lifted-guard-breadth.txt` and `optin-lifted-guard.txt`. Checks: the result exactly
+  (the failed case counted under its line), the exit code, which planted functions ran and how often, and the
+  groups the report names, exactly. The text form of the failing variant gives the same result and the word
+  `breadth`.
+- *Zero still fails*: a line naming a case no file defines, beside a measured line, whether or not a list names it;
+  and (a guard) a line naming only such a case: `fail` with 0 passed, 0 failed.
+- *Only that ticket's cases*: the other ticket's folder holds a failing function of the same name as the mapped one
+  and its own failing file, both in `breadth` beside this ticket's case; neither runs, the run passes.
+- *A group no mapped case needs is not enabled*: a failing case of this ticket that the map never names sits in
+  `breadth` while the mapped case is in `lifted` (or the map needs no group at all, a guard): it does not run, the
+  run passes, and the report names `lifted` alone (or no group).
+
+**S-D10b** (`test_w2_96_at_d10b_cells.py`). A row-form map: `Success 1` over `ALPHA`, and the cell under test over
+one planted case.
+
+- *The KPI line's own form* (`Success 4, failures 4, 5`, with words after it or alone; the case passing or failing):
+  success 4, failure 4 and failure 5 each reported with the case.
+- *The forms of the maps in use* (seven): the F1 cell with its citation; W1-49's row 88 (`Success 5 [CAP-37.g],
+  first half, and failure 1`) and row 94 (`…, failure 4, and failure 1 in a real session`); W2-87's row 36 (a
+  parenthesis between); `Success 2, 3`; `Successes 2 and 3, failure 2`; the KPI line's form as a heading. Each
+  either reads every line it lists, or is refused with `ACCEPT_MAP_UNREADABLE` naming the cell before any test runs;
+  a reading of fewer lines fails.
+- *Cannot be read in full* (`Success 2, F 3a / F4`, `Success 4, failures 4, 5b`): refused with
+  `ACCEPT_MAP_UNREADABLE`, `ok: false`, exit 1, the error naming the cell, no planted test run, no raw output; the
+  text form gives the code and the cell on stderr.
+- *Still reads as before* (a guard): seven cells of the forms the maps use today (a citation, a parenthesis or
+  words with commas, numbers and semicolons after the names, after a colon or a dash) map their cases to the lines
+  the design note's reader gives them.
+
+**Choices where the lines leave the form open:**
+
+- *The groups the report names* are read from the result (`--json`), anywhere in it: a key or a string value, or a
+  word of one split at spaces and punctuation but not at `-` or `.`, equal to `breadth` or `lifted`
+  (`support.groups_named`). A list's file name (`optin-lifted-breadth.txt`) names no group by itself. The text form
+  must hold the group's word. A run that enables no group must name none.
+- *"Only for that ticket's cases"* is checked on the other ticket's cases (never run). A case of this ticket that
+  the map never names, in a group a mapped case needs, is not planted: whether it runs then is not judged. A group
+  no mapped case needs is read as not needed, so not enabled (its unmapped failing case must not run).
+- *Naming the cell* is read as quoting it: the cell's text (white space runs as one) appears in a string of the
+  envelope's `error` (or on stderr in text). A cell the reader may name carries no marker; the rest of each planted
+  README does. The refusal code is review 1's R4 code for a map the reader cannot read.
+- *The forms of the maps in use* are allowed either answer, as the line allows; only the KPI line's own row form
+  must read in full.
+
+### Round 2 (scope (b), F1, F3; `Rewrite-Reason: PKG-D10a-scope (b) (DEC-1112 (3), DEC-1061 (2)); DEC-866`)
+
+Round 1's review found three things; the CTO decided the scope (PKG-D10a-scope (b), DEC-1112 (3)): a formal `gov
+accept` enables only `breadth` for its map's cases, never `lifted` (DEC-1061 (2): lifted is report-only).
+
+- *Revised* (they asserted lifted enabled): `a-case-in-lifted-passes` and
+  `lines-in-both-groups-through-every-list-name` moved from the measured case to
+  `test_s_d10a_a_line_whose_cases_rest_only_on_lifted_is_report_only`; the unneeded-group variant whose mapped case
+  sat in `lifted` is now `an-unneeded-breadth-beside-a-report-only-line` (the line report-only, no group enabled,
+  the unmapped failing breadth case not run). The unneeded-group case (both variants) reads the groups enabled from
+  the result's `"optin"` only (absent meaning none), so a report-only line's own `report-only (lifted)` wording is
+  not read as an enabled group (`Rewrite-Reason`: DAEO-ouet). The other cases' group check now reads the result
+  without its `report_only` key.
+- *Report-only* (four variants: a lifted case passing or failing, a whole file in lifted, lines in both groups
+  through the guard lists): the line is `{"outcome": "report-only"}` with every count 0, the run `pass`, exit 0, the
+  lifted case never runs, `"optin"` exactly the groups enabled (never `lifted`) and `"report_only": ["lifted"]`.
+  The text form prints `report-only (lifted)` on the line's row (or, if the command prints JSON, in that line's
+  object), the measured lines as the other text cases read them.
+- *Mixed* (three): a line mapping a breadth case (or one in no list) and a lifted case is measured on the case that
+  runs: `pass` with 1, or `fail` with 1 failed when the running case fails; the lifted case never runs.
+- *Zero for another reason* (two): beside a report-only line, a line whose case no file defines (named in no list,
+  or in a breadth list) is still `fail` with 0 and 0, the run exit 3.
+- *F3*: a run enabling `breadth` that ends in an error (an import error: `collection`; pytest's internal-error
+  exit: `crash`) gives the error result and `"optin"` naming `breadth`; its text form names `breadth`.
+- *F1* (`test_s_d10b_a_cell_of_the_maps_in_use_reads_every_line_or_refuses_naming_the_cell`, eight variants added):
+  `Success 5 [CAP-37.g], second half, and failure 2` (W1-49 row 89), `Success 6 with success 4.` (W2-92 row 128),
+  `S2-S4`, `Success 2–Success 4`, `Success 1 to 3` (a range names the lines between), `Success 1 or failure 2`,
+  `Success 1 (and failure 2)`, `Success 1 — and failure 2`; read in full or refused naming the cell. Where the cell
+  names success 1, its case adds to ALPHA's three. The fail-open shape
+  (`test_s_d10b_a_listed_line_also_mapped_on_a_passing_row_never_reads_pass_when_this_rows_case_fails`, the KPI
+  line's form and every row form): each listed line after the first is also mapped on a row of its own over a
+  passing case while the cell's case fails; the line must read `fail` (1 passed, 1 failed), or the map is refused.
+- *Premise*: each planted lifted case is out of a default run and in one opting in to both groups
+  (`test_premise_s_d10a_a_lifted_case_is_left_out_by_default_and_would_run_were_lifted_enabled`).
+
+In round 1, no earlier case changed what it expects. The README premise
+(`test_w2_96_at_premises.py::test_this_readme_is_a_kpi_map_gov_accept_can_run`) now expects success 7 and 8 in the
+map and takes items in the full node-id form, each naming a function its file defines (`Rewrite-Reason: DEC-1112
+(3)`, two KPI lines added). The support module gained, without changing what the earlier cases do:
+`OPTIN_CONFTEST`, `OPTIN_GROUPS`, `OPTIN_FILE`, the planted kind `rows_second_fails`, `optin_list`, `optin_entry`,
+`groups_named`, `CELLS_FILE`, `CELLS_CASE`, `cells_files`, `cell_readme`, `heading_cell_readme`, `line_order`,
+`cells_expected`, `strings_of` and `names_cell`. The D-4 cut's table below is generated data (`placement.json`) and
+was not edited; the new cases are in no opt-in list, so they run in the full run.
 
 ## The brief change has no test
 
