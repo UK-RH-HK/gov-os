@@ -14479,6 +14479,34 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (work judged against a known bar, bounded, brought to the owner with evidence) and question 2
   (a failed line never reads as ready; a rebuilt ACT does not reset its review count).
 
+### DEC-1127 — WITHDRAWN: the close-history decision proposed for ACT-CLOSE-HISTORY-1, never accepted
+- **Status:** WITHDRAWN (owner, 2026-11-11, DEC-1132 (1)); never in force · **Under:** DEC-953, DEC-1052 (Q-8), DEC-1061 (9) · **Source:** `governance/project/orchestration/reviews/ACT-CLOSE-HISTORY-1-review.md` (F2)
+- **What it was:** a proposal to accept 18 old merge commits as history and re-point four ratchet entries in the path map,
+  so the pinned `gov close` would pass the lift's closes. The independent review (F2) found the refusing gates were
+  already lifted here by DEC-953 and DEC-1052 Q-8 (with `accepted_history` deleted, DEC-1061 (9)). The owner chose
+  DEC-953's practices instead; the id is kept so the register stays whole.
+
+### DEC-1132 — The lift's closes by DEC-953's practices (option D); ADOPT-VERIFY-1 option (d) and W2-174; the rg tripwire; the nightly's restart as an ACT; set-up A's bar defined for approval
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1)'s route standing until W2-115 · **Under:** DEC-953 (1), (5), DEC-1052 (Q-8), DEC-1126 (7), DEC-1128 (2), (3), DEC-1130 (2), DEC-1083 · **Source:** the owner's answers (chat, 2026-11-11 ~15:20 UTC) to row 127, ADOPT-VERIFY-1, rows 142-143, SWITCHED-OFF-1
+- **Decision:**
+  - (1) **Option D:** the nine ready tickets (W2-122, W2-123, W2-126, W2-92, W2-96, W1-01b, W2-66b, W2-90c, W2-151) are
+    closed now by DEC-953's practices, each with `tk close` and a close record; DAEO-feon is closed as not needed;
+    ACT-CLOSE-HISTORY-1 and DEC-1127 are withdrawn. `gov close`'s gates return later through W2-115, including the rule
+    that skips merges with no change of their own, only on evidence (DEC-1128 (2)). W2-05, W2-112, W2-04, W2-148 and
+    W2-149 close after their fix or review; W2-32 and W2-15a stay open.
+  - (2) **ADOPT-VERIFY-1: option (d),** the checked `Verify:` pass when an adopted ticket is about to launch; W2-174 is
+    filed; W2-88's refactoring-plan line changes so its proposed tickets carry `Verify:` from the start.
+  - (3) **The WSL stop:** (a) the CTO's `rg` tripwire, yes; the owner adds (b) to the editor's settings. The CTO checks
+    whether Claude Code's additional directories (`~/gov-os-runs`, `~/gov-os-worktrees` in `settings.local.json`) make
+    it scan those folders, and proposes the fix.
+  - (4) **The nightly:** its restart comes to the owner as an ACT after the formal closes: in the quiet hours, with nothing
+    else running, sized to memory so it cannot exhaust it.
+  - (5) **Set-up A's bar:** the CTO brings its exact definition for the owner's approval (the actions counted, the
+    period, the planted share, how an action the guard could not judge is scored), with the likely result today given
+    the error path and the unresolvable writes. The error path is fixed first, as decided (DEC-1128 (3)).
+- **Basis:** question 2 (closes by the practices in force; a control returns on evidence) and question 1 (adopted
+  tickets ready by code).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14546,3 +14574,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.512 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1129 (W2-32 S9 (a1); the memory audit's briefs approved, hashes to the approved list by the install ACT; W2-60a a fresh round 1). DEC-1127 still held PROPOSED. Next free id: DEC-1130. |
 | 0.513 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1130 (the `Verify:` pass and the hand-built-brief exception to DEC-1083; a ticket for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route). DEC-1127 still held PROPOSED. Next free id: DEC-1131. |
 | 0.514 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1131 (one bar, two rounds for every role, option A; a blocking-only fix the same round; verdict.py and operator_run.py fixed now); DEC-1010 changed; DEC-1128's note corrected (W2-141's rule not live). DEC-1127 still held PROPOSED. Next free id: DEC-1132. |
+| 0.515 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1127 WITHDRAWN (never in force); DEC-1132 (closes by DEC-953, option D; ADOPT-VERIFY-1 (d) and W2-174; the rg tripwire; the nightly's restart ACT; set-up A's bar to define). Next free id: DEC-1133. |

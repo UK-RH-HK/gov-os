@@ -522,3 +522,8 @@ other restart is an ACT.
   ticket, counted by the CTO by hand from the ticket's id and role (the ledger); **a blocking-only engineer fix is the
   same round**; a third round only by the owner's decision; the text by CIT-P first, the counting code after two
   weeks; `verdict.py` (a failed KPI line blocks) and `operator_run.py` (reviews per ACT id) fixed now. Basis: questions 2 and 4.
+- DEC-1132 (2026-11-11): **the lift's closes by DEC-953's practices** (`tk close` and a close record; `gov close`'s gates
+  return later through W2-115 with a no-change-merge rule, only on evidence); ACT-CLOSE-HISTORY-1 and DEC-1127
+  withdrawn; **ADOPT-VERIFY-1 (d)**: a checked `Verify:` pass when an adopted ticket is about to launch (W2-174), W2-88's
+  proposed tickets carry `Verify:`; the `rg` tripwire; the nightly's restart as an ACT after the closes (quiet hours,
+  nothing else running, sized to memory); set-up A's bar defined for the owner's approval. Basis: questions 1 and 2.
