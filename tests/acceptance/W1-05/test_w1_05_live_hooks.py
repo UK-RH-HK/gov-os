@@ -48,6 +48,10 @@ INSTALLS = (
 # ``Bash(pip install*)`` and ``Bash(npm install*)`` before any hook is asked (template/.rulesync/permissions.jsonc):
 # the interim deny rules this case's docstring names. Their case stays as it stood, on this repository's settings;
 # the third install moved (tests/acceptance/W2-90/README.md).
+# W2-90b (Rewrite-Reason: DEC-953 item 2, DEC-970, DEC-999 item 1): their setup no longer reads this repository's
+# settings, which since ACT 1 wire no PostToolUse hook (the setup error ``live`` and ``decide`` gave them). They ask
+# the kernel's wiring, with their verdict (``ask``) unchanged; until W2-105 removes the template's install deny rules
+# they are red at their own assertion, and W2-90c holds them (tests/acceptance/W2-90b/README.md).
 NOT_MOVED_TO_THE_KERNEL = ("pip install requests", "npm install -g ccusage")
 
 # Who reads: (GOV_ROLE, GOV_TICKET).
@@ -87,11 +91,14 @@ LATER_CALLS["mcp__github__create_issue"] = lambda project: {"title": "W1-05 acce
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("tool_name", support.EVERY_TOOL)
-def test_a_hook_runs_before_every_tool(settings, tool_name):
-    """Every tool, not the write tools alone: a later call of any tool must reach the hook (DEC-142, DEC-144)."""
+def test_a_hook_runs_before_every_tool(kernel_settings, tool_name):
+    """Every tool, not the write tools alone: a later call of any tool must reach the hook (DEC-142, DEC-144).
+
+    W2-90b (Rewrite-Reason: DEC-953 item 2): asked of the kernel's generated settings, not this repository's."""
+    settings = kernel_settings
     commands = support.hook_commands(settings, "PreToolUse", tool_name)
     assert commands, (
-        f"{support.SETTINGS_REL} registers no PreToolUse command for {tool_name}: "
+        f"the generated {support.SETTINGS_REL} registers no PreToolUse command for {tool_name}: "
         "a call of that tool would run without the guard, and the containment check would never learn of it"
     )
 
@@ -248,8 +255,9 @@ def test_the_freeze_flag_stops_every_write(kernel_scratch_copy, kernel_decide):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("command", NOT_MOVED_TO_THE_KERNEL)
-def test_an_install_by_the_orchestrator_asks_the_owner(live, decide, command):
+def test_an_install_by_the_orchestrator_asks_the_owner(kernel_live, kernel_decide, command):
     """The interim deny rules on installs (W1-01) would stop the prompt from ever appearing."""
+    live, decide = kernel_live, kernel_decide
     for mode in ("default", "auto", "acceptEdits"):
         result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
         assert result.decision == "ask", (
