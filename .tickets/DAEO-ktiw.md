@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 profile: STANDARD
 depends_on: []
+waits_on: []
 allowed_paths:
 - template/governance/kernel/hooks/precompact.py
 - template/governance/kernel/hooks/context_watch.py
