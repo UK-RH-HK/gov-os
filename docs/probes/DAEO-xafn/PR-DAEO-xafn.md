@@ -7,7 +7,7 @@ reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 judged_by: orchestrator
 judgement: fail
-probed_commit: 2ef060a65c77
+probed_commit: 2ef060a65c7712c11556b82eb8931f9b7222e32f
 ---
 
 # Probe record: W2-148 (DAEO-xafn) The operator agent: ACTs applied by class from a queue, in a walled session, FULL review of the merged code (DEC-1010, DEC-1131)
