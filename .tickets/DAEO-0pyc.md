@@ -10,7 +10,7 @@ assignee: engineer
 external-ref: W2-32
 tags: [wave-2, implementation, standard]
 wbs_id: W2-32
-title: 'Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row'
+title: 'Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the memory line'
 class: implementation
 state_class: AUTHORITATIVE
 role: engineer
@@ -35,7 +35,7 @@ kpis:
   - 'S6 (G2, round 3; DEC-1066) Ranked-lexical tuning for code questions: code ranked above tests and assessments for a question about code, call sites preferred for an --id question; one round plus its probe, measured by D-4b (a rebuild and the measure); F1 reverts a round that lowers a baseline figure beyond its noise band [dropped, DEC-1083 (3): overtaken by the levers; left in place because the acceptance README maps S7 to S11 by number]'
   - 'S7 (G1, round 1; DEC-1066) The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk''s size; the manifest''s cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice); one round, measured by D-4b'
   - 'S8 (G3, round 2; DEC-1067 (a), replacing DEC-1066 (2)''s wording) Routing by question type: a question that names a symbol puts the code route''s first 2 hits ahead after the rerank; a question that names a record puts that record''s 2 best chunks ahead; each half kept only if it holds at its measure (F1''s revert rule), judged on the visible half alone (DEC-1067 (b)); measured by D-4b'
-  - 'If memory is below 85 % after two improvement rounds, the orchestrator escalates to the owner with the reasons; at the third the owner decides: a discovery and research ticket benchmarking market tools in a separate worktree, accepting the level reached, or another course. At 85 % or above but under the owner''s target of 95 %, with room for improvement found, memory is not closed: an escalation to the owner [DEC-954 Q9e, DEC-957]'
+  - 'S9 K9''s memory line (DEC-1083 (2), re-worded by DEC-1097 (1)(d)): on the verdict set, judged once on the declared configuration, right end to end at least 85 % with wrong claims at most 5 %, target 95 %, hit@5 reported beside it. Judged on the fresh 80 at window 4''s pin: 78 of 79 right (98.7 %), 0 wrong claims, hit@5 67 of 79 (84.8 %) [FRESH-80-RESULT, DEC-1098 (1)]. A later fall below 85 % is brought to the owner by the memory audit (DEC-1101 (1), DEC-1125 (2)), whose first run on 11-23 measures today''s pin. Verify: the S9 cases of tests/acceptance/W2-32/, re-pointed to the end-to-end figure by an independent test designer (Rewrite-Reason: DEC-1129 (1); DEC-1126 (6) asked for the disposition), and the evidence note''s S9 row in docs/changes/W2-32-evidence.md, which records FRESH-80-RESULT''s figures (78 of 79 right, 0 wrong claims, hit@5 67 of 79) [re-worded, DEC-1129 (1)]'
   - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'
   - 'S11 The candidate pool, v456 (DEC-1071 (2), approved for re-pin window 4 by DEC-1074 (5)): five query-time settings in governance/project/retrieval.yaml, each absent or 0 meaning today''s behaviour, the loader refusing an invalid value with CONFIG_INVALID naming the key: pool.meaning_uncut (the meaning route''s phrasings fused and not cut back to its depth), pool.route_depth (the keyword and meaning routes'' depth, 30 today), pool.rerank_depth (the first n fused candidates reranked once, in one pass under the padded request bound, and the pages cut from that order, in place of each page''s 20 reranked apart), pool.per_file_first10 (at most n chunks of one file in the first 10 of the final order, the rest kept after them) and pool.drop_nested (an item whose lines lie inside an earlier item''s of the same file dropped from the bundle); with 60, 40, 2 and both true, the product''s own path gives, on the D-4b measure clone with the stated links (e884675b), a hit@5 on the 138 within 2 of the research harness''s v456 with the question (the CTO''s measure, the hidden half in counts only), and a plain search''s median stays at or under the pin''s, measured by the CTO on the shared servers, the pin and the candidate side by side in re-pin window 4 [DEC-1071, DEC-1074, DEC-1065] [re-worded, DEC-1086 A]'
   failure:
@@ -61,6 +61,9 @@ sources:
 - DEC-1074
 - DEC-1083
 - DEC-1086
+- DEC-1097
+- DEC-1098
+- DEC-1129
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-32/
@@ -84,7 +87,7 @@ list_rows:
 - W2-M191
 - W2-M341
 ---
-# W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the hit@5 85 row
+# W2-32 Retrieval components and bounded improvements: model pin, swap by configuration, learning loop; ranked-lexical tuning, chunking, the memory line
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
