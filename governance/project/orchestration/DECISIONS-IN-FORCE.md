@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added). Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added), and to DEC-1126 on 2026-11-11 (re-pin window 5 done at 13:31: the live pin is `pin-797495bdfc70`, `pin-bcea09060ebc` kept for rollback; register v0.510). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -479,7 +479,7 @@ other restart is an ACT.
 - DEC-1121 (2026-11-10): the ticket template gains `class` as version 1.0.1 (W1-08's DEC-105 case, (a)); its hash to
   the owner before it lands. Basis: 2.
 - DEC-1122 (2026-11-10): the ticket template 1.0.1 approved (`bbfc068e58e2`); **usage (A) from now until the reset
-  11-15 09:00: only the lift's critical path runs** (DEC-1115 (4) brought forward); D-10 goes once ACT-PATHMAP-NS-2 is
+  11-15 09:00: only the lift's critical path runs** (DEC-1115 (4) brought forward; **(A) ended at the lift, DEC-1126 (2)**); D-10 goes once ACT-PATHMAP-NS-2 is
   committed and gov check is green, the triage of the first run's reds to the owner; a fresh CTO session at the next
   quiet point. Basis: 1 and 2.
 - DEC-1123 (2026-11-10): D-10 run 2 by option 1 (the lifted step alone, the fixes by role, run 2 from a normal shell);
@@ -495,3 +495,10 @@ other restart is an ACT.
   development is active, monthly once stable** (DEC-1101 (1) changed), a scheduled tool for Gov OS and every adopted
   repository that replaces ad-hoc re-measures (DEC-1097 (4) folded); the night of 11-10/11 to the re-pin the lift's
   critical path (re-pin ACT, closes prepared, anti-drift audit, ready lists, the 09:30 digest).
+- DEC-1126 (2026-11-11, items (2) (4) (5) standing): the re-pin done (`pin-797495bdfc70`, registry `8f00bb908`);
+  **usage (A) ended at the lift, the 80 % brake stays**; W2-60a takes RUBRIC-2's lines now (DEC-105 apply now);
+  **every ticket of an adopted product has a runaway brake at twice its projection, never a cap** (DEC-1091 (2)
+  widened; W2-156); **the memory audit Mondays 21:00, 40 questions, first 11-23** (its three briefs to the owner
+  before approval); W2-32 and W2-15a open at the lift, W2-32 S9 to be disposed under DEC-1097's end-to-end bar
+  (DEC-1083 (2)'s hit@5 bar replaced); D-10's ruled red is the green run for W1-01b, W2-66b, W2-90c; W2-82 to P3; the
+  permissions asked for on 11-10/11 to the owner by form with an allow-list ACT. Basis: questions 1 and 2.

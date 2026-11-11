@@ -13498,7 +13498,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   drift) and question 4 (prompts only where they carry a decision).
 
 ### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1098 (1) (K9's memory line met); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1098 (1) (K9's memory line met); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2) · **Changed by:** DEC-1126 (6): item (2)'s hit@5 bar replaced by DEC-1097 (1)(d)'s end-to-end bar (the owner, 11-11)
 - **Decision:**
   - **D9-FATES:**
     - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
@@ -14375,6 +14375,28 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** D-10 run 2's report (DECIDED-NOT-DONE row 110); question 1 (memory kept right as the repository grows,
   judged on fresh questions at a fixed rhythm) and question 2 (the lift not held by a gap that does no harm).
 
+### DEC-1126 — The owner's answers to the 09:30 digest of 11-11: the re-pin done; usage (A) ends at the lift; W2-60a takes RUBRIC-2 now; the runaway brake for every ticket of an adopted product; the memory audit's schedule approved; W2-32 and W2-15a open at the lift; D-10's ruled red is the green run; W2-82 to P3; the permissions list and its ACT
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (4) and (5) standing · **Under:** DEC-1125, DEC-1122 (2), DEC-1115 (4), DEC-1120, DEC-105, DEC-1091 (2), DEC-1101, DEC-1097 (1)(d), DEC-1083 (2), DEC-1083 (7), DEC-1110 (3), DEC-1037 · **Source:** the owner's answers to the 09:30 digest (chat, 2026-11-11 ~13:35 UTC; `.gov-runtime/scratch/orchestrator/drafts/night-1111/DIGEST-0930.md`)
+- **Decision:**
+  - (1) **The re-pin is done:** ACT-REPIN-W5 ran (`RE-PIN DONE: pin-797495bdfc70 is live`), the push made, the
+    registry entry committed by the owner as `8f00bb908`. The CTO's hold ended at 13:35.
+  - (2) **Usage rule (A) ends at the lift** (DEC-1122 (2) ended); the 80 % brake stays (DEC-1115 (4)).
+  - (3) **W2-60a (DEC-105, option "apply now"):** RUBRIC-2's lines (DEC-1120) go into W2-60a now
+    (`packages/AUDIT-NIGHT-1/w2-60a-options.md`).
+  - (4) **The spending brake (DEC-1091 (2) widened):** every ticket of an adopted product gets a runaway brake at
+    twice its own projection; never a cap. W2-156 is its home.
+  - (5) **The memory audit (MEMORY-AUDIT-1):** Mondays 21:00, 40 questions, the first audit on 11-23: approved. The
+    three fixed briefs (writer, checker, auditor) go to the owner to read before they are approved.
+  - (6) **W2-32 and W2-15a stay open at the lift.** For W2-32's S9 the CTO brings a disposition in line with
+    DEC-1097, whose end-to-end bar (DEC-1097 (1)(d)) replaced the hit@5 bar of DEC-1083 (2).
+  - (7) **D-10's ruled red counts as the green run** for W1-01b, W2-66b and W2-90c (DEC-1083 (7)).
+  - (8) **ACT-EFFORT-HIGH-2 was applied on 11-10 at 17:40** (the operator's log): DECIDED-NOT-DONE row 106 corrected.
+  - (9) **The ready lists (READY-AFTER-LIFT-1):** W2-82 to P3, so W2-156 lands before EXAMIN's copy.
+  - (10) **The permissions:** the CTO brings the list of permissions asked for last night, grouped by form, with an
+    allow-list ACT.
+- **Basis:** question 2 (the lift closed and the work after it started) and question 1 (one memory bar, measured on
+  fresh questions at a fixed rhythm).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14437,3 +14459,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.507 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1123 (items 3 and 5 standing; trailers a warning under Q-8 until W2-115). Next free id: DEC-1124. |
 | 0.508 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1124 (Q23 re-worded by an independent session). Next free id: DEC-1125. |
 | 0.509 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1125 (the latency a named red; the memory audit weekly, DEC-1101 (1) changed, DEC-1097 (4) folded; the night to the re-pin). Next free id: DEC-1126. |
+| 0.510 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1126 (the answers to the 09:30 digest: re-pin done; usage (A) ends; W2-60a RUBRIC-2 now; the runaway brake for adopted products; the memory audit's schedule; W2-32/W2-15a open; D-10 the green run; W2-82 to P3; the permissions ACT). Next free id: DEC-1127. |
