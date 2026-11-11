@@ -1,0 +1,74 @@
+---
+id: DAEO-k1e2
+status: open
+deps: [DAEO-61vm]
+links: [DAEO-52ku, DAEO-2bdu, DAEO-p8tv, DAEO-qz4p]
+created: 2026-11-11T01:20:40Z
+type: task
+priority: 2
+assignee: engineer
+external-ref: W2-171
+tags: [wave-2, implementation, memory, audit, full, after-the-lift]
+wbs_id: W2-171
+title: 'The memory audit''s measure: the control, the retrieval figures, the judged reader run, the fault rule, the misses file, the regression pool (DEC-1101 (1), DEC-1125 (2))'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on:
+- DAEO-61vm
+allowed_paths:
+- src/gov/memaudit/**
+- tests/unit/memaudit/**
+- docs/changes/W2-171-evidence.md
+kpis:
+  success:
+  - 'S1 The control runs first: the standing visible-40 set is measured with the audit''s declared configuration, and its hit@5 must be within 2 of the last audit''s control (the first audit''s control is within 2 of 34, E0''s figure, DEC-1097 (1)(b)). Outside that, nothing is measured, the counts say `control out of range`, and `USED` is left as written by W2-170. Verify: planted fake `gov` returning a control at 34, 33 and 31: the first two proceed, the third stops before the audit set''s first search [DEC-1097 (1), DEC-1101 (1)]'
+  - 'S2 One attempt measures the kept questions with `gov.retrieval.measure`''s matcher and source families: hit@5, full evidence and the first gold rank per question (hit@10, hit@20 and MRR beside them), each search''s ranked output kept so a label is never re-scored by searching again. Verify: a planted set of 12 questions against a fake `gov` with planted ranks: the figures equal the planted ones; the kept outputs re-score to the same figures with `--kept` [DEC-833, DEC-860, DEC-1101 (1)]'
+  - 'S3 The judged reader run: the reader answers each question from its searches with search again once (A2), a named grader judges right end to end with a second grader''s agreement beside it. The reader''s and graders'' prompts are the fresh 80''s, pinned by hash (`READER_SYS`, the schemas, the cut), so audits compare with FRESH-80-RESULT. The verdict line reads: right end to end r of n, wrong claims w of n, the exact 95 % interval, against the scaled bar (at least ceil(0.85 n) right and at most floor(0.05 n) wrong; target ceil(0.95 n)); hit@5, gold in the first bundle, the answer correct with the citation aside and one search against two (exact McNemar) are printed beside it and never judged. Verify: a fake reader and graders with planted verdicts on n=40: the line shows planted r and w and the planted interval; bar 34 and 2 [DEC-1097 (1)(d), DEC-1098 (1), DEC-1101 (1)]'
+  - 'S4 The fault rule, as FRESH-80-1 section 3.5 states it: a search not answered as declared (a bundle not reranked by the shared service, a route missing, the pool''s rerank fallen back), or a store whose sha256 changed during the attempt, makes the attempt not whole. One restart is allowed while no attempt has counted; a second fault stops the audit and goes to the owner in the counts. No restart into the same outage: the live reranker is checked ready before each attempt. Verify: planted degraded search (one restart then pass; two faults then stop); planted store change (stop, no restart) [DEC-1097 (1)(g), DEC-1101 (1)]'
+  - 'S5 A miss is a result: a verdict below either limit stands as recorded, is never run again and never re-scored to pass. The runner writes `runs/<audit>/misses.jsonl`, one line per miss (a question not right end to end at A2): `{"id","question","gold_answer","gold_sources","answer","outcome","evidence_in_bundle"}` with `outcome` one of `wrong`, `incomplete`, `not_found` and `evidence_in_bundle` the measure''s own yes or no on whether a gold place was in the first bundle; an audit with no miss writes an empty file. Verify: planted run with 5 misses: the file holds 5 lines in that form; a second run on the same audit is refused by W2-170''s `USED`; the file is the auditor brief''s input form (parsed by the brief''s own field list) [DEC-1074 (1), DEC-1101 (1), DEC-1125 (2)]'
+  - 'S6 `runs/<audit>/FIGURES.json` carries counts only: the verdict numbers, the beside figures, and for the misses, counts by rank bucket (gold at rank 6 to 20; not in the first 20), by namespace of the gold source (embedded; keyword only), by category and by route; with the auditor''s class counts added after its run. Verify: schema check over a planted run; grep for a planted question word, a planted gold path and a planted answer finds none [DEC-1101 (2), DEC-1097 (2)]'
+  - 'S7 The regression pool: after a measured audit its kept questions join `pool/` under the sets root (hidden, like a set). Each audit re-runs the pool through the retrieval measure only (hit@5 and full evidence, no model tokens): the whole pool while it holds 400 questions or fewer, else a seeded draw of 400 (the seed recorded first). The pool''s figures are printed beside the last audit''s, and a fall of 3 points or more in either is named a regression in the counts. The 79 of the fresh 80 and the 138 of earlier sets are added by one planted-tested import path, run once by the CTO. Verify: planted pools of 300 and 900 questions: whole, then a draw of 400 with the same seed twice giving the same draw; a planted fall of 4 points is named [DEC-1101 (1), DEC-1125 (2)]'
+  - 'S8 The spend is bounded and recorded: each model call''s `total_cost_usd` goes to the run''s ledger; the run stops at twice its projection (the fresh 80''s 0.157 USD a question, so 12.6 USD for 40), and a brake stop goes to the owner first; a stopped run resumes without re-asking finished questions. Verify: planted ledger over the brake: stops; resume asks only the unfinished [DEC-1097 (1), DEC-1118 (3)]'
+  failure:
+  - 'A question, gold answer, answer or source path in standard output, a log or an error text; only ids, counts and digests leave.'
+  - 'A set measured twice, or re-scored to pass; a label changed after its figures exist.'
+  - 'A search made before `DECLARATION.json` and `USED` exist (W2-170); the store rebuilt during an attempt.'
+  - 'The shared Ollama servers or the reranker service touched other than by their ordinary query calls.'
+  - 'Any change outside the paths above.'
+profile: FULL
+sources:
+- DEC-1101
+- DEC-1125
+- DEC-1098
+- DEC-1097
+- DEC-1074
+- DEC-833
+- DEC-860
+- DEC-1118
+- DEC-1050
+- DEC-1073
+est_loc: 600
+acceptance_tests:
+  path: tests/acceptance/W2-171/
+  author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines, before the engineer, on a planted set, a fake `gov` and a fake model; never a real search, GPU call or the real sets root'
+track: B
+list_rows: []
+needs: []
+waits_on: []
+---
+# W2-171 The memory audit's measure
+
+The measured part of one audit (DEC-1125 (2)): the control, the retrieval figures, the judged end-to-end run, and
+what feeds the auditor. It generalises the fresh 80's tools (`.gov-runtime/scratch/orchestrator/drafts/fresh80/`:
+`f80lib.py`, `run_measure.sh`, `fresh80_reader.py`, `fresh80_figures.py`), which were built for one set. The CTO copies
+them to `.gov-runtime/scratch/ref/fresh80/` in the worktree when the ticket starts. W2-170 comes first.
+
+- **Why a tool and not the fresh 80's scripts:** those pin one set name and one run folder; a weekly audit needs the
+  same steps for a new set each time, tested on a planted set.
+- **Alternatives (one line each):** end to end for the pool as well as the fresh set (rejected: about 0.16 USD a
+  question, so the pool's cost grows each week); no pool (rejected: DEC-1101 (1) asks for the regression check).
+- **Not here:** the set's checks and the declaration (W2-170); the cycle (W2-172); the miss classes by the auditor
+  session (its brief; the launch script).
+
+[DEC-1101 (1); DEC-1125 (2)]
