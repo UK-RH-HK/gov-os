@@ -1,0 +1,141 @@
+--- 0. set-up: a planted HOME, a fresh clone of the main tree's HEAD (w2/integrate)
+clone HEAD b9e878009b8c on w2/integrate; register holds DEC-1134: 1
+main tree's map fb52ab2dc756 (read only); clone's map fb52ab2dc756; EXAMIN-SETS-1 before fb52ab2dc756, after b1ffdb0b7b3e; this ACT's before b1ffdb0b7b3e, after 72916f1da4ae
+ok   A0 the clone's map is EXAMIN-SETS-1's frozen before (fb52ab2d...)
+ok   A1 this ACT's before is EXAMIN-SETS-1's after (b1ffdb0b...)
+ok   A2 the main tree's map (read only) is still EXAMIN-SETS-1's before
+git status of the clone: [0] lines
+--- B. REVERSED ORDER: this ACT first, on the map as it is today (EXAMIN-SETS-1 not applied): it must refuse and touch nothing
+     state other: not the frozen before (ACT-EXAMIN-SETS-1 applied?) and not the frozen after (sha256 fb52ab2dc756)
+ok   B1 check refuses (state other) (exit 3)
+     refused: governance/project/path-map.yaml is neither the frozen before nor the frozen after (sha256 fb52ab2dc756)
+ok   B2 apply refuses (exit 3)
+     refused: governance/project/path-map.yaml is not as this ACT left it (sha256 fb52ab2dc756); a later change is not overwritten
+ok   B3 undo refuses (exit 3)
+     not applied: governance/project/path-map.yaml (sha256 fb52ab2dc756)
+ok   B4 verify refuses (exit 3)
+ok   B5 the map is byte for byte as it was
+ok   B6 the clone's git status is empty (nothing created beside the map)
+ok   B7 no temp file left beside the map
+--- C. ACT-EXAMIN-SETS-1 first (its own apply.sh, the plain apply), committed in the clone as the operator would
+     state before (sha256 fb52ab2dc756)
+ok   C1 EXAMIN check: state before (exit 0)
+     state applied (sha256 b1ffdb0b7b3e)
+ok   C2 EXAMIN apply (exit 0)
+ok   C3 EXAMIN verify (exit 0)
+ok   C4 EXAMIN committed in the clone
+ok   C5 the clone's map is now this ACT's frozen before (b1ffdb0b...)
+--- D. this ACT's states before the apply
+     state before (sha256 b1ffdb0b7b3e)
+ok   D1 check: state before (exit 0)
+     not applied: governance/project/path-map.yaml (sha256 b1ffdb0b7b3e)
+ok   D2 verify refused before the apply (exit 3)
+     state before (sha256 b1ffdb0b7b3e); nothing to undo
+ok   D3 undo before the apply says nothing to undo (exit 0)
+--- E. the PLAIN apply (no backup, no environment variable), as the operator runs it
+     state applied (sha256 72916f1da4ae)
+ok   E1 apply (exit 0)
+ok   E2 the map is the frozen after, byte for byte
+ok   E3 the mode is kept (644)
+ok   E4 git status lists only the map: [ M governance/project/path-map.yaml]
+ok   E5 no temp or backup file beside the map
+     state applied (sha256 72916f1da4ae)
+ok   E6 check: state applied (exit 0)
+ok   E7 verify exit 0 (exit 0)
+     state applied (sha256 72916f1da4ae); nothing to do
+ok   E8 apply again changes nothing (exit 0)
+ok   E9 the clone's diff (from the EXAMIN-applied map) is the drafted hunk, accepted-reds.diff, byte for byte (after its two header lines)
+     finding: ACCEPTED_RED_REFUSED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | the accepted_reds entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_que
+     finding: ACCEPTED_RED_REFUSED tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | the accepted_reds entry tests/acceptance/W2-13/test_w2_13_latency.py::test_a_w
+     expectation pending holds
+ok   E10 pinned judge, applied but not yet committed by the owner: neither test counted, each refused as 'no commit of the history adds it' (exit 0)
+     numstat: 9	1	governance/project/path-map.yaml
+--- F. every manifest checks[].cmd, exactly as written, with bash -c from the clone (review F1)
+     check 1 cmd: PYTHONPATH=src python3 -m gov.check.pathmap
+     exit 0 (manifest says 0); count: n/a (manifest count: None; no count is printed by this check)
+ok   F1 check 1 as written: exit 0
+     check 2 cmd: python3 -I -c 'import yaml,sys; d=yaml.safe_load(open("governance/project/path-map.yaml")); r=d["accepted_reds"]; t=["tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within
+     exit 0 (manifest says 0); count: n/a (manifest count: None; no count is printed by this check)
+ok   F2 check 2 as written: exit 0
+ok   F3 check 2 exits 1 on the before map, so it tells before from after (exit 1)
+main tree's own checks, for the record: python3 -c 'import yaml' = 6.0.1
+--- G. the validate step (DEC-895) on the drafted patch with the pinned judge's readers, against the register as it stands
+     PASS (accepted_reds): tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 (pending the owner's commit)
+     PASS (accepted_reds): tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget (pending the owner's commit)
+     placeholder scan: 0 hit(s)
+     entries judged: 2; failed: 0
+ok   G1 validate_entry.py (PASS for both, pending the owner's commit) (exit 0)
+--- H. the owner's operator's commit, by hand, as the message gives it (Role: owner), then the pinned judge's ratchet reader
+ok   H1 committed with Role: owner
+     trailers: Task: DAEO-sdxk; Implements: DEC-1134, DEC-1125; Role: owner
+ok   H2 the clone is clean after the commit
+     counted: tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | DEC-1134 | W2-155
+     counted: tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | DEC-1134 | W2-155
+     expectation counted holds
+ok   H3 both tests counted (accepted) by gov.close.ratchet.counted_entries, no finding (exit 0)
+ok   H3b the message's own one-line reader, run from the repository root: prints 2 0
+     counted: tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | DEC-1134 | W2-155
+     counted: tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | DEC-1134 | W2-155
+     apply_accepted_reds: {'ok': True, 'reports': [('test_a_warm_query_answers_within_half_a_', 'failed'), ('test_a_warm_retrieval_with_the_real_mode', 'failed')], 'findings': []}
+     expectation both-red holds
+ok   H4 apply_accepted_reds, both red: ok true, each covered (reported failed) (exit 0)
+     counted: tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | DEC-1134 | W2-155
+     counted: tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | DEC-1134 | W2-155
+     apply_accepted_reds: {'ok': False, 'reports': [('test_a_warm_query_answers_within_half_a_', 'passed'), ('test_a_warm_retrieval_with_the_real_mode', 'failed')], 'findings': [('ACCEPTED_RED_PASSES', 'test_a_warm_query_answers_w
+     expectation one-passes holds
+ok   H5 a listed test that passes: a finding, the entry must leave (exit 0)
+     counted: tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | DEC-1134 | W2-155
+     counted: tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | DEC-1134 | W2-155
+     apply_accepted_reds: {'ok': False, 'reports': [('test_a_warm_query_answers_within_half_a_', 'failed'), ('test_a_warm_retrieval_with_the_real_mode', 'failed')], 'findings': [('RED_NOT_ACCEPTED', 'test_some_other_red')]}
+     expectation other-red holds
+ok   H6 another red is still refused (exit 0)
+--- H7. the same commit with Role: operator (what the operator agent would make): the ratchet refuses both entries
+     finding: ACCEPTED_RED_REFUSED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | the accepted_reds entry tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_que
+     finding: ACCEPTED_RED_REFUSED tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | the accepted_reds entry tests/acceptance/W2-13/test_w2_13_latency.py::test_a_w
+     expectation not-owner holds
+ok   H7 both refused: added without Role: owner (exit 0)
+     counted: tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 | DEC-1134 | W2-155
+     counted: tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget | DEC-1134 | W2-155
+     expectation counted holds
+ok   H8 restored: both counted again (exit 0)
+--- I. undo, from the committed applied state
+     state before (sha256 b1ffdb0b7b3e)
+ok   I1 undo (exit 0)
+ok   I2 the map is the frozen before, byte for byte
+ok   I3 git status lists only the map
+     state before (sha256 b1ffdb0b7b3e); nothing to undo
+ok   I4 undo again: nothing to undo (exit 0)
+ok   I5 no temp file left
+--- J. refusals (the map is the before again)
+     state other: not the frozen before (ACT-EXAMIN-SETS-1 applied?) and not the frozen after (sha256 f82ed26c878f)
+ok   J1 check refuses a map that changed (exit 3)
+     refused: governance/project/path-map.yaml is neither the frozen before nor the frozen after (sha256 f82ed26c878f)
+ok   J2 apply refuses (exit 3)
+     refused: governance/project/path-map.yaml is not as this ACT left it (sha256 f82ed26c878f); a later change is not overwritten
+ok   J3 undo refuses (exit 3)
+     refused: governance/project/path-map.yaml is a link
+ok   J4 a link is refused by check (exit 3)
+     refused: governance/project/path-map.yaml is a link
+ok   J5 a link is refused by apply (exit 3)
+ok   J6 link test left the map as it was
+     state applied (sha256 72916f1da4ae)
+ok   J7 apply with a link planted at the old fixed temp name <map>.act-tmp (exit 0)
+ok   J8 the planted link's target is untouched (review F4)
+ok   J9 the map is the frozen after
+     state before (sha256 b1ffdb0b7b3e)
+ok   J10 undo (exit 0)
+ok   J11 no temp file left (mktemp names removed)
+     the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/accepted-reds-1/tmp/bundle-tampered/after/repo/governance/project/path-map.yaml
+ok   J12 a tampered frozen copy: apply exits 4 (exit 4)
+ok   J13 the map is untouched by the refused apply
+     mktemp: failed to create file via template ‘/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/accepted-reds-1/tmp/clone/governance/project/path-map.yaml.act-tmp.XXXXXX’: Permission denied
+ok   J14 the map's folder not writable: apply exits 5 and nothing changes (exit 5)
+ok   J15 the map is untouched
+ok   J16 no temp file left
+--- K. the live files are unchanged (read only)
+main tree's map fb52ab2dc756, EXAMIN-SETS-1's before fb52ab2dc756
+ok   K1 the main tree's map is unchanged
+
+checks run: 63
+REHEARSAL PASS
+failures: 0

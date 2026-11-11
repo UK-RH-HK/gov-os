@@ -1,0 +1,29 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2] ________
+
+project = (PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-14/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-14/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-14/test_w2_96_r14_a_stopped_run_k0')
+launch = <function planted.<locals>.launch at 0x7842795d5c60>, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() < deadline:
+            time.sleep(0.05)
+>       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-170/pytest-of-usain/pytest-14/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]
+1 failed in 60.16s (0:01:00)

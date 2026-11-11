@@ -1,6 +1,28 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 19:20 UTC: session `b40cba91` hands over (rule 11); next free id DEC-1137
+## RESUME HERE — 2026-11-11 19:50 UTC: session `b40cba91` hands over (rule 11; context far past 200k); next free id DEC-1138
+- **THE ORDER** (the owner, 19:20; in `dispatch/ready.txt` as live lines plus `#NEXT n` lines; the dispatcher does NOT enforce
+  `max_leads: 3`, so release one `#NEXT` line per freed slot, never more). Leads now: **W2-05 fix** (19:24, slot 3; est. 2 h;
+  then its close: unblocks batch 5), **W2-170 FULL review** (queued 19:35, `W2-170-A5-review`; build DONE 19:27, accept 165/0/0
+  at `5795081004a8`; then commit its probe record, merge, close; memory audit 11-23). One slot was freed by W2-66c (tests DONE
+  19:27, 31 cases at `400991361362`): **next live line = W2-81 land r6** once `briefs/W2-81-A5-r6-land.md` exists (a helper
+  writes it with the two rebuilt ACTs and W2-90b's brief; README passes DONE `294f3e84b`, `4009d597a`; W1-01 exemption applied).
+- **W2-66c to land and close (CTO):** its lead asks: paste its README map row, trim the ticket under the context ceiling (P1 (a)),
+  P2 (b) accepted; scoped run on `400991361362`; merge; close by DEC-953 (record + tk close).
+- **Workers running** (pids in their worktrees' `.gov-runtime/scratch/lead/log/*.pid`): ACT A companion tests (W2-153), W2-105
+  test fixes, W2-11 pre-merge (W1-35), probes W2-112 (from W2-20), W2-149, W2-148. On each probe's PROBE_MD: fill the lead's
+  judgement, the full probed commit, sessions; commit `docs/probes/<id>/PR-<id>.md`; close by DEC-953 (as W2-04,
+  `closes/W2-04-DAEO-u4oz.md`). On the companion: merge w2/W2-153 into integrate, then ACT A's review (`drafts/act-a/`), the
+  owner's yes, the agent's apply; then the p95 ACT (helper running, `drafts/act-p95/`) and the sample day 11-12.
+- **DEC-1137** (`870d5af84`): W2-11 re-baselined (c) + the role-template ticket (W2-175 or next) before EXAMIN's copy, W2-27
+  depending on it; a helper drafts `drafts/w2-11/ticket-rebaseline.patch`, `drafts/w2-tpl-policy/ticket.md`, the W2-27 deps
+  patch and the W2-11 designer brief: apply, `tk create`, commit (Task: decision-record). W2-11's merge: its 14 skill files by a
+  product-spec worker per `drafts/w2-11/RESOLUTION.md` §5-6, after the pre-merge designer; then its resume lead.
+- **Owner queue:** the rebuilt EXAMIN-SETS-1 and ACCEPTED-REDS-1 (round-2 reviews after the rebuild); ACT A's yes; the p95 ACT.
+- **Watch:** W2-96's six signal cases fail only in empty-HOME, signal-ignoring shells (row 133's cause): name, don't chase.
+  The ledger: `tools/lead_ledger.py --md` in each digest; the sampler `lead_mem_watch.py` runs. First nightly 11-12 04:00.
+
+## RESUME HERE (history) — 2026-11-11 19:20 UTC: session `b40cba91` hands over (rule 11); next free id DEC-1137
 - **Leads (cap 3 until ACT A; `max_leads: 3` in dispatch/config.json; the idle guard ACT-IDLE-GUARD-1 is LIVE, `256b4e12d`):**
   W2-170 BUILD running (18:32, `W2-170-A5-build`; est. 4 h, end ~22:30); W2-66c TESTS running (~18:58, `W2-66c-A5-r2-tests`);
   W2-81's README test designer running (worker pid 1124395, `W2-81-A1-readme-map`). **Third slot:** W2-105 merged integrate

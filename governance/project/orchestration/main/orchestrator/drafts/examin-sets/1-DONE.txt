@@ -1,0 +1,1 @@
+ACT-EXAMIN-SETS-1 round 2 manifest sha256 e80202922e72b3e55767efceef315b8ead863de443fb4036aab24cb6f9e8674f; ACT-ACCEPTED-REDS-1 round 2 manifest sha256 b8df21d891600ff4701ff264ff94f32257c4c9150ae4eb4a3254af2662248ea7; rehearsal chain 124 checks, failures 0, two runs byte-equal; section 5 as written ran in one clone: exit 0

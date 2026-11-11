@@ -1,0 +1,1 @@
+{"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'DAEO-btcs': its own text and its mandatory inputs come to 13557 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "DAEO-btcs", "limit": 6000, "mandatory_tokens": 13557}}}

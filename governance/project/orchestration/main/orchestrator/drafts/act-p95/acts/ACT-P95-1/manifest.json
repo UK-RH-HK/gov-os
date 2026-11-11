@@ -1,0 +1,46 @@
+{
+ "act": "ACT-P95-1",
+ "dec": "DEC-1133, DEC-1105",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "home",
+   "path": ".gov-os/machine/gate.json",
+   "before": "52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034",
+   "after": "3311d6e5d60868b3641b11ed072d64c38319ca675ebe66c82ee8e475c26ec0bd"
+  }
+ ],
+ "files": {
+  "before/home/.gov-os/machine/gate.json": "52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034",
+  "after/home/.gov-os/machine/gate.json": "3311d6e5d60868b3641b11ed072d64c38319ca675ebe66c82ee8e475c26ec0bd",
+  "evidence/samples.jsonl": "11654726ce9430e2701946d8941a2f80fe5891ec4754242c9c097bb49a0ee2be",
+  "evidence/params.json": "e95107a4067d6fe04319a5845487d9167f64336e0cc00273d4c966f1d16bb5cd",
+  "evidence/figures.txt": "1f4a93cbb641d6e85470c9574b550cfef24877d68fd04795c25f9b6cc4c9d574",
+  "apply.sh": "cf6073f4028475cfca1ae7867702fa2479d4b2ec3defa88f02b17947d3f3b4b8",
+  "list.txt": "ffd838276fa67d99365228e9f366927e10f8f8004a0a5f84cd830ac260a0e5b9",
+  "rehearsal.log": "e2abfd80935c1b7189ebbe0786570c009f088c501eba9c6ddebc4b389b1fc75c"
+ },
+ "checks": [
+  {
+   "cmd": "python3 -I -m json.tool \"$HOME/.gov-os/machine/gate.json\" > /dev/null",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import hashlib,json,os,sys; d=json.load(open(os.environ[\"HOME\"]+\"/.gov-os/machine/gate.json\")); e=d[\"working_size_bytes\"]; r=json.dumps({k:v for k,v in d.items() if k!=\"working_size_bytes\"},sort_keys=True); sys.exit(0 if e[\"value\"]==2475000000 and e[\"date\"]==\"2026-11-11\" and e[\"source\"].startswith(\"ACT-P95-1\") and hashlib.sha256(r.encode()).hexdigest()==\"8cae9b2686637bcdade6cb0cfc4e2e4431479756a3954416f693e262913a5127\" and list(d)==[\"memory_floor_bytes\", \"oom_floor_bytes\", \"working_size_bytes\", \"verification_peak_bytes\", \"rebuild_peak_bytes\", \"disk_floor_bytes\", \"inode_floor\", \"verification_lock\", \"gpu_margin\", \"gpu_shares\", \"heavy_slots\", \"embedding_servers\"] else 1)'",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -B -c 'import sys; sys.path.insert(0,\"src\"); from gov.resources import config; c=config.load(); sys.exit(0 if not c[\"faults\"] and c[\"values\"][\"working_size_bytes\"]==2475000000 and \"working_size_bytes\" not in c[\"due\"] else 1)'",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "e2abfd80935c1b7189ebbe0786570c009f088c501eba9c6ddebc4b389b1fc75c"
+ }
+}

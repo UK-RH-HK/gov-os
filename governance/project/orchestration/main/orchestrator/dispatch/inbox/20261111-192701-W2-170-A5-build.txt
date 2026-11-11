@@ -1,0 +1,9 @@
+log: W2-170-A5-build.json
+W2: W2-170
+status: DONE. Head `5795081004a8` passes its acceptance tests: `gov accept W2-170` gives outcome pass, 165 passed, 0 failed, 0 skipped, with every line S1–S6 and F1–F5 passing. The full check (`lead_verify`) had 7 failures. None comes from this ticket's change, but none is listed in skip_known.json either (
+
+task: DAEO-61vm (W2-170), lead, FULL, build run 1
+status: DONE. Head `5795081004a8` passes its acceptance tests: `gov accept W2-170` gives outcome pass, 165 passed, 0 failed, 0 skipped, with every line S1–S6 and F1–F5 passing. The full check (`lead_verify`) had 7 failures. None comes from this ticket's change, but none is listed in skip_known.json either (see risks).
+work_completed:
+- Merged w2/integrate into the branch (`49c776675`, Task: DAEO-61vm, Role: orchestrator), so the ticket file carries Interface §10 readings 5–8.
+- Built the engineer's context packet (`gov context --budget 30000`, 

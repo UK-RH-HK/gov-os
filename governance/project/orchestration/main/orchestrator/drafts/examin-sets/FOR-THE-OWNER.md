@@ -13,7 +13,7 @@ opened the sets root or the run folders.
    (the walls' trees leave that folder out). If your answers below change a number in a brief, the hash is taken again
    and you approve the new one.
 2. **ACT-EXAMIN-SETS-1** (`ACT-EXAMIN-SETS-1.md` and the bundle): class (a), tightening only. It needs no yes from you; if you
-   want to give one, the line is `yes ACT-EXAMIN-SETS-1 97d45565`. It adds two entries to the path map. **The guard
+   want to give one, the line is `yes ACT-EXAMIN-SETS-1 e8020292` (round 2, on the map `f4029cfb4942`; the r1 line `97d45565` is superseded). It adds two entries to the path map. **The guard
    already refuses any new set's hidden folder** (ACT-SETS-GLOBS-1's wildcard), so this ACT closes no guard gap: it makes the
    sets declared. The measure needs the declaration in the sets root's own map, which is yours by hand (step 3).
 
@@ -78,7 +78,7 @@ opened the sets root or the run folders.
 - **Whoever commits the two briefs and the approved-list lines** is yours (class O rows `walled-sessions`).
 
 ## Files
-`ACT-EXAMIN-SETS-1.md`; `ACT-EXAMIN-SETS-1/` (manifest, apply.sh, list, before/after, rehearsal.log); `EXAMIN-writer.md`;
-`PROVING-GROUND-writer.md`; `rehearsal.log` (31 checks, `failures: 0`); `launch-rehearsal.log` (14 checks, `failures: 0`);
+`ACT-EXAMIN-SETS-1.md`; `acts-r2/ACT-EXAMIN-SETS-1/` (round 2: manifest, apply.sh, list, before/after, rehearsal.log); `ACT-EXAMIN-SETS-1.r1/` (round 1, superseded); `EXAMIN-writer.md`;
+`PROVING-GROUND-writer.md`; `rehearsal.r2.log` (the chain, 124 checks, `failures: 0`; `rehearsal.r1.log` is round 1's); `launch-rehearsal.log` (14 checks, `failures: 0`);
 `tools/` (`insert_entries.py`, `entries.yaml`, `sets_root_map.sh`, `release_visible.sh`, `examin_check.py`, `store_check.py`,
-`rehearse.sh`, `launch_rehearsal.sh`, `mk_fake_examin.py`, `make_manifest.py`).
+`rehearse_r2.sh`, `build_r2.py`, `apply_r2.sh.tpl`, `rehearse.sh` (r1), `launch_rehearsal.sh`, `mk_fake_examin.py`, `make_manifest.py`).

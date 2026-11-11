@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="29" skipped="0" tests="31" time="0.994" timestamp="2026-11-11T19:06:22.635093+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.claude/settings.json]" time="0.051"><failure message="AssertionError: no coupling the live map declares takes a change of .claude/settings.json to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']&#10;assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = '.claude/settings.json'
+
+    @pytest.mark.parametrize("path", SETTINGS_PATHS)
+    def test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites(live_map, path):
+        targets = reached(live_map, path)
+        missing = [suite for suite in SETTINGS_SUITES if not any(covers_file(t, suite) for t in targets)]
+&gt;       assert not missing, f"no coupling the live map declares takes a change of {path} to {missing}"
+E       AssertionError: no coupling the live map declares takes a change of .claude/settings.json to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+E       assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:185: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.rulesync/hooks.jsonc]" time="0.001"><failure message="AssertionError: no coupling the live map declares takes a change of .rulesync/hooks.jsonc to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']&#10;assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = '.rulesync/hooks.jsonc'
+
+    @pytest.mark.parametrize("path", SETTINGS_PATHS)
+    def test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites(live_map, path):
+        targets = reached(live_map, path)
+        missing = [suite for suite in SETTINGS_SUITES if not any(covers_file(t, suite) for t in targets)]
+&gt;       assert not missing, f"no coupling the live map declares takes a change of {path} to {missing}"
+E       AssertionError: no coupling the live map declares takes a change of .rulesync/hooks.jsonc to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+E       assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:185: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.rulesync/permissions.jsonc]" time="0.001"><failure message="AssertionError: no coupling the live map declares takes a change of .rulesync/permissions.jsonc to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']&#10;assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = '.rulesync/permissions.jsonc'
+
+    @pytest.mark.parametrize("path", SETTINGS_PATHS)
+    def test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites(live_map, path):
+        targets = reached(live_map, path)
+        missing = [suite for suite in SETTINGS_SUITES if not any(covers_file(t, suite) for t in targets)]
+&gt;       assert not missing, f"no coupling the live map declares takes a change of {path} to {missing}"
+E       AssertionError: no coupling the live map declares takes a change of .rulesync/permissions.jsonc to ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+E       assert not ['tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py', 'tests/acceptance/W1-46/test_w1_46_research_installs.py', 'tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py']
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:185: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/adapter-portability.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/adapter-portability.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855444a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/adapter-portability.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/adapter-portability.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855444a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/audit-reproducibility.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/audit-reproducibility.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855450e0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/audit-reproducibility.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/audit-reproducibility.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855450e0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/context-reproducibility.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/context-reproducibility.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855458c0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/context-reproducibility.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/context-reproducibility.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855458c0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-authority.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-authority.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545d20&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-authority.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-authority.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545d20&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-claims.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-claims.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85547140&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-claims.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-claims.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85547140&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-commands.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-commands.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85547920&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-commands.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-commands.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85547920&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-decision-citations.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-decision-citations.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d0120&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-decision-citations.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-decision-citations.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d0120&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-graph.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-graph.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d09e0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-graph.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-graph.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d09e0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-mutation.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-mutation.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d11c0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-mutation.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-mutation.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d11c0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-pathmap.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-pathmap.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d19a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-pathmap.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-pathmap.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d19a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-schema.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/core-schema.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855473e0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/core-schema.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/core-schema.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855473e0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/fresh-agent-reconstruction.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/fresh-agent-reconstruction.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855475a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/fresh-agent-reconstruction.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/fresh-agent-reconstruction.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855475a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/index-freshness.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/index-freshness.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85546c00&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/index-freshness.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/index-freshness.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85546c00&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/product-traceability-trailers.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/product-traceability-trailers.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545a80&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/product-traceability-trailers.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/product-traceability-trailers.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545a80&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/recovery-rebuild.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/recovery-rebuild.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545620&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/recovery-rebuild.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/recovery-rebuild.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85545620&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/retrieval-regression.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/retrieval-regression.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855452a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/retrieval-regression.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/retrieval-regression.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855452a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/secrets-indexing.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/secrets-indexing.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85544580&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/secrets-indexing.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/secrets-indexing.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be85544580&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-a.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-a.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ae5e0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/skill-regression-a.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-a.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ae5e0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-b1.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-b1.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ad380&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/skill-regression-b1.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-b1.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ad380&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-orchestration.yaml]" time="0.001"><failure message="AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-orchestration.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened&#10;assert False&#10; +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d1000&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+path = 'template/governance/kernel/checks/skill-regression-orchestration.yaml'
+
+    @pytest.mark.parametrize("path", _checks_files())
+    def test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone(live_map, path):
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, NO_WEAKENING) for t in targets), \
+            f"no coupling takes a change of {path} to {NO_WEAKENING}"
+E       AssertionError: no coupling takes a change of template/governance/kernel/checks/skill-regression-orchestration.yaml to tests/acceptance/W2-54/test_w2_54_time_limit.py::test_no_hard_block_check_is_weakened
+E       assert False
+E        +  where False = any(&lt;generator object test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d1000&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[py]" time="0.001"><failure message="AssertionError: no coupling takes a change of tests/acceptance/W3-98/test_w3_98_planted.py (py) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass&#10;assert False&#10; +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d0740&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'py'
+
+    @pytest.mark.parametrize("kind", list(PLANTED))
+    def test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans(live_map, kind):
+        path = PLANTED[kind]
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, W1_01_MERGES) for t in targets), \
+            f"no coupling takes a change of {path} ({kind}) to {W1_01_MERGES}"
+E       AssertionError: no coupling takes a change of tests/acceptance/W3-98/test_w3_98_planted.py (py) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
+E       assert False
+E        +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d0740&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:218: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[md]" time="0.001"><failure message="AssertionError: no coupling takes a change of tests/acceptance/W3-98/notes_planted.md (md) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass&#10;assert False&#10; +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d1fc0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'md'
+
+    @pytest.mark.parametrize("kind", list(PLANTED))
+    def test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans(live_map, kind):
+        path = PLANTED[kind]
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, W1_01_MERGES) for t in targets), \
+            f"no coupling takes a change of {path} ({kind}) to {W1_01_MERGES}"
+E       AssertionError: no coupling takes a change of tests/acceptance/W3-98/notes_planted.md (md) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
+E       assert False
+E        +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be853d1fc0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:218: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[conftest]" time="0.001"><failure message="AssertionError: no coupling takes a change of tests/acceptance/W3-98/conftest.py (conftest) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass&#10;assert False&#10; +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ae7a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'conftest'
+
+    @pytest.mark.parametrize("kind", list(PLANTED))
+    def test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans(live_map, kind):
+        path = PLANTED[kind]
+        targets = reached(live_map, path)
+&gt;       assert any(covers_node(t, W1_01_MERGES) for t in targets), \
+            f"no coupling takes a change of {path} ({kind}) to {W1_01_MERGES}"
+E       AssertionError: no coupling takes a change of tests/acceptance/W3-98/conftest.py (conftest) to tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
+E       assert False
+E        +  where False = any(&lt;generator object test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be854ae7a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:218: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s4_the_record_reading_set_holds_w2_66_s_record_only_case" time="0.000"><failure message="AssertionError: the live map's record_reading does not hold tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only&#10;assert False&#10; +  where False = any(&lt;generator object test_s4_the_record_reading_set_holds_w2_66_s_record_only_case.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855444a0&gt;)">live_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+
+    def test_s4_the_record_reading_set_holds_w2_66_s_record_only_case(live_map):
+        targets = live_map.get("record_reading") or []
+&gt;       assert any(covers_node(t, RECORD_ONLY_CASE) for t in targets), \
+            f"the live map's record_reading does not hold {RECORD_ONLY_CASE}"
+E       AssertionError: the live map's record_reading does not hold tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only
+E       assert False
+E        +  where False = any(&lt;generator object test_s4_the_record_reading_set_holds_w2_66_s_record_only_case.&lt;locals&gt;.&lt;genexpr&gt; at 0x70be855444a0&gt;)
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:233: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s4_no_opt_in_list_leaves_a_row_of_the_record_only_case_out" time="0.004"><failure message="AssertionError: opt-in list entries name tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only, so a plain run leaves rows of it out: ['rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only (optin-lifted-breadth.txt)']&#10;assert not ['rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only (optin-lifted-breadth.txt)']">request = &lt;FixtureRequest for &lt;Function test_s4_no_opt_in_list_leaves_a_row_of_the_record_only_case_out&gt;&gt;
+
+    def test_s4_no_opt_in_list_leaves_a_row_of_the_record_only_case_out(request):
+        entries = _root_conftest(request.config).optin_entries(ROOT / "tests")
+        assert entries, "the fixture is wrong: the opt-in lists hold no entry"
+        naming = [f"{kind}: {target} ({name})" for kind, target, name in entries if _names_the_function(target)]
+&gt;       assert not naming, f"opt-in list entries name {RECORD_ONLY_CASE}, so a plain run leaves rows of it out: {naming}"
+E       AssertionError: opt-in list entries name tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only, so a plain run leaves rows of it out: ['rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only (optin-lifted-breadth.txt)']
+E       assert not ['rep: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only (optin-lifted-breadth.txt)']
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:257: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s4_a_scoped_selection_of_a_records_only_change_selects_the_record_only_case" time="0.647"><failure message="AssertionError: the scoped selection of a records-only change does not select tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only as record-reading&#10;assert []">tmp_path = PosixPath('/tmp/gov-os-lead-W2-66c/pytest-of-usain/pytest-0/test_s4_a_scoped_selection_of_0')
+
+    def test_s4_a_scoped_selection_of_a_records_only_change_selects_the_record_only_case(tmp_path):
+        root = _plant(tmp_path / "planted")
+        plan = select.plan(root, "W9-own", ticket="PLANT-own")
+        why_full = plan.get("why_full")
+        assert plan.get("scope") == "scoped", f"the planted records-only change is not selected scoped: {why_full}"
+        selected = [(entry["target"], [w.get("reason") for w in entry.get("why") or []]) for entry in plan["selected"]]
+        held = [target for target, reasons in selected
+                if covers_node(target, RECORD_ONLY_CASE) and "RECORD_READING" in reasons]
+&gt;       assert held, f"the scoped selection of a records-only change does not select {RECORD_ONLY_CASE} as record-reading"
+E       AssertionError: the scoped selection of a records-only change does not select tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only as record-reading
+E       assert []
+
+tests/acceptance/W2-66/test_w2_66_select_fixes.py:345: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s5_every_coupling_target_of_the_live_map_exists" time="0.005" /><testcase classname="tests.acceptance.W2-66.test_w2_66_select_fixes" name="test_s5_a_planted_map_with_a_misspelt_node_id_reds_the_same_helper" time="0.003" /></testsuite></testsuites>

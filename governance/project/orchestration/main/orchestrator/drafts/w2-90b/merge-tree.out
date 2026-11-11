@@ -1,0 +1,14 @@
+023b12956855b28f81f66058e073376d1bb8b77d
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py
+tests/acceptance/W1-47/w1_47_support.py
+tests/acceptance/W2-90/w2_90_kernel_wiring.py
+
+Auto-merging tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py
+CONFLICT (content): Merge conflict in tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py
+Auto-merging tests/acceptance/W1-47/w1_47_support.py
+CONFLICT (content): Merge conflict in tests/acceptance/W1-47/w1_47_support.py
+Auto-merging tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+Auto-merging tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py
+Auto-merging tests/acceptance/W2-90/README.md
+Auto-merging tests/acceptance/W2-90/w2_90_kernel_wiring.py
+CONFLICT (content): Merge conflict in tests/acceptance/W2-90/w2_90_kernel_wiring.py

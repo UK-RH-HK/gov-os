@@ -1,0 +1,6 @@
+Merge w2/W2-66c-tests: W2-66c's live-map select-fixes cases (31; S1-S5, S6 recorded)
+
+The independent test designer's tests/acceptance/W2-66/test_w2_66_select_fixes.py (295ef7d3ccb9, S6 record 00b71a26e2e2). The lead's repeat of S6: 29 failed, 2 passed (S5) on the test map and breadth list of ACT-SELECT-FIXES-1's parent 795d97c7cd44; 31 passed on 8038e0ee648c's; 31 passed on the branch head.
+
+Task: DAEO-btcs
+Role: orchestrator

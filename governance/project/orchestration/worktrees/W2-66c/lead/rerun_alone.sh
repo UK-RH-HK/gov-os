@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Re-run the six red W2-96 signal cases alone, once (load-sensitive check).
+set -u
+W=/home/usain/gov-os-worktrees/W2-66c
+LOG=$W/.gov-runtime/scratch/lead/log
+cd "$W" || exit 9
+env HOME=$W/.gov-runtime/scratch/empty-home PYTHONUSERBASE=/home/usain/.local TMPDIR=/tmp/gov-os-lead-W2-66c PYTHONPATH=$W/src \
+  python3 -m pytest -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rA --junitxml="$LOG/rerun-alone.xml" \
+  "tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]" \
+  "tests/unit/accept/test_w2_96_review4.py::test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]" \
+  "tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]" \
+  "tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]" \
+  "tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]" \
+  "tests/unit/accept/test_w2_96_run2.py::test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it" \
+  > "$LOG/rerun-alone.txt" 2>&1
+echo $? > "$LOG/rerun-alone.exit"

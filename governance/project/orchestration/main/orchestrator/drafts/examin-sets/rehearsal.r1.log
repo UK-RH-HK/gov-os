@@ -1,0 +1,377 @@
+--- A. apply.sh on the clone's path map (cwd = the clone)
+clone HEAD 625aa084fa02; the main tree's map fb52ab2dc756, the clone's fb52ab2dc756, the bundle's before fb52ab2dc756, after b1ffdb0b7b3e
+ok   A0 the clone's map is the frozen before (the bundle is not stale)
+ok   A0b the main tree's map (read only) is the frozen before
+     state before (sha256 fb52ab2dc756)
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/path-map.yaml (sha256 fb52ab2dc756)
+ok   A2 verify refused before the apply (exit 3)
+     state before (sha256 fb52ab2dc756); nothing to undo
+ok   A2b undo before the apply says nothing to undo (exit 0)
+--- B. the guard's cases on the map BEFORE the entries (the gap check)
+     ok   S1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml
+     ok   S1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: want
+     ok   S1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: want de
+     ok   S2[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.y
+     ok   S2[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.y
+     ok   S2[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q
+     ok   S2[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/
+     ok   S2[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.ya
+     ok   S2[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S2[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.yaml:
+     ok   S3[examin] engineer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S3[examin] research Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S3[examin] product-spec Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want den
+     ok   S3[examin] test designer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want de
+     ok   S3[examin] auditor Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, go
+     ok   S3[examin] orchestrator (the CTO) Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S3[examin] lead Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, got d
+     ok   S4[examin] engineer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S4[examin] research Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S4[examin] product-spec Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want den
+     ok   S4[examin] test designer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want de
+     ok   S4[examin] auditor Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, go
+     ok   S4[examin] orchestrator (the CTO) Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S4[examin] lead Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, got d
+     ok   S5[examin] engineer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S5[examin] research Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S5[examin] product-spec Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.y
+     ok   S5[examin] test designer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.
+     ok   S5[examin] auditor Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: 
+     ok   S5[examin] orchestrator (the CTO) Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hi
+     ok   S5[examin] lead Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S6[examin] engineer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wa
+     ok   S6[examin] research Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wa
+     ok   S6[examin] product-spec Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml
+     ok   S6[examin] test designer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yam
+     ok   S6[examin] auditor Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wan
+     ok   S6[examin] orchestrator (the CTO) Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidde
+     ok   S6[examin] lead Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: want d
+     ok   S7[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want d
+     ok   S7[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want d
+     ok   S7[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: wa
+     ok   S7[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: w
+     ok   S7[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want de
+     ok   S7[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK
+     ok   S7[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want deny,
+     ok   V1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wa
+     ok   V1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wa
+     ok   V1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml
+     ok   V1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yam
+     ok   V1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wan
+     ok   V1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visibl
+     ok   V1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: want a
+     ok   T1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got
+     ok   T1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got
+     ok   T1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny,
+     ok   T1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny
+     ok   T1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got 
+     ok   T1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: 
+     ok   T1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got den
+     ok   S1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S2[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S2[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S2[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S2[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S2[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S2[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S2[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S3[adoption-proving-ground] engineer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S3[adoption-proving-ground] research Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S3[adoption-proving-ground] product-spec Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S3[adoption-proving-ground] test designer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S3[adoption-proving-ground] auditor Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S3[adoption-proving-ground] orchestrator (the CTO) Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S3[adoption-proving-ground] lead Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S4[adoption-proving-ground] engineer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S4[adoption-proving-ground] research Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S4[adoption-proving-ground] product-spec Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S4[adoption-proving-ground] test designer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S4[adoption-proving-ground] auditor Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S4[adoption-proving-ground] orchestrator (the CTO) Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S4[adoption-proving-ground] lead Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S5[adoption-proving-ground] engineer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S5[adoption-proving-ground] research Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S5[adoption-proving-ground] product-spec Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/ad
+     ok   S5[adoption-proving-ground] test designer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/a
+     ok   S5[adoption-proving-ground] auditor Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoptio
+     ok   S5[adoption-proving-ground] orchestrator (the CTO) Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/eva
+     ok   S5[adoption-proving-ground] lead Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S6[adoption-proving-ground] engineer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-
+     ok   S6[adoption-proving-ground] research Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-
+     ok   S6[adoption-proving-ground] product-spec Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S6[adoption-proving-ground] test designer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adop
+     ok   S6[adoption-proving-ground] auditor Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S6[adoption-proving-ground] orchestrator (the CTO) Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evalua
+     ok   S6[adoption-proving-ground] lead Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-prov
+     ok   S7[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S7[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S7[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S7[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S7[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S7[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S7[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   V1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   V1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   V1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   V1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   V1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   V1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   V1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   T1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-grou
+     ok   T1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-grou
+     ok   T1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-
+     ok   T1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving
+     ok   T1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-groun
+     ok   T1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoptio
+     ok   T1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-ground/h
+     ok   P1 engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got 
+     ok   P1 research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got 
+     ok   P1 product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, 
+     ok   P1 test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow,
+     ok   P1 auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got a
+     ok   P1 orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: wa
+     ok   P1 lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got allo
+     ok   H1 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/tools/x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-se
+     ok   H1 lead Bash: python3 .gov-runtime/scratch/orchestrator/tools/x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os
+     ok   H2 orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval --out /home/usai
+     ok   H2 lead Bash: python3 x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval --out /home/usain/Dynamic-Agentic-
+     examin cases: 137, failed: 0, expect: before
+     PASS
+ok   B1 examin_check --expect before (exit 0)
+--- C. apply
+backup /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/governance/project/path-map.yaml.bak-20261111T151632Z-ACT-EXAMIN-SETS-1 (sha256 fb52ab2dc756)
+state applied (sha256 b1ffdb0b7b3e)
+ok   C1 apply with a backup beside it (exit 0)
+ok   C2 the map is the frozen after, byte for byte
+ok   C3 the backup is the original byte for byte
+     state applied (sha256 b1ffdb0b7b3e)
+ok   C4 check: state applied (exit 0)
+ok   C5 verify exit 0 (exit 0)
+     state applied (sha256 b1ffdb0b7b3e); nothing to do
+ok   C6 apply again changes nothing (exit 0)
+--- D. the checks the manifest lists, on the applied clone
+ok   D1 PYTHONPATH=src python3 -m gov.check.pathmap (exit 0)
+     ['adoption-proving-ground', 'examin']
+ok   D2 the map is valid YAML with the two entries only added (diff is two blocks at the end of evaluation_sets) (exit 0)
+--- E. the guard's cases on the applied map
+     ok   S1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml
+     ok   S1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: want
+     ok   S1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: want de
+     ok   S2[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.y
+     ok   S2[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.y
+     ok   S2[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q
+     ok   S2[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/
+     ok   S2[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.ya
+     ok   S2[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S2[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/visible/q01.yaml:
+     ok   S3[examin] engineer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S3[examin] research Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S3[examin] product-spec Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want den
+     ok   S3[examin] test designer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want de
+     ok   S3[examin] auditor Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, go
+     ok   S3[examin] orchestrator (the CTO) Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S3[examin] lead Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, got d
+     ok   S4[examin] engineer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S4[examin] research Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, g
+     ok   S4[examin] product-spec Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want den
+     ok   S4[examin] test designer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want de
+     ok   S4[examin] auditor Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, go
+     ok   S4[examin] orchestrator (the CTO) Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden
+     ok   S4[examin] lead Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden: want deny, got d
+     ok   S5[examin] engineer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S5[examin] research Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml:
+     ok   S5[examin] product-spec Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.y
+     ok   S5[examin] test designer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.
+     ok   S5[examin] auditor Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: 
+     ok   S5[examin] orchestrator (the CTO) Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hi
+     ok   S5[examin] lead Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q01.yaml: wan
+     ok   S6[examin] engineer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wa
+     ok   S6[examin] research Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wa
+     ok   S6[examin] product-spec Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml
+     ok   S6[examin] test designer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yam
+     ok   S6[examin] auditor Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: wan
+     ok   S6[examin] orchestrator (the CTO) Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidde
+     ok   S6[examin] lead Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/hidden/q99.yaml: want d
+     ok   S7[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want d
+     ok   S7[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want d
+     ok   S7[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: wa
+     ok   S7[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: w
+     ok   S7[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want de
+     ok   S7[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK
+     ok   S7[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/XCHECK-r1.md: want deny,
+     ok   V1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wa
+     ok   V1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wa
+     ok   V1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml
+     ok   V1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yam
+     ok   V1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: wan
+     ok   V1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visibl
+     ok   V1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/examin/visible/q01.yaml: want a
+     ok   T1[examin] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got
+     ok   T1[examin] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got
+     ok   T1[examin] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny,
+     ok   T1[examin] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny
+     ok   T1[examin] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got 
+     ok   T1[examin] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: 
+     ok   T1[examin] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/examin/hidden/q01.yaml: want deny, got den
+     ok   S1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S2[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S2[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S2[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S2[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S2[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S2[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S2[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S3[adoption-proving-ground] engineer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S3[adoption-proving-ground] research Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S3[adoption-proving-ground] product-spec Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S3[adoption-proving-ground] test designer Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S3[adoption-proving-ground] auditor Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S3[adoption-proving-ground] orchestrator (the CTO) Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S3[adoption-proving-ground] lead Grep: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S4[adoption-proving-ground] engineer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S4[adoption-proving-ground] research Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S4[adoption-proving-ground] product-spec Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S4[adoption-proving-ground] test designer Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S4[adoption-proving-ground] auditor Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S4[adoption-proving-ground] orchestrator (the CTO) Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S4[adoption-proving-ground] lead Glob: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   S5[adoption-proving-ground] engineer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S5[adoption-proving-ground] research Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S5[adoption-proving-ground] product-spec Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/ad
+     ok   S5[adoption-proving-ground] test designer Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/a
+     ok   S5[adoption-proving-ground] auditor Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoptio
+     ok   S5[adoption-proving-ground] orchestrator (the CTO) Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/eva
+     ok   S5[adoption-proving-ground] lead Bash: cat /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S6[adoption-proving-ground] engineer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-
+     ok   S6[adoption-proving-ground] research Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-
+     ok   S6[adoption-proving-ground] product-spec Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S6[adoption-proving-ground] test designer Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adop
+     ok   S6[adoption-proving-ground] auditor Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S6[adoption-proving-ground] orchestrator (the CTO) Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evalua
+     ok   S6[adoption-proving-ground] lead Write: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-prov
+     ok   S7[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S7[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   S7[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   S7[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   S7[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   S7[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   S7[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   V1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   V1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-p
+     ok   V1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopti
+     ok   V1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adopt
+     ok   V1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-pr
+     ok   V1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluat
+     ok   V1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/fixtures/evaluation/adoption-provi
+     ok   T1[adoption-proving-ground] engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-grou
+     ok   T1[adoption-proving-ground] research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-grou
+     ok   T1[adoption-proving-ground] product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-
+     ok   T1[adoption-proving-ground] test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving
+     ok   T1[adoption-proving-ground] auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-groun
+     ok   T1[adoption-proving-ground] orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoptio
+     ok   T1[adoption-proving-ground] lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/fixtures/evaluation/adoption-proving-ground/h
+     ok   P1 engineer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got 
+     ok   P1 research Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got 
+     ok   P1 product-spec Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, 
+     ok   P1 test designer Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow,
+     ok   P1 auditor Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got a
+     ok   P1 orchestrator (the CTO) Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: wa
+     ok   P1 lead Read: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/clone/tests/acceptance/W2-81/questions/python-app.yaml: want allow, got allo
+     ok   H1 orchestrator (the CTO) Bash: python3 .gov-runtime/scratch/orchestrator/tools/x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-se
+     ok   H1 lead Bash: python3 .gov-runtime/scratch/orchestrator/tools/x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os
+     ok   H2 orchestrator (the CTO) Bash: python3 x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval --out /home/usai
+     ok   H2 lead Bash: python3 x.py --sets-root /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval --out /home/usain/Dynamic-Agentic-
+     examin cases: 137, failed: 0, expect: after
+     PASS
+ok   E1 examin_check --expect after (exit 0)
+--- F. the owner's step 2 on the PLANTED sets root's map, then the store and measure checks
+     state before
+ok   F1 check: state before (exit 0)
+     written /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/governance/project/path-map.yaml
+     applied; the old map is kept as /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/tmp/home/gov-os-eval/governance/project/path-map.yaml.pre-ACT-EXAMI
+ok   F2 apply (exit 0)
+ok   F3 the planted sets root's map now equals the applied repository map (the same block)
+     state applied
+ok   F4 check: state applied (exit 0)
+     state applied; nothing to do
+ok   F5 apply again changes nothing (exit 0)
+     ok   the clone's map: evaluation_sets names the two new sets and the four old ones (memory-retrieval, memory-verdict, memory-verdict-2, sandbox-guard-exp-1, examin, adoption-proving-ground)
+     ok   the clone's map: set memory-retrieval is well formed (None)
+     ok   the clone's map: set memory-verdict is well formed (None)
+     ok   the clone's map: set memory-verdict-2 is well formed (None)
+     ok   the clone's map: set sandbox-guard-exp-1 is well formed (None)
+     ok   the clone's map: set examin is well formed (None)
+     ok   the clone's map: set adoption-proving-ground is well formed (None)
+     ok   the clone's map: examin hidden is under fixtures/evaluation/examin/hidden
+     ok   the clone's map: examin measured(engineer) is True (got True)
+     ok   the clone's map: examin measured(independent-auditor) is True (got True)
+     ok   the clone's map: examin measured(orchestrator) is False (got False)
+     ok   the clone's map: adoption-proving-ground hidden is under fixtures/evaluation/adoption-proving-ground/hidden
+     ok   the clone's map: adoption-proving-ground measured(engineer) is True (got True)
+     ok   the clone's map: adoption-proving-ground measured(independent-auditor) is True (got True)
+     ok   the clone's map: adoption-proving-ground measured(orchestrator) is False (got False)
+     ok   the planted sets root's map: evaluation_sets names the two new sets and the four old ones (memory-retrieval, memory-verdict, memory-verdict-2, sandbox-guard-exp-1, examin, adoption-proving-g
+     ok   the planted sets root's map: set memory-retrieval is well formed (None)
+     ok   the planted sets root's map: set memory-verdict is well formed (None)
+     ok   the planted sets root's map: set memory-verdict-2 is well formed (None)
+     ok   the planted sets root's map: set sandbox-guard-exp-1 is well formed (None)
+     ok   the planted sets root's map: set examin is well formed (None)
+     ok   the planted sets root's map: set adoption-proving-ground is well formed (None)
+     ok   the planted sets root's map: examin hidden is under fixtures/evaluation/examin/hidden
+     ok   the planted sets root's map: examin measured(engineer) is True (got True)
+     ok   the planted sets root's map: examin measured(independent-auditor) is True (got True)
+     ok   the planted sets root's map: examin measured(orchestrator) is False (got False)
+     ok   the planted sets root's map: adoption-proving-ground hidden is under fixtures/evaluation/adoption-proving-ground/hidden
+     ok   the planted sets root's map: adoption-proving-ground measured(engineer) is True (got True)
+     ok   the planted sets root's map: adoption-proving-ground measured(independent-auditor) is True (got True)
+     ok   the planted sets root's map: adoption-proving-ground measured(orchestrator) is False (got False)
+     ok   kept_out: fixtures/evaluation/examin/hidden/q01.yaml is not indexed (evaluation-fixtures)
+     ok   kept_out: fixtures/evaluation/examin/visible/q01.yaml is not indexed (evaluation-fixtures)
+     ok   kept_out: fixtures/evaluation/adoption-proving-ground/hidden/q01.yaml is not indexed (evaluation-fixtures)
+     ok   kept_out: fixtures/evaluation/adoption-proving-ground/visible/q01.yaml is not indexed (evaluation-fixtures)
+     ok   kept_out: W2-81's visible questions stay as today (not kept out by this map) (None)
+     failures: 0
+ok   F6 store_check (evaluation_sets, set_fault, measure gate, kept_out) (exit 0)
+     refused: the map changed after this step; a later change is not overwritten
+ok   F7 undo refused after a later change (exit 3)
+ok   F8 the planted map restored
+     undone: the map is as before
+ok   F9 undo restores the map (exit 0)
+ok   F10 undone byte for byte
+--- G. a map that changed after the freeze is refused, undo, and the final state
+     state other: changed since the freeze (sha256 f82ed26c878f)
+ok   G1 check refuses a map that changed (exit 3)
+     refused: governance/project/path-map.yaml is not as this ACT left it (sha256 f82ed26c878f); a later change is not overwritten
+ok   G2 undo refuses (not as this ACT left it) (exit 3)
+     state before (sha256 fb52ab2dc756)
+ok   G3 undo from the applied state (exit 0)
+ok   G4 the map is the original byte for byte
+     refused: state other: only examin is present
+ok   G5 the insert tool refuses a map already holding one entry (exit 3)
+--- H. the live files are unchanged (read only)
+main tree map fb52ab2dc756, the bundle's before fb52ab2dc756
+ok   H1 the main tree's map is unchanged
+
+REHEARSAL PASS
+failures: 0

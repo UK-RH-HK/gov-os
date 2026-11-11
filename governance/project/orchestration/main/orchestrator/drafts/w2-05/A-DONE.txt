@@ -1,0 +1,7 @@
+A done: W2-05 (DAEO-0z8c) hand-built lead brief written.
+Brief: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-05-A5-r7-fix.md (98,032 bytes, 365 lines)
+Checks: no {UPPER_CASE} slot left; placeholder_scan 0 hits; keyword_warn 0 hits in this file; main tree clean.
+Finding that changes the task: the five sweep rows are already on integrate (f53c8543d, merge 7c74877ec, W2-05 65 passed
+with the opt-ins); the sweep case is green (4 passed, the lower bound 33 files, none unnamed). What is left is row 71's
+code change (role_paths.py onto git_env/git_binary), the record's stale lines (row 71, Counts, row 61, the conftest line F5),
+and the fresh FULL probe.

@@ -1,0 +1,33 @@
+{
+ "act": "ACT-EXAMIN-SETS-1",
+ "dec": "DEC-1130, DEC-1101, DEC-957",
+ "author": "cto",
+ "claimed_class": "a",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/path-map.yaml",
+   "before": "f4029cfb49428708a7c7f9ca754bcd50a1c610ccc22966d09c4c581f1abbd971",
+   "after": "0ec1d20da86a4bdb0f38affe6bd76e86185af3152478ea6422e764442df8645d"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/path-map.yaml": "f4029cfb49428708a7c7f9ca754bcd50a1c610ccc22966d09c4c581f1abbd971",
+  "after/repo/governance/project/path-map.yaml": "0ec1d20da86a4bdb0f38affe6bd76e86185af3152478ea6422e764442df8645d",
+  "apply.sh": "3214474e96aa74cdaf6cbf05b93e4cd3db13db700aa932c5d7760abaf21284a0",
+  "list.txt": "c29875294c52d2ccafac1b5064a408baa15b46a790a957153ab5e51818af2172"
+ },
+ "checks": [
+  {
+   "cmd": "PYTHONPATH=src python3 -m gov.check.pathmap",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import yaml,sys; d=yaml.safe_load(open(\"governance/project/path-map.yaml\")); s=d[\"evaluation_sets\"]; sys.exit(0 if list(s)[-2:]==[\"examin\",\"adoption-proving-ground\"] and len(s)==6 and s[\"examin\"][\"hidden\"]==[\"fixtures/evaluation/examin/hidden/**\"] and s[\"adoption-proving-ground\"][\"hidden\"]==[\"fixtures/evaluation/adoption-proving-ground/hidden/**\"] and all(s[k][\"measures\"][\"roles\"]==s[\"memory-verdict-2\"][\"measures\"][\"roles\"] for k in list(s)[-2:]) else 1)'",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": []
+}

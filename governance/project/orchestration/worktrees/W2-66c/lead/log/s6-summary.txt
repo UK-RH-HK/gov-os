@@ -1,0 +1,4 @@
+parent exit 1
+act exit 0
+head exit 0
+done

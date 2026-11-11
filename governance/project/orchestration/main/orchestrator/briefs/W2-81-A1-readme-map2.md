@@ -1,0 +1,12 @@
+You are an independent test designer (role independent-test-designer; Opus at high, RUBRIC-2 C2), the second and last pass on W2-81's acceptance README map (ticket DAEO-l78m), in ~/gov-os-worktrees/W2-81 (branch w2/W2-81 at `294f3e84b`, your predecessor's commit; no other worker runs there). The CTO decided this pass as a delegated P2 (it revises test text under an existing decision, DEC-906), on your predecessor's proposal.
+
+Read the first pass's brief first, and keep every rule in it (the reader's rule, the commit form, the checks, the scratch budget, waits by pid only, no commits on w2/integrate, row W2-L423's rule, refused twice for the same call: stop and say so, the return form): /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-81-A1-readme-map.md. Only the task below replaces its task.
+
+THE TASK: `gov accept DAEO-l78m` exits 3 because three lines (S5, S11, F2) are red: the runner fails a line whose map names a test that no collected case matches; all 276 cases pass. Rewrite ONLY these four items in tests/acceptance/W2-81/README.md's map, to full node ids, nothing else:
+- line ~762 (S5): `test_every_repository_has_its_two_controls_…` → `test_w2_81_planted.py::test_every_repository_has_its_two_controls_and_each_says_what_flagging_it_looks_like`
+- line ~768 (S11): `test_each_failure_is_not_ready_naming_it[close-fails]` → the real parameter id `[close-fails-gov close PG-1 ended with exit 3]` (check it with a collect-only run), or the bare function name if all its parameters are meant (say which, and why)
+- line ~771 (F2): `test_on_todays_code_…` → `test_w2_81_judge.py::test_on_todays_code_the_handlings_not_built_are_named_and_never_passed`
+- line ~771 (F2): `test_a_scorer_at_84_…` → `test_w2_81_score.py::test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready`
+Verify the names with the runner's own matcher (`gov.accept` runner's `matches` / `names_a_test`) and a collect-only run, as your predecessor did. Commit: `Task: DAEO-l78m`, `Role: independent-test-designer`, `Rewrite-Reason: W2-96 S-D10b map reader (full node ids)`. Checks: `gov accept DAEO-l78m` exits 0 (run it in plain form, one simple command; do not run with an empty HOME); the W2-81 suite stays 276 passed (scoped, through /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/heavy_slot.sh).
+
+Return first the twelve labelled lines (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action).

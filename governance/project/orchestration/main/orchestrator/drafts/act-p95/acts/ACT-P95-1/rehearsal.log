@@ -1,0 +1,55 @@
+ACT-P95-1 rehearsal: the p95 of the sampled working sizes in place of the maximum
+--- A. set-up: the live files are read, never written
+ok   A1 src/ of the head copied (git archive)
+ok   A2 the planted HOME holds a copy of the gate file, and nothing else
+ok   A3 the planted day written (192 session samples outside verification, 5 outliers)
+     working_size_bytes: `gov resources --remeasure` would write the MAXIMUM 9500000000 (9,500 MB); ACT-P95-1 writes the p95 2475000000 (2,475 MB), 74 % lower
+--- B. the tests: green on the p95, red on the maximum
+ok   B1 tests/test_p95_remeasure.py green on the tool (the p95)
+ok   B2 a mutant of the tool that returns the maximum was made
+ok   B3 the same tests are RED on a tool that writes the maximum
+--- C. the product's own --remeasure writes the maximum on this day; the bundle writes the p95
+ok   C1 gov resources --remeasure wrote the maximum: working_size_bytes 9500000000
+ok   C2 the bundle is built from the same samples
+ok   C3 the bundle's after file has working_size_bytes 2475000000 (the p95), not 9500000000
+ok   C4 verify: the after file is reproduced from the evidence
+ok   C5 only working_size_bytes differs between the before and the after file
+--- D. the manifest's checks, as written with bash -c, on the planted HOME
+ok   D0 a manifest was drawn up for the checks
+ok   D0b verify with the manifest: the checks are the tool's, every file hashes as listed
+ok   D1 apply.sh check: the file is the frozen before
+ok   D2 apply.sh verify before the apply: refused (3)
+ok   D3 check 0 (the file is JSON) is green on the before
+ok   D4 check 1 (the figure and the rest of the file) is RED on the before
+ok   D5 check 2 (the product's own reader: no fault, the figure, not due) is RED on the before
+ok   D6 apply.sh undo before the apply: nothing to undo (0)
+ok   D7 nothing changed yet
+ok   D8 apply.sh apply (the plain apply, no option)
+ok   D9 exactly one file changed, none added: the gate file (no temp file left)
+ok   D10 the file is the frozen after, byte for byte
+ok   D11 the mode 600 is kept
+ok   D12.0 check 0 as written, on the applied file
+ok   D12.1 check 1 as written, on the applied file
+ok   D12.2 check 2 as written, on the applied file
+ok   D13 apply.sh verify after the apply
+ok   D14 apply.sh apply again: nothing to do (0)
+ok   D15 the second apply changed nothing
+--- E. the maximum written in its place is caught; a moved or tampered state is refused
+ok   E1 check 1 is RED when the maximum is written instead of the p95
+ok   E2 check 2 is RED when the maximum is written instead of the p95
+ok   E3 undo over a file that is neither the after nor the before: refused (3)
+ok   E4 apply over a file that is neither: refused (3)
+ok   E5 apply.sh check on it: state other (3)
+ok   E6 the refused steps touched nothing
+ok   E7 undo
+ok   E8 the undo restored the planted HOME byte for byte
+ok   E9 a frozen after copy that does not hash as listed: apply exits 4
+ok   E10 nothing touched by the refused apply
+ok   E11 a link in place of the file: refused (3)
+ok   E12 apply.sh check after the repair
+--- F. the operator's own classifier on the bundle (read only)
+ok   F1 act_class.py: class b (row machine-gate), no script hit
+--- G. the live files were only read
+ok   G1 the live gate file is unchanged
+ok   G2 the live samples file is unchanged
+failures: 0

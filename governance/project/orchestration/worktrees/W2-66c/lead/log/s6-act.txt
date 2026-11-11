@@ -1,0 +1,35 @@
+...............................                                          [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.claude/settings.json]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.rulesync/hooks.jsonc]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s1_a_settings_or_hook_wiring_change_reaches_the_three_suites[.rulesync/permissions.jsonc]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/adapter-portability.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/audit-reproducibility.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/context-reproducibility.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-authority.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-claims.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-commands.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-decision-citations.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-graph.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-mutation.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-pathmap.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/core-schema.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/fresh-agent-reconstruction.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/index-freshness.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/product-traceability-trailers.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/recovery-rebuild.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/retrieval-regression.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/secrets-indexing.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-a.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-b1.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s2_a_declared_check_change_reaches_w2_54_s_no_weakening_case_alone[template/governance/kernel/checks/skill-regression-orchestration.yaml]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[py]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[md]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s3_an_acceptance_change_reaches_the_history_rule_and_a_python_one_the_fixture_scans[conftest]
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s4_the_record_reading_set_holds_w2_66_s_record_only_case
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s4_no_opt_in_list_leaves_a_row_of_the_record_only_case_out
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s4_a_scoped_selection_of_a_records_only_change_selects_the_record_only_case
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s5_every_coupling_target_of_the_live_map_exists
+PASSED tests/acceptance/W2-66/test_w2_66_select_fixes.py::test_s5_a_planted_map_with_a_misspelt_node_id_reds_the_same_helper
+31 passed in 0.86s
