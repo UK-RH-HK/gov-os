@@ -196,17 +196,26 @@ def test_no_permission_field_in_front_matter(rel):
     assert not found, f"{rel} carries a permission field in its front matter: {found}"
 
 
+def _output_findings(front, texts):
+    """What the output check finds in one skill (``texts``: its folder's files by path).
+
+    Revised (Rewrite-Reason: DEC-1112 (3) P-W2-11-R6-1 (b)): only a skill that declares ``output`` is held to it; a
+    skill without the key is not a failure (five of the nine kernel skills are version-line only in this ticket's
+    paths, DEC-981). A skill that declares it must name none or a path class, and no step may write outside it."""
+    if "output" not in front:
+        return []
+    output = front["output"]
+    if not (s.declares_none(output) or s.output_classes(output)):
+        return [f"output is neither none nor a path class: {output!r}"]
+    stray = {rel: s.stray_writes(text, output) for rel, text in texts.items()}
+    return [f"{rel}: {found}" for rel, found in stray.items() if found]
+
+
 @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
 def test_every_write_step_lies_in_the_skills_output_class(name):
     front = _front(f"{s.SKILLS}/{name}/SKILL.md")
-    assert "output" in front, f"{name} declares no output class, so its write steps cannot be held to one"
-    output = front["output"]
-    assert s.declares_none(output) or s.output_classes(output), (
-        f"{name}'s output is neither none nor a path class: {output!r}")
-    stray = {rel: s.stray_writes(text, output)
-             for rel, text in s.folder_texts(f"{s.SKILLS}/{name}").items()}
-    stray = {rel: found for rel, found in stray.items() if found}
-    assert not stray, f"{name} tells its role to write outside its output class {output!r}: {stray}"
+    found = _output_findings(front, s.folder_texts(f"{s.SKILLS}/{name}"))
+    assert not found, f"{name} tells its role to write outside its output class {front.get('output')!r}: {found}"
 
 
 PERMISSION_PLANTS = ["allowed-tools", "permissions", "paths", "network", "model", "effort", "metadata.allowed-tools"]
@@ -253,6 +262,9 @@ def test_a_planted_step_writing_outside_its_output_class_is_found(kind):
     text = f"---\nname: planted\nversion: \"1.0.0\"\ndescription: A planted skill.\noutput: {output}\n---\n\n" \
            f"# Planted\n\n## Steps\n\n{WITHIN}\n## More steps\n\n{step}\n"
     assert s.stray_writes(text, output), f"the check passed a step writing outside {output!r}: {step}"
+    front, _ = s.split_frontmatter(text)
+    assert _output_findings(front, {"planted/SKILL.md": text}), \
+        f"the skill case's check passed a skill declaring {output!r} with a step writing outside it: {step}"
 
 
 def test_a_planted_skill_writing_inside_its_class_passes():
@@ -261,3 +273,19 @@ def test_a_planted_skill_writing_inside_its_class_passes():
     assert not s.permission_fields(front), "the check refuses a front matter without a permission field"
     assert s.write_targets(text) == ["tests/acceptance/<ticket>/test_cases.py"], s.write_targets(text)
     assert not s.stray_writes(text, front["output"]), "the check refuses a step inside the output class"
+    assert not _output_findings(front, {"planted/SKILL.md": text}), \
+        "the skill case's check refuses a skill whose steps write inside its output class"
+
+
+def test_a_planted_skill_declaring_no_output_is_not_held_to_one():
+    # DEC-1112 (3) P-W2-11-R6-1 (b): a skill without output is not a failure; one whose output is neither none nor
+    # a path class still is
+    steps = f"# Planted\n\n## Steps\n\n{WITHIN}\n## More steps\n\n{STRAY_PLANTS[sorted(STRAY_PLANTS)[0]][1]}\n"
+    bare = f"---\nname: planted\nversion: \"1.0.0\"\ndescription: A planted skill.\n---\n\n{steps}"
+    front, _ = s.split_frontmatter(bare)
+    assert not _output_findings(front, {"planted/SKILL.md": bare}), \
+        "the skill case's check fails a skill that declares no output"
+    vague = bare.replace("description: A planted skill.\n", "description: A planted skill.\noutput: the records\n")
+    front, _ = s.split_frontmatter(vague)
+    assert _output_findings(front, {"planted/SKILL.md": vague}), \
+        "the skill case's check passed an output that is neither none nor a path class"
