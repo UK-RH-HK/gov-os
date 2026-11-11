@@ -441,3 +441,22 @@ owner's step at the Wave 1 exit, from the main tree, after the baseline is empty
 ```
 
 From then on every push from that tree also pushes the notes ref of the evidence record to the same remote.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 38 in the full run, 35 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: pre-commit runs G1-G2; pre-push runs G3 including model-dependent tests and writes an evidence record bound to the head commit [CAP-39.a] | `test_w1_40_pre_commit.py::test_a_clean_commit_passes_and_runs_the_g1_and_g2_checks`, `test_w1_40_pre_push.py::test_a_push_runs_the_g3_check`, `test_w1_40_pre_push.py::test_a_failing_g3_check_stops_the_push` | designer |
+| S2: GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier (git note or commit) ... | `test_w1_40_ci_evidence.py::test_ci_runs_the_g1_and_g2_checks`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_no_record_exists`, `test_w1_40_ci_evidence.py::test_ci_is_red_when_the_record_is_for_another_commit` | designer |
+| S3: pre-commit also runs the second gitleaks scan, with the project's rules alone (DEC-347, DEC-369) | `test_w1_40_pre_commit.py::test_a_staged_secret_stops_the_commit`, `test_w1_40_pre_commit.py::test_a_staged_secret_that_the_builtin_allowlist_shelters_stops_the_commit` (2 of 2) | designer |
+| F1: CI downloads models or needs a GPU | `test_w1_40_workflow_text.py::test_no_step_downloads_a_model_or_asks_for_a_gpu` | the ticket's words |
+| F2: A push with a failing G3 check leaves CI green | `test_w1_40_ci_evidence.py::test_a_push_with_a_failing_g3_check_never_leaves_ci_green` | the ticket's words |

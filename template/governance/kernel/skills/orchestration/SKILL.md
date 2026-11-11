@@ -1,6 +1,6 @@
 ---
 name: orchestration
-version: "1.0.0"
+version: "1.2.0"
 description: "Method for running a wave: parallel tickets under ticket leads, integration, decisions, stops, sessions, briefs, commits and status answers."
 ---
 
@@ -11,7 +11,7 @@ A method for the orchestrator role and its ticket leads: the way a wave is run. 
 ## Parallel tickets
 
 - Each independent ticket gets its own worktree and branch, cut from the integration branch `<integration branch>`; no two tickets in flight have overlapping paths, and an overlapping ticket waits (DEC-235).
-- A ticket lead per ticket is started in that worktree with its identity (the orchestrator role and the ticket's id), from `brief-lead.md` (DEC-236).
+- A ticket lead per ticket is started in that worktree with its identity (the orchestrator role and the ticket's id), from the brief envelope `brief.md` and the lead template `role-lead.md` (DEC-236, DEC-1050).
 - A stated ceiling holds: at most `<ceiling>` tickets in flight. A ticket idle on an owner answer frees its slot (DEC-235, DEC-363).
 - The resource gate is read before each start: free memory of at least `<free memory>` and a load average below the core count. Heavy tickets count double (DEC-235).
 - No worktree is left behind: one whose ticket is closed is removed (DEC-235).
@@ -26,7 +26,7 @@ A method for the orchestrator role and its ticket leads: the way a wave is run. 
 
 ## The ticket loop
 
-The lead runs the loop from `brief-lead.md`, which states each step in full.
+The lead runs the loop from the lead template `role-lead.md` (DEC-1050, DEC-1052).
 
 - Tests first, by a fresh test designer, checked red for the stated reason; then a fresh implementer; then the verification, on the ticket's acceptance tests, every earlier suite and the builder tests (MR-3).
 - For a FULL ticket a second review is the last. After it only fail-open holes and losses of work are fixed (DEC-413 names silent changes to tests or ticket files); the rest are residuals (DEC-413).
@@ -52,13 +52,13 @@ The lead runs the loop from `brief-lead.md`, which states each step in full.
 - A worker's identity (role and ticket) goes through the settings argument, which the launcher builds for a worker and the orchestrator passes for a lead (DEC-183, DEC-371).
 - The model `<model>` is named on every launch (DEC-460).
 - Leads and workers run in the background: a lead with the absolute path of the CLI, `<absolute path of the CLI>`, a worker through the launcher; never a bare call in the foreground (DEC-371, DEC-537).
-- Never two writing sessions in one tree, and never a commit in a tree while a worker's command runs there: containment would attribute the change to the worker (DEC-254, DEC-537).
+- Never two writing sessions in one tree: each worktree has one writer (DEC-963 item 1). Never a commit in a tree while a worker's command runs there: containment would attribute the change to the worker (DEC-537).
 - On an authentication or access error there is no retry loop: nothing more is started, the checkpoint is written, and the stop is named `AUTH_REQUIRED` (DEC-420).
 - The orchestrator reads only a lead's final summary, never its workers' output (DEC-236).
 
 ## Briefs
 
-- A session is started from a filled template: `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` or `brief-lead.md`. Each carries the standing sentences word for word (DEC-537).
+- A session is started from the kernel templates (`template/governance/kernel/templates/`; `governance/kernel/templates/` in an adopted project): the brief envelope `brief.md`, filled from the ticket and the project's facts file, with the role's template, `role-research.md`, `role-product-spec.md`, `role-test-designer.md`, `role-engineer.md`, `role-reviewer.md`, `role-lead.md` or `role-cto.md` (DEC-1050, DEC-1052). The retired texts `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` and `brief-lead.md` are one-line pointers to these templates (DEC-1050).
 - A worker gets only its brief and the decisions that apply, never the orchestrator's notes, the loop count or another worker's output (DEC-096, DEC-537).
 - A test designer's brief states behaviour and sources only, never the names of the implementation's private parts (DEC-462).
 - Tests are in proportion to the profile: FULL thorough; STANDARD every KPI line's success and failure plus the key edge cases; LITE one test per KPI line; no combinatorial expansion beyond what a KPI demands (DEC-221).
@@ -73,16 +73,16 @@ The lead runs the loop from `brief-lead.md`, which states each step in full.
 
 ## Checkpoints and context
 
-- A lead writes a real checkpoint with `gov checkpoint` at each round boundary of its ticket; none is written only to pass the close (DEC-511).
+- No committed `gov checkpoint` record is required at each round boundary; a checkpoint a lead writes is a real one, for resuming, never one written only to pass the close (DEC-511, DEC-1057).
 - The orchestrator updates its own checkpoint after every merge, close and stop (DEC-537).
 - With the session-start and pre-compaction hooks in place the session compacts and continues from the injected checkpoint; it does not stop for context (DEC-250).
 - When the checkpoint is older than the state, the state is re-derived from git and the tickets (DEC-537).
 
 ## Temp hygiene and protected files
 
-- A session's temporary folder is its own and is removed with it; nothing is left in or read from another session's folders (DEC-386, DEC-537).
-- No glob, search or listing runs over the project's governance folder: files there are named one by one (DEC-508).
-- The settings file and the held-out file are never read, by any role (DEC-525).
+- A session's temporary folder is its own and is removed with it; nothing is left in another session's folders, and reading them is open as the next line states (DEC-386, DEC-537, DEC-820).
+- Reads are open: the whole repository, the governance folder included, other worktrees and git history, by any search, glob or listing, apart from secrets and keys, the held-out material's contents, the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, DEC-1052).
+- The held-out material's contents are never read, by any role; its file names may be seen (DEC-525, DEC-820).
 
 ## Learning metrics
 

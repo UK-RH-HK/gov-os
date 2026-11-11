@@ -18,7 +18,7 @@ depends_on:
 - DAEO-g0ip
 - DAEO-ha8z
 allowed_paths:
-- .claude/skills/adopt/SKILL.md
+# .claude/skills/adopt/SKILL.md out of the paths: generated from the kernel skill by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - src/gov/adopt/lite_gates.py
 - src/gov/adopt/stages.py
 - template/governance/kernel/skills/adopt/**
@@ -37,6 +37,8 @@ sources:
 - DEC-738
 - CAP-44.f
 - CAP-44.h
+- DEC-315
+- DEC-1112
 est_loc: 100
 acceptance_tests:
   path: tests/acceptance/W2-52/
@@ -44,6 +46,7 @@ acceptance_tests:
 track: A
 closes:
 - DEC-741 (H)
+- CAP-44.f  # the lite A7 and A10 gates DEC-741 (H) brings into Wave 2; no Wave 2 ticket named it (the plan validator's contract-items-delivered; D-10's red-fix list, DEC-1109 (2), DEC-1112 (3))
 list_rows: []
 ---
 # W2-52 The lite A7 and A10 stage records

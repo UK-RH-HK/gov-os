@@ -10,7 +10,7 @@ probe:
 1. starts the suite's stand-in embedder (round 2's, with its variation: a text after a different text gets another
    vector) on the sandbox's own loopback: this machine's Ollama is not reachable from inside (the sandbox has its own
    network, and the engineer's allowlist is empty), and the probe records that;
-   (round 4, DEC-798: the reads name it both at ``OLLAMA_HOST`` and at the CPU embedder's address, so the
+   (round 4, DEC-1033: the reads name it both at ``OLLAMA_HOST`` and at the query embedder's address, so the
    question is answered by it, with its variation, as before);
 2. reads a project with a built index that lies **outside** the launched repository, so its ``.gov-runtime/`` is
    read-only to the worker by the sandbox's write fence (the probe records that a new file cannot be made there);
@@ -81,6 +81,10 @@ def _launch_environment(project, sandbox):
     env = {key: value for key, value in os.environ.items()
            if not key.startswith("CLAUDE") and key not in ("GOV_ROLE", "GOV_TICKET")}
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
+    # The session runs under the real HOME (the CLI's login), so the gate reads this machine's own gate.json; the
+    # readings are planted with room to spare (W1-46's ``plant_open_gate``), so the machine's load does not shut it
+    # (W2-20 S19, DEC-1088 (5)(b)).
+    env.update(L.plant_open_gate(sandbox))
     return env
 
 

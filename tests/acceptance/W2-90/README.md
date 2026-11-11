@@ -29,6 +29,7 @@ wiring. Seven could not be moved: they are left exactly as they stood (see "Case
   line starts its program with the `python3` first on `PATH`, and a product has `gov` installed. Nothing is installed
   by a test: `install_gov_for(home)` writes a path file naming this worktree's `src` into the stand-in home's user site
   folder, as an editable install does (W1-38's `make_session_sandbox` does the same).
+- **D-10's pinned-gov fix (2026-11-10, W2-20 `DAEO-r30l`, Rewrite-Reason: DEC-866, W2-106):** `install_gov_for` also plants the editable install's `gov` script at `<home>/.local/bin/gov` (W1-47's `plant_pinned_gov`), the fix W2-106's README names, so the kernel's pinned line never takes the runner's `PATH`. With `PATH=/usr/bin:/bin`, before → after, both opt-ins: W1-05 53 → 4 red (left: the 2 switch-over setup errors, red on both PATHs, and 2 p95 latency cases red only under `-n 6` load, 9 passed alone), W1-28 3 → 1 (red on both PATHs), W1-47 11 → 0; nothing new red under the runner's `PATH`.
 - **Fixture files.** Each suite plants what its cases name, and commits it:
   - W1-05 and W1-47: the fixture ticket `DAEO-zz90`, `README.md`, `src/gov/guard/decide.py`,
     `tests/acceptance/W1-02/README.md`.

@@ -75,8 +75,8 @@ def test_a_ticket_no_record_has_is_a_gap_and_no_exception(api, project, ollama):
 
 
 def test_an_id_that_exists_nowhere_is_named_as_a_gap_and_nothing_is_made_up(api, project, ollama):
-    """RETR-X-02's first half, on the fixture. ``DEC-9999`` is no record; the code tool, which the closure asks
-    for every id that is no record (DEC-391), is not installed here. Either way the id is a gap, the reason is
+    """RETR-X-02's first half, on the fixture. The planted ``RETR_X_02_MISSING_ID`` is no record; the code tool,
+    which the closure asks for every id that is no record (DEC-391), is not installed here. Either way the id is a gap, the reason is
     not one that says nothing is left, and no evidence carries the id."""
     bundle = ask(api, project, ollama, support.RETR_X_02_MISSING_ID, ids=[support.RETR_X_02_MISSING_ID],
                  radius=support.RADIUS_FULL)

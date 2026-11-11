@@ -20,15 +20,15 @@ allowed_paths:
 - fixtures/evaluation/examin/hidden/**
 kpis:
   success:
-  - 'Between 10 and 20 questions about EXAMIN''s code and governance, each with its gold answer and the source or sources an answer must cite (file and section or line), in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, sends half to the visible folder and half to the hidden folder [DEC-957, DEC-828 items 3 and 4, DEC-954 Q9f]'
-  - 'Written from a clone of the owner''s copy made by exact path under ~/gov-os-runs/W2-94/examin/; the copy is only read by that clone; nothing written in the workbench or in EXAMIN''s real repository [DEC-723, DEC-728]'
-  - 'Written by a session independent of the adopting team: no session of W2-26, W2-27, W2-88 or a retrieval ticket writes or reads the hidden half; nothing hidden quoted in a commit message, a return, a log or a ticket note [DEC-820 (d), DEC-845]'
-  - 'Every gold source exists at the copy''s recorded commit and holds the answer [DEC-828 item 4]'
-  - 'W2-61''s KPI 6 ("the same split for EXAMIN''s set") is met by this ticket; W2-61''s close record names it as moved here [DEC-954, DEC-957]'
+  - 'Between 10 and 20 questions about EXAMIN''s code and governance, each with its gold answer and the source or sources an answer must cite (file and section or line), in the form W2-61''s visible half takes; after writing, a recorded seeded draw, stratified by category, sends half to the visible folder and half to the hidden folder Verify: a planted stand-in set: a count outside 10 to 20 is refused; the record holds the seed and the draw; the visible and hidden folders each hold half (within one) with each category in both halves [DEC-957, DEC-828 items 3 and 4, DEC-954 Q9f]'
+  - 'Written from a clone of the owner''s copy made by exact path under ~/gov-os-runs/W2-94/examin/; the copy is only read by that clone; nothing written in the workbench or in EXAMIN''s real repository Verify: the record names the clone''s path under `~/gov-os-runs/W2-94/examin/`; after the run `git status` in the workbench and in EXAMIN''s real repository shows no change, and the owner''s copy''s file times are unchanged [DEC-723, DEC-728]'
+  - 'Written by a session independent of the adopting team: no session of W2-26, W2-27, W2-88 or a retrieval ticket writes or reads the hidden half; nothing hidden quoted in a commit message, a return, a log or a ticket note Verify: the guard''s log shows no session of W2-26, W2-27, W2-88 or a retrieval ticket opened the hidden folder; a grep of commit messages, return, log and ticket notes for a planted unique question word finds 0 hits [DEC-820 (d), DEC-845]'
+  - 'Every gold source exists at the copy''s recorded commit and holds the answer Verify: a script run by the writer prints only counts and ids: for each question, its gold source exists at the copy''s recorded commit and holds the answer ("n of n hold"); a planted source that is absent or does not hold its answer is reported by id [DEC-828 item 4]'
+  - 'W2-61''s KPI 6 ("the same split for EXAMIN''s set") is met by this ticket; W2-61''s close record names it as moved here Verify: a grep of W2-61''s close record finds KPI 6 named as moved to W2-94; this ticket''s visible and hidden folders hold the split of S1 [DEC-954, DEC-957]'
   failure:
-  - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work.'
-  - 'A write in the workbench, the owner''s copy or EXAMIN''s real repository; a clone outside ~/gov-os-runs/W2-94/.'
-  - 'A gold source that does not hold its answer.'
+  - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work. Verify: a planted stand-in hidden file: a read, a grep and a `git log` from a measured session''s sandbox (the guard''s path map) are refused or find it 0 times'
+  - 'A write in the workbench, the owner''s copy or EXAMIN''s real repository; a clone outside ~/gov-os-runs/W2-94/. Verify: `git status` in the workbench, the owner''s copy and EXAMIN''s real repository shows no change after the run; a `find` for a clone of the copy outside `~/gov-os-runs/W2-94/` finds none'
+  - 'A gold source that does not hold its answer. Verify: the S4 script on a planted source that does not hold its answer reports that question''s id as failing'
 profile: STANDARD
 sources:
 - DEC-957

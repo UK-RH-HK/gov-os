@@ -50,6 +50,7 @@ session anything; the cases that expect writes there allowed open it first.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -217,6 +218,7 @@ def base_environment(sandbox, role=None, ticket=None, project=None):
         "GIT_AUTHOR_NAME": "W2-50 acceptance", "GIT_AUTHOR_EMAIL": "w2-50@example.invalid",
         "GIT_COMMITTER_NAME": "W2-50 acceptance", "GIT_COMMITTER_EMAIL": "w2-50@example.invalid",
         **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
+        **{k: v for k, v in os.environ.items() if k == "GOV_GUARD_CALLS_DIR"},  # DEC-1108 (5): the test's own log
     }
     if project is not None:
         env["CLAUDE_PROJECT_DIR"] = str(project)
@@ -242,6 +244,15 @@ PROJECT_FILES = {
     "docs/audit/earlier.md": "audit\n",
     "experiments/spikes/exp-901/README.md": "# Experiment 901\n",
 }
+# W2-153 (DEC-1050, DEC-1116): ``gov launch`` refuses a session without ``.claude/templates/<stem>.md`` for its role
+# (LAUNCH_NO_TEMPLATE), so the fixture project holds the eight copies, byte for byte the kernel's own
+# ``template/governance/kernel/templates/<stem>.md`` (what the ACT installs, W2-153 S4). The cases that launch a
+# session test what they tested before; none accepts the refusal.
+TEMPLATE_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                  "role-reviewer", "role-lead", "role-cto")
+KERNEL_TEMPLATES = REPO_ROOT / "template/governance/kernel/templates"
+PROJECT_FILES.update({f".claude/templates/{stem}.md": (KERNEL_TEMPLATES / f"{stem}.md").read_text(encoding="utf-8")
+                      for stem in TEMPLATE_STEMS})
 # Single named files of this repository the fixture project holds where a product repository has them.
 COPIED_FILES = {
     GUARD_REL: GUARD_SOURCE,
@@ -549,9 +560,68 @@ class Launch:
         return entries
 
 
+GIB = 1024 ** 3
+
+
+def plant_open_gate(sandbox):
+    """An open resource gate in the sandbox's HOME; the variables that name its readings, for ``gov launch``'s
+    environment (``base_environment`` builds it from scratch).
+
+    W2-20 S19 (DEC-1088 (5)(b)) runs the gate on every launch, and S8 shuts it when the configuration is missing. The
+    form is W2-136's ``_plant_open_gate`` (``tests/acceptance/W2-136/test_w2_136_launch_check.py``), from W2-20's
+    README, "The configuration file": every value dated and sourced, in ``$HOME/.gov-os/machine/gate.json``; the
+    readings are files under ``<elsewhere>/open-gate`` with room to spare, named through ``GOV_RESOURCES_*``. These
+    cases test the launcher's folders and records, whatever the machine is doing. Planted once per sandbox."""
+    today = datetime.date.today().isoformat()
+
+    def dated(value, source="planted for the W2-50 launcher cases (W2-20 README)"):
+        return {"value": value, "date": today, "source": source}
+
+    base = sandbox.elsewhere / "open-gate"
+    readings = {
+        "GOV_RESOURCES_MEMINFO": ("meminfo", f"MemTotal: {80 * GIB // 1024} kB\nMemAvailable: {64 * GIB // 1024} kB\n"),
+        "GOV_RESOURCES_LOADAVG": ("loadavg", "0.00 0.00 0.00 1/321 54321\n"),
+        "GOV_RESOURCES_BUSY_CORES": ("busy", "0\n"),
+        "GOV_RESOURCES_EMBEDDING_CPU": ("embedding-cpu.json", json.dumps({"shared": 0, "query": 0})),
+        "GOV_RESOURCES_DISK": ("disk.json", json.dumps({"free_bytes": 1024 * GIB, "free_inodes": 100_000_000})),
+    }
+    env = {"GOV_RESOURCES_NPROC": "64", **{variable: str(base / name) for variable, (name, _) in readings.items()}}
+    if base.is_dir():
+        return env
+    base.mkdir(parents=True)
+    cpu = str(max(os.sched_getaffinity(0)))
+    values = {
+        "memory_floor_bytes": dated(3 * GIB, "DEC-942 item 2 (planted)"),
+        "verification_peak_bytes": dated(4 * GIB),
+        "working_size_bytes": dated(1 * GIB),
+        "rebuild_peak_bytes": dated(2 * GIB),
+        "disk_floor_bytes": dated(100 * GIB, "DEC-898 item 1 (planted)"),
+        "inode_floor": dated(10_000_000, "DEC-898 item 1 (planted)"),
+        "verification_lock": dated(str(base / "verification.lock")),
+        "gpu_margin": dated(0.10, "DEC-950 item 2 (planted)"),
+        "oom_floor_bytes": dated(1 * GIB),
+        "heavy_slots": dated(2),
+        "gpu_shares": dated({"embedder_mib": 0, "reranker_mib": 0}),
+        "embedding_servers": {
+            "shared": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+            "query": {"cpus": cpu, "nice": 10, "date": today, "source": "planted"},
+        },
+    }
+    machine = sandbox.home / ".gov-os" / "machine"
+    machine.mkdir(parents=True, exist_ok=True)
+    (machine / "gate.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
+    for name, text in readings.values():
+        (base / name).write_text(text, encoding="utf-8")
+    return env
+
+
 def launch(sandbox, cli, role, ticket):
+    """``gov launch <role> <ticket>`` in ``sandbox.project``, the resource gate planted open (``plant_open_gate``):
+    it is W2-20's, not under test here."""
+    env = {**base_environment(sandbox), **plant_open_gate(sandbox)}
     before = len(calls(cli))
-    run = run_gov(sandbox, sandbox.project, "launch", role, ticket.tk if isinstance(ticket, Ticket) else ticket)
+    run = run_gov(sandbox, sandbox.project, "launch", role, ticket.tk if isinstance(ticket, Ticket) else ticket,
+                  env=env)
     return Launch(run, tuple(calls(cli)[before:]))
 
 

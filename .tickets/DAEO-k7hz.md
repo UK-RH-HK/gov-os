@@ -20,54 +20,48 @@ allowed_paths:
 - template/governance/kernel/templates/brief-*.md
 - template/governance/kernel/skills/orchestration/**
 - template/governance/kernel/skills/audit/**
-- .claude/skills/orchestration/**
-- .claude/skills/audit/**
+# Every .claude/** line (skills/orchestration, skills/audit, agents/orchestrator.md, skills/*/SKILL.md, skills/test-design, skills/qa-review) is out of the paths: those files are generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - docs/changes/W2-11-CIT-P.md
 - template/governance/kernel/roles/orchestrator.md
 - .rulesync/subagents/orchestrator.md
 - template/.rulesync/subagents/orchestrator.md
-- .claude/agents/orchestrator.md
 - .rulesync/skills/orchestration/**
 - template/.rulesync/skills/orchestration/**
 - .rulesync/skills/audit/**
 - template/.rulesync/skills/audit/**
-- .claude/skills/*/SKILL.md
 - .rulesync/skills/*/SKILL.md
 - template/.rulesync/skills/*/SKILL.md
 - template/governance/kernel/skills/*/SKILL.md
 - template/governance/kernel/skills/test-design/SKILL.md
 - template/governance/kernel/skills/test-design/**
-- .claude/skills/test-design/**
 - .rulesync/skills/test-design/**
 - template/.rulesync/skills/test-design/**
 - template/governance/kernel/templates/skill.md
 - template/governance/kernel/skills/qa-review/**
-- .claude/skills/qa-review/**
 - .rulesync/skills/qa-review/**
 - template/.rulesync/skills/qa-review/**
 kpis:
   success:
   - 'The test-design skill says how much is enough: acceptance tests in proportion to the change (the minimum that shows each KPI line and each failure line), with W2-60a''s 2,980 test lines for 713 code lines named as out of proportion [DEC-951 item 5]'
-  - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
-  - They also carry Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
-  - The audit brief states DEC-430 [F-m1, W2-L268].
-  - The launcher command is stated as a command, not a code span [W2-L257].
-  - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].
-  - 'Supersession (DEC-866): the brief templates, the orchestration skill and its copies, and the orchestrator role file and its copies no longer teach a superseded rule: no LEAD_CHECKPOINT and no
+  - The orchestration skill carries the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
+  - It also carries Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
+  - The orchestration skill's audit brief rule states DEC-430, as the audit skill's own wording does [F-m1, W2-L268].
+  - Loose citations in the orchestration skill are fixed [W2-L256].
+  - 'Supersession (DEC-866): the orchestration skill and its copies, and the orchestrator role file and its copies no longer teach a superseded rule: no LEAD_CHECKPOINT and no
     "at about <context limit> tokens" (DEC-838, DEC-837); no listing or search refusal over the governance folder or .claude/, the held-out list''s names readable (DEC-820); no fixed ceiling of
     tickets in flight (DEC-847); the owner''s decisions recorded by decision-record commits (DEC-861). W1-35''s cases that require the old sentences are revised by the test designer with Rewrite-Reason'
   - 'The test-design skill states the test kinds (unit, acceptance, live or harness, dev-tier, load-sensitive, repository-state), the run-time cost a test may take and how it is measured, that a test never copies the whole working tree where a minimal fixture will do, and that a test asserting the live repository''s own state is declared as such [DEC-889 item 11 c; lens H finding 10]'
   - 'Every gap the orchestrator fixed in the common brief or the brief builder (governance/project/orchestration/brief-gaps.md, its "Fixed by" column) has a case that builds a brief today and shows the fix is still in it; taken from the withdrawn W2-79 (DEC-954, PLAN-W2-DEC953 §4.2) [DEC-943 item 1]'
-  - 'One skill template (`template/governance/kernel/templates/skill.md`): front matter (name, version, third-person description of what and when), When / not when, Inputs, Steps as a checklist, Done when, Output and handover, Escalation (P3/P2/P1/Emergency), Never, Sources at the end; the front matter closed to name, version, description and output (the path class its method writes, or none), with no permission field (no allowed-tools, permissions, paths, network, model or effort), and a Never section stating that the skill changes no role''s reads or writes and that work needing other writes goes back as a package for the role that holds them (DEC-995, DEC-996; round 2); the body under about 150 lines with reference files one level deep; three test scenarios written before the text; an imported skill adopted only licence-checked and passing its three scenarios [DEC-959 item 5, ROLES-RESEARCH-1 §2]'
+  - 'One skill template (`template/governance/kernel/templates/skill.md`): front matter (name, version, third-person description of what and when), When / not when, Inputs, Steps as a checklist, Done when, Output and handover, Escalation (P3/P2/P1/Emergency), Never, Sources at the end; the front matter closed to name, version, description and output (the path class its method writes, or none), with no permission field (no allowed-tools, permissions, paths, network, model or effort), and a Never section stating that the skill changes no role''s reads or writes and that work needing other writes goes back as a package for the role that holds them (DEC-995, DEC-996; round 2); the body under about 150 lines with reference files one level deep; three test scenarios written before the text; an imported skill adopted only licence-checked and passing its three scenarios [DEC-959 item 5, ROLES-RESEARCH-1 §2] (folds W2-99 S3)'
   - 'test-design gains the work order in parallel (the designer works from the spec beside the engineer, never reading its work), red against the ticket''s base, ISTQB''s black-box techniques (equivalence partitions, boundary values, decision tables, state transitions), the proportion rule, and the README map of KPI lines to tests in the form gov accept reads [DEC-959 items 6 and 7, ROLES-RESEARCH-1 §2.6]'
   - 'orchestration gains three reference files: integration-queue (the merge queue''s enqueue, test, advance or eject, record), nightly-sheriff (re-run the red alone, bisect, fix small or P1) and incident-response (stop, contain, P1, a live handoff, a blameless note); and a new qa-review skill for the QA engineer (trace each KPI line to its tests and code; tests against the spec; code against the spec; probes in proportion to the profile; findings in JUDGEMENT.md''s two lines; severity tied to P3/P2/P1; re-runs nothing) [DEC-959 items 1 and 3, ROLES-RESEARCH-1 §5.3 items 3 and 4]'
-  - 'The kernel''s lead brief template carries a `brief_gaps:` section (gap, where it belongs, its cost) after the twelve fields, and the orchestration skill states that the gaps are fixed in the template within the week (DEC-943, ROLES-SPEC-1 G14) [DEC-983, DEC-982]'
+  - 'The orchestration skill states that the gaps a worker names in `brief_gaps:` (the return of the brief envelope, W2-128) are fixed in the template within the week (DEC-943, ROLES-SPEC-1 G14) [DEC-983, DEC-982] (to Wave 3, W3-P02, W-10) [re-scoped, DEC-1083]'
   - 'The orchestration skill states the anti-drift kit: a fresh orchestrator session every morning from a handover (checkpoint, RESUME HERE, the decisions in force), the digest loaded at start, every rule written into its five places (DEC-851) [DEC-952 item 6, DEC-953 item 7, DEC-983, DEC-982]'
   - 'The orchestration skill states scope control: a new ticket in the WBS goes to the owner as a P1 with a recommendation before it is filed; leads name a needed ticket in their return and never file one [DEC-974, DEC-983, DEC-982]'
   - 'The test-design skill states that a timing test measures the work under test (its process''s CPU time, or against a quiet reference beside it), never the wall time of a loaded machine, at the same bound [DEC-979 item 1 D2, DEC-983, DEC-982]'
   - 'The orchestration skill has an approvals section, and the orchestrator brief template carries it: the orchestrator reads its own allow list at session start (the settings files'' allow, ask and deny rules, and the host''s known safety checks: for Claude Code, any `.claude/` path); before each command it classifies it as allowed or as possibly needing the owner''s approval; such a call is never chained to other work; by day it notifies the owner first, then runs it; inside the project''s quiet hours it never runs it and queues it for the morning package; one scenario each for day, night and a chained command [DEC-991, DEC-994 item 3] (round 2)'
   failure:
-  - 'A kernel skill, its generated copy or the skill template with a permission field in its front matter, or a step telling its role to write what its output class does not hold [DEC-995, DEC-996] (round 2)'
+  - 'A kernel skill, its generated copy or the skill template with a permission field in its front matter, or a step telling its role to write what its output class does not hold [DEC-995, DEC-996] (round 2) (folds W2-99 F4)'
   - A template, skill or role file that still teaches LEAD_CHECKPOINT, a listing refusal or a fixed ceiling fails a test [DEC-866].
 profile: STANDARD
 sources:
@@ -85,6 +79,20 @@ sources:
 - DEC-957
 - DEC-959
 - DEC-983
+- DEC-1083
+- DEC-951
+- DEC-952
+- DEC-953
+- DEC-974
+- DEC-979
+- DEC-982
+- DEC-991
+- DEC-994
+- DEC-995
+- DEC-996
+- DEC-315
+- DEC-1112
+- DEC-1137
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/
@@ -106,6 +114,8 @@ list_rows:
 - W2-M356
 ---
 # W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430
+
+**DEC-1137 (2026-11-11):** W2-11's brief KPIs are re-baselined to what W2-128 left (DEC-105 option (c)): the five `brief-*.md` files are one-line pointers and stay so, and the front matter's KPI lines name the skills, `skill.md`, the orchestration, test-design and QA-review skills and the audit's DEC-430 wording. Where the card's older list under "KPIs, success" below names a brief template's content, the front matter holds; the role templates carry Policy 2's refusals, DEC-861's record rule and the two-refusal stop under W2-175 (DEC-1137 (2)).
 
 **DEC-959 (2026-10-30):** the skill template with three scenarios first and licence-checked imports (item 5); test-design's parallel work order; orchestration's three reference files; the new qa-review skill (ROLES-RESEARCH-1 §5.3 items 3 and 4).
 

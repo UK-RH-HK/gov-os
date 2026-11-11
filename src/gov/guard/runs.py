@@ -12,7 +12,8 @@ import re
 import stat
 from pathlib import Path
 
-ROOT_NAME = "gov-os-runs"
+from gov.util.runs_root import ROOT_NAME, root  # noqa: F401 - moved there by W2-150; both stay names of this module
+
 # DEC-751 1: the file in an own folder naming the git common directory of the repository whose launch made it.
 MARKER = ".gov-os-repository"
 # DEC-728 item 2 ("any role", R4); DEC-743 7: ticket-lead (DEC-434) has no own folder.
@@ -20,14 +21,6 @@ ROLES = frozenset({"orchestrator", "product-spec", "independent-test-designer",
                    "engineer", "independent-auditor", "research"})
 # The review (DEC-136): a plain folder name, a letter or digit first, then letters, digits, '.', '_' and '-'.
 PLAIN_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
-
-
-def root() -> str | None:
-    """The real path of ``~/gov-os-runs`` in the session's home, which need not exist; ``None`` without a home."""
-    home = os.path.expanduser("~")
-    if not os.path.isabs(home):
-        return None
-    return os.path.join(os.path.realpath(home), ROOT_NAME)
 
 
 def _name(ticket: dict) -> str:

@@ -58,7 +58,9 @@ grep -q 'EST=14400;' "$HERE/nightly.sh" || fail "N9: the no-history estimate is 
 # ---- nightly.sh: the rebuild scans in full (DEC-966 item 4, W2-107); the suites do not get the setting ---------------
 rb=$(grep -n 'gov.cli.main rebuild' "$HERE/nightly.sh")
 [ "$(echo "$rb" | grep -c .)" -eq 1 ] || fail "N10: not exactly one rebuild line in nightly.sh"
-echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN=1 ' || fail "N10: the rebuild line does not set GOV_SECRETS_FULL_SCAN=1"
+echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN="$FULL_SCAN" ' || fail "N10: the rebuild line does not take the full scan from the switch (DEC-1045)"
+grep -q "import secrets_switch as s; print(1 if s.scan_on('\$CLONE') else 0)" "$HERE/nightly.sh" || fail "N10: FULL_SCAN is not read from the clone's DEC-1045 switch"
+grep -q 'the secrets switch cannot be read (DEC-1045)" >> "$OUT/run.txt"; exit 2' "$HERE/nightly.sh" || fail "N10: an unreadable switch does not stop the night"
 grep -v 'gov.cli.main rebuild' "$HERE/nightly.sh" | grep -v '^ *#' | grep -q 'GOV_SECRETS_FULL_SCAN' && fail "N11: GOV_SECRETS_FULL_SCAN set outside the rebuild line"
 
 # ---- nightly.sh: the nightly takes all the heavy-job slots while its suites run (DEC-984) ------------------------
@@ -102,6 +104,41 @@ grep -q err-visible "$sb/err.txt" || fail "N17: stderr lost after the slot block
 bash "$sb/run_err.sh" "$sb/out_err2" "$sb/ro" 2> "$sb/err2.txt"
 grep -q err-visible "$sb/err2.txt" || fail "N17: stderr lost after a failed open"
 [ "$(grep -c '( noslot env' "$HERE/nightly.sh")" -eq 2 ] || fail "N14: not both suites run under noslot"
+# N18 (DEC-1038 (4), DEC-1039): both suites run through the gate's --held form for the slots the nightly holds, the
+# serial one naming 1 worker; a gate without the form is said in run.txt and the suites still run
+[ "$(grep -c '"${HEAVY_RUN\[@\]}" $WITH_LOCK python3 -m pytest' "$HERE/nightly.sh")" -eq 2 ] || fail "N18: not both suites through the gate"
+grep 'GOV_CLOSE_SERIAL_ONLY_GIVEN=' "$HERE/nightly.sh" | grep -q 'PYTEST_XDIST_AUTO_NUM_WORKERS=1 ' || fail "N18: the serial suite does not name 1 worker"
+grep -q '^HEAVY=\${NIGHTLY_HEAVY:-' "$sb/block.sh" || fail "N18: the gate is not chosen in the slot block"
+printf '%s\n' '#!/bin/bash' '# heavy-slot: --held' 'echo "gate $1 [$2]" >> "$GATE_LOG"; shift 2; exec "$@"' > "$sb/fakegate.sh"
+printf '%s\n' '#!/bin/bash' 'echo "old gate $*" >> "$GATE_LOG"; exit 9' > "$sb/oldgate.sh"
+printf '%s\n' 'OUT=$1; mkdir -p "$OUT"; MODE=night; latest=$(( $(date +%s) + 30 )); lock_wait=0; NIGHTLY_SLOT_DIR=$2' \
+  ". $sb/block.sh" '( noslot "${HEAVY_RUN[@]}" echo ran ) > "$OUT/stdout" 2>&1' > "$sb/run_gate.sh"
+GATE_LOG=$sb/gate1 NIGHTLY_HEAVY=$sb/fakegate.sh bash "$sb/run_gate.sh" "$sb/out_g1" "$sb/dir"
+grep -qx "gate --held \[1,2,3\]" "$sb/gate1" && grep -qx ran "$sb/out_g1/stdout" || fail "N18: the run did not go through the gate for 1,2,3: $(cat "$sb/gate1" "$sb/out_g1/stdout" 2>/dev/null)"
+grep -q "the gate's, for the slots held (1,2,3)" "$sb/out_g1/run.txt" || fail "N18: run.txt: $(cat "$sb/out_g1/run.txt")"
+flock "$sb/dir/gov-os-heavy-slot-1.lock" sleep 20 & busy=$!
+sleep 0.5; GATE_LOG=$sb/gate2 NIGHTLY_SLOT_WAIT=2 NIGHTLY_HEAVY=$sb/fakegate.sh bash "$sb/run_gate.sh" "$sb/out_g2" "$sb/dir"
+kill $busy 2>/dev/null; wait $busy 2>/dev/null
+grep -qx "gate --held \[2,3\]" "$sb/gate2" || fail "N18: two slots held did not give --held 2,3: $(cat "$sb/gate2" 2>/dev/null)"
+GATE_LOG=$sb/gate3 NIGHTLY_HEAVY=$sb/oldgate.sh bash "$sb/run_gate.sh" "$sb/out_g3" "$sb/dir"
+[ ! -e "$sb/gate3" ] && grep -qx ran "$sb/out_g3/stdout" || fail "N18: an old gate was called, or the run did not run"
+grep -q "WITHOUT the slots' thread budget and CPU sets" "$sb/out_g3/run.txt" || fail "N18: an old gate not said: $(cat "$sb/out_g3/run.txt")"
+# N19: through the real gate (NIGHTLY_TEST_HEAVY, else the orchestrator's heavy_slot.sh) when it has the --held form:
+# every CPU of this shell's set, 3 x 6 workers and the budget from them; the serial suite's 1 worker, the whole set
+RG=${NIGHTLY_TEST_HEAVY:-$(sed -n 's/^ORCH=//p' "$HERE/nightly.sh")/tools/heavy_slot.sh}
+if grep -q '^# heavy-slot: --held' "$RG" 2>/dev/null && command -v taskset > /dev/null; then
+  probe='import os; print(",".join(map(str, sorted(os.sched_getaffinity(0)))), os.environ["PYTEST_XDIST_AUTO_NUM_WORKERS"], os.environ["GOMAXPROCS"], os.environ["GOV_HEAVY_THREAD_BUDGET"])'
+  printf '%s\n' 'OUT=$1; mkdir -p "$OUT"; MODE=night; latest=$(( $(date +%s) + 30 )); lock_wait=0; NIGHTLY_SLOT_DIR=$2' \
+    ". $sb/block.sh" "( noslot env GOV_HEAVY_SLOTS=3 GOV_HEAVY_WORKERS=6 \"\${HEAVY_RUN[@]}\" python3 -c '$probe' ) > \"\$OUT/par\"" \
+    "( noslot env GOV_HEAVY_SLOTS=3 GOV_HEAVY_WORKERS=6 PYTEST_XDIST_AUTO_NUM_WORKERS=1 \"\${HEAVY_RUN[@]}\" python3 -c '$probe' ) > \"\$OUT/ser\"" > "$sb/run_real.sh"
+  NIGHTLY_HEAVY=$RG bash "$sb/run_real.sh" "$sb/out_real" "$sb/dir" 2>/dev/null
+  read -r allc n < <(python3 -c 'import os; c = sorted(os.sched_getaffinity(0)); print(",".join(map(str, c)), len(c))')
+  b=$(( n / 18 )); [ "$b" -ge 1 ] || b=1
+  [ "$(cat "$sb/out_real/par" 2>/dev/null)" = "$allc 18 $b $b" ] || fail "N19: the parallel suite got '$(cat "$sb/out_real/par" 2>/dev/null)', want '$allc 18 $b $b'"
+  [ "$(cat "$sb/out_real/ser" 2>/dev/null)" = "$allc 1 $n $n" ] || fail "N19: the serial suite got '$(cat "$sb/out_real/ser" 2>/dev/null)', want '$allc 1 $n $n'"
+else
+  echo "SKIP N19: the gate at $RG has no --held form (or no taskset here)"
+fi
 
 # ---- nightly_cron.sh: committed code only, a session's PATH, a log ----------------------------------------------
 mkdir -p "$work/repo/governance/project/orchestration/nightly"
@@ -326,5 +363,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N17, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N19, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"

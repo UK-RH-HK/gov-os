@@ -50,6 +50,12 @@ TEMPLATE_RULESYNC_REL = "template/.rulesync"
 KERNEL_ROLES_REL = "template/governance/kernel/roles"
 KERNEL_HOOKS_REL = "template/governance/kernel/hooks"
 KERNEL_SKILLS_REL = "template/governance/kernel/skills"
+KERNEL_TEMPLATES_REL = "template/governance/kernel/templates"   # W2-153 S3 amended (DEC-1112 (3))
+# W2-153 S4 (DEC-1050): the kernel templates an adopted project holds as byte copies under ``.claude/templates/``,
+# installed by the copies ACT (DEC-315), never by rulesync. The portability check reports a missing copy.
+TEMPLATE_COPIES_REL = ".claude/templates"
+TEMPLATE_COPY_STEMS = ("brief", "role-research", "role-product-spec", "role-test-designer", "role-engineer",
+                       "role-reviewer", "role-lead", "role-cto")
 SUPERPOWERS_REL = "template/governance/kernel/skills/superpowers"
 CHECK_DECL_REL = "template/governance/kernel/checks/adapter-portability.yaml"
 TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"   # DEC-127: per-repository project data
@@ -348,8 +354,14 @@ def build_project_from_template(project_dir: Path) -> None:
     """Build an adopted project in a temporary folder, file by file.
 
     - ``.rulesync/`` from ``template/.rulesync/``;
-    - ``governance/kernel/{hooks,roles,skills}`` from the kernel template
-      (ADR-0002 section 5: the kernel of a product repository);
+    - ``governance/kernel/{hooks,roles,skills,templates}`` from the kernel
+      template (ADR-0002 section 5: the kernel of a product repository).
+      ``templates/`` holds the role templates the rulesync role sources are
+      composed from (W2-153 S3 amended, DEC-1112 (3)): without it the
+      portability check has no composition to compare a source with;
+    - ``.claude/templates/<stem>.md``, byte copies of the eight kernel
+      templates of W2-153 S4, as the copies ACT installs them in an adopted
+      project (DEC-315; rulesync never writes them);
     - ``governance/project/tool-registry.yaml`` with this repository's
       registered rulesync entry (DEC-127), where a project records the
       rulesync version it expects;
@@ -365,6 +377,10 @@ def build_project_from_template(project_dir: Path) -> None:
 
     _copy_files(REPO_ROOT / KERNEL_ROLES_REL, project_dir / PROJECT_KERNEL_REL / "roles")
     _copy_files(REPO_ROOT / KERNEL_SKILLS_REL, project_dir / PROJECT_KERNEL_REL / "skills")
+    _copy_files(REPO_ROOT / KERNEL_TEMPLATES_REL, project_dir / PROJECT_KERNEL_REL / "templates")
+    for stem in TEMPLATE_COPY_STEMS:
+        _copy_file(REPO_ROOT / KERNEL_TEMPLATES_REL / f"{stem}.md",
+                   project_dir / TEMPLATE_COPIES_REL / f"{stem}.md")
     write_tool_registry(project_dir)
 
     decl = REPO_ROOT / CHECK_DECL_REL

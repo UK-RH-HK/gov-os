@@ -23,6 +23,8 @@ import re
 from gov.guard.decide import (LONG_REFUSAL, MOST_READ, _ASSIGN_RE, _copy_args,
                               _expand_token, _has_glob, _is_punct)
 from gov.guard.heldout import CONFIG_REL, SETTINGS_REL, _words
+# The whole-path glob matcher is ``gov.util.parts``'s: one source (W2-150 S6, DEC-1109 (2)).
+from gov.util.parts import _Glob
 
 SECOND_NAME_REFUSAL = ("the command gives the settings file or the held-out file, "
                        "a copy of one or a folder that holds one a second name (a "
@@ -82,60 +84,6 @@ def _real(path: str, cwd: str) -> str | None:
         return os.path.realpath(os.path.join(cwd, path))
     except (OSError, ValueError):
         return None  # not a path
-
-
-class _Glob:
-    """A glob as a matcher of whole paths: ``**`` crosses folders, ``*`` and
-    ``?`` stay inside one name, ``{a,b}`` is either, ``[...]`` any one
-    character.
-
-    The places of the path the pattern has reached are the bits of one
-    number, and no place is tried twice: a match costs the length of the
-    pattern, whatever stars it holds (DEC-562)."""
-
-    def __init__(self, pattern: str):
-        self.pattern = pattern
-
-    def match(self, path: str) -> bool:
-        pattern, n = self.pattern, len(path)
-        at: dict[str, int] = {}  # a character -> the places where the path has it
-        for k, c in enumerate(path):
-            at[c] = at.get(c, 0) | 1 << k
-        slash = at.get("/", 0)
-        every = (1 << n + 1) - 1
-        inside = (every >> 1) & ~slash  # the places of a character that is no slash
-        last = pattern.rfind("]")
-        groups: list[tuple[int, int]] = []  # open braces: where each began, what its alternatives reached
-        cur, i = 1, 0
-        while i < len(pattern) and (cur or groups):
-            c = pattern[i]
-            i += 1
-            if pattern.startswith("**/", i - 1):
-                cur |= (every & -(cur & -cur) & slash) << 1
-                i += 2
-            elif c == "*" and pattern.startswith("*", i):
-                cur = every & -(cur & -cur)  # every place from the first one on
-                i += 1
-            elif c == "*":
-                # The carry of the sum runs from a place to the end of its name.
-                cur |= ((cur & inside) + inside) ^ inside
-            elif c == "?" or (c == "[" and last > i):
-                if c == "[":
-                    i = pattern.index("]", i + 1) + 1
-                cur = (cur & inside) << 1
-            elif c == "{":
-                groups.append((cur, 0))
-            elif c == "}" and groups:
-                cur |= groups.pop()[1]
-            elif c == "," and groups:
-                start, reached = groups[-1]
-                groups[-1] = (start, reached | cur)
-                cur = start
-            else:
-                cur = (cur & at.get(c, 0)) << 1
-        for _, reached in groups:
-            cur |= reached
-        return bool(cur >> n & 1)
 
 
 _glob_rx = _Glob  # the name the callers and the builder cases know

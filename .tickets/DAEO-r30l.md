@@ -21,20 +21,47 @@ allowed_paths:
 - src/gov/check/commands.py
 - src/gov/launch/gate*
 - tests/unit/resources/**
+- src/gov/rebuild/watch.py
+- tests/unit/rebuild/test_w2_20*
+- src/gov/secrets/__init__.py
+- src/gov/codeintel/__init__.py
+- tests/unit/secrets_check/test_w2_20_*
+- src/gov/retrieval/ollama.py  # the query embedder's automatic start, for the DEC-1037 line [added, DEC-1037; DEC-1097 (8)]
+- src/gov/launch/plan_check.py  # W2-136's F2 entry criterion [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- src/gov/launch/launcher.py  # the launch's call of the gate and its override (P-1) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- src/gov/launch/command.py  # gov launch's --gate-override and --gpu-need-mib options (P-1) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_runs.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w1_28.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w1_32.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/launch/test_w2_136_plan_check.py  # an open gate planted in its launch fixtures only (S19) [added, DEC-1088 (5)(b); DEC-1097 (8)]
+- tests/unit/rebuild/test_w2_76_watch.py  # its machine-wide rebuild-lock default, now each tree its own (S7, DEC-1001 (d)) [added, DEC-1097 (8)]
+- tests/unit/rebuild/test_w2_76_lock_override.py  # the same [added, DEC-1097 (8)]
 kpis:
   success:
   - gov resources reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under ~/.gov-os/machine/, whichever repository started it.
-  - The gate opens or shuts with a named reason.
+  - 'The gate opens or shuts with a named reason; the gate judges real CPU use (busy cores over the last minute) as well as the load, and shows both [DEC-1010 item 7, SMART-WORK-3]'
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
   - 'The gate also reads the shared disk: it shuts below a floor of free space and of free inodes (100 GiB and 10,000,000, set in the gate''s one configuration file); gov launch refuses to start a session while it is shut, naming the reading, and the reading is one function gov close can call before a close (its call is W2-07''s or W2-66''s, whose paths hold the close) [DEC-898 item 1]'
   - 'The gate opens on load only while min(1-minute load, 15-minute load) < nproc: a short peak does not shut it; both at or above nproc does [DEC-942 item 2, DEC-942 item 3, DEC-950 item 2]'
   - 'The gate opens on memory while MemAvailable plus the running sessions'' live memory is at least the floor plus a working size for each running session and for the new one; nothing is reserved for a run that has not started [DEC-961, DEC-983, DEC-982]'
-  - 'Heavy jobs take a slot: a test run and a rebuild each wait for one of a configured number of machine-wide slots (the number in the gate''s configuration file, sized from a measure so that the load stays near the number of processors); sessions, reviews and single-process runs take no slot and are gated only by load, memory and disk; no other fixed ceiling on leads or sessions [DEC-979 item 1 D1, DEC-983, DEC-982]'
+  - 'Heavy jobs take a slot: a test run and a rebuild each wait for one of a configured number of machine-wide slots (the number in the gate''s configuration file, sized from a measure so that the load stays near the number of processors); sessions, reviews and single-process runs take no slot and are gated only by load, memory and disk; no other fixed ceiling on leads or sessions [DEC-979 item 1 D1, DEC-983, DEC-982]; a rebuild excludes only another rebuild of the same tree (each tree its own lock), never every rebuild on the machine; the rebuild''s peak memory is measured with the re-measure (S9) and counted by the gate like a test run''s [DEC-1001 (d), DEC-1003, SMART-WORK-2]'
   - 'All values in one configuration file (floor, verification peak, working size, disk and inode floors, verification lock, GPU margin), each with its date and source; a value missing or malformed shuts the gate, naming it; the reading names a measured figure older than seven days as due for re-measure [DEC-947 item 3, DEC-950 item 2]'
   - 'The re-measure: gov resources records samples of each live session''s process-tree memory, noting whether a verification run holds the configured lock, and from them writes the verification peak (largest sample) and the working size (largest outside verification) with the date into the configuration file, showing old and new side by side [DEC-947 items 2 and 3, DEC-950 item 2]'
   - 'GPU, minimal: a start that declares a GPU need opens only when a GPU''s free memory, read with nvidia-smi, is at least the need plus 10%; no nvidia-smi or no GPU shuts such a start, named; a start with no declared need never reads the GPU [DEC-950 item 2, DEC-941 item 6]'
   - 'The out-of-memory trip-wire: below a second, lower memory floor (in the configuration file), the gate names the largest heavy job and stops it before the kernel''s out-of-memory killer would end a session, and the stop is a finding; nothing else is stopped [DEC-947, DEC-983, DEC-982]'
+  - 'The durable CPU cap of both the Gov OS''s embedding servers, the shared one and the CPU-only query one (ports 11434 and 11435 on this machine, from the configuration): the gate''s configuration file holds each one''s logical CPUs and lower priority, inherited by their runner processes, which their start (W2-123) reads; the gate counts both servers'' CPU p95 when it admits a session; a planted restart of either server shows the cap applied, so a restart never loses it [ACT-OLLAMA-CAP-1, ACT-OLLAMA-CAP-2, DEC-1010 item 7, DEC-1017]'
+  - 'The gate measures the GPU as it measures CPU and memory: its memory used and total, its utilisation, and which processes hold it (an embedder, a reranker, other), read once per check; a machine with no GPU or an unreadable one is named in the answer, never an error [DEC-1030 item 4, DEC-1031 item 4]'
+  - 'The gate schedules GPU memory: each kind of GPU work has a configured share (default: the embedding model first, then one shared reranker, then the rest), and a job that would push the embedder off the GPU waits (or runs its model on the CPU) instead of starting; the answer states the GPU room it saw [DEC-1030 items 2 and 4, DEC-1031 item 4]'
+  - 'A heavy job''s slot carries a thread budget: every program the job starts (children, grandchildren, xdist workers, programs started by its tests) receives the common runtimes'' thread limits (Go, OpenMP, MKL, OpenBLAS, Rayon, numexpr, Accelerate) set to the slot''s share of the logical CPUs divided by its workers, at least 1, derived from the machine at start (never a number fixed for one machine); a value inherited from the caller does not raise it; the configuration file may set it, with its date and source [DEC-1038 (4), P-W2-20-THREAD-BUDGET (a), owner 2026-11-02]'
+  - 'Measured, in the evidence: a planted test suite whose tests each start a program that uses every CPU, run in one slot, keeps the machine''s busy cores within the slot''s share plus one, where without the budget and the CPU set it does not; and its time with them against without (no more than 20 % slower on the planted suite) [DEC-1038 (4), P-W2-20-THREAD-BUDGET (a)]'
+  - 'A heavy job''s slot is confined to its share of the logical CPUs (its own CPU set, derived from the machine and the number of slots, outside any CPU set the configuration gives the embedding servers), so a program that ignores every thread variable or starts many processes is still held to the share [DEC-1038 (4), the owner 2026-11-02 ~18:20]'
+  - 'The product''s own parallel work sizes its pools to the CPUs the process may use (its CPU set, `os.sched_getaffinity`), never to the machine''s count: the secret scan''s pool (`gov.secrets`) included, so a scan inside a slot runs at most the slot''s share at once [the owner 2026-11-02 ~18:20; incident 2026-11-02 16:20: about 120 gitleaks at once from one slot]'
+  - 'Enforcement at launch (DEC-1088 (5)(b)): gov launch refuses any session, lead or worker, while the gate is shut on any of its readings (load, CPU, memory, disk, inodes, a heavy-job slot, the GPU for a start that declares a need) or when the new session''s working size would pass a limit, naming the limit and its reading; one recorded override (gate_override: <DEC-id> on the launch) starts it anyway, and the override is written in the launch log and the plan''s output. Verify: unit tests with each reading planted shut, and with the override [DEC-1088 (5), DEC-899] [added, DEC-1088]'
+  - 'The query-wrapper removal (DEC-1037): the product''s automatic start of the query embedding server (ensure_query_available with start, in gov.retrieval.ollama) carries everything the interim wrapper ~/.local/bin/ollama adds, so that a small ACT can remove the wrapper: its CPUs and priority from the gate''s configuration file (as today); its device from that file (the GPU visible by default, or the CPU with the GPU hidden), a malformed value shutting the start, named; none of a heavy slot''s thread-budget variables inherited by the server; its output appended to its own log; and one line per start in a start log naming the time, the device and the caller (pid, working folder, command). The evidence names the ACT''s steps (the wrapper removed, the real binary found on PATH, a restart seen capped), not applied by this ticket. Verify: unit tests with a stand-in executable that records its environment, CPU affinity and niceness, started through ensure_query_available(start=True) with no wrapper on PATH, one case per device and a planted thread budget [DEC-1037 (a), DEC-1037 (4), DEC-1038 (1)] [added, DEC-1037; DEC-1097 (8)]'
+  - 'W2-136''s F2 entry criterion: before leads are routed through gov launch, the plan check (src/gov/launch/plan_check.py) reads the current tickets and the approved ready list from the main tree (or a named path the dispatcher keeps), never a lead worktree''s own copies, which can be stale; and a plan override is written to a launch log, not only to standard error (W2-136 F4). Verify: unit tests with a planted main tree and a lead worktree whose tickets and ready list differ from it: the check follows the main tree''s, a lead its stale copy would admit is refused; a planted override: one line in the launch log and the line on standard error [DEC-1088 (5)(b), DEC-803] [added, DEC-1088 (5)(b); DEC-1097 (8)]'
+  - 'The secrets scan has one switch: `governance/project/secrets.yaml` (`scan: on` or `scan: off`; the file or the key absent means on). When it is off, no content goes to the scanner; the rebuild''s report, `gov doctor` and `gov ci` name it; and the secrets-indexing check reads not applicable (YELLOW). Verify: `tests/unit/secrets_check/test_dec1045_switch.py` [DEC-1045] [added, DEC-1045 (3); the switch was built in `ddcec657c` under the CTO''s own task id, so no ticket held a line for it]'
   failure:
+  - 'A heavy job whose child programs together use more CPUs than its slot''s share, because they start their own thread pools or size their pools to the whole machine.'
   - A session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
   - A launch or a close that starts with the disk below either floor; a gate that reads disk space but not inodes.
   - 'Any fixed ceiling on leads or sessions other than the heavy-job slots (DEC-983).'
@@ -42,6 +69,9 @@ kpis:
   - 'A worker''s memory charged twice (in its lead''s tree and as its own session).'
 profile: STANDARD
 sources:
+- DEC-866
+- DEC-753
+- DEC-1109
 - DEC-729
 - DEC-742
 - DEC-747
@@ -52,6 +82,24 @@ sources:
 - DEC-950
 - DEC-954
 - DEC-983
+- DEC-1001
+- DEC-1003
+- DEC-1010
+- DEC-1017
+- DEC-1030
+- DEC-1031
+- DEC-1038
+- DEC-1039
+- DEC-1041
+- DEC-1045
+- DEC-1088
+- DEC-1037
+- DEC-1097
+- DEC-899
+- DEC-961
+- DEC-979
+- DEC-982
+- DEC-803
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-20/
@@ -79,3 +127,32 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-20), as approved (DEC-729). The list row
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
 - **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
 - **DEC-747 (delegated, 2026-10-17):** `src/gov/check/commands.py` is in the paths for the one line that records `resources` (P-A). "At most 8 sessions" holds after the start: the start check adds the new session's weight (P-B). DEC-742's load value stands (P-C). P-B's "at most 8" superseded by DEC-942 item 1.
+
+**Entry criterion from W2-136's review (F2; DEC-803, the CTO, 2026-11-07):** before leads are routed through `gov launch`, the plan check reads the **current** tickets and the **approved** ready list (the main tree's, or a named path the dispatcher keeps), never a lead worktree's own copies, which can be stale (fails open otherwise); and an override is written to a launch log, not only to stderr (W2-136 F4). [DEC-1088]
+Now a KPI line, with `plan_check.py` in the paths [added, DEC-1088 (5)(b); DEC-1097 (8)].
+
+**The designer's points settled (the CTO, delegated, 2026-11-09; the README's P-1 to P-6) [DEC-1097 (8)]:**
+- **P-1 (a):** the override is a launch option, `gov launch ... --gate-override DEC-NNN` (`launch(..., gate_override=)`),
+  written to `~/.gov-os/machine/launch.log` and to standard error; `launcher.py` and `command.py` added to the paths.
+- **P-2 (a) with (c):** S7 holds (DEC-983): a full set of heavy-job slots never refuses a session; a launch is refused
+  on the slots only when their reading cannot be taken. `--gpu-need-mib` stays for a start that declares a GPU need.
+- **P-3 (a):** the engineer ships a dated, sourced configuration template (`gov resources --init-config`, this
+  machine's values from the decisions, never overwriting an existing file); no default is read in its absence (S8).
+- **P-4:** confirmed: the 20 % is measured on time-bound programs (the slot's overhead), not on CPU-bound work.
+- **P-5 (a):** the re-measure keeps a third figure, the rebuild peak, from samples of slot holders of kind
+  `rebuild`; a rebuild does not hold the verification lock.
+- **P-6:** confirmed: a start check without a declared need never runs `nvidia-smi`; the reading and a start with a
+  need read the GPU once.
+- **P-7 (round 2):** `rebuild_peak_bytes` is required, dated and sourced like every value (S8: a missing value shuts the
+  gate, named; due for re-measure after seven days), and counted by the gate like the verification peak.
+- **P-8 (round 2):** kept: the plan override's line goes to the machine-wide `~/.gov-os/machine/launch.log` (P-1's log)
+  and to standard error; a relative `GOV_PLAN_READY` is read against the main tree.
+- **W2-136's launcher cases** (`tests/acceptance/W2-136/test_w2_136_launch_check.py`) plant no gate configuration, so
+  once every launch runs the gate they would be refused by it (S8, S19): a test designer revises their fixture to plant
+  an open gate, landing with this ticket's change (G-1).
+- **The engineer's round-1 points (the CTO, 2026-11-09):** (1) (a): each tree its own rebuild lock (S7, DEC-1001 (d));
+  W2-76's two unit tests that pin the machine-wide `/tmp/gov-os-rebuild.lock` default change with it (in the paths).
+  (2) The launch unit tests that start a launch with no gate planted (`test_runs.py`, `test_w1_28.py`, `test_w1_32.py`,
+  `test_w2_136_plan_check.py`) plant an open gate in their fixtures only (unit tests, the engineer's; in the paths).
+  (3) The interface the acceptance cases assume (the designer's README, "The interface these tests assume") is the
+  spec the engineer builds to: the CTO hands that section to the engineer in its brief.

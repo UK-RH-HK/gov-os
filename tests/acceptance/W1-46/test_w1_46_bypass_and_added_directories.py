@@ -105,7 +105,9 @@ def test_a_harmless_permission_mode_is_launched(launch, arguments):
     passed = ORDINARY + arguments
     result = launch(ENGINEER, None, *passed)
     assert result.run.returncode == 0, f"gov launch refused a harmless permission mode\n{result.describe()}"
-    assert tuple(result.session()["args"][-len(passed):]) == passed, "the CLI did not get the arguments unchanged"
+    assert support.caller_args_then_template_pair(result.session()["args"], passed), (
+        f"the CLI did not get the arguments unchanged, followed by nothing or the one template pair: "
+        f"{result.session()['args']}")
     assert support.sandbox_faults(result.settings()) == []
 
 

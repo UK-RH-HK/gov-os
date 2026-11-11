@@ -87,3 +87,5 @@ so the form that keeps W1-29 green is exit 2 with the reason on standard error. 
 - `tests/acceptance/W2-65`: 14 tests (1 structure, 6 cannot-run, 6 pass-through, 1 SubagentStop); 7 red before the
   implementation (the six cannot-run cases and the SubagentStop case).
 - `tests/acceptance/W1-29/test_session_hooks.py`: one case revised, red before the implementation; the others unchanged.
+
+- **DEC-1108 (5), DEC-1109 (2)** (W2-141 S4, its test designer, 2026-11-09): `w2_65_support.run_line` carries `GOV_GUARD_CALLS_DIR` from the test's environment (each test's own guard call-log folder, set in `tests/conftest.py`), so no hook run here writes `~/.gov-os/guard-calls`; nothing else changes.

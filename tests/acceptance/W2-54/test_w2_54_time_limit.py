@@ -114,9 +114,27 @@ def test_the_same_check_within_its_limit_is_green(box, tmp_path):
     assert checks["w254-timed"]["status"] == S.GREEN, done.describe()
 
 
+# Rewrite-Reason: DEC-1045. The owner's decision to switch the secrets scan off by configuration on this repository
+# (the feature stays built, on by default elsewhere) added, in ddcec657c278, exactly these three lines at the end of
+# the secrets-indexing declaration, so that with ``scan: off`` the check answers not applicable (YELLOW, naming the
+# switch). That change is accepted as DEC-1045's, and nothing else: the declaration must be its bytes at the base, or
+# those bytes followed by these lines and no other; every other declaration stays byte for byte as at the base.
+DECIDED_CHANGES = {
+    f"{S.CHECKS_REL}/secrets-indexing.yaml": ("DEC-1045", (
+        b"# With `scan: off` in governance/project/secrets.yaml (DEC-1045) the check answers not applicable, naming "
+        b"the switch:\n"
+        b"# YELLOW with that reason. Absent, the scan is on and the check is as above.\n"
+        b'allows-not-applicable: "true"\n')),
+}
+
+
 def test_no_hard_block_check_is_weakened():
     """DEC-768 item 4: every check declaration is as it was before this ticket, byte for byte, but the context
-    check's one added line; none is removed, added, downgraded or excluded. Passes today."""
+    check's one added line; none is removed, added, downgraded or excluded. Passes today.
+
+    Rewrite-Reason: DEC-1045: one declaration may also carry an owner's decided change, named in
+    ``DECIDED_CHANGES`` with its exact lines appended to the base's bytes (the secrets-indexing check's
+    ``allows-not-applicable``, DEC-1045). Any other change to it, or to any other declaration, still fails."""
     for folder in (S.CHECKS_REL, S.INSTALLED_CHECKS_REL):
         before = S.listed(S.BASE_COMMIT, folder)
         here = S.REPO_ROOT / folder
@@ -127,7 +145,13 @@ def test_no_hard_block_check_is_weakened():
             rel = f"{folder}/{name}"
             if rel == S.CONTEXT_DECLARATION_REL:
                 continue
-            assert (S.REPO_ROOT / rel).read_bytes() == S.show(S.BASE_COMMIT, rel), f"{rel} is changed"
+            base, now = S.show(S.BASE_COMMIT, rel), (S.REPO_ROOT / rel).read_bytes()
+            if rel in DECIDED_CHANGES and now != base:
+                decision, lines = DECIDED_CHANGES[rel]
+                assert now == base + lines, \
+                    f"{rel} is changed beyond {decision}'s lines (only those, appended to the base, are accepted)"
+                continue
+            assert now == base, f"{rel} is changed"
 
 
 @pytest.mark.parametrize("rel", (S.CONTEXT_DECLARATION_REL, f"{S.CHECKS_REL}/core-schema.yaml"))

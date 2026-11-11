@@ -173,6 +173,25 @@ def test_the_launcher_gives_the_role_an_empty_network_profile(kernel_launch, rol
     )
 
 
+def _ready_list_without(project, ticket):
+    """Plant an approved ready list whose one batch holds another ticket, never ``ticket`` (W2-136's form)."""
+    other = launch_support.TICKET_OF[support.ENGINEER]
+    assert other != ticket
+    launch_support.write(project, support.READY_REL,
+                         "# the approved ready list (planted for the W1-33 launcher case)\n"
+                         f"# batch 1\nW1-98 {other} W1-98-A5-plan.md W1-98-A5-plan.json\n")
+
+
+@pytest.mark.parametrize("ready", ["no ready list", "a ready list without the ticket"])
 @pytest.mark.parametrize("role", support.NOT_LAUNCHED)
-def test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker(launch, role):
-    launch_support.assert_refused(launch(role), "worker role")
+def test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker(launch, project, role, ready):
+    """Rewritten for DEC-1088 (5)(a) (W2-136 S9). The orchestrator on a ticket is a lead launch, no longer refused as
+    "not a worker role". Outside an approved ready list it starts no session, and the refusal names the ticket and
+    the ready list. The gate is planted open, so the refusal is the lead check's, not the gate's."""
+    ticket = support.w47.TICKET_OF[role]
+    if ready != "no ready list":
+        _ready_list_without(project, ticket)
+    result = launch(role, ticket)
+    launch_support.assert_refused(result, *support.LEAD_REFUSAL_WORDS)
+    said = result.run.stderr + "\n" + result.run.stdout
+    assert ticket in said, f"the refusal does not name the ticket {ticket}\n{result.describe()}"
