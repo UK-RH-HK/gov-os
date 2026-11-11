@@ -3,7 +3,7 @@ name: test-design
 version: "1.4.0"
 metadata:
   version: "1.4.0"
-description: Method for independent test design from the specification and KPIs, in parallel with the implementer and never reading its work.
+description: Method for independent test design from specification and KPIs, without reading implementation.
 ---
 
 # Test design
@@ -13,7 +13,7 @@ This skill describes how the independent test designer writes acceptance tests. 
 ## The work order in parallel
 
 - The work order is in parallel: the designer works from the specification and the KPIs beside the engineer, at the same time as it builds the code from the same specification, in a worktree of its own, and never reads its work; neither waits for the other (DEC-959 item 7, DEC-963).
-- It never reads this ticket's implementation: no file the ticket's branch changes against its base, other than its own tests; a retrieval or search result under those paths is dropped unread and named in its return (DEC-820 (c)). It may read the integrated code it must work with, on the integration branch (DEC-963, DEC-820). Its retrieval uses the integration branch's store, never the ticket worktree's (DEC-963 item 2). Everything else is open to it (DEC-820).
+- It never reads this ticket's implementation: no file the ticket's branch changes against its base, other than its own tests; a retrieval or search result under those paths is dropped unread and named in its return (CAP-38.c, DEC-820 (c)). It may read the integrated code it must work with, on the integration branch (DEC-963, DEC-820). Its retrieval uses the integration branch's store, never the ticket worktree's (DEC-963 item 2). Everything else is open to it (DEC-820).
 - When its tests are committed, the lead merges them and the implementer runs them once, reading results only, through the project's opaque acceptance runner where it has one (DEC-959 item 6).
 
 ## Inputs

@@ -87,7 +87,7 @@ The lead runs the loop from the lead template `role-lead.md` (DEC-1050, DEC-1052
 ## Temp hygiene and protected files
 
 - A session's temporary folder is its own and is removed with it; nothing is left in another session's folders (DEC-386, DEC-537).
-- Reads are open: the whole repository, the governance folder included, other worktrees and git history, by any search, glob or listing, apart from secrets and keys, the held-out material's contents (its file names may be seen), the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, DEC-525, DEC-1052).
+- Reads are open: the whole repository, the governance folder included, other worktrees and git history, by any search, glob or listing, except secrets and keys, the held-out material's contents (its file names may be seen), the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, DEC-525, DEC-1052).
 
 ## Learning metrics
 
