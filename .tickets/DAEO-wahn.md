@@ -19,6 +19,12 @@ depends_on: []
 allowed_paths:
 - template/governance/kernel/templates/role-*.md
 - docs/changes/W2-175-CIT-P.md
+- template/.rulesync/subagents/engineer.md
+- template/.rulesync/subagents/independent-auditor.md
+- template/.rulesync/subagents/independent-test-designer.md
+- template/.rulesync/subagents/orchestrator.md
+- template/.rulesync/subagents/product-spec.md
+- template/.rulesync/subagents/research.md
 # .claude/templates/role-*.md out of the paths: byte copies of the kernel templates, written only by the copies ACT after the owner's approval (DEC-315, as in W2-128)
 reads:
 - template/governance/kernel/templates/**
@@ -116,3 +122,5 @@ role's system prompt would still lack them, and the owner asked for the template
 - `role-reviewer.md` is the tightest against its 3500-character budget: measure before the lines go in.
 - Do not write `.claude/templates/`; `python3 -m gov.adapters.portability` reports those copies as differing until the
   copies ACT runs (as after W2-128), so the close of this ticket names that finding and does not fix it.
+
+**Scope amended (CTO, delegated, 2026-11-11, P-2 (a) of run 1's return):** the six `template/.rulesync/subagents/*.md` files join `allowed_paths` and F2's list, written by `compose()` (byte-determined) so W2-153's cases check them; the root `.rulesync/` follows by the copies ACT after the owner's approval; S6 reads green after that ACT for the six root cases and the guard case.
