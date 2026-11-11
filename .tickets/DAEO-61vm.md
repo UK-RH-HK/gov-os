@@ -326,3 +326,17 @@ repository with at least two commits (the audit commit and an earlier one), a `g
 a runs dir with `indep/AUDITS.log` and `indep/SEEDS.log` (or a planted `selection.json`); a planted pool folder; a store
 file with a `fingerprints` row; a `gov` link into a folder named `pin-<12 hex>`. The real `~/gov-os-eval`,
 `~/gov-os-runs` and run folders are never opened (F3).
+
+### 10 The CTO's readings of row 147 (delegated decisions, 2026-11-11, session b40cba91; DEC-936 item 2.5, DEC-1112 (3))
+1. **`dropped/` stays inside `hidden/`** (`hidden/dropped/`), so the existing glob `fixtures/evaluation/*/hidden/**`
+   keeps the dropped questions from every measured role. Every consumer of the set reads `hidden/*.yaml` flat, never
+   recursively; the auditor's copy made by the launch script excludes `hidden/dropped/` (a W2-173 follow-up, noted in its
+   ticket). Until W2-173 lands, an auditor that is shown a dropped question also sees its note's verdict; nothing counts it.
+2. **S4's "the six roles measured" reads as `memory-verdict-2`'s list:** the five roles `engineer`, `research`,
+   `product-spec`, `independent-test-designer`, `independent-auditor`; the orchestrator (the CTO, who measures) is not in
+   `measures.roles`, as in every `evaluation_sets` entry today. A test checks the five, never six.
+3. **S1's quotas for 36 to 39 files read as "at most":** with `n` files, each category's count is at most its 40-question
+   quota (section 4's table, PF-QUOTA), and at `n = 40` exactly the quota; the domain and subsystem scales stay as section 4
+   states them.
+4. **The draw lists come from the runs folder's `indep/AUDITS.log` and `indep/SEEDS.log`** as section 4 and section 9 state;
+   `selection.json`, when present, is a planted or hand-made override read first. No W2-173 change is needed for it.
