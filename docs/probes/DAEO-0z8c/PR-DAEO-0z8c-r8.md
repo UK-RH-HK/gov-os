@@ -1,0 +1,129 @@
+---
+type: probe
+task: DAEO-0z8c
+reviewer_session: 809acd19-32c4-42ca-8f87-2f99d32a2c8a
+implementer_session: 231ce824-8f91-4689-876d-ce792d9e375b
+reviewer_wrote_nothing: true
+commissioned_by: orchestrator
+judged_by: orchestrator
+judgement: pass
+probed_commit: 1e0ab6280cc97e789b04fb9c7c3dc572f6b1b6f2
+---
+
+# Fresh FULL probe of W2-05 (DAEO-0z8c) at 1e0ab6280cc9, land run r8 (review round 2 of 2, the last)
+
+- **Why a round 2:** round 1 (`PR-DAEO-0z8c-r7.md`, pass at `cd03a9d95653`) was READY, but W2-170 then landed on `w2/integrate` with `src/gov/memaudit/common.py`, which starts git and had no sweep row, so S1's sweep case was red on the merged result. The CTO decided P-MEMAUDIT option (a) (DEC-936 item 2.5): merge integrate (`1f2a38a712f1`); one record-only engineer pass (`e71e687bb665`: row 72 for `memaudit/common.py`, open; rows 73 to 76 and the corrections to rows 61 and 71 from round 1's F1 to F3, riding along, DEC-802, DEC-1131 (2)); verify; this review. The CTO's test designer rewrote the README map's seven bare items in full node-id form (`ac4fca415e99`, P-ACCEPT-MAP, round 1's F6). Integrate moved again and was merged before the review (`1e0ab6280cc9`, the probed head).
+- **The lead's results at the probed head:** `gov accept W2-05` 65 passed, 0 failed, exit 0 (S1 33/0, S2 7/0, S3 28/0, F1 25/0, every line pass). Scoped verification (`select_tests.py`: scope `scoped`, `core_changed` none, `unplaced` none): parallel 3741 tests, 6 failed, 6 skipped; serial phase 0 entries. The six are W2-96's SIGINT unit cases in `tests/unit/accept/`, the same as round 1; all six pass alone (foreground, normal HOME, 11.3 s). None touches this ticket's code or record.
+- **Brief:** `.gov-runtime/scratch/lead/briefs/rev-2.md` (hand-built; `JUDGEMENT.md` word for word); a fresh, read-only independent reviewer (`independent-auditor`, Opus 5.5, effort high, class C2), launched by the ticket lead through `launch_worker.sh`; tripwire: this tree unchanged; sandbox trial file absent. `verdict.ready` on the record below: READY (`(True, [])`: no finding in scope, ordinary work yes and fails open or loses work). The orchestrator's judgement: pass. F1 (four files reaching git through row 41 with no row) is a record row for the CTO, not a round.
+- **The reviewer's record follows, as returned.**
+
+**Step 0, the sandbox check, passed.**
+- (a) The write to `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-0z8c` failed with `OSError: [Errno 30] Read-only file system`.
+- (b) `git hash-object -w --stdin` returned `1ae28402a109`, and `git update-index --refresh` exited 0.
+- `GOV_ROLE` is `independent-auditor` and `GOV_TICKET` is `DAEO-0z8c`.
+- `rev-parse HEAD` read `1e0ab6280cc97e789b04fb9c7c3dc572f6b1b6f2` at the start and `1e0ab6280cc9` at the end.
+- `git status --porcelain` is empty at the end.
+
+task: a fresh, read-only FULL review of W2-05 (DAEO-0z8c) at head `1e0ab6280cc9`, run r8, review round 2 of 2 (the last)
+status: DONE. All four KPI lines pass. There is one new finding and it does not block: it is in scope and reachable in ordinary work, but it neither fails open nor loses work.
+work_completed:
+- Read round 1's probe record and the commits since `cd03a9d95653`, with their trailers.
+- Checked the engineer's record diff (`e71e687bb665`) row by row against the code: rows 61 and 71 to 76, the Counts paragraph and "Not settled here".
+- Checked the README map diff (`ac4fca415e99`) against the map reader and matcher in `accept/runner.py` (lines 145 to 214) and against the parametrize ids in the three test files.
+- Checked the `permissions.jsonc` change against the committed settings.
+- Swept `src/gov` for every process start, every import of the helpers (`gitenv` and `gitrun`), and every caller of `close.repo.git`, `checker._git`, `project.git`, `tickets.create` and `loader._git`, then compared the results with the record.
+files_changed: none
+evidence:
+- Commits since round 1, first-parent:
+  - `91dcaf9db1f0`: Role orchestrator, Task DAEO-0z8c.
+  - `ac4fca415e99`: Role independent-test-designer, Task DAEO-0z8c. It touches only `tests/acceptance/W2-05/README.md`, +3/-3.
+  - `1f2a38a712f1`: orchestrator, a merge.
+  - `e71e687bb665`: Role engineer, Task DAEO-0z8c. It touches only `docs/research/AR-2-git-sweep.md`.
+  - `e41d03365`: orchestrator, the checkpoint record.
+  - `1e0ab6280cc9`: orchestrator, a merge.
+- `git diff --stat cd03a9d95653 1e0ab6280cc9` shows no change in any of these paths: `.claude`, `lefthook.yml`, `template/lefthook.yml`, `template/.rulesync/hooks.jsonc`, `tests/conftest.py`, `gitenv.py`, `role_paths.py`, `tests/unit/gitenv`, the ticket file, and `src/gov/{adapters,ci,close,secrets,guard}`.
+- The four files that reach git through `loader._git` without a row all exist at `cd03a9d95653`:
+  - `src/gov/links/check.py`, added in `422aac405`
+  - `src/gov/util/register.py`, added in `28c586930`
+  - `src/gov/decisions/propagation.py` and `src/gov/decisions/backfill.py`, both added in `1a5342a15`/`1c835d47d`
+tests: none run. The lead's counts are taken as given.
+discoveries: four files of `src/gov` reach git through the store loader's git function (row 41) and have no row in the sweep record (F1). They were already present at round 1's head.
+risks: none from this run's changes. The record is still incomplete for files that reach git only through another row's function, and the sweep case cannot see such files.
+lessons: to check that the record names every file, search for the importers of each helper (`loader._git`, `close.repo.git`, `checker._git`, `project.git`), not only for `git_env` and `git_binary`. Row 74 was added for exactly this class of file, but the search behind it stopped at `context_check.py`.
+proposed_decisions: none. F1 is a record row that rides along with the next research touch of the record (DEC-802); no round is needed.
+unresolved: rows 61, 66, 71 (the hook), 72, 75 and 76 stay open for the CTO under P-MEMAUDIT (a). F1's four rows are not yet written.
+recommended_next_action: CTO: record round 2 as READY by `verdict.ready`. Add F1's four rows (in the "through row 41" form of row 74) when the record is next touched, without starting a round.
+
+task: DAEO-0z8c
+decisions: DEC-801, DEC-802, DEC-808, DEC-809, DEC-1010, DEC-1131 (the judgement rules); DEC-710, DEC-712, DEC-580, DEC-783, DEC-805, DEC-970 (KPI behaviour). No superseded or PROPOSED rule is in use.
+
+## Answers
+
+**(i) S1.**
+- I found no git call in `src/gov` that does not start from `git_env`, `program_env` or `runner_env`, or from a recorded exception (rows 61, 66, 72, 75, 76).
+- Rows 61 and 71 to 76 agree with the code:
+  - **Row 61:** `_git` at line 194, with callers at 208, 211, 214, 256, 1671 and 1698, `ask` at 1664, `addr` at 1491 to 1498, the questions at 1637, 1639, 1653 and 1658, and `_clone_trees` at 281. No other line of `reads.py` starts a process.
+  - **Row 71:** `_git` at 56 to 65; the calls at 122, 184, 262 and 279; the fall-back at 127. `Denied.names` (line 334) is false on None and `Linked.names_rel` (line 350) is false on None, as written. The hook imports `gov.guard.reads` only (lines 152, 182, 846) and runs its own environments at 240, 334 and 375, with git at 243, 337 and 378.
+  - **Row 72:** `_env` at 32 to 36, `git` at 39 to 44, `git_code` at 47 to 49, the three callers at 54, 65 and 75 to 79. In `preflight.py` and `declare.py` the line numbers are exact, and `layout.py`, `drops.py`, `ledger.py` and `__main__.py` import only other names.
+  - **Row 73:** `_ls_files` at 130 to 142; `Tracked` is built at `derive.py` line 98.
+  - **Row 74:** line 51 goes through `loader._git` (line 114, `git_env(root, pinned=True)`).
+  - **Row 75:** `env` at 539 to 543 and `Popen` at 555 to 556.
+  - **Row 76:** line 332, `job_env` at 82 to 88, and `Popen` at 375 to 376 with no `cwd`.
+- The Counts paragraph adds up: 76 rows, 5 open, and rows 73 and 74 recorded only. "Not settled here" matches.
+- Four files that reach git through row 41 have no row (F1).
+- "Open, recorded for the CTO" is acceptable for rows 72, 75 and 76 at this head:
+  - **Row 72** clears every `GIT_*` variable, so a planted `GIT_DIR` or `GIT_INDEX_FILE` reaches nothing. It only reads, with `GIT_OPTIONAL_LOCKS=0`, so it changes no index. The parts that are missing (lazy fetch, pinning, `git_binary`) neither fail open nor lose work.
+  - **Rows 75 and 76** are not started from a hook (`lefthook.yml` runs only `gov ci`), and `tests/conftest.py` strips the repository-local names in each test process.
+  - None of the three meets both questions.
+
+**(ii) Round 1's findings.**
+- F1: true. Rows 73 and 74 are written.
+- F2 (a) to (e): true.
+  - (a) The hook's separate copies are recorded.
+  - (b) The None outcomes are stated truly, and "the containment check calls none of the four" is true: no file of `src/gov/guard` other than the re-export names the module.
+  - (c) The DEC-135 citation is gone.
+  - (d) The line numbers are current.
+  - (e) Row 61 names every call.
+- F3: true. Rows 75 and 76 are written, and the `src/gov/resources/**` line is corrected.
+- I found nothing the engineer wrote that is untrue to the code.
+
+**(iii) The README map.**
+- The change is wording only. It changes exactly seven items, each from `test_x[id]` to `file.py::test_x[id]`: one in S2, one in S3 and five in F1. Every id exists in its file's parametrize list.
+- `matches` compares a `::` item with a bracket against the case's full name, so each item names exactly one case.
+- No case moves between lines:
+  - S2 and S3 each already list their whole file (`test_w2_05_linked_worktree.py`, `test_w2_05_settings.py`), so their case sets are unchanged.
+  - The new F1 items name cases of `test_w2_05_planted.py` that the line already meant.
+- The lead's run reports S2 7/0, S3 28/0 and F1 25/0 as pass.
+
+**(iv) S2, S3 and F1.**
+- No code behind the DEC-710 case, the settings or the planted cases changed through either merge (see the empty diff stat in evidence).
+- `permissions.jsonc` dropped the `npm install*`/`pip install*` deny rules (W2-105). The committed `.claude/settings.json` holds neither rule either, so the template and the committed file still agree, and S3's adapter-portability case stays green (28/0 at the head).
+- W1-38's change is to its own acceptance folder and does not bear on S3.
+
+## Probed and found sound
+- Nobody wrote outside their role's paths. The only change to `tests/acceptance/W2-05/**` is the independent test designer's. The engineer touched only the record, and no code under `src/gov` changed in this ticket.
+- `gitenv.py`, `tests/conftest.py` and the ticket file (non-goals) are untouched.
+- The other process starters that have no row start no git: `resources/machine.py` (an SMI query), `secrets/cache.py` (a tool's `version`), `check/schema.py` (a schema validator).
+- Every importer of `close.repo.git`, `checker._git` and `project.git` has a row.
+
+## Findings
+Classification (DEC-809): F1 in/yes/other. It does not block; it is a row.
+
+**F1 (S1): four files that reach git through the store loader's git function are not named in the sweep record.**
+- What was done:
+  - `src/gov/links/check.py` (W2-129) asks `loader._git` for `cat-file --batch`, `log`, `rev-list`, `diff` and `cat-file blob` (lines 350, 735, 736, 832, 977, 998, 999, 1006).
+  - `src/gov/util/register.py` asks it for `rev-parse --verify HEAD^{commit}` (line 106).
+  - `src/gov/decisions/propagation.py` asks it for `cat-file --batch` (line 40).
+  - `src/gov/decisions/backfill.py` asks it for `log -1` (line 76).
+- What happened: the record has no row for any of them. Rows 67 and 74 name files of exactly this kind. The sweep case stays green because none of the four holds a `"git"` literal. Each call does run in `git_env(root, pinned=True)` through row 41, so the behaviour is right.
+- What should have happened: one row each in row 74's form ("through row 41").
+- Ordinary work: yes, because tickets add callers of the loader's git function, and the only check cannot see them.
+- Consequence: other. Only the record is short; every call is scrubbed and pinned.
+- Scope: in (S1: "the sweep record lists every call").
+- Reversed by: a row at this head that names these files, or a reading that the record lists only files that start git themselves. Rows 58 to 60, 67 and 74 argue against that reading.
+
+Refusals: the guard refused nothing. That includes one Grep of `.claude/settings.json` and one of `.claude/hooks/role_reads.py`.
+
+```verdict
+{"kpis": [{"kpi": "S1", "verdict": "pass", "findings": [{"id": "F1", "scope": "in", "ordinary_work": "yes", "consequence": "other"}]}, {"kpi": "S2", "verdict": "pass", "findings": []}, {"kpi": "S3", "verdict": "pass", "findings": []}, {"kpi": "F1", "verdict": "pass", "findings": []}]}
+```
