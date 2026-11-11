@@ -2,8 +2,10 @@
 
 ``check_tags(root)`` gives a finding for every entry of the register whose tags line is missing or incomplete, whose
 domain or scope is outside its closed list, whose "lands in" places ``HEAD`` does not hold or are not where its
-scope says, and for every status that does not name what superseded or changed the entry. Findings have W2-03's
-shape; an empty list passes. They are not added to ``gov.decisions.check`` (the close reads that list).
+scope says, and for every SUPERSEDED status whose successor is unnamed or not in the register. Whether an old
+entry's status names the entry that supersedes or changes it is ``gov links``' one relation check (UNMARKED_CHANGE,
+W2-129; DEC-1109 (2)). Findings have W2-03's shape; an empty list passes. They are not added to
+``gov.decisions.check`` (the close reads that list).
 
 ``python3 -m gov.decisions.tags``, in a project root, prints the findings and exits 1 when there are any; a
 register that cannot be read exits 1 too, never 0.
@@ -68,16 +70,6 @@ def check_tags(root: Path) -> list[dict]:
             found.append(_finding("STATUS_SUCCESSOR_UNNAMED", [record_id], [path], f"{record_id} is SUPERSEDED and "
                                   + (f"its successor {entry['successor']} is not in the register" if entry["successor"]
                                      else "its status names no successor (`SUPERSEDED by DEC-<n>`)")))
-        for relation, olds in (("supersedes", entry["supersedes"]), ("changes", entry["changes"])):
-            for old in olds:
-                marked = held.get(old)
-                if marked is None or old == record_id:
-                    continue
-                if record_id not in marked["changed_by"] and record_id not in marked["named"]:
-                    found.append(_finding("STATUS_RELATION_UNMARKED", [old, record_id], [path],
-                                          f"{record_id} {relation} {old}, and {old}'s status line does not name "
-                                          f"{record_id} (`SUPERSEDED by {record_id}` or `**Changed by:** "
-                                          f"{record_id}`)"))
     return sorted(found, key=lambda finding: (finding["code"], finding["ids"], finding["paths"]))
 
 

@@ -104,7 +104,7 @@ The five file names are fixed by this suite. Nothing else is: no heading text, n
 | Each row is stated (success), and a row or clause that is absent is found (failure) | `TestRows::test_every_clause_of_the_row_is_stated[<row>]` × 11 | the skill does not exist |
 | The Wave 2 items are rules followed by hand, not a mechanism yet (DEC-537) | `TestWave2Items` (2): one section says both "by hand" and "not enforced yet" and cites DEC-537; it names the resource gate, the launch without a model, `AUTH_REQUIRED`, and leads started through the launcher | the skill does not exist |
 | The ticket lead is a section of the role file | `TestTicketLeadSection` (7): what a lead is; what it does; what it never does (merge, edit ticket files or the decision register, push); the four return forms; an id cited; no labelled field added; the roles and the rulesync subagents stay at six | no section whose heading names the ticket lead |
-| The five briefs | `TestBriefTemplates` (12): placeholders for ticket, profile, paths, sources, decisions × 5; the three standing sentences × 5; the test designer's states behaviour and sources only and cites DEC-462; no brief is named or framed as a record template | the brief does not exist |
+| The five briefs | `TestBriefTemplates` (12): placeholders for ticket, profile, paths, sources, decisions × 5; the three standing sentences × 5; the test designer's states behaviour and sources only and cites DEC-462; no brief is named or framed as a record template. Three of these cases revised for W2-128 TPL-1 S4 (see "The revision for W2-128" below) | the brief does not exist |
 | The wording | `TestWording` (2): no `pytest`, `python`, `.py`, `conftest` or `tests/acceptance` in the skill's body, the lead section or a brief, and the skill names tests in a project's terms (DEC-534); no ticket id, branch, folder, workbench, model name or `x.y.z` version of this repository's wave (DEC-539) | a deliverable does not exist |
 | The check is registered as `skill-regression-a` is | `TestOrchestrationCheck` (5): five string fields, family, tier and severity those of `skill-regression-a`, an id of its own; the command runs the generic validator over the skill's folder with no fallback; the delivered skill passes the validator; the same file with a body over the bound gives the one finding `SKILL_BODY_TOO_LONG` (failure line 1); in a temporary project `gov check` shows the check `GREEN` under `skill regression`, and `RED` with the skill taken out | no declaration; the skill does not exist |
 | The template's rulesync sources stay in step | `TestRulesyncSources` (2) | the skill does not exist; the role case is the green guard |
@@ -119,7 +119,7 @@ The rows and their cases (each case lists the clauses a reader cannot find):
 | Decisions | `[decisions]` | DEC-220, DEC-416, DEC-463 |
 | Stops | `[stops]` | |
 | Sessions | `[sessions]` | DEC-460, DEC-420 |
-| Briefs | `[briefs]` (and `TestBriefTemplates`) | DEC-462, DEC-221 |
+| Briefs | `[briefs]` (and `TestBriefTemplates`); revised for W2-128, see below | DEC-462, DEC-221 |
 | Commits | `[commits]` | DEC-476, DEC-491 |
 | Checkpoints and context | `[checkpoints and context]` | DEC-511 |
 | Temp hygiene and protected files | `[temp hygiene and protected files]` | DEC-508, DEC-525 |
@@ -188,6 +188,21 @@ The parts and "not read" are looked for in the section where the route is stated
    `write`, ...) also matches "an owner can read on a phone". Write "readable on a phone", or put an id on the
    line.
 
+### The revision for W2-128 (DAEO-t8mp; DEC-1050, DEC-1052; DEC-866)
+
+W2-128 TPL-1 S4 removes the five `brief-*.md` or makes each a one-line pointer to the template that replaces it
+(`role-test-designer.md`, `role-engineer.md`, `role-reviewer.md`, `role-product-spec.md`, `role-lead.md`; T-0
+`brief.md` is the envelope sent with each). A brief is **retired** when it is removed or its body is one non-blank
+line; a retired brief is read as the template its line names (else the ticket's map) plus `brief.md`. While a brief
+stands in full, every case below reads it exactly as before.
+
+| Case (full node id) | Choice | Why |
+|---|---|---|
+| `test_w1_35_orchestration.py::TestRows::test_every_clause_of_the_row_is_stated[briefs]` | (a) | The row's clauses and ids still govern the way a wave is run: the corpus follows a retired brief the skill names to its replacement and the envelope. The two standing sentences are held word for word while any brief stands; once all five are retired, DEC-1050's templates replace that rule (see the next row) |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_brief_has_a_placeholder_for_each_thing_it_is_filled_in_with` (× 5, one per brief) | (b) | Pointer form accepted; the five placeholders (ticket, profile, paths, sources, decisions) are looked for in the replacement and the envelope together. There the decisions may be the sources placeholder in a statement that sends the reader to the decision register (R3-TEMPLATES.md's T-0: `Sources: {SOURCES} (read each in .../DECISION_REGISTER.md ...)`) |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_brief_carries_the_standing_sentences_word_for_word` (× 5, one per brief) | (c) once retired | DEC-1050's one template per role replaces the word-for-word sentences in every brief (R3-1: four contradicting layers), and the first is contradicted by the templates' own rule (wait for long runs with an exit file). Held while the brief stands; once retired the case holds only that the replacement and the envelope exist |
+| `test_w1_35_orchestration.py::TestBriefTemplates::test_the_test_designers_brief_states_behaviour_and_sources_only` | (b) | DEC-462 stands. Pointer form accepted; the statement and the DEC-462 citation are looked for in the templates a designer's brief is made of and written from: `role-test-designer.md`, `brief.md`, and `role-lead.md` (the lead fills the brief's free text) |
+
 ## Token counting
 
 Uses `ceil(len(text) / 4)` where `text` is the decoded UTF-8 string, per W1-24.
@@ -198,3 +213,35 @@ Uses `ceil(len(text) / 4)` where `text` is the decoded UTF-8 string, per W1-24.
 cd /home/usain/gov-os-worktrees/W1-35
 python3 -m pytest tests/acceptance/W1-35/ -v
 ```
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 124 in the full run, 42 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens [CAP-24.a] | `test_w1_35.py::TestFrontmatterAndSize::test_description_within_60_tokens` (1 of 4), `test_w1_35.py::TestFrontmatterAndSize::test_body_within_2500_tokens` (1 of 4), `test_w1_35.py::TestFrontmatterAndSize::test_frontmatter_is_valid_yaml` (4 of 4) | the ticket's words |
+| S2: On the MR-A-02 and MR-B-02 dev scenarios, 0 of the decision packages discovery asks are answerable from files its retrieval bundle cites; at mo... | `test_w1_35.py::TestDecisionPackages::test_discovery_mentions_decision_packages`, `test_w1_35.py::TestDecisionPackages::test_discovery_mentions_cap_of_five`, `test_w1_35.py::TestDecisionPackages::test_discovery_p1_bypass` | the ticket's words |
+| S3: Planning emits schema-valid tickets and one linked gap ticket (class discovery, data, research or test-design) per required open readiness row ... | `test_w1_35.py::TestPlanningGapTickets::test_planning_mentions_schema_valid_tickets`, `test_w1_35.py::TestPlanningGapTickets::test_planning_mentions_gap_tickets`, `test_w1_35.py::TestPlanningGapTickets::test_planning_mentions_ticket_classes` | the ticket's words |
+| S4: Test design reads only the specification and KPIs (its transcript reads no file outside them); change covers CIT-P and CIT-E, and an accepted C... | `test_w1_35.py::TestTestDesignConstraints::test_test_design_reads_only_spec_and_kpis`, `test_w1_35.py::TestTestDesignConstraints::test_change_covers_audit_ticket` | designer |
+| S5: No skill file grants a permission or states a rule as its own authority: a skill is a method, holds no tool permissions, and cites the policy o... | `test_w1_35.py::TestNoPermissionGrants::test_no_permission_granting_language` (4 of 4), `test_w1_35.py::TestNoPermissionGrants::test_procedural_statements_cite_policy` (4 of 4), `test_w1_35.py::TestCitations::test_skill_cites_at_least_one_reference` (1 of 4) | the ticket's words |
+| S6: The change skill takes a skill change through evidence → proposal → independent review → owner approval → a new version in the skill frontmatte... | `test_w1_35.py::TestChangeSkillLifecycle::test_change_skill_documents_lifecycle`, `test_w1_35.py::TestChangeSkillLifecycle::test_change_skill_lifecycle_order` | the ticket's words |
+| S7: A change to the Gov OS kernel, policy or skills passes evidence → corroboration → proposal (CIT-P) → independent review → owner approval → vers... | `test_w1_35.py::TestCITWorkflow::test_change_skill_mentions_cit_p_and_cit_e`, `test_w1_35.py::TestCITWorkflow::test_change_skill_refuses_archive_without_records` | designer |
+| S8: Registers the skill-regression family check over its four skills, using the generic validator from W1-26: frontmatter, version, size, and every... | `test_w1_35.py::TestReferencedCommands::test_referenced_commands_are_known` (1 of 4), `test_w1_35.py::TestCheckDeclaration::test_check_declaration_family_is_skill_regression`, `test_w1_35.py::TestDeclarationCommand::test_command_references_all_four_skill_folders` | the ticket's words |
+| S9: Discovery treats experiments (spikes, tool compatibility and performance trials) as a normal step that can run at any point: each runs in a san... | `test_w1_35.py::TestDiscoveryExperiments::test_discovery_normal_cycle_promotion` | the ticket's words |
+| S10: Discovery and planning follow the order of specification work: discovery and research, scenarios, representative data, UX for a feature with a... | `test_w1_35.py::TestSpecificationWorkOrder::test_discovery_states_work_order`, `test_w1_35.py::TestSpecificationWorkOrder::test_planning_states_work_order`, `test_w1_35.py::TestSpecificationWorkOrder::test_work_order_correct_sequence_discovery` | the ticket's words |
+| S11: When an experiment or finding contradicts a closed specification, the change skill opens a CIT-P whose impact assessment lists the affected sp... | `test_w1_35.py::TestEvidenceTriggeredChange::test_change_cit_p_on_contradiction`, `test_w1_35.py::TestEvidenceTriggeredChange::test_change_mentions_three_options` | designer |
+| S12: Test design takes probe findings from the orchestrator's review as described behaviours, never as code; it decides from the specification whet... | `test_w1_35.py::TestProbeFindings::test_test_design_described_behaviours_not_code`, `test_w1_35.py::TestProbeFindings::test_test_design_specification_gap_reporting` | the ticket's words |
+| S13: A question of the form "what is the impact of X?", asked in plain language, makes the change skill run the impact assessment: an OpenSpec prop... | `test_w1_35.py::TestCITWorkflow::test_change_skill_refuses_archive_without_records`, `test_w1_35.py::TestImpactAssessment::test_change_mentions_impact_assessment`, `test_w1_35.py::TestImpactAssessment::test_change_impact_triggered_by_question` | the ticket's words |
+| S14: The orchestration skill, the ticket lead section of the orchestrator role file and five brief templates (test designer, engineer, reviewer, pr... | `test_w1_35_orchestration.py::TestOrchestrationSkillForm::test_the_skill_names_the_five_brief_templates` | the ticket's words |
+| S15: A status question asked in natural language is answered from gov status --json: the orchestration skill states the route, and a case holds it ... | `test_w1_35_orchestration.py::TestStatusRoute::test_a_status_question_is_routed_to_the_command` | the ticket's words |
+| F1: A skill body exceeds 2.5k tokens | `test_w1_35_orchestration.py::TestOrchestrationCheck::test_the_delivered_skill_with_a_body_over_the_bound_does_not_pass` | the ticket's words |
+| F2: The test-design skill reads implementation files | `test_w1_35.py::TestFailureTestDesignReadsImpl::test_test_design_states_restriction`, `test_w1_35.py::TestTestDesignConstraints::test_test_design_reads_only_spec_and_kpis`, `test_w1_35.py::TestTestDesignConstraints::test_test_design_no_implementation_files` | the ticket's words |
+| F3: A required open readiness row has no linked gap ticket after planning | `test_w1_35.py::TestFailureMissingGapTicket::test_planning_states_gap_ticket_requirement`, `test_w1_35.py::TestPlanningGapTickets::test_planning_mentions_gap_tickets`, `test_w1_35.py::TestPlanningGapTickets::test_planning_mentions_readiness_rows` | the ticket's words |

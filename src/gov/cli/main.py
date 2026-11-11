@@ -184,6 +184,9 @@ def _emit(args, ok: bool, result: dict, error: GovError | None) -> None:
     elif error is not None:
         print(f"gov {args.command}: {error.code}: {error.message}", file=sys.stderr)
     else:
+        store = result.get("store") if args.command == "retrieve" else None
+        if isinstance(store, dict):  # W2-138 S1 (DEC-1090 (3)): the store a search answered from, first
+            print(f"store: {str(store.get('commit') or 'unknown')[:12]} ({store.get('root')})")
         print(json.dumps(result, indent=2))
 
 

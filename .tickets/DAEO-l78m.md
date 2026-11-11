@@ -52,6 +52,15 @@ sources:
 - DEC-953
 - DEC-954
 - DEC-957
+- CAP-03.a
+- CAP-03.d
+- CAP-44.b
+- CAP-44.e
+- CAP-44.g
+- CAP-44.h
+- CAP-44.j
+- DEC-898
+- DEC-906
 est_loc: 1200
 acceptance_tests:
   path: tests/acceptance/W2-81/

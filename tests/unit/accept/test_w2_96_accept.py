@@ -1,7 +1,8 @@
 """W2-96 (DAEO-ouet): builder tests of ``gov accept``, the opaque acceptance runner (DEC-959 item 6).
 
 Each test plants a tiny project in a temporary folder: a ticket, its acceptance folder with a README map
-and a few tests. Nothing runs against this repository's own acceptance folders.
+and a few tests. Nothing runs against this repository's own acceptance folders. A ``gov accept`` started as its own
+process is reaped, with the pytest it starts, however the case ends (``w2_96_reap``; incident 2026-11-10 00:43).
 """
 
 from __future__ import annotations
@@ -16,6 +17,9 @@ import pytest
 from gov.accept import runner
 from gov.cli.errors import GovError
 from gov.cli.main import main
+from w2_96_reap import launch_fixture
+
+launch = launch_fixture()  # the r2 cases' planted gov: reaped, with the pytest it started, however the case ends
 
 MARK = "PLANTED-LEAK-7f3a"  # planted in assertions, output and names: must never reach the caller
 
@@ -319,9 +323,7 @@ def _gone(pid: int) -> bool:
 
 
 @pytest.mark.parametrize("signum", [15, 1])  # SIGTERM, SIGHUP
-def test_w2_96_r2_a_signal_stops_the_run_and_cleans_up(project, tmp_path, signum):
-    import subprocess
-    import sys
+def test_w2_96_r2_a_signal_stops_the_run_and_cleans_up(project, tmp_path, launch, signum):
     import time
 
     root, temp = project
@@ -331,9 +333,7 @@ def test_w2_96_r2_a_signal_stops_the_run_and_cleans_up(project, tmp_path, signum
             "    child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])\n"
             f"    open({str(flag)!r}, 'w').write(str(child.pid))\n    time.sleep(60)\n")
     _plant(root, ONE_LINE, {"test_a.py": test})
-    env = dict(os.environ, PYTHONPATH=str(Path(runner.__file__).parents[2]), TMPDIR=str(temp))
-    gov = subprocess.Popen([sys.executable, "-m", "gov.cli.main", "accept", "DAEO-t001", "--json", "--root",
-                            str(root)], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    gov = launch(root, temp)  # gov's own main, reaped with the pytest it started however the case ends (w2_96_reap)
     deadline = time.monotonic() + 60
     while not (flag.exists() and flag.read_text()) and time.monotonic() < deadline:
         time.sleep(0.1)

@@ -282,6 +282,11 @@ def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
       is that list, read from ``root`` when not given). A ``Role: owner``
       trailer alone exempts nothing. A merge commit on the merged side is
       judged by this same rule when the history walk reaches it.
+
+    DEC-1031 item 3 (the owner's named decision under DEC-906): a merge whose own
+    full id is listed in ``acceptance_exemptions`` is exempt for the changes it
+    makes itself (a test designer's conflict resolution committed under another
+    role, as ``0568d91baf56``); the commits it brings are judged as above.
     """
     if exempt is None:
         exempt = acceptance_exemptions(root)
@@ -290,7 +295,7 @@ def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
     base = _blobs_under(first, path, root)
     brought = [_blobs_under(parent, path, root) for parent in others]
     offences = []
-    own = sorted(
+    own = [] if sha in exempt else sorted(
         name for name in set(merged) | set(base)
         if merged.get(name) != base.get(name)
         and not any(side.get(name) == merged.get(name) for side in brought)

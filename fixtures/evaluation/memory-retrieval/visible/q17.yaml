@@ -1,9 +1,15 @@
 # Lens B's Q17 (Table 2): "path-map.yaml 6–116; semantic.py 206–220". My reading: two pieces, the rule (_wanted:
 # a file is embedded when every namespace it falls in says embedded) and the namespaces that say so (the path map's
 # namespaces block, lines 6–135 at the commit).
+# Re-anchored by the owner's DEC-1069 (1) (2026-11-04; the audit's R6-SPAN-MISSES), checked blind at the commit by a
+# session independent of the retrieval work. The path map's `namespaces:` heading spans the stated 130 lines (6 to
+# 135), but the block now runs from 6 to 288, the line before the project floor's comment and `capabilities:`.
+# Half the namespaces fell outside the span, so it is now 6 to 288; the audit's 287 is one line short (the last
+# namespace's deletion_rebuild is at 288). _wanted's heading is now at line 429; its span keeps its length, and holds
+# the rule. The question and the gold answer are kept. The label before is in ../retired/q17-pre-dec1069.yaml.
 id: Q17
 category: code location
-commit: 23079f92a6fa
+commit: cc9c94d42a54
 question: Which paths are embedded for semantic search?
 gold_answer: >-
   The chunks of every file whose every path-map namespace says embedding_policy: embedded (semantic._wanted); a file
@@ -12,7 +18,7 @@ gold_answer: >-
 sources:
   - path: src/gov/retrieval/semantic.py
     heading: "def _wanted(root: Path, connection: sqlite3.Connection) -> list[str]:"
-    lines: [206, 220]
+    lines: [429, 443]
   - path: governance/project/path-map.yaml
     heading: "namespaces:"
-    lines: [6, 135]
+    lines: [6, 288]

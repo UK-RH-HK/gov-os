@@ -1,6 +1,6 @@
 ---
 id: DAEO-2upp
-status: open
+status: closed
 deps: [DAEO-uzme]
 links: []
 created: 2026-10-26T23:24:29Z
@@ -11,6 +11,7 @@ parent: DAEO-uzme
 state_class: AUTHORITATIVE
 disposition: unclassed
 role: independent-test-designer
+depends_on: [DAEO-uzme]
 allowed_paths:
 - tests/acceptance/W1-05/**
 - tests/acceptance/W1-47/**
@@ -47,3 +48,4 @@ Findings of the refused close of DAEO-uzme (disposition: unclassed):
 - tests/acceptance/W1-49/test_w1_49_precompact.py::test_without_tk_the_block_says_so_and_holds_the_rest[not on PATH] is red (failed) and accepted_reds does not list it
 - tests/acceptance/W2-69/test_w2_69_unit_folder_renamed.py::test_the_unit_folder_named_secrets_is_gone is red (failed) and accepted_reds does not list it
 
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (8). Its parent is closed; its lines go with it, and D-10 catches any red it names that still stands.

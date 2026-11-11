@@ -17,6 +17,7 @@ from gov.util.gitenv import git_env
 
 # the gitleaks configuration a tier is adopted with: this repository's template, else an adopted project's own
 GITLEAKS_CONFIGS = ("template/.gitleaks.toml", ".gitleaks.toml")
+SECRETS_SWITCH = "governance/project/secrets.yaml"  # the secrets scan's switch (DEC-1045)
 
 
 def main():
@@ -46,6 +47,9 @@ def main():
 
     tiers_map = {"A": "a-dev", "B": "b-dev"}
     project = Path.cwd()  # the project under check (DEC-285), never the install path (DEC-835)
+    from gov.secrets import SCAN_OFF, scan_on
+    if not scan_on(project):  # the tiers are indexed without a scan: said, never silent
+        print(SCAN_OFF)
 
     # Every git call of the check acts on a temporary clone, never on the repository whose hook runs it
     # (DEC-710): the GIT_* variables a hook inherits are cleared for the whole process, the store's calls included.
@@ -151,6 +155,8 @@ def _adopt(root: Path, project: Path):
         if (project / rel).is_file():
             shutil.copy2(project / rel, root / ".gitleaks.toml")
             break
+    if (project / SECRETS_SWITCH).is_file():  # the tier follows the project's scan switch (DEC-1045)
+        shutil.copy2(project / SECRETS_SWITCH, root / SECRETS_SWITCH)
     exclude = root / ".git" / "info" / "exclude"
     exclude.parent.mkdir(parents=True, exist_ok=True)
     text = exclude.read_text(encoding="utf-8") if exclude.is_file() else ""

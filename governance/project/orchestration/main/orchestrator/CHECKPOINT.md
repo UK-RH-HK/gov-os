@@ -1,337 +1,591 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — HANDOVER of 2026-10-30 21:36 GMT, for the fresh session after ACT 1 (DEC-955, DEC-957)
+## RESUME HERE — 2026-11-03 14:03: handover from session `bb5cd8bd` to a FRESH SESSION (the owner's order)
 
-**Read first, in order:** `governance/project/prompts/w2-orchestrator.md` §0 (v3.47: DEC-953, DEC-954, DEC-957's
-work order and escalation rubric); `governance/project/orchestration/DECISIONS-IN-FORCE.md`; this block. Owner texts
-verbatim: `drafts/DEC-953-owner-text.md`, `drafts/DEC-954-owner-text.md`; DEC-955 to DEC-957 in the register.
-**Check first:** `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; that ACT 1 is committed (`git log
---oneline -5 -- .claude/settings.json` shows the owner's `ACT-1-GUARD` commit) and the hook is wired (`python3
-.gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS` ends
-PASS, 38 cases). If ACT 1 is NOT committed: stop and tell the owner.
+**START FROM `governance/project/orchestration/START-NEXT-SESSION.md`** (the emergency, the reading list, what is done,
+live and next, what waits on the owner, the checks at start); this block is its detail.
 
-**State at the handover (main tree clean at `aafd45c1`, nothing staged):**
-- Closed on the 10 practices: W2-71 (`9f448448`; own suite back-filled 304/304, `26495f56`).
-- Merged, not closed: W2-57, W2-77, W2-03, W2-26 (their batch was STOPPED at 21:19 by the owner, DEC-957 item 1:
-  it tested the head with my register fault), W2-61 (merged `758cd53f`, not yet closed).
-- Leads running: W2-87 only (started 16:29; register defect first, then authority order; re-measure with W2-61's
-  measure). Returns land in `log/<W2>-A5-*.json`; watchers to arm: `tools/lead_return_watch.sh`,
-  `tools/interim_watch.sh` (background). Monitors running detached: mem_sampler, usage_watch, oom_watch.
-- Returned, waiting for after ACT 1: W2-85 (route done, head `d113ff5ea045`: merge + close), W2-64 (run 2 brief
-  `briefs/W2-64-A5-run2.md`: P-W2-64-1 (a) fixture revision, scoped run of the corrected tests only), W2-76 (run 2:
-  DEC-956's two items; write `briefs/W2-76-part-run2.md` from its return `log/W2-76-A5-run1.json`), W2-78 parked.
-- `CLOSE-HEAD` (scratch) pins closes to `aafd45c1` (corrected register, before ACT 1) until W2-90 lands; then delete.
-- The main tree's store was rebuilt 21:20 to 21:34 with the current code (the STORE_MISSING cause: a store built
-  before W2-03's `span` column; log `log/rebuild-main-2026-10-30.json`); `gov retrieve` answers `ok: true` there
-  again (checked 21:35). Its stderr carries the reranker's progress lines: read stdout alone for the JSON.
+**The plan (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its "DECIDED BY DEC-1052"
+section first; `INTENT-DEC-1052.md`; `OWNER-GLOSSARY.md`. **Read first:** the prompt's §0; `DECISIONS-IN-FORCE.md`; the
+register's DEC-1052 and DEC-1053. **Next free id DEC-1054.** Still in force: DEC-1047, DEC-1049 (no nightly), DEC-1051
+(everything stopped but the refactoring), DEC-1045 (no gitleaks).
 
-**The fresh session's order (DEC-954, DEC-955, DEC-957):**
-1. **W2-90 first:** file it (LITE, independent test designer; the owner's named decision under DEC-906, DEC-957):
-   revise the 235 live-wiring tests (`/tmp/gov-os-act1/confirmed.json`, if gone re-derive with `tools/act1_tests.py`
-   + `tools/act1_confirm.py`; 19 files: W1-46 142, W1-05 77, W2-59 5, W1-47 4, W1-49 2, W1-28 2, W1-50 2, W2-65 1)
-   to judge the kernel's wiring, `Rewrite-Reason: DEC-953 item 2`, lowering nothing; claim, worktree, brief, lead.
-2. **The batch re-run:** `python3 tools/close_build.py W2-57 W2-77 W2-03 W2-26` (background; full; on CLOSE-HEAD).
-   Before it: check W2-54's green-here and time-limit cases alone on a rebuilt clone at `aafd45c1` are green (the
-   register re-mark, `6fd19a5f`). Then W2-85's merge and close, W2-61's close.
-3. **Then, in parallel within the gate:** W2-64 run 2, W2-76 run 2, the 10 built tickets (W2-67, W2-51, W2-49,
-   W2-37, W2-16, W2-84, W2-05, W2-20, W2-52, W2-60a) each finished and closed on the 10 practices (merge
-   `w2/integrate` into each kept worktree first, so it carries ACT 1's settings), and the streams S1 memory,
-   S2 roles, S3 sandbox, S4 adoption + proving ground.
-4. **The roles research session (DEC-957 item 8), now:** a research worker (effort high) on a software company's
-   roles and skills from the CTO down (the QA engineer among them; domain engineers as engineer + domain skill),
-   what each skill contains, best practice, who integrates (SE per stream, CTO across) and who may push, benchmarking
-   as a research skill. Reports to the owner as a package with insights. Until the owner decides: Q6 (the CTO the
-   only main-tree writer), the push the owner's.
-5. **Memory (DEC-957):** target 95 % (floor 85 %); all seven gaps of `packages/MEMORY-SPEC-MAP.md` closed before
-   ready; the 48-question measure (W2-61h writes the 28 new; judged on the hidden half, >= 21 of 24); file W2-86,
-   W2-88 (draft `drafts/tickets/W2-88.md`), and tickets for the graph/code-graph routes, embeddings of root files +
-   `governance/**` + `schemas/**`, W2-81's hidden half, EXAMIN's question set; apply
-   `drafts/plan-dec954/TICKET-EDITS.md` one commit per ticket (and W2-78's three rows).
-6. **The roles (ROLES-SPEC-1 approved with DEC-957's answers):** W2-33 r1 (role default lines) before W2-60a's merge;
-   W2-11 r1 versions the skill copies; the combined CIT-P; new W2-89 (`gov streams`), W2-00a/b/c; the domain skill
-   packs in Wave 2; the escalation rubric into the playbooks (W2-83b).
-7. Then ACT 2 (one re-pin), the three layers in new sessions, EXAMIN only when K9's criteria are met.
-- **Housekeeping:** remove `~/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26-20261030-191445/` (the stopped batch's
-  clone; my old guard refused writes there), `/dev/shm/gov-os-W2-76-held.lock`, `/tmp/gov-os-act1/` once W2-90's
-  list is taken; brief gaps from today's returns into `governance/project/orchestration/brief-gaps.md`.
-- **Milestone 2** (pinged when done): the five closes (W2-71 done; the batch of four), selection proven scoped
-  (W2-71: 5,091 tests vs ~16,900 full; ~46 min testing at load 35 after an 83-min lock wait; the batch gives the
-  full time), the gates lifted, the guard at five rules. **Milestone 3:** memory and the roles landed.
-- **Lessons today:** "lifted" is not "superseded" (status lines are read by the context check); a scoped selection
-  must keep the ticket's own suite; nightly-route entries stay out of a close; never `pkill -f`; no backticks or
-  braces in inline commands under the old guard (gone after ACT 1); validate parsers' inputs before comparing runs.
+**Done today (D-0 to D-2):**
+- **D-0** (DEC-1053 `d855e41a`, the list `packages/LIFT-1/D0-CLEANUP-LIST.md`): 43 worktrees + branches with nothing
+  unmerged removed (their scratch archived to `archive/worktree-scratch/`, self-ignored; the record synced first);
+  `w2/W2-48` deleted; 67 run folders removed (the measures' evidence kept). 32 worktrees left; 878 GB free.
+  `w2/W2-78` and the in-flight tickets' branches wait for D-9's fates.
+- **D-1:** merged as built into `w2/integrate`: W2-122 `5543a03a44c0`, W2-123 `f704f7d3fee3`, W2-112 `9a02a474e3d5`,
+  emg/select `b120aad0f048` (+ `9a5254ce8bf7`, `9894b0cf514a`), emg/noscan `c72ededc5c97`, emg/w1-19-helper
+  `d7b25cf3c605`, W2-126 `0c5d7f4c935f` (conflict + KPI 7 + 8 builder tests; P-W2-126-BT delegated, ticket line
+  `81801789`), W2-04 `70965cf61311`. **Re-pin window 2 LIVE:** `pin-9894b0cf` (ACT-REPIN-W2, registry `b74d2c7f`);
+  pin-a7182f6c kept for the rollback; the integration store at 9894b0cf.
+- **D-2 live:** E1 (Q-1 + G-1: `emg/queue` `2d968b5089c5`, `tools/land.py` promoted, backup `land.py.pre-dec1050`);
+  R1-21 (`tools/structural_pass.py`, in `land.py`, backup `land.py.pre-r1-21`); the LB held-slot fix + O-A1
+  (`emg/lb2` `bad90a750fb7`: the forecast admits); **ACT-GUARD-FIX-4 applied** (hooks `3bc25241`, `Role: owner`; the
+  three `rm` asks removed from `~/.claude/settings.json`, backup `.pre-act-guard-fix-4`; the test's fix and the finish
+  in the ACT's §8, `a698ebfe`). Reviews (READY by `tools/verdict.py`): `reviews/e1-q1-g1.md`, `r1-21.md`,
+  `emg-lb2.md`, `e3-guard-fix-4.md`.
+- **Reds fixed on the spot (DEC-968):** W2-123's cap tests use the run's CPUs `043f8222`; the test map's
+  `packages/*.diff` record-only `530879a4`; the path map's `orchestration/reviews/**` `0e6de735`; W2-54's hard-block
+  case accepts DEC-1045's change only (`9894b0cf`). Known red left: W2-66's record-only case on `win_toast.ps1`
+  (W2-66b's, D-9). `tools/guard4_check.py`'s two rule-2 cases repointed to W2-13's trees (D-0 removed W2-87's).
 
-## Earlier notes of 2026-10-30 evening (superseded by the handover above)
+**Running now:** the shared reranker (W2-112) pid 356621 since 13:45:09, cuda:0, idle end 43,200 s (the owner: keep it
+running for the refactoring's searches; trial `drafts/W2-112-trial/REPORT.md`); the slot watcher pid 8416; the
+dispatcher (cron; ready list empty, nothing to land); the samplers. No lead, no landing, no test run.
 
-**DEC-955 (owner): ACT 1 first.** A close refused before ACT 1 is committed is not repaired until it is. Right
-after ACT 1 is committed: write the handover (checkpoint + RESUME HERE), tell the owner it is ready, and STOP; the
-fresh session starts under the five-rule guard. ACT-1-GUARD: `governance/project/orchestration/packages/ACT-1-GUARD.md`
-(+ `.hooks.patch`); trial clone `/tmp/gov-os-act1/repo`; test sweep `tools/act1_tests.py` -> /tmp/gov-os-act1/.
-ROLES-SPEC-1 sent (`acbd8353`), awaiting approval.
-**19:35 state:** ACT-1-GUARD sent (`bd07b650`, pinged): 235 live-wiring tests (19 files: W1-46 142, W1-05 77, W2-59 5,
-W1-47 4, W1-49 2, W1-28 2, W1-50 2, W2-65 1; `/tmp/gov-os-act1/confirmed.json`) go red -> W2-90 (LITE, test designer,
-owner's named decision asked) first after ACT 1. `CLOSE-HEAD` pins closes to `9f448448` (pre-ACT) until W2-90 lands;
-remove the file then. W2-71 CLOSED `9f448448` (scoped, 5,091 tests, parallel 7,767 s incl. ~83 min lock wait, so
-~46 min testing at load 35; 1 flaky candidate W2-54 green-here). Batch W2-57+W2-77+W2-03+W2-26 running (full, pre-ACT
-clone). Plan+WBS committed `e814289d`; MEMORY-SPEC-MAP in packages; TICKET-EDITS.md and W2-88 draft in
-drafts/plan-dec954 + drafts/tickets for the fresh session (one commit per ticket; file W2-86, W2-88, W2-90; rows of
-W2-78). W2-64 run 2 brief ready (`briefs/W2-64-A5-run2.md`), waits for ACT 1. Leads: W2-87, W2-85 running.
-**20:35:** W2-76 returned PACKAGES (6.85 h, $11.04; rebuild 307 s, secrets filter 275 s of it). DEC-956 (delegated):
-P-W2-76-1 (a) test designer fixes its watchdog case's setup; P-W2-76-3 (a) per-run rebuild-lock override set by the
-root conftest, W2-76 paths + `tests/conftest.py`; run 2 after ACT 1. **DEC-956 is appended to the register but NOT
-committed** (no main-tree commits while the owner runs ACT 1): commit it, then widen DAEO-tgk2's paths (own commit),
-right after ACT 1. Left for removal after ACT 1: `/dev/shm/gov-os-W2-76-held.lock` (guard refused).
-**21:05, W2-85 returned PACKAGES** (2.29 h, $5.47): route done (head `d113ff5ea045`), merge + close after ACT 1. Its
-findings, all MY slips, fixed in the working tree, NOT committed (ACT window):
-- (1) my DEC-866 marks "SUPERSEDED by DEC-953" on 14 status lines (`3f28e09c`) made the context check red on content
-  (11 tickets cite them): re-marked as `<original status> · **Lifted by:** DEC-953 (...)` in docs/DECISION_REGISTER.md
-  (uncommitted, with DEC-956). Verify after ACT 1: W2-54's green-here and time-limit cases alone on a rebuilt clone.
-  The running batch (cloned after `3f28e09c`) will likely be refused on them: DEC-955, ACT 1 first; then re-run the
-  batch with CLOSE-HEAD moved to the fixed head (not a repair of those tickets: the cause is the register).
-- (2) close_build ran nightly-route entries in its serial phase: fixed (`gov.close.serial.phase`).
-- (3) scoped selection ignored the ticket's own acceptance suite: fixed in select_tests.py (own suite kept). W2-71's
-  close lacked its own suite: back-fill run on `a4939b45` in `/tmp/gov-os-w271-own/` -> append the result to
-  `governance/project/orchestration/closes/W2-71-DAEO-e8f0.md` (commit after ACT 1). Tell the owner either way.
+**Stopped at the owner's order, to resume in the fresh session:**
+1. **G-14** (path-map role reads): its engineer stopped at a safe point; scratch only, nothing committed or live:
+   `drafts/g14/NEXT.md` (the design and steps 1-5; nothing built, no replay yet). Then one review, then the owner's ACT.
+   **For the owner with it:** whether `{ticket_impl}` (what the test designer may not read) covers the engineer's
+   `tests/unit/**` paths too (the engineer's recommendation: decide; the brief's "outside tests/" leaves them open);
+   `permitted_roles` not read (every namespace lists all six roles); W2-58's shell guessing in the pinned
+   `reads.py` not reused (its 26.2 h cost), only its glob matcher and ticket reader.
+2. **D-3:** NOT started. `packages/LIFT-1/D3-WORKLIST.md` (items 2-4 and 6-7 moved to D-4). Then D-4 onward.
 
-**The plan ahead (owner, DEC-954; PLAN-W2-DEC953 approved with amendments). In this order:**
-1. **ACT 1, the five-rule guard** (milestone 2, with its ping): the four of DEC-953 item 2 + rule 5 (independent
-   reviewers and auditors write only their own review and audit records in their allowed paths; nothing else),
-   and the hidden half refused from EVERY worktree (W2-84's fix, Q9b). Hook: `.claude/hooks/pretooluse.py`;
-   check: `tools/guard4_check.py` (planted cases). ACT = the settings regeneration (owner's act), with the
-   live-settings tests revised by a test designer. Milestone 2 also = gates lifted, selection proven scoped (4c),
-   the five closes (W2-71, W2-77, W2-57, W2-03, W2-26) done.
-2. **Then, in parallel, within the resource gate:** the 10 built tickets finished and closed on the 10 practices
-   under the five-rule guard (W2-67, W2-51, W2-49, W2-37, W2-16, W2-84, W2-05, W2-20, W2-52, W2-60a — W2-60a's
-   scoped last round may finish meanwhile), and the plan's streams: S1 memory, S2 roles/skills/briefs,
-   S3 sandbox, S4 adoption and proving ground. Already going before ACT 1: W2-87, W2-86, W2-85, W2-76
-   (finish+close), W2-64 (P-W2-64-1 (a): fixtures revised, scoped run of the corrected tests only).
-3. **The roles spec first, for the owner's approval** (existing pieces; every role CTO → Senior Engineer → lead,
-   test designer, implementer, reviewer, auditor, others: duties, read/write, skills, model, brief contents,
-   handover; gaps and the ticket filling each). W2-60b, W2-11, W2-33 (re-scoped), W2-83a/b build nothing
-   further until it is approved. One combined CIT-P for the four K3 tickets.
-4. **Memory lands, for this repository AND any adopted repository (Q9f):** quick wins W2-86, W2-87 (register fix
-   inside), then W2-55, W2-04, W2-05, W2-06, W2-13, W2-15a, W2-32; the measure enlarged (Q9a: ~40-50 questions,
-   visible + hidden halves, size and time cost proposed); judged on the combined memory spec (Q9c); the memory
-   spec mapped to tickets (Q9d); below 85 % after two rounds -> escalate (Q9e); the any-repository memory ticket
-   filed in Wave 2's minimum (assess, plan refactoring as governed tickets, full index + embeddings, SQLite +
-   vector store; proven on W2-81's synthetic repos, two messy public GitHub repos, the register's test repos;
-   EXAMIN's copy its live trial).
-5. **The roles land** (S2: CTO and Senior Engineer roles, skills, briefs; a coordination ticket per stream; the
-   CTO's watchers of each Senior Engineer's state).
-6. **ACT 2, one re-pin** once memory, the roles and the three layers' foundations have landed.
-7. **The three layers start, in new sessions:** the CTO and a Senior Engineer per stream.
-8. **EXAMIN's copy only when K9's entry criteria are met** (Q1: gated by milestones and core closes, never by a
-   date; dates are weekly estimates). W2-16 cuts the numbered, frozen release W2-81 and EXAMIN install (Q8c).
-- **Standing from DEC-954:** closes take the test lock ahead of any lead's full run; W2-78 parked (rows filed);
-  W2-67's rounds right after the quick wins; Q10 machine-use breakdown after W2-76/W2-06 and scoped tests;
-  W2-20 on DEC-950 in Wave 2 (machine-agnostic in Wave 3); milestones 2 and 3 pinged; the roles spec sent as
-  soon as ready.
+**Check at the start of the fresh session (beyond §1):**
+- `readlink -f ~/.local/bin/gov` = pin-9894b0cf; `python3 tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS` = PASS.
+- **The first live test of ACT-GUARD-FIX-4's settings:** a new session loads `~/.claude/settings.json` at start, so
+  an `rm` of your own scratch should now run with no prompt, and a catastrophic one be refused by the hook with a
+  reason. A reviewer may write its record in `reviews/` itself now (until today the CTO transcribed).
+- The shared reranker alive (`tail -2 ~/.cache/gov-os/rerank.log`; READY, no END) and the GPU memory (9,714 MiB at
+  14:02; about 900 MiB stayed after the trial: re-read it; if it keeps growing, find the holder).
+- After every record commit: `python3 tools/structural_pass.py /home/usain/Dynamic-Agentic-Engineering-OS HEAD~1`.
 
-## Earlier RESUME (2026-10-30 16:20 — DEC-953 IN FORCE)
+**Open, for later (not blocking):** the sandboxed worker searches unranked (`~/.cache/gov-os` read-only in the
+sandbox; W2-127's); the sandbox's `ollama.com:443` denials on each search (to trace); the forecast prices 4.5 GB a
+job's reranker, so one GPU job at a time beside the embedders (revisit at the restart, with the shared reranker);
+`close_build.py`'s attribution (Q-1's other half, or retired); the queue's unused `--base` path and
+`land.candidate.applied-2112.py` (O-8); Wave 3 rows to add to `docs/plan/WAVE_3_PARKING.md`: E1 F2/F3, R1-21 F1/F2,
+LB F1/F2, E3 F1/F2/F3.
 
-- **DEC-952 + DEC-953 recorded `6c1b3d3f`** (prompt v3.45 §0, common lead brief with the DEC-953 block). Owner text
-  verbatim: `drafts/DEC-953-owner-text.md`. Gates lifted; closes = `tools/close_build.py` (10 practices);
-  selection = `tools/select_tests.py` (governance left out; ticket's own merges/merge base).
-- **Running:** closes W2-71 (scoped) then batch W2-57+W2-77+W2-03+W2-26 (full), background, logs
-  `log/close-build-*.out`, `log/close-build/`. Helpers (in-session agents): PLAN (item 10; returns text, save to
-  `governance/project/orchestration/packages/PLAN-W2-DEC953.md`, ping = milestone 1); GUARD switch-off proposal
-  (item 2; ACT if owner needed); DECISIONS (item 7; drafts in `drafts/decisions-dec953/`, move to
-  `governance/project/orchestration/`, mark DEC-866 status lines).
-- **Proof 4c so far:** `log/select-proof-1.json`, `-2.json`: W2-76 scoped; W2-64 full (src/gov/check/schema.py core);
-  W2-78 full (close code + test-map); W2-71 scoped; W2-57, W2-77, W2-03 full (core); W2-26 full (UNPLACED research
-  docs). Timing comes from the closes.
-- **Withdrawn:** ACT-TESTMAP-1, ACT-REPIN-3, P-W2-03-CONTAINMENT (answered). Leads W2-64/76/78 keep building; new
-  tickets wait for plan approval except quick wins W2-86, W2-87 (+ register-as-one-record) — to claim and launch.
+**Standing practice:** deleting your own scratch is not a slip (the owner, DEC-1050 (8)); times only from `date`;
+checkpoints only by `tools/cto_checkpoint.sh`; no main-tree commit while `log/act-in-progress.txt` exists.
 
-## Earlier (2026-10-30 — OWNER CHANGE OF COURSE; superseded by DEC-953 above)
 
-- **Owner, 2026-10-30 (chat):** stop dog-fooding the half-built Gov OS; build and test it first. Before anything
-  else, an independent read-only audit of every Gov OS feature used to run this repo's development (cost, faults
-  caught, standard-practice replacement, keep/lift/replace), as one package with the minimum close practices.
-- **Holds until the owner decides from the audit:** ALL closes (no re-queue of W2-71/77/57/26); W2-03's lift;
-  ACT-TESTMAP-1 (not committed: W2-66's live test-map test refused it; edit undone, tree clean). Build no new gate,
-  tool, rule or package. No new lead starts (read of "before anything else"); running leads W2-64, W2-78, W2-76
-  keep building. After-queue list below is on hold.
-- **Audit:** `briefs/AUDIT-GOV-FEATURES-1.md`, independent-auditor on DAEO-sdxk, effort max, read-only, return in
-  `log/AUDIT-GOV-FEATURES-1.json`; save the package verbatim to
-  `governance/project/orchestration/packages/AUDIT-GOV-FEATURES-1.md`, then ping P1.
-- **Audit DONE 14:26** (36 min, $38.58): package committed `a4939b45`, P1 pinged. Recommends DEC-105 option (a):
-  build-phase close with §5's 10 practices, gates lifted/replaced per §4, clean `gov close` proof re-run at the end
-  (batched by W2-68); W2-03 closes under it; ACT-TESTMAP-1 lifted (2 prose lines, DEC-891 widened, live test
-  revised, nightly/** left out). Awaiting the owner's answer: (a)/(b)/(c) and per-feature lifts.
-- **Monitors kept:** mem_sampler, usage_watch, oom_watch (old session). Re-armed here: lead_return_watch,
-  interim_watch. Wake timers (05:37/07:30/07:45) not yet set again.
+## (history, superseded by the RESUME HERE above) — 2026-11-03 00:00: handover from session `debdb3f7` before the owner's restart of WSL and the machine
 
-## Earlier RESUME (2026-10-30 13:15 GMT — HANDOVER to a fresh session (owner, 2026-10-30 item 6))
+**Resumed 2026-11-03 11:28 by session `bb5cd8bd`** (registered; stand-by ended; waiter armed; 3 night items filed:
+restart marks, all clear; test push "not sent", terminal active). **D-0:** list `packages/LIFT-1/D0-CLEANUP-LIST.md`
+(`ad3d1529`) with the owner, nothing deleted until the answers. **D-1:** merged as built W2-122 `5543a03a44c0`, W2-123
+`f704f7d3fee3`, W2-112 `9a02a474e3d5`, emg/select `b120aad0f048`. Conflicts: W2-04 (W2-54 README, vs integrate: test
+designer), emg/noscan (rebuild/command.py vs W2-122: engineer), W2-126 (semantic.py vs W2-123: engineer + KPI 7; the
+designer revises W2-123's 500 case and W2-126's KPI 7 cases on `w2/W2-126-tests`, and W2-66's live test-map case on
+`emg/select`). Three in-session workers running. Then: merge `w2/W2-126-tests` into `w2/W2-126`, `gov accept`, merge
+W2-126, W2-04, emg/noscan, emg/select into `w2/integrate`; then re-pin window 2's ACT. `emg/w1-19-helper` (1 test
+commit) asked of the owner in the D-0 list.
+**11:39:** emg/noscan DONE (merge `b8957843aba8`; unit 177 + 250/1 skip, W2-122 acceptance 22/22), merged into
+`w2/integrate` as `c72ededc5c97`. For D-9's homes (W2-122 or W2-45): a seed base and a copy with different `scan`
+settings may index different files (untested; not on this repository); `seed.py` fingerprints the gitleaks binary
+even with the scan off (harmless).
+**11:43:** W2-126 engineer PACKAGES: merge `0ee425698978`, KPI 7 `dbdcddad8df5` (14 unit cases; W2-126 acceptance green;
+W2-123's 500 case red as expected, the designer's). 8 builder reds outside its paths (6 W2-122 seed: the shared cache
+makes the cold rebuild warm; 2 W2-123 retry: old rule). P-W2-126-BT decided (delegated P2, ticket line `81801789`);
+the same engineer resumed on the 8. Review F1-F8 left for the formal close.
+**11:45 (owner) DEC-1053 `d855e41a`: D-0 as recommended, DONE:** emg/w1-19-helper merged `d7b25cf3c605`; 43 worktrees +
+branches removed (scratch archived to `archive/worktree-scratch/`, self-ignored so the sync skips it; record synced
+`557e5d4e` first); `w2/W2-48` deleted; 67 run folders removed (measures' evidence kept); 879 GB free. W2-78 and the
+in-flight branches wait for D-9. W2-126 engineer DONE `6f7fd689da30` (8 builder reds fixed). W2-123's cap builder
+tests red in a narrow slot (fixed config CPUs "0-1"/"0"): fixed on the spot `043f8222` (CPUs from the run's affinity).
+One guard false refusal (nested `bash -c` quoting: "list index out of range"); worked round by a script file.
+**Waiting:** the test designer (W2-04 README; W2-123 500 case + W2-126 KPI 7 cases on `w2/W2-126-tests`; W2-66 case on
+`emg/select`). Then merge `w2/W2-126-tests` into `w2/W2-126`, acceptance W2-126 + W2-123 once, merge W2-126 and W2-04
+and emg/select into `w2/integrate`; then re-pin window 2's ACT.
+**12:03:** designer DONE (W2-04 README `fcfb9150b557`; W2-126-tests `aabbf31a7536` + `741f9eddd45c`: W2-123's 500 case rewritten, 10 KPI 7 cases; W2-66 live map `e66ca8510b42`). `w2/W2-126-tests` merged into W2-126 `15c80ebb72b7`; W2-126 +
+W2-123 acceptance and retrieval/rebuild/semantic units 369 passed 1 skipped; merged W2-126 `0c5d7f4c935f`, emg/select
+`9a5254ce8bf7`. W2-04 now conflicts with W2-126's W2-54 revision in `test_w2_54_query_cache.py`: the designer
+resumed on it (merge integrate into w2/W2-04). Test map: `packages/*.diff` record-only `530879a4` (W2-66 red's
+half); its `.ps1` half is W2-66b's (D-9 fate: P1-12 red fixes). Then: W2-04's merge, the integration store refresh,
+`pin/make_repin3_commands.sh <head>` (dry build twice), `pin/repin3_checks.sh` on the dry install, then the ACT.
+**12:05: D-1's seven merges DONE:** W2-04 merged `70965cf61311` (designer's merge `98993db4ec0e`, W2-54 query_cache
+combined, 14/14). One red owned by `w2/integrate`: W2-54 `test_no_hard_block_check_is_weakened` pins
+`secrets-indexing.yaml`, which DEC-1045 (emg/noscan) changed: the designer revises it on `emg/select`
+(Rewrite-Reason: DEC-1045), then I merge it. Window 2 tools written and tested: `pin/make_repin4_commands.sh`,
+`pin/REPIN-COMMANDS-W2.template.sh` (OLD=a7182f6c), `pin/repin4_registry.py` (tested on a throwaway copy: replaces
+window 1's entry, a second run refuses). Next: merge the designer's fix; refresh the integration store; then
+`bash pin/make_repin4_commands.sh <head>` and `pin/repin3_checks.sh` on the dry install; then ACT-REPIN-W2 to the owner
+(write `log/act-in-progress.txt` at the hand-over).
+**12:10: ACT-REPIN-W2 handed to the owner** (`packages/ACT-REPIN-W2.md`, `70a82a72`; commands
+`pin/REPIN-COMMANDS-9894b0cf.sh`; sha256 94931d3d...25c2, two builds agree; ALL CHECKS PASS on the dry install,
+`log/repin-w2-dry-checks-20261103-r2.txt`). emg/select's W2-54 fix merged `9894b0cf514a` (the pinned head); store
+refreshed there. `tools/guard4_check.py`'s two rule-2 cases repointed from W2-87 / W2-61's clone (removed by D-0) to
+W2-13's (backup `.pre-d0`). HOLD ON: `log/act-in-progress.txt` written; no main-tree commit until the owner says
+done; then `mv` it, confirm `readlink -f ~/.local/bin/gov` = pin-9894b0cf, a search, and go on with D-2 (E1 first,
+`EMG-queue`'s uncommitted work).
+**12:20:** E1 DONE: `emg/queue` merge `daef9a55bab8` + Q-1 `04568e140703` (108 queue tests); `tools/land.candidate.py`
+(G-1, merges by `--remerge-diff`; 22/22; promoted copy 26 passed). Review (Sonnet, read-only) writes
+`reviews/e1-q1-g1.md`; READY by `tools/verdict.py`. Promotion after READY, when no landing runs and the ACT hold has
+ended: `mv tools/land.candidate.py tools/land.py` (backup `land.py.pre-dec1050` exists) together with merging
+`emg/queue` (the new land.py passes `--load-sensitive`). Open for later: `close_build.py`'s attribution (Q-1's other
+half, or retire it); the queue's `--base` path unused (O-8); `land.candidate.applied-2112.py` a dead copy (O-8).
+**12:27: ACT-REPIN-W2 DONE (owner): pin-9894b0cf live, registry `b74d2c7f`; hold ended (`mv`); confirmed from this
+session (link, a search with both facets).** Owner: deleting the CTO's own scratch is not a slip (DEC-1050 (8)): not
+logged. **E1 LIVE:** review `reviews/e1-q1-g1.md` (the reviewer's Write to reviews/ refused twice by the guard: a false
+rule-5 refusal; transcribed by the CTO), READY (True, []); F1 fixed before promotion (`core.quotepath=off`, probe);
+F2, F3 Wave 3 rows; emg/queue merged `2d968b5089c5`; `tools/land.py` promoted (backup `land.py.pre-dec1050`); land
+tests 26, queue Q-1 + base 31 passed. **D-2 running, three engineers:** R1-21 (`tools/structural_pass.py` +
+`tools/land.candidate.py`), E3 (`drafts/act-guard-fix-4/`, with the reviews/ rule-5 case; then one review, then
+ACT-GUARD-FIX-4 to the owner), LB held-slot fix + O-A1 (`EMG-lb2`; then one review, then merge). G-14's path-map
+role checks after E3.
+**12:35:** R1-21 DONE: `tools/structural_pass.py` (8 families, ~9 s, a notice only) + `tools/land.candidate.py`
+(45 tests); review (Sonnet, record in its return; the CTO transcribes to `reviews/r1-21.md`) running. Promotion after
+READY: `cp -p land.py land.py.pre-r1-21 && mv land.candidate.py land.py`, then its 45 tests. Its first run found
+core-pathmap red (3 `orchestration/reviews/EMG-*` records unmapped): fixed `0e6de735`; pass all 8 ok. **After each
+record commit:** `python3 tools/structural_pass.py /home/usain/Dynamic-Agentic-Engineering-OS HEAD~1`.
+**12:37: R1-21 LIVE:** review `reviews/r1-21.md` READY (True, []; F1, F2 cosmetic rows); `tools/land.py` promoted
+(backup `land.py.pre-r1-21`); 49 passed on the live files. LB held-slot + O-A1 DONE on `emg/lb2` (`3a82896d24be`, 210
+passed): its review (Sonnet, record in its return) running; merge after READY. E3 still with its engineer.
+**12:40: LB held-slot + O-A1 LIVE:** review `reviews/emg-lb2.md` READY (True, []; F1, F2 Wave 3 rows); emg/lb2 merged
+`bad90a750fb7` (the dispatcher runs the tracked copy: live from its next pass); structural pass all 8 ok. The 12:39
+pass, just before, still showed the double count (lead cap 0, slots rule -1390 MB, 15.6 GB available).
+**12:44:** O-A1 confirmed live (12:41 pass: "memory by the Load Balancer's forecast"). The forecast now binds on the
+GPU: 6.1 used + 4.5 per running job's reranker peak + 4.5 for the newcomer > 13.9 budget, so one GPU job at a time
+beside the embedders (pre-existing pricing, not O-A1's). **For the restart after the lift:** the shared reranker
+(W2-112, merged, not started) should replace per-session reranker pricing; check the forecast then (a DEC-1052
+symptom if it blocks leads). E3 DONE (`drafts/act-guard-fix-4/`, 451 tests, ACT-GUARD-FIX-4.md; the `rm` ask is in
+`~/.claude/settings.json` lines 16-18, user level); its review (Sonnet) running; on READY: copy the ACT to
+`packages/`, commit, ping; hold while applied.
+**12:48: ACT-GUARD-FIX-4 handed to the owner** (`packages/ACT-GUARD-FIX-4.md` + `.diff`, `c4a7d7cd`): review
+`reviews/e3-guard-fix-4.md` READY (True, []); F6 answered (user `allow` holds `Bash(*)`); F1, F2, F3 Wave 3 rows.
+HOLD ON (`log/act-in-progress.txt`). After the owner's "done": `mv` the hold; confirm `guard4_check.py --settings`
+PASS from this session, an `rm` of own scratch with no prompt (in a NEW session: the user settings load at start);
+then G-14 (path-map role checks), O-A1 done, then D-3 (T-3 first).
+**13:45 (owner): ACT-GUARD-FIX-4 NOT done:** stopped at §3's test (1 failed 461 passed): the ACT copied the new
+guard4_check.py before the test, whose LET_THROUGH still named four renamed cases. Hook files in place in the main
+tree, UNCOMMITTED; settings untouched; HOLD STAYS. Fixed the test (accepts either copy; `.pre-names` kept;
+sha256 0b37aa565dc3): 462 passed on the files in place. Finish steps for the operator:
+`drafts/act-guard-fix-4/FINISH-20261103.md` (pinged). After "done": add FINISH's note to `packages/ACT-GUARD-FIX-4.md`
+and commit it. **W2-112 (owner): the shared reranker started** 13:45:09 (pid 356621, cuda:0, idle 43,200 s; the
+watcher holds slot 1); the trial (research agent, `drafts/W2-112-trial/REPORT.md`): alone, 10 and 20 at once, three
+agent sessions incl. a sandboxed worker (P-W2-112-T2). If it holds: keep it running.
+**13:52: W2-112 trial DONE** (`drafts/W2-112-trial/REPORT.md`): holds for ordinary sessions (61/61 by the service on
+cuda:0, slot held in 472/472 samples, GPU peak 9.8 of 13.9 GB, 20 at once p50 4.1 s); KEPT RUNNING (pid 356621, idle
+12 h). Sandboxed worker (gov launch engineer DAEO-clon): unranked, named (`~/.cache/gov-os` read-only in the sandbox;
+the private fallback's slot check fails), never GPU/CPU: W2-127's. To do: re-read GPU memory about 14:50 (900 MiB
+stayed); trace the sandbox's `ollama.com:443` denials.
 
-**Read first, in this order:**
-1. `.gov-runtime/scratch/orchestrator/drafts/RULES-IN-FORCE.md`, the rules in force (53, from the register). It moves to `governance/project/orchestration/` with DEC-952.
-2. `.gov-runtime/scratch/orchestrator/log/after-queue-2026-10-30.md`, the work due now, in order.
-3. `log/report-state.json` and `tools/status_block.py`: every report ends with that block (DEC-948), then at most five lines on what changed and what the owner must do (owner, 2026-10-30). Keep it accurate; fix stale lines first.
+**THE PLAN, as decided (DEC-1052):** `governance/project/orchestration/packages/LIFT-1/P1-PLAN.md`, its section
+"DECIDED BY DEC-1052" first (it overrides the draft below it). The owner's intent, which every affected ticket points to:
+`governance/project/orchestration/INTENT-DEC-1052.md` (one question, five tests; templates; READY and DONE by code;
+path-map roles; what memory holds). **After the restart: `governance/project/orchestration/MORNING-RESTART-2026-11-03.md`**
+(what to start again, in order, and what must not start).
 
-**State at 13:15:**
-- **The close queue ended:**
-  - W2-03 was refused at 13:08 on `CONTAINMENT_FINDING`. Its merge `b23bf1ac` has two merge bases, so DEC-918 reads every path as its own; against the integration parent its own change is 11 files. All tests passed (16,887 and 104). Package `drafts/P-W2-03-CONTAINMENT.md` is sent; recommended (a), the owner's lift, then re-close as `DAEO-ym8a:DEC-<n>`.
-  - W2-71, W2-77, W2-57 and W2-26 did not run. Their merges each have one merge base: re-queue them at once (`tools/close_queue.sh DAEO-e8f0 DAEO-b6hm DAEO-cy5o DAEO-2ds6`, background).
-- **The owner commits ACT-TESTMAP-1** (pinged with this handover). Do not commit in the main tree until that commit is in.
-- **The order after it:** the after-queue list. In short:
-  - resume W2-84 first (`briefs/W2-84-part-run1b.md`), merge W2-61;
-  - record DEC-952 (the owner's items of 2026-10-30: memory quick wins, scoped verification, morning close batches, the digest, a fresh session each morning, interim results, the memory-chain line);
-  - W2-86 as a path-map line;
-  - file and claim W2-87, then W2-55, W2-04 and W2-85, then the leads;
-  - re-pin 3's ACT the moment W2-71 and W2-77 close.
-- **Leads running:** W2-64, W2-78 and W2-76.
-- **Returned, to resume after the closes (all stopped by the 90-minute rule, held by the close queue):**
-  - W2-51 (13:09): only its serial phase and a `gov check` re-run are left;
-  - W2-84 (`briefs/W2-84-part-run1b.md`);
-  - W2-67 (after-queue item 8).
+**The owner's terms:** `governance/project/orchestration/OWNER-GLOSSARY.md` (two lines each). The old emergency plan file is history (marked SUPERSEDED at its top).
 
-  Write each a short resume part (scoped verification by DEC-952).
-  - Returns go to `log/<W2>-A5-*.json`.
-  - Start the watchers again in the new session: `tools/lead_return_watch.sh` and `tools/interim_watch.sh`, each in the background, re-armed after each event.
-  - Start detached leads with `tools/lead_chain2.sh <spec>` (gate `tools/gate_check.py`, DEC-947 floor 3 GiB; `tools/oom_watch.sh` and `tools/mem_sampler.sh` run detached; `tools/usage_watch.sh` too).
-- **Briefs** are built from `drafts/LEAD-w2-common.dec952.md` (DEC-952's scoped verification) with `GOV_BRIEF_COMMON=<that path>`, until it is committed as the common brief.
-- **Memory:** W2-61's baseline is hit@5 8/20 (40 %) and full evidence 12/20 (60 %), against 85 and 99 %. Memory is not cut. The re-estimate follows the first quick win's re-measure, with W2-61's measure on a clone, as an unmeasured role.
-- **Open owner items:**
-  - P-W2-03-CONTAINMENT;
-  - ACT-TESTMAP-1 (being committed);
-  - the hook injection of the digest (a CIT-P, ask);
-  - Q-2 for W2-15a (`DAEO-rd0g`; package to write).
-- **Timers:** this session's 05:37, 07:30 and 07:45 waits die with it. Set them again (`tools/wake_at.sh`). The 07:30 package carries the night only (DEC-949); keep 07:15 to 07:35 clear of long foreground work (DEC-951 B).
-- **The slips log:** `log/drift-2026-w44.txt`, for the weekly drift count.
-- **Never:** commit during a close queue; untracked files in the main tree during a queue; `pkill -f` matching your own command; inline Python with backticks (the guard refuses it: use a script file).
+**Read first:** the prompt's §0 (DEC-1047, DEC-1049, DEC-1051, DEC-1052 hold over everything below);
+`governance/project/orchestration/DECISIONS-IN-FORCE.md`; the register's last entries DEC-1040 to DEC-1052; this block.
+Next free id DEC-1053.
 
-### STATE-OF-GOV-OS (DEC-940)
-- Final file with re-pin 3's measured close times, in the first morning package after re-pin 3, at the latest 11-01.
-  Drafts: drafts/state/ (STATE-head + annexes A-E). REPLAN-W2, P-SCOPE-RECORDS-1, P-TOOLS-REVIEW-1 are in packages/.
+**State at the handover:** EVERYTHING STOPPED (DEC-1051, 23:08): no lead, no landing, no agent, no test run; nothing
+scheduled but the dispatcher (cron, every minute; ready list empty; no `dispatch/land.txt`; the queue's approvals
+parked in `merge-queue/parked-by-emergency/`); the nightly and the runs sweep commented out in the crontab
+(ACT-NIGHTLY-STOP-1, ACT-SCHEDULE-STOP-2); the guard harvest off; `bench_loop.sh` and `usage_watch.sh` stopped. Where
+each piece stopped and how it resumes: `log/emergency-stops-20261102.md` (its 23:08 and 23:39 sections).
+`w2/integrate` at its last records commit (the owner pushes); main tree clean.
 
-### Now
-- **Pin:** gov = pin-5c401220 (DEC-935, registry `bc37c419`); pin-6a4696eb kept. Tools read the pin from
-  ~/.local/bin/gov's first line. The nightly route takes 15 entries out of the close (nightly only now).
-- **Merged-not-closed:** W2-58, W2-63, W2-07, W2-67 (r1), W2-57. W2-65's worktree kept (guard refused my rm of its
-  stray `pytest-of-usain/`) -> digest.
-- **ACT-W2-57-LS-1 done** (owner `6367e965`). ACT-W2-57-LS-2 (W1-46 x23, W1-19) next: validate with the new pin
-  (`tools/act_clone_run.sh`), then send.
-- **Nightly:** committed `governance/project/orchestration/nightly/` (DEC-934; ping gate DEC-936, 28/28 tests);
-  crontab 3 lines + Windows wake task (owner, checked). Morning: read status.txt + pings.log, relay P1s (prompt §7);
-  digest reports each night's line, estimate vs actual.
-- **Lessons:** check tracked files; never commit after `;`; register before a ticket citing it; long commands in
-  the background. W2-58's review cases fail inside a Claude session: row.
-- **Rows added:** W2-L449, W2-M407, W2-L450. Run clones under ~/gov-os-runs/W2-00 (3G+) never removed ->
-  P-TOOLS-REVIEW-1.
-- **W2-67** held (probe stale; `d0140d4d`).
+**The order of work (DEC-1052), for the fresh session:**
+1. D-0 clean-up (O-8, O-13): list anything unmerged that may hold work TO THE OWNER before deleting it.
+2. D-1 merge directly into `w2/integrate`, accepted as built, no queue run: W2-122 `3fc448601e2d`, W2-123
+   `3de9bcf44d91`, W2-126 `2785b2e47432` (an engineer resolves its `semantic.py` conflict with W2-123, then KPI 7),
+   W2-112 `d5216599e6fd`, W2-04 `a0c79a6c970e`, `emg/noscan` `ddcec657c278` (the DEC-1045 product switch), `emg/select`
+   `194e3289c540` (T-4; one W2-66 case for a designer). Then re-pin window 2 with its checks (an ACT).
+3. D-2 the CTO's tools: E1 (Q-1, G-1; its partial work in worktree `EMG-queue`, uncommitted), then R1-21, then E3's guard
+   ACT (`drafts/act-guard-fix-4/`, partial), then G-14's path-map role checks; O-A1; the LB held-slot fix (`EMG-lb2`,
+   uncommitted).
+4. D-3 configuration and text lifts (T-3 first). D-4 the test suite cut to about 5,000 cases before any full suite,
+   the deletions listed to the owner first, counts and times before and after. D-5 templates (scripts first), READY and
+   DONE by code. D-6 the code tidy-up. D-7 memory's scope (M-4) with W2-61's measure. D-8 G-3.
+5. D-9 the WBS refactor with the homes (KPI lines in the home tickets; every affected ticket points to the intent note);
+   the tests run per ticket, before and after.
+6. D-10 the full suite on the refactored repository, on the owner's word only; then the lift, the restart of tickets,
+   the formal closes, EXAMIN's adoption.
+7. D-11 the basis as a standing practice, after the lift (at adoption, on symptoms, weekly; the list to the owner first).
+**No run uses the old way:** gitleaks off; no full suite but D-10's; scoped selection; attribution once each way.
 
-### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
-- **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
-  section < 10,000 chars (older text: CHECKPOINT-ARCHIVE.md). **Memory used (DEC-836):** `gov retrieve` in every brief.
-- **Parallelism (DEC-847/880):** gate in the launch command (load1 < 20, MemAvailable >= 6710886 kB); never in a
-  close's quiet window; ceiling 10; fewer until W2-66.
-- **Disk and scratch (DEC-898, `17515bba`):** `bash tools/disk_gate.sh &&` in every launch command (>= 100 GiB and
-  >= 10,000,000 inodes free; figures provisional until the owner confirms); queue/nightly/trials call it. Every
-  auditor/trial/research brief: 30 GB + 2,000,000 files budget; lead + workers 20 GB + 1,000,000; own TMPDIR,
-  pytest's own retention (never per-run --basetemp), clean up as they go, scratch size in the return's evidence;
-  over budget -> stop heavy work, return PACKAGES/PARTIAL, I ping P1. W2-20 KPI `efa2e4b0`.
-- **Notify (DEC-855):** six-part package in my message + `packages/<id>.md`; start all independent work; LAST ACTION
-  `~/.local/bin/owner-ping "<P1|P2|COMMIT|ACT> <id> | gates <...> | <need>"`; never AskUserQuestion; no secret,
-  key, held-out path or file content. During a queue: ping only if a close is refused (new or seen cause).
-- **Reports:** countdown first, progress line first (DEC-878: closed / merged-not-closed / built-held / in flight /
-  not started of 58; keystones done / in progress / ahead of 9); owner acts collected at the top in order (DEC-888);
-  last line OWNER_ACTION.
-- **Commits (DEC-861, DEC-896):** decision records `Task: decision-record`, `Role: orchestrator`, `Decided-by: owner
-  (chat, <date>)`; a commit that changes a ticket file carries THAT ticket's Task (+ Implements); never Role:
-  owner; never push. Ratchet entries and code/test/kernel accepted-history entries = the owner's Role: owner commit
-  (DEC-862 (a), DEC-891), validated first with the pin's readers (`tools/validate_entry.py`, DEC-895).
-- **No placeholders (DEC-893):** exact times only; `tools/placeholder_scan.py` (in record_checks.sh).
-- **After every merge (DEC-895):** `tools/probe_impact.py <merge>`; a stale probe of a merged-not-closed FULL
-  ticket is scheduled at once.
-- **Closes:** `tools/close_queue.sh <ids>` runs gates (c) checkpoint, rebuild, (a) collection, (f) record suites,
-  (g) network, (b) gov check, (e) trailers, (h) work-without-a-task (pin's code), (d) tree as the close reads it.
-  **Until the first re-pin, no close unless (a)-(h) all predict a pass (DEC-896).** Record edits:
-  `tools/record_checks.sh` first; no main-tree commits while a queue runs. Never rebuild-until-green.
-- **Policy 1 (DEC-887):** `python3 governance/project/orchestration/sync_context.py --commit "<subject>"` (record/w2;
-  safe during closes); `--main` only with a head-moving decision commit, never during a close. Owner's daily push:
-  `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`.
-- **Supersession (DEC-866):** mark at once, sweep by id and value.
-- **Settings changes and ACTs (DEC-925, standing):** any settings change or regeneration -> a full run in the close's
-  form on a clone with it applied + a sweep for dependent tests, BEFORE the owner's commit; every ACT's commands in
-  `governance/project/orchestration/packages/ACT-<id>.md`, named in the ping.
-- **Implements: ids (DEC-927, standing):** gate (e) = `tools/trailer_gate.py` also refuses an Implements item that is
-  not a DEC the register holds or a CAP the store holds; leads run it on their worktree before returning
-  (LEAD-w2-common); build_lead_brief.py refuses a non-id IMPL. CAP-n reading ACCEPTED by the owner (DEC-928).
-- **ACT wording (DEC-928, standing):** "a plain terminal, not a Claude session" only when an ACT replaces or
-  reinstalls gov (a re-pin); an owner commit of a patch is run by the owner's operator.
+**Open with the owner:** nothing blocking; the CTO lists D-0's unmerged work to the owner first. P-LB-PRODUCT-1 is
+covered by the homes (D-9). Two engineer tickets cover `tests/acceptance/` in their paths (core-mutation): DAEO-a3u2
+fixed (`8562ae79`); DAEO-tgk2 still to fix in D-3.
 
-### Plan in force (DEC-933..DEC-939)
-- **Merged, not closed (7):** W2-58 (re-close decided, DEC-939 item 3), W2-63, W2-07, W2-57 (re-probe run 4 after
-  W2-68's merge), W2-67 r1 (rest held `d0140d4d`, probe stale), W2-75, W2-68 (batch off until W2-77). **Held, 10+ days
-  stale:** W2-03, 05, 16, 20, 26, 37, 49, 51, 52 (merge-back each). W2-71 run 2 in flight (F1). Re-pin 3 = W2-68 + W2-71
-  (+ W2-77 if ready); each judge improvement re-pinned as it lands (DEC-933).
-- **Residual rows to file:** W2-72's F5-F8 etc.; W2-L452 (W2-58 review cases fail inside a Claude session); W2-68's
-  F2-F6; W2-71's F2-F7; W2-57's P-1/P-2/P-R2-T1 for the digest.
-- **Standing (summary):** full runs `-o tmp_path_retention_policy=failed` under `flock /tmp/gov-os-verify.lock`;
-  rebuilds under `flock /tmp/gov-os-rebuild.lock` (DEC-939); tests/acceptance/ only by test designers (DEC-906);
-  owner commits = ratchet, accepted_history, exemptions; remove returned leads' temp folders after a holder check.
+**Standing practice:** record times only from `date`; only a ticket's probe record, with its frontmatter, under
+`docs/probes/`; no main-tree commit while `log/act-in-progress.txt` exists; stops cover every standing script, not only
+running tests (slips of 2026-11-02 in `log/drift-2026-w44.txt`).
 
-### Next
-1. **Queue end:** commit DEC-939 + DEC-940 (state request) + prompt v3.38 + LEAD-w2-common (rebuild lock, 01:00 cut-off,
-   AND the guard's command-form rules: no $VAR write targets, heredocs, backticks, inline python with braces; slip S10)
-   + rows + nightly folder (drafts/nightly-next2) + ACT-PUSHOVER-1; tk W2-76, W2-77; queue W2-58; leads W2-77, W2-76.
-2. **STATE-OF-GOV-OS + re-plan + P-SCOPE-RECORDS-1 + P-TOOLS-REVIEW-1: ALL DRAFTED** in drafts/state/ (STATE-head.md +
-   annexes A..E; REPLAN-W2.md, target EXAMIN start 2026-11-18, range 11-14..11-25; P-SCOPE-RECORDS-1.md -> W2-78;
-   P-TOOLS-REVIEW-1.md -> W2-79/80 + auditor). At delivery: add re-pin 3's measured close times to STATE §3, make
-   STATE one file (head + annexes) under packages/, commit with the others in the first morning package after re-pin
-   3 (latest 2026-11-01's).
-3. ACT-REPIN-3, ACT-W2-57-LS-2, W2-67 merge-back + re-probe, then K4 (file W2-55, W2-61, W2-64; resume W2-03, W2-05,
-   W2-37) and K3 (file W2-60, W2-56) leads in parallel up to the resource gate.
-4. KEEP until the owner says: .gov-runtime/scratch/owner-share/replan-2026-10-29/ and .zip (owner reviewing the re-plan). Next free: DEC-940; ticket W2-78; rows W2-M408, W2-L451 (drafted), W2-L452.
 
-### Never
-push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
-ticket without the owner; hooks; --no-verify; print secrets or held-out contents, or name the qualification
-oracle; ~/gov-os-workbench; grow accepted_reds/load_sensitive; weaken a hard-block check; let the ratchet retry;
-`$VAR` write targets (also sed -i); heredocs/backticks in commands (DEC-409).
+## (history, superseded by the RESUME HERE above) — 2026-11-02 ~18:30 GMT: handover from session `07f25884` (W2O V3) to the FRESH SESSION; window 1 and ACT-QUERY-GPU-2 DONE
+
+**EMERGENCY IN FORCE (DEC-1033; DEC-1037, DEC-1038, DEC-1039): read
+`.gov-runtime/scratch/orchestrator/EMERGENCY-PLAN-2026-11-02.md` FIRST: "THE OWNER'S PLAN (DEC-1039)" at its top is
+the work, in order, **including step 1b (the owner, ~18:40): the Gov Load Balancer** (phases and their measured peaks
+on CPU, RAM, GPU and its memory; GPU-heavy work paired with CPU-heavy work; embedders and rerankers within the GPU's
+budget even if leads are limited to two or three; the rule that the GPU's dedicated memory never spills into shared
+memory nor runs out into a CUDA crash, tested; the CTO's tools first, then a DEC-1003 proposal: its own ticket or
+W2-20/W2-121 KPI lines); then "State at ~18:30". At start: register in `log/cto-session.txt`, end the stand-by with `mv
+log/cto-standby.txt log/cto-standby.ended-$(date +%H%M).txt`, arm `bash tools/inbox_wait_quiet.sh` in the background.
+The dispatcher starts nothing (empty ready list) until you restart work under DEC-1039. Checkpoints only by
+`tools/cto_checkpoint.sh`; processes judged by `tools/tree_busy.sh` (never `pgrep -f`); every heavy run through
+`tools/heavy_slot.sh`; anything outside the repository that changes the machine is an owner ACT (DEC-1038). The push
+of w2/integrate is the owner's (refused by the CTO session's permissions). The older summaries below are history: (1) watch the W2-122 + W2-123 landing (since 15:48; no commit to w2/integrate until it ends); (2) commit
+DEC-1037, the re-pin P1, ACT-QUERY-GPU-2's step 0 and the plan; (3) refresh the integration store; (4) **window 1's
+preparation** (the re-pin, every check incl. the guard's; any failure: back to the old pin, tell the owner), then
+ACT-QUERY-GPU-2; (5) the full suite on the re-pinned head; (6) the clean restart until green. The plan supersedes the
+older notes below where they differ. At start: steps 1-2 of "At start, in order" below (register in
+`log/cto-session.txt`, end the stand-by with `mv`), arm the inbox waiter, then the plan.**
+
+**Read first:** `governance/project/prompts/w2-orchestrator.md` §0; `governance/project/orchestration/DECISIONS-IN-FORCE.md`;
+this block. Older history: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (read only for a named question). Register: DEC-1009
+to DEC-1018 are today's; next free id DEC-1019.
+
+**Resumed 2026-11-01 23:49 by session `07f25884` (registered; stand-by ended; `dispatch/sentinel-expected` on).**
+Done: inbox read (5 filed; guard 61-63 false positives, ACT-GUARD-FIX-3's pattern, 60 of 64 false); pre-reload jobs
+all alive (land.py 514085, close_build.py 514602, leads W2-104/W2-122/W2-123; W2-92's lead returned PACKAGES);
+P-W2-92-5 decided (a), DEC-1019 `f9d0685f`, run 3 brief `briefs/W2-92-A5-run3-dec1019.md` on the ready list; the
+quiet-hours hook test at 03:00 PASSED and the push-on-prompt test ran 23:50:50 (prompt approved in ~10 s; owner to
+confirm the phone push): `log/safety-net-tests-20261101.txt`. Test push: first "not sent" (owner at the PC), the two
+APPROVE pings "Mobile push requested". ACT-GUARD-FIX-3 copied to `drafts/act-guard-fix-3/`; its independent review
+(Sonnet subagent) writes `reviews/act-guard-fix-3.md`; then `packages/` and the ping (before midnight, else 09:00).
+**00:08:** review round 1 FAILED (F2 regression fails open; F3, F4 as today; F1 flaky test). Moderator's triage at the
+record's end: F1-F3 fixed, F4 only if false refusals stay under 10 %, F5-F7 rows. Round 2 (Opus subagent) works in
+`drafts/act-guard-fix-3/` (round 1 kept in `drafts/act-guard-fix-3-round1/`); then the second and last review
+(Sonnet, same probes); then the package to `packages/`, pinged if before 02:00 (DEC-1021), else the 09:00 package.
+**00:25 (owner):** both 23:50 pushes arrived; DEC-1021 `a332b2aa`: pings until 02:00, quiet 02:00-07:30. Push-on-prompt
+re-run 00:12:48 (pinged first, approved in ~25 s; owner to confirm Claude Code's own push). Owner asked for the three
+open items in short form (P-W2-90b-1, W2-11's seven lines, SW4 line 3) to decide now.
+**00:35 (owner) DEC-1022** `94df6e93`: P-W2-90b-1 (b), W2-90c's S4 line re-worded `3a4203e5`; W2-11b `DAEO-9bc0` filed
+`c361b095` (product-spec, STANDARD; starts once W2-11 closes; withdrawn if W2-11 takes the lines in another round);
+SW4 line 3 -> W3-P21. applied_check 0 gaps. **TODO by day (after 07:30, 2026-11-02):** the push-on-prompt test again:
+ping first, the owner steps away, the prompt waits a few minutes (DEC-1022 item 1).
+**00:45:** guard-fix round 2 done (F1-F4 fixed; corpus 2/61; 0 of 167 planted writes missed; 270 tests stable; one
+residual regression -> Wave 3 row). Review round 2 (Sonnet, the last) writes `reviews/act-guard-fix-3-round2.md`.
+PASS -> copy to `packages/ACT-GUARD-FIX-3.md` (+ diff, files), commit, ping (before 02:00) or 09:00 package. FAIL ->
+the owner once, with options (DEC-1010). Refusals 63 of 67 false (a classify can race the harvester: re-check
+unclassified after classifying).
+**00:58:** review round 2 PASS, READY true (`tools/verdict.py`); package in `packages/` (`49158e13`: .md with the review
+summary, .diff, test file); ACT pinged (sent). Waiting on the owner's operator to apply it. Round 2's low findings and
+F5-F7 are Wave 3 rows to add to WAVE_3_PARKING.md with the morning records.
+**01:02 (owner) DEC-1023:** ACT-GUARD-FIX-3 (a) approved; the owner's operator applies it THIS MORNING with the owner
+present (not overnight). Morning list: remind the owner at 09:00; after it is applied, confirm guard4 PASS and the
+test file's result, and watch the next refusals harvested.
+**00:15:** W2-104 returned DONE at `ac2d92af8c0e` with P-W2-104-CMDLIST: decided (a) + CLAUDEPATH (c), DEC-1020
+`235c4d5d`, ticket paths `d942524f`; run 2 brief `briefs/W2-104-A5-run2-dec1020.md` on the ready list after W2-92.
+Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch for removal (rm: by day only, pinged):
+`/tmp/gov-os-lead-W2-92`, `/tmp/gov-os-lead-W2-104` once its run 2 ends. Morning package: W2-104 run 1's inherited
+reds (W2-54 AR-5 input, W1-46/W2-59 hook-file reds, W2-66 win_toast.ps1) to trace.
+
+**01:26 slip (drift log):** the inbox sat 30+ min unread (guard 67-69, W2-123 interim) because this session never armed
+`tools/inbox_wait.sh` after the reload; the sentinel's stale-inbox push caught it. **Every session start and after every
+wake: arm `bash tools/inbox_wait_quiet.sh` (09:28: repeat server-hung items wake at most hourly; else as inbox_wait.sh) with the Bash tool's background run (it exits on an item; re-arm after handling).**
+Mechanism proposed to the owner (DEC-1012): a Stop hook that names an unarmed waiter (a `.claude/` change: the owner's).
+
+**02:52:** the close W2-05+W2-55+W2-96 REFUSED at 01:48 (W2-55's backfill 31 rows behind the register: W2-55's;
+W2-66's record-only red on `win_toast.ps1` from `42104b11`: the CTO's, misattributed because the baseline predates it).
+The landing batch found an owned W1-08 probe-schema red at 02:01 (W2-11's or W2-81's probe record) and is still
+re-running cases alone; no hold of its own; left running. All in `drafts/P1-MORNING-2026-11-02.md` (scratch until the
+nightly starts; then copy to `packages/`). **After the nightly's verdict:** re-close W2-05 + W2-96 against it (rec (a));
+W2-55 back for its table + P-W2-55-HOOK. Inbox waiter re-armed 02:52.
+**03:17:** W2-123 DONE (verified `17d88232b287`, head `9bb92097c811`): added to `dispatch/land.txt` (held for the
+nightly); its three P1s (Ollama `-np 1`; embedder not bit-reproducible; the query server starved: an ACT for its own
+CPUs, first) in the morning draft §5. Leads now 1 (W2-122). Waiter re-armed 03:17.
+**04:45:** nightly started 04:00 on `9d605eba20a2`. First landing batch STOPPED 04:32 (baseline prepare failed),
+nothing landed. Culprit of its owned reds: **W2-81** (both probe records fail `probe.schema.json`; reproduced, edit
+undone): back to its lead. Dispatcher batch of five started 04:33 (`land-dispatch-20261102-043305.out`). Embedding
+servers hung/overloaded since 04:31 (11434 reloading its model; 11435's runner 490 % CPU for ~5 h); a background
+probe (task bydgl3oz2) watches; no restart (caps would be lost; the owner's). Waiter re-armed 04:45. Draft §6.
+**05:20:** batch of five STOPPED 04:37 (prepare failed: the server). Shared server flapping (HUNG 05:14). W2-81
+ejected by hand (`merge-queue/ejected/W2-81.json`); its records-only repair `briefs/W2-81-A5-r4-records.md` on the ready
+list. The four others stay approved; the dispatcher retries.
+**06:07:** W2-122 PACKAGES (26/26 at `bd50a9581893`); P-W2-122-K5 (K5 reds 100 earlier cases; adoption would need an
+embedder) is the owner's P1: morning draft §7, rec (b) then (a). W2-122 waits. W2-81's records repair running.
+**06:20:** W2-81 repair DONE `e78e6af7530d` (records only, checked). All five relisted in `dispatch/land.txt` (the
+dispatcher does not retry kept entries by itself: a gap, morning draft).
+**07:56:** landing of five STOPPED 07:54 (semantic not recreated: the embedder); relisted. Nightly: parallel 21 F + 2 E,
+serial 3 F + 8 E; re-running alone. W2-04 verify run 4 running (scoped). Morning package at 09:00 from the draft,
+with the push-on-prompt re-test (DEC-1022 item 1).
+**08:01:** retry STOPPED 07:59 (semantic not recreated in 121 s, server healthy): W2-123 (its new embedding client) is
+the suspect; its approval moved to `merge-queue/held/` (not ejected); W2-11, W2-105, W2-90b, W2-81 relisted.
+**08:06:** the four failed the same way: W2-123 NOT the cause, restored to approved/. Cause: the one-at-a-time shared
+embedder busy with W2-04's retrieve_check and the nightly's W1-19 re-run. `land.txt` left empty: relist all five once
+those end.
+**09:00:** morning package `packages/P1-MORNING-2026-11-02.md` (`0d0e8e41`) pinged (sent). Waiting on the owner's A-F. The
+nightly still re-running its reds alone; investigate when it ends. Leads W2-04, W2-92, W2-104. Handover to a fresh
+session after the package (DEC-952 item 6).
+**09:15:** W2-04 verify DONE `b37b5c8f1741` (FULL: review not yet run); its review run `briefs/W2-04-A5-review.md`
+first on the ready list. P-W2-04-5 decided: DEC-1024 `446897f7`, W2-120's sources DEC-718 `a4c92d4e` (W2-10 and W2-11 keep
+AR-5/6 under closes:). Nightly marked FAILED at 09:00 (no verdict yet, still re-running): package item G `24375c96`.
+**09:20:** sixth landing attempt failed (09:16). Mechanism: `semantic.py` TIMEOUT_S 120, no retry. Package A updated with
+option (d), a bounded retry (`be9e2812`), pinged. `land.txt` left empty: relist only when the embedder is free.
+**09:36:** W2-91 DONE `55b47e075b3b` (STANDARD, gov accept 8/8; VERIFY-1: the queue verifies). Six to land kept in
+`dispatch/land.pending.txt` (copy to `land.txt` when the embedder is free or (d) lands). Leftovers to remove by day
+(rm: ping first): W2-91-tests worktree + branch, gov-os-runs/W2-91/{base,head}, /tmp/gov-os-lead-W2-{91,92,104,122,123,04}.
+**09:38:** W2-92 run 3 DONE `448a835a9dca` (STANDARD; DEC-1019 built; 30/30; gov check's retrieval-regression red is
+environmental: 0 % at the pre-ticket base too, the shared embedder). Seven pending to land. W2-13 waits on W2-92's landing.
+**09:46:** W2-04 review 1 FAILED (F1 fails open: an emptied mandatory file shown as read). DEC-1025 `3861c3fb`: one repair
+round (F1; F2, F3 ride along), review 2 the last (a different model); brief `briefs/W2-04-A5-r5-repair.md` first on
+the ready list. P-W2-04-7 -> package item H `60a9b4a1`, pinged.
+**10:19:** W2-104 run 2 DONE `909d7ff0a926` (STANDARD; the one skilleval line checked). Eight pending to land.
+**10:25:** DEC-1026 `5f3d143b` (delegated, package A (d)): W2-123 run 2 builds the bounded embed retry in semantic.py
+(ticket `4c3f3ecd`); brief `briefs/W2-123-A5-r2-retry.md` first on the ready list; W2-123's old approval moved to
+`merge-queue/held/W2-123-at-9bb92097c811.json`. Seven pending in `dispatch/land.pending.txt`; land them WITH W2-123's new head.
+**10:50 (owner) DEC-1027 `feb80819`, B-H; A to follow.** Applied: F ACT-GUARD-FIX-3 applied by the operator `e662684a`
+(guard4 PASS); the push test by day 10:37:42, approved in 8 s (owner to confirm the phone push). H: common brief 6a
+`4fdee1e6`, W2-61h's lead messaged; W2-125 `DAEO-jfm3` filed. C: W2-124 `DAEO-mb2t` filed (K5), W2-122's KPI 5 moved
+`42dad22d`, W2-122 run 2 brief `W2-122-A5-r2-nok5.md` queued. B: W2-66b `DAEO-zuiy` filed+claimed, worktree, brief
+queued; **W2-05 + W2-96 re-close against tonight's nightly once it has a verdict** (watch bnsm55ns4); **W2-55's run
+held: asked the owner how its table stays current** (my package mis-described P-W2-55-HOOK). E: ACT-STOP-WAITER-1
+`36970e6f` (script + 6 tests) for the operator. P1-GUARD-PARSER-W2 `f614ec78` pinged. Guard 71 = first false positive
+under the new hook (F4 rule).
+**11:05 (owner) DEC-1028 `79fa030f`:** push test PASSED; ACT-STOP-WAITER-1 applied (live check in the next fresh
+session); quiet-hours test confirmed to the owner (backups may go). Standing: no main-tree commit while an owner ACT is
+applied (`log/act-in-progress.txt`, prompt §0). W2-42a `DAEO-03ub` filed (FULL; split files from W2-09; claim when a
+K3 slot opens). W2-55: KPI line `09a1ac54`, run-2 brief `W2-55-A5-r2-append.md` queued (test reads the register at the
+proposal's commit; append mode); **TODO when it returns: wire its append command into a decision-recording tool and
+use it for every register entry.** A: the load-balancing plan: `tools/lb_measure.py` runs 10:57-11:57
+(`log/lb/hour-20261102.*`); sections a-d drafted by a research subagent into `drafts/LB-PLAN-sections-a-d.md`; the CTO
+writes e and f, then the package `packages/P1-LOAD-BALANCE-1.md`.
+**11:18 (owner) DEC-1029 `39e3c16f`:** ROOT CAUSE of the night: the shared embedder fell off the GPU at 04:33 (CUDA
+crashes 02:36, 04:31; 8-10 rerankers on the GPU; 0/29 layers). Reloaded 11:15 (runner ended, serve kept, caps kept):
+29/29 on the GPU, about 26 chunks/s at batch 32; dispatcher health 1.96 s. **Standing until the plan: alert the
+owner on any `offloaded 0/N layers` or `CUDA error` in serve-11434.log** (background watch task b7ulw6ru4; re-arm after
+it fires). The seven ready relisted to `land.txt` at 11:18 (they no longer wait for W2-123's retry).
+**11:30 (owner) DEC-1030 `01f5d8be` (standing): the whole machine watched.** Dispatcher GPU pass being built by an
+engineer subagent (test_dispatcher.py; then a short review, then commit; until then the background watch b7ulw6ru4).
+Morning package: run `tools/server_log_scan.py` (found 3 CUDA crashes 23:54, 02:36, 04:30 and the 0/29 load at 04:34).
+SMART-WORK-6 `1e5d3395` (4 GPU KPI lines for W2-20 and W2-121) for the owner. Landing 11:16 refused before queueing:
+W2-104's gitleaks (two test fixtures: REPLY_TOKEN, SECRET; redacted); W2-104 run 3 `W2-104-A5-r3-gitleaks.md` queued
+(build the literals from parts); six relisted in `land.txt`.
+**11:27:** six landing (claimed 11:21). The nightly of 11-02 ENDED 09:24, verdict red 32 (status line corrected 11:25).
+Its reds: 6 test_dispatcher (they read the untracked scratch tools: skip guard asked of the GPU-pass engineer); W1-19 x4 +
+W1-21 x4 (real-model errors: the embedder was on the CPU; re-run alone after the landing); W1-33 x4, W1-05 x2, W1-46,
+W2-59 x4 (known install/hook-line, W2-90c/W2-105); W2-54 x3 (AR-5: DEC-1024 after the head; sandboxed worker; time
+limit); W2-55, W2-66 (their runs); W1-01 x2 (history: DEC-906's known red; integration merges: to check). B: W2-05 + W2-96
+re-close started 11:26 against it (`log/close-two-20261102-1127.out`). W2-61h DONE `ac7dfa1790c7` in land.pending.txt.
+**11:46:** P1-NIGHTLY-2026-11-02 `578203ec` pinged (one decision: W1-01's merge rule and 0568d91baf56, rec (a)).
+Dispatcher v4.4 `7f81f91a` LIVE (DEC-1030 item 1): GPU line in status, `gpu-alert` inbox items (the quiet waiter wakes
+on them: push the owner at once); the 6 scratch-tools tests skip by name; review by Sonnet running
+(`reviews/dispatch-v4.4.md`). The background log watch b7ulw6ru4 stays as a second net.
+**12:25 (owner) DEC-1031 `44f4df2d`.** Embedder PINNED in VRAM (keep_alive -1, 12:05). COMMIT HOLD ON
+(`log/act-in-progress.txt`): ACT-W1-01-EXEMPT-1 `983f1ece` with the operator; ACT-RERANK-CPU-1 `5aeed6ea` must NOT be
+applied (CPU rerank >100 s/query): replaced by `drafts/ACT-RERANK-GPU-SLOTS-1.md` + `drafts/gov_reranker_gpu_slot.py`
+(at most 2 rerankers on the GPU; tested) — commit both to packages/ and tools/ when the hold ends, and mark v1
+superseded. The plan: `drafts/P1-LOAD-BALANCE-1.md` (with the GPU agent's figures; query on GPU: no answer changes)
+— commit to packages/ when the hold ends. W1-01b `DAEO-vhad` queued. SMART-WORK-6 applied (`4036a296`, `42889c78`).
+GPU at 15.1/16.3 GB with 11 rerankers at 12:16 (pre-crash state).
+**12:45 (owner) DEC-1032 `caa01da9`: FREEZE + the infrastructure sprint.** Ready list frozen (the rest parked in
+`dispatch/ready.parked-by-freeze.txt`; land.pending kept). Sprint: (i) W2-112 claimed `be02bb01`, first on the ready
+list (waits for CPU room); (ii) ACT-QUERY-GPU-1 `10f856c7` handed to the operator (HOLD on); W2-123 got the
+query-GPU line `b0156a41` (its lead messaged); (iii) dispatcher v4.6 being built by an engineer agent (review, then
+commit); (iv) seeding everywhere being built by an engineer agent (tools; review, then commit); W2-126 (the vector
+cache) filed+claimed `2a3c998f`, run 1 = tests only, queued; (v) the assessment after. After the query ACT: set
+dispatch/config.json `gpu_expected.query` true. Plan + v2 ACT committed `d03ce368`.
+**13:03 EMERGENCY (owner) DEC-1033 `7fa7fe54`.** ACT-QUERY-GPU-1 NOT applied, never (semantic.py's `_on_cpu` gate). Stopped
+at safe points (`log/emergency-stops-20261102.md`): the landing of six, the W2-05+W2-96 re-close, W2-04's lead. Running:
+W2-122, W2-123 (returning run 2 DONE), W2-112 (started 13:01 past the gate). Fixes in parallel, each to one review
+then live: (a) W2-112; (b) engineer agent on branch `emg/query` (worktree EMG-query): any-device query vector +
+ollama.py start without NO_GPU, then the operator's restart ACT; reranker interim: engineer agent on
+tools/gov_reranker_gpu_slot.py (wait for a slot or go without reranking, named; never the CPU), then the operator's
+install ACT; (c) dispatcher v4.6 agent; (d) seeding agent (it is editing merge_queue.py in the MAIN tree, uncommitted).
+Before snapshot: `log/emergency-before-20261102.txt`. After all four: the after figures, then the owner lifts it.
+**13:16:** fix (b) LIVE in code: emg/query reviewed PASS (`reviews/emg-query.md`, READY true) and merged `6ed6a5ae`
+(slip: merged without Task/Role trailers; not amended; drift log). ACT-QUERY-GPU-2 `2cd0e836` waits until W2-112,
+W2-122 and W2-123 have merged 6ed6a5ae (messaged; background watch), then to the owner. Reranker interim patch
+(tools/gov_reranker_gpu_slot.py + 14 tests, uncommitted) in review (`reviews/emg-rerank-slot.md`); then commit and the
+owner's install ACT (commands in the engineer's return). Follow-ups: W2-54 acceptance revision (5 groups), review F1
+(zero vector) and F2 (list answers), the automatic start's caps.
+**13:30:** reranker interim LIVE (ACT-RERANK-WAIT-1 applied, `81b7a739`). v4.6 review FAILED health (F1 first request
+after idle = HUNG; F2 5xx counted as progress): engineer fixing F1-F4 live-by-rename after tests; then review round 2
+(health only). Seeding (d) built and NOT live (`tools-review/`, both patches + seed_store.py, new_worktree.sh,
+rebuild_counts.py); in review (`reviews/emg-seeding.md`). After install: refresh the integration store once by hand
+past 6ed6a5ae (it is at 6ebd7b56 of 11-01). W2-123: success-7/8 amended `0fa24eda`; P-W2-123-4 to W2-126 `5e67a14d`.
+**13:33 (owner):** the 19:30 after figures include a seeded close's time beside today's cold median (30 min) and
+confirm no close runs cold (rebuild_counts.py). Plan: once seeding is live (~15:30), run the stopped W2-05+W2-96
+re-close as the measured seeded close, unless the owner objects.
+**13:55:** fix (d) seeding LIVE `648e5067` (review 2 rounds; READY true after a strict block; verdict.py now reads the
+LAST block, fixed + test). Fix (c) dispatcher v4.6 LIVE `b06ee350` (G1/G2 installed on the owner's word, DEC-1035).
+W2-127 `DAEO-1vka` filed (`8e0daae2`): the reranker socket in the sandbox, after W2-112. All three leads have the patch;
+ACT-QUERY-GPU-2 handed over 13:55 (HOLD on). After it: set dispatch/config.json gpu_expected.query true; land W2-123
+(DONE, head 3de9bcf44d91, verified 2a4455be0785) via the queue (now seeded); W2-122 DONE soon; then the seeded close of
+W2-05+W2-96 as the measurement; refresh the integration store once by hand (it is at 6ebd7b56).
+**14:00:** W2-112's T5 (b) and T6 (b) decided and told to its lead; DEC-1036 drafted in `drafts/DEC-1036.md`: commit it
+and W2-112's KPI 6 lines when the ACT hold ends.
+
+**At start, in order (the earlier session's list; items 1-5 done above):**
+1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
+2. Write your session id to `log/cto-session.txt` (the sentinel watches it), then end the stand-by with
+   `mv log/cto-standby.txt log/cto-standby.ended-$(date +%H%M).txt` (no `rm`: it needs the owner's approval, DEC-991).
+   **The sentinel:** started 22:44 in tmux `cto-sentinel`, but it waits at Claude Code's folder-trust prompt (the owner's
+   choice; never press it for them). Once the owner has accepted it (`tmux attach -t cto-sentinel`) and its watch writes
+   `log/deadman.log`, `mv dispatch/sentinel-expected.pending dispatch/sentinel-expected` (parked so the dispatcher does
+   not flag it silent meanwhile: the log's last line is a 13:01 test).
+3. Confirm your Remote Control link is live and send one test push (DEC-998 item 2).
+4. **If before 02:00:** the live "push when actions required" test (ACT-PUSH-INPUT-1): ping the owner first, then run one
+   command that needs approval (e.g. `ls .claude/`); the owner should get a push. From 02:00 the quiet-hours hook refuses
+   prompts: the test moves to 07:30.
+5. **At 03:00:** the throwaway hook test (ACT-QUIET-DENY-1): a throwaway session started with `GOV_QUIET_NOW=03:00` and
+   `GOV_QUIET_QUEUE=<a scratch file>` (the hook's test clock and queue) tries one command that needs approval; it must be
+   denied with the hook's message, never shown, and appear in that queue file. Report both results in the morning package.
+
+**The night's rules:**
+- Quiet hours 02:00-07:30: never run a command that could need approval (rm in any form, owner-ping, any `.claude/` path);
+  queue it to `log/approval-queue.jsonl` for the 09:00 package (DEC-991).
+- **The nightly runs at 04:00** (DEC-973). From 03:15 until it has started (`NIGHTLY-RUNNING` written, or today's line in
+  `log/nightly/status.txt`): no commit, no file written in the main tree; the dispatcher holds landings (v4.3,
+  `66b08891`; check the 03:15 pass's status shows `held for the nightly`, cleared after it starts). Last two nights it
+  never started (a dirty tree). A `land.py` or `close_build.py` run by hand must not be started after 03:00.
+- Leads start only through `dispatch/ready.txt` (or `tools/start_owner_order.sh` on an owner's explicit order); landings
+  through `dispatch/land.txt` or `tools/land.py`. Never `&`; check a tree with `tools/tree_busy.sh <W2>` (never
+  `pgrep -f` on a path: matched my own shell twice).
+- A rule broken twice becomes a mechanism (DEC-1012); slips go to `log/drift-2026-w44.txt`.
+- Status counts come from files: `dispatch/status.txt`, `git log`, `tk`.
+- `tools/applied_check.py` at every handover and in the morning package: every decision draft in the register, every
+  package KPI line in a ticket (ignores with reasons in `tools/applied_check.ignore`).
+
+**The machinery (all live):**
+- Dispatcher v4.2 (`d216e61f`, cron every minute): ready list by peaks, inbox, landings, sentinel heartbeat, interim
+  results, guard refusals (harvest detached), nightly lines, embedding-server health (starts held while it is down) and
+  slot-holder progress; v4.3 (`66b08891`) holds landings 03:15 until the nightly starts. Status `dispatch/status.txt`.
+  Open v4 follow-ups (non-blocking): reviews `reviews/dispatch-v4.2-round2.md` F2/F3 (server flapping hysteresis;
+  reaped children's CPU) and `reviews/dispatch-v4.3.md` F2/F3.
+- `tools/rebuild_slot.sh` exits 75 when a rebuild answers ok without its semantic store (DEC-1015 item 4): a lead,
+  close or queue run sees it as failed.
+- Sentinel (ACT-SENTINEL-1, two-day trial from tonight): tmux `cto-sentinel`, Haiku, Remote Control "CTO sentinel";
+  `dispatch/sentinel-expected` present. Report its cost after day one (morning of 11-03).
+- Embedding servers: 11434 (shared) and 11435 (query, CPU-only), both capped 12-19, nice 10 (ACT-OLLAMA-CAP-1/2). The
+  caps are lost on a restart until W2-20 and W2-123 land (DEC-1017).
+
+**State at the handover (w2/integrate `9a74ef2a91b3`, main tree clean):**
+- Closed 45. Leads running 4 (from the processes): W2-104, W2-92, W2-122, W2-123 (the last two started 22:24 and 22:26 on
+  the owner's order, DEC-1018 item 2). Load about 22; embedding server healthy.
+- **Detached from the old session (parent: init), each writing its own log; check them first:**
+  - The landing batch W2-11, W2-105, W2-81: `land.py` pid 514085, `log/land-batch3-20261101-2205.out` (rebuilding its
+    warm clone, then tests, merge, close records, commit). Its last line "exit N" will be missing (its wrapper was
+    ended to detach it): judge it by the queue's records and `git log`.
+  - The close W2-05, W2-55, W2-96: `close_build.py` pid 514602, `log/close-three-20261101-2205.out` (same note).
+  - W2-04's store rebuild: DONE 22:43 (semantic recreated, 54,514 vectors). W2-04's verify run is on the ready list
+    and starts when the dispatcher admits it.
+  - If any of them dies, re-run it with `setsid -f` and a log redirect, never in a session-bound background shell.
+- `dispatch/land.txt`: `W2-90b=73c18fea1e1f` (DEC-1016). The dispatcher lands it once the queue is free, outside the
+  nightly hold.
+- **Starts held at the handover:** W2-92's lead runs one acceptance suite with 4 workers outside a slot (pid 761575,
+  `timeout 3000`), against the common brief. Raise it with W2-92's return.
+- ACT-GUARD-FIX-3 is designed and staged (finished 23:3x, before the reload): `/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/scratchpad/guard-fix/`
+  (`ACT-GUARD-FIX-3.md`, `.diff`, `bash_writes.py`, 198 tests). Logged refusals 31 of 61 refused by today's hook ->
+  2 of 61 (3.3 %) with the fix; planted writes 40 of 87 missed today -> 0; the final history differential (4,873
+  commands) done: 67 newly passed (none writes into the tests), 9 newly refused (6 real test writes today's hook
+  misses, 3 fail-closed). To do: an independent review of
+  `bash_writes.py` (about 1,200 lines, a different model); copy the package into `packages/`; send it to the owner
+  (rec (a)). Product half: W2-42's six proposed lines (package §7). Do NOT relaunch the brief in `drafts/`.
+
+**Open for the owner (the 09:00 package):**
+- ACT-GUARD-FIX-3 (DEC-1018 item 3): the acceptance-folder rule's fix, 57 of 61 refusals false; its design subagent to be relaunched from `drafts/GUARD-FIX-3-brief.md`.
+- P-W2-90b-1 (DEC-1016): how W1-46's live sessions and W1-50's launcher judge the worktree's code; lead's rec (b).
+- W2-11's seven unplaced lines (SW3 reviewer template; SW4 4, 6, 9, 10; SW5 B, C): a ticket covering the orchestration
+  skill once W2-11 closes (P1, DEC-1015 item 3).
+- SW4 line 3 (reviewer recall per model): no home (W2-81 lands without a round; W2-93 has no scorer). SW4 line 1
+  (W2-82 ROLE_SCOPE): at W2-82's claim with its split.
+- The sentinel's cost after day one; the two tests' results; the approval queue.
+
+**Next, in order:** land and close what returns (one merge per ticket); W2-04's verification once its store is
+complete (store `semantic_vector` near 50,000; `log/rebuild-W2-04-20261101-2205.out`); then the ready list as written
+(W2-92 run 2, W2-61h verify, W2-91); the memory chain W2-92 -> W2-13 -> W2-15a -> W2-32; W2-115 after W2-55 closes;
+W2-20's next run starts by merging w2/integrate (1,510 behind; acceptance conflicts: its test designer).
 
 ## Archive
-The long history moved to `CHECKPOINT-ARCHIVE.md` beside this file (DEC-792, 2026-10-18).
+Everything older: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (to 2026-11-01 night) and `CHECKPOINT-ARCHIVE.md` (to 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-10-29T14:49:22Z 345890073adc74569c2ee97068be8beab3ba1b8b801bae4f04676e38f9eae8ef
-git head: 4f5937653719c10772c6906665e38845b5eabe37
+generated: 2026-11-02T14:25:00Z 11715889ad43893f7b3b5d2c8a1ff93400b0ce47097255b73b91fe65cc399bb1
+git head: a7182f6c7de00d91b3c5161e10590e06641f0baa
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
-  DAEO-2ds6 [in_progress] - W2-26 EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg)
-  DAEO-2gc7 [in_progress] - W2-68 Batched closes, reuse on the same code, and two fingerprints
-  DAEO-49o5 [in_progress] - W2-16 Immutable, hash-pinned releases (CAP-43.b lite) <- [DAEO-g0ip, DAEO-ha8z]
-  DAEO-5j8b [in_progress] - W2-58 Policy 2 in the guard and the launcher: reads open, four refusals
+  DAEO-3r1j [in_progress] - W2-110 A product's CTO-only install rule
+  DAEO-6b2q [in_progress] - W2-109 Contract v4.3
   DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
-  DAEO-9nys [in_progress] - W2-67 Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions
-  DAEO-cy5o [in_progress] - W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry
-  DAEO-e8f0 [in_progress] - W2-71 The secrets check passes a real commit hash of this repository for row W2-L423's rule only
-  DAEO-egsy [in_progress] - W2-51 The Wave 2 plan validator <- [DAEO-g0ip]
-  DAEO-ha8z [in_progress] - W2-49 Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P) <- [DAEO-g0ip, DAEO-egsy]
+  DAEO-a3u2 [in_progress] - W2-91 Full embeddings: the root files, the governance overlay and schemas/ <- [DAEO-jsg1]
+  DAEO-arrl [in_progress] - W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see
+  DAEO-blwa [in_progress] - W2-122 Seeded rebuilds
+  DAEO-clon [in_progress] - W2-112 One reranker serves every session
+  DAEO-cv58 [in_progress] - W2-60a The role, its skills and its model and effort loaded at launch; the launch record
+  DAEO-drhj [in_progress] - W2-104 The skill evaluation harness
+  DAEO-h2k3 [in_progress] - W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources <- [DAEO-m1u3]
+  DAEO-jpr0 [in_progress] - W2-126 A machine-wide vector cache keyed by the text <- [DAEO-qzrq]
+  DAEO-k7hz [in_progress] - W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 <- [DAEO-g0ip]
+  DAEO-l78m [in_progress] - W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository
+  DAEO-n0wb [in_progress] - W2-92 The knowledge graph and the code graph as routes of plain-question retrieval <- [DAEO-s9qc, DAEO-ym8a]
+  DAEO-nqa2 [in_progress] - W2-90b W2-90's next round <- [DAEO-0mtg]
+  DAEO-ouet [in_progress] - W2-96 The opaque acceptance runner
+  DAEO-qzrq [in_progress] - W2-123 Parallel requests on the embedding server
   DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
-  DAEO-ym8a [in_progress] - W2-03 Decisions as records, each with its own hash <- [DAEO-g0ip, DAEO-zflj]
+  DAEO-u4oz [in_progress] - W2-04 gov context bounded and reproducible <- [DAEO-g0ip, DAEO-ym8a]
+  DAEO-vhad [in_progress] - W1-01b A listed merge is exempt for its own changes
+  DAEO-wnnz [in_progress] - W2-56 `gov launch` usable for every worker
+  DAEO-zpdj [in_progress] - W2-105 The template's install block removed
+  DAEO-zqvn [in_progress] - W2-13 RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) <- [DAEO-g0ip, DAEO-ym8a]
+  DAEO-zuiy [in_progress] - W2-66b W2-66's record-only case reads a .ps1 script as code
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS  4f593765 [w2/integrate]
-  /home/usain/gov-os-worktrees/W2-00-record   48236df6 [record/w2]
-  /home/usain/gov-os-worktrees/W2-03          9a3e3456 [w2/W2-03]
-  /home/usain/gov-os-worktrees/W2-05          f19f156e [w2/W2-05]
+  /home/usain/Dynamic-Agentic-Engineering-OS  a7182f6c [w2/integrate]
+  /home/usain/gov-os-worktrees/EMG-query      75f18d11 [emg/query]
+  /home/usain/gov-os-worktrees/W1-01b         76f12566 [w2/W1-01b]
+  /home/usain/gov-os-worktrees/W2-00-record   3a8ed9f9 [record/w2]
+  /home/usain/gov-os-worktrees/W2-00-store-a  d88a1fff (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-00-store-b  6ebd7b56 (detached HEAD)
+  /home/usain/gov-os-worktrees/W2-03          92e03a72 [w2/W2-03]
+  /home/usain/gov-os-worktrees/W2-04          a0c79a6c [w2/W2-04]
+  /home/usain/gov-os-worktrees/W2-05          8d2a1f54 [w2/W2-05]
   /home/usain/gov-os-worktrees/W2-07          31ddf173 [w2/W2-07]
-  /home/usain/gov-os-worktrees/W2-16          1908149d [w2/W2-16]
+  /home/usain/gov-os-worktrees/W2-104         909d7ff0 [w2/W2-104]
+  /home/usain/gov-os-worktrees/W2-105         fa653609 [w2/W2-105]
+  /home/usain/gov-os-worktrees/W2-106         9525808d [w2/W2-106]
+  /home/usain/gov-os-worktrees/W2-107         3861d3f3 [w2/W2-107]
+  /home/usain/gov-os-worktrees/W2-108         d3f87c55 [w2/W2-108]
+  /home/usain/gov-os-worktrees/W2-109         695eea48 [w2/W2-109]
+  /home/usain/gov-os-worktrees/W2-11          c9f99b28 [w2/W2-11]
+  /home/usain/gov-os-worktrees/W2-110         d0ecd1bc [w2/W2-110]
+  /home/usain/gov-os-worktrees/W2-112         0b9deb2d [w2/W2-112]
+  /home/usain/gov-os-worktrees/W2-112-tests   9af602dc [w2/W2-112-tests]
+  /home/usain/gov-os-worktrees/W2-114         e9214850 [w2/W2-114]
+  /home/usain/gov-os-worktrees/W2-122         3fc44860 [w2/W2-122]
+  /home/usain/gov-os-worktrees/W2-123         3de9bcf4 [w2/W2-123]
+  /home/usain/gov-os-worktrees/W2-126         2a3c998f [w2/W2-126]
+  /home/usain/gov-os-worktrees/W2-13          bdc4b795 [w2/W2-13]
+  /home/usain/gov-os-worktrees/W2-16          05952376 [w2/W2-16]
   /home/usain/gov-os-worktrees/W2-20          1a54976c [w2/W2-20]
-  /home/usain/gov-os-worktrees/W2-26          62c4e477 [w2/W2-26]
-  /home/usain/gov-os-worktrees/W2-37          2ff873b2 [w2/W2-37]
-  /home/usain/gov-os-worktrees/W2-49          19d45246 [w2/W2-49]
-  /home/usain/gov-os-worktrees/W2-51          c2c80e6c [w2/W2-51]
-  /home/usain/gov-os-worktrees/W2-52          a21f06a7 [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-57          bd418982 [w2/W2-57]
+  /home/usain/gov-os-worktrees/W2-26          5cee4e6b [w2/W2-26]
+  /home/usain/gov-os-worktrees/W2-37          38e74a5d [w2/W2-37]
+  /home/usain/gov-os-worktrees/W2-49          9fc4dcd9 [w2/W2-49]
+  /home/usain/gov-os-worktrees/W2-51          61b6600b [w2/W2-51]
+  /home/usain/gov-os-worktrees/W2-52          2b922bf7 [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-55          aca86233 [w2/W2-55]
+  /home/usain/gov-os-worktrees/W2-55-tests    1f7a4dd9 [w2/W2-55-tests]
+  /home/usain/gov-os-worktrees/W2-56          23079f92 [w2/W2-56]
+  /home/usain/gov-os-worktrees/W2-57          70ee48e2 [w2/W2-57]
   /home/usain/gov-os-worktrees/W2-58          09f5ebfa [w2/W2-58]
+  /home/usain/gov-os-worktrees/W2-60a         4d798caf [w2/W2-60a]
+  /home/usain/gov-os-worktrees/W2-61          6b517db9 [w2/W2-61]
+  /home/usain/gov-os-worktrees/W2-61h         ac7dfa17 [w2/W2-61h]
   /home/usain/gov-os-worktrees/W2-63          ad38ed68 [w2/W2-63]
+  /home/usain/gov-os-worktrees/W2-64          bb389b71 [w2/W2-64]
   /home/usain/gov-os-worktrees/W2-65          f6881547 [w2/W2-65]
-  /home/usain/gov-os-worktrees/W2-67          d0140d4d [w2/W2-67]
+  /home/usain/gov-os-worktrees/W2-66b         2536346b [w2/W2-66b]
+  /home/usain/gov-os-worktrees/W2-67          ff2cc697 [w2/W2-67]
   /home/usain/gov-os-worktrees/W2-68          05ec0f6a [w2/W2-68]
-  /home/usain/gov-os-worktrees/W2-71          c9939587 [w2/W2-71]
+  /home/usain/gov-os-worktrees/W2-71          027d4f10 [w2/W2-71]
   /home/usain/gov-os-worktrees/W2-75          e7f90cd3 [w2/W2-75]
+  /home/usain/gov-os-worktrees/W2-76          e1ddcaa6 [w2/W2-76]
+  /home/usain/gov-os-worktrees/W2-77          3ce51300 [w2/W2-77]
+  /home/usain/gov-os-worktrees/W2-78          8e7640b9 [w2/W2-78]
+  /home/usain/gov-os-worktrees/W2-81          e78e6af7 [w2/W2-81]
+  /home/usain/gov-os-worktrees/W2-84          e3096fae [w2/W2-84]
+  /home/usain/gov-os-worktrees/W2-85          d113ff5e [w2/W2-85]
+  /home/usain/gov-os-worktrees/W2-86          01e21d63 [w2/W2-86]
+  /home/usain/gov-os-worktrees/W2-87          51a72c7f [w2/W2-87]
+  /home/usain/gov-os-worktrees/W2-90          12f85350 [w2/W2-90]
+  /home/usain/gov-os-worktrees/W2-90b         73c18fea [w2/W2-90b]
+  /home/usain/gov-os-worktrees/W2-91          55b47e07 [w2/W2-91]
+  /home/usain/gov-os-worktrees/W2-91-tests    a5bf211f [w2/W2-91-tests]
+  /home/usain/gov-os-worktrees/W2-92          448a835a [w2/W2-92]
+  /home/usain/gov-os-worktrees/W2-95          6ce82952 [w2/W2-95]
+  /home/usain/gov-os-worktrees/W2-96          220e2923 [w2/W2-96]
+  /home/usain/gov-os-worktrees/W2-97          115def7e [w2/W2-97]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->
