@@ -17,7 +17,6 @@ role: product-spec
 depends_on:
 - DAEO-g0ip
 allowed_paths:
-- template/governance/kernel/templates/brief-*.md
 - template/governance/kernel/skills/orchestration/**
 - template/governance/kernel/skills/audit/**
 # Every .claude/** line (skills/orchestration, skills/audit, agents/orchestrator.md, skills/*/SKILL.md, skills/test-design, skills/qa-review) is out of the paths: those files are generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
@@ -59,7 +58,7 @@ kpis:
   - 'The orchestration skill states the anti-drift kit: a fresh orchestrator session every morning from a handover (checkpoint, RESUME HERE, the decisions in force), the digest loaded at start, every rule written into its five places (DEC-851) [DEC-952 item 6, DEC-953 item 7, DEC-983, DEC-982]'
   - 'The orchestration skill states scope control: a new ticket in the WBS goes to the owner as a P1 with a recommendation before it is filed; leads name a needed ticket in their return and never file one [DEC-974, DEC-983, DEC-982]'
   - 'The test-design skill states that a timing test measures the work under test (its process''s CPU time, or against a quiet reference beside it), never the wall time of a loaded machine, at the same bound [DEC-979 item 1 D2, DEC-983, DEC-982]'
-  - 'The orchestration skill has an approvals section, and the orchestrator brief template carries it: the orchestrator reads its own allow list at session start (the settings files'' allow, ask and deny rules, and the host''s known safety checks: for Claude Code, any `.claude/` path); before each command it classifies it as allowed or as possibly needing the owner''s approval; such a call is never chained to other work; by day it notifies the owner first, then runs it; inside the project''s quiet hours it never runs it and queues it for the morning package; one scenario each for day, night and a chained command [DEC-991, DEC-994 item 3] (round 2)'
+  - 'The orchestration skill has an approvals section (its brief-template half retired with the brief templates, DEC-1137; the CTO''s P-a, 2026-11-11): the orchestrator reads its own allow list at session start (the settings files'' allow, ask and deny rules, and the host''s known safety checks: for Claude Code, any `.claude/` path); before each command it classifies it as allowed or as possibly needing the owner''s approval; such a call is never chained to other work; by day it notifies the owner first, then runs it; inside the project''s quiet hours it never runs it and queues it for the morning package; one scenario each for day, night and a chained command [DEC-991, DEC-994 item 3] (round 2)'
   failure:
   - 'A kernel skill, its generated copy or the skill template with a permission field in its front matter, or a step telling its role to write what its output class does not hold [DEC-995, DEC-996] (round 2) (folds W2-99 F4)'
   - A template, skill or role file that still teaches LEAD_CHECKPOINT, a listing refusal or a fixed ceiling fails a test [DEC-866].
@@ -137,3 +136,12 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-11), as approved (DEC-729). The list row
 **DEC-981 (ROLES-SPEC-1 G13, round 1):** the version line of every skill's `SKILL.md` (the kernel's source and its generated copies under `.claude/skills/`, `.rulesync/skills/` and `template/.rulesync/skills/`) is in this ticket's paths for that line only; **not the adopt skill's** while W2-52 (`DAEO-siiz`) holds it (it gets its version line when W2-52 merges); nothing else in those files changes. The role file stays limited to DEC-866's sweep sentences (W2-33 holds the rest).
 
 **DEC-983 (SMART-WORK-1, round 2):** the last four success KPIs (brief gaps, the anti-drift kit, scope control, timing tests) are round 2's, not round 1's. For the fourth, the test-design skill's `SKILL.md` body (`template/governance/kernel/skills/test-design/SKILL.md` and its generated copies) is in this ticket's paths for that one section.
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-11), round 2's run r6 packages:** P-W2-11-R6-1 (b): F1's case checks only
+  the skills that declare `output` (a designer revision with `Rewrite-Reason`; the planted-file cases still show the check;
+  five of the nine skills are version-line only, DEC-981). P-W2-11-R6-2 (c): product-spec states the held-out refusal as a
+  bar and cites CAP-38.c in the read rule (inside the 10,000-character cap); W2-11's designer revises W2-128's and W2-142's
+  pins, front-matter guards (to allow `metadata.version`) and the placeholder (`Rewrite-Reason: DEC-866, DEC-981,
+  DEC-1137`), lowering nothing else (DEC-957 P2; W1-35 the precedent). P-a: S16 reworded to the skill half (above).
+  P-b: `metadata.version` is the one carried repeat. Housekeeping: `brief-*.md` dropped from `allowed_paths`; W2-L257 and
+  W2-L258 no longer apply (W2-128 retired the files they name).

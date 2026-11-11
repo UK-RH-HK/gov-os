@@ -417,6 +417,8 @@ class DispatchBed:
             write(self.tree / ".claude" / "templates" / f"{stem}.md", template_text(stem))
         self.cli = stub_cli(self.bin / "claude")
         self.home_cli = stub_cli(self.home / ".local" / "bin" / "claude")
+        # DEC-1133 (3): the lead line checks the resource gate and registers the lead with gov; here the gate is open
+        write(self.home / ".local" / "bin" / "gov", "#!/usr/bin/env bash\nexit 0\n").chmod(0o755)
         self._runs = 0
 
     def expected_path(self) -> str:

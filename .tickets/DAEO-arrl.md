@@ -1,6 +1,6 @@
 ---
 id: DAEO-arrl
-status: in_progress
+status: closed
 deps: [DAEO-ym8a]
 links: []
 created: 2026-10-29T15:55:50Z

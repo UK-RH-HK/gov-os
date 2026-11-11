@@ -154,6 +154,10 @@ def _launch_now(tmp_path: Path, with_template: bool) -> tuple[subprocess.Complet
     stub = home / ".local/bin/claude"
     stub.write_text(f'#!/bin/bash\nprintf "%s\\n" "$@" > "{record}"\n', encoding="utf-8")
     stub.chmod(0o755)
+    # DEC-1133 (3): the lead form checks the resource gate and registers the lead with gov; here the gate is open.
+    gov = home / ".local/bin/gov"
+    gov.write_text("#!/bin/bash\nexit 0\n", encoding="utf-8")
+    gov.chmod(0o755)
     for folder in ("tools", "briefs", "log"):
         (orch / folder).mkdir(parents=True)
     (orch / "tools/disk_gate.sh").write_text("exit 0\n", encoding="utf-8")

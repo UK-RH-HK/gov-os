@@ -550,3 +550,10 @@ other restart is an ACT.
 - DEC-1139 (2026-11-11): **W2-175's role templates approved at `4c0c73472fd8`, promoted as 1.0.1** (the seven
   `role-*.md` and six composed `template/.rulesync/subagents`); the copies by ACT (class (b)); three fixes ride the one-bar
   CIT-P (RV1 engineer wording, RV3 lead/CTO read tests and code), the composed files' stale "Wave 1" sections to W2-33. Basis: question 2.
+- DEC-1140 (2026-11-11; (5) and (6) for the week to the reset of 11-15; (4) standing): **usage first**: RUBRIC-2 at every
+  launch (C2/C1 workers Sonnet high; Opus for C3 and reviews), briefs checked before release, no-action notices logged not
+  sent; **context awareness before compaction back for every session**; then ACT A, the dispatcher's own lead cap, the idle
+  guard's F1-F3, the brake's false trips (row 159), W2-115; usage, spend and speed measured from 11-02, in the digests;
+  **the CTO session to about 1M tokens, a fresh one each morning after the 09:30 digest** (changes DEC-1118 (A) for the
+  CTO); **the 80 % brake lifted this week, five leads, EXAMIN's path first**; **at 97 % no new start, at 99 % push the
+  owner at any hour** (an exception to DEC-1089 (3)); the night hold stays. Basis: questions 2 and 4.
