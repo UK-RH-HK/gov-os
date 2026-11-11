@@ -1,0 +1,39 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "69f548b45242",
+   "after": "b9e878009b8c"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/reviews/ACT-OPERATOR-ROUNDS-1-and-MEMORY-AUDIT-INSTALL-1-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "f90bb925d2ed",
+   "after": "66056232661c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "69f548b45242",
+   "after": "b9e878009b8c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "69f548b45242",
+   "after": "b9e878009b8c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "91c8885a407d",
+   "after": "0d017ae4e7c9"
+  }
+ ]
+}

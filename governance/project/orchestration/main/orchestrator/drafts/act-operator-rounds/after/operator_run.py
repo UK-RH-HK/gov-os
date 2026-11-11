@@ -85,6 +85,17 @@ def check_ok(check, rc, out):
         return False
 
 
+def check_act(m, act):
+    """G1 (DEC-1131 (3), review P1-F1): the manifest names the ACT it is requested under. Fails closed: act_rounds counts the
+    earlier builds of an ACT id by this field, so a manifest that leaves it out or names another id would drop its build
+    from the count and bring back the reset DEC-1131 (3) closes. Raises Refused at G1."""
+    named = m.get("act") if isinstance(m, dict) else None
+    if not isinstance(named, str) or not named:
+        raise oc.Refused("G1", f"the manifest names no act (its \"act\" must be the requested id {act}); DEC-1131 (3)")
+    if named != act:
+        raise oc.Refused("G1", f"the manifest names act {named!r}, not the requested {act}; DEC-1131 (3)")
+
+
 def validate_manifest(m):
     """The manifest's form (the interface's fields); raises ValueError on anything else."""
     if not isinstance(m, dict):
@@ -276,6 +287,7 @@ class Run:
                 validate_manifest(m)
             except (ValueError, UnicodeDecodeError) as exc:
                 raise oc.Refused("G1", f"the manifest is malformed: {exc}")
+            check_act(m, self.act)
             listed = dict(m["files"])
             found = set()
             for top, dirs, files in os.walk(tmp):
@@ -322,6 +334,7 @@ class Run:
             validate_manifest(m)
         except (OSError, ValueError, UnicodeDecodeError):
             raise oc.Refused("G1", "the existing frozen copy's manifest cannot be read: changed after review")
+        check_act(m, self.act)
         self.msha = oc.sha256_bytes(raw)
         if self.msha != self.sha:
             raise oc.Refused("G1", "the existing frozen copy's manifest is not the requested sha: changed after review")
@@ -438,8 +451,9 @@ class Run:
     # ---------------------------------------------------------------------------------------------------------- G4
     def act_rounds(self, vmod, blocks):
         """The review rounds of this ACT id (DEC-1131 (3)): the verdict blocks of this build's review record and of the
-        review record in every other frozen copy of the same ACT id (acts/<id>-<sha12>/, its manifest naming this id),
-        so a rebuild does not reset the count. A block that a later record carries forward counts once: blocks are
+        review record in every other frozen copy of the same ACT id (acts/<id>-<sha12>/, its manifest naming this id;
+        G1 refuses a manifest that does not, so every copy frozen under this code does), so a rebuild does not reset the
+        count. A block that a later record carries forward counts once: blocks are
         compared by their text, and a text counts as many times as the record holding it most often holds it. A copy
         without a readable review record counts nothing (this build's own record is read as before)."""
         total = collections.Counter(blocks)

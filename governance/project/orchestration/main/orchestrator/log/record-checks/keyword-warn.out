@@ -1,7 +1,19 @@
+keyword-warn: .gov-runtime/scratch/audit-d/clone/docs/research/D4B-memory-survey.md
+keyword-warn: .gov-runtime/scratch/audit-d/clone/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/scratch/audit-d/clone/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
 keyword-warn: .gov-runtime/scratch/orchestrator/briefs/D4B-research-memory-survey.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-3-round1/work/diff_cmds.json
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-3/work/diff3_cmds.json
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-guard-fix-3/work/diff_cmds.json
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/docs/research/D4B-memory-survey.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/clone/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/round1/clone/docs/research/D4B-memory-survey.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/round1/clone/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-2/round1/clone/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/lift-close-blockers/rehearsal/docs/research/D4B-memory-survey.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/lift-close-blockers/rehearsal/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/scratch/orchestrator/drafts/lift-close-blockers/rehearsal/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/clone/docs/research/D4B-memory-survey.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/clone/docs/research/W2-69-secrets-scan.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/clone/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
@@ -11,4 +23,4 @@ keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/final-check-c
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/final-clone/docs/research/D4B-memory-survey.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/final-clone/docs/research/W2-69-secrets-scan.md
 keyword-warn: .gov-runtime/scratch/orchestrator/drafts/w2-130/work/final-clone/governance/project/orchestration/packages/LIFT-1/MEMORY-INVENTION-DISCLOSURE.md
-keyword-warn: 13 file(s) hold a keyword of row W2-L423's rule; 0 not read
+keyword-warn: 25 file(s) hold a keyword of row W2-L423's rule; 0 not read

@@ -139,13 +139,18 @@ def test_g4_a_folder_whose_manifest_names_another_act_does_not_count(kit):
 
 
 # ------------------------------------------------------------------------- G1: the manifest names the requested ACT (P1-F1)
-def with_manifest_act(kit, act, **change):
-    """Build a bundle, then rewrite its manifest.json (the act key removed or set); returns the new manifest sha."""
+ABSENT = object()
+
+
+def with_manifest_act(kit, act, named=ABSENT):
+    """Build a bundle for `act`, then rewrite its manifest.json: the "act" key removed (named=ABSENT) or set to `named`;
+    returns the new manifest sha."""
     kit.bundle(act, {("repo", "tests/optin-x.txt"): b"one\nthree\n"}, rounds=1)
     mp = kit.scratch / "acts" / act / "manifest.json"
     m = json.loads(mp.read_text())
     m.pop("act")
-    m.update(change)
+    if named is not ABSENT:
+        m["act"] = named
     raw = json.dumps(m, indent=1).encode()
     mp.write_bytes(raw)
     return hashlib.sha256(raw).hexdigest()
@@ -154,7 +159,7 @@ def with_manifest_act(kit, act, **change):
 @pytest.mark.parametrize("how", ["absent", "null", "empty"])
 def test_g1_a_manifest_with_no_act_is_refused(kit, how):
     """Fails closed: act_rounds counts the earlier builds by this field, so a manifest without it would drop out of the count."""
-    msha = with_manifest_act(kit, "ACT-RA1", **({} if how == "absent" else {"act": None if how == "null" else ""}))
+    msha = with_manifest_act(kit, "ACT-RA1", {"absent": ABSENT, "null": None, "empty": ""}[how])
     rc, res, _ = kit.run("run", "ACT-RA1", msha)
     assert rc != 0 and res["gate"] == "G1", res
     assert "names no act" in res["reason"] and "ACT-RA1" in res["reason"]
@@ -163,7 +168,7 @@ def test_g1_a_manifest_with_no_act_is_refused(kit, how):
 
 
 def test_g1_a_manifest_naming_another_act_is_refused(kit):
-    msha = with_manifest_act(kit, "ACT-RA2", act="ACT-SOMETHING-ELSE")
+    msha = with_manifest_act(kit, "ACT-RA2", "ACT-SOMETHING-ELSE")
     rc, res, _ = kit.run("run", "ACT-RA2", msha)
     assert rc != 0 and res["gate"] == "G1", res
     assert "ACT-SOMETHING-ELSE" in res["reason"] and "not the requested ACT-RA2" in res["reason"]

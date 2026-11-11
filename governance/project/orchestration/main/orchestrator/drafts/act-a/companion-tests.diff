@@ -1,0 +1,28 @@
+diff --git a/tests/acceptance/W2-153/w2_153_support.py b/tests/acceptance/W2-153/w2_153_support.py
+index 85bac3a6b..efb6a6caf 100644
+--- a/tests/acceptance/W2-153/w2_153_support.py
++++ b/tests/acceptance/W2-153/w2_153_support.py
+@@ -417,6 +417,8 @@ class DispatchBed:
+             write(self.tree / ".claude" / "templates" / f"{stem}.md", template_text(stem))
+         self.cli = stub_cli(self.bin / "claude")
+         self.home_cli = stub_cli(self.home / ".local" / "bin" / "claude")
++        # DEC-1133 (3): the lead line checks the resource gate and registers the lead with gov; here the gate is open
++        write(self.home / ".local" / "bin" / "gov", "#!/usr/bin/env bash\nexit 0\n").chmod(0o755)
+         self._runs = 0
+ 
+     def expected_path(self) -> str:
+diff --git a/tests/unit/launch/test_w2_153_template.py b/tests/unit/launch/test_w2_153_template.py
+index 77aafc9bc..b0d34d8a7 100644
+--- a/tests/unit/launch/test_w2_153_template.py
++++ b/tests/unit/launch/test_w2_153_template.py
+@@ -154,6 +154,10 @@ def _launch_now(tmp_path: Path, with_template: bool) -> tuple[subprocess.Complet
+     stub = home / ".local/bin/claude"
+     stub.write_text(f'#!/bin/bash\nprintf "%s\\n" "$@" > "{record}"\n', encoding="utf-8")
+     stub.chmod(0o755)
++    # DEC-1133 (3): the lead form checks the resource gate and registers the lead with gov; here the gate is open.
++    gov = home / ".local/bin/gov"
++    gov.write_text("#!/bin/bash\nexit 0\n", encoding="utf-8")
++    gov.chmod(0o755)
+     for folder in ("tools", "briefs", "log"):
+         (orch / folder).mkdir(parents=True)
+     (orch / "tools/disk_gate.sh").write_text("exit 0\n", encoding="utf-8")

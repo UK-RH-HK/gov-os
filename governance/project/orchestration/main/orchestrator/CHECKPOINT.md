@@ -1,5 +1,38 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
+## RESUME HERE — 2026-11-11 16:55 UTC: session `b40cba91` (fresh after 8ddb8b14; context near rule 11's limit); next free id DEC-1135
+- **Start checks done 16:00:** identity ok; pin `pin-797495bdfc70`; guard4 PASS (453/0); core.bare false; inbox filed;
+  watchers armed in b40cba91 (inbox_wait_quiet, helper_watch, sentinel_check, bare_watch, store backstop, usage_log; mem_guard
+  pid 309921 and oom_watch pid 299389 still up); digests are session crons (09:02/18:02): **a new session re-arms them**.
+- **Commits this session:** `0d017ae4e`+`b9e878009` (MEMORY-AUDIT-INSTALL-1 recorded ready, yes line filled); `db8576bc0`
+  (nightly/nightly_restart.sh + quiet_check.py, blob-identical to r1's reviewed copies; test_nightly.sh PASS: never wrap it
+  in heavy_slot.sh, its N19 fails nested); `09e856c70` (rows); `a7bd59e03` (W2-170 row 147 settled, delegated: see the
+  ticket's Interface §10; W2-173 note). W2-20's runaway brake cleared 16:50 (projection 40: all ACT reviews share DAEO-r30l).
+- **ACT states (the owner's queue):**
+  - ACT-EXAMIN-SETS-1: **READY** r1 (`acts/.../review.md`), `yes ACT-EXAMIN-SETS-1 97d45565` + C1-C8 + two writer briefs
+    (`drafts/examin-sets/FOR-THE-OWNER.md`). Through the agent: queue only after ~21:17 UTC 11-12 (row 124); by hand: not held.
+  - ACT-MEMORY-AUDIT-INSTALL-1: **READY** r1, class (O) by hand, `yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4`; P2-F1 row 151.
+  - ACT-ACCEPTED-REDS-1 (DEC-1134): built (`drafts/accepted-reds-1/`), class (O) by hand (the agent's Role: operator commit
+    is not counted by the ratchet), after EXAMIN-SETS-1 on the map, `49e11172`; **review r1 RUNNING** (log
+    `~/gov-os-worktrees/W2-20/.gov-runtime/scratch/lead/log/ACT-ACCEPTED-REDS-1-review.json`, wait on its `.exit`).
+  - ACT-OPERATOR-ROUNDS-1: fix pass done (`drafts/act-operator-rounds/`, manifest.sha256 `79c95ff3`); **review r2 (the last)
+    RUNNING** (same log folder, `ACT-OPERATOR-ROUNDS-1-review-r2.json`). If READY: the owner runs §5 by hand; then copy
+    `after/cto-verdict.py` and `after/cto-test_verdict.py` over `tools/verdict.py` and `tools/test_verdict.py`.
+  - ACT-NIGHTLY-RESTART-1: r1 READY but its sha cannot pass (F2; `reviews/ACT-NIGHTLY-RESTART-1-review-r1.md`); **fix pass and
+    rebuild by an in-session Sonnet helper RUNNING** (F1, F3, F4, F5; F8-F11 as `drafts/nightly-act/wrapper-r2.diff`, committed by
+    the CTO after r2 READY and before queuing); then review r2 (the last) in the same brief form as `briefs/ACT-NIGHTLY-RESTART-1-review.md`.
+    F6 (a detection-only name match vs DEC-1073 (4)) is a reading for the owner, in the digest.
+  - ACT-LOAD-BALANCER-A (DEC-1133 (3)): built (`drafts/act-a/`), class (b), `0b40f1bf`; **first** its companion tests
+    (row 153, `drafts/act-a/companion-tests.diff`, an independent test designer under DEC-1133 (3)/DEC-906), then one review,
+    then the yes. Row 154: the p95 write for `--remeasure`; the stale scratch `dispatch/launch_now.sh` (the live one is
+    `governance/project/orchestration/tools/dispatch/launch_now.sh`).
+- **Next, in order:** file the three returns (review.md from REVIEW_MD blocks; reviews/ for class (O)); NIGHTLY r2 review; row
+  153; W2-170's lead relaunch (`gov brief lead DAEO-61vm --run tests`, the Interface §10 now settled); the guard error-path
+  and listing-rule ACTs (rows 123, 146), then set-up A; CIT-P FX1-FX9; batches 1-3 (READY-AFTER-LIFT-1); worktree
+  reconciliation (two dead `/tmp/.../ad44f5fe/scratchpad/*` worktrees among others); in-session helper costs into spend.jsonl.
+- **Digest items (short form) waiting for 18:00:** F6's reading; row 153's test route under DEC-1133 (3); the delegated row-147
+  readings; the brake clearance; DECIDED-NOT-DONE's three pre-existing unfilled times (rows 110, 123, 126).
+
 ## RESUME HERE — 2026-11-11 16:10 UTC: session `8ddb8b14` hands over (rule 11, DEC-1134 (3)); THE LIFT IS DONE; next free id DEC-1135
 - **State:** re-pin live (`pin-797495bdfc70`, 13:31); usage (A) ENDED (80 % brake stays; 64 % of the week, reset 11-15 09:00);
   the ten closes done by DEC-953 (`tk close` + `closes/` records; `gov close`'s gates are LIFTED here, never use it to close:

@@ -1,8 +1,27 @@
-== the planted HOME: a copy of the live install
-== the planted tree: the repository files as they are now, in a git repository of its own
-ok:   the planted tree committed
-== apply.sh, the cases
-ok:   check on the before state (exit 0)
+== the clone: git clone --no-hardlinks of the main tree's committed head
+ok:   cloned w2/integrate at b9e878009b8c
+ok:   the clone is clean
+ok:   the untracked tools and drafts copied in (ignored by git, as in the main tree)
+== the planted HOME: a copy of the live install (log/ and queue/ empty)
+ok:   section 5 holds 8 command lines
+ok:   the package states the APPROVED to expect: 97c9a3a5bd22
+   the cd line, as written: cd /home/usain/Dynamic-Agentic-Engineering-OS  (run here as: cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-operator-rounds/tmp/world/root)
+   the G line, as written:  G=.gov-runtime/scratch/orchestrator/drafts/act-operator-rounds
+== (a) the 17 new cases on the OLD code (the clone as committed, only the new test file added)
+FAILED tests/unit/operator/test_dec1131_rounds.py::test_g1_a_manifest_with_no_act_is_refused[empty]
+FAILED tests/unit/operator/test_dec1131_rounds.py::test_g1_a_manifest_naming_another_act_is_refused
+14 failed, 3 passed in 3.17s
+ok:   the new cases on the old code: 14 fail, 3 pass (the 3 need no change)
+ok:   the clone is clean again
+== (b) the CTO's tools/test_verdict.py on the old and the new verdict.py
+3 failed, 5 passed in 0.06s
+ok:   test_verdict.py on the old verdict.py: 3 failed, 5 passed
+8 passed in 0.05s
+ok:   test_verdict.py on the new verdict.py: 8 passed
+ok:   the CTO's verdict.py is the operator's, byte for byte
+ok:   the CTO's live tools/verdict.py is the 'before' file
+== apply.sh, the cases (the owner's own lines where the message has them)
+ok:   the owner's check, on the before state (exit 0)
 ok:     output has: state: before
 ok:     output has: check: ready to apply
 ok:   check refuses while a request waits in queue/ (exit 1)
@@ -13,38 +32,44 @@ ok:   apply refuses while the journal exists (exit 1)
 ok:     output has: journal
 ok:   apply refuses while a launch holds log/launch.lock (exit 1)
 ok:     output has: a launch is running
+ok:   a refused apply left no backup/
 ok:   check refuses a repository file moved since the build (exit 1)
 ok:     output has: neither as built before
 ok:   check again on the before state (exit 0)
 ok:   check refuses an unlisted file in the install (exit 1)
 ok:     output has: neither as built before
-ok:   apply (exit 0)
+== flow A: the owner's lines (check, apply, sha256sum, git status), the suites on the applied tree, then undo
+ok:   the owner's apply (plain, as typed) (exit 0)
 ok:     output has: the install's own APPROVED check: ok
 ok:     output has: state applied
-   APPROVED ece74a7678244ba20232b9fd586cee5d3afa356eebb674ec23ddc69cf598181b
+   APPROVED 97c9a3a5bd22e0bc3546cc12c6c5d9aca8f9f39d145825b6f129b59259895820
+ok:   the owner's sha256sum line (exit 0)
+ok:   the APPROVED the package says to expect: 97c9a3a5bd22e0bc3546cc12c6c5d9aca8f9f39d145825b6f129b59259895820
+ok:   the owner's git status line (exit 0)
+    M governance/project/operator/operator_run.py
+    M governance/project/operator/verdict.py
+    M tests/acceptance/W2-148/w2_148_support.py
+    M tests/unit/operator/test_w2_148_parts.py
+   ?? tests/unit/operator/test_dec1131_rounds.py
+ok:   5 paths changed (4 M, 1 ??), as section 5 says
 ok:   a second apply is refused (exit 1)
 ok:     output has: not in the before state
 ok:   check reads already applied (exit 0)
 ok:     output has: already applied
+ok:   no temp file left beside any written file (mktemp names removed by the rename)
+ok:   no APPROVED.new.* left in backup/
 -- the installed files are byte for byte the repository's
 ok:   install verdict.py = repository verdict.py
 ok:   install operator_run.py = repository operator_run.py
 ok:   every file in the install hashes as APPROVED says
--- the main tree after apply: what the owner commits
- M governance/project/operator/operator_run.py
- M governance/project/operator/verdict.py
- M tests/acceptance/W2-148/w2_148_support.py
- M tests/unit/operator/test_w2_148_parts.py
-?? tests/unit/operator/test_dec1131_rounds.py
-ok:   5 paths changed (4 M, 1 new)
--- the operator's own tests and W2-148's acceptance tests on the applied tree (two deselected by name: each reads the real repository's history, commit 116c2b413 and the packages' ACT files, which a planted tree lacks; neither reads anything this ACT changes)
-........................................................................ [ 69%]
-........................................................................ [ 86%]
-......................................................                   [100%]
-414 passed, 2 deselected in 76.47s (0:01:16)
-ok:   unit and acceptance tests pass on the applied tree
--- undo
-ok:   undo (exit 0)
+-- the operator's own unit tests and W2-148's acceptance tests on the applied tree (nothing deselected)
+........................................................................ [ 68%]
+........................................................................ [ 85%]
+............................................................             [100%]
+420 passed in 73.98s (0:01:13)
+ok:   unit and acceptance tests pass on the applied tree: 420 passed in 73.98s (0:01:13)
+-- undo (before any commit)
+ok:   the owner's undo (exit 0)
 ok:     output has: state before (undone)
 ok:   APPROVED as before
 ok:   every install file byte for byte as before
@@ -53,15 +78,59 @@ ok:   undo again is refused (exit 1)
 ok:     output has: not as this ACT left it
 ok:   check reads ready to apply again (exit 0)
 ok:     output has: check: ready to apply
--- a tampered backup stops the undo
+== flow B: the owner's whole message (apply, git add, git commit), then undo AFTER the commit
+ok:   apply (exit 0)
+ok:   the owner's git add line (exit 0)
+ok:   the owner's git commit line, as written (exit 0)
+   commit 1a57eb68f361, 5 files changed, 232 insertions(+), 6 deletions(-)
+ok:   the tree is clean after the owner's commit
+ok:   the commit carries the message's trailers
+ok:   undo after the commit (the working tree then differs from the commit) (exit 0)
+ok:     output has: state before (undone)
+ok:   undo after the commit leaves 5 paths in the working tree (4 M, 1 D), as section 5 says
+ok:   the undone commit (the same five paths, the same three trailers)
+ok:   clean after the undone commit
+ok:   check reads ready to apply again (exit 0)
+ok:     output has: check: ready to apply
+== a tampered backup stops the undo (before any write)
 ok:   apply again (exit 0)
-ok:   undo refuses a backup that does not match its SHA256SUMS (exit 1)
+ok:   undo refuses an install backup that does not match its SHA256SUMS (exit 1)
 ok:     output has: does not match its SHA256SUMS
-ok:   undo with the backup mended (exit 0)
+ok:   undo refuses a repository backup altered together with its SHA256SUMS (P1-F2) (exit 1)
+ok:     output has: is not the before file
+ok:     output has: nothing changed
+ok:   nothing was written: the tree and the install are as the refusal found them
+ok:   undo with the backups mended (exit 0)
 ok:   clean again
+== apply stops part way: the repository files written, the install folder not writable
+ok:   apply stops part way when the install cannot be written (exit 1)
+ok:     output has: stopped part way
+ok:     output has: restore by hand
+ok:     output has: cp -pf
+ok:   the repository step had been done (5 paths changed), so undo has no applied state to take
+ok:   undo refuses the part-way state (exit 1)
+ok:     output has: not as this ACT left it
+ok:   the message names 7 restore lines (the install's 3 files in two lines, and the five repository paths)
+ok:   the printed restore lines, run exactly as printed (exit 0)
+ok:   after the hand restore the tree is clean
+ok:   after the hand restore check reads before (exit 0)
+ok:     output has: state: before
+ok:     output has: check: ready to apply
+ok:   every install file as at the start
+== the committed records with a verdict block, read only (scan_history.py, hidden and memory-verdict paths excluded)
+records with a verdict block: 57
+READY today, last block has a KPI marked fail: 3
+   docs/probes/DAEO-jpr0/PR-DAEO-jpr0.md ['success-7']
+   governance/project/orchestration/reviews/w2-128-r1.md ['F7']
+   governance/project/orchestration/reviews/w2-153-r1.md ['S5']
+READY today, last block has a KPI not marked pass: 3
+ok:   57 records, 3 change reading (the package says the same)
 == the live files are untouched
 277c8ca9f06c
 fe2e2f424616
 ok:   live APPROVED unchanged
 ok:   live verdict.py unchanged
+ok:   every live install file unchanged
+ok:   the live tree's git status unchanged under the three folders the five paths live in
+ok:   no backup/ in the live drafts folder
 failures: 0

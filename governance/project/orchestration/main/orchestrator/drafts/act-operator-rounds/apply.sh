@@ -7,13 +7,13 @@
 # What changes (nothing else on the machine, nothing committed by this script):
 #  1. In the main tree (the working copy of w2/integrate, for the owner's commit):
 #       governance/project/operator/verdict.py            277c8ca9f06c... -> 30214f3de29d...
-#       governance/project/operator/operator_run.py       fe2e2f424616... -> 334e7a032322...
+#       governance/project/operator/operator_run.py       fe2e2f424616... -> 037208586796...
 #       tests/unit/operator/test_w2_148_parts.py           051eec8a3f22... -> bca1d3c5e0e2...  (the pinned verdict.py hash)
 #       tests/acceptance/W2-148/w2_148_support.py          b4302cf7aea3... -> 247996d86290...  (the same pin, S4's test)
-#       tests/unit/operator/test_dec1131_rounds.py         (new)          -> 0268f5ea43a5...   (the new cases, 13)
+#       tests/unit/operator/test_dec1131_rounds.py         (new)          -> 7e73c8683688...   (the new cases, 17)
 #  2. In $HOME/gov-os-operator/install/ (the operator's hashed copies):
 #       verdict.py        277c8ca9f06c... -> 30214f3de29d...
-#       operator_run.py   fe2e2f424616... -> 334e7a032322...
+#       operator_run.py   fe2e2f424616... -> 037208586796...
 #       APPROVED          b4a15c8f3b7c... -> (printed by apply; the two lines above change, sha256sum's form)
 # Every other install file is checked unchanged. It refuses while the operator holds a run (the freeze, the journal, the lock
 # of a failed undo, a launch running) or a request waits in queue/. It writes only the five repository paths above, the
@@ -26,18 +26,18 @@ OP=$HOME/gov-os-operator
 INST=$OP/install
 BACKUP=$HERE/backup
 
-# The hashes as built (2026-11-11, w2/integrate at df30e3dfd; the install as ACT-OPERATOR-2 left it)
+# The hashes as built (2026-11-11, w2/integrate at df30e3dfd3f4; the install as ACT-OPERATOR-2 left it)
 OLD_VERDICT=277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378
 NEW_VERDICT=30214f3de29dacdf9bb443371c05a4392e8da3c305aeb9b7845b9a433d5cf4a5
 OLD_RUN=fe2e2f424616b9083f371fd3e611a91ff9488c2c9d24513b61200cb7beeb4ac2
-NEW_RUN=334e7a032322e154e3570e2c945c6c9e90814a8b4e7cb2dd65fa3959583e7879
+NEW_RUN=03720858679680ef23ab7fc4a91f9c3a80d136b891f37ad9e063f383c4a8c9eb
 LIVE_APPROVED_BEFORE=b4a15c8f3b7c769259f25b8d71406e6c7d387d30c021343f26f4bad6e3831fa4
 # The repository files: path, before (none = absent), after
 REPO="governance/project/operator/verdict.py $OLD_VERDICT $NEW_VERDICT
 governance/project/operator/operator_run.py $OLD_RUN $NEW_RUN
 tests/unit/operator/test_w2_148_parts.py 051eec8a3f22fa130d71322afdba805c328c9f998af54dff6e336446b1ebee16 bca1d3c5e0e233d55295ae0d2a8574eddf3dd569954ea1691fee4ab4433f6ad6
 tests/acceptance/W2-148/w2_148_support.py b4302cf7aea3d274f928e2c1d9bab977b816da6ffbd6eead8a99579960af2208 247996d8629072c29238df1d3c96c87c226176d3ec8b063c79f4b83831415bbc
-tests/unit/operator/test_dec1131_rounds.py none 0268f5ea43a52d892979da468b839f26ed3f5e983370e849304570033f08157c"
+tests/unit/operator/test_dec1131_rounds.py none 7e73c8683688918027037c50f457c938eea3a46c2c5ac4dba9a5ce5c1a56ca5a"
 # The install's other files, unchanged by this ACT (ACT-OPERATOR-2's APPROVED less the two code files)
 KEEP="c8ce4308aaf7a94975ea872d8eb4cb7bd045ef6415dc5e8c9f286cc63bbcc523  act_class.py
 51c459cfbcfec47652df455844480a56a5bc91b5fba3bcf57dc807c5dbf08cc2  brief.md
@@ -119,16 +119,35 @@ idle_or_die() {  # the operator holds nothing, and nothing waits to be launched
   [ -z "$q" ] || die "a request waits in queue/ ($(basename "$q")): let it run first; nothing changed"
 }
 
-put() {  # $1 source file, $2 install name: a new file beside it, 0444, then renamed over it
-  local tmp="$INST/.$(basename "$2").act-operator-rounds-1.$$"
-  rm -f "$tmp"; cat "$1" > "$tmp"; chmod 0444 "$tmp"; mv -f "$tmp" "$INST/$2"
+put() {  # $1 source file, $2 install name: a new file beside it (mktemp, same folder), 0444, then renamed over it
+  local tmp; tmp=$(mktemp "$INST/.$(basename "$2").act-operator-rounds-1.XXXXXX")
+  cat "$1" > "$tmp" || { rm -f "$tmp"; return 1; }
+  chmod 0444 "$tmp"; mv -f "$tmp" "$INST/$2"
 }
-put_repo() {  # $1 source file, $2 path under the main tree: written beside, then renamed over (the file's mode kept)
+put_repo() {  # $1 source file, $2 path under the main tree: written beside (mktemp, same folder), then renamed over (mode kept)
   local dst="$ROOT/$2" tmp mode
-  tmp="$(dirname "$dst")/.$(basename "$dst").act-operator-rounds-1.$$"
   mode=$([ -f "$dst" ] && stat -c %a "$dst" || echo 644)
-  rm -f "$tmp"; cat "$1" > "$tmp"; chmod "$mode" "$tmp"; mv -f "$tmp" "$dst"
+  tmp=$(mktemp "$(dirname "$dst")/.$(basename "$dst").act-operator-rounds-1.XXXXXX")
+  cat "$1" > "$tmp" || { rm -f "$tmp"; return 1; }
+  chmod "$mode" "$tmp"; mv -f "$tmp" "$dst"
 }
+# After the backup is taken, any stop (a refusal or an error) prints the hand restore: undo refuses every state but "applied"
+# (review P1-F3), so a half-changed state is put back by hand from backup/, then checked with 'check'.
+STARTED=0
+hand_restore() {
+  local rc=$?
+  [ "$STARTED" = 1 ] && [ "$rc" != 0 ] || return 0
+  echo "apply.sh: apply stopped part way: files may be half changed, and 'undo' refuses any state but fully applied." >&2
+  echo "apply.sh: restore by hand from $BACKUP (its SHA256SUMS lists every file's hash), by running these lines:" >&2
+  echo "  cp -pf $BACKUP/install/verdict.py $BACKUP/install/operator_run.py $INST/" >&2
+  echo "  cp -pf $BACKUP/install/APPROVED $INST/" >&2
+  local p b a
+  while read -r p b a; do
+    if [ "$b" = none ]; then echo "  rm -f $ROOT/$p" >&2; else echo "  cp -pf $BACKUP/repo/$p $ROOT/$p" >&2; fi
+  done <<< "$REPO"
+  echo "apply.sh: then 'bash apply.sh check' must read \"state: before\"; send this output to the CTO either way." >&2
+}
+trap hand_restore EXIT
 
 case "$cmd" in
   check)
@@ -154,18 +173,20 @@ case "$cmd" in
       if [ "$b" != none ]; then mkdir -p "$BACKUP/repo/$(dirname "$p")"; cp -p "$ROOT/$p" "$BACKUP/repo/$p"; fi
     done <<< "$REPO"
     ( cd "$BACKUP" && find install repo -type f | LC_ALL=C sort | xargs sha256sum > SHA256SUMS )
+    STARTED=1       # from here a stop prints the hand restore
     # 1. the repository files (the source; the operator reads none of them)
     while read -r p b a; do put_repo "$HERE/code/$p" "$p"; done <<< "$REPO"
-    [ "$(repo_state)" = applied ] || die "after the repository step the files are $(repo_state): run 'bash apply.sh undo'"
+    [ "$(repo_state)" = applied ] || die "after the repository step the files are $(repo_state)"
     # 2. the install: the two code files, then APPROVED last, under the launch lock taken above
     put "$HERE/code/governance/project/operator/verdict.py" verdict.py
     put "$HERE/code/governance/project/operator/operator_run.py" operator_run.py
-    tmpa="$BACKUP/APPROVED.new"
+    tmpa=$(mktemp "$BACKUP/APPROVED.new.XXXXXX")
     approved_text "$NEW_VERDICT" "$NEW_RUN" > "$tmpa"
     put "$tmpa" APPROVED; rm -f "$tmpa"
-    [ "$(inst_state)" = applied ] || die "after the swap the install is $(inst_state): run 'bash apply.sh undo'"
+    [ "$(inst_state)" = applied ] || die "after the swap the install is $(inst_state)"
     ( cd "$INST" && python3 -I -c 'import sys; sys.path.insert(0, "."); import opcommon as oc; r = oc.approved_state("."); print("the install'"'"'s own APPROVED check:", "ok" if r[0] else r[2]); sys.exit(0 if r[0] else 1)' ) \
-      || die "the install's own APPROVED check failed: run 'bash apply.sh undo'"
+      || die "the install's own APPROVED check failed"
+    STARTED=0
     echo "APPROVED $(sha "$INST/APPROVED")"
     echo "state applied" ;;
   undo)
@@ -176,8 +197,14 @@ case "$cmd" in
     [ "$(sha "$BACKUP/install/verdict.py")" = "$OLD_VERDICT" ] && [ "$(sha "$BACKUP/install/operator_run.py")" = "$OLD_RUN" ] \
       && [ "$(sha "$BACKUP/install/APPROVED")" = "$LIVE_APPROVED_BEFORE" ] \
       || die "the backup is not the before state; nothing changed"
+    # each repository backup file against its expected before hash, before any write (a backup altered together with its
+    # SHA256SUMS would otherwise be written into the main tree; review P1-F2)
+    while read -r p b a; do
+      [ "$b" = none ] || [ "$(sha "$BACKUP/repo/$p")" = "$b" ] || die "the backup's repo/$p is not the before file; nothing changed"
+    done <<< "$REPO"
     exec 9>>"$OP/log/launch.lock"
     flock -n 9 || die "a launch is running (log/launch.lock is held); nothing changed"
+    STARTED=1       # a stop from here prints the same hand restore
     put "$BACKUP/install/verdict.py" verdict.py
     put "$BACKUP/install/operator_run.py" operator_run.py
     put "$BACKUP/install/APPROVED" APPROVED
@@ -185,6 +212,7 @@ case "$cmd" in
       if [ "$b" = none ]; then rm -f "$ROOT/$p"; else put_repo "$BACKUP/repo/$p" "$p"; fi
     done <<< "$REPO"
     [ "$(state)" = before ] || die "after the undo the state is $(state)"
+    STARTED=0
     mv "$BACKUP" "$BACKUP.undone-$(date -u +%Y%m%dT%H%M%SZ)"
     echo "APPROVED $(sha "$INST/APPROVED")"
     echo "state before (undone)" ;;

@@ -1,0 +1,5 @@
+log: nightly/restart
+Memory: rg tripwire (during the nightly)
+status: P1: 500 rg processes running (trip at 200); MemAvailable 17485652 kB; the nightly's scope gov-nightly-20261111-163120 is running
+
+parents (child count, pid, cwd, command):

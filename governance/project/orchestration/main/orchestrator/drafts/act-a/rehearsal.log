@@ -1,0 +1,136 @@
+--- A. the bundle and the clone
+clone HEAD b9e878009b8c on w2/integrate; main tree head b9e878009b8c
+ok   A0 the clone's launcher is the frozen before (the bundle is not stale)
+ok   A0b the main tree's launcher (read only) is the frozen before
+ok   A0c before/ and after/ hash as list.txt says
+ok   A0d the untracked tools the tests read (lead_mem.py, disk_gate.sh, proc.sh) copied into the clone's scratch folder
+     state before (sha256 03b93044ff98)
+ok   A1 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/dispatch/launch_now.sh (sha256 03b93044ff98)
+ok   A2 verify refused before the apply (exit 3)
+     state before (sha256 03b93044ff98); nothing to undo
+ok   A3 undo before the apply says nothing to undo (exit 0)
+--- B. the existing launcher tests on the BEFORE launcher (the baseline)
+     30 passed in 0.60s
+ok   existing launcher tests (tests/unit/launch/test_w2_153_template.py, tests/acceptance/W2-153/test_w2_153_dispatch.py): exit 0
+--- C. the sequencing: the plain apply WITHOUT the companion test change turns the existing tests red (the check refuses it)
+     state applied (sha256 023623ac6ac8)
+ok   C1 plain apply (no option) (exit 0)
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys; t=open("governance/project/orchestration/tools/dispatch/launch_... (exit 0)
+     launch_now.sh: open gate checks, registers its own pid and starts; shut gate starts nothing
+ok   check 2 as written: bash <<'EOF'
+set -u
+S="$PWD/governance/project/orchestration/tools/dispatch/launch_now.sh"... (exit 0)
+     (the manifest's check 3, the companion guard, is red here: the ACT refuses itself until the companion has landed)
+ok   check 3 as written: grep -q 'bin/gov' tests/unit/launch/test_w2_153_template.py && grep -q '"bin" / "gov"' tes... (exit 1)
+     and the existing suites are red, as the guard says (the three named tests):
+     FAILED tests/unit/launch/test_w2_153_template.py::test_the_dispatchers_lead_form_passes_the_lead_template
+     FAILED tests/acceptance/W2-153/test_w2_153_dispatch.py::test_s2_the_lead_line_passes_the_flag_with_role_lead_md
+     FAILED tests/acceptance/W2-153/test_w2_153_dispatch.py::test_f2_the_lead_line_is_integrate_s_but_for_the_one_flag
+     3 failed, 27 passed in 0.55s
+ok   existing launcher tests (tests/unit/launch/test_w2_153_template.py, tests/acceptance/W2-153/test_w2_153_dispatch.py): exit 1
+     state before (sha256 03b93044ff98)
+ok   C2 undo (exit 0)
+ok   C3 undone byte for byte
+--- D. the companion test change (a stand-in gov in the two beds), then the plain apply
+ok   D0 companion-tests.diff applies to the clone
+      M tests/acceptance/W2-153/w2_153_support.py
+      M tests/unit/launch/test_w2_153_template.py
+the old launcher with the companion:
+ok   check 3 as written: grep -q 'bin/gov' tests/unit/launch/test_w2_153_template.py && grep -q '"bin" / "gov"' tes... (exit 0)
+     30 passed in 0.60s
+ok   existing launcher tests (tests/unit/launch/test_w2_153_template.py, tests/acceptance/W2-153/test_w2_153_dispatch.py): exit 0
+     state applied (sha256 023623ac6ac8)
+ok   D1 plain apply (no option, no env) (exit 0)
+ok   D2 the launcher is the frozen after, byte for byte
+ok   D3 the mode is kept (755)
+ok   D4 the apply changed the one listed file and wrote nothing else (git status, no stray temp file)
+ok   D5 no temp file left beside the launcher
+     state applied (sha256 023623ac6ac8)
+ok   D6 check: state applied (exit 0)
+ok   D7 verify exit 0 (exit 0)
+     state applied (sha256 023623ac6ac8); nothing to do
+ok   D8 apply again changes nothing (exit 0)
+--- E. every manifest check, exactly as written, with bash -c, on the applied clone
+ok   check 0 as written: bash -n governance/project/orchestration/tools/dispatch/launch_now.sh... (exit 0)
+ok   check 1 as written: python3 -I -c 'import sys; t=open("governance/project/orchestration/tools/dispatch/launch_... (exit 0)
+     launch_now.sh: open gate checks, registers its own pid and starts; shut gate starts nothing
+ok   check 2 as written: bash <<'EOF'
+set -u
+S="$PWD/governance/project/orchestration/tools/dispatch/launch_now.sh"... (exit 0)
+ok   check 3 as written: grep -q 'bin/gov' tests/unit/launch/test_w2_153_template.py && grep -q '"bin" / "gov"' tes... (exit 0)
+     30 passed in 0.59s
+ok   existing launcher tests (tests/unit/launch/test_w2_153_template.py, tests/acceptance/W2-153/test_w2_153_dispatch.py): exit 0
+--- F. this ACT's own tests (test_launch_now_gate.py): green on the new launcher, red on the old
+     ............                                                             [100%]
+     12 passed in 0.95s
+ok   F1 new launcher: 12 passed
+     FAILED test_launch_now_gate.py::test_an_open_gate_checks_then_registers_the_launchers_own_pid_then_starts_the_lead
+     FAILED test_launch_now_gate.py::test_a_shut_gate_starts_nothing_and_registers_nothing
+     FAILED test_launch_now_gate.py::test_a_gate_check_that_cannot_run_starts_nothing
+     FAILED test_launch_now_gate.py::test_a_check_that_fails_in_another_way_starts_nothing
+     FAILED test_launch_now_gate.py::test_a_lead_that_cannot_be_registered_is_not_started
+     FAILED test_launch_now_gate.py::test_the_script_is_in_order_and_matches_no_process_by_name
+     FAILED test_launch_now_gate.py::test_with_the_real_gov_the_lead_is_in_the_registry_before_it_runs_and_the_gate_and_the_sampler_see_it
+     FAILED test_launch_now_gate.py::test_with_the_real_gov_a_shut_gate_starts_nothing_and_leaves_no_entry
+     FAILED test_launch_now_gate.py::test_with_the_real_gov_a_registry_that_cannot_be_written_starts_nothing
+     FAILED test_launch_now_gate.py::test_the_stale_entry_of_an_ended_lead_is_cleared_by_the_next_reading
+     10 failed, 2 passed in 0.48s
+ok   F2 old launcher: 10 failed, 2 passed (red on the old, as the tests say)
+--- G. the dispatcher's own start form, end to end, with a stub lead and the real gov under the planted home
+     ok   the planted machine folder is initialised
+     ok   setsid -f returns at once (exit 0)
+     ok   the lead found its own registry entry at its first line
+     ok   the entry names DAEO-act30e6463f as orchestrator
+     ok   the gate's reading lists the lead ([{'pid': 452202, 'repository': '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-a/tmp/e2e/trees/W9-1', 'ticket': 'DAEO-act30e6463f', 'role': 'orc
+     ok   lead_mem.py's sampler lists the lead
+     ok   gov resources --sample takes a sample that holds the lead
+     ok   the launch log says the gate was open and the pid registered
+     ok   the lead ended and was waited for by pid (proc.sh wait: exited: 452202)
+     ok   after the lead ended the next reading clears its entry
+     failures: 0
+ok   G1 end to end (exit 0)
+--- G2. the same end to end on the OLD launcher (it must fail: no registration, no gate)
+     ok   the planted machine folder is initialised
+     ok   setsid -f returns at once (exit 0)
+     FAIL the lead found its own registry entry at its first line
+ok   G2 the old launcher fails the end-to-end checks (exit 1)
+--- H. the wider scoped set on the applied clone, and the apply.sh states
+     ......................................................................   [100%]
+     285 passed, 1 skipped, 86 deselected in 10.76s
+ok   H1 tests/unit/launch and tests/acceptance/W2-153 (scoped) green with the new launcher
+     state other: changed since the freeze (sha256 2348da1a76ed)
+ok   H2 check refuses a launcher that changed (exit 3)
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is not as this ACT left it (sha256 2348da1a76ed); a later change is not overwritten
+ok   H3 undo refuses (not as this ACT left it) (exit 3)
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is neither the frozen before nor the frozen after (sha256 2348da1a76ed)
+ok   H4 apply refuses (neither before nor after) (exit 3)
+     state before (sha256 03b93044ff98)
+ok   H5 undo from the applied state (exit 0)
+ok   H6 the launcher is the original, byte for byte, mode kept
+     state before (sha256 03b93044ff98)
+ok   H7 check: state before (exit 0)
+     Traceback (most recent call last):
+       File "<string>", line 1, in <module>
+     ValueError: substring not found
+ok   check 1 as written: python3 -I -c 'import sys; t=open("governance/project/orchestration/tools/dispatch/launch_... (exit 1)
+     the launcher names no gov of its own
+ok   check 2 as written: bash <<'EOF'
+set -u
+S="$PWD/governance/project/orchestration/tools/dispatch/launch_now.sh"... (exit 1)
+     (checks 1 and 2, structure and behaviour, are red on the old launcher: they tell the two apart)
+     state other: the file is missing (sha256 null)
+ok   H8 a missing launcher: check refuses (exit 3)
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is neither the frozen before nor the frozen after (sha256 null)
+ok   H9 a missing launcher: apply refuses (exit 3)
+ok   H10 nothing was created in its place
+     refused: governance/project/orchestration/tools/dispatch/launch_now.sh is a link
+ok   H11 a link: apply refuses (exit 3)
+ok   H12 the clone is back to the original
+--- I. the live files are unchanged (read only)
+ok   I1 the main tree's launcher is unchanged (03b93044ff98)
+ok   I2 the main tree's head is still the clone's
+
+REHEARSAL PASS
+failures: 0

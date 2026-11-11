@@ -1,10 +1,13 @@
-"""Read-only: which existing review records change READY if a KPI line marked fail blocks (and if any value but pass does)."""
+"""Read-only: which existing review records change READY if a KPI line marked fail blocks (and if any value but pass does).
+   python3 -I scan_history.py <repo root> <folder holding verdict_old.py, the verdict.py before this ACT>
+Paths under a folder named hidden or memory-verdict* are excluded in git's own pathspec, so their contents are never read."""
 import json, os, re, subprocess, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, sys.argv[2])
 import verdict_old as old
 root = sys.argv[1]
-files = subprocess.run(["git", "-C", root, "grep", "-l", "```verdict"], capture_output=True, text=True).stdout.split()
+files = subprocess.run(["git", "-C", root, "grep", "-l", "```verdict", "--", ".", ":(exclude)**/hidden/**",
+                        ":(exclude)**/memory-verdict*/**"], capture_output=True, text=True).stdout.split()
 changed_fail, changed_notpass, total, rows = [], [], 0, []
 for f in files:
     if "/hidden" in f or "memory-verdict" in f:

@@ -1,62 +1,62 @@
 {
- "computed": "2026-11-11 15:19:01",
+ "computed": "2026-11-11 16:19:04",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 5.48,
+   "cpu_p95": 5.55,
    "cpu_max": 2335.84,
    "rss_kb_p95": 9111440,
    "rss_kb_max": 13410904,
-   "samples": 8092
+   "samples": 8094
   },
   "embedding": {
    "cpu_p95": 0.02,
    "cpu_max": 5.89,
-   "rss_kb_p95": 1369316,
+   "rss_kb_p95": 1369340,
    "rss_kb_max": 1751232,
-   "samples": 8092
+   "samples": 8094
   },
   "claude": {
    "cpu_p95": 0.09,
    "cpu_max": 2.2,
    "rss_kb_p95": 1162416,
    "rss_kb_max": 2311132,
-   "samples": 8092
+   "samples": 8094
   },
   "rebuild": {
    "cpu_p95": 0.02,
    "cpu_max": 4.35,
-   "rss_kb_p95": 88692,
+   "rss_kb_p95": 91388,
    "rss_kb_max": 396024,
-   "samples": 5201
+   "samples": 5256
   },
   "codegraph": {
    "cpu_p95": 0.76,
    "cpu_max": 2.14,
-   "rss_kb_p95": 444328,
+   "rss_kb_p95": 445792,
    "rss_kb_max": 1169916,
-   "samples": 565
+   "samples": 570
   },
   "test_run": {
    "cpu_p95": 7.47,
    "cpu_max": 27.15,
    "rss_kb_p95": 2593776,
    "rss_kb_max": 6126012,
-   "samples": 1412
+   "samples": 1431
   },
   "git": {
    "cpu_p95": 0.0,
    "cpu_max": 0.01,
-   "rss_kb_p95": 29128,
+   "rss_kb_p95": 18044,
    "rss_kb_max": 124460,
-   "samples": 111
+   "samples": 112
   },
   "gitleaks": {
    "cpu_p95": 0.15,
    "cpu_max": 0.44,
    "rss_kb_p95": 1259216,
    "rss_kb_max": 3676260,
-   "samples": 475
+   "samples": 479
   },
   "reranker": {
    "cpu_p95": 0.0,
@@ -66,29 +66,30 @@
    "samples": 72
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 0.1,
+   "cpu_p95": 0.11,
    "cpu_max": 5.8999999999999995,
-   "rss_kb_p95": 1372212,
+   "rss_kb_p95": 1412484,
    "rss_kb_max": 1905032,
-   "samples": 5201
+   "samples": 5256
   }
  },
  "lead": {
-  "rss_kb_p95": 248980,
-  "rss_kb_max": 248980,
-  "samples": 1
+  "rss_kb_p95": 271088,
+  "rss_kb_max": 271088,
+  "samples": 3
  },
  "lead_own_max_kb": {
-  "DAEO-61vm": 248980
+  "DAEO-61vm": 271088,
+  "DAEO-act9ce8973c": 5120
  },
  "lead_inside": {
-  "rss_kb_p95": 248980,
-  "rss_kb_max": 248980,
-  "samples": 1
+  "rss_kb_p95": 271088,
+  "rss_kb_max": 271088,
+  "samples": 3
  },
  "test_run_per_slot": {
   "rss_kb_p95": 505996.0,
   "rss_kb_max": 1593062.6666666667,
-  "samples": 1412
+  "samples": 1431
  }
 }
