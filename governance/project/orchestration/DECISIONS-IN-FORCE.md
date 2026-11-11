@@ -339,7 +339,7 @@ other restart is an ACT.
   repository via W2-88): a fresh set weighted to what changed plus older areas, cross-checked in at most two rounds,
   measured once against the bar (85 %, target 95 %), misses classified by an independent auditor, structural fixes only
   (to the owner, judged on earlier sets), the spent set into a regression pool re-run each audit, the next fresh set
-  the verdict on the fixes; every two weeks while active, monthly once stable; "not found" and "may be incomplete"
+  the verdict on the fixes; weekly while active (DEC-1125 (2); was every two weeks), monthly once stable; "not found" and "may be incomplete"
   counted weekly in the digest; an unindexed-path notice resolved within a day. **Automated independent sessions:**
   writers, checkers, labellers launched headless in walled folders, fixed briefs the owner approves once (hashed, not
   changed by the CTO), content chosen by rule (git changes plus a seeded sample), memory's search, run outputs, the
@@ -478,3 +478,9 @@ other restart is an ACT.
   a set time** (ACT-DEADMAN-STANDBY-1, class (b)). Basis: D10-RECORD-REDS.
 - DEC-1124 (2026-11-10): Q23 re-worded to a stable fact by an independent session (the Q07/Q14 process), not by the
   CTO; its 3 cases may stay red in D-10 run 2, fixed and re-checked by a scoped run after.
+- DEC-1125 (2026-11-11, items (1) (2) standing): **the warm-query latency (W2-13, W1-19: 0.54-0.59 s against 0.5 s)
+  a named red for the re-pin and the lift**, the budget unchanged, a low-priority performance ticket after the lift
+  (profile, short time box, simple fix or evidence and options to the owner); **the memory audit weekly while
+  development is active, monthly once stable** (DEC-1101 (1) changed), a scheduled tool for Gov OS and every adopted
+  repository that replaces ad-hoc re-measures (DEC-1097 (4) folded); the night of 11-10/11 to the re-pin the lift's
+  critical path (re-pin ACT, closes prepared, anti-drift audit, ready lists, the 09:30 digest).

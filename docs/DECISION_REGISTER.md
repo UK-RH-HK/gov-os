@@ -14344,6 +14344,37 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   D-10 run 2; they are fixed and re-checked with a scoped run after.
 - **Applied:** the independent session launched 22:06 (`w2/W2-61h-q23-tests`, DAEO-h2k3, Sonnet high, C1).
 
+### DEC-1125 — The warm-query latency a named red for the re-pin and the lift, with a low-priority performance ticket after it; the memory audit weekly while development is active, a scheduled tool that replaces ad-hoc re-measures; the night of 11-10/11 up to the owner's re-pin counted as the lift's critical path
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1) and (2) standing · **Under:** DEC-1101 (1) (changed), DEC-1097 (4) (folded), DEC-1123 (1), DEC-1122 (3), DEC-1115 (4), DEC-1110 (3), DEC-1118, DEC-936 (1) · **Source:** the owner's answer to D-10 run 2's report (chat, 2026-11-11 ~01:00 UTC)
+- **Decision:**
+  - (1) **The latency, option 1:** W2-13's and W1-19's warm real-model query latency (p95 0.54-0.59 s against the
+    0.5 s budget; red alone and idle in D-10 run 2) is a **named red for the re-pin and the lift**; the budget stays as
+    written. A performance ticket is filed for after the lift, **low priority**, with the owner's note for whoever
+    takes it: profile the warm query path, including the retrieval changes since the budget last held, but do not
+    over-spend time on it (the gap is not noticeable and does no harm); if a simple cause is found, fix it; if not
+    within a short time box, stop and bring the evidence and options to the owner.
+  - (2) **The memory audit (DEC-1101 (1) changed): weekly while development is active, monthly once stable.** It is
+    a scheduled practice like the nightly, built as a tool for Gov OS and every adopted repository: an independent
+    writer drafts fresh questions, they are measured once, misses are classified, drift is fixed. It **replaces
+    ad-hoc re-measures:** a retrieval change is measured by the next audit, not by a separate run; DEC-1097 (4) (the
+    138 measured again at the release commit if retrieval changes) folds into it.
+  - (3) **The night of 11-10/11, up to the owner's re-pin, is the lift's critical path under usage (A):** (i) the
+    re-pin ACT, rehearsed in a clone and independently reviewed, ready for the owner's re-pin in the morning with the
+    exact commands; (ii) the formal closes prepared: each lift ticket's acceptance check run on integrate now; (iii) a
+    full anti-drift audit before the re-pin, deterministic checks first, then reading: decisions, the plan, the
+    tickets, the tools (EMERGENCY-TOOLS-1 mapped to tickets with KPI lines), memory and retrieval (the store at the
+    candidate, freshness, path-map coverage, links, the register, context-reproducibility; the memory audit as a
+    scheduled tool: its state, the fixed briefs for writer, checker and auditor to the owner for approval, its schedule,
+    its home tickets in Gov OS and W2-88, the first audit's date, which also measures the re-pin's retrieval change),
+    every anti-drift check at the candidate; small record drift fixed by role, anything needing an engineer or an ACT
+    listed with a recommendation, no control changed without an ACT; (iv) the first ready lists after the lift with
+    `gov plan`, several batches deep (DEC-1110 (3)), for the owner's review; (v) then checkpoint and clear before the
+    idle (DEC-1118), watchers armed, no pushes to the owner before 07:30 unless a P1 fault (DEC-936 (1)). The 09:30
+    digest carries the audit's findings and fixes, a ready-for-re-pin verdict, the re-pin ACT and the owner's steps, the
+    closes' state and anything else that needs the owner.
+- **Basis:** D-10 run 2's report (DECIDED-NOT-DONE row 110); question 1 (memory kept right as the repository grows,
+  judged on fresh questions at a fixed rhythm) and question 2 (the lift not held by a gap that does no harm).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14405,3 +14436,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.506 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1122 (the template 1.0.1 approved; usage (A) from now, DEC-1115 (4) changed; D-10's go on a condition). Next free id: DEC-1123. |
 | 0.507 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1123 (items 3 and 5 standing; trailers a warning under Q-8 until W2-115). Next free id: DEC-1124. |
 | 0.508 | 2026-11-10 | Owner (recorded by the orchestrator, DEC-861): DEC-1124 (Q23 re-worded by an independent session). Next free id: DEC-1125. |
+| 0.509 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1125 (the latency a named red; the memory audit weekly, DEC-1101 (1) changed, DEC-1097 (4) folded; the night to the re-pin). Next free id: DEC-1126. |
