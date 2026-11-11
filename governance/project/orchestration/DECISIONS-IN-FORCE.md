@@ -1,7 +1,7 @@
 # Decisions in force
 
 The one list of what holds (DEC-1052 R-9), 2026-11-04; brought to DEC-1096 on 2026-11-07 (re-pin window 4 done at
-14:22: the live pin is `pin-bcea09060ebc`), and to DEC-1122 on 2026-11-10. Where the prompt, a brief or RESUME HERE differs, it holds; a
+14:22: the live pin is `pin-bcea09060ebc`), to DEC-1122 on 2026-11-10, and to DEC-1125 on 2026-11-11 (the anti-drift audit a, register v0.509; marks of changed entries and DEC-1057, DEC-1058, DEC-1063 added). Where the prompt, a brief or RESUME HERE differs, it holds; a
 rule the prompt's body states correctly is not repeated. The register is the authority; spent and superseded entries
 stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it passes.
 
@@ -22,11 +22,15 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
 - DEC-1052 G-14, DEC-1054, DEC-1056, DEC-1059 (live since ACT-G14, `4edd196c`): role separation by path checks; the test designer never reads the ticket's new
   code or new unit-test files; the engineer never reads its own ticket's acceptance tests, wherever they sit; shared
   test files, other tickets' tests and the integrated code stay readable (DEC-963).
+- DEC-1063 (live since ACT-G14b, `e02d55e40424`): a ticket with `class: coordination` (today W2-00) has as its own
+  tests only its own folder; a test designer and an engineer paired under a coordination ticket are not separated by
+  the guard, so a pair runs under its own ticket's id (the lead template says so). Basis: question 1.
 - DEC-1065 (standing): no CPU fallback for embeddings anywhere (the shared GPU embedders unreachable: the semantic part
   unavailable, named, keywords answer; never a private embedder on the CPU, as the reranker's ACT-RERANK-WAIT-1);
   search respects role separation (`gov retrieve` filtered by the caller's `role_paths`, before W2-127 and the restart).
   DEC-1064: sandboxed workers run no `gov retrieve` and no real-model test until then.
-- DEC-1067 (standing for D-4b): the memory measure's hidden half never chooses a method (adopted only if it wins on
+- DEC-1067 (standing for D-4b; its (b) changed by DEC-1071: a structural fix judged on all 80; its (f) by DEC-1090 and
+  DEC-1095: the reranker's request cap measured, 64): the memory measure's hidden half never chooses a method (adopted only if it wins on
   the visible half alone; the hidden half reported separately; hidden ranks never in the index or on integrate);
   labels change only where wrong, never to fit results; GPU safety for experiments (the 15.5 GB backstop; no measure or
   rebuild beside one; the GPU back in budget between); no install until the owner decides the bigger models.
@@ -41,8 +45,10 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   measure script writes a reason line for every automatic re-anchor; every run keeps every search's ranked output
   (`~/gov-os-eval/runs/`), so an approved label change is re-scored without running again; the reranker trial runs
   all three candidates, adoption by its written rule only; a standing model bench. Basis: question 2 (a measure that
-  is wrong or keyword-only misjudges memory). *(The trial's (12)-(13) amended by DEC-1070.)*
-- DEC-1070 (2026-11-04, standing for the measure): **three sets, three jobs**: the visible 40 tune and choose; the
+  is wrong or keyword-only misjudges memory). *(The trial's (12)-(13) amended by DEC-1070; (12) changed by DEC-1076
+  (4), then mxbai dropped by DEC-1079: the comparisons are among the Qwen3 models only.)*
+- DEC-1070 (2026-11-04, standing for the measure; its (2)-(4) changed by DEC-1074 (1): the hidden 40 and the spent 60
+  are now tuning or diagnostic sets too, only a fresh set gives a verdict): **three sets, three jobs**: the visible 40 tune and choose; the
   hidden 40 check (counts only, never choose; a visible-only gain is suspect); a **new measurement set** (fresh, blind,
   by the rubric, a new writer, outside every tree) is the verdict, measured only at decision points. Memory is reported
   as those three figures. **The choice rule:** hit@5, then MRR of the first gold source from the kept ranks. **Recall
@@ -66,7 +72,7 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
 - DEC-1040 (3), DEC-849: a false refusal is worked round at once by an equivalent form and named; a true one is taken.
 
 ## The owner
-- R-11, R-8 (DEC-1050 (9)): a ping only when work waits on the owner (a blocking P1, an ACT a step waits on,
+- R-11, R-8 (DEC-1050 (9), DEC-1057): a ping only when work waits on the owner (a blocking P1, an ACT a step waits on,
   LAUNCH_BLOCKED, ESCALATION, AUTH_REQUIRED) or an emergency; the rest in two digests a day (09:00, 18:00), one page
   each. Six parts only for a blocking P1, else question, options, recommendation; P1 only by DEC-957's rubric (§7). A
   delegated choice is a line in its ticket's file or close record, not a register entry.
@@ -81,13 +87,13 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
 - DEC-954 Q1: EXAMIN's copy on K9's entry criteria, never a date. DEC-952 (6): a fresh CTO session each morning; no handover by context size (O-3 refused).
 
 ## Machine and ACTs
-- O-6, scoping DEC-1038 (1): an ACT only for a machine change, where it helps: installs, services, crontab,
+- O-6 (DEC-1057), scoping DEC-1038 (1) and DEC-1028 (6): an ACT only for a machine change, where it helps: installs, services, crontab,
   `.wslconfig`, `~/.local/bin` (the pinned gov), `~/.config`, `~/.ollama`, `~/.local/share`, environment files,
   `.claude/` settings and hooks; exact commands, check and undo (DEC-925 (2)). No ACT for records. Until D-10, a
   settings change runs its own scoped tests on a clone, not the full suite (owner, D-3 answer 5). **Every ACT is
   rehearsed end to end, exactly as the operator will run it, in a scratch copy (its own clone) before it is handed
   over; its stated counts are the rehearsal's (owner, standing, 2026-11-03).**
-- P-ACT-SPLIT (owner, 2026-11-03): (a) the operator's ACTs: the guard, its hooks, `.claude/` settings and generated
+- P-ACT-SPLIT (DEC-1058, owner, 2026-11-03; the shared servers' settings now (a), DEC-1104 (2)): (a) the operator's ACTs: the guard, its hooks, `.claude/` settings and generated
   files, the pinned gov, the sentinel, what the CTO's session runs on; (b) the CTO's ACTs on the owner's ping reply
   (crontab, the servers' settings, the CTO's watchers, `~/.config/gov-os*`, `~/.cache/gov-os`), only with a rehearsed
   rollback, the approval recorded verbatim in the ACT and `log/act-approvals.jsonl`, the report in the next digest.
@@ -125,10 +131,10 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   proposed weekly as one batch.
 
 ## Records and commits
-- DEC-861, R-10: the CTO commits the owner's decisions (`Task: decision-record`, `Role: orchestrator`, `Decided-by`),
+- DEC-861, R-10 (kept by DEC-1057 (6)): the CTO commits the owner's decisions (`Task: decision-record`, `Role: orchestrator`, `Decided-by`),
   one commit per batch (hourly or at handover); `record/w2` synced hourly and at session end; `--main` lifted.
-- R-12: `Task:` and `Role:` on every commit; `Implements:` optional; a decision and its ticket files in one commit.
-- R-6: no committed `gov checkpoint` record per round; the prose checkpoint, PreCompact and SessionStart stay.
+- R-12 (DEC-1057, lifting DEC-896 item 2 and DEC-927 item 2): `Task:` and `Role:` on every commit; `Implements:` optional; a decision and its ticket files in one commit.
+- R-6 (DEC-1057, lifting DEC-511): no committed `gov checkpoint` record per round; the prose checkpoint, PreCompact and SessionStart stay.
 - R1-21: `tools/structural_pass.py` after each landing and record commit, a notice only.
 
 ## Lifted (was `LIFTED-BY-DEC953.md`, `69a0e5d89f04`; kept built and tested in the product unless "ended")
@@ -141,11 +147,12 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
   Stop-hook waiter check, the scratch `deadman.py` (O-5); §0's copies and RULES-IN-FORCE (R-9); `gate_check.py` (O-10).
 
 ## Approved restarts by class (owner, O-6)
-Approved (owner, D-3 answer 4, 2026-11-03): the five classes in `governance/project/orchestration/RESTART-CLASSES.md`
+Approved (owner, DEC-1057 (4), D-3 answer 4, 2026-11-03): the five classes in `governance/project/orchestration/RESTART-CLASSES.md`
 (the shared embedder :11434, the query server :11435, the shared reranker service, the CTO's samplers and slot
 watcher, the sentinel). Each is restarted by the CTO from its committed config, with its check, without an ACT; any
 other restart is an ACT.
-- DEC-1071 (2026-11-04, standing for the measure): **structural fixes only**, never per question, from one structural
+- DEC-1071 (2026-11-04, standing for the measure; its (3) changed by DEC-1074 (4): consistency within 5 points on
+  sets of about 80, and the spent 60 are no longer a confirmation set, DEC-1074 (1)): **structural fixes only**, never per question, from one structural
   review (chunking, embedding, ranking, the graph). **The rule:** a structural fix is judged on **all 80 together**
   (hit@5, then MRR), the hidden half in counts only. It is adopted if the 80 do not fall and the halves' gap does not
   widen. **The proof is consistency:** the halves agree within 3 points; then memory-verdict (60) is measured once as
@@ -157,7 +164,7 @@ other restart is an ACT.
   the evidence supports; a drift count (decisions retrievable as current though superseded or amended). **Memory-building
   is a Wave 0 practice** for every adopted repository, kept in its ticket as D-4b goes, a kernel skill after the
   refactoring.
-- DEC-1073 (2026-11-04): the measurement set is used once, **after the structure is final** (D4B-STRUCTURE steps 2 and
+- DEC-1073 (2026-11-04; its "within 3 points" is now 5, DEC-1074 (4)): the measurement set is used once, **after the structure is final** (D4B-STRUCTURE steps 2 and
   4-7 measured first), and only if the halves still agree within 3 points; otherwise to the owner. **Drift:** the
   register is the authority. The archive's 110 "spent" decisions go to a separate status-reconciliation list. A
   PROPOSED decision is not current, and retrieval must show its status. M5 is retested with the register links.
@@ -165,7 +172,8 @@ other restart is an ACT.
   comes to the owner as one package before anything is built. **Standing (L-0075):** every wait and every stop is by
   process id or process group, never a name match, through `.gov-runtime/scratch/orchestrator/tools/proc.sh` (`wait
   --max`, `stop --grace`, `pgid`).
-- DEC-1074 (2026-11-05): **67.8 % is the 0.6B's honest figure** (v456 + the stated links, `memory-verdict`).
+- DEC-1074 (2026-11-05; its (3) changed by DEC-1076 (1), its (7) O1 (A) by DEC-1087 (3): W2-116's refresh after every
+  merge is built): **67.8 % is the 0.6B's honest figure** (v456 + the stated links, `memory-verdict`).
   - **The sets:** every used set (visible 40, hidden 40, the spent 60) is now tuning or diagnostic; only a fresh set
     gives a verdict. A **new verdict set of 80** is written blind by a new writer and cross-checked, then used only at
     the next decision point.
@@ -175,7 +183,7 @@ other restart is an ACT.
   - **Approved for re-pin window 4,** tests first: v456 into W2-32, the stated links into W2-92.
   - **W2-54's premise** is rewritten by its test designer.
   - **LINK-INTEGRITY is adopted:** O1 (A), O2 (A); unlinked mentions are notices from the start.
-- DEC-1075 (2026-11-05): ACT-MSET-3/4 approved: the verdict set of 80 (`memory-verdict-2`, declared in both path maps,
+- DEC-1075 (2026-11-05; its (1), the folders, changed by DEC-1076 (1)): ACT-MSET-3/4 approved: the verdict set of 80 (`memory-verdict-2`, declared in both path maps,
   measured by the CTO only at the next decision point, counts only), written and cross-checked outside the CTO's system;
   failure-memory 4, a shortfall of at most 2 to `decision`. W2-32's S11 (v456) as worded. Basis: questions 1 and 2.
 - DEC-1076 (2026-11-05): the 80 by the 60's writer and checker sessions (resumed, new settings); the writer varies its
@@ -198,7 +206,8 @@ other restart is an ACT.
   keep the GPU. Every report ends with DEC-948's block. **mxbai is dropped** (closed as measured, not replayed; its
   downloads kept): the reranker comparisons are among the Qwen3 models only (the 0.6B, the 4B at 24, the cascade).
   Basis: questions 1 and 4.
-- DEC-1080 (2026-11-06, standing): the CTO reads with the Read and Grep tools, runs one simple command per call, no
+- DEC-1080 (2026-11-06, standing; its (2) changed by DEC-1081 (1): no `git -C` rules, and its premise by DEC-1082 (0):
+  the user-level settings allow all, the guard is the check): the CTO reads with the Read and Grep tools, runs one simple command per call, no
   `cd … &&` chains, and says in one line before any command that will prompt what it does and why; the same rule in
   every agent's brief. P-PERMISSIONS-1 approved with read-only git through `git -C` only; the settings change is the
   operator's ACT (`ACT-PERMISSIONS-1.md`). Basis: questions 4 and 2.
@@ -212,7 +221,9 @@ other restart is an ACT.
   levers (window 4's builds checked first, else a ticket, tests first); the guard refuses the hidden sets outside the
   repository to engineer, research and orchestrator (an ACT); the spill reading investigated; the score-once window
   after its review. Basis: 2 and 4.
-- DEC-1083 (2026-11-06): D9-FATES approved (the auditor checks the 792 lines before any edit); K9's memory bar 85 %
+- DEC-1083 (2026-11-06; K9's bar changed by DEC-1097 (1)(d) to right end to end, met per DEC-1098; W2-66b, W2-90c by
+  DEC-1084; W2-33's layer lines by DEC-1087 (13)): D9-FATES approved (the auditor checks the 792 lines before any
+  edit); K9's memory bar 85 %
   hit@5 on the fresh 80 once, on the pin with W2-92, W2-32 S11, W2-131 and the chosen reranker (95 % the target);
   W2-32 S6 dropped; W2-15b out of K9; W2-128 in K9; W2-128's ready check computed by code (only advisory items warn);
   W2-131's follow-up a ticket, tests first; grid v2 and v3 accepted. Basis: 1 and 2.
@@ -225,7 +236,7 @@ other restart is an ACT.
   (two and three attempts: misses recovered, tokens, time, wrong claims); its practice and the end-to-end experiments
   (top 5, 10, 20, today's bundle, 40 unranked; each with search-again; an independent grader) as packages, nothing run
   first; the fresh 80 unused until the owner decides what it measures. Basis: 1.
-- DEC-1086 (2026-11-06): S11 re-worded ("within 2 of the harness on the 138"; speed against the pin in window 4);
+- DEC-1086 (2026-11-06; its C's cap changed by DEC-1091 (1): no cap): S11 re-worded ("within 2 of the harness on the 138"; speed against the pin in window 4);
   W2-135, a 4,000-character cap per item (a guard against one-line files; the total size tested in E5); the
   search-again reader sees the 138 (no tools, no transcript, counts only; the pilot, then the owner's cap). Recorded,
   acted on only at the owner's go: no re-pin and no experiment before the owner reads the seven answers. Basis: 1.
@@ -414,7 +425,7 @@ other restart is an ACT.
   and R5 (leads lose GOV_STORE, TERM, TMPDIR) are follow-ups before W2-56 closes, tests first; R1 (the main
   repository's settings.local.json in worktree sessions) is W2-60a's; R2 and R4 are rows for W2-56's close review; R6
   (the CLI's config.lock placeholders, P-S7) is W3-P29.
-- DEC-1115 (2026-11-09): yes to ACT-SETS-GLOBS-1 (the owner's operator by hand) and ACT-CLAUDE-COPIES-1 (the operator
+- DEC-1115 (2026-11-09; its (4) changed by DEC-1122 (2): brought forward to 11-10, until the reset 11-15 09:00): yes to ACT-SETS-GLOBS-1 (the owner's operator by hand) and ACT-CLAUDE-COPIES-1 (the operator
   agent, its first live run; on a refusal the CTO says why and the operator applies by hand; the agent's yes form is
   `yes ACT-<id> <manifest sha8>` on its own line); TPL-6's Appendix A applied now. **Standing until the lift: past 80 %
   of the week's usage, only the lift's critical path runs; the rest waits for the reset.** Basis: 2 and 4.
@@ -452,7 +463,7 @@ other restart is an ACT.
   idles over an hour; ACT-preparation helpers on Sonnet, reviews, test design and engineering on Opus; every session's
   list-price cost logged. D (5-minute worker cache) once verified on this CLI; E and F trials after the lift. A
   model-tier investigation for the fresh session to finish (MODEL-TIERS-1). Basis: 4.
-- DEC-1119 (2026-11-10): the owner's tiered rubric of model and effort by task found first (the fresh session's first
+- DEC-1119 (2026-11-10; its (1) changed by DEC-1120: the rubric found, RUBRIC-1, is replaced by RUBRIC-2): the owner's tiered rubric of model and effort by task found first (the fresh session's first
   task) and applied before the lift: in practice at once, into the product through W2-33 and W2-60a with a trial
   exception before EXAMIN's copy; ACT-preparation helpers on Sonnet at high now; trials only where the rubric leaves a
   role open; not options 4 or 5 unless the rubric calls for them; option 6 as guidance; the default effort to high by
