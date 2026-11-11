@@ -5,7 +5,7 @@ deps: [DAEO-h4rh]
 links: []
 created: 2026-10-29T19:07:34Z
 type: task
-priority: 1
+priority: 3  # was 1; DEC-1126 (9): so W2-156 (DAEO-ylsh), which shares launcher.py, lands before EXAMIN's copy
 assignee: engineer
 external-ref: W2-82
 tags: [wave-2, implementation, readiness, standard]

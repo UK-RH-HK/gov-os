@@ -29,11 +29,10 @@ reads:
 - src/gov/telemetry/**
 - governance/project/orchestration/packages/EMERGENCY-TOOLS-1.md
 needs:
-- src/gov/launch/launcher.py
+# launcher.py is written here, not needed first from every writer: as a need it made W2-156 wait for W2-82, which
+# follows EXAMIN's copy, so the plan put W2-156 after it (CTO, DEC-1112 (3), for DEC-1126 (9)); the overlap stays
 - src/gov/check/commands.py
-waits_on:
-- ref: DEC-1091
-  reason: 'DEC-1091 (2) states the brake for experiments; the owner confirms it holds for every ticket of an adopted product before this is built'
+waits_on: []  # the owner's confirmation came: DEC-1126 (4), every ticket of an adopted product, twice its projection, never a cap
 kpis:
   success:
   - 'S1 A ticket''s running cost is the sum of the measured cost of its launched sessions'' records (W2-60b''s session record, keyed by the ticket) since its first launch or since the last clear; a session whose cost the record gives as not measured is counted as unknown and named in the sum, never as zero. Verify: planted session records for one ticket (three measured, one not measured): `gov spend sum` prints the total of the three, "1 unknown", the projection and the brake state, one line per ticket [DEC-1091 (2), DEC-1119 (5), DEC-655]'
@@ -50,6 +49,7 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-1091
+- DEC-1126
 - DEC-1089
 - DEC-1112
 - DEC-1119
