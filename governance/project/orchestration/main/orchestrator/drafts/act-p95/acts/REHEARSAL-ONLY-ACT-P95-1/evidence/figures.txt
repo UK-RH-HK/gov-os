@@ -1,0 +1,4 @@
+96 sample lines, 198 session samples, 192 outside verification, span 7.9 h
+  engineer       n=96     p50   2,023 MB  p95   2,475 MB  max   7,200 MB
+  orchestrator   n=96     p50   2,014 MB  p95   2,478 MB  max   9,500 MB
+working_size_bytes: `gov resources --remeasure` would write the MAXIMUM 9500000000 (9,500 MB); ACT-P95-1 writes the p95 2475000000 (2,475 MB), 74 % lower

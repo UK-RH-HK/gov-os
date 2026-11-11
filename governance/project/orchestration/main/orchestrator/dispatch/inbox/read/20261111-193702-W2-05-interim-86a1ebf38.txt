@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-05
+status: interim result 86a1ebf38: W2-05: sweep record: row 71 scrubbed (ls-files pinned, measured), row 61 open for the CTO after W2-84's merge, the conftest's own git strip named

@@ -398,3 +398,7 @@
 2026-11-11 19:24:07 started W2-05 (DAEO-0z8c) W2-05-A5-r7-fix.md -> W2-05-A5-r7-fix.json (launcher exit 0)
 2026-11-11 19:27:01 return: W2-66c-A5-r2-tests.json -> inbox/20261111-192701-W2-66c-A5-r2-tests.txt
 2026-11-11 19:27:01 return: W2-170-A5-build.json -> inbox/20261111-192701-W2-170-A5-build.txt
+2026-11-11 19:30:02 started W2-170 (DAEO-61vm) W2-170-A5-review.md -> W2-170-A5-review.json (launcher exit 0)
+2026-11-11 19:33:01 idle with headroom: inbox item written (waiting)
+2026-11-11 19:36:02 started W2-81 (DAEO-l78m) W2-81-A5-r6-land.md -> W2-81-A5-r6-land.json (launcher exit 0)
+2026-11-11 19:37:02 interim result: W2-05 86a1ebf38 W2-05: sweep record: row 71 scrubbed (ls-files pinned, measured), row 61 open fo

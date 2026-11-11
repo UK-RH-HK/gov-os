@@ -1,0 +1,10 @@
+[
+  {
+    "code": "FRONTMATTER_UNREADABLE",
+    "ids": [],
+    "paths": [
+      "governance/project/orchestration/packages/P1-W2-11-BRIEFS.md"
+    ],
+    "message": "governance/project/orchestration/packages/P1-W2-11-BRIEFS.md: the frontmatter is not valid YAML: mapping values are not allowed here in \"<unicode string>\", line 1, column 27: status: ANSWERED (DEC-1137: (c) and the small ticket) ^"
+  }
+]

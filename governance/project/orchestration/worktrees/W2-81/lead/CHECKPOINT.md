@@ -76,6 +76,13 @@ STATE: PACKAGES returned | HEAD: 76c9b5cd1071 | NEXT: the CTO decides P-W2-81-LA
 - Scratch: .gov-runtime/scratch 19M / 163 inodes; /tmp/gov-os-lead-W2-81 11M / 2529 inodes (not removable by the lead). Logs: lead/log/verify/, scratch/land/.
 - Untracked empty harness folders still present: tests/acceptance/W2-81/.claude/.cc-writes, tests/acceptance/W2-81/questions/.claude/.cc-writes.
 
+## Run 7 - land round 6 (hand-built brief, DEC-1130 (1)), 2026-11-11 ~20:30-
+STATE: merged; lead_verify running (pid 1949767) | HEAD: 6e2003ff3bdb | NEXT: wait_for verify.exit; then links, keyword_warn, context, scratch, return DONE | WAITING ON: lead_verify
+- Merge 6e2003ff3bdb (parents 4009d597a173, 08f51ea8c68f; Task DAEO-l78m, Role orchestrator), no conflict, 17 files. Integrate had moved since the brief (9d288f1b1c49 -> 08f51ea8c68f: 870d5af842e9 DEC-1137 record, 08f51ea8c68f DECIDED-NOT-DONE row 159). DEC-895: none under tests/acceptance/W2-81/, docs/probes/DAEO-l78m/, nor .tickets/DAEO-l78m.md -> no re-probe. Designer commits 76c9b5cd1071..4009d597a173: tests/acceptance/W2-81/README.md alone, 7+/7- (brief expected 8 lines).
+- Post-merge: disk gate open 818 GiB; gov accept pass, exit 0, 276/0/0, same per-line counts (land/accept-r6-post.txt). Record checks (opt-in lifted,breadth): 55 passed 33.74 s.
+- First calls ok: identity orchestrator/DAEO-l78m; tree/branch ok; head 4009d597a173; status clean. disk gate open (819 GiB, 64.9M inodes). hooks_check 0.
+- gov accept (pre-merge, normal HOME): outcome pass, exit 0, totals 276 passed / 0 failed / 0 skipped, unmapped 0. Per line passed: S1 10, S2 23, S3 150, S4 230, S5 165, S6 163, S7 158, S8 23, S9 148, S10 186, S11 2, S12 1, F1 148, F2 151, F3 151, F4 150, F5 109; all 0 failed 0 skipped. Output land/accept-r6-pre.txt.
+
 ## Loop count
 - 3 (round 1: two; round 2: batch 5). Converged.
 

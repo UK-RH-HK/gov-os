@@ -1,0 +1,2 @@
+2026-11-11 19:30:02 admitted by the dispatcher; launching W2-170
+disk gate open: 818 GiB free, 64858185 inodes free

@@ -13,15 +13,16 @@
 # returned 18:38 PACKAGES: README map (designer W2-81-A1 launched 18:58) and the W1-01 exemption (owner, P1); a new land run after both
 # W2-81 DAEO-l78m W2-81-A5-r5b-land.md W2-81-A5-r5b-land.json
 # 18:35 b40cba91: W2-170's build run (tests DONE 18:30 at 79a8fb87f19e; Interface readings 5-8 at 9e40aa184)
-W2-170 DAEO-61vm W2-170-A5-build.md W2-170-A5-build.json
+# returned 19:27 DONE: W2-170 DAEO-61vm W2-170-A5-build.md W2-170-A5-build.json
 # 19:10 b40cba91: batch 1 second wave, W2-66c tests (worktree on a fresh branch from integrate; hand-built brief, DEC-1130 (1))
-W2-66c DAEO-btcs W2-66c-A5-r2-tests.md W2-66c-A5-r2-tests.json
+# returned 19:27 DONE: W2-66c DAEO-btcs W2-66c-A5-r2-tests.md W2-66c-A5-r2-tests.json
 # ===== 11-11 19:30 b40cba91: THE ORDER (the owner, 19:20: unblockers first, long poles early, cheap closes, every slot used,
 # nothing that waits on a known red). The dispatcher does not enforce max_leads yet (ACT A will): only ONE live lead line at a
 # time below; each '#NEXT' line is uncommented by the CTO when its trigger holds and a lead slot frees.
 # NEXT 1 RELEASED 19:50 (brief 98 KB, no slot left):
 W2-05 DAEO-0z8c W2-05-A5-r7-fix.md W2-05-A5-r7-fix.json
-#NEXT 2 (after the W1-01 exemption + W2-81's README designer): W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json   [re-filled brief]
+# NEXT 2 RELEASED 19:40 (exemption 7b5c3cb94fd9; README 294f3e84b + 4009d597a; brief re-filled):
+W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
 #NEXT 3 (after W2-105's test fixes): W2-105 DAEO-zpdj W2-105-A5-r4-tests.md W2-105-A5-r4-tests.json   [re-filled brief]
 #NEXT 4 (after W2-11's merge by its designer; the long pole, 4-6 h): W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json   [re-filled brief]
 #NEXT 5 (after the exemption): W2-90b DAEO-nqa2 W2-90b-A5-r2-land.md W2-90b-A5-r2-land.json   [merge integrate first; hand brief]

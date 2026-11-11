@@ -1,0 +1,8 @@
+{
+ "date": "2026-11-11",
+ "method": "nearest rank",
+ "min_hours": 6.0,
+ "min_samples": 40,
+ "pct": 95,
+ "since": null
+}

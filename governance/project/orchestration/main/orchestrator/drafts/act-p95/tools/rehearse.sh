@@ -5,13 +5,13 @@
 # check run EXACTLY as written with `bash -c` from that copy, and the plain apply. The planted day (tools/plant_samples.py):
 # maximum 9.5 GB, p95 under 2.5 GB. No real session, no live file written; the live gate file and samples file are only
 # read, and hashed before and after to show they did not change. The log holds fixed text only (no head, pid, date or count).
-#   bash rehearse.sh      the log is ../rehearsal.log (it ends "failures: <n>"); the bundle is ../acts/ACT-P95-1
+#   bash rehearse.sh      the log is ../rehearsal.log (it ends "failures: <n>"); the planted bundle is ../acts/REHEARSAL-ONLY-ACT-P95-1 (never submitted: the live bundle is built on the sample day into acts/ACT-P95-1)
 set -u
 D=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-p95
 MAIN=/home/usain/Dynamic-Agentic-Engineering-OS
 T=$D/tools
 LOG=$D/rehearsal.log
-BUNDLE=$D/acts/ACT-P95-1
+BUNDLE=$D/acts/REHEARSAL-ONLY-ACT-P95-1
 LIVE=$HOME/.gov-os/machine
 W=$(mktemp -d "$D/tmp/rehearsal.XXXXXX") || exit 5
 trap 'rm -rf "$W"' EXIT

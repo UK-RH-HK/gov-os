@@ -1,0 +1,7 @@
+log: W2-66c-A5-r2-tests.json
+W2: W2-66c
+status: DONE. 31 cases are merged at head `400991361362`. Every S1–S4 case is red on the test map and breadth list of ACT-SELECT-FIXES-1's parent and green on the ACT's and on the head; the W2-66 folder is 145/145 green in the scoped run. Six reds in `tests/unit/accept` are not this ticket's (see tests). Th
+
+task: W2-66c (DAEO-btcs) tests run: one independent test designer writes `tests/acceptance/W2-66/test_w2_66_select_fixes.py` from S1–S6 and F1–F3; I check it, repeat S6 myself and merge it into `w2/W2-66c`.
+status: DONE. 31 cases are merged at head `400991361362`. Every S1–S4 case is red on the test map and breadth list of ACT-SELECT-FIXES-1's parent and green on the ACT's and on the head; the W2-66 folder is 145/145 green in the scoped run. Six reds in `tests/unit/accept` are not this ticket's (see tests). The context check answered CONTEXT_OVER_CEILING (see proposed_decisions).
+work_complete

@@ -1,0 +1,9 @@
+Merge w2/integrate into w2/W2-170: ACT-W1-01-EXEMPT-3 (7b5c3cb94fd9, W1-01's history case) and DEC-1136/1137 records, for the review run
+
+Nothing under src/gov/memaudit/, tests/unit/memaudit/, tests/acceptance/W2-170/ or the test map changes.
+
+Task: DAEO-61vm
+Role: orchestrator
+Implements: DEC-1052, DEC-1073
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
