@@ -2,7 +2,7 @@
 
 Written 2026-11-11 ~03:00 UTC by the CTO (session 8ddb8b14) from `gov plan --open` at `56b4858cc7fb` (integrate, after the
 night's ticket audit). **Nothing is launched from it until the owner has reviewed it.** The dispatcher's form is
-beside this file (`READY-AFTER-LIFT-1/ready-batches.txt`, from `gov plan --ready`); it goes to
+beside this file (`READY-AFTER-LIFT-1/ready-batches.md`, from `gov plan --ready`); it goes to
 `dispatch/ready*.txt` only after the review.
 
 ## How to read it
@@ -23,7 +23,7 @@ beside this file (`READY-AFTER-LIFT-1/ready-batches.txt`, from `gov plan --ready
    on it. Accepted for tickets already in progress (the CTO, DEC-1112 (3)); new tickets carry `needs`, `reads`,
    `waits_on` (DEC-1088 (3)).
 3. W2-32 and W2-15a are in the plan as open work: LIFT-CLOSES-1 recommends they do not close at the lift (W2-32 S9
-   at hit@5 58.3 % against 85 %, the owner's disposition).
+   at hit@5 58.3 % against 85 %, the owner's disposition). [corrected 11-11, DEC-1126 (6): 58.3 % (28 of 48) is D-4b's baseline on the 48 development questions of 11-03, not the fresh 80; the 80 gave right end to end 78 of 79 (98.7 %), wrong claims 0, hit@5 84.8 %, and DEC-1098 (1) records K9's memory line met; S9's disposition goes to the owner, `drafts/w2-32-s9/DISPOSITION.md`]
 
 ## The batches (ticket, id, priority, role, state)
 **Batch 1**

@@ -20,7 +20,7 @@ tool visible: `W2-92-withtool.json`).
 | W2-126 (`DAEO-jpr0`) | **yes**, with one noted gap | none (28 of 28) | accept 2.1 min; close about 15 to 20 |
 | W2-151 (`DAEO-qzca`) | **no `gov close` route; a recorded CTO close** | none to run (LITE, no folder); its two lines hold on my own checks | about 10 for the record, no test run |
 | W2-15a (`DAEO-rd0g`) | **no** | no acceptance run (research, no folder); the evidence route refuses it today | record fixes about 30, plus a probe; closes with W2-32 |
-| W2-32 (`DAEO-0pyc`) | **no, a line is the owner's** | none (257 passed, 0 failed, 2 skipped); S9 is open: hit@5 was 58.3 %, below 85 % | not before the owner decides S9 |
+| W2-32 (`DAEO-0pyc`) | **no, a line is the owner's** | none (257 passed, 0 failed, 2 skipped); S9 is open: hit@5 was 58.3 %, below 85 % (D-4b's baseline, not the 80: see §3's correction) | not before the owner decides S9 |
 
 Minutes for a close are an estimate, not a measurement: the acceptance run is measured (above); the rest is
 `gov close`'s scoped regression and gates. On a merged ticket the scope has no diff, so it selects the ticket's own
@@ -163,7 +163,7 @@ README's "KPI map after D-4's cut" section names them. A line with no case is na
 - **Why not ready:** S9 passes as a rule (the escalation logic and the record's wording), but the measured level is
   hit@5 58.3 % (28 of 48), below the 85 % floor, and "no improvement round has run yet" (the evidence note). The
   ticket's own words send that to the owner (escalate; at the third round the owner decides). W2-15a also gates it
-  (`deps`). And DEC-1125 (2) now says the memory audit replaces ad-hoc re-measures.
+  (`deps`). And DEC-1125 (2) now says the memory audit replaces ad-hoc re-measures. [corrected 11-11, DEC-1126 (6): 58.3 % (28 of 48) is D-4b's baseline on the 48 development questions of 11-03, not the fresh 80; the 80 gave right end to end 78 of 79 (98.7 %), wrong claims 0, hit@5 84.8 %, and DEC-1098 (1) records K9's memory line met; S9's disposition goes to the owner, `drafts/w2-32-s9/DISPOSITION.md`]
 - **The close needs:** the owner's disposition of S9 (close with the level reached, or keep open), then `gov close
   DAEO-0pyc` together with W2-15a.
 
@@ -173,7 +173,7 @@ README's "KPI map after D-4's cut" section names them. A line with no case is na
 2. **Record fix, W2-05:** five rows in `docs/research/AR-2-git-sweep.md`, then a fresh probe.
 3. **Review, W2-112:** one fresh probe round; its record committed by the orchestrator.
 4. **Ticket and record edits, W2-15a:** `acceptance_tests.evidence`, `type: research`, a probe.
-5. **Owner, W2-32 S9** (the 58.3 % level against 85 %), and whether W2-15a and W2-32 close at the lift at all.
+5. **Owner, W2-32 S9** (the 58.3 % level against 85 %; corrected: D-4b's baseline, the 80 met K9's bar), and whether W2-15a and W2-32 close at the lift at all.
 6. **W2-151:** a recorded CTO close; `gov close` would refuse twice, counted.
 7. **Launch hygiene:** run W2-96's signal cases from a shell that does not ignore SIGHUP.
 8. **Not checked:** `gov close`'s own gates (trailers, `_check_unmeasured`, containment, collection, `gov check`) were
