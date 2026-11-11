@@ -107,7 +107,8 @@ def restore(root: Path, commit: str, written=()) -> None:
     folder stays as it is, byte for byte (W2-23 S1)."""
     git(root, "reset", "-q", "--hard", commit)
     written = list(written)
-    kept = set(git(root, "--literal-pathspecs", "ls-files", "-z", "--", *written).split("\0")) if written else set()  # tracked at commit
+    # what ``commit`` tracks is put back by the reset, never deleted
+    kept = set(git(root, "--literal-pathspecs", "ls-files", "-z", "--", *written).split("\0")) if written else set()
     for rel in written:
         path = root / rel
         if rel in kept:
