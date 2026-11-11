@@ -505,7 +505,7 @@ other restart is an ACT.
 - DEC-1128 (2026-11-11, items (2) (3) (4) standing): **no switched-off control returns and no new guard rule goes
   live unless set-up A's evidence shows 100 % on the path map's actions** (every covered action right, no false
   refusal, no wrong allow; actions outside the path map outside the bar); **the lift does not wait for set-up A**: the
-  guard stays as today (W2-141's rule included), live false refusals counted weekly from the call log, the guard's
+  guard stays as today (the live hook of 11-09; W2-141's rule is NOT live: staged, its hook ACT not run, off until set-up A shows 100 %), live false refusals counted weekly from the call log, the guard's
   error-path faults (row 123) first after the lift; **set-up B dropped entirely** (not a Wave 3 row), leads not
   sandboxed, the path map and the guard are the controls, set-up A stays as the guard's measurement, the workers'
   launcher sandbox unchanged; DEC-1010's one rule for all roles investigated read-only first. Basis: questions 2 and 4.
@@ -517,3 +517,8 @@ other restart is an ACT.
   briefs until they close, `gov brief`'s refusal recorded in each** (the owner's exception to DEC-1083, those tickets
   only); a ticket before EXAMIN's copy so `gov brief` handles an adopted repository's tickets without `Verify:`; W2-94 and
   W2-93 by the walled writer route (an `evaluation_sets` ACT and writer briefs for approval). Basis: questions 1 and 2.
+- DEC-1131 (2026-11-11, items (1)-(3) standing): **one bar, two rounds for every role** (DEC-1010 widened): judged only
+  on the ticket's KPI lines and specification; every finding names its KPI line or is a row; at most two rounds per
+  ticket, counted by the CTO by hand from the ticket's id and role (the ledger); **a blocking-only engineer fix is the
+  same round**; a third round only by the owner's decision; the text by CIT-P first, the counting code after two
+  weeks; `verdict.py` (a failed KPI line blocks) and `operator_run.py` (reviews per ACT id) fixed now. Basis: questions 2 and 4.

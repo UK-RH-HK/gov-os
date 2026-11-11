@@ -12642,7 +12642,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.391 | 2026-11-01 | Orchestrator (delegated): DEC-1009. Next free id: DEC-1010. |
 
 ### DEC-1010 — Reviews converge; W2-81 lands; W2-93 proves its own exam; W2-117 before EXAMIN's copy; the dispatcher versioned; checks and the embedding server in slots, real CPU judged; a research session (standing)
-- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-096, DEC-916, DEC-801 to DEC-803, DEC-1003, DEC-1007, DEC-1008 · **Changes:** DEC-916's "a third review is the owner's exception" (now: at most two rounds, then the owner once, with options); DEC-096 for reviews
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-096, DEC-916, DEC-801 to DEC-803, DEC-1003, DEC-1007, DEC-1008 · **Changes:** DEC-916's "a third review is the owner's exception" (now: at most two rounds, then the owner once, with options); DEC-096 for reviews · **Changed by:** DEC-1131: widened to every role (one bar, two rounds), the round counted per ticket by the CTO, a blocking-only fix the same round
 - **Decision:**
   1. **How reviews converge** (in force now, for the CTO, the leads, every reviewer and QA engineer): a moderator (the QA engineer or the Senior Engineer; the CTO until the three layers) triages every finding against the ticket's own scope and KPIs; a finding outside the scope, or needing an unusual construction, becomes a Wave 3 row, never a round; a finding blocks only if in scope, reachable in ordinary work, and failing open or losing work; at most two review rounds, then the owner once with options, no more routine exceptions; READY is computed by code from each reviewer's structured verdict per KPI (pass or fail, each finding's scope and classification). Written into the common lead brief, `JUDGEMENT.md` (the reviewers' and probes' text), `AUDITOR-common.md` (QA and audits) and the prompt (§0, §14); the CTO's `land.py` and `close_build.py` compute READY from a ```verdict block (`tools/verdict.py`).
   2. **The same in the Gov OS (DEC-1003):** each rule mapped into the product, the deterministic parts (the round cap enforced by the queue and the dispatcher; READY computed from structured verdicts in the smart close, W2-115) and the guidance parts (the QA role and skill, the reviewer's brief template), as KPI proposals.
@@ -14421,9 +14421,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     all roles, with what it would change in the briefs, JUDGEMENT.md and the tickets.
   - (6) **The memory audit:** the CTO confirms W2-170 to W2-173 and W2-88's lines are planned to land in time for the
     first weekly audit on 11-23 (DEC-1126 (5)).
-- **Note (the CTO):** the guard "as it is today" is the re-pinned guard of `pin-797495bdfc70` (13:31 UTC 11-11),
-  which carries W2-141's rule (an engineer's wide search into its own acceptance folder refused); item (1)'s list
-  names it with its set-up A evidence so far.
+- **Note (the CTO, corrected 11-11 15:30):** the guard "as it is today" is the live hook (`.claude/hooks/pretooluse.py`
+  `74f8dbea4761`, `role_reads.py` `5407aade9417`, unchanged since 11-09). **W2-141's rule is not live:** the re-pin put
+  W2-141's code into `gov` (`src/gov/guard/reads.py`), but the rule that refuses the search is in staged hook files
+  (`docs/changes/W2-141-hook/`) that a separate ACT copies over the live ones, and that ACT has not run (checked by a
+  planted engineer search on the live hook: allowed). Under item (2) it stays off until set-up A shows 100 %. The
+  first version of this note said it was live; that was wrong.
 - **Basis:** question 2 (a control is trusted only on measured evidence, and the lift is not held by a measurement)
   and question 4 (the owner's time: one list, one rule, one recommendation).
 
@@ -14460,6 +14463,21 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     owner's approval.
 - **Basis:** question 2 (work moves without weakening the ready check for new tickets) and question 1 (the held-out
   sets written blind by the walled route).
+
+### DEC-1131 — "One bar, two rounds" for every role (DEC-1010 widened), option A: the text first by CIT-P, the round ledger by hand, the counting code after two weeks; a blocking-only fix is the same round; the two code gaps fixed now
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1)-(3) standing · **Under:** DEC-1010 (changed), DEC-1128 (5), DEC-096, DEC-916, DEC-957, DEC-1105, DEC-1106, DEC-1107, CAP-33 · **Source:** the owner's answer (chat, 2026-11-11 ~15:30 UTC) to `governance/project/orchestration/packages/DEC1010-REVIEW.md`
+- **Decision:**
+  - (1) **Adopt the rule "one bar, two rounds" for every role** (DEC1010-REVIEW §4.1), **option A:** the text first
+    (JUDGEMENT.md, the brief templates, the role files, a KPI id in the ticket template), by a CIT-P for the owner's
+    approval; the CTO keeps the round ledger by hand; the counting code follows after two weeks of use.
+  - (2) **The open point (§4.4 point 1):** an engineer pass that only fixes the findings the review marked blocking
+    belongs to the same round.
+  - (3) **Now, not after two weeks, the two code gaps, each by its usual route:** `verdict.py` accepting a ticket with a
+    failed KPI line (READY needs no KPI line marked fail), and `operator_run.py` counting reviews per manifest instead
+    of per ACT id.
+  - (4) The CTO drafts the CIT-P.
+- **Basis:** question 4 (work judged against a known bar, bounded, brought to the owner with evidence) and question 2
+  (a failed line never reads as ready; a rebuilt ACT does not reset its review count).
 
 | Version | Date | Change |
 |---|---|---|
@@ -14527,3 +14545,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.511 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1128 (the 100 % bar on set-up A for any control returning or new guard rule; the lift does not wait; set-up B dropped; DEC-1010 investigated; the switched-off list; the memory audit's landing); DEC-1112 (1) changed. DEC-1127 held for the owner's answer (the close history, PROPOSED). Next free id: DEC-1129. |
 | 0.512 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1129 (W2-32 S9 (a1); the memory audit's briefs approved, hashes to the approved list by the install ACT; W2-60a a fresh round 1). DEC-1127 still held PROPOSED. Next free id: DEC-1130. |
 | 0.513 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1130 (the `Verify:` pass and the hand-built-brief exception to DEC-1083; a ticket for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route). DEC-1127 still held PROPOSED. Next free id: DEC-1131. |
+| 0.514 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1131 (one bar, two rounds for every role, option A; a blocking-only fix the same round; verdict.py and operator_run.py fixed now); DEC-1010 changed; DEC-1128's note corrected (W2-141's rule not live). DEC-1127 still held PROPOSED. Next free id: DEC-1132. |
