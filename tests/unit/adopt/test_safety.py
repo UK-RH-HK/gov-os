@@ -259,6 +259,21 @@ def test_s3_a_form_outside_the_list_is_not_found():
         assert safety.citations(f"Read {cited} before a vote.\n", [STORE], ["MEM-7"]) == [], cited
 
 
+def test_s3_a_glob_followed_by_sentence_punctuation_is_found_without_it():
+    record_ = "legacy/memory/decisions/leg-001.md"
+    for text in ("The vote rules are in legacy/memory/**/*.md.\n", "See legacy/memory/**/*.md, then vote.\n",
+                 "Rules: legacy/memory/**/*.md: read them.\n", "Rules (legacy/memory/**/*.md) first.\n",
+                 "Read legacy/memory/**/*.md; then vote.\n", "Read “legacy/memory/**/*.md” first.\n",
+                 "Read legacy/memory/**/*.md\n"):
+        found = safety.citations(text, [record_], [])
+        assert [(item["form"], item["found"]) for item in found] == [("glob", "legacy/memory/**/*.md")], text
+
+
+def test_s3_a_glob_with_no_literal_first_folder_stays_not_found_before_punctuation():
+    for text in ("Read **/*.md.\n", "Read *.md, then vote.\n", "Read **/*: first.\n"):
+        assert safety.citations(text, ["legacy/memory/decisions/leg-001.md"], []) == [], text
+
+
 def test_s3_the_a8_proof_prints_a_rule_files_url_encoded_citation(root):
     write(root, STORE, "# Legacy memory\n")
     write(root, ".windsurfrules", "Before a vote, read legacy%2Fmemory%2Findex.md.\n")

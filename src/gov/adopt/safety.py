@@ -238,6 +238,8 @@ def refuse_after_failed_a6(run) -> None:
 
 _HEX = re.compile(r"%([0-9A-Fa-f]{2})")
 _GLOB_TOKEN = re.compile(r"[^\s\"'`()<>{},;|]*[*?][^\s\"'`()<>{},;|]*")
+_AFTER_GLOB = ".:!’”»"  # what may follow a glob in prose (``,;)`` and plain quotes end the token already)
+_BEFORE_GLOB = "‘“«"  # an opening typographic quote before it
 
 
 def _normal(text: str, join: bool) -> tuple[str, list[int], list[int]]:
@@ -293,12 +295,14 @@ def citations(text: str, paths: list[str], ids: list[str]) -> list[dict]:
         normal, starts, ends = _normal(text, join)
         hits = [(form, name, m.start(), m.end()) for form, name, rx in wanted for m in re.finditer(rx, normal)]
         for m in _GLOB_TOKEN.finditer(normal):
-            token = m.group().lstrip("/").removeprefix("./")
+            lead = len(m.group()) - len(m.group().lstrip(_BEFORE_GLOB))
+            bare = m.group()[lead:].rstrip(_AFTER_GLOB)  # a sentence's stop or colon, or a quote, is no part of it
+            token = bare.lstrip("/").removeprefix("./")
             head = token.split("/", 1)[0]
             if "/" not in token or not head or any(c in head for c in "*?"):
                 continue  # a glob with no literal folder first (``**/*``, ``*.md``) names no store
             rx = _glob(token)
-            hits += [("glob", rel, m.start(), m.end()) for rel in paths
+            hits += [("glob", rel, m.start() + lead, m.start() + lead + len(bare)) for rel in paths
                      if rx.fullmatch(rel.lower()) or rx.fullmatch(rel.lower().rpartition("/")[0])]
         for form, name, start, end in hits:
             raw = text[starts[start]:ends[end - 1]]
