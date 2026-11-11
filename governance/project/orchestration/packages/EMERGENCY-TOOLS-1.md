@@ -214,3 +214,33 @@ candidate. The query wrapper equals S. The real gaps are these:
 - Who reads `mem_sampler.sh`'s output and `log/lead-mem.jsonl` (both live).
 - The "in use" answers for tools started by hand rest on the logs' times and START-NEXT-SESSION §6. I did not trace
   each run.
+
+## 7. Home tickets (anti-drift audit (d), 2026-11-11; the full table is `AUDIT-NIGHT-1/d-tools.md`)
+
+Of the 40 rows the kernel or an adopted repository needs: 26 mapped to a ticket with a KPI line, 7 mapped without one (a line is
+proposed), 7 missing (five tickets filed). **Bold** = needed before EXAMIN's copy. This section changes no row above; where it
+differs from a row, this section is the later reading (M, with the ticket line).
+
+| Row | Home ticket | KPI line | State |
+|---|---|---|---|
+| A1, C1 | W2-121 | lines 1, 3, 4, 9, 13 (the Balancer is in 3, 9, 13; §2 item 1 said it carried none) | mapped, **BE** |
+| A4, D16, E8 | W2-116 | lines 1-4 (the after-landing trigger is line 4); "every worker" is in the body only | mapped, **BE** |
+| A6, D6 | W2-115 | none: held by DEC-1100 (4) until proven in use | line proposed (P-1) |
+| A8, A9 | W2-159 (DAEO-6lid) | S1-S5 | filed |
+| A10, A11, D11, D13, E5, E6 | W2-20, W2-145 | the query-wrapper line; S3 and S5 of W2-145; the slot lines | mapped, **BE** |
+| B2 | W2-42a | lines 1-10 | mapped, **BE** |
+| B3, E10, E11 | W2-13 S5, W2-141, W2-152, W2-129, W2-150 | S-lines | mapped |
+| C2, D5, D7, D8, D10, E2 | W2-115 | lines 2-7, 9-12 (D10: line 10, "READY is computed"; §1 said none) | mapped, D5 D7 **BE** |
+| C3 | none in Wave 2 | the Wave 3 row W3-P16, by decision (DEC-994 item 3) | parked |
+| C5 | W2-154, W2-115, W2-116 | S3; line 8; line 2; the held-slot form has none | line proposed (P-6) |
+| D1 | W2-56, W2-60a, W2-153 | launch lines; class tiers (RUBRIC-2) have none | lines proposed (P-2, P-3), **BE** |
+| D2 | W2-156 (DAEO-ylsh) | S1-S6 | filed, **BE** |
+| D3, D17 | W2-160 (DAEO-fd0p) | S1-S4 | filed |
+| D4 | W2-115 | line 3 (the set); the whole verify run has none | line proposed (P-4), **BE** |
+| D9 | W2-158 (DAEO-8a3f) | S1-S5 | filed |
+| D12 | W2-157 (DAEO-ozyt) | S1-S5 | filed, **BE** |
+| D15, E3, E4, E7, E9 | W2-122, W2-126, W2-32, W2-137, W2-56, W2-153, W2-136, W2-147 | S-lines | mapped |
+| E1 | W2-20 (proposed) | the pools only; the switch has none | line proposed (P-5) |
+
+**Not in W2-27's closure, though a decision or the ticket puts them before EXAMIN's copy (M):** W2-42a, W2-116, W2-145, W2-153,
+and the new W2-156 and W2-157. Recommended: add them to W2-27's `depends_on:` (the CTO's edit).
