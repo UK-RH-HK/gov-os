@@ -1,0 +1,182 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+s....................................................................... [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 43%]
+.............................sss........................................ [ 44%]
+........................................................................ [ 46%]
+.....sss................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+................................F.F..................................... [ 73%]
+.....................................................F.................. [ 74%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+.....................s.................................................. [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+..................F..................................................... [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+............................                                             [100%]
+=================================== FAILURES ===================================
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7cece1934f40>
+project = PosixPath('/tmp/pytest-of-usain/pytest-70/popen-gw5/test_the_guard_refuses_install0/repo')
+name = 'created-path-under-the-tickets'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install -D src/gov/guard/decide.py .tickets/w1-46/decide.py` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_ test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7cece2ac1120>
+project = PosixPath('/tmp/pytest-of-usain/pytest-70/popen-gw5/test_the_guard_refuses_install1/repo')
+name = 'two-operands-onto-a-ticket'
+
+    @pytest.mark.parametrize("name", sorted(INSTALLS))
+    def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(guard, project, name):
+        """The source is the engineer's own file in every form."""
+        command = INSTALLS[name]
+>       w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
+
+tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='allow', returncode=0, stdout='', stderr='')
+what = '`install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer'
+
+    def assert_stopped(result, what):
+        """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+>       assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `install src/gov/guard/decide.py .tickets/DAEO-zz90.md` by an engineer was let through: decision=allow exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:498: AssertionError
+_________________ test_every_tracked_path_is_in_one_namespace __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_tracked_path_is_in_one_namespace():
+        namespaces = _head()
+>       assert [rel for rel in _tracked() if len(_owners(namespaces, rel)) != 1] == []
+E       AssertionError: assert ['experiments...-a.json', ...] == []
+E         
+E         Left contains 16 more items, first extra item: 'experiments/EXP-002/README.md'
+E         Use -v to get more diff
+
+tests/unit/retrieval/test_w2_91_full_embeddings.py:76: AssertionError
+____________ test_every_tracked_path_matches_exactly_one_namespace _____________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_tracked_path_matches_exactly_one_namespace():
+        """The names come from `git ls-files`; no tracked file is opened."""
+        spaces = support.namespaces(support.load_path_map())
+        patterns = {name: [pattern for pattern in value.get("paths") or [] if isinstance(pattern, str)]
+                    for name, value in spaces.items()}
+        tracked = support.tracked_files()
+        nowhere, twice = [], []
+        for path in tracked:
+            found = [name for name, own in patterns.items() if any(support.matches(pattern, path) for pattern in own)]
+            if not found:
+                nowhere.append(path)
+            elif len(found) > 1:
+                twice.append(f"{path} -> {found}")
+>       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
+                             f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
+E       AssertionError: 16 of 4073 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['experiments/EXP-002/README.md', 'experiments/EXP-002/hook-limit-record.md', 'experiments/EXP-002/results/post-5-a.json', 'experiments/EXP-002/results/pre-allow-5-a.json', 'experiments/EXP-002/results/pre-allow-5-b.json', 'experiments/EXP-002/results/pre-allow-60-a.json', 'experiments/EXP-002/results/pre-allow-60-b.json', 'experiments/EXP-002/results/pre-control-5-a.json', 'experiments/EXP-002/results/pre-control-5-b.json', 'experiments/EXP-002/results/pre-deny-5-a.json']
+E       assert not ['experiments/EXP-002/README.md', 'experiments/EXP-002/hook-limit-record.md', 'experiments/EXP-002/results/post-5-a.js...ow-5-a.json', 'experiments/EXP-002/results/pre-allow-5-b.json', 'experiments/EXP-002/results/pre-allow-60-a.json', ...]
+
+tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError
+=============================== warnings summary ===============================
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+tests/unit/resources/test_w2_20_round3.py::test_f1_launches_started_together_admit_only_those_the_memory_rule_admits
+  /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/tests/unit/resources/test_w2_20_round3.py:107: DeprecationWarning: This process (pid=3474329) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/hooks/test_live_hook.py:722: the rebuilt corpus is not here (GOV_LIVE_HOOK_CORPUS)
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:623: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:635: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_w2_149_setup_a.py:653: bwrap: run with GOV_W2_149_BWRAP=1 outside the sandbox
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:964: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:977: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/unit/orchestration/test_dispatcher.py:989: the CTO's untracked scratch tools are not in this tree (a clean clone)
+SKIPPED [1] tests/acceptance/W1-49/test_w1_49_threshold.py:67: not run from a Claude Code session (CLAUDECODE is not 1): the env block of a settings file reaches a session's commands only; the window is not measured
+4 failed, 4984 passed, 8 skipped, 6 warnings in 805.17s (0:13:25)
+heavy_slot: all 3 slots taken; waiting (2026-11-11 21:21:49)

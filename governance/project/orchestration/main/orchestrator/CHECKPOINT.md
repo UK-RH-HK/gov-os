@@ -1,6 +1,34 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 21:00 UTC: session `b40cba91` hands over (rule 11, context far past 200k); next free id DEC-1139
+## RESUME HERE — 2026-11-11 21:40 UTC: session `b40cba91` hands over (rule 11; the owner's order "prepare to hand over"); next free id DEC-1139
+**Read the 21:00 block below too; this block replaces it where they differ.**
+- **Closed tonight (5):** W2-04, W2-81, W2-170 (DEC-953 records in `closes/`), W2-105 (the merge queue, DEC-989; its README map
+  commit merged `77dfff06c3b4`). **Landing now (merge queue):** W2-90b (`cb0e69ba57f2`) and W2-40 (`29753c768def`) in flight;
+  **W2-05 `52de591b8c08` queued in `dispatch/land.txt`** (review 2 READY at `1e0ab6280cc9`, probe `52de591b8`; its close unblocks
+  batch 5). Check `dispatch/dispatch.log` / the inbox `land` items; the queue closes each (DEC-989).
+- **Leads: none running at 21:40.** No live `ready.txt` line (all `#NEXT`/retired). Next lead: **W2-11 r6 resume**
+  (`briefs/W2-11-A5-r6-resume.md`, slots filled) after (a) the product-spec restore worker RUNNING (pid 3656071,
+  `W2-11-A4-skills-restore`, launched 21:36; log in `~/gov-os-worktrees/W2-11/.gov-runtime/scratch/lead/log/`) and then (b) the
+  designer `briefs/W2-11-A1-rebaseline.md` (launch line in the helper's return: Opus high C3, projection 5; one writer at a time);
+  then the ready line `W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json`. Seven W2-11 copy cases stay red until a
+  copies ACT (four `.claude/skills/*/SKILL.md` differ after A4: discovery, retrieval, orchestration, test-design). Three P2s are
+  in the r6 brief as packages (S16's template half; S9's front matter; allowed_paths still list brief-*.md).
+- **W2-175 DONE** (head `4c0c73472fd8`, review READY): the owner was shown the approval table (13 files, old/new sha256, lines
+  added; `docs/changes/W2-175-CIT-P.md` §2 on w2/W2-175). **On the owner's approval: record DEC-1139**, prepare the copies ACT
+  (class (b): `.claude/templates/role-*.md` x7 and root `.rulesync/subagents` x6), then S6 re-run (254/0), CIT-P §4-5 ACCEPTED,
+  merge, close. W2-27 depends on it (DEC-1137 (3)).
+- **W2-149: probe committed `17c5d4b3e`, close HELD** (accept rc 3: success-26's 2 cases skipped; 35 skipped vs 3 before; and
+  BATCH-PREP's "in_progress by design for rows F37…"): see item 3a below. W2-173 waits on it.
+- **Still to do from the 21:00 list:** (1) the two ACT r2s READY → packages + the owner's yes lines; (2) ACT A's companion merge
+  + review; (3) W2-112's probe → record + close; W2-148's package to the owner (S15 fails, rounds used); (6) done; (7) W2-66c land
+  and close; ticket trims (W2-05, W2-81, W2-175, W2-66c, W2-170 done); W2-40's sources (W2-H052, W2-L316 …); row 159 (the brake).
+- **The idle guard's false positives:** it reads stale ticks (returned lines) and `gov plan`'s first batch (merged-awaiting-close
+  tickets): the follow-up ACT for F1-F3 is due.
+- Holds and watchers running outside the session: mem_hold, night_hold (03:00), lead_mem_watch, mem_guard, oom_watch, the sentinel,
+  the dispatcher; the CTO's own watchers (inbox, helper_watch, sentinel_check, bare_watch, usage_log, store backstop) and the digest
+  crons die with this session: **re-arm them first** (START-NEXT-SESSION §6).
+
+## RESUME HERE (history) — 2026-11-11 21:00 UTC: session `b40cba91` hands over (rule 11, context far past 200k); next free id DEC-1139
 **Closed tonight:** W2-04, W2-81, W2-170 (records in `closes/`). **Leads live** (cap five, DEC-1138; `max_leads: 5`): W2-05 r8 land,
 W2-175 run 2, W2-40 run 1, W2-90b r2b land (released 21:00: pre-merge `b3ed3f88d`, merge `cb0e69ba5`). Holds RUNNING: mem_hold,
 night_hold (03:00 → the nightly's end), lead_mem_watch. **The order** is in `dispatch/ready.txt` (`#NEXT` lines; release one per

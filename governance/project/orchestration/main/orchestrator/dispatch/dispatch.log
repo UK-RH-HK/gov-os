@@ -450,3 +450,9 @@
 2026-11-11 21:20:02 idle with headroom: inbox item written (used:W2-40 DAEO-6ox0,W2-90b DAEO-nqa2)
 2026-11-11 21:21:02 idle with headroom: inbox item written (waiting)
 2026-11-11 21:21:02 land started: ['W2-90b=cb0e69ba57f2', 'W2-40=29753c768def'] -> land-dispatch-20261111-212102.out (launcher exit 0)
+2026-11-11 21:26:03 idle with headroom: inbox item written (waiting)
+2026-11-11 21:30:03 idle with headroom: inbox item written (waiting)
+2026-11-11 21:33:03 interim result: W2-05 52de591b8 W2-05 (DAEO-0z8c) r8: probe record of review round 2 (the last) at 1e0ab6280cc9 
+2026-11-11 21:34:02 return: W2-05-A5-r8-land.json -> inbox/20261111-213402-W2-05-A5-r8-land.txt
+2026-11-11 21:34:02 idle with headroom: inbox item written (used:W2-05 DAEO-0z8c)
+2026-11-11 21:35:02 idle with headroom: inbox item written (empty)

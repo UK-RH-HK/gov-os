@@ -4,3 +4,13 @@ W2-40 (DAEO-6ox0, FULL) at 29753c768def: pre-check passed
 reds traced: the head without the batch, once each way, the same failure; 3 rounds for the load-sensitive list's cases (Q-1, DEC-1050)
 2026-11-11 21:21:03 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
 2026-11-11 21:21:03 merged W2-90b, W2-40 onto 77dfff06c3b4: 9e07d5105210
+2026-11-11 21:36:31 the integration store /home/usain/gov-os-worktrees/W2-00-store-a is at 17c5d4b3e140, not at the head 77dfff06c3b4, and refs/heads/w2/integrate has moved on: no refresh
+2026-11-11 21:36:31 seed of head-77dfff06c3b4-0 from /home/usain/gov-os-worktrees/W2-00-store: deferred (product): --seed /home/usain/gov-os-worktrees/W2-00-store-a
+2026-11-11 21:37:16 the head without the batch: a throwaway worktree head-77dfff06c3b4-0 at 77dfff06c3b4, rebuilt once, seeded from the integration store (not at that head; no clone rebuilt)
+2026-11-11 21:37:17 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[created-path-under-the-tickets]
+2026-11-11 21:37:18 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 1, 'without_exit': None}): unowned: tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py::test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets[two-operands-onto-a-ticket]
+2026-11-11 21:37:19 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace
+2026-11-11 21:37:21 red alone, traced against the head without the batch ({'rounds': 1, 'red_with': 1, 'red_without': 0, 'without_exit': None}): owned: tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
+2026-11-11 21:37:25 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
+2026-11-11 21:38:48 EJECTED W2-40: red; failing: tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace, tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
+2026-11-11 21:38:48 merged W2-90b onto 17c5d4b3e140: ae36b145b1b2

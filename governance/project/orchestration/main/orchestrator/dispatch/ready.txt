@@ -21,7 +21,7 @@
 # time below; each '#NEXT' line is uncommented by the CTO when its trigger holds and a lead slot frees.
 # NEXT 1 RELEASED 19:50 (brief 98 KB, no slot left):
 # returned 20:34 PACKAGES (P-MEMAUDIT (a), P-ACCEPT-MAP decided): W2-05 DAEO-0z8c W2-05-A5-r7-fix.md W2-05-A5-r7-fix.json
-W2-05 DAEO-0z8c W2-05-A5-r8-land.md W2-05-A5-r8-land.json
+# returned 21:34 DONE (land via land.txt at once): W2-05 DAEO-0z8c W2-05-A5-r8-land.md W2-05-A5-r8-land.json
 # NEXT 2 RELEASED 19:40 (exemption 7b5c3cb94fd9; README 294f3e84b + 4009d597a; brief re-filled):
 # returned 19:54 DONE, merged: W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
 # NEXT 3 RELEASED 20:05 (fixes 19ac51dd9; brief rebuilt, slots filled; template present):

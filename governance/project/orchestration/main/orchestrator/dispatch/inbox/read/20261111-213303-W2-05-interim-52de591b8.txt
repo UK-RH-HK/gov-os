@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-05
+status: interim result 52de591b8: W2-05 (DAEO-0z8c) r8: probe record of review round 2 (the last) at 1e0ab6280cc9 (READY by verdict.ready)

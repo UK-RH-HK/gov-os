@@ -148,3 +148,17 @@
 {"at": "2026-11-11 21:22:48", "avail_mb": 16280, "leads": {"W2-05": {"mb": 1610, "kb": 1649092, "procs": 21, "in_status": true}}}
 {"at": "2026-11-11 21:23:49", "avail_mb": 16132, "leads": {"W2-05": {"mb": 1755, "kb": 1797904, "procs": 25, "in_status": true}}}
 {"at": "2026-11-11 21:24:50", "avail_mb": 16007, "leads": {"W2-05": {"mb": 1799, "kb": 1842236, "procs": 25, "in_status": true}}}
+{"at": "2026-11-11 21:25:50", "avail_mb": 16296, "leads": {"W2-05": {"mb": 1442, "kb": 1476904, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:26:51", "avail_mb": 16411, "leads": {"W2-05": {"mb": 1320, "kb": 1352668, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:27:53", "avail_mb": 16377, "leads": {"W2-05": {"mb": 1329, "kb": 1360936, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:28:54", "avail_mb": 16051, "leads": {"W2-05": {"mb": 1292, "kb": 1323816, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:29:55", "avail_mb": 16040, "leads": {"W2-05": {"mb": 1289, "kb": 1320656, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:30:56", "avail_mb": 15882, "leads": {"W2-05": {"mb": 1293, "kb": 1324416, "procs": 16, "in_status": true}}}
+{"at": "2026-11-11 21:31:57", "avail_mb": 17038, "leads": {"W2-05": {"mb": 272, "kb": 279528, "procs": 1, "in_status": true}}}
+{"at": "2026-11-11 21:32:58", "avail_mb": 17257, "leads": {"W2-05": {"mb": 275, "kb": 281628, "procs": 1, "in_status": true}}}
+{"at": "2026-11-11 21:33:59", "avail_mb": 17515, "leads": {"W2-05": {"mb": 0, "kb": 0, "procs": 0, "in_status": true}}}
+{"at": "2026-11-11 21:35:00", "avail_mb": 17484, "leads": {}}
+{"at": "2026-11-11 21:36:01", "avail_mb": 17457, "leads": {}}
+{"at": "2026-11-11 21:37:02", "avail_mb": 18130, "leads": {"W2-11": {"mb": 301, "kb": 308768, "procs": 4, "in_status": false}}}
+{"at": "2026-11-11 21:38:03", "avail_mb": 17934, "leads": {"W2-11": {"mb": 312, "kb": 319772, "procs": 4, "in_status": false}}}
+{"at": "2026-11-11 21:39:04", "avail_mb": 18252, "leads": {"W2-11": {"mb": 311, "kb": 318668, "procs": 4, "in_status": false}}}

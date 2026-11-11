@@ -92,19 +92,94 @@ metadata:
 
 **`orchestration`, hunk 5 (hygiene and Policy 2).** Integrate's three lines, unchanged (the temporary folder; reads open; the held-out contents never read): they carry Policy 2 and DEC-820 and cover the words of W2-11's own two lines. Drop W2-11's two lines.
 
+## The size cap: the merged orchestration skill is 780 characters too long, and 21 tightenings bring it under (the helper's finding, 2026-11-11)
+The orchestration skill's body (the text after the front matter) is capped at **2,500 tokens**, counted as `ceil(characters / 4)`: at most **10,000 characters**. The cap is held twice: W1-35's case `test_w1_35_orchestration.py::TestOrchestrationSkillForm::test_the_body_is_within_2500_tokens` and the skill validator (`gov check`'s skill regression family, a hard block: `TestSkillRegressionGreen` goes red). Both sides grew the skill (integrate to 9,718 characters, W2-11 to 9,999, from a base of 8,922); after the hunk rules above the body is **10,780 characters (2,695 tokens), over the cap**. The other three skills fit (discovery 780, retrieval 905, test-design 1,342 tokens; description at most 60 tokens). W2-11's own round 1 stayed under by keeping detail in `briefs-and-returns.md`, but W1-35's rows (the corpus is the skill plus the templates the skill names, not the skill's own reference files) pin most of the skill's sentences, so the room has to come out of wording, never out of an idea.
+
+**After the nine hunks, apply the 21 tightenings below to the orchestration text** (each `-` fragment occurs exactly once, inside one line unless the fragment shows a line break; replace it by the `+` fragment; an empty `+` means delete the fragment). Each keeps its idea and its decision ids. The helper measured the result on a scratch clone: the body is **9,976 characters (2,494 tokens)**; W2-11's folder and W1-35's orchestration cases and `TestSkillRegressionGreen` pass except the seven copy cases named below. If you prefer other words, you may use them, but the body stays at or under 10,000 characters and **no idea is dropped**; three tightenings the helper tried were refused by the cases and are not to be used: removing the five retired `brief-*.md` names (`test_the_skill_names_the_five_brief_templates`), merging the two Stops lines (`test_dec_486_is_not_cited_for_the_stops_short_block`), removing the work-order bullet's "red" clause entirely.
+
+```diff
+-  The retired texts `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` and `brief-lead.md` are one-line pointers to these templates (DEC-1050).
++  The retired `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` and `brief-lead.md` point to these (DEC-1050).
+
+- ; then the verification, on the ticket's acceptance tests, the scoped selection and the builder tests, once (MR-3, DEC-968).
++ ; then one scoped verification (MR-3, DEC-968).
+
+- The merge queue: [integration-queue.md](integration-queue.md). A red nightly: [nightly-sheriff.md](nightly-sheriff.md). An Emergency: [incident-response.md](incident-response.md).
++ Merge queue: `integration-queue.md`; red nightly: `nightly-sheriff.md`; Emergency: `incident-response.md`.
+
+- nothing is left in another session's folders, and reading them is open as the next line states (DEC-386, DEC-537, DEC-820).
++ nothing is left in another session's folders (DEC-386, DEC-537).
+
+- the held-out material's contents, the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, DEC-1052).
+- - The held-out material's contents are never read, by any role; its file names may be seen (DEC-525, DEC-820).
+-
++ the held-out material's contents (its file names may be seen), the counterpart's work on the same ticket and the hidden half of an evaluation set (DEC-820, DEC-525, DEC-1052).
++
+
+- These rules are followed by hand: they are not enforced by a mechanism yet (DEC-537). The resource gate is not a command; the launcher does not refuse a launch without a model; `AUTH_REQUIRED` is a stop the orchestrator names, not a mechanism; and leads are not started through the launcher, which starts workers alone.
++ These rules are followed by hand, not enforced by a mechanism yet (DEC-537): the resource gate is not a command; the launcher does not refuse a launch without a model; `AUTH_REQUIRED` is a stop the orchestrator names; leads are not started through the launcher, which starts workers alone.
+
+- No fixed number of tickets in flight: the eligible tickets, the resource gate and the owner's usage limits decide, each time a slot could open; every countdown says how many and why (DEC-847).
++ No fixed number of tickets in flight: the resource gate and the owner's usage limits decide (DEC-847).
+
+- For a FULL ticket a second review is the last. After it only fail-open holes and losses of work are fixed (DEC-413 names silent changes to tests or ticket files); the rest are residuals (DEC-413).
++ For a FULL ticket a second review is the last: after it only fail-open holes and losses of work are fixed, the rest are residuals (DEC-413).
+
+- Each rule names the decision it follows; a rule that only an orchestrator's prompt held is cited with DEC-537, which ordered it stated here.
++ Each rule names its decision; a rule only an orchestrator's prompt held is cited with DEC-537, which ordered it stated here.
+
+- a fresh test designer and a fresh implementer at the same time, from the spec, neither reading the other's work (DEC-959 item 7); the tests checked red against the ticket's base for the stated reason;
++ a fresh test designer and a fresh implementer at the same time, neither reading the other's work (DEC-959 item 7); the tests checked red against the ticket's base;
+
+- A lead returns one of these forms: DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED (DEC-236), then `brief_gaps:` (DEC-943 item 1).
++ A lead returns one of these forms: DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED (DEC-236).
+
+- The model `<model>` is named on every launch (DEC-460); no launch sets a compaction threshold (DEC-838).
++ The model `<model>` is named on every launch (DEC-460).
+
+- Of every part marked not read it says that the part was not read, and of a share not measured that it was not measured. A status question is never answered from recall (CAP-28, DEC-541).
++ Of a part marked not read it says it was not read, and of a share not measured, that it was not measured. A status question is never answered from recall (CAP-28, DEC-541).
+
+- Detail: [briefs-and-returns.md](briefs-and-returns.md).
++ Detail: `briefs-and-returns.md`.
+
+- a full regression runs (DEC-536), which since DEC-968 is the next nightly's; a close runs the scoped set.
++ a full regression runs (DEC-536), since DEC-968 the next nightly's; a close runs the scoped set.
+
+-  and health (the doctor summary).
++  and health.
+
+- confidence is medium or higher (for a P2 also medium-low, where the owner has widened it as in DEC-416);
++ confidence is medium or higher (medium-low too for a P2, DEC-416);
+
+- a lead with the absolute path of the CLI, `<absolute path of the CLI>`, a worker through the launcher;
++ a lead with the CLI's absolute path `<absolute path of the CLI>`, a worker through the launcher;
+
+- ; leads are not started through the launcher, which starts workers alone.
++ ; leads are not started through the launcher.
+
+- ; the tests checked red against the ticket's base;
++ ; the tests checked red;
+
+- filled from the ticket and the project's facts file,
++ filled from the ticket and the facts file,
+```
+
+Measure with the read-only script `python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-11/tmp/body_tokens.py <file> [...]` (it prints the body's characters and tokens against the cap, and the description's): run it on the four kernel files before you commit; the orchestration file must say `OK`.
+
 ## Checks before you commit (all read-only; report each result)
 1. No `<<<<<<<`, `=======` or `>>>>>>>` line in any of the 12 files (Grep tool).
 2. The three places of each skill are one text: `cmp` of the kernel file with each `.rulesync` file, 8 comparisons, all silent.
-3. `git -C /home/usain/gov-os-worktrees/W2-11 diff --numstat HEAD` shows exactly the 12 paths. **Expected, per place:** discovery 2 added 0 removed; retrieval 2 and 0; orchestration 20 and 14; test-design 41 and 15 (12 files, 195 added, 87 removed in all). A different count is not an error by itself: say why (the hunk rules left no room, so look for an edit outside a hunk first).
-4. **Reference rendering (to compare, not to copy blindly):** the CTO's helper resolved the same hunks by the same rules into `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-11/tmp/resolved/{discovery,orchestration,retrieval,test-design}.md`. `diff` each of your four files against it: expect no difference. A difference is yours to explain in the return (a better reading, or a slip): say which.
-5. Versions: in the 12 files `version` and `metadata.version` are equal in every file (discovery 1.1.0, retrieval 1.1.0, test-design 1.3.0, orchestration 1.3.0). Read the four other skills with a version pair, `change`, `checkpoint`, `planning`, `audit` (kernel path): `version` equals `metadata.version` in each (they did on 2026-11-11); if one does not, name it in the return and **do not edit it** (it is outside your 12).
+3. `git -C /home/usain/gov-os-worktrees/W2-11 diff --numstat HEAD` shows exactly the 12 paths. **Expected, per place:** discovery 2 added 0 removed; retrieval 2 and 0; orchestration 27 and 22 (after the tightenings); test-design 41 and 15 (12 files, 216 added, 111 removed in all). A different count is not an error by itself: say why (the hunk rules left no room, so look for an edit outside a hunk first).
+4. **Reference rendering (to compare, not to copy blindly):** the CTO's helper resolved the same hunks by the same rules into `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-11/tmp/resolved/{discovery,orchestration,retrieval,test-design}.md` (`orchestration.md` there is after the 21 tightenings; `orchestration-untrimmed.md` is after the hunks alone). `diff` each of your four files against it: expect no difference. A difference is yours to explain in the return (a better reading, or a slip): say which.
+5. Size: the orchestration file's body is at most 10,000 characters (`body_tokens.py` says `OK` for the four kernel files). Versions: in the 12 files `version` and `metadata.version` are equal in every file (discovery 1.1.0, retrieval 1.1.0, test-design 1.3.0, orchestration 1.3.0). Read the four other skills with a version pair, `change`, `checkpoint`, `planning`, `audit` (kernel path): `version` equals `metadata.version` in each (they did on 2026-11-11); if one does not, name it in the return and **do not edit it** (it is outside your 12).
 6. The orchestrator role file (`template/governance/kernel/roles/orchestrator.md`, and the two `.rulesync/subagents/orchestrator.md`): Grep each for `ceiling` and `brief-lead`: expect no hit (they were clean on 2026-11-11). Report the result; edit nothing (the role file is not one of your 12).
 7. The brief templates are untouched: `git -C /home/usain/gov-os-worktrees/W2-11 diff --quiet HEAD -- template/governance/kernel/templates` exits 0.
 
 ## The generated copies you list for the CTO (step 6: read-only, report only)
 Run `python3 -I /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-11/tmp/copies_diff.py /home/usain/gov-os-worktrees/W2-11` **after** the commit (it reads the tree, writes nothing). It prints, for every kernel skill, whether the `.claude/skills/<name>/SKILL.md` copy carries the source's body and version. **Expected after your commit (the helper's measure on a scratch clone): exactly four copies differ:** `.claude/skills/discovery/SKILL.md` and `.claude/skills/retrieval/SKILL.md` (copy `metadata.version` 1.0.0 against source 1.1.0), `.claude/skills/orchestration/SKILL.md` and `.claude/skills/test-design/SKILL.md` (body differs; the copy carries no `metadata` block, against sources at 1.3.0). The other skills' copies (`audit`, `change`, `checkpoint`, `planning`, `qa-review`, `adopt`) and the orchestration and test-design reference files agree. Quote the script's lines in `evidence` and say whether they match; any other copy that differs, or the `.claude/agents/orchestrator.md` copy, goes in `discoveries`.
 
-**Who regenerates them (the CTO's decision; the helper's reading, put in your return as `unresolved` so the CTO sees it with your list):** the copies are class (b) control paths (`class-rules.yaml`, row `agents-skills-kernel`: `.claude/skills/**`, `.claude/agents/**` and `template/governance/kernel/**`; the `.rulesync/**` sources are row `rulesync-other`, (b)), so the change is an ACT with the owner's yes (DEC-1112 (3), DEC-315). Round 1's 16 copies were the CTO's hand run of rulesync with the owner's approval by day (`c895bb6283a6`, DEC-992 P-W2-11-5 (b), DEC-991); since then the copies went by operator-applied class (b) ACTs (ACT-CLAUDE-COPIES-1 to 3, for example `2059048f2eb4`, the orchestration and test-design copies, Approved-by: owner). **The recommendation is one copies ACT, after round 2's text is final** (the lead's product-spec batch changes these skills again; two regenerations would double the ACT). Until then the four copies are stale by design, and the cases that compare a copy with its source (`test_every_copy_carries_the_kernel_skills_body[test-design, orchestration]`, `test_the_skill_carries_one_version_in_all_four_places[discovery, orchestration, retrieval, test-design]`, `test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]`) are red: the helper measured exactly these seven reds in the skill and supersession files on a scratch clone with your text; the other reds there are the five brief templates' cases, which the test designer retires (DEC-1137 (1)).
+**Who regenerates them (the CTO's decision; the helper's reading, put in your return as `unresolved` so the CTO sees it with your list):** the copies are class (b) control paths (`class-rules.yaml`, row `agents-skills-kernel`: `.claude/skills/**`, `.claude/agents/**` and `template/governance/kernel/**`; the `.rulesync/**` sources are row `rulesync-other`, (b)), so the change is an ACT with the owner's yes (DEC-1112 (3), DEC-315). Round 1's 16 copies were the CTO's hand run of rulesync with the owner's approval by day (`c895bb6283a6`, DEC-992 P-W2-11-5 (b), DEC-991); since then the copies went by operator-applied class (b) ACTs (ACT-CLAUDE-COPIES-1 to 3, for example `2059048f2eb4`, the orchestration and test-design copies, Approved-by: owner). **The recommendation is one copies ACT, after round 2's text is final** (the lead's product-spec batch changes these skills again; two regenerations would double the ACT). Until then the four copies are stale by design, and the cases that compare a copy with its source (`test_every_copy_carries_the_kernel_skills_body[test-design, orchestration]`, `test_the_skill_carries_one_version_in_all_four_places[discovery, orchestration, retrieval, test-design]`, `test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]`) are red: the helper measured exactly these seven reds in the skill and supersession files on a scratch clone with this text (the two skill-and-supersession files plus W1-35's orchestration cases and `TestSkillRegressionGreen` otherwise pass); the other reds there are the five brief templates' cases, which the test designer retires (DEC-1137 (1)).
 
 ## Commit (one commit; never amend, rebase, reset, push or merge)
 Hooks check first: `test ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.git/hooks/pre-commit`. Then:
@@ -115,9 +190,9 @@ Then: `git -C /home/usain/gov-os-worktrees/W2-11 status --short` empty; `git -C 
 
 ## Rules
 - Step 0, the sandbox check, first and reported first: `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-k7hz','w').write('x')"` must fail; `echo sandbox-trial | git hash-object -w --stdin` and `git update-index --refresh` must work.
-- No test run (the helper ran W2-11's folder on a scratch clone with this text; the lead re-runs after the test designer). No installs. Never the full suite. Never `git merge`, `git stash`, push, or a commit on another branch.
+- No test run, except what this paragraph allows: the helper ran W2-11's folder, W1-35's orchestration cases and `TestSkillRegressionGreen` on a scratch clone with this text, and the lead re-runs after the test designer. You may run `gov accept DAEO-k7hz --root /home/usain/gov-os-worktrees/W2-11` once at the end, results only (the five brief templates' cases are red until the designer retires them, and the seven copy cases until the copies ACT; name any other red), and `python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/w2-11/tmp/body_tokens.py` as above. Nothing else heavy. No installs. Never the full suite. Never `git merge`, `git stash`, push, or a commit on another branch.
 - A refusal is taken, never routed round; a false refusal is worked round at once with an equivalent form (named in your return), never a form chosen to pass a true refusal (DEC-849, DEC-1040). One simple command per Bash call; the Edit and Write tools for file changes (no here-documents); no `cd ... &&` chains (use `git -C <dir>`).
 - The hidden-half rule: never open anything under `~/gov-os-eval/` or `~/gov-os-runs/`, or any folder named `hidden`, `memory-verdict` or `memory-verdict-2`.
 - `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "<question>"` is optional (at most twice, then once more in different words if it did not answer); say whether you used it. Policy 2: reads are open; only secrets, the held-out material's contents, the counterpart's work on the ticket and an evaluation set's hidden half are refused.
 - Refused twice for the same call: stop and say so.
-- Estimate: 20 to 30 minutes, about 45 tool calls, about $3 (E). Return the twelve fields as labelled lines first (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action), short; any payload after them. `evidence` holds the commit (12 digits, with its trailers), the nine hunk counts, the check results (1 to 7), the `copies_diff.py` lines, and the form you used to capture the three versions. `tests`: none run, and why. `discoveries`: any difference from the reference rendering, any `.claude` copy beyond the four. `unresolved`: the copies ACT's route (the CTO decides), the list of stale copies.
+- Estimate: 30 to 40 minutes, about 70 tool calls, about $4 (E). Return the twelve fields as labelled lines first (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action), short; any payload after them. `evidence` holds the commit (12 digits, with its trailers), the nine hunk counts, the 21 tightenings (applied as given, or each difference and why), the check results (1 to 7), the `copies_diff.py` lines, and the form you used to capture the three versions. `tests`: the `gov accept` counts and the names of its reds (or why you did not run it), and the `body_tokens.py` lines. `discoveries`: any difference from the reference rendering, any `.claude` copy beyond the four. `unresolved`: the copies ACT's route (the CTO decides), the list of stale copies.

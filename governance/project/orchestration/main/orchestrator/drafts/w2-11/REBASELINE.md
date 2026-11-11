@@ -79,3 +79,12 @@ Cases not under a ticket line (the README's list) that read a retired brief, and
 
 Left alone: `test_w2_11_brief_gaps.py` (it reads the project's common brief, not a template), `test_w2_11_skills.py` (no brief
 file), and everything under `tests/acceptance/W1-35/` (W2-128 and the designer's pre-merge commit settled it).
+
+## 4. Correction, 2026-11-11 about 21:32 UTC (second helper): the numbers in section 1 and section 3 are the README's OLD numbers
+
+The ticket's line numbers after DEC-1137 (success-5 removed) are: README success-6 is now **S5**, success-7 **S6**,
+success-8 **S7**, success-9 **S8**, success-10 **S9**, success-11 **S10**, success-12 **S11**, success-13 **S12**,
+success-14 to 16 **S13 to S15**, and the approvals line **S16**; the DEC-866 failure line is **F2**, the permission
+field line **F1**. `gov accept` reads the n-th success and n-th failure line of the ticket by number, so the README map
+must be renumbered in the same commit as the cases (`briefs/W2-11-A1-rebaseline.md`, step 3, has the table). Nothing
+else in this file changes.

@@ -1,0 +1,17 @@
+{
+ "ticket": "W2-40",
+ "task": "DAEO-6ox0",
+ "branch": "w2/W2-40",
+ "commit": "29753c768defc7703085507523b8ab82408123a5",
+ "requested_at": "2026-11-11 21:21:03",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-11T21:21:03.170806",
+ "reason": "red",
+ "failing": [
+  "tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace",
+  "tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace"
+ ],
+ "log": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/log/20261111-212103-220335",
+ "tested_on": "77dfff06c3b401e9c92f00499fc46aa45f3cb388",
+ "ejected_at": "2026-11-11 21:38:48"
+}

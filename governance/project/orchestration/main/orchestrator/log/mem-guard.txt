@@ -26,3 +26,10 @@
 2026-11-11 20:59:45 level back to 0 (rg 0, available 15264 MB)
 2026-11-11 21:09:56 level 1: 0 rg, available 16181 MB, stall 1.5%
 2026-11-11 21:10:00 level back to 0 (rg 0, available 15920 MB)
+2026-11-11 21:27:10 level 1: 0 rg, available 16421 MB, stall 1.1%
+2026-11-11 21:27:12 level back to 0 (rg 0, available 16002 MB)
+2026-11-11 21:36:11 level back to 0 (rg 0, available 18117 MB)
+2026-11-11 21:37:10 level 1: 0 rg, available 17968 MB, stall 1.8%
+2026-11-11 21:37:17 level back to 0 (rg 0, available 18293 MB)
+2026-11-11 21:38:21 level back to 0 (rg 0, available 18294 MB)
+2026-11-11 21:38:55 level back to 0 (rg 0, available 18232 MB)
