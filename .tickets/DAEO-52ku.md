@@ -1,6 +1,6 @@
 ---
 id: DAEO-52ku
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-09T18:55:59Z
