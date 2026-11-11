@@ -82,7 +82,13 @@ the diff for schema versions, `CREATE TABLE`, the semantic pin and the embedder 
 2. **The staged pair rehearsed with the candidate pin (review F4):** `drafts/repin-w5/rehearse_w2141.sh`, a copy of
    `drafts/w2-141-rebase/rehearse.sh` with `PIN` the candidate pin's interpreter and its base under
    `/tmp/gov-os-emg-repin5/w141` (the original writes to `~/gov-os-runs/`, which this night's rules close). Result in
-   `drafts/repin-w5/w2141-rehearsal.log` (see the package).
+   `drafts/repin-w5/w2141-rehearsal.log` (02:12 GMT, 39 min): sets_globs 573/0 and walls 331/0 before and after; replay of
+   48 h, 21,919 unique calls: under DAEO-sdxk 0 changed; under DAEO-xwro 31 allow to deny, all W2-141's S1/S2, 0 deny to
+   allow; latency median 133 ms. **Location artifacts:** under `/tmp` the guard treats the clone as scratch, so 9 cases
+   are red before and after alike (guard4 sets W8; 6 of test_guard_fix_4: the catastrophic-rm cases, the logged
+   refusals, one planted row; test_live_hook's logged-refusals replay; g14's test_w2_91_tests_today): the differential is
+   the evidence (the same 9 before and after; the pair adds only the four g14 cases). The rehearsal's own count says
+   "failures: 2" (guard4, before and after). The same suites pass in the main tree (part B).
 3. **F1 and F3 folded:** the text is in `drafts/repin-w5/W2-141-README-fold.md` (the README is outside this helper's paths:
    the CTO applies it). F2 (the four cases named) is in the same file.
 4. **D1 (a `git diff <rev>:<path> <rev>:<path>` falsely refused):** still in the candidate's `gov.guard.reads`

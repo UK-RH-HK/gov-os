@@ -159,3 +159,74 @@ after live hook, reads: 1 failed, 83 passed, 1 skipped in 18.79s
 median ms per call: 133.1
 
 == replay_after: the same calls, W2-141's staged pair; before against after (01:57:50)
+replay after: {'calls in the window, to the start': 23100, 'duplicates': 1132, 'skipped: names the real sets root in a form not rewritten': 49, 'unique judged': 21919, 'calls naming the new globs': 91} {'allow': 21820, 'deny': 98, 'ask': 1}
+replay after-xwro: {'calls in the window, to the start': 23100, 'duplicates': 1132, 'skipped: names the real sets root in a form not rewritten': 49, 'unique judged': 21919, 'calls naming the new globs': 91} {'allow': 21788, 'deny': 131}
+compare before -> after (exit 0):
+window 2026-11-09T01:33:59 .. 2026-11-11T01:33:59; calls judged before 21919, after 21919, in both 21919
+answers: {'allow->allow': 21820, 'ask->ask': 1, 'deny->deny': 98} ; calls naming the new globs: 91
+differences: 0; naming the new globs: 0; other: 0
+compare before-xwro -> after-xwro (exit 1):
+window 2026-11-09T01:33:59 .. 2026-11-11T01:33:59; calls judged before 21919, after 21919, in both 21919
+answers: {'allow->allow': 21788, 'allow->deny': 31, 'deny->deny': 100} ; calls naming the new globs: 91
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-20/tests/acceptance ^#+ .*[Pp]ort\b|the port | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-141 deselect|items\[:\]|pytest_collection_modifyitems|GOV_[A-Z_]*ALL | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rhno --exclude-dir=W2-150 --exclude-dir=__pycache__ "from gov.guard.reads import [^#]*\|reads\ | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-20 gov-os-rebuild|watch\.LOCK|_default_lock|GOV_REBUILD_LOCK | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-149-sgx/tests deselect|pytest_collection_modifyitems | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150 runs_root|runs\.root|ROOT_NAME | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-20/tests watch\.LOCK|gov-os-rebuild\.lock|FROM_DEFAULT|"default" | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-153 launch_now | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-92-d6 register_statements|_entry_statements | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-56 daemon_dir|DAEMON_BASE|gov-cbm|CODEINTEL_DAEMON_BASE | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-152 be3e204355c0|TEMPLATES-APPROVAL | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150 repo\.subprocess|loader\.subprocess|_commit_git|repo, "git"|repo | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150/tests (setattr|patch)\(.*(fingerprint|of_commit|_select|close\.s | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rn --exclude-dir=W2-150 "fingerprint\.\w\+\|from gov.close.fingerprint import\|from gov.close  | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-152 facts\.schema|FormatChecker|format_checker | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-55-f2 STATUS_RELATION_UNMARKED | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150/tests fingerprint|close\.select|_match_pattern|close import sele | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-153 adapters\.portability|portability\.main | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-152 new_since|facts\.schema | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rn --exclude-dir=W2-150 "setattr(reads\|setattr(decide\|setattr(runs\|reads, \"\|decide, \"\|r | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-56 gov-cbm|DAEMON_BASE|daemon_dir|CBM_RUNTIME_DIR | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rn --exclude-dir=W2-56 "build_lead_settings" /home/usain/gov-os-worktrees/W2-56-f/src /home/us | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | . deselect | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150/tests (repo|fingerprint|_select|select)[,.]\s*["']?(git|_git|mat | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rln --exclude-dir=W2-150 --exclude-dir=__pycache__ "util/gitenv\|util/frontmatter\|util/digest | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Bash | grep -rn --exclude-dir=W2-150 "role_paths\.\(WORKTREES\|changed\|engineer_side\|linked_tests\|LINK_C | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-20/tests "_run"|launcher\._run|_admit_start|_admit_lead|StartLock | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-149-sgx RULES_OUT_BASE|RULES_WALL_S|def rule_run|indep-briefs/sgx1 | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150/tests loader\.os\b|loader, "os" | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150 role_paths | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+  allow->deny [OTHER] engineer/None Grep | /home/usain/gov-os-worktrees/W2-150 _GIT_VARIABLES|close\.repo import|from gov\.close import repo|cl | after: the search can reach tests/acceptance/W2-141/, the ticket's 
+differences: 31; naming the new globs: 0; other: 31
+
+== root_back (02:12:44)
+sets block root: "~/gov-os-eval"
+
+== live_after: the live files against before (02:12:44)
+74f8dbea4761de37628305e5d58125641ae39a409a7ed0a2babb379b1ceca5b8  .claude/hooks/pretooluse.py
+5407aade941734c086aefefe5372e715262aedc1805380f9427b068eb2444f07  .claude/hooks/role_reads.py
+bb246a21735e70ad0b3a8213102a942bfcf1688838977aae618052c2f1f54732  .claude/hooks/bash_writes.py
+fb52ab2dc7568d24234b755abc7fd6ad7b21743ca3d01b572ef7e9dc40fc2d95  governance/project/path-map.yaml
+1d724dcb0a8b5b94f2b4fba1d8a47674033502a0a4a2efbc7f769afcb078aba4  governance/project/held-out.yaml
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+90b943aef8be33f6e282dbd8527382683c6c3cfab6831e620daf4f7047d83c6e  governance/project/orchestration/tools/indep_launch.py
+aee245ce7a8034565d9c304820ece8091946b1d9898d34c20a3fb38f93bd9267  governance/project/indep-walls/CLAUDE.md.tmpl
+65298d3468484515ca18e2dd3db5e6eb867221f1d9d6318e5e07998a2a5aef49  governance/project/indep-walls/README.md
+ddd84ae2591061327e1730517ffbce987be7a272a72311bb3b6e79e4bf2401a7  governance/project/indep-walls/kinds.yaml
+9b85b9a604d00e5c5aadffedbbb3ff93e51cebe641c73c11dc248374278a609b  governance/project/indep-walls/settings.json.tmpl
+e8395088167ed9bc6d01d43e1c6504341a2f06db752d4d3aef969c14718b8537  governance/project/indep-walls/tree-exclude.txt
+95638d7d9edb5eb67035248e928652a737e783f39b5860bac93b4958073343d3  governance/project/indep-walls/wall_hook.py
+ff5321041613ebfdf7a54029cda8e5ecb4bd9ef5d58a92547b8d5c99c0a55308  .gov-runtime/scratch/orchestrator/tools/guard4_check.py
+15d405ce15952fe18798dc1b5aa2fb678b016a73ea0e7484e2e2649be1ecf2dc  .gov-runtime/scratch/orchestrator/drafts/indep-walls/walls_check.py
+e7e1c4ce66d66b39eea6c2285cf746e5ae62b65cd6ba89e3a991f04fbeb5ea22  docs/changes/W2-141-hook/pretooluse.py
+b1bc1745f80c74ff998314d66e8b1e03046f0d2e671fedf44cdf8ba102e9a74c  docs/changes/W2-141-hook/role_reads.py
+8f1a3ef183f2953fcda15cbe482294707be06e02a49f6d2658369b5132762c6b  .claude/settings.json
+d715292711a2c38fe7ea3830df3c1000b001c7348876f74902fd683981d98624  .claude/settings.local.json
+2a1c8469318952bb444164114468845742c0f0facb951c5b9cd8bfef21593328  /home/usain/.claude/settings.json
+live: unchanged
+this rehearsal's hook runs logged in /tmp/gov-os-emg-repin5/w141/calls: 92560 lines
+the live call log: lines from this rehearsal's checks (their session names, or a run clone) since its start: 0
+
+rehearsal done: 2026-11-11 02:12:44 GMT, failures: 2

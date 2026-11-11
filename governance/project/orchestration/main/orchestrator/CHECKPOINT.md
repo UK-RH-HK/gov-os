@@ -1,19 +1,13 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 01:20 UTC: session `8ddb8b14`; THE NIGHT TO THE RE-PIN (DEC-1125 (3)); next free id DEC-1126
-- **Owner asleep; no pushes to the owner before 07:30 unless P1** (DEC-936 (1)). The 09:30 digest (cron 7355d120,
-  fires ~09:32) carries: the audit's findings and fixes, a ready-for-re-pin verdict, ACT-REPIN-W5 and the owner's
-  steps, the closes' state, anything else for the owner.
-- **Done tonight:** D-10 run 2 reported; DEC-1125 recorded `493d485b6` (latency a named red; memory audit weekly,
-  DEC-1101 (1) changed, DEC-1097 (4) folded; the night); W2-155 filed `DAEO-ar89` (P4); rows 116-118; stand-by ended.
-- **Eight Sonnet helpers running (01:18), briefs `briefs/NIGHT-*.md`, none commits; the CTO commits their paths:**
-  re-pin ACT (`NIGHT-repin-act.md` → `packages/ACT-REPIN-W5.md`, `pin/*W5*`, `pin/*7*`); closes (`LIFT-CLOSES-1.md`);
-  audit (a) decisions (writes DECISIONS-IN-FORCE + DECIDED-NOT-DONE: the CTO keeps off both until it returns), (b)
-  plan (P1-PLAN, FORECAST-W2-3), (c) tickets (`.tickets/*` open/in-progress), (d) tools (EMERGENCY-TOOLS-1, tickets
-  W2-156..169), (e) memory audit tool (`MEMORY-AUDIT-1`, tickets W2-170..179), (f) checks (`AUDIT-NIGHT-1/f-checks.md`).
-  Reports in `packages/AUDIT-NIGHT-1/`. **`src/` frozen tonight** (the candidate's wheel).
-- **Then:** an Opus C3 review of ACT-REPIN-W5 (fixed form, JUDGEMENT.md); `gov plan` ready lists several batches deep
-  (`packages/READY-AFTER-LIFT-1.md`); commit everything; write the digest text; checkpoint; watchers armed.
+## RESUME HERE — 2026-11-11 02:40 UTC: session `8ddb8b14`; THE OWNER'S RE-PIN IS NEXT; HOLD WRITTEN; next free id DEC-1126
+- **Hold:** `log/act-in-progress.txt` (ACT-REPIN-W5): **no commit on integrate until the owner says "done"** (review
+  F1). Stand-by note written; renew it when woken (it expires after 2 h; the dead-man's wake comes at 60 min).
+- **09:30 digest** (cron 7355d120, ~09:32): send `drafts/night-1111/DIGEST-0930.md` as written (update usage and any
+  change since). No push to the owner before 07:30 unless P1 (DEC-936 (1)).
+- **The night (DEC-1125 (3)) is done:** ACT-REPIN-W5 READY (`f63c1d9b7`); LIFT-CLOSES-1 (5 ready: W2-96, 122, 123,
+  126, 92); AUDIT-NIGHT-1 a-f, c2; FORECAST-W2-3; MEMORY-AUDIT-1 (W2-170..173); W2-156..160; READY-AFTER-LIFT-1;
+  rows 116-126. START-NEXT-SESSION §000 has the after-"done" order.
 
 ## RESUME HERE (history) — 2026-11-10 18:15 UTC: session `412a4e37` hands over during D-10 run 1 (DEC-1122 (2)); next free id DEC-1123
 - **D-10 run 1 RUNNING since 18:10:09 UTC** (the records' "after 18:20" is wrong: correct it in the next commit), head
