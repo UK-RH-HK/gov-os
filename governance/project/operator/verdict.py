@@ -7,7 +7,8 @@ A probe record may hold a fenced block opened by ```verdict, containing JSON:
 ready(text) returns (True|False, reasons) for a record with such a block, or (None, []) when it has none (the caller
 then keeps its older reading). A finding blocks when it is in scope, reachable in ordinary work and fails open or loses
 work; a malformed block, an unknown value or a finding missing a field blocks (fail closed). A KPI line marked fail
-with no blocking finding does not block on its own: the moderator's triage put its findings out of the round."""
+blocks on its own, whatever its findings (DEC-1131 (3): one bar, READY is judged against the KPI lines); a KPI line
+whose verdict is neither pass nor fail blocks (fail closed)."""
 import json
 import re
 
@@ -29,6 +30,10 @@ def ready(text):
         return False, ["the verdict block is not the structured form (fail closed)"]
     reasons = []
     for k in kpis:
+        if isinstance(k, dict) and k.get("verdict") == "fail":
+            reasons.append(f"{k.get('kpi')}: the KPI line is marked fail")
+        elif isinstance(k, dict) and k.get("verdict") != "pass":
+            reasons.append(f"{k.get('kpi')}: the KPI line's verdict is neither pass nor fail (fail closed)")
         for f in (k.get("findings") or []) if isinstance(k, dict) else [None]:
             if not isinstance(f, dict) or f.get("scope") not in SCOPES or f.get("ordinary_work") not in ORDINARY \
                     or f.get("consequence") not in CONSEQ:
