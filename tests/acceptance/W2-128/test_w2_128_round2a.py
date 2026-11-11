@@ -13,7 +13,8 @@ expected); the guards also allow round 2b's F2 and F4 lines. Round 2b's new case
 Revised for W2-11 (DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): the read rule is found where it now
 stands and may name the integration branch generically; the versions are held raised above integrate's base, not
 pinned to 1.2.0; the front-matter guards also allow ``metadata.version`` equal to ``version``; the test-design
-guard's section half reads the skill at W2-128's own merge, as W2-11 restructures its sections. Nothing else lowered.
+guard's section half reads the skill at W2-128's own merge, as W2-11 restructures its sections; so do the orchestration
+guard's section and unit halves, as W2-11 rewrites units across its sections. Nothing else lowered.
 """
 
 from __future__ import annotations
@@ -373,7 +374,11 @@ def test_s11_guard_orchestration_skill_changes_only_the_named_parts():
     old, new = baseline(ORCHESTRATION), now(ORCHESTRATION)
     assert _front_without_version(new) == _front_without_version(old), \
         "the orchestration skill's front matter changed beyond its version"
-    old_parts, new_parts = sections(s.split(old)[1]), sections(s.split(new)[1])
+    # Revised for W2-11 (Rewrite-Reason: DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): W2-11 rewrites
+    # units across the orchestration skill's sections (its S2, S3, S5, S6, S10), so, as for the test-design guard, the
+    # sections and units are read as W2-128 merged them (``w2_128_merge``); the front matter above still reads now.
+    merged = baseline(ORCHESTRATION, w2_128_merge(ORCHESTRATION))
+    old_parts, new_parts = sections(s.split(old)[1]), sections(s.split(merged)[1])
     assert [h for h, _ in new_parts] == [h for h, _ in old_parts], "the orchestration skill's sections changed"
     wrong = []
     for (heading, a), (_, b) in zip(old_parts, new_parts):
