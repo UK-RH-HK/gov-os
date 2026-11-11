@@ -9,7 +9,7 @@ import pytest
 
 from gov.memaudit import preflight
 
-from .conftest import AUDIT, UNIQUE, question
+from .conftest import AUDIT, UNIQUE
 
 CODES = list(preflight.CODES)
 

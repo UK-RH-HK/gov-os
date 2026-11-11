@@ -17,7 +17,6 @@ from gov.memaudit.preflight import MIN_FILES, _load, first_path
 SECTION = "## Questions"
 HEADING = re.compile(r"#{1,6}(\s|$)")
 LEAD_ID = re.compile(r"(q[0-9]{2})(?![0-9A-Za-z_-])")
-VERDICTS = ("accept", "revise", "reject")
 NOLINE, UNFIT = "NOLINE", "UNFIT"
 
 
@@ -47,19 +46,19 @@ def _codes(field: str) -> list[str]:
 
 def verdict(rows: list | None) -> tuple[bool, list[str]]:
     """``(kept, drop codes)`` for one question's lines: kept only for exactly one fitting line whose verdict is exactly
-    ``accept``; a missing line is ``NOLINE``; a line that does not fit the checker brief's form (or two lines) is
-    ``UNFIT``; any other is counted by its codes."""
+    ``accept``; a missing line is ``NOLINE``; a line that does not fit the checker brief's form
+    ``<id> | <verdict> | <codes> | also: <...> | <sentence>`` (or two lines) is ``UNFIT``; any other is counted by its
+    codes (none when its codes field is ``-``)."""
     if not rows:
         return False, [NOLINE]
     if len(rows) != 1:
         return False, [UNFIT]
     f = rows[0]
-    if len(f) != 5 or f[0] != f[0].strip() or f[1] not in VERDICTS or not f[3].startswith("also:"):
+    if len(f) != 5 or not LEAD_ID.fullmatch(f[0]) or not f[3].startswith("also:"):
         return False, [UNFIT]
     if f[1] == "accept":
         return True, []
-    codes = _codes(f[2])
-    return (False, codes) if codes else (False, [UNFIT])
+    return False, _codes(f[2])
 
 
 def apply(sets_root, audit) -> tuple[str, dict]:

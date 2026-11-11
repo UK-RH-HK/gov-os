@@ -18,10 +18,6 @@ class UsageError(Exception):
     """A flag or value refused, or the sets root unusable: exit 4. The message is never printed."""
 
 
-class LineRefused(Exception):
-    """``say`` refused a line: the subcommand stops with exit 4 (the refusal is already printed)."""
-
-
 class GitError(Exception):
     """git could not answer: the subcommand ends ``ERROR: GitError``, exit 4."""
 

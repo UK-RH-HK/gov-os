@@ -12,7 +12,7 @@ import sys
 import warnings
 
 from gov.memaudit import EXIT
-from gov.memaudit.common import LineRefused, UsageError
+from gov.memaudit.common import UsageError
 from gov.memaudit.say import say
 
 
@@ -24,8 +24,7 @@ class _Parser(argparse.ArgumentParser):
 
     def _print_message(self, message, file=None):
         for line in (message or "").rstrip("\n").splitlines():
-            if say(line)[0] != "ok":
-                raise LineRefused()
+            say(line)
 
 
 def _common(sp):
@@ -87,13 +86,10 @@ def main(argv=None) -> int:
         root = args.sets_root
         word, out = _run(args)
         for line in out:
-            if say(line, root)[0] != "ok":
-                return EXIT["usage"]
+            say(line, root)  # a refused line ends the process with exit 4
         return EXIT[word]
-    except SystemExit as e:  # --help: argparse's own exit 0
-        return e.code if isinstance(e.code, int) and e.code == 0 else EXIT["usage"]
-    except LineRefused:
-        return EXIT["usage"]
+    except SystemExit as e:  # --help: argparse's own exit 0; a line say refused: 4
+        return 0 if e.code == 0 else EXIT["usage"]
     except BaseException as e:  # noqa: BLE001: one line, the class only; no traceback, no text (F1)
         say(f"ERROR: {type(e).__name__}", root, err=True)
         return EXIT["usage"]

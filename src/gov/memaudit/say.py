@@ -37,12 +37,11 @@ def _write(text: str, err: bool) -> None:
 
 
 def say(line, sets_root=None, *, err: bool = False) -> tuple[str, dict]:
-    """Print the one ``line`` (on standard error too when ``err``); ``("ok", {"printed": 1, "refused": 0})``. A line
-    that names a sets-root folder is not printed: the refusal is printed on both streams and the word is ``usage``
-    (the subcommand's exit 4)."""
+    """Print the one ``line`` (on standard error too when ``err``) and return ``("ok", {"printed": 1})``. A line that
+    names a sets-root folder is not printed: the refusal is printed on both streams and the process exits 4."""
     text = str(line)
     if "\n" in text or "\r" in text or refused(text, sets_root):
         _write(REFUSAL, True)
-        return "usage", {"printed": 0, "refused": 1}
+        raise SystemExit(4)
     _write(text, err)
-    return "ok", {"printed": 1, "refused": 0}
+    return "ok", {"printed": 1}

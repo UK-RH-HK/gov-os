@@ -12,7 +12,6 @@ import hashlib
 import json
 import os
 import random
-import re
 from fnmatch import fnmatchcase
 from pathlib import Path
 

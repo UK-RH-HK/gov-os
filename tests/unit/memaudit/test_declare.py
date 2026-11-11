@@ -147,14 +147,11 @@ def test_a_different_entry_or_no_block_is_dc_map(plant):
     assert not (plant.run_dir / "USED").exists()
 
 
-def test_an_empty_block_takes_the_entry():
-    code, new = None, None
-    import tempfile
-    with tempfile.TemporaryDirectory() as d:
-        root = Path(d)
-        (root / "governance/project").mkdir(parents=True)
-        (root / "governance/project/path-map.yaml").write_text("evaluation_sets:\n# end\nnext: 1\n")
-        code, new = declare.plan_map({"map": root / "governance/project/path-map.yaml"}, AUDIT)
+def test_an_empty_block_takes_the_entry(tmp_path):
+    root = Path(tmp_path)
+    (root / "governance/project").mkdir(parents=True)
+    (root / "governance/project/path-map.yaml").write_text("evaluation_sets:\n# end\nnext: 1\n")
+    code, new = declare.plan_map({"map": root / "governance/project/path-map.yaml"}, AUDIT)
     assert code is None and new.startswith("evaluation_sets:\n  memory-audit-") and new.endswith("# end\nnext: 1\n")
 
 

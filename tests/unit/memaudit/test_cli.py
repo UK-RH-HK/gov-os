@@ -53,12 +53,22 @@ def test_an_unresolved_commit_exits_4(plant):
 
 
 def test_say_refuses_a_line_naming_a_sets_root_folder(tmp_path, capsys):
-    for line in (f"{tmp_path}/x", "a fixtures/b", "the runs/ folder", "indep-walls/x", "hidden"):
-        assert say(line, tmp_path) == ("usage", {"printed": 0, "refused": 1})
+    for line in (f"{tmp_path}/x", "a fixtures/b", "the runs/ folder", "indep-walls/x", "hidden", "two\nlines"):
+        with pytest.raises(SystemExit) as e:
+            say(line, tmp_path)
+        assert e.value.code == 4
     out = capsys.readouterr()
-    assert out.out.splitlines() == [REFUSAL] * 5 and out.err.splitlines() == [REFUSAL] * 5
-    assert say("PF-COUNT ok", tmp_path) == ("ok", {"printed": 1, "refused": 0})
+    assert out.out.splitlines() == [REFUSAL] * 6 and out.err.splitlines() == [REFUSAL] * 6
+    assert say("PF-COUNT ok", tmp_path) == ("ok", {"printed": 1})
     assert capsys.readouterr().out == "PF-COUNT ok\n"
+
+
+def test_a_line_say_refuses_in_a_subcommand_exits_4(plant, monkeypatch, capsys):
+    from gov.memaudit import __main__ as cli, drops
+    monkeypatch.setattr(drops, "lines", lambda word, counts: ["runs/ named"])
+    plant.notes()
+    assert cli.main(plant.void_args()) == 4
+    assert capsys.readouterr().out == REFUSAL + "\n"
 
 
 def test_an_unexpected_error_is_one_line_with_its_class_only(plant, monkeypatch, capsys):

@@ -106,5 +106,8 @@ def test_read_notes_splits_the_checker_form():
     assert list(rows) == ["q01"] and rows["q01"][0][4] == "s | with a bar"
     assert drops.verdict(rows["q01"]) == (True, [])
     assert drops.verdict(None) == (False, ["NOLINE"])
-    assert drops.verdict([["q01", "revise", "-", "also: none", "s"]]) == (False, ["UNFIT"])
+    assert drops.verdict([["q01", "revise", "-", "also: none", "s"]]) == (False, [])
+    assert drops.verdict([["q01", "Accept", "-", "also: none", "s"]]) == (False, [])
+    assert drops.verdict([["q01", "accept", "-", "none", "s"]]) == (False, ["UNFIT"])
+    assert drops.verdict([["q01", "accept", "-", "also: none", "s"]] * 2) == (False, ["UNFIT"])
     assert drops.verdict([["q01", "reject", "R1-WRONG, R8-EVAL", "also: none", "s"]]) == (False, ["R1-WRONG", "R8-EVAL"])
