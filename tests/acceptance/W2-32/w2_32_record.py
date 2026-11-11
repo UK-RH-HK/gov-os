@@ -7,12 +7,15 @@ is judged the same way each time:
 - **The noise band (F1)** of a figure is the range of its counts over the baseline's repeated runs (W2-15a's measure
   1: the same commit, set and part, run more than once). A round **lowers a figure beyond its noise band** when its
   count is below the band's lowest; that round's improvement is reverted.
-- **S9:** after a round, hit@5 below 85 % is the next round while fewer than two rounds have run, and the owner's
-  decision after two (DEC-954 Q9e); at 85 % or above but under 95 %, with room for improvement found, memory is not
-  closed and goes to the owner; at 95 % or above, nothing.
+- **S9** (DEC-1083 (2), re-worded by DEC-1097 (1)(d) and DEC-1129 (1)): K9's memory line is judged once, on the
+  declared configuration, on the verdict set, by the figure **right end to end** and the **wrong claims**: right at
+  least 85 % with wrong claims at most 5 % is met (target 95 %); below 85 %, or wrong claims above 5 %, is brought to
+  the owner by the memory audit ("owner told"). hit@5 is reported beside the end-to-end figure and never judged. No
+  "next round" and no "owner decides after two rounds" any more.
 
 Run it on records: ``python3 w2_32_record.py <baseline records folder> [<round record.json> ...]`` prints each
-figure's band and, per round in the order given, F1's verdict and S9's state.
+figure's band and, per round in the order given, F1's verdict, hit@5 (reported) and S9's state, S9 being judged on the
+record's ``total.end_to_end`` (``count`` right, ``wrong`` claims, ``of`` questions) when it carries one.
 """
 
 from __future__ import annotations
@@ -22,7 +25,8 @@ import sys
 from pathlib import Path
 
 FIGURES = ("hit_at_5", "full_evidence")
-FLOOR, TARGET = 85, 95  # CAP-10's floor; the owner's target for hit@5 (DEC-957)
+FLOOR, TARGET = 85, 95  # S9's bar and the owner's target for the end-to-end figure (DEC-1097 (1)(d), DEC-1129 (1))
+WRONG_MAX = 5  # S9: wrong claims at most 5 %
 QUESTIONS = 48
 
 
@@ -63,16 +67,28 @@ def f1_verdict(band, count):
     return "revert" if count < band[0] else "keep"
 
 
-def s9_state(percents, room=True):
-    """S9's state after the rounds whose hit@5 percentages are ``percents`` (in order)."""
-    if not percents:
-        return "no round"
-    last = percents[-1]
-    if last < FLOOR:
-        return "owner decides" if len(percents) >= 2 else "next round"
-    if last < TARGET and room:
-        return "owner told: not closed"
-    return "none"
+def percent(count, of):
+    return 100.0 * count / of
+
+
+def s9_state(right_percent, wrong_percent=0.0):
+    """S9's state, judged once on the end-to-end figure: ``right_percent`` of the questions right end to end and
+    ``wrong_percent`` of them a wrong claim. hit@5 is never an input: it is reported beside, not judged."""
+    if right_percent is None:
+        return "no figure"
+    if right_percent < FLOOR or wrong_percent > WRONG_MAX:
+        return "owner told"
+    if right_percent < TARGET:
+        return "met, under target"
+    return "met"
+
+
+def s9_report(right, wrong, hit_at_5, of):
+    """S9 on counts of ``of`` questions: the state, the end-to-end and wrong-claim percentages, and hit@5's
+    percentage reported beside them."""
+    right_percent, wrong_percent = percent(right, of), percent(wrong, of)
+    return {"state": s9_state(right_percent, wrong_percent), "end_to_end": right_percent, "wrong_claims": wrong_percent,
+            "hit_at_5": percent(hit_at_5, of)}
 
 
 def main(argv):
@@ -86,12 +102,17 @@ def main(argv):
     bands = {figure: noise_band(baseline, figure) for figure in FIGURES}
     for figure, band in bands.items():
         print(f"{figure}: baseline {band[0]}..{band[1]} of {QUESTIONS} over {len(baseline)} runs")
-    percents = []
     for path in argv[1:]:
         record = load(path)
         verdicts = {figure: f1_verdict(bands[figure], record["total"][figure]["count"]) for figure in FIGURES}
-        percents.append(100.0 * record["total"]["hit_at_5"]["count"] / QUESTIONS)
-        print(f"{path}: F1 {verdicts}; hit@5 {percents[-1]:.1f} %; S9 {s9_state(percents)}")
+        hit = percent(record["total"]["hit_at_5"]["count"], QUESTIONS)
+        end = record["total"].get("end_to_end")
+        if end:
+            right, wrong = percent(end["count"], end["of"]), percent(end["wrong"], end["of"])
+            print(f"{path}: F1 {verdicts}; hit@5 {hit:.1f} % (reported); end to end {right:.1f} %, wrong claims "
+                  f"{wrong:.1f} %; S9 {s9_state(right, wrong)}")
+        else:
+            print(f"{path}: F1 {verdicts}; hit@5 {hit:.1f} % (reported); S9 {s9_state(None)}")
     return 0
 
 
