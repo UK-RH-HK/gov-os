@@ -2,6 +2,7 @@
 name: <skill-name>
 version: "1.0.0"
 description: "<In the third person: what the skill does and when to use it, under 60 tokens.>"
+output: <the path class the skill's method writes, or none>
 metadata:
   version: "1.0.0"
 ---
@@ -14,9 +15,14 @@ How a skill is written (DEC-959 item 5):
   session before the skill is promoted.
 - The body stays under about 150 lines. Detail goes into reference files directly in the skill's folder, each
   linked from the body; a reference file links to no further reference file.
-- The front matter: `name`, `version`, and a third-person `description` of what the skill does and when, under 60
-  tokens; `metadata.version` repeats `version`, so the generated copy states it (DEC-832 item 2). A skill whose text
-  changes raises its version.
+- The front matter is closed to four keys and `metadata.version`: `name`, `version`, a third-person `description` of
+  what the skill does and when, under 60 tokens, and `output`, the path class the skill's method writes (for example
+  `<the project's findings path>`), or `none`. `metadata.version` repeats `version` and is the one carried key: the
+  generated copy keeps only `metadata`, so it states the version there (DEC-832 item 2); never drop it. No other
+  key stands. A permission field never stands in a skill's front matter: no `allowed-tools`, `permissions`, `paths`,
+  `network`, `model` or `effort` (DEC-995, DEC-996). A skill whose text changes raises its version.
+- No step tells the skill's role to write what its `output` class does not hold: a role is what it may read and
+  write, and a skill changes how a role works, never what it may touch (DEC-995, DEC-996).
 - A project's own values stand as `<placeholders>` (DEC-539). Every `gov <command>` in a code span is a recorded
   command. Sources stand at the end, not on every line; each rule stays traceable to its decision.
 - The skill states a method and grants nothing: the guard decides (CAP-24.b). Rules the briefs already carry are
@@ -99,7 +105,9 @@ Detail that does not fit here: [<reference file>](<reference-file>.md).
 
 Reminders only: the guard decides.
 
-- <what a session using this skill never does>.
+- This skill changes no role's reads or writes. Work that needs other writes goes back as a package for the role that
+  holds them, never routed round (DEC-995, DEC-996).
+- <what else a session using this skill never does>.
 
 ## Sources
 

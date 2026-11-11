@@ -12,7 +12,7 @@ otherwise in <the project's test settings>.
 | acceptance | a KPI line's behaviour through the public interface, in process or one child process, on a minimal temporary fixture | its folder, the ticket's acceptance path | under 5 s |
 | live or harness | a real model session, a real daemon, the network or the agent harness | `<the project's marker for live tests>`; outside the default run where the project allows | stated in the test, at most `<limit>` |
 | dev-tier | runs on the project's dev-tier repositories, named only and cloned into a temporary folder | `<the project's dev-tier marker>` | under 60 s |
-| load-sensitive | asserts a time or a latency | `<the project's marker>`; times the code's own work, never the machine's load (DEC-979 item 1) | under 5 s |
+| load-sensitive | asserts a time or a latency | `<the project's marker>`; measures the work under test (its process's CPU time, or its time against a quiet reference run beside it), never the wall time of a loaded machine, at the same bound (DEC-979 item 1 D2, DEC-983) | under 5 s |
 | repository-state | reads the live repository's own records, not the code | `<the project's marker>`; listed in the record-reading set | under 5 s |
 
 ## Cost, and how it is measured

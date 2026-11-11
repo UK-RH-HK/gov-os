@@ -1,8 +1,8 @@
 ---
 name: test-design
-version: "1.3.0"
+version: "1.4.0"
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 description: Method for independent test design from the specification and KPIs, in parallel with the implementer and never reading its work.
 ---
 
@@ -39,6 +39,7 @@ For each KPI success and failure line, the test designer:
 
 - Each test is one kind: unit, acceptance, live or harness, dev-tier, load-sensitive or repository-state; every kind but acceptance is declared, and each kind has a run-time limit, measured from the runner's own per-test durations (DEC-889 item 11 c). The table: [test-kinds.md](test-kinds.md).
 - A test never copies the whole working tree where a minimal fixture will do: it builds a temporary repository holding only what the case needs (DEC-889 item 11 c).
+- A timing test measures the work under test: its process's CPU time, or its time against a quiet reference run beside it, never the wall time of a loaded machine, and at the same bound as before, lowered by nothing (DEC-979 item 1 D2, DEC-983).
 - A test that asserts the live repository's own state (its records, not the code) is declared as such: it belongs to the record-reading set, which runs after record changes (DEC-889 item 11 c).
 
 ## Red against the ticket's base

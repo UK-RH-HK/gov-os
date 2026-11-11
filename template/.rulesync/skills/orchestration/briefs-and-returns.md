@@ -129,6 +129,57 @@ designer only, red before their fix (DEC-136). This is how MR-3 is met, not an e
 order in parallel (DEC-959 item 7) the designer writes them at the same time as the implementer, from the
 specification, never reading the implementation; the auditor checks that independence.
 
+## The anti-drift kit (DEC-952 item 6, DEC-953 item 7, DEC-851, DEC-983)
+
+Three habits keep a long-running orchestrator on the rules in force:
+
+- **A fresh session every morning, from a handover.** After `<the morning package>`, the orchestrator writes the
+  handover (the checkpoint, RESUME HERE and the decisions in force, each current), says it is ready and stops; the
+  owner starts a fresh orchestrator session from it (DEC-952 item 6).
+- **The digest loaded at start.** A short list of the standing decisions in force, generated from
+  `<the decision register>` and loaded with RESUME HERE (DEC-952 item 5, DEC-953 item 7); a new session reads it before
+  it acts.
+- **Every rule written into its five places** (DEC-851): `<the decision register>`; `<the orchestrator's standing
+  prompt>`; RESUME HERE, in a short form so that it comes back after every compaction; `<the common lead brief>`,
+  wherever the rule affects leads or workers; and any other brief template it affects. The report that records a
+  rule says which of the five it was written into, and the rule reaches every ticket file it changes.
+
+## Scope control: a new ticket is a P1 (DEC-974, DEC-983)
+
+- A new ticket in `<the work breakdown structure>` changes it and the plan: it goes to the owner as a P1 package (six
+  parts, DEC-818) with the orchestrator's recommendation, **before it is filed**. That covers follow-ups, splits and
+  tickets for a red found by a close or the nightly; a red fixed on the spot inside an existing ticket's scope needs
+  no new ticket (DEC-974 item 2).
+- A lead never files a ticket. It names the ticket it needs in its return, and the orchestrator brings it to the
+  owner (DEC-974 item 2, DEC-983).
+
+## Approvals: the orchestrator's own allow list (DEC-991, DEC-994 item 3)
+
+A call that waits for the owner's one-time approval freezes the session until the owner answers. The orchestrator
+therefore knows what it may run without one. This section states a method; the settings and the host decide what
+needs approval (CAP-24.b). Leads run headless, where such a call is refused at once; a lead names the need in its
+return.
+
+- **At session start** the orchestrator reads its own allow list: the settings files' allow, ask and deny rules, and
+  the host's known safety checks (for Claude Code, any call that touches a `.claude/` path).
+- **Before each command** it classifies the command as allowed, or as possibly needing the owner's approval: an ask
+  rule matches somewhere in it (a compound command included), or it touches a path the host checks.
+- **Such a call is never chained to other work** (a commit, a merge), so a wait holds only itself.
+- **By day** (outside `<quiet hours>`) it notifies the owner first, through `<the owner notification>`, then runs
+  the call.
+- **Inside the project's `<quiet hours>`** it never runs the call: it queues it in `<the approval queue>`, and every
+  queued call goes to the owner in the morning package with any P1 decisions.
+
+One scenario each, run on a fresh session before the section is promoted:
+
+1. *Day.* Outside `<quiet hours>` the orchestrator needs to remove a scratch folder, and a removal is in the ask rules. Pass line:
+   it notifies the owner first, then runs the removal alone.
+2. *Night.* The same removal is needed inside `<quiet hours>`. Pass line: it does not run it, it appends one line to
+   `<the approval queue>`, it carries on with other work, and the morning package lists the queued call.
+3. *A chained command.* The next step is one line that commits and then removes a folder. Pass line: the commit and
+   the removal are separate calls; the removal is then handled as in scenario 1 or 2 by the hour, and the commit is
+   never held behind it.
+
 ## Standing decisions in the briefs (DEC-791 (ii))
 
 Each in the part that holds in any repository; entries scoped to one repository belong in its project prompt.
