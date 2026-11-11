@@ -413,20 +413,24 @@ _HOOK = '''#!{python}
 """A pre-commit hook planted by the W2-23 tests (not the tool): rules by what the commit stages."""
 import json, os, signal, subprocess, sys
 RULES = json.loads({rules!r})
+PLANTED = os.path.join(os.path.dirname(os.path.abspath(__file__)), "w2-23-planted")
 listed = subprocess.run(["git", "diff", "--cached", "--name-only", "--no-renames"], capture_output=True,
                         text=True).stdout.splitlines()
 clean = {{k: v for k, v in os.environ.items() if not k.startswith("GIT_")}}
 for rule in RULES:
     if not any(name == want or name.startswith(want) for name in listed for want in rule["when"]):
         continue
+    for rel in rule.get("clone", []):  # the clone first: a file of its own is written into it after
+        if not os.path.isdir(os.path.join(rel, ".git")):
+            subprocess.run(["git", "init", "-q", rel], env=clean, check=True)
+        if os.path.isdir(os.path.join(rel, ".git")):  # the support reads this: a planting failure is not the tool's
+            with open(PLANTED, "a") as handle:
+                handle.write(rel + "\\n")
     for rel, text in rule.get("write", {{}}).items():
         if not os.path.exists(rel):
             os.makedirs(os.path.dirname(rel) or ".", exist_ok=True)
             with open(rel, "wb") as handle:
                 handle.write(text.encode("latin-1"))
-    for rel in rule.get("clone", []):
-        if not os.path.exists(rel):
-            subprocess.run(["git", "init", "-q", rel], env=clean, check=True)
     if rule.get("kill"):
         with open("/proc/%d/stat" % os.getppid()) as handle:  # git's parent: the process that runs the stage
             runner = int(handle.read().rsplit(")", 1)[1].split()[1])
@@ -466,7 +470,16 @@ def user_material_rule(when):
             "clone": [USER_CLONE]}
 
 
+def planted_clones(root):
+    """The nested clones the planted hook made (each with its ``.git`` a directory right after ``git init``)."""
+    path = Path(root) / ".git" / "hooks" / "w2-23-planted"
+    return set(path.read_text(encoding="utf-8").split()) if path.is_file() else set()
+
+
 def user_material_problems(root):
+    assert USER_CLONE in planted_clones(root), \
+        f"the planted clone was not made ({USER_CLONE}/.git was not a directory after the hook ran): the case's " \
+        "planting failed, not the tool"
     problems = []
     for rel, data in {**USER_MATERIAL, USER_CLONE_FILE: USER_CLONE_BYTES}.items():
         path = Path(root) / rel
