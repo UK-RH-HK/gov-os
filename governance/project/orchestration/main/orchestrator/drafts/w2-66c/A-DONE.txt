@@ -1,0 +1,14 @@
+A DONE 2026-11-11 (helper, Sonnet high), W2-66c (DAEO-btcs), tests run.
+
+Written: .gov-runtime/scratch/orchestrator/briefs/W2-66c-A5-r2-tests.md (87,962 bytes, non-empty; refusal head, brief envelope, ticket's tests run section, LEAD-w2-common.md appended whole).
+Builder: drafts/w2-66c/tmp/build_66c.py (reuses drafts/batch-prep/hand/tmp/parts.py; run with PYTHONDONTWRITEBYTECODE=1 python3 -I).
+drafts/w2-66c/ticket.patch: NOT a diff. The ticket already has `acceptance_tests: path: tests/acceptance/W2-66/` (HEAD 256b4e12d7ca). Nothing to apply.
+
+Things the CTO should know before launch:
+1. The worktree ~/gov-os-worktrees/W2-66c ALREADY EXISTS (branch w2/W2-66c checked out, HEAD 256b4e12d7ca = integrate head, clean, role templates present). Nothing to add.
+2. The ticket is still `open`: `tk start DAEO-btcs` (claim, committed on integrate) is still to do. The worktree lacks the claim; the brief's step 2 has the lead merge integrate for it.
+3. Slot bug in the earlier hand briefs: parts.common() substitutes @@ID@@ forms, but LEAD-w2-common.md writes {ID}, {W2}, {PATHS}, {ROWS}, {SOURCES}, {IMPL}, {EST}, {PROFILE}. So briefs/W2-81-A5-r5-land.md (and W2-105, W2-04, W2-11 hand briefs, same parts.py) still hold 17 unfilled `{ID}`-style slots each in the appended common text (grep -c "{ID}" gives 17). The W2-66c brief fills them (fill() in build_66c.py). Fix the others by the same replace before launch.
+4. DEC-1130 (1) is worded for reviewed tickets IN PROGRESS; W2-66c is `open`. The brief says so at its head and that the CTO applies it.
+5. README gap: allowed_paths is only the .py; S1-S6's README map (read by `gov accept`) cannot be written by the designer (that README is W2-66b's). The brief makes `gov accept` informational and asks the designer for `readme_map_gap`. Consider adding README.md to the ticket's paths later.
+6. The designer is Opus high as the CTO said; BATCH-PREP's table says Sonnet high for C2. The brief names the CTO's choice and the difference.
+7. S6 red run: ACT-SELECT-FIXES-1 commit 8038e0ee648c, parent 795d97c7cd44. Later commits touched the two files (3849c1ca2223 win_toast out of record_only; a46d4517a1a0 and 3fea21bb5322 breadth list only) but not the couplings or record_reading; the live record_only has 16 entries, not 17.

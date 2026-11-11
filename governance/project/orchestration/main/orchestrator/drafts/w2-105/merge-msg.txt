@@ -1,0 +1,6 @@
+Merge w2/integrate into w2/W2-105 before its tests round (DEC-999): the one conflict, template/.rulesync/permissions.jsonc, resolved as both sides' intent
+
+Integrate added the `gov launch:*` allow line (W2-56, dca333e7a55d); this branch removes the `npm install*` and `pip install*` deny lines (DEC-966 item 1). The merge keeps the allow line and keeps both denies removed. The two W1-38 files merged without a conflict.
+
+Task: DAEO-zpdj
+Role: orchestrator

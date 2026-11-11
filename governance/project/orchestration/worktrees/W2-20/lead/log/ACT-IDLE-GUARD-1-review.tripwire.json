@@ -1,0 +1,309 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "35f4eb9943a5",
+   "after": "87fc1bd5b37a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "d946dd15e8a9",
+   "after": "49815ffb304e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/cpu_prev.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/dispatch.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/embed-health.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/forecast.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/gpu-health.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/interim-seen.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/jobs-prev.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/peaks.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/phase-peaks.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/ready.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/reranker-peak.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/slot-progress.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/started.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/status.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/status.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/main/orchestrator/dispatch/targets.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1510.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1511.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1512.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1513.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1514.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1515.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1516.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1517.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1518.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1519.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-1520.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-04-A5-r6-review.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-04-A5-r6-review.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-105-A5-r3-tests.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-11-A5-r5-resume.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-11-A5-r5-resume.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-170-A5-tests2.err"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-170-A5-tests2.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-170-A5-tests2.part.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/briefs/W2-81-A5-r5-land.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/dispatch/inbox/read/20261111-170643-rg-watch.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/dispatch/inbox/read/20261111-170838-sentinel-down.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/dispatch/inbox/read/20261111-171004-sentinel-up.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/dispatch/ready.pre-1758.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/after/repo/governance/project/orchestration/tools/dispatch/dispatcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/after/repo/governance/project/orchestration/tools/stop_idle_check.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/apply.sh"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/before/repo/governance/project/orchestration/tools/dispatch/dispatcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/before/repo/governance/project/orchestration/tools/stop_idle_check.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/list.txt"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/companion-tests.diff"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/rehearsal.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/tmp/.rehearsal-out.pSTbME"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/tmp/disp-base.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/main/orchestrator/drafts/act-idle-guard/tmp/disp-new.log"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "35f4eb9943a5",
+   "after": "87fc1bd5b37a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "4c55f14179be",
+   "after": "9e40aa184a64"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "35f4eb9943a5",
+   "after": "87fc1bd5b37a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "head",
+   "before": "c07a3a941397",
+   "after": "49c776675eb6"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

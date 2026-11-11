@@ -1,0 +1,7 @@
+log: W2-81-A5-r5b-land.json
+W2: W2-81
+status: PACKAGES. W2-81 can't land yet: `gov accept` refuses its README map, and the scoped run has one red caused by a merge the CTO made before I started. W2-81's own 276 cases all pass.
+
+task: W2-81 (DAEO-l78m) land round. Confirm the verified head, merge `w2/integrate` in, verify once and return the new head.
+status: PACKAGES. W2-81 can't land yet: `gov accept` refuses its README map, and the scoped run has one red caused by a merge the CTO made before I started. W2-81's own 276 cases all pass.
+work_completed: Checked the head. It was `76c9b5cd1071`, not `e78e6af7530d`: the CTO had merged `w2/integrate` at 18:11 (first parent `e78e6af7530d`, trailers `Task: DAEO-l78m`, `Role: orchestrator`). I made no merge of my own. I checked that merge against DEC-895, ran `gov accept`, ra

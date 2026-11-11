@@ -1,0 +1,24 @@
+NO PATCH NEEDED. This file is not a diff: do not apply it.
+
+The task said .tickets/DAEO-btcs.md has `allowed_paths` but no `acceptance_tests:` key. It has the key, at HEAD (256b4e12d7ca) and in the working tree (clean), lines 48-50 of the ticket file:
+
+acceptance_tests:
+  path: tests/acceptance/W2-66/
+  author: 'independent-test-designer (MR-3), from these KPI lines, before the cases are relied on: the live test map read with the product''s own loader and matcher; planted paths and a planted git repository in a temporary folder; never the main tree''s store, and no pytest run from inside a case'
+
+Shape check against other `class: test-revision` tickets (key, then `path:` and `author:` two-space indented, before `track:`):
+  DAEO-zuiy (W2-66b)  path: tests/acceptance/W2-66/    author: independent-test-designer (MR-3)
+  DAEO-pl6k           path: tests/acceptance/W1-49/    author: independent-test-designer (MR-3); the revision is the deliverable
+  DAEO-4eux           path: tests/acceptance/W2-114/   author: independent-test-designer (MR-3); a test-revision ticket judged on its revised suite and the planted cases (DEC-892)
+  DAEO-nqa2           path: tests/acceptance/W2-90b/   author: independent-test-designer (MR-3); a test-revision ticket judged on its revised suites (DEC-892)
+The same form. DAEO-btcs's path is the suite folder its allowed file lives in (as zuiy's is), so the Definition of Ready's acceptance-test item (prompt section 3, DEC-944 item 2) is met as it stands.
+
+The Definition of Ready by hand, for the claim commit message (checked 2026-11-11 ~19:00 UTC):
+  - sources: DEC-1109, DEC-1112, DEC-1100, DEC-1098, DEC-889, DEC-891, DEC-253, DEC-968, DEC-1061, DEC-896, DEC-912, DEC-1045, DEC-906 all resolve in docs/DECISION_REGISTER.md (DEC-891 and DEC-896 are DONE, the rest ACCEPTED).
+  - allowed_paths: one file, tests/acceptance/W2-66/test_w2_66_select_fixes.py (does not exist yet; a new file).
+  - KPIs: S1-S6 with Verify: text, F1-F3 without (gov brief's KPI_NO_VERIFY; DEC-1130 (1) hand-built brief).
+  - profile LITE; deps and depends_on empty; status open (needs `tk start`, committed on integrate).
+
+Two points that are NOT edits to apply but that the CTO may want to decide (details in A-DONE.txt):
+  1. The ticket's allowed_paths holds only the .py, so the designer cannot add S1-S6's map to tests/acceptance/W2-66/README.md, which `gov accept` reads (that README is W2-66b's, DAEO-zuiy, in progress).
+  2. The three failure lines have no `Verify:` (the Verify pass of DEC-1130 (1) is for unreviewed tickets; this one launches on the hand-built brief).

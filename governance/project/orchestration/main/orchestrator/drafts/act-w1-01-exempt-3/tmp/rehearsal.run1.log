@@ -1,0 +1,108 @@
+--- 0. set-up: a planted HOME, a fresh clone of the main tree's HEAD (w2/integrate)
+the main tree's map fb52ab2dc756 (read only); the clone's map fb52ab2dc756; the bundle's before fb52ab2dc756, after f4029cfb4942
+ok   A0 the clone's map is the frozen before (the bundle is not stale)
+ok   A1 the main tree's map (read only) is the frozen before
+ok   A2 the clone is clean
+     the owner commit: ACT-OPERATOR-ROUNDS-1: a KPI line marked fail blocks READY; 
+     its Role trailer: owner
+     its acceptance-test change: tests/acceptance/W2-148/w2_148_support.py 
+     DEC-1136 in the clone's register: 1 entry
+--- A3. W1-01's two cases that judge DEC-253 and acceptance_exemptions, BEFORE the apply: red, naming 6fbe73b1adde
+     pytest exit 1; 1 failed, 1 passed; named: 6fbe73b1adde 
+ok   A3 red before: the history case fails naming 6fbe73b1adde only; the merges case passes
+--- B. the states before the apply
+     state before (sha256 fb52ab2dc756)
+ok   B1 check: state before (exit 0)
+     not applied: governance/project/path-map.yaml (sha256 fb52ab2dc756)
+ok   B2 verify refused before the apply (exit 3)
+     state before (sha256 fb52ab2dc756); nothing to undo
+ok   B3 undo before the apply says nothing to undo (exit 0)
+--- C. the PLAIN apply (no backup, no environment variable), as the operator runs it
+     state applied (sha256 f4029cfb4942)
+ok   C1 apply (exit 0)
+ok   C2 the map is the frozen after, byte for byte
+ok   C3 the mode is kept (644)
+ok   C4 git status lists only the map: [ M governance/project/path-map.yaml]
+ok   C5 no temp or backup file beside the map
+     state applied (sha256 f4029cfb4942)
+ok   C6 check: state applied (exit 0)
+ok   C7 verify exit 0 (exit 0)
+     state applied (sha256 f4029cfb4942); nothing to do
+ok   C8 apply again changes nothing (exit 0)
+     the diff against the map: 2 0 governance/project/path-map.yaml
+ok   C9 two lines added, none removed
+ok   C10 the added entry names the full id
+--- D. every manifest checks[].cmd, exactly as written, with bash -c from the clone (review F1)
+     check 1 cmd: PYTHONPATH=src python3 -m gov.check.pathmap...
+     exit 0 (manifest says 0); manifest count: None (the check prints no count)
+ok   D1 check 1 as written: exit 0
+     check 2 cmd: python3 -I -c 'import yaml,sys; d=yaml.safe_load(open("governance/project/path-map.yaml")); e=d["acceptance_exemptions"]; c=["c9a08678644485a7528bc875164e110881...
+     exit 0 (manifest says 0); manifest count: None (the check prints no count)
+ok   D2 check 2 as written: exit 0
+ok   D3 check 2 exits 1 on the before map, so it tells before from after (exit 1)
+--- E. the validate step (DEC-895) on the patch, with the pinned judge's readers, against the register as it stands (it holds DEC-1136)
+     PASS (accepted_history): 6fbe73b1adde40571f00d490b4b478cf86b70a52
+     placeholder scan: 0 hit(s)
+     entries judged: 1; failed: 0
+ok   E1 validate_entry.py (PASS: DEC-1136 is the owner's and names 6fbe73b1a) (exit 0)
+     placeholder scan: 0 hit(s)
+ok   E2 placeholder scan of the patch (exit 0)
+--- F. the owner's operator's commit, by hand, as the package's section 5 gives it (Role: owner); then W1-01 must be green
+     trailers: Task: DAEO-sdxk; Implements: DEC-1136, DEC-906, DEC-253; Role: owner
+ok   F1 the clone is clean after the commit
+     pytest exit 0; 2 passed
+ok   F2 W1-01's two cases are green after the owner's commit: 2 passed
+ok   F3 the close's gate (h) reader, gates.owner_listed, counts the commit as owner-listed under DEC-1136
+--- F4. information, not a gate: the same entry committed as Role: operator (what the operator agent would make)
+     W1-01's cases with the entry in a Role: operator commit: pytest exit 0; 2 passed (W1-01 reads the list by full id and decision shape only; that the entry is the owner's own commit is DEC-906's rule and class-rules.yaml's row path-map, class (O))
+--- G. undo, from the committed applied state
+     state before (sha256 fb52ab2dc756)
+ok   G1 undo (exit 0)
+ok   G2 the map is the frozen before, byte for byte
+ok   G3 git status lists only the map
+     state before (sha256 fb52ab2dc756); nothing to undo
+ok   G4 undo again: nothing to undo (exit 0)
+ok   G5 no temp file left
+--- H. refusals (the map is the before again)
+     state other: not the frozen before (another path-map ACT applied first?) and not the frozen after (sha256 1a56f370cfaa)
+ok   H1 check refuses a map that changed (exit 3)
+     refused: governance/project/path-map.yaml is neither the frozen before nor the frozen after (sha256 1a56f370cfaa)
+ok   H2 apply refuses (exit 3)
+     refused: governance/project/path-map.yaml is not as this ACT left it (sha256 1a56f370cfaa); a later change is not overwritten
+ok   H3 undo refuses (exit 3)
+     not applied: governance/project/path-map.yaml (sha256 1a56f370cfaa)
+ok   H3b verify refuses (exit 3)
+--- H4. another path-map ACT applied first (ACT-EXAMIN-SETS-1's after copy as the map): this ACT refuses and touches nothing
+     state other: not the frozen before (another path-map ACT applied first?) and not the frozen after (sha256 b1ffdb0b7b3e)
+ok   H4a check refuses (state other) (exit 3)
+     refused: governance/project/path-map.yaml is neither the frozen before nor the frozen after (sha256 b1ffdb0b7b3e)
+ok   H4b apply refuses (exit 3)
+     refused: governance/project/path-map.yaml is not as this ACT left it (sha256 b1ffdb0b7b3e); a later change is not overwritten
+ok   H4c undo refuses (exit 3)
+ok   H4d the map is byte for byte as it was
+ok   H4e no temp file left
+     refused: governance/project/path-map.yaml is a link
+ok   H5 a link is refused by check (exit 3)
+     refused: governance/project/path-map.yaml is a link
+ok   H6 a link is refused by apply (exit 3)
+ok   H7 the link test left the map as it was
+     state applied (sha256 f4029cfb4942)
+ok   H8 apply with a link planted at the old fixed temp name <map>.act-tmp (exit 0)
+ok   H9 the planted link's target is untouched (review F4)
+ok   H10 the map is the frozen after
+     state before (sha256 fb52ab2dc756)
+ok   H11 undo (exit 0)
+ok   H12 no temp file left (mktemp names removed)
+     the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-3/tmp/bundle-tampered/after/repo/governance/project/path-map.yaml
+ok   H13 a tampered frozen copy: apply exits 4 (exit 4)
+ok   H14 the map is untouched by the refused apply
+     mktemp: failed to create file via template ‘/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-3/tmp/clone/governance/project/path-map.yaml.act-tmp.XXXXXX’: Permission den
+ok   H15 the map's folder not writable: apply exits 5 and nothing changes (exit 5)
+ok   H16 the map is untouched
+ok   H17 no temp file left
+--- K. the live files are unchanged (read only)
+the main tree's map fb52ab2dc756, the frozen before fb52ab2dc756
+ok   K1 the main tree's map is unchanged
+
+REHEARSAL PASS
+failures: 0

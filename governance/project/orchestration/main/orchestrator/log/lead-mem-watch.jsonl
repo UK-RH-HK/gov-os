@@ -1,0 +1,6 @@
+{"at": "2026-11-11 18:53:14", "avail_mb": 12530, "leads": {"W2-170": {"mb": 644, "kb": 660428, "procs": 5, "in_status": true}}}
+{"at": "2026-11-11 18:54:17", "avail_mb": 14168, "leads": {"W2-170": {"mb": 272, "kb": 279448, "procs": 1, "in_status": true}}}
+{"at": "2026-11-11 18:55:24", "avail_mb": 13952, "leads": {"W2-170": {"mb": 325, "kb": 332936, "procs": 6, "in_status": true}, "W2-66c": {"mb": 256, "kb": 262528, "procs": 1, "in_status": false}}}
+{"at": "2026-11-11 18:56:27", "avail_mb": 12644, "leads": {"W2-170": {"mb": 1266, "kb": 1296432, "procs": 15, "in_status": true}, "W2-66c": {"mb": 266, "kb": 273324, "procs": 1, "in_status": true}}}
+{"at": "2026-11-11 18:57:34", "avail_mb": 12482, "leads": {"W2-170": {"mb": 1287, "kb": 1318324, "procs": 16, "in_status": true}, "W2-20": {"mb": 310, "kb": 317696, "procs": 8, "in_status": false}, "W2-66c": {"mb": 570, "kb": 584540, "procs": 8, "in_status": true}}}
+{"at": "2026-11-11 18:58:37", "avail_mb": 12488, "leads": {"W2-170": {"mb": 1360, "kb": 1393188, "procs": 19, "in_status": true}, "W2-20": {"mb": 319, "kb": 327596, "procs": 8, "in_status": false}, "W2-66c": {"mb": 575, "kb": 589728, "procs": 8, "in_status": true}}}

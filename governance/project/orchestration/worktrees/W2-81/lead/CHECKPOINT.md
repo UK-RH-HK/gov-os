@@ -65,6 +65,17 @@
 - Scoped run 5 (06:01-06:15): exit 0; parallel 4233 passed, 1 skipped (test_lexical.py:54 govbridge, pre-existing), 773.8 s; XML 4234 tests, 0 failures, 0 errors; the four record cases (W1-08, W1-26 x2, W2-02) ok; serial: none selected.
 - RETURNED DONE at e78e6af7530d. Scratch: /tmp/gov-os-lead-W2-81 5.3M/741 inodes; .gov-runtime 492M/3415.
 
+## Run 6 — land round (hand-built brief, DEC-1130 (1)), 2026-11-11 ~18:10-19:00
+STATE: PACKAGES returned | HEAD: 76c9b5cd1071 | NEXT: the CTO decides P-W2-81-LAND-1..4; then a land re-run (accept + lead_verify) on the resulting head | WAITING ON: CTO
+- Start: head was NOT e78e6af7530d: the CTO had merged w2/integrate (4c55f14179be) at 18:11 as 76c9b5cd1071 (Task DAEO-l78m, Role orchestrator; first parent e78e6af7530d). The lead made no merge and no commit. w2/integrate since moved 1 commit (35f4eb9943a5, DECIDED-NOT-DONE.md only; no W2-81 path).
+- DEC-895: the merge changed nothing under tests/acceptance/W2-81/ or docs/probes/DAEO-l78m/; it changed .tickets/DAEO-l78m.md (+9 sources lines from W2-130's e12f8a30c; no conflict; the branch never edits it). Brief step 3 names that a stop -> package 1.
+- gov accept W2-81 (pinned ~/.local/bin/gov, and this tree's src): refused ACCEPT_MAP_UNREADABLE, no case run. README line 774 ("Review (batch 4)" row; also 775-777 Round 3 / 2b / 2) names no KPI line in its KPI cell; W2-96's stricter map reader (dac10e5df, 1df7ccd60, 11-10). Fix is the test designer's -> package 2.
+- Record checks alone (W1-08 probe, W1-26 probe records, W2-02 green here), empty HOME + PYTHONUSERBASE: 8 passed, 47 deselected (opt-in lifted); with GOV_TESTS_OPTIN=lifted,breadth: 55 passed 33.7 s (as 11-02).
+- lead_verify (scoped, base 4c55f1417, core_changed [], unplaced []): RED parallel 3875 tests, 3862 passed, 7 failed, 6 skipped, 708 s; serial 0 entries. W2-81's 276 all passed. Reds: (a) W1-01 test_the_integration_merges_of_this_repository_pass: merge 76c9b5cd1071 brings 6fbe73b1adde (Role: owner, Task DAEO-sdxk, touches tests/acceptance/W2-148/w2_148_support.py) not in path-map acceptance_exemptions -> package 3 (owner's path map); (b) six W2-96 signal cases (test_w2_96_review3/review4/run2, all on gw3): 6 passed alone in 11.2 s (rerun_six.txt) -> flaky/load-sensitive candidates, named.
+- gov.__file__: /home/usain/gov-os-worktrees/W2-81/src/gov/__init__.py. keyword_warn 0. gov links --since e78e6af7530d: exit 1, "413 new ... commits 1882", no line names DAEO-l78m or W2-81 (all integrate's). context: CONTEXT_OVER_CEILING 23037 of 6000 tokens -> package 4.
+- Scratch: .gov-runtime/scratch 19M / 163 inodes; /tmp/gov-os-lead-W2-81 11M / 2529 inodes (not removable by the lead). Logs: lead/log/verify/, scratch/land/.
+- Untracked empty harness folders still present: tests/acceptance/W2-81/.claude/.cc-writes, tests/acceptance/W2-81/questions/.claude/.cc-writes.
+
 ## Loop count
 - 3 (round 1: two; round 2: batch 5). Converged.
 

@@ -1,0 +1,99 @@
+--- A. the bundle and the clone
+ok   A0 the clone is w2/integrate
+ok   A1 the clone's stop_idle_check.py is the frozen before (the bundle is not stale)
+ok   A2 the main tree's stop_idle_check.py (read only) is the frozen before
+ok   A3 before/ and after/ hash as list.txt says: stop_idle_check.py
+ok   A1 the clone's dispatcher.py is the frozen before (the bundle is not stale)
+ok   A2 the main tree's dispatcher.py (read only) is the frozen before
+ok   A3 before/ and after/ hash as list.txt says: dispatcher.py
+ok   A4 the clone's tree is clean
+ok   A5 check: state before (exit 0)
+     not applied: governance/project/orchestration/tools/stop_idle_check.py
+ok   A6 verify refused before the apply (exit 3)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (undo)
+     already in place: governance/project/orchestration/tools/dispatch/dispatcher.py (undo)
+ok   A7 undo before the apply: nothing to undo (exit 0)
+--- B. the existing tests on the BEFORE code (the baseline), and this ACT's checks on it
+ok   B1 the existing stop-idle and dispatcher tests: all passed
+ok   check 0 as written (exit 0, count None)
+ok   check 1 is red on this state (exit 1), as it must be
+ok   check 2 is red on this state (exit 1), as it must be
+ok   check 3 as written (exit 0, count None)
+     (checks 1 and 2, the behaviour of the two files, are red on the old code: they tell the two apart)
+--- C. the companion test change on the OLD code: the two named cases are red
+ok   C0 companion-tests.diff applies to the clone
+ok   C1 the new tests on the old code: red as expected
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_a_cause_that_stops_holding_is_reported_again_when_it_returns
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_idle_with_headroom_a_used_log_line_with_an_open_gate_raises_one_inbox_item_an_hour
+     FAILED tests/unit/orchestration/test_dispatcher.py::test_idle_with_headroom_names_a_returned_log_and_an_empty_list
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_a_returned_log_line_blocks_too_and_every_such_line_is_named
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_a_used_log_ready_line_with_an_open_gate_blocks_whatever_runs
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_an_empty_ready_list_with_no_usable_plan_does_not_block_and_says_so
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_an_empty_ready_list_with_plan_tickets_ready_blocks_naming_the_first_batch
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_an_idle_reason_while_a_ticket_is_launchable_is_shown_as_such
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_helper_watch_beside_a_real_job_still_counts_only_the_job
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_no_ready_count_in_the_tick_or_only_other_waits_is_not_launchable
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_the_cap_is_read_from_the_config_not_fixed
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_the_launchable_block_is_once_a_turn
+     FAILED tests/unit/orchestration/test_stop_idle_check.py::test_the_standing_watchers_of_section_6_are_not_work
+ok   C2 the clone's tests back to the committed ones
+--- D. the plain apply
+ok   D1 plain apply (no option, no env) (exit 0)
+ok   D2 stop_idle_check.py is the frozen after, byte for byte
+ok   D2 dispatcher.py is the frozen after, byte for byte
+ok   D3 the modes are kept
+ok   D4 git status shows exactly the two listed files changed; no stray temp file
+ok   D5 no temp file left beside either file
+ok   D6 verify exit 0 (exit 0)
+     moved: governance/project/orchestration/tools/stop_idle_check.py
+ok   D7 check after the apply: the before it expects is gone (the operator's check runs before the apply) (exit 3)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (apply)
+     already in place: governance/project/orchestration/tools/dispatch/dispatcher.py (apply)
+ok   D8 apply again changes nothing (exit 0)
+--- E. every manifest check, exactly as written, with bash -c, on the applied clone
+ok   check 0 as written (exit 0, count None)
+ok   check 1 as written (exit 0, count 2)
+ok   check 2 as written (exit 0, count 4)
+ok   check 3 as written (exit 0, count None)
+ok   E1 the existing tests on the new code: all passed
+ok   E2 companion-tests.diff applies on the applied clone
+ok   E3 the existing and the new tests on the new code: all passed
+ok   E4 the clone's tests back to the committed ones
+--- F. undo, and the states apply.sh refuses
+ok   F1 undo from the applied state (exit 0)
+ok   F2 stop_idle_check.py is the original, byte for byte
+ok   F2 dispatcher.py is the original, byte for byte
+ok   F3 the clone's tree is clean again
+ok   F4 check: state before (exit 0)
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py
+ok   F5 check refuses a dispatcher that changed (exit 3)
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py (neither the before nor the after; apply refused, nothing touched)
+ok   F6 apply refuses (one file neither the before nor the after) (exit 3)
+ok   F7 the hook, the other file, was not touched by the refused apply
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py (neither the before nor the after; undo refused, nothing touched)
+ok   F8 undo refuses too (exit 3)
+     already in place: governance/project/orchestration/tools/stop_idle_check.py (apply)
+ok   F9 apply over a half-applied state completes it (exit 0)
+ok   F10 verify (exit 0)
+ok   F11 undo (exit 0)
+ok   F12 check (exit 0)
+     the frozen copy does not hash as listed: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-idle-guard/acts/ACT-IDLE-GUARD-1/after/repo/governance/project/orchestr
+ok   F13 a tampered frozen copy: apply refuses (exit 4) (exit 4)
+ok   F14 nothing was written by the refused apply
+ok   F15 the bundle's after copy restored as listed
+     moved: governance/project/orchestration/tools/stop_idle_check.py
+ok   F16 a missing hook: check refuses (exit 3)
+     moved: governance/project/orchestration/tools/stop_idle_check.py (neither the before nor the after; apply refused, nothing touched)
+ok   F17 a missing hook: apply refuses (exit 3)
+ok   F18 nothing was created in its place
+     moved: governance/project/orchestration/tools/dispatch/dispatcher.py (neither the before nor the after; apply refused, nothing touched)
+ok   F19 a link: apply refuses (exit 3)
+ok   F20 the clone is back to the original
+--- G. the live files are unchanged (read only), the main tree clean
+ok   G1 the main tree's stop_idle_check.py is unchanged
+ok   G1 the main tree's dispatcher.py is unchanged
+ok   G2 neither live file shows a change in git
+ok   G3 nothing was written to the planted HOME
+
+REHEARSAL PASS
+failures: 0

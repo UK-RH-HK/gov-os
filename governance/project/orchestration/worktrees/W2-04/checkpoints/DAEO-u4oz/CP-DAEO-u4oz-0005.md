@@ -8,12 +8,12 @@ task: DAEO-u4oz
 task_status: in_progress
 trigger: stop
 next_action: Resume after stop
-created: '2026-11-01T18:12:49Z'
+created: '2026-11-11T18:39:20Z'
 inputs:
 - id: DAEO-u4oz
-  version: 4d594bfe
-  hash: sha256:eb6c82420bce57d2211e85d06bbd3e92cf4d84e554bb12241e585716b0e052ce
-head_commit: d78d31f216edd9271774a2ab4802e51601829bab
+  version: 66303c373
+  hash: sha256:49d425de47bd76bb86948828702c9c2481ca07a35ff8a356333407c2b5672a91
+head_commit: c77dc358d04812cff53cf4c6d461cccc9e330b62
 ---
 
 # CP-DAEO-u4oz-0005 — DAEO-u4oz at stop

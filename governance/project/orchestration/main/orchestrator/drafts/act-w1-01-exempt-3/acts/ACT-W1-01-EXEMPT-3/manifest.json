@@ -1,0 +1,38 @@
+{
+ "act": "ACT-W1-01-EXEMPT-3",
+ "dec": "DEC-1136, DEC-1131, DEC-906, DEC-253",
+ "author": "cto",
+ "claimed_class": "O",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/path-map.yaml",
+   "before": "fb52ab2dc7568d24234b755abc7fd6ad7b21743ca3d01b572ef7e9dc40fc2d95",
+   "after": "f4029cfb49428708a7c7f9ca754bcd50a1c610ccc22966d09c4c581f1abbd971"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/path-map.yaml": "fb52ab2dc7568d24234b755abc7fd6ad7b21743ca3d01b572ef7e9dc40fc2d95",
+  "after/repo/governance/project/path-map.yaml": "f4029cfb49428708a7c7f9ca754bcd50a1c610ccc22966d09c4c581f1abbd971",
+  "apply.sh": "90dc55413d0c4315e94c396778d6e3978602ac64b48ded9ab44e6e3a38c4c666",
+  "list.txt": "fd9e803c4679d8b262cb4c0159fb30aa6f7de5c6a61618cd908fc4a9af8915dc",
+  "rehearsal.log": "3359eb2c49d597df492a64a283515b55327f4436948676c374192aa0967aa1ed"
+ },
+ "checks": [
+  {
+   "cmd": "PYTHONPATH=src python3 -m gov.check.pathmap",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import yaml,sys; d=yaml.safe_load(open(\"governance/project/path-map.yaml\")); e=d[\"acceptance_exemptions\"]; c=[\"c9a08678644485a7528bc875164e110881b63d93\", \"0568d91baf566b4d8f3ccb448e51af41cbb46d03\", \"cade65dfe0454bb1b34c6a44bd475a9d67c5e45e\", \"04460404ea8a07bfb3f3f0019d3384e30c7f9466\", \"8c512d7e7921bfd7b5c3dd50a79bb1fc145f869a\", \"ab169d051b82072f0db4350b2066eabf6919ffa0\", \"15952bbfa576dcfabb7d36d95912a848077e5c3c\", \"6fbe73b1adde40571f00d490b4b478cf86b70a52\"]; ok=[x[\"commit\"] for x in e]==c and all(x[\"decision\"].startswith(\"DEC-\") for x in e) and e[-1][\"decision\"]==\"DEC-1136\"; sys.exit(0 if ok else 1)'",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "3359eb2c49d597df492a64a283515b55327f4436948676c374192aa0967aa1ed"
+ }
+}

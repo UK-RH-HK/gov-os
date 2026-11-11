@@ -384,3 +384,12 @@
 2026-11-11 18:18:07 started W2-04 (DAEO-u4oz) W2-04-A5-r6c-review.md -> W2-04-A5-r6c-review.json (launcher exit 0)
 2026-11-11 18:30:04 return: W2-170-A5-tests2.json -> inbox/20261111-183004-W2-170-A5-tests2.txt
 2026-11-11 18:32:04 started W2-170 (DAEO-61vm) W2-170-A5-build.md -> W2-170-A5-build.json (launcher exit 0)
+2026-11-11 18:38:06 return: W2-81-A5-r5b-land.json -> inbox/20261111-183806-W2-81-A5-r5b-land.txt
+2026-11-11 18:39:07 interim result: W2-04 c77dc358d W2-04: probe record, review 2 of 2 (DEC-1025): pass at 4c55f14179be, READY by ve
+2026-11-11 18:40:01 return: W2-04-A5-r6c-review.json -> inbox/20261111-184001-W2-04-A5-r6c-review.txt
+2026-11-11 18:40:01 started but never ran: W2-04 W2-04-A5-r6b-review.json
+2026-11-11 18:41:06 idle with headroom: inbox item written (used:W2-04 DAEO-u4oz,W2-81 DAEO-l78m)
+2026-11-11 18:43:07 idle with headroom: inbox item written (waiting)
+2026-11-11 18:52:08 idle with headroom: inbox item written (waiting)
+2026-11-11 18:55:05 started W2-66c (DAEO-btcs) W2-66c-A5-r2-tests.md -> W2-66c-A5-r2-tests.json (launcher exit 0)
+2026-11-11 18:58:07 idle with headroom: inbox item written (waiting)

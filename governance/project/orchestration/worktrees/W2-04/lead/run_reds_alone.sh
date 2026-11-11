@@ -6,7 +6,7 @@ L=/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/lead/log
 rm -f "$L/reds-alone.exit"
 grep SigIgn /proc/$$/status > "$L/reds-alone.txt"
 cd /home/usain/gov-os-worktrees/W2-04 || exit 2
-env TMPDIR=/tmp/gov-os-lead-W2-04 HOME=/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/empty-home PYTHONUSERBASE=/home/usain/.local \
+env TMPDIR=/tmp/gov-os-lead-W2-04 \
   PYTHONPATH=/home/usain/gov-os-worktrees/W2-04/src \
   python3 -m pytest -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rs \
   "tests/unit/accept/test_w2_96_review3.py::test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]" \

@@ -1,0 +1,68 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "256b4e12d7ca",
+   "after": "5b4fe01acea2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "head",
+   "before": "256b4e12d7ca",
+   "after": "5b4fe01acea2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-a",
+   "change": "head",
+   "before": "71d756cbfbfb",
+   "after": "80169ddd17a2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store-b",
+   "change": "head",
+   "before": "256b4e12d7ca",
+   "after": "5b4fe01acea2"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/__main__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "status line added",
+   "line": "?? src/gov/memaudit/declare.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "status line added",
+   "line": "?? tests/unit/memaudit/__init__.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "status line added",
+   "line": "?? tests/unit/memaudit/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "status line added",
+   "line": "?? tests/unit/memaudit/test_preflight.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66c",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "head",
+   "before": "76c9b5cd1071",
+   "after": "294f3e84bbe7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "acceptance folder",
+   "folder": "W2-81"
+  }
+ ]
+}

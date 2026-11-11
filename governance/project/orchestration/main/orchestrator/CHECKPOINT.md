@@ -1,6 +1,29 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 18:25 UTC: session `b40cba91` hands over (rule 11, context past 200k); next free id DEC-1136
+## RESUME HERE — 2026-11-11 19:20 UTC: session `b40cba91` hands over (rule 11); next free id DEC-1137
+- **Leads (cap 3 until ACT A; `max_leads: 3` in dispatch/config.json; the idle guard ACT-IDLE-GUARD-1 is LIVE, `256b4e12d`):**
+  W2-170 BUILD running (18:32, `W2-170-A5-build`; est. 4 h, end ~22:30); W2-66c TESTS running (~18:58, `W2-66c-A5-r2-tests`);
+  W2-81's README test designer running (worker pid 1124395, `W2-81-A1-readme-map`). **Third slot:** W2-105 merged integrate
+  (`f95b82431`, `drafts/w2-105/RESOLUTION.md`); before its lead, a test designer fixes W2-105's 4 cases (`BASE_COMMIT` to
+  `dca333e7a55d`) and W1-38's 2 opt-in constants (`gov launch:*`); then its lead on a re-filled brief. **Hand briefs W2-81/105/
+  04/11 keep 17 unfilled `{ID}`-style slots** (the helper's parts.py bug): re-fill before reuse. W2-11 held (conflicts:
+  a kernel template + a W1-35 acceptance file).
+- **Closed today by this session:** W2-04 (record `b0d313cec`, ticket `d8064dbff`; gov accept 89/0/1 at `e14b5dcfc`).
+- **The owner's queue:** ACT-W1-01-EXEMPT-3 (P1, blocks every landing; `drafts/act-w1-01-exempt-3/`, manifest `6af6bdeb`,
+  class (O) by hand, FIRST per DEC-1136 (1)): its review is RUNNING (pid 1428371, log `~/gov-os-worktrees/W2-20/.gov-runtime/
+  scratch/lead/log/ACT-W1-01-EXEMPT-3-review.json`); on READY: copy the bundle to `acts/`, file review.md, copy the P1 and ACT
+  packages to `packages/`, commit, push the owner (P1, ping_log.sh + PushNotification) with `yes ACT-W1-01-EXEMPT-3 6af6bdeb`.
+  After its apply: rebuild ACT-EXAMIN-SETS-1 (on `f4029cfb`) and ACT-ACCEPTED-REDS-1 (on EXAMIN's new after), entries
+  byte-identical (the helper's facts in its return); each needs a new review block (round 2 under DEC-1131).
+- **DEC-1135, DEC-1136 recorded** (DEC-1136 (2) confirmed: a second owner commit straight after the first names its id).
+- **The lead ledger (the owner's order 18:45):** `tools/lead_ledger.py --md` in every digest; the sampler `lead_mem_watch.py`
+  runs (pid in `log/lead-mem-watch.pid`); CTO notes in `log/lead-ledger-notes.jsonl`; W2-170's usd estimates still null.
+  The first-hour memory watch (`lead_hour_watch.py`, ends 19:32): report the lowest MemAvailable and each lead's peak
+  (`log/lead-hour-watch-summary.json`; at 18:45: lowest 17,975 MB, peaks W2-170 619, W2-81 363, W2-04 359 MB; no hold).
+- **Also due:** ACT-IDLE-GUARD-1's `companion-tests.diff` (scoped run, commit) and its F1-F3 follow-up; ACT A's companion tests
+  (row 153); watch the first nightly 11-12 04:00; the 09:00 morning package with the ledger.
+
+## RESUME HERE (history) — 2026-11-11 18:25 UTC: session `b40cba91` hands over (rule 11, context past 200k); next free id DEC-1136
 - **The owner (17:55):** READY-AFTER-LIFT-1 approved (W2-82 P3): W2-170's lead first, then batches 1-3 in BATCH-PREP's order
   (`drafts/batch-prep/BATCH-PREP.md` §4-5), **at most three leads at once until ACT A**; ACT work beside. Rule 1: never idle while
   a ticket can launch: at every turn end check `dispatch/status.txt` (leads running vs 3) and `dispatch/ready.txt`.

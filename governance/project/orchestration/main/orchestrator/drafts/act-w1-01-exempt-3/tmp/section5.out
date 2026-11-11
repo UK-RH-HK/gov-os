@@ -1,0 +1,9 @@
+6af6bdeb15b018d37f8b11b451b783dbb959ea33e762c89cefaa1033f01cba5e  /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-w1-01-exempt-3/acts/ACT-W1-01-EXEMPT-3/manifest.json
+state before (sha256 fb52ab2dc756)
+state applied (sha256 f4029cfb4942)
+0
+2	0	governance/project/path-map.yaml
+[w2/integrate d8a92300c] ACT-W1-01-EXEMPT-3: acceptance_exemptions lists the owner's ACT-OPERATOR-ROUNDS-1 commit 6fbe73b1adde (DEC-1136 (1))
+ 1 file changed, 2 insertions(+)
+True
+/usr/bin/python3: No module named pytest

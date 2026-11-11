@@ -1,0 +1,5 @@
+{
+ "_about": "The CTO's own estimates for runs BATCH-PREP does not cover. Key: '<W2>:<run>' (the run is the log name less '<W2>-A5-' and '.json'; 'tests2' reads as 'tests'). hours: a number or [low, high]. usd: a number, [low, high] or null. These are the CTO's estimates, not measurements.",
+ "W2-170:tests": {"hours": 1.5, "usd": null, "source": "MEMORY-AUDIT-1 §6 E and W2-149's day (the CTO's estimate)", "by": "CTO"},
+ "W2-170:build": {"hours": 4, "usd": null, "source": "MEMORY-AUDIT-1 §6 E and W2-149's day: build incl. verify and the FULL review (the CTO's estimate)", "by": "CTO"}
+}
