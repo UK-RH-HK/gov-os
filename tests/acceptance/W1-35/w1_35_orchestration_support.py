@@ -107,11 +107,15 @@ ROWS = {
             ("a ticket lead per ticket, started in that worktree with its identity",
              [r"\blead", r"worktree", r"identit"]),
             ("no two tickets in flight with overlapping paths", [r"overlap", r"path"]),
-            # DEC-847 replaced the stated ceiling (DEC-737, DEC-776, DEC-786) with no fixed number.
-            ("no fixed number of tickets in flight",
-             [r"no fixed|not (a )?fixed|no set", r"number|ceiling|cap|count", r"ticket|lead"]),
+            ("a stated ceiling of tickets in flight",
+             [r"ceiling|at most|up to|no more than|maximum|limit", r"ticket",
+              r"in flight|at a time|at once|parallel|concurrent|running"]),
             ("the resource gate before each start",
              [r"resource gate", r"before (each|every|any|a)\b|(each|every) start"]),
+            # W2-11 (DEC-847, DEC-866): DEC-847 replaced the stated ceiling (DEC-737, DEC-776, DEC-786) with no fixed
+            # number; the skill says so, and this clause pins it.
+            ("no fixed number of tickets in flight",
+             [r"no fixed|not (a )?fixed|no set", r"number|ceiling|cap|count", r"ticket|lead"]),
             ("the gate reads free memory", [r"memory", r"free|available"]),
             ("the gate reads the load against the core count", [r"\bload", r"\bcores?\b|\bcpus?\b|processor"]),
             ("heavy tickets count double", [r"heavy", r"double|twice|\btwo\b"]),
