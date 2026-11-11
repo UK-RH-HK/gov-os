@@ -14398,7 +14398,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   fresh questions at a fixed rhythm).
 
 ### DEC-1128 — No switched-off control returns and no new guard rule goes live without set-up A's 100 % on the path map's actions; the lift does not wait for set-up A; set-up B dropped entirely; DEC-1010's one-rule principle investigated first; the switched-off list and the memory audit's landing to the owner
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC) · **Read by:** DEC-1133 (1): a fix to the guard's own faults is not a new rule; only a rule that adds or removes a deliberate refusal goes through the bar
 - **Decision:**
   - (1) **The switched-off controls:** the CTO brings one list of every guard rule, gate and check switched off during
     the emergency: why each was switched off, its home ticket, what must be true before it returns (for the guard,
@@ -14507,6 +14507,25 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (closes by the practices in force; a control returns on evidence) and question 1 (adopted
   tickets ready by code).
 
+### DEC-1133 — Set-up A's bar defined (V2, C, a fault fix is not a new rule, the as-run stratum); the error path and the listing rule fixed first; ACT A for the dispatcher's leads; the sample day after it, --remeasure writes the p95; FX6 one fix pass per round; MEMORY-PROTECTION-1 D1-D3, no window; the floor back to 3 GiB
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1), (2) and (5) standing · **Under:** DEC-1128 (2), (3), DEC-1132 (5), DEC-1105, DEC-1131, DEC-947 (5), DEC-1038 (3), DEC-1073 (4), DEC-1057 (4) · **Source:** the owner's answers (chat, 2026-11-11 ~15:40 UTC) to SETUP-A-BAR, LOAD-BALANCER-1, the CIT-P review's FX6 and MEMORY-PROTECTION-1
+- **Decision:**
+  - (1) **Set-up A's bar (SETUP-A-BAR):** scope V2; calls the guard cannot place scored by C; **a fix to the guard's own
+    faults is not a new rule:** it goes by ACT as today, and only a rule that adds or removes a deliberate refusal goes
+    through the bar (DEC-1128 (2) read so); the as-run call log added as a held-out stratum (R2); the rest of the
+    definition as proposed.
+  - (2) **The sequence:** the error path and the listing rule are fixed first, each by ACT; set-up A runs after they
+    land, not before.
+  - (3) **The load balancer:** ACT A, yes: `launch_now.sh` checks the gate before each lead and registers it. The sample
+    day after ACT A is in, on a working day with leads running; then `--remeasure` writes the p95, not the maximum.
+  - (4) **The one-bar CIT-P, FX6:** one fix pass per round, then the review.
+  - (5) **MEMORY-PROTECTION-1:** D1 yes (the guard stops `rg` chosen by program name, by pid, an exception to DEC-1073
+    (4) for `rg` only); D2 yes (the guard in restart class 4); D3 yes (`.wslconfig` unchanged). No WSL restart and no
+    maintenance window: work carries on. `mem_guard.py` starts now; once it runs, the gate's floor goes back to 3 GiB
+    (DEC-947).
+- **Basis:** question 2 (a control proved on measured evidence, its own faults fixed first; the machine protected from a
+  runaway whatever starts it) and question 4 (one fix pass per round).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14575,3 +14594,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.513 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1130 (the `Verify:` pass and the hand-built-brief exception to DEC-1083; a ticket for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route). DEC-1127 still held PROPOSED. Next free id: DEC-1131. |
 | 0.514 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1131 (one bar, two rounds for every role, option A; a blocking-only fix the same round; verdict.py and operator_run.py fixed now); DEC-1010 changed; DEC-1128's note corrected (W2-141's rule not live). DEC-1127 still held PROPOSED. Next free id: DEC-1132. |
 | 0.515 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1127 WITHDRAWN (never in force); DEC-1132 (closes by DEC-953, option D; ADOPT-VERIFY-1 (d) and W2-174; the rg tripwire; the nightly's restart ACT; set-up A's bar to define). Next free id: DEC-1133. |
+| 0.516 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1133 (set-up A's bar; the error path and listing rule first; ACT A; the sample day and the p95; FX6; MEMORY-PROTECTION-1 D1-D3; the floor 3 GiB). Next free id: DEC-1134. |
