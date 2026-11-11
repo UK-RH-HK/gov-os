@@ -13245,7 +13245,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     - The 110 decisions the archive calls spent while the register lists them as current go into a separate list for a status reconciliation. They are not counted as drift for now.
     - A PROPOSED decision is not in force and does not count as current. Retrieval must show its status, so no agent takes it as a rule.
   - **(3) M5** (one span per register entry) gets one more test, combined with the register links once they are built.
-  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper.
+  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper. *(Read with DEC-1135: a detection-only match that can only refuse is outside this rule.)*
   - **(5) Link integrity becomes a Gov OS capability,** for this repository and every adopted one. The census shows drift comes from links nobody is required to record and nothing checks. It has three parts:
     - **(a) Clean up what is here:**
       - the 215 drifting decisions, the 87 with no hint in their own entry first;
@@ -14538,6 +14538,17 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     CHECKPOINT's RESUME HERE), and the owner starts a fresh CTO session after the VS Code reload.
 - **Basis:** question 2 (a known, named red does not stop every night's report; it leaves the list when its fix lands).
 
+### DEC-1135 — A process-name match used only to detect, which can only refuse and never stops anything, is outside DEC-1073 (4)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); standing · **Under:** DEC-1073 (4), DEC-1133 (5), DEC-1132 (4) · **Source:** the owner's message (chat, 2026-11-11 ~17:45 UTC), confirming the reading ACT-NIGHTLY-RESTART-1's round-1 review raised (F6; `governance/project/orchestration/reviews/ACT-NIGHTLY-RESTART-1-review-r1.md`, package §2.4)
+- **Decision:**
+  - (1) **DEC-1073 (4)'s rule (every wait and every stop by pid or process group, never a name match) governs waits and
+    stops.** A process-name match used only to detect (to decide that the machine is busy), which can only refuse an
+    action (a night of the nightly) and never waits on, signals or stops a process, is outside it, as for `rg` in
+    DEC-1133 (5) D1. `nightly/quiet_check.py`'s detection matches and the wrapper's watchdog count are read so.
+  - (2) A match that leads to a wait, a signal or a stop stays under DEC-1073 (4) (pids or process groups only), except
+    `rg` under DEC-1133 (5).
+- **Basis:** question 2 (the rule keeps stops exact; a detection that can only refuse fails closed and loses nothing).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14608,3 +14619,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.515 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1127 WITHDRAWN (never in force); DEC-1132 (closes by DEC-953, option D; ADOPT-VERIFY-1 (d) and W2-174; the rg tripwire; the nightly's restart ACT; set-up A's bar to define). Next free id: DEC-1133. |
 | 0.516 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1133 (set-up A's bar; the error path and listing rule first; ACT A; the sample day and the p95; FX6; MEMORY-PROTECTION-1 D1-D3; the floor 3 GiB). Next free id: DEC-1134. |
 | 0.517 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1134 (the two warm-latency reds to accepted_reds until W2-155; linger; the handover). Next free id: DEC-1135. |
+| 0.518 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1135 (a detection-only process-name match that can only refuse is outside DEC-1073 (4); DEC-1073 (4) read with it). Next free id: DEC-1136. |

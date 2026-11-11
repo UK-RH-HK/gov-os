@@ -535,3 +535,6 @@ other restart is an ACT.
   pid past its thresholds, in restart class 4)**, `.wslconfig` unchanged, no window; the floor back to 3 GiB. Basis: questions 2 and 4.
 - DEC-1134 (2026-11-11, until W2-155 closes): W1-19's and W2-13's warm real-model latency cases in `accepted_reds`, named
   (decision DEC-1134, fixed_by W2-155), by the owner's commit through the owner's operator; linger enabled. Basis: question 2.
+- DEC-1135 (2026-11-11, standing): **DEC-1073 (4) governs waits and stops; a process-name match used only to detect,
+  which can only refuse (a night) and never waits, signals or stops, is outside it** (as `rg` in DEC-1133 (5)); `nightly/quiet_check.py`
+  read so. Basis: question 2.
