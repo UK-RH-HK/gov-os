@@ -13968,7 +13968,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   question 5 (proven in use before it enters the product).
 
 ### DEC-1101 — Memory quality audited periodically with fresh questions, for Gov OS and every adopted repository; the "not found" and "may be incomplete" answers counted weekly; independent writers, checkers and labellers launched automatically in walled folders, with fixed briefs the owner approves once
-- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`)
+- **Status:** ACCEPTED (owner, 2026-11-09, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-09)`); items (1) and (2) standing, active from now; **item (1)'s cadence changed by DEC-1125 (2): weekly while development is active, monthly once stable** · **Under:** DEC-1098 (1), (4), DEC-1099 (1) Q5, (2), DEC-1100, DEC-1078, DEC-1070 (14), DEC-820, DEC-1052 · **Source:** the owner's message (chat, 2026-11-09); its item 1 repeats DEC-1100 (recorded `1d49ca86`)
 - **Decision:**
   - (1) **Standing: memory quality is audited periodically with new questions,** for Gov OS and for every adopted
     repository (through W2-88). Each audit: an independent writer writes a fresh set, weighted toward what was added or
