@@ -14561,6 +14561,19 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     first, listing its full id; the ACT's rehearsal and review cover both commits.)*
 - **Basis:** question 2 (an applied ACT never leaves a red that blocks every landing).
 
+### DEC-1137 — W2-11's brief KPIs re-baselined to what W2-128 left (DEC-105 (c)); a small ticket so the role templates carry Policy 2's four refusals, DEC-861's record rule and the stop after two refusals, before EXAMIN's copy
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`) · **Under:** DEC-105, DEC-1050 (TPL-1), DEC-1116, DEC-820, DEC-861, DEC-750, DEC-754 · **Source:** the owner's answer (chat, 2026-11-11 ~19:40 UTC) to `governance/project/orchestration/packages/P1-W2-11-BRIEFS.md`
+- **Decision:**
+  - (1) **W2-11 (`DAEO-k7hz`) re-baselined (option (c)):** its brief KPIs follow what W2-128 left: the skills, `skill.md`, the
+    orchestration, test-design and QA-review skills, and the audit's DEC-430 wording; the CTO edits the ticket under this
+    decision; the five `brief-*.md` pointers stay as integrate has them; W2-11's brief cases are retired by an independent
+    test designer to follow the re-baselined lines.
+  - (2) **A small ticket:** the role templates (`template/governance/kernel/templates/role-*.md`) carry Policy 2's four
+    refusals (DEC-820), DEC-861's record rule and the stop after two refusals, through the template review (DEC-1116's
+    route: a template delta, its review, the owner's approval).
+  - (3) **The small ticket lands before EXAMIN's copy: W2-27 depends on it.**
+- **Basis:** questions 1 and 4 (the ticket judged on what exists; the live rules carried where agents read them).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14633,3 +14646,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.517 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1134 (the two warm-latency reds to accepted_reds until W2-155; linger; the handover). Next free id: DEC-1135. |
 | 0.518 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1135 (a detection-only process-name match that can only refuse is outside DEC-1073 (4); DEC-1073 (4) read with it). Next free id: DEC-1136. |
 | 0.519 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1136 (the W1-01 exemption first, the two path-map ACTs rebuilt after; every ACT changing tests/acceptance/ carries its own exemption entry in its apply). Next free id: DEC-1137. |
+| 0.520 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1137 (W2-11's brief KPIs re-baselined, option (c); the role-template ticket before EXAMIN's copy, W2-27 depends on it). Next free id: DEC-1138. |

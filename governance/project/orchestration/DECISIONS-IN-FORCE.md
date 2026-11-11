@@ -541,3 +541,6 @@ other restart is an ACT.
 - DEC-1136 (2026-11-11, item (2) standing): ACT-W1-01-EXEMPT-3 first, EXAMIN-SETS-1 and ACCEPTED-REDS-1 rebuilt after it;
   **every ACT whose commit changes a file under `tests/acceptance/` carries its own `acceptance_exemptions` entry in the same
   owner apply** (a second owner commit straight after the first, naming its full id; rehearsal and review cover both: confirmed by the owner). Basis: question 2.
+- DEC-1137 (2026-11-11): W2-11's brief KPIs re-baselined to what W2-128 left (DEC-105 (c)); the five brief pointers stay;
+  **a small ticket: the role templates carry Policy 2's four refusals, DEC-861's record rule and the stop after two refusals**
+  (DEC-1116's template review), **landing before EXAMIN's copy (W2-27 depends on it)**. Basis: questions 1 and 4.

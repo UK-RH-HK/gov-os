@@ -1,5 +1,5 @@
 ---
-status: OPEN
+status: ANSWERED (DEC-1137: (c) and the small ticket)
 ---
 # P1-W2-11-BRIEFS: W2-11's brief KPIs name five templates W2-128 retired (DEC-105: apply now, defer or re-baseline)
 
