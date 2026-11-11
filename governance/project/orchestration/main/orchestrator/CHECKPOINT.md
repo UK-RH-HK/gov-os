@@ -1,6 +1,31 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 21:40 UTC: session `b40cba91` hands over (rule 11; the owner's order "prepare to hand over"); next free id DEC-1139
+## RESUME HERE — 2026-11-11 22:25 UTC: session `b2f0511f` (fresh after b40cba91); next free id DEC-1140
+**Read the 21:40 block below too; this block replaces it where they differ.**
+- **Owner tonight:** DEC-1139 recorded `f13d2a439` (W2-175 approved at `4c0c73472fd8`, promoted 1.0.1; three fixes: (a) RV1, (b) RV3 ride
+  the one-bar CIT-P, (c) composed files' "Wave 1" sections to W2-33; DECIDED-NOT-DONE rows 160-161).
+- **Closed since 21:40:** W2-90b, W2-05, W2-66c (merge queue, DEC-989), W2-149 (`9f00982b9`, accept 206/0/3 with `GOV_W2_149_BWRAP=1`;
+  F37/F40 rows, delegated). **W2-40 EJECTED** 21:38 (experiments/** unmapped): ACT-PATHMAP-EXP-1 built (`drafts/pathmap-exp-1/`, manifest
+  `9a945c99`, class (b), `doc-records`), chained after EXAMIN-SETS-1 then ACCEPTED-REDS-1; **its review RUNNING** (pid 3993021, log
+  `~/gov-os-worktrees/W2-40/.gov-runtime/scratch/lead/log/ACT-PATHMAP-EXP-1-review.json`); then package to `packages/`, the owner's yes,
+  then re-queue `W2-40=29753c768def` in `dispatch/land.txt` after the agent applies it.
+- **Leads running:** W2-11 r6 resume (from 22:00; designer `c96136eb6` DONE: 41 cases retired) and W2-23 run 1 (claimed `219307d1d`,
+  worktree `~/gov-os-worktrees/W2-23`, brief `briefs/W2-23-A5-run1.md` from `gov brief lead --run build --part`).
+- **ACT A:** companion merged `792b92923`; **review RUNNING** (pid 3998632, log `~/gov-os-worktrees/W2-153/.gov-runtime/scratch/lead/log/ACT-LOAD-BALANCER-A-review.json`);
+  then package to `packages/`, `yes ACT-LOAD-BALANCER-A 0b40f1bf`.
+- **W2-175 copies ACT:** a Sonnet helper is building ACT-CLAUDE-COPIES-4 (`acts/ACT-CLAUDE-COPIES-4/`, package `drafts/claude-copies-4/`);
+  then review (Opus), the owner's yes, apply, S6 re-run (254/0), CIT-P §4-5 ACCEPTED, merge, close.
+- **W2-112:** probe record `f0e368f5c`; fresh `gov accept` RUNNING (`log/close-w2-112/`); on pass, close by DEC-953 (as W2-149's record).
+- **With the owner:** W2-148-S15 (`packages/W2-148-S15.md`, option 2); `yes ACT-ACCEPTED-REDS-1 b8df21d8` (by hand, after EXAMIN-SETS-1);
+  EXAMIN-SETS-1 r2 READY class (a) (`e8020292`; the agent after ~21:17 UTC 11-12, or the owner's operator earlier; step 2 by hand).
+- **Free slots (owner's ask):** EXAMIN-path and conflict-free: W2-23 (started). Off-path free: W2-171, W2-173 (now unblocked by W2-149's
+  close), W2-154, W2-146, W2-34: held under the 80 % brake (78 % at 21:49). Not free: W2-93/94 (EXAMIN-SETS-1), W2-124 (W2-52), W2-45
+  (W2-104), W2-33 (W2-11), W2-42 (W2-42a, W2-110), W2-18 (W2-110); W2-17/W2-19 overlap W2-23/W2-154/W2-146.
+- **Watchers (this session):** inbox waiter, helper_watch, sentinel_check, bare_watch, store backstop, usage_log; digests CronCreate
+  `f12e2342` (09:02) and `d41536c8` (18:02). Old session's surviving watcher processes stopped by pgid 21:58.
+- **Next:** W2-66c's ticket lines (S2 reading (b) delegated; the ceiling 13513/6000 recorded, trim as a row); sync_context commit.
+
+## RESUME HERE (history) — 2026-11-11 21:40 UTC: session `b40cba91` hands over (rule 11; the owner's order "prepare to hand over"); next free id DEC-1139
 **Read the 21:00 block below too; this block replaces it where they differ.**
 - **Closed tonight (5):** W2-04, W2-81, W2-170 (DEC-953 records in `closes/`), W2-105 (the merge queue, DEC-989; its README map
   commit merged `77dfff06c3b4`). **Landing now (merge queue):** W2-90b (`cb0e69ba57f2`) and W2-40 (`29753c768def`) in flight;

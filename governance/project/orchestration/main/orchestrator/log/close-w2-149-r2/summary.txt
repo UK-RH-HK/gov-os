@@ -1,0 +1,5 @@
+2026-11-11 22:03:42 start at 31c8c31eb2a2 GOV_W2_149_BWRAP=1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+KeyError: 'lines'
+pass {'passed': 206, 'failed': 0, 'skipped': 3} [('success-25', 10, 0), ('success-26', 2, 0), ('success-31', 34, 0), ('failure-11', 19, 0)]

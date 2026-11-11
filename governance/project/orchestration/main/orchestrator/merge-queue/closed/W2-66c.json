@@ -1,0 +1,12 @@
+{
+ "ticket": "W2-66c",
+ "task": "DAEO-btcs",
+ "branch": "w2/W2-66c",
+ "commit": "400991361362724354d1195a8df3f9387943100d",
+ "requested_at": "2026-11-11 21:58:02",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-11T21:58:02.955249",
+ "merge": "e452af6b1717b0c5296616b0a0e3c8de9a61b152",
+ "record": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/e452af6b1717.json",
+ "landed_at": "2026-11-11 22:10:58"
+}

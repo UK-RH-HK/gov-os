@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261111-215802.out
+Structural: after the landing of W2-05, W2-66c (base 31c8c31eb2a2)
+status: structural pass at f9fdaa9a236c (the work tree differs from it at 4 tracked path(s): the working files were read): NOTICE in schema, links (7 of 9 families ok), 14.5 s; a notice, not a refusal
+
+schema: NOTICE 1 finding: docs/probes/DAEO-xafn/PR-DAEO-xafn.md: field 'probed_commit' is refused by probe.schema.json at $.probed_commit: '2ef060a65c77' does not match '^[0-9a-f]{40}$'
+graph: ok
+claims: ok
+mutation: ok
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 31c8c31eb2a2)
+links: NOTICE 4 new since 31c8c31eb2a2ae17890ca1bb3e07d2520c04ddce (1601 standing): UNLINKED_ID W2-L160 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-L160 to DAEO-0z8c's sources: | UNLINKED_ID W2-M105 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-M105 to DAEO-0z8c's sources: | UNLINKED_ID W2-M113 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-M113 to DAEO-0z8c's sources: (+1 more)
+structural pass at f9fdaa9a236c (the work tree differs from it at 4 tracked path(s): the working files were read): NOTICE in schema, links (7 of 9 families ok), 14.5 s; a notice, not a refusal

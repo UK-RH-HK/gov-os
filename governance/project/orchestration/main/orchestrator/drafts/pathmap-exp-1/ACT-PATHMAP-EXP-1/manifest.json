@@ -1,0 +1,38 @@
+{
+ "act": "ACT-PATHMAP-EXP-1",
+ "dec": "DEC-333, DEC-273, DEC-1066, DEC-957",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "repo",
+   "path": "governance/project/path-map.yaml",
+   "before": "5654eca4c139be0e2f8457593a685fcd9d747657e952215e3c46bcac45998211",
+   "after": "d50884e3633e6e778626a17a0cae62f37778ff7f1903b2a557ad7920e9bbbb4d"
+  }
+ ],
+ "files": {
+  "before/repo/governance/project/path-map.yaml": "5654eca4c139be0e2f8457593a685fcd9d747657e952215e3c46bcac45998211",
+  "after/repo/governance/project/path-map.yaml": "d50884e3633e6e778626a17a0cae62f37778ff7f1903b2a557ad7920e9bbbb4d",
+  "apply.sh": "d51e8749d3ab80a0bf5194cb81027bbe28fd2ea0515473d4354d72cda5b45d6e",
+  "list.txt": "ee4fc76d9483104877df4c5540eefb2ae4750f130a3f328ac4b66f9b183d79c2",
+  "rehearsal.log": "f981a313350fe4234358c0f02dbf3fc5edaa2ff25cd666d1a18fd3e352c85877"
+ },
+ "checks": [
+  {
+   "cmd": "PYTHONPATH=src python3 -m gov.check.pathmap",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "python3 -I -c 'import yaml,sys,re; d=yaml.safe_load(open(\"governance/project/path-map.yaml\")); n=d[\"namespaces\"]; m=lambda p,s: re.fullmatch(\".*\".join(re.escape(x).replace(r\"\\*\",\"[^/]*\") for x in p.split(\"**\")),s) is not None; t=[\"experiments/EXP-002/README.md\",\"experiments/EXP-002/results/pre-allow-5-a.json\",\"experiments/EXP-002/run_hook_limit.py\",\"experiments/EXP-003/a/b/c.md\"]; sys.exit(0 if n[\"doc-records\"][\"paths\"]==[\"docs/close/**\",\"docs/checkpoints/**\",\"docs/probes/**\",\"experiments/**\"] and len(n)==18 and sum(\"experiments/**\" in v[\"paths\"] for v in n.values())==1 and all(sum(m(p,s) for v in n.values() for p in v[\"paths\"])==1 for s in t) and n[\"doc-records\"][\"embedding_policy\"]==\"not embedded\" and len(d[\"accepted_reds\"])==2 else 1)'",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "f981a313350fe4234358c0f02dbf3fc5edaa2ff25cd666d1a18fd3e352c85877"
+ }
+}

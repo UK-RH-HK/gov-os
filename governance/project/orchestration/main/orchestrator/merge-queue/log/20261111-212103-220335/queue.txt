@@ -10,3 +10,7 @@
 2026-11-11 21:37:25 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
 2026-11-11 21:38:48 EJECTED W2-40: red; failing: tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace, tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
 2026-11-11 21:38:48 merged W2-90b onto 17c5d4b3e140: ae36b145b1b2
+2026-11-11 21:55:50 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 37066e82a654: 09b3740612b4; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-11 21:55:50 ADVANCED refs/heads/w2/integrate 37066e82a654 -> 09b3740612b4; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/09b3740612b4.json
+2026-11-11 21:55:51 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-11 21:56:25 integration store promoted: the merged clone's stores at 09b3740612b4 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)

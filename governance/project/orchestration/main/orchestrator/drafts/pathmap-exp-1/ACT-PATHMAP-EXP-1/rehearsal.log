@@ -1,0 +1,205 @@
+# Rehearsal of ACT-PATHMAP-EXP-1 (class (b)): scripts rehearse-1.sh and rehearse-2.sh beside the bundle; a --no-hardlinks clone of w2/integrate; the live tree only read.
+# The chain: ACT-EXAMIN-SETS-1 r2 (its own apply.sh), then ACT-ACCEPTED-REDS-1 r2's after copy put in place, then this ACT.
+
+## A. preconditions
+clone branch: w2/integrate; map f4029cfb4942; clean: 0 changes
+EXAMIN before f4029cfb4942 after 0ec1d20da86a; REDS before 0ec1d20da86a after 5654eca4c139; mine before 5654eca4c139 after d50884e3633e
+  [ok] my before copy is REDS's after copy, byte for byte
+the one added line (diff before to after of this ACT):
+95a96
+>       - "experiments/**"
+
+## B. wrong order: this ACT on the map before EXAMIN (f4029cfb)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh check
+state other: not the frozen before (ACT-EXAMIN-SETS-1 and ACT-ACCEPTED-REDS-1 not both applied yet?) and not the frozen after (sha256 f4029cfb4942)
+  [ok] out of order check: exit 3
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh apply
+refused: governance/project/path-map.yaml is neither the frozen before nor the frozen after (sha256 f4029cfb4942)
+  [ok] out of order apply: exit 3
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh undo
+refused: governance/project/path-map.yaml is not as this ACT left it (sha256 f4029cfb4942); a later change is not overwritten
+  [ok] out of order undo: exit 3
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh verify
+not applied: governance/project/path-map.yaml (sha256 f4029cfb4942)
+  [ok] out of order verify: exit 3
+map unchanged: f4029cfb4942; git status: 0 changes; temp files: 0
+
+## C. ACT-EXAMIN-SETS-1 r2 (its own apply.sh)
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/ACT-EXAMIN-SETS-1/apply.sh check
+state before (sha256 f4029cfb4942)
+  [ok] examin check: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/examin-sets/ACT-EXAMIN-SETS-1/apply.sh apply
+state applied (sha256 0ec1d20da86a)
+  [ok] examin apply: exit 0
+map 0ec1d20da86a
+committed
+
+## D. ACT-ACCEPTED-REDS-1 r2 (its after copy put in place; its section 5 commit is the owner's by hand)
+map 5654eca4c139
+committed
+
+## E. ACT-PATHMAP-EXP-1: check, verify, undo, apply, verify, again
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh check
+state before (sha256 5654eca4c139)
+  [ok] check (before): exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh verify
+not applied: governance/project/path-map.yaml (sha256 5654eca4c139)
+  [ok] verify before apply: exit 3
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh undo
+state before (sha256 5654eca4c139); nothing to undo
+  [ok] undo when nothing applied: exit 0
+$ bash -c bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh check | grep -x 'state before (sha256 5654eca4c139)'
+state before (sha256 5654eca4c139)
+  [ok] check line: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh apply
+state applied (sha256 d50884e3633e)
+  [ok] apply: exit 0
+map d50884e3633e mode 644; status:
+ M governance/project/path-map.yaml
+no temp file
+  [ok] the map is the frozen after, byte for byte
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh verify
+  [ok] verify: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh apply
+state applied (sha256 d50884e3633e); nothing to do
+  [ok] apply again: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh check
+state applied (sha256 d50884e3633e)
+  [ok] check (applied): exit 0
+git diff of the map:
+diff --git a/governance/project/path-map.yaml b/governance/project/path-map.yaml
+index d144dc2f0..a21691068 100644
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -93,6 +93,7 @@ namespaces:
+       - "docs/close/**"
+       - "docs/checkpoints/**"
+       - "docs/probes/**"
++      - "experiments/**"
+     memory_class: governance
+     sensitivity: internal
+     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+
+## F. the manifest's two checks, as written, applied and before
+$ bash -c PYTHONPATH=src python3 -m gov.check.pathmap
+  [ok] check 1 on the applied map: exit 0
+$ bash -c python3 -I -c 'import yaml,sys,re; d=yaml.safe_load(open("governance/project/path-map.yaml")); n=d["namespaces"]; m=lambda p,s: re.fullmatch(".*".join(re.escape(x).replace(r"\*","[^/]*") for x in p.split("**")),s) is not None; t=["experiments/EXP-002/README.md","experiments/EXP-002/results/pre-allow-5-a.json","experiments/EXP-002/run_hook_limit.py","experiments/EXP-003/a/b/c.md"]; sys.exit(0 if n["doc-records"]["paths"]==["docs/close/**","docs/checkpoints/**","docs/probes/**","experiments/**"] and len(n)==18 and sum("experiments/**" in v["paths"] for v in n.values())==1 and all(sum(m(p,s) for v in n.values() for p in v["paths"])==1 for s in t) and n["doc-records"]["embedding_policy"]=="not embedded" and len(d["accepted_reds"])==2 else 1)'
+  [ok] check 2 on the applied map: exit 0
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh undo
+state before (sha256 5654eca4c139)
+  [ok] undo: exit 0
+  [ok] undo: byte for byte the before copy
+git status changes: 0
+$ bash -c PYTHONPATH=src python3 -m gov.check.pathmap
+  [ok] check 1 on the before map: exit 0
+$ bash -c python3 -I -c 'import yaml,sys,re; d=yaml.safe_load(open("governance/project/path-map.yaml")); n=d["namespaces"]; m=lambda p,s: re.fullmatch(".*".join(re.escape(x).replace(r"\*","[^/]*") for x in p.split("**")),s) is not None; t=["experiments/EXP-002/README.md","experiments/EXP-002/results/pre-allow-5-a.json","experiments/EXP-002/run_hook_limit.py","experiments/EXP-003/a/b/c.md"]; sys.exit(0 if n["doc-records"]["paths"]==["docs/close/**","docs/checkpoints/**","docs/probes/**","experiments/**"] and len(n)==18 and sum("experiments/**" in v["paths"] for v in n.values())==1 and all(sum(m(p,s) for v in n.values() for p in v["paths"])==1 for s in t) and n["doc-records"]["embedding_policy"]=="not embedded" and len(d["accepted_reds"])==2 else 1)'
+  [ok] check 2 on the before map (must fail): exit 1
+PART1 N=19 FAIL=0
+
+## G0. W2-40's branch merged in the clone only (its head 29753c768def; 16 files under experiments/EXP-002, 1 under docs/probes)
+$ git merge --no-ff --no-edit 29753c768def     (in the clone; the ACT is undone, the map is 5654eca4c139)
+  [ok] merge made, working tree clean
+
+
+## G. W2-40 merged in the clone, the ACT undone
+merge parents: 2; experiments files tracked: 16; map 5654eca4c139 (the before: ACT undone)
+--- the two tests, ACT undone (expected RED)
+____________ test_every_tracked_path_matches_exactly_one_namespace _____________
+
+    def test_every_tracked_path_matches_exactly_one_namespace():
+        """The names come from `git ls-files`; no tracked file is opened."""
+        spaces = support.namespaces(support.load_path_map())
+        patterns = {name: [pattern for pattern in value.get("paths") or [] if isinstance(pattern, str)]
+                    for name, value in spaces.items()}
+        tracked = support.tracked_files()
+        nowhere, twice = [], []
+        for path in tracked:
+            found = [name for name, own in patterns.items() if any(support.matches(pattern, path) for pattern in own)]
+            if not found:
+                nowhere.append(path)
+            elif len(found) > 1:
+                twice.append(f"{path} -> {found}")
+>       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
+                             f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
+E       AssertionError: 16 of 4075 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['experiments/EXP-002/README.md', 'experiments/EXP-002/hook-limit-record.md', 'experiments/EXP-002/results/post-5-a.json', 'experiments/EXP-002/results/pre-allow-5-a.json', 'experiments/EXP-002/results/pre-allow-5-b.json', 'experiments/EXP-002/results/pre-allow-60-a.json', 'experim
+E       assert not ['experiments/EXP-002/README.md', 'experiments/EXP-002/hook-limit-record.md', 'experiments/EXP-002/results/post-5-a.js...ow-5-a.json', 'experiments/EXP-002/results/pre-allow-5-b.json', 'experiments/EXP-002/results/pre-allow-60-a.json', ...]
+
+tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace
+FAILED tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
+2 failed in 1.75s
+--- gov.check.pathmap, ACT undone (expected findings)
+exit 1
+[
+  {
+    "code": "PATH_NO_NAMESPACE",
+    "path": "experiments/EXP-002/README.md",
+    "message": "experiments/EXP-002/README.md matches no namespace in path-map.yaml"
+
+## H. the ACT applied, the same merge
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh apply
+state applied (sha256 d50884e3633e)
+  [ok] apply: exit 0
+--- the two tests, W1-08 and W2-91's whole file (expected green)
+exit 0
+........................................................................ [ 56%]
+.......................................................                  [100%]
+127 passed, 114 deselected in 50.80s
+--- gov.check.pathmap
+exit 0
+--- every tracked path in exactly one namespace (clone with the merge in), the applied map
+tracked: 4075 | not in exactly one namespace: 0 [] | experiments files: 16 | all in doc-records only: True
+
+## I. undo, back to REDS's after
+$ bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pathmap-exp-1/ACT-PATHMAP-EXP-1/apply.sh undo
+state before (sha256 5654eca4c139)
+  [ok] undo: exit 0
+map 5654eca4c139
+
+PART2 N=21 FAIL=0
+
+## J. gov check --root <clone>, the whole run (each under 5 minutes; the entry is gov.cli.main: 'python3 -m gov check' does not exist as written)
+--- the ACT applied (map d50884e3633e), W2-40 merged:
+  adapter/model portability: GREEN
+  audit reproducibility: GREEN
+  authority/role limits: YELLOW
+  command-contract consistency: GREEN
+  concurrency/claims: GREEN
+  context reproducibility: RED
+  fresh-agent reconstruction: GREEN
+  graph integrity: GREEN
+  index freshness: RED
+  mutation scope: GREEN
+  path-map compliance: GREEN
+  product traceability: RED
+  recovery/rebuild: RED
+  retrieval regression: GREEN
+  schema/invariants: GREEN
+  skill regression: GREEN
+gov check: CHECK_FAILED: one or more hard-block checks failed: index freshness, context reproducibility, recovery/rebuild, product traceability
+--- the ACT undone (map 5654eca4c139), W2-40 merged:
+  adapter/model portability: GREEN
+  audit reproducibility: GREEN
+  authority/role limits: YELLOW
+  command-contract consistency: GREEN
+  concurrency/claims: GREEN
+  context reproducibility: RED
+  fresh-agent reconstruction: GREEN
+  graph integrity: GREEN
+  index freshness: RED
+  mutation scope: GREEN
+  path-map compliance: RED
+  product traceability: RED
+  recovery/rebuild: RED
+  retrieval regression: GREEN
+  schema/invariants: GREEN
+  skill regression: GREEN
+gov check: CHECK_FAILED: one or more hard-block checks failed: index freshness, path-map compliance, context reproducibility, recovery/rebuild, product traceability
+(index freshness, context reproducibility, recovery/rebuild and product traceability are RED in both runs: a fresh clone has no built index or store; they do not read the map's namespaces; path-map compliance is the only one that changes: RED without, GREEN with.)
+
+## K. the operator's classifier on this bundle (read only: python3 -I governance/project/operator/act_class.py <bundle>)
+{"class": "b", "files": [{"root": "repo", "path": "governance/project/path-map.yaml", "class": "b", "row": "path-map", "why": "a change the row does not allow as (a)"}], "hits": []}
+(the same classifier on ACT-ACCEPTED-REDS-1's bundle says O: a change to accepted_reds is read only from the owner's commits; this ACT touches no ratchet list.)
+
+checks: 21; failures: 0

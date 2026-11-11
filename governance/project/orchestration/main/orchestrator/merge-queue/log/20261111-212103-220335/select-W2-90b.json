@@ -3,8 +3,8 @@
  "why_full": [],
  "core_changed": [],
  "unplaced": [],
- "base": "77dfff06c3b401e9c92f00499fc46aa45f3cb388",
- "head": "9e07d5105210a38169f8b6066ad51db6e893c46b",
+ "base": "17c5d4b3e1408108a8d4e161c1ab6424c3fca82d",
+ "head": "ae36b145b1b2842501a00834ce68bf1f32d6adc9",
  "governance_left_out": [
   "docs/checkpoints/DAEO-nqa2/CP-DAEO-nqa2-0004.md"
  ],

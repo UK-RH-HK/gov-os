@@ -1,0 +1,12 @@
+{
+ "ticket": "W2-90b",
+ "task": "DAEO-nqa2",
+ "branch": "w2/W2-90b",
+ "commit": "cb0e69ba57f2ebcfebce5e234c7a7b1f185e6aa8",
+ "requested_at": "2026-11-11 21:21:03",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-11T21:21:03.081784",
+ "merge": "09b3740612b47be08717d351105518caf764c8e5",
+ "record": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/09b3740612b4.json",
+ "landed_at": "2026-11-11 21:55:50"
+}

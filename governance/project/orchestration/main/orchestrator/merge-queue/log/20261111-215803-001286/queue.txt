@@ -1,0 +1,5 @@
+2026-11-11 21:58:03 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-11 21:58:03 merged W2-05, W2-66c onto 31c8c31eb2a2: e452af6b1717
+2026-11-11 22:10:58 ADVANCED refs/heads/w2/integrate 31c8c31eb2a2 -> e452af6b1717; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/e452af6b1717.json
+2026-11-11 22:10:58 seed of W2-00-store-b from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-11 22:11:31 integration store promoted: the merged clone's stores at e452af6b1717 into W2-00-store-b; the link moved (its own rebuild of the landing's change not needed)

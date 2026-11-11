@@ -1,0 +1,1 @@
+2026-11-11 21:39:17 CTO b40cba91 waits on the owner: the switch to a fresh CTO session (rule 11); handover in CHECKPOINT RESUME HERE 21:40, record/w2 1b117f93b; leads, workers, holds and the dispatcher run on

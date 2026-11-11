@@ -1,0 +1,7 @@
+W2-11 (DAEO-k7hz): merge w2/W2-11-tests, round 2's acceptance cases (S9 round-2 half, S13, S14, S15, S16 skill half, F1)
+
+The independent test designer's commit 8f64800d1, written in parallel with the product-spec worker (DEC-959 item 7, DEC-963).
+
+Task: DAEO-k7hz
+Role: orchestrator
+Implements: DEC-959, DEC-983, DEC-991, DEC-995, DEC-996

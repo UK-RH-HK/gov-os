@@ -44,3 +44,7 @@
 2026-11-02 23:09:04 W2-122=3fc448601e2d no outcome in the output (refused or stopped)
 2026-11-02 23:09:04 W2-126=2785b2e47432 no outcome in the output (refused or stopped)
 2026-11-11 20:59:02 W2-105=19ac51dd9793 CLOSED
+2026-11-11 21:57:02 W2-90b=cb0e69ba57f2 CLOSED
+2026-11-11 21:57:02 W2-40=29753c768def not landed (ejected: red)
+2026-11-11 22:12:03 W2-05=52de591b8c08 CLOSED
+2026-11-11 22:12:03 W2-66c=400991361362 CLOSED

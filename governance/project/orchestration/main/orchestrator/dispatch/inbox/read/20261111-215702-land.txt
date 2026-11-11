@@ -1,0 +1,9 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261111-212102.out
+W2: (land batch)
+status: W2-90b=cb0e69ba57f2 CLOSED; W2-40=29753c768def not landed (ejected: red)
+
+last output:
+ources | .tickets/DAEO-nqa2.md:48 | orchestrator | add DE... | UNLINKED_ID W2-106 in DAEO-nqa2's KPI brackets, not in its sources | .tickets/DAEO-nqa2.md:48 | orchestrator | add W2-106 to DAEO-nqa2's sources:
+structural pass: structural pass at 31c8c31eb2a2: NOTICE in links (8 of 9 families ok), 14.7 s; a notice, not a refusal
+structural pass: notice -> inbox/20261111-215641-structural-notice.txt
+

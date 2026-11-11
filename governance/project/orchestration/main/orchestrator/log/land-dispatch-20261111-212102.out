@@ -14,3 +14,22 @@ reds traced: the head without the batch, once each way, the same failure; 3 roun
 2026-11-11 21:37:25 warm clone alt reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/alt); its stores kept, the rest of .gov-runtime cleared
 2026-11-11 21:38:48 EJECTED W2-40: red; failing: tests/unit/retrieval/test_w2_91_full_embeddings.py::test_every_tracked_path_is_in_one_namespace, tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
 2026-11-11 21:38:48 merged W2-90b onto 17c5d4b3e140: ae36b145b1b2
+2026-11-11 21:55:50 refs/heads/w2/integrate moved by records only (1 path(s)); merged again onto 37066e82a654: 09b3740612b4; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-11 21:55:50 ADVANCED refs/heads/w2/integrate 37066e82a654 -> 09b3740612b4; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/09b3740612b4.json
+2026-11-11 21:55:51 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-11 21:56:25 integration store promoted: the merged clone's stores at 09b3740612b4 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 3
+CLOSED W2-90b: 31c8c31eb W2-90b (DAEO-nqa2): merged and closed in one step by the merge queue (DEC-989)
+W2-40: not landed (ejected: red)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: ok
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 77dfff06c3b4)
+structural pass: links: NOTICE 2 new since 77dfff06c3b401e9c92f00499fc46aa45f3cb388 (1603 standing): UNLINKED_ID DEC-1065 in b3ed3f88d1f2's Implements: (independent-test-designer), not in DAEO-nqa2's sources | .tickets/DAEO-nqa2.md:48 | orchestrator | add DE... | UNLINKED_ID W2-106 in DAEO-nqa2's KPI brackets, not in its sources | .tickets/DAEO-nqa2.md:48 | orchestrator | add W2-106 to DAEO-nqa2's sources:
+structural pass: structural pass at 31c8c31eb2a2: NOTICE in links (8 of 9 families ok), 14.7 s; a notice, not a refusal
+structural pass: notice -> inbox/20261111-215641-structural-notice.txt
