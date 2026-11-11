@@ -538,3 +538,6 @@ other restart is an ACT.
 - DEC-1135 (2026-11-11, standing): **DEC-1073 (4) governs waits and stops; a process-name match used only to detect,
   which can only refuse (a night) and never waits, signals or stops, is outside it** (as `rg` in DEC-1133 (5)); `nightly/quiet_check.py`
   read so. Basis: question 2.
+- DEC-1136 (2026-11-11, item (2) standing): ACT-W1-01-EXEMPT-3 first, EXAMIN-SETS-1 and ACCEPTED-REDS-1 rebuilt after it;
+  **every ACT whose commit changes a file under `tests/acceptance/` carries its own `acceptance_exemptions` entry in the same
+  owner apply** (a second owner commit naming the first's full id, the CTO's reading to confirm). Basis: question 2.
