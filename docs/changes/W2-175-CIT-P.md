@@ -63,6 +63,17 @@ The statements added (the words of the ticket's Interface section):
 The base sha256 values are those of the files at the base commit; the new values are `sha256sum` of each file after the
 last template edit (they must equal `sha256sum` at the ticket's head).
 
+The CTO's scope amendment (P-2 (a)) added these six byte-determined compositions; the root `.rulesync/` copies follow by the copies ACT after the owner's approval.
+
+| File | Base sha256 | New sha256 | Statements added |
+|---|---|---|---|
+| `template/.rulesync/subagents/engineer.md` | `be528c5a52019183df147c5a640aaf347433c293c0184f528c8fc193a9bc6d2d` | `33155d8015ac24a628a771596a3a7cb093526ef95821616a0e87564fc8ae9d86` | composed by `compose()` from the role's template (W2-153 S3) |
+| `template/.rulesync/subagents/independent-auditor.md` | `f4fcb152cfaff5ece77bde9706cf8fc93aa63ef1b32f43b247bc14d2a24b6437` | `6bd4dfd519f18b3af142b30ce47ffefe1ada25206d86cb09d7314f0ea3a4e08e` | composed by `compose()` from the role's template (W2-153 S3) |
+| `template/.rulesync/subagents/independent-test-designer.md` | `04cc3f44f5c32fd7584debae544d80a9b567053f58477fdabe5f9b64329f2599` | `42fae108dda88dd8c42feffe95e3cc75a4496d25be019471ddd4866aabb24c68` | composed by `compose()` from the role's template (W2-153 S3) |
+| `template/.rulesync/subagents/orchestrator.md` | `b2f717c4ecca3d7ae6ea0b4eda6de5021f9425961a4ab1a9c29cc832c71aee54` | `692efdee2df95685d9a405c0c835a9b9cfe141ccbeb65b75250bad8ebac40333` | composed by `compose()` from the role's template (W2-153 S3) |
+| `template/.rulesync/subagents/product-spec.md` | `c8c04a03bfc75dd9a8172b65be01652aa3b627b2d130d2f24e013e711275597d` | `787f5a04bad04dba13957c9bf321fb607f331a56620e6fa822e8d28a7bc566fa` | composed by `compose()` from the role's template (W2-153 S3) |
+| `template/.rulesync/subagents/research.md` | `2b8e2b217397d4b91ce51cfd5d03b8cc9757d2b20ec5f55fb944bf9347fe674f` | `3b9d6a3d28b5320ad23344afe44b43498c6d3bf66d61d48c2d1cdda3bbb1e13a` | composed by `compose()` from the role's template (W2-153 S3) |
+
 Prose size (W2-128's `prose()` measure) against the budget of `governance/project/facts.yaml`:
 
 | Template | Base | New | Budget |
@@ -83,8 +94,8 @@ The three options (DEC-105):
 | Defer | Keep the templates at 1.0.0 | A launched session keeps lacking the three rules (E2, E3); W2-27 stays blocked (DEC-1137 (3)) |
 | Re-baseline | Put the rules in `brief.md` only | Set aside in the ticket: every session reads `brief.md`, but a role's system prompt would still lack them, and the owner asked for the templates |
 
-Not changed: `brief.md`, the five `brief-*.md` pointers, `keys.yaml`, `facts.yaml`, any skill, any file under `roles/`, any
-`.rulesync/` path, any `.claude/` path.
+Not changed: `brief.md`, the five `brief-*.md` pointers, `keys.yaml`, `facts.yaml`, any skill, any file under `roles/`, the root
+`.rulesync/`, any `.claude/` path.
 
 The `.claude/templates/role-*.md` copies are not written here: the copies ACT writes them after the owner's approval
 (DEC-315). Until it runs, `python3 -m gov.adapters.portability` reports `TEMPLATE_COPY_DIFFERS` for the seven files (as
