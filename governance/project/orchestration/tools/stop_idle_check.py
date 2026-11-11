@@ -36,18 +36,29 @@ it lets a legitimate wait through and names which. In order:
    bounded, so the check errs toward the reminder. No unblocked item: every open item waits, named with its counts.
    Otherwise: block, naming the unblocked items.
 
+A launchable ticket (ACT-IDLE-GUARD-1, the owner's rule 1 failed on 11-11 from 13:31 to 17:54): checked before the
+Running let-through, so whatever else runs. When the dispatcher's tick (at most 5 minutes old) shows no legitimate
+wait (case 3), fewer leads running or launching than the cap in `dispatch/config.json` (`max_leads`; unset: no cap,
+the forecast alone admits), and a launchable ticket, the turn is blocked naming it. Launchable: a line of
+`dispatch/ready.txt` the dispatcher skipped only for a used or a returned log (`ready_waits`: "already started for",
+"already holds a return"), or, when the tick counts no ready line (`ready_count` 0), a ticket of `gov plan`'s first
+batch that no lead runs (the plan's `--ready` form; the CTO's own W2-00 left out). An `IDLE-REASON` still ends the
+turn, but the log and the owner's message say a ticket was launchable.
+
 A cto-standby.txt does not let a turn end idle here (DEC-1109 (3): unblocked work moves while the owner decides).
 It never fails open silently: an error is named to the owner (`systemMessage`) and in the log, and the turn ends.
 It always exits 0 and prints at most one JSON object. Standard library only.
 Overrides for tests: GOV_STOPIDLE_ORCH, GOV_STOPIDLE_DND, GOV_STOPIDLE_TASKS, GOV_STOPIDLE_SUBAGENTS,
 GOV_STOPIDLE_PROC (a JSON list of {pid, cmdline, start, state, fds} instead of /proc), GOV_STOPIDLE_PIDGLOBS
-(globs joined by ':'), GOV_STOPIDLE_NOW (epoch seconds).
+(globs joined by ':'), GOV_STOPIDLE_NOW (epoch seconds), GOV_STOPIDLE_GOV (the `gov` program run for the plan).
 """
 import glob
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -60,8 +71,12 @@ LOG = ORCH / "log/stop-idle.log"
 STATE = ORCH / "log/stop-idle-state.json"
 AGENT_STALE_S = 1800
 STATUS_MAX_AGE_S = 300
-WATCHERS = ("inbox_wait.sh", "inbox_wait_quiet.sh", "sentinel_check.sh", "usage_log.sh", "store_refresh_daily.sh",
-            "bare_watch.sh")
+# The standing watchers of START-NEXT-SESSION section 6 (and the two machine watchers): never work, whatever their age.
+WATCHERS = ("inbox_wait.sh", "inbox_wait_quiet.sh", "helper_watch.py", "sentinel_check.sh", "bare_watch.sh",
+            "store_refresh_daily.sh", "usage_log.sh", "mem_guard.py", "oom_watch.sh")
+USED_LOG = ("already started for", "already holds a return")  # the dispatcher's why_not() answers for a used log
+COORDINATION = "W2-00"  # the CTO's own ticket: in gov plan's first batch, never a lead
+PLAN_TIMEOUT_S = 30
 LAUNCHERS = ("launch_worker.sh --run", "lead_verify.sh", "landing_select.sh")
 START_SLACK_S = 900
 RUN_BOUND_S = 3 * 3600
@@ -277,6 +292,71 @@ def legit_wait(st):
     return None
 
 
+# ------------------------------------------------------------------------------------------------ launchable tickets
+def lead_cap():
+    """The cap on running leads, dispatch/config.json `max_leads`; None when unset or unreadable (no cap known)."""
+    try:
+        v = json.loads((ORCH / "dispatch/config.json").read_text()).get("max_leads")
+    except (OSError, ValueError, AttributeError):
+        return None
+    return v if isinstance(v, int) and not isinstance(v, bool) and v >= 1 else None
+
+
+def plan_first_batch(running, notes):
+    """The unlaunched tickets of `gov plan`'s first batch (the plan exits 1 on its own findings: only its output
+    counts): ["W2-105 (DAEO-zpdj)", ...]. An unusable plan is named in `notes`, never relied on."""
+    gov = os.environ.get("GOV_STOPIDLE_GOV") or str(HOME / ".local/bin/gov")
+    try:
+        fd, tmp = tempfile.mkstemp(prefix="plan-ready-", suffix=".txt", dir=str(LOG.parent))
+        os.close(fd)
+    except OSError as exc:
+        notes.append(f"gov plan not run ({exc})")
+        return []
+    try:
+        subprocess.run([gov, "plan", "--root", str(ROOT), "--ready", tmp], capture_output=True, text=True,
+                       timeout=PLAN_TIMEOUT_S, cwd=str(ROOT), stdin=subprocess.DEVNULL)
+        text = Path(tmp).read_text()
+    except (OSError, subprocess.SubprocessError) as exc:
+        notes.append(f"gov plan unusable ({type(exc).__name__})")
+        return []
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    out, batch = [], 0
+    for line in text.splitlines():
+        if line.startswith("# batch"):
+            batch += 1
+            continue
+        parts = line.split()
+        if batch == 1 and len(parts) >= 2 and not line.startswith("#"):
+            if parts[0] != COORDINATION and parts[0] not in running:
+                out.append(f"{parts[0]} ({parts[1]})")
+    if not batch:
+        notes.append("gov plan unusable (no batch in its ready form)")
+    return out
+
+
+def launchable(st, notes):
+    """(cap, running count, the launchable tickets, a note on where they come from) or None. Never without a usable dispatcher tick; never with a
+    legitimate wait; never at the cap."""
+    if st is None or legit_wait(st):
+        return None
+    cap = lead_cap()
+    running = (st.get("lead_count") or 0) + len(st.get("pending_launches") or [])
+    if cap is not None and running >= cap:
+        return None
+    waits = st.get("ready_waits") if isinstance(st.get("ready_waits"), dict) else {}
+    found = [f"{k} ({str(v)[:60]})" for k, v in sorted(waits.items()) if any(m in str(v) for m in USED_LOG)]
+    note = " (ready.txt lines the dispatcher skipped for a used or returned log)"
+    if not found and st.get("ready_count") == 0:
+        found = plan_first_batch(set(map(str, st.get("leads") or [])), notes)
+        note = (" (ready.txt is empty; these are gov plan's first batch with no lead running: not yet shown startable, "
+                "a brief or a claim may be missing)")
+    return (cap, running, found, note) if found else None
+
+
 # ----------------------------------------------------------------------------------------------- DECIDED-NOT-DONE
 def cells(line):
     s = line.strip()
@@ -396,7 +476,21 @@ def decide(data):
     if not cto or sid != cto:
         return "skip", "another session", "", None
     turn, reason = turn_and_reason(data)
+    notes = []
+    st, disp = dispatcher(notes)
+    idle = launchable(st, notes)
+    named = ""
+    if idle:
+        cap, n_run, tickets, note = idle
+        more_t = f"; and {len(tickets) - SHOW_MAX} more" if len(tickets) > SHOW_MAX else ""
+        shown_t = "; ".join(tickets[:SHOW_MAX]) + more_t
+        named = (f"{len(tickets)} launchable: {shown_t}{note} (leads {n_run} of "
+                 f"{cap if cap is not None else 'no cap'})")
     if reason:
+        if idle:
+            return "through", "the CTO's stated reason WHILE a ticket was launchable", f"{reason} | {named}", {
+                "systemMessage": f"Idle check (DEC-1110): let through on the CTO's stated reason, recorded: {reason}. "
+                                 f"NOTE for the owner: a ticket was launchable ({named})."}
         return "through", "the CTO's stated reason", reason, {
             "systemMessage": f"Idle check (DEC-1110): let through on the CTO's stated reason, recorded: {reason}"}
     try:
@@ -404,12 +498,22 @@ def decide(data):
     except (OSError, ValueError):
         state = {}
     if data.get("stop_hook_active") or (turn and state.get("session") == sid and state.get("turn") == turn):
-        return "through", "bound: blocked once this turn", "no IDLE-REASON stated", {
-            "systemMessage": "Idle check (DEC-1110): a second stop this turn, let through (no IDLE-REASON line stated)"}
-    notes = []
+        more = f" (a ticket was launchable: {named})" if idle else ""
+        return "through", "bound: blocked once this turn", "no IDLE-REASON stated" + (f" | {named}" if idle else ""), {
+            "systemMessage": "Idle check (DEC-1110): a second stop this turn, let through (no IDLE-REASON line "
+                             f"stated){more}"}
+    if idle:  # checked before the Running let-through: whatever else runs, a launchable ticket is not left idle
+        reason_text = (f"Idle check (ACT-IDLE-GUARD-1; DEC-1110 (1), DEC-1109 (3)): the gate is open, the machine is not "
+                       f"full and {n_run} of {cap if cap is not None else 'no cap'} leads run, and {named}. Start "
+                       f"them now (a ready.txt line with a new log name, or the next batch's tickets), then end the "
+                       f"turn. If none can start, write one line `IDLE-REASON: <why>` (recorded in log/stop-idle.log "
+                       f"and shown to the owner as stated while a ticket was launchable) and end the turn.")
+        STATE.parent.mkdir(parents=True, exist_ok=True)
+        STATE.write_text(json.dumps({"session": sid, "turn": turn, "at": time.strftime("%Y-%m-%d %H:%M:%S")}) + "\n")
+        return "block", f"launchable: {len(tickets)}", "; ".join([named] + notes), {"decision": "block",
+                                                                                      "reason": reason_text}
     procs = processes()
     sub, tasks = session_dirs(data)
-    st, disp = dispatcher(notes)
     past = []
     running = running_agents(sub, notes) + running_tasks(tasks, procs, past) + running_pidfiles(procs, past) + disp
     pasts = f"over the {RUN_BOUND_S // 3600} h bound, not counted: {', '.join(past)}" if past else ""

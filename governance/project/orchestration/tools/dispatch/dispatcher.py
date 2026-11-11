@@ -2527,6 +2527,74 @@ def start_one(t, dry):
     return None, waits
 
 
+# ---- 3b. idle with headroom (ACT-IDLE-GUARD-1: DEC-1110 (1), DEC-1109 (3), DEC-936 item 2) -----------------------------
+IDLE_REPORT_S = 3600  # one inbox item per cause an hour
+USED_LOG = ("already started for", "already holds a return")  # why_not()'s answers for a used or a returned log
+
+
+def max_leads(c):
+    """The cap on running leads the owner set, from config.json `max_leads` (a whole number of 1 or more); None when
+    it is not set (the forecast alone admits each start, DEC-1052 O-A1). The idle item below is sent only with a cap
+    set: the cap is the owner's word that there is work to push; the Stop hook's check does not need it."""
+    v = (c or {}).get("max_leads")
+    return v if isinstance(v, int) and not isinstance(v, bool) and v >= 1 else None
+
+
+def idle_headroom(t, started_w2, waits, c):
+    """None, or (cause key, the item's text) when the dispatcher is idle with room to start: nothing started this pass,
+    the gates open, the machine not full, fewer leads running or launching than the cap, and no ready line startable
+    (an empty list, or every line waiting). Lines skipped for a used or a returned log are named first: the CTO's
+    cheapest cure is a new line with a new log name. A hold the dispatcher keeps itself is not idle: the stagger after
+    a start, a hung embedding server."""
+    if started_w2 or not t.get("gate_open") or not t.get("disk_open") or t.get("admit") is False:
+        return None
+    if ((t.get("forecast") or {}).get("lead") or {}).get("ok") is False:
+        return None
+    cap = max_leads(c)
+    running = t.get("lead_count", 0) + len(t.get("pending_launches") or [])
+    if cap is None or running >= cap:
+        return None
+    if "stagger" in waits or any(str(v).startswith("embedding server hung") for v in waits.values()):
+        return None
+    used = sorted(k for k, v in waits.items() if any(m in str(v) for m in USED_LOG))
+    others = sorted(k for k in waits if k not in used)
+    lines = len(read_list(D / "ready.txt"))
+    text = (f"log: dispatch.log\nIdle: headroom\nstatus: the gate is open and {running} of {cap} leads run, but no "
+            f"ready line is startable ({lines} line(s) in ready.txt)")
+    if used:
+        text += ("; skipped for a used or returned log: " +
+                 ", ".join(f"{k} ({waits[k][:70]})" for k in used[:6]) +
+                 ". Write the line again with a new log name (<W2>-A5-<run>.json) to start it")
+    if others:
+        text += "; waiting for other reasons: " + ", ".join(f"{k} ({str(waits[k])[:50]})" for k in others[:6])
+    text += ("\nThe standing rule: never idle while unblocked work remains (DEC-1110 (1), DEC-1109 (3)); "
+             "ready.txt is the CTO's list.\n")
+    key = "used:" + ",".join(used) if used else ("empty" if not lines else "waiting")
+    return key, text
+
+
+def watch_headroom(t, started_w2, waits, c, dry):
+    """An inbox item when idle_headroom() holds, once per cause an hour (idle-headroom-reported.json), so the inbox
+    waiter wakes the CTO. A cause that no longer holds is forgotten, so it is reported again if it returns."""
+    f = D / "idle-headroom-reported.json"
+    try:
+        seen = json.loads(f.read_text())
+        seen = seen if isinstance(seen, dict) else {}
+    except (OSError, ValueError):
+        seen = {}
+    got = idle_headroom(t, started_w2, waits, c)
+    if dry:
+        return got
+    kept = {k: v for k, v in seen.items() if got and k == got[0]}
+    if got and now() - float(kept.get(got[0], 0) or 0) >= IDLE_REPORT_S:
+        inbox_item("idle-headroom", got[1])
+        kept[got[0]] = now()
+        log(f"idle with headroom: inbox item written ({got[0]})")
+    if kept != seen:
+        f.write_text(json.dumps(kept))
+    return got
+
+
 # ---- 4. land ------------------------------------------------------------------------------------------------------
 
 def finalise_land(t, dry):
@@ -3014,6 +3082,7 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     age = int(now() - oldest_item.stat().st_mtime) if oldest_item else None
     s = {k: v for k, v in t.items() if not k.startswith("_")}
     s.update(inbox_unread=len(items), inbox_oldest_age_s=age, started_this_tick=started_w2, ready_waits=waits,
+             ready_count=len(read_list(D / "ready.txt")), max_leads=max_leads(t.get("_c")),
              land=land_state, land_pending=[" ".join(e) for e in read_list(D / "land.txt")], new_returns=new_returns,
              last_start=(" ".join(started()[-1][:3]) if started() else None), failures=failures)
     (D / "status.json").write_text(json.dumps(s, indent=1))
@@ -3159,6 +3228,11 @@ def tick(dry):
     except Exception as exc:
         failures.append(f"start: {exc!r}"[:200])
         log(f"start failed: {exc!r}")
+    try:  # ACT-IDLE-GUARD-1: idle with headroom wakes the CTO through the inbox
+        watch_headroom(t, started_w2, waits, t.get("_c") or {}, dry)
+    except Exception as exc:
+        failures.append(f"headroom watch: {exc!r}"[:200])
+        log(f"headroom watch failed: {exc!r}")
     try:
         land_state = land_step(t, dry)
     except Exception as exc:
