@@ -165,6 +165,10 @@ couplings:
   - paths: ["src/gov/retrieval/validate.py", "src/gov/retrieval/canary.py"]
     suites: ["tests/unit/validate"]
     why: "the folder's name names no package (I2 §4.1)"
+  # W2-170 S6 (DEC-896 item 2): the memory audit's set record and its unit tests, so a change there runs them
+  - paths: ["src/gov/memaudit/**"]
+    suites: ["tests/unit/memaudit/"]
+    why: "the memory audit's package (python3 -m gov.memaudit) and its own unit tests (W2-170 S6)"
   - paths: ["template/governance/kernel/roles/**", "template/governance/kernel/skills/**"]
     suites: ["tests/acceptance/W1-38/"]
     why: "W1-38's fixture copies the kernel's roles and skills into every generated project (I4 §4.1 item 3)"
