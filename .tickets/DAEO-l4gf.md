@@ -45,6 +45,13 @@ acceptance_tests:
 track: A
 list_rows: []
 needs: []
+reads:
+- src/gov/close/**
+- governance/project/orchestration/nightly/**
+- tests/acceptance/serial-only.txt
+- tests/optin-lifted*.txt
+- tests/unit/close/**
+waits_on: []
 ---
 # W2-154 The close's serial plugin and an entry out of the run; the nightly's serial count
 

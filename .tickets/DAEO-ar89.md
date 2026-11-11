@@ -34,7 +34,7 @@ sources:
 - DEC-1125
 - DEC-1123
 - DEC-105
-- W1-19
+- DAEO-t6hf
 est_loc: 60
 acceptance_tests:
   path: tests/acceptance/W1-19/
@@ -42,6 +42,12 @@ acceptance_tests:
 track: A
 list_rows: []
 needs: []
+reads:
+- src/gov/retrieve/**
+- src/gov/retrieval/**
+waits_on:
+- DAEO-rmhj  # W2-138 and W2-145 write the retrieval and reranker paths first (P1); the profile follows them
+- DAEO-2tfd
 ---
 # W2-155 The warm query path profiled: W1-19's 0.5 s budget
 
