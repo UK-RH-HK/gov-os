@@ -1,1 +1,1 @@
-2026-11-10 15:49:50 CTO 412a4e37 waits on the owner: the two yes lines re-sent as fresh messages (ACT-CLAUDE-COPIES-3, ACT-DEADMAN-WAKE-1; G6 refused the mid-turn form); helpers running: the ACT-EFFORT-HIGH-1 review, ACT-PATHMAP-NS-2's preparation
+2026-11-10 23:49:33 CTO 8ddb8b14 waits on the owner: D-10 run 2 reported (nightly red 2, the warm latency); the owner's choice on the latency before the re-pin ACT

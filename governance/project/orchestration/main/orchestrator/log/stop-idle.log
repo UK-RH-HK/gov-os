@@ -102,3 +102,4 @@
 2026-11-10 22:22:57	8ddb8b14	through	running: 3	task b508y3079: bash proc.sh wait --max 14400 --every 60 239599; echo "rc=$?"; cat summary.txt; task bqqwqpwhp: python3 helper_watch.py --every 300 --max 86400; dispatcher job: rebuild pid 237328 (rebuild.lexical)
 2026-11-10 23:09:37	8ddb8b14	through	running: 3	task b508y3079: bash proc.sh wait --max 14400 --every 60 239599; echo "rc=$?"; cat summary.txt; task bqqwqpwhp: python3 helper_watch.py --every 300 --max 86400; dispatcher job: nightly nightly (test)
 2026-11-10 23:36:15	8ddb8b14	through	running: 3	task b508y3079: bash proc.sh wait --max 14400 --every 60 239599; echo "rc=$?"; cat summary.txt; task bqqwqpwhp: python3 helper_watch.py --every 300 --max 86400; dispatcher job: slot pid 799161 (test)
+2026-11-10 23:49:47	8ddb8b14	through	running: 1	task bqqwqpwhp: python3 helper_watch.py --every 300 --max 86400
