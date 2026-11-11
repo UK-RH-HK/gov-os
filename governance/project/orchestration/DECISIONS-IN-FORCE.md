@@ -509,3 +509,7 @@ other restart is an ACT.
   error-path faults (row 123) first after the lift; **set-up B dropped entirely** (not a Wave 3 row), leads not
   sandboxed, the path map and the guard are the controls, set-up A stays as the guard's measurement, the workers'
   launcher sandbox unchanged; DEC-1010's one rule for all roles investigated read-only first. Basis: questions 2 and 4.
+- DEC-1129 (2026-11-11): W2-32 S9 re-worded to the end-to-end bar, met on the fresh 80 (W2-32 open with W2-15a; the
+  exception to DEC-757 (6) for its file); **the memory audit's writer, checker and auditor briefs approved** (sha256
+  `bc0894230e31`, `cea517b8da7d`, `37be41c3fb2f`; into the approved list by ACT-MEMORY-AUDIT-INSTALL-1); W2-60a's
+  RUBRIC-2 lines a fresh round 1, at most two, judged only on those lines. Basis: questions 1 and 4.

@@ -14427,6 +14427,25 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (a control is trusted only on measured evidence, and the lift is not held by a measurement)
   and question 4 (the owner's time: one list, one rule, one recommendation).
 
+### DEC-1129 — W2-32 S9 re-worded to DEC-1097's end-to-end bar, met on the fresh 80; the memory audit's three fixed briefs approved; W2-60a's RUBRIC-2 lines a fresh round 1, at most two, judged only on those lines
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`) · **Under:** DEC-1126 (3), (5), (6), DEC-1097 (1)(d), DEC-1098 (1), DEC-1083 (2), DEC-1101 (2)-(3), DEC-1125 (2), DEC-1010, DEC-1120, DEC-105 · **Source:** the owner's answers (chat, 2026-11-11 ~14:40 UTC) to `packages/W2-32-S9-DISPOSITION.md`, `packages/MEMORY-AUDIT-1.md` and the W2-60a round question
+- **Decision:**
+  - (1) **W2-32 S9: option (a1).** S9 is re-worded to DEC-1097 (1)(d)'s end-to-end bar (right end to end at least 85 %
+    with wrong claims at most 5 %, target 95 %, hit@5 reported beside it), met on the fresh 80's recorded result (78 of
+    79 right, 0 wrong claims, hit@5 84.8 %; FRESH-80-RESULT, DEC-1098 (1)); the first weekly audit on 11-23 checks
+    today's pin. W2-32 stays open with W2-15a (DEC-1126 (6)). This owner decision is the exception to DEC-757 (6) for
+    W2-32's ticket file: S9, its title and its evidence row are edited, its S9 cases revised by an independent test
+    designer, and its probe taken again.
+  - (2) **The memory audit's three fixed briefs are approved as written:** `packages/MEMORY-AUDIT-1/briefs/writer.md`
+    (sha256 `bc0894230e3181e5be27726d60e9fb781f9355da1c4f8e76f69b400af97d379b`), `checker.md`
+    (`cea517b8da7d4834bb2a698b9c7023670da36f0ceca6b3350656c6db77c45248`) and `auditor.md`
+    (`37be41c3fb2fea1654d68f71f1ecfc5ad4b41faaed9356a27ce1f01d8ef94245`), at `8c18fa300`. Their hashes go into the launch
+    script's approved list (`<sets root>/indep-walls/APPROVED`) by the install ACT (ACT-MEMORY-AUDIT-INSTALL-1, the
+    owner's, as ACT-W2-149-INSTALL-1 was).
+  - (3) **W2-60a:** RUBRIC-2's lines (DEC-1126 (3)) are new scope: a fresh round 1 and at most two rounds, the review
+    judging only those new lines against their KPI lines.
+- **Basis:** question 1 (one memory bar, met on a set used once, checked weekly) and question 4 (a bounded review).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14491,3 +14510,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.509 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1125 (the latency a named red; the memory audit weekly, DEC-1101 (1) changed, DEC-1097 (4) folded; the night to the re-pin). Next free id: DEC-1126. |
 | 0.510 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1126 (the answers to the 09:30 digest: re-pin done; usage (A) ends; W2-60a RUBRIC-2 now; the runaway brake for adopted products; the memory audit's schedule; W2-32/W2-15a open; D-10 the green run; W2-82 to P3; the permissions ACT). Next free id: DEC-1127. |
 | 0.511 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1128 (the 100 % bar on set-up A for any control returning or new guard rule; the lift does not wait; set-up B dropped; DEC-1010 investigated; the switched-off list; the memory audit's landing); DEC-1112 (1) changed. DEC-1127 held for the owner's answer (the close history, PROPOSED). Next free id: DEC-1129. |
+| 0.512 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1129 (W2-32 S9 (a1); the memory audit's briefs approved, hashes to the approved list by the install ACT; W2-60a a fresh round 1). DEC-1127 still held PROPOSED. Next free id: DEC-1130. |
