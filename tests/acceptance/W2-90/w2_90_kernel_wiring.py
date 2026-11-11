@@ -33,11 +33,12 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 _TESTS = REPO_ROOT / "tests" / "acceptance"
-for _suite in ("W1-07", "W1-39", "W1-38", "W1-05"):
+for _suite in ("W1-07", "W1-39", "W1-38", "W1-05", "W1-47"):
     if str(_TESTS / _suite) not in sys.path:
         sys.path.insert(0, str(_TESTS / _suite))
 
 import w1_05_support as live_support  # noqa: E402  (registered commands, hook input, the fixture ticket)
+import w1_47_support as pinned_support  # noqa: E402  (the pinned gov a stand-in home holds, W2-106)
 import w1_38_support as rulesync_support  # noqa: E402  (rulesync generate, as W1-38 runs it)
 import w1_39_support as copier_support  # noqa: E402  (the template source, copier copy)
 
@@ -110,35 +111,26 @@ def copy_project(base, destination):
     return destination
 
 
-EDITABLE_PYTHON = os.path.realpath(sys.executable)   # the interpreter the editable install's script names
-
-
 def install_gov_for(home):
-    """Make this worktree's ``gov`` package the installed one for a hook line run with ``HOME=home``.
+    """Make this worktree's ``gov`` package importable for ``python3`` run with ``HOME=home``.
 
-    A path file in the user site folder of that home, as an editable install leaves one: a product has the package
-    installed. Revised (W2-90b, Rewrite-Reason: DEC-953 item 2, W2-106's P2 in DEC-970): the editable install's
-    ``gov`` script is written too, at ``<home>/.local/bin/gov``, its first line naming this interpreter, as
-    ``pip install --user -e`` leaves it (DEC-605; W1-38's ``make_session_sandbox`` since W2-106). The template's
-    guard lines are pinned (W2-106, DEC-822): they find the installed gov there, else on ``PATH``, and start their
-    program with the interpreter its first line names, with ``-E`` (which keeps the user site folder, so the path
-    file gives this worktree's package). Without the script they find the ``gov`` on the runner's ``PATH`` (on this
-    machine the owner's pin, which imports its own package, not this worktree's: DEC-732). The four lifecycle lines
-    still start the ``python3`` first on ``PATH`` (DEC-608, DEC-917); the path file is written for it too.
+    A path file in the user site folder of that home, as an editable install leaves one: the kernel's hook line
+    starts its program with the ``python3`` first on ``PATH``, and a product has the package installed.
+
+    Rewrite-Reason: DEC-866, W2-106. The kernel's lines now take the pinned form: ``$HOME/.local/bin/gov``, else
+    ``gov`` on ``PATH``, and its first line's interpreter with ``-E``. The home is also given the editable install's
+    ``gov`` script, its first line naming this interpreter (W1-47's ``plant_pinned_gov``, as W2-106's README names
+    the fix), so a case no longer depends on the runner's ``PATH``: not refused where no ``gov`` is on it, not
+    judging the owner's pin where it is.
     """
     home = Path(home)
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8"}
-    for python in dict.fromkeys((EDITABLE_PYTHON, "python3")):
-        site = subprocess.run([python, "-c", "import site; print(site.getusersitepackages())"], capture_output=True,
-                              text=True, env=env, check=True).stdout.strip()
-        assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
-        Path(site).mkdir(parents=True, exist_ok=True)
-        (Path(site) / PTH_NAME).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
-    script = home / ".local" / "bin" / "gov"
-    script.parent.mkdir(parents=True, exist_ok=True)
-    script.write_text(f"#!{EDITABLE_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
-                      encoding="utf-8")
-    script.chmod(0o755)
+    site = subprocess.run(["python3", "-c", "import site; print(site.getusersitepackages())"], capture_output=True,
+                          text=True, env=env, check=True).stdout.strip()
+    assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
+    Path(site).mkdir(parents=True, exist_ok=True)
+    (Path(site) / PTH_NAME).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    pinned_support.plant_pinned_gov(home)
     return home
 
 

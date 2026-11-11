@@ -25,7 +25,8 @@ deleted, skipped, marked xfail or given a weaker verdict. Every id that existed 
   `<home>/.local/bin/gov`, its first line naming this interpreter, as `pip install --user -e` leaves it (DEC-605,
   W1-38's revision in W2-106):
   - `w2_90_kernel_wiring.install_gov_for`: W1-05, W1-46, W1-28, W1-33 and W1-47 `failed_commands`;
-  - `w1_47_support.install_editable_gov`, called by `installed_environment`: W1-47 `kernel_template`.
+  - `w1_47_support.plant_pinned_gov`, called by `installed_environment` (and, since the merge of `w2/integrate`, by
+    `install_gov_for`): W1-47 `kernel_template`.
 
   Measured (`gov_the_pinned_line_imports`, the line's own look-up):
 
@@ -33,7 +34,7 @@ deleted, skipped, marked xfail or given a weaker verdict. Every id that existed 
   |---|---|
   | path file only (before) | `/home/usain/.local/share/gov-os/pin-5c401220/lib/python3.12/site-packages/gov/__init__.py` |
   | `install_gov_for` (after) | `/home/usain/gov-os-worktrees/W2-90b/src/gov/__init__.py` |
-  | `install_editable_gov` (after) | `/home/usain/gov-os-worktrees/W2-90b/src/gov/__init__.py` |
+  | `plant_pinned_gov` (after) | `/home/usain/gov-os-worktrees/W2-90b/src/gov/__init__.py` |
 
 - **No revised case reads this repository's live settings.** None of them reads `.claude/settings.json` or
   `.claude/hooks/` of this repository. The cases left on this repository's lines are listed below with the reason.

@@ -92,16 +92,35 @@ def kernel_guard(kernel_project, kernel_sandbox):
 @pytest.fixture()
 def kernel_launch(kernel_project, kernel_sandbox):
     """``launch(role)`` runs ``gov launch <role> <ticket>`` in the project on a generated project, with a stand-in
-    CLI that starts no session."""
+    CLI that starts no session. The resource gate is planted open, W2-20 S19, as the conftest's ``launch`` plants it
+    (every launch passes the gate, DEC-1088 (5)(b)); the gate is W2-20's, not under test here."""
     directory = w47.make_stand_in(kernel_sandbox.elsewhere / "held-out-stand-in")
     w47.configure_stand_in(kernel_project, directory)
     cli = launch_support.install_stand_in_cli(kernel_sandbox)
+    gate = support.plant_open_gate(kernel_sandbox.home, kernel_sandbox.elsewhere / "gate-readings")
 
     def _launch(role, ticket=None):
-        return launch_support.launch(kernel_project, kernel_sandbox, cli, role,
-                                     ticket or launch_support.TICKET_OF.get(role) or w47.TICKET_OF[role])
+        ticket = ticket or launch_support.TICKET_OF.get(role) or w47.TICKET_OF[role]
+        before = len(launch_support.calls(cli))
+        env = {**launch_support.gov_environment(kernel_project, kernel_sandbox, cli), **gate}
+        run = launch_support.run_gov(kernel_project, kernel_sandbox, "launch", role, ticket, cli=cli, env=env)
+        return launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
 
     return _launch
+
+
+@pytest.fixture()
+def launch(kernel_launch):
+    """The conftest's ``launch`` and ``project``, in this module the kernel's (W2-90b, DEC-953 item 2): a case that
+    names them by their old names (integrate's rewrite of the not-a-worker case, DEC-1088 (5)(a)) runs on the
+    project on a generated project, as every other case here does."""
+    return kernel_launch
+
+
+@pytest.fixture()
+def project(kernel_project):
+    """See ``launch``: the conftest's ``project`` is, in this module, ``kernel_project``."""
+    return kernel_project
 
 
 @pytest.mark.parametrize("role", support.ROLES)
@@ -155,6 +174,5 @@ def test_the_launcher_gives_the_role_an_empty_network_profile(kernel_launch, rol
 
 
 @pytest.mark.parametrize("role", support.NOT_LAUNCHED)
-def test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker(kernel_launch, role):
-    launch = kernel_launch
+def test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker(launch, role):
     launch_support.assert_refused(launch(role), "worker role")
