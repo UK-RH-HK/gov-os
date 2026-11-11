@@ -130,7 +130,7 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S10 | `test_w2_128_schemas.py::test_s10_ticket_schema_declares_waits_on_as_a_string_or_ref_and_reason` | red | `waits_on` not declared: a bare string passes, and an object without `ref` passes |
 | S10 | `test_w2_128_schemas.py::test_s10_every_existing_ticket_stays_valid` | green (guard) | all 213 tickets validate today; they must after the change (see N-2: `DAEO-2bdu`) |
 | S10 | `test_w2_128_schemas.py::test_s10_t1_is_the_ticket_template_with_its_skeleton_in_one_yaml_block` | red | today's `ticket.md` is front matter, with no `name: ticket` and no yaml block |
-| S11 | `test_w2_128_round2a.py::test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation` | red (2a); green (2b, strengthened) | 2a: no `w2/integrate`, "any path under src/" barred outright; 2b (F3) adds a permitting sentence naming `w2/integrate` or the integrated code, and no clause barring source code or implementation without "ticket" |
+| S11 | `test_w2_128_round2a.py::test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation` | red (2a); green (2b, strengthened) | 2a: no `w2/integrate`, "any path under src/" barred outright; 2b (F3) adds a permitting sentence naming `w2/integrate` or the integrated code, and no clause barring source code or implementation without "ticket"; revised for W2-11 (DEC-866, DEC-981, DEC-1137): the rule is found where it stands (`read_rule`) and may name the integration branch generically |
 | S11 | `test_w2_128_round2a.py::test_s11_orchestration_briefs_points_to_the_kernel_templates` | red (2a) | Briefs names the five `brief-*.md` texts and no kernel template |
 | S11 | `test_w2_128_round2a.py::test_s11_orchestration_skill_no_longer_says_a_brief_states_each_step_in_full` | red (2a) | "The ticket loop" says `brief-lead.md` "states each step in full" |
 | S11 | `test_w2_128_round2a.py::test_s11_k4_no_bar_on_globbing_the_governance_folder` | red (2a) | "No glob, search or listing runs over the project's governance folder" (DEC-508) |
@@ -147,15 +147,15 @@ does not declare the field, or a record template without its link lines. The 8 g
 | S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[retrieval]` | red (2a) | the copy differs from the kernel skill |
 | S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[orchestration]` | green (guard) | equal today; must stay equal after the skill changes |
 | S11 | `test_w2_128_round2a.py::test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill[test-design]` | green (guard) | as above |
-| S11 | `test_w2_128_round2a.py::test_s11_skill_version_is_one_minor_above_integrates[orchestration]` | red (2b) | `1.1.0` (round 2a's), not `1.2.0`; baseline `a2576c6f` (revised in 2b) |
+| S11 | `test_w2_128_round2a.py::test_s11_skill_version_is_one_minor_above_integrates[orchestration]` | red (2b) | `1.1.0` (round 2a's), not `1.2.0`; baseline `a2576c6f` (revised in 2b); revised for W2-11 (DEC-866, DEC-981, DEC-1137): at least one minor above that base, semver, and one version in `version` and `metadata.version` of the kernel skill and its template rulesync copy, not pinned to `1.2.0` (W2-11 raises it again) |
 | S11 | `test_w2_128_round2a.py::test_s11_skill_version_is_one_minor_above_integrates[test-design]` | red (2b) | as above |
 | S11 | `test_w2_128_round2a.py::test_s11_skills_validator_passes_on_both_skills` | green (guard) | `{"findings": []}` today |
-| S11 | `test_w2_128_round2a.py::test_s11_guard_test_design_skill_changes_only_its_read_rule` | green (guard) | only the read rule changed in 2a; 2b also lets a unit elsewhere differ by CAP-38.b re-cited as CAP-38.c |
-| S11 | `test_w2_128_round2a.py::test_s11_guard_orchestration_skill_changes_only_the_named_parts` | green (guard) | only 2a's named lines changed; 2b also frees F2's three lines (DEC-511, DEC-254, DEC-386) |
+| S11 | `test_w2_128_round2a.py::test_s11_guard_test_design_skill_changes_only_its_read_rule` | green (guard) | only the read rule changed in 2a; 2b also lets a unit elsewhere differ by CAP-38.b re-cited as CAP-38.c; revised for W2-11 (DEC-866, DEC-981, DEC-1137): the front matter may add `metadata.version` equal to `version`, and the read rule's section is the one `read_rule` finds |
+| S11 | `test_w2_128_round2a.py::test_s11_guard_orchestration_skill_changes_only_the_named_parts` | green (guard) | only 2a's named lines changed; 2b also frees F2's three lines (DEC-511, DEC-254, DEC-386); revised for W2-11 (DEC-866, DEC-981, DEC-1137): the front matter may add `metadata.version` equal to `version` |
 | S11 | `test_w2_128_round2b.py::test_s11_f2_orchestration_requires_no_gov_checkpoint_record_per_round_on_dec_511` | red (2b) | `SKILL.md:76` "A lead writes a real checkpoint with `gov checkpoint` at each round boundary" on DEC-511 alone (lifted by DEC-1057, R-6) |
 | S11 | `test_w2_128_round2b.py::test_s11_f2_one_writer_per_tree_cites_dec_963_not_dec_254` | red (2b) | `SKILL.md:55` cites DEC-254 for "never two writing sessions in one tree" |
 | S11 | `test_w2_128_round2b.py::test_s11_f2_no_bar_on_reading_another_sessions_folders` | red (2b) | `SKILL.md:83` "nothing is left in or read from another session's folders", a read bar beyond DEC-820's four |
-| S11 | `test_w2_128_round2b.py::test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136` | red (2b) | the read rule cites "(CAP-38.b, DEC-136)" and no CAP-38.c |
+| S11 | `test_w2_128_round2b.py::test_s11_f4_test_design_read_rule_cites_cap_38c_not_cap_38b_or_dec_136` | red (2b) | the read rule cites "(CAP-38.b, DEC-136)" and no CAP-38.c; revised for W2-11 (DEC-866, DEC-981, DEC-1137): the rule is found where it stands (`read_rule`) |
 | S12 | round 2: not mapped | none | TPL-7, the measures |
 | S13 | round 2: not mapped | none | TPL-8, the pilot |
 | S14 | `test_w2_128_links.py::test_s14_template_carries_its_link_lines[brief]` | red | `brief.md` does not exist |
@@ -312,6 +312,16 @@ sandbox: **121 collected, 10 failed, 111 passed** (15 s); the exclusion left not
     the other units stay in order, and new units may not outnumber the freed ones (a freed unit is restated one for
     one or dropped). Test-design: outside the read rule a unit may differ only by CAP-38.b re-cited as CAP-38.c.
     Both green.
+- **Revised for W2-11** (`Rewrite-Reason: DEC-866, DEC-981, DEC-1137`; DEC-1112 (3) P-W2-11-R6-2 (c), P-b):
+  - The read rule (`read_rule`): the one section whose heading names reading (not "README") or the work order (W2-11
+    moves the rule into "The work order in parallel", DEC-959 item 7; its README map heading also holds "read"),
+    cut to its units on reading, the specification and KPIs, the implementation or the integrated code. The branch
+    may be named generically ("the integration branch", a kernel skill naming no project branch) in place of
+    `w2/integrate`; the permitting sentence, the bar on this ticket's implementation, DEC-963, CAP-38.c and the
+    absence of CAP-38.b and DEC-136 stay.
+  - Versions: at least `1.2.0` (one minor above `a2576c6f`'s 1.1.0), semver, and `metadata.version`, where carried,
+    equal to `version` in the kernel skill and the template's rulesync copy.
+  - Guards: the front matter may also carry `metadata` holding only `version` equal to `version`; nothing else.
 - **A check of the cases** (a scratch worktree, removed): a stand-in 2b passed all 121. Each of 19 wrong changes
   failed only the case(s) meant for it (`task: '{ID}'` kept fails the three checkpoint cases): the rulesync role keeping `brief-lead.md`; a per-round `gov
   checkpoint` kept after ", and none …"; DEC-511 alone; DEC-254 kept; the one-writer line dropped; the other-session

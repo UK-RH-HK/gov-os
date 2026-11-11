@@ -9,6 +9,10 @@ the merge, ``w2/integrate`` holds the change itself, and "one minor above integr
 Revised for round 2b (DEC-866, DEC-1112 (3)): the F6 role case also reads the template's rulesync copy (review F1);
 the read-rule and K-4 cases are strengthened (review F3); the versions compare with ``BASELINE_VERSIONS`` (1.2.0
 expected); the guards also allow round 2b's F2 and F4 lines. Round 2b's new cases are in ``test_w2_128_round2b.py``.
+
+Revised for W2-11 (DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): the read rule is found where it now
+stands and may name the integration branch generically; the versions are held raised above integrate's base, not
+pinned to 1.2.0; the front-matter guards also allow ``metadata.version`` equal to ``version``. Nothing else lowered.
 """
 
 from __future__ import annotations
@@ -73,6 +77,29 @@ def section(text: str, word: str) -> str:
     return hits[0]
 
 
+# Revised for W2-11 (Rewrite-Reason: DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): the read rule is
+# found where it stands. W2-11 moves it into the section on the work order in parallel (DEC-959 item 7), and its
+# README map section's heading also holds "read" (README); the rule names the integration branch generically, as a
+# kernel skill names no project branch, in place of the literal ``w2/integrate``.
+READ_RULE_HEADING = re.compile(r"\bread(?!me)\w*|\bwork order\b", re.I)
+READ_RULE_UNIT = re.compile(r"\bread(?!me)\w*|\bworks? from\b|\bspecification\b|\bspec\b|\bKPIs?\b|"
+                            r"\bimplementation\b|\bintegrat\w*", re.I)
+INTEGRATION_BRANCH = re.compile(r"w2/integrate|\bintegration[ _-]branch\b", re.I)
+
+
+def read_rule(text: str) -> str:
+    """The test-design skill's read rule: the one section whose heading names reading (not the README) or the work
+    order (if several, the one citing DEC-820), cut to its units on reading, working from the specification and its
+    KPIs, the implementation or the integrated code."""
+    hits = [part for heading, part in sections(s.split(text)[1]) if READ_RULE_HEADING.search(heading)]
+    if len(hits) > 1:
+        hits = [part for part in hits if re.search(r"DEC-820\b", part)]
+    assert len(hits) == 1, f"premise: no single section holding the read rule ({len(hits)} found)"
+    rule = [unit for unit in s.units(hits[0]) if READ_RULE_UNIT.search(unit)]
+    assert rule, "premise: the read rule's section says nothing of reading, the specification or the implementation"
+    return "\n\n".join(rule)
+
+
 def folded_units(text: str) -> list[str]:
     return [s.fold(unit) for unit in s.units(text) if unit.strip()]
 
@@ -106,8 +133,9 @@ def version_parts(text: str) -> tuple[int, int, int]:
 # --- TPL-6 S3: the test-design skill's read rule (DEC-963; the review's F7) ------------------------------------------
 
 def test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_tickets_implementation():
-    rule = section(now(TEST_DESIGN), "read")
-    assert "w2/integrate" in rule, "the test-design skill's read rule does not name w2/integrate (DEC-963)"
+    rule = read_rule(now(TEST_DESIGN))
+    assert INTEGRATION_BRANCH.search(rule), \
+        "the test-design skill's read rule names neither the integration branch nor w2/integrate (DEC-963)"
     assert "DEC-963" in rule, "the test-design skill's read rule does not cite DEC-963"
     bars = [line for line in sentences(rule)
             if NEG.search(line) and "implementation" in line.lower() and "ticket" in line.lower()]
@@ -115,8 +143,8 @@ def test_s11_test_design_read_rule_permits_integrate_and_forbids_only_this_ticke
     # Round 2b (review F3): the permission is a sentence of its own kind, not only a name somewhere in the rule
     permits = [line for line in sentences(rule)
                if PERMIT.search(line) and not NEG.search(line) and re.search(r"\bread", line, re.I)
-               and ("w2/integrate" in line or "integrated code" in line.lower())]
-    assert permits, "no sentence of the read rule permits reading w2/integrate or the integrated code (DEC-963)"
+               and (INTEGRATION_BRANCH.search(line) or "integrated code" in line.lower())]
+    assert permits, "no sentence of the read rule permits reading the integration branch or the integrated code (DEC-963)"
     outright = [line for line in clauses(s.split(now(TEST_DESIGN))[1])
                 if GENERAL_CODE_BAR.search(line) and NEG.search(line) and "ticket" not in line.lower()]
     assert not outright, f"the test-design skill still bars source code or implementation outright: {outright}"
@@ -251,10 +279,27 @@ def test_s11_rulesync_skill_copy_is_byte_equal_to_the_kernel_skill(skill):
 
 @pytest.mark.parametrize("rel", [ORCHESTRATION, TEST_DESIGN], ids=["orchestration", "test-design"])
 def test_s11_skill_version_is_one_minor_above_integrates(rel):
-    # Round 2b: one minor above integrate as round 2b's cases found it (1.1.0, round 2a's), so 1.2.0
+    # Round 2b: one minor above integrate as round 2b's cases found it (1.1.0, round 2a's), so 1.2.0.
+    # Revised for W2-11 (Rewrite-Reason: DEC-866, DEC-981, DEC-1137): a later ticket raises the version again, so
+    # the case holds what W2-128 meant without pinning 1.2.0: at least one minor above that base, a valid semver,
+    # and one version in every place this suite reads it (version and metadata.version, in the kernel skill and the
+    # template's rulesync copy; the .claude/ copies and root .rulesync/ are not read here, README N-6). The node id
+    # stays, as records cite it.
     major, minor, _ = version_parts(baseline(rel, BASELINE_VERSIONS))
-    assert version_parts(now(rel)) == (major, minor + 1, 0), \
-        f"{rel}'s version is not {major}.{minor + 1}.0 (one minor above integrate's {major}.{minor}.x)"
+    assert version_parts(now(rel)) >= (major, minor + 1, 0), \
+        f"{rel}'s version is not raised to {major}.{minor + 1}.0 or above (integrate's base {major}.{minor}.x)"
+    version = str(s.split(now(rel))[0]["version"])
+    carried = {}
+    for place in (rel, str((RULESYNC_SKILLS / rel.split("/")[-2] / "SKILL.md").relative_to(s.REPO))):
+        assert (s.REPO / place).is_file(), f"premise: {place} is missing"
+        front, _ = s.split(now(place))
+        assert isinstance(front, dict), f"{place} has no front matter"
+        metadata = front.get("metadata") if isinstance(front.get("metadata"), dict) else {}
+        for key, value in (("version", front.get("version")), ("metadata.version", metadata.get("version"))):
+            if value is not None:
+                carried[f"{place} {key}"] = str(value)
+    unequal = {where: value for where, value in carried.items() if value != version}
+    assert not unequal, f"{rel}'s version {version!r} is not the one carried in every place: {unequal}"
 
 
 def test_s11_skills_validator_passes_on_both_skills(tmp_path):
@@ -268,9 +313,17 @@ def test_s11_skills_validator_passes_on_both_skills(tmp_path):
 # --- Guards: nothing else in the two skills changes ------------------------------------------------------------------
 
 def _front_without_version(text: str) -> dict:
+    """The front matter with ``version`` set aside, and ``metadata`` too when it holds only ``version`` equal to it.
+
+    Revised for W2-11 (Rewrite-Reason: DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-b): every kernel skill carries
+    ``metadata.version`` equal to ``version``, the one carried repeat; any other change to the front matter still
+    fails."""
     front, _ = s.split(text)
     assert isinstance(front, dict), "the skill has no front matter"
-    return {key: value for key, value in front.items() if key != "version"}
+    kept = {key: value for key, value in front.items() if key != "version"}
+    if "version" in front and kept.get("metadata") == {"version": front["version"]}:
+        del kept["metadata"]
+    return kept
 
 
 def test_s11_guard_test_design_skill_changes_only_its_read_rule():
@@ -283,8 +336,10 @@ def test_s11_guard_test_design_skill_changes_only_its_read_rule():
     def recited(units: list[str]) -> list[str]:
         return [re.sub(r"cap-38\.c\b", "cap-38.b", unit, flags=re.I) for unit in units]
 
+    # Revised for W2-11 (DEC-866, DEC-981, DEC-1137): the read rule's section is the one ``read_rule`` finds by its
+    # heading (reading, not the README, or the work order)
     changed = [h or "(before the first section)" for (h, a), (_, b) in zip(old_parts, new_parts)
-               if "read" not in h.lower() and recited(folded_units(a)) != recited(folded_units(b))]
+               if not READ_RULE_HEADING.search(h) and recited(folded_units(a)) != recited(folded_units(b))]
     assert not changed, f"the test-design skill changed outside its read rule: {changed}"
 
 
