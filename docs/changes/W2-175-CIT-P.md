@@ -103,8 +103,15 @@ after W2-128); this ticket's close names that finding and does not fix it.
 
 ## 3. Independent review
 
-Pending. The lead fills this section after one read-only independent review of the delta (`git diff 7709021ad6cc..HEAD`
-on the seven templates), with its READY from the verdict block (DEC-1010).
+Round 1 of at most 2 (DEC-1010): READY. A fresh read-only reviewer (role `independent-auditor`, session
+`bbd46e9d-ea41-4da2-80a2-a84dde4f6bcc`, 2026-11-11, Opus 5.5 at effort high, class C3, launched under the OS sandbox) read
+head `44d83e22d7e7`: the seven templates' delta (`git diff 7709021ad6cc..HEAD`), the six `template/.rulesync/subagents`
+compositions, this record and the acceptance tests of `tests/acceptance/W2-175/`. Its verdict block marks all nine KPI
+lines (S1 to S7, F1, F2) pass; READY is computed by code (`verdict.ready`): True, no reason. It found the stop sentence
+byte-equal to `brief.md` line 62, role-cto's decision-record line unchanged, every bracketed id ACCEPTED, each composed
+file equal to `compose()`, and all 13 base and 13 new sha256 values of section 2 equal to the files at the base and the head.
+Its six findings (RV1 to RV6) are all out of scope with consequence `other`: rows, not a round (DEC-801, DEC-808). The
+probe record is `docs/probes/DAEO-wahn/PR-DAEO-wahn.md`.
 
 ## 4. Owner's approval
 
