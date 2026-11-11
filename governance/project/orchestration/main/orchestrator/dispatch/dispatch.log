@@ -437,3 +437,16 @@
 2026-11-11 20:50:02 idle with headroom: inbox item written (waiting)
 2026-11-11 20:55:01 idle with headroom: inbox item written (waiting)
 2026-11-11 20:57:01 started W2-90b (DAEO-nqa2) W2-90b-A5-r2b-land.md -> W2-90b-A5-r2b-land.json (launcher exit 0)
+2026-11-11 20:59:02 land finished: {'W2-105=19ac51dd9793': 'CLOSED'}
+2026-11-11 21:04:02 idle with headroom: inbox item written (waiting)
+2026-11-11 21:06:02 interim result: W2-175 4c0c73472 W2-175: probe record, review 1 of at most 2 (DEC-1010): pass at 44d83e22d7e7, RE
+2026-11-11 21:07:01 return: W2-175-A5-run2.json -> inbox/20261111-210701-W2-175-A5-run2.txt
+2026-11-11 21:07:01 idle with headroom: inbox item written (used:W2-175 DAEO-wahn)
+2026-11-11 21:08:01 idle with headroom: inbox item written (waiting)
+2026-11-11 21:14:02 interim result: W2-40 6b01098c5 W2-40: EXP-002 hook-limit record from the measured results
+2026-11-11 21:18:02 interim result: W2-40 29753c768 W2-40 (DAEO-6ox0): FULL probe record, review round 1 READY by verdict.ready (S1 
+2026-11-11 21:20:02 return: W2-40-A5-run1.json -> inbox/20261111-212002-W2-40-A5-run1.txt
+2026-11-11 21:20:02 return: W2-90b-A5-r2b-land.json -> inbox/20261111-212002-W2-90b-A5-r2b-land.txt
+2026-11-11 21:20:02 idle with headroom: inbox item written (used:W2-40 DAEO-6ox0,W2-90b DAEO-nqa2)
+2026-11-11 21:21:02 idle with headroom: inbox item written (waiting)
+2026-11-11 21:21:02 land started: ['W2-90b=cb0e69ba57f2', 'W2-40=29753c768def'] -> land-dispatch-20261111-212102.out (launcher exit 0)

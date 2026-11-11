@@ -1,0 +1,7 @@
+log: W2-40-A5-run1.json
+W2: W2-40
+status: DONE. S1 holds as its `Verify:` line says, review round 1 is READY by `verdict.ready` (S1 pass, no findings), and the probe record is committed.
+
+task: W2-40 (DAEO-6ox0) run hook-limit-1: measure what Claude Code does with a hook that runs past its time limit, get it written up as one evidence record, then one fresh FULL review and the probe record.
+status: DONE. S1 holds as its `Verify:` line says, review round 1 is READY by `verdict.ready` (S1 pass, no findings), and the probe record is committed.
+work_completed: All first calls and the three CTO records checked out (`in_progress`, `allowed_paths` exactly `experiments/EXP-002/**`, the folder exists). BASE `8fc771dc0215` equalled integrate, so step 2 needed no merge. Research-1 wrote t

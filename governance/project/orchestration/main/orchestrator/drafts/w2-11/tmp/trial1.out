@@ -1,0 +1,11 @@
+orchestration body chars 10229 tokens 2558
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[discovery]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[retrieval]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationSkillForm::test_the_body_is_within_2500_tokens
+FAILED tests/acceptance/W1-35/test_w1_35_orchestration.py::TestOrchestrationSkillForm::test_the_skill_names_the_five_brief_templates
+40 failed, 134 passed, 1 skipped, 27 deselected in 8.07s

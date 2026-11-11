@@ -1,9 +1,9 @@
 {
- "computed": "2026-11-11 20:21:01",
+ "computed": "2026-11-11 21:21:02",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 5.65,
+   "cpu_p95": 5.72,
    "cpu_max": 2335.84,
    "rss_kb_p95": 9126224,
    "rss_kb_max": 13410904,
@@ -19,64 +19,64 @@
   "claude": {
    "cpu_p95": 0.1,
    "cpu_max": 7.54,
-   "rss_kb_p95": 1198936,
+   "rss_kb_p95": 1331860,
    "rss_kb_max": 2534960,
    "samples": 8097
   },
   "test_run": {
-   "cpu_p95": 7.51,
+   "cpu_p95": 8.37,
    "cpu_max": 27.15,
    "rss_kb_p95": 2586796,
    "rss_kb_max": 6126012,
-   "samples": 1551
+   "samples": 1608
   },
   "codegraph": {
-   "cpu_p95": 0.76,
+   "cpu_p95": 0.79,
    "cpu_max": 2.14,
-   "rss_kb_p95": 458736,
+   "rss_kb_p95": 463028,
    "rss_kb_max": 1169916,
-   "samples": 553
+   "samples": 544
   },
   "git": {
    "cpu_p95": 0.0,
    "cpu_max": 0.01,
    "rss_kb_p95": 29128,
    "rss_kb_max": 124460,
-   "samples": 109
+   "samples": 108
   },
   "rebuild": {
-   "cpu_p95": 0.03,
+   "cpu_p95": 0.04,
    "cpu_max": 4.35,
-   "rss_kb_p95": 102472,
+   "rss_kb_p95": 103540,
    "rss_kb_max": 396024,
-   "samples": 5483
+   "samples": 5541
   },
   "gitleaks": {
-   "cpu_p95": 0.11,
+   "cpu_p95": 0.1,
    "cpu_max": 0.44,
-   "rss_kb_p95": 999516,
+   "rss_kb_p95": 973212,
    "rss_kb_max": 3676260,
-   "samples": 537
+   "samples": 581
   },
   "reranker": {
    "cpu_p95": 0.0,
    "cpu_max": 0.0,
-   "rss_kb_p95": 22268,
+   "rss_kb_p95": 31556,
    "rss_kb_max": 119320,
-   "samples": 72
+   "samples": 74
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 0.11,
+   "cpu_p95": 0.12,
    "cpu_max": 5.8999999999999995,
-   "rss_kb_p95": 1423068,
+   "rss_kb_p95": 1422472,
    "rss_kb_max": 1905032,
-   "samples": 5483
+   "samples": 5541
   }
  },
  "lead": {
-  "rss_kb_p95": 428528,
+  "rss_kb_p95": 439528,
   "rss_kb_max": 1354888,
-  "samples": 311
+  "samples": 473
  },
  "lead_own_max_kb": {
   "DAEO-61vm": 446624,
@@ -86,7 +86,9 @@
   "DAEO-btcs": 572116,
   "DAEO-0z8c": 1354888,
   "DAEO-zpdj": 505172,
-  "DAEO-wahn": 309440
+  "DAEO-wahn": 411384,
+  "DAEO-6ox0": 526808,
+  "DAEO-nqa2": 341176
  },
  "lead_outside": {
   "rss_kb_p95": 307064,
@@ -100,14 +102,14 @@
   "DAEO-0z8c": 300180
  },
  "lead_inside": {
-  "rss_kb_p95": 431940,
+  "rss_kb_p95": 446624,
   "rss_kb_max": 1354888,
-  "samples": 269
+  "samples": 431
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 527312.0,
+  "rss_kb_p95": 564386.0,
   "rss_kb_max": 1593062.6666666667,
-  "samples": 1551
+  "samples": 1608
  },
- "slot_run_kb": 527312.0
+ "slot_run_kb": 564386.0
 }

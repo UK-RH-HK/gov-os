@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="6" time="244.508" timestamp="2026-11-11T21:13:03.033074+00:00" hostname="Usain"><testcase classname="tests.unit.accept.test_w2_96_review3" name="test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal[True-2]" time="60.037"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r14_a_stopped_run_k0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r14_a_stopped_run_k0/proj'), PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r14_a_stopped_run_k0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r14_a_stopped_run_k0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x708b9566a480&gt;, signum = 2
+vanish = True
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    @pytest.mark.parametrize("vanish", [True, False])
+    def test_w2_96_r14_a_stopped_run_keeps_128_plus_the_signal(project, tmp_path, launch, signum, vanish):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid = _racer(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, {"test_a.py": test})
+        gov = launch(root, temp, env={"W296_VANISH": "1"} if vanish else None)
+        deadline = time.monotonic() + 60
+        while not started.exists() and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert started.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r14_a_stopped_run_k0/started').exists
+
+tests/unit/accept/test_w2_96_review3.py:282: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_review4" name="test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up[2]" time="60.041"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0/proj'), PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x708b9566a8e0&gt;, signum = 2
+
+    @pytest.mark.parametrize("signum", [2, 15, 1])
+    def test_w2_96_r16_an_own_session_orphan_is_reaped_before_a_stopped_run_cleans_up(project, tmp_path, launch,
+                                                                                       signum):
+        root, temp = project
+        started = tmp_path / "started"
+        test, pid_file = _orphan(tmp_path, f"    open({str(started)!r}, 'w').write('x')\n    time.sleep(60)\n")
+        _plant(root, test)
+        gov = launch(root, temp)
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_review4.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not path.exists() and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r16_an_own_session_0/started').exists
+
+tests/unit/accept/test_w2_96_review4.py:118: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_a_signal_during_the_clean_up_is_held_back[signals0]" time="2.098" /><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up[2-more0]" time="60.039"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0/proj'), PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x708b956d9940&gt;, first = 2
+more = (15, 1)
+
+    @pytest.mark.parametrize("first, more", [(2, (15, 1)), (15, (2,)), (1, (2,))])
+    def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(project, tmp_path, launch, first, more):
+        root, temp = project
+        started, slow = tmp_path / "started", tmp_path / "slow"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp, env=_slow(slow))
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_a_signal_dur0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError</failure></testcase><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it[kinds0]" time="2.096" /><testcase classname="tests.unit.accept.test_w2_96_run2" name="test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it" time="60.050"><failure message="AssertionError: assert False&#10; +  where False = exists()&#10; +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0/started').exists">project = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0/proj'), PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0/tmpdir'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0')
+launch = &lt;function planted.&lt;locals&gt;.launch at 0x708b956db1a0&gt;
+
+    def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path, launch):
+        root, temp = project
+        started = tmp_path / "started"
+        _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(tmp_path / "never"))})
+        gov = launch(root, temp)
+&gt;       _wait_for(started)
+
+tests/unit/accept/test_w2_96_run2.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0/started')
+seconds = 60
+
+    def _wait_for(path: Path, seconds: float = 60) -&gt; None:
+        deadline = time.monotonic() + seconds
+        while not (path.exists() and path.read_text()) and time.monotonic() &lt; deadline:
+            time.sleep(0.05)
+&gt;       assert path.exists()
+E       AssertionError: assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-41/test_w2_96_r9_r12_ctrl_c_durin0/started').exists
+
+tests/unit/accept/test_w2_96_run2.py:179: AssertionError</failure></testcase></testsuite></testsuites>

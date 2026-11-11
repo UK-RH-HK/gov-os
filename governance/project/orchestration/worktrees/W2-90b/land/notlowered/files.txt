@@ -1,0 +1,7 @@
+tests/acceptance/W1-05/test_w1_05_live_hooks.py
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py
+tests/acceptance/W1-46/test_w1_46_research_installs.py
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+tests/acceptance/W2-59/test_w2_59_hook_lines.py
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py
+tests/acceptance/W2-65/test_w2_65_hook_lines.py

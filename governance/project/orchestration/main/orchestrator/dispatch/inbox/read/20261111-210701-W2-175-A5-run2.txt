@@ -1,0 +1,10 @@
+log: W2-175-A5-run2.json
+W2: W2-175
+status: DONE. Review 1 is READY (`verdict.ready` returned True with no reasons). Head is `4c0c73472fd8` and the tree is clean. The next step is the owner's approval of the new bytes; this lead does not merge.
+
+task: DAEO-wahn (W2-175), run 2 (resume): write the six `template/.rulesync` compositions, verify, run review round 1, and return DONE so the owner can approve the templates (DEC-1116)
+status: DONE. Review 1 is READY (`verdict.ready` returned True with no reasons). Head is `4c0c73472fd8` and the tree is clean. The next step is the owner's approval of the new bytes; this lead does not merge.
+work_completed:
+- Merged w2/integrate into the branch (`6dc99e2c1`) so the ticket file carries P-2 (a).
+- The CTO had already committed the CIT-P state-line fix (`f0cb5618a`).
+- ps-3 stopped as ESCALATION_B

@@ -5,3 +5,21 @@ reds traced: the head without the batch, once each way, the same failure; 3 roun
 2026-11-11 20:25:06 merged W2-105 onto 7709021ad6cc: e0001d704179
 2026-11-11 20:40:09 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
 2026-11-11 20:40:09 merged W2-105 onto 7a8d5536d664: 4687835e9501
+2026-11-11 20:57:33 refs/heads/w2/integrate moved by records only (2 path(s)); merged again onto 8fc771dc0215: 92c653f37703; the record-reading tests re-run: {'tests': 321, 'failures': 0, 'errors': 0, 'skipped': 1}
+2026-11-11 20:57:33 ADVANCED refs/heads/w2/integrate 8fc771dc0215 -> 92c653f37703; record /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/merge-queue/records/92c653f37703.json
+2026-11-11 20:57:34 seed of W2-00-store-a from /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged: deferred (product): --seed /home/usain/gov-os-runs/W2-00/merge-queue/warm/merged
+2026-11-11 20:58:25 integration store promoted: the merged clone's stores at 92c653f37703 into W2-00-store-a; the link moved (its own rebuild of the landing's change not needed)
+queue run exit 0
+CLOSED W2-105: 628ee9f6e W2-105 (DAEO-zpdj): merged and closed in one step by the merge queue (DEC-989)
+structural pass: schema: ok
+structural pass: graph: ok
+structural pass: claims: ok
+structural pass: mutation: ok
+structural pass: authority: ok
+structural pass: pathmap: ok
+structural pass: audit: ok
+structural pass: skills: ok
+structural pass: portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 7709021ad6cc)
+structural pass: links: NOTICE 13 new since 7709021ad6cc26aa24ca00a3285e58afde299f65 (1592 standing): UNKNOWN_ID tests/acceptance/W2-175 in DAEO-wahn's acceptance_tests.path | .tickets/DAEO-wahn.md:52 | orchestrator | write the tests at tests/acceptance/W2-17... | UNLINKED_ID W2-H052 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-H052 to DAEO-6ox0's sources: | UNLINKED_ID W2-L316 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L316 to DAEO-6ox0's sources: (+10 more)
+structural pass: structural pass at 628ee9f6edc3: NOTICE in links (8 of 9 families ok), 21.7 s; a notice, not a refusal
+structural pass: notice -> inbox/20261111-205847-structural-notice.txt

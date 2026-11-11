@@ -1,0 +1,8 @@
+import sys
+import gov.cli.main as _module
+_target = _module
+for _name in 'main'.split('.'):
+    _target = getattr(_target, _name)
+if __name__ == '__main__':
+    sys.argv[0] = 'gov'
+    sys.exit(_target())

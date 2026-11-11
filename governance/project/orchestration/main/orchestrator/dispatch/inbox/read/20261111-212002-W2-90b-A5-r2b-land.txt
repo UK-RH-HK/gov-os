@@ -1,0 +1,9 @@
+log: W2-90b-A5-r2b-land.json
+W2: W2-90b
+status: DONE — `cb0e69ba57f2` verified; every red is named, with proof
+
+**W2-90b is verified at `cb0e69ba57f2` and ready for you to land.** The scoped run shows 9 reds, all in the two groups you expected (3 `test_runs.py` cases and the 6 W2-96 signal cases); each passes when run alone, as shown below. I made no commit and started no worker; the tree is clean.
+
+task: DAEO-nqa2 (W2-90b) land r2b: confirm the head, run the scoped verification on the merged head, name the known reds, return the verified head
+status: DONE — `cb0e69ba57f2` verified; every red is named, with proof
+work_completed: Confirmed identity (`orchestrator`, `DAEO-nqa2`), the tree and branch (`/ho

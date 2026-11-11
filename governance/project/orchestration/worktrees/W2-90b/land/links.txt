@@ -1,0 +1,430 @@
+gov links: 429 new since 73c18fea1e1f, 1177 standing (UNMARKED_CHANGE orchestrator 3, UNKNOWN_ID orchestrator 18, UNKNOWN_ID owner 1, UNLINKED_ID orchestrator 959, NOT_IN_FORCE_AS_RULE orchestrator 5, CLOSED_TICKET_EDITED orchestrator 99, TICKET_CHANGE_UNMARKED orchestrator 92; records 2093, register 1134 entries, commits 1915)
+UNMARKED_CHANGE DEC-026 <- DEC-086 (**Settles:**; part) | docs/DECISION_REGISTER.md:222 | orchestrator | add "**Changed by:** DEC-086" to DEC-026's status line
+UNMARKED_CHANGE DEC-056 <- DEC-017 (text: replaced by; part) (text) | docs/DECISION_REGISTER.md:396 | orchestrator | add "**Changed by:** DEC-017" to DEC-056's status line
+UNMARKED_CHANGE DEC-162 <- DEC-156 (text: amended by; part) (text) | docs/DECISION_REGISTER.md:1475 | orchestrator | add "**Changed by:** DEC-156" to DEC-162's status line
+UNMARKED_CHANGE DEC-853 <- DEC-884 (**Changes:**; part) | docs/DECISION_REGISTER.md:9277 | orchestrator | add "**Changed by:** DEC-884 (item 4)" to DEC-853's status line
+UNMARKED_CHANGE DEC-1050 <- DEC-1057 (**Changes:**; part) | docs/DECISION_REGISTER.md:13008 | orchestrator | add "**Changed by:** DEC-1057 (8)" to DEC-1050's status line
+UNMARKED_CHANGE DEC-1053 <- DEC-880 (text: withdrawn by; part) (text) | docs/DECISION_REGISTER.md:13042 | orchestrator | add "**Changed by:** DEC-880" to DEC-1053's status line
+UNMARKED_CHANGE DEC-1115 <- DEC-1122 (**Changes:**; part) | docs/DECISION_REGISTER.md:14181 | orchestrator | add "**Changed by:** DEC-1122 (4)" to DEC-1115's status line
+UNKNOWN_ID tests/acceptance/W2-80 in DAEO-03dg's acceptance_tests.path | .tickets/DAEO-03dg.md:50 | orchestrator | write the tests at tests/acceptance/W2-80 or correct DAEO-03dg's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-42a in DAEO-03ub's acceptance_tests.path | .tickets/DAEO-03ub.md:51 | orchestrator | write the tests at tests/acceptance/W2-42a or correct DAEO-03ub's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-119 in DAEO-168f's acceptance_tests.path | .tickets/DAEO-168f.md:39 | orchestrator | write the tests at tests/acceptance/W2-119 or correct DAEO-168f's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-21 in DAEO-1ahb's acceptance_tests.path | .tickets/DAEO-1ahb.md:45 | orchestrator | write the tests at tests/acceptance/W2-21 or correct DAEO-1ahb's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-127 in DAEO-1vka's acceptance_tests.path | .tickets/DAEO-1vka.md:40 | orchestrator | write the tests at tests/acceptance/W2-127 or correct DAEO-1vka's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-109 in DAEO-6b2q's acceptance_tests.path | .tickets/DAEO-6b2q.md:50 | orchestrator | write the tests at tests/acceptance/W2-109 or correct DAEO-6b2q's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-37 in DAEO-6n5k's acceptance_tests.path | .tickets/DAEO-6n5k.md:40 | orchestrator | write the tests at tests/acceptance/W2-37 or correct DAEO-6n5k's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-11b in DAEO-9bc0's acceptance_tests.path | .tickets/DAEO-9bc0.md:51 | orchestrator | write the tests at tests/acceptance/W2-11b or correct DAEO-9bc0's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-09 in DAEO-a3m2's acceptance_tests.path | .tickets/DAEO-a3m2.md:39 | orchestrator | write the tests at tests/acceptance/W2-09 or correct DAEO-a3m2's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-10 in DAEO-cuao's acceptance_tests.path | .tickets/DAEO-cuao.md:41 | orchestrator | write the tests at tests/acceptance/W2-10 or correct DAEO-cuao's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-60a in DAEO-cv58's acceptance_tests.path | .tickets/DAEO-cv58.md:67 | orchestrator | write the tests at tests/acceptance/W2-60a or correct DAEO-cv58's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-104 in DAEO-drhj's acceptance_tests.path | .tickets/DAEO-drhj.md:39 | orchestrator | write the tests at tests/acceptance/W2-104 or correct DAEO-drhj's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-83a in DAEO-dy7j's acceptance_tests.path | .tickets/DAEO-dy7j.md:56 | orchestrator | write the tests at tests/acceptance/W2-83a or correct DAEO-dy7j's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-90c in DAEO-fu3n's acceptance_tests.path | .tickets/DAEO-fu3n.md:54 | orchestrator | write the tests at tests/acceptance/W2-90c or correct DAEO-fu3n's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-38 in DAEO-g23i's acceptance_tests.path | .tickets/DAEO-g23i.md:39 | orchestrator | write the tests at tests/acceptance/W2-38 or correct DAEO-g23i's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-103 in DAEO-hgv3's acceptance_tests.path | .tickets/DAEO-hgv3.md:42 | orchestrator | write the tests at tests/acceptance/W2-103 or correct DAEO-hgv3's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-12 in DAEO-j8gn's acceptance_tests.path | .tickets/DAEO-j8gn.md:60 | orchestrator | write the tests at tests/acceptance/W2-12 or correct DAEO-j8gn's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-125 in DAEO-jfm3's acceptance_tests.path | .tickets/DAEO-jfm3.md:39 | orchestrator | write the tests at tests/acceptance/W2-125 or correct DAEO-jfm3's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-11 in DAEO-k7hz's acceptance_tests.path | .tickets/DAEO-k7hz.md:98 | orchestrator | write the tests at tests/acceptance/W2-11 or correct DAEO-k7hz's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-06 in DAEO-kia7's acceptance_tests.path | .tickets/DAEO-kia7.md:46 | orchestrator | write the tests at tests/acceptance/W2-06 or correct DAEO-kia7's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-99 in DAEO-lxzn's acceptance_tests.path | .tickets/DAEO-lxzn.md:47 | orchestrator | write the tests at tests/acceptance/W2-99 or correct DAEO-lxzn's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-83b in DAEO-mc6n's acceptance_tests.path | .tickets/DAEO-mc6n.md:45 | orchestrator | write the tests at tests/acceptance/W2-83b or correct DAEO-mc6n's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-102 in DAEO-rpfv's acceptance_tests.path | .tickets/DAEO-rpfv.md:47 | orchestrator | write the tests at tests/acceptance/W2-102 or correct DAEO-rpfv's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-41 in DAEO-s694's acceptance_tests.path | .tickets/DAEO-s694.md:42 | orchestrator | write the tests at tests/acceptance/W2-41 or correct DAEO-s694's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-52 in DAEO-siiz's acceptance_tests.path | .tickets/DAEO-siiz.md:44 | orchestrator | write the tests at tests/acceptance/W2-52 or correct DAEO-siiz's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-118 in DAEO-ts4y's acceptance_tests.path | .tickets/DAEO-ts4y.md:45 | orchestrator | write the tests at tests/acceptance/W2-118 or correct DAEO-ts4y's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-43 in DAEO-u5g6's acceptance_tests.path | .tickets/DAEO-u5g6.md:40 | orchestrator | write the tests at tests/acceptance/W2-43 or correct DAEO-u5g6's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-78 in DAEO-v4is's acceptance_tests.path | .tickets/DAEO-v4is.md:48 | orchestrator | write the tests at tests/acceptance/W2-78 or correct DAEO-v4is's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-175 in DAEO-wahn's acceptance_tests.path | .tickets/DAEO-wahn.md:52 | orchestrator | write the tests at tests/acceptance/W2-175 or correct DAEO-wahn's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-31 in DAEO-wbdh's acceptance_tests.path | .tickets/DAEO-wbdh.md:37 | orchestrator | write the tests at tests/acceptance/W2-31 or correct DAEO-wbdh's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-39 in DAEO-wudw's acceptance_tests.path | .tickets/DAEO-wudw.md:34 | orchestrator | write the tests at tests/acceptance/W2-39 or correct DAEO-wudw's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-22 in DAEO-xm6l's acceptance_tests.path | .tickets/DAEO-xm6l.md:40 | orchestrator | write the tests at tests/acceptance/W2-22 or correct DAEO-xm6l's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-117 in DAEO-zkr9's acceptance_tests.path | .tickets/DAEO-zkr9.md:44 | orchestrator | write the tests at tests/acceptance/W2-117 or correct DAEO-zkr9's acceptance_tests.path
+UNKNOWN_ID tests/acceptance/W2-44 in DAEO-zndm's acceptance_tests.path | .tickets/DAEO-zndm.md:35 | orchestrator | write the tests at tests/acceptance/W2-44 or correct DAEO-zndm's acceptance_tests.path
+UNLINKED_ID DEC-780 in DAEO-03dg's KPI brackets, not in its sources | .tickets/DAEO-03dg.md:38 | orchestrator | add DEC-780 to DAEO-03dg's sources:
+UNLINKED_ID DEC-862 in DAEO-03dg's KPI brackets, not in its sources | .tickets/DAEO-03dg.md:38 | orchestrator | add DEC-862 to DAEO-03dg's sources:
+UNLINKED_ID DEC-889 in DAEO-03dg's KPI brackets, not in its sources | .tickets/DAEO-03dg.md:38 | orchestrator | add DEC-889 to DAEO-03dg's sources:
+UNLINKED_ID DEC-906 in DAEO-03dg's KPI brackets, not in its sources | .tickets/DAEO-03dg.md:38 | orchestrator | add DEC-906 to DAEO-03dg's sources:
+UNLINKED_ID DEC-922 in DAEO-03dg's KPI brackets, not in its sources | .tickets/DAEO-03dg.md:38 | orchestrator | add DEC-922 to DAEO-03dg's sources:
+UNLINKED_ID W2-H021 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-H021 to DAEO-057v's sources:
+UNLINKED_ID W2-H032 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-H032 to DAEO-057v's sources:
+UNLINKED_ID W2-L172 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-L172 to DAEO-057v's sources:
+UNLINKED_ID W2-L173 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-L173 to DAEO-057v's sources:
+UNLINKED_ID W2-L174 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-L174 to DAEO-057v's sources:
+UNLINKED_ID W2-L230 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-L230 to DAEO-057v's sources:
+UNLINKED_ID W2-M123 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-M123 to DAEO-057v's sources:
+UNLINKED_ID W2-M279 in DAEO-057v's KPI brackets, not in its sources | .tickets/DAEO-057v.md:36 | orchestrator | add W2-M279 to DAEO-057v's sources:
+UNLINKED_ID DEC-105 in 8c18fa3004a6's Implements: (product-spec), not in DAEO-0pyc's sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add DEC-105 to DAEO-0pyc's sources:
+UNLINKED_ID DEC-1126 in 8c18fa3004a6's Implements: (product-spec), not in DAEO-0pyc's sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add DEC-1126 to DAEO-0pyc's sources:
+UNLINKED_ID W2-L065 in DAEO-0pyc's KPI brackets, not in its sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add W2-L065 to DAEO-0pyc's sources:
+UNLINKED_ID W2-M073 in DAEO-0pyc's KPI brackets, not in its sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add W2-M073 to DAEO-0pyc's sources:
+UNLINKED_ID W2-M103 in DAEO-0pyc's KPI brackets, not in its sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add W2-M103 to DAEO-0pyc's sources:
+UNLINKED_ID W2-M104 in DAEO-0pyc's KPI brackets, not in its sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add W2-M104 to DAEO-0pyc's sources:
+UNLINKED_ID W2-M191 in DAEO-0pyc's KPI brackets, not in its sources | .tickets/DAEO-0pyc.md:45 | orchestrator | add W2-M191 to DAEO-0pyc's sources:
+UNLINKED_ID DEC-1033 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1033 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1033 in 0922aa7646e6's Implements: (independent-test-designer), not in DAEO-0rfi's sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1033 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1033 in 31186ebfc2b7's Implements: (independent-test-designer), not in DAEO-0rfi's sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1033 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1033 in 816e86dd30ae's Implements: (independent-test-designer), not in DAEO-0rfi's sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1033 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1042 in 0922aa7646e6's Implements: (independent-test-designer), not in DAEO-0rfi's sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1042 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1042 in 816e86dd30ae's Implements: (independent-test-designer), not in DAEO-0rfi's sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-1042 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-866 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add DEC-866 to DAEO-0rfi's sources:
+UNLINKED_ID W2-30 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add W2-30 to DAEO-0rfi's sources:
+UNLINKED_ID W2-32 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add W2-32 to DAEO-0rfi's sources:
+UNLINKED_ID W2-34 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add W2-34 to DAEO-0rfi's sources:
+UNLINKED_ID W2-40 in DAEO-0rfi's KPI brackets, not in its sources | .tickets/DAEO-0rfi.md:47 | orchestrator | add W2-40 to DAEO-0rfi's sources:
+UNLINKED_ID DEC-1074 in 5e9cdcc8d6ba's Implements: (independent-test-designer), not in DAEO-0z8c's sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add DEC-1074 to DAEO-0z8c's sources:
+UNLINKED_ID DEC-1109 in 5e9cdcc8d6ba's Implements: (independent-test-designer), not in DAEO-0z8c's sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add DEC-1109 to DAEO-0z8c's sources:
+UNLINKED_ID DEC-1125 in f53c8543dcf5's Implements: (research), not in DAEO-0z8c's sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add DEC-1125 to DAEO-0z8c's sources:
+UNLINKED_ID W2-L160 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-L160 to DAEO-0z8c's sources:
+UNLINKED_ID W2-M105 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-M105 to DAEO-0z8c's sources:
+UNLINKED_ID W2-M113 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-M113 to DAEO-0z8c's sources:
+UNLINKED_ID W2-M161 in DAEO-0z8c's KPI brackets, not in its sources | .tickets/DAEO-0z8c.md:37 | orchestrator | add W2-M161 to DAEO-0z8c's sources:
+UNLINKED_ID W2-H001 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-H001 to DAEO-1ahb's sources:
+UNLINKED_ID W2-H012 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-H012 to DAEO-1ahb's sources:
+UNLINKED_ID W2-H046 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-H046 to DAEO-1ahb's sources:
+UNLINKED_ID W2-L105 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-L105 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M094 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M094 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M095 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M095 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M097 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M097 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M152 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M152 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M181 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M181 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M187 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M187 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M245 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M245 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M247 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M247 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M275 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M275 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M291 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M291 to DAEO-1ahb's sources:
+UNLINKED_ID W2-M405 in DAEO-1ahb's KPI brackets, not in its sources | .tickets/DAEO-1ahb.md:38 | orchestrator | add W2-M405 to DAEO-1ahb's sources:
+UNLINKED_ID DEC-1010 in DAEO-1vka's KPI brackets, not in its sources | .tickets/DAEO-1vka.md:33 | orchestrator | add DEC-1010 to DAEO-1vka's sources:
+UNLINKED_ID W2-112 in DAEO-1vka's KPI brackets, not in its sources | .tickets/DAEO-1vka.md:33 | orchestrator | add W2-112 to DAEO-1vka's sources:
+UNLINKED_ID DEC-1132 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:88 | orchestrator | add DEC-1132 to DAEO-2bdu's sources:
+UNLINKED_ID W2-124 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:88 | orchestrator | add W2-124 to DAEO-2bdu's sources:
+UNLINKED_ID W2-26 in DAEO-2bdu's KPI brackets, not in its sources | .tickets/DAEO-2bdu.md:88 | orchestrator | add W2-26 to DAEO-2bdu's sources:
+UNLINKED_ID W2-128 in DAEO-4k3l's KPI brackets, not in its sources | .tickets/DAEO-4k3l.md:49 | orchestrator | add W2-128 to DAEO-4k3l's sources:
+UNLINKED_ID W2-L319 in DAEO-6n5k's KPI brackets, not in its sources | .tickets/DAEO-6n5k.md:33 | orchestrator | add W2-L319 to DAEO-6n5k's sources:
+UNLINKED_ID W2-M285 in DAEO-6n5k's KPI brackets, not in its sources | .tickets/DAEO-6n5k.md:33 | orchestrator | add W2-M285 to DAEO-6n5k's sources:
+UNLINKED_ID W2-H052 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-H052 to DAEO-6ox0's sources:
+UNLINKED_ID W2-L316 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L316 to DAEO-6ox0's sources:
+UNLINKED_ID W2-L328 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L328 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M334 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M334 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M335 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M335 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M336 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M336 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M337 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M337 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M338 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M338 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M344 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M344 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M347 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M347 to DAEO-6ox0's sources:
+UNLINKED_ID W2-M350 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-M350 to DAEO-6ox0's sources:
+UNLINKED_ID DEC-1014 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add DEC-1014 to DAEO-7r5e's sources:
+UNLINKED_ID DEC-803 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add DEC-803 to DAEO-7r5e's sources:
+UNLINKED_ID W2-H020 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-H020 to DAEO-7r5e's sources:
+UNLINKED_ID W2-L017 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-L017 to DAEO-7r5e's sources:
+UNLINKED_ID W2-L106 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-L106 to DAEO-7r5e's sources:
+UNLINKED_ID W2-L335 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-L335 to DAEO-7r5e's sources:
+UNLINKED_ID W2-M013 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-M013 to DAEO-7r5e's sources:
+UNLINKED_ID W2-M142 in DAEO-7r5e's KPI brackets, not in its sources | .tickets/DAEO-7r5e.md:36 | orchestrator | add W2-M142 to DAEO-7r5e's sources:
+UNLINKED_ID W2-H053 in DAEO-7y6v's KPI brackets, not in its sources | .tickets/DAEO-7y6v.md:36 | orchestrator | add W2-H053 to DAEO-7y6v's sources:
+UNLINKED_ID W2-L018 in DAEO-7y6v's KPI brackets, not in its sources | .tickets/DAEO-7y6v.md:36 | orchestrator | add W2-L018 to DAEO-7y6v's sources:
+UNLINKED_ID W2-L324 in DAEO-7y6v's KPI brackets, not in its sources | .tickets/DAEO-7y6v.md:36 | orchestrator | add W2-L324 to DAEO-7y6v's sources:
+UNLINKED_ID W2-L341 in DAEO-7y6v's KPI brackets, not in its sources | .tickets/DAEO-7y6v.md:36 | orchestrator | add W2-L341 to DAEO-7y6v's sources:
+UNLINKED_ID DEC-1116 in a7d476c16da2's Implements: (independent-test-designer), not in DAEO-8s85's sources | .tickets/DAEO-8s85.md:46 | orchestrator | add DEC-1116 to DAEO-8s85's sources:
+UNLINKED_ID DEC-1122 in a7d476c16da2's Implements: (independent-test-designer), not in DAEO-8s85's sources | .tickets/DAEO-8s85.md:46 | orchestrator | add DEC-1122 to DAEO-8s85's sources:
+UNLINKED_ID W2-I015 in DAEO-a3m2's KPI brackets, not in its sources | .tickets/DAEO-a3m2.md:33 | orchestrator | add W2-I015 to DAEO-a3m2's sources:
+UNLINKED_ID W2-M016 in DAEO-a3m2's KPI brackets, not in its sources | .tickets/DAEO-a3m2.md:33 | orchestrator | add W2-M016 to DAEO-a3m2's sources:
+UNLINKED_ID W2-M236 in DAEO-a3m2's KPI brackets, not in its sources | .tickets/DAEO-a3m2.md:33 | orchestrator | add W2-M236 to DAEO-a3m2's sources:
+UNLINKED_ID W1-19 in DAEO-ar89's KPI brackets, not in its sources | .tickets/DAEO-ar89.md:33 | orchestrator | add W1-19 to DAEO-ar89's sources:
+UNLINKED_ID W2-118 in DAEO-cb2b's KPI brackets, not in its sources | .tickets/DAEO-cb2b.md:52 | orchestrator | add W2-118 to DAEO-cb2b's sources:
+UNLINKED_ID W2-21 in DAEO-cb2b's KPI brackets, not in its sources | .tickets/DAEO-cb2b.md:52 | orchestrator | add W2-21 to DAEO-cb2b's sources:
+UNLINKED_ID W2-H046 in DAEO-cb2b's KPI brackets, not in its sources | .tickets/DAEO-cb2b.md:52 | orchestrator | add W2-H046 to DAEO-cb2b's sources:
+UNLINKED_ID DEC-1122 in 73e33d7b32bc's Implements: (independent-test-designer), not in DAEO-clon's sources | .tickets/DAEO-clon.md:43 | orchestrator | add DEC-1122 to DAEO-clon's sources:
+UNLINKED_ID W2-M049 in DAEO-cuao's KPI brackets, not in its sources | .tickets/DAEO-cuao.md:37 | orchestrator | add W2-M049 to DAEO-cuao's sources:
+UNLINKED_ID W2-M280 in DAEO-cuao's KPI brackets, not in its sources | .tickets/DAEO-cuao.md:37 | orchestrator | add W2-M280 to DAEO-cuao's sources:
+UNLINKED_ID DEC-105 in 32ad6859cfbf's Implements: (product-spec), not in DAEO-cv58's sources | .tickets/DAEO-cv58.md:50 | orchestrator | add DEC-105 to DAEO-cv58's sources:
+UNLINKED_ID CAP-24.c in DAEO-dy7j's KPI brackets, not in its sources | .tickets/DAEO-dy7j.md:42 | orchestrator | add CAP-24.c to DAEO-dy7j's sources:
+UNLINKED_ID CAP-50.a in DAEO-dy7j's KPI brackets, not in its sources | .tickets/DAEO-dy7j.md:42 | orchestrator | add CAP-50.a to DAEO-dy7j's sources:
+UNLINKED_ID DEC-239 in DAEO-dy7j's KPI brackets, not in its sources | .tickets/DAEO-dy7j.md:42 | orchestrator | add DEC-239 to DAEO-dy7j's sources:
+UNLINKED_ID DEC-968 in DAEO-dy7j's KPI brackets, not in its sources | .tickets/DAEO-dy7j.md:42 | orchestrator | add DEC-968 to DAEO-dy7j's sources:
+UNLINKED_ID DEC-982 in DAEO-dy7j's KPI brackets, not in its sources | .tickets/DAEO-dy7j.md:42 | orchestrator | add DEC-982 to DAEO-dy7j's sources:
+UNLINKED_ID W2-59 in DAEO-e82f's KPI brackets, not in its sources | .tickets/DAEO-e82f.md:35 | orchestrator | add W2-59 to DAEO-e82f's sources:
+UNLINKED_ID W3-P09 in DAEO-ecac's KPI brackets, not in its sources | .tickets/DAEO-ecac.md:44 | orchestrator | add W3-P09 to DAEO-ecac's sources:
+UNLINKED_ID W2-117 in DAEO-emq1's KPI brackets, not in its sources | .tickets/DAEO-emq1.md:65 | orchestrator | add W2-117 to DAEO-emq1's sources:
+UNLINKED_ID W2-06 in DAEO-f58b's KPI brackets, not in its sources | .tickets/DAEO-f58b.md:42 | orchestrator | add W2-06 to DAEO-f58b's sources:
+UNLINKED_ID W2-M088 in DAEO-f58b's KPI brackets, not in its sources | .tickets/DAEO-f58b.md:42 | orchestrator | add W2-M088 to DAEO-f58b's sources:
+UNLINKED_ID W2-H006 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H006 to DAEO-fau3's sources:
+UNLINKED_ID W2-H007 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H007 to DAEO-fau3's sources:
+UNLINKED_ID W2-H009 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H009 to DAEO-fau3's sources:
+UNLINKED_ID W2-H010 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H010 to DAEO-fau3's sources:
+UNLINKED_ID W2-H011 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H011 to DAEO-fau3's sources:
+UNLINKED_ID W2-H013 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H013 to DAEO-fau3's sources:
+UNLINKED_ID W2-H031 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-H031 to DAEO-fau3's sources:
+UNLINKED_ID W2-L216 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-L216 to DAEO-fau3's sources:
+UNLINKED_ID W2-M019 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M019 to DAEO-fau3's sources:
+UNLINKED_ID W2-M031 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M031 to DAEO-fau3's sources:
+UNLINKED_ID W2-M047 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M047 to DAEO-fau3's sources:
+UNLINKED_ID W2-M061 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M061 to DAEO-fau3's sources:
+UNLINKED_ID W2-M067 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M067 to DAEO-fau3's sources:
+UNLINKED_ID W2-M173 in DAEO-fau3's KPI brackets, not in its sources | .tickets/DAEO-fau3.md:37 | orchestrator | add W2-M173 to DAEO-fau3's sources:
+UNLINKED_ID DEC-968 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add DEC-968 to DAEO-g23i's sources:
+UNLINKED_ID DEC-982 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add DEC-982 to DAEO-g23i's sources:
+UNLINKED_ID W2-H043 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add W2-H043 to DAEO-g23i's sources:
+UNLINKED_ID W2-M163 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add W2-M163 to DAEO-g23i's sources:
+UNLINKED_ID W2-M240 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add W2-M240 to DAEO-g23i's sources:
+UNLINKED_ID W2-M241 in DAEO-g23i's KPI brackets, not in its sources | .tickets/DAEO-g23i.md:34 | orchestrator | add W2-M241 to DAEO-g23i's sources:
+UNLINKED_ID DEC-1097 in 35396225e07c's Implements: (independent-test-designer), not in DAEO-h2k3's sources | .tickets/DAEO-h2k3.md:44 | orchestrator | add DEC-1097 to DAEO-h2k3's sources:
+UNLINKED_ID DEC-1097 in a2104dc5f7c2's Implements: (independent-test-designer), not in DAEO-h2k3's sources | .tickets/DAEO-h2k3.md:44 | orchestrator | add DEC-1097 to DAEO-h2k3's sources:
+UNLINKED_ID DEC-1122 in a2104dc5f7c2's Implements: (independent-test-designer), not in DAEO-h2k3's sources | .tickets/DAEO-h2k3.md:44 | orchestrator | add DEC-1122 to DAEO-h2k3's sources:
+UNLINKED_ID DEC-1123 in 35396225e07c's Implements: (independent-test-designer), not in DAEO-h2k3's sources | .tickets/DAEO-h2k3.md:44 | orchestrator | add DEC-1123 to DAEO-h2k3's sources:
+UNLINKED_ID DEC-1124 in 53affe5337fd's Implements: (independent-test-designer), not in DAEO-h2k3's sources | .tickets/DAEO-h2k3.md:44 | orchestrator | add DEC-1124 to DAEO-h2k3's sources:
+UNLINKED_ID W2-L097 in DAEO-i89t's KPI brackets, not in its sources | .tickets/DAEO-i89t.md:30 | orchestrator | add W2-L097 to DAEO-i89t's sources:
+UNLINKED_ID DEC-968 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add DEC-968 to DAEO-j8gn's sources:
+UNLINKED_ID DEC-982 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add DEC-982 to DAEO-j8gn's sources:
+UNLINKED_ID W2-H037 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-H037 to DAEO-j8gn's sources:
+UNLINKED_ID W2-H048 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-H048 to DAEO-j8gn's sources:
+UNLINKED_ID W2-H049 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-H049 to DAEO-j8gn's sources:
+UNLINKED_ID W2-L010 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-L010 to DAEO-j8gn's sources:
+UNLINKED_ID W2-M107 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-M107 to DAEO-j8gn's sources:
+UNLINKED_ID W2-M108 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-M108 to DAEO-j8gn's sources:
+UNLINKED_ID W2-M227 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-M227 to DAEO-j8gn's sources:
+UNLINKED_ID W2-M257 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-M257 to DAEO-j8gn's sources:
+UNLINKED_ID W2-M258 in DAEO-j8gn's KPI brackets, not in its sources | .tickets/DAEO-j8gn.md:51 | orchestrator | add W2-M258 to DAEO-j8gn's sources:
+UNLINKED_ID W2-04 in DAEO-jfm3's KPI brackets, not in its sources | .tickets/DAEO-jfm3.md:33 | orchestrator | add W2-04 to DAEO-jfm3's sources:
+UNLINKED_ID W2-25 in DAEO-jip3's KPI brackets, not in its sources | .tickets/DAEO-jip3.md:31 | orchestrator | add W2-25 to DAEO-jip3's sources:
+UNLINKED_ID W2-123 in DAEO-jpr0's KPI brackets, not in its sources | .tickets/DAEO-jpr0.md:46 | orchestrator | add W2-123 to DAEO-jpr0's sources:
+UNLINKED_ID W2-H026 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-H026 to DAEO-jzvg's sources:
+UNLINKED_ID W2-H042 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-H042 to DAEO-jzvg's sources:
+UNLINKED_ID W2-L119 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-L119 to DAEO-jzvg's sources:
+UNLINKED_ID W2-M159 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-M159 to DAEO-jzvg's sources:
+UNLINKED_ID W2-M160 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-M160 to DAEO-jzvg's sources:
+UNLINKED_ID W2-M162 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-M162 to DAEO-jzvg's sources:
+UNLINKED_ID W2-M253 in DAEO-jzvg's KPI brackets, not in its sources | .tickets/DAEO-jzvg.md:41 | orchestrator | add W2-M253 to DAEO-jzvg's sources:
+UNLINKED_ID W2-L256 in DAEO-k7hz's KPI brackets, not in its sources | .tickets/DAEO-k7hz.md:67 | orchestrator | add W2-L256 to DAEO-k7hz's sources:
+UNLINKED_ID W2-L268 in DAEO-k7hz's KPI brackets, not in its sources | .tickets/DAEO-k7hz.md:67 | orchestrator | add W2-L268 to DAEO-k7hz's sources:
+UNLINKED_ID W2-H039 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-H039 to DAEO-kia7's sources:
+UNLINKED_ID W2-H040 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-H040 to DAEO-kia7's sources:
+UNLINKED_ID W2-H041 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-H041 to DAEO-kia7's sources:
+UNLINKED_ID W2-M011 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M011 to DAEO-kia7's sources:
+UNLINKED_ID W2-M088 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M088 to DAEO-kia7's sources:
+UNLINKED_ID W2-M143 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M143 to DAEO-kia7's sources:
+UNLINKED_ID W2-M210 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M210 to DAEO-kia7's sources:
+UNLINKED_ID W2-M243 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M243 to DAEO-kia7's sources:
+UNLINKED_ID W2-M282 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M282 to DAEO-kia7's sources:
+UNLINKED_ID W2-M293 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M293 to DAEO-kia7's sources:
+UNLINKED_ID W2-M295 in DAEO-kia7's KPI brackets, not in its sources | .tickets/DAEO-kia7.md:41 | orchestrator | add W2-M295 to DAEO-kia7's sources:
+UNLINKED_ID W2-H035 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-H035 to DAEO-kmcr's sources:
+UNLINKED_ID W2-H036 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-H036 to DAEO-kmcr's sources:
+UNLINKED_ID W2-H050 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-H050 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M216 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M216 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M217 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M217 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M218 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M218 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M219 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M219 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M220 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M220 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M224 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M224 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M225 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M225 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M229 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M229 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M232 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M232 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M307 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M307 to DAEO-kmcr's sources:
+UNLINKED_ID W2-M312 in DAEO-kmcr's KPI brackets, not in its sources | .tickets/DAEO-kmcr.md:42 | orchestrator | add W2-M312 to DAEO-kmcr's sources:
+UNLINKED_ID MR-3 in DAEO-l4gf's KPI brackets, not in its sources | .tickets/DAEO-l4gf.md:35 | orchestrator | add MR-3 to DAEO-l4gf's sources:
+UNLINKED_ID W2-13 in DAEO-l4gf's KPI brackets, not in its sources | .tickets/DAEO-l4gf.md:35 | orchestrator | add W2-13 to DAEO-l4gf's sources:
+UNLINKED_ID CAP-10 in 18d082983e02's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-10 to DAEO-l78m's sources:
+UNLINKED_ID CAP-10 in 2dd40a4e530b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-10 to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.c in 0a2608e40388's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.c to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.c in 226d47b8d5d7's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.c to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.c in 2dd40a4e530b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.c to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.d in 0a2608e40388's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.d to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.d in 226d47b8d5d7's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.d to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.d in 2dd40a4e530b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.d to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.d in 56af0a59973b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.d to DAEO-l78m's sources:
+UNLINKED_ID CAP-44.f in 2dd40a4e530b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add CAP-44.f to DAEO-l78m's sources:
+UNLINKED_ID DEC-802 in 1c79204eeb5d's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-802 to DAEO-l78m's sources:
+UNLINKED_ID DEC-802 in 226d47b8d5d7's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-802 to DAEO-l78m's sources:
+UNLINKED_ID DEC-802 in 56af0a59973b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-802 to DAEO-l78m's sources:
+UNLINKED_ID DEC-860 in 18d082983e02's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-860 to DAEO-l78m's sources:
+UNLINKED_ID DEC-968 in 1c79204eeb5d's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-968 to DAEO-l78m's sources:
+UNLINKED_ID DEC-968 in 56af0a59973b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-968 to DAEO-l78m's sources:
+UNLINKED_ID DEC-968 in 8c14b3f06d8f's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-968 to DAEO-l78m's sources:
+UNLINKED_ID DEC-993 in 1c79204eeb5d's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-993 to DAEO-l78m's sources:
+UNLINKED_ID DEC-993 in 226d47b8d5d7's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-993 to DAEO-l78m's sources:
+UNLINKED_ID DEC-993 in 56af0a59973b's Implements: (independent-test-designer), not in DAEO-l78m's sources | .tickets/DAEO-l78m.md:41 | orchestrator | add DEC-993 to DAEO-l78m's sources:
+UNLINKED_ID W2-61h in DAEO-m4rq's KPI brackets, not in its sources | .tickets/DAEO-m4rq.md:37 | orchestrator | add W2-61h to DAEO-m4rq's sources:
+UNLINKED_ID W2-26 in DAEO-mb2t's KPI brackets, not in its sources | .tickets/DAEO-mb2t.md:36 | orchestrator | add W2-26 to DAEO-mb2t's sources:
+UNLINKED_ID W2-88 in DAEO-mb2t's KPI brackets, not in its sources | .tickets/DAEO-mb2t.md:36 | orchestrator | add W2-88 to DAEO-mb2t's sources:
+UNLINKED_ID DEC-1112 in 5fc7681a1214's Implements: (independent-test-designer), not in DAEO-n0wb's sources | .tickets/DAEO-n0wb.md:48 | orchestrator | add DEC-1112 to DAEO-n0wb's sources:
+UNLINKED_ID DEC-1125 in 5fc7681a1214's Implements: (independent-test-designer), not in DAEO-n0wb's sources | .tickets/DAEO-n0wb.md:48 | orchestrator | add DEC-1125 to DAEO-n0wb's sources:
+UNLINKED_ID W2-H018 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-H018 to DAEO-neam's sources:
+UNLINKED_ID W2-M129 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M129 to DAEO-neam's sources:
+UNLINKED_ID W2-M130 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M130 to DAEO-neam's sources:
+UNLINKED_ID W2-M151 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M151 to DAEO-neam's sources:
+UNLINKED_ID W2-M211 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M211 to DAEO-neam's sources:
+UNLINKED_ID W2-M212 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M212 to DAEO-neam's sources:
+UNLINKED_ID W2-M259 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M259 to DAEO-neam's sources:
+UNLINKED_ID W2-M265 in DAEO-neam's KPI brackets, not in its sources | .tickets/DAEO-neam.md:33 | orchestrator | add W2-M265 to DAEO-neam's sources:
+UNLINKED_ID W2-24 in DAEO-nn1s's KPI brackets, not in its sources | .tickets/DAEO-nn1s.md:107 | orchestrator | add W2-24 to DAEO-nn1s's sources:
+UNLINKED_ID DEC-1065 in b3ed3f88d1f2's Implements: (independent-test-designer), not in DAEO-nqa2's sources | .tickets/DAEO-nqa2.md:48 | orchestrator | add DEC-1065 to DAEO-nqa2's sources:
+UNLINKED_ID W2-106 in DAEO-nqa2's KPI brackets, not in its sources | .tickets/DAEO-nqa2.md:48 | orchestrator | add W2-106 to DAEO-nqa2's sources:
+UNLINKED_ID W2-129 in DAEO-qzca's KPI brackets, not in its sources | .tickets/DAEO-qzca.md:29 | orchestrator | add W2-129 to DAEO-qzca's sources:
+UNLINKED_ID DEC-1105 in 057926aa3ca4's Implements: (engineer), not in DAEO-r30l's sources | .tickets/DAEO-r30l.md:71 | orchestrator | add DEC-1105 to DAEO-r30l's sources:
+UNLINKED_ID DEC-1105 in bdc5e0525136's Implements: (independent-test-designer), not in DAEO-r30l's sources | .tickets/DAEO-r30l.md:71 | orchestrator | add DEC-1105 to DAEO-r30l's sources:
+UNLINKED_ID DEC-1105 in f12b7e00a5df's Implements: (independent-test-designer), not in DAEO-r30l's sources | .tickets/DAEO-r30l.md:71 | orchestrator | add DEC-1105 to DAEO-r30l's sources:
+UNLINKED_ID DEC-1122 in ae489a979dd9's Implements: (independent-test-designer), not in DAEO-r30l's sources | .tickets/DAEO-r30l.md:71 | orchestrator | add DEC-1122 to DAEO-r30l's sources:
+UNLINKED_ID W2-M188 in DAEO-r30l's KPI brackets, not in its sources | .tickets/DAEO-r30l.md:71 | orchestrator | add W2-M188 to DAEO-r30l's sources:
+UNLINKED_ID W2-M244 in DAEO-r30l's KPI brackets, not in its sources | .tickets/DAEO-r30l.md:71 | orchestrator | add W2-M244 to DAEO-r30l's sources:
+UNLINKED_ID W2-M262 in DAEO-r30l's KPI brackets, not in its sources | .tickets/DAEO-r30l.md:71 | orchestrator | add W2-M262 to DAEO-r30l's sources:
+UNLINKED_ID W2-15b in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-15b to DAEO-rd0g's sources:
+UNLINKED_ID W2-L102 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-L102 to DAEO-rd0g's sources:
+UNLINKED_ID W2-L321 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-L321 to DAEO-rd0g's sources:
+UNLINKED_ID W2-L322 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-L322 to DAEO-rd0g's sources:
+UNLINKED_ID W2-L329 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-L329 to DAEO-rd0g's sources:
+UNLINKED_ID W2-M340 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-M340 to DAEO-rd0g's sources:
+UNLINKED_ID W2-M342 in DAEO-rd0g's KPI brackets, not in its sources | .tickets/DAEO-rd0g.md:41 | orchestrator | add W2-M342 to DAEO-rd0g's sources:
+UNLINKED_ID W2-L373 in DAEO-rmbe's KPI brackets, not in its sources | .tickets/DAEO-rmbe.md:42 | orchestrator | add W2-L373 to DAEO-rmbe's sources:
+UNLINKED_ID W2-M404 in DAEO-rmbe's KPI brackets, not in its sources | .tickets/DAEO-rmbe.md:42 | orchestrator | add W2-M404 to DAEO-rmbe's sources:
+UNLINKED_ID DEC-1122 in 3e403a285d85's Implements: (independent-test-designer), not in DAEO-rmhj's sources | .tickets/DAEO-rmhj.md:42 | orchestrator | add DEC-1122 to DAEO-rmhj's sources:
+UNLINKED_ID W2-H022 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-H022 to DAEO-s694's sources:
+UNLINKED_ID W2-H023 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-H023 to DAEO-s694's sources:
+UNLINKED_ID W2-H024 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-H024 to DAEO-s694's sources:
+UNLINKED_ID W2-H025 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-H025 to DAEO-s694's sources:
+UNLINKED_ID W2-H033 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-H033 to DAEO-s694's sources:
+UNLINKED_ID W2-M015 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M015 to DAEO-s694's sources:
+UNLINKED_ID W2-M115 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M115 to DAEO-s694's sources:
+UNLINKED_ID W2-M164 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M164 to DAEO-s694's sources:
+UNLINKED_ID W2-M203 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M203 to DAEO-s694's sources:
+UNLINKED_ID W2-M204 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M204 to DAEO-s694's sources:
+UNLINKED_ID W2-M254 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M254 to DAEO-s694's sources:
+UNLINKED_ID W2-M255 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M255 to DAEO-s694's sources:
+UNLINKED_ID W2-M256 in DAEO-s694's KPI brackets, not in its sources | .tickets/DAEO-s694.md:38 | orchestrator | add W2-M256 to DAEO-s694's sources:
+UNLINKED_ID W2-M176 in DAEO-sdhj's KPI brackets, not in its sources | .tickets/DAEO-sdhj.md:34 | orchestrator | add W2-M176 to DAEO-sdhj's sources:
+UNLINKED_ID DEC-1121 in f715158c4052's Implements: (product-spec), not in DAEO-sdxk's sources | .tickets/DAEO-sdxk.md:34 | orchestrator | add DEC-1121 to DAEO-sdxk's sources:
+UNLINKED_ID DEC-1123 in 66303c373556's Implements: (product-spec), not in DAEO-sdxk's sources | .tickets/DAEO-sdxk.md:34 | orchestrator | add DEC-1123 to DAEO-sdxk's sources:
+UNLINKED_ID DEC-1130 in f715158c4052's Implements: (product-spec), not in DAEO-sdxk's sources | .tickets/DAEO-sdxk.md:34 | orchestrator | add DEC-1130 to DAEO-sdxk's sources:
+UNLINKED_ID DEC-798 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add DEC-798 to DAEO-swdu's sources:
+UNLINKED_ID W2-15a in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-15a to DAEO-swdu's sources:
+UNLINKED_ID W2-61 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-61 to DAEO-swdu's sources:
+UNLINKED_ID W2-L102 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-L102 to DAEO-swdu's sources:
+UNLINKED_ID W2-L317 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-L317 to DAEO-swdu's sources:
+UNLINKED_ID W2-L320 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-L320 to DAEO-swdu's sources:
+UNLINKED_ID W2-L321 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-L321 to DAEO-swdu's sources:
+UNLINKED_ID W2-L322 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-L322 to DAEO-swdu's sources:
+UNLINKED_ID W2-M017 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-M017 to DAEO-swdu's sources:
+UNLINKED_ID W2-M089 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-M089 to DAEO-swdu's sources:
+UNLINKED_ID W2-M340 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-M340 to DAEO-swdu's sources:
+UNLINKED_ID W2-M342 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-M342 to DAEO-swdu's sources:
+UNLINKED_ID W2-M351 in DAEO-swdu's KPI brackets, not in its sources | .tickets/DAEO-swdu.md:46 | orchestrator | add W2-M351 to DAEO-swdu's sources:
+UNLINKED_ID DEC-1039 in a0d1d3a0cab7's Implements: (independent-test-designer), not in DAEO-t6hf's sources | .tickets/DAEO-t6hf.md:34 | orchestrator | add DEC-1039 to DAEO-t6hf's sources:
+UNLINKED_ID DEC-1046 in a0d1d3a0cab7's Implements: (independent-test-designer), not in DAEO-t6hf's sources | .tickets/DAEO-t6hf.md:34 | orchestrator | add DEC-1046 to DAEO-t6hf's sources:
+UNLINKED_ID DEC-1116 in a0957eb56e8b's Implements: (independent-test-designer), not in DAEO-t8mp's sources | .tickets/DAEO-t8mp.md:67 | orchestrator | add DEC-1116 to DAEO-t8mp's sources:
+UNLINKED_ID DEC-1121 in 0aa20ac0c8f7's Implements: (product-spec), not in DAEO-t8mp's sources | .tickets/DAEO-t8mp.md:67 | orchestrator | add DEC-1121 to DAEO-t8mp's sources:
+UNLINKED_ID DEC-1121 in 8df648cc9690's Implements: (product-spec), not in DAEO-t8mp's sources | .tickets/DAEO-t8mp.md:67 | orchestrator | add DEC-1121 to DAEO-t8mp's sources:
+UNLINKED_ID W2-11b in DAEO-t8mp's KPI brackets, not in its sources | .tickets/DAEO-t8mp.md:67 | orchestrator | add W2-11b to DAEO-t8mp's sources:
+UNLINKED_ID DEC-1003 in DAEO-ts4y's KPI brackets, not in its sources | .tickets/DAEO-ts4y.md:38 | orchestrator | add DEC-1003 to DAEO-ts4y's sources:
+UNLINKED_ID DEC-1009 in DAEO-ts4y's KPI brackets, not in its sources | .tickets/DAEO-ts4y.md:38 | orchestrator | add DEC-1009 to DAEO-ts4y's sources:
+UNLINKED_ID DEC-1014 in DAEO-ts4y's KPI brackets, not in its sources | .tickets/DAEO-ts4y.md:38 | orchestrator | add DEC-1014 to DAEO-ts4y's sources:
+UNLINKED_ID W2-H034 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-H034 to DAEO-u4oz's sources:
+UNLINKED_ID W2-M126 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-M126 to DAEO-u4oz's sources:
+UNLINKED_ID W2-M215 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-M215 to DAEO-u4oz's sources:
+UNLINKED_ID W2-M239 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-M239 to DAEO-u4oz's sources:
+UNLINKED_ID W2-M294 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-M294 to DAEO-u4oz's sources:
+UNLINKED_ID W2-M330 in DAEO-u4oz's KPI brackets, not in its sources | .tickets/DAEO-u4oz.md:38 | orchestrator | add W2-M330 to DAEO-u4oz's sources:
+UNLINKED_ID W2-H002 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-H002 to DAEO-u5g6's sources:
+UNLINKED_ID W2-H008 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-H008 to DAEO-u5g6's sources:
+UNLINKED_ID W2-H014 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-H014 to DAEO-u5g6's sources:
+UNLINKED_ID W2-H027 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-H027 to DAEO-u5g6's sources:
+UNLINKED_ID W2-H028 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-H028 to DAEO-u5g6's sources:
+UNLINKED_ID W2-M003 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-M003 to DAEO-u5g6's sources:
+UNLINKED_ID W2-M018 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-M018 to DAEO-u5g6's sources:
+UNLINKED_ID W2-M271 in DAEO-u5g6's KPI brackets, not in its sources | .tickets/DAEO-u5g6.md:36 | orchestrator | add W2-M271 to DAEO-u5g6's sources:
+UNLINKED_ID DEC-866 in DAEO-v4is's KPI brackets, not in its sources | .tickets/DAEO-v4is.md:38 | orchestrator | add DEC-866 to DAEO-v4is's sources:
+UNLINKED_ID W2-M284 in DAEO-w19l's KPI brackets, not in its sources | .tickets/DAEO-w19l.md:29 | orchestrator | add W2-M284 to DAEO-w19l's sources:
+UNLINKED_ID DEC-1122 in 843777f66ae2's Implements: (independent-test-designer), not in DAEO-wnnz's sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add DEC-1122 to DAEO-wnnz's sources:
+UNLINKED_ID W2-112 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-112 to DAEO-wnnz's sources:
+UNLINKED_ID W2-127 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-127 to DAEO-wnnz's sources:
+UNLINKED_ID W2-145 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-145 to DAEO-wnnz's sources:
+UNLINKED_ID W2-21 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-21 to DAEO-wnnz's sources:
+UNLINKED_ID W2-I012 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-I012 to DAEO-wnnz's sources:
+UNLINKED_ID W2-L105 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-L105 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M094 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M094 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M095 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M095 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M097 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M097 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M181 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M181 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M187 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M187 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M275 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M275 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M393 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M393 to DAEO-wnnz's sources:
+UNLINKED_ID W2-M405 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W2-M405 to DAEO-wnnz's sources:
+UNLINKED_ID W3-P28 in DAEO-wnnz's KPI brackets, not in its sources | .tickets/DAEO-wnnz.md:55 | orchestrator | add W3-P28 to DAEO-wnnz's sources:
+UNLINKED_ID DEC-1107 in 0e43fac2ebd7's Implements: (engineer), not in DAEO-xafn's sources | .tickets/DAEO-xafn.md:65 | orchestrator | add DEC-1107 to DAEO-xafn's sources:
+UNLINKED_ID DEC-1107 in 0fe71aa8bb00's Implements: (engineer), not in DAEO-xafn's sources | .tickets/DAEO-xafn.md:65 | orchestrator | add DEC-1107 to DAEO-xafn's sources:
+UNLINKED_ID DEC-1107 in 51f0c70b09d9's Implements: (independent-test-designer), not in DAEO-xafn's sources | .tickets/DAEO-xafn.md:65 | orchestrator | add DEC-1107 to DAEO-xafn's sources:
+UNLINKED_ID DEC-1122 in a38809a3364a's Implements: (independent-test-designer), not in DAEO-xafn's sources | .tickets/DAEO-xafn.md:65 | orchestrator | add DEC-1122 to DAEO-xafn's sources:
+UNLINKED_ID W2-L101 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-L101 to DAEO-xm6l's sources:
+UNLINKED_ID W2-L206 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-L206 to DAEO-xm6l's sources:
+UNLINKED_ID W2-L215 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-L215 to DAEO-xm6l's sources:
+UNLINKED_ID W2-L336 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-L336 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M139 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M139 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M201 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M201 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M264 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M264 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M287 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M287 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M288 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M288 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M289 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M289 to DAEO-xm6l's sources:
+UNLINKED_ID W2-M290 in DAEO-xm6l's KPI brackets, not in its sources | .tickets/DAEO-xm6l.md:36 | orchestrator | add W2-M290 to DAEO-xm6l's sources:
+UNLINKED_ID DEC-1097 in c3e0e16bc5ee's Implements: (independent-test-designer), not in DAEO-xwro's sources | .tickets/DAEO-xwro.md:40 | orchestrator | add DEC-1097 to DAEO-xwro's sources:
+UNLINKED_ID W2-H015 in DAEO-yadm's KPI brackets, not in its sources | .tickets/DAEO-yadm.md:35 | orchestrator | add W2-H015 to DAEO-yadm's sources:
+UNLINKED_ID W2-H051 in DAEO-yadm's KPI brackets, not in its sources | .tickets/DAEO-yadm.md:35 | orchestrator | add W2-H051 to DAEO-yadm's sources:
+UNLINKED_ID W2-M082 in DAEO-yadm's KPI brackets, not in its sources | .tickets/DAEO-yadm.md:35 | orchestrator | add W2-M082 to DAEO-yadm's sources:
+UNLINKED_ID W2-M274 in DAEO-yadm's KPI brackets, not in its sources | .tickets/DAEO-yadm.md:35 | orchestrator | add W2-M274 to DAEO-yadm's sources:
+UNLINKED_ID W2-M283 in DAEO-yadm's KPI brackets, not in its sources | .tickets/DAEO-yadm.md:35 | orchestrator | add W2-M283 to DAEO-yadm's sources:
+UNLINKED_ID DEC-1001 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-1001 to DAEO-zkr9's sources:
+UNLINKED_ID DEC-1003 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-1003 to DAEO-zkr9's sources:
+UNLINKED_ID DEC-1010 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-1010 to DAEO-zkr9's sources:
+UNLINKED_ID DEC-1014 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-1014 to DAEO-zkr9's sources:
+UNLINKED_ID DEC-1015 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-1015 to DAEO-zkr9's sources:
+UNLINKED_ID DEC-989 in DAEO-zkr9's KPI brackets, not in its sources | .tickets/DAEO-zkr9.md:38 | orchestrator | add DEC-989 to DAEO-zkr9's sources:
+UNLINKED_ID W2-H019 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-H019 to DAEO-zndm's sources:
+UNLINKED_ID W2-L078 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-L078 to DAEO-zndm's sources:
+UNLINKED_ID W2-L135 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-L135 to DAEO-zndm's sources:
+UNLINKED_ID W2-M037 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-M037 to DAEO-zndm's sources:
+UNLINKED_ID W2-M038 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-M038 to DAEO-zndm's sources:
+UNLINKED_ID W2-M156 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-M156 to DAEO-zndm's sources:
+UNLINKED_ID W2-M222 in DAEO-zndm's KPI brackets, not in its sources | .tickets/DAEO-zndm.md:31 | orchestrator | add W2-M222 to DAEO-zndm's sources:
+UNLINKED_ID DEC-1112 in 6afff5d74295's Implements: (independent-test-designer), not in DAEO-zqvn's sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add DEC-1112 to DAEO-zqvn's sources:
+UNLINKED_ID W2-L233 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-L233 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M071 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M071 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M072 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M072 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M100 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M100 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M102 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M102 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M292 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M292 to DAEO-zqvn's sources:
+UNLINKED_ID W2-M296 in DAEO-zqvn's KPI brackets, not in its sources | .tickets/DAEO-zqvn.md:51 | orchestrator | add W2-M296 to DAEO-zqvn's sources:
+STATUS_CONFLICT DEC-896 done in the register, listed in DECISIONS-IN-FORCE | governance/project/orchestration/DECISIONS-IN-FORCE.md:136 | orchestrator | take DEC-896 off the in-force list, or correct its register status
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DAEO-swdu's KPI brackets | .tickets/DAEO-swdu.md:38 | orchestrator | decide DEC-798 or cite it in the body as superseded
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-811's **Under:** | docs/DECISION_REGISTER.md:8862 | orchestrator | decide DEC-798 or name an entry in force under DEC-811's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-847's **Under:** | docs/DECISION_REGISTER.md:9210 | orchestrator | decide DEC-798 or name an entry in force under DEC-847's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in DEC-872's **Under:** | docs/DECISION_REGISTER.md:9525 | orchestrator | decide DEC-869 or name an entry in force under DEC-872's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in DEC-876's **Under:** | docs/DECISION_REGISTER.md:9594 | orchestrator | decide DEC-869 or name an entry in force under DEC-876's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-875 (SUPERSEDED) in DEC-876's **Under:** | docs/DECISION_REGISTER.md:9594 | orchestrator | decide DEC-875 or name an entry in force under DEC-876's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in DEC-880's **Under:** | docs/DECISION_REGISTER.md:9664 | orchestrator | decide DEC-869 or name an entry in force under DEC-880's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-876 (SUPERSEDED) in DEC-880's **Under:** | docs/DECISION_REGISTER.md:9664 | orchestrator | decide DEC-876 or name an entry in force under DEC-880's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-898's **Under:** | docs/DECISION_REGISTER.md:10278 | orchestrator | decide DEC-798 or name an entry in force under DEC-898's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-942's **Under:** | docs/DECISION_REGISTER.md:11569 | orchestrator | decide DEC-798 or name an entry in force under DEC-942's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-975's **Under:** | docs/DECISION_REGISTER.md:12233 | orchestrator | decide DEC-798 or name an entry in force under DEC-975's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-1032's **Under:** | docs/DECISION_REGISTER.md:12834 | orchestrator | decide DEC-798 or name an entry in force under DEC-1032's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-798 (SUPERSEDED) in DEC-1060's **Under:** | docs/DECISION_REGISTER.md:13105 | orchestrator | decide DEC-798 or name an entry in force under DEC-1060's **Under:**
+NOT_IN_FORCE_AS_RULE DEC-869 (SUPERSEDED) in a brief or prompt line | governance/project/prompts/w2-orchestrator.md:1 | orchestrator | decide DEC-869 or name it as superseded, not as a rule
+ENFORCES_SUPERSEDED cites DEC-798: it still enforces DEC-798, superseded by DEC-1033 | tests/unit/retrieval/test_semantic_query_vector.py:1 | independent-test-designer | cite the decision in force, or record a **Kept:** reason in the register
+ENFORCES_SUPERSEDED cites DEC-798: it still enforces DEC-798, superseded by DEC-1033 | tests/unit/retrieval/test_semantic_query_vector.py:82 | independent-test-designer | cite the decision in force, or record a **Kept:** reason in the register
+ENFORCES_SUPERSEDED cites DEC-798: it still enforces DEC-798, superseded by DEC-1033 | tests/unit/semantic/test_semantic.py:60 | independent-test-designer | cite the decision in force, or record a **Kept:** reason in the register
+CLOSED_TICKET_EDITED DAEO-03dg 2e5c9cd999a2 body: closed before the commit | .tickets/DAEO-03dg.md:57 | orchestrator | revert 2e5c9cd999a2's edit of DAEO-03dg or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-0rfi 0111374ab92e kpis: closed before the commit | .tickets/DAEO-0rfi.md:36 | orchestrator | revert 0111374ab92e's edit of DAEO-0rfi or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-0uhh d92924de458b deps: closed before the commit | .tickets/DAEO-0uhh.md:4 | orchestrator | revert d92924de458b's edit of DAEO-0uhh or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-1ahb d92924de458b body: closed before the commit | .tickets/DAEO-1ahb.md:115 | orchestrator | revert d92924de458b's edit of DAEO-1ahb or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-2d6f d92924de458b depends_on: closed before the commit | .tickets/DAEO-2d6f.md:14 | orchestrator | revert d92924de458b's edit of DAEO-2d6f or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-2upp d92924de458b depends_on: closed before the commit | .tickets/DAEO-2upp.md:14 | orchestrator | revert d92924de458b's edit of DAEO-2upp or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-9bc0 d92924de458b body: closed before the commit | .tickets/DAEO-9bc0.md:65 | orchestrator | revert d92924de458b's edit of DAEO-9bc0 or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-cv6c d92924de458b depends_on: closed before the commit | .tickets/DAEO-cv6c.md:14 | orchestrator | revert d92924de458b's edit of DAEO-cv6c or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-dy7j d92924de458b deps: closed before the commit | .tickets/DAEO-dy7j.md:4 | orchestrator | revert d92924de458b's edit of DAEO-dy7j or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-e82f d92924de458b deps: closed before the commit | .tickets/DAEO-e82f.md:4 | orchestrator | revert d92924de458b's edit of DAEO-e82f or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-e8f0 d92924de458b deps: closed before the commit | .tickets/DAEO-e8f0.md:4 | orchestrator | revert d92924de458b's edit of DAEO-e8f0 or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-mc6n d92924de458b deps: closed before the commit | .tickets/DAEO-mc6n.md:4 | orchestrator | revert d92924de458b's edit of DAEO-mc6n or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-pr0y d92924de458b depends_on: closed before the commit | .tickets/DAEO-pr0y.md:14 | orchestrator | revert d92924de458b's edit of DAEO-pr0y or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-rmbe d92924de458b deps: closed before the commit | .tickets/DAEO-rmbe.md:4 | orchestrator | revert d92924de458b's edit of DAEO-rmbe or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-s1wp d92924de458b depends_on: closed before the commit | .tickets/DAEO-s1wp.md:14 | orchestrator | revert d92924de458b's edit of DAEO-s1wp or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-s9qc d92924de458b deps: closed before the commit | .tickets/DAEO-s9qc.md:4 | orchestrator | revert d92924de458b's edit of DAEO-s9qc or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-sg6x d92924de458b depends_on: closed before the commit | .tickets/DAEO-sg6x.md:14 | orchestrator | revert d92924de458b's edit of DAEO-sg6x or carry the change in a new ticket; a closed ticket is not edited
+CLOSED_TICKET_EDITED DAEO-ts4y d92924de458b body: closed before the commit | .tickets/DAEO-ts4y.md:57 | orchestrator | revert d92924de458b's edit of DAEO-ts4y or carry the change in a new ticket; a closed ticket is not edited
+TICKET_CHANGE_UNMARKED DAEO-f58b 9072eded34ee allowed_paths: changed with no DEC-n in the lines, Implements: or Decided-by: | .tickets/DAEO-f58b.md:20 | orchestrator | name the decision behind 9072eded34ee's change of DAEO-f58b's allowed_paths (a DEC-n in a commit's Implements: or Decided-by:), or revert it
+TICKET_CHANGE_UNMARKED DAEO-wahn 8884424781d6 allowed_paths: changed with no DEC-n in the lines, Implements: or Decided-by: | .tickets/DAEO-wahn.md:19 | orchestrator | name the decision behind 8884424781d6's change of DAEO-wahn's allowed_paths (a DEC-n in a commit's Implements: or Decided-by:), or revert it

@@ -1,0 +1,15 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261111-202501.out
+Structural: after the landing of W2-105 (base 7709021ad6cc)
+status: structural pass at 628ee9f6edc3: NOTICE in links (8 of 9 families ok), 21.7 s; a notice, not a refusal
+
+schema: ok
+graph: ok
+claims: ok
+mutation: ok
+authority: ok
+pathmap: ok
+audit: ok
+skills: ok
+portability: skipped (no change under template/governance/kernel/{roles,skills,hooks}/ or .rulesync/ since 7709021ad6cc)
+links: NOTICE 13 new since 7709021ad6cc26aa24ca00a3285e58afde299f65 (1592 standing): UNKNOWN_ID tests/acceptance/W2-175 in DAEO-wahn's acceptance_tests.path | .tickets/DAEO-wahn.md:52 | orchestrator | write the tests at tests/acceptance/W2-17... | UNLINKED_ID W2-H052 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-H052 to DAEO-6ox0's sources: | UNLINKED_ID W2-L316 in DAEO-6ox0's KPI brackets, not in its sources | .tickets/DAEO-6ox0.md:30 | orchestrator | add W2-L316 to DAEO-6ox0's sources: (+10 more)
+structural pass at 628ee9f6edc3: NOTICE in links (8 of 9 families ok), 21.7 s; a notice, not a refusal

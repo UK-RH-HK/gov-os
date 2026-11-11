@@ -1,0 +1,8 @@
+W2-05: merge w2/integrate into w2/W2-05 before review round 2 (r8)
+
+Integrate moved after the land run's first merge (W2-105's close, W1-38's
+folder-rule wording, template/.rulesync/permissions.jsonc); the head the
+last review probes is this merge.
+
+Task: DAEO-0z8c
+Role: orchestrator
