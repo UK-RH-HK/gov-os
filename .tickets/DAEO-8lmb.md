@@ -2,7 +2,7 @@
 id: DAEO-8lmb
 status: closed
 deps: []
-links: []
+links: [DAEO-nqa2]
 created: 2026-10-30T21:44:47Z
 type: task
 priority: 0

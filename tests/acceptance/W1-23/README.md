@@ -86,3 +86,21 @@ All tests need only `git` and `python3`. No machine dependencies (no gitleaks, n
 ## Packages
 
 None.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 10 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: When evidence exceeds the packet budget, notes are derived under .gov-runtime/, cite source ids and hashes, and disclose unresolved evidence [C... | `test_w1_23_synthesis.py::TestDerive::test_notes_cite_source_ids`, `test_w1_23_synthesis.py::TestDerive::test_notes_disclose_unresolved_evidence` | the ticket's words |
+| S2: A note is invalidated when any cited source hash changes; notes are rebuildable [CAP-15.f] | `test_w1_23_synthesis.py::TestInvalidation::test_note_invalidated_when_source_hash_changes`, `test_w1_23_synthesis.py::TestF1::test_changed_source_invalidates_note` | the ticket's words |
+| F1: A note survives a change to a cited source | `test_w1_23_synthesis.py::TestF1::test_changed_source_invalidates_note` | the ticket's words |
+| F2: A note cites a span not in its source | `test_w1_23_synthesis.py::TestInvalidation::test_note_invalidated_when_source_hash_changes`, `test_w1_23_synthesis.py::TestF1::test_changed_source_invalidates_note`, `test_w1_23_synthesis.py::TestF2::test_all_citations_reference_valid_spans` | the ticket's words |

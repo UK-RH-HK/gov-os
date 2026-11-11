@@ -373,11 +373,11 @@ def _commit(root: Path, subject: str, paths: list[str], task: str | None = None)
                                                       f"Implements: {IMPLEMENTS}"]
     if os.environ.get(CO_AUTHOR_VARIABLE):
         trailers.append(f"Co-Authored-By: {os.environ[CO_AUTHOR_VARIABLE]}")
-    named = _git(root, "config", "user.email", ok=(0, 1), code=True) == 0
+    named = _git(root, "config", "user.email", ok=(0, 1), code=True, pinned=False) == 0
     identity = [] if named else ["-c", "user.name=gov", "-c", "user.email=gov@localhost"]
-    _git(root, "add", "--all", "--", *paths)
+    _git(root, "add", "--all", "--", *paths, pinned=False)
     _git(root, *identity, "commit", "-q", "-m", subject, *[a for t in trailers for a in ("--trailer", t)],
-         "--", *paths)
+         "--", *paths, pinned=False)
     return _git(root, "rev-parse", "HEAD").strip()
 
 

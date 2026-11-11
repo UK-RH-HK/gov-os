@@ -112,21 +112,50 @@ def test_source_map_rows_of_a11_and_a9_still_say_wave_3_unchanged(rows, base_row
     assert wave_token("W3").search(row[3]), f"{doc} / {item} no longer says W3: {row[3]!r}"
 
 
-def test_source_map_no_row_but_the_eight_differs_from_before_this_ticket(rows, base_rows):
-    """DEC-745 item 2: four columns everywhere; the eight keep document, item and class; every other row as before."""
+# The three rows that name CAP-45 with its wave (lines 107, 224 and 286 at the base), which DEC-1093 (1) changes
+# (A (i); W2-27-CIT-P §5.4): "(KEPT, wave W2)" becomes "(KEPT, wave W3)", nothing else. Found by content.
+CAP_45_ROWS = [
+    ("Contract v3", "S5. `gov update`"),
+    ("Framework v4.1.2", "82. `gov update`"),
+    (DISTRIBUTION, "12. `gov update`"),
+]
+CAP_45_W2, CAP_45_W3 = "Contract v4 CAP-45 (KEPT, wave W2)", "Contract v4 CAP-45 (KEPT, wave W3)"
+
+
+def is_a_cap_45_row(row: list[str]) -> bool:
+    return any(len(row) >= 2 and row[0] == doc and row[1] == item for doc, item in CAP_45_ROWS)
+
+
+def test_source_map_no_row_but_the_eight_and_the_three_cap_45_rows_differs_from_before_this_ticket(rows, base_rows):
+    """DEC-745 item 2 and DEC-1093 (1): four columns everywhere; the eight keep document, item and class; the three
+    CAP-45 rows differ from the base exactly by "wave W2" -> "wave W3" (W2-27-CIT-P §5.4); every other row as before
+    (row 222, Framework §80, which names CAP-45 with no wave, among them)."""
+    # Rewrite-Reason: DEC-1093 (1) — A (i) moves CAP-45 to W3: the rows of Contract v3 S5, Framework v4.1.2 §82 and
+    # Distribution Protocol v1.2 §12 (107, 224, 286) must now differ from ffc60703e373, by exactly "(KEPT, wave W2)"
+    # -> "(KEPT, wave W3)", named as DEC-1093's; the eight and every other row are held as before. Renamed: the old
+    # name said "no row but the eight differs".
     assert rows and rows[0] == COLUMNS, f"{SOURCE_MAP}: header {rows[:1]}, not {COLUMNS}"
     bad_width = [r for r in rows if len(r) != 4]
     assert not bad_width, f"{SOURCE_MAP}: {len(bad_width)} rows without four columns, e.g. {bad_width[:3]}"
     assert len(rows) == len(base_rows), f"{SOURCE_MAP}: {len(rows) - 1} rows, {len(base_rows) - 1} at {SOURCE_MAP_BASE}"
     eight = [b for b in base_rows[1:] if is_one_of_the_eight(b)]
     assert len(eight) == len(EIGHT), f"{len(eight)} of the eight rows found at {SOURCE_MAP_BASE}"
+    three = [b for b in base_rows[1:] if is_a_cap_45_row(b)]
+    assert len(three) == len(CAP_45_ROWS) and all(b[3].count(CAP_45_W2) == 1 for b in three), (
+        f"the premise fails: the three CAP-45 rows at {SOURCE_MAP_BASE} are not one each saying '{CAP_45_W2}': {three}"
+    )
     changed = []
     for now, before in zip(rows, base_rows):
         if is_one_of_the_eight(before):
             if now[:3] != before[:3]:
                 changed.append(f"one of the eight lost its document, item or class: {before[:3]} -> {now[:3]}")
+        elif is_a_cap_45_row(before):
+            expected = before[:3] + [before[3].replace(CAP_45_W2, CAP_45_W3)]
+            if now != expected:
+                changed.append(f"a CAP-45 row is not as DEC-1093 moves it (wave W2 -> wave W3): {now} != {expected}")
         elif now != before:
             changed.append(f"{before} -> {now}")
     assert not changed, (
-        f"{SOURCE_MAP}: rows differ from {SOURCE_MAP_BASE} beyond the eight rows' carrying cells:\n" + "\n".join(changed[:10])
+        f"{SOURCE_MAP}: rows differ from {SOURCE_MAP_BASE} beyond the eight rows' carrying cells and DEC-1093's three "
+        "CAP-45 rows:\n" + "\n".join(changed[:10])
     )

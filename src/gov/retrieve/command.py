@@ -2,7 +2,33 @@
 
 ``gov retrieve [--ticket <id>] [--id <id>]... [--radius <R>] [--batch-size <N>] [--bundle-budget <N>]
 [--continue <token>] <query>`` prints the evidence bundle of ``gov.retrieval.retrieve``. It only reads (CAP-27).
-Exit code 1: ``STORE_MISSING``, no store was loaded; ``CONTINUATION_INVALID``, the token is none.
+The register's superseded and done entries are left out of it, and its ``left_out`` counts them (W2-55).
+Exit code 1: ``STORE_MISSING``, no store was loaded; ``STORE_UNREADABLE``, the store is no database that can be read
+(W2-13: never a traceback); ``CONTINUATION_INVALID``, the token is none.
+
+The stated gap (RETR-X-02; AR-9, DEC-900, W2-13). The ids a request names are the question's id-shaped tokens
+(``gov.retrieval.lexical.ids_in``), each ``--id`` and the ``--ticket``. When it names some, every one is id-shaped,
+and every one exists nowhere (no record has it and no line of the index holds it as a whole token), the request
+stops with ``UNRESOLVED_IDS``, each id a gap ``UNRESOLVED``, no evidence and no continuation: nothing unrelated is
+offered in its place. The line is drawn at "every": when one named id exists, the request is retrieved as before
+(the closure names the missing ones as gaps beside the answer); when one is no id (an ``--id`` that is a symbol name,
+for the code index), or a ``--continue`` is given, it is retrieved as before too. When the lexical index cannot
+answer, or the record graph cannot be read, nothing is decided here and the request is retrieved as before.
+
+Role separation (W2-13 S5, DEC-1065 (2)): every route's hits are filtered by the caller's ``role_paths``
+(``GOV_ROLE``, a ``--role`` beside it, ``GOV_TICKET``; ``gov.util.role_paths``), and the bundle's ``role_filter``
+counts what was withheld, by rule; no section, no filter, no ``role_filter``. ``ROLE_PATHS_UNREADABLE``: the section
+or the session's ticket cannot be read, so nothing is handed out.
+
+The store it answers from (W2-116 S3, DEC-963): with no ``--root`` given on the command line and ``GOV_STORE`` set
+(``gov launch`` sets it to the integration store's link, ``gov.launch.store``), the folder ``GOV_STORE`` names, never
+the working tree: nothing there falls back to the working tree's store (``STORE_MISSING`` names that folder). A
+``GOV_STORE`` that is not an absolute path is ``STORE_ROOT_INVALID``. A ``--root`` given wins; a call that does not come
+through the command line (no ``root`` in its arguments) is answered from the ``root`` it is given.
+
+The store it names (W2-138, DEC-1090 (3)): every result carries ``store`` (``gov.retrieval.retrieve.store_of``): the
+commit the store was built at and its folder. The folder is resolved once, whichever form named it (``--root <link>``,
+``GOV_STORE``, a call's ``root``), and every facet of the search reads it, even when the link is switched meanwhile.
 """
 
 from __future__ import annotations
@@ -21,8 +47,102 @@ def add_arguments(parser) -> None:
     parser.add_argument("query", metavar="<query>", help="the question")
 
 
-def run(root: Path, args, config: dict) -> dict:
-    from gov.retrieval.retrieve import retrieve
+def _nowhere(root: Path, query: str, named: list[str] = ()) -> tuple[list[str], dict] | None:
+    """The ids the question and ``named`` (the ``--id`` values and the ticket) name, when they name some, all are
+    ids and none exists anywhere, with the lexical facet's state; None otherwise, or when that cannot be decided."""
+    import sqlite3
 
-    return retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
-                    batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    from gov import records
+    from gov.cli.errors import GovError
+    from gov.retrieval import lexical
+
+    if any(lexical.ids_in(name) != [name] for name in named):
+        return None  # a symbol name, or no id: the closure asks the code index for it
+    names = list(dict.fromkeys([*lexical.ids_in(query), *named]))
+    if not names:
+        return None
+    try:
+        if set(names) & {record["id"] for record in records.records(root)}:
+            return None
+    except (sqlite3.Error, GovError):
+        return None  # no record graph: the retrieval says so itself
+    for name in names:
+        answer = lexical.search(root, name, refresh=False)
+        if not answer["available"]:
+            return None
+        whole = lexical.whole_id(name)
+        if any(whole.search(hit["text"]) for hit in answer["hits"]):
+            return None
+    return names, {"available": True, "reason": None}
+
+
+def _stated_gap(root: Path, query: str, names: list[str], lexical_facet: dict, args) -> dict:
+    """The bundle that states the gap: no evidence, each id a gap, ``UNRESOLVED_IDS``."""
+    from gov import closure
+    from gov.retrieval import retrieve, semantic
+
+    answer = semantic.search(root, query, refresh=False)  # asked for its state only: its hits are not offered
+    rounds = retrieve.ROUNDS_BY_RADIUS.get(args.radius, retrieve.ROUNDS_BY_RADIUS[4])
+    return {"stopping_reason": closure.UNRESOLVED_ALONE, "evidence": [], "batches": [{"size": 0}],
+            "merge": {"candidates": 0, "duplicates": 0, "dropped": [], "reranked": False},
+            "expansions": [], "gaps": [{"id": name, "reason": closure.UNRESOLVED} for name in names],
+            "facets": {"lexical": lexical_facet,
+                       semantic.FACET: {"available": answer["available"], "reason": answer["reason"]}},
+            "budget": {"bundle": {"limit": retrieve.BUNDLE_BUDGET if args.bundle_budget is None
+                                  else args.bundle_budget, "used": 0},
+                       "rounds": {"limit": rounds, "used": 0}},
+            "continuation": None}
+
+
+_NOT_GIVEN = object()
+
+
+def _store_root(root: Path, args) -> Path:
+    """The folder the search answers from: ``GOV_STORE``'s where the command line gave no ``--root`` (W2-116 S3), its
+    link followed once here, so every facet of this search opens the same half (review F2); a ``--root`` given, or a
+    call's ``root``, is followed once here too (W2-138 S2)."""
+    import os
+
+    from gov.cli.errors import GovError
+    from gov.launch.store import ENV, StoreSettingError, session_root
+    from gov.retrieval.retrieve import resolved
+
+    if getattr(args, "root", _NOT_GIVEN) is not None:  # a --root given, or a call that did not parse the line
+        return resolved(root)
+    try:
+        chosen = session_root(os.environ.get(ENV))
+    except StoreSettingError as error:
+        raise GovError("STORE_ROOT_INVALID", f"{error}: nothing is retrieved", {"variable": ENV}) from None
+    return resolved(root) if chosen is None else chosen
+
+
+def run(root: Path, args, config: dict) -> dict:
+    import sqlite3
+
+    from gov.cli.errors import GovError
+    from gov.retrieval.retrieve import retrieve, role_filter, store_of
+    from gov.util.register import leave_out
+
+    root = _store_root(root, args)
+    store = store_of(root)  # W2-138 S1: read once, named in the result and carried in the token
+    role = getattr(args, "role", None)  # W2-13 S5: a --role given adds its filter beside GOV_ROLE's (DEC-1065 (2))
+    if args.continuation is None:
+        nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
+        if nowhere is not None:
+            bundle = _stated_gap(Path(root), args.query, *nowhere, args)
+            withhold = role_filter(root, role)
+            if withhold is not None:  # nothing is offered, so nothing is withheld; the filter is named all the same
+                bundle["role_filter"] = withhold.summary()
+            return {"store": store, **bundle}
+    try:
+        bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+                          batch_size=args.batch_size, bundle_budget=args.bundle_budget,
+                          continuation=args.continuation, role=role, store=store)
+    except sqlite3.DatabaseError as error:  # no bundle was made: the store itself cannot be read (W2-M071)
+        raise GovError("STORE_UNREADABLE", f"the store at {root} cannot be read: {error}",
+                       {"root": str(root), "error": str(error)}) from None
+    # W2-55 (DEC-791 item 1): the register's superseded and done entries are left out, and counted
+    bundle["evidence"], left_out = leave_out(root, bundle["evidence"])
+    if left_out:
+        bundle["left_out"] = left_out
+    return {"store": store, **bundle}

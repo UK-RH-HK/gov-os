@@ -1,6 +1,6 @@
 ---
 id: DAEO-a3u2
-status: open
+status: in_progress
 deps: [DAEO-jsg1]
 links: []
 created: 2026-10-30T22:14:08Z
@@ -18,15 +18,15 @@ depends_on: [DAEO-jsg1]
 allowed_paths:
 - governance/project/path-map.yaml
 - tests/unit/retrieval/test_w2_91*
-- docs/research/W2-91-memory-measure.md
+- docs/changes/W2-91-evidence.md
 kpis:
   success:
-  - 'After a rebuild with the embedder, the tracked root files (CLAUDE.md, README.md, AGENTS.md and the rest the root-files namespace holds), every tracked file under governance/** and every tracked file under schemas/** have vectors; the count of chunks with vectors under each is recorded from the clone''s store [DEC-957, DEC-954 Q9c, CAP-10.a]'
+  - 'After a rebuild with the embedder, the tracked root files (CLAUDE.md, README.md, AGENTS.md and the rest the root-files namespace holds), every tracked file under governance/** other than governance/project/orchestration/{closes,reviews,sessions,nightly}/** (not embedded, M-4, DEC-1055 (3)) and every tracked file under schemas/** have vectors; the count of chunks with vectors under each is recorded from the clone''s store [DEC-957, DEC-954 Q9c, CAP-10.a, DEC-1055 (2) and (3)] [re-worded, DEC-1084]'
   - 'What stays out stays out: fixtures/** (the hidden half), .claude/** and .rulesync/** (generated copies), template/.rulesync/** and the vendored parts W2-86 placed, and cli/** (the old carried code) have no vector; schemas/** gets a namespace of its own so cli/** keeps not embedded [DEC-957, DEC-388, DEC-820 (d)]'
-  - 'The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied; the ticket shows, from the code, that the indexer reads embedding_policy only and the export path still refuses the overlay, with a planted export case; embedding it changes no export or sharing rule [DEC-957, DEC-856, DEC-887]'
+  - 'The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied, and the ticket shows from the code that the indexer reads embedding_policy only (narrowed by DEC-1013, P-W2-91-TD-1 (a): no export path exists yet; an export command that refuses denied is Wave 3 row W3-P18) [DEC-694, DEC-388, DEC-1013]'
   - 'The path map states it in its two valid values only, every tracked path matches exactly one namespace, and the indexer''s code is not changed [DEC-694, DEC-388]'
   - 'Nothing else moves: for every tracked path outside the newly embedded sets, the embedding verdict is the same at the head as at the base; the vector sets differ only by the newly embedded files [DEC-381]'
-  - 'W2-61''s measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 %, full evidence against 99 %) and the in-the-bundle count, per question, beside the last measure, in docs/research/W2-91-memory-measure.md [DEC-957, DEC-833, DEC-860]'
+  - 'W2-61''s measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 %, full evidence against 99 %) and the in-the-bundle count, per question, beside the last measure, in docs/changes/W2-91-evidence.md [DEC-957, DEC-833, DEC-860]'
   failure:
   - 'A file under fixtures/, .claude/, .rulesync/ or cli/ embedded.'
   - 'The overlay''s sensitivity or export policy changed, or the overlay exported.'
@@ -45,6 +45,11 @@ sources:
 - DEC-833
 - DEC-860
 - CAP-10.a
+- DEC-1013
+- DEC-1055
+- DEC-1084
+- DEC-968
+- DEC-996
 est_loc: 30
 acceptance_tests:
   path: tests/acceptance/W2-91/
@@ -61,3 +66,5 @@ Card: MEMORY-SPEC-MAP gap 1, resolved by the owner in DEC-957 ("full embeddings:
 - **The one check first:** `project-overlay` is `sensitivity: restricted`, `export_policy: denied`. The ticket shows from the code that sensitivity is read by export, not by the indexer, and keeps both as they are.
 - **Order:** after W2-86 (same block of the same file; it depends on it). W2-87 adds a different top-level block: split by lines; whichever merges second merges back.
 - **The re-measure:** W2-61's procedure, as W2-86's.
+
+**D9-FATES (DEC-1083):** Close formally at the lift (DEC-1083), lines met: all 10 (`947da7a4`, `W2-91-evidence.md`); S6's and F4's evidence is `docs/changes/W2-91-evidence.md` §3 to §5 (control `f46b9653` against head `b652fc96`, 2026-11-01, both figures, per question); S1 re-worded to M-4's scope (DEC-1055 (2)). The CTO closes it at the lift (P1-13).

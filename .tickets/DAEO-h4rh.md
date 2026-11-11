@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r]
+deps: [DAEO-zmo4, DAEO-wahn, DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-49o5, DAEO-r30l, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-3r1j, DAEO-nqa2, DAEO-clon, DAEO-blwa, DAEO-qzrq, DAEO-jpr0, DAEO-emq1, DAEO-cb2b, DAEO-mb2t, DAEO-t8mp, DAEO-r8vq, DAEO-k4wm, DAEO-03ub, DAEO-f58b, DAEO-2tfd, DAEO-8s85, DAEO-ylsh, DAEO-ozyt]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -15,14 +15,14 @@ class: integration
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
+- DAEO-zmo4  # W2-174: an adopted repository's tickets get their Verify clauses [added, DEC-1132 (2)]
+- DAEO-wahn  # W2-175: the role templates carry Policy 2's four refusals, DEC-861's record rule and the two-refusal stop, before EXAMIN's copy [added, DEC-1137 (3)]
 - DAEO-g0ip
 - DAEO-ym8a
 - DAEO-u4oz
 - DAEO-0z8c
-- DAEO-kia7
 - DAEO-49o5
 - DAEO-r30l
-- DAEO-1ahb
 - DAEO-kmcr
 - DAEO-2ds6
 - DAEO-ha8z
@@ -35,23 +35,53 @@ depends_on:
 - DAEO-k7hz
 - DAEO-lrre
 - DAEO-l78m
-- DAEO-4k3l
-- DAEO-dy7j
 - DAEO-2bdu
 - DAEO-g87r
+- DAEO-h2k3
+- DAEO-jsg1
+- DAEO-a3u2
+- DAEO-n0wb
+- DAEO-6y0x
+- DAEO-57hm
+- DAEO-ouet
+- DAEO-wq2b
+- DAEO-wi46
+- DAEO-zpdj
+- DAEO-0mtg
+- DAEO-kiar
+- DAEO-zoex
+- DAEO-3r1j
+- DAEO-nqa2
+- DAEO-clon
+- DAEO-blwa
+- DAEO-qzrq
+- DAEO-jpr0
+- DAEO-emq1
+- DAEO-cb2b
+- DAEO-mb2t
+- DAEO-t8mp
+- DAEO-r8vq
+- DAEO-k4wm
+# The six below are on EXAMIN's copy's path (AUDIT-NIGHT-1 d-tools §5): W2-42a, W2-116, W2-145, W2-153, W2-156, W2-157 [added, DEC-1112 (3), the CTO's delegated decision]
+- DAEO-03ub
+- DAEO-f58b
+- DAEO-2tfd
+- DAEO-8s85
+- DAEO-ylsh
+- DAEO-ozyt
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
+- docs/changes/W2-27-CIT-P.md  # [DEC-1089]
 kpis:
   success:
-  - The pinned, hash-verified release is installed (W2-16, W2-18).
+  - 'The pinned, hash-verified release is installed: W2-16''s release only. [re-scoped, DEC-1083]'
   - gov adopt runs A0 to A6 and A8 with the A5 independent review, and the lite A7 and A10 gates of Contract v4.2.
   - EXAMIN's own CLAUDE.md, settings and untracked files are preserved (W2-23).
-  - gov doctor and gov check are green.
+  - '`gov doctor` is green (the `gov check` families follow T-2, W2-45). [re-scoped, DEC-1083]'
   - 'One LITE ticket goes through the full cycle: test designer, red, implement, green, then gov close at exit 0 with EXAMIN''s own test command.'
   - Its governance share is measured and ≤ 15 %.
   - At the first full gov rebuild after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler, against DEC-078's envelope; a figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735].
-  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones; the owner does not know whether its governance suite passes on Windows, so the hour finds out (DEC-745).
-    Then the reds go into W2-19's ratchet baseline (exact id, owner, cause class, how it shrinks), which the owner accepts [DEC-736].
+  - 'EXAMIN''s red tests are named in the close record, each with its cause (an environment red or a real one), with no ratchet baseline and no known-red list [DEC-736, DEC-745, W-4] [re-scoped, DEC-1083]'
   - One pinned install package goes to the owner. It holds EXAMIN's 10 product-suite packages from EXAMIN's own lock file, installed into the clone's own virtual environment only. With the owner's approval,
     the product suite is measured before W2-30's verdict. Until then it is "needs environment", reported UNMEASURED by name and never as passed [DEC-736].
   - EXAMIN's governance kit stays in a legacy namespace, and its tests stay in the declared test command. The A5 review maps each of its checks to a Gov OS check family or to "no equivalent" [DEC-736].
@@ -62,6 +92,8 @@ kpis:
   - 'W2-16''s numbered, frozen release is the one installed, never this repository''s branch [DEC-954 Q8c]'
   - 'A clean gov close of the LITE ticket on the copy, at exit 0, on that release, is exit criterion 1''s proof; gov doctor green on the copy is exit criterion 3''s [DEC-953, DEC-954]'
   - 'W2-88''s tools run on the copy at adoption (the assessment, the refactoring plan as proposals, the full index and embeddings), and EXAMIN''s question set (W2-94) is measured with both figures, hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % [DEC-954 Q9f, DEC-957]'
+  - 'The first numbered, frozen release is cut by the owner and hash-checked (two builds give the same bytes; the wheel and every file match the manifest), recorded in docs/plan/wave-2/examin-copy/release-check.md, before W2-81''s proving-ground run and this ticket''s adoption [DEC-1089, DEC-954 Q8c, DEC-772]'
+  - 'Exit criterion 7: CAP-45.a moved to Wave 3 by an approved CIT-P note (docs/changes/W2-27-CIT-P.md), or named as an exception the owner accepts [DEC-1089]'
   failure: []
 profile: FULL
 sources:
@@ -74,6 +106,11 @@ sources:
 - DEC-953
 - DEC-954
 - DEC-957
+- DEC-772
+- DEC-1083
+- DEC-1089
+- DEC-1090
+- DEC-1112
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -83,6 +120,8 @@ closes:
 list_rows: []
 ---
 # W2-27 EXAMIN adoption on a copy
+
+**Dependencies widened (PLAN-GROWTH-1 §2 gap 5):** the tickets DEC-959, DEC-966, DEC-969 and DEC-971 put before EXAMIN's copy (W2-61h, W2-86, W2-91 to W2-110, W2-90b).
 
 **DEC-954 Q1:** this ticket starts only when K9's entry criteria are met: memory proven, the roles, skills and briefs landed, the proving ground passed, the rest of the minimum closed. Never because a date arrived.
 
@@ -105,3 +144,17 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-27), as approved (DEC-729). The list row
   - EXAMIN's own `CLAUDE.md`, `AGENTS.md` and `.claude/commands/` are never silently overwritten. Their content is migrated into EXAMIN's rulesync sources or kept in place, and the A5 review checks that nothing of the owner's was lost [DEC-736].
 - **Correction (DEC-736):** DEC-735 item 2 said W2-19 does not join this ticket, because EXAMIN's tests are pytest. That was wrong. `gov close` runs its regression only over `tests/`, whatever the language, so W2-19 is now in `deps`.
 - **W2-52 (DEC-741 H, 2026-10-17):** the lite A7 and A10 stage records close before this ticket starts.
+
+**DEC-1089 (owner, 2026-11-07): K7's Wave 2 part is this ticket's.** K7 is done for Wave 2; W2-17 and W2-18 stay in
+Wave 3. Two items are added here, as one package (`governance/project/orchestration/packages/K7-W2-REMAINDER.md`):
+- (a) **the first numbered, frozen release,** cut by the owner (DEC-772) and hash-checked by the CTO, after the lift's
+  re-pin and before W2-81's proving-ground run and this ticket's adoption;
+- (b) **exit criterion 7's paperwork for CAP-45.a:** a CIT-P note moving it to Wave 3 (`docs/changes/W2-27-CIT-P.md`;
+  `docs/contract/**` joins the paths only once the owner approves its edit), or a named exception.
+
+Neither touches EXAMIN's copy, so both run before K9's entry criteria are met (DEC-954 Q1 gates the adoption, not
+these two items). [DEC-1089]
+
+**DEC-1090 (5) (owner, 2026-11-07):** (b) takes option A, the CIT-P note moving CAP-45.a to Wave 3 (drafted by a
+product-spec agent, one independent review, then the owner). (a) The release is cut after the lift's re-pin and before
+W2-81's proving-ground run. [DEC-1090]

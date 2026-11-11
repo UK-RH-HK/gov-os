@@ -1,0 +1,18 @@
+# Re-anchored at c9742b08910a (D-10 run 2, DEC-1122 (3)): W2-150 moved set_fault into src/gov/util/parts.py (28c586930)
+# and the three call sites moved with later edits (reads.py 465 -> 227, 483 -> 245; measure.py 247 -> 477). Same three
+# callers, same facts; only the line numbers of the gold answer and the sources changed.
+category: callers
+commit: c9742b08910a
+question: "Which functions call set_fault?"
+gold_answer: >-
+  Three: check_sets (src/gov/guard/reads.py, line 227) and _hidden (reads.py, line 245), each raising PolicyError
+  on a fault, and measure in src/gov/retrieval/measure.py (line 477), which refuses a set that is not declared well
+  formed in the path map's evaluation_sets.
+sources:
+  - path: src/gov/guard/reads.py
+    lines: [227, 227]
+  - path: src/gov/guard/reads.py
+    lines: [245, 245]
+  - path: src/gov/retrieval/measure.py
+    heading: "        if not isinstance(entry, dict) or set_fault(entry):"
+    lines: [477, 477]

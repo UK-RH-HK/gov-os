@@ -1,6 +1,6 @@
 ---
 id: DAEO-j8gn
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -39,8 +39,8 @@ kpis:
   - A decision set ACTIVE without an owner approval fact turns core-authority red [W2-H049, W2-M227, W2-M257].
   - '"The decision checker could not run" is a finding, never green [W2-H037, W2-H048].'
   - Body edits that keep an approved decision ACTIVE are flagged [W2-L010]. An author date earlier than the committer date by more than a day is flagged [W2-M107].
-  - 'The owner''s push as the acceptance in git: the close counts a ratchet entry (accepted_reds, load_sensitive) or an escalation lift from a commit carrying Task: decision-record and Decided-by: owner
-    only once that commit is an ancestor of the owner''s pushed origin/w2/integrate (the remote-tracking ref the owner''s push left); before the push it counts nothing, and says so by name [DEC-862 (b)]'
+  - 'The owner''s push as the acceptance in git: where a project keeps the ratchet''s lists on (the strict close, W2-115), the close counts a ratchet entry (accepted_reds, load_sensitive) or an escalation lift from a commit carrying Task: decision-record and Decided-by: owner
+    only once that commit is an ancestor of the owner''s pushed origin/w2/integrate (the remote-tracking ref the owner''s push left); before the push it counts nothing, and says so by name; in the default close no list is read [DEC-862 (b), DEC-968, DEC-983, DEC-982]'
   - 'A register entry recorded by the orchestrator under DEC-861 (Role: orchestrator, Task: decision-record, Decided-by: owner) reads as the owner''s once its commit is in the pushed ref, and as "recorded,
     not yet pushed" before; it is never read as transcribed without a source [DEC-861, DEC-862]'
   failure:
@@ -54,6 +54,7 @@ sources:
 - DEC-861
 - DEC-862
 - DEC-891
+- DEC-983
 est_loc: 340
 acceptance_tests:
   path: tests/acceptance/W2-12/
@@ -106,3 +107,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-12), as approved (DEC-729). The list row
   - A `Decided-by` trailer alone, on a commit not in the owner's pushed ref, never counts as the owner's (DEC-862 (c): never, it fails open).
   - `gov approve` run from an agent's Bash call, piped input included, commits nothing.
   - A `Role: owner` trailer on a commit made inside an agent's call is a containment finding, not an approval.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

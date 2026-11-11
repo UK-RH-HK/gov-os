@@ -17,6 +17,7 @@ from pathlib import Path
 from gov.checkpoint.command import EXIT_UNHEALTHY, TRIGGERS
 from gov.cli.errors import GovError
 from gov.tasks.tickets import TICKETS_REL, frontmatter
+from gov.util.gitenv import git_env
 
 CHECKPOINTS_REL = "docs/checkpoints"
 SCRATCH_CHECKPOINTS_REL = ".gov-runtime/scratch/checkpoints"
@@ -27,7 +28,8 @@ HASH = re.compile(r"sha256:[0-9a-f]{64}")
 
 
 def _git(root: Path, *args: str) -> str:
-    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                          env=git_env(root, pinned=True))
     if done.returncode != 0:  # never a silent "no commits": the watchdog does not pass what it could not count
         raise GovError("GIT_FAILED", f"git {args[0]} failed: {done.stderr.strip()}", {"args": list(args)})
     return done.stdout.strip()

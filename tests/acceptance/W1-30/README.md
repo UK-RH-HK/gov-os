@@ -14,6 +14,10 @@ the last run are in "Round 8".
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs
 ```
 
+W2-67 (DAEO-9nys) revised the 13 first-round cases lens I2 found weak, and brought row W2-L420's docstrings to
+DEC-868 and DEC-908: each case's planted fault, its red and green runs and its Rewrite-Reason are in
+`README-W2-67.md`.
+
 ## How the tests run
 
 - Through public interfaces only: the `gov close` command line (W1-07's console-script
@@ -1332,8 +1336,8 @@ A project without a path map, or whose path map names neither key, closes as tod
 and no command is added; nothing in W1-07's or W1-32's suite holds anything against it (W1-07 runs
 `gov close` only for a ticket that does not exist; W1-32 runs no close).
 
-Note for the lead: the path map must hold `namespaces` (the loader requires the key), so the one
-line is added to a path map a project already has; the kernel's schema file for the path map
+Note for the lead: the path map must hold `namespaces` (the loader requires the key; the suite's
+projects write one catch-all namespace, `paths: ["**"]`, below), so the one line is added to a path map a project already has; the kernel's schema file for the path map
 (`template/governance/kernel/schemas/path-map.schema.json`) does not name the two keys, as it
 does not name DEC-479's two. This repository's own line for P-3 is `close_timeout: 7200`.
 
@@ -1363,7 +1367,13 @@ the product's command line.
 ### The projects of this suite (rewritten, reason "defect found by the parallel trial")
 
 `support.Project` now writes `governance/project/path-map.yaml` into every temporary project, in
-its first commit: `namespaces: {}` and `close_workers: 2` (`support.SUITE_WORKERS`). So every
+its first commit: one catch-all namespace (`namespaces: {all: {paths: ['**']}}`) and
+`close_workers: 2` (`support.SUITE_WORKERS`). The namespace was empty (`namespaces: {}`) until
+W2-95 made `core-pathmap` judge every tracked path: a path in no namespace is a finding of
+path-map compliance (hard-block), so every case would have failed for a reason that is not its
+subject. `**` places every path in exactly one namespace and lowers nothing (DEC-970, DEC-959
+item 9); the same holds for the path maps of rounds 15 and 16 (`r15.policies_text` and the cases
+that write their own). So every
 close of this suite starts two workers for a parallel run, not as many as the machine gives. Two,
 not one: the parallel form stays what round 11's cases hold (a worker's name, more than one
 worker), and none of them needs a number of its own; none contradicts the setting.
@@ -1371,7 +1381,7 @@ worker), and none of them needs a number of its own; none contradicts the settin
 values.
 
 Until the setting is built the line changes nothing of a close: the loader accepts the path map
-(an empty `namespaces`, a top-level key it does not know), no commit of a ticket's range touches
+(one namespace with `paths` alone, a top-level key it does not know), no commit of a ticket's range touches
 it, and the cases of round 11 pass with it (below).
 
 One existing file was rewritten for it, with the same reason and in a commit of its own: the two
@@ -2337,3 +2347,29 @@ No expectation, assertion, pass line or threshold changes. In the designer's san
 `test_w1_30_r11_rebuild_mode.py` 2 passed. Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
 query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
 expectation`.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 7 in the full run, 0 in `breadth`, 530 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpo... | `test_w1_30_close.py::test_close_runs_acceptance_tests`, `test_w1_30_close.py::test_regression_failure_blocks_close`, `test_w1_30_close.py::test_close_succeeds_on_green_standard_ticket` | the ticket's words |
+| S2: Holds the iteration count of every review→repair, test→fix and verification loop on the ticket; after three consecutive non-converging iteratio... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_first_failure_records_iteration`, `test_iteration_count_persists_across_failures` \| README (lif... | lifted |
+| S3: Registers the product-traceability family check: the commits of every closed ticket carry Implements: and Task: trailers that resolve [CAP-38.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_product_traceability_check_in_family`, `test_check_red_when_closed_ticket_lacks_implements_trail... | lifted |
+| S4: A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash: gov close re-runs the checks o... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_w1_30_governance_checks`, `test_w1_30_stale` \| README (lifted) | lifted |
+| S5: The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented... | `test_w1_30_receipt.py::test_close_record_has_packet_hash`, `test_w1_30_receipt.py::test_close_record_has_tests_and_deviations` | the ticket's words |
+| S6: A finding raised at close is classed into exactly one disposition (repair, reuse, delete, narrow, defer or owner) with whole-system context fro... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_no_disposition_records_unclassed`, `test_no_disposition_output_names_findings_awaiting_class` \|... | lifted |
+| S7: A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer, commissioned and ... | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_full_ticket_requires_probe_record`, `test_full_ticket_closes_with_valid_probe` \| README (lifted) | lifted |
+| F1: A ticket closes with a failing acceptance test | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | the ticket's words |
+| F2: A fourth consecutive non-converging iteration starts without an owner decision | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_fourth_non_converging_blocked_without_owner` \| README (lifted) | lifted |
+| F3: The iteration count or budget appears in any output seen by the looping session [CAP-59.b] | none: the line's feature is lifted (`--optin=lifted`): moved to `lifted` (the feature is off here): `test_iteration_count_not_in_output`, `test_budget_not_in_output` \| README (lifted) | lifted |
+
+**Citations (DEC-1109 (2), 2026-11-09):** `test_w1_30_r11_rebuild_mode.py`'s comment on `GOV_QUERY_OLLAMA_HOST` names DEC-1033 (which replaced DEC-798 and keeps the query embedder at its own address); the comments and docstrings that wrote the planted base decision and the planted WBS id now name `BASE_SOURCE`, `WBS` and `DECLARED`; comments only, no case changes (`Rewrite-Reason: DEC-1109 (2)`).

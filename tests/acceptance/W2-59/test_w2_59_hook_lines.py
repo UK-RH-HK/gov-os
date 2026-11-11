@@ -18,6 +18,15 @@ preToolUse line running its own five-rule hook. The case that counted the seven 
 the hook source of a project generated from the template, where the kernel's lines are (``.rulesync/hooks.jsonc`` as
 Copier puts it there). The cases on the pin's interpreter and package stay on this repository's lines: the kernel's
 lines start ``python3`` and carry no pin (``tests/acceptance/W2-90/README.md``).
+
+Rewrite-Reason: DEC-953 item 2 (W2-90b, DEC-965 item 4, DEC-999 item 1). Since W2-106 the template's three guard lines
+(preToolUse, postToolUse, postToolUseFailure) take the pinned form. Those three events' ids are parametrized over the
+template's lines (``template/.rulesync/hooks.jsonc``, the kernel's wiring), each run in a project holding the kernel's
+programs where a product has them (``governance/kernel/hooks/``): the preToolUse ids no longer run this repository's
+five-rule line, and the postToolUse and postToolUseFailure ids ACT 1 removed exist again, so the after-call case's
+parameter list is no longer empty. The four lifecycle lines' ids stay on this repository's lines: the template's
+lifecycle lines keep DEC-608's plain form by DEC-917, so the same verdict has no kernel line to judge
+(``tests/acceptance/W2-90b/README.md``).
 """
 
 from __future__ import annotations
@@ -36,7 +45,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
 
 import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
-ENTRIES = support.hook_entries()
+# W2-90b: the guard and containment lines are the template's (W2-106 pinned them); the lifecycle lines this
+# repository's (the template's keep DEC-608's plain form, DEC-917).
+ENTRIES = kernel_wiring.template_hook_entries() + [
+    entry for entry in support.hook_entries() if entry[0] not in kernel_wiring.KERNEL_GUARD_EVENTS]
 IDS = [f"{event}[{index}]" for event, index, _ in ENTRIES]
 
 # The events whose program imports the governance package for an engineer's call with a ticket. The subagentStop
@@ -86,7 +98,8 @@ def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, en
     """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
     not."""
     box = support.make_box(tmp_path / "box", pin_markers)
-    project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers,
+                                               with_src=event not in PROGRAM_ADDS_SRC)
     done = support.run_hook_line(entry["command"], event, project, box)
     assert not box.marks("path-python3-"), (
         f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
@@ -102,7 +115,8 @@ def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
     """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
     (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
     box = support.make_box(tmp_path / "box", pin_markers)
-    project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers,
+                                               with_src=event not in PROGRAM_ADDS_SRC)
     done = support.run_hook_line(entry["command"], event, project, box)
     assert not box.marks("tree-gov-"), (
         f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
@@ -111,13 +125,13 @@ def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
         f"{done.describe()}")
 
 
-def _without_pin(tmp_path):
+def _without_pin(tmp_path, entry):
     box = support.make_box(tmp_path / "box", None)
     path = f"{box.local_bin}:{box.decoy_bin}:{support.SYSTEM_PATH}"
     check = subprocess.run(["sh", "-c", "command -v gov"], env={"PATH": path, "HOME": str(box.home)},
                            capture_output=True, text=True)
     assert check.returncode != 0, f"a gov is on the case's PATH although no pin is installed: {check.stdout}"
-    project = support.hook_project(tmp_path / "project", box.markers, with_src=True)
+    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers, with_src=True)
     return box, project, path
 
 
@@ -126,7 +140,7 @@ def _without_pin(tmp_path):
 def test_without_a_pin_the_pretooluse_line_blocks_the_call(event, index, entry, tmp_path):
     """No ``gov`` link and no ``gov`` on ``PATH``: the call is blocked (exit 2 or a deny decision), and neither the
     project's ``src`` nor the ``python3`` first on ``PATH`` stands in for the pin."""
-    box, project, path = _without_pin(tmp_path)
+    box, project, path = _without_pin(tmp_path, entry)
     done = support.run_hook_line(entry["command"], event, project, box, path=path)
     assert support.denies(done), (
         f"with no pin to be found, {event}[{index}] lets the call through (exit {done.returncode}; only exit 2 or "
@@ -142,7 +156,7 @@ def test_without_a_pin_the_pretooluse_line_blocks_the_call(event, index, entry, 
 def test_without_a_pin_the_after_call_lines_do_not_end_silently(event, index, entry, tmp_path):
     """The containment check cannot run without the pin: the line ends with an error (non-zero), never as a
     silent success, and no other install stands in for the pin."""
-    box, project, path = _without_pin(tmp_path)
+    box, project, path = _without_pin(tmp_path, entry)
     done = support.run_hook_line(entry["command"], event, project, box, path=path)
     assert done.returncode not in (0, None), (
         f"with no pin to be found, {event}[{index}] ends as a silent success\n{done.describe()}")
@@ -173,7 +187,7 @@ def test_the_line_follows_the_owner_s_rollback_to_an_editable_install(event, ind
         pth.write(f"{support.SRC}\n")
         pth.write(f"import os; open(os.path.join({str(box.markers)!r}, 'rollback-python-%d' % os.getpid()), "
                   f"'w').close()\n")
-    project = support.hook_project(tmp_path / "project", box.markers, with_src=True)
+    project = kernel_wiring.w2_59_hook_project(entry, tmp_path / "project", box.markers, with_src=True)
     done = support.run_hook_line(entry["command"], event, project, box)
     assert not box.marks("path-python3-"), (
         f"after the rollback, {event}[{index}] started the python3 first on PATH\n{done.describe()}")

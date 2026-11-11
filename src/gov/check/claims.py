@@ -7,35 +7,16 @@ from pathlib import Path
 
 import yaml
 
+from gov.util.frontmatter import ids as _ids
+from gov.util.frontmatter import quiet as _frontmatter
+from gov.util.gitenv import git_env
+
 VERSION = "1.0.0"
 
 TICKETS_REL = ".tickets"
 REQUIRED_TICKET_FIELDS = ("id", "type", "status", "state_class", "role", "allowed_paths", "kpis")
 READINESS_DIMENSIONS_REL = "docs/contract/readiness-dimensions.yaml"
 CHANGES_REL = "openspec/changes"
-
-
-def _frontmatter(text: str) -> dict | None:
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None
-    try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
-
-
-def _ids(value) -> list[str]:
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, list):
-        return [str(v) for v in value if v]
-    return []
 
 
 def _load_tickets(root: Path) -> list[tuple[str, dict]]:
@@ -184,13 +165,13 @@ def _check_taxonomy_change(root: Path) -> list[dict]:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "log", "--oneline", "-1", "--", READINESS_DIMENSIONS_REL],
-            capture_output=True, text=True
+            capture_output=True, text=True, env=git_env(root, pinned=True)
         )
         if result.returncode != 0 or not result.stdout.strip():
             return findings
         diff_result = subprocess.run(
             ["git", "-C", str(root), "diff", "HEAD~1", "--", READINESS_DIMENSIONS_REL],
-            capture_output=True, text=True
+            capture_output=True, text=True, env=git_env(root, pinned=True)
         )
         if diff_result.returncode != 0 or not diff_result.stdout.strip():
             return findings

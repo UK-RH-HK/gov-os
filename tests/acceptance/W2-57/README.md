@@ -300,3 +300,27 @@ One run, `-n auto`, on run 1's head with run 2's tests (2026-10-27): 21 cases, 1
 - **The designer-read p95 case:** red here and red alone ("p95 … per round (ms): 300.5, 547.0, 296.8; the bound is
   100 ms"). The machine's load average was 64 to 70 on 20 cores, set by other sessions. It is a `serial: latency`
   case, which the close runs alone; run 1 measured 55 ms on a quiet machine. Run 2 does not change it.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 20 in the full run, 1 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: First item, the rulesync probe, with its four effects (DEC-892 item 2, P-I4-5 (a)): the portability check's two rulesync calls get a limit a lo... | `test_w2_57_rulesync_probe.py::test_a_late_answer_is_waited_for_and_the_check_compares_as_with_a_prompt_one` (1 of 2), `test_w2_57_rulesync_probe.py::test_a_rulesync_that_is_absent_or_fails_keeps_its_own_finding_and_is_never_a_timeout` (3 of 3) | the ticket's words |
+| S2: The doctor probes (src/gov/doctor/command.py, the probes only) get limits a loaded machine meets, and a probe exception gov doctor does not cat... | `test_w2_57_doctor_probes.py::test_a_probe_exception_ends_doctor_with_the_envelope_and_its_text` | the ticket's words |
+| S3: The serial-only list is reworked as the two tables of P-IS-6 (I-SYNTHESIS): every entry kept serial names its reason in the list; W1-16's 94 ca... | `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list`, `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` | the ticket's words |
+| S4: W1-30's r11 test, which holds today's serial entries one by one, is revised to read the reworked list and its reasons (Rewrite-Reason: DEC-889 ... | `test_w2_57_serial_list.py::test_every_reader_takes_the_same_entries_and_each_is_the_beginning_of_a_node_id`, `test_w2_57_doctor_probes.py::test_a_probed_tool_that_answers_well_past_today_s_limit_is_read_as_answering` (4 of 4), `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` | the ticket's words |
+| S5: W1-30's r13 case gets a limit a loaded start meets (Rewrite-Reason: W2-M384) [I2 §2.2]; W1-50's two live freeze cases remove every CLAUDE* vari... | `test_w2_57_doctor_probes.py::test_a_probed_tool_that_answers_well_past_today_s_limit_is_read_as_answering` (4 of 4), `test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95` | the ticket's words |
+| S6: The close's resource gate covers the wall-clock limits that went red under load: W1-02's 5-second bound (168 cases), by a limit a loaded machin... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` | the ticket's words |
+| S7: Run 2 (owner, DEC-925 item 3, P-W2-57-B B1 (a)): the close's serial phase in src/gov/close/command.py (its call to serial.py only; gate (h)'s l... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` | the ticket's words |
+| S8: The network check probes the live tests' hosts through the route the session uses, close to when it runs [I1 F-1] | `test_w2_57_doctor_probes.py::test_a_probe_exception_ends_doctor_with_the_envelope_and_its_text`, `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone`, `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | the ticket's words |
+| S9: Then the orchestrator commits the removal of every load_sensitive entry this ticket makes unnecessary (DEC-861: a removal only shrinks the list... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone`, `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | the ticket's words |
+| F1: A rulesync or doctor timeout that skips or passes a case; a serial entry without its reason; a live or real-model file left in the close; a cas... | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone`, `test_w2_57_nightly_route.py::test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | the ticket's words |

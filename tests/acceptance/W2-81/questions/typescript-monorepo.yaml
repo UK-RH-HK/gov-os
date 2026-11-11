@@ -1,0 +1,70 @@
+# The visible half of the question set: typescript-monorepo (W2-81). Templates over the manifest's facts.
+form: w2-81-questions/1
+repository: typescript-monorepo
+questions:
+  - id: typescript-monorepo-v01
+    category: which-spec-governs
+    question: Which ADR governs the page size of {topic}?
+    gold_answer: "{governing}, which states {spec_line}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+    forbidden: ["{stale}"]
+  - id: typescript-monorepo-v02
+    category: what-value
+    question: What page size does the {p2} package use?
+    gold_answer: "{page_code}, in {paging}"
+    sources:
+      - {path: "{paging}", holds: "{page_code}"}
+    forbidden: ["{stale}", "{dead_module}"]
+  - id: typescript-monorepo-v03
+    category: where-specified
+    question: Where are the paging of {topic} specified and implemented?
+    gold_answer: "specified in {governing}, implemented in {paging}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+      - {path: "{paging}", holds: "{page_code}"}
+    forbidden: ["{stale}"]
+  - id: typescript-monorepo-v04
+    category: which-plan-current
+    question: What is the release plan of the {p1} package?
+    gold_answer: "{release_plan}: publish {p2} first, then {p1} and {p3} together"
+    sources:
+      - {path: "{release_plan}", holds: "1. Publish `{p2}` first."}
+  - id: typescript-monorepo-v05
+    category: what-module-does
+    question: How does the {p1} package open its session?
+    gold_answer: "connect, from {client_module}, called in {p1_index}"
+    sources:
+      - {path: "{client_module}", holds: "export function connect(url: string) {{"}
+      - {path: "{p1_index}", holds: "export const session = connect("}
+  - id: typescript-monorepo-v06
+    category: which-spec-governs
+    question: What is the record width of the {other} records, and where is it described?
+    gold_answer: "{width_line}, in {control_spec}"
+    sources:
+      - {path: "{control_spec}", holds: "{width_line}"}
+      - {path: "{records_module}", holds: "{width_code}"}
+  - id: typescript-monorepo-v07
+    category: how-to-run
+    question: How are the packages of {product} published?
+    gold_answer: "{script}, with GITHUB_TOKEN from the environment, then npm publish --workspaces"
+    sources:
+      - {path: "{script}", holds: "npm publish --workspaces"}
+  - id: typescript-monorepo-v08
+    category: structure
+    question: Which folder holds the workspaces of the {product} monorepo?
+    gold_answer: "packages/* (package.json workspaces)"
+    sources:
+      - {path: package.json, holds: '"workspaces": ["packages/*"]'}
+  - id: typescript-monorepo-v09
+    category: where-config
+    question: Where are the TypeScript compiler options of the monorepo set?
+    gold_answer: "tsconfig.base.json: strict, ES2022"
+    sources:
+      - {path: tsconfig.base.json, holds: '"strict": true'}
+  - id: typescript-monorepo-v10
+    category: where-config
+    question: What is the published name of the {p1} package, and how is it built and tested?
+    gold_answer: "{p1_name}; tsc -p . and vitest run"
+    sources:
+      - {path: "{p1_package}", holds: '"name": "{p1_name}"'}

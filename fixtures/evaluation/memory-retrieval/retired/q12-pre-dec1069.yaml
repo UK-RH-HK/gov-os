@@ -1,0 +1,18 @@
+# Lens B's Q12 (Table 2): "retrieve.py 91–104".
+# Entry 1 re-anchored (the CTO's decision, 2026-11-04, the measure's pre-check at b32e8504), decided from the code:
+# W2-32's S7 (merged at b32e8504) gave _decode_continuation two keyword parameters (expanded, alone) and moved it, so
+# its old heading was found nowhere and lines 91-104 were no longer the function. The statement is unchanged: the
+# same three checks raise CONTINUATION_INVALID, now in the function at retrieve.py lines 162-181. The question, the
+# gold answer and the question's commit are kept.
+id: Q12
+category: code location
+commit: 23079f92a6fa
+question: CONTINUATION_INVALID
+gold_answer: >-
+  In _decode_continuation in src/gov/retrieval/retrieve.py: when the token is not base64 JSON, when it belongs to a
+  different question or arguments, or when its offset is not a non-negative integer.
+sources:
+  - path: src/gov/retrieval/retrieve.py
+    heading: "def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget, expanded=None, alone=None):"
+    lines: [162, 181]
+    commit: b32e8504b8d381337e3b3120ba91109cee156684

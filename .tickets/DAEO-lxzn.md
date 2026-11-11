@@ -1,7 +1,7 @@
 ---
 id: DAEO-lxzn
-status: open
-deps: []
+status: closed
+deps: [DAEO-k7hz, DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
 type: task
@@ -14,7 +14,7 @@ title: 'The benchmarking skill for research: a practice, tool or design of the G
 class: specification
 state_class: AUTHORITATIVE
 role: product-spec
-depends_on: []
+depends_on: [DAEO-k7hz, DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/benchmarking/**
 - .claude/skills/benchmarking/**
@@ -51,4 +51,8 @@ list_rows: []
 ---
 # W2-99 The benchmarking skill for research
 
+**Dependencies (PLAN-GROWTH-1 §2 gaps 2 and 3):** after W2-11's round 1 (the skill template) and W2-104 (the skill harness, which runs its three scenarios before adoption, DEC-959 item 5).
+
 Card: ROLES-RESEARCH-1 §5.3 item 8, approved (DEC-959 item 8). Starts after W2-11 r1 merges (the skill template).
+
+**D9-FATES (DEC-1083):** Merged into W2-11 and W2-128, by folds only (DEC-1083 (6)) by DEC-1083. S3 and F4 fold into W2-11's S10 and F1; S6 and F7 fold into W2-128's S9; S1, F1, F2, S2, F3, S4, F5, S5 and F6 are retired. No line is added.

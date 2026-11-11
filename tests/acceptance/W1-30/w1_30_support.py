@@ -95,7 +95,7 @@ ENGINEER_ROLE = "Role: engineer"
 TICKETS_PREFIX = ".tickets/"
 ACCEPTANCE_PREFIX = "tests/acceptance/"
 
-# The record every fixture ticket names as its source (``tasks_support.ticket_text``: ``sources: [DEC-000]``).
+# The planted record every fixture ticket names as its source (``tasks_support.ticket_text``'s ``sources``).
 BASE_SOURCE = "DEC-000"
 
 # The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
@@ -155,12 +155,13 @@ COMMIT_ID_KEYS = ("trailers_base", "decision_citations_base")
 
 
 def path_map_text(settings):
-    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and no namespace (the
-    one key the loader requires of a path map). A value is written as given, but for a key that holds a commit
+    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and one catch-all
+    namespace (``namespaces``, the one key the loader requires of a path map; ``**`` places every tracked path
+    in it once, so path-map compliance holds, DEC-970, DEC-959 item 9). A value is written as given, but for a key that holds a commit
     id (``COMMIT_ID_KEYS``), whose value is written as quoted text."""
     def written(key, value):
         return json.dumps(str(value)) if key in COMMIT_ID_KEYS else value
-    return "namespaces: {}\n" + "".join(f"{key}: {written(key, value)}\n" for key, value in settings.items())
+    return "namespaces: {all: {paths: ['**']}}\n" + "".join(f"{key}: {written(key, value)}\n" for key, value in settings.items())
 
 
 # --------------------------------------------------------------------------
@@ -415,7 +416,7 @@ class Project:
         self._copy_kernel_templates()
         if self._settings is not None:
             write(self.root, PATH_MAP_REL, path_map_text(self._settings))
-        # The source every fixture ticket names (``sources: [DEC-000]``): without it the ticket's context
+        # The source every fixture ticket names (``sources: [BASE_SOURCE]``): without it the ticket's context
         # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
         write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
         commit_all(self.root, "initial project")
