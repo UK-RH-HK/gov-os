@@ -17,7 +17,7 @@ role: product-spec
 depends_on: [DAEO-k7hz]
 allowed_paths:
 - template/governance/kernel/skills/spec-writing/**
-- .claude/skills/spec-writing/**
+# .claude/skills/spec-writing/** out of the paths: generated from the kernel source by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - .rulesync/skills/spec-writing/**
 - template/.rulesync/skills/spec-writing/**
 kpis:
@@ -45,6 +45,8 @@ sources:
 - DEC-645
 - DEC-1083
 - DEC-1084
+- DEC-315
+- DEC-1112
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-98/

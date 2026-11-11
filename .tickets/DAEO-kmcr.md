@@ -26,7 +26,7 @@ allowed_paths:
 - fixtures/adopt/**
 - CLAUDE.md
 - AGENTS.md
-- .claude/settings.json
+# .claude/settings.json out of the paths: a launched session cannot edit it (DEC-315), and a change to this repository's own file goes by ACT; the adapter code and the fixtures that merge such a file stay in the paths (the CTO's delegated decision, DEC-1112 (3))
 kpis:
   success:
   - Rollback never deletes an untracked file it did not create; it refuses or preserves [W2-H036].
@@ -42,6 +42,8 @@ profile: FULL
 sources:
 - DEC-729
 - DEC-954
+- DEC-315
+- DEC-1112
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-23/

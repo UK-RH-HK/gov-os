@@ -17,15 +17,13 @@ role: product-spec
 depends_on: [DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/frontend/**
-- .claude/skills/frontend/**
+# The .claude/skills/{frontend,ui-ux,devops}/** lines are out of the paths: generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - .rulesync/skills/frontend/**
 - template/.rulesync/skills/frontend/**
 - template/governance/kernel/skills/ui-ux/**
-- .claude/skills/ui-ux/**
 - .rulesync/skills/ui-ux/**
 - template/.rulesync/skills/ui-ux/**
 - template/governance/kernel/skills/devops/**
-- .claude/skills/devops/**
 - .rulesync/skills/devops/**
 - template/.rulesync/skills/devops/**
 kpis:
@@ -49,6 +47,8 @@ sources:
 - DEC-616
 - DEC-645
 - CAP-24.b
+- DEC-315
+- DEC-1112
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-101/

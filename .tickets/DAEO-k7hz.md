@@ -20,29 +20,24 @@ allowed_paths:
 - template/governance/kernel/templates/brief-*.md
 - template/governance/kernel/skills/orchestration/**
 - template/governance/kernel/skills/audit/**
-- .claude/skills/orchestration/**
-- .claude/skills/audit/**
+# Every .claude/** line (skills/orchestration, skills/audit, agents/orchestrator.md, skills/*/SKILL.md, skills/test-design, skills/qa-review) is out of the paths: those files are generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - docs/changes/W2-11-CIT-P.md
 - template/governance/kernel/roles/orchestrator.md
 - .rulesync/subagents/orchestrator.md
 - template/.rulesync/subagents/orchestrator.md
-- .claude/agents/orchestrator.md
 - .rulesync/skills/orchestration/**
 - template/.rulesync/skills/orchestration/**
 - .rulesync/skills/audit/**
 - template/.rulesync/skills/audit/**
-- .claude/skills/*/SKILL.md
 - .rulesync/skills/*/SKILL.md
 - template/.rulesync/skills/*/SKILL.md
 - template/governance/kernel/skills/*/SKILL.md
 - template/governance/kernel/skills/test-design/SKILL.md
 - template/governance/kernel/skills/test-design/**
-- .claude/skills/test-design/**
 - .rulesync/skills/test-design/**
 - template/.rulesync/skills/test-design/**
 - template/governance/kernel/templates/skill.md
 - template/governance/kernel/skills/qa-review/**
-- .claude/skills/qa-review/**
 - .rulesync/skills/qa-review/**
 - template/.rulesync/skills/qa-review/**
 kpis:
@@ -96,6 +91,8 @@ sources:
 - DEC-994
 - DEC-995
 - DEC-996
+- DEC-315
+- DEC-1112
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/

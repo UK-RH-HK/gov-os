@@ -20,7 +20,7 @@ allowed_paths:
 - src/gov/guard/role_paths.py
 - tests/unit/guard/test_w2_141*
 - docs/changes/W2-141-evidence.md
-- .claude/hooks/role_reads.py  # the live hook's side [changed, DEC-1093 (2); DEC-1102]
+# .claude/hooks/role_reads.py out of the paths: a launched session cannot edit it (DEC-315); the hook as built stays staged in docs/changes/W2-141-hook/** below, applied to the live file by the operator's ACT; the CTO's delegated decision (DEC-1112 (3))
 - docs/changes/W2-141-hook/**  # the hook as built, staged for the operator's ACT (a launched worker cannot edit .claude/, DEC-315) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/hooks/test_live_hook.py  # its one G14_PASSED case that S1 now refuses (the designer's round-2 P-2) [changed, DEC-1093 (2); DEC-1102]
 - tests/unit/guard/test_reads.py  # its rows that expect the old refusal of a search into the own acceptance folder (the engineer's round-1 report) [changed, DEC-1093 (2); DEC-1102]
@@ -49,6 +49,8 @@ sources:
 - DEC-963
 - DEC-1052
 - DEC-1102
+- DEC-315
+- DEC-1112
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-141/

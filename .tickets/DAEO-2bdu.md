@@ -1,7 +1,7 @@
 ---
 id: DAEO-2bdu
 status: open
-deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk]
+deps: [DAEO-ym8a, DAEO-siiz, DAEO-tgk2, DAEO-l78m, DAEO-q7lk, DAEO-61vm, DAEO-k1e2, DAEO-p8tv]
 links: []
 created: 2026-10-30T22:14:08Z
 type: task
@@ -20,6 +20,9 @@ depends_on:
 - DAEO-tgk2
 - DAEO-l78m
 - DAEO-q7lk
+- DAEO-61vm  # W2-170: the audit's set record and checks, called by memory_sets.py (S20) [added, DEC-1101 (1), DEC-1125 (2)]
+- DAEO-k1e2  # W2-171: the audit's measure and pool, called by memory_sets.py (S20) [added, DEC-1101 (1), DEC-1125 (2)]
+- DAEO-p8tv  # W2-172: the audit's driver and schedule rule (S18) [added, DEC-1101 (1), DEC-1125 (2)]
 allowed_paths:
 - src/gov/adopt/assess.py
 - src/gov/adopt/refactor_plan.py
@@ -33,7 +36,7 @@ allowed_paths:
 - template/governance/kernel/skills/adopt/SKILL.md
 - template/.rulesync/skills/adopt/SKILL.md
 - .rulesync/skills/adopt/SKILL.md
-- .claude/skills/adopt/SKILL.md
+# .claude/skills/adopt/SKILL.md out of the paths: generated from the kernel skill by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - tests/unit/adopt/test_w2_88*
 - tests/unit/rebuild/test_w2_88*
 - docs/research/W2-88-any-repository.md
@@ -62,6 +65,12 @@ kpis:
   - 'S15 Search again once in the adopted repository: adoption copies, unchanged, the kernel''s retrieval skill with step 7 (W2-142 S1), the discovery skill''s line (W2-142 S2) and T-0''s and T-8''s "Search again once" line (W2-128''s line). Nothing is re-worded per repository. The verdict''s judged condition is up to two searches (A2). Verify: a string test on a planted adoption''s generated skill and T-0 for "search again once", "own, different words", "not found" and "two searches" [DEC-1098 (1), DEC-1094 (2), DEC-1092 (1)] [added, DEC-1099 (2); DEC-1098 (1)]'
   - 'S16 A miss is a result. A verdict below either limit stands as recorded. It is never run again, never re-scored to pass, and its labels are never changed after its figures exist. The spent set becomes a diagnostic set. An independent auditor classifies its misses by kind, counts only: never retrieved, ranked low, vocabulary, correct answer citing an unlisted place, other. The result goes to the repository''s owner with options: structural fixes judged on the tuning set and then a new fresh set used once, or the figure accepted as a named residual with its cause. The store stays in service. The four settings of S10 change only by Gov OS''s owner''s decision (a CIT-P), never at the adopted repository. Verify: the result record''s miss section on a planted miss (stand-in figures); the runner refuses a set marked USED [DEC-1098 (1), DEC-1074 (1)-(2), DEC-1071 (1), DEC-1083 (2), DEC-954 Q9e, DEC-1070 (14)] [added, DEC-1099 (2); DEC-1098 (1)]'
   - 'S17 The Wave 0 order in the adopt skill: A9''s step in template/governance/kernel/skills/adopt/SKILL.md states the practice in order and points to the practice record. The order: assess and plan; census the stated links and build the graph from them; build the store with the standard (S10) and its refresh (S11); have the verdict set and the tuning set written (S13, S12); measure the tuning set and fix only the structure, never a named question, until its halves agree within 5 points; declare and measure the verdict set once (S14); record every method and figure. Verify: a string test on the skill for the steps in that order, and the skills check [DEC-1098 (1), DEC-1072 (2), DEC-1071 (1)-(3), DEC-1074 (4), CAP-33] [added, DEC-1099 (2); DEC-1098 (1)]'
+  - 'S18 The audit''s schedule at adoption: an adopted repository is audited on the same rhythm by the same tool (weekly while active, monthly once stable, by W2-172''s rule). Adoption writes the repository''s audit record: its sets root, its audit names, its mode, the three briefs'' variant ids and their sha256, and the first audit''s earliest date. It starts no audit and installs no schedule line itself (the crontab is an ACT). Verify: a planted adoption writes the record with those fields; a grep of the planted crontab and sets root before and after finds no change [DEC-1101 (1)-(2), DEC-1125 (2)] [added, DEC-1101 (1), DEC-1125 (2)]'
+  - 'S19 The briefs'' variants, approved once: the adopted repository''s writer, checker and auditor briefs are the Gov OS briefs (`governance/project/orchestration/packages/MEMORY-AUDIT-1/briefs/`, once approved) with two parts replaced by the repository''s own: the domain table (the writer''s section 5 items 1 and 3, the checker''s section 5a) mapped from S12''s twelve categories to the repository''s domains, with every dropped category recorded, and the list of records the audit stays blind to. Nothing else changes. Each variant is approved once by the repository''s owner and hashed; a launch under an unapproved variant is refused. Verify: a planted adoption''s variants differ from the Gov OS briefs only in those two parts (a diff test); a launch under a variant not on the planted approved list exits 10 [DEC-1101 (2), DEC-1099 (2)] [added, DEC-1101 (1), DEC-1125 (2)]'
+  - 'S20 One core, not two: `src/gov/adopt/memory_sets.py` calls `gov.memaudit` (W2-170''s checks and declaration, W2-171''s measure and pool) and defines no pre-flight, use-once marker or figures of its own. Verify: a test that the module imports from `gov.memaudit` and defines none of those functions; S12''s and S13''s planted runs produce the same declaration and verdict line as the audit''s [DEC-1101 (1), DEC-1099 (2), DEC-1125 (2)] [added, DEC-1101 (1), DEC-1125 (2)]'
+  - 'S21 The first scheduled audit follows the verdict set: an adopted repository''s first scheduled audit runs only after its verdict set (S13) was used and its result record written; the audits'' log starts at the verdict set''s commit (`gov.memaudit baseline`), and the tuning and verdict sets join the repository''s pool. Verify: a planted adoption before S13''s USED marker: `due` says `not due: no verdict set used`; after it: the baseline line holds the verdict commit [DEC-1101 (1), DEC-1098 (1)] [added, DEC-1101 (1), DEC-1125 (2)]'
+  - 'S22 The walls for an adopted repository by one ACT: adoption writes one ACT package for the repository''s owner''s operator: the walls'' template copy, the sets root folder (mode 0700), the approved list with the three variant briefs, and the path-map hidden globs. Adoption never applies it. Verify: a planted adoption writes the package and changes nothing in the planted sets root or path map [DEC-1101 (2)-(3), DEC-1099 (2)] [added, DEC-1101 (1), DEC-1125 (2)]'
+  - 'S23 The audit''s cost is stated at adoption: the adoption record gives, for the repository''s set size, the estimated tokens and USD per audit, the GPU minutes and the owner''s minutes, from `governance/project/orchestration/packages/MEMORY-AUDIT-1.md` section 7, and names the figure to replace once the first audit has measured them. Verify: a string test on a planted adoption record for the four figures [DEC-1101 (3)] [added, DEC-1101 (1), DEC-1125 (2)]'
   failure:
   - 'Anything written, moved, committed or deleted in a repository by the assessment or the refactoring plan; a proposed ticket created with tk or applied without the owner.'
   - 'A tracked file neither indexed nor named with its reason; a store not built reported ok.'
@@ -72,6 +81,7 @@ kpis:
   - 'A verdict set read by a measured role, measured twice, or used to choose anything; a declaration committed after the first search [added, DEC-1099 (2); DEC-1098 (1)]'
   - 'A store served with a setting other than the standard''s and no decision id in the A9 record [added, DEC-1099 (2); DEC-1098 (1)]'
   - 'A tuning or verdict question written with the product''s own search, or by a session in the retrieval work [added, DEC-1099 (2); DEC-1098 (1)]'
+  - 'An audit started by adoption; a variant brief launched without the repository owner''s approval; a second copy of the pre-flight, the use-once marker or the figures in `src/gov/adopt/` [added, DEC-1101 (1), DEC-1125 (2)]'
   moved:
   - 'A store not built is never ok: gov rebuild on a repository where the path map or .gitleaks.toml is missing, or where a store the path map calls for was not built, names each store not built with its reason, and its result is not ok. A rebuild with --no-embeddings stays ok for the vectors it was told not to build, and says so. W2-26''s finding 2 is a planted case [DEC-954 Q9f, W2-26 finding 2, DEC-530] [moved to W2-124, DEC-1083] (was S5)'
 profile: FULL
@@ -121,6 +131,10 @@ sources:
 - DEC-1076
 - DEC-1078
 - DEC-1079
+- DEC-1101
+- DEC-1125
+- DEC-315
+- DEC-1112
 est_loc: 750  # [changed, DEC-1099 (2)] was 500 (W2-88-STANDARD-1 §4)
 acceptance_tests:
   path: tests/acceptance/W2-88/

@@ -26,6 +26,8 @@ allowed_paths:
 - template/governance/project/test-map.yaml
 - tests/unit/close/test_w2_115*
 - docs/research/W2-115-smart-close.md
+- src/gov/close/traceability.py  # the trailers family's on-demand report [added, DEC-1123 (3)]
+- template/governance/kernel/checks/product-traceability-trailers.yaml  # the family's declaration: a kernel file, changed only under this ticket's CIT-P (CAP-33), named in the commit body [added, DEC-1123 (3), CAP-33]
 kpis:
   success:
   - 'A project setting chooses the close: `close: scoped` (the default of a new project) or `close: strict` (today''s close, unchanged, every lifted gate kept built); this repository runs scoped [DEC-953 item 1, DEC-983, DEC-982]'
@@ -44,6 +46,8 @@ kpis:
   - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired [DEC-983, DEC-982] [moved from W2-117 S3, DEC-1083]'
   - 'After each landing, the queue starts the integration store''s refresh (W2-116) and seeds its own warm clones from it [DEC-1014 items 4 and 6, SMART-WORK-5 E, DEC-1015 item 3] [moved from W2-117 S4, DEC-1083]'
   - 'When the integration branch moved during a run only by record or governance files (the record places and the governance overlay), the queue merges onto the new head and re-runs only the record-reading suites (named in the test map), then advances; any other file in the move re-runs the whole selection; a record-reading set that cannot be read re-runs the whole selection [DEC-1001 (a), DEC-1003, SMART-WORK-2] [moved from W2-117 S5, DEC-1083]'
+  - 'The trailers switch: the check family `product-traceability-trailers` counts as a warning, not a hard block. Its declaration (`template/governance/kernel/checks/product-traceability-trailers.yaml`, a kernel file: the change goes by this ticket''s CIT-P, independent review and the owner''s approval first) reads `severity: warning`; `gov close` names a missing trailer as a notice and never refuses on it; `src/gov/close/traceability.py` stays an on-demand report that lists each commit without its trailers. Verify: a planted history with commits that carry no trailers: `gov check` reports the family YELLOW with the finding count and never RED; `gov close` exits 0 and names no `TRAILER_MISSING` refusal; `python3 -m gov.close.traceability` lists each such commit [DEC-1123 (3), CAP-33, LIFT-1 P1-PLAN Q-8] [added, DEC-1123 (3)]'
+  - '`gov close --verify <ticket>` runs a lead''s whole verify: the scoped selection, the parallel phase and then the serial phase (W2-154''s), each in a heavy-job slot; it writes `select.json`, one JUnit file per phase and one summary line, and writes its exit file last; exit 0 green, 1 a red, 2 the selection refused, 3 a run that did not complete. Verify: a planted tree with one red and one serial entry: exit 1, both JUnit files and the summary line; a refused selection: exit 2; a killed run: exit 3 [DEC-1052, DEC-1079, DEC-1050] [added, DEC-1125 (3)]'
   - 'The queue keeps its work clones between runs (reset to the head, untracked files removed, the stores kept, so a rebuild is incremental); a clone that cannot be reset is replaced by a fresh one; measured: the rebuild''s seconds per run, warm against fresh [DEC-1001 (b), DEC-1003, SMART-WORK-2] [moved from W2-117 S6, DEC-1083]'
   failure:
   - 'A scoped close refused by a red its change did not cause, or closed with a red its change caused.'
@@ -76,6 +80,11 @@ sources:
 - DEC-959
 - DEC-988
 - DEC-989
+- DEC-1123
+- DEC-1125
+- DEC-1052
+- DEC-1079
+- CAP-33
 - DAEO-zkr9
 est_loc: 400
 acceptance_tests:

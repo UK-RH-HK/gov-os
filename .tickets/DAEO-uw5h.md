@@ -17,19 +17,16 @@ role: product-spec
 depends_on: [DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/backend/**
-- .claude/skills/backend/**
+# The .claude/skills/{backend,api,data,security}/** lines are out of the paths: generated from the kernel sources by the copies ACT, and a launched session cannot edit them (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 - .rulesync/skills/backend/**
 - template/.rulesync/skills/backend/**
 - template/governance/kernel/skills/api/**
-- .claude/skills/api/**
 - .rulesync/skills/api/**
 - template/.rulesync/skills/api/**
 - template/governance/kernel/skills/data/**
-- .claude/skills/data/**
 - .rulesync/skills/data/**
 - template/.rulesync/skills/data/**
 - template/governance/kernel/skills/security/**
-- .claude/skills/security/**
 - .rulesync/skills/security/**
 - template/.rulesync/skills/security/**
 kpis:
@@ -55,6 +52,8 @@ sources:
 - DEC-616
 - DEC-645
 - CAP-24.b
+- DEC-315
+- DEC-1112
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-100/

@@ -35,6 +35,7 @@ kpis:
   - 'A role named in a ticket but with no role file is refused at launch, naming the role [DEC-946 (W3-P09)]'
   - '`qa-engineer` is a known role: it is in the guard''s KNOWN_ROLES (`src/gov/guard/decide.py`, that set only) and in the reviewer set the session record and launcher read, so a QA engineer is held to rule 5 (it writes only its findings report); this repository''s own hook''s reviewer line is prepared beside it as an owner ACT, not changed here [DEC-959 item 3, DEC-953 item 2]'
   - '`gov launch` refuses a second writing session in a worktree that has one live (read from the session records), naming it; a reviewer or the QA engineer, which write only their reports, are not counted; `gov launch --tests-worktree` makes a ticket''s tests worktree on its own branch from the ticket''s head [DEC-847, DEC-963, DEC-983, DEC-982]'
+  - 'The session record carries RUBRIC-2''s three keys: the tier (opus, sonnet, haiku or other, derived from the model''s name), the ticket''s criticality class (C0 to C3) and any promotion reason, the last two read from W2-60a''s launch record; each is null when it is not given, never a guess. Verify: a planted launch with a promotion: the record holds all three; a planted launch without one: the three keys are present and null [DEC-1120 (3)] [added, DEC-1120 (5)]'
   failure:
   - A fixed list of launchable roles left in code.
   - A value the log does not hold reported as measured; a zero for not measured; log text in a record.
@@ -59,6 +60,7 @@ sources:
 - DEC-953
 - DEC-963
 - DEC-982
+- DEC-1120
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/

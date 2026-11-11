@@ -24,7 +24,7 @@ allowed_paths:
 - tests/unit/launch/test_w1_28.py
 - tests/unit/launch/test_w1_32.py
 - tests/unit/launch/test_w2_136_plan_check.py
-- tests/unit/resources/test_w2_20_launch.py
+- tests/unit/resources/test_w2_20_unit_launch.py  # renamed from test_w2_20_launch.py by `ae489a979` (D-10 collection fix) [changed, path moved]
 - tests/unit/resources/test_w2_20_round3.py
 - tests/unit/launch/test_w2_56.py
 - tests/unit/launch/test_w2_56_r5_lead_store.py
@@ -86,7 +86,7 @@ split its code half into W2-152 (`gov brief`) and this ticket (a delegated P2 un
 - **The review's R1 (2026-11-09, the CTO, DEC-1112 (3)):**
   - The CTO scanned the suites the review named, on a clean `w2/W2-153` checkout against its merge base: 58 cases
     newly red.
-    - Unit, the engineer's (paths added): `tests/unit/resources/test_w2_20_launch.py` (29) and `test_w2_20_round3.py`
+    - Unit, the engineer's (paths added): `tests/unit/resources/test_w2_20_unit_launch.py` (29; named `test_w2_20_launch.py` then) and `test_w2_20_round3.py`
       (7).
     - Acceptance support files, a test designer's under DEC-866 (`Rewrite-Reason:`), in the same commit:
       - W2-20: `test_w2_20_launch.py` (13), `test_w2_20_plan_source.py` (2), `test_w2_20_stale_samples.py` (1);

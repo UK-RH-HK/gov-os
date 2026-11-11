@@ -20,7 +20,7 @@ allowed_paths:
 - template/governance/kernel/roles/**
 - template/governance/kernel/schemas/handoff*
 - template/governance/kernel/templates/handoff.md
-- .claude/agents/**
+# .claude/agents/** out of the paths: generated from the kernel role files by the copies ACT, and a launched session cannot edit it (DEC-315); the CTO's delegated decision (DEC-1112 (3))
 kpis:
   success:
   - 'The ticket lead''s own role file (today a section of orchestrator.md) [DEC-954, DEC-236] (folds W2-21 S2)'
@@ -29,6 +29,7 @@ kpis:
   - 'Every role file states the work order in one line: product-spec writes the spec and KPIs; the test designer and the engineer work in parallel from it, never reading each other''s work; the engineer runs the acceptance tests once ready (through gov accept); the QA engineer alone reads both [DEC-959 item 7, DEC-957]'
   - 'Every role file states one writer per worktree: two sessions that write never share a worktree; a ticket''s test designer works in its own tests worktree, merged by the lead [DEC-847, DEC-963, DEC-983, DEC-982]'
   - 'The QA engineer''s role file makes it the moderator: it triages every finding against the ticket''s own scope and KPIs; a finding out of scope, or needing an unusual construction, is a Wave 3 row, never a round; it returns the structured verdict per KPI; at most two review rounds per ticket [DEC-1010 item 1, SMART-WORK-3]'
+  - 'RUBRIC-2''s model and effort by role and criticality, in each role file: a line `Launch default: model <m>, effort <e>` and, where the rubric varies by criticality class, a line `Launch by criticality: C3 ..., C2 ..., C1 ..., C0 ...`, with these values: orchestrator, ticket lead and senior engineer Opus high; engineer Sonnet high (C3 Opus high); test designer C3 Opus high, otherwise Sonnet high; QA engineer C3 Opus high, C2 Opus high on a FULL ticket and Sonnet high otherwise, C1 Sonnet high; independent auditor Opus high; product-spec and research Sonnet high. The `Model tier` field stays and names the line; the through-D-10 rule for engineers is the CTO''s launch practice and is written into no role file; the generated agents carry the same lines (W2-153 S3). Verify: a test per role file reads both lines and the values equal the table; a role file with a missing or malformed line fails it [DEC-1120 (2), DEC-1119 (2)] [added, DEC-1120 (5)]'
   failure:
   - 'A role built other than as the approved roles spec states it; a role file placed by hand rather than generated; a role without its machine-readable defaults.'
   lifted:
@@ -55,6 +56,10 @@ sources:
 - DEC-982
 - DEC-991
 - DEC-994
+- DEC-315
+- DEC-1112
+- DEC-1119
+- DEC-1120
 est_loc: 260
 acceptance_tests:
   path: tests/acceptance/W2-33/
