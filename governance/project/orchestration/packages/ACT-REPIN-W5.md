@@ -11,8 +11,10 @@ The CTO writes `log/act-in-progress.txt` at the hand-over (DEC-1028 item 6: no C
    - the reference-transaction hook is there, parses and refreshes the store through `~/.local/bin/gov`;
    - **the wheel's inputs are the candidate's.** `src/`, `pyproject.toml` and anything else the wheel is built from are
      the same in `797495bdfc70` and in `w2/integrate` as it stands (checked at the start, before the rebuild and at the
-     quiet point), and `src/` and `pyproject.toml` have no uncommitted change in the main tree. The CTO freezes `src/`
-     for the night; record commits go on, and the script does not mind them;
+     quiet point), and `src/` and `pyproject.toml` have no uncommitted change in the main tree. The CTO froze `src/`
+     for the night. **From the hand-over until you say "done", nothing lands on `w2/integrate`** (the CTO's hold): a
+     commit during the run lets the live hook move the store link, and the script then stops or rolls back. That fails
+     safe, but it costs the window (review F1);
    - the main tree is on `w2/integrate` and `tool-registry.yaml` has no uncommitted change (your commit takes only that file).
 1. Builds gov's wheel from `797495bdfc70`, twice, each from a clean export, and checks that both builds have the dry
    run's sha256 (`04b094fb…d7c3`). `797495bdfc70` is `w2/integrate` on 2026-11-11 01:08 UTC. It carries every build
@@ -49,9 +51,15 @@ The CTO writes `log/act-in-progress.txt` at the hand-over (DEC-1028 item 6: no C
 `pin-bcea09060ebc` and the old store half stay, for the rollback. The servers, the crontab and the dispatcher stay as
 they are.
 
-## The commands (about 5 minutes)
+## The commands (about 5 minutes after the push)
+1. **The push** (yours, DEC-1087 (7)):
 ```
-bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/pin/REPIN-COMMANDS-W5.sh 2>&1 | tee ~/repin-w5.log
+git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2
+```
+2. **The files the script runs are the reviewed ones, then the re-pin** (one line; `sha256sum -c` prints 13 `OK` lines
+   and stops the line if any file changed since the review, review F2):
+```
+cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && sha256sum -c pin/REPIN-W5.sha256 && bash pin/REPIN-COMMANDS-W5.sh 2>&1 | tee ~/repin-w5.log
 ```
 - It stops at the first failure:
   - before the switch (parts 0, A, S, B, C), with `STOP: ...`: nothing is switched, the store link goes back;
@@ -73,6 +81,13 @@ The script also calls the CTO's tools. Their sha256 at the rehearsal (the first 
 `hook_timing.py` `823d876cf796`, `heavy_slot.sh` `3d5ffa51964c`, `refresh_integration_store.sh` `81302de55a2d`,
 `seed_store.py` `71c970feba35`, `rebuild_slot.sh` `1f317984fe2b`, `test_guard_fix_3.py` `d638c1fb3acb`,
 `tree_busy.sh` `867c37bd05ed`, `proc.sh` `5b189399f40b`. The CTO checks them again at the hand-over.
+
+## The independent review
+**READY** (C3, Opus high, a fresh session, 2026-11-11; `reviews/ACT-REPIN-W5-review.md`): 0 blocking findings, 8
+recorded rows, none fails open or loses work; it reproduced the wheel's sha256 (`04b094fbd587`) and all 13 file hashes.
+F1-F3 are applied above (the hold from the hand-over, the `sha256sum -c` line, the rollback split and the push); F4-F8
+(the reranker found by a command-line substring, no signal handler, `test_g14.py`'s setup errors ignored, the success
+line's reranker wording, `gov launch` tested only on a refusal) are rows for the next window.
 
 ## The CTO's rehearsal on the same commit (DEC-1057)
 The whole script ran as you will run it, against a scratch mirror under `/tmp/gov-os-emg-repin5/`:
@@ -175,8 +190,10 @@ The rehearsal's own count of "failures: 2" is those two guard4 lines, one before
 ```
 ln -sfn ~/.local/share/gov-os/pin-bcea09060ebc/bin/gov ~/.local/bin/gov.new && mv -Tf ~/.local/bin/gov.new ~/.local/bin/gov; hash -r
 ```
-There is no hook to remove: this act wrote none. Then the reranker: `bash .gov-runtime/scratch/orchestrator/tools/proc.sh stop <its pid>`,
-and one `gov retrieve` starts it from the old pin. Revert the registry commit.
+That one line is yours, and it is the whole rollback of what sessions use. There is no hook to remove: this act
+wrote none. **The rest is the CTO's, after you tell it** (review F3): the reranker, if the script restarted it from
+the new pin, is stopped by its pid (`tools/proc.sh stop <pid>`) and one `gov retrieve` starts it from the old pin; the
+registry commit is reverted (`git revert --no-edit <the commit that changed governance/project/tool-registry.yaml>`).
 
 ## After it
 Tell the CTO "done". It then:
