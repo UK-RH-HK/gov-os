@@ -15,9 +15,6 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 KERNEL = "template/governance/kernel"
 TEMPLATES = f"{KERNEL}/templates"
 SKILLS = f"{KERNEL}/skills"
-BRIEFS = ("brief-lead.md", "brief-engineer.md", "brief-test-designer.md", "brief-product-spec.md",
-          "brief-reviewer.md")
-BRIEF_RELS = tuple(f"{TEMPLATES}/{name}" for name in BRIEFS)
 SKILL_REL = f"{SKILLS}/orchestration/SKILL.md"
 COPY_ROOTS = (".claude/skills", ".rulesync/skills", "template/.rulesync/skills")
 ROLE_RELS = (f"{KERNEL}/roles/orchestrator.md", ".rulesync/subagents/orchestrator.md",
@@ -140,7 +137,7 @@ def superseded_teachings(text):
 
 def supersession_files(root=REPO_ROOT):
     """The files DEC-866's sweep names for W2-11, as they exist under ``root``."""
-    rels = [*BRIEF_RELS, *ROLE_RELS]
+    rels = [*ROLE_RELS]
     for base in (SKILLS, *COPY_ROOTS):
         rels += folder_texts(f"{base}/orchestration", root)
     return [rel for rel in dict.fromkeys(rels) if (Path(root) / rel).is_file()]

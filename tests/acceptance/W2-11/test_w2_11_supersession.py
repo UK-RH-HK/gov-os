@@ -1,5 +1,6 @@
-"""W2-11, KPI 6 (DEC-866): the briefs, the orchestration skill and its copies, the orchestrator role file and its
-copies teach no superseded rule; the same check fails on planted files (the failure line)."""
+"""W2-11, KPI 6 (DEC-866): the orchestration skill and its copies, the orchestrator role file and its copies teach
+no superseded rule; the same check fails on planted files (the failure line). The brief templates left the sweep
+(DEC-1137 (1))."""
 from __future__ import annotations
 
 import pytest
@@ -8,7 +9,7 @@ import w2_11_support as s
 
 
 def test_every_swept_file_is_there():
-    expected = [*s.BRIEF_RELS, *s.ROLE_RELS, s.SKILL_REL, *(f"{c}/orchestration/SKILL.md" for c in s.COPY_ROOTS)]
+    expected = [*s.ROLE_RELS, s.SKILL_REL, *(f"{c}/orchestration/SKILL.md" for c in s.COPY_ROOTS)]
     missing = [rel for rel in expected if not (s.REPO_ROOT / rel).is_file()]
     assert not missing, f"missing: {missing}"
 
@@ -19,7 +20,7 @@ def test_the_file_teaches_no_superseded_rule(rel):
     assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
 
 
-@pytest.mark.parametrize("rel", [s.SKILL_REL, f"{s.TEMPLATES}/brief-lead.md"])
+@pytest.mark.parametrize("rel", [s.SKILL_REL])
 def test_dec_460s_citation_for_naming_the_model_stays(rel):
     assert s.stated(s.read(rel), [r"\bDEC-460\b", r"model"]), f"{rel} no longer cites DEC-460 for the model"
 
@@ -41,12 +42,12 @@ CURRENT = ("- Reads are open (DEC-820); refused only: secrets, the held-out mate
            "decision-record commits (DEC-861).\n")
 
 
-PLANTED_IN = (f"{s.TEMPLATES}/brief-lead.md", f"{s.COPY_ROOTS[1]}/orchestration/SKILL.md", s.ROLE_RELS[3])
+PLANTED_IN = (s.SKILL_REL, f"{s.COPY_ROOTS[1]}/orchestration/SKILL.md", s.ROLE_RELS[3])
 
 
 @pytest.mark.parametrize("kind", sorted(PLANTED))
 def test_a_planted_file_that_still_teaches_the_old_rule_fails(tmp_path, kind):
-    rel = PLANTED_IN[sorted(PLANTED).index(kind) % len(PLANTED_IN)]   # a template, a skill copy, a role copy
+    rel = PLANTED_IN[sorted(PLANTED).index(kind) % len(PLANTED_IN)]   # the kernel skill, a skill copy, a role copy
     planted = tmp_path / rel
     planted.parent.mkdir(parents=True)
     planted.write_text(f"# Planted\n\n{CURRENT}\n{PLANTED[kind]}\n", encoding="utf-8")
