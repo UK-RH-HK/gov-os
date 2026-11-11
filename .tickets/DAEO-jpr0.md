@@ -1,6 +1,6 @@
 ---
 id: DAEO-jpr0
-status: in_progress
+status: closed
 deps: [DAEO-qzrq]
 links: [DAEO-blwa, DAEO-qzrq]
 created: 2026-11-02T12:41:50Z

@@ -23,6 +23,7 @@ Test hook points (GOV_OPERATOR_TEST_HOOK <point> <frozen>): after-G1, after-G6, 
 The result is the last line of stdout, one JSON object; exit 0 when applied, undone (the undo step) or digested.
 The undo step and the journal's recovery that leave a file not the ACT's own say "refused" and exit 1 (DEC-1107).
 """
+import collections
 import hashlib
 import json
 import os
@@ -82,6 +83,17 @@ def check_ok(check, rc, out):
         return bool(lines) and int(lines[-1]) == int(check["count"])
     except ValueError:
         return False
+
+
+def check_act(m, act):
+    """G1 (DEC-1131 (3), review P1-F1): the manifest names the ACT it is requested under. Fails closed: act_rounds counts the
+    earlier builds of an ACT id by this field, so a manifest that leaves it out or names another id would drop its build
+    from the count and bring back the reset DEC-1131 (3) closes. Raises Refused at G1."""
+    named = m.get("act") if isinstance(m, dict) else None
+    if not isinstance(named, str) or not named:
+        raise oc.Refused("G1", f"the manifest names no act (its \"act\" must be the requested id {act}); DEC-1131 (3)")
+    if named != act:
+        raise oc.Refused("G1", f"the manifest names act {named!r}, not the requested {act}; DEC-1131 (3)")
 
 
 def validate_manifest(m):
@@ -275,6 +287,7 @@ class Run:
                 validate_manifest(m)
             except (ValueError, UnicodeDecodeError) as exc:
                 raise oc.Refused("G1", f"the manifest is malformed: {exc}")
+            check_act(m, self.act)
             listed = dict(m["files"])
             found = set()
             for top, dirs, files in os.walk(tmp):
@@ -321,6 +334,7 @@ class Run:
             validate_manifest(m)
         except (OSError, ValueError, UnicodeDecodeError):
             raise oc.Refused("G1", "the existing frozen copy's manifest cannot be read: changed after review")
+        check_act(m, self.act)
         self.msha = oc.sha256_bytes(raw)
         if self.msha != self.sha:
             raise oc.Refused("G1", "the existing frozen copy's manifest is not the requested sha: changed after review")
@@ -435,6 +449,35 @@ class Run:
         self.line("G3", "pass")
 
     # ---------------------------------------------------------------------------------------------------------- G4
+    def act_rounds(self, vmod, blocks):
+        """The review rounds of this ACT id (DEC-1131 (3)): the verdict blocks of this build's review record and of the
+        review record in every other frozen copy of the same ACT id (acts/<id>-<sha12>/, its manifest naming this id;
+        G1 refuses a manifest that does not, so every copy frozen under this code does), so a rebuild does not reset the
+        count. A block that a later record carries forward counts once: blocks are
+        compared by their text, and a text counts as many times as the record holding it most often holds it. A copy
+        without a readable review record counts nothing (this build's own record is read as before)."""
+        total = collections.Counter(blocks)
+        acts = os.path.join(self.s["operator_root"], "acts")
+        pat = re.compile(r"^" + re.escape(self.act) + r"-[0-9a-f]{12}$")
+        try:
+            names = sorted(os.listdir(acts))
+        except OSError:
+            names = []
+        for n in names:
+            d = os.path.join(acts, n)
+            if not pat.match(n) or os.path.abspath(d) == os.path.abspath(self.frozen) or os.path.islink(d):
+                continue
+            try:
+                with open(os.path.join(d, "manifest.json"), encoding="utf-8") as f:
+                    if json.load(f).get("act") != self.act:
+                        continue
+                with open(os.path.join(d, "review.md"), encoding="utf-8") as f:
+                    for t, c in collections.Counter(vmod.BLOCK.findall(f.read())).items():
+                        total[t] = max(total[t], c)
+            except (OSError, ValueError, UnicodeDecodeError, AttributeError):
+                continue
+        return sum(total.values())
+
     def g4(self):
         vmod = load_verdict()
         p = os.path.join(self.frozen, "review.md")
@@ -447,10 +490,12 @@ class Run:
         blocks = vmod.BLOCK.findall(text)
         if not blocks:
             raise oc.Refused("G4", "the review record holds no verdict block")
-        if len(blocks) >= 3:
+        rounds = self.act_rounds(vmod, blocks)
+        if rounds >= 3:
             oc.notify(self.s, self.act, "P1", "to-owner",
                       f"{self.act}: a third review round; refused, to the owner", manifest_sha256=self.sha)
-            raise oc.Refused("G4", f"a third review round ({len(blocks)} verdict blocks): to the owner")
+            raise oc.Refused("G4", f"a third review round ({rounds} verdict blocks across this ACT's builds, "
+                                   f"{len(blocks)} in this one; DEC-1131 (3)): to the owner")
         try:
             v = json.loads(blocks[-1])
             assert isinstance(v, dict)
@@ -487,7 +532,7 @@ class Run:
         if not isinstance(rr, list) or not all(isinstance(x, (str, int)) for x in rr):
             raise oc.Refused("G4", "replay_refused is not a list of call ids")
         self.verdict = dict(v, _time=rtime, replay_refused=[str(x) for x in rr])
-        self.line("G4", "pass", rounds=len(blocks), review_sha256=self.review_sha)
+        self.line("G4", "pass", rounds=len(blocks), act_rounds=rounds, review_sha256=self.review_sha)
 
     # ---------------------------------------------------------------------------------------------------------- G5
     def g5(self):

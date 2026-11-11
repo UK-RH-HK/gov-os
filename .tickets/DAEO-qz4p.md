@@ -67,6 +67,8 @@ delivered unchecked, though the next steps read them by their form.
 - **Alternatives (one line each):** put effort in the walls' `kinds.yaml` (rejected: a template change, so an ACT and
   the owner's new hash); leave the notes unchecked and let W2-170 reject a malformed file (rejected: the delivery
   would already have replaced the set's folder).
+- **From W2-170's Interface (row 147, the CTO's reading 1, 2026-11-11):** the auditor's copy of an audit's set excludes
+  `hidden/dropped/` (the dropped questions); every other file of the set is copied as today.
 - **Not here:** the briefs, the schedule, the measure.
 
 [DEC-1120 (2)-(3); DEC-1101 (2)]

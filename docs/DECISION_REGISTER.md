@@ -13245,7 +13245,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     - The 110 decisions the archive calls spent while the register lists them as current go into a separate list for a status reconciliation. They are not counted as drift for now.
     - A PROPOSED decision is not in force and does not count as current. Retrieval must show its status, so no agent takes it as a rule.
   - **(3) M5** (one span per register entry) gets one more test, combined with the register links once they are built.
-  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper.
+  - **(4) A standing rule (L-0075):** every wait and every stop uses process ids or process groups, never a name match, through a shared helper. *(Read with DEC-1135: a detection-only match that can only refuse is outside this rule.)*
   - **(5) Link integrity becomes a Gov OS capability,** for this repository and every adopted one. The census shows drift comes from links nobody is required to record and nothing checks. It has three parts:
     - **(a) Clean up what is here:**
       - the 215 drifting decisions, the 87 with no hint in their own entry first;
@@ -14398,7 +14398,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   fresh questions at a fixed rhythm).
 
 ### DEC-1128 — No switched-off control returns and no new guard rule goes live without set-up A's 100 % on the path map's actions; the lift does not wait for set-up A; set-up B dropped entirely; DEC-1010's one-rule principle investigated first; the switched-off list and the memory audit's landing to the owner
-- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (2), (3) and (4) standing · **Under:** DEC-1112 (1) (changed), DEC-1113, DEC-1099 (1), DEC-1082 (3), DEC-820, DEC-1010, DEC-1101, DEC-1125 (2), DEC-1126 (5) · **Source:** the owner's message (chat, 2026-11-11 ~14:10 UTC) · **Read by:** DEC-1133 (1): a fix to the guard's own faults is not a new rule; only a rule that adds or removes a deliberate refusal goes through the bar
 - **Decision:**
   - (1) **The switched-off controls:** the CTO brings one list of every guard rule, gate and check switched off during
     the emergency: why each was switched off, its home ticket, what must be true before it returns (for the guard,
@@ -14479,6 +14479,76 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 4 (work judged against a known bar, bounded, brought to the owner with evidence) and question 2
   (a failed line never reads as ready; a rebuilt ACT does not reset its review count).
 
+### DEC-1127 — WITHDRAWN: the close-history decision proposed for ACT-CLOSE-HISTORY-1, never accepted
+- **Status:** WITHDRAWN (owner, 2026-11-11, DEC-1132 (1)); never in force · **Under:** DEC-953, DEC-1052 (Q-8), DEC-1061 (9) · **Source:** `governance/project/orchestration/reviews/ACT-CLOSE-HISTORY-1-review.md` (F2)
+- **What it was:** a proposal to accept 18 old merge commits as history and re-point four ratchet entries in the path map,
+  so the pinned `gov close` would pass the lift's closes. The independent review (F2) found the refusing gates were
+  already lifted here by DEC-953 and DEC-1052 Q-8 (with `accepted_history` deleted, DEC-1061 (9)). The owner chose
+  DEC-953's practices instead; the id is kept so the register stays whole.
+
+### DEC-1132 — The lift's closes by DEC-953's practices (option D); ADOPT-VERIFY-1 option (d) and W2-174; the rg tripwire; the nightly's restart as an ACT; set-up A's bar defined for approval
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1)'s route standing until W2-115 · **Under:** DEC-953 (1), (5), DEC-1052 (Q-8), DEC-1126 (7), DEC-1128 (2), (3), DEC-1130 (2), DEC-1083 · **Source:** the owner's answers (chat, 2026-11-11 ~15:20 UTC) to row 127, ADOPT-VERIFY-1, rows 142-143, SWITCHED-OFF-1
+- **Decision:**
+  - (1) **Option D:** the nine ready tickets (W2-122, W2-123, W2-126, W2-92, W2-96, W1-01b, W2-66b, W2-90c, W2-151) are
+    closed now by DEC-953's practices, each with `tk close` and a close record; DAEO-feon is closed as not needed;
+    ACT-CLOSE-HISTORY-1 and DEC-1127 are withdrawn. `gov close`'s gates return later through W2-115, including the rule
+    that skips merges with no change of their own, only on evidence (DEC-1128 (2)). W2-05, W2-112, W2-04, W2-148 and
+    W2-149 close after their fix or review; W2-32 and W2-15a stay open.
+  - (2) **ADOPT-VERIFY-1: option (d),** the checked `Verify:` pass when an adopted ticket is about to launch; W2-174 is
+    filed; W2-88's refactoring-plan line changes so its proposed tickets carry `Verify:` from the start.
+  - (3) **The WSL stop:** (a) the CTO's `rg` tripwire, yes; the owner adds (b) to the editor's settings. The CTO checks
+    whether Claude Code's additional directories (`~/gov-os-runs`, `~/gov-os-worktrees` in `settings.local.json`) make
+    it scan those folders, and proposes the fix.
+  - (4) **The nightly:** its restart comes to the owner as an ACT after the formal closes: in the quiet hours, with nothing
+    else running, sized to memory so it cannot exhaust it.
+  - (5) **Set-up A's bar:** the CTO brings its exact definition for the owner's approval (the actions counted, the
+    period, the planted share, how an action the guard could not judge is scored), with the likely result today given
+    the error path and the unresolvable writes. The error path is fixed first, as decided (DEC-1128 (3)).
+- **Basis:** question 2 (closes by the practices in force; a control returns on evidence) and question 1 (adopted
+  tickets ready by code).
+
+### DEC-1133 — Set-up A's bar defined (V2, C, a fault fix is not a new rule, the as-run stratum); the error path and the listing rule fixed first; ACT A for the dispatcher's leads; the sample day after it, --remeasure writes the p95; FX6 one fix pass per round; MEMORY-PROTECTION-1 D1-D3, no window; the floor back to 3 GiB
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); items (1), (2) and (5) standing · **Under:** DEC-1128 (2), (3), DEC-1132 (5), DEC-1105, DEC-1131, DEC-947 (5), DEC-1038 (3), DEC-1073 (4), DEC-1057 (4) · **Source:** the owner's answers (chat, 2026-11-11 ~15:40 UTC) to SETUP-A-BAR, LOAD-BALANCER-1, the CIT-P review's FX6 and MEMORY-PROTECTION-1
+- **Decision:**
+  - (1) **Set-up A's bar (SETUP-A-BAR):** scope V2; calls the guard cannot place scored by C; **a fix to the guard's own
+    faults is not a new rule:** it goes by ACT as today, and only a rule that adds or removes a deliberate refusal goes
+    through the bar (DEC-1128 (2) read so); the as-run call log added as a held-out stratum (R2); the rest of the
+    definition as proposed.
+  - (2) **The sequence:** the error path and the listing rule are fixed first, each by ACT; set-up A runs after they
+    land, not before.
+  - (3) **The load balancer:** ACT A, yes: `launch_now.sh` checks the gate before each lead and registers it. The sample
+    day after ACT A is in, on a working day with leads running; then `--remeasure` writes the p95, not the maximum.
+  - (4) **The one-bar CIT-P, FX6:** one fix pass per round, then the review.
+  - (5) **MEMORY-PROTECTION-1:** D1 yes (the guard stops `rg` chosen by program name, by pid, an exception to DEC-1073
+    (4) for `rg` only); D2 yes (the guard in restart class 4); D3 yes (`.wslconfig` unchanged). No WSL restart and no
+    maintenance window: work carries on. `mem_guard.py` starts now; once it runs, the gate's floor goes back to 3 GiB
+    (DEC-947).
+- **Basis:** question 2 (a control proved on measured evidence, its own faults fixed first; the machine protected from a
+  runaway whatever starts it) and question 4 (one fix pass per round).
+
+### DEC-1134 — The nightly's two warm-latency reds added to `accepted_reds`, named, until W2-155 closes; linger enabled; a fresh CTO session after the VS Code reload
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1) until W2-155 (`DAEO-ar89`) closes · **Under:** DEC-1125 (1), DEC-1132 (4), DEC-757, DEC-762, DEC-1052 (Q-10), DEC-1118 · **Source:** the owner's message (chat, 2026-11-11 ~16:00 UTC)
+- **Decision:**
+  - (1) **`accepted_reds` gains two entries, named, until W2-155 closes:** `tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95` and `tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget` (the warm real-model query
+    latency, p95 0.54-0.59 s against the 0.5 s budget, the named red of DEC-1125 (1)); each entry's decision DEC-1134,
+    its reason that red, its `fixed_by` W2-155. Prepared by the CTO as the owner's commit (the path map's ratchet takes
+    an owner's commit only), applied by the owner's operator.
+  - (2) The owner ran `loginctl enable-linger usain` (ACT-NIGHTLY-RESTART-1's prerequisite).
+  - (3) **Rule 11 (DEC-1118):** the CTO's context is past 200k; the CTO writes the handover (report-state.json to today,
+    CHECKPOINT's RESUME HERE), and the owner starts a fresh CTO session after the VS Code reload.
+- **Basis:** question 2 (a known, named red does not stop every night's report; it leaves the list when its fix lands).
+
+### DEC-1135 — A process-name match used only to detect, which can only refuse and never stops anything, is outside DEC-1073 (4)
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); standing · **Under:** DEC-1073 (4), DEC-1133 (5), DEC-1132 (4) · **Source:** the owner's message (chat, 2026-11-11 ~17:45 UTC), confirming the reading ACT-NIGHTLY-RESTART-1's round-1 review raised (F6; `governance/project/orchestration/reviews/ACT-NIGHTLY-RESTART-1-review-r1.md`, package §2.4)
+- **Decision:**
+  - (1) **DEC-1073 (4)'s rule (every wait and every stop by pid or process group, never a name match) governs waits and
+    stops.** A process-name match used only to detect (to decide that the machine is busy), which can only refuse an
+    action (a night of the nightly) and never waits on, signals or stops a process, is outside it, as for `rg` in
+    DEC-1133 (5) D1. `nightly/quiet_check.py`'s detection matches and the wrapper's watchdog count are read so.
+  - (2) A match that leads to a wait, a signal or a stop stays under DEC-1073 (4) (pids or process groups only), except
+    `rg` under DEC-1133 (5).
+- **Basis:** question 2 (the rule keeps stops exact; a detection that can only refuse fails closed and loses nothing).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14546,3 +14616,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.512 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1129 (W2-32 S9 (a1); the memory audit's briefs approved, hashes to the approved list by the install ACT; W2-60a a fresh round 1). DEC-1127 still held PROPOSED. Next free id: DEC-1130. |
 | 0.513 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1130 (the `Verify:` pass and the hand-built-brief exception to DEC-1083; a ticket for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route). DEC-1127 still held PROPOSED. Next free id: DEC-1131. |
 | 0.514 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1131 (one bar, two rounds for every role, option A; a blocking-only fix the same round; verdict.py and operator_run.py fixed now); DEC-1010 changed; DEC-1128's note corrected (W2-141's rule not live). DEC-1127 still held PROPOSED. Next free id: DEC-1132. |
+| 0.515 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1127 WITHDRAWN (never in force); DEC-1132 (closes by DEC-953, option D; ADOPT-VERIFY-1 (d) and W2-174; the rg tripwire; the nightly's restart ACT; set-up A's bar to define). Next free id: DEC-1133. |
+| 0.516 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1133 (set-up A's bar; the error path and listing rule first; ACT A; the sample day and the p95; FX6; MEMORY-PROTECTION-1 D1-D3; the floor 3 GiB). Next free id: DEC-1134. |
+| 0.517 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1134 (the two warm-latency reds to accepted_reds until W2-155; linger; the handover). Next free id: DEC-1135. |
+| 0.518 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1135 (a detection-only process-name match that can only refuse is outside DEC-1073 (4); DEC-1073 (4) read with it). Next free id: DEC-1136. |

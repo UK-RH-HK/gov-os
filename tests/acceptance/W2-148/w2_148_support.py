@@ -36,7 +36,7 @@ PACKAGES = ROOT / "governance" / "project" / "orchestration" / "packages"
 EVIDENCE = ROOT / "docs" / "changes" / "W2-148-evidence.md"
 
 # The reference verdict.py the CTO's scratch holds (.gov-runtime/scratch/ref/verdict.py), which the install pins.
-REF_VERDICT_SHA256 = "277c8ca9f06c90906397579f4d5bd144fb506a40b0836eb2a8f9c1443d909378"
+REF_VERDICT_SHA256 = "30214f3de29dacdf9bb443371c05a4392e8da3c305aeb9b7845b9a433d5cf4a5"
 
 SID = "5b1f0c9e-0d1a-4c4e-9a43-2f6a8d3c7e11"
 NOW = "2026-11-10T10:00:00+00:00"

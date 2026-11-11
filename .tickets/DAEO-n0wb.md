@@ -1,6 +1,6 @@
 ---
 id: DAEO-n0wb
-status: in_progress
+status: closed
 deps: [DAEO-s9qc, DAEO-ym8a]
 links: []
 created: 2026-10-30T22:14:08Z

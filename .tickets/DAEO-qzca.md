@@ -1,6 +1,6 @@
 ---
 id: DAEO-qzca
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-11-09T21:30:00Z

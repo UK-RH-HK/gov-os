@@ -522,3 +522,19 @@ other restart is an ACT.
   ticket, counted by the CTO by hand from the ticket's id and role (the ledger); **a blocking-only engineer fix is the
   same round**; a third round only by the owner's decision; the text by CIT-P first, the counting code after two
   weeks; `verdict.py` (a failed KPI line blocks) and `operator_run.py` (reviews per ACT id) fixed now. Basis: questions 2 and 4.
+- DEC-1132 (2026-11-11): **the lift's closes by DEC-953's practices** (`tk close` and a close record; `gov close`'s gates
+  return later through W2-115 with a no-change-merge rule, only on evidence); ACT-CLOSE-HISTORY-1 and DEC-1127
+  withdrawn; **ADOPT-VERIFY-1 (d)**: a checked `Verify:` pass when an adopted ticket is about to launch (W2-174), W2-88's
+  proposed tickets carry `Verify:`; the `rg` tripwire; the nightly's restart as an ACT after the closes (quiet hours,
+  nothing else running, sized to memory); set-up A's bar defined for the owner's approval. Basis: questions 1 and 2.
+- DEC-1133 (2026-11-11, items (1) (2) (5) standing): **set-up A's bar** as SETUP-A-BAR proposes (scope V2, unplaceable
+  calls by C, the as-run call log a held-out stratum); **a fix to the guard's own faults is not a new rule** (by ACT as
+  today; only a rule adding or removing a deliberate refusal goes through the bar); **the error path and the listing rule
+  fixed first, each by ACT, set-up A after**; ACT A (`launch_now.sh` gates and registers each lead); the sample day after
+  it with leads running, `--remeasure` writes the p95; FX6 one fix pass per round; **`mem_guard.py` runs (kills `rg` by
+  pid past its thresholds, in restart class 4)**, `.wslconfig` unchanged, no window; the floor back to 3 GiB. Basis: questions 2 and 4.
+- DEC-1134 (2026-11-11, until W2-155 closes): W1-19's and W2-13's warm real-model latency cases in `accepted_reds`, named
+  (decision DEC-1134, fixed_by W2-155), by the owner's commit through the owner's operator; linger enabled. Basis: question 2.
+- DEC-1135 (2026-11-11, standing): **DEC-1073 (4) governs waits and stops; a process-name match used only to detect,
+  which can only refuse (a night) and never waits, signals or stops, is outside it** (as `rg` in DEC-1133 (5)); `nightly/quiet_check.py`
+  read so. Basis: question 2.

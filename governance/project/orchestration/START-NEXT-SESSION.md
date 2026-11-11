@@ -2,9 +2,19 @@
 
 You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main tree on `w2/integrate`, in
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
-the register and the owner's word hold over both. **Next free id: DEC-1126.**
+the register and the owner's word hold over both. **Next free id: DEC-1135.**
 
-## 000. NOW (02:40 UTC 11-11, session 8ddb8b14): the re-pin is the owner's next step; read this, then §00
+## 00000. NOW (16:55 UTC 11-11, session b40cba91): read CHECKPOINT's RESUME HERE (16:55) first
+- Six ACTs in the owner's queue or in review (EXAMIN-SETS-1 and MEMORY-AUDIT-INSTALL-1 READY with yes lines;
+  ACCEPTED-REDS-1, OPERATOR-ROUNDS-1 r2, NIGHTLY-RESTART-1 rebuild in flight; LOAD-BALANCER-A after its companion tests).
+  The start-check pin in §7 is now `pin-797495bdfc70`. Session crons (the digests) die with the session: re-arm them.
+
+## 0000. (history) NOW (16:10 UTC 11-11, session 8ddb8b14 hands over, rule 11): the lift is done; read CHECKPOINT's RESUME HERE first
+- The re-pin is live (`pin-797495bdfc70`); usage (A) ended; ten closes done by DEC-953 (never `gov close` here); decisions
+  DEC-1126 to DEC-1134 (DEC-1127 withdrawn). The full order of work and the owner's queue are in
+  `.gov-runtime/scratch/orchestrator/CHECKPOINT.md`, RESUME HERE (16:10). DECIDED-NOT-DONE rows 106-150.
+
+## 000. (history) NOW (02:40 UTC 11-11, session 8ddb8b14): the re-pin is the owner's next step; read this, then §00
 - **D-10 is done** (run 2: nightly red 2, the warm latency, ruled a named red, DEC-1125 (1); W2-155 `DAEO-ar89` P4).
 - **ACT-REPIN-W5 is READY** (`packages/ACT-REPIN-W5.md`; review `reviews/ACT-REPIN-W5-review.md`): candidate
   `797495bdfc70`, wheel `04b094fbd587`; `src/` frozen since; **the CTO's hold `log/act-in-progress.txt` is written:
