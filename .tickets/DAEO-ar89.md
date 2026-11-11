@@ -33,6 +33,8 @@ profile: LITE
 sources:
 - DEC-1125
 - DEC-1123
+- DEC-105
+- W1-19
 est_loc: 60
 acceptance_tests:
   path: tests/acceptance/W1-19/
