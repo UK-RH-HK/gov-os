@@ -44,7 +44,7 @@ For each KPI success and failure line, the test designer:
 
 ## Red against the ticket's base
 
-The tests are shown red against the ticket's base: run in the designer's own worktree, which holds no implementation, to the end of the suite, each fails for the reason the README states (MR-3, DEC-959 item 7). A test green on the base either tests nothing new or finds the line already met: it is fixed or reported, never left (DEC-959 item 7).
+The tests are shown red against the ticket's base: run in the designer's own worktree, which holds none of this ticket's implementation (DEC-820, DEC-963), to the end of the suite, each fails for the reason the README states (MR-3, DEC-959 item 7). A test green on the base either tests nothing new or finds the line already met: it is fixed or reported, never left (DEC-959 item 7).
 
 ## The README map
 

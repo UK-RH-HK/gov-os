@@ -217,10 +217,11 @@ round adds the six lines below.
 | S14 | the same file, "Scope control: a new ticket is a P1" | A new WBS ticket goes to the owner as a P1 with a recommendation before it is filed; a lead names a needed ticket in its return and never files one | DEC-974, DEC-983 |
 | S16 (skill half) | the same file, "Approvals: the orchestrator's own allow list" | The orchestrator reads its own allow list at session start; classifies each command as allowed or possibly needing approval; never chains such a call to other work; by day notifies the owner, then runs it; inside `<quiet hours>` never runs it and queues it for the morning package; one scenario each for day, night and a chained command | DEC-991, DEC-994 item 3 |
 | S15 | `skills/test-design/SKILL.md` ("Kinds and cost") and `test-kinds.md` (the load-sensitive row, made consistent) | A timing test measures the work under test (its process's CPU time, or its time against a quiet reference run beside it), never the wall time of a loaded machine, at the same bound | DEC-979 item 1 D2, DEC-983 |
-| W2-128's cases (P-W2-11-R6-2 (c)) | `skills/orchestration/SKILL.md` ("Reads are open"); `skills/test-design/SKILL.md` (front matter, "The work order in parallel") | Orchestration: the four read refusals follow "except", not "apart from" (body 2,493 tokens, `OK`). Test-design: the read rule cites CAP-38.c; the description is the integration branch's again, word for word | DEC-820, DEC-525, DEC-1052, CAP-38.c |
+| W2-128's cases (P-W2-11-R6-2 (c)) | `skills/orchestration/SKILL.md` ("Reads are open", "Followed by hand (Wave 2)"); `skills/test-design/SKILL.md` (front matter, "The work order in parallel", "Red against the ticket's base") | Orchestration: the four read refusals follow "except", not "apart from"; the heading "Followed by hand" is the integration branch's "Followed by hand (Wave 2)" again (the restore had shortened it). Test-design: the read rule cites CAP-38.c; the description is the integration branch's again, word for word; the base run's worktree holds none of this ticket's implementation, not no implementation at all | DEC-820, DEC-525, DEC-963, DEC-1052, CAP-38.c |
 
-`skills/orchestration/SKILL.md` gains nothing but its version: its body is at its cap, and its first paragraph already
-points to `briefs-and-returns.md` for the detail. Its body stays `OK` (2,494 tokens of 2,500).
+Beyond its version, `skills/orchestration/SKILL.md` changes only the reads line's "apart from" to "except" and its
+"Followed by hand" heading back to "Followed by hand (Wave 2)": its body is at its cap, and its first paragraph already
+points to `briefs-and-returns.md` for the detail. Its body stays `OK` (2,496 tokens of 2,500).
 
 **Versions:** orchestration 1.3.0 to 1.4.0 and test-design 1.3.0 to 1.4.0, each a minor raise, in the kernel source,
 `.rulesync/skills/` and `template/.rulesync/skills/`, `version` and `metadata.version` alike. `templates/skill.md` is

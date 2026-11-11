@@ -97,6 +97,6 @@ The lead runs the loop from the lead template `role-lead.md` (DEC-1050, DEC-1052
 
 When the owner asks in plain words where things stand, the session runs `gov status --json` and answers from its parts: tickets, open decision packages and gates, readiness, governance share, pause state and health. Of a part marked not read it says it was not read, and of a share not measured, that it was not measured. A status question is never answered from recall (CAP-28, DEC-541).
 
-## Followed by hand
+## Followed by hand (Wave 2)
 
 These rules are followed by hand, not enforced by a mechanism yet (DEC-537): the resource gate is not a command; the launcher does not refuse a launch without a model; `AUTH_REQUIRED` is a stop the orchestrator names; leads are not started through the launcher.
