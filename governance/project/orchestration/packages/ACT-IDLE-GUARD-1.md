@@ -205,9 +205,10 @@ no temp file.
   planted truth, and in the unit tests through full planted passes.
 
 ## 7. The review, residuals, risks
-- **Not independently reviewed.** The CTO's rule (DEC-1131, two rounds a ticket) applies to ACTs through the operator; by hand
-  the owner's yes is the gate (as for ACT-MEMORY-AUDIT-INSTALL-1). One independent read before the yes is advisable: the
-  hook is the CTO's own brake.
+- **Independently reviewed: round 1 READY**, class (O) (2026-11-11, a fresh read-only independent auditor, not the author;
+  `reviews/ACT-IDLE-GUARD-1-review-r1.md`, also `acts/ACT-IDLE-GUARD-1/review.md`); rows F1-F6, no blocking finding; a
+  follow-up ACT for F1 (the wording), F2 (the merged-ticket filter) and F3 (the timeout). The owner's yes `a49a4228` followed;
+  **APPLIED** by the owner's operator by hand, committed as `256b4e12d` (exactly the two files; check, apply, verify exit 0).
 - **A false block costs one extra turn,** bounded once per turn, with the `IDLE-REASON:` escape (shown to the owner as
   stated while launchable). The likeliest false block: the plan's first batch when `ready.txt` is empty: it holds tickets
   merged and waiting for a formal close, which need the CTO's close, not a lead, and tickets with no brief or claim yet
