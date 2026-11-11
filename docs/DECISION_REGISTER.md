@@ -14557,7 +14557,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     it) goes first, on the live map; ACT-EXAMIN-SETS-1 and ACT-ACCEPTED-REDS-1 are rebuilt on the new map afterwards.
   - (2) **Standing:** every ACT whose commit changes a file under `tests/acceptance/` carries its own `acceptance_exemptions`
     entry in the same owner apply, so W1-01 never turns red after an applied ACT. *(A commit cannot name its own id: the
-    CTO's reading, put to the owner for confirmation, is a second `Role: owner` commit in the same §5 run, right after the
+    owner confirmed (chat, 2026-11-11 ~19:10 UTC) a second `Role: owner` commit in the same §5 run, straight after the
     first, listing its full id; the ACT's rehearsal and review cover both commits.)*
 - **Basis:** question 2 (an applied ACT never leaves a red that blocks every landing).
 
