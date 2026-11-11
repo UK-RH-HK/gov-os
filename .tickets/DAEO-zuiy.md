@@ -1,6 +1,6 @@
 ---
 id: DAEO-zuiy
-status: in_progress
+status: closed
 deps: []
 links: [DAEO-c1uz]
 created: 2026-11-02T10:39:45Z
