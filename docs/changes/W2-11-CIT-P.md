@@ -3,13 +3,15 @@ id: W2-11-CIT-P
 type: change-impact-proposal
 status: PROPOSED
 date: 2026-10-31
-revised: 2026-11-01
+revised: 2026-11-11
 branch: w2/W2-11
 base: 4c064bab
-ticket: DAEO-k7hz (W2-11), round 1 of two declared rounds (DEC-916), with its resume under DEC-992
+round2_head: c96136eb62c8
+ticket: DAEO-k7hz (W2-11), rounds 1 and 2 of two declared rounds (DEC-916), round 1 with its resume under DEC-992; round 2 re-baselined by DEC-1137
 author: product-spec (W2-11)
-review: a fresh independent reviewer of the combined K3 CIT-P (DEC-954 Q7), with the judgement rules; round 1's review record `docs/probes/DAEO-k7hz/CITP-REVIEW-r1.md` (pass, F1 to F7)
-decisions_carried: [DEC-957, DEC-959, DEC-866, DEC-820, DEC-861, DEC-862, DEC-847, DEC-837, DEC-838, DEC-808, DEC-791, DEC-430, DEC-943, DEC-951, DEC-889, DEC-968, DEC-832, DEC-981, DEC-992, DEC-802, DEC-536, DEC-534, DEC-539]
+review: a fresh independent reviewer of the combined K3 CIT-P (DEC-954 Q7), with the judgement rules; round 1's review record `docs/probes/DAEO-k7hz/CITP-REVIEW-r1.md` (pass, F1 to F7); round 2 awaits its own review
+decisions_carried: [DEC-957, DEC-959, DEC-866, DEC-820, DEC-861, DEC-862, DEC-847, DEC-837, DEC-838, DEC-808, DEC-791, DEC-430, DEC-943, DEC-951, DEC-889, DEC-968, DEC-832, DEC-981, DEC-992, DEC-802, DEC-536, DEC-534, DEC-539, DEC-1137, DEC-1083, DEC-995, DEC-996, DEC-991, DEC-994, DEC-974, DEC-979, DEC-983, DEC-982, DEC-952, DEC-953, DEC-851, DEC-315, DEC-1112]
+decisions_read: [DEC-952, DEC-953, DEC-851, DEC-974, DEC-979, DEC-982, DEC-983, DEC-991, DEC-994, DEC-995, DEC-996, DEC-959, DEC-832, DEC-1137, DEC-1083]
 list_rows: [W2-L097, W2-L256, W2-L257, W2-L258, W2-L259, W2-L268, W2-M313, W2-M346, W2-M356]
 state_class: EVIDENCE
 ---
@@ -166,9 +168,10 @@ The orchestrator's packages P-W2-11-1 to 8 (DEC-992); the review's F1 to F6 ride
 
 ## 6. Not in this round, and outside the paths
 
-- **Round 2** (declared): the orchestration skill split into three (the orchestrator's, the Senior Engineer's, the
-  lead's); the Senior Engineer's brief template; the checkpoint skill's stream checkpoint and morning handover
-  (G7 to G9); the orchestration, audit and test-design skills in the skill template's form (§4).
+- **Round 2** (declared): what round 2 holds is in §7, re-baselined by DEC-1137. Round 1's list stands as history:
+  the orchestration skill split into three (the orchestrator's, the Senior Engineer's, the lead's); the Senior
+  Engineer's brief template; the checkpoint skill's stream checkpoint and morning handover (G7 to G9); the
+  orchestration, audit and test-design skills in the skill template's form (§4).
 - **The vendored skills carry no version** (F3): `superpowers/test-driven-development`, `systematic-debugging` and
   `verification-before-completion`, and the openspec skills, with their copies, state none. Owner: round 2 of
   this ticket, under their vendoring record (DEC-992 P-W2-11-4).
@@ -195,3 +198,73 @@ The orchestrator's packages P-W2-11-1 to 8 (DEC-992); the review's F1 to F6 ride
   run-time limits as defaults a project may set otherwise.
 - **Rows still open:** W2-L097 (above), W2-L259 (the project prompt), W2-M313 (placeholders filled or checked at
   adoption), W2-M346 (a recorded session), W2-M356 (rules mechanised).
+
+## 7. Round 2 (DEC-916; re-baselined by DEC-1137; status PROPOSED)
+
+Round 2 is a kernel change (CAP-33) and part of the same combined K3 CIT-P (DEC-954 Q7). DEC-1137 (DEC-105 option
+(c)) re-baselined the ticket's brief KPIs to what W2-128 left: the five `brief-*.md` files stay one-line pointers and
+are not touched; the role templates' Policy 2, record rule and two-refusal stop go to the small ticket of DEC-1137
+(2). The restore of round 1's skill text onto the merged head is already committed (its commits name DEC-1137); this
+round adds the six lines below.
+
+### 7.1 What round 2 changes
+
+| KPI line | File | Change | Decisions |
+|---|---|---|---|
+| S9 (round 2's half) | `templates/skill.md` | The front matter is closed to `name`, `version`, `description` and a new `output` (the path class the skill's method writes, or `none`), with `metadata.version` repeating `version` as the one carried key. The writer's comment says no other key stands and names the permission fields that never stand there: `allowed-tools`, `permissions`, `paths`, `network`, `model`, `effort`. Its Never section states that the skill changes no role's reads or writes and that work needing other writes goes back as a package for the role that holds them | DEC-995, DEC-996, DEC-832 item 2 |
+| F1 | `templates/skill.md` (writing rules) | The same rule for every skill: no permission field in a skill's front matter, and no step telling the skill's role to write what its `output` class does not hold | DEC-995, DEC-996 |
+| S13 | `skills/orchestration/briefs-and-returns.md`, "The anti-drift kit" | A fresh orchestrator session every morning from a handover (checkpoint, RESUME HERE, the decisions in force); the digest loaded at start; every rule written into its five places | DEC-952 item 6, DEC-953 item 7, DEC-983, DEC-851 |
+| S14 | the same file, "Scope control: a new ticket is a P1" | A new WBS ticket goes to the owner as a P1 with a recommendation before it is filed; a lead names a needed ticket in its return and never files one | DEC-974, DEC-983 |
+| S16 (skill half) | the same file, "Approvals: the orchestrator's own allow list" | The orchestrator reads its own allow list at session start; classifies each command as allowed or possibly needing approval; never chains such a call to other work; by day notifies the owner, then runs it; inside `<quiet hours>` never runs it and queues it for the morning package; one scenario each for day, night and a chained command | DEC-991, DEC-994 item 3 |
+| S15 | `skills/test-design/SKILL.md` ("Kinds and cost") and `test-kinds.md` (the load-sensitive row, made consistent) | A timing test measures the work under test (its process's CPU time, or its time against a quiet reference run beside it), never the wall time of a loaded machine, at the same bound | DEC-979 item 1 D2, DEC-983 |
+
+`skills/orchestration/SKILL.md` gains nothing but its version: its body is at its cap, and its first paragraph already
+points to `briefs-and-returns.md` for the detail. Its body stays `OK` (2,494 tokens of 2,500).
+
+**Versions:** orchestration 1.3.0 to 1.4.0 and test-design 1.3.0 to 1.4.0, each a minor raise, in the kernel source,
+`.rulesync/skills/` and `template/.rulesync/skills/`, `version` and `metadata.version` alike. `templates/skill.md` is
+a template: its `1.0.0` is the version a new skill starts at and is left as it is.
+
+**Not done, by design:** no `output` key is added to the existing kernel skills (it would change their copies and
+versions beyond this round; a possible follow-up). The five `brief-*.md` and the role templates are not touched
+(DEC-1137). `roles/orchestrator.md` is not touched this round.
+
+### 7.2 Evidence and corroboration
+
+- Each rule was read in the register before it was cited (DEC-952, DEC-953, DEC-851, DEC-974, DEC-979, DEC-982,
+  DEC-983, DEC-991, DEC-994, DEC-995, DEC-996, DEC-832). `gov retrieve` was asked twice, in different words, and
+  returned DEC-991 and DEC-952 with the SMART-WORK-1 map, which agree with the register's text.
+- The twelve kernel skills' front matter was checked (the ten native skills and the three vendored superpowers
+  skills): no permission field in any `SKILL.md` front matter.
+- `body_tokens.py`: orchestration body 9,976 chars = 2,494 tokens (cap 2,500), `OK`; test-design 5,623 chars =
+  1,406 tokens, `OK`. `cmp`: every changed kernel file is byte-identical to its two `.rulesync` copies.
+- W1-35's cases: 124 passed (42 deselected); W1-37's: 4 passed.
+- The skill validator on the kernel skills and the template: no finding on the files this round changes.
+
+### 7.3 The lead's verification of the round
+
+| # | Row |
+|---|---|
+| a | The restore on the merged head was verified line by line: S1 to S11 are met in the sources. |
+| b | `gov accept` before round 2: 99 passed, 7 failed, 1 skipped. The seven failures are the copy cases, which fail on stale `.claude` copies by design until the copies ACT. |
+| c | S12 has no text by design: its first half was retired by DEC-1137 (1), its second half is Wave 3 (DEC-1083). |
+| d | S16's template half (the orchestrator brief template) has no file in W2-11's paths: it is a package with the CTO. |
+| e | The generated copies to regenerate (the CTO's step, after the lead's DONE; no worker writes `.claude/**`, DEC-315, DEC-1112 (3)): `.claude/skills/orchestration/SKILL.md` and `briefs-and-returns.md`, `.claude/skills/test-design/SKILL.md` and `test-kinds.md`. |
+
+### 7.4 Options (DEC-105) and rollback
+
+1. **Apply now** (recommended): the front matter's closed form and the Never rule reach every new skill; the
+   orchestration and test-design skills carry the anti-drift kit, scope control, the approvals method and the timing
+   rule that DEC-952, DEC-974, DEC-991 and DEC-979 already put in force in this repository's own practice.
+2. **Defer:** a new skill could carry a permission field, and an adopted product's orchestrator would not know the
+   approvals method (the freeze of 2026-11-01 could recur there).
+3. **Re-baseline:** done once already (DEC-1137); none further.
+
+Rollback: revert round 2's commits on the integration branch and regenerate the copies; no data or record depends on
+them.
+
+### 7.5 Open after round 2
+
+- The vendored skills carry no version (F3; DEC-992 P-W2-11-4), and the six vendored openspec skills still carry
+  `allowed-tools` in their `.rulesync` and `.claude` copies, which DEC-996 item 5 strips: not in this round's brief.
+- The orchestrator brief template's approvals text (S16's template half): a package with the CTO (7.3 d).
