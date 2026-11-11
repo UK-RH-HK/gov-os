@@ -54,6 +54,11 @@ acceptance_tests:
   author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines, before the engineer: planted roots, planted git histories, a stub `claude`, a stub launch script; never the real ~/gov-os-eval, ~/gov-os-runs or the crontab'
 track: B
 list_rows: []
+reads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write
+- governance/project/path-map.yaml
+- governance/project/retrieval.yaml
+- governance/project/orchestration/packages/MEMORY-AUDIT-1.md
+- governance/project/indep-briefs/memory-audit/
 needs: []
 waits_on: []
 ---

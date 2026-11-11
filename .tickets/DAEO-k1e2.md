@@ -54,6 +54,9 @@ acceptance_tests:
   author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines, before the engineer, on a planted set, a fake `gov` and a fake model; never a real search, GPU call or the real sets root'
 track: B
 list_rows: []
+reads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write
+- governance/project/orchestration/packages/MEMORY-AUDIT-1.md
+- src/gov/retrieval/retrieve.py
 needs: []
 waits_on: []
 ---

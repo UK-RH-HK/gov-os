@@ -46,6 +46,9 @@ acceptance_tests:
   author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines and W2-149''s tests, before the engineer: planted sets root, HOME and repository, a stub `claude` on PATH; never the real ~/gov-os-eval, ~/gov-os-runs or ~/.claude'
 track: B
 list_rows: []
+reads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write
+- governance/project/indep-walls/kinds.yaml
+- governance/project/orchestration/packages/MEMORY-AUDIT-1.md
 needs:
 - governance/project/orchestration/tools/indep_launch.py
 waits_on: []

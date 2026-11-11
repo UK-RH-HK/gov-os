@@ -51,6 +51,9 @@ acceptance_tests:
   author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines and the writer, checker and auditor briefs (`packages/MEMORY-AUDIT-1/briefs/`), before the engineer: a planted sets root, a planted repository with commits, a planted pool; never the real ~/gov-os-eval or ~/gov-os-runs'
 track: B
 list_rows: []
+reads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write
+- governance/project/path-map.yaml
+- governance/project/orchestration/packages/MEMORY-AUDIT-1.md
 needs: []
 waits_on: []
 ---
