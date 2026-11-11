@@ -1,0 +1,4 @@
+log: dispatch.log
+Idle: headroom
+status: the gate is open and 3 of 5 leads run, but no ready line is startable (3 line(s) in ready.txt); skipped for a used or returned log: W2-81 DAEO-l78m (already started for W2-81-A5-r6-land.json). Write the line again with a new log name (<W2>-A5-<run>.json) to start it; waiting for other reasons: W2-05 DAEO-0z8c (running), W2-170 DAEO-61vm (running)
+The standing rule: never idle while unblocked work remains (DEC-1110 (1), DEC-1109 (3)); ready.txt is the CTO's list.

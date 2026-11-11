@@ -1,0 +1,7 @@
+log: W2-170-A5-review.json
+W2: W2-170
+status: PACKAGES. Review round 1 failed on one blocking finding, RV1 (S1: in scope, an honest agent can hit it in ordinary work, and it fails open). The code does what the Interface's `DC-PREFLIGHT` rule says, so the fix changes the Interface. That is the CTO's decision before a test-design batch and the on
+
+task: DAEO-61vm (W2-170), review run, round 1 of at most 2 (FULL)
+status: PACKAGES. Review round 1 failed on one blocking finding, RV1 (S1: in scope, an honest agent can hit it in ordinary work, and it fails open). The code does what the Interface's `DC-PREFLIGHT` rule says, so the fix changes the Interface. That is the CTO's decision before a test-design batch and the one engineer fix pass (DEC-1052, DEC-1133 (4)).
+work_completed: I merged `w2/integrate` into the branch (`ad664fc87755`) so the probed head carries W1-01's fix `7b5c3cb94fd9`; nothing under the ticket's paths changed. I re-ran `

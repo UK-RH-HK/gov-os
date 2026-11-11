@@ -1,0 +1,88 @@
+# Your assignment
+You are a fresh orchestrator session. Your role's rules are in your system prompt (template `role-lead`); this brief gives this assignment's facts.
+Ticket DAEO-wahn (W2-175), profile STANDARD. Objective: The role templates carry Policy 2's four refusals (DEC-820), DEC-861's record rule and the stop after two refusals (DEC-1137 (2); a template delta through DEC-1116's route). **Problem.** W2-128 (templates 1.0.0, approved by DEC-1116) replaced the five `brief-*.md` files with one-line pointers and gave each role one template. W2-11's brief text carried three live rules that the role templates do not state today: Policy 2's four refusals (DEC-820: `role-engineer.md` and four others have none; `role-test-designer.md` holds only the counterpart half in one line), DEC-861's rule that the orchestrator records the owner's decisions (only `role-cto.md` has it), and the stop after two refusals (it is in `brief.md`'s return section, in no role template). A launched session reads its role template as the system prompt (W2-153), so a rule in no template is a rule that session never sees. The owner decided on 2026-11-11 (DEC-1137 (2), (3)) that a small ticket adds them before EXAMIN's copy; W2-27 depends on it. The analysis is `governance/project/orchestration/packages/P1-W2-11-BRIEFS.md`.
+
+## Where you work
+| what | path |
+|---|---|
+| your tree (write here only) | /home/usain/gov-os-worktrees/W2-175 |
+| branch | w2/W2-175 |
+| allowed paths | template/governance/kernel/templates/role-*.md, docs/changes/W2-175-CIT-P.md |
+| ticket file (read-only) | /home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-wahn.md |
+| your scratch | /home/usain/gov-os-worktrees/W2-175/.gov-runtime/scratch/ |
+
+## What must be true (KPI lines and how each is checked)
+| id | line | verify |
+|---|---|---|
+| S1 | Each of the seven role templates (role-cto, role-engineer, role-lead, role-product-spec, role-research, role-reviewer, role-test-designer) states, in one statement, that reads are open and that only four things are refused, in DEC-820 item 2's words: (a) secrets and keys, never printed; (b) the held-out qualification material's contents (its file names may be seen); (c) the counterpart's work on the same ticket; (d) the hidden half of an evaluation set; the statement ends with [DEC-820] | tests/acceptance/W2-175/: for each of the seven files, one statement (a paragraph, a list item or a table row, whitespace collapsed) carries `read` with `open`, `secret`, `held-out`, `counterpart` and `hidden half` and ends with `[DEC-820]`; red on the base (no template cites DEC-820 for it) |
+| S2 | The counterpart refusal (c) is stated in each role's own half: role-engineer says the engineer never reads this ticket's acceptance-test code and may run its cases and see names, pass or fail and failure messages; role-test-designer says the designer never reads this ticket's implementation (the branch's changes other than its own tests) and works from the specification, the KPI lines and the existing code; role-reviewer says a reviewer reads everything, tests and code alike [DEC-820 item 2 (c) and item 3, DEC-957, DEC-963] | tests/acceptance/W2-175/: three string tests, one per file, each on one statement carrying a negation (`never`, `not`) for the engineer's and the designer's, and `everything` with `tests` and `code` for the reviewer's; and tests/acceptance/W2-128/test_w2_128_templates.py::test_s3_engineer_template_holds_no_instruction_to_read_the_acceptance_tests still passes |
+| S3 | Each of the six templates role-engineer, role-test-designer, role-product-spec, role-research, role-reviewer and role-lead states that the owner's decisions are recorded by the orchestrator's decision-record commits and that no worker or lead puts `Role: owner` or `Decided-by:` on a commit; role-cto keeps its decision-record commit line (`Task: decision-record`, `Role: orchestrator`, `Decided-by: owner (chat, {DATE})`) unchanged [DEC-861] | tests/acceptance/W2-175/: for each of the six, one statement carries `decision-record`, `owner` and `Role: owner`, and ends with `[DEC-861]`; for role-cto, the line of the base is still there byte for byte (a test reads it from `git show` of the base commit) |
+| S4 | Each of the seven role templates carries, word for word, the stop sentence of the brief envelope's return section: "Refused twice for the same call: stop and say so. Never work around a refusal: report it." [DEC-1137 (2)] | tests/acceptance/W2-175/: each of the seven files holds that sentence, and the sentence is a substring of brief.md too (one source of wording, so TPL-6 F1's conflict cannot arise) |
+| S5 | Each changed role template's `version` goes from 1.0.0 to 1.0.1 (DEC-1121's step for a template delta); no other front matter key changes, and the prose of each stays within its budget in `governance/project/facts.yaml` (3500 characters, role-lead 8000, role-cto 6000) with every placeholder a key of `keys.yaml` [DEC-1050, DEC-1116, DEC-1121] | tests/acceptance/W2-175/: the front matter of each changed file parses with `version: 1.0.1` and the other keys equal the base's; tests/acceptance/W2-128/test_w2_128_templates.py::test_s2_prose_is_within_r3_budget and ::test_s5_every_key_placeholder_is_in_keys_yaml pass for all seven |
+| S6 | The cases of W2-128, W2-152 and W2-153 that read the role templates still pass with the new text (the gov brief golden files, the template tests, the launch delivery) [DEC-1050, DEC-1116] | `PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-128 tests/acceptance/W2-152 tests/acceptance/W2-153 -q -p no:cacheprovider` exits 0 in the ticket's worktree, run through the heavy-job gate |
+| S7 | The change goes through DEC-1116's route, recorded in docs/changes/W2-175-CIT-P.md: the template delta (each changed file, its base and new sha256, the lines added), the independent review's READY, and the owner's approval of the new bytes; the record's `status` is ACCEPTED only after that approval, and the kernel set is promoted at the approved bytes [CAP-33, DEC-1116, DEC-1137 (2)] | docs/changes/W2-175-CIT-P.md has a section per CAP-33 step (evidence, proposal, independent review, owner's approval, versioned promotion); the sha256 column equals `sha256sum` of each file at the ticket's head; the file's `decisions_read` and `decisions_carried` cite DEC-1137, DEC-820 and DEC-861 |
+| F1 | A role template line that states a rule cites a PROPOSED or superseded decision for it, or states a stop rule that differs from brief.md's [DEC-1073, TPL-6 F1] | tests/acceptance/W2-128/test_w2_128_templates.py::test_f7_every_bracketed_decision_id_in_a_template_is_accepted passes for the seven files; the substring test of the stop sentence (success line 4) fails when one file's sentence is changed by a letter |
+| F2 | The ticket's diff names any file beyond the seven role templates and docs/changes/W2-175-CIT-P.md: not brief.md, a `brief-*.md` pointer, keys.yaml, facts.yaml, a skill, a file under `roles/`, any `.claude/` or `.rulesync/` path [DEC-1137, DEC-315] | `git diff --name-only <base>..HEAD` of the ticket's branch lists only those paths (a close-time check; the guard refuses the rest at write time) |
+Non-goals (do not build, do not test): no change to brief.md, the five `brief-*.md` pointers (they stay as W2-128 left them, DEC-1137 (1)), keys.yaml, facts.yaml or the role files under roles/; no change to the orchestration skill or any skill (W2-11 holds them); the `.claude/templates/role-*.md` copies are not written here: the copies ACT writes them after the owner's approval (DEC-315); no new rule beyond the three the owner named (DEC-1137 (2)); no rewording of the rules the templates already carry
+Done when: the DoD lines DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6 hold for your part.
+
+## Inputs
+- Sources: DEC-1137, DEC-820, DEC-861, DEC-1116, DEC-1050, DEC-1121, DEC-957, DEC-963, DEC-1073, DEC-315, CAP-33, DAEO-t8mp, DAEO-k7hz, DAEO-h4rh. Read each by id in /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md, or ask memory (below).
+- What the lead knows of the ground: none
+none
+
+## Commands (copy them as they are)
+| name | command |
+|---|---|
+| identity | `printenv GOV_ROLE GOV_TICKET` |
+| where | `git -C /home/usain/gov-os-worktrees/W2-175 rev-parse --show-toplevel --abbrev-ref HEAD` |
+| retrieve | `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}"` |
+| context | `gov context DAEO-wahn --role {WORKER_ROLE}` |
+| launch_worker | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/launch_worker.sh {WORKER_ROLE} {EFFORT} {BRIEF_FILE}` |
+| wait_for | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}` |
+| tests_worktree | `git -C /home/usain/gov-os-worktrees/W2-175 worktree add /home/usain/gov-os-worktrees/W2-175-tests -b w2/W2-175-tests HEAD` |
+| merge_tests | `git -C /home/usain/gov-os-worktrees/W2-175 merge --no-ff w2/W2-175-tests -F {MESSAGE_FILE}` |
+| accept | `gov accept W2-175 --root /home/usain/gov-os-worktrees/W2-175` |
+| rebuild | `env PYTHONPATH=/home/usain/gov-os-worktrees/W2-175/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh /home/usain/gov-os-worktrees/W2-175` |
+| lead_verify | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh /home/usain/gov-os-worktrees/W2-175 W2-175 DAEO-wahn` |
+| tests_worktree_remove | `git -C /home/usain/gov-os-worktrees/W2-175 worktree remove /home/usain/gov-os-worktrees/W2-175-tests` |
+| links | `gov links --since {BASE}` |
+Ask memory first: outside the sandbox gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}" "<which decision governs X | where is Y implemented>"; inside it, the Read and Grep tools [DEC-1065]; grep the register only by id.
+Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read.
+No `gov retrieve` in the sandbox, and no `gov context`: a launched worker searches with the Read and Grep tools, and searches again once the same way [DEC-1065].
+Every whole-folder pytest run adds `-m "not local_only" -k "not real and not green_here and not time_limit"` and an empty `HOME`: run it as env HOME=/home/usain/gov-os-worktrees/W2-175/.gov-runtime/scratch/empty-home PYTHONPATH=/home/usain/gov-os-worktrees/W2-175/src python3 -m pytest {FOLDER} -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit" [DEC-1065].
+Wait for anything long with bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}, one call per 9.5 min; never a hand-written sleep loop.
+No merge inside the sandbox: the CTO or your lead merges into your branch outside it; a restore or conflict resolution in `tests/acceptance/` is a test designer's [DEC-1052].
+
+## Forms that work (the guard and the harness accept these)
+- Write and edit files with the Write and Edit tools and absolute paths.
+- Anything longer than one line goes in a script file under /home/usain/gov-os-worktrees/W2-175/.gov-runtime/scratch/, run with `bash <file>` or `python3 <file>`.
+- Use literal paths, never a shell variable or `$(…)` as a write target; name the folder a listing or search starts at.
+- The harness allows these headless without asking: Bash, Read, Edit, Write, Grep, Glob. For anything else use a script file as above, or report it; never retry another form.
+
+## Commit (your paths only)
+```
+git commit -m "{SUBJECT}" --trailer "Task: DAEO-wahn" --trailer "Role: orchestrator" --trailer "Implements: DEC-1137, DEC-820, DEC-861, DEC-1116, DEC-1050, DEC-1121, DEC-957, DEC-963, DEC-1073, DEC-315, CAP-33, DAEO-t8mp, DAEO-k7hz, DAEO-h4rh" -- {COMMIT_PATHS}
+```
+- `Task:` is the ticket's id (DAEO-wahn, a `DAEO-…` id), never a W2 id [DEC-182].
+- `Implements:` lists only ids from the ticket's `sources:`, each ACCEPTED [DEC-927].
+- Put an id you need that is not in `sources:` in `discoveries`, never into `Implements:` alone [DEC-1073].
+- Cite only ACCEPTED decisions as rules; name a PROPOSED one "proposed", never as the rule [DEC-1073].
+
+## Return (your last message; nothing else is read)
+The twelve fields first, each a labelled line ("none" where nothing), then each section below, always present:
+```
+task: / status: / work_completed: / files_changed: / evidence: / tests: / discoveries: / risks: / lessons: / proposed_decisions: / unresolved: / recommended_next_action:
+template: role-lead@1.0.0
+commits: <hash12> <subject> | Task/Role/Implements as committed
+brief_gaps: none | - <what was missing> | <where it belonged: template, facts, ticket, tool> | <minutes, est.>
+guard_refusals: none | - <time> | <the command's form, one line> | <the rule's reason as the hook gave it> | true or false-positive [DEC-958]
+```
+Refused twice for the same call: stop and say so. Never work around a refusal: report it.
+
+## Your run: build (only this section is in your brief)
+**build**: implement and verify.
+1. Run the *tests* steps 1 to 3 and, in parallel, the implementer (product-spec) from its brief.
+2. Merge the tests when the implementer is between batches; write TESTS-READY.
+3. Verify: env PYTHONPATH=/home/usain/gov-os-worktrees/W2-175/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh /home/usain/gov-os-worktrees/W2-175, then bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh /home/usain/gov-os-worktrees/W2-175 W2-175 DAEO-wahn, then wait. Name a red as known only from /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/skip_known.json; re-run a load-sensitive case alone once.
+4. Red: a fresh implementer given the failing output only. Three iterations that do not converge: return ESCALATION [DEC-096].

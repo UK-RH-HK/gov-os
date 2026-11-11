@@ -2,3 +2,5 @@
   engineer       n=96     p50   2,023 MB  p95   2,475 MB  max   7,200 MB
   orchestrator   n=96     p50   2,014 MB  p95   2,478 MB  max   9,500 MB
 working_size_bytes: `gov resources --remeasure` would write the MAXIMUM 9500000000 (9,500 MB); ACT-P95-1 writes the p95 2475000000 (2,475 MB), 74 % lower
+verification_peak_bytes: ACT-P95-1 writes the largest of 19 verification-run sample(s): 10200000000 (10,200 MB); `gov resources --remeasure` would write 9500000000 (9,500 MB) (the largest of all session samples)
+rebuild_peak_bytes: ACT-P95-1 writes the largest of 8 rebuild sample(s): 12000000000 (12,000 MB); `gov resources --remeasure` would write 12000000000 (12,000 MB) (the same rule)

@@ -1,0 +1,6 @@
+W2-105-A5-r4-tests.md written to .gov-runtime/scratch/orchestrator/briefs/ (84491 bytes, 342 lines), 19:53 UTC.
+Built by drafts/w2-105/assemble.py from drafts/w2-105/head.md and governance/project/briefs/LEAD-w2-common.md (whole, every slot filled).
+Checks: no {UPPER_CASE} slot left, no @@, no 40-hex string, file non-empty, keyword_warn 0 files.
+gov brief lead W2-105 --run tests still refuses (KPI_NO_VERIFY x8, NON_GOALS_MISSING): the refusal is recorded at the brief's head (DEC-1130 (1)).
+Read-only finding for the CTO: gov accept DAEO-zpdj will exit 3 on the README map (28 passed, 0 failed; success-1, success-2, failure-1, failure-2 read fail with 0 cases; 7 README items match no case).
+Simulation: drafts/w2-105/tmp/simulate_map.py on drafts/w2-105/tmp/collected.txt.

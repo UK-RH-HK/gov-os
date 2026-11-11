@@ -1,0 +1,6 @@
+W2-05: merge w2/integrate into w2/W2-05 before the scoped run and the review (r7)
+
+Five commits on integrate (DEC-1137, P1-W2-11-BRIEFS, DECIDED-NOT-DONE row 159): tickets of other ids, the register and governance records; no file this ticket judges.
+
+Task: DAEO-0z8c
+Role: orchestrator

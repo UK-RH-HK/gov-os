@@ -12,17 +12,17 @@
   "working_size_bytes": {
     "value": 2475000000,
     "date": "2026-11-11",
-    "source": "ACT-P95-1, DEC-1133 (3): the p95 (nearest rank) of 192 session samples outside verification, 2026-11-11T08:00:00+00:00 to 2026-11-11T15:55:00+00:00 (samples.jsonl sha256 11654726ce94); gov resources --remeasure would have written the maximum"
+    "source": "ACT-P95-1, DEC-1133 (3): the p95 (nearest rank) of 192 session samples outside verification, 2026-11-11T08:00:00+00:00 to 2026-11-11T15:55:00+00:00 (samples.jsonl sha256 94b00e90bda5); gov resources --remeasure would have written the maximum"
   },
   "verification_peak_bytes": {
-    "value": 7582199808,
-    "date": "2026-10-29",
-    "source": "DEC-947 item 1: a verification run's peak, 7,404,492 kB"
+    "value": 10200000000,
+    "date": "2026-11-11",
+    "source": "ACT-P95-1, DEC-1138 (4): the largest of 19 verification-run sample(s) (a peak is a maximum), 2026-11-11T08:00:00+00:00 to 2026-11-11T15:55:00+00:00 (samples.jsonl sha256 94b00e90bda5)"
   },
   "rebuild_peak_bytes": {
-    "value": 7582199808,
-    "date": "2026-11-01",
-    "source": "DEC-1001 (d), P-7: not yet measured; the verification peak until the re-measure"
+    "value": 12000000000,
+    "date": "2026-11-11",
+    "source": "ACT-P95-1, DEC-1138 (4): the largest of 8 rebuild sample(s) (a peak is a maximum), 2026-11-11T08:00:00+00:00 to 2026-11-11T15:55:00+00:00 (samples.jsonl sha256 94b00e90bda5)"
   },
   "disk_floor_bytes": {
     "value": 107374182400,

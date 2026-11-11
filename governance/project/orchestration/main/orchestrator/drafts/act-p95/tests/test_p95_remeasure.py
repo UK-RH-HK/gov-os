@@ -51,7 +51,10 @@ PLANTED_GATE = {
                           "date": "2026-11-02", "source": "ACT-OLLAMA-CAP-1"},
 }
 TODAY = "2099-01-01"
-PARAMS = {"since": None, "date": TODAY, "min_samples": 40, "min_hours": 6.0, "pct": 95, "method": "nearest rank"}
+PARAMS = {"since": None, "date": TODAY, "min_samples": 40, "min_hours": 6.0, "min_peak_samples": 3, "pct": 95,
+          "method": "nearest rank; peaks = largest"}
+PEAKS = ("verification_peak_bytes", "rebuild_peak_bytes")
+ALL_THREE = ["working_size_bytes", "verification_peak_bytes", "rebuild_peak_bytes"]
 
 
 def sha(data: bytes) -> str:
@@ -70,17 +73,27 @@ def clean_env(home, **extra):
     return env
 
 
-@pytest.fixture
-def day(tmp_path):
-    """A planted home with the gate file and the planted day's samples; the samples' bytes and lines."""
+def make_day(tmp_path, **plant_kw):
+    """A planted home with the gate file and a planted day's samples; the samples' bytes."""
     home = tmp_path / "home"
     machine = home / ".gov-os" / "machine"
     machine.mkdir(parents=True)
     (machine / "gate.json").write_bytes(gate_bytes())
     os.chmod(machine / "gate.json", 0o600)
-    samples = plant.text()
+    samples = plant.text(**plant_kw)
     (machine / "samples.jsonl").write_text(samples)
     return home, samples
+
+
+@pytest.fixture
+def day(tmp_path):
+    return make_day(tmp_path)
+
+
+@pytest.fixture
+def day_no_holders(tmp_path):
+    """The same day with no slot holder and no lock-held sample: no data for either peak."""
+    return make_day(tmp_path, holders=False)
 
 
 def build(tmp_path, home, **over):
@@ -88,7 +101,8 @@ def build(tmp_path, home, **over):
     params = {**PARAMS, **over}
     argv = ["build", "--out", str(out), "--samples", str(home / ".gov-os/machine/samples.jsonl"),
             "--gate", str(home / ".gov-os/machine/gate.json"), "--date", params["date"],
-            "--min-samples", str(params["min_samples"]), "--min-hours", str(params["min_hours"])]
+            "--min-samples", str(params["min_samples"]), "--min-hours", str(params["min_hours"]),
+            "--min-peak-samples", str(params["min_peak_samples"])]
     if params["since"]:
         argv += ["--since", params["since"]]
     rc = tool.main(argv)
@@ -128,7 +142,7 @@ def test_the_population_is_the_products_own():
     assert len(every) == 192 + 6  # six verification-time samples (i = 9, 25, 41, 57, 73, 89)
     assert len(outside) == 192
     assert sum(len(v) for v in by_role.values()) == 192
-    assert 12_000_000_000 not in every and 15_000_000_000 in every and 15_000_000_000 not in outside
+    assert 12_000_000_000 not in every and 9_000_000_000 in every and 9_000_000_000 not in outside
     if not SRC:
         pytest.skip("P95_SRC (a copy of src/) is not set: the parity with the product is not checked here")
     sys.path.insert(0, SRC)
@@ -137,6 +151,25 @@ def test_the_population_is_the_products_own():
     product = measure.figures(lines)
     assert product["working_size_bytes"] == (max(outside), len(outside))
     assert product["verification_peak_bytes"] == (max(every), len(every))
+    # the rebuild peak is the product's own rule; the verification peak is NOT (a run's peak, not a session's)
+    verification, rebuild = tool.peak_populations(lines)
+    assert product["rebuild_peak_bytes"] == (max(rebuild), len(rebuild))
+    assert max(verification) == 10_200_000_000 != product["verification_peak_bytes"][0]
+
+
+def test_the_peak_populations_are_runs_and_rebuilds_only():
+    lines = tool.read_lines(plant.text().encode())
+    verification, rebuild = tool.peak_populations(lines)
+    assert sorted(set(rebuild)) == [12_000_000_000] and len(rebuild) == 8
+    assert len(verification) == 12 + 1 + 6  # test holders, the 10.2 GB one, the lock-held sessions
+    assert 9_000_000_000 in verification and 10_200_000_000 in verification
+    assert 9_500_000_000 not in verification and 12_000_000_000 not in verification
+    # bools and strings, a session outside verification and a rebuild never count as a verification run
+    junk = [{"time": "2026-11-11T08:00:00+00:00", "samples": [
+        {"pid": 1, "tree_memory_bytes": True, "kind": "test"}, {"pid": 2, "tree_memory_bytes": "99", "kind": "test"},
+        {"pid": 3, "tree_memory_bytes": 5, "verification": False}, {"pid": 4, "tree_memory_bytes": 6, "kind": "rebuild"},
+        {"pid": 5, "tree_memory_bytes": 7, "kind": "test"}, {"pid": 6, "tree_memory_bytes": 8, "verification": True}]}]
+    assert tool.peak_populations(junk) == ([7, 8], [6])
 
 
 def test_since_cuts_the_day():
@@ -159,17 +192,21 @@ def test_the_product_writes_the_maximum_and_the_bundle_writes_the_p95(tmp_path, 
     p = subprocess.run([sys.executable, "-m", "gov.cli.main", "resources", "--remeasure", "--json"], cwd=SRC + "/..",
                        env=clean_env(twin, PYTHONPATH=SRC), capture_output=True, text=True)
     assert p.returncode == 0, p.stderr
-    written = json.loads((twin / ".gov-os/machine/gate.json").read_text())["working_size_bytes"]["value"]
+    product = json.loads((twin / ".gov-os/machine/gate.json").read_text())
+    written = product["working_size_bytes"]["value"]
     assert written == 9_500_000_000
+    assert product["verification_peak_bytes"]["value"] == 9_500_000_000 and product["rebuild_peak_bytes"]["value"] == 12_000_000_000
     # the bundle: the p95
     rc, bundle = build(tmp_path, home)
     assert rc == 0
     after = json.loads((bundle / "after" / "home" / ".gov-os/machine/gate.json").read_text())
     assert after["working_size_bytes"]["value"] == 2_475_000_000
     assert after["working_size_bytes"]["value"] != written
+    assert after["rebuild_peak_bytes"]["value"] == product["rebuild_peak_bytes"]["value"]  # the same rule
+    assert after["verification_peak_bytes"]["value"] == 10_200_000_000 != product["verification_peak_bytes"]["value"]
 
 
-def test_the_after_file_differs_from_the_before_in_one_key_only(tmp_path, day):
+def test_the_after_file_differs_from_the_before_in_the_three_measured_keys_only(tmp_path, day):
     home, _ = day
     rc, bundle = build(tmp_path, home)
     assert rc == 0
@@ -177,12 +214,57 @@ def test_the_after_file_differs_from_the_before_in_one_key_only(tmp_path, day):
     after = json.loads((bundle / "after/home/.gov-os/machine/gate.json").read_text())
     assert list(before) == list(after)  # same keys, same order
     changed = [k for k in before if before[k] != after[k]]
-    assert changed == ["working_size_bytes"]
+    assert changed == ALL_THREE
+    for key, value, what in (("verification_peak_bytes", 10_200_000_000, "verification-run"),
+                             ("rebuild_peak_bytes", 12_000_000_000, "rebuild")):
+        e = after[key]
+        assert e["value"] == value and e["date"] == TODAY
+        assert e["source"].startswith("ACT-P95-1, DEC-1138 (4)") and what in e["source"] and "largest of" in e["source"]
+    assert after["rebuild_peak_bytes"]["value"] != before["rebuild_peak_bytes"]["value"]
     entry = after["working_size_bytes"]
     assert entry["date"] == TODAY and entry["value"] == 2_475_000_000
     assert entry["source"].startswith("ACT-P95-1") and "192 session samples" in entry["source"]
     assert "p95 (nearest rank)" in entry["source"]
     assert (bundle / "after/home/.gov-os/machine/gate.json").read_bytes() == tool.dumps(after)
+
+
+def test_a_peak_with_no_data_is_left_with_a_note_not_invented(tmp_path, day_no_holders, capsys):
+    home, _ = day_no_holders
+    rc, bundle = build(tmp_path, home)
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert out.count("NOTE") == 2 and "verification_peak_bytes is LEFT as it is" in out and "rebuild_peak_bytes is LEFT" in out
+    before = json.loads((bundle / "before/home/.gov-os/machine/gate.json").read_text())
+    after = json.loads((bundle / "after/home/.gov-os/machine/gate.json").read_text())
+    assert [k for k in before if before[k] != after[k]] == ["working_size_bytes"]  # both peaks exactly as they were
+    figures = (bundle / "evidence/figures.txt").read_text()
+    assert "verification_peak_bytes: LEFT as it is" in figures and "rebuild_peak_bytes: LEFT as it is" in figures
+    assert tool.verify(bundle) == []
+
+
+def test_only_the_peak_with_data_is_written(tmp_path):
+    """Rebuild samples but no test run: the rebuild peak is written, the verification peak is left."""
+    home, _ = make_day(tmp_path)
+    lines = tool.read_lines((home / ".gov-os/machine/samples.jsonl").read_bytes())
+    for line in lines:
+        line["samples"] = [i for i in line["samples"] if i.get("kind") != "test" and i.get("verification") is not True]
+    (home / ".gov-os/machine/samples.jsonl").write_text("".join(json.dumps(x) + "\n" for x in lines))
+    rc, bundle = build(tmp_path, home)
+    before = json.loads((bundle / "before/home/.gov-os/machine/gate.json").read_text())
+    after = json.loads((bundle / "after/home/.gov-os/machine/gate.json").read_text())
+    assert [k for k in before if before[k] != after[k]] == ["working_size_bytes", "rebuild_peak_bytes"]
+    assert after["verification_peak_bytes"] == before["verification_peak_bytes"]
+
+
+@pytest.mark.parametrize("floor,left", [(8, []), (9, ["rebuild_peak_bytes"]), (20, ["verification_peak_bytes", "rebuild_peak_bytes"])])
+def test_a_peak_needs_the_minimum_number_of_samples(tmp_path, day, floor, left):
+    home, _ = day  # 8 rebuild samples, 19 verification-run samples
+    rc, bundle = build(tmp_path, home, min_peak_samples=floor)
+    assert rc == 0
+    before = json.loads((bundle / "before/home/.gov-os/machine/gate.json").read_text())
+    after = json.loads((bundle / "after/home/.gov-os/machine/gate.json").read_text())
+    unchanged = [k for k in PEAKS if before[k] == after[k]]
+    assert unchanged == left
 
 
 def test_the_bundle_is_reproduced_by_verify_and_a_tamper_is_caught(tmp_path, day):
@@ -192,6 +274,10 @@ def test_the_bundle_is_reproduced_by_verify_and_a_tamper_is_caught(tmp_path, day
     after = bundle / "after/home/.gov-os/machine/gate.json"
     good = after.read_bytes()
     after.write_bytes(good.replace(b"2475000000", b"9500000000"))  # the maximum slipped in
+    assert tool.verify(bundle) != []
+    after.write_bytes(good.replace(b"10200000000", b"7582199808"))  # a peak put back to its old value
+    assert tool.verify(bundle) != []
+    after.write_bytes(good.replace(b"12000000000", b"13000000000"))  # a peak raised
     assert tool.verify(bundle) != []
     after.write_bytes(good)
     ev = bundle / "evidence/samples.jsonl"
@@ -250,6 +336,7 @@ def test_the_after_file_loads_clean_in_the_product_and_is_not_due(tmp_path, day)
     assert p.returncode == 0, p.stderr
     faults, value, due = json.loads(p.stdout)
     assert faults == [] and value == 2_475_000_000 and "working_size_bytes" not in due
+    assert not set(PEAKS) & set(due)
 
 
 # --- apply.sh ---------------------------------------------------------------------------------------------------------
@@ -352,6 +439,7 @@ def test_the_checks_pass_on_the_after_file_and_fail_on_the_before_and_on_the_max
     needed = [0, 1, 2] if SRC else [0, 1]
     # the before file: the figure check is red
     assert run(1) == 1
+    assert run(0) == 0
     apply_sh(bundle, home, "apply")
     assert [run(i) for i in needed] == [0] * len(needed)
     # the maximum written in its place: red
@@ -361,3 +449,23 @@ def test_the_checks_pass_on_the_after_file_and_fail_on_the_before_and_on_the_max
     assert run(1) == 1
     if SRC:
         assert run(2) == 1
+    # a peak put back to its old value (the ACT's second and third keys not written): red as well
+    data = json.loads((bundle / "after/home/.gov-os/machine/gate.json").read_text())
+    data["verification_peak_bytes"] = json.loads((bundle / "before/home/.gov-os/machine/gate.json").read_text())["verification_peak_bytes"]
+    gate.write_bytes(tool.dumps(data))
+    assert run(1) == 1
+    if SRC:
+        assert run(2) == 1
+    # a day with no data for a peak: the checks name only the keys that moved, and are green on its after file
+    h2, _ = make_day(tmp_path / "d2", holders=False)
+    out2 = tmp_path / "bundle2"
+    assert tool.main(["build", "--out", str(out2), "--samples", str(h2 / ".gov-os/machine/samples.jsonl"),
+                      "--gate", str(h2 / ".gov-os/machine/gate.json"), "--date", datetime.date.today().isoformat()]) == 0
+    tool.manifest(out2, log)
+    checks2 = json.loads((out2 / "manifest.json").read_text())["checks"]
+    assert 'F={"working_size_bytes": [' in checks2[1]["cmd"] and '"verification_peak_bytes": [' not in checks2[1]["cmd"]
+    assert '"verification_peak_bytes": [' in checks[1]["cmd"] and '"rebuild_peak_bytes": [' in checks[1]["cmd"]
+    apply_sh(out2, h2, "apply")
+    for i in needed:
+        p = subprocess.run(["bash", "-c", checks2[i]["cmd"]], cwd=clone, env=clean_env(h2), capture_output=True, text=True)
+        assert p.returncode == 0, (i, p.stdout, p.stderr)

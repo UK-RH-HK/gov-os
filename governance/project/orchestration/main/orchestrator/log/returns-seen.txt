@@ -178,3 +178,5 @@ W2-81-A5-r5b-land.json
 W2-04-A5-r6c-review.json
 W2-66c-A5-r2-tests.json
 W2-170-A5-build.json
+W2-170-A5-review.json
+W2-81-A5-r6-land.json

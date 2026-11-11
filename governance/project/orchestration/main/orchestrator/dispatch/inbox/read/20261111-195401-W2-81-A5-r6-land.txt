@@ -1,0 +1,13 @@
+log: W2-81-A5-r6-land.json
+W2: W2-81
+status: DONE. Verified head is `6e2003ff3bdb`. `gov accept` passed before and after the merge. The scoped run's only reds were the six W2-96 cases named in open point (3), and all six pass alone.
+
+task: W2-81 (DAEO-l78m) land round 6: run `gov accept` first, merge `w2/integrate` in again, verify once, return the new head.
+
+status: DONE. Verified head is `6e2003ff3bdb`. `gov accept` passed before and after the merge. The scoped run's only reds were the six W2-96 cases named in open point (3), and all six pass alone.
+
+work_completed:
+- **First calls:** all as expected.
+  - Identity was `orchestrator` / `DAEO-l78m`, in `/home/usain/gov-os-worktrees/W2-81` on `w2/W2-81`.
+  - Head was `4009d597a173` and the tree was clean.
+  - CHECKPOINT.md was read and now has a "Run 7 - land round 6" secti

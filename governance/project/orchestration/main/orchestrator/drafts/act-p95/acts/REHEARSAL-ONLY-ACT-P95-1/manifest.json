@@ -1,6 +1,6 @@
 {
  "act": "ACT-P95-1",
- "dec": "DEC-1133, DEC-1105",
+ "dec": "DEC-1133, DEC-1105, DEC-1138",
  "author": "cto",
  "claimed_class": "b",
  "touched": [
@@ -8,18 +8,18 @@
    "root": "home",
    "path": ".gov-os/machine/gate.json",
    "before": "52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034",
-   "after": "3311d6e5d60868b3641b11ed072d64c38319ca675ebe66c82ee8e475c26ec0bd"
+   "after": "41f243d31db77d16cb473bad7bde4df15ba3438f32db9f792f2213f513827206"
   }
  ],
  "files": {
   "before/home/.gov-os/machine/gate.json": "52e32fc182d6e07c856512eb6926e7442eb16c856b46194f35d522e238c44034",
-  "after/home/.gov-os/machine/gate.json": "3311d6e5d60868b3641b11ed072d64c38319ca675ebe66c82ee8e475c26ec0bd",
-  "evidence/samples.jsonl": "11654726ce9430e2701946d8941a2f80fe5891ec4754242c9c097bb49a0ee2be",
-  "evidence/params.json": "e95107a4067d6fe04319a5845487d9167f64336e0cc00273d4c966f1d16bb5cd",
-  "evidence/figures.txt": "1f4a93cbb641d6e85470c9574b550cfef24877d68fd04795c25f9b6cc4c9d574",
+  "after/home/.gov-os/machine/gate.json": "41f243d31db77d16cb473bad7bde4df15ba3438f32db9f792f2213f513827206",
+  "evidence/samples.jsonl": "94b00e90bda581d0bed679f653fe7c84de99bac505013a4b1f8c373ff42c1cd3",
+  "evidence/params.json": "af190cfdeaff2e3a9588dc4c30c4313c70f3a3f6d86ffb945264a824fdf5ebe2",
+  "evidence/figures.txt": "bacfc925fa566eedbb92bbee110cd859a508922b6478f564df7530029d53fc0f",
   "apply.sh": "cf6073f4028475cfca1ae7867702fa2479d4b2ec3defa88f02b17947d3f3b4b8",
-  "list.txt": "ffd838276fa67d99365228e9f366927e10f8f8004a0a5f84cd830ac260a0e5b9",
-  "rehearsal.log": "e2abfd80935c1b7189ebbe0786570c009f088c501eba9c6ddebc4b389b1fc75c"
+  "list.txt": "c5cb5c576b4920a04e653dc32b30a4f14f1552e8dfa7c93a1d2605876ab36c29",
+  "rehearsal.log": "6893a220da3016394bd95cfb4dd045153a48c4ff10e92726328241f7beec61bb"
  },
  "checks": [
   {
@@ -28,12 +28,12 @@
    "count": null
   },
   {
-   "cmd": "python3 -I -c 'import hashlib,json,os,sys; d=json.load(open(os.environ[\"HOME\"]+\"/.gov-os/machine/gate.json\")); e=d[\"working_size_bytes\"]; r=json.dumps({k:v for k,v in d.items() if k!=\"working_size_bytes\"},sort_keys=True); sys.exit(0 if e[\"value\"]==2475000000 and e[\"date\"]==\"2026-11-11\" and e[\"source\"].startswith(\"ACT-P95-1\") and hashlib.sha256(r.encode()).hexdigest()==\"8cae9b2686637bcdade6cb0cfc4e2e4431479756a3954416f693e262913a5127\" and list(d)==[\"memory_floor_bytes\", \"oom_floor_bytes\", \"working_size_bytes\", \"verification_peak_bytes\", \"rebuild_peak_bytes\", \"disk_floor_bytes\", \"inode_floor\", \"verification_lock\", \"gpu_margin\", \"gpu_shares\", \"heavy_slots\", \"embedding_servers\"] else 1)'",
+   "cmd": "python3 -I -c 'import hashlib,json,os,sys; d=json.load(open(os.environ[\"HOME\"]+\"/.gov-os/machine/gate.json\")); F={\"working_size_bytes\": [2475000000, \"2026-11-11\"], \"verification_peak_bytes\": [10200000000, \"2026-11-11\"], \"rebuild_peak_bytes\": [12000000000, \"2026-11-11\"]}; r=json.dumps({k:v for k,v in d.items() if k not in F},sort_keys=True); sys.exit(0 if all(k in d and d[k][\"value\"]==v[0] and d[k][\"date\"]==v[1] and d[k][\"source\"].startswith(\"ACT-P95-1\") for k,v in F.items()) and hashlib.sha256(r.encode()).hexdigest()==\"e18b55f6deaed2c4b99087482ad1dd71b508573b5fc1b6350e84270d3ee24424\" and list(d)==[\"memory_floor_bytes\", \"oom_floor_bytes\", \"working_size_bytes\", \"verification_peak_bytes\", \"rebuild_peak_bytes\", \"disk_floor_bytes\", \"inode_floor\", \"verification_lock\", \"gpu_margin\", \"gpu_shares\", \"heavy_slots\", \"embedding_servers\"] else 1)'",
    "exit": 0,
    "count": null
   },
   {
-   "cmd": "python3 -B -c 'import sys; sys.path.insert(0,\"src\"); from gov.resources import config; c=config.load(); sys.exit(0 if not c[\"faults\"] and c[\"values\"][\"working_size_bytes\"]==2475000000 and \"working_size_bytes\" not in c[\"due\"] else 1)'",
+   "cmd": "python3 -B -c 'import sys; sys.path.insert(0,\"src\"); from gov.resources import config; c=config.load(); F={\"working_size_bytes\": [2475000000, \"2026-11-11\"], \"verification_peak_bytes\": [10200000000, \"2026-11-11\"], \"rebuild_peak_bytes\": [12000000000, \"2026-11-11\"]}; sys.exit(0 if not c[\"faults\"] and all(c[\"values\"][k]==v[0] and k not in c[\"due\"] for k,v in F.items()) else 1)'",
    "exit": 0,
    "count": null
   }
@@ -41,6 +41,6 @@
  "commands": [],
  "rehearsal": {
   "log": "rehearsal.log",
-  "sha256": "e2abfd80935c1b7189ebbe0786570c009f088c501eba9c6ddebc4b389b1fc75c"
+  "sha256": "6893a220da3016394bd95cfb4dd045153a48c4ff10e92726328241f7beec61bb"
  }
 }

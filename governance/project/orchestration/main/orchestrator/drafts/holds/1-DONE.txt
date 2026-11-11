@@ -1,0 +1,3 @@
+1 DONE 2026-11-11 19:52 UTC (helper, Sonnet): tools/mem_hold.py (with tools/hold_lib.py) and tools/test_mem_hold.py
+Tests: python3 -m pytest -q -p no:cacheprovider .gov-runtime/scratch/orchestrator/tools/test_mem_hold.py  (23 passed; the dispatcher-view test is red without the hold; two mutations (no re-read check, no brake removal) go red).
+Not started. Start command is in the final return. Release by hand after stopping it: python3 tools/mem_hold.py --release-now

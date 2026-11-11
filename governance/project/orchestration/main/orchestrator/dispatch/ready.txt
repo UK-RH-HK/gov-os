@@ -22,10 +22,12 @@
 # NEXT 1 RELEASED 19:50 (brief 98 KB, no slot left):
 W2-05 DAEO-0z8c W2-05-A5-r7-fix.md W2-05-A5-r7-fix.json
 # NEXT 2 RELEASED 19:40 (exemption 7b5c3cb94fd9; README 294f3e84b + 4009d597a; brief re-filled):
-W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
+# returned 19:54 DONE, merged: W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
 #NEXT 3 (after W2-105's test fixes): W2-105 DAEO-zpdj W2-105-A5-r4-tests.md W2-105-A5-r4-tests.json   [re-filled brief]
 #NEXT 4 (after W2-11's merge by its designer; the long pole, 4-6 h): W2-11 DAEO-k7hz W2-11-A5-r6-resume.md W2-11-A5-r6-resume.json   [re-filled brief]
-#NEXT 5 (after the exemption): W2-90b DAEO-nqa2 W2-90b-A5-r2-land.md W2-90b-A5-r2-land.json   [merge integrate first; hand brief]
+# NEXT 5 RELEASED 19:58 (DEC-1138: cap five; exemption in; brief ready; its merge conflicts are resolved by a designer inside the run, drafts/w2-90b/RESOLUTION.md):
+# 19:47 REFUSED LAUNCH_NO_TEMPLATE (branch not merged); a designer merges first (W2-90b-A1-merge), then relist as r2b:
+#NEXT 5b W2-90b DAEO-nqa2 W2-90b-A5-r2b-land.md W2-90b-A5-r2b-land.json   [after the merge: role-lead.md present]
 #NEXT 6 (after W2-149 closes): W2-173 DAEO-qz4p W2-173-A5-run1.md W2-173-A5-run1.json
 #NEXT 7 (after W2-81 and W2-11 close): W2-98 DAEO-wi46 W2-98-A5-run1.md W2-98-A5-run1.json ; W2-93 DAEO-6y0x W2-93-A5-run1.md W2-93-A5-run1.json (+ the owner's EXAMIN route)
 #NEXT 8 (after the owner's EXAMIN-SETS route): W2-94 DAEO-g87r W2-94-A5-run1.md W2-94-A5-run1.json
@@ -33,4 +35,6 @@ W2-81 DAEO-l78m W2-81-A5-r6-land.md W2-81-A5-r6-land.json
 # Beside the leads (workers within the gate, not lead slots): W2-105 test fixes (designer), W2-11 merge (designer), W2-112 and
 # W2-149 probes (reviewers), W2-148 probe record (from its READY reviews if valid), then their closes by DEC-953; W2-81 README (running).
 # 19:35 b40cba91: W2-170's FULL review run (build DONE 19:27 at 5795081004a8)
-W2-170 DAEO-61vm W2-170-A5-review.md W2-170-A5-review.json
+# returned 19:43 PACKAGES (RV1; reading 9 decided, the fix run below)
+# W2-170 DAEO-61vm W2-170-A5-review.md W2-170-A5-review.json
+W2-170 DAEO-61vm W2-170-A5-fix.md W2-170-A5-fix.json

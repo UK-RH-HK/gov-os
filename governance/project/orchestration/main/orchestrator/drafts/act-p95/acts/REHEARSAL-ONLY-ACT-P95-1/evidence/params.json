@@ -1,7 +1,8 @@
 {
  "date": "2026-11-11",
- "method": "nearest rank",
+ "method": "nearest rank; peaks = largest",
  "min_hours": 6.0,
+ "min_peak_samples": 3,
  "min_samples": 40,
  "pct": 95,
  "since": null

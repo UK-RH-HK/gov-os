@@ -4,12 +4,12 @@
  "gpu_expected": {
   "query": true
  },
- "nightly_hold_from": "00:00",
- "nightly_hold_until": "00:00",
- "_nightly_hold_note": "DEC-1049: an empty window (no nightly while it holds); restore from config.json.pre-dec1049",
+ "nightly_hold_from": "03:00",
+ "nightly_hold_until": "05:30",
+ "_nightly_hold_note": "DEC-1138 (3): landings held 03:00-05:30 for the nightly (restored from DEC-1049's empty window); lead starts held by tools/night_hold.sh",
  "guard_harvest_s": 1000000000,
  "_guard_harvest_note": "DEC-1050 item 6: the guard harvest stops (interval 10^9 s); restore from config.json.pre-dec1050",
  "gpu_shared_floor_mib": 2048,
  "_gpu_shared_floor_note": "DEC-1084: 2,048 MiB from 11-06's readings (1,490-1,581 MiB shared, flat while dedicated ran 6.1-12.7 GB; the derived 1/16 of the card was 1,019); re-read on 2026-11-13",
- "max_leads": 3
+ "max_leads": 5
 }

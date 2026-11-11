@@ -1,10 +1,14 @@
 """A planted samples.jsonl for ACT-P95-1's tests and rehearsal (no real session is read).
 
 96 lines 300 s apart from 2026-11-11T08:00:00+00:00 (an 8 h day); each holds two session samples (a lead and an engineer),
-and some lines also hold: a slot holder (kind rebuild, 12 GB: never a session), a session sample taken while a
-verification run held the lock (15 GB: outside the population), and two malformed sizes (a bool and a string). Of the 192
-session samples outside verification, 5 are outliers of 6 to 9.5 GB; the rest lie between 1.5 and 2.5 GB. So the
-maximum is 9.5 GB and the p95 (nearest rank, the 183rd of 192) is a normal sample under 2.5 GB.
+and some lines also hold: a slot holder of kind rebuild (12 GB, 8 samples: never a session), slot holders of kind test (the
+verification runs in their slots: 12 samples of 8.4 to 8.8 GB and one of 10.2 GB), a session sample taken while a verification
+run held the lock (9 GB, 6 samples: outside the working-size population), and two malformed sizes (a bool and a string).
+Of the 192 session samples outside verification, 5 are outliers of 6 to 9.5 GB; the rest lie between 1.5 and 2.5 GB. So the
+maximum working size is 9.5 GB and the p95 (nearest rank, the 183rd of 192) is a normal sample under 2.5 GB. The peaks:
+verification_peak 10.2 GB (the largest test-holder sample; the product's own --remeasure would write 9.5 GB, the largest
+session sample), rebuild_peak 12 GB.
+`holders=False` plants the same day with no slot holder and no lock-held sample: no data for either peak.
 
    python3 plant_samples.py <out file>
 """
@@ -16,7 +20,7 @@ START = datetime.datetime(2026, 11, 11, 8, 0, 0, tzinfo=datetime.timezone.utc)
 OUTLIERS = {7: 6_000_000_000, 31: 7_200_000_000, 58: 9_500_000_000, 80: 8_100_000_000, 140: 6_600_000_000}
 
 
-def lines(count: int = 96, step: int = 300) -> list[dict]:
+def lines(count: int = 96, step: int = 300, holders: bool = True) -> list[dict]:
     out, index = [], 0
     for i in range(count):
         taken = []
@@ -25,11 +29,17 @@ def lines(count: int = 96, step: int = 300) -> list[dict]:
             taken.append({"pid": 4000 + (index % 2), "tree_memory_bytes": OUTLIERS.get(index, size),
                           "verification": False, "ticket": ticket, "role": role})
             index += 1
-        if i % 12 == 5:
+        if holders and i % 12 == 5:
             taken.append({"pid": 4010, "tree_memory_bytes": 12_000_000_000, "verification": False,
                           "kind": "rebuild", "slot": 1})
-        if i % 16 == 9:
-            taken.append({"pid": 4011, "tree_memory_bytes": 15_000_000_000, "verification": True,
+        if holders and i % 8 == 3:
+            taken.append({"pid": 4014, "tree_memory_bytes": 8_400_000_000 + (i % 5) * 100_000_000, "verification": False,
+                          "kind": "test", "slot": 2})
+        if holders and i == 50:
+            taken.append({"pid": 4015, "tree_memory_bytes": 10_200_000_000, "verification": False,
+                          "kind": "test", "slot": 0})
+        if holders and i % 16 == 9:
+            taken.append({"pid": 4011, "tree_memory_bytes": 9_000_000_000, "verification": True,
                           "ticket": "W2-98", "role": "engineer"})
         if i == 20:
             taken += [{"pid": 4012, "tree_memory_bytes": True, "verification": False, "role": "engineer"},

@@ -402,3 +402,14 @@
 2026-11-11 19:33:01 idle with headroom: inbox item written (waiting)
 2026-11-11 19:36:02 started W2-81 (DAEO-l78m) W2-81-A5-r6-land.md -> W2-81-A5-r6-land.json (launcher exit 0)
 2026-11-11 19:37:02 interim result: W2-05 86a1ebf38 W2-05: sweep record: row 71 scrubbed (ls-files pinned, measured), row 61 open fo
+2026-11-11 19:43:01 return: W2-170-A5-review.json -> inbox/20261111-194301-W2-170-A5-review.txt
+2026-11-11 19:43:01 idle with headroom: inbox item written (used:W2-170 DAEO-61vm)
+2026-11-11 19:45:01 idle with headroom: inbox item written (waiting)
+2026-11-11 19:47:02 started W2-90b (DAEO-nqa2) W2-90b-A5-r2-land.md -> W2-90b-A5-r2-land.json (launcher exit 0)
+2026-11-11 19:50:01 started W2-170 (DAEO-61vm) W2-170-A5-fix.md -> W2-170-A5-fix.json (launcher exit 0)
+2026-11-11 19:52:01 idle with headroom: inbox item written (used:W2-90b DAEO-nqa2)
+2026-11-11 19:53:01 started but never ran: W2-90b W2-90b-A5-r2-land.json
+2026-11-11 19:53:01 idle with headroom: inbox item written (waiting)
+2026-11-11 19:54:01 return: W2-81-A5-r6-land.json -> inbox/20261111-195401-W2-81-A5-r6-land.txt
+2026-11-11 19:54:01 idle with headroom: inbox item written (used:W2-81 DAEO-l78m)
+2026-11-11 19:57:01 idle with headroom: inbox item written (waiting)

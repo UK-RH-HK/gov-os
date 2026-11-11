@@ -1,0 +1,30 @@
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_templates_source_binds_the_install[npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_templates_source_binds_the_install[pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-deny]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-ask]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-allow]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-deny]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-ask]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-allow]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[engineer-npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[engineer-pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[product-spec-npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_by_another_role_is_refused_by_the_guard[product-spec-pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[npm install -g ccusage]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[pip install requests]
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_the_comparison_base_gives_the_two_install_rules
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_the_templates_source_is_its_base_less_the_two_install_rules
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_other_rule_of_the_templates_source_is_added_removed_or_changed
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_the_generated_rules_are_the_base_rules_less_the_two_install_rules
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_no_other_generated_rule_is_added_removed_or_changed
+tests/acceptance/W2-105/test_w2_105_install_block.py::test_sudo_is_still_denied_by_the_generated_settings
+
+28 tests collected in 0.19s

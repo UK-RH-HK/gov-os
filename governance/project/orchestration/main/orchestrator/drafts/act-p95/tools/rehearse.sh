@@ -3,7 +3,7 @@
 # touches (a copy of the live gate file), a copy of the repository's src/ (git archive of the head: the checks import the
 # product's own reader from it), the operator's clean environment (env -i, PATH, LANG, TMPDIR, HOME planted), every manifest
 # check run EXACTLY as written with `bash -c` from that copy, and the plain apply. The planted day (tools/plant_samples.py):
-# maximum 9.5 GB, p95 under 2.5 GB. No real session, no live file written; the live gate file and samples file are only
+# maximum 9.5 GB, p95 under 2.5 GB; the peaks (DEC-1138 (4)): verification run 10.2 GB, rebuild 12 GB. No real session, no live file written; the live gate file and samples file are only
 # read, and hashed before and after to show they did not change. The log holds fixed text only (no head, pid, date or count).
 #   bash rehearse.sh      the log is ../rehearsal.log (it ends "failures: <n>"); the planted bundle is ../acts/REHEARSAL-ONLY-ACT-P95-1 (never submitted: the live bundle is built on the sample day into acts/ACT-P95-1)
 set -u
@@ -32,7 +32,7 @@ expect() { # expect <label> <want exit> <cmd...>   (clean env, planted HOME, cwd
   (cd "$CL" && cenv "$@") > "$W/out" 2>&1; local rc=$?
   [ "$rc" = "$want" ] && ok "$label" || { bad "$label (wanted exit $want, got $rc)"; tail -n 6 "$W/out" | cut -c1-200 | sed 's/^/     /'; }
 }
-echo "ACT-P95-1 rehearsal: the p95 of the sampled working sizes in place of the maximum"
+echo "ACT-P95-1 rehearsal: the p95 of the sampled working sizes in place of the maximum, and both peaks from the day (DEC-1138 (4))"
 
 echo "--- A. set-up: the live files are read, never written"
 live_before="$(sha "$LIVE/gate.json")"
@@ -40,8 +40,8 @@ samples_before="$([ -f "$LIVE/samples.jsonl" ] && sha "$LIVE/samples.jsonl" || e
 mkdir -p "$PH/.gov-os/machine" "$CL"
 (git -C "$MAIN" archive HEAD src | tar -x -C "$CL") && ok "A1 src/ of the head copied (git archive)" || bad "A1 git archive"
 cp -p "$LIVE/gate.json" "$PH/.gov-os/machine/gate.json" && ok "A2 the planted HOME holds a copy of the gate file, and nothing else" || bad "A2"
-python3 -I "$T/plant_samples.py" "$W/samples.jsonl" && ok "A3 the planted day written (192 session samples outside verification, 5 outliers)" || bad "A3"
-python3 -I "$T/p95_remeasure.py" figures --samples "$W/samples.jsonl" | tail -n 1 | sed "s/^/     /"
+python3 -I "$T/plant_samples.py" "$W/samples.jsonl" && ok "A3 the planted day written (192 session samples outside verification, 5 outliers, test and rebuild slot holders)" || bad "A3"
+python3 -I "$T/p95_remeasure.py" figures --samples "$W/samples.jsonl" | tail -n 3 | sed "s/^/     /"
 
 echo "--- B. the tests: green on the p95, red on the maximum"
 (cd "$D" && penv env P95_SRC="$CL/src" P95_GATE="$LIVE/gate.json" python3 -m pytest -q -p no:cacheprovider --basetemp="$W/pt" tests) > "$W/out" 2>&1 \
@@ -51,8 +51,13 @@ sed -i 's/    return ordered\[k - 1\]/    return ordered[-1]/' "$W/mutant/p95_re
 if cmp -s "$T/p95_remeasure.py" "$W/mutant/p95_remeasure.py"; then bad "B2 the mutant is the tool: the sed did not change it"; else ok "B2 a mutant of the tool that returns the maximum was made"; fi
 (cd "$D" && penv env P95_TOOLS="$W/mutant" P95_SRC="$CL/src" P95_GATE="$LIVE/gate.json" python3 -m pytest -q -p no:cacheprovider --basetemp="$W/ptm" tests) > "$W/out" 2>&1 \
   && bad "B3 the tests are GREEN on the maximum" || ok "B3 the same tests are RED on a tool that writes the maximum"
+cp -r "$T" "$W/mutant2"
+sed -i 's/        if len(values) >= min_peak_samples:/        if False:/' "$W/mutant2/p95_remeasure.py"
+if cmp -s "$T/p95_remeasure.py" "$W/mutant2/p95_remeasure.py"; then bad "B4 the second mutant is the tool: the sed did not change it"; else ok "B4 a mutant of the tool that never writes a peak was made"; fi
+(cd "$D" && penv env P95_TOOLS="$W/mutant2" P95_SRC="$CL/src" P95_GATE="$LIVE/gate.json" python3 -m pytest -q -p no:cacheprovider --basetemp="$W/ptm2" tests) > "$W/out" 2>&1 \
+  && bad "B5 the tests are GREEN on a tool that leaves the peaks" || ok "B5 the same tests are RED on a tool that leaves both peaks as they were"
 
-echo "--- C. the product's own --remeasure writes the maximum on this day; the bundle writes the p95"
+echo "--- C. the product's own --remeasure writes the maximum on this day; the bundle writes the p95 and the two peaks"
 mkdir -p "$W/twin/.gov-os"
 cp -rp "$PH/.gov-os/machine" "$W/twin/.gov-os/machine"
 cp "$W/samples.jsonl" "$W/twin/.gov-os/machine/samples.jsonl"
@@ -60,17 +65,30 @@ cp "$W/samples.jsonl" "$W/twin/.gov-os/machine/samples.jsonl"
    python3 -m gov.cli.main resources --remeasure --json) > "$W/out" 2>&1
 product="$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["working_size_bytes"]["value"])' "$W/twin/.gov-os/machine/gate.json")"
 [ "$product" = 9500000000 ] && ok "C1 gov resources --remeasure wrote the maximum: working_size_bytes 9500000000" || bad "C1 the product wrote $product"
+pfig="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["verification_peak_bytes"]["value"], d["rebuild_peak_bytes"]["value"])' "$W/twin/.gov-os/machine/gate.json")"
+[ "$pfig" = "9500000000 12000000000" ] && ok "C1b the product wrote verification_peak_bytes 9500000000 (the largest session sample) and rebuild_peak_bytes 12000000000" || bad "C1b the product wrote $pfig"
 rm -rf "$BUNDLE"
 python3 -I "$T/p95_remeasure.py" build --out "$BUNDLE" --samples "$W/samples.jsonl" --gate "$PH/.gov-os/machine/gate.json" > "$W/out" 2>&1 \
   && ok "C2 the bundle is built from the same samples" || { bad "C2 build"; cat "$W/out"; }
 after_v="$(python3 -I -c 'import json,sys; print(json.load(open(sys.argv[1]))["working_size_bytes"]["value"])' "$BUNDLE/after/home/.gov-os/machine/gate.json")"
 [ "$after_v" = 2475000000 ] && ok "C3 the bundle's after file has working_size_bytes 2475000000 (the p95), not 9500000000" || bad "C3 the bundle holds $after_v"
+after_p="$(python3 -I -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d["verification_peak_bytes"]["value"], d["rebuild_peak_bytes"]["value"])' "$BUNDLE/after/home/.gov-os/machine/gate.json")"
+[ "$after_p" = "10200000000 12000000000" ] && ok "C3b the after file has verification_peak_bytes 10200000000 (the largest verification-run sample) and rebuild_peak_bytes 12000000000" || bad "C3b the bundle holds $after_p"
 python3 -I "$T/p95_remeasure.py" verify "$BUNDLE" > "$W/out" 2>&1 && ok "C4 verify: the after file is reproduced from the evidence" || bad "C4 verify"
-python3 - "$BUNDLE" "$PH/.gov-os/machine/gate.json" <<'EOF' && ok "C5 only working_size_bytes differs between the before and the after file" || bad "C5 more than one key differs"
+python3 - "$BUNDLE" "$PH/.gov-os/machine/gate.json" <<'EOF' && ok "C5 only the three measured keys differ between the before and the after file" || bad "C5 another key differs"
 import json, sys
 b = json.load(open(sys.argv[2])); a = json.load(open(sys.argv[1] + "/after/home/.gov-os/machine/gate.json"))
-raise SystemExit(0 if list(a) == list(b) and [k for k in b if a[k] != b[k]] == ["working_size_bytes"] else 1)
+raise SystemExit(0 if list(a) == list(b) and [k for k in b if a[k] != b[k]] == ["working_size_bytes", "verification_peak_bytes", "rebuild_peak_bytes"] else 1)
 EOF
+python3 -I -c 'import sys; sys.path.insert(0, sys.argv[1]); import plant_samples as p; open(sys.argv[2], "w").write(p.text(holders=False))' "$T" "$W/samples-bare.jsonl"
+python3 -I "$T/p95_remeasure.py" build --out "$W/bare" --samples "$W/samples-bare.jsonl" --gate "$PH/.gov-os/machine/gate.json" > "$W/out" 2>&1
+python3 - "$W/bare" "$PH/.gov-os/machine/gate.json" <<'EOF' && ok "C6 a day with no slot-holder sample: both peaks LEFT as they were (a note each), only working_size_bytes changes" || bad "C6 a peak was invented"
+import json, sys
+b = json.load(open(sys.argv[2])); a = json.load(open(sys.argv[1] + "/after/home/.gov-os/machine/gate.json"))
+raise SystemExit(0 if [k for k in b if a[k] != b[k]] == ["working_size_bytes"] else 1)
+EOF
+[ "$(grep -c '^  NOTE .* is LEFT as it is' "$W/out")" = 2 ] && ok "C7 the build names both peaks it left" || bad "C7 notes"
+python3 -I "$T/p95_remeasure.py" verify "$W/bare" > /dev/null && ok "C8 verify on the no-data bundle" || bad "C8"
 
 echo "--- D. the manifest's checks, as written with bash -c, on the planted HOME"
 cp -r "$BUNDLE" "$W/provisional" && printf 'failures: 0\n' > "$W/prov.log"
@@ -101,6 +119,9 @@ cp -p "$PH/.gov-os/machine/gate.json" "$W/applied.json"
 python3 -I -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); d["working_size_bytes"]["value"]=9500000000; open(p,"w").write(json.dumps(d,indent=2)+"\n")' "$PH/.gov-os/machine/gate.json"
 expect "E1 check 1 is RED when the maximum is written instead of the p95" 1 bash -c "$(check 1)"
 expect "E2 check 2 is RED when the maximum is written instead of the p95" 1 bash -c "$(check 2)"
+python3 -I -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); b=json.load(open(sys.argv[2])); d["working_size_bytes"]=json.load(open(sys.argv[3]))["working_size_bytes"]; d["rebuild_peak_bytes"]=b["rebuild_peak_bytes"]; open(p,"w").write(json.dumps(d,indent=2)+"\n")' "$PH/.gov-os/machine/gate.json" "$BUNDLE/before/home/.gov-os/machine/gate.json" "$BUNDLE/after/home/.gov-os/machine/gate.json"
+expect "E2b check 1 is RED when a peak is left at its old value" 1 bash -c "$(check 1)"
+expect "E2c check 2 is RED when a peak is left at its old value" 1 bash -c "$(check 2)"
 moved="$(sha "$PH/.gov-os/machine/gate.json")"
 expect "E3 undo over a file that is neither the after nor the before: refused (3)" 3 bash "$BUNDLE/apply.sh" undo
 expect "E4 apply over a file that is neither: refused (3)" 3 bash "$BUNDLE/apply.sh" apply
