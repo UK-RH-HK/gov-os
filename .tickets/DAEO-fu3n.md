@@ -1,6 +1,6 @@
 ---
 id: DAEO-fu3n
-status: open
+status: closed
 deps: [DAEO-nqa2, DAEO-zpdj, DAEO-3r1j]
 links: [DAEO-nqa2, DAEO-8lmb]
 created: 2026-11-01T15:30:00Z
