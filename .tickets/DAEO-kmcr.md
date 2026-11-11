@@ -41,6 +41,7 @@ kpis:
 profile: FULL
 sources:
 - DEC-729
+- DEC-1052
 - DEC-954
 - DEC-315
 - DEC-1112
@@ -108,3 +109,20 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-23), as approved (DEC-729). The list row
   - Every command and hook works in a repository whose path contains a space (`~/EXAMIN APP`).
   - A move to a target that no namespace holds is refused before it runs [W2-M216].
 - **KPIs, failure:** the fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
+
+## Interface (DEC-1052; the CTO's delegated decision, DEC-1112 (3), 2026-11-11: the lead's P-W2-23-2 as written, alternatives left out)
+
+1. S1 "rollback": the restore a failed stage or batch runs (`project.restore`, called by `project.commit` and `_batch`), not a new command. It deletes only paths the tool wrote and names in the call; every other untracked path stays byte for byte; an untracked directory does not raise. (Bootstrap.md 2393: "A rollback deletes every untracked, non-ignored file; an untracked directory would make it raise.")
+2. S4 "resume command": running `gov adopt --lite --stage A6` again resumes. A failed batch commits the A6 record with `status: failed`, `failed_batch: <n>`, the batches done with their commits and dispositions, and per-run rollback refs (`refs/gov/adoption/rollback/<run-id>/batch-<n>`); refusal code stays `ADOPT_BATCH_FAILED`. A killed batch (moves staged, no commit): the next A6 run finds the staged set equal to a recorded in-progress batch, unstages it to its rollback point and continues there; anything else staged is refused naming the paths (never reset).
+3. S5 "set-up": A0 writes `.gitleaks.toml` (the template's text) when absent and adds `.gov-runtime/` to `.gitignore` when not ignored, both in A0's record commit; an existing `.gitleaks.toml` is never touched; A3 and A8 then never refuse for either.
+4. S7: A3 refuses `ADOPT_TARGET_UNHELD`, naming each target no namespace holds, before its record is written (tree unchanged); A6 refuses the same before any batch.
+5. S2 "adapter generation": a new command `gov adapters generate` (src/gov/adapters/command.py; the CLI finds command modules by folder, so no change to src/gov/cli/main.py), which runs `rulesync generate` into a temporary folder and merges into the project: CLAUDE.md and AGENTS.md keep every programme line in order with the generated text in one marked block (`<!-- gov:generated begin -->` ... `end -->`) after them, replaced in place on the next run; `.claude/settings.json` is merged key by key, the programme's keys and list entries kept in their order, generated keys and hook entries added after, an `env` block carrying the auto-compact entry (W2-M229).
+6. S3 "listed citation forms": the list of bootstrap.md line 2362: a word character or `-` directly before the path or id; backslashes; URL-encoding; another letter case; a path split across lines; a citation of only the store's folder or a glob; `../` followed by only the tail of the path; an id cited in a record's prose. The planted unlisted form (the one that must stay "not found") is the test designer's choice, named in the test.
+7. S6 "each gov command and each kernel hook": every name in `gov.cli.main` COMMANDS plus the discovered command modules, each with `--help` and with one real read invocation (status, doctor, retrieve, context --dry-run, adopt --lite --stage A0 on a clean fixture), and the six hooks of `template/governance/kernel/hooks/` fed a minimal event JSON, through the settings' own hook command lines, with `CLAUDE_PROJECT_DIR` holding a space. See P-W2-23-3 for where a fix would land.
+
+- **Delegated (the CTO, DEC-1112 (3), 2026-11-11), run 1's packages:** P-W2-23-1 (a): `src/gov/adopt/stages.py` (already
+  inside `src/gov/adopt/**`) may be edited for call sites only, in `a0`, `a3`, `_batch` and `a6` (about 20 lines), the logic
+  in a new `src/gov/adopt/safety.py`; W2-52's own change there (`run()` and `STAGE`) is not touched and no hunk overlaps;
+  whichever merges second merges back (DEC-954's rule). A narrowing of DEC-954's split by file to a split by function,
+  listed in the digest for the owner to overturn. P-W2-23-3 (a): S6 stays; a red whose fix lies outside the allowed paths
+  returns as a package naming the file and line.
