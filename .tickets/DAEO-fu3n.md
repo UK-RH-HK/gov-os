@@ -1,0 +1,65 @@
+---
+id: DAEO-fu3n
+status: closed
+deps: [DAEO-nqa2, DAEO-zpdj, DAEO-3r1j]
+links: [DAEO-nqa2, DAEO-8lmb]
+created: 2026-11-01T15:30:00Z
+type: task
+priority: 1
+assignee: independent-test-designer
+external-ref: W2-90c
+tags: [wave-2, test-revision, guard, lite]
+wbs_id: W2-90c
+title: 'The cases of W2-90b that need W2-105 (the template''s install block removed) or W2-110 (a product''s CTO-only install rule): W2-90''s seven named reds and any case W2-90b names (the owner''s split, DEC-999)'
+class: test-revision
+state_class: AUTHORITATIVE
+role: independent-test-designer
+depends_on:
+- DAEO-nqa2
+- DAEO-zpdj
+- DAEO-3r1j
+allowed_paths:
+- tests/acceptance/W1-05/test_w1_05_live_hooks.py
+- tests/acceptance/W1-05/conftest.py
+- tests/acceptance/W1-46/test_w1_46_research_installs.py
+- tests/acceptance/W1-46/conftest.py
+- tests/acceptance/W1-46/test_w1_46_live_sessions.py
+- tests/acceptance/W1-50/test_w1_50_freeze_launcher.py
+- tests/acceptance/W2-59/test_w2_59_hook_lines.py
+- tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py
+- tests/acceptance/W2-90c/**
+kpis:
+  success:
+  - 'W2-90''s seven named reds (W1-05''s two orchestrator-asks cases, W1-46''s research npm-install case, four W2-59 cases) judge the kernel''s wiring and pass on the head with W2-105 and W2-106 merged Verify: pytest on the seven named cases on the head with W2-105 and W2-106 merged prints seven passed [DEC-965 item 1, DEC-966]'
+  - 'Every case W2-90b named in its return as needing W2-105 or W2-110 judges the kernel''s wiring and passes on the head with them merged Verify: the cases W2-90b''s return names as needing W2-105 or W2-110, run on the head with them merged, all pass; the README maps each to its return line [DEC-999]'
+  - 'Nothing is lowered: no case deleted, skipped, xfailed or weakened; every revised file''s commit carries Rewrite-Reason: DEC-953 item 2; a README under the ticket''s folder maps every case Verify: a diff of the revised files shows no deleted test, no skip or xfail marker and no weaker assertion; each revised file''s commit carries the Rewrite-Reason trailer; the README lists every case [DEC-906, MR-3]'
+  - 'From W2-90b''s KPI S4, re-baselined (P-W2-90b-1 (b), DEC-1022, under DEC-822 item 3): W1-46''s live sessions and W1-50''s freeze launcher start a real CLI session with the caller''s HOME and so judge the pinned guard by design, and their README says so; the kernel''s non-live cases judge the worktree''s code; nothing is lowered: no case deleted, skipped, xfailed or weakened Verify: the README says the live sessions and the freeze launcher judge the pinned guard; a planted change in the worktree''s `src/` changes the result of a non-live case and does not change a live one; a diff shows no case deleted, skipped, xfailed or weakened [DEC-970, DEC-1016, DEC-1022, DEC-822]'
+  failure:
+  - 'A revised case still reads this repository''s live settings, or is red with W2-105, W2-106 and W2-110 merged. Verify: a grep of the revised cases for this repository''s live settings path finds none, and the run with W2-105, W2-106 and W2-110 merged shows no red among them'
+  - 'A case deleted, skipped, xfailed or its verdict weakened. Verify: a diff of the revised files shows no deleted case, no skip, no xfail and no weaker verdict'
+profile: LITE
+sources:
+- DEC-999
+- DEC-965
+- DEC-966
+- DEC-953
+- DEC-1016
+- DEC-1022
+- DEC-822
+- DEC-906
+- DEC-970
+- MR-3
+est_loc: 60
+acceptance_tests:
+  path: tests/acceptance/W2-90c/
+  author: independent-test-designer (MR-3); a test-revision ticket judged on its revised suite (DEC-892)
+track: B
+list_rows: []
+---
+# W2-90c The cases of W2-90b that wait for W2-105 or W2-110
+
+The owner split W2-90b on 2026-11-01 (DEC-999) so it does not wait for W2-105 or ACT 2: W2-90b fixes now every case
+whose fixtures need only the kernel's hook file; this ticket holds the cases that truly need W2-105 (the template's
+install block removed) or W2-110 (a product's CTO-only install rule), after both land and after W2-90b.
+
+**D9-FATES (DEC-1083, DEC-1084):** Stays open as its own ticket (DEC-1084 (3)), closed by its own named run of its cases after W2-105 and W2-110 merge (its S1 and S2). Its cases sit in `optin-lifted-guard.txt` (lines 276 and 427 to 430), which run report-only in D-10.

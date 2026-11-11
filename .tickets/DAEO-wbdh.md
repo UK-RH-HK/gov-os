@@ -1,6 +1,6 @@
 ---
 id: DAEO-wbdh
-status: open
+status: closed
 deps: [DAEO-g0ip, DAEO-r9ss]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -53,3 +53,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-31), as approved (DEC-729). The list row
   - A ticket declares a token budget with executable thresholds [CAP-04.a].
   - A run that exceeds it stops at the next `gov close` or hook boundary and raises a decision package, and the breach is recorded in the ticket [CAP-04.d].
 - **Failure:** a breach that passes silently.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): part D's retirements (INVESTIGATION-1 §5).

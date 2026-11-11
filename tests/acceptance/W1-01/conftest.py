@@ -41,10 +41,4 @@ def bootstrap_text(repo_root):
 @pytest.fixture(scope="session")
 def w1_05_landed(repo_root):
     return support.w1_05_has_landed(repo_root)
-
-
-@pytest.fixture()
-def interim(w1_05_landed):
-    """Skip a check that only holds until W1-05 lands (DEC-084)."""
-    if w1_05_landed:
-        pytest.skip("W1-05 is closed: the interim guardrail is retired (DEC-084)")
+# The ``interim`` fixture (skip once W1-05 lands, DEC-084) is deleted with its cases (D-4, row D1, DEC-1040 (1)).

@@ -20,7 +20,7 @@
       "$ref": "#/$defs/targets"
     },
     "every_close": {
-      "description": "Targets run on every close, whatever changed (P-IS-1 (a): W1-07's three contract files).",
+      "description": "Targets run on a close whose change holds a record-only path, and in the full run (P-IS-1 (a): W1-07's three contract files; DEC-1050).",
       "$ref": "#/$defs/targets"
     },
     "couplings": {

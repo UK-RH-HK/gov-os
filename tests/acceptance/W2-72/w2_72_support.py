@@ -17,7 +17,7 @@ its answer is unchanged (DEC-918 item 4).
 
 **The merges.** As a ticket lead merges ``w2/integrate`` back into its ticket's branch: the checked-out branch
 (``main`` in the fixture project, the first parent) moves forward to a merge commit of the merged side
-(``w1/W1-90``, the second parent; ``w2/integrate`` in a merge-back), made in an orchestrator session's own call
+(the planted ``BRANCH``, the second parent; ``w2/integrate`` in a merge-back), made in an orchestrator session's own call
 (DEC-266) and carrying ``Task: DAEO-zz90`` and ``Role: orchestrator`` in its final trailer block. Every commit a
 merge brings is a test designer's or an engineer's commit inside the paths of its own trailers, unless a case
 says otherwise.
@@ -223,7 +223,7 @@ def _the_test_on_main(project, sandbox, path=MERGED_TEST, trailers=AS_DESIGNER):
 
 
 def _two_sides(project, sandbox, branch_steps, main_steps):
-    """The merged side gets the commands ``branch_steps`` on ``w1/W1-90`` cut from ``main``; ``main`` then gets
+    """The merged side gets the commands ``branch_steps`` on ``BRANCH`` cut from ``main``; ``main`` then gets
     ``main_steps``. ``main`` is checked out."""
     support.ticket_branch_of(project, sandbox, *branch_steps, main_moves_on=False)
     for step in main_steps:
@@ -617,7 +617,7 @@ STAGE_THE_TESTS = f"git add -A -- {shlex.quote(ACCEPTANCE)}"
 
 @dataclass(frozen=True)
 class TwoCalls:
-    """A history whose merge of ``w1/W1-90`` is made over two Bash calls: ``first`` starts it and stops before
+    """A history whose merge of ``BRANCH`` is made over two Bash calls: ``first`` starts it and stops before
     the commit (exiting ``first_exit``), ``second`` commits it."""
     name: str
     first: str
@@ -738,7 +738,7 @@ class HandWrite:
 
 
 # The merge of F1 (b) with one more line of MERGED_TEST changed by hand: content that differs from git's own merge
-# of HEAD and w1/W1-90. A call that commits stages the acceptance tests as the tree holds them.
+# of HEAD and BRANCH. A call that commits stages the acceptance tests as the tree holds them.
 HAND_WRITES = {
     "in-the-first-call-after-the-merge": HandWrite(
         (f"{START_THE_MERGE} && {by_hand()}", commit_the_merge(before_the_commit=STAGE_THE_TESTS)), 0,
@@ -946,7 +946,7 @@ DROPPED = {
 
 
 def assert_moved_shape(project, shape, before, merge_id):
-    """From git's own answers: ``merge_id`` is a merge commit of ``before`` and ``w1/W1-90`` on one merge base;
+    """From git's own answers: ``merge_id`` is a merge commit of ``before`` and ``BRANCH`` on one merge base;
     git's own merge reports the conflicts ``shape.conflicted`` (a name ending in ``~`` stands for one moved-aside
     name); the merge commit holds git's own merge of the folder exactly or not, as ``shape.git_s_own`` says, and
     the folder as ``shape.keeps`` has it."""

@@ -1,0 +1,3 @@
+**tests**: planted tests block for DAEO-fx01.
+1. PLANTED-RUN-TESTS step one.
+2. PLANTED-RUN-TESTS step two.

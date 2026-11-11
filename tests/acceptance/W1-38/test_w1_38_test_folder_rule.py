@@ -28,7 +28,10 @@ the sudo rule, and nothing else. The two cases keep their ids ("four other") fro
 
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -221,16 +224,46 @@ def _describe(results):
 # ``gov launch`` in the stand-in project
 # ---------------------------------------------------------------------------
 
+def _run_launch(product, sandbox, gate, role, ticket):
+    """``gov launch <role> <ticket>`` in ``product`` with this worktree's ``gov``: W1-07's ``run_gov_with_code``
+    (its environment, its timeout, its ``Run``), with the open gate's ``GOV_RESOURCES_*`` variables added."""
+    cli = support.cli_support
+    launcher = cli.write_launcher(support.REPO_ROOT, sandbox)
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(Path(support.REPO_ROOT) / "src"),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},
+        **gate,
+    }
+    args = ("launch", role, ticket)
+    started = time.perf_counter()
+    try:
+        done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(product), env=env, capture_output=True,
+                              text=True, timeout=cli.COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired as exc:
+        raise AssertionError(f"gov {' '.join(args)} did not end within {cli.COMMAND_TIMEOUT_S:.0f} s; what it "
+                             f"printed before then:\n{cli.output_excerpt(exc.stdout, exc.stderr)}") from None
+    return cli.Run(args, done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
+
+
 @pytest.fixture()
 def launched(product, sandbox):
     """``launched(role)``: ``gov launch <role> <its ticket>`` run in the stand-in project with this worktree's
-    code and a stand-in home whose CLI is W1-46's recording stand-in. No session is started."""
+    code and a stand-in home whose CLI is W1-46's recording stand-in. No session is started.
+
+    The resource gate is planted open in the stand-in home (W1-46's ``plant_open_gate``; W2-20 S19, DEC-1088 (5)(b)
+    runs it on every launch) and its readings carried into the launch's environment, which W1-07's
+    ``run_gov_with_code`` builds from scratch: ``_run_launch`` is that runner with them added."""
     cli = launch_support.install_stand_in_cli(sandbox)
+    gate = launch_support.plant_open_gate(sandbox)
 
     def _launch(role):
         before = len(launch_support.calls(cli))
-        run = support.cli_support.run_gov_with_code(support.REPO_ROOT, product, sandbox, "launch", role,
-                                                    TICKET_OF[role])
+        run = _run_launch(product, sandbox, gate, role, TICKET_OF[role])
         result = launch_support.Launch(run, tuple(launch_support.calls(cli)[before:]))
         assert run.returncode == 0, (
             f"gov launch {role} {TICKET_OF[role]} was refused in the stand-in project made from the template\n"

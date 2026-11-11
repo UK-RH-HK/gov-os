@@ -24,14 +24,14 @@ allowed_paths:
 - tests/unit/checkpoint/**
 kpis:
   success:
-  - A missing role argument yields no write scope [W2-H006].
-  - A missing held-out file, where the project declares one, fails closed, and doctor reports it [W2-H007].
-  - Checkpoint and guard-file saves are atomic, and a broken guard-file edit cannot lock every session [W2-H009, W2-H031, W2-M047, W2-M061].
-  - Late-created .gov-runtime/ names are refused in launched sessions [W2-H010].
-  - The main .git refs are writable only through the session's own commit [W2-H011].
-  - Links are resolved, and a write that reaches the acceptance tests through a link is refused [W2-H013, W2-M031, W2-M067].
-  - The guard creates the folder of an allowed file instead of refusing it [W2-M173, W2-L216].
-  - A quoted $NAME target is judged as the literal the shell writes [W2-M019].
+  - 'A missing role argument yields no write scope Verify: a unit test calls the guard''s decision with the role argument missing: the write scope is empty and every write is refused [W2-H006].'
+  - 'A missing held-out file, where the project declares one, fails closed, and doctor reports it Verify: a planted project that declares a held-out file which is absent: the guard denies on every call (fail closed) and `gov doctor` prints a finding naming the missing file [W2-H007].'
+  - 'Checkpoint and guard-file saves are atomic, and a broken guard-file edit cannot lock every session Verify: a planted halt of a save between the temp file and the rename leaves the old whole file, never a part; a planted broken edit of the guard file: the next decision call still returns a decision and a session can write the repair, so no session is locked out [W2-H009, W2-H031, W2-M047, W2-M061].'
+  - 'Late-created .gov-runtime/ names are refused in launched sessions Verify: a test in a launched session that creates a new `.gov-runtime/<name>` after launch: a write to that name is refused [W2-H010].'
+  - 'The main .git refs are writable only through the session''s own commit Verify: a planted Bash call that writes the main `.git/refs` (`git update-ref`, a redirect) is refused; the session''s own `git commit` advances its ref [W2-H011].'
+  - 'Links are resolved, and a write that reaches the acceptance tests through a link is refused Verify: a planted symbolic link and a planted hard link to a file under `tests/acceptance/`: a write through either is refused; a link to an allowed path is judged as its target [W2-H013, W2-M031, W2-M067].'
+  - 'The guard creates the folder of an allowed file instead of refusing it Verify: a planted allowed file whose folder does not exist: the guard creates the folder and allows the write, and does not refuse [W2-M173, W2-L216].'
+  - 'A quoted $NAME target is judged as the literal the shell writes Verify: planted commands `echo x > "$NAME"` with NAME set to a path outside the allowed paths and to one inside: judged as the literal path the shell writes, refused and allowed respectively [W2-M019].'
   failure: []
 profile: FULL
 sources:
@@ -96,3 +96,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-42), as approved (DEC-729). The list row
   - Links are resolved, and a write that reaches the acceptance tests through a link is refused [W2-H013, W2-M031, W2-M067].
   - The guard creates the folder of an allowed file instead of refusing it [W2-M173, W2-L216].
   - A quoted `$NAME` target is judged as the literal the shell writes [W2-M019].
+
+**D9-FATES (DEC-1083):** Wave 3 by DEC-1083 (D9-FATES, as P1-PLAN §C); the status is kept. Its S3, atomic saves, comes first.

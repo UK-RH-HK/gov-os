@@ -1,14 +1,14 @@
 ---
 id: DAEO-neam
 status: open
-deps: [DAEO-g0ip, DAEO-7r5e]
+deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
 priority: 4
 assignee: engineer
 external-ref: W2-45
-tags: [wave-2, implementation, standard, wave-3, deferred]
+tags: [wave-2, implementation, standard]
 wbs_id: W2-45
 title: gov check runner semantics and scale
 class: implementation
@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-g0ip
-- DAEO-7r5e
 allowed_paths:
 - src/gov/check/runner.py
 - src/gov/check/commands.py
@@ -24,11 +23,11 @@ allowed_paths:
 - tests/unit/check/**
 kpis:
   success:
-  - The decision checker runs within the gov check budget on a 200-decision, 20k-commit repository [W2-H018].
-  - A check that exits 0 with findings, or with "unmeasured" in its result, is not green [W2-M129, W2-M212].
-  - An absent tool of a hard-block check is red, not yellow [W2-M130, W2-M265].
-  - A hard-block key is covered only by a check of hard-block tier [W2-M211, W2-M259].
-  - The time limit is stated and tested [W2-M151].
+  - 'The decision checker runs within the gov check budget on a 200-decision, 20k-commit repository Verify: a planted repository of 200 decisions and 20,000 commits: `gov check` runs the decision checker and its recorded time is within the gov check budget (the budget''s value printed beside it) [W2-H018].'
+  - 'A check that exits 0 with findings, or with "unmeasured" in its result, is not green Verify: planted checks, one exiting 0 with a finding and one exiting 0 with "unmeasured" in its result: both are reported not green; a planted clean check exiting 0 is green [W2-M129, W2-M212].'
+  - 'An absent tool of a hard-block check is red, not yellow Verify: a planted hard-block check whose tool is absent from the path: its result is red, never yellow [W2-M130, W2-M265].'
+  - 'A hard-block key is covered only by a check of hard-block tier Verify: a planted check map that covers a hard-block key only by a check of a lower tier is refused naming the key; the same key covered by a hard-block-tier check is accepted [W2-M211, W2-M259].'
+  - 'The time limit is stated and tested Verify: the limit''s value is printed in the runner''s result, and a planted check that runs past it is stopped and reported as timed out, by a unit test [W2-M151].'
   failure: []
 profile: STANDARD
 sources:

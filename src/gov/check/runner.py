@@ -14,6 +14,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
+from gov.util.frontmatter import quiet as _frontmatter
 from gov.util.gitenv import git_env, program_env
 
 VERSION = "1.0.0"
@@ -213,21 +214,6 @@ def _check_openspec(root: Path, commit: str) -> dict:
         "findings": findings,
         "provenance": _provenance(check_id, commit),
     }
-
-
-def _frontmatter(text: str) -> dict | None:
-    lines = text.split("\n")
-    if not lines or lines[0].strip() != "---":
-        return None
-    try:
-        end = lines.index("---", 1)
-    except ValueError:
-        return None
-    try:
-        front = yaml.safe_load("\n".join(lines[1:end]))
-    except yaml.YAMLError:
-        return None
-    return front if isinstance(front, dict) else None
 
 
 def _check_skill_version(root: Path, commit: str) -> dict:

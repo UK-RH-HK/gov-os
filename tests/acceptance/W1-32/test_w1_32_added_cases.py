@@ -181,6 +181,7 @@ def _close_stderr():
 def _launch_without_stderr(launch_support, project, sandbox, cli, way):
     """``gov launch`` to its end, with a stderr that cannot be written. Returns W1-46's ``Launch``."""
     w46 = launch_support.w46
+    w46.plant_open_gate(sandbox)   # W2-20 S19 (DEC-1088 (5)(b)): the gate is planted open, its readings in the env
     before = len(w46.calls(cli))
     script = launch_support.cli_support.write_launcher(project, sandbox)
     out_path = sandbox.elsewhere / "launch-stdout.txt"
@@ -209,16 +210,20 @@ def _launch_without_stderr(launch_support, project, sandbox, cli, way):
                          ids=("stderr-closed-7", "stderr-reader-gone-7", "stderr-reader-gone-0"))
 def test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written(launch_project, sandbox, cli,
                                                                                     way, code):
-    """DEC-392 puts the exit code first: the line that names the folder is lost with the stream, the code is not."""
+    """DEC-392 puts the exit code first: the line that names the folder is lost with the stream, the code is not.
+
+    D-10's rewrite (DEC-1112 (3); DEC-902, W2-M405): W2-56 restores 0700 on the temp folder before it removes it
+    whole, so the session also leaves the temp folder's parent read-only (``stuck_plan``); the premise is that the
+    temp folder stays, and the exit code is asserted as before."""
     import w1_32_launch_support as launch_support
 
     if os.geteuid() == 0:
         pytest.skip("a read-only folder does not stop the removal for the superuser")
-    launch_support.plan(cli, files=launch_support.LEFT, sealed=("sealed",), exit_code=code)
+    launch_support.stuck_plan(cli, code)
     try:
         result = _launch_without_stderr(launch_support, launch_project, sandbox, cli, way)
         folder = launch_support.w28.temp_folder(result)
-        assert (folder / "sealed" / "kept.txt").is_file(), \
+        assert launch_support.removal_failed(folder), \
             "the fixture's folder was removed: the removal did not fail"
         assert result.run.returncode == code, (
             f"the session ended with exit code {code}, its temp folder could not be removed, stderr could not be "

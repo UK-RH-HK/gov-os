@@ -48,7 +48,9 @@ def test_a_daemon_that_never_becomes_healthy_gives_the_same_degraded_result(stag
 
     call = stage.call()
 
-    assert len(stage.serve_runs()) == 1, "`ollama serve` was not tried once before degrading"
+    # Rewrite-Reason: DEC-1065 (1) replaces the on-demand start: gov checks health only, so the executable found is
+    # never run (it was "tried once before degrading"); the degraded result is the same.
+    assert stage.runs() == [], f"gov ran the executable (DEC-1065 (1)): {stage.runs()}"
     assert_degraded(call.result)
 
 

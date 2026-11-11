@@ -117,12 +117,18 @@ def shared_definitions_path():
     return holders[0]
 
 
+# DEC-1116 (W2-128's 1.0.0 kernel templates): the role-file and brief templates share the folder with the record
+# templates (`role-research.md`); they are no record's template, whatever word their name holds.
+NOT_RECORD_TEMPLATES = ("role-", "brief-")
+
+
 def template_paths(record_type):
     """The template files of ``record_type`` (at least one); an AssertionError when there is none."""
     folder = REPO_ROOT / TEMPLATES_REL
     assert folder.is_dir(), f"no record template exists: there is no {TEMPLATES_REL}/"
     words = RECORD_TYPES[record_type]
-    files = sorted(path for path in folder.rglob("*") if path.is_file())
+    files = sorted(path for path in folder.rglob("*")
+                   if path.is_file() and not path.name.startswith(NOT_RECORD_TEMPLATES))
     found = [path for path in files if _matches(path.name, words)]
     assert found, (f"no template for the {record_type} record: no file under {TEMPLATES_REL}/ has one of "
                    f"{list(words[0])} in its name (found: {[path.name for path in files]})")
@@ -169,10 +175,61 @@ def load_record(path):
     return document
 
 
+# DEC-866 after DEC-1116: a 1.0.0 kernel template's front matter describes the template itself (`name`, `version`,
+# `role`) and its body holds the record's shape in a fenced ```yaml block, with placeholders; a template with no such
+# block (checkpoint, lesson, ...) is still its record's front matter, with placeholders too. A record written from a
+# template is that text with each placeholder filled. One fixed value per placeholder, each one its schema accepts.
+PLACEHOLDERS = (
+    (re.compile(r"<area>"), "records"),                       # src/gov/<area>/** -> src/gov/records/** (a real area)
+    (re.compile(r"<[^<>\n]+>"), "an example"),                # <the outcome, in one line, imperative>, ...
+    (re.compile(r"\bDAEO-xxxx\b"), "DAEO-t8mp"),              # the record's own id
+    (re.compile(r"\bDAEO-yyyy\b"), "DAEO-av72"),              # another ticket's id
+    (re.compile(r"\bDEC-n\b"), "DEC-1116"),
+    (re.compile(r"\bCAP-n\b"), "CAP-31"),
+    (re.compile(r"\{ID\}"), "DAEO-t8mp"),                     # checkpoint: the ticket's id
+    (re.compile(r"^(task:[ \t]*)''", re.MULTILINE), r"\1DAEO-t8mp"),  # checkpoint: `task: ''`, to fill with {ID}
+)
+FENCE_OPEN = "```yaml"
+FENCE_CLOSE = "```"
+
+
+def _fenced_yaml(path):
+    """The text of the first fenced ```yaml block after the front matter of ``path``; None when it has none."""
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    start = 0
+    if lines and lines[0].strip() == "---":
+        start = next((index + 1 for index in range(1, len(lines)) if lines[index].strip() == "---"), len(lines))
+    for index in range(start, len(lines)):
+        if lines[index].strip() == FENCE_OPEN:
+            for end in range(index + 1, len(lines)):
+                if lines[end].strip() == FENCE_CLOSE:
+                    return "\n".join(lines[index + 1:end]) + "\n"
+            raise AssertionError(f"{Path(path).name}: the ```yaml block is never closed")
+    return None
+
+
+def record_text(path):
+    """The text of a record written from the template ``path``: its ```yaml block, else its front matter, with every
+    placeholder filled (``PLACEHOLDERS``)."""
+    text = _fenced_yaml(path)
+    if text is None:
+        text = frontmatter_text(path)
+    for pattern, value in PLACEHOLDERS:
+        text = pattern.sub(value, text)
+    return text
+
+
+def template_record(path):
+    """A record written from the template ``path`` (``record_text``), as a map."""
+    document = load_yaml(record_text(path), f"the record of the template {Path(path).name}")
+    assert isinstance(document, dict), f"{Path(path).name}: the record it gives is not a map"
+    return document
+
+
 def template(record_type):
-    """``(path, frontmatter)`` of the first template of ``record_type``."""
+    """``(path, record)`` of the first template of ``record_type``: a record written from it (``template_record``)."""
     path = template_paths(record_type)[0]
-    return path, load_record(path)
+    return path, template_record(path)
 
 
 def without(document, key):

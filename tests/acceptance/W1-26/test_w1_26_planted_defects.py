@@ -440,3 +440,61 @@ def test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id(project, sandbox, i
         f"a ticket depending on itself (by ticket id, graph keyed by wbs_id) was not "
         f"detected as a cycle; concurrency/claims is {status!r}, expected RED\n{run.describe()}"
     )
+
+
+# --------------------------------------------------------------------------
+# D-4's cut (DEC-1061; review finding F4): the families above, folded into one case
+# --------------------------------------------------------------------------
+
+# Every planted-defect case of this file, in file order: S1 and F-1 enumerate the check families, so the full run
+# keeps one case that plants every family's defect (each in a fresh project, as its own case does) and names each
+# family whose defect passes. The cases themselves stay, built, in the opt-in suite (tests/optin-lifted*breadth*.txt).
+PLANTED_FAMILIES = (
+    test_planted_schema_defect_ticket_missing_kpis,
+    test_planted_schema_defect_decision_missing_status,
+    test_planted_graph_defect_dangling_depends_on,
+    test_planted_graph_defect_duplicate_id,
+    test_planted_graph_defect_id_outside_grammar,
+    test_planted_authority_defect_active_while_superseded,
+    test_planted_mutation_defect_implementer_covers_acceptance,
+    test_planted_mutation_defect_implementer_covers_acceptance_subpath,
+    test_planted_pathmap_defect_file_matches_no_namespace,
+    test_planted_pathmap_defect_file_matches_two_namespaces,
+    test_planted_claims_defect_ticket_dag_cycle,
+    test_planted_claims_defect_ticket_missing_required_field,
+    test_planted_commands_defect_reserved_command_no_module,
+    test_commands_check_green_when_every_reserved_command_has_a_module,
+    test_planted_schema_defect_record_missing_type,
+    test_planted_schema_defect_record_type_null,
+    test_planted_schema_defect_record_type_non_string,
+    test_planted_authority_defect_decision_checker_exception_not_swallowed,
+    test_planted_claims_defect_dag_cycle_ticket_id_vs_wbs_id,
+)
+
+
+def test_a_planted_defect_of_every_family_is_found(built, tmp_path, interface):
+    """KPI S1 and F-1 (DEC-1061, F4): each of the 19 planted-defect cases above, run in a fresh project and sandbox
+    of its own, passes; a failing one is named with its own message. A case that would skip counts as failing: a
+    family whose defect is not checked is not protected."""
+    import inspect
+
+    failures = []
+    for number, case in enumerate(PLANTED_FAMILIES):
+        base = tmp_path / f"family-{number:02d}"
+        project = support.Project(base / "project")
+        given = {"sandbox": cli_support.make_sandbox(base / "sandbox"), "interface": interface}
+        wanted = inspect.signature(case).parameters
+        if "green_project" in wanted:
+            given["green_project"] = support.green_base(project)
+        if "project" in wanted:
+            given["project"] = project
+        if "tmp_path" in wanted:
+            (base / "own").mkdir(parents=True, exist_ok=True)
+            given["tmp_path"] = base / "own"
+        try:
+            case(**given)
+        except (AssertionError, pytest.fail.Exception, pytest.skip.Exception) as failure:
+            first = (str(failure).strip().splitlines() or [type(failure).__name__])[0]
+            failures.append(f"{case.__name__}: {first}")
+    assert not failures, f"{len(failures)} of {len(PLANTED_FAMILIES)} planted-defect families pass:\n" + \
+        "\n".join(failures)

@@ -289,8 +289,9 @@ def test_an_entry_that_supersedes_decisions_gives_the_edge(api, tmp_path):
 
 
 def test_a_partial_supersession_and_the_other_relations_give_no_edge(api, tmp_path):
-    """``**Supersedes:** the first point of DEC-002 (its other points stand)``, ``**Amends:**``, ``**Refines:**``
-    and ``**Under:**``: the decision named still stands, and no edge of the graph says otherwise."""
+    """A partial ``**Supersedes:**`` (the fixture's sixth entry names "the first point of" its second, "its other
+    points stand"), ``**Amends:**``, ``**Refines:**`` and ``**Under:**``: the decision named still stands, and no edge
+    of the graph says otherwise."""
     root = _project(tmp_path)
     api.load(root)
 
@@ -412,8 +413,8 @@ def test_a_named_register_that_cannot_be_read_refuses_the_load(which, api, tmp_p
 # ---- what resolves
 
 def test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves(api, tmp_path):
-    """A requirement that depends on DEC-001 and on DEC-777, and a commit that implements DEC-002: without the
-    register all three dangle; with it only DEC-777, which no entry records."""
+    """A requirement that depends on DEC-001 and on DEC-777, and a commit that implements the fixture register's
+    second entry (its planted id in ``ENTRIES``): without the register all three dangle; with it only DEC-777, which no entry records."""
     files = {"docs/spec/REQ-0002.md": support.record("REQ-0002", "requirement", "ACTIVE", "Another requirement",
                                                      depends_on=["DEC-001", "DEC-777"])}
 

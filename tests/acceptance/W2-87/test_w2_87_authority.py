@@ -72,8 +72,13 @@ def test_2b_a_lower_chunk_better_by_more_than_the_lift_keeps_its_place(api, plan
     """A lift of 0.00054 per step: 0.00108 between the specification (plain rank 7, 1/67) and a report. The reports
     at plain ranks 1 and 2 are better by 0.00147 and 0.00120, more than the lift, and keep their places ahead; the
     report at rank 3 is better by 0.00095, less than the lift, and is overtaken, so the specification enters the
-    first call's four and the reports of ranks 4 to 6 are left out."""
+    first call's four and the reports of ranks 4 to 6 are left out.
+
+    The plain ranks are those of the fused order of the list the fusion takes, the lexical route's ``ranked`` list
+    since W2-13's S2 (BM25; DEC-1055); the plant puts the specification seventh there, as checked first."""
     root = planted("small")
+    plain = [path for _, path in api.fused_order(root, CUT_PHRASE)]
+    assert plain == [*CUT_REPORTS, CUT_SPEC], f"the plant no longer puts the specification seventh: {plain}"
     bundle = _bundle(api, root, "no-reranker", CUT_PHRASE, batch_size=2)
     names = support.labels(bundle)
     assert names == [CUT_REPORTS[0], CUT_REPORTS[1], CUT_SPEC, CUT_REPORTS[2]], \
@@ -107,7 +112,7 @@ def test_3b_without_the_block_the_order_is_the_plain_fused_one(api, planted):
     root = planted("absent")
     bundle = _bundle(api, root, "no-reranker")
     dropped = {entry["path"] for entry in bundle["merge"]["dropped"]}
-    plain = [chunk for chunk, path in api.plain_order(root, PHRASE) if path not in dropped]
+    plain = [chunk for chunk, path in api.fused_order(root, PHRASE) if path not in dropped]
     assert [item["chunk_id"] for item in bundle["evidence"]] == plain, \
         f"without the block the bundle is not the plain fused order: {support.labels(bundle)}"
 

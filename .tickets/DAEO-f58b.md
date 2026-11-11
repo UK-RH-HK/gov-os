@@ -1,6 +1,6 @@
 ---
 id: DAEO-f58b
-status: open
+status: in_progress
 deps: [DAEO-ecac, DAEO-lrre]
 links: []
 created: 2026-10-31T23:52:57Z
@@ -21,6 +21,9 @@ allowed_paths:
 - src/gov/rebuild/integration.py
 - src/gov/rebuild/command.py
 - src/gov/launch/store.py
+- src/gov/launch/launcher.py
+- src/gov/retrieve/command.py
+- docs/changes/W2-116-evidence.md
 - tests/unit/rebuild/test_w2_116*
 - tests/unit/launch/test_w2_116*
 kpis:
@@ -28,21 +31,34 @@ kpis:
   - '`gov rebuild --integration <branch>` keeps a store of that branch''s head in two detached worktrees outside the project, building into the one not in use and switching a link to it only when the build succeeded; a search during a build is answered from the ready one [DEC-963, DEC-983, DEC-982]'
   - 'It is refreshed after the nightly''s verdict and at a set second time each day (both in the project''s configuration), and its status (head, age) is in `gov status` [DEC-966 item 3, DEC-983, DEC-982]'
   - '`gov launch independent-test-designer` points the session''s retrieval at it; a designer''s retrieval never reads a ticket worktree''s store [DEC-963, DEC-983, DEC-982]'
+  - 'The store is also refreshed after every landing on the integration branch, and it is the warm base `gov rebuild --seed` (W2-122) reads; a seed taken from a store behind the integration head is named, and only what changed since is re-embedded [DEC-1014 items 4 and 6, SMART-WORK-5 D, DEC-1015 item 3] (folds W2-06 S1, S2)'
+  - 'A re-index never empties the semantic index; a model-less re-index reports the semantic facet unavailable instead [DEC-719]. [moved from W2-06 S5, DEC-1083]'
+  - '`gov launch` points every worker session''s retrieval at the integration store (the `GOV_STORE` of a launched session), not only a designer''s; a designer''s retrieval never reads a ticket worktree''s store. Verify: a launcher unit test per worker role: the session environment names the integration store; a designer''s never names a worktree''s store [DEC-1087 (3), DEC-963] [added, the CTO''s note of 2026-11-06 in the body (S3 widened), DEC-1087 (3)]'
   failure:
   - 'A designer''s retrieval answered from a ticket worktree''s store.'
   - 'The link switched to a store whose build failed, or a search answered from a half-built store.'
+  - 'A re-index that fails leaves the previous index and reports the failure; it never leaves no index [W2-M088]. [moved from W2-06 F1, DEC-1083]'
 profile: STANDARD
 sources:
+- DEC-1109
+- DEC-1112
 - DEC-983
 - DEC-982
 - DEC-963
 - DEC-966
+- DEC-1014
+- DEC-1015
+- DEC-1083
+- DEC-1087
+- DEC-719
+- DAEO-kia7
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-116/
   author: independent-test-designer (MR-3); from the spec and KPIs, in parallel with the implementer (DEC-963); a planted branch, a build killed half-way, a search during a build
 track: B
-list_rows: []
+list_rows:
+- W2-M088
 ---
 # W2-116 The designers' store in the product
 
@@ -51,3 +67,51 @@ The owner's SMART-WORK-1 decision 2 (DEC-983): the designers' store (DEC-963, DE
 - **Why:** a test designer retrieves only from the integration branch's store, so its retrieval never serves a ticket's implementation. W2-33's role files and W2-83b's playbooks will tell an adopted product's designers so; nothing in the product builds that store.
 - **This repository's own configuration:** the place (`~/gov-os-worktrees/W2-00-store`) and the two times a day; the CTO's scripts are retired once this lands.
 - **Order:** after W2-60b (the launcher's files) and W2-33 (the rule it serves); before EXAMIN's copy (W2-27).
+
+**DEC-1087 (3) placed here (CTO, 2026-11-06, delegated P3 on the scope):** the owner orders the refresh after every
+merge into integrate built, tested and reviewed before re-pin window 4, so the window puts it live. The worktrees get
+the integration store's path, so workers can search.
+- **This pass builds S1, S3 (widened, below), S4 and S5, and the three failure lines.** S2's two daily times and
+  `gov status` stay for the next pass. Until then the CTO's `store_refresh_daily.sh` runs as the backstop (DEC-1087
+  (3)).
+- **S3 widened:** `gov launch` points every worker session's retrieval at the integration store, not only a
+  designer's. A designer's retrieval still never reads a ticket worktree's store. A worktree has no store of its own
+  today, so a worker's search answers `STORE_MISSING` (checked 2026-11-06).
+- **S4's trigger:** "after every landing" covers every merge into the integration branch, by the merge queue or by
+  hand. The product offers the refresh as a command run after the merge (`gov rebuild --integration <branch>`, idempotent
+  at an unchanged head). The hook that calls it after a hand merge is installed by the owner's operator in re-pin window
+  4's ACT (hooks are the operator's). The design is the engineer's, stated in its evidence record.
+- **The deps W2-60b (the session record) and W2-33 (the roles) are not needed** for this pass: it touches neither the
+  session record nor the role files. They stay in `deps:` for S2 and the role rule's text.
+- **The rebuild uses the code it runs under.** The store at window 4's head is built by window 4's code, so the pinned
+  code and the store always match. The engineer states how the double buffer keeps the ready half answering while the
+  other builds (F2).
+
+**TESTS-READY and the designer's points settled (CTO, 2026-11-06, delegated P3):**
+- **The tests:** `tests/acceptance/W2-116/` on `w2/W2-116-tests`.
+- **The interface they assume:**
+  - `gov rebuild --integration <branch>`, its link at the path `rebuild.yaml`'s `integration_store` names (W2-122's
+    key);
+  - a seed from a store behind the head names the base's head commit (12 hex digits or more) and says `behind`.
+- **`allowed_paths` widened:** S3 needs a plain `gov retrieve` in a launched session to answer from the integration
+  store. So the launcher's session env (`src/gov/launch/launcher.py`) and the place `gov retrieve` picks its root
+  (`src/gov/retrieve/command.py`) are added, with the evidence record. Use an environment variable the launch sets and
+  `gov retrieve` reads when no `--root` is given.
+- **The refresh after a merge seeds from the ready half,** so it re-embeds only what changed (the designer's N-1).
+- **A build whose semantic store is not recreated counts as failed** (N-2), as the CTO's script counts it.
+- **Untested (N-4):** a search through the link writes its question-vector cache into the ready half. The engineer
+  states whether a sandboxed session may write there, or where the cache goes instead.
+
+**Pass 1 merged (CTO, 2026-11-06, `75acb0ff`; review READY in round 2, `reviews/w2-116.md`).** For the next pass (S2),
+riding along (DEC-802):
+- **R2-F1:** `gov retrieve --root <link>` still resolves the link once per facet. Resolve the root once in
+  `_store_root` in both branches. The plain form with `GOV_STORE` is fixed.
+- **R2-F3:** a continuation token carries no mark of the half it was made on. Page 2, asked after a switch, pages the
+  other half. The parallel-agents test after window 4 measures it (DEC-1087 (10)).
+- **F7:** the merge queue's promotion builds with the clone's code. Retire it, or make it build with the pinned gov,
+  once the hook is live.
+- **Window 4's ACT** installs the hook with `flock -o` (R2-F2), `env -u PYTHONPATH -u PYTHONHOME -u PYTHONSTARTUP -u
+  GOV_REBUILD_LOCK` (F5), and the separate `W2-00-store.refresh.lock` taken before the heavy slot (F6).
+- **F3,** a stale `index.lock` after a refresh killed during its checkout, is a row (not ordinary work).
+
+[DEC-1087]

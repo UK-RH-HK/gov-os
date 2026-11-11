@@ -87,7 +87,7 @@ New or changed for Wave 2:
 10. **List rows.** A list row's state is re-checked against the code when its ticket picks it up (DEC-718). A row a ticket closes is marked closed in `docs/plan/WAVE_2_LIST.md` with its commit.
 11. **Owner decisions (DEC-724, changed by DEC-861 and DEC-862).**
     - The orchestrator records the owner's decisions and commits them itself, as soon as they are written, with `Role: orchestrator`, `Task: decision-record` and `Decided-by: owner (chat, <date>)`; nothing stays staged. The owner's push is the acceptance.
-    - ~~Until W2-12 lands, ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts stay the owner's own `Role: owner` commits (DEC-862 (a)).~~ **Lifted by DEC-953:** the ratchet lists and escalation lifts no longer gate anything here (`LIFTED-BY-DEC953.md` B). W2-12 is Wave 3.
+    - ~~Until W2-12 lands, ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts stay the owner's own `Role: owner` commits (DEC-862 (a)).~~ **Lifted by DEC-953:** the ratchet lists and escalation lifts no longer gate anything here (`DECISIONS-IN-FORCE.md`, its "Lifted" section). W2-12 is Wave 3.
     - Once W2-12 lands, the owner approves with `gov approve` in a plain terminal, and the close counts a decision-record commit once it is in the owner's pushed ref (DEC-862 (b)).
     - Delegated decisions are the orchestrator's, with `Role: orchestrator`.
 12. **The coordination ticket W2-00 (DEC-729)** carries the main session's own records (section 2, W2-00).
@@ -180,17 +180,29 @@ Three tracks.
 | W2-108 | B | **New (DEC-969; a follow-up of W2-54, linked).** Retrieval checks the stores' freshness once per run, not on each of the context check's 328 calls (~460 s of repeated work under load); the time limit not raised (`DAEO-zoex`) | implementation | engineer | STANDARD | none | 80 | DEC-969, DEC-968 |
 | W2-109 | A | **New (DEC-971 item 2).** Contract v4.3: DEC-841's nine items to Wave 3 by a CIT-P, CAP-53.b split, `contract.yaml` the authority, the two forms checked to agree (W2-49's P-A (b), P-B) (`DAEO-6b2q`) | specification | product-spec | STANDARD | none | 300 | DEC-971, DEC-841, DEC-825, CAP-33 |
 | W2-110 | A | **New (DEC-971 item 4).** A product's CTO-only install rule: the kernel's guard asks only the orchestrator on the project's coordination ticket (W2-105's P-W2-105-1 (a)) (`DAEO-3r1j`) | implementation | engineer | FULL | none | 80 | DEC-971, DEC-957 |
-| W2-90b | A | **New (DEC-965 item 4, DEC-970; PLAN-GROWTH-1 gap 1).** W2-90's next round: its 7 named reds, the 14 ids ACT 1 dropped, W1-33 ×4, W1-05 ×2 and W2-54's sandboxed case to the kernel's wiring, and the harnesses' stand-in homes on the editable install, lowering nothing (`DAEO-nqa2`) | test-revision | independent-test-designer | LITE | W2-105, W2-106 | 300 | DEC-965, DEC-970, DEC-953 |
+| W2-90b | A | **New (DEC-965 item 4, DEC-970; PLAN-GROWTH-1 gap 1).** W2-90's next round: its 7 named reds, the 14 ids ACT 1 dropped, W1-33 ×4, W1-05 ×2 and W2-54's sandboxed case to the kernel's wiring, and the harnesses' stand-in homes on the editable install, lowering nothing (`DAEO-nqa2`) **Split by the owner (DEC-999, 2026-11-01):** the cases needing W2-105 or W2-110 (its 7 named reds) moved to W2-90c; the rest now, after W2-106 only. | test-revision | independent-test-designer | LITE | W2-106 | 300 | DEC-965, DEC-970, DEC-953 |
+| W2-90c | A | **New (DEC-999, the owner's split of W2-90b).** The cases of W2-90b that need W2-105 or W2-110: W2-90's seven named reds and any case W2-90b names (`DAEO-fu3n`). | test-revision | independent-test-designer | LITE | W2-90b, W2-105, W2-110 | 60 | DEC-999, DEC-965, DEC-966 |
 | W2-111 | A | **New (DEC-979 item 1 D2, P-LATENCY-1).** The 11 hook-latency cases (W1-02, W1-05, W2-57, p95 under 100 ms) time the hook's own work, not the machine's load, at the same bound, lowering nothing (`DAEO-qvff`) | test-revision | independent-test-designer | LITE | W2-90b | 120 | DEC-979, DEC-906, DEC-968 |
 | W2-112 | A | **New (DEC-982, P-RERANKER-1 (a)).** One reranker serves every session: a shared, on-demand service on a local socket; each search falls back to a private reranker, else an unranked order marked `rerank: unavailable` (`DAEO-clon`) | implementation | engineer | FULL | W2-32 | 200 | DEC-982, DEC-979, DEC-374 |
 | W2-113 | A | **New (DEC-982, P1-NEW-TICKETS-2026-10-31 T1).** An adopted product's CTO is named at adoption: the adopt step writes the coordination-ticket key; the orchestrator role file states the CTO-only install rule; the refusal names `GOV_TICKET` (`DAEO-g29a`) | implementation | engineer | STANDARD | W2-110, W2-52 | 60 | DEC-982, DEC-971 |
 | W2-114 | A | **New (DEC-982, P1-NEW-TICKETS-2026-10-31 T2).** W1-28's whole-tree copy check reads code, not message text; every true copy still found (`DAEO-4eux`) | test-revision | independent-test-designer | LITE | none | 40 | DEC-982, DEC-385, DEC-906 |
 | W2-115 | A | **New (DEC-983, SMART-WORK-1 decision 1).** `gov close`, the smart close: scoped runs only, a close refused only by a red its own change caused, the culprit of a batch sent back, no lists, a close record, the nightly's full secrets scan; the strict close kept built; before EXAMIN's copy (`DAEO-emq1`) | implementation | engineer | FULL | W2-55 | 400 | DEC-983, DEC-982, DEC-968, DEC-953 |
 | W2-116 | A | **New (DEC-983, SMART-WORK-1 decision 2).** The designers' store in the product: a double-buffered store of the integration branch, refreshed after the nightly and once more a day, read by a test designer's retrieval; before EXAMIN's copy (`DAEO-f58b`) | implementation | engineer | STANDARD | W2-60b, W2-33 | 150 | DEC-983, DEC-982, DEC-963 |
-| W2-117 | A | **New (DEC-983, SMART-WORK-1 decision 3).** The merge queue in the product (`gov queue`), from W2-97's tool; after EXAMIN's copy (`DAEO-zkr9`) | implementation | engineer | FULL | W2-97, W2-115, W2-20, W2-27 | 250 | DEC-983, DEC-982, DEC-959 |
+| W2-117 | A | **New (DEC-983, SMART-WORK-1 decision 3).** The merge queue in the product (`gov queue`), from W2-97's tool; **before EXAMIN's copy (DEC-1010 item 5)** (`DAEO-zkr9`) | implementation | engineer | FULL | W2-97, W2-115, W2-20, W2-27 | 250 | DEC-983, DEC-982, DEC-959 |
 | W2-118 | A | **New (DEC-983, SMART-WORK-1 decision 3).** Interim results (`gov watch`) and the return's brief gaps checked by the subagent-stop hook; after EXAMIN's copy (`DAEO-ts4y`) | implementation | engineer | STANDARD | W2-33, W2-60b, W2-27 | 120 | DEC-983, DEC-982, DEC-952, DEC-943 |
 | W2-119 | A | **New (DEC-983, SMART-WORK-1 decision 2).** The guard's refusals counted: recorded without their text, counted by rule in `gov status`, a rule over its threshold a finding; before EXAMIN's copy (`DAEO-168f`) | implementation | engineer | FULL | W2-110 | 80 | DEC-983, DEC-982, DEC-958 |
 | W2-120 | A | **New (DEC-995, DEC-996, P-W2-11-9 (c)).** W2-11's child engineer ticket (`DAEO-i89t`, STANDARD, engineer): the skill validator refuses a brief template without the twelve-field rule (row W2-L097, moved from W2-11) and a skill whose front matter carries a permission field; after W2-11; before EXAMIN's copy. | implementation | engineer | STANDARD | W2-11 | 80 | DEC-995, DEC-996, DEC-992 |
+| W2-121 | A | **New (DEC-1007, DEC-1008, P1-DISPATCH-1 (a)).** `gov dispatch` (`DAEO-cb2b`): one pass a minute starts the ready list's next ticket when there is room for each job's peak, every heavy step in a slot, returns into an inbox, approved landings as one batch, the true status; before EXAMIN's copy (one of K9's entry criteria). | implementation | engineer | FULL | W2-20, W2-118 | 500 | DEC-1007, DEC-1008, DEC-1003 |
+| W2-122 | A | **New (DEC-1014, SIZING-1 option 0; at the front).** Seeded rebuilds: `gov rebuild --seed` from the integration store, so no rebuild is cold and each copy re-embeds only its changed files (`DAEO-blwa`). | implementation | engineer | STANDARD | none | 150 | DEC-1014, DEC-1011 |
+| W2-123 | A | **New (DEC-1014, SIZING-1 option 0; at the front).** The shared embedding server serves parallel requests within its CPU cap, vectors unchanged, the cap measured not to be the new limit (`DAEO-qzrq`). | implementation | engineer | STANDARD | none | 80 | DEC-1014, DEC-1011 |
+| W2-124 | A | **New (DEC-1027 C, P-W2-122-K5 (c)).** A rebuild without its semantic store fails named; adoption finishes and records it as a finding; the close treats it as failed (`DAEO-mb2t`). | implementation | engineer | STANDARD | W2-122 | 80 | DEC-1027, DEC-1015 |
+| W2-125 | A | **New (DEC-1027 H, P-W2-04-7 (b)).** The context gate before the close's runs, uncounted; the session-start hook names a refused context (`DAEO-jfm3`). | implementation | engineer | STANDARD | W2-04 | 60 | DEC-1027, DEC-1025 |
+| W2-126 | A | **New (DEC-1032, P1-LOAD-BALANCE-1 b.1 and b.6; the infrastructure sprint).** A machine-wide vector cache keyed by the text: each text embedded once on the machine; the retrieval check's dev tiers cached (`DAEO-jpr0`). | implementation | engineer | STANDARD | W2-123 (`semantic.py`) | 150 | DEC-1032 |
+| W2-127 | A | **New (DEC-1035, P-W2-112-T2 (a)).** The shared reranker reachable from the launch sandbox: its one socket path allowed, nothing else; right after W2-112, before EXAMIN's copy (`DAEO-1vka`). | implementation | engineer | FULL | W2-112 | 40 | DEC-1035 |
+| W2-42a | A | **New (DEC-1028 item 4, P1-GUARD-PARSER-W2 (a)).** The product's guard reads what a Bash command writes: ACT-GUARD-FIX-3's eight parser lines in `src/gov/guard`, before EXAMIN's copy (`DAEO-03ub`). | implementation | engineer | FULL | none (files split from W2-09) | 600 | DEC-1028, DEC-958 |
+| W1-01b | A | **New (DEC-1031 item 3).** W1-01's merge rule: a merge listed in `acceptance_exemptions` is exempt for its own changes; a test revision under the owner's named decision (`DAEO-vhad`). | test-revision | independent-test-designer | LITE | none | 20 | DEC-1031, DEC-906 |
+| W2-66b | A | **New (DEC-1027 B).** W2-66's record-only case reads `win_toast.ps1` as code; a test revision under the owner's named decision (`DAEO-zuiy`). | test-revision | independent-test-designer | LITE | none | 2 | DEC-1027, DEC-906 |
+| W2-11b | A | **New (DEC-1022 item 3, P-W2-11-LINES (a)).** The seven KPI lines W2-11 landed without (SMART-WORK-3's reviewer template and qa-review line; SMART-WORK-4 lines 4, 6, 9, 10; SMART-WORK-5 B and C), word for word; starts once W2-11 closes; withdrawn if W2-11 takes them in another round (`DAEO-9bc0`). | skill | product-spec | STANDARD | W2-11 | 120 | DEC-1022, DEC-1014, DEC-1010 |
 | ACT 2 | — | **Milestone (DEC-954 item 6; PLAN-GROWTH-1 gap 4).** The one re-pin, an owner ACT, once memory, the roles and the three layers' foundations have landed; W2-100 and W2-101 start after it | milestone | owner | — | memory landed (K4), the roles landed (W2-33, W2-60b, W2-11), W2-104 | 0 | DEC-954 item 6 |
 | W2-55 | C | Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see (DEC-791) | implementation | engineer | STANDARD | W2-03 | 150 | DEC-791 (i) |
 | W2-56 | A | `gov launch` usable for every worker: the code-graph folder in the session's own temporary folder, the sandbox's write list limited to the ticket's paths, no placeholder in a commit (DEC-799) | implementation | engineer | FULL | W2-50, W2-05 (closes after them) | 120 | DEC-789, DEC-799 |
@@ -814,6 +826,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - the adoption proving ground passed (W2-81);
   - Wave 2-grade evidence (a clean close, the memory measure, or the proving ground) for every capability the copy relies on, not only Wave 1's record.
   - a Definition of Ready checked at claim (W2-82, `DAEO-4k3l`) and a playbook per stream in the kernel template (W2-83a, `DAEO-dy7j`) (owner, DEC-944 items 2 and 3).
+  - **the dispatcher (W2-121, `gov dispatch`) closed: the Gov OS is not adopted on EXAMIN without a dispatcher (owner, DEC-1008).**
+  - **the product's merge queue (W2-117, `gov queue`) closed: EXAMIN gets test-before-merge (owner, DEC-1010 item 5).**
   - **DEC-953, DEC-954 (the plan's §6):** a ticket in each of W2-81's synthetic repositories closes with `gov close` at exit 0 on a pinned release.
   - **DEC-954 Q1: gated by these criteria, never by a date.** The copy starts only when they are met:
     - memory proven: the enlarged measure at 85 % on the combined memory spec (Q9c);
@@ -842,7 +856,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 #### W2-27 EXAMIN adoption on a copy (FULL, orchestrator)
 - **Depends on, from DEC-954:**
-  - K9's entry criteria above: W2-32 (memory at 85 %), W2-60a, W2-60b, W2-11 and W2-33 (the roles landed), W2-81 (passed), W2-82, W2-83a and W2-56;
+  - K9's entry criteria above: W2-32 (memory at 85 %), W2-60a, W2-60b, W2-11 and W2-33 (the roles landed), W2-81 (passed), W2-82, W2-83a, W2-56, W2-121 (the dispatcher, DEC-1008) and W2-117 (the product's queue, DEC-1010);
   - plus W2-26, W2-52, W2-21, W2-16 (its release installed, Q8c) and W2-88 (memory for any repository; this ticket is its live trial);
   - the deps W2-01, W2-03, W2-04, W2-05, W2-06, W2-20, W2-23, W2-49 and W2-50 stay;
   - W2-08, W2-09, W2-10, W2-18, W2-19 and W2-45 are removed.
@@ -1446,7 +1460,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are filed on 2026-10-29.
 
-#### W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
+#### Split: W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
 - **Why:** a launched session loads none of its role's text (lens E F2); no launch sets effort, and the compaction threshold was a user-level value (lens F F1); the model a subagent runs on is not the one recorded (lens E F14); the loaded skill copy has no version (lens E F15). The accepted plan (§4.3, §2 rows 5, CAP-35.c lite and CAP-36.a lite) adds W2-60 under the admission rule (iii): exit criterion 5. Until it lands, the prompt's launch forms carry the values by hand (prompt v3, §6; DEC-839 item 5).
 - **Split** so that each part fits one lead run: **W2-60a** (the role at launch and the launch record; FULL, engineer) and **W2-60b** (the per-session record; STANDARD, engineer, after W2-60a).
 - **Starts** as soon as filed, beside the memory work (DEC-941), stacked on `w2/integrate` (DEC-786): W2-58's launcher is merged there (`af5d1a25`). W2-60a runs beside W2-56 on `launcher.py`, each in modules of its own. W2-60b starts after W2-60a merges and after W2-07 (`DAEO-r9ss`) closes, since W2-07 holds `src/gov/telemetry/**`. W2-21 follows both on the launcher, and builds on W2-60a's launch record.
@@ -1555,7 +1569,7 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
   - a partial output.
 
 #### W2-80 Acceptance tests for the close queue's gates (a) to (h) and its refusal path (STANDARD, independent-test-designer; DEC-941; DEC-929 item 3; P-TOOLS-REVIEW-1 §4 (a) item 2)
-- **Withdrawn (DEC-953 item 10, DEC-954), unbuilt.** The queue's gates (a) to (h) are lifted (`LIFTED-BY-DEC953.md` A). The text below is history.
+- **Withdrawn (DEC-953 item 10, DEC-954), unbuilt.** The queue's gates (a) to (h) are lifted (`DECISIONS-IN-FORCE.md`, its "Lifted" section). The text below is history.
 - **Why:** the queue decides whether a close starts and what reaches the commit. Its faults T8, S1, S2 and T9 cost closes this fortnight. Only the refusal path is tested, by a cut-out line range. Ticket file `DAEO-03dg`.
 - **Starts** once the orchestrator has committed the queue and its gate tools under `governance/project/orchestration/tools/` (not this ticket's). **Closes** after the orchestrator's change to the queue turns its red cases green: the settable interface, gate (d)'s fail-closed read, the wording of a stop after the close, and the self-check.
 - **Allowed paths:** `tests/acceptance/W2-80/**`.
@@ -1746,6 +1760,85 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
 - **Depends on:** W2-03, W2-52 (`stages.py`, the adopt skill), W2-76 (`src/gov/rebuild/**`), W2-81 (its builders). W2-27 depends on it.
 - **Contract:** A9 lite comes into Wave 2 by a CIT-P note under DEC-105 option (a) (the owner's decision is DEC-954 Q9f).
 
+### Cards for tickets filed without one (2026-11-09; D-10's red-fix list, the plan validator's `wave2-tickets`)
+
+W2-60 above is a split parent with no ticket of its own: its heading says so, so it is not read as a ticket. The tickets below were filed straight from a decision with no card (W2-63 and W2-66c, then W2-128 onwards, the three-digit ids the validator now reads, W2-139's D-10 review F1); each card points at its ticket file, which holds the KPIs.
+
+#### W2-63 W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window (LITE, independent-test-designer; DEC-838, DEC-665, DEC-865)
+- **Ticket file:** `DAEO-pl6k` (closed).
+
+#### W2-66c W2-66's live-map suite pins ACT-SELECT-FIXES-1's lines (LITE, independent-test-designer; DEC-1100, DEC-1098, DEC-889, DEC-891)
+- **Ticket file:** `DAEO-btcs` (open); its KPIs and paths are there.
+
+#### W2-128 The templates: one per role, the ticket and the brief envelope, filled from the ticket and one facts file, delivered at launch, their use measured (P1-7, R3 TPL-1 to TPL-8, DEC-1050 TEMPLATES) (STANDARD, product-spec)
+- **Ticket file:** `DAEO-t8mp` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-129 gov links: one cheap, incremental link-integrity check that finds every unlinked or contradicted record across the repository and its memory, and names the role that fixes it; a notice, never a gate (DEC-1073 (5)(b)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-q7lk` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-130 The link clean-up: every drifting decision marked in its own entry (the 87 with no hint first), tickets linked to the decisions they rest on, commit trailers' residuals listed, and one status-reconciliation list for the owner (DEC-1073 (5)(a)) (STANDARD, orchestrator)
+- **Ticket file:** `DAEO-q8cl` (open); its KPIs, paths and sources are there.
+
+#### W2-131 A register chunk in a bundle carries its own entry's id, not DEC-999 (DEC-1082 (2), a priority fix in re-pin window 4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-r8vq` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-133 A narrowed or gap-starting register item carries its own entry's id (W2-131's follow-up, DEC-1083, re-pin window 4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-k4wm` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-134 The memory measure re-anchors line-cited gold in memory for the commit it measures, and never writes the sets root (W2-61h S8's code, DEC-1085 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-m4rq` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-135 A line over 4,000 characters in a bundle item is sent as its first 4,000, the item marked cut, its lines cited unchanged: a guard against one-line files only (BUNDLE-BUDGET-1 (a), DEC-1086 B) (STANDARD, engineer)
+- **Ticket file:** `DAEO-c4pb` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-136 gov plan: the dependency map from each ticket's writes, needs and waits, the launch batches it proposes, and gov launch's check against them (DEC-1088, DEPENDENCY-MAP-1) (STANDARD, engineer)
+- **Ticket file:** `DAEO-p3ln` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-137 The shared reranker's request cap raised, now that memory is released after each request: fewer requests a search, 20 and 10 searches at once measured with the GPU peak under budget (DEC-1090 (2), PAT-1 G1) (STANDARD, engineer)
+- **Ticket file:** `DAEO-5emz` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-138 The store's commit in every search result, and the worker's check of each item's line hash against its own file (DEC-1090 (3), PAT-1 G2 and G4) (STANDARD, engineer)
+- **Ticket file:** `DAEO-rmhj` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-139 CAP-45.a to Wave 3: the approved CIT-P note applied to the Contract as version 4.3, with its CIT-E, merged in one batch with W2-140 (DEC-1093 (1)) (STANDARD, product-spec)
+- **Ticket file:** `DAEO-ongl` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-140 W2-49's acceptance suite revised for Contract 4.3 (CAP-45 and CAP-45.a to Wave 3), written against the approved CIT-P note before the edit, merged in one batch with W2-139 (DEC-1093 (1)) (STANDARD, independent-test-designer)
+- **Ticket file:** `DAEO-5ce2` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-141 The guard refuses an engineer's search that can reach its own ticket's acceptance folder (Grep, Glob, and Bash recursive searches) unless the call excludes it, saying how (DEC-1093 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-xwro` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-142 Search again once in the kernel skills: the retrieval skill's step 7 and the discovery skill's line, after the practice is proven in use (DEC-1094 (2), SEARCH-AGAIN-PRACTICE §3.1-3.2) (LITE, product-spec)
+- **Ticket file:** `DAEO-qskx` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-145 No private reranker beside the shared service: a search the shared reranker cannot answer stays unranked and named, never a private reranker on the GPU or the CPU; the service holds every reranker GPU slot (DEC-1048 (5), DEC-1046 (1), DEC-1097 (8)) (FULL, engineer)
+- **Ticket file:** `DAEO-2tfd` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-146 The id reader reads every id form a repository declares: a question that names a nonexistent id in any declared form stops with UNRESOLVED_IDS, so DEC-1071 (5)'s stop can fire in any adopted repository (DEC-1099 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-f6x3` (open); its KPIs, paths and sources are there.
+
+#### W2-147 gov plan breaks a cycle only at a ticket inside it: a ticket outside every cycle keeps all its waits (DEC-1102) (STANDARD, engineer)
+- **Ticket file:** `DAEO-zi7s` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-148 The operator agent: ACTs applied by class from a queue, in a walled session (DEC-1104 (2)) (FULL, engineer)
+- **Ticket file:** `DAEO-xafn` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-149 The independent sessions' launch script: a walled headless session per job from an approved brief (DEC-1101 (2)-(3) step 2) (FULL, engineer)
+- **Ticket file:** `DAEO-52ku` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-150 Memory's import closure free of the gates: E-2's four coupling edges untangled (P1-6 item 1, D-6 part 2; DEC-1039 (2), DEC-1109 (2)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-ijf5` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-151 MR-1 to MR-6 regenerated from contract.yaml: the master-rule records say what the Contract says (D-6 part 2; DEC-1074 (8), DEC-1109 (2)) (LITE, product-spec)
+- **Ticket file:** `DAEO-qzca` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-152 gov brief: a filled brief from the ticket and the facts file, refused when the ticket is not READY by code (W2-128 TPL-3, TPL-2 S3, TPL-5 S3 and the dependency fields; the CTO's split, DEC-1112 (3)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-o5x1` (in_progress); its KPIs, paths and sources are there.
+
+#### W2-153 The role template delivered at launch: gov launch and the dispatcher pass it as the appended system prompt, refusing without it; the subagent bodies and the template copies generated and checked byte for byte (W2-128 TPL-4; the CTO's split, DEC-1112 (3)) (STANDARD, engineer)
+- **Ticket file:** `DAEO-8s85` (in_progress); its KPIs, paths and sources are there.
+
 ## 3. Order, layers and critical path
 
 > **Replaced by DEC-953 and DEC-954.** The order is now:
@@ -1845,7 +1938,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
    - **the stacking test:** a question needing about 24k tokens, retrieved in 8k batches, assembled complete, with no duplicates;
    - **the scale probe** against DEC-078's envelope, on EXAMIN's clone and `~/workspace`;
    - CAP-10's figures for the owner (F-m2).
-5. **The adoption-readiness block passes:** AR-1 to AR-10, shown in order (W2-24) and audited (W2-25). **The AR lines whose tickets moved to Wave 3 are named as Wave 3 in W2-24's report** (DEC-953, DEC-954).
+5. **The adoption-readiness block passes:** AR-1 to AR-10, each shown once, in order, in the Wave 2 exit run's record (W2-46), and audited in the exit audit (W2-47). **The AR lines whose tickets moved to Wave 3 are named as Wave 3 in W2-46's record** (DEC-953, DEC-954, W-8; re-worded by DEC-1084, W2-24 and W2-25 retired).
 6. **EXAMIN is adopted with a healthy verdict.** ADOPTED_HEALTHY comes from a fresh independent auditor on the real repository (W2-30), after the copy's verdict (W2-28), against Contract v4.2's lite CAP-44.h. **EXAMIN runs W2-16's release** (DEC-722; DEC-954 Q8c: numbered and frozen). W2-18 is deferred to Wave 3.
 7. **CAP-45.a (W2-17) moves to Wave 3 by a CIT-P note, or is a named exception** (DEC-953, DEC-954). The rest of this criterion stands:
    - *(Revision 3)* **The Contract's Wave 2 items after the re-baseline** (DEC-841: eight, CAP-17.b, CAP-45.a, CAP-10.b, CAP-19.a, CAP-19.c, CAP-33.b, CAP-33.g and CAP-61.f; the other nine moved to Wave 3 through W2-49's CIT-P), **and Contract v4.2's lite items** (CAP-44.h with A7 and A10, CAP-43.b), are each delivered by a closed ticket and cited by an acceptance test. The plan validator checks this both ways.
