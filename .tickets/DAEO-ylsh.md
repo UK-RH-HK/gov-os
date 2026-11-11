@@ -56,9 +56,9 @@ sources:
 - DEC-1120
 - DEC-655
 - DEC-1109
-- W2-60a
-- W2-60b
-- W2-20
+- DAEO-cv58  # W2-60a
+- DAEO-ecac  # W2-60b
+- DAEO-r30l  # W2-20
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-156/

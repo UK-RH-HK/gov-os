@@ -52,7 +52,7 @@ sources:
 - DEC-1088
 - DEC-1119
 - DEC-994
-- W2-121
+- DAEO-cb2b  # W2-121
 est_loc: 330
 acceptance_tests:
   path: tests/acceptance/W2-159/

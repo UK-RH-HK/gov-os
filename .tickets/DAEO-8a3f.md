@@ -48,8 +48,8 @@ sources:
 - DEC-1073
 - DEC-1119
 - DEC-1109
-- W2-129
-- W2-45
+- DAEO-q7lk  # W2-129
+- DAEO-neam  # W2-45
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-158/

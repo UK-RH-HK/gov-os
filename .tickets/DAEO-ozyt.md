@@ -51,7 +51,7 @@ sources:
 - DEC-1073
 - DEC-1119
 - DEC-1109
-- W2-20
+- DAEO-r30l  # W2-20
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-157/
