@@ -544,3 +544,6 @@ other restart is an ACT.
 - DEC-1137 (2026-11-11): W2-11's brief KPIs re-baselined to what W2-128 left (DEC-105 (c)); the five brief pointers stay;
   **a small ticket: the role templates carry Policy 2's four refusals, DEC-861's record rule and the stop after two refusals**
   (DEC-1116's template review), **landing before EXAMIN's copy (W2-27 depends on it)**. Basis: questions 1 and 4.
+- DEC-1138 (2026-11-11, (1) until the end of 11-12's working day): **the lead cap is five**, measured; the 3 GiB floor, `mem_guard`
+  and **the hold below 5 GB available on any lead's next launch** stay; **no new lead run after 03:00** before the nightly;
+  the p95 ACT rewrites the working size and both peak figures. Basis: question 2.

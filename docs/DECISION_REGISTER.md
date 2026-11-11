@@ -14574,6 +14574,20 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (3) **The small ticket lands before EXAMIN's copy: W2-27 depends on it.**
 - **Basis:** questions 1 and 4 (the ticket judged on what exists; the live rules carried where agents read them).
 
+### DEC-1138 — The lead cap raised to five tonight and through 11-12's working day, measured; the safety nets kept; no new lead run after 03:00 before the nightly; the p95 ACT rewrites the working size and both peak figures
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); until the end of 11-12's working day for (1) · **Under:** DEC-1133 (3), (5), DEC-947, DEC-1132 (4), DEC-942 · **Source:** the owner's message (chat, 2026-11-11 ~19:55 UTC): "the risk is mine"
+- **Decision:**
+  - (1) **The lead cap is five** (from three, DEC-1133 (3)'s interim), tonight and through 11-12's working day; up to five
+    live lines released from the order, unblockers first; what happens is measured (the lead ledger, the memory sampler).
+  - (2) **The safety nets stay:** the gate's 3 GiB floor; `mem_guard`; and the hold below 5 GB available, applied to any
+    lead's next launch (no new lead and no new worker while available memory is under 5 GB; released when it recovers).
+  - (3) **The nightly at 04:00 needs a quiet machine:** no new lead run starts after 03:00; the leads wind down before it
+    and resume after it ends.
+  - (4) **The p95 ACT** (ACT-P95-1, after the sample day) **rewrites the working size and both peak figures**
+    (`verification_peak_bytes`, `rebuild_peak_bytes`) from the new measurements, rather than leaving them.
+  - (5) The morning digest gives the lowest available memory, each lead's peak, the load and the usage spent overnight.
+- **Basis:** question 2 (measured capacity, with the protections that keep the machine up).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14647,3 +14661,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.518 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1135 (a detection-only process-name match that can only refuse is outside DEC-1073 (4); DEC-1073 (4) read with it). Next free id: DEC-1136. |
 | 0.519 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1136 (the W1-01 exemption first, the two path-map ACTs rebuilt after; every ACT changing tests/acceptance/ carries its own exemption entry in its apply). Next free id: DEC-1137. |
 | 0.520 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1137 (W2-11's brief KPIs re-baselined, option (c); the role-template ticket before EXAMIN's copy, W2-27 depends on it). Next free id: DEC-1138. |
+| 0.521 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1138 (the lead cap five through 11-12's working day, measured; the safety nets kept; no new lead run after 03:00; the p95 ACT rewrites the working size and both peaks). Next free id: DEC-1139. |
