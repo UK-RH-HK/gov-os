@@ -1,6 +1,6 @@
 ---
 id: DAEO-6ox0
-status: open
+status: in_progress
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -17,7 +17,6 @@ role: research
 depends_on:
 - DAEO-g0ip
 allowed_paths:
-- docs/research/EXP-002/**
 - experiments/EXP-002/**
 kpis:
   success:
@@ -70,3 +69,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-40), as approved (DEC-729). The list row
   - file tools, hooks and MCP servers outside the sandbox [W2-M334, W2-M335];
   - the harness's behaviour at a hook's time limit, so that the guard's deadline sits below it [W2-H052, W2-M347, W2-L328];
   - live auto-compaction and the PreCompact output [W2-M338, W2-M344].
+
+**Scope (CTO, delegated, 2026-11-11):** `allowed_paths` cut to `experiments/EXP-002/**` alone, because the launcher starts a research worker only on exactly one existing folder under `experiments/` (`src/gov/launch/launcher.py`, DEC-827, DEC-996 (C)); the research record goes under `experiments/EXP-002/` and is copied to `docs/research/EXP-002/` by the CTO at close.
