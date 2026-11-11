@@ -38,10 +38,10 @@ kpis:
   - 'S4 A check never traps a session and never fails open silently: on any error the turn ends and the error is named to the owner (`systemMessage`) and in the check''s log; a stand-by note does not let a turn end idle in S2 (unblocked work moves while the owner decides). Verify: a planted unreadable state file: the turn ends, the error named and logged; a stand-by note beside unblocked items: still a block [DEC-1110 (1), DEC-1109 (3)]'
   - 'S5 Where the open items come from is the project''s configuration, never a file name in the code: the default is the dispatcher''s ready list (W2-121, `gov plan --ready`); a project may name a file and a reader. Verify: a planted project with each source: the same block text naming the items; a search of src/gov/session_watch for this repository''s file names finds none [DEC-1110 (1), DEC-1088]'
   failure:
-  - 'A turn blocked twice in a row, or blocked for a legitimate wait.'
-  - 'A check that fails with no message, or that traps a session it cannot read.'
-  - 'A file name, folder or ticket of this repository named in the code.'
-  - 'Any change outside the paths above.'
+  - 'A turn blocked twice in a row, or blocked for a legitimate wait. Verify: S3''s planted turn (a second and a third call in the same turn say nothing) and S2''s planted files for each legitimate wait (gate shut, owner-only items, a running job): each says nothing blocking and names the wait'
+  - 'A check that fails with no message, or that traps a session it cannot read. Verify: S4''s planted unreadable state file: the turn ends, the error is named in `systemMessage` and in the check''s log; a silent end or a block there is this failure'
+  - 'A file name, folder or ticket of this repository named in the code. Verify: S5''s search of src/gov/session_watch for this repository''s file, folder and ticket names finds none'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
 - DEC-1027

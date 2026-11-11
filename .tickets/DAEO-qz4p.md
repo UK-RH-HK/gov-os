@@ -28,10 +28,10 @@ kpis:
   - 'S4 The auditor''s `classes.json` is checked at delivery: one entry for each line of `input/misses.jsonl`, none for another id, each `class` one of the five, each `reason` one line of at most 200 characters, and the five counts of `result.json` equal the classes'' counts. Anything else delivers nothing and ends with code 20. Verify: planted classes: well formed (delivered); a missing id, an extra id, a sixth class, a two-line reason, counts that disagree (each refused 20) [DEC-1101 (2)]'
   - 'S5 Nothing else about the launch script changes: every existing exit code, check and the five set-up A flows behave as at `2f98aecbc`. Verify: `gov accept W2-149`''s cases pass unchanged (206/0/3 passed, failed and skipped at the merge; the live cases run by the CTO), and a diff of the script outside the four changes above is empty [DEC-1112 (3), DEC-1113]'
   failure:
-  - 'A session started without the effort its brief names; an invalid `effort` that builds a wall.'
-  - 'A stopped or malformed result delivered into a set''s folder or an audit''s folder.'
-  - 'A change to the walls'' template files, the approved list, the path map or the guard; to a set-up A brief''s bytes; to any exit code''s meaning.'
-  - 'Any change outside the paths above.'
+  - 'A session started without the effort its brief names; an invalid `effort` that builds a wall. Verify: S1''s planted briefs: with `high` the stub `claude` receives `--effort high`; with `loud` the launch exits 10 and the wall folder is unchanged'
+  - 'A stopped or malformed result delivered into a set''s folder or an audit''s folder. Verify: S2''s planted results with each stopped word, S3''s planted notes with a missing line and S4''s planted classes with a missing id: each is refused (21 or 20) and the set''s and the audit''s folders are byte-identical before and after'
+  - 'A change to the walls'' template files, the approved list, the path map or the guard; to a set-up A brief''s bytes; to any exit code''s meaning. Verify: `git diff --name-only` of the ticket''s branch against its base lists none of those files, and S5''s diff of the script outside the four changes is empty with `gov accept W2-149`''s cases unchanged'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: FULL
 sources:
 - DEC-1101

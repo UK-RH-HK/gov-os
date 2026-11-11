@@ -95,14 +95,14 @@ allowed_paths:
 - docs/plan/wave-2-exit/**
 kpis:
   success:
-  - 'Every exit criterion of §5 is run and evidenced, including: the full, uncached regression and the dev-tier regression, both green'
-  - 'Every exit criterion of §5 is run and evidenced, including: a mid-programme specification change on a-dev that propagates through CIT-P → CIT-E with the correct impact set (WBS §6 exit)'
-  - 'Every exit criterion of §5 is run and evidenced, including: every Wave 2 close record listed with its exit code'
-  - 'Every exit criterion of §5 is run and evidenced, including: the governance share per programme, the EXAMIN pilot included'
-  - 'Every exit criterion of §5 is run and evidenced, including: gov doctor green in EXAMIN. [re-scoped, DEC-1083]'
-  - 'AR-1 to AR-10 are each shown once, in order, in the Wave 2 exit run''s record, with the evidence path of each (DEC-721); the AR lines whose tickets moved to Wave 3 are named as Wave 3 there (DEC-953, DEC-954, W-8). EXP-003''s line is shown by W2-15a. [moved from W2-24 S5, DEC-1083] [re-worded, DEC-1084]'
+  - 'Every exit criterion of §5 is run and evidenced, including: the full, uncached regression and the dev-tier regression, both green Verify: the exit run''s record holds the full uncached regression and the dev-tier regression, each with its command, its date and exit code 0'
+  - 'Every exit criterion of §5 is run and evidenced, including: a mid-programme specification change on a-dev that propagates through CIT-P → CIT-E with the correct impact set (WBS §6 exit) Verify: the record holds a planted specification change on a-dev, its CIT-P to CIT-E trace and the impact set it listed, set beside the expected impact set with no difference'
+  - 'Every exit criterion of §5 is run and evidenced, including: every Wave 2 close record listed with its exit code Verify: the record lists every Wave 2 close record with its exit code; a count of the close records on the integration branch equals the number of rows'
+  - 'Every exit criterion of §5 is run and evidenced, including: the governance share per programme, the EXAMIN pilot included Verify: the record holds the governance share for each programme, EXAMIN''s pilot included, each with the command that measured it'
+  - 'Every exit criterion of §5 is run and evidenced, including: gov doctor green in EXAMIN. Verify: the record holds the `gov doctor` run in EXAMIN with its output and exit code 0 [re-scoped, DEC-1083]'
+  - 'AR-1 to AR-10 are each shown once, in order, in the Wave 2 exit run''s record, with the evidence path of each (DEC-721); the AR lines whose tickets moved to Wave 3 are named as Wave 3 there (DEC-953, DEC-954, W-8). EXP-003''s line is shown by W2-15a. Verify: the record holds ten rows, AR-1 to AR-10 in order, each with an evidence path that exists on disk; each AR line whose ticket moved to Wave 3 is named as Wave 3, and EXP-003''s row points to W2-15a [moved from W2-24 S5, DEC-1083] [re-worded, DEC-1084]'
   failure:
-  - 'Any AR line not shown. [moved from W2-24 F1, DEC-1083] [re-worded, DEC-1084]'
+  - 'Any AR line not shown. Verify: a count of the AR rows in the record under ten, or an AR row with no evidence path, is the failure; neither is found in the record [moved from W2-24 F1, DEC-1083] [re-worded, DEC-1084]'
 profile: FULL
 sources:
 - DEC-729

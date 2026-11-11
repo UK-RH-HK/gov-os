@@ -21,7 +21,7 @@ allowed_paths:
 - experiments/EXP-002/**
 kpis:
   success:
-  - 'Each of these is measured: the harness''s behaviour at a hook''s time limit, so that the guard''s deadline sits below it [W2-H052, W2-M347, W2-L328]'
+  - 'Each of these is measured: the harness''s behaviour at a hook''s time limit, so that the guard''s deadline sits below it. Verify: the experiment''s evidence record holds, for a planted hook that sleeps past the limit, the measured outcome the harness gave (the call allowed, denied or failed, the time it took) as a number with its unit, and the guard''s configured deadline recorded below that measured limit [W2-H052, W2-M347, W2-L328]'
   failure: []
   lifted:
   - 'Each of these is measured: the sandbox cases: denyWrite on a path that does not exist yet; symlink and hard-link tricks; the seccomp filter; bypassPermissions; subagents inside a sandboxed worker session; excludedCommands [CAP-61.f, DEC-160, W2-M336, W2-M337, W2-M350, W2-L316] [lifted (was S1), DEC-1083: re-scoped to S3]'

@@ -29,11 +29,11 @@ kpis:
   - 'S5 Only counts and ids leave the tool: standard output and `runs/<audit>/PREFLIGHT.json` hold ids, counts, codes and digests, never a question, a gold answer, a source path or a heading; a line naming the sets root''s folders is refused before it is printed; the command line names only `--sets-root <root>`, never a folder under it (the guard''s line rule). Verify: a planted question with a unique word: grep of every output file and the captured stdout and stderr finds it 0 times; the printed command line holds no `fixtures/` or `runs/` [DEC-1101 (2), DEC-1097 (2)]'
   - 'S6 The package is wired in: `governance/project/test-map.yaml` places `src/gov/memaudit/**` and its tests (so a change here runs these tests and not the full suite), and the module runs as `python3 -m gov.memaudit preflight|void|declare`. Verify: `gov close`''s scoped selection for a planted change under `src/gov/memaudit/` names `tests/unit/memaudit/`; each subcommand prints its usage with `--help` and exits 0 [DEC-896]'
   failure:
-  - 'A question, gold answer, answer, source path or heading of a set in any output, log or error text.'
-  - 'A set measured twice, or measured without `DECLARATION.json` and `USED` written first.'
-  - 'The repository''s path map, the guard, the hook, `.claude/` or the walls'' template written; the real sets root or run folders opened by a test.'
-  - 'A dropped question deleted; a VOID audit that wrote `USED`.'
-  - 'Any change outside the paths above.'
+  - 'A question, gold answer, answer, source path or heading of a set in any output, log or error text. Verify: S5''s planted question with a unique word, gold answer, source path and heading: grep of every output file, the captured stdout and stderr and the logs finds each 0 times'
+  - 'A set measured twice, or measured without `DECLARATION.json` and `USED` written first. Verify: S3''s planted runs: the file times and the ledger line show `DECLARATION.json` before `USED` before any search, and a second run on the same audit exits with the refusal and starts no search'
+  - 'The repository''s path map, the guard, the hook, `.claude/` or the walls'' template written; the real sets root or run folders opened by a test. Verify: S4''s `git status` in the planted repository shows no change, and a run of the tests with the planted roots under TMPDIR leaves no open of the real sets root or run folders in the tests'' file-access log'
+  - 'A dropped question deleted; a VOID audit that wrote `USED`. Verify: S2''s planted notes with 3 drops (the 3 files are found under `dropped/`) and with 5 drops (VOID: no `USED` and no `DECLARATION.json` in the audit''s run folder)'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: FULL
 sources:
 - DEC-1101

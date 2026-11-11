@@ -22,13 +22,13 @@ allowed_paths:
 - tests/unit/retrieval/**
 kpis:
   success:
-  - 'S1 A profile of the warm real-model query path (the case of W1-19 and W2-13 that measures warm p95 with the real models) names where the time goes, stage by stage, and which retrieval changes since the budget last held added to it; the profile is kept as an evidence note in the ticket''s folder [DEC-1125 (1)]'
-  - 'S2 If a simple cause is found within the time box: it is fixed, and W1-19''s and W2-13''s warm real-model cases pass at 0.5 s p95 on an idle machine, with no other case made red [DEC-1125 (1), W1-19]'
-  - 'S3 If no simple cause is found within the time box (2 lead-hours): work stops and the evidence and options go to the owner; the budget is not changed by this ticket [DEC-1125 (1), DEC-105]'
+  - 'S1 A profile of the warm real-model query path (the case of W1-19 and W2-13 that measures warm p95 with the real models) names where the time goes, stage by stage, and which retrieval changes since the budget last held added to it; the profile is kept as an evidence note in the ticket''s folder. Verify: the evidence note exists in the ticket''s folder and holds a table of the warm query''s stages with a time for each, a total, and a list of the retrieval changes since the budget last held with the time each adds [DEC-1125 (1)]'
+  - 'S2 If a simple cause is found within the time box: it is fixed, and W1-19''s and W2-13''s warm real-model cases pass at 0.5 s p95 on an idle machine, with no other case made red. Verify: where a fix is made, the run of W1-19''s and W2-13''s warm real-model cases on an idle machine prints a p95 at or under 0.5 s for each, and the scoped test run of the changed paths has no new red; where none is made, the note says no simple cause was found [DEC-1125 (1), W1-19]'
+  - 'S3 If no simple cause is found within the time box (2 lead-hours): work stops and the evidence and options go to the owner; the budget is not changed by this ticket. Verify: the lead''s checkpoint records show at most 2 lead-hours before a stop; the evidence note lists the options for the owner; the diff holds no change to the 0.5 s figure in W1-19''s or W2-13''s case [DEC-1125 (1), DEC-105]'
   failure:
-  - 'More than the time box spent without stopping and reporting.'
-  - 'The 0.5 s budget, the case or its measure changed to make it pass.'
-  - 'Any change outside the paths above.'
+  - 'More than the time box spent without stopping and reporting. Verify: the lead''s checkpoint records sum to at most 2 lead-hours, or a stop-and-report record exists at or before the 2 hours; work recorded past 2 hours with no report is this failure'
+  - 'The 0.5 s budget, the case or its measure changed to make it pass. Verify: the ticket''s diff of W1-19''s and W2-13''s warm real-model cases and of the measure they call is empty; any changed line there is this failure'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: LITE
 sources:
 - DEC-1125

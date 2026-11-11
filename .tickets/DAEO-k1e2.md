@@ -31,11 +31,11 @@ kpis:
   - 'S7 The regression pool: after a measured audit its kept questions join `pool/` under the sets root (hidden, like a set). Each audit re-runs the pool through the retrieval measure only (hit@5 and full evidence, no model tokens): the whole pool while it holds 400 questions or fewer, else a seeded draw of 400 (the seed recorded first). The pool''s figures are printed beside the last audit''s, and a fall of 3 points or more in either is named a regression in the counts. The 79 of the fresh 80 and the 138 of earlier sets are added by one planted-tested import path, run once by the CTO. Verify: planted pools of 300 and 900 questions: whole, then a draw of 400 with the same seed twice giving the same draw; a planted fall of 4 points is named [DEC-1101 (1), DEC-1125 (2)]'
   - 'S8 The spend is bounded and recorded: each model call''s `total_cost_usd` goes to the run''s ledger; the run stops at twice its projection (the fresh 80''s 0.157 USD a question, so 12.6 USD for 40), and a brake stop goes to the owner first; a stopped run resumes without re-asking finished questions. Verify: planted ledger over the brake: stops; resume asks only the unfinished [DEC-1097 (1), DEC-1118 (3)]'
   failure:
-  - 'A question, gold answer, answer or source path in standard output, a log or an error text; only ids, counts and digests leave.'
-  - 'A set measured twice, or re-scored to pass; a label changed after its figures exist.'
-  - 'A search made before `DECLARATION.json` and `USED` exist (W2-170); the store rebuilt during an attempt.'
-  - 'The shared Ollama servers or the reranker service touched other than by their ordinary query calls.'
-  - 'Any change outside the paths above.'
+  - 'A question, gold answer, answer or source path in standard output, a log or an error text; only ids, counts and digests leave. Verify: a planted run on the fake reader and graders with a unique word in a question, a gold answer, an answer and a source path: grep of standard output, standard error, every log and `FIGURES.json` finds each 0 times'
+  - 'A set measured twice, or re-scored to pass; a label changed after its figures exist. Verify: a planted miss (S5): a second run on the same audit is refused by W2-170''s `USED` and `misses.jsonl` is byte-identical before and after the refusal; a planted verdict below the bar stays as recorded'
+  - 'A search made before `DECLARATION.json` and `USED` exist (W2-170); the store rebuilt during an attempt. Verify: the planted run''s call ledger: no search entry earlier than the file times of `DECLARATION.json` and `USED`; S4''s planted store change stops the attempt with no rebuild call in the ledger'
+  - 'The shared Ollama servers or the reranker service touched other than by their ordinary query calls. Verify: a planted run with stub servers on stand-in ports: their request logs hold only query calls, and no stop, restart, model load or unload call; no process of either server is signalled'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: FULL
 sources:
 - DEC-1101

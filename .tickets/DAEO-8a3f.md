@@ -38,10 +38,10 @@ kpis:
   - 'S4 With a `<base>`: the portability family runs only when `<base>..HEAD` touches template/governance/kernel/{roles,skills,hooks}/** or .rulesync/**, or when `<base>` does not resolve (otherwise it reads "skipped (no such change)"), and the tree''s own `gov links --since <base>` runs after the others, as `links: ok (0 new since <base>, M standing)` or `links: NOTICE N new: <the first finding lines>`; it writes only links'' own mark. Without a `<base>` both are left out, named. Verify: planted history with and without a kernel change; a planted tree with and without `src/gov/links/` [DEC-1052, DEC-1073]'
   - 'S5 It is bounded and cheap: the whole pass on this repository''s main tree ends within the time bound plus 10 seconds, and it reads and writes nothing else (a filesystem-spy test over a planted tree: only the declared checks'' own outputs and links'' mark). Verify: the measured time on this repository, recorded in docs/changes/W2-158-evidence.md [DEC-1052]'
   failure:
-  - 'A refusal, a non-zero exit or a blocked commit, close, landing or launch because of what it found.'
-  - 'A family that timed out reading ok or red.'
-  - 'A check run that is not the tree''s own declaration.'
-  - 'Any change outside the paths above.'
+  - 'A refusal, a non-zero exit or a blocked commit, close, landing or launch because of what it found. Verify: S3''s planted failing check: exit 0 and a NOTICE line; a search of src/gov/close, src/gov/launch and src/gov/queue finds no call of it whose result decides a refusal'
+  - 'A family that timed out reading ok or red. Verify: S1''s stand-in command that sleeps past the bound and S2''s timed-out planted check: the family''s line reads NOTICE "not measured"; a line reading ok, or a red result, is this failure'
+  - 'A check run that is not the tree''s own declaration. Verify: a planted tree whose declaration for one family holds a marker command: the marker runs and no command from a built-in list does; a planted tree with no declaration for a family reads that family as skipped'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
 - DEC-1052

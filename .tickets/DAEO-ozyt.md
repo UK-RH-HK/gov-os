@@ -39,10 +39,10 @@ kpis:
   - 'S4 Only the named groups are touched: nothing is matched by name, a name that is not a process group id above 1 refuses to start (exit 2), and a group already ended is skipped and named. A trip writes one inbox item naming the reason, the groups paused and how to resume (`kill -CONT -- -<pgid>`) or stop them, then the watch ends; when every named group has ended on its own, the watch logs it and ends. Verify: a stand-in with an unrelated process of the same name left running after a trip; a refused argument "abc"; a job that ends first [DEC-1067 (GPU safety), DEC-1068 (4), DEC-1073]'
   - 'S5 It changes nothing else: it only reads the GPU, the servers'' answers and their logs, and writes its own log and the one inbox item. Verify: a filesystem-spy test over a run with no trip: only its log is written [DEC-1068 (4)]'
   failure:
-  - 'A process outside the named groups paused or signalled.'
-  - 'A trip on a reading under every limit, or a spill, an embedder partly on the CPU or a partial offload not tripping it.'
-  - 'A limit taken from anywhere but the gate''s configuration file.'
-  - 'Any change outside the paths above.'
+  - 'A process outside the named groups paused or signalled. Verify: S4''s planted unrelated process of the same name, left running after a trip: its state is still running and it received no signal; any stop of it is this failure'
+  - 'A trip on a reading under every limit, or a spill, an embedder partly on the CPU or a partial offload not tripping it. Verify: S1''s stand-in readings (15,800 MiB no trip), S2''s (total minus 65 MiB no trip, total minus 63 MiB trip) and S3''s stand-in server (N equal to M no trip; `size_vram` below `size` and N below M each trip): each reading gives the stated outcome'
+  - 'A limit taken from anywhere but the gate''s configuration file. Verify: a planted configuration with a limit differing from the built-in value (and an environment variable and a command-line argument holding a third value): the trip happens at the file''s value only; a planted file with the limit missing or malformed refuses to start and names it'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
 - DEC-1067

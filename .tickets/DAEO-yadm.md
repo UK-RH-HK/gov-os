@@ -25,11 +25,11 @@ allowed_paths:
 - tests/unit/bridge/**
 kpis:
   success:
-  - gov readiness --generate creates one linked gap ticket per required open row, with its dependencies [CAP-30.c, MR-2, W2-M283].
-  - A MISSING required row keeps production tickets out of READY [W2-M274].
-  - The delivered tasks.md template is accepted by the bridge [W2-H051].
-  - A direct openspec archive or a hand-set status does not bypass readiness [W2-H015].
-  - The bridge checks the role against the roster [W2-M082].
+  - 'gov readiness --generate creates one linked gap ticket per required open row, with its dependencies. Verify: a planted readiness table with three required open rows (one depending on another): `gov readiness --generate` exits 0 and creates exactly three gap tickets, each linked to its row, the dependent one listing the other in its dependencies; a second run creates none [CAP-30.c, MR-2, W2-M283]'
+  - 'A MISSING required row keeps production tickets out of READY. Verify: a planted project with one required row MISSING: a production ticket reports not READY, naming the row; once the row is filled it reports READY [W2-M274]'
+  - 'The delivered tasks.md template is accepted by the bridge. Verify: the bridge run on the delivered template unchanged exits 0 and prints no refusal [W2-H051]'
+  - 'A direct openspec archive or a hand-set status does not bypass readiness. Verify: a planted ticket with open readiness rows: `openspec archive` run directly, and a status set by hand to done, are each refused or reverted by the readiness check, naming the open rows [W2-H015]'
+  - 'The bridge checks the role against the roster. Verify: a planted tasks.md naming a role that is not in the roster is refused by the bridge naming the role; a listed role is accepted [W2-M082]'
   failure: []
 profile: STANDARD
 sources:

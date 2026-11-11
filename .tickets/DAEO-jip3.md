@@ -21,9 +21,9 @@ allowed_paths:
 - docs/audit/wave-2/**
 kpis:
   success:
-  - A fresh, read-only auditor gives a finding row to every Wave 2 covers item, every Contract v4.2 lite item, every AR line and every MR clause, against Contract v4.2 and the decisions.
-  - The audit→repair loop runs on its findings under DEC-096.
-  - 'A fresh, read-only auditor checks AR-1 to AR-10 and Track A''s tickets against DEC-718, DEC-720 to DEC-727 and this plan. Its verdict is Track A''s pass or fail. A BLOCKER is fixed; every other finding goes to the owner (§6). [moved from W2-25 S1, DEC-1083]'
+  - 'A fresh, read-only auditor gives a finding row to every Wave 2 covers item, every Contract v4.2 lite item, every AR line and every MR clause, against Contract v4.2 and the decisions. Verify: a script lists every Wave 2 covers item, Contract v4.2 lite item, AR line and MR clause and compares it with the report''s finding rows: no item is without a row'
+  - 'The audit→repair loop runs on its findings under DEC-096. Verify: the report''s loop record shows each finding''s repair round under DEC-096 and its end (closed or taken to the owner); no open finding is without a round'
+  - 'A fresh, read-only auditor checks AR-1 to AR-10 and Track A''s tickets against DEC-718, DEC-720 to DEC-727 and this plan. Its verdict is Track A''s pass or fail. A BLOCKER is fixed; every other finding goes to the owner (§6). Verify: the verdict record holds the auditor''s session as fresh and read-only (its role record and the guard''s log show no write but the report), Track A''s pass or fail, each BLOCKER with the commit that fixed it, and each other finding with an owner entry [moved from W2-25 S1, DEC-1083]'
   failure: []
   lifted:
   - 'The report commits through the hook. [lifted (was S3), DEC-1083: dropped, it cannot pass as written (W-4)]'

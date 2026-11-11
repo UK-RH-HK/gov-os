@@ -24,8 +24,8 @@ allowed_paths:
 - tests/unit/readiness/**
 kpis:
   success:
-  - For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved, and its acceptance tests include visual checks against them [CAP-30.g, DEC-104].
-    A visual-testing tool is installed under DEC-083 when first needed (queued).
+  - 'For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved, and its acceptance tests include visual checks against them [CAP-30.g, DEC-104].
+    A visual-testing tool is installed under DEC-083 when first needed (queued). Verify: a planted UI feature whose UX row has no approved wireframe or mockup record is refused at close, naming the UX row; with an approved record and acceptance tests that hold no visual check against it, also refused; with both present the UX row closes; the visual-testing tool is installed only through the DEC-083 request, never silently.'
   failure: []
 profile: STANDARD
 sources:

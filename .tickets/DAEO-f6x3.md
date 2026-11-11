@@ -29,9 +29,9 @@ kpis:
   - 'S3 The stop fires on them: `gov retrieve` on a planted store, asked a question that names an id of a declared form that exists nowhere (no record has it, no line of the index holds it as a whole token), stops with UNRESOLVED_IDS, that id a gap UNRESOLVED, no evidence and no continuation. The same id present as a whole token on one line is retrieved as before. The "every" rule stays: one named id that exists means the request is retrieved as before. Verify: end-to-end tests on a planted store for each planted form [DEC-1071 (5), DEC-1099 (2), DEC-900]'
   - 'S4 Nothing else moves: with no form declared, the lexical route''s ranking of a question, the closure''s gaps and the existing UNRESOLVED_IDS cases are unchanged. A declared form changes only what the id reader reads. Verify: the existing retrieval and retrieve unit and acceptance tests pass unchanged [DEC-1071 (5), DEC-1099 (2)]'
   failure:
-  - 'A question naming a nonexistent id of a declared form answered with unrelated evidence instead of UNRESOLVED_IDS.'
-  - 'A question naming an existing id of a declared form stopped with UNRESOLVED_IDS.'
-  - 'Any change to ids_in''s result, to ranking or to the stop when no form is declared; a path map with a malformed form accepted.'
+  - 'A question naming a nonexistent id of a declared form answered with unrelated evidence instead of UNRESOLVED_IDS. Verify: S3''s end-to-end test on the planted store, asked for a declared-form id that exists nowhere: the answer is UNRESOLVED_IDS with no evidence; any evidence returned there is this failure'
+  - 'A question naming an existing id of a declared form stopped with UNRESOLVED_IDS. Verify: S3''s end-to-end test with the same id present as a whole token on one line: the answer is retrieved, and UNRESOLVED_IDS is never printed for it'
+  - 'Any change to ids_in''s result, to ranking or to the stop when no form is declared; a path map with a malformed form accepted. Verify: S4''s unchanged existing tests, and S2''s byte-identical comparison of `ids_in` with and without forms on a planted text, all pass; S1''s planted map with a nameless, a patternless and a non-compiling form is refused by the schema each time'
 profile: STANDARD
 sources:
 - DEC-1071

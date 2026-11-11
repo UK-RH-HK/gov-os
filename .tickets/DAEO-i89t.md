@@ -20,7 +20,7 @@ allowed_paths:
 - tests/unit/check/test_w2_120*
 kpis:
   success:
-  - 'gov check''s skill validator refuses a skill whose front matter has no output class or carries a key outside the skill template''s list (allowed-tools, permissions, paths, sandbox, network, model, effort or any other), naming the file and the key; it reads the kernel skills and every generated copy, and names each vendored skill so found [DEC-995, DEC-996, CAP-24.b]'
+  - 'gov check''s skill validator refuses a skill whose front matter has no output class or carries a key outside the skill template''s list (allowed-tools, permissions, paths, sandbox, network, model, effort or any other), naming the file and the key; it reads the kernel skills and every generated copy, and names each vendored skill so found Verify: planted skills: one with no output class, one with each of the listed keys (allowed-tools, permissions, paths, sandbox, network, model, effort) and one with another key: `gov check` refuses each, printing the file and the key; a planted vendored skill is named; a planted copy under the generated folders is read as well as the kernel one; a clean skill passes. [DEC-995, DEC-996, CAP-24.b]'
   failure: []
   lifted:
   - 'gov check''s skill validator refuses a brief template without the twelve-field rule (the twelve labelled return fields, the payload-after rule and the two-refusal stop), naming the file and what is missing; the kernel''s five brief templates as W2-11 leaves them pass [AR-5, AR-6, W2-L097, DEC-995] [lifted (was S1), DEC-1083: re-scoped to S3]'

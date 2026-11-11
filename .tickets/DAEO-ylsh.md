@@ -42,10 +42,10 @@ kpis:
   - 'S5 `gov spend clear <ticket> [--projection-usd N] --note <text>` removes the marker and restarts the ticket''s count from that moment, with the note and the new projection (if given) in the brake record; a cost before the clear is no longer counted. Verify: after a planted brake, `clear` then `launch` starts, and `sum` shows the cost since the clear only [DEC-1091 (2)]'
   - 'S6 Usage stays record-only: the brake only holds a new launch and writes its one inbox item; it stops no running session, sends no notification outside the project''s inbox, and raises no alarm about usage. Verify: a planted braked ticket with a running stand-in session: the session''s process is untouched after `check`, and a notifier stub is never called [DEC-1089 (3), DEC-1091 (2)]'
   failure:
-  - 'A running session stopped by the brake, or a push or alarm sent about usage.'
-  - 'A not-measured cost counted as zero, or a ticket with no projection braked.'
-  - 'A launch for a braked ticket that starts.'
-  - 'Any change outside the paths above.'
+  - 'A running session stopped by the brake, or a push or alarm sent about usage. Verify: S6''s planted braked ticket with a running stand-in session and a notifier stub: after `check` the session''s process is alive and the stub has 0 calls; either changed is this failure'
+  - 'A not-measured cost counted as zero, or a ticket with no projection braked. Verify: S1''s planted records with one not-measured session: `sum` prints "1 unknown" and a total of the measured three only; S4''s planted records with a large cost and no projection: no marker and no inbox item'
+  - 'A launch for a braked ticket that starts. Verify: S3''s launcher unit test with a planted marker: the launch is refused with SPEND_BRAKED and nothing is started; a started session there is this failure'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: STANDARD
 sources:
 - DEC-1091

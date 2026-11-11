@@ -29,15 +29,15 @@ allowed_paths:
 # .claude/settings.json out of the paths: a launched session cannot edit it (DEC-315), and a change to this repository's own file goes by ACT; the adapter code and the fixtures that merge such a file stay in the paths (the CTO's delegated decision, DEC-1112 (3))
 kpis:
   success:
-  - Rollback never deletes an untracked file it did not create; it refuses or preserves [W2-H036].
-  - Adapter generation merges a programme's own CLAUDE.md, AGENTS.md and .claude/settings.json instead of overwriting them, keeping their order [W2-H050, W2-M232, W2-M312, W2-M229].
-  - The A8 dependency proof finds every listed citation form [W2-H035, W2-M225].
-  - A failed or interrupted batch leaves a resumable record and no half-staged state [W2-M219, W2-M220, W2-M224].
-  - A project without .gitleaks.toml, or with a .gitignore that omits .gov-runtime/, is set up, not refused late [W2-M217, W2-M218, W2-M307].
-  - Every command and hook works in a repository whose path contains a space (~/EXAMIN APP).
-  - A move to a target that no namespace holds is refused before it runs [W2-M216].
+  - 'Rollback never deletes an untracked file it did not create; it refuses or preserves. Verify: a planted fixture with one untracked file created by the user before an adoption batch and one created by the batch: after rollback the user''s file is present byte for byte (or the rollback refuses and names it) and the batch''s file is removed [W2-H036]'
+  - 'Adapter generation merges a programme''s own CLAUDE.md, AGENTS.md and .claude/settings.json instead of overwriting them, keeping their order. Verify: a planted programme whose three files each hold its own lines: after generation each file still holds every one of the programme''s lines in the original order plus the generated lines, and none is replaced by the generated file alone [W2-H050, W2-M232, W2-M312, W2-M229]'
+  - 'The A8 dependency proof finds every listed citation form. Verify: a planted set holding one citation of each listed form: the A8 proof prints every one of them as found, and a planted citation of an unlisted form is the only one not found [W2-H035, W2-M225]'
+  - 'A failed or interrupted batch leaves a resumable record and no half-staged state. Verify: a planted batch that fails at its third step, and one killed between steps: each leaves a record from which the resume command continues at the failed step, and `git status` shows nothing staged [W2-M219, W2-M220, W2-M224]'
+  - 'A project without .gitleaks.toml, or with a .gitignore that omits .gov-runtime/, is set up, not refused late. Verify: a planted project with neither the file nor the ignore line: adoption writes `.gitleaks.toml` and adds `.gov-runtime/` to `.gitignore` at set-up, and no later stage refuses for either [W2-M217, W2-M218, W2-M307]'
+  - 'Every command and hook works in a repository whose path contains a space (~/EXAMIN APP). Verify: a planted repository in a folder named `EXAMIN APP`: each `gov` command and each kernel hook run there exits as it does in a path without a space, and none prints a word-splitting or path error.'
+  - 'A move to a target that no namespace holds is refused before it runs. Verify: a planted move whose target path is in no namespace: the move is refused with a message naming the target, before any file is moved (the tree is unchanged) [W2-M216]'
   failure:
-  - The fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
+  - 'The fixture''s own instruction files and every untracked file survive an adoption and its rollback byte for byte. Verify: a planted fixture with instruction files and untracked files, sha256 listed before; after an adoption and its rollback the same listing is equal; any difference is named and fails.'
 profile: FULL
 sources:
 - DEC-729

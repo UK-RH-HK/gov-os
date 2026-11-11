@@ -35,11 +35,11 @@ kpis:
   - 'S8 A retrieval change waits for the next audit and is never measured by a separate run: `python3 -m gov.memaudit status --sets-root <root> --since <commit>` prints `audited` when a measured audit''s commit is at or after the last change to a retrieval path since `<commit>`, else `not audited, next due <date>`; a release cut reads it (DEC-1097 (4) folded into the audit, DEC-1125 (2)). Verify: planted audits and retrieval commits: before, after, none [DEC-1125 (2), DEC-1097 (4)]'
   - 'S9 The cron wrapper `memaudit_cron.sh` runs `due` and starts the cycle only when an audit is due, with the pinned interpreter; it does nothing and exits 0 when none is due, appends one line per run to the audits'' cron log, and does not start the measure steps while the dispatcher holds a full run or a rebuild (the gate''s own check), waiting at most 60 minutes and then stopping with `gate busy`. It contains no crontab edit (the crontab is class (O), an ACT). Verify: planted `due` outputs and gate states: not due (no start, exit 0), due and idle (starts), due and busy for 61 minutes (stops `gate busy`); `grep -c crontab` of the wrapper is 0 [DEC-1125 (2), DEC-1038]'
   failure:
-  - 'A wall, a set, the approved list or a run folder opened by the driver other than through the launch script, W2-170''s or W2-171''s code; a command line naming a folder under the sets root.'
-  - 'A question, gold answer, answer or source path in the digest block, standard output or a log.'
-  - 'An audit started while another runs, or twice in 5 days without `--force`; a stopped audit''s set measured later.'
-  - 'The crontab, the path map, the guard, `.claude/` or the walls'' template written.'
-  - 'Any change outside the paths above.'
+  - 'A wall, a set, the approved list or a run folder opened by the driver other than through the launch script, W2-170''s or W2-171''s code; a command line naming a folder under the sets root. Verify: S1''s planted run: the call ledger''s printed command lines hold no `fixtures/`, `runs/` or `indep-walls/`, and a file-access spy over the driver''s own process shows no open of those folders'
+  - 'A question, gold answer, answer or source path in the digest block, standard output or a log. Verify: S7''s planted audit with a planted question word, gold path and answer: grep of `DIGEST.txt`, standard output and the logs finds none'
+  - 'An audit started while another runs, or twice in 5 days without `--force`; a stopped audit''s set measured later. Verify: S4''s planted second start while the lock is held and a start 3 days after the last are refused; S3''s planted stop before `USED` leaves the set unmeasured and the next audit starts a new set'
+  - 'The crontab, the path map, the guard, `.claude/` or the walls'' template written. Verify: S9''s `grep -c crontab` of the wrapper is 0, and `git status` in the planted repository after a run shows no change to the path map, the guard, `.claude/` or the walls'' template'
+  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'
 profile: FULL
 sources:
 - DEC-1101
