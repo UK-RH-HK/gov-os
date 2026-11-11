@@ -513,3 +513,7 @@ other restart is an ACT.
   exception to DEC-757 (6) for its file); **the memory audit's writer, checker and auditor briefs approved** (sha256
   `bc0894230e31`, `cea517b8da7d`, `37be41c3fb2f`; into the approved list by ACT-MEMORY-AUDIT-INSTALL-1); W2-60a's
   RUBRIC-2 lines a fresh round 1, at most two, judged only on those lines. Basis: questions 1 and 4.
+- DEC-1130 (2026-11-11): **a `Verify:` pass on unreviewed tickets; reviewed tickets in progress launch on hand-built
+  briefs until they close, `gov brief`'s refusal recorded in each** (the owner's exception to DEC-1083, those tickets
+  only); a ticket before EXAMIN's copy so `gov brief` handles an adopted repository's tickets without `Verify:`; W2-94 and
+  W2-93 by the walled writer route (an `evaluation_sets` ACT and writer briefs for approval). Basis: questions 1 and 2.

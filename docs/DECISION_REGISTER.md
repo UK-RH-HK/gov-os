@@ -13498,7 +13498,7 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   drift) and question 4 (prompts only where they carry a decision).
 
 ### DEC-1083 — D9-FATES decided; K9's memory bar; W2-128's ready check per DEC-1052; W2-131's follow-up a ticket of its own; grid v2 and v3 accepted; h23 traced through the re-anchoring log; a new spill floor proposed
-- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1098 (1) (K9's memory line met); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2)
+- **Status:** ACCEPTED (owner, 2026-11-06, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-06)`) · **Under:** DEC-1039 (3b), DEC-1052, DEC-1074, DEC-1079, DEC-1081, DEC-1082 · **Source:** `governance/project/orchestration/packages/LIFT-1/D9-FATES.md`, `packages/LIFT-1/D4B-SCORE-ONCE.md` · **Changed by:** DEC-1084 (W2-66b, W2-90c); DEC-1098 (1) (K9's memory line met); DEC-1097 (1)(d) (K9's bar: right end to end ≥ 85 % with wrong claims ≤ 5 %, target 95 %, hit@5 beside it, replacing item (2)'s hit@5 bar); DEC-1087 (13) (W2-33's layer lines back in Wave 2) · **Excepted by:** DEC-1130 (1): reviewed in-progress tickets launch on hand-built briefs until they close
 - **Decision:**
   - **D9-FATES:**
     - (1) The fates are approved in one approval. An independent auditor checks all 792 KPI lines before any edit
@@ -14446,6 +14446,21 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
     judging only those new lines against their KPI lines.
 - **Basis:** question 1 (one memory bar, met on a set used once, checked weekly) and question 4 (a bounded review).
 
+### DEC-1130 — `gov brief` and the missing `Verify:` lines: a pass on the unreviewed tickets, the reviewed ones on hand-built briefs until they close (the owner's exception to DEC-1083); a ticket before EXAMIN's copy for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`) · **Under:** DEC-1083 (W2-128's ready check by code; excepted here), DEC-757 (6), DEC-1121, DEC-1122 (1), DEC-1101 (3), DEC-1112 (3) · **Source:** the owner's answers (chat, 2026-11-11 ~15:00 UTC) to DECIDED-NOT-DONE rows 139 and 140
+- **Decision:**
+  - (1) **Option (a).** A `Verify:` pass on the tickets not yet reviewed. The reviewed tickets in progress launch on
+    hand-built briefs until they close, with `gov brief`'s refusal recorded in each brief. This is the owner's
+    exception to DEC-1083 for those tickets only.
+  - (2) **A ticket to land before EXAMIN's copy:** an adopted repository's tickets will arrive without `Verify:` lines,
+    so `gov brief` must handle them (option (c), `gov brief` reading the acceptance folder, or an adoption step that
+    adds them); the CTO brings its approach.
+  - (3) **W2-94 (EXAMIN's question set) and W2-93 (W2-81's held-out half): the automated walled writer route**
+    (DEC-1101 (3)). The CTO prepares the path map's `evaluation_sets` entries as an ACT and the writer briefs for the
+    owner's approval.
+- **Basis:** question 2 (work moves without weakening the ready check for new tickets) and question 1 (the held-out
+  sets written blind by the walled route).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14511,3 +14526,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.510 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1126 (the answers to the 09:30 digest: re-pin done; usage (A) ends; W2-60a RUBRIC-2 now; the runaway brake for adopted products; the memory audit's schedule; W2-32/W2-15a open; D-10 the green run; W2-82 to P3; the permissions ACT). Next free id: DEC-1127. |
 | 0.511 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1128 (the 100 % bar on set-up A for any control returning or new guard rule; the lift does not wait; set-up B dropped; DEC-1010 investigated; the switched-off list; the memory audit's landing); DEC-1112 (1) changed. DEC-1127 held for the owner's answer (the close history, PROPOSED). Next free id: DEC-1129. |
 | 0.512 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1129 (W2-32 S9 (a1); the memory audit's briefs approved, hashes to the approved list by the install ACT; W2-60a a fresh round 1). DEC-1127 still held PROPOSED. Next free id: DEC-1130. |
+| 0.513 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1130 (the `Verify:` pass and the hand-built-brief exception to DEC-1083; a ticket for adopted tickets without `Verify:`; W2-94 and W2-93 by the walled writer route). DEC-1127 still held PROPOSED. Next free id: DEC-1131. |
