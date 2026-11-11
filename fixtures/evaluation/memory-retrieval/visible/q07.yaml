@@ -1,17 +1,29 @@
-# Lens B's Q07 (Table 2): "The front matter's dependency list (DAEO-0mab.md 1–72) or WBS:118": one piece of
-# evidence in two places, alternatives of one entry. The list is lines 17–44 at the commit.
+# Re-worded to a stable fact by the owner's DEC-1070 (13) (R11), as DEC-1074 (8), DEC-1097 (12) and DEC-1098 (6)
+# keep it: after the fresh 80 and before any re-measure, by a session independent of the retrieval work, 2026-11-09,
+# blind (from the rubric, this file and the repository at 8bb10a68366c; no search, no result read).
+# The question before asked for the tickets the Track A gate run waits on: a list (23 at cc9c94d42a54, 27 in lens B's
+# label) that moved with re-scoping (DEC-954 took nine out and put five in), so its gold drifted (R11-GROWS, marked
+# volatile by DEC-1069 (6)). It now asks the decided rule behind that list, which changes only by a decision: the gate
+# waits on the Track A tickets that stayed in Wave 2, never on those moved to Wave 3 (DEC-954). One entry, three
+# places that each state the whole rule: the WBS card's DEC-954 line, the WBS row (the old label's second source) and
+# the ticket's DEC-954 line. Category and ticket kept. W2-24 was later retired (DEC-1083, W-8; its AR lines are shown
+# in W2-46); the question asks only what it was to wait on, so nothing it presupposes is false.
+# The label before is in ../retired/q07-pre-reword-2026-11-09.yaml (and before that q07-pre-dec1069.yaml).
 id: Q07
 category: ticket
-commit: 23079f92a6fa
+commit: 8bb10a68366c
 ticket: DAEO-0mab
-question: Which tickets must be done before the Track A gate run?
+question: Did the Track A gate (W2-24) have to wait for the Track A tickets that got pushed back to Wave 3?
 gold_answer: >-
-  Every other Track A ticket: DAEO-0mab's depends_on lists the 27 tickets from DAEO-g0ip to DAEO-7rr2 (among them
-  W2-03 DAEO-ym8a, W2-04 DAEO-u4oz and W2-06 DAEO-kia7).
+  No. Under DEC-954 the Track A gate run depends only on the Track A tickets that stayed in Wave 2; the tickets moved
+  to Wave 3 are not among its dependencies.
 sources:
-  - - path: .tickets/DAEO-0mab.md
-      heading: "depends_on:"
-      lines: [17, 44]
+  - - path: docs/plan/WAVE_2_WBS.md
+      heading: "  - its dependencies are the Wave 2 tickets only, with the Wave 3 tickets and the withdrawn W2-48 removed;"
+      lines: [800, 800]
     - path: docs/plan/WAVE_2_WBS.md
       heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954) | 0 | AR-1 … AR-10 (the lines whose tickets moved are named Wave 3 in its report) |"
-      lines: [118, 118]
+      lines: [150, 150]
+    - path: .tickets/DAEO-0mab.md
+      heading: "**DEC-954:** dependencies are the Wave 2 tickets only (W2-57, W2-52, W2-56, W2-51 and W2-88 added as later Track A tickets). The AR lines whose tickets moved to Wave 3 are named Wave 3 in this ticket's report (exit criterion 5). W2-17 is Wave 3, so the \"gov update\" step is a named Wave 3 line. The release is W2-16's."
+      lines: [72, 72]

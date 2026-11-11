@@ -54,4 +54,4 @@ Each package moves through these states: draft → submitted → decided → rec
 
 ## Retrieval bundle
 
-Before formulating a decision package, the practitioner gathers context through `gov retrieve` (CAP-34.c). The retrieval bundle surfaces related specifications, decisions and evidence so that packages present questions the existing record does not already answer.
+Before formulating a decision package, the practitioner gathers context through `gov retrieve` (CAP-34.c). The retrieval bundle surfaces related specifications, decisions and evidence so that packages present questions the existing record does not already answer. When the first bundle does not answer, the practitioner searches once more in its own words before treating the question as unanswered (the retrieval skill, step 7; DEC-1092 (1)).

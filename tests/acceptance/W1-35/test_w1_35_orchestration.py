@@ -277,15 +277,29 @@ class TestBriefTemplates:
 
     @pytest.mark.parametrize("kind", sorted(support.BRIEFS))
     def test_the_brief_has_a_placeholder_for_each_thing_it_is_filled_in_with(self, kind):
-        found = support.placeholders(support.read(support.brief_rel(kind)))
+        """Revised for W2-128 TPL-1 S4 (DEC-1050, DEC-1052): a retired brief is read as its replacement template
+        and the envelope; there the decisions may come as the sources placeholder sent to the decision register
+        (R3-TEMPLATES.md's T-0: "Sources: {SOURCES} (read each in .../DECISION_REGISTER.md, by id ...)")."""
+        texts = support.brief_texts(kind)
+        found = [inner for text in texts.values() for inner in support.placeholders(text)]
         missing = [what for what, pattern in support.PLACEHOLDER_KINDS.items()
                    if not any(re.search(pattern, inner, re.IGNORECASE) for inner in found)]
+        if "decisions" in missing and support.is_retired(support.BRIEFS[kind]):
+            if any(re.search(r"decision", statement, re.IGNORECASE)
+                   and any(re.search(r"source", inner, re.IGNORECASE) for inner in support.placeholders(statement))
+                   for text in texts.values() for _section, statement in support.statements(text)):
+                missing.remove("decisions")
         assert not missing, (
-            f"{support.brief_rel(kind)} has no placeholder for {missing} (its placeholders: {found})"
+            f"{sorted(texts)} have no placeholder for {missing} (their placeholders: {found})"
         )
 
     @pytest.mark.parametrize("kind", sorted(support.BRIEFS))
     def test_the_brief_carries_the_standing_sentences_word_for_word(self, kind):
+        """Revised for W2-128 TPL-1 S4: held while the brief stands in full; once it is removed or a pointer,
+        DEC-1050's templates replace the word-for-word rule and the case holds that the replacement exists."""
+        if support.is_retired(support.BRIEFS[kind]):
+            support.brief_texts(kind)   # the replacement template and the envelope exist
+            return
         text = support.collapse(support.read(support.brief_rel(kind)))
         missing = [sentence for sentence in support.STANDING_SENTENCES if sentence not in text]
         assert not missing, (
@@ -294,12 +308,20 @@ class TestBriefTemplates:
         )
 
     def test_the_test_designers_brief_states_behaviour_and_sources_only(self):
-        rel = f"{support.TEMPLATES_REL}/{support.TEST_DESIGNER_BRIEF}"
-        text = support.read(rel)
-        assert support.statements_with(text, [r"behaviou?r", r"source", r"\b(only|never|no|nothing)\b"]), (
-            f"{rel} does not say that the brief states behaviour and sources only"
+        """Revised for W2-128 TPL-1 S4: DEC-462 stands. Once the brief is retired, the rule is looked for in the
+        templates a test designer's brief is made of and written from: its replacement, the envelope, and the
+        lead's template (the lead fills the brief's free text)."""
+        texts = support.brief_texts("test designer")
+        if support.is_retired(support.TEST_DESIGNER_BRIEF):
+            lead = f"{support.TEMPLATES_REL}/{support.replacement_of(support.BRIEFS['lead'])}"
+            if support.path(lead).is_file():
+                texts[lead] = support.read(lead)
+        rels = sorted(texts)
+        assert any(support.statements_with(text, [r"behaviou?r", r"source", r"\b(only|never|no|nothing)\b"])
+                   for text in texts.values()), (
+            f"{rels}: no statement says that a test designer's brief states behaviour and sources only"
         )
-        assert "DEC-462" in text, f"{rel} does not cite DEC-462"
+        assert any("DEC-462" in text for text in texts.values()), f"{rels} do not cite DEC-462"
 
     def test_no_brief_is_named_like_a_record_template(self):
         """W1-08 validates a templates file as a record when its name holds one of these words."""

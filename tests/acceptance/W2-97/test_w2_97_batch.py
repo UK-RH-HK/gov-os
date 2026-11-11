@@ -75,7 +75,7 @@ def test_a_red_no_single_ticket_explains_ejects_the_whole_batch(q):
 def test_a_ticket_bringing_another_ticket_s_commits_fails_the_batch_closed(q):
     q.plant()
     good = q.ticket(901, {"app/e.txt": "ok\n"})
-    # W2-902's approved commit brings a commit of another ticket's (Task: DAEO-other), then its own red change.
+    # The planted ticket 902's approved commit brings a commit of another ticket's (Task: DAEO-other), then its own red change.
     mixed = q.ticket(902, {"app/a.txt": "broken\n"}, before=[({"app/x.txt": "other\n"}, "DAEO-other")])
     h1 = q.code_moves_on()
     q.submit(good, mixed)
@@ -93,7 +93,7 @@ def test_a_conflicting_ticket_is_ejected_and_the_rest_go_on(q):
     q.plant()
     good = q.ticket(901, {"app/e.txt": "ok\n"})
     clash = q.ticket(902, {"app/notes.txt": "ticket\n"})
-    h1 = q.code_moves_on()  # changes app/notes.txt too: W2-902 does not merge cleanly
+    h1 = q.code_moves_on()  # changes app/notes.txt too: the planted ticket 902 does not merge cleanly
     q.submit(good, clash)
 
     done = q.run()

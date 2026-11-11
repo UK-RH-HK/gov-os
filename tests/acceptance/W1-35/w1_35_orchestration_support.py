@@ -49,6 +49,18 @@ BRIEFS = {
 }
 TEST_DESIGNER_BRIEF = BRIEFS["test designer"]
 
+# W2-128 TPL-1 S4 (DEC-1050, DEC-1052): each brief is removed or becomes a one-line pointer to the template that
+# replaces it; T-0 `brief.md` is the envelope every session receives with its role's template (the ticket body's
+# "Interface and rounds"; R3-TEMPLATES.md's Appendix). A retired brief's substance is read from those two.
+REPLACEMENTS = {
+    "brief-test-designer.md": "role-test-designer.md",
+    "brief-engineer.md": "role-engineer.md",
+    "brief-reviewer.md": "role-reviewer.md",
+    "brief-product-spec.md": "role-product-spec.md",
+    "brief-lead.md": "role-lead.md",
+}
+ENVELOPE = "brief.md"
+
 # The roles of the kernel (W1-33, W1-46): the follow-up adds none.
 ROLE_FILES = ("engineer.md", "independent-auditor.md", "independent-test-designer.md", "orchestrator.md",
               "product-spec.md", "research.md")
@@ -107,9 +119,9 @@ ROWS = {
             ("a ticket lead per ticket, started in that worktree with its identity",
              [r"\blead", r"worktree", r"identit"]),
             ("no two tickets in flight with overlapping paths", [r"overlap", r"path"]),
-            ("a stated ceiling of tickets in flight",
-             [r"ceiling|at most|up to|no more than|maximum|limit", r"ticket",
-              r"in flight|at a time|at once|parallel|concurrent|running"]),
+            # Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R3: the clause "a stated ceiling of tickets
+            # in flight" enforced DEC-737/776/786, replaced by DEC-847 and then DEC-942 (no fixed number of leads;
+            # capacity is the resource gate's, whose clauses below stay). The clause is removed; the row stays.
             ("the resource gate before each start",
              [r"resource gate", r"before (each|every|any|a)\b|(each|every) start"]),
             # W2-11 (DEC-847, DEC-866): DEC-847 replaced the stated ceiling (DEC-737, DEC-776, DEC-786) with no fixed
@@ -370,6 +382,41 @@ def brief_rel(kind):
     return f"{TEMPLATES_REL}/{BRIEFS[kind]}"
 
 
+def is_retired(name):
+    """True when the templates file ``name`` is removed or its body is one non-blank line (W2-128 TPL-1 S4)."""
+    file = path(f"{TEMPLATES_REL}/{name}")
+    if not file.is_file():
+        return True
+    _front, body = split_frontmatter(file.read_text(encoding="utf-8"))
+    return len([line for line in body.splitlines() if line.strip()]) == 1
+
+
+def replacement_of(name):
+    """The templates file that replaces a retired brief: the one its pointer line names, else the ticket's map."""
+    file = path(f"{TEMPLATES_REL}/{name}")
+    if file.is_file():
+        line = split_frontmatter(file.read_text(encoding="utf-8"))[1].strip()
+        for named in re.findall(r"[\w.-]+\.md", line):
+            if named != name and path(f"{TEMPLATES_REL}/{named}").is_file():
+                return named
+    return REPLACEMENTS[name]
+
+
+def brief_texts(kind):
+    """``{relative path: text}`` a reader takes the brief of ``kind`` from: the brief itself while it stands in
+    full; once retired, the template that replaces it and the envelope (each must exist)."""
+    name = BRIEFS[kind]
+    if not is_retired(name):
+        return {brief_rel(kind): read(brief_rel(kind))}
+    rels = [f"{TEMPLATES_REL}/{replacement_of(name)}", f"{TEMPLATES_REL}/{ENVELOPE}"]
+    return {rel: read(rel) for rel in rels}
+
+
+def briefs_stand():
+    """True while at least one of the five briefs stands in full (not removed, not a pointer)."""
+    return not all(is_retired(name) for name in BRIEFS.values())
+
+
 def check_declarations():
     return sorted(path(CHECKS_REL).glob(CHECK_GLOB))
 
@@ -481,13 +528,20 @@ def statements_with(text, ideas):
 # --------------------------------------------------------------------------
 
 def corpus():
-    """``{relative path: text}``: the skill and every templates file the skill names by its file name."""
+    """``{relative path: text}``: the skill and every templates file the skill names by its file name. A brief
+    the skill names that is retired (removed or a pointer, W2-128 TPL-1 S4) is followed to its replacement and
+    the envelope."""
     skill = read(SKILL_REL)
     documents = {SKILL_REL: skill}
     folder = path(TEMPLATES_REL)
     for file in sorted(folder.iterdir()) if folder.is_dir() else []:
         if file.is_file() and file.name in skill:
             documents[f"{TEMPLATES_REL}/{file.name}"] = file.read_text(encoding="utf-8")
+    for name in REPLACEMENTS:
+        if name in skill and is_retired(name):
+            for target in (replacement_of(name), ENVELOPE):
+                if path(f"{TEMPLATES_REL}/{target}").is_file():
+                    documents[f"{TEMPLATES_REL}/{target}"] = read(f"{TEMPLATES_REL}/{target}")
     return documents
 
 
@@ -501,7 +555,9 @@ def row_faults(row, documents):
     for what, ideas in spec.get("one_document", ()):
         if not any(carries(collapse(text), ideas) for text in documents.values()):
             faults.append(f"no one document names all of: {what}")
-    for sentence in spec.get("verbatim", ()):
+    # The standing sentences are held word for word while a brief stands; once all five are retired, DEC-1050's
+    # templates replace that rule (W2-128 TPL-1 S4; the README's note on the revision).
+    for sentence in spec.get("verbatim", ()) if briefs_stand() else ():
         if not any(sentence in collapse(text) for text in documents.values()):
             faults.append(f"the standing sentence is not there word for word: {sentence[:60]}...")
     for decision in spec["ids"]:

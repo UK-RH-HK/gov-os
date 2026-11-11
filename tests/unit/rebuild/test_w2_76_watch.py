@@ -29,8 +29,12 @@ def _settings(root, text):
 
 
 def test_the_defaults_hold_without_a_settings_file(tmp_path, monkeypatch):
+    """The default lock is the tree's own (W2-20 S7, DEC-1001 (d)): /tmp/gov-os-rebuild-<12 hex of the tree>.lock."""
     monkeypatch.delenv(watch.ENV_LOCK, raising=False)
-    assert watch.settings(tmp_path) == (1800, "/tmp/gov-os-rebuild.lock", "default")
+    assert watch.settings(tmp_path) == (1800, watch.tree_lock(tmp_path), "default")
+    assert watch.tree_lock(tmp_path).startswith("/tmp/gov-os-rebuild-") and watch.tree_lock(tmp_path).endswith(".lock")
+    (tmp_path / "other").mkdir()
+    assert watch.settings(tmp_path / "other")[1] != watch.settings(tmp_path)[1]
 
 
 @pytest.mark.parametrize("text, key", [("slow_after_s: true\n", "slow_after_s"), ("slow_after_s: -1\n", "slow_after_s"),

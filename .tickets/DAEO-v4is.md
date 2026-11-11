@@ -1,6 +1,6 @@
 ---
 id: DAEO-v4is
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -60,3 +60,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-78), from package P-SCOPE-RECORDS-1 (a) 
 - **Place:** block A (fast closes) of the re-plan (DEC-941), after W2-77; it rides the next re-pin.
 - **The migration:** the move of entries the owner committed is itself the owner's commit, or accepted by decision before the merge. The ticket prepares it; the orchestrator sends it as an ACT, validated with the pinned readers (DEC-895).
 - **The test map** (`governance/project/test-map.yaml`) is shared core and W2-66's and W2-68's; this ticket edits only its `record_only` and `record_reading` lists, which DEC-941 places here.
+
+**D9-FATES (DEC-1083):** Retired by DEC-1083 (D9-FATES): T-4 was done as config; its branch is deleted with this answer (DEC-1053 (6)).

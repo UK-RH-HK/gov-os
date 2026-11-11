@@ -127,3 +127,33 @@ says `NOT MET` in row `4` and in `Overall verdict` (the failure-line case holds 
 - **The per-ticket metrics against `governance/project/bootstrap.md`.** The residual sections there record them
   in free prose, differently per ticket; the cases hold the table to one full row per ticket, not to those
   sentences.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 22 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: On a-dev and b-dev clones one feature runs discovery -> closed spec -> independent specification audit (DEC-088) -> WBS with linked gap tickets... | `test_w1_42_exit_report.py::test_one_real_ticket_closed_by_a_clean_gov_close`, `test_w1_42_exit_report.py::test_parallel_tickets_ran_in_worktrees_and_were_merged_by_the_main_orchestrator` | the ticket's words |
+| S2: RETR-A-04 and RETR-X-02 run with bundles, parent expansions, synthesis notes where evidence exceeds the ceiling, and stopping reasons; governan... | `test_w1_42_exit_report.py::test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason` | the ticket's words |
+| S3: gov check reports 17 of 17 governance test families with at least one executable check [CAP-38.b] | `test_w1_42_exit_report.py::test_gov_check_reports_17_of_17_families_with_an_executable_check` | the ticket's words |
+| S4: All twelve Wave 1 gov commands are implemented: none returns NOT_IMPLEMENTED [CAP-28.b] | `test_w1_42_exit_report.py::test_all_twelve_wave_1_commands_are_implemented` | the ticket's words |
+| S5: The exit run starts its engineer, test designer and auditor sessions as worker sessions through gov launch, sandboxed with their network profil... | `test_w1_42_exit_report.py::test_worker_sessions_were_started_through_gov_launch` | the ticket's words |
+| S6: The exit report gives, per ticket, the three Wave 1 learning metrics: KPI disputes, acceptance tests rewritten after implementation began with ... | `test_w1_42_exit_report.py::test_learning_metrics_table_has_a_full_row_for_every_wave_1_ticket` | the ticket's words |
+| S7: The exit report shows, from the orchestrator's records, that Wave 1 ran tickets in parallel in the light form of DEC-235: each ticket in its ow... | `test_w1_42_exit_report.py::test_git_worktree_list_shows_no_ticket_worktree_left`, `test_w1_42_exit_report.py::test_parallel_tickets_ran_in_worktrees_and_were_merged_by_the_main_orchestrator` | the ticket's words |
+| S8: The exit run measures callers/impact hit@5 on the dev query set's code classes, the measurement comparable to the S0b2 code-intelligence baseli... | `test_w1_42_exit_report.py::test_callers_impact_hit5_is_measured_on_the_code_classes` | the ticket's words |
+| S9: The exit run re-measures the dev query set's mean hit@5 against the S0b2 R1 baseline of 85 and reports it (DEC-414) | `test_w1_42_exit_report.py::test_dev_query_set_mean_hit5_is_remeasured_against_85` | the ticket's words |
+| S10: The owner freezes, pauses and lifts from a plain terminal, on a throwaway repository and on this one, and the results are recorded (DEC-428) | `test_w1_42_exit_report.py::test_owner_froze_paused_and_lifted_on_a_throwaway_repository_and_on_this_one` | the ticket's words; partly lifted, as round 1's map said: `test_w1_42_exit_report.py::test_owner_froze_paused_and_lifted_on_a_throwaway_repository_and_on_this_one`, `t... |
+| S11: The gov check baseline of this repository (DEC-467) is empty at the exit run, cleared by W1-39 and W1-41's adoption; any item still in it come... | `test_w1_42_exit_report.py::test_baseline_is_empty_and_adoption_was_complete_before_the_exit_run` | the ticket's words; partly lifted, as round 1's map said: `test_w1_42_exit_report.py::test_baseline_is_empty_and_adoption_was_complete_before_the_exit_run`, `test_w1_4... |
+| S12: This repository's adoption is complete before the exit run (gov adopt --lite run on it, the gov check baseline empty, capability records prese... | `test_w1_42_exit_report.py::test_baseline_is_empty_and_adoption_was_complete_before_the_exit_run` | the ticket's words |
+| S13: The exit run includes at least one real ticket closed by a clean gov close, with no exception, showing the gate works end to end (DEC-511) | `test_w1_42_exit_report.py::test_one_real_ticket_closed_by_a_clean_gov_close` | the ticket's words |
+| S14: The exit run is run from the kernel's orchestration skill and brief templates, not from this repository's orchestrator prompt (DEC-537) | `test_w1_42_exit_report.py::test_exit_run_was_run_from_the_kernel_skill_and_brief_templates` | the ticket's words |
+| F1: Any forbidden outcome | `test_w1_42_exit_report.py::test_a_forbidden_outcome_or_a_share_above_15_percent_is_never_reported_as_a_pass` | the ticket's words |
+| F2: Governance share > 15 % on either programme | `test_w1_42_exit_report.py::test_programme_cycle_is_stated_step_by_step` (2 of 2) | the ticket's words |

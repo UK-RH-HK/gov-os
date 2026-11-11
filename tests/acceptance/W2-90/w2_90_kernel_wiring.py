@@ -33,11 +33,12 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 _TESTS = REPO_ROOT / "tests" / "acceptance"
-for _suite in ("W1-07", "W1-39", "W1-38", "W1-05"):
+for _suite in ("W1-07", "W1-39", "W1-38", "W1-05", "W1-47"):
     if str(_TESTS / _suite) not in sys.path:
         sys.path.insert(0, str(_TESTS / _suite))
 
 import w1_05_support as live_support  # noqa: E402  (registered commands, hook input, the fixture ticket)
+import w1_47_support as pinned_support  # noqa: E402  (the pinned gov a stand-in home holds, W2-106)
 import w1_38_support as rulesync_support  # noqa: E402  (rulesync generate, as W1-38 runs it)
 import w1_39_support as copier_support  # noqa: E402  (the template source, copier copy)
 
@@ -115,6 +116,12 @@ def install_gov_for(home):
 
     A path file in the user site folder of that home, as an editable install leaves one: the kernel's hook line
     starts its program with the ``python3`` first on ``PATH``, and a product has the package installed.
+
+    Rewrite-Reason: DEC-866, W2-106. The kernel's lines now take the pinned form: ``$HOME/.local/bin/gov``, else
+    ``gov`` on ``PATH``, and its first line's interpreter with ``-E``. The home is also given the editable install's
+    ``gov`` script, its first line naming this interpreter (W1-47's ``plant_pinned_gov``, as W2-106's README names
+    the fix), so a case no longer depends on the runner's ``PATH``: not refused where no ``gov`` is on it, not
+    judging the owner's pin where it is.
     """
     home = Path(home)
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8"}
@@ -123,6 +130,7 @@ def install_gov_for(home):
     assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
     Path(site).mkdir(parents=True, exist_ok=True)
     (Path(site) / PTH_NAME).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    pinned_support.plant_pinned_gov(home)
     return home
 
 

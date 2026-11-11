@@ -1,0 +1,22 @@
+# Lens B's Q03 (Table 2): "DEC-798; semantic.py 10–25; ollama.py 1–30". My reading: the three state the same
+# reason (the GPU gives a text a vector that depends on the prompt before it; the CPU does not), so they are
+# alternatives of one entry. ollama.py states the CPU-only embedder that embeds the questions, not the reason itself;
+# kept because lens B names it. semantic.py's lines are 12–17 and ollama.py's 8–11 at the commit.
+id: Q03
+category: decision
+commit: 23079f92a6fa
+question: Why are query embeddings computed on a CPU-only embedder?
+gold_answer: >-
+  Because on the shared GPU runner one text's vector varies with the prompt computed just before it (50 of 216 reads
+  differed), while on the CPU it never did; DEC-798 has a CPU-only embedder of gov's own, on its own port, answer the
+  query embeddings, and the shared GPU runner keeps building the index.
+sources:
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-798 — Query embeddings on a CPU-only embedder of their own; DEC-261 amended (P-W2-40 (b))"
+      lines: [8731, 8739]
+    - path: src/gov/retrieval/semantic.py
+      heading: "- On the GPU the embedder gives a text a vector that depends on the prompt the runner computed just before it, by"
+      lines: [12, 17]
+    - path: src/gov/retrieval/ollama.py
+      heading: "Two daemons are started so (DEC-261 as DEC-798 amends it): the shared one at"
+      lines: [8, 11]
