@@ -12,7 +12,8 @@ expected); the guards also allow round 2b's F2 and F4 lines. Round 2b's new case
 
 Revised for W2-11 (DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): the read rule is found where it now
 stands and may name the integration branch generically; the versions are held raised above integrate's base, not
-pinned to 1.2.0; the front-matter guards also allow ``metadata.version`` equal to ``version``. Nothing else lowered.
+pinned to 1.2.0; the front-matter guards also allow ``metadata.version`` equal to ``version``; the test-design
+guard's section half reads the skill at W2-128's own merge, as W2-11 restructures its sections. Nothing else lowered.
 """
 
 from __future__ import annotations
@@ -326,11 +327,36 @@ def _front_without_version(text: str) -> dict:
     return kept
 
 
+# Revised for W2-11 (Rewrite-Reason: DEC-866, DEC-981, DEC-1137; DEC-1112 (3) P-W2-11-R6-2 (c)): W2-11 restructures
+# the test-design skill's sections (its S1, S7, S10, S15), so the section half of the guard reads the skill as W2-128
+# merged it: the newest W2-128 merge into w2/integrate reachable from HEAD that changed the skill against its first
+# parent, found from history. It keeps holding W2-128's own change and no longer pins later tickets' sections.
+W2_128_MERGE = re.compile(r"^Merge W2-128[ -].* into w2/integrate\b")
+
+
+def w2_128_merge(rel: str) -> str:
+    """The commit of W2-128's last merge into w2/integrate that changed ``rel``; fails (never skips) if none is found."""
+    def git(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run(["git", "-C", str(s.REPO), *args], capture_output=True, text=True)
+
+    shallow = git("rev-parse", "--is-shallow-repository").stdout.strip()
+    assert shallow != "true", "premise: a shallow clone cannot find W2-128's merge; fetch the full history"
+    listed = git("log", "--merges", "--topo-order", "--format=%H%x09%s", "HEAD")
+    assert listed.returncode == 0, f"premise: git log failed: {listed.stderr.strip()}"
+    for line in listed.stdout.splitlines():
+        commit, _, subject = line.partition("\t")
+        if W2_128_MERGE.search(subject) and git("diff", "--quiet", f"{commit}^1", commit, "--", rel).returncode == 1:
+            return commit
+    raise AssertionError(f"premise: no W2-128 merge into w2/integrate that changed {rel} is reachable from HEAD")
+
+
 def test_s11_guard_test_design_skill_changes_only_its_read_rule():
     old, new = baseline(TEST_DESIGN), now(TEST_DESIGN)
     assert _front_without_version(new) == _front_without_version(old), \
         "the test-design skill's front matter changed beyond its version"
-    old_parts, new_parts = sections(s.split(old)[1]), sections(s.split(new)[1])
+    # Revised for W2-11 (above): the sections, and the units outside the read rule, as W2-128 merged them
+    merged = baseline(TEST_DESIGN, w2_128_merge(TEST_DESIGN))
+    old_parts, new_parts = sections(s.split(old)[1]), sections(s.split(merged)[1])
     assert [h for h, _ in new_parts] == [h for h, _ in old_parts], "the test-design skill's sections changed"
     # Round 2b (F4): the read rule may change; elsewhere a unit may differ only by CAP-38.b re-cited as CAP-38.c
     def recited(units: list[str]) -> list[str]:
