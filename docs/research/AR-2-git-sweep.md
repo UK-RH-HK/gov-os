@@ -162,7 +162,7 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 58 | `src/gov/check/citations.py` | through rows 39 and 40 (`checker._git`, `checker._Objects`) | the project root | as row 39 | through rows 39 and 40 |
 | 59 | `src/gov/adopt/stages.py`, `src/gov/adopt/legacy.py` | through row 1 (`project.git`) | the project being adopted | as row 1 | through row 1 |
 | 60 | `src/gov/tasks/bridge.py`, `src/gov/readiness/checker.py` | through row 30 (`tickets.create`) | the project root | as row 30 | through row 30 |
-| 61 | `src/gov/guard/reads.py` | `_git`: `git -C <root> rev-parse`, `merge-base`, `diff --name-only` (the guard's read policy) | the project root | no: it clears every `GIT_*` variable; configuration not pinned; git by name | after W2-84 merges |
+| 61 | `src/gov/guard/reads.py` | `_git`: `git -C <root> rev-parse`, `merge-base`, `diff --name-only` (the guard's read policy) | the project root | no: it clears every `GIT_*` variable; configuration not pinned; git by name | open: W2-84 has merged, and `_git` (line 194) still builds its own environment (every `GIT_*` variable cleared, no `GIT_NO_LAZY_FETCH`), unpinned, git by name on the inherited `PATH`. No decision exempts it. Left unchanged as the guard's own policy file, outside this ticket's paths: open for the CTO |
 | 62 | `src/gov/secrets/__init__.py` | `_partial`: `git config --list -z`; `_commits`: `git cat-file --batch-check` (which matches name a commit) | the project root | no: it clears every `GIT_*` variable, sets `GIT_CEILING_DIRECTORIES`, `GIT_NO_REPLACE_OBJECTS` and `GIT_NO_LAZY_FETCH`; configuration not pinned (it reads the person's on purpose, for a partial-clone setting) | after W2-107 merges |
 | 63 | `src/gov/retrieval/measure.py` | `main`: `git -C <root> rev-parse HEAD`; `_retriever` and `_ask`: `gov --version` and `gov retrieve` (rows 57 and 24) | the project root | yes | after W2-87 merges (W2-61 too) |
 | 64 | `src/gov/rebuild/**` | through rows 24, 41 and 43 to 45 (`lexical.refresh`, `store.load`, `codeintel.index`) | the project root | as those rows | after W2-76 merges; it started no process of its own when swept. As merged, `command.py` and `integration.py` start git themselves: rows 68 and 69 |
@@ -172,7 +172,7 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 68 | `src/gov/rebuild/command.py` | `_commit_of`: `<git> -C <where> <args>` (`rev-parse --verify`, `rev-list --count`: `gov rebuild --seed`'s relation of the base's head to the tree's, `_behind`, lines 118 to 124; call at lines 85 to 86) | the project root, or the seed's base tree | no: new since the sweep, written with the helper | scrubbed: `env=git_env(where)` (line 86), git by `git_binary()` with `git` as the fall-back (line 85). Reads only, left unpinned; a close does not reach it (it runs from `gov rebuild`), so no W2-M161 reason to pin. Nothing to change. Recorded only |
 | 69 | `src/gov/rebuild/integration.py` | `_git`: `<git> -C <where> <args>` (`gov rebuild --integration`; lines 52 to 60): `worktree add --force --detach` (lines 139, 152) and `checkout -q --force --detach` (line 147) write the store's half; `rev-parse --git-common-dir`, `rev-parse --verify -q` (lines 64, 71, 247) read | the project root, and the two halves (`<link>-a`, `<link>-b`: **other worktrees** of the repository) | no: new since the sweep, written with the helper | scrubbed: `env=git_env(where)` (line 56), git by `git_binary()` with `git` as the fall-back (line 55). Unpinned for reads and writes alike: the writes are right so (as row 56); the reads only read, and no close reaches them (`gov rebuild --integration` is the merge queue's and a hook's). Nothing to change. Recorded only |
 | 70 | `src/gov/util/gitrun.py` | `git`: `git -C <root> --no-replace-objects <args>` (lines 22 to 45): the runner moved whole from `gov.close.repo` (W2-150 S6); `gov.close.repo.git` and `gov.store.loader._commit_git` are this function | the project root | no: it clears every `GIT_*` variable of the base (lines 32 to 33) | scrubbed: `env=git_env(root, pinned=pinned, base=<os.environ without any GIT_* variable>)` (lines 32 to 33), `pinned=True` by default. This is row 32's code at its new place: rows 32 to 38, 46 to 50 and 53 to 54 reach git through it; the row 32 text holds. Recorded only |
-| 71 | `src/gov/util/role_paths.py` | `main_tree` (line 112, `rev-parse --path-format=absolute --git-common-dir`), `linked_tests` (line 175, `rev-parse`, `log --all`, `rev-list`), `changed` (line 251, `merge-base`, `diff --name-only`, `ls-files --others`), `engineer_side` (line 268, `merge-base`, `rev-parse`, `log`); the file moved whole from `gov.guard.role_paths` (W2-150), which is this module (`gov.guard.role_paths` re-exports it); `gov retrieve`'s role filter and the guard's read hook reach it | the project root, the main tree, or the searched tree | no: `_git_env()` (lines 54 to 55) clears every `GIT_*` variable of `os.environ` | **not scrubbed with the helper**: `env=_git_env()` clears every `GIT_*` variable (location, index, trace and configuration variables) but it is not `git_env`: no `GIT_NO_LAZY_FETCH`, the configuration not pinned (the person's own is read), git by name on the inherited `PATH` (W2-L160). It also drops the identity and ssh variables, which its reads do not use. Open: an engineer's change, `git_env(root, pinned=True)` and `git_binary()`, as row 61 (the guard's own `reads.py`) |
+| 71 | `src/gov/util/role_paths.py` | `main_tree` (line 112, `rev-parse --path-format=absolute --git-common-dir`), `linked_tests` (line 175, `rev-parse`, `log --all`, `rev-list`), `changed` (line 251, `merge-base`, `diff --name-only`, `ls-files --others`), `engineer_side` (line 268, `merge-base`, `rev-parse`, `log`); the file moved whole from `gov.guard.role_paths` (W2-150), which is this module (`gov.guard.role_paths` re-exports it); `gov retrieve`'s role filter and the guard's read hook reach it | the project root, the main tree, or the searched tree | no: all four go through `_git` (lines 56 to 65), `env=git_env(<the folder given to -C>, pinned=True)`: no inherited location, index, trace or configuration variable, `GIT_NO_LAZY_FETCH=1`, the system's and the person's configuration unread. Before this round its own `_git_env()` cleared every `GIT_*` variable but set none of that | scrubbed (round r7): `_git_env` removed; each call (`main_tree` line 122, `linked_tests` line 184, `changed` line 262, `engineer_side` line 279) takes `git_env(<its -C folder>, pinned=True)` and starts git by `git_binary()`. A `None` from `git_binary()` raises `OSError`, the file's "git cannot say" route: `main_tree` gives the folder it was given, the other three None (the guard's containment check refuses on None, DEC-580); never a git from `PATH`. `changed`'s `ls-files --others --exclude-standard` is pinned too, measured (git 2.43.0, a HOME of the test's own): with `core.excludesFile` named in `~/.gitconfig`, unpinned lists `b.xdg c.txt`, pinned `a.secret c.txt`; the ignore file the person names is unread, so an untracked file it alone hides is now counted as changed (withheld from the designer, never handed out: the strict side, DEC-135), and git's default `$XDG_CONFIG_HOME/git/ignore` (or `~/.config/git/ignore`) is read in its place, as it is with no `core.excludesFile` (so `b.xdg`, which that default file alone hides, drops out: the one way the answer can shrink, and only for a person who has both files); the repository's `.gitignore` and `info/exclude` apply as before. Unit cases: `tests/unit/gitenv/test_role_paths_env.py` |
 
 Files that name git or start a program and start no git:
 
@@ -191,19 +191,27 @@ Files that name git or start a program and start no git:
   (W2-20), and the rest of `src/gov/launch/**` (W2-56) start no process. `src/gov/release/**` (W2-16) did not when
   first swept; as merged it starts git (row 66).
 
-**Counts:** 71 rows (rows 67 to 71 added at `f2c228681`, after the files they name were merged: see below). 60 changed by W2-05, directly or through a changed row: rows 1 to 60. Of them, 40 changed in
+**Counts:** 71 rows (rows 67 to 71 added at `f2c228681`, after the files they name were merged: see below). 61 changed by W2-05, directly or through a changed row: rows 1 to 60 and 71 (round r7). Of rows 1 to 60, 40 changed in
 batch 2: rows 2 to 8, 10 to 12, 15, 29 and 31 (pinned: reads a close reaches), 19 to 21, 32 to 42 and 46 to 58. Rows 16, 17 and 43 to 45 (W2-56's file now) and 24 and 28 (W2-87's)
-were changed in the first runs and are recorded only since. 5 marked "after <W2 id> merges": rows 61 (W2-84), 62
-(W2-107), 63 (W2-87), 64 (W2-76) and 65 (W2-60a). No row is open for W2-50, W2-53 or W2-03: those have merged.
+were changed in the first runs and are recorded only since. 4 marked "after <W2 id> merges": rows 62
+(W2-107), 63 (W2-87), 64 (W2-76) and 65 (W2-60a). Row 61 (W2-84's, merged) is open, below. No row is open for W2-50,
+W2-53 or W2-03: those have merged.
 Package I (b) (DEC-970) changed rows 36 and 55, and through row 36 rows 51 and 52; its review's finding R4-1
 changed row 55 again (the step's tests). The round after W2-108's merge changed row 24 again (pinned, W2-M161,
 R6-2). 2 open: row 66 (W2-16's
-`gov release`, merged after batch 2), recorded in package I (b)'s round and unchanged; and row 71
-(`src/gov/util/role_paths.py`, below). Rows 67 to 70 are files that started git after the sweep and were written with
-the helper (`git_env`, or `gitrun.git` through it): recorded only, no change needed. Row 71 clears every `GIT_*`
-variable itself and does not use the helper.
+`gov release`, merged after batch 2), recorded in package I (b)'s round and unchanged; and row 61 (the guard's
+`src/gov/guard/reads.py`, W2-84's, merged: its `_git` builds its own environment, unpinned, git by name; open for the
+CTO). Rows 67 to 70 are files that started git after the sweep and were written with the helper (`git_env`, or
+`gitrun.git` through it): recorded only, no change needed. Row 71 (`src/gov/util/role_paths.py`) was changed in round
+r7: its four calls take `git_env(<folder>, pinned=True)` and `git_binary()`.
 
 The test helpers outside `src/` (`tests/**/*support*.py`) build their own environments and are not Gov OS calls.
+`tests/conftest.py` strips git's repository-local variables from `os.environ` at import in every test process
+(`drop_git_local_env`, D-10, DEC-1074 (8)): its one git call, `git rev-parse --local-env-vars` from `/`, asks git for
+the names, joined with a fixed list (git 2.43's 15) used alone when git cannot answer, and every
+`GIT_CONFIG_KEY_<n>`/`VALUE_<n>`. It does not use the helper: the conftest must load without `gov`; `git_env` and
+`program_env` would also drop `runner_env`'s generated `GIT_CONFIG_GLOBAL` (and `GIT_CONFIG_NOSYSTEM`), which a run
+the Gov OS starts must keep; and it asks git which names are repository-local rather than clearing every `GIT_*`.
 The test runs the Gov OS starts are rows 36, 51, 52 and 55, all in `runner_env`.
 
 ## Not settled here
@@ -215,14 +223,16 @@ The test runs the Gov OS starts are rows 36, 51, 52 and 55, all in `runner_env`.
   `removeAIHookEntries` -> `writeJSONFile`, with no check of the configuration or of a change. The rewrite is
   Go's `json.MarshalIndent` of a map: keys sorted, `&`, `<` and `>` escaped. DEC-783 item 1 re-baselined it:
   `install` leaves the file byte-identical; `uninstall` is the owner's act, followed by restoring it.
-- **The rows marked "after <W2 id> merges"** (61 to 65) are changed by the ticket that holds each file, or by a
+- **The rows marked "after <W2 id> merges"** (62 to 65) are changed by the ticket that holds each file, or by a
   later W2-05 round after it merges.
+- **Row 61** (`src/gov/guard/reads.py`, the guard's read policy; W2-84 merged): `_git` still clears every `GIT_*`
+  variable itself, sets no `GIT_NO_LAZY_FETCH`, reads the person's configuration and starts git by name. No decision
+  exempts it; no code was changed there. It is left as the guard's own policy file, open for the CTO.
 - **Row 66** (`gov release`, W2-16's, merged): its git calls inherit the caller's whole environment. They take
   `git_env(repo)` (pinned for the reads) once a round's paths hold the file (P-W2-05-RELEASE).
 
-- **Row 71** (`src/gov/util/role_paths.py`, W2-150's move of the guard's file): `_git_env()` clears every `GIT_*`
-  variable, so no inherited location, index or trace variable reaches its git, but it does not set
-  `GIT_NO_LAZY_FETCH`, does not pin the configuration and starts git by name. It takes `git_env(root, pinned=True)`
-  and `git_binary()` once a round's paths hold the file (an engineer's change, not this record's).
+- **Row 71** (`src/gov/util/role_paths.py`, W2-150's move of the guard's file) is settled in round r7: its four
+  calls take `git_env(<folder>, pinned=True)` and `git_binary()`, and a missing system git is "git cannot say"
+  (`changed`'s `ls-files` pinned too, its measured change in the row).
 
 W2-L160 (rows 19 to 21 and 42) and W2-M161 (rows 32 to 38 and 46 to 56) are settled in this record.
