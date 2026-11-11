@@ -10,7 +10,7 @@ author: product-spec (W2-175, round 1)
 review: one read-only independent reviewer, reading the delta only (CAP-33, DEC-1116's route)
 decisions_read: [DEC-1137, DEC-820, DEC-861, DEC-1116, DEC-1121, DEC-1050, DEC-105, DEC-957, DEC-963, DEC-1073, DEC-315]
 decisions_carried: [DEC-1137, DEC-820, DEC-861, DEC-957, DEC-963, DEC-1116]
-state: draft (round 1: the text; the review, the approval and the promotion are pending)
+state: draft (round 1, the text; the review, the approval and the promotion are pending)
 ---
 
 # W2-175: change-impact proposal (CIT-P) on the seven role templates
