@@ -1,6 +1,33 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 02:40 UTC: session `8ddb8b14`; THE OWNER'S RE-PIN IS NEXT; HOLD WRITTEN; next free id DEC-1126
+## RESUME HERE — 2026-11-11 16:10 UTC: session `8ddb8b14` hands over (rule 11, DEC-1134 (3)); THE LIFT IS DONE; next free id DEC-1135
+- **State:** re-pin live (`pin-797495bdfc70`, 13:31); usage (A) ENDED (80 % brake stays; 64 % of the week, reset 11-15 09:00);
+  the ten closes done by DEC-953 (`tk close` + `closes/` records; `gov close`'s gates are LIFTED here, never use it to close:
+  DEC-953, DEC-1052 Q-8; they return through W2-115 on evidence). Decisions today DEC-1126 to DEC-1134 (DEC-1127 withdrawn).
+  `report-state.json` brought to today (the status block reads it). DECIDED-NOT-DONE rows 106-150 hold every open item.
+- **Running, not yours to start again:** two launched reviews in `~/gov-os-worktrees/W2-20` (logs `.gov-runtime/scratch/lead/log/
+  ACT-EXAMIN-SETS-1-review.json` and `ACT-OWNER-PACKAGES-review.json` (OPERATOR-ROUNDS-1 + MEMORY-AUDIT-INSTALL-1)): wait with
+  `tools/wait_for.sh <log>.exit`; write each review.md from the REVIEW_MD block (EXAMIN's to `acts/ACT-EXAMIN-SETS-1/review.md`).
+  Servers by RESTART-CLASSES 1-5 (embedders, reranker, sentinel), class 4 watchers incl. **`mem_guard.py`** (pid in
+  `log/mem-guard.alive`, stop ON, DEC-1133 (5)) and `oom_watch.sh` (rg tripwire fixed 15:37). Dispatcher by cron.
+- **First, in a fresh session:** re-arm your watchers (inbox_wait, sentinel_check, bare_watch, usage_log, helper_watch, store
+  backstop) and the digests (09:02/18:02 crons if gone); renew `log/cto-standby.txt` when waiting.
+- **The owner's queue (bring each with its yes line when ready):** ACT-EXAMIN-SETS-1 (+ the two writer briefs and C1-C8,
+  `drafts/examin-sets/FOR-THE-OWNER.md`); ACT-OPERATOR-ROUNDS-1; ACT-MEMORY-AUDIT-INSTALL-1; ACT-NIGHTLY-RESTART-1 (needs its
+  independent review first; linger done); **the accepted_reds commit** (DEC-1134: diff in `drafts/accepted-reds-1/accepted-reds.diff`;
+  build it as an operator bundle with a rehearsal and a fixed-brief review, then the owner's yes).
+- **Your next work, in order:** (1) ACT A (`dispatch/launch_now.sh` checks the gate and registers each lead, DEC-1133 (3)); (2)
+  the guard's error-path fix (row 123) and the listing-rule fix, each by ACT, then set-up A (SETUP-A-BAR, DEC-1133 (1)-(2));
+  (3) the CIT-P fixes FX1-FX9 (`packages/CIT-P-ONE-BAR-draft.md`, review in `reviews/`; FX6 = one fix pass per round), round 2
+  is the last; (4) W2-170: settle row 147's four Interface points, then relaunch its lead (`briefs/W2-170-A5-tests.md`,
+  rebuild with `gov brief lead DAEO-61vm --run tests`); W2-173 after W2-149's close; (5) batches 1-3 (`drafts/batch-prep/
+  BATCH-PREP.md`): reviewed tickets on hand-built briefs with `gov brief`'s refusal recorded (DEC-1130 (1)); the 44 by `gov
+  brief`; W2-05's fix first (it gates batch 5).
+- **Lessons today:** check the operator's log before calling an ACT unapplied; `gov close` is the wrong route here; a guard
+  rule is live only if its hook files are installed (W2-141's is NOT live); helpers write in their scratch folder, never
+  `/tmp/gov-os-emg-*`; a heredoc naming the sets root next to `$(...)` is refused: use the Write tool.
+
+## RESUME HERE (history) — 2026-11-11 02:40 UTC: session `8ddb8b14`; THE OWNER'S RE-PIN IS NEXT; HOLD WRITTEN; next free id DEC-1126
 - **Hold:** `log/act-in-progress.txt` (ACT-REPIN-W5): **no commit on integrate until the owner says "done"** (review
   F1). Stand-by note written; renew it when woken (it expires after 2 h; the dead-man's wake comes at 60 min).
 - **09:30 digest** (cron 7355d120, ~09:32): send `drafts/night-1111/DIGEST-0930.md` as written (update usage and any

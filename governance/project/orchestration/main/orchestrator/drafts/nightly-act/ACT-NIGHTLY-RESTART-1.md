@@ -252,7 +252,16 @@ outside the scratch folder (TMPDIR set). The memory cases run a **real `systemd-
   frozen copy refused (4). Counts: see section 6.
 
 ## 6. Counts and the operator's gates
-(Filled by `build_act.py rehearse` and `gates`; see the bottom of this file.)
+- **Rehearsal: 77 cases, 0 failures** (`acts/ACT-NIGHTLY-RESTART-1/rehearsal.log`, ends `failures: 0`): 24 for the ACT's
+  own dry run on a stub crontab, 53 for the wrapper and the quiet check (`rehearsal-wrapper.log`). Three earlier runs of
+  the wrapper cases found and fixed three faults in my own code: the wrapper's own `OFF` was read as a hold by its second
+  look; the watchdog's `sleep` kept the wrapper's lock for 10 s after the run; a memory kill was classed from the unit's
+  `Result`, which said `success` once. Each has a case now.
+- **The operator's own code on the bundle** (`build_act.py gates`, read-only): `validate_manifest` pass; 5 files hash as the
+  manifest says; the path rule passes on `apply.sh` and every check; `act_class.classify`: **class b**, no script hits, why
+  `crontab:crontab`. Manifest sha256 `2ec8ae17c698...` (the CTO rebuilds it when it queues the ACT; the number then changes).
+- Not done here, as the brief says: no crontab change, no commit, no change to a committed tool; the three new files and the
+  bundle are in this folder only.
 
 ## 7. Open points for the CTO and the owner
 1. **Linger** (3.4): the owner's one command, or the nightly does not run on a night without a session.
