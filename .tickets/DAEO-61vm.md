@@ -327,7 +327,7 @@ a runs dir with `indep/AUDITS.log` and `indep/SEEDS.log` (or a planted `selectio
 file with a `fingerprints` row; a `gov` link into a folder named `pin-<12 hex>`. The real `~/gov-os-eval`,
 `~/gov-os-runs` and run folders are never opened (F3).
 
-### 10 The CTO's readings of row 147 (delegated decisions, 2026-11-11, session b40cba91; DEC-936 item 2.5, DEC-1112 (3))
+### 10 The CTO's readings of row 147 and of the tests run's questions (delegated decisions, 2026-11-11, session b40cba91; DEC-936 item 2.5, DEC-1112 (3))
 1. **`dropped/` stays inside `hidden/`** (`hidden/dropped/`), so the existing glob `fixtures/evaluation/*/hidden/**`
    keeps the dropped questions from every measured role. Every consumer of the set reads `hidden/*.yaml` flat, never
    recursively; the auditor's copy made by the launch script excludes `hidden/dropped/` (a W2-173 follow-up, noted in its
@@ -340,3 +340,11 @@ file with a `fingerprints` row; a `gov` link into a folder named `pin-<12 hex>`.
    states them.
 4. **The draw lists come from the runs folder's `indep/AUDITS.log` and `indep/SEEDS.log`** as section 4 and section 9 state;
    `selection.json`, when present, is a planted or hand-made override read first. No W2-173 change is needed for it.
+5. **`say(line, sets_root)`** (PKG-W2-170-TD-1, the test designer's question): `gov.memaudit.say.say` takes the one line to
+   append and the sets root, as the tests drive it; it returns the exit word and the counts, as section 8's others do.
+6. **A file PF-FORM refuses counts toward `n` (PF-COUNT), not toward the category quotas or the spread** (TD-2); below 36
+   files PF-COUNT refuses first, so no quota below 36 is defined.
+7. **A path map that cannot be read at the commit gives `ERROR: <class>` and exit 4** (TD-3), never a PF- code: it fails
+   closed and is not a finding about the set.
+8. **`DC-DECISION` writes no map entry before an `ok: true` declaration** (TD-4): the map entry follows a declaration that
+   passed, never a refused one.
