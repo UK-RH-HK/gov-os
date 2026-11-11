@@ -4,7 +4,9 @@
 # in this script's own folder (before/crontab/crontab, after/crontab/crontab); each is hashed against list.txt before it is
 # installed with `crontab <file>`. Nothing but the crontab is touched.
 #   check   the live crontab is the "before" (exit 3 "moved: crontab" otherwise)
-#   apply   the "after" crontab installed       undo   the "before" crontab put back
+#   apply   the "after" crontab installed; only over the "before" (or when it is already the "after": nothing to do);
+#           over anything else exit 3 and nothing is touched (review round 1, F1)
+#   undo    the "before" crontab put back; only over the "after" (or when it is already the "before"); otherwise exit 3
 #   verify  the live crontab is the "after" (exit 3 "not applied: crontab" otherwise)
 set -u
 B="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,7 +21,10 @@ while IFS='|' read -r root path before after; do
     check) [ "$(live)" = "$before" ] || { echo "moved: crontab" >&2; exit 3; } ;;
     verify) [ "$(live)" = "$after" ] || { echo "not applied: crontab" >&2; exit 3; } ;;
     apply|undo)
-      if [ "$step" = apply ]; then want=$after; src="$B/after/crontab/crontab"; else want=$before; src="$B/before/crontab/crontab"; fi
+      if [ "$step" = apply ]; then want=$after; other=$before; src="$B/after/crontab/crontab"; else want=$before; other=$after; src="$B/before/crontab/crontab"; fi
+      now="$(live)"
+      [ "$now" = "$want" ] && { echo "already in place: crontab ($step)"; continue; }
+      [ "$now" = "$other" ] || { echo "moved: crontab (neither the before nor the after; $step refused, nothing touched)" >&2; exit 3; }
       [ "$(h "$src")" = "$want" ] || { echo "the frozen copy does not hash as listed: $src" >&2; exit 4; }
       crontab "$src" || exit 5 ;;
   esac

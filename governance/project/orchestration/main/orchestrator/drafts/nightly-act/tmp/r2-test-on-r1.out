@@ -59,3 +59,14 @@ ok 50: the watchdog's stop leaves no NIGHTLY-RUNNING
 ok 51: the run's time limit (RuntimeMaxSec) stops a hang
 ok 52: 500 rg processes during the run: one inbox item, and the run goes on to its end (the tripwire stops nothing)
 ok 53: the item names the count and is a P1
+FAIL 54: stale OFF (2: 2026-11-11 16:32:25 nightly_restart: REFUSED: something else was running until the latest start 16:32: the dispatcher is switched OFF (the CTO's hold: dispatch/OFF);)
+FAIL 55: OFF left after the stale-OFF run
+ok 56: F8: a dispatch/OFF whose token names a live pid is kept, and the night is refused
+FAIL 57: scope failure (1: cat: '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/nightly-act/tmp/nr-rehearsal.9WVn8i/orch/log/nightly/2*/run.txt': No such file or directory)
+ok 58: F9: no dispatch/OFF is left after the failed scope
+ok 59: F9: a run that wrote its own run.txt and exited 1 is left as it wrote it (no NOT STARTED line)
+FAIL 60: uncapped probe (0: tail: cannot open '/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/nightly-act/tmp/nr-rehearsal.9WVn8i/orch/log/nightly/2*/run.txt' for reading: No such file or directory)
+FAIL 61: index changed or busy (0: quiet)
+ok 62: F11, the control: a plain git status does rewrite that index, so the case above shows something
+cases: 62
+failures: 6

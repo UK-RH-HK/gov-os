@@ -1,0 +1,93 @@
+{
+ "act": "ACT-NIGHTLY-RESTART-1",
+ "dec": "DEC-1132, DEC-1049",
+ "author": "cto",
+ "claimed_class": "b",
+ "touched": [
+  {
+   "root": "crontab",
+   "path": "crontab",
+   "before": "91e07361e51e4f7afd1431c6e0f691ce5adf5d54763ab95d48c288ebb870d27a",
+   "after": "c613d523f7edb4ee1214f2b5c495727c67c060db702e090cf7718c3b9db690c7"
+  }
+ ],
+ "files": {
+  "before/crontab/crontab": "91e07361e51e4f7afd1431c6e0f691ce5adf5d54763ab95d48c288ebb870d27a",
+  "after/crontab/crontab": "c613d523f7edb4ee1214f2b5c495727c67c060db702e090cf7718c3b9db690c7",
+  "apply.sh": "988b1bc29e96e69b44117a0d60f0040677f7516601fdb997a5c9537f0be7ba51",
+  "list.txt": "5b94d7ac1ce5e49c5e7883e3fec83f38e1fad133c7f1f3cfd9b094890dc58cc0",
+  "rehearsal.log": "259714f5f3656bf96cc1c88a36a8d05c47a3fac79d37789bea00faf3cde277d2"
+ },
+ "checks": [
+  {
+   "cmd": "crontab -l | grep -v '^#' | grep -c .",
+   "exit": 0,
+   "count": 4
+  },
+  {
+   "cmd": "crontab -l | grep -c '^0 4 \\* \\* \\* /usr/bin/bash .*/nightly/nightly_restart\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \\* \\* \\* bash .*/nightly/nightly_cron\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^0 8 \\* \\* \\* bash .*/nightly/nightly_check\\.sh  # DEC-1132 (4), ACT-NIGHTLY-RESTART-1:'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/nightly_check\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \\* \\* \\* bash .*/nightly/runs_sweep\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c '^\\* \\* \\* \\* \\* /usr/bin/bash .*/dispatch/run_tick\\.sh$'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "crontab -l | grep -c 'operator_launch\\.py'",
+   "exit": 0,
+   "count": 1
+  },
+  {
+   "cmd": "git ls-files --error-unmatch governance/project/orchestration/nightly/nightly_restart.sh governance/project/orchestration/nightly/quiet_check.py",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "git diff --quiet HEAD -- governance/project/orchestration/nightly",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "bash -n governance/project/orchestration/nightly/nightly_restart.sh",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "[ \"$(git rev-parse HEAD:governance/project/orchestration/nightly/nightly_restart.sh)\" = dd5129a25715b3bc00685e6104eba79f195563e2 ]",
+   "exit": 0,
+   "count": null
+  },
+  {
+   "cmd": "[ \"$(git rev-parse HEAD:governance/project/orchestration/nightly/quiet_check.py)\" = 3225297532f2dcdbb849c21e758cd4529b300dc2 ]",
+   "exit": 0,
+   "count": null
+  }
+ ],
+ "commands": [],
+ "rehearsal": {
+  "log": "rehearsal.log",
+  "sha256": "259714f5f3656bf96cc1c88a36a8d05c47a3fac79d37789bea00faf3cde277d2"
+ }
+}

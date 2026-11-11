@@ -1,29 +1,60 @@
-# ACT-NIGHTLY-RESTART-1 rehearsal, part 1: apply.sh on a stub crontab seeded with the live bytes
-ok 1: apply.sh check: the stub crontab (the live bytes at build) is the before
+# ACT-NIGHTLY-RESTART-1 rehearsal (round 2). Parts 1 and 2: the ACT's own dry run; part 3: the wrapper's cases.
+# part 1: apply.sh on a stub crontab (a file) seeded with the live bytes at the build
+ok 1: apply.sh check: the stub crontab is the before
 ok 2: apply.sh verify before the apply: exit 3 'not applied'
-ok 3: apply.sh apply: the after crontab installed
-ok 4: the stub crontab is the after, byte for byte
-ok 5: apply.sh verify after the apply: exit 0
-ok 6: check (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
-ok 7: check (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh  # DEC-11
-ok 8: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \* \* \* bash .*/nightly/nightly_cron\.sh$'
-ok 9: check (exit 0, count 1): crontab -l | grep -c '^0 8 \* \* \* bash .*/nightly/nightly_check\.sh  # DEC-1132 (4), ACT
-ok 10: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/nightly_ch
-ok 11: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \* \* \* bash .*/nightly/runs_sweep\.sh$'
-ok 12: check (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
-ok 13: check (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
-ok 14: committed in a fixture repo (exit 0): git ls-files --error-unmatch governance/project/orchestration/nightly/nightly_restart.sh g
-ok 15: committed in a fixture repo (exit 0): git diff --quiet HEAD -- governance/project/orchestration/nightly
-ok 16: committed in a fixture repo (exit 0): bash -n governance/project/orchestration/nightly/nightly_restart.sh
-ok 17: a changed, uncommitted file under nightly/: `git diff --quiet HEAD` exits 1 (the ACT would not apply)
-ok 18: a file that is not committed: `git ls-files --error-unmatch` exits non-zero
-# at the live head today: red, green, red (the wrapper is committed by the CTO before the ACT is queued; red here is the hold that makes it so)
-ok 19: apply.sh undo
-ok 20: the undo restored the stub crontab byte for byte
-ok 21: apply.sh check after the undo: the before again
-ok 22: a crontab that moved since the build: check exits 3
-ok 23: a frozen copy that does not hash as listed: apply exits 4
-# part 2: nightly_restart.sh and quiet_check.py in a planted world (files/test_nightly_restart.sh); every memory case ran under a real `systemd-run --user --scope`
+ok 3: F1: apply.sh undo when the crontab is already the before: exit 0, nothing touched
+ok 4: apply.sh apply: the after crontab installed
+ok 5: the stub crontab is the after, byte for byte
+ok 6: apply.sh verify after the apply: exit 0
+ok 7: F1: apply.sh apply when the crontab is already the after: exit 0, nothing touched
+ok 8: check (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
+ok 9: check (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh  # DEC-11
+ok 10: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \* \* \* bash .*/nightly/nightly_cron\.sh$'
+ok 11: check (exit 0, count 1): crontab -l | grep -c '^0 8 \* \* \* bash .*/nightly/nightly_check\.sh  # DEC-1132 (4), ACT
+ok 12: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/nightly_ch
+ok 13: check (exit 0, count 1): crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \* \* \* bash .*/nightly/runs_sweep\.sh$'
+ok 14: check (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
+ok 15: check (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
+ok 16: F1: apply.sh undo over a crontab that is neither the after nor the before: exit 3, nothing touched
+ok 17: apply.sh undo
+ok 18: the undo restored the stub crontab byte for byte
+ok 19: apply.sh check after the undo: the before again
+ok 20: a crontab that moved since the build: check exits 3
+ok 21: F1: apply.sh apply over a crontab that is neither the before nor the after: exit 3, nothing touched (the added line stays)
+ok 22: a frozen copy that does not hash as listed: apply exits 4, nothing touched
+ok 23: wrapper-r2 committed in a fixture repo (exit 0): git ls-files --error-unmatch governance/project/orchestration/nightly/nightly_restart.sh governa
+ok 24: wrapper-r2 committed in a fixture repo (exit 0): git diff --quiet HEAD -- governance/project/orchestration/nightly
+ok 25: wrapper-r2 committed in a fixture repo (exit 0): bash -n governance/project/orchestration/nightly/nightly_restart.sh
+ok 26: wrapper-r2 committed in a fixture repo (exit 0): [ "$(git rev-parse HEAD:governance/project/orchestration/nightly/nightly_restart.sh)" = dd5129a2
+ok 27: wrapper-r2 committed in a fixture repo (exit 0): [ "$(git rev-parse HEAD:governance/project/orchestration/nightly/quiet_check.py)" = 3225297532f2
+ok 28: a changed, uncommitted file under nightly/: `git diff --quiet HEAD` exits 1 (the ACT would not apply)
+ok 29: F3: a wrapper committed with other bytes than the pinned blob: its pin check fails, the other pin still holds
+ok 30: a file that is not committed: `git ls-files --error-unmatch` exits non-zero
+# part 2: the operator's dry run in a clone of the live head (planted HOME, crontab stubbed by a file)
+ok 31: the crontab seeded from the live one is the bundle's before, byte for byte
+ok 32: apply.sh check in the clone's environment: exit 0
+ok 33: apply.sh apply in the clone's environment: exit 0
+ok 34: the planted crontab is the bundle's after, byte for byte
+ok 35: the apply changed nothing in the clone or the planted HOME (only the crontab file)
+ok 36: the manifest's check, run in the clone (exit 0, count 4): crontab -l | grep -v '^#' | grep -c .
+ok 37: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^0 4 \* \* \* /usr/bin/bash .*/nightly/nightly_restart\.sh
+ok 38: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: 0 4 \* \* \* bash .*/nightly/nightly_
+ok 39: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^0 8 \* \* \* bash .*/nightly/nightly_check\.sh  # DEC-113
+ok 40: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^# DEC-1049 stopped: @reboot sleep 300 && bash .*/nightly/
+ok 41: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^# DEC-1050 stopped: 30 9 \* \* \* bash .*/nightly/runs_sw
+ok 42: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c '^\* \* \* \* \* /usr/bin/bash .*/dispatch/run_tick\.sh$'
+ok 43: the manifest's check, run in the clone (exit 0, count 1): crontab -l | grep -c 'operator_launch\.py'
+ok 44: the manifest's check, run in the clone (exit 0, count None): git ls-files --error-unmatch governance/project/orchestration/nightly/nightly_re
+ok 45: the manifest's check, run in the clone (exit 0, count None): git diff --quiet HEAD -- governance/project/orchestration/nightly
+ok 46: the manifest's check, run in the clone (exit 0, count None): bash -n governance/project/orchestration/nightly/nightly_restart.sh
+ok 47: the manifest's check, run in the clone (exit 0, count None): [ "$(git rev-parse HEAD:governance/project/orchestration/nightly/nightly_restart
+ok 48: the manifest's check, run in the clone (exit 0, count None): [ "$(git rev-parse HEAD:governance/project/orchestration/nightly/quiet_check.py)
+ok 49: apply.sh verify in the clone's environment: exit 0
+ok 50: apply.sh undo in the clone's environment: exit 0
+ok 51: the undo restored the planted crontab byte for byte; the clone and the planted HOME are as they were
+ok 52: the clone's tree is clean after the whole dry run
+# part 3: test_nightly_restart.sh on the wrapper as committed in the clone (nightly/); the memory cases run a real `systemd-run --user --scope`
+# the files tested (git blob ids): nightly_restart.sh dd5129a25715, quiet_check.py 3225297532f2, test_nightly_restart.sh e3edb0cef582
 ok 1: nothing planted: quiet, exit 0
 ok 2: a lead in the dispatcher's status: busy, named
 ok 3: a planted lead process in a ticket worktree: busy
@@ -64,12 +95,12 @@ ok 37: the run's processes carry oom_score_adj 500
 ok 38: dispatch/OFF was there during the run and is gone after it
 ok 39: cron's bare environment (env -i): the wrapper finds the user bus itself and runs the capped scope
 ok 40: the CTO's own dispatch/OFF is respected and never removed by the wrapper
-ok 41: a 600 MB hog in a 200 MB cap: the run ended, exit 137
+ok 41: a 600 MB hog in a 200 MB cap: the run ended, with a non-zero exit
 ok 42: the wrapper says the memory cap killed the run (exit 137, the whole run)
 ok 43: the hog's sibling process died with it (the whole run, not a part)
 ok 44: the marker NIGHTLY-RUNNING and dispatch/OFF are gone after the kill
-ok 45: the test's own session (pid 309470) is alive
-ok 46: every shared-server process seen before (6 of them) is still alive after
+ok 45: the test's own session is alive
+ok 46: every shared-server process seen before the hog is still alive after it
 ok 47: run.txt's last line says what stopped the run
 ok 48: no gov-nightly unit is left loaded or failed
 ok 49: MemAvailable under the trip-wire's floor: the watchdog stops the run's scope within seconds
@@ -77,5 +108,14 @@ ok 50: the watchdog's stop leaves no NIGHTLY-RUNNING
 ok 51: the run's time limit (RuntimeMaxSec) stops a hang
 ok 52: 500 rg processes during the run: one inbox item, and the run goes on to its end (the tripwire stops nothing)
 ok 53: the item names the count and is a P1
-cases: 77
+ok 54: F8: a stale dispatch/OFF (its pid is dead) is removed and logged, and the night runs
+ok 55: F8: no dispatch/OFF is left after that run
+ok 56: F8: a dispatch/OFF whose token names a live pid is kept, and the night is refused
+ok 57: F9: a scope that fails after the probe leaves a NOT STARTED run.txt that names the scope failure
+ok 58: F9: no dispatch/OFF is left after the failed scope
+ok 59: F9: a run that wrote its own run.txt and exited 1 is left as it wrote it (no NOT STARTED line)
+ok 60: F10: a probe scope whose memory.max is not the 64M it was given: the night is refused, nothing run
+ok 61: F11: quiet_check leaves the main tree's index alone (GIT_OPTIONAL_LOCKS=0), tree touched or not
+ok 62: F11, the control: a plain git status does rewrite that index, so the case above shows something
+cases: 114
 failures: 0

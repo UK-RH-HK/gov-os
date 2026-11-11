@@ -1,1 +1,1 @@
-{"553829:691260": {"slot": "1", "pid": 553829, "cpu": 121, "since": 1794414667.8965383, "reported": false, "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock /usr/bin/taskset -c 0,1,2,3,4,5 /home/usain/.local/bin/gov rebuild --integration w2/integrate", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS"}}
+{}

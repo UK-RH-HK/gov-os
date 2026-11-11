@@ -1,0 +1,13 @@
+built /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/nightly-act/acts/ACT-NIGHTLY-RESTART-1: before 91e07361e51e, after c613d523f7ed
+# live head 483a5a2bee12: wrapper-r2 is not committed there (not in the log: F2)
+# at the live head, the git checks that are red: 2 of 5
+# the wrapper's cases: 62 cases, 0 failures, exit 0
+ok 62: F11, the control: a plain git status does rewrite that index, so the case above shows something
+cases: 114
+failures: 0
+manifest sha256 0e308cde3aecb0347a0aad634a8bf248a3df881cad500c23c8044611cec8ed88
+validate_manifest: pass
+files: 5 hash as the manifest says
+path rule: pass (apply.sh and every check)
+act_class.classify: class b; hits []; why crontab:crontab (crontab: crontab lines (NIGHTLY-1, NIGHTLY-STOP-1, SCHEDULE-STOP-2, DISPATCH-CRON-2, DISPATCHER-1, RUNS-SWEEP-1): run code on a schedule outside the guard)
+manifest sha256 0e308cde3aecb0347a0aad634a8bf248a3df881cad500c23c8044611cec8ed88

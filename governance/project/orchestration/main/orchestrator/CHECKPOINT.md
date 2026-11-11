@@ -12,13 +12,13 @@
   - ACT-EXAMIN-SETS-1: **READY** r1 (`acts/.../review.md`), `yes ACT-EXAMIN-SETS-1 97d45565` + C1-C8 + two writer briefs
     (`drafts/examin-sets/FOR-THE-OWNER.md`). Through the agent: queue only after ~21:17 UTC 11-12 (row 124); by hand: not held.
   - ACT-MEMORY-AUDIT-INSTALL-1: **READY** r1, class (O) by hand, `yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4`; P2-F1 row 151.
-  - ACT-ACCEPTED-REDS-1 (DEC-1134): built (`drafts/accepted-reds-1/`), class (O) by hand (the agent's Role: operator commit
+  - ACT-ACCEPTED-REDS-1 (DEC-1134): **READY r1 (17:05, `483a5a2be`)**; built (`drafts/accepted-reds-1/`), class (O) by hand (the agent's Role: operator commit
     is not counted by the ratchet), after EXAMIN-SETS-1 on the map, `49e11172`; **review r1 RUNNING** (log
     `~/gov-os-worktrees/W2-20/.gov-runtime/scratch/lead/log/ACT-ACCEPTED-REDS-1-review.json`, wait on its `.exit`).
-  - ACT-OPERATOR-ROUNDS-1: fix pass done (`drafts/act-operator-rounds/`, manifest.sha256 `79c95ff3`); **review r2 (the last)
+  - ACT-OPERATOR-ROUNDS-1: **r2 READY (17:05, `483a5a2be`), the owner runs §5 by hand**; fix pass done (`drafts/act-operator-rounds/`, manifest.sha256 `79c95ff3`); **review r2 (the last)
     RUNNING** (same log folder, `ACT-OPERATOR-ROUNDS-1-review-r2.json`). If READY: the owner runs §5 by hand; then copy
     `after/cto-verdict.py` and `after/cto-test_verdict.py` over `tools/verdict.py` and `tools/test_verdict.py`.
-  - ACT-NIGHTLY-RESTART-1: r1 READY but its sha cannot pass (F2; `reviews/ACT-NIGHTLY-RESTART-1-review-r1.md`); **fix pass and
+  - ACT-NIGHTLY-RESTART-1: **r2 READY 17:10, wrapper-r2 committed b2e6256fa, bundle in acts/ with review.md; WAITS the yes `yes ACT-NIGHTLY-RESTART-1 0e308cde`, then queue `~/gov-os-operator/queue/ACT-NIGHTLY-RESTART-1.req` (one line: ACT id and the 64-hex sha)**; rebuilt 17:20 (manifest `0e308cde`, rehearsal 114/0; wrapper-r2 pins dd5129a25715, 3225297532f2; review r2 RUNNING, pid 587920, log `ACT-NIGHTLY-RESTART-1-review-r2.json`); after READY: copy the bundle to `acts/`, `git apply drafts/nightly-act/wrapper-r2.diff`, run test_nightly.sh (not in heavy_slot), commit, check the blobs, then the yes `yes ACT-NIGHTLY-RESTART-1 0e308cde`**; r1 READY but its sha cannot pass (F2; `reviews/ACT-NIGHTLY-RESTART-1-review-r1.md`); **fix pass and
     rebuild by an in-session Sonnet helper RUNNING** (F1, F3, F4, F5; F8-F11 as `drafts/nightly-act/wrapper-r2.diff`, committed by
     the CTO after r2 READY and before queuing); then review r2 (the last) in the same brief form as `briefs/ACT-NIGHTLY-RESTART-1-review.md`.
     F6 (a detection-only name match vs DEC-1073 (4)) is a reading for the owner, in the digest.

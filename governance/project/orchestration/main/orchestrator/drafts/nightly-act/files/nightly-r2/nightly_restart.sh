@@ -184,6 +184,7 @@ watch 8>&- &
 WPID=$!
 wait "$SPID"; rc=$?
 kill "$WPID" 2>/dev/null; wait "$WPID" 2>/dev/null; WPID=""
+for _ in 1 2 3 4 5 6 7 8 9 10; do systemctl --user is-active --quiet "$UNIT.scope" 2>/dev/null || break; sleep 0.5; done   # let the unit settle first
 result=$(systemctl --user show -p Result --value "$UNIT.scope" 2>/dev/null)
 systemctl --user reset-failed "$UNIT.scope" 2>/dev/null
 
