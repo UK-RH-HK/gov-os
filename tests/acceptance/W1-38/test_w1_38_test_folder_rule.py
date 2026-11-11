@@ -66,8 +66,10 @@ RULE_LISTS = ("deny", "ask", "allow")
 OTHER_SOURCE_RULES = {
     ("edit", ".tickets/**", "deny"),
     ("bash", "sudo *", "deny"),
+    ("bash", "gov launch:*", "allow"),
 }
 OTHER_GENERATED_RULES = {
+    "allow": ["Bash(gov launch:*)"],
     "deny": ["Bash(sudo *)", "Edit(.tickets/**)"],
 }
 

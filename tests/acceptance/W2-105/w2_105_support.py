@@ -13,7 +13,8 @@ worktree's ``gov`` is importable for the stand-in home through a path file in it
 install leaves one (W2-90's ``install_gov_for``). So the guard that answers is this worktree's ``src/gov`` (DEC-732).
 
 **The base.** "Before" is the template as it stood before this ticket: ``template/.rulesync/permissions.jsonc`` at
-``BASE_COMMIT``, the commit of DEC-664's round, the last to change the file on ``w2/integrate`` before W2-105.
+``BASE_COMMIT``, the commit of W2-56's round 2, which added the rule ``"gov launch:*": "allow"``: the last to change
+the file on ``w2/integrate`` before W2-105.
 """
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ check_support = hooks.check_support                # W1-03: a ticket file, a hoo
 SOURCE_REL = "template/.rulesync/permissions.jsonc"   # the ticket's one path
 PROJECT_SOURCE_REL = ".rulesync/permissions.jsonc"    # where Copier puts it in the project
 SETTINGS_REL = kernel_wiring.SETTINGS_REL
-BASE_COMMIT = "74d83913a86b"   # DEC-664's round: the template's permission source on w2/integrate before W2-105
+BASE_COMMIT = "dca333e7a55d"   # W2-56's round 2 (adds "gov launch:*": "allow"): the source on w2/integrate before W2-105
 
 # The two rules DEC-966 item 1 removes, as the source gives them and as rulesync generates them.
 INSTALL_SOURCE_RULES = frozenset({("bash", "npm install*", "deny"), ("bash", "pip install*", "deny")})

@@ -33,9 +33,9 @@ this repository's settings.
   refused first, and the guard's program itself ended with 0 and wrote `deny` (W1-38's `refused_by_the_program`: an
   exit 2 is also what an interpreter gives that did not find the program). The registered commands are run even when
   a settings rule denies, so that a red message says what the guard would have answered.
-- **The base ("before")** is `template/.rulesync/permissions.jsonc` at `74d83913a86b`, the commit of DEC-664's round:
-  the last change to the file on `w2/integrate` before this ticket. It is read with `git show` from the repository's
-  history; its generated settings are what rulesync writes in a copy of the same generated project given that source.
+- **The base ("before")** is `template/.rulesync/permissions.jsonc` at `dca333e7a55d`, the commit of W2-56's round 2,
+  which added the rule `"gov launch:*": "allow"`: the last change to the file on `w2/integrate` before this ticket.
+  It is read with `git show` from the repository's history; its generated settings are what rulesync writes in a copy of the same generated project given that source.
 - **Run**:
 
   ```
