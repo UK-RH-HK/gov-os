@@ -14526,6 +14526,18 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 - **Basis:** question 2 (a control proved on measured evidence, its own faults fixed first; the machine protected from a
   runaway whatever starts it) and question 4 (one fix pass per round).
 
+### DEC-1134 — The nightly's two warm-latency reds added to `accepted_reds`, named, until W2-155 closes; linger enabled; a fresh CTO session after the VS Code reload
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`); item (1) until W2-155 (`DAEO-ar89`) closes · **Under:** DEC-1125 (1), DEC-1132 (4), DEC-757, DEC-762, DEC-1052 (Q-10), DEC-1118 · **Source:** the owner's message (chat, 2026-11-11 ~16:00 UTC)
+- **Decision:**
+  - (1) **`accepted_reds` gains two entries, named, until W2-155 closes:** `tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95` and `tests/acceptance/W2-13/test_w2_13_latency.py::test_a_warm_retrieval_with_the_real_models_answers_within_the_budget` (the warm real-model query
+    latency, p95 0.54-0.59 s against the 0.5 s budget, the named red of DEC-1125 (1)); each entry's decision DEC-1134,
+    its reason that red, its `fixed_by` W2-155. Prepared by the CTO as the owner's commit (the path map's ratchet takes
+    an owner's commit only), applied by the owner's operator.
+  - (2) The owner ran `loginctl enable-linger usain` (ACT-NIGHTLY-RESTART-1's prerequisite).
+  - (3) **Rule 11 (DEC-1118):** the CTO's context is past 200k; the CTO writes the handover (report-state.json to today,
+    CHECKPOINT's RESUME HERE), and the owner starts a fresh CTO session after the VS Code reload.
+- **Basis:** question 2 (a known, named red does not stop every night's report; it leaves the list when its fix lands).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14595,3 +14607,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.514 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1131 (one bar, two rounds for every role, option A; a blocking-only fix the same round; verdict.py and operator_run.py fixed now); DEC-1010 changed; DEC-1128's note corrected (W2-141's rule not live). DEC-1127 still held PROPOSED. Next free id: DEC-1132. |
 | 0.515 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1127 WITHDRAWN (never in force); DEC-1132 (closes by DEC-953, option D; ADOPT-VERIFY-1 (d) and W2-174; the rg tripwire; the nightly's restart ACT; set-up A's bar to define). Next free id: DEC-1133. |
 | 0.516 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1133 (set-up A's bar; the error path and listing rule first; ACT A; the sample day and the p95; FX6; MEMORY-PROTECTION-1 D1-D3; the floor 3 GiB). Next free id: DEC-1134. |
+| 0.517 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1134 (the two warm-latency reds to accepted_reds until W2-155; linger; the handover). Next free id: DEC-1135. |

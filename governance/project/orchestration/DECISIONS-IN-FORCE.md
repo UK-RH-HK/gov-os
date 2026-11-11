@@ -533,3 +533,5 @@ other restart is an ACT.
   fixed first, each by ACT, set-up A after**; ACT A (`launch_now.sh` gates and registers each lead); the sample day after
   it with leads running, `--remeasure` writes the p95; FX6 one fix pass per round; **`mem_guard.py` runs (kills `rg` by
   pid past its thresholds, in restart class 4)**, `.wslconfig` unchanged, no window; the floor back to 3 GiB. Basis: questions 2 and 4.
+- DEC-1134 (2026-11-11, until W2-155 closes): W1-19's and W2-13's warm real-model latency cases in `accepted_reds`, named
+  (decision DEC-1134, fixed_by W2-155), by the owner's commit through the owner's operator; linger enabled. Basis: question 2.
