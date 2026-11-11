@@ -13,8 +13,8 @@
 - **Drafts:** `.gov-runtime/scratch/orchestrator/drafts/memaudit-install-1/` (§4).
 
 ## 0. Class: (O); your yes, then your operator by hand
-The yes line: **`yes ACT-MEMORY-AUDIT-INSTALL-1 <8 hex of the commit that records this package ready>`** (the CTO fills
-the commit in when it records the package; the form of DEC-1115 (1)).
+The yes line: **`yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4`** (`0d017ae4e`, the commit that records this package ready; the
+form of DEC-1115 (1)).
 
 - **The code's vote is (O).** `governance/project/operator/class-rules.yaml`'s `walled-sessions` row (class O,
   `control: false`) names both paths this ACT writes: `gov-os-eval/**` (so `<sets root>/indep-walls/APPROVED`) and
@@ -109,7 +109,7 @@ unless the live file's sha256 is exactly `6b923cb4d552…`** and changes nothing
 
 ## 5. The operator's steps: the message
 > **ACT-MEMORY-AUDIT-INSTALL-1 (DEC-1129 (2)): the memory audit's three briefs and their lines in the launch script's
-> approved list.** Class (O), by hand: your yes first: **`yes ACT-MEMORY-AUDIT-INSTALL-1 <8 hex>`**. It comes after
+> approved list.** Class (O), by hand: your yes first: **`yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4`**. It comes after
 > ACT-W2-149-INSTALL-1, ACT-SETS-GLOBS-1 and ACT-PATHMAP-NS-2 (all applied). In the main tree, about one minute:
 > ```
 > cd /home/usain/Dynamic-Agentic-Engineering-OS
