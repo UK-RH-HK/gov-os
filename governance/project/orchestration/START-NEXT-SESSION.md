@@ -4,6 +4,19 @@ You are the Wave 2 orchestrator (the CTO), `orchestrator DAEO-sdxk`, in the main
 **emergency mode**. This file maps everything you need, in order. Where it and an older note differ, this file holds;
 the register and the owner's word hold over both. **Next free id: DEC-1126.**
 
+## 000. NOW (02:40 UTC 11-11, session 8ddb8b14): the re-pin is the owner's next step; read this, then §00
+- **D-10 is done** (run 2: nightly red 2, the warm latency, ruled a named red, DEC-1125 (1); W2-155 `DAEO-ar89` P4).
+- **ACT-REPIN-W5 is READY** (`packages/ACT-REPIN-W5.md`; review `reviews/ACT-REPIN-W5-review.md`): candidate
+  `797495bdfc70`, wheel `04b094fbd587`; `src/` frozen since; **the CTO's hold `log/act-in-progress.txt` is written:
+  no landing on integrate until the owner says "done"** (review F1). The owner's steps are in the package and in
+  `.gov-runtime/scratch/orchestrator/drafts/night-1111/DIGEST-0930.md`, the 09:30 digest's text.
+- **After "done":** end the hold (`mv`); check the registry commit's store refresh; close W2-96, W2-122, W2-123 (before
+  W2-126), W2-126, W2-92 from a shell that does not ignore SIGHUP (`packages/LIFT-CLOSES-1.md`); rows 122-126; then
+  the owner's answers to the digest's eight items (usage (A) at the lift; W2-60a DEC-105; DEC-1091 (2); MEMORY-AUDIT-1;
+  W2-32/W2-15a; D-10's named red as "green"; ACT-EFFORT-HIGH-2), and READY-AFTER-LIFT-1 after its review.
+- **The night's records:** `packages/AUDIT-NIGHT-1/` (a-f, c2, w2-60a-options), `FORECAST-W2-3.md`, `MEMORY-AUDIT-1.md`,
+  `READY-AFTER-LIFT-1.md`, P1-PLAN P1-15..25; notes `drafts/night-1111/NOTES.md`.
+
 ## 00. NOW (17:45 UTC 11-10): read this first; the sections below it are the 14:30 handover, still valid where not replaced
 - **Usage (A) is in force (DEC-1122 (2)): only the lift's critical path runs until the reset 11-15 09:00.** 60 % at
   16:00; at the last 24 h's pace 80 % ≈ 11-11 03:00, 100 % ≈ 11-11 afternoon (`packages/USAGE-RUBRIC-2.md` §4).
