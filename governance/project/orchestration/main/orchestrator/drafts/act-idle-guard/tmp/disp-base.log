@@ -1,0 +1,55 @@
+.........F.............................................................. [ 39%]
+....sss...........................................F..................... [ 79%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+____ test_a_finished_return_becomes_one_inbox_item_and_is_marked_seen_once _____
+
+w = <class 'test_dispatcher.W'>
+
+    def test_a_finished_return_becomes_one_inbox_item_and_is_marked_seen_once(w):
+        (w.orch / "log" / "W2-A-A5-run1.json").write_text(json.dumps({"result": "task: x\nstatus: DONE at abc\n"}))
+        tick(w)
+        tick(w, DISPATCH_NOW=NOW + 200)
+        items = list((w.d / "inbox").glob("*.txt"))
+>       assert len(items) == 1 and "status: DONE at abc" in items[0].read_text()
+E       AssertionError: assert (2 == 1)
+E        +  where 2 = len([PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-idle-guard/tmp/pyt...d/tmp/pytest-of-usain/pytest-0/test_a_finished_return_becomes0/orch/dispatch/inbox/20270115-080320-idle-headroom.txt')])
+
+tests/unit/orchestration/test_dispatcher.py:203: AssertionError
+___________ test_gpu_a_cuda_error_is_one_item_at_once_and_not_again ____________
+
+w = <class 'test_dispatcher.W'>
+
+    def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
+        (w.d / "ready.txt").write_text("")  # no lead starts: the inbox holds only the GPU's items
+        # 13,000 MiB: within the budget (16,303 - 2,048); above it is a gpu-alert of its own (DEC-1039 (1b))
+        smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 13000, 16303, 99")
+        glog(w, "shared", LOADED + "an old " + CUDA)  # history before the first pass: not alerted
+        tick(w)
+        assert gpu_items(w) == []
+        glog(w, "shared", "ggml_cuda_compute_forward: x\n" + CUDA + "/build/ggml-cuda.cu:108: CUDA error\n")
+        tick(w, DISPATCH_NOW=NOW + 60)
+        items = gpu_items(w)
+        assert len(items) == 1 and items[0].name.endswith("-gpu-alert.txt") and not items[0].name.endswith("-server-hung.txt")
+        body = items[0].read_text().splitlines()
+        assert body[0] == "log: serve-11434.log" and body[1] == "GPU: CUDA error (shared)" and body[2].startswith("status: ")
+        text = items[0].read_text()
+        assert "shared: CUDA error: unknown error" in text and "12.7/15.9 GB, 99 %" in text and "W2:" not in text
+        assert "holders:" in text and "layers: shared 29/29" in text
+        assert (w.d / "inbox-stale.txt").read_text().startswith("gpu: the GPU CUDA error (shared) since ")
+        tick(w, DISPATCH_NOW=NOW + 120)  # no new line: not again
+        assert len(gpu_items(w)) == 1 and "last alert " in gpu_status(w)
+        items[0].rename(w.d / "inbox" / (items[0].name + ".read"))  # read: the stale line clears
+        tick(w, DISPATCH_NOW=NOW + 180)
+>       assert not (w.d / "inbox-stale.txt").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = (PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-idle-guard/tmp/pytest-of-usain/pytest-0/test_gpu_a_cuda_error_is_one_i0/orch/dispatch') / 'inbox-stale.txt').exists
+E        +      where PosixPath('/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/act-idle-guard/tmp/pytest-of-usain/pytest-0/test_gpu_a_cuda_error_is_one_i0/orch/dispatch') = <class 'test_dispatcher.W'>.d
+
+tests/unit/orchestration/test_dispatcher.py:1607: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/orchestration/test_dispatcher.py::test_a_finished_return_becomes_one_inbox_item_and_is_marked_seen_once
+FAILED tests/unit/orchestration/test_dispatcher.py::test_gpu_a_cuda_error_is_one_item_at_once_and_not_again
+2 failed, 177 passed, 3 skipped, 10 deselected in 75.72s (0:01:15)
+done

@@ -1,0 +1,631 @@
+{
+  "ticket": "DAEO-61vm",
+  "ticket_text": "---\nid: DAEO-61vm\nstatus: in_progress\ndeps: []\nlinks: [DAEO-52ku, DAEO-2bdu, DAEO-k1e2, DAEO-p8tv, DAEO-qz4p]\ncreated: 2026-11-11T01:20:37Z\ntype: task\npriority: 2\nassignee: engineer\nexternal-ref: W2-170\ntags: [wave-2, implementation, memory, audit, full, after-the-lift]\nwbs_id: W2-170\ntitle: 'The memory audit''s set record: the checks before any search, the drop and void rule, the declaration and the use-once marker, counts only (DEC-1101 (1), DEC-1125 (2))'\nclass: implementation\nstate_class: AUTHORITATIVE\nrole: engineer\ndepends_on: []\nallowed_paths:\n- src/gov/memaudit/**\n- tests/unit/memaudit/**\n- governance/project/test-map.yaml\n- docs/changes/W2-170-evidence.md\nkpis:\n  success:\n  - 'S1 The pre-flight checks a delivered set before any search and prints ids, counts and the codes below only. It refuses on each of: fewer than 36 files; a file not in the writer brief''s form (`id`, `question`, `gold_answer`, `sources`, `commit`, `category`, `drawn`); a `commit` other than the audit commit; a category count other than the 40-question quotas of the rubric (R5 item 6); a governing domain under 4 questions or a subsystem over 10, scaled to the kept count; a `drawn: changed` or `drawn: sample` question whose first source is not in `selection.json`''s list of that name; a source path missing at the audit commit, or a `heading` not found and `lines` outside the file; a source in an evaluation or evaluation-source namespace (R8); a gold-source set equal to a pool question''s (R9); a nonexistent-id question whose id exists at the commit. Verify: a planted set in a planted repository and sets root under TMPDIR with ten planted defects, one per check: each refused with its own code; the clean planted set ends `PRE-FLIGHT: every check as expected`; no real `~/gov-os-eval` is opened [DEC-1101 (1), DEC-1069 (5), DEC-1125 (2)]'\n  - 'S2 The drop and void rule: after the checker''s second pass, every question whose verdict in the notes is not `accept` is moved to `dropped/` in the set''s folder (never deleted), the kept count and every S1 scale are recomputed from the kept questions, and a kept count under 36 or a domain under 4 makes the audit VOID: nothing is measured, no `USED` marker is written, and the counts say `void` with the cause code. Verify: planted notes with 3 drops (audit goes on, kept 37, scales recomputed), with 5 drops (VOID, no `USED`, no `DECLARATION.json`), and with a drop that leaves a domain at 3 (VOID) [DEC-1101 (1), DEC-1125 (2)]'\n  - 'S3 Before any search the runner writes `runs/<audit>/DECLARATION.json` and a `USED` marker, in that order. The declaration holds: the audit commit; the store''s commit and its sha256; the gov pin; the `retrieval.yaml` digest; the standard''s four settings by name (the shared reranker, the pool on, the 6,000-token bundle, search again once); the set''s digest (`LC_ALL=C sha256sum *.yaml | sha256sum` over the kept questions); n; the bar scaled to n (at least ceil(0.85 n) right end to end, at most floor(0.05 n) wrong claims; the target ceil(0.95 n)); and how it rounds. The runner refuses to start while `USED` exists, so a set is measured once. Verify: a planted run writes both files in that order (the file times and the ledger line); a second run on the same audit exits with the refusal and writes nothing; a planted `retrieval.yaml` with the pool off is named in the declaration and the run is not ok without a decision id [DEC-1098 (1), DEC-1097 (1)(d), DEC-1101 (1)]'\n  - 'S4 The set is declared in the sets root''s own path map by the runner''s code, as one `evaluation_sets` entry of the shape `memory-verdict-2`''s has (its hidden glob, the six roles measured), so `gov.retrieval.measure` accepts it, and nowhere else: the repository''s `governance/project/path-map.yaml`, the guard and the hook are never written, and no ACT is needed for a new audit''s name. Verify: a planted sets root map gains exactly one entry for `memory-audit-<date>`; `git status` in the planted repository shows no change; the measure run on the planted set accepts it [DEC-1101 (2), DEC-820]'\n  - 'S5 Only counts and ids leave the tool: standard output and `runs/<audit>/PREFLIGHT.json` hold ids, counts, codes and digests, never a question, a gold answer, a source path or a heading; a line naming the sets root''s folders is refused before it is printed; the command line names only `--sets-root <root>`, never a folder under it (the guard''s line rule). Verify: a planted question with a unique word: grep of every output file and the captured stdout and stderr finds it 0 times; the printed command line holds no `fixtures/` or `runs/` [DEC-1101 (2), DEC-1097 (2)]'\n  - 'S6 The package is wired in: `governance/project/test-map.yaml` places `src/gov/memaudit/**` and its tests (so a change here runs these tests and not the full suite), and the module runs as `python3 -m gov.memaudit preflight|void|declare`. Verify: `gov close`''s scoped selection for a planted change under `src/gov/memaudit/` names `tests/unit/memaudit/`; each subcommand prints its usage with `--help` and exits 0 [DEC-896]'\n  failure:\n  - 'A question, gold answer, answer, source path or heading of a set in any output, log or error text. Verify: S5''s planted question with a unique word, gold answer, source path and heading: grep of every output file, the captured stdout and stderr and the logs finds each 0 times'\n  - 'A set measured twice, or measured without `DECLARATION.json` and `USED` written first. Verify: S3''s planted runs: the file times and the ledger line show `DECLARATION.json` before `USED` before any search, and a second run on the same audit exits with the refusal and starts no search'\n  - 'The repository''s path map, the guard, the hook, `.claude/` or the walls'' template written; the real sets root or run folders opened by a test. Verify: S4''s `git status` in the planted repository shows no change, and a run of the tests with the planted roots under TMPDIR leaves no open of the real sets root or run folders in the tests'' file-access log'\n  - 'A dropped question deleted; a VOID audit that wrote `USED`. Verify: S2''s planted notes with 3 drops (the 3 files are found under `dropped/`) and with 5 drops (VOID: no `USED` and no `DECLARATION.json` in the audit''s run folder)'\n  - 'Any change outside the paths above. Verify: `git diff --name-only` of the ticket''s branch against its base lists only paths matched by the ticket''s allowed_paths'\nprofile: FULL\nsources:\n- DEC-1101\n- DEC-1125\n- DEC-1098\n- DEC-1097\n- DEC-1069\n- DEC-820\n- DEC-896\n- DEC-1050\n- DEC-1073\n- DEC-1052\nest_loc: 450\nacceptance_tests:\n  path: tests/acceptance/W2-170/\n  author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines and the writer, checker and auditor briefs (`packages/MEMORY-AUDIT-1/briefs/`), before the engineer: a planted sets root, a planted repository with commits, a planted pool; never the real ~/gov-os-eval or ~/gov-os-runs'\ntrack: B\nlist_rows: []\nreads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write\n- governance/project/path-map.yaml\n- governance/project/orchestration/packages/MEMORY-AUDIT-1.md\n- governance/project/orchestration/tools/indep_launch.py\n- governance/project/indep-walls/tree-exclude.txt\nneeds: []\nwaits_on: []\n---\n# W2-170 The memory audit's set record\n\nOwner decision DEC-1125 (2): the memory audit is a scheduled practice, weekly while development is active, an\nindependent writer drafting fresh questions, measured once, misses classified. This ticket is the **record and the\nchecks** around one audit's set: what is checked before any search, what is dropped, what is declared, and the\nuse-once marker. The measure is W2-171's; the cycle and the schedule are W2-172's; the launch script's follow-ups are\nW2-173's. The whole is described in `governance/project/orchestration/packages/MEMORY-AUDIT-1.md`.\n\n- **Home:** a new package `src/gov/memaudit/`, so that the tool ships with Gov OS and with every adopted repository\n  (W2-88 reuses it: its `memory_sets.py` calls this core and carries no second copy). **After the lift; usage (A)\n  keeps it waiting until the weekly reset (DEC-1122 (2)).**\n- **Built on:** the independent sessions' launch script, merged (`2f98aecbc`, W2-149), the walls (`147706ae`), the\n  install ACT (`baac0b2c2`), and the fresh 80's tools (`.gov-runtime/scratch/orchestrator/drafts/fresh80/`:\n  `preflight.py`, `f80lib.py`), which are generalised here: they pin one set name and one run folder. The CTO copies the\n  fresh-80 tools to `.gov-runtime/scratch/ref/fresh80/` in the worktree when the ticket starts.\n- **Alternatives (one line each):** carry the checks in the launch script (rejected: it decides what a session sees,\n  not whether a set is fit to measure); keep the fresh-80 scripts per set (rejected: pinned to one set, no tests for\n  a second).\n- **Not here:** the measure, the reader run, the pool's re-run (W2-171); the cycle, the schedule, the digest (W2-172);\n  `--effort`, the stop word, the notes' form (W2-173).\n\n[DEC-1101 (1)-(2); DEC-1125 (2)]\n\n## Interface\n\nStated by the CTO before the pair starts (DEC-1052; PKG-W2-170-IFACE-1, option (a)). The test designer writes tests to\nthis block and the engineer conforms to it; neither changes it. A gap or a clash found in it goes back to the CTO as a\npackage, never settled by the pair. Bracketed lines name the KPI line each item serves (S1 to S6; F1 to F5 are the\n`failure:` lines in order). The three approved briefs are not changed by anything here (DEC-1129 (2)).\n\n### 1 The command line [S6, S5, F1]\nThe module is run as `python3 -m gov.memaudit <subcommand> [flags]`, the form W2-171 and W2-172 call it by\n(`src/gov/memaudit/__main__.py`). No `gov memaudit` subcommand is added (`src/gov/cli/` is not in this ticket's paths).\nThree subcommands belong to this ticket; W2-172 adds `run`, `due`, `baseline` and `status` to the same module.\n\n| subcommand | what it does | KPI |\n|---|---|---|\n| `preflight` | the ten checks of the set in `hidden/`, before any search; writes `PREFLIGHT.json` | S1 |\n| `void` | the drop and void rule: moves every question the notes do not accept to `hidden/dropped/`, recomputes the scales on the kept ones; writes `DROPS.json` | S2 |\n| `declare` | the set's entry in the sets root's path map, then `DECLARATION.json`, then `USED`, then the ledger lines | S3, S4 |\n\nEach prints its usage with `--help` and exits 0. Every flag takes a value, and each value is a bare name, a number, a\nhash or a path **outside** the sets root; no flag ever names a folder under the sets root (F1, S5).\n\n| flag | used by | meaning and default |\n|---|---|---|\n| `--sets-root <root>` | all, required | the sets root (a real directory; `~` is expanded). It is the only flag that names the sets root. Every folder under it is derived in the code (section 2). A root that is not a directory, or whose real path lies inside `indep-walls`, is refused with exit 4. |\n| `--audit <name>` | all, required | the audit's name, matching `memory-audit-[0-9]{8}` (also the set's name and the audit's run folder). Any other form: exit 4. |\n| `--repo <dir>` | `preflight`, `declare` | a git repository that holds `--commit`. Default: the top level of the working directory (as the launch script finds it). Source paths, `retrieval.yaml` and the path map are read from the commit with `git show`/`git cat-file`, never from the working tree, so the tree may be at another commit. |\n| `--commit <rev>` | `preflight`, `declare`, required | the audit commit, resolved to 40 hex digits with `git rev-parse --verify <rev>^{commit}`; an unresolved value: exit 4. |\n| `--runs-dir <dir>` | `preflight` | the folder holding `indep/AUDITS.log` and `indep/SEEDS.log` (the launch script's own folder, `GOV_INDEP_RUNS_DIR`). Default: `$GOV_INDEP_RUNS_DIR` when set, else `~/gov-os-runs`. A value inside the sets root: exit 4. It is read only to derive the selection lists (section 4, last paragraph). |\n| `--store <file>` | `declare` | the store to declare. Default: `<repo>/.gov-runtime/store.db`. |\n| `--gov <path>` | `declare` | the `gov` executable whose pin is declared. Default: `~/.local/bin/gov`. |\n| `--decision DEC-<n>` | `declare` | the decision that allows a `retrieval.yaml` other than the standard (section 6). The form is `DEC-[0-9]+`; the register is not looked up. |\n\nPrinting: one tool function, `say`, is the only way anything is printed. It refuses (prints `REFUSED: a line that names\na sets-root folder was not printed`, exits 4) any line that holds the sets root's real path followed by a slash, or one\nof `fixtures/`, `runs/`, `indep-walls/`, `hidden`. A line holds only ids (`q07`), counts, codes and digests. A failure\nprints one line, `ERROR: <exception class>`; no traceback and no exception text is printed or written anywhere (a\nYAML error quotes the file's text). Standard error carries the same single line. [S5, F1]\n\n### 2 The layout under the sets root [S2, S3, S4, S5]\nDerived from `--sets-root` and `--audit` only; the shape follows the launch script's own folders and the path map's\nexisting `memory-verdict-2` entry. `<A>` is `--audit`.\n```\n<root>/governance/project/path-map.yaml            the sets root's own map: gains one evaluation_sets entry (S4)\n<root>/fixtures/evaluation/<A>/hidden/q01.yaml..   the set: only q<nn>.yaml files, flat (the launch script delivers them)\n<root>/fixtures/evaluation/<A>/hidden/dropped/     dropped questions, moved, never deleted (S2)\n<root>/fixtures/evaluation/<A>/XCHECK-r1.md        the checker's notes, written by the launch script (r2 after round 2)\n<root>/fixtures/evaluation/<A>/selection.json      optional: {\"commit\",\"last_audit\",\"seed_sha256\",\"changed\",\"sample\"}\n<root>/fixtures/evaluation/memory-pool/hidden/     the regression pool: flat <audit>-<qid>.yaml files (W2-171 fills it)\n<root>/runs/<A>/PREFLIGHT.json  DROPS.json  DECLARATION.json  USED  ledger.jsonl\n```\n- **The notes are `XCHECK-r<n>.md`, not `notes.md`.** The checker's `out/notes.md` is delivered by the launch script as\n  `XCHECK-r<round>.md` in the set's folder (beside `hidden/`, not in it). `void` reads the one with the highest `n`.\n- **`dropped/` is inside `hidden/`** so that the path map's existing glob `fixtures/evaluation/*/hidden/**` already hides\n  the dropped questions from the six roles. The measure reads `hidden/*.yaml` flat and never sees `dropped/`.\n- **The pool is `fixtures/evaluation/memory-pool/hidden/`** for the same reason: a `pool/` folder at the root would match\n  no hidden glob (`sets_root_hidden` lists none for it). This ticket only reads the pool; a missing folder is an empty\n  pool.\n- `runs/<A>/` is the folder the launch script already uses for the auditor (`runs/<A>/misses.jsonl` in,\n  `miss-classes.json` out). `preflight` creates it with mode 700 when absent. `PREFLIGHT.json` and `DROPS.json` are\n  written whole or not at all (a temporary name, then rename).\n- `ledger.jsonl`: one JSON object per line, in order, each `{\"seq\": n, \"at\": <ISO UTC>, \"event\": <word>, ...}` with\n  numbers and codes only. This ticket writes the events `preflight`, `drop`, `void`, `declaration` and `used`. W2-171\n  appends its own events (`search`, `spend`) to the same file; no search entry may precede the `used` line.\n- The set's digest is the fresh 80's: for the files `hidden/*.yaml` (not `dropped/`) in byte order of name, the sha256\n  of the text of lines `<sha256 of the file>\u2423\u2423<name>\\n` (`LC_ALL=C sha256sum *.yaml | sha256sum`).\n- Nothing is written outside `<root>/runs/<A>/`, `<root>/fixtures/evaluation/<A>/hidden/dropped/` (a move) and the\n  sets root's own path map. In particular not the repository's path map, the guard, the hook, `.claude/` or the walls'\n  template (F3).\n\n### 3 The ten refusal codes of `preflight` [S1, S5]\nOne code per S1 check, in the KPI line's order. `preflight` runs all ten (a check whose input a file does not give is\nskipped for that file, which the form check has already named), prints one line per code,\n`PF-<NAME> ok` or `PF-<NAME> refused <n>` followed by the offending ids (`q07 q12`, at most 40; none for set-level\ncodes), writes the same to `PREFLIGHT.json` with the counts, and ends with the exact line\n`PRE-FLIGHT: every check as expected` (all ten ok) or `PRE-FLIGHT: NOT as expected: stop, fix before any search`.\n\n| # | code | refuses when (the KPI line's words) |\n|---|---|---|\n| 1 | `PF-COUNT` | fewer than 36 files. (`hidden/` holds a file that is not `q<nn>.yaml` or a folder other than `dropped/`: also this code.) |\n| 2 | `PF-FORM` | a file not in the writer brief's form: it parses as a YAML mapping with exactly the keys `id`, `question`, `gold_answer`, `sources`, `commit`, `category`, `drawn` and optionally `keyword` (bool) and `naive_answer` (string); `id` equals the file's stem `q<nn>`; the three texts are non-empty strings; `category` is one of the twelve names; `drawn` is `changed`, `sample` or `none`; `commit` is 40 hex digits; `sources` is a non-empty list whose entries are each a mapping or a list of mappings (alternatives), each with a string `path`, an optional string `heading` and an optional `lines: [first, last]` of two integers with 1 <= first <= last |\n| 3 | `PF-COMMIT` | a `commit` other than the audit commit (`--commit`, resolved) |\n| 4 | `PF-QUOTA` | a category count other than the 40-question quotas of the rubric (R5 item 6): decision 6, contract 4, plan 4, ticket 4, exact-string 4, callers 4, code-paraphrase 3, kernel-template 3, multi-file 3, failure-memory 3, history 1, nonexistent-id 1. With 40 files every count equals its quota; with 36 to 39 files (the writer brief section 9 delivers them as they stand) no count may exceed its quota. Set-level: it prints the category names and counts, no ids. |\n| 5 | `PF-SPREAD` | a governing domain under 4 questions or a subsystem over 10, scaled to the kept count `n` (section 4). Prints `domain <name> <count>` or `subsystem <name> <count>`; no ids. |\n| 6 | `PF-DRAWN` | a `drawn: changed` or `drawn: sample` question whose first source is not in `selection.json`'s list of that name (`changed`, `sample`). `drawn: none` is not checked. If the lists cannot be had (section 4, last paragraph), every `drawn: changed` and `drawn: sample` question is named. |\n| 7 | `PF-SOURCE` | a source path missing at the audit commit (`git cat-file -e <commit>:<path>`), or, for an alternative whose file exists, a `heading` not found (as the first line of the file equal to it, trailing spaces ignored) and `lines` outside the file (`last` > the file's line count) or absent. An alternative with no `heading` is refused only when its `lines` are outside the file. A heading not found with `lines` inside the file passes and is counted `re-anchored` in `PREFLIGHT.json`. |\n| 8 | `PF-EVALNS` | a source (any alternative) in an evaluation or evaluation-source namespace (R8): its path matches a `paths` glob of the path map's `evaluation-sources` or `evaluation-fixtures` namespace, or a `visible` or `hidden` glob of any `evaluation_sets` entry, all read from the path map at the audit commit and matched by the path map's own glob rule |\n| 9 | `PF-DUPPOOL` | a gold-source set equal to a pool question's (R9). A question's gold-source set is the set over its entries of the set of its alternatives' `(path, heading or \"\", lines or [])`; two questions are equal when these sets are equal. The pool is every `*.yaml` of `fixtures/evaluation/memory-pool/hidden/`. |\n| 10 | `PF-IDEXISTS` | a `nonexistent-id` question whose id exists at the commit: an id-shaped token of its question (`gov.retrieval.lexical.ids_in`) that `git grep` finds in a tracked file of the commit as a whole token (`lexical.whole_id`). A question with no id-shaped token is counted `no_token` in `PREFLIGHT.json` and is not refused (the checker's R3 code decides). |\n\n### 4 Domain and subsystem by a fixed rule [S1, S2]\nBoth are computed from **the first source path** of a question: the `path` of the first alternative of its first entry\nin `sources`. No new question field exists and the writer brief is unchanged. The rule is the checker brief's section\n5a, written as two tables (data in `src/gov/memaudit/`, matched top to bottom, the first match wins; a prefix ending in\n`/**` matches anything below it, a bare name matches that file).\n\n| governing domain | first source path |\n|---|---|\n| `decisions` | `docs/DECISION_REGISTER.md` |\n| `tickets` | `.tickets/**` |\n| `plan` | `docs/plan/**` |\n| `contract` | `docs/contract/**`, `docs/charter/**` |\n| `code` | `src/**`, `template/governance/kernel/hooks/**`, `.claude/hooks/**` |\n| `none` | anything else (a lesson, a role file, a skill, the path map, an operations file) |\n\n| subsystem (writer brief's seven) | first source path |\n|---|---|\n| `retrieval` (retrieval and the context packet) | `src/gov/retrieval/**`, `src/gov/retrieve/**`, `src/gov/context/**`, `src/gov/store/**`, `src/gov/codeintel/**`, `governance/project/retrieval.yaml` |\n| `guard` | `src/gov/guard/**`, `src/gov/hooks/**`, `template/governance/kernel/hooks/**`, `.claude/hooks/**` |\n| `close` (the close and the nightly) | `src/gov/close/**`, `src/gov/closure/**`, `src/gov/accept/**`, `src/gov/check/**`, `src/gov/readiness/**`, `src/gov/ci/**`, `docs/close/**`, `governance/project/orchestration/tools/nightly*` |\n| `checkpoint` (checkpoints and resume) | `src/gov/checkpoint/**`, `src/gov/pause/**`, `docs/checkpoints/**` |\n| `rebuild` (rebuild and the secrets scan) | `src/gov/rebuild/**`, `src/gov/secrets/**`, `src/gov/doctor/**` |\n| `launch` (launch and the sandbox) | `src/gov/launch/**`, `src/gov/brief/**`, `template/governance/kernel/launch/**`, `governance/project/orchestration/tools/indep_launch.py`, `governance/project/indep-walls/**` |\n| `release` (releases and install) | `src/gov/release/**`, `src/gov/adopt/**`, `src/gov/adapters/**`, `docs/releases/**` |\n| `none` | anything else |\n\nA question whose first source matches no row is scored `none` for that table, and `none` counts toward no minimum and no\nmaximum. (So a `decisions` question has subsystem `none`: the pre-flight's subsystem count is a lower bound of what\nthe checker judges, which counts \"what the asked fact is about\"; the checker's own R5 lines in the notes stay the\njudgement, this is the part that can be computed.)\n\n**The scale.** With `n` the number of questions counted (the files in `hidden/`, not `dropped/`): a domain needs at\nleast `ceil(4 * n / 40)` and a subsystem may hold at most `floor(10 * n / 40)`, integer arithmetic. For n from 36 to 40\nthe minimum is 4, and the maximum is 9 for n = 36 to 39 and 10 for n = 40. `preflight` applies it to the files it finds;\n`void` applies it again to the kept questions (section 5).\n\n**The selection lists** (`changed`, `sample`) are `fixtures/evaluation/<A>/selection.json` when that file exists\n(this is how tests plant them, and how a later launch-script change would deliver the writer's own file). When it does\nnot exist, `preflight` derives them in memory, by the launch script's own rule (its stage B4), and writes nothing:\n`last` is the `commit` of the last line of `<runs-dir>/indep/AUDITS.log` (none when the file is absent or empty);\n`tracked` is `git ls-tree -r --name-only -z <commit>` in that order; `excluded` is the globs of\n`governance/project/indep-walls/tree-exclude.txt` at the commit, tested on the path and each of its parent folders with\n`fnmatch.fnmatchcase`, as the launch script does; `changed` is the sorted tracked paths of `git diff --name-only\n--no-renames -z <last> <commit>` that are not excluded (empty when there is no `last`); `others` is `tracked` in order,\nless `excluded` and less `changed`; `sample` is `random.Random(seed).sample(others, min(300, len(others)))`, where\n`seed` is the `seed` of the single line of `<runs-dir>/indep/SEEDS.log` with `kind` `writer`, `set` `<A>`, `round` 1 and\n`dry` false, whose `seed_sha256` equals the sha256 of the file `<seed>\\n`. No such line, two such lines, or a seed\nthat does not match its hash: the lists cannot be had.\n\n### 5 The declaration, the exit codes and the void causes [S2, S3, F2, F4]\n**Exit codes (all three subcommands).**\n\n| exit | word | meaning |\n|---|---|---|\n| 0 | ok | every check as expected; or, for `void`, the audit goes on; or `declare` wrote its files |\n| 1 | refused | at least one refusal code printed: a `PF-` code (`preflight`), a `DR-` code (`void`), a `DC-` code (`declare`); nothing is written beyond what the subcommand says |\n| 2 | void | `void` only: the kept set cannot be measured; the cause code is printed |\n| 3 | used | `USED` exists for this audit: the subcommand writes nothing and prints `USED` (a set is measured once) |\n| 4 | usage | a flag or value refused (section 1), the sets root unusable, a printed line refused by `say`, or an unexpected error (`ERROR: <class>`) |\n\nargparse's own error exit (2) is mapped to 4; `--help` exits 0.\n\n**`void`** reads the highest `XCHECK-r<n>.md`. Its `## Questions` lines have the checker brief's form\n`<id> | <verdict> | <codes> | also: <...> | <sentence>`, split on ` | `. A question is kept only when its line's second\nfield is exactly `accept`; a `revise`, a `reject`, a missing line or a line that does not fit is dropped (counted by its\ncodes, or `NOLINE`, `UNFIT`). Order: (1) refuse `DR-NOTES` (exit 1, nothing moved) when no `XCHECK-r<n>.md` exists or\nit has no `## Questions` section; (2) move each dropped file with `os.rename` into `hidden/dropped/` (made on need),\nnever deleting; (3) recompute from the kept files: `kept`, the domain counts and the subsystem counts (section 4);\n(4) write `DROPS.json` and the `drop` ledger line; (5) if void, write the `void` ledger line and exit 2, else exit 0.\n`void` refuses `DR-DONE` (exit 1) when `DROPS.json` exists. **Void causes (closed): `VOID-COUNT` when `kept` < 36;\n`VOID-DOMAIN` when a domain holds fewer than `ceil(4 * kept / 40)` kept questions** (`VOID-COUNT` is reported first when\nboth hold). A subsystem over its scaled maximum after drops is printed and recorded as `subsystem_over` and does not\nvoid (S2's void causes are the count and a domain). A void audit writes **no `USED` and no `DECLARATION.json`**\n(F4); its dropped files stay in `dropped/`. `DROPS.json` holds `{\"kept\": n, \"dropped\": n, \"by_code\": {<code>: n},\n\"domains\": {...}, \"subsystems\": {...}, \"subsystem_over\": [...], \"void\": null | \"VOID-COUNT\" | \"VOID-DOMAIN\",\n\"set_digest\": <the kept set's digest>, \"notes_round\": n}`. Printed: `VOID <cause> kept <n> dropped <n>` or `DROPS: kept <n> dropped <n>`.\n\n**`declare`.** Refuses first, writing nothing: a present `USED` is exit 3 (printed `USED`, no `DC-` code). The others\nare exit 1 with the code printed:\n`DC-PREFLIGHT` (`PREFLIGHT.json` absent, or its `ok` false), `DC-DROPS` (`DROPS.json` absent, or its `void` not null,\nor the digest of `hidden/` now differs from the digest in `DROPS.json`), `DC-STORE` (the store file is absent or\nunreadable, or the `head` of its fingerprints row, read with `gov.store.loader.fingerprints`, is not the audit commit),\n`DC-PIN` (the real path of `--gov` has no component `pin-[0-9a-f]{12}`), `DC-RETRIEVAL` (no\n`governance/project/retrieval.yaml` at the commit, or it is not a YAML mapping), `DC-MAP` (section 7), `DC-DECISION`\n(section 6; this one writes `DECLARATION.json` with `ok: false` and no `USED`, the only refusal that writes). Then, in\nthis order:\n1. the entry in the sets root's path map (section 7);\n2. `DECLARATION.json` (written whole, then synced);\n3. the `declaration` ledger line;\n4. `USED`, created with `O_CREAT | O_EXCL` (an existing one is exit 3), holding one line `<ISO UTC> <A> <sha256 of\n   DECLARATION.json>`, and only after waiting until the clock is past `DECLARATION.json`'s mtime, so that its mtime is\n   strictly later (nanoseconds);\n5. the `used` ledger line.\nPrinted: `DECLARED: audit commit <12 hex>, n <n>, set digest <12 hex>` and `USED written`.\n`DECLARATION.json` keys (all present):\n```\naudit, audit_commit, store_commit, store_sha256, gov_pin, retrieval_yaml_sha256, set_digest, n,\nsettings: {\"reranker\": \"shared\", \"pool\": <bool>, \"bundle_tokens\": 6000, \"search_again_once\": true},\nnonstandard: [<setting names, empty when standard>], decision: \"DEC-n\" | null, ok: <bool>,\nbar: {\"need_right\": ceil(85n/100), \"max_wrong\": floor(5n/100), \"target_right\": ceil(95n/100)},\nrounding: \"need_right = ceil(85 n / 100); max_wrong = floor(5 n / 100); target_right = ceil(95 n / 100); integer arithmetic\",\ndeclared_at: <ISO UTC>\n```\n`audit_commit` is `--commit` resolved; `store_sha256` is the sha256 of the store file's bytes; `gov_pin` is the\n`pin-<12 hex>` component; `retrieval_yaml_sha256` is the sha256 of the bytes of `governance/project/retrieval.yaml` at the\ncommit; `n` is the kept count.\nThe four settings are by name; only `pool` is read from `retrieval.yaml`, the other three are the standard's fixed\nvalues (the shared reranker, a 6,000-token bundle, search again once). The runner of W2-171 calls `declare` first and\nstarts no search unless it exited 0 and `ok` is true; with `USED` present it exits 3 and starts nothing.\n\n### 6 The flag for a non-standard `retrieval.yaml` [S3]\nThe standard is \"the pool on\": `retrieval.yaml` at the commit has a `pool` mapping with `meaning_uncut: true`. If it\ndoes not, `pool` is `false` and `nonstandard` is `[\"pool\"]`. `declare` then:\n- without `--decision`: writes `DECLARATION.json` with `ok: false` and `decision: null`, **no `USED`**, prints\n  `DC-DECISION pool` and exits 1. (The run is not ok. A later `declare` with the flag may rewrite the file, because it\n  is allowed only while `USED` is absent.)\n- with `--decision DEC-<n>`: writes `decision: \"DEC-<n>\"` and `ok: true`, and goes on to `USED`.\nWith a standard file the flag is accepted and recorded as given, and `ok` is true.\n\n### 7 The set's entry in the sets root's own path map [S4, F3]\n`declare` makes `<root>/governance/project/path-map.yaml` hold exactly one entry\n`evaluation_sets.<A>`, of the shape of `memory-verdict-2`'s:\n```\n  <A>:\n    visible: []\n    hidden: [\"fixtures/evaluation/<A>/hidden/**\"]\n    measures:\n      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]\n```\n- The file is edited as text: the entry is inserted at the end of the `evaluation_sets:` block, and every other byte is\n  kept (the block may sit among comments; the map is read back with `gov.util.parts.evaluation_sets` to prove the entry\n  parses and `<A>` is found). A map that does not exist, has no `evaluation_sets` block or cannot be read: exit 1\n  `DC-MAP`, nothing written. An entry for `<A>` already present and equal: left as is. Present and different: `DC-MAP`.\n- The five roles are the ones `memory-verdict-2` lists, not six: the orchestrator is the session that runs the measure,\n  and a role in `measures.roles` is refused the hidden part (`gov.retrieval.measure`, DEC-820 (d)). S4's phrase \"the six\n  roles measured\" is read as \"the roles of `memory-verdict-2`'s entry\".\n- Nothing else is written outside the sets root's folders of section 2; the repository's `governance/project/path-map.yaml`\n  is never opened for writing (S4's `git status` in the planted repository shows no change).\n\n### 8 Python entry points for W2-171 and W2-172\nNamed so that those tickets import, and never copy, this code (W2-88 imports the same): `gov.memaudit.layout.paths(\nsets_root, audit)` (every path of section 2, derived and checked inside the root), `layout.is_used(...)`,\n`gov.memaudit.preflight.run(...)`, `gov.memaudit.drops.apply(...)`, `gov.memaudit.declare.declare(...)`,\n`gov.memaudit.say.say(...)`, `gov.memaudit.ledger.append(...)`. Each `run`/`apply`/`declare` returns the exit word and the\ncounts object that the subcommand prints; the subcommand is a thin wrapper. The module imports `gov.retrieval.lexical`,\n`gov.store.loader` and `gov.util.parts`, never `gov.retrieval.measure`'s private functions.\n\n### 9 What the tests plant (the designer's and the engineer's common ground)\nA sets root and a repository, both under `TMPDIR`; a sets-root path map with an `evaluation_sets` block and comments; a\nrepository with at least two commits (the audit commit and an earlier one), a `governance/project/retrieval.yaml`, a\n`governance/project/path-map.yaml` with the two evaluation namespaces and a `governance/project/indep-walls/tree-exclude.txt`;\na runs dir with `indep/AUDITS.log` and `indep/SEEDS.log` (or a planted `selection.json`); a planted pool folder; a store\nfile with a `fingerprints` row; a `gov` link into a folder named `pin-<12 hex>`. The real `~/gov-os-eval`,\n`~/gov-os-runs` and run folders are never opened (F3).\n\n### 10 The CTO's readings of row 147 (delegated decisions, 2026-11-11, session b40cba91; DEC-936 item 2.5, DEC-1112 (3))\n1. **`dropped/` stays inside `hidden/`** (`hidden/dropped/`), so the existing glob `fixtures/evaluation/*/hidden/**`\n   keeps the dropped questions from every measured role. Every consumer of the set reads `hidden/*.yaml` flat, never\n   recursively; the auditor's copy made by the launch script excludes `hidden/dropped/` (a W2-173 follow-up, noted in its\n   ticket). Until W2-173 lands, an auditor that is shown a dropped question also sees its note's verdict; nothing counts it.\n2. **S4's \"the six roles measured\" reads as `memory-verdict-2`'s list:** the five roles `engineer`, `research`,\n   `product-spec`, `independent-test-designer`, `independent-auditor`; the orchestrator (the CTO, who measures) is not in\n   `measures.roles`, as in every `evaluation_sets` entry today. A test checks the five, never six.\n3. **S1's quotas for 36 to 39 files read as \"at most\":** with `n` files, each category's count is at most its 40-question\n   quota (section 4's table, PF-QUOTA), and at `n = 40` exactly the quota; the domain and subsystem scales stay as section 4\n   states them.\n4. **The draw lists come from the runs folder's `indep/AUDITS.log` and `indep/SEEDS.log`** as section 4 and section 9 state;\n   `selection.json`, when present, is a planted or hand-made override read first. No W2-173 change is needed for it.\n",
+  "authority": [
+    {
+      "id": "DEC-1101",
+      "sha256": "551b823d94cb80e629f27431a58e2f6aa6c347de6844b79c3f99c947ca7993a1",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "551b823d94cb80e629f27431a58e2f6aa6c347de6844b79c3f99c947ca7993a1",
+      "reason": "declared in sources",
+      "tokens": 876
+    },
+    {
+      "id": "DEC-1125",
+      "sha256": "4c6b238b79eb0ea478c32c2d17a386fc201b007b389ab87f4319bcf546ae3349",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "4c6b238b79eb0ea478c32c2d17a386fc201b007b389ab87f4319bcf546ae3349",
+      "reason": "declared in sources",
+      "tokens": 945
+    },
+    {
+      "id": "DEC-1098",
+      "sha256": "ecc0acf03f76d6a8bba861e7ec59436e065fcf1305ccfbe214e58297017bee73",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "ecc0acf03f76d6a8bba861e7ec59436e065fcf1305ccfbe214e58297017bee73",
+      "reason": "declared in sources",
+      "tokens": 869
+    },
+    {
+      "id": "DEC-1097",
+      "sha256": "30a2c6e0bb30d0534d5127aa2cf3a39460cebb7fb5fda84d34632479a8831955",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "30a2c6e0bb30d0534d5127aa2cf3a39460cebb7fb5fda84d34632479a8831955",
+      "reason": "declared in sources",
+      "tokens": 1506
+    },
+    {
+      "id": "DEC-1069",
+      "sha256": "daece4f80d526eb3fa032162690b307b49a12a600fc11ab87ae5bda6f6625ba8",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "daece4f80d526eb3fa032162690b307b49a12a600fc11ab87ae5bda6f6625ba8",
+      "reason": "declared in sources",
+      "tokens": 1134
+    },
+    {
+      "id": "DEC-820",
+      "sha256": "32aab8ba141b0957202f50528a12671130686f6476d0178a16b88f75e8b85c1d",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "32aab8ba141b0957202f50528a12671130686f6476d0178a16b88f75e8b85c1d",
+      "reason": "declared in sources",
+      "tokens": 638
+    },
+    {
+      "id": "DEC-896",
+      "sha256": "ebc1b1c838580053d5d92fb092c2d7db573f06dc66fca19d5b3b9192b2417db0",
+      "authority": "decision",
+      "lifecycle": "DONE",
+      "constraint": "ebc1b1c838580053d5d92fb092c2d7db573f06dc66fca19d5b3b9192b2417db0",
+      "reason": "declared in sources",
+      "tokens": 1040
+    },
+    {
+      "id": "DEC-1050",
+      "sha256": "5aa4028efb141b7a31de8938bdf16151d33934312265d1f2bdf217b3735b2a28",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "5aa4028efb141b7a31de8938bdf16151d33934312265d1f2bdf217b3735b2a28",
+      "reason": "declared in sources",
+      "tokens": 936
+    },
+    {
+      "id": "DEC-1073",
+      "sha256": "c35a4272874e4ccfb5fe307885c0fb94f9880677de63ca13352d31c0ec1d6852",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "c35a4272874e4ccfb5fe307885c0fb94f9880677de63ca13352d31c0ec1d6852",
+      "reason": "declared in sources",
+      "tokens": 1047
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "adfcc8f9fe4a5f99cf528155317cd036a40191733165299df39b2e229982491b",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "adfcc8f9fe4a5f99cf528155317cd036a40191733165299df39b2e229982491b",
+      "reason": "declared in sources",
+      "tokens": 1859
+    }
+  ],
+  "mandatory": [
+    {
+      "id": "DEC-1101",
+      "sha256": "551b823d94cb80e629f27431a58e2f6aa6c347de6844b79c3f99c947ca7993a1",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "551b823d94cb80e629f27431a58e2f6aa6c347de6844b79c3f99c947ca7993a1",
+      "reason": "declared in sources",
+      "tokens": 876
+    },
+    {
+      "id": "DEC-1125",
+      "sha256": "4c6b238b79eb0ea478c32c2d17a386fc201b007b389ab87f4319bcf546ae3349",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "4c6b238b79eb0ea478c32c2d17a386fc201b007b389ab87f4319bcf546ae3349",
+      "reason": "declared in sources",
+      "tokens": 945
+    },
+    {
+      "id": "DEC-1098",
+      "sha256": "ecc0acf03f76d6a8bba861e7ec59436e065fcf1305ccfbe214e58297017bee73",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "ecc0acf03f76d6a8bba861e7ec59436e065fcf1305ccfbe214e58297017bee73",
+      "reason": "declared in sources",
+      "tokens": 869
+    },
+    {
+      "id": "DEC-1097",
+      "sha256": "30a2c6e0bb30d0534d5127aa2cf3a39460cebb7fb5fda84d34632479a8831955",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "30a2c6e0bb30d0534d5127aa2cf3a39460cebb7fb5fda84d34632479a8831955",
+      "reason": "declared in sources",
+      "tokens": 1506
+    },
+    {
+      "id": "DEC-1069",
+      "sha256": "daece4f80d526eb3fa032162690b307b49a12a600fc11ab87ae5bda6f6625ba8",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "daece4f80d526eb3fa032162690b307b49a12a600fc11ab87ae5bda6f6625ba8",
+      "reason": "declared in sources",
+      "tokens": 1134
+    },
+    {
+      "id": "DEC-820",
+      "sha256": "32aab8ba141b0957202f50528a12671130686f6476d0178a16b88f75e8b85c1d",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "32aab8ba141b0957202f50528a12671130686f6476d0178a16b88f75e8b85c1d",
+      "reason": "declared in sources",
+      "tokens": 638
+    },
+    {
+      "id": "DEC-896",
+      "sha256": "ebc1b1c838580053d5d92fb092c2d7db573f06dc66fca19d5b3b9192b2417db0",
+      "authority": "decision",
+      "lifecycle": "DONE",
+      "constraint": "ebc1b1c838580053d5d92fb092c2d7db573f06dc66fca19d5b3b9192b2417db0",
+      "reason": "declared in sources",
+      "tokens": 1040
+    },
+    {
+      "id": "DEC-1050",
+      "sha256": "5aa4028efb141b7a31de8938bdf16151d33934312265d1f2bdf217b3735b2a28",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "5aa4028efb141b7a31de8938bdf16151d33934312265d1f2bdf217b3735b2a28",
+      "reason": "declared in sources",
+      "tokens": 936
+    },
+    {
+      "id": "DEC-1073",
+      "sha256": "c35a4272874e4ccfb5fe307885c0fb94f9880677de63ca13352d31c0ec1d6852",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "c35a4272874e4ccfb5fe307885c0fb94f9880677de63ca13352d31c0ec1d6852",
+      "reason": "declared in sources",
+      "tokens": 1047
+    },
+    {
+      "id": "DEC-1052",
+      "sha256": "adfcc8f9fe4a5f99cf528155317cd036a40191733165299df39b2e229982491b",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "adfcc8f9fe4a5f99cf528155317cd036a40191733165299df39b2e229982491b",
+      "reason": "declared in sources",
+      "tokens": 1859
+    }
+  ],
+  "supplementary": [
+    {
+      "id": "DAEO-p8tv",
+      "path": ".tickets/DAEO-p8tv.md",
+      "text": "  - 'S9 The cron wrapper `memaudit_cron.sh` runs `due` and starts the cycle only when an audit is due, with the pinned interpreter; it does nothing and exits 0 when none is due, appends one line per run to the audits'' cron log, and does not start the measure steps while the dispatcher holds a full run or a rebuild (the gate''s own check), waiting at most 60 minutes and then stopping with `gate busy`. It contains no crontab edit (the crontab is class (O), an ACT). Verify: planted `due` outputs and gate states: not due (no start, exit 0), due and idle (starts), due and busy for 61 minutes (stops `gate busy`); `grep -c crontab` of the wrapper is 0 [DEC-1125 (2), DEC-1038]'\n  failure:\n  - 'A wall, a set, the approved list or a run folder opened by the driver other than through the launch script, W2-170''s or W2-171''s code; a command line naming a folder under the sets root. Verify: S1''s planted run: the call ledger''s printed command lines hold no `fixtures/`, `runs/` or `indep-walls/`, and a file-access spy over the driver''s own process shows no open of those folders'\n",
+      "tokens": 272
+    },
+    {
+      "id": "cb97f0d27c8ef61e2ea1f271",
+      "path": "docs/changes/W2-13-evidence.md",
+      "text": "  given to the filter and indexed again if it passes. A file the filter refused (`indexed = 0`: a secret, a product\n  memory class) that the map does not keep out agrees with the policy and is not asked again. `refresh` names the\n  `KEPT_OUT` rows from the same answer, without reading the map again. Unit cases: `test_a_store_judged_without_s6_is_put_right_by_one_refresh`,\n  `test_a_stored_kept_out_the_map_now_indexes_is_indexed_again`,\n  `test_a_file_kept_out_for_another_reason_is_not_reindexed_by_the_rule`: all three red on the code before the fix\n  and green after.\n  **Cost** (a throwaway checkout of this branch in `TMPDIR` with D-7's map, `emg/d7` at `9c0807889cb4`, in its\n  working tree; a stand-in store with every one of the 3,187 tracked paths stored `indexed = 1` and no chunks, the\n  pre-S6 state; the secrets filter stood in; through `heavy_slot.sh`, load near 2.5): the first refresh puts the 28\n  files right (27 under `evaluation-fixtures`, 1 under `evaluation-sources`) in 0.19 s; `kept_out` over every tracked\n  path 48 ms (median of 7); a refresh where nothing changed 183 ms, of which `_update` 178 ms with the policy against\n",
+      "tokens": 288
+    },
+    {
+      "id": "47089ec06f89bf30077bf431",
+      "path": "governance/project/indep-walls/tree-exclude.txt",
+      "text": "# ACT-INDEP-WALLS-1: paths left out of every wall's plain tree (repository-relative globs, the path map's language).\n# The union of: the path map's evaluation-sources namespace, every evaluation set's visible and hidden globs, and the\n# repository paths the operator's writer and checker folders deny today (ACT-MSET-3/4), so a wall is blind to the\n# tuning questions and to every search or measure result. A change to this file is a change to the walls: it needs the\n# owner's approval (its sha256 is in walls/APPROVED).\nfixtures/evaluation/**\ndocs/assessment/2026-10/B-memory-retrieval.md\ndocs/research/EXP-003/**\ndocs/research/memory-measure-audit/**\ndocs/research/W2-61-baseline.md\ndocs/research/W2-88-memory-practice.md\ndocs/audit/memory-measure-*\ndocs/audit/memory-measure-*/**\ndocs/audit/memory-verdict-*\ndocs/audit/memory-recall-diagnosis-*\ngovernance/project/orchestration/packages/LIFT-1/D4B-*\ntests/acceptance/W2-61*/**\n.gov-runtime/**\n# The fixed briefs themselves (DEC-1112 (3), F7): a wall reads its own brief.md only, never another job's brief.\ngovernance/project/indep-briefs/**\n",
+      "tokens": 274
+    },
+    {
+      "id": "0d121294692fceb6ddfd11d1",
+      "path": "governance/project/path-map.yaml",
+      "text": "    provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history\n    deletion_rebuild: authoritative; restored from git only\n  # M-4: close, checkpoint and probe records stay in keyword search only\n  doc-records:\n    paths:\n      - \"docs/close/**\"\n      - \"docs/checkpoints/**\"\n      - \"docs/probes/**\"\n    memory_class: governance\n    sensitivity: internal\n    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]\n    retention: kept in git history; superseded records stay\n    export_policy: allowed\n    embedding_policy: not embedded\n    provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history\n    deletion_rebuild: authoritative; restored from git only\n  # DEC-1066 (3), G4: lens B's report and W2-15a's raw measure output quote the measure's questions or name their\n  # gold positions and hold the hidden half's ranks: out of both indexes (the D-7 review's F5)\n  evaluation-sources:\n    paths:\n      - \"docs/assessment/2026-10/B-memory-retrieval.md\"\n      - \"docs/research/EXP-003/w2-15a/raw/**\"\n",
+      "tokens": 295
+    },
+    {
+      "id": "b0c244a6693cb77e8c794c10",
+      "path": "tests/acceptance/W2-13/README.md",
+      "text": "  `fixtures/memory-quality/**`. The last is in `evaluation-fixtures` by the CTO's map and holds no tracked file; the\n  review's F3 is open on it.\n- **Runs.** Green on `e44d6732`. Each plant was put in a clone of `e44d6732` and turned the converse red:\n  - `lexical_policy: not indexed` on `tests` (the review's plant C);\n  - the same on `doc-records` (plant D);\n  - `docs/research/EXP-003/examin/**` moved into `evaluation-sources`, which the namespace form alone would not\n    catch.\n- **G4 extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's `363c1459`).\n  `KEPT_OUT_BY_DECISION` also names `docs/research/memory-measure-audit/**` (3 tracked files), whose `VISIBLE.md`\n  quotes the visible questions. Without it the converse was red on `363c1459`, as it should be.\n\n",
+      "tokens": 203
+    },
+    {
+      "id": "d71acbb2d63c9b43d403104b",
+      "path": "tests/acceptance/W2-13/README.md",
+      "text": "(`fd22f3d0`): 31 run, 23 failed, 8 passed, this case red the same way. Expected on the engineer's fix: 29 of 31, the\ntwo repository cases red (D-7).\n\n**Added from the D-7 review (F2 and F5; the CTO, on `e44d6732`).**\n- **F5.** `tests/acceptance/W2-13/test_w2_13_lexical_policy.py::test_the_repository_marks_the_evaluation_sets_own_documents_not_indexed` has a third row, W2-15a's raw\n  measure output (`docs/research/EXP-003/w2-15a/raw/`). The CTO moved it into `evaluation-sources` under\n  DEC-1066 (3).\n- **F2, the converse.** `tests/acceptance/W2-13/test_w2_13_lexical_policy.py::test_the_repository_keeps_nothing_else_out_of_the_keyword_index` holds M-4's \"they stay in\n  keyword search\". In this repository's path map, the namespaces that say `lexical_policy: not indexed` are exactly\n  `evaluation-sources` and `evaluation-fixtures`. Every tracked file a namespace keeps out also has to lie under the\n  decided patterns (`KEPT_OUT_BY_DECISION`): lens B's report, the raw folder, `fixtures/evaluation/**` and\n  `fixtures/memory-quality/**`. The last is in `evaluation-fixtures` by the CTO's map and holds no tracked file; the\n  review's F3 is open on it.\n",
+      "tokens": 290
+    },
+    {
+      "id": "6e26f7aea2db447040dd60cd",
+      "path": "tests/acceptance/W2-13/test_w2_13_lexical_policy.py",
+      "text": "def test_the_repository_keeps_nothing_else_out_of_the_keyword_index():\n    \"\"\"The converse (the D-7 review's F2; DEC-1052 M-4: tests and the close, checkpoint and probe records stay in\n    keyword search). This repository's path map says ``lexical_policy: not indexed`` on ``evaluation-sources`` and\n    ``evaluation-fixtures`` only. Every tracked file that a namespace keeps out lies under the decided patterns: lens B's\n    report, W2-15a's raw measure output and the evaluation fixtures (DEC-1066 (3)).\"\"\"\n    namespaces = s6.repository_namespaces()\n    marked = {name for name, entry in namespaces.items()\n              if isinstance(entry, dict) and entry.get(s6.FIELD) == s6.NOT_INDEXED}\n    assert marked == s6.NOT_INDEXED_NAMESPACES, \\\n        f\"the namespaces that say lexical_policy: not indexed are {sorted(marked)}, not \" \\\n        f\"{sorted(s6.NOT_INDEXED_NAMESPACES)}: extra {sorted(marked - s6.NOT_INDEXED_NAMESPACES)}\"\n    files = s6.tracked(\".\")\n    kept = [path for path in files\n            if any(namespaces[name].get(s6.FIELD) == s6.NOT_INDEXED for name in s6.holders(namespaces, path))]\n    assert kept, \"premise: the path map keeps no tracked file out of the keyword index\"\n",
+      "tokens": 300
+    },
+    {
+      "id": "b914d53ceaae51b34d55c2be",
+      "path": "tests/acceptance/W2-13/w2_13_lexical_policy_support.py",
+      "text": "MEASURE_AUDIT = \"docs/research/memory-measure-audit/\"\n\n# The converse (the D-7 review's F2; DEC-1052 M-4: tests and the close, checkpoint and probe records stay in keyword\n# search): only these namespaces say ``not indexed``, and every tracked file they keep out lies under these patterns.\n# Written as the decisions word them, not read from the path map. fixtures/memory-quality/** is in evaluation-fixtures\n# by the CTO's map and holds no tracked file (the review's F3, open).\nNOT_INDEXED_NAMESPACES = {\"evaluation-sources\", \"evaluation-fixtures\"}\nKEPT_OUT_BY_DECISION = (LENS_B_REPORT, W2_15A_RAW + \"**\", MEASURE_AUDIT + \"**\", EVALUATION_FIXTURES + \"**\",\n                        \"fixtures/memory-quality/**\")\n\n\n# --------------------------------------------------------------------------\n# The path map and the projects\n# --------------------------------------------------------------------------\n\n",
+      "tokens": 226
+    },
+    {
+      "id": "a3f3f96d25c0d6f9979930d9",
+      "path": "tests/acceptance/W2-86/README.md",
+      "text": "The case is red when the path map takes anything more out than D-7 decided, or when it puts a file of the cut back.\nEach of these was planted in a clone of `emg/d7` and turned the case red:\n- `docs` not embedded: 482 files moved;\n- `docs/adr/**` moved into `doc-records`: 3 files moved;\n- `gov-source` not embedded: 145 files moved;\n- `tests` embedded again: 1,322 files of the cut still embedded.\n\n**Added with the D-7 review's F5** (the CTO's `e44d6732`, under DEC-1066 (3)): W2-15a's raw measure output,\n`docs/research/EXP-003/w2-15a/raw/**` (19 tracked files), is in `evaluation-sources`, which is not embedded and not\nindexed, as lens B's report is. The cut names it, in the same direction only. Without it the case was red on\n`e44d6732`. A plant that moves another `docs/research/` folder out, here `docs/research/EXP-003/examin/**` put into\n`evaluation-sources`, stays red.\n\n**Added when G4 was extended** (DEC-1066 (3) G4, extended 2026-11-04 to the measure's audit, DEC-1068; the CTO's\n`363c1459`): `docs/research/memory-measure-audit/**` (3 tracked files) is in `evaluation-sources`, because its\n",
+      "tokens": 277
+    },
+    {
+      "id": "a9a3a986a2d136ca4eef7e27",
+      "path": "tests/acceptance/W2-91/README.md",
+      "text": "were made under, and W2-86 case 3 shares the definition.\n\nEach revised case is green on `emg/d7`. In a clone of `emg/d7`, each of these plants turned it red:\n- `project-overlay` not embedded: success 1 (209 files) and the rebuild;\n- `orchestration-records` embedded: success 1 (40 record files embedded) and the rebuild (the session plant has a\n  vector);\n- `governance/project/orchestration/tools/**` moved into `orchestration-records`: success 1 (14 files) and the\n  rebuild;\n- `evaluation-fixtures` removed: the rebuild and failure 1's first row (the plant in no namespace).\n\nThe D-7 review's F5 (`e44d6732`) moves `docs/research/EXP-003/w2-15a/raw/**` into `evaluation-sources`. These tests\ndo not name that folder, and need not. It is outside every set W2-91 judges: the root files, `governance/`,\n`schemas/`, and what stays out. The rebuild's `docs/planted.md` control lies in `docs/*`, which is still embedded.\nW2-86 case 3 holds the folder in its cut.\n\n",
+      "tokens": 241
+    },
+    {
+      "id": "0c8ae324c90dffee86b29197",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "## 5. The operator's steps: the message\n> **ACT-MEMORY-AUDIT-INSTALL-1 (DEC-1129 (2)): the memory audit's three briefs and their lines in the launch script's\n> approved list.** Class (O), by hand: your yes first: **`yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4`**. It comes after\n> ACT-W2-149-INSTALL-1, ACT-SETS-GLOBS-1 and ACT-PATHMAP-NS-2 (all applied). In the main tree, about one minute:\n> ```\n> cd /home/usain/Dynamic-Agentic-Engineering-OS\n> G=.gov-runtime/scratch/orchestrator/drafts/memaudit-install-1\n> sha256sum ~/gov-os-eval/indep-walls/APPROVED   # expect 6b923cb4d552077f99924fd5df38f1a448b21f863c4755c9ff4e0dcfb28ed959\n> bash $G/apply.sh check     # \"state: before (the list 6b923cb4d552)\", then \"check: ready to apply\" (exit 0)\n> bash $G/apply.sh apply     # backup; the three briefs; the list; \"6 template lines, 10 brief lines ...\"; \"state applied\"\n> stat -c '%a %n' ~/gov-os-eval/indep-walls ~/gov-os-eval/indep-walls/APPROVED   # expect 700 and 400\n> sha256sum ~/gov-os-eval/indep-walls/APPROVED   # expect 41e3969aa969cec58bf6bc09e770f037acf97ca0ebdd2e8d893e8a1ac2d938e0\n> git add governance/project/indep-briefs/memory-audit\n",
+      "tokens": 286
+    },
+    {
+      "id": "758d89d5a06760ff94de97bf",
+      "path": "governance/project/orchestration/packages/MEMORY-AUDIT-1/ACT-DRAFTS.md",
+      "text": "## ACT-MEMORY-AUDIT-INSTALL-1: the three briefs and their lines in the approved list\n- **Class: (O).** Both paths it writes are (O) rows of `governance/project/operator/class-rules.yaml`\n  (`walled-sessions`): `governance/project/indep-briefs/**` and `gov-os-eval/**` (the list `indep-walls/APPROVED`). The\n  yes line has the form of ACT-W2-149-INSTALL-1's (`yes ACT-MEMORY-AUDIT-INSTALL-1 <8 hex of the ready commit>`), and\n  the owner's operator applies it by hand, about one minute.\n- **Before it:** the owner approves the three briefs' text (`packages/MEMORY-AUDIT-1.md` section 3). The CTO then takes\n  their sha256 and builds the ACT from exactly those bytes. A word changed in a brief after approval means a new hash and\n  a new approval.\n- **What lands:** `governance/project/indep-briefs/memory-audit/writer.md`, `checker.md`, `auditor.md` (byte for byte as\n  approved), committed by the operator with `Role: owner`; and three lines appended to the approved list, in the form of\n  the existing brief lines:\n  ```\n  <sha256 of writer.md>   brief writer  governance/project/indep-briefs/memory-audit/writer.md\n",
+      "tokens": 280
+    },
+    {
+      "id": "DAEO-p8tv",
+      "path": ".tickets/DAEO-p8tv.md",
+      "text": "  - 'S1 One command, `python3 -m gov.memaudit run --sets-root <root>`, runs one audit in this order and no other: the writer''s round 1; the pre-flight (W2-170); the checker''s round 1; the writer''s round 2; the checker''s round 2; the drop and void rule; the declaration, the control and the measure (W2-171); the auditor, also with an empty misses file when there is no miss (the launch script writes the audits'' log line only when an auditor delivers, and that line is what the next audit''s \"changed since the last audit\" list starts from); the pool''s re-run. Each launch is the launch script''s command line with only `--sets-root <root>` named, the brief''s path under `governance/project/indep-briefs/memory-audit/` and its sha256 taken from `git show` at the audit commit (the script checks it against the owner''s approved list itself); the driver never opens a wall, a set or the approved list. The writer''s round 2 and the checker''s second pass run only when the first checker''s notes hold a `revise` or `reject`; a clean first pass goes straight to the measure. Verify: a planted sets root, repository and stub `claude` (W2-149''s): the call ledger shows the steps in that order for a set with revisions, and without the two second-round steps for a clean set; the printed command lines hold no `fixtures/`, `runs/` or `indep-walls/` [DEC-1101 (2)-(3), DEC-1125 (2)]'\n",
+      "tokens": 347
+    },
+    {
+      "id": "DAEO-p8tv",
+      "path": ".tickets/DAEO-p8tv.md",
+      "text": "  - 'S2 The audit commit is the commit the integration store names as its build (its own commit stamp), so the measure needs no rebuild. The driver refuses, builds nothing and says why in the counts when that commit is more than 24 hours old, is not an ancestor of the main line, or the store is being rebuilt. The audit name is `memory-audit-<yyyymmdd>` (the set and the audit folder). Verify: planted store stamps: fresh and an ancestor (starts), 30 hours old (refuses), a side branch (refuses), a rebuild marker (refuses) [DEC-1101 (1), DEC-1125 (2)]'\n  - 'S3 A stop is a stop: any launch exit code other than 0 stops the cycle and the counts name the step and the code; only code 16 (the canary) is retried, once. A stop before `USED` leaves the set unmeasured and the next scheduled audit starts a new set; a stop after `USED` (a measure fault, a brake) is a line to the owner in the digest block and the set is not run again. Verify: planted exit codes 10, 20, 21, 22 (stop, no retry), 16 then 0 (goes on), 16 twice (stop); a planted fault after `USED` (marked for the owner, no second measure) [DEC-1101 (2), DEC-1097 (1)(g)]'\n",
+      "tokens": 284
+    },
+    {
+      "id": "DAEO-p8tv",
+      "path": ".tickets/DAEO-p8tv.md",
+      "text": "  author: 'independent-test-designer (MR-3), Sonnet high (RUBRIC-2, class C2), from these KPI lines, before the engineer: planted roots, planted git histories, a stub `claude`, a stub launch script; never the real ~/gov-os-eval, ~/gov-os-runs or the crontab'\ntrack: B\nlist_rows: []\nreads:  # declared by the CTO 11-11 (gov brief READS_MISSING; DEC-1121): what it reads that it does not write\n- governance/project/path-map.yaml\n- governance/project/retrieval.yaml\n- governance/project/orchestration/packages/MEMORY-AUDIT-1.md\n- governance/project/indep-briefs/memory-audit/\nneeds: []\nwaits_on: []\n---\n",
+      "tokens": 150
+    },
+    {
+      "id": "37326360cf820762a8d1dd57",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "## 7. The review\n**READY, round 1** (2026-11-11 15:55 UTC): a fresh read-only independent auditor (claude -p, launch_worker.sh, DAEO-r30l; not the author), reviewed together with ACT-OPERATOR-ROUNDS-1; full text `governance/project/orchestration/reviews/ACT-OPERATOR-ROUNDS-1-and-MEMORY-AUDIT-INSTALL-1-review.md` (\"Package 2\"). Its rerun: 57 checks passed, 0 failures, on the same head. Two rows, no change to this ACT: P2-F1 (the six `MEMORY-AUDIT-1/` paths can enter the writer's 300-path sample; take the `tree-exclude.txt` change before the first live cycle, 11-23: DECIDED-NOT-DONE row 151); P2-F2 (a failure between the briefs and the list's rename leaves the state \"other\", which undo refuses, and may leave a stray `.APPROVED.act-memaudit-install.<pid>` in `indep-walls/`: it fails closed; send the output to the CTO, who gives the hand clean-up).\nSuggested focus: `apply.sh`'s `check` against a list that is not `6b923cb4d552`; that `APPROVED.before` equals the applied\nlist (the one thing the records cannot prove is the live file); the choice of `indep-briefs/memory-audit/`.\n\n",
+      "tokens": 273
+    },
+    {
+      "id": "67634f9c40c4751022263b14",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "> - **If the commit stops,** nothing is committed and nothing launches under the briefs. Send the output to the CTO.\n> - **0400 kept:** `apply` writes the list 0400 and leaves the folder 0700; the `stat` line is the check.\n>\n> **Undo:** `bash $G/apply.sh undo` puts the list back byte for byte (`6b923cb4d552\u2026`) and removes the three files. Then\n> run `git commit -m \"ACT-MEMORY-AUDIT-INSTALL-1 undone\" --trailer \"Task: DAEO-sdxk\" --trailer \"Implements: DEC-1101, DEC-1129\" --trailer \"Role: owner\" -- governance/project/indep-briefs/memory-audit`.\n> If the commit was never made, the undo needs no commit.\n\n**Rollback in short:** `undo` restores the list from the backup (checked by its sha256) and removes the three files;\nset-up A's briefs and list lines are never touched. After an undo a launch under the memory briefs is refused 10 again.\n\n**Then the CTO, the same day:** record the apply here; run the dry cycle and the live canary (MEMORY-AUDIT-1 \u00a76).\n\n",
+      "tokens": 240
+    },
+    {
+      "id": "94784223d77e34932f594804",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "## 1. What lands\n1. **Three files in the repository,** byte for byte the briefs you approved, at\n   `governance/project/indep-briefs/memory-audit/{writer,checker,auditor}.md`:\n\n   | File | sha256 (DEC-1129 (2)) | Source at `8c18fa300` |\n   |---|---|---|\n   | `writer.md` | `bc0894230e3181e5be27726d60e9fb781f9355da1c4f8e76f69b400af97d379b` | `packages/MEMORY-AUDIT-1/briefs/writer.md` |\n   | `checker.md` | `cea517b8da7d4834bb2a698b9c7023670da36f0ceca6b3350656c6db77c45248` | `.../checker.md` |\n   | `auditor.md` | `37be41c3fb2fea1654d68f71f1ecfc5ad4b41faaed9356a27ce1f01d8ef94245` | `.../auditor.md` |\n\n   **Why the folder is `indep-briefs/memory-audit/` and not where you approved them.** The launch script reads a brief\n   from any repository path at `--commit` (`git show`) and only checks that the list's line names that path, the kind\n   and the hash. The briefs themselves say \"your tree leaves the briefs out\"; only `governance/project/indep-briefs/**`\n   is left out of every wall's tree by `tree-exclude.txt`. The path map already names that folder (ACT-PATHMAP-NS-2),\n   so the new files sit in a namespace (rehearsed: `gov.check.pathmap` exits 0). The bytes, so the hashes, are the same;\n",
+      "tokens": 300
+    },
+    {
+      "id": "bc64d04591da76847bd87d62",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "> sha256sum ~/gov-os-eval/indep-walls/APPROVED   # expect 41e3969aa969cec58bf6bc09e770f037acf97ca0ebdd2e8d893e8a1ac2d938e0\n> git add governance/project/indep-briefs/memory-audit\n> git diff --cached --name-status    # expect exactly 3 A: writer.md, checker.md, auditor.md\n> git commit -m \"ACT-MEMORY-AUDIT-INSTALL-1: the memory audit's three fixed briefs as the owner approved them (DEC-1129 (2)), and their lines in the launch script's approved list\" --trailer \"Task: DAEO-sdxk\" --trailer \"Implements: DEC-1101, DEC-1129\" --trailer \"Role: owner\" -- governance/project/indep-briefs/memory-audit\n> ```\n> - **If the first `sha256sum` is not `6b923cb4d552\u2026`,** or `check` stops, send its line to the CTO and apply nothing\n>   (`apply.sh` refuses by itself and changes nothing).\n> - **If `git diff --cached` lists anything besides the three,** commit anyway: the `--` path limits the commit.\n> - **If the commit stops,** nothing is committed and nothing launches under the briefs. Send the output to the CTO.\n> - **0400 kept:** `apply` writes the list 0400 and leaves the folder 0700; the `stat` line is the check.\n>\n",
+      "tokens": 278
+    },
+    {
+      "id": "d54cc718db50d85fcdc52da4",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "   so the new files sit in a namespace (rehearsed: `gov.check.pathmap` exits 0). The bytes, so the hashes, are the same;\n   `packages/MEMORY-AUDIT-1/briefs/` stays as the record of what you read.\n2. **The list** `<sets root>/indep-walls/APPROVED` (0400, written by your operator only): the list as\n   ACT-W2-149-INSTALL-1 left it (23 lines, sha256 `6b923cb4d552077f99924fd5df38f1a448b21f863c4755c9ff4e0dcfb28ed959`),\n   unchanged, then a four-line comment and three lines:\n   ```\n   bc0894230e31\u2026  brief writer  governance/project/indep-briefs/memory-audit/writer.md\n   cea517b8da7d\u2026  brief checker governance/project/indep-briefs/memory-audit/checker.md\n   37be41c3fb2f\u2026  brief auditor governance/project/indep-briefs/memory-audit/auditor.md\n   ```\n   `drafts/memaudit-install-1/APPROVED.after`: 30 lines, sha256\n   `41e3969aa969cec58bf6bc09e770f037acf97ca0ebdd2e8d893e8a1ac2d938e0`. After the apply the launch script's parser reads\n   6 template lines and 10 brief lines.\n3. **Nothing else.** The walls' template, the launch script, the schemas, the path map, the guard and the settings are\n   untouched.\n\n",
+      "tokens": 277
+    },
+    {
+      "id": "db1c642b462319e131fc1da4",
+      "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md",
+      "text": "## 8. Residuals and what else MEMORY-AUDIT-1 \u00a76 names (listed only; nothing here is built)\n1. **The list's live state is checked only at your apply** (\u00a74).\n2. **The cron is a later ACT** (ACT-MEMORY-AUDIT-CRON-1, class (b): your yes, then the operator agent), after W2-170 to W2-173 are merged.\n3. **W2-170 to W2-173 are not built yet.** The install needs none of them to apply; the first live launch needs them\n   (the runner, the cycle's driver, W2-173's `effort`). Until W2-173 the sessions run at the CLI's default effort.\n4. **The blindness the briefs alone hold** (MEMORY-AUDIT-1 \u00a79 item 3): every memory wall's tree still holds\n   `governance/project/orchestration/packages/MEMORY-AUDIT-1/` (the package and the three brief copies; rehearsed,\n   observed: yes), which the briefs forbid reading. Putting the package and its briefs under `tree-exclude.txt` is a\n   template change (a new hash and a rebuilt list, class (O)); the package recommends taking it with the next\n   template change. Moving nothing now is the cheapest; say so if you want it before 11-23.\n5. **The launch script's docstring examples** name `indep-briefs/{writer,checker,auditor}.md`, not `indep-briefs/memory-audit/`.\n",
+      "tokens": 300
+    },
+    {
+      "id": "2043770f4809f6e2d094fdb0",
+      "path": "governance/project/orchestration/packages/AUDIT-NIGHT-1/c-tickets.md",
+      "text": "   the product through these two. Neither ticket cites DEC-1118, DEC-1119 or DEC-1120. W2-60a already applies a role's\n   default model and effort and records the ticket's class; it has no line for the class-by-role table (DEC-1120 (2)),\n   promotion after two failed reviews or a fail-open finding (3), the trial exception, or the spend log's tier, class\n   and promotion. Recommendation: one product-spec session adds the KPI lines and sources to both before the lift (they\n   must land before EXAMIN's copy). I did not change KPIs.\n3. **W2-115 (DAEO-emq1) has no line for the trailers switch.** DEC-1123 (3), DECIDED-NOT-DONE row 114 and P1-PLAN Q-8\n   say W2-115 lands the switch from warning to block; the ticket never mentions trailers, `traceability.py` or the\n   `trailers_base` deletion. Recommendation: add the Q-8 line (a KPI), or name another owning ticket.\n4. **W2-88 (DAEO-2bdu) has no line for the weekly memory audit.** DEC-1125 (2) names it a home ticket. S12 to S16 hold\n   the one-off tuning and verdict sets; nothing says \"scheduled, weekly while development is active\". It does not cite\n   DEC-1101 or DEC-1125. The memory-audit helper's package should settle the wording.\n",
+      "tokens": 299
+    },
+    {
+      "id": "DEC1131-ONE-BAR-CIT-P",
+      "path": "governance/project/orchestration/packages/CIT-P-ONE-BAR-draft.md",
+      "text": "## 4. What this does not change\n\n1. **The two code fixes of DEC-1131 (3), each by its own route, now, separate from this record:**\n   - `verdict.py` (`governance/project/operator/verdict.py`, an (O) operator path, so by the owner's ACT; and the CTO's\n     copy in `tools/`): READY needs no KPI line marked fail (the docstring's lines 9-10 and the code at 38-39 now say a failed\n     line with no blocking finding does not block). Text R's last bullet says the CTO reads a failed line as not READY by hand until it lands.\n   - `operator_run.py` (lines 308-320 and 448-453): count verdict blocks by ACT id, not by manifest\n     (ACT-OPERATOR-ROUNDS-1).\n2. **The counting code, after two weeks of use.** Proposed ticket: **W2-180** (the CTO files it; W2-170 to W2-179 are\n   reserved by the memory-audit brief, and W2-174 is the adopted-repository `Verify:` ticket). Its parts: a counter that\n   reads the ledger (or the spend log's `ticket` and `role` fields) at `gov launch` and refuses a third round without a\n   recorded override with a decision id (the launch already has one, DEC-1088 (5)); `kpi_rows` reading a written\n",
+      "tokens": 281
+    },
+    {
+      "id": "af330ef86f32375b2d1a62fa",
+      "path": "governance/project/orchestration/packages/MEMORY-AUDIT-1/ACT-DRAFTS.md",
+      "text": "  the existing brief lines:\n  ```\n  <sha256 of writer.md>   brief writer  governance/project/indep-briefs/memory-audit/writer.md\n  <sha256 of checker.md>  brief checker governance/project/indep-briefs/memory-audit/checker.md\n  <sha256 of auditor.md>  brief auditor governance/project/indep-briefs/memory-audit/auditor.md\n  ```\n  Nothing else in the list changes. The walls' template files are not touched, so every template line stays.\n- **Rehearsal:** a clone with a planted home and sets root; `apply.sh check`, `apply`, `undo` as in ACT-W2-149-INSTALL-1;\n  a dry launch under each of the three briefs (`--seed 17`) passes stage 10 and builds its wall (each brief names its\n  `result_schema` and `sample`, and the model comes from the brief's front matter); the set-up A briefs' lines still\n  pass.\n- **Order:** after W2-173 is merged (so that `effort` is passed), or the sessions run at the CLI's default effort and the\n  first audit's record says so.\n\n",
+      "tokens": 239
+    },
+    {
+      "id": "2321102dcbe8a107a0d2e367",
+      "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-1.md",
+      "text": "   - *Do (recommended):* the checker session re-reads the 80's gold answers against the measured commit and flags any fact that changed; the writer updates those, in one round. Only counts come back to the CTO.\n   - *Cost:* about 1 to 2 hours of the owner's operator and the two sessions.\n4. **The visible q12 sync does not apply.** The CTO synced the sets root's visible q12 once, for E0 (E0-DECLARATION). The 80 have their own labels, and nobody in the CTO's system edits them.\n5. **Source families.** The sets root's path map declares no `evaluation_families` (read: only `evaluation_sets`), so the measure takes the measured clone's. At `c00d525f` that block holds contract, kernel and agents (checked with `git show`).\n   - *Do:* the run's first line must read `families: contract (4 members), kernel (3 members), agents (2 members)`; anything else stops the run before its first search.\n   - The 80 were written before the family rule. A family hit counts only where the item's text holds the gold span's text, and on the 138 the families moved no count.\n6. **The nonexistent-id question.** There is 1 in the 80 (DEC-1078 (1)). It is counted apart, so the judged figures are on 79.\n",
+      "tokens": 297
+    },
+    {
+      "id": "DEC-1078",
+      "path": "docs/DECISION_REGISTER.md",
+      "text": "### DEC-1078 \u2014 The verdict set of 80 (`memory-verdict-2`) ready: the writer's checks pass, the cross-check closed after two rounds; unused until the next decision point; source families for the rubric's next version\n- **Status:** ACCEPTED (owner, 2026-11-05 evening, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-05)`) \u00b7 **Under:** DEC-1074 (3), DEC-1075, DEC-1076, DEC-1010 \u00b7 **Source:** the owner's report of the writer's and checker's lines (ACT-MSET-3 section 6, ACT-MSET-4 section 6)\n- **Decision:**\n  - **(1) The set is ready.** The writer's final checks: sources 179, path missing 0, heading on no line 0, heading on\n    more than one line 0; unresolved 0 (179 heading-anchored); 80 new questions, 0 overlapping an earlier set's gold\n    source; categories callers 8, code-paraphrase 7, contract 8, decision 15 of 13, exact-string 8, failure-memory 2\n    of 4, history 2, kernel-template 7, multi-file 6, nonexistent-id 1, plan 8, ticket 8: total 80 of 80, PASS\n    (failure-memory short by 2, moved to `decision`, as quota (A) of DEC-1075 (2) allows). The CTO's own check at\n",
+      "tokens": 295
+    },
+    {
+      "id": "9ad7872937f0715fdcad0270",
+      "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-READINESS.md",
+      "text": "## 2. The checker's brief (the owner's operator's checker, outside the guard; only counts come back)\n- **Task:** for each of the 80, re-read its gold answer and sources at `c00d525f`, in a clean clone checked out there;\n  never the main tree, never the CTO's tools.\n- **Mark each question:** *unchanged* (every fact true at `c00d525f`); *changed* (name the fact, give the corrected\n  fact with new source and lines); *ambiguous* (the repository states it two ways).\n- **Check above all:** ticket and decision statuses; anything superseded or amended (a decision's *Changed by* line);\n  counts and figures; paths and function names that moved; the nonexistent-id question (its id exists nowhere).\n- **The writer** updates only *changed* and *ambiguous* entries, one round, keeping the question and its category:\n  - a *changed* entry gets the corrected fact and its new source, and **its commit field set to `c00d525fd420`**; the\n    old label is kept in `memory-verdict-2/retired/` (never inside `hidden/`);\n  - an *ambiguous* entry gets the second place as an alternative source, so the gold accepts either (as DEC-1078 (2)'s\n    cross-check added whole places that also state an answer);\n",
+      "tokens": 298
+    },
+    {
+      "id": "dd5eef7a36e589d00a46ad33",
+      "path": "governance/project/orchestration/packages/ACT-MSET-3.md",
+      "text": "## 10. The path-map line (both maps): in (`efcd91a2`)\nIn `~/gov-os-eval/governance/project/path-map.yaml` (the sets root, which the measure reads; the old file kept as\n`path-map.yaml.pre-dec1075`) and in `governance/project/path-map.yaml` (the main tree), under `evaluation_sets:`, after\n`memory-verdict`, which gained \"Spent 2026-11-05 (one use, 40 of 59); a diagnostic set from DEC-1074 (2)\":\n```yaml\n  memory-verdict-2:\n    visible: []\n    hidden: [\"fixtures/evaluation/memory-verdict-2/hidden/**\"]\n    measures:\n      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]\n```\nBoth maps validated (`check_sets`), and the guard check passes.\n\n",
+      "tokens": 171
+    },
+    {
+      "id": "DAEO-2bdu",
+      "path": ".tickets/DAEO-2bdu.md",
+      "text": "  - 'S13 The fresh verdict set, used once: 80 questions, written by the same independent writer and checker under the same rubric, blind, before the first measure of the tuning set. None of its gold sources is a gold source of the tuning set. It is held outside every worktree in a folder of mode 700, declared in the path map''s evaluation_sets with every role but the orchestrator refused, and the guard refuses the measured roles a read of the set and of its run folder (as ACT-GUARD-SETS-1). It is used once, as FRESH-80-1 did. First a counts-only pre-flight: the set''s digest, how its anchors resolve at the measured commit, and whether each nonexistent id still exists nowhere. Then the checker''s staleness pass at that commit. Then a declaration, committed before any search, naming the configuration (S10), the commit, the denominator with nonexistent-id questions apart, the bar and how it rounds (S14), any data conditions as data only, and the fault rule (FRESH-80-1 \u00a73.5). Then a control on the tuning set. A USED marker is written before the first search, and the runner refuses to start once it exists. The result record gives counts only. Verify: the declaration''s commit is earlier than the USED marker; a planted USED makes the runner refuse; a planted read of the set by a measured role is refused by the guard [DEC-1098 (1), DEC-1097 (1)(b), (1)(g), DEC-1097 (2), DEC-1092 (4), DEC-1078 (3), DEC-1074 (1)] [added, DEC-1099 (2); DEC-1098 (1)]'\n",
+      "tokens": 367
+    },
+    {
+      "id": "249b917ed5a7dc6cead63101",
+      "path": "governance/project/orchestration/packages/W2-88-STANDARD-1.md",
+      "text": "  - 'S13 The fresh verdict set, used once: 80 questions, written by the same independent writer and checker under the same rubric, blind, before the first measure of the tuning set. None of its gold sources is a gold source of the tuning set. It is held outside every worktree in a folder of mode 700, declared in the path map''s evaluation_sets with every role but the orchestrator refused, and the guard refuses the measured roles a read of the set and of its run folder (as ACT-GUARD-SETS-1). It is used once, as FRESH-80-1 did. First a counts-only pre-flight: the set''s digest, how its anchors resolve at the measured commit, and whether each nonexistent id still exists nowhere. Then the checker''s staleness pass at that commit. Then a declaration, committed before any search, naming the configuration (S10), the commit, the denominator with nonexistent-id questions apart, the bar and how it rounds (S14), any data conditions as data only, and the fault rule (FRESH-80-1 \u00a73.5). Then a control on the tuning set. A USED marker is written before the first search, and the runner refuses to start once it exists. The result record gives counts only. Verify: the declaration''s commit is earlier than the USED marker; a planted USED makes the runner refuse; a planted read of the set by a measured role is refused by the guard [DEC-1098 (1), DEC-1097 (1)(b), (1)(g), DEC-1097 (2), DEC-1092 (4), DEC-1078 (3), DEC-1074 (1)] [added, DEC-1098 (1)]'\n",
+      "tokens": 363
+    },
+    {
+      "id": "1e1448fdf8984f2453ec0436",
+      "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-READINESS.md",
+      "text": "## 8. The owner's run sheet (2026-11-08), paths only\n- **The checker's and writer's tree at `c00d525f`:** `~/gov-os-eval/fixtures/evaluation/memory-verdict-2/tree-c00d525f/`\n  (`git archive`, no history; the paths both sessions' settings deny removed), readable by both (their settings'\n  `additionalDirectories`), protected by the ACT's `fixtures/evaluation/memory-verdict-2/**` once applied; removed\n  after the writer.\n- **The checker's report:** `memory-verdict-2/STALENESS-CHECK.md` (beside `hidden/`, never inside it). **The writer's:**\n  `memory-verdict-2/WRITER-REPORT.md`; old labels in `memory-verdict-2/retired/`.\n- **Back to the CTO:** counts only; the digest computed by the operator after the writer\n  (`cd .../memory-verdict-2/hidden && LC_ALL=C sha256sum *.yaml | sha256sum`), the files count and the folder mode.\n- **Then:** the transcripts moved, the ACT applied; the CTO's live guard check, the worktree merges, the pre-flight\n  (`--expect-sha256`, `--expect-changed`), the declaration committed; \"ready to launch\" to the owner; the run on the\n  owner's word.\n",
+      "tokens": 270
+    },
+    {
+      "id": "0b2e6314db3038f9cbd8f453",
+      "path": "tests/acceptance/W2-149/w2_149_support.py",
+      "text": "               \"delivered\": {\"files\", \"sha256\", \"to\"}}\nWALL_KEYS = {\"kind\", \"run\", \"set\", \"round\", \"commit\", \"repo\", \"tree\", \"runs\", \"home\", \"sets_root\", \"brief_sha256\",\n             \"seed_sha256\", \"settings_sha256\", \"hook_sha256\", \"template_sha256\", \"approved_sha256\", \"selection\",\n             \"seeded_before_content\", \"runs_override\", \"trees_override\"}\nHEX64 = re.compile(r\"^[0-9a-f]{64}$\")\nHEX40 = re.compile(r\"^[0-9a-f]{40}$\")\nRUN_ID = re.compile(r\"^\\d{8}T\\d{6}Z-[a-z0-9][a-z0-9-]*-r[12]$\")\nSET_NAME = re.compile(r\"^[a-z0-9][a-z0-9-]{0,63}$\")\nHIDDEN_GLOBS = (\"fixtures/evaluation/memory-retrieval/hidden/**\", \"fixtures/evaluation/memory-verdict/**\",\n                \"fixtures/evaluation/memory-verdict-2/**\", \"transcripts/**\", \"runs/fresh-80/**\",\n                \"fixtures/evaluation/sandbox-guard-exp-1/hidden/**\", \"indep-walls/**\")\nSGX_SET_BLOCK = \"\"\"evaluation_sets:\n  sandbox-guard-exp-1:\n    visible: []\n    hidden: [\"fixtures/evaluation/sandbox-guard-exp-1/hidden/**\"]\n    measures:\n      roles: [engineer, research, product-spec, independent-test-designer, independent-auditor]\n\"\"\"\nSGX_HIDDEN_GLOB = '\"fixtures/evaluation/sandbox-guard-exp-1/hidden/**\", '\n",
+      "tokens": 292
+    },
+    {
+      "id": "DAEO-h2k3",
+      "path": ".tickets/DAEO-h2k3.md",
+      "text": "# W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources\n\n**Re-scoped by DEC-954 Q9a; the size confirmed by DEC-957:** 48 questions with lens B's 20 (24 visible, 24 hidden); K9's \"memory proven\" is judged on the hidden half, at least 21 of 24 hit@5, against the owner's target of 95 %. Est. 12 to 14 lead-hours (MEMORY-SPEC-MAP B.2).\n\nCompanion to W2-61 (DEC-941). W2-61's engineer writes the measure and runs the visible half's baseline. The engineer is a measured role (`measures: roles: [engineer, research]` in the path map's `evaluation_sets.memory-retrieval`), so the hidden half is written here, by an independent auditor whose role is not measured, in a session the orchestrator starts, never a retrieval ticket's lead.\n\n- **Why:** a measure tuned on its own questions overstates itself. The hidden half keeps W2-61's figures honest across the memory chain (DEC-828 item 3, DEC-820 (d)).\n- **Form:** the auditor reads W2-61's script's input form once it is merged (`src/gov/retrieval/measure.py` and its README or docstring) and writes in that form. Before then, one YAML file per question with `question`, `gold_answer` and `sources` (path plus heading or line).\n",
+      "tokens": 300
+    },
+    {
+      "id": "47c01f0556930b2b811557f6",
+      "path": "src/gov/retrieval/measure.py",
+      "text": "\"\"\"The standing retrieval measure: an evaluation set's questions asked of ``gov retrieve``, scored (W2-61; DEC-828\nitems 3 and 4, DEC-833, DEC-860, DEC-820 (d)).\n\n``python3 -m gov.retrieval.measure <set> [--root <dir>] [--sets-root <dir>] [--part visible|hidden|all]\n[--gov <executable> | --kept <dir>] [--batch-size 10] [--bundle-budget 6000] [--stack-budget 24000] [--json]\n[--out <dir>] [--compare <record>]...``\n\nThe set is one the ``evaluation_sets`` block of the sets root's path map declares; its questions are\n``<sets-root>/fixtures/evaluation/<set>/<part>/*.yaml``, taken in file-name order. The hidden folder must be covered\nby the set's ``hidden`` globs, and a session the set measures (its ``GOV_ROLE`` or ``GOV_TICKET``) is refused the\nhidden part before any hidden file is opened.\n\n**The question form** (one YAML file per question, the same for both halves): ``question`` (the text passed to\n``gov retrieve``), ``gold_answer`` (the answer as the governing source states it) and ``sources``, all required.\nEach ``sources`` entry is one piece of evidence the answer needs: a map with ``path`` and optionally ``heading``\n",
+      "tokens": 284
+    },
+    {
+      "id": "8967e71d39728294702fcfe0",
+      "path": "tests/unit/retrieval/test_w2_134_reanchor.py",
+      "text": "    write(repo / \"docs/gone.md\", [\"keep\", \"keep\"])\n    write(repo / \"docs/twice.md\", [\"one\", \"two\", \"dup line here\", \"dup line here\"])  # moved, and found twice\n    subprocess.run([*git, \"commit\", \"-q\", \"-am\", \"two\"], check=True)\n    c2 = subprocess.run([*git, \"rev-parse\", \"HEAD\"], capture_output=True, text=True, check=True).stdout.strip()\n    bin_dir = tmp_path / \"bin\"\n    bin_dir.mkdir()\n    gov = bin_dir / \"gov\"\n    gov.write_text(GOV.format(python=sys.executable))\n    gov.chmod(0o755)\n    monkeypatch.setenv(\"GOV_ROLE\", \"orchestrator\")\n    monkeypatch.delenv(\"GOV_TICKET\", raising=False)\n    monkeypatch.delenv(\"GOV_KEEP\", raising=False)\n\n    def path_map(families=None):\n        doc = {\"evaluation_sets\": SETS, **({\"evaluation_families\": families} if families is not None else {})}\n        write(sets / \"governance/project/path-map.yaml\", [yaml.safe_dump(doc)])\n\n    def ask(part, name, plan, **question):\n        folder = sets / \"fixtures/evaluation/s\" / part\n        folder.mkdir(parents=True, exist_ok=True)\n        (folder / f\"{name}.yaml\").write_text(yaml.safe_dump({\"gold_answer\": f\"the {SECRET}\", **question}))\n",
+      "tokens": 282
+    },
+    {
+      "id": "3689643ceb0f35d45960fc71",
+      "path": "docs/changes/W2-148-evidence.md",
+      "text": "| ACT-INDEP-WALLS-1.md | (O) | (b) (pinned) | yes | repo:governance/project/indep-walls/CLAUDE.md.tmpl (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 ( |\n| ACT-MSET-1.md | (O) | none (not pinned) | yes | home:gov-os-eval/fixtures/evaluation/memory-verdict/hidden (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DE |\n| ACT-MSET-2.md | (O) | none (not pinned) | yes | home:gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under |\n| ACT-MSET-3.md | (O) | none (not pinned) | yes | home:gov-os-writer/.claude/settings.json (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 (N-2)); hom |\n| ACT-MSET-4.md | (O) | none (not pinned) | yes | home:gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions und |\n",
+      "tokens": 280
+    },
+    {
+      "id": "b5d9a4887a1a800e215d9de4",
+      "path": "docs/changes/W2-148-evidence.md",
+      "text": "| ACT-MSET-2 | none | (O) | home:gov-os-eval/fixtures/evaluation/memory-verdict/XCHECK.md (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 (N-2)); home:gov-os- |\n| ACT-MSET-3 | none | (O) | home:gov-os-writer/.claude/settings.json (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 (N-2)); home:gov-os-writer/.claude/settin |\n| ACT-MSET-4 | none | (O) | home:gov-os-eval/fixtures/evaluation/memory-verdict-2/XCHECK.md (walled-sessions: the blind writers and checkers (HLABEL-1 to 3, HNEW-1, MSET-1 to 4): walled sessions under DEC-1101 (N-2)) |\n| ACT-NIGHTLY-1 | (b) | (O) | script hit windows: powershell.exe -NoProfile -Command x |\n| ACT-NIGHTLY-STOP-1 | (b) | (O) | home:crontab.pre-nightly-stop-<stamp>.txt (unknown: src/**, tests, the register, tickets, or a path no rule names: not an ACT's business, or unclassifiable) |\n| ACT-QUERY-GPU-2 | (a) | (b) | home:.local/bin/ollama (installs: installs and downloads without sudo (RERANK-TRIAL-1/2): new code on the machine (DEC-083, DEC-957)) |\n",
+      "tokens": 283
+    },
+    {
+      "id": "b856de51d94992694154b7de",
+      "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md",
+      "text": "## 1. The gap, and the fix\n- **The gap:** the guard (`.claude/hooks/pretooluse.py`) builds its hidden-path checks only for the repository and\n  its worktrees, so it never judges a path under the sets root `~/gov-os-eval`, for any role. The health check of\n  11-06 showed it: an engineer's Read of `~/gov-os-eval/.../hidden/h01.yaml` was allowed.\n- **The fix, two files, no pin change:**\n  1. **A new block in the path map**, `sets_root_hidden`, read from the main tree's copy only, so a branch cannot\n     weaken it. It names:\n     - the root `~/gov-os-eval`;\n     - the hidden globs: `memory-retrieval/hidden/**`, `memory-verdict/**`, `memory-verdict-2/**`,\n       **`transcripts/**`** and **`runs/fresh-80/**`** (DEC-1097 (2): the 80's questions, gold answers, answers and kept\n       outputs); every other folder under `runs/` stays open;\n     - **the refused roles: orchestrator, engineer, research, product-spec, independent-test-designer and\n       independent-auditor.**\n  2. **The hook:**\n     - those globs are refused under the sets root and in every tree, for reads and for the writes the guard can\n       resolve;\n",
+      "tokens": 282
+    }
+  ],
+  "supplementary_query": "The memory audit's set record: the checks before any search, the drop and void rule, the declaration and the use-once marker, counts only (DEC-1101 (1), DEC-1125 (2))\nS1 The pre-flight checks a delivered set before any search and prints ids, counts and the codes below only. It refuses on each of: fewer than 36 files; a file not in the writer brief's form (`id`, `question`, `gold_answer`, `sources`, `commit`, `category`, `drawn`); a `commit` other than the audit commit; a category count other than the 40-question quotas of the rubric (R5 item 6); a governing domain under 4 questions or a subsystem over 10, scaled to the kept count; a `drawn: changed` or `drawn: sample` question whose first source is not in `selection.json`'s list of that name; a source path missing at the audit commit, or a `heading` not found and `lines` outside the file; a source in an evaluation or evaluation-source namespace (R8); a gold-source set equal to a pool question's (R9); a nonexistent-id question whose id exists at the commit. Verify: a planted set in a planted repository and sets root under TMPDIR with ten planted defects, one per check: each refused with its own code; the clean planted set ends `PRE-FLIGHT: every check as expected`; no real `~/gov-os-eval` is opened [DEC-1101 (1), DEC-1069 (5), DEC-1125 (2)]\nS2 The drop and void rule: after the checker's second pass, every question whose verdict in the notes is not `accept` is moved to `dropped/` in the set's folder (never deleted), the kept count and every S1 scale are recomputed from the kept questions, and a kept count under 36 or a domain under 4 makes the audit VOID: nothing is measured, no `USED` marker is written, and the counts say `void` with the cause code. Verify: planted notes with 3 drops (audit goes on, kept 37, scales recomputed), with 5 drops (VOID, no `USED`, no `DECLARATION.json`), and with a drop that leaves a domain at 3 (VOID) [DEC-1101 (1), DEC-1125 (2)]\nS3 Before any search the runner writes `runs/<audit>/DECLARATION.json` and a `USED` marker, in that order. The declaration holds: the audit commit; the store's commit and its sha256; the gov pin; the `retrieval.yaml` digest; the standard's four settings by name (the shared reranker, the pool on, the 6,000-token bundle, search again once); the set's digest (`LC_ALL=C sha256sum *.yaml | sha256sum` over the kept questions); n; the bar scaled to n (at least ceil(0.85 n) right end to end, at most floor(0.05 n) wrong claims; the target ceil(0.95 n)); and how it rounds. The runner refuses to start while `USED` exists, so a set is measured once. Verify: a planted run writes both files in that order (the file times and the ledger line); a second run on the same audit exits with the refusal and writes nothing; a planted `retrieval.yaml` with the pool off is named in the declaration and the run is not ok without a decision id [DEC-1098 (1), DEC-1097 (1)(d), DEC-1101 (1)]\nS4 The set is declared in the sets root's own path map by the runner's code, as one `evaluation_sets` entry of the shape `memory-verdict-2`'s has (its hidden glob, the six roles measured), so `gov.retrieval.measure` accepts it, and nowhere else: the repository's `governance/project/path-map.yaml`, the guard and the hook are never written, and no ACT is needed for a new audit's name. Verify: a planted sets root map gains exactly one entry for `memory-audit-<date>`; `git status` in the planted repository shows no change; the measure run on the planted set accepts it [DEC-1101 (2), DEC-820]\nS5 Only counts and ids leave the tool: standard output and `runs/<audit>/PREFLIGHT.json` hold ids, counts, codes and digests, never a question, a gold answer, a source path or a heading; a line naming the sets root's folders is refused before it is printed; the command line names only `--sets-root <root>`, never a folder under it (the guard's line rule). Verify: a planted question with a unique word: grep of every output file and the captured stdout and stderr finds it 0 times; the printed command line holds no `fixtures/` or `runs/` [DEC-1101 (2), DEC-1097 (2)]\nS6 The package is wired in: `governance/project/test-map.yaml` places `src/gov/memaudit/**` and its tests (so a change here runs these tests and not the full suite), and the module runs as `python3 -m gov.memaudit preflight|void|declare`. Verify: `gov close`'s scoped selection for a planted change under `src/gov/memaudit/` names `tests/unit/memaudit/`; each subcommand prints its usage with `--help` and exits 0 [DEC-896]\nA question, gold answer, answer, source path or heading of a set in any output, log or error text. Verify: S5's planted question with a unique word, gold answer, source path and heading: grep of every output file, the captured stdout and stderr and the logs finds each 0 times\nA set measured twice, or measured without `DECLARATION.json` and `USED` written first. Verify: S3's planted runs: the file times and the ledger line show `DECLARATION.json` before `USED` before any search, and a second run on the same audit exits with the refusal and starts no search\nThe repository's path map, the guard, the hook, `.claude/` or the walls' template written; the real sets root or run folders opened by a test. Verify: S4's `git status` in the planted repository shows no change, and a run of the tests with the planted roots under TMPDIR leaves no open of the real sets root or run folders in the tests' file-access log\nA dropped question deleted; a VOID audit that wrote `USED`. Verify: S2's planted notes with 3 drops (the 3 files are found under `dropped/`) and with 5 drops (VOID: no `USED` and no `DECLARATION.json` in the audit's run folder)\nAny change outside the paths above. Verify: `git diff --name-only` of the ticket's branch against its base lists only paths matched by the ticket's allowed_paths",
+  "further_batch": [
+    {
+      "id": "ea6ee4c44facc970497c8a8b",
+      "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md"
+    },
+    {
+      "id": "ff0e785f3ace874673ed0dc2",
+      "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md"
+    }
+  ],
+  "supplementary_batches": [
+    {
+      "items": [
+        {
+          "id": "DAEO-p8tv",
+          "path": ".tickets/DAEO-p8tv.md"
+        },
+        {
+          "id": "cb97f0d27c8ef61e2ea1f271",
+          "path": "docs/changes/W2-13-evidence.md"
+        },
+        {
+          "id": "47089ec06f89bf30077bf431",
+          "path": "governance/project/indep-walls/tree-exclude.txt"
+        },
+        {
+          "id": "0d121294692fceb6ddfd11d1",
+          "path": "governance/project/path-map.yaml"
+        },
+        {
+          "id": "b0c244a6693cb77e8c794c10",
+          "path": "tests/acceptance/W2-13/README.md"
+        },
+        {
+          "id": "d71acbb2d63c9b43d403104b",
+          "path": "tests/acceptance/W2-13/README.md"
+        },
+        {
+          "id": "6e26f7aea2db447040dd60cd",
+          "path": "tests/acceptance/W2-13/test_w2_13_lexical_policy.py"
+        },
+        {
+          "id": "b914d53ceaae51b34d55c2be",
+          "path": "tests/acceptance/W2-13/w2_13_lexical_policy_support.py"
+        },
+        {
+          "id": "a3f3f96d25c0d6f9979930d9",
+          "path": "tests/acceptance/W2-86/README.md"
+        },
+        {
+          "id": "a9a3a986a2d136ca4eef7e27",
+          "path": "tests/acceptance/W2-91/README.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "0c8ae324c90dffee86b29197",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "758d89d5a06760ff94de97bf",
+          "path": "governance/project/orchestration/packages/MEMORY-AUDIT-1/ACT-DRAFTS.md"
+        },
+        {
+          "id": "DAEO-p8tv",
+          "path": ".tickets/DAEO-p8tv.md"
+        },
+        {
+          "id": "DAEO-p8tv",
+          "path": ".tickets/DAEO-p8tv.md"
+        },
+        {
+          "id": "DAEO-p8tv",
+          "path": ".tickets/DAEO-p8tv.md"
+        },
+        {
+          "id": "37326360cf820762a8d1dd57",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "67634f9c40c4751022263b14",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "94784223d77e34932f594804",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "bc64d04591da76847bd87d62",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "d54cc718db50d85fcdc52da4",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "db1c642b462319e131fc1da4",
+          "path": "governance/project/orchestration/packages/ACT-MEMORY-AUDIT-INSTALL-1.md"
+        },
+        {
+          "id": "2043770f4809f6e2d094fdb0",
+          "path": "governance/project/orchestration/packages/AUDIT-NIGHT-1/c-tickets.md"
+        },
+        {
+          "id": "DEC1131-ONE-BAR-CIT-P",
+          "path": "governance/project/orchestration/packages/CIT-P-ONE-BAR-draft.md"
+        },
+        {
+          "id": "af330ef86f32375b2d1a62fa",
+          "path": "governance/project/orchestration/packages/MEMORY-AUDIT-1/ACT-DRAFTS.md"
+        },
+        {
+          "id": "2321102dcbe8a107a0d2e367",
+          "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-1.md"
+        },
+        {
+          "id": "DEC-1078",
+          "path": "docs/DECISION_REGISTER.md"
+        },
+        {
+          "id": "9ad7872937f0715fdcad0270",
+          "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-READINESS.md"
+        },
+        {
+          "id": "dd5eef7a36e589d00a46ad33",
+          "path": "governance/project/orchestration/packages/ACT-MSET-3.md"
+        },
+        {
+          "id": "DAEO-2bdu",
+          "path": ".tickets/DAEO-2bdu.md"
+        },
+        {
+          "id": "249b917ed5a7dc6cead63101",
+          "path": "governance/project/orchestration/packages/W2-88-STANDARD-1.md"
+        }
+      ],
+      "limit": 10
+    },
+    {
+      "items": [
+        {
+          "id": "1e1448fdf8984f2453ec0436",
+          "path": "governance/project/orchestration/packages/LIFT-1/FRESH-80-READINESS.md"
+        },
+        {
+          "id": "0b2e6314db3038f9cbd8f453",
+          "path": "tests/acceptance/W2-149/w2_149_support.py"
+        },
+        {
+          "id": "DAEO-h2k3",
+          "path": ".tickets/DAEO-h2k3.md"
+        },
+        {
+          "id": "47c01f0556930b2b811557f6",
+          "path": "src/gov/retrieval/measure.py"
+        },
+        {
+          "id": "8967e71d39728294702fcfe0",
+          "path": "tests/unit/retrieval/test_w2_134_reanchor.py"
+        },
+        {
+          "id": "3689643ceb0f35d45960fc71",
+          "path": "docs/changes/W2-148-evidence.md"
+        },
+        {
+          "id": "b5d9a4887a1a800e215d9de4",
+          "path": "docs/changes/W2-148-evidence.md"
+        },
+        {
+          "id": "b856de51d94992694154b7de",
+          "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md"
+        },
+        {
+          "id": "ea6ee4c44facc970497c8a8b",
+          "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md"
+        },
+        {
+          "id": "ff0e785f3ace874673ed0dc2",
+          "path": "governance/project/orchestration/packages/ACT-GUARD-SETS-1.md"
+        }
+      ],
+      "limit": 10
+    }
+  ],
+  "dropped": [
+    {
+      "id": "ea6ee4c44facc970497c8a8b",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "ff0e785f3ace874673ed0dc2",
+      "reason": "budget exceeded"
+    },
+    {
+      "id": "role_filter",
+      "reason": "withheld from independent-test-designer (ticket DAEO-61vm): 0 paths, 0 chunks; none matched (DEC-1065 (2))"
+    }
+  ],
+  "tokens": 29928,
+  "budget": {
+    "limit": 30000,
+    "used": 29928
+  },
+  "hash": "f40b4f05f5908ff46f3527c595a428b687bb572b7bc21a63da05a67cfb9e4aed"
+}

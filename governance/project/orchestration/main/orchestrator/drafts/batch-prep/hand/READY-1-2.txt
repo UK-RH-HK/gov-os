@@ -1,0 +1,4 @@
+READY: briefs (1) and (2) are done; (3) and (4) follow.
+(1) W2-04-A5-r6-review.md   (2) W2-11-A5-r5-resume.md   both in this folder; placeholder_scan.py: 0 hits each.
+Before launching (1): the CTO makes /home/usain/gov-os-worktrees/W2-04 from w2/integrate (branch w2/W2-04 is 0 ahead: --ff-only).
+Before launching (2): consider merging w2/integrate into w2/W2-11 first: 27 files changed on both sides, 15 of them generated copies a lead cannot write.

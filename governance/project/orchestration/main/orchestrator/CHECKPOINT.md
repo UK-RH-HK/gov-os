@@ -1,6 +1,29 @@
 # CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE — 2026-11-11 16:55 UTC: session `b40cba91` (fresh after 8ddb8b14; context near rule 11's limit); next free id DEC-1135
+## RESUME HERE — 2026-11-11 18:25 UTC: session `b40cba91` hands over (rule 11, context past 200k); next free id DEC-1136
+- **The owner (17:55):** READY-AFTER-LIFT-1 approved (W2-82 P3): W2-170's lead first, then batches 1-3 in BATCH-PREP's order
+  (`drafts/batch-prep/BATCH-PREP.md` §4-5), **at most three leads at once until ACT A**; ACT work beside. Rule 1: never idle while
+  a ticket can launch: at every turn end check `dispatch/status.txt` (leads running vs 3) and `dispatch/ready.txt`.
+- **18:45 HANDOVER STATE (session b40cba91, rule 11):** three leads running: W2-170 BUILD (`W2-170-A5-build`, 18:32; its tests DONE 18:30 at `79a8fb87f19e`; Interface readings 5-8 `9e40aa184`), W2-81 land (18:13), W2-04 review r6c (18:18). ACT-NIGHTLY-RESTART-1 APPLIED 18:30 (crontab `c613d523f7ed`; watch the first night 11-12 04:00). ACT-IDLE-GUARD-1 (`drafts/act-idle-guard/`, manifest `a49a4228`, class (O) by hand) has its independent review RUNNING (pid 992158, log `~/gov-os-worktrees/W2-20/.gov-runtime/scratch/lead/log/ACT-IDLE-GUARD-1-review.json`): file review.md, then the owner's yes; after the apply, commit `companion-tests.diff` and set `"max_leads": 3` in `dispatch/config.json`. **Merges that conflict (aborted, trees clean):** W2-11 (a kernel template + a W1-35 acceptance file: the acceptance part needs an independent test designer, MR-3) and W2-105 (`template/.rulesync/permissions.jsonc`); resolve by role, then their leads. Next free slot otherwise: BATCH-PREP's second wave (W2-90b land, W2-66c tests), each merged with integrate first (check `.claude/templates/role-lead.md` exists and the brief file is non-empty before listing). The 18:00 digest was sent; never leave `log/act-in-progress.txt` while an agent ACT is queued (memory).
+- **18:19: THREE LEADS RUNNING (the cap until ACT A):** W2-170 (`W2-170-A5-tests2`, 17:54), W2-81 (`W2-81-A5-r5b-land`, 18:13), W2-04 (`W2-04-A5-r6c-review`, 18:18; r6b died at launch on an empty brief: a refused `gov brief` left a 0-byte file my copy skipped; all four briefs now equal `drafts/batch-prep/hand/`). Next when a slot frees: W2-105 (merge integrate into its branch first, then its line), W2-11 after its conflicts are resolved by role.
+- **18:15 LAUNCH_NO_TEMPLATE:** the dispatcher's starts of W2-04 (18:08) and W2-11 (18:11) were refused by `launch_now.sh`: their branches predate W2-153's `.claude/templates/role-lead.md`. **Every old worktree needs `w2/integrate` merged before its lead can start.** W2-04 fast-forwarded; W2-81 merged clean (`76c9b5cd1`); both requeued as `W2-04-A5-r6b-review` and `W2-81-A5-r5b-land`. **W2-11's merge conflicts** (`template/governance/kernel/templates/brief-test-designer.md` and `tests/acceptance/W1-35/w1_35_orchestration_support.py`): aborted, off the list; it needs a resolution by role (the acceptance file: an independent test designer, MR-3). W2-105 (7 ahead, 1857 behind) needs its merge before its slot.
+- **Leads:** W2-170 tests2 STARTED 17:54:06 (dispatcher); W2-04 r6-review and W2-11 r5-resume put on `ready.txt` 18:20 (hand-built
+  briefs, DEC-1130 (1); check `dispatch.log` for "started"). **Next as slots free:** W2-81 `W2-81-A5-r5-land` and W2-105
+  `W2-105-A5-r3-tests` (briefs already in `briefs/`; add their lines), then BATCH-PREP §5's second wave. W2-04's worktree was
+  added on `w2/W2-04` (its lead merges integrate). Brief helper's notes: W2-11's DEC-983 four (S13-S16) not done; S2-S7 name
+  retired brief templates (a P2 for the CTO: read against the replacing files); a lead cannot write `.claude/**`, so a
+  generated-copy conflict comes back as PACKAGES; W2-105's map reader changed 11-10, its three red lines may now pass.
+- **Applied today by the owner's operator:** ACT-MEMORY-AUDIT-INSTALL-1 (`0c5032bc8`), ACT-OPERATOR-ROUNDS-1 (`6fbe73b1a`; the
+  verdict tool copies done). **DEC-1135** (`38c1dac91`). ACT-NIGHTLY-RESTART-1: the owner's yes 17:44, queued
+  (`~/gov-os-operator/queue/ACT-NIGHTLY-RESTART-1.req`); check `~/gov-os-operator/log/operator.jsonl` for its apply, then the
+  crontab; commit freeze on `nightly/**` until applied (`log/act-in-progress.txt`); watch the first night (R2-F1).
+- **In preparation:** ACT-IDLE-GUARD-1 (a Sonnet helper, `drafts/act-idle-guard/`; DECIDED-NOT-DONE row 156): the Stop hook's
+  watcher list (helper_watch.py counted as work let every idle turn through 17:06-17:49) and a block while a ticket can launch;
+  the dispatcher's "idle with headroom" inbox item. If the helper died with the session, relaunch it from row 156.
+- **Still with the owner:** `yes ACT-EXAMIN-SETS-1 97d45565` (+ C1-C8); `yes ACT-ACCEPTED-REDS-1 49e11172` (by hand, after it).
+- The sentinel was restarted at 17:09 (class 5); the push link is confirmed (the owner, 17:55).
+
+## RESUME HERE (history) — 2026-11-11 16:55 UTC: session `b40cba91` (fresh after 8ddb8b14; context near rule 11's limit); next free id DEC-1135
 - **Start checks done 16:00:** identity ok; pin `pin-797495bdfc70`; guard4 PASS (453/0); core.bare false; inbox filed;
   watchers armed in b40cba91 (inbox_wait_quiet, helper_watch, sentinel_check, bare_watch, store backstop, usage_log; mem_guard
   pid 309921 and oom_watch pid 299389 still up); digests are session crons (09:02/18:02): **a new session re-arms them**.
@@ -30,10 +53,10 @@
   153; W2-170's lead relaunch (`gov brief lead DAEO-61vm --run tests`, the Interface §10 now settled); the guard error-path
   and listing-rule ACTs (rows 123, 146), then set-up A; CIT-P FX1-FX9; batches 1-3 (READY-AFTER-LIFT-1); worktree
   reconciliation (two dead `/tmp/.../ad44f5fe/scratchpad/*` worktrees among others); in-session helper costs into spend.jsonl.
-- **Digest items (short form) waiting for 18:00:** F6's reading; row 153's test route under DEC-1133 (3); the delegated row-147
+- **Digest items (short form) waiting for 18:00:** the sentinel restart (class 5, 17:09; its dead-man loop stopped 16:57 after a check printed no line; pushed DOWN 17:08 and UP 17:10); mem_guard level 1 at 17:06 for 4 s (0 rg); F6's reading; row 153's test route under DEC-1133 (3); the delegated row-147
   readings; the brake clearance; DECIDED-NOT-DONE's three pre-existing unfilled times (rows 110, 123, 126).
 
-## RESUME HERE — 2026-11-11 16:10 UTC: session `8ddb8b14` hands over (rule 11, DEC-1134 (3)); THE LIFT IS DONE; next free id DEC-1135
+## RESUME HERE (history) — 2026-11-11 16:10 UTC: session `8ddb8b14` hands over (rule 11, DEC-1134 (3)); THE LIFT IS DONE; next free id DEC-1135
 - **State:** re-pin live (`pin-797495bdfc70`, 13:31); usage (A) ENDED (80 % brake stays; 64 % of the week, reset 11-15 09:00);
   the ten closes done by DEC-953 (`tk close` + `closes/` records; `gov close`'s gates are LIFTED here, never use it to close:
   DEC-953, DEC-1052 Q-8; they return through W2-115 on evidence). Decisions today DEC-1126 to DEC-1134 (DEC-1127 withdrawn).

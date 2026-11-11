@@ -1,0 +1,8 @@
+log: W2-170-A5-tests2.json
+W2: W2-170
+status: DONE — the tests are merged into `w2/W2-170` at `79a8fb87f19e` and fail for the right reason; TESTS-READY is written. The test designer raised four questions about gaps in the Interface. None blocks the build run (see proposed_decisions).
+
+task: DAEO-61vm (W2-170), FULL — tests run: merge `w2/integrate` so the ticket carries its Interface, have the independent test designer write the acceptance tests, merge them, confirm they fail before the build, write TESTS-READY
+status: DONE — the tests are merged into `w2/W2-170` at `79a8fb87f19e` and fail for the right reason; TESTS-READY is written. The test designer raised four questions about gaps in the Interface. None blocks the build run (see proposed_decisions).
+work_completed:
+- Merged `w2/integrate` into `w2/W2-170`: `c07a3a941397`, 36 commits, carrying the ticket's `## Interface`

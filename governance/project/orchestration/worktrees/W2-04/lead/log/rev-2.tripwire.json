@@ -1,0 +1,19 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "head",
+   "before": "c07a3a941397",
+   "after": "79a8fb87f19e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170",
+   "change": "acceptance folder",
+   "folder": "W2-170"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-170-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

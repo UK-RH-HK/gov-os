@@ -1,0 +1,3 @@
+log: sentinel-check.log
+Sentinel: DOWN
+status: its watch log has written nothing for 11 min

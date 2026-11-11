@@ -1,0 +1,3 @@
+caller: SigIgn:	0000000000000004
+child (setsid ... &): SigIgn:	0000000000000006
+python child SIGINT handler: 1

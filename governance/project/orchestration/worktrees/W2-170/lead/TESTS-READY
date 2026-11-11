@@ -1,0 +1,5 @@
+TESTS-READY W2-170 (DAEO-61vm): merge 79a8fb87f19e (w2/W2-170-tests at 2f07cf66c8 into w2/W2-170)
+tests/acceptance/W2-170/: 165 cases, 93 functions, seven test files; S1-S6 and F1-F5 all mapped (parse_map)
+red on the base: gov accept W2-170 outcome fail, 164 failed, 1 passed (failure-5), log .gov-runtime/scratch/lead/log/accept-red-1.txt
+failures: No module named gov.memaudit (163), S6 selection UNPLACED in test-map (1)
+run note: whole-folder pytest with an empty HOME needs PYTHONUSERBASE=/home/usain/.local (pytest is a user install)

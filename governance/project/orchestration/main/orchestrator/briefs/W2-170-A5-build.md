@@ -1,0 +1,90 @@
+# Your assignment
+You are a fresh orchestrator session. Your role's rules are in your system prompt (template `role-lead`); this brief gives this assignment's facts.
+Ticket DAEO-61vm (W2-170), profile FULL. Objective: The memory audit's set record: the checks before any search, the drop and void rule, the declaration and the use-once marker, counts only (DEC-1101 (1), DEC-1125 (2)). Owner decision DEC-1125 (2): the memory audit is a scheduled practice, weekly while development is active, an independent writer drafting fresh questions, measured once, misses classified. This ticket is the **record and the checks** around one audit's set: what is checked before any search, what is dropped, what is declared, and the use-once marker. The measure is W2-171's; the cycle and the schedule are W2-172's; the launch script's follow-ups are W2-173's. The whole is described in `governance/project/orchestration/packages/MEMORY-AUDIT-1.md`.
+
+## Where you work
+| what | path |
+|---|---|
+| your tree (write here only) | /home/usain/gov-os-worktrees/W2-170 |
+| branch | w2/W2-170 |
+| allowed paths | src/gov/memaudit/**, tests/unit/memaudit/**, governance/project/test-map.yaml, docs/changes/W2-170-evidence.md |
+| ticket file (read-only) | /home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-61vm.md |
+| your scratch | /home/usain/gov-os-worktrees/W2-170/.gov-runtime/scratch/ |
+
+## What must be true (KPI lines and how each is checked)
+| id | line | verify |
+|---|---|---|
+| S1 | S1 The pre-flight checks a delivered set before any search and prints ids, counts and the codes below only. It refuses on each of: fewer than 36 files; a file not in the writer brief's form (`id`, `question`, `gold_answer`, `sources`, `commit`, `category`, `drawn`); a `commit` other than the audit commit; a category count other than the 40-question quotas of the rubric (R5 item 6); a governing domain under 4 questions or a subsystem over 10, scaled to the kept count; a `drawn: changed` or `drawn: sample` question whose first source is not in `selection.json`'s list of that name; a source path missing at the audit commit, or a `heading` not found and `lines` outside the file; a source in an evaluation or evaluation-source namespace (R8); a gold-source set equal to a pool question's (R9); a nonexistent-id question whose id exists at the commit. | a planted set in a planted repository and sets root under TMPDIR with ten planted defects, one per check: each refused with its own code; the clean planted set ends `PRE-FLIGHT: every check as expected`; no real `~/gov-os-eval` is opened [DEC-1101 (1), DEC-1069 (5), DEC-1125 (2)] |
+| S2 | S2 The drop and void rule: after the checker's second pass, every question whose verdict in the notes is not `accept` is moved to `dropped/` in the set's folder (never deleted), the kept count and every S1 scale are recomputed from the kept questions, and a kept count under 36 or a domain under 4 makes the audit VOID: nothing is measured, no `USED` marker is written, and the counts say `void` with the cause code. | planted notes with 3 drops (audit goes on, kept 37, scales recomputed), with 5 drops (VOID, no `USED`, no `DECLARATION.json`), and with a drop that leaves a domain at 3 (VOID) [DEC-1101 (1), DEC-1125 (2)] |
+| S3 | S3 Before any search the runner writes `runs/<audit>/DECLARATION.json` and a `USED` marker, in that order. The declaration holds: the audit commit; the store's commit and its sha256; the gov pin; the `retrieval.yaml` digest; the standard's four settings by name (the shared reranker, the pool on, the 6,000-token bundle, search again once); the set's digest (`LC_ALL=C sha256sum *.yaml \| sha256sum` over the kept questions); n; the bar scaled to n (at least ceil(0.85 n) right end to end, at most floor(0.05 n) wrong claims; the target ceil(0.95 n)); and how it rounds. The runner refuses to start while `USED` exists, so a set is measured once. | a planted run writes both files in that order (the file times and the ledger line); a second run on the same audit exits with the refusal and writes nothing; a planted `retrieval.yaml` with the pool off is named in the declaration and the run is not ok without a decision id [DEC-1098 (1), DEC-1097 (1)(d), DEC-1101 (1)] |
+| S4 | S4 The set is declared in the sets root's own path map by the runner's code, as one `evaluation_sets` entry of the shape `memory-verdict-2`'s has (its hidden glob, the six roles measured), so `gov.retrieval.measure` accepts it, and nowhere else: the repository's `governance/project/path-map.yaml`, the guard and the hook are never written, and no ACT is needed for a new audit's name. | a planted sets root map gains exactly one entry for `memory-audit-<date>`; `git status` in the planted repository shows no change; the measure run on the planted set accepts it [DEC-1101 (2), DEC-820] |
+| S5 | S5 Only counts and ids leave the tool: standard output and `runs/<audit>/PREFLIGHT.json` hold ids, counts, codes and digests, never a question, a gold answer, a source path or a heading; a line naming the sets root's folders is refused before it is printed; the command line names only `--sets-root <root>`, never a folder under it (the guard's line rule). | a planted question with a unique word: grep of every output file and the captured stdout and stderr finds it 0 times; the printed command line holds no `fixtures/` or `runs/` [DEC-1101 (2), DEC-1097 (2)] |
+| S6 | S6 The package is wired in: `governance/project/test-map.yaml` places `src/gov/memaudit/**` and its tests (so a change here runs these tests and not the full suite), and the module runs as `python3 -m gov.memaudit preflight\|void\|declare`. | `gov close`'s scoped selection for a planted change under `src/gov/memaudit/` names `tests/unit/memaudit/`; each subcommand prints its usage with `--help` and exits 0 [DEC-896] |
+| F1 | A question, gold answer, answer, source path or heading of a set in any output, log or error text. | S5's planted question with a unique word, gold answer, source path and heading: grep of every output file, the captured stdout and stderr and the logs finds each 0 times |
+| F2 | A set measured twice, or measured without `DECLARATION.json` and `USED` written first. | S3's planted runs: the file times and the ledger line show `DECLARATION.json` before `USED` before any search, and a second run on the same audit exits with the refusal and starts no search |
+| F3 | The repository's path map, the guard, the hook, `.claude/` or the walls' template written; the real sets root or run folders opened by a test. | S4's `git status` in the planted repository shows no change, and a run of the tests with the planted roots under TMPDIR leaves no open of the real sets root or run folders in the tests' file-access log |
+| F4 | A dropped question deleted; a VOID audit that wrote `USED`. | S2's planted notes with 3 drops (the 3 files are found under `dropped/`) and with 5 drops (VOID: no `USED` and no `DECLARATION.json` in the audit's run folder) |
+| F5 | Any change outside the paths above. | `git diff --name-only` of the ticket's branch against its base lists only paths matched by the ticket's allowed_paths |
+Non-goals (do not build, do not test): none
+Done when: the DoD lines DOD-1, DOD-2, DOD-3, DOD-4, DOD-5, DOD-6 hold for your part.
+
+## Inputs
+- Sources: DEC-1101, DEC-1125, DEC-1098, DEC-1097, DEC-1069, DEC-820, DEC-896, DEC-1050, DEC-1073, DEC-1052. Read each by id in /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md, or ask memory (below).
+- What the lead knows of the ground: This is the build run, after your tests run's DONE (18:30): the acceptance tests are merged into `w2/W2-170` at `79a8fb87f19e` and fail for the right reason; TESTS-READY is written. The CTO answered the test designer's four questions as delegated decisions, in the ticket's Interface section 10, readings 5 to 8 (`9e40aa184` on w2/integrate): `say(line, sets_root)`; a file PF-FORM refuses counts in n only, not in the quotas or the spread; an unreadable path map at the commit gives `ERROR: <class>` and exit 4; DC-DECISION writes no map entry before an ok declaration. First step: merge `w2/integrate` into `w2/W2-170` (Task: DAEO-61vm, Role: orchestrator) so the ticket file carries readings 5-8; the merge does not count against F5's allowed paths, but no other commit on the branch may touch a path outside allowed_paths. Pass to the engineer as behaviour only (never the tests' code): file mtimes here are coarser than time.time_ns(), so `USED` must be written only once a probe file's own mtime is past `DECLARATION.json`'s. Then the loop's build, verify and FULL review steps (engineer and reviewer on Opus at high, RUBRIC-2). The first memory audit is Mon 11-23; MEMORY-AUDIT-1 §6 needs W2-170 reviewed by about 11-17.
+none
+
+## Commands (copy them as they are)
+| name | command |
+|---|---|
+| identity | `printenv GOV_ROLE GOV_TICKET` |
+| where | `git -C /home/usain/gov-os-worktrees/W2-170 rev-parse --show-toplevel --abbrev-ref HEAD` |
+| retrieve | `gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}"` |
+| context | `gov context DAEO-61vm --role {WORKER_ROLE}` |
+| launch_worker | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/launch_worker.sh {WORKER_ROLE} {EFFORT} {BRIEF_FILE}` |
+| wait_for | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}` |
+| tests_worktree | `git -C /home/usain/gov-os-worktrees/W2-170 worktree add /home/usain/gov-os-worktrees/W2-170-tests -b w2/W2-170-tests HEAD` |
+| merge_tests | `git -C /home/usain/gov-os-worktrees/W2-170 merge --no-ff w2/W2-170-tests -F {MESSAGE_FILE}` |
+| accept | `gov accept W2-170 --root /home/usain/gov-os-worktrees/W2-170` |
+| rebuild | `env PYTHONPATH=/home/usain/gov-os-worktrees/W2-170/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh /home/usain/gov-os-worktrees/W2-170` |
+| lead_verify | `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh /home/usain/gov-os-worktrees/W2-170 W2-170 DAEO-61vm` |
+| tests_worktree_remove | `git -C /home/usain/gov-os-worktrees/W2-170 worktree remove /home/usain/gov-os-worktrees/W2-170-tests` |
+| links | `gov links --since {BASE}` |
+Ask memory first: outside the sandbox gov retrieve --root /home/usain/gov-os-worktrees/W2-00-store "{QUESTION}" "<which decision governs X | where is Y implemented>"; inside it, the Read and Grep tools [DEC-1065]; grep the register only by id.
+Search again once: if the bundle does not answer, or your answer may be incomplete, ask once more in your own, different words; then answer from both bundles with path and lines, or say "not found". Two searches in all; never answer beyond what you read.
+No `gov retrieve` in the sandbox, and no `gov context`: a launched worker searches with the Read and Grep tools, and searches again once the same way [DEC-1065].
+Every whole-folder pytest run adds `-m "not local_only" -k "not real and not green_here and not time_limit"` and an empty `HOME`: run it as env HOME=/home/usain/gov-os-worktrees/W2-170/.gov-runtime/scratch/empty-home PYTHONPATH=/home/usain/gov-os-worktrees/W2-170/src python3 -m pytest {FOLDER} -q -p no:cacheprovider -o tmp_path_retention_policy=failed -m "not local_only" -k "not real and not green_here and not time_limit" [DEC-1065].
+Wait for anything long with bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/wait_for.sh {EXIT_FILE}, one call per 9.5 min; never a hand-written sleep loop.
+No merge inside the sandbox: the CTO or your lead merges into your branch outside it; a restore or conflict resolution in `tests/acceptance/` is a test designer's [DEC-1052].
+
+## Forms that work (the guard and the harness accept these)
+- Write and edit files with the Write and Edit tools and absolute paths.
+- Anything longer than one line goes in a script file under /home/usain/gov-os-worktrees/W2-170/.gov-runtime/scratch/, run with `bash <file>` or `python3 <file>`.
+- Use literal paths, never a shell variable or `$(…)` as a write target; name the folder a listing or search starts at.
+- The harness allows these headless without asking: Bash, Read, Edit, Write, Grep, Glob. For anything else use a script file as above, or report it; never retry another form.
+
+## Commit (your paths only)
+```
+git commit -m "{SUBJECT}" --trailer "Task: DAEO-61vm" --trailer "Role: orchestrator" --trailer "Implements: DEC-1101, DEC-1125, DEC-1098, DEC-1097, DEC-1069, DEC-820, DEC-896, DEC-1050, DEC-1073, DEC-1052" -- {COMMIT_PATHS}
+```
+- `Task:` is the ticket's id (DAEO-61vm, a `DAEO-…` id), never a W2 id [DEC-182].
+- `Implements:` lists only ids from the ticket's `sources:`, each ACCEPTED [DEC-927].
+- Put an id you need that is not in `sources:` in `discoveries`, never into `Implements:` alone [DEC-1073].
+- Cite only ACCEPTED decisions as rules; name a PROPOSED one "proposed", never as the rule [DEC-1073].
+
+## Return (your last message; nothing else is read)
+The twelve fields first, each a labelled line ("none" where nothing), then each section below, always present:
+```
+task: / status: / work_completed: / files_changed: / evidence: / tests: / discoveries: / risks: / lessons: / proposed_decisions: / unresolved: / recommended_next_action:
+template: role-lead@1.0.0
+commits: <hash12> <subject> | Task/Role/Implements as committed
+brief_gaps: none | - <what was missing> | <where it belonged: template, facts, ticket, tool> | <minutes, est.>
+guard_refusals: none | - <time> | <the command's form, one line> | <the rule's reason as the hook gave it> | true or false-positive [DEC-958]
+```
+Refused twice for the same call: stop and say so. Never work around a refusal: report it.
+
+## Your run: build (only this section is in your brief)
+**build**: implement and verify.
+1. Run the *tests* steps 1 to 3 and, in parallel, the implementer (engineer) from its brief.
+2. Merge the tests when the implementer is between batches; write TESTS-READY.
+3. Verify: env PYTHONPATH=/home/usain/gov-os-worktrees/W2-170/src bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh /home/usain/gov-os-worktrees/W2-170, then bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/lead_verify.sh /home/usain/gov-os-worktrees/W2-170 W2-170 DAEO-61vm, then wait. Name a red as known only from /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/skip_known.json; re-run a load-sensitive case alone once.
+4. Red: a fresh implementer given the failing output only. Three iterations that do not converge: return ESCALATION [DEC-096].

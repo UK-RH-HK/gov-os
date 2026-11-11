@@ -1,0 +1,8 @@
+Merge w2/W2-170-tests into w2/W2-170: W2-170's acceptance tests (2f07cf66c; 165 cases, S1-S6 and F1-F5 mapped; red before the build)
+
+The independent test designer's run 1 (td-1, Opus high, C2), written from the KPI lines and the ticket's Interface
+(22e3feca6, readings a7bd59e03) before any implementation. Red on the base: 164 failed, 1 passed (F5).
+
+Task: DAEO-61vm
+Role: orchestrator
+Implements: DEC-1101, DEC-1125, DEC-1098, DEC-1097, DEC-1069, DEC-820, DEC-896, DEC-1052

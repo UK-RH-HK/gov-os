@@ -1,0 +1,281 @@
+diff --git a/tests/unit/orchestration/test_dispatcher.py b/tests/unit/orchestration/test_dispatcher.py
+index c477e6778..a66c4091a 100644
+--- a/tests/unit/orchestration/test_dispatcher.py
++++ b/tests/unit/orchestration/test_dispatcher.py
+@@ -2756,3 +2756,85 @@ def test_o_a1_the_floor_and_the_trip_wire_are_kept(wp):
+     tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 600)
+     s = status(wp)
+     assert not s["admit"] and s["admit_reason"] == "no floor in gate-config.json (fail closed)" and calls(wp) == []
++
++
++# ---- ACT-IDLE-GUARD-1: idle with headroom (11-11: ready.txt held one line, W2-170, its log used since 15:20; the tick
++# ran all afternoon with the gate open and no lead, and raised nothing)
++def headroom_items(w):
++    return sorted((w.d / "inbox").glob("*-idle-headroom*.txt"))
++
++
++def set_max_leads(w, n=3):
++    (w.d / "config.json").write_text(json.dumps({"max_leads": n}))
++
++
++def used_log_line(w, log="W2-A-A5-run1.json"):
++    """ready.txt holds only W2-A, whose log name was started long ago (past the stagger)."""
++    (w.d / "ready.txt").write_text(f"W2-A T-A A.md {log}\n")
++    (w.d / "started.txt").write_text(f"{datetime.fromtimestamp(NOW - 1000):%Y-%m-%d %H:%M:%S} W2-A A.md {log}\n")
++
++
++def test_idle_with_headroom_a_used_log_line_with_an_open_gate_raises_one_inbox_item_an_hour(w):
++    set_max_leads(w, 3)
++    used_log_line(w)
++    assert tick(w).returncode == 0 and calls(w) == []
++    items = headroom_items(w)
++    assert len(items) == 1
++    body = items[0].read_text()
++    assert body.startswith("log: dispatch.log\nIdle: headroom\nstatus: the gate is open and 0 of 3 leads run")
++    assert "skipped for a used or returned log: W2-A T-A (already started for W2-A-A5-run1.json)" in body
++    assert "new log name" in body and "DEC-1110" in body
++    assert not any(line.startswith("W2: ") for line in body.splitlines())    # that line would hold W2-A's own start
++    tick(w, DISPATCH_NOW=NOW + 600)
++    assert len(headroom_items(w)) == 1                                       # the same cause: once an hour
++    tick(w, DISPATCH_NOW=NOW + 3700)
++    assert len(headroom_items(w)) == 2
++    assert status(w)["ready_count"] == 1 and status(w)["max_leads"] == 3
++
++
++def test_idle_with_headroom_names_a_returned_log_and_an_empty_list(w):
++    set_max_leads(w, 3)
++    (w.orch / "log" / "W2-A-A5-run1.json").write_text(json.dumps({"result": "task: x\nstatus: DONE at abc\n"}))
++    (w.d / "ready.txt").write_text("W2-A T-A A.md W2-A-A5-run1.json\n")
++    tick(w)
++    assert "skipped for a used or returned log: W2-A T-A (W2-A-A5-run1.json already holds a return)" in \
++        headroom_items(w)[0].read_text()
++    w2_items = len(headroom_items(w))
++    (w.d / "ready.txt").write_text("")
++    tick(w, DISPATCH_NOW=NOW + 60)
++    assert len(headroom_items(w)) == w2_items + 1                             # another cause: reported at once
++    assert "0 line(s) in ready.txt" in headroom_items(w)[-1].read_text()
++
++
++def test_no_idle_item_when_a_line_starts_the_cap_is_reached_the_gate_is_shut_or_no_cap_is_set(w):
++    set_max_leads(w, 3)
++    tick(w)                                                                   # W2-A and W2-B are startable: one starts
++    assert calls(w) and headroom_items(w) == []
++    used_log_line(w)
++    set_max_leads(w, 1)
++    w.procs.write_text(json.dumps([{"cmd": LEAD.format("T-B"), "cwd": str(w.wt / "W2-B")}]))
++    tick(w, DISPATCH_NOW=NOW + 300)                                           # one of one lead runs: at the cap
++    assert headroom_items(w) == []
++    set_max_leads(w, 3)
++    tick(w, DISPATCH_NOW=NOW + 400, DISPATCH_GATE_CMD="sh -c 'echo SHUT load; exit 1'")
++    assert headroom_items(w) == []                                            # a legitimate wait
++    (w.d / "config.json").write_text("{}")
++    tick(w, DISPATCH_NOW=NOW + 500)
++    assert headroom_items(w) == []                                            # no cap set: the item is not sent
++    set_max_leads(w, 3)
++    tick(w, "--dry", DISPATCH_NOW=NOW + 600)
++    assert headroom_items(w) == []                                            # a dry pass writes nothing
++
++
++def test_a_cause_that_stops_holding_is_reported_again_when_it_returns(w):
++    set_max_leads(w, 3)
++    used_log_line(w)
++    tick(w)
++    assert len(headroom_items(w)) == 1
++    (w.d / "ready.txt").write_text("W2-B T-B B.md W2-B-A5-run2.json\n")      # a fresh line starts
++    tick(w, DISPATCH_NOW=NOW + 200)
++    assert calls(w) and json.loads((w.d / "idle-headroom-reported.json").read_text()) == {}
++    w.procs.write_text("[]")
++    used_log_line(w)
++    tick(w, DISPATCH_NOW=NOW + 400)
++    assert len(headroom_items(w)) == 2                                        # within the hour, but the cause had cleared
+diff --git a/tests/unit/orchestration/test_stop_idle_check.py b/tests/unit/orchestration/test_stop_idle_check.py
+index 3bf61b137..6698ba6d1 100644
+--- a/tests/unit/orchestration/test_stop_idle_check.py
++++ b/tests/unit/orchestration/test_stop_idle_check.py
+@@ -466,3 +466,186 @@ def test_f2_the_open_words_are_the_upper_case_states_not_prose(tmp_path):
+     w = World(tmp_path)
+     w.dnd.write_text(ALL_WAIT + '| 12 | K9 | **DONE 11-08**: status_block.py reads the lists; K9 now "in progress" |\n')
+     assert "decision" not in w.run()
++
++
++# ---- ACT-IDLE-GUARD-1 (11-11: no lead ran from 13:31 to 17:54 while W2-170 and batch 1 were ready)
++USED = "already started for W2-170-A5-tests.json"
++RETURNED = "W2-170-A5-tests.json already holds a return"
++HELPER = "python3 /x/tools/helper_watch.py --every 300 --max 86400"
++
++
++def set_cap(w, n):
++    (w.orch / "dispatch/config.json").write_text(json.dumps({"max_leads": n}))
++
++
++def stale_line(**over):
++    """The dispatcher's tick of 11-11 15:20 to 17:53: one lead's line, skipped for its used log; the gate open."""
++    return status(ready_count=1, ready_waits={"W2-170 DAEO-61vm": USED}, **over)
++
++
++def stub_gov(tmp, lines, exit_code=1):
++    """A `gov` that writes `gov plan --ready <file>`'s form to the file named after --ready (the real one exits 1 on
++    the plan's own findings)."""
++    g = tmp / "gov"
++    g.write_text("#!/bin/sh\nout=''\nwhile [ $# -gt 0 ]; do [ \"$1\" = --ready ] && out=\"$2\"; shift; done\n"
++                 f"cat > \"$out\" <<'EOT'\n{lines}\nEOT\nexit {exit_code}\n")
++    g.chmod(0o755)
++    return str(g)
++
++
++def test_the_standing_watchers_of_section_6_are_not_work(tmp_path):
++    """helper_watch.py ran 24 h and let every idle turn through; every watcher START-NEXT-SESSION names is listed."""
++    w = World(tmp_path)
++    for i, cmd in enumerate(("bash /x/tools/inbox_wait.sh", "bash /x/tools/inbox_wait_quiet.sh", HELPER,
++                             "bash /x/tools/sentinel_check.sh", "bash /x/tools/bare_watch.sh",
++                             "bash /x/tools/store_refresh_daily.sh", "bash /x/tools/usage_log.sh",
++                             "python3 /x/tools/mem_guard.py", "bash /x/tools/oom_watch.sh")):
++        w.task(f"bw{i:05d}", cmd, 400 + i)
++    assert w.run()["decision"] == "block"
++    assert "helper_watch" not in w.log()
++
++
++def test_helper_watch_beside_a_real_job_still_counts_only_the_job(tmp_path):
++    w = World(tmp_path)
++    w.task("bwatch01", HELPER, 410)
++    w.task("bjob0001", "python3 -m pytest tests/unit -q", 411)
++    assert w.run() is None
++    assert "running: 1\ttask bjob0001" in w.log() and "helper_watch" not in w.log()
++
++
++def test_a_used_log_ready_line_with_an_open_gate_blocks_whatever_runs(tmp_path):
++    """The 17:06-17:49 case: one lead running (W2-170 relaunch pending), a watcher, a job; the old hook let it through."""
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(stale_line(lead_count=1, leads=["W2-9"]))
++    w.task("bwatch01", HELPER, 420)
++    w.task("bjob0001", "python3 -m pytest tests/unit -q", 421)
++    w.worker("W2-129-d6", "W2-129-engineer-d6", 422)
++    ans = w.run()
++    assert ans["decision"] == "block"
++    r = ans["reason"]
++    assert "ACT-IDLE-GUARD-1" in r and "IDLE-REASON" in r
++    assert "1 launchable: W2-170 DAEO-61vm (already started for W2-170-A5-tests.json)" in r
++    assert "skipped for a used or returned log" in r and "leads 1 of 3" in r
++    assert "\tblock\tlaunchable: 1\t" in w.log()
++
++
++def test_a_returned_log_line_blocks_too_and_every_such_line_is_named(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(status(ready_count=3, ready_waits={"W2-170 DAEO-61vm": RETURNED, "W2-105 DAEO-zpdj": USED,
++                                                    "W2-04 DAEO-u4oz": "no brief W2-04.md"}))
++    r = w.run()["reason"]
++    assert "2 launchable" in r and "W2-170 DAEO-61vm (W2-170-A5-tests.json already holds a return)" in r
++    assert "W2-105 DAEO-zpdj (already started for" in r and "W2-04" not in r
++
++
++def test_no_block_at_the_cap_or_with_the_gate_shut_or_the_machine_full(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
++    assert w.run() is None                                  # at the cap: the dispatcher's lead runs, nothing launchable
++    w2 = World(tmp_path / "second")
++    set_cap(w2, 3)
++    w2.set_status(stale_line(lead_count=2, leads=["a"], pending_launches=["x", "y"]))
++    assert w2.run() is None                                 # two running and two launching: at the cap
++    w3 = World(tmp_path / "third")
++    set_cap(w3, 3)
++    w3.set_status(stale_line(gate_open=False, gate="SHUT load 19.5"))
++    assert "the gate shut" in w3.run()["systemMessage"]
++    w4 = World(tmp_path / "fourth")
++    set_cap(w4, 3)
++    w4.set_status(stale_line(forecast={"lead": {"ok": False, "reason": "REFUSES, binding CPU"}}))
++    assert "the machine full" in w4.run()["systemMessage"]
++
++
++def test_the_cap_is_read_from_the_config_not_fixed(tmp_path):
++    w = World(tmp_path)
++    w.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
++    set_cap(w, 5)
++    assert w.run()["decision"] == "block"                   # three of five run: room
++    w2 = World(tmp_path / "second")
++    w2.set_status(stale_line(lead_count=3, leads=["a", "b", "c"]))
++    assert w2.run()["decision"] == "block"                  # no cap set: the forecast alone admits, and it does
++    (w2.orch / "dispatch/config.json").write_text("{not json")
++    w2.new_turn("turn-2")
++    assert w2.run()["decision"] == "block"                  # an unreadable config is no cap, never a crash
++
++
++def test_a_stale_tick_is_not_relied_on_for_a_launchable_ticket(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(stale_line(lead_count=1, leads=["a"]), age=900)
++    w.task("bjob0001", "python3 -m pytest tests/unit -q", 430)
++    assert w.run() is None
++    assert "dispatcher status unusable" in w.log()
++
++
++def test_an_idle_reason_while_a_ticket_is_launchable_is_shown_as_such(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(stale_line())
++    w.say("IDLE-REASON: the owner's yes comes first")
++    ans = w.run()
++    assert "decision" not in ans
++    assert "NOTE for the owner: a ticket was launchable (1 launchable: W2-170 DAEO-61vm" in ans["systemMessage"]
++    assert "the CTO's stated reason WHILE a ticket was launchable\tthe owner's yes comes first" in w.log()
++    assert "W2-170 DAEO-61vm" in w.log()
++
++
++def test_the_launchable_block_is_once_a_turn(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(stale_line())
++    assert w.run()["decision"] == "block"
++    again = w.run()
++    assert "decision" not in again and "second stop this turn" in again["systemMessage"]
++    assert "a ticket was launchable: 1 launchable: W2-170 DAEO-61vm" in again["systemMessage"]
++    w.new_turn("turn-2")
++    assert w.run()["decision"] == "block"
++    assert "decision" not in w.run(active=True)
++
++
++def test_no_ready_count_in_the_tick_or_only_other_waits_is_not_launchable(tmp_path):
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(status(lead_count=1, leads=["a"], ready_waits={"W2-170 DAEO-61vm": USED}))   # an older dispatcher's tick
++    assert w.run()["decision"] == "block"   # the used-log line is named whatever the count key says
++    w2 = World(tmp_path / "second")
++    set_cap(w2, 3)
++    w2.set_status(status(lead_count=1, leads=["a"], ready_count=2,
++                         ready_waits={"W2-1 T-1": "no brief X.md", "W2-2 T-2": "claim not committed on w2/integrate"}))
++    assert w2.run() is None                 # lines wait for the CTO's own prep: the dispatcher's item covers them
++    w3 = World(tmp_path / "third")
++    w3.set_status(status(lead_count=1, leads=["a"]))
++    assert w3.run() is None                 # no ready_count, no ready_waits: nothing known launchable
++
++
++PLAN = "# batch 1\nW2-105 DAEO-zpdj W2-105-A5-run1.md W2-105-A5-run1.json\nW2-00 DAEO-sdxk W2-00-A5-run1.md W2-00-A5-run1.json\n" \
++       "W2-04 DAEO-u4oz W2-04-A5-run1.md W2-04-A5-run1.json\n# batch 2\nW2-133 DAEO-k4wm W2-133-A5-run1.md x.json"
++
++
++def test_an_empty_ready_list_with_plan_tickets_ready_blocks_naming_the_first_batch(tmp_path, monkeypatch):
++    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path, PLAN))
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(status(lead_count=1, leads=["W2-04"], ready_count=0, ready_waits={}))
++    w.task("bwatch01", HELPER, 440)
++    r = w.run()["reason"]
++    assert "1 launchable: W2-105 (DAEO-zpdj) (ready.txt is empty; these are gov plan's first batch" in r
++    assert "W2-00" not in r and "W2-04" not in r and "W2-133" not in r      # the CTO's own, a running lead, batch 2
++    assert not list((w.orch / "log").glob("plan-ready-*"))                   # no temp file left
++
++
++def test_an_empty_ready_list_with_no_usable_plan_does_not_block_and_says_so(tmp_path, monkeypatch):
++    monkeypatch.setenv("GOV_STOPIDLE_GOV", str(tmp_path / "no-such-gov"))
++    w = World(tmp_path)
++    set_cap(w, 3)
++    w.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
++    assert w.run() is None
++    assert "gov plan unusable" in w.log() or "gov plan not run" in w.log()
++    (tmp_path / "x").mkdir()
++    monkeypatch.setenv("GOV_STOPIDLE_GOV", stub_gov(tmp_path / "x", "# no batches", exit_code=0))
++    w2 = World(tmp_path / "second")
++    w2.set_status(status(lead_count=1, leads=["a"], ready_count=0, ready_waits={}))
++    assert w2.run() is None and "no batch in its ready form" in w2.log()

@@ -1,0 +1,8 @@
+docs/checkpoints/DAEO-zpdj/CP-DAEO-zpdj-0002.md
+template/.rulesync/permissions.jsonc
+tests/acceptance/W1-38/README.md
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py
+tests/acceptance/W2-105/README.md
+tests/acceptance/W2-105/conftest.py
+tests/acceptance/W2-105/test_w2_105_install_block.py
+tests/acceptance/W2-105/w2_105_support.py

@@ -34,14 +34,14 @@
   "examin": "forecast FORECAST-W2-3 (11-11): EXAMIN's copy about 11-16 now that usage (A) ended at the lift (DEC-1126 (2)); W2-27 now also depends on W2-156 (batch 13) and W2-174; the memory audit's first run Mon 11-23 (W2-170 to W2-173)",
   "emergency": "ENDED: the lift done 11-11 (re-pin pin-797495bdfc70 at 13:31, the closes 15:3x); usage (A) ended; 80 % brake stays; WSL out-of-memory 14:19 (2,161 rg), recovered 15:04; mem_guard.py running (DEC-1133 (5))",
   "countdown": [
-    "Done 11-11: the re-pin (13:31); DEC-1126 to DEC-1134; ten closes by DEC-953; W2-32 S9 re-worded and merged (824919dc7); the Verify pass on 44 tickets; W2-174 filed; W2-60a RUBRIC-2 lines; recovery after the 14:19 OOM",
-    "Waiting on the owner: the yes on ACT-EXAMIN-SETS-1 (READY 97d45565) with C1-C8 and the two writer briefs; the yes on ACT-MEMORY-AUDIT-INSTALL-1 (READY, 0d017ae4, by hand). Coming to the owner: ACT-NIGHTLY-RESTART-1 (review running), ACT-OPERATOR-ROUNDS-1 (fix pass then round 2), ACT-ACCEPTED-REDS-1 (DEC-1134), ACT-LOAD-BALANCER-A (DEC-1133 (3))",
-    "Next for the CTO (16:55): file the reviews of ACCEPTED-REDS-1 and OPERATOR-ROUNDS-1 r2; NIGHTLY-RESTART-1's rebuild then r2; ACT A's companion tests (row 153); W2-170's lead relaunch (row 147 settled, a7bd59e03); the guard error-path and listing-rule ACTs, then set-up A; CIT-P FX1-FX9",
-    "Then: batches 1-3 of READY-AFTER-LIFT-1 (hand-built briefs for reviewed tickets, gov brief for the 44); W2-05's fix and close",
-    "After: EXAMIN's copy about 11-16; the first memory audit 11-23; Wave 2's end about 11-24 (FORECAST-W2-3); usage 68 % at 16:01 (reset 11-15 09:00), the 80 % brake"
+    "Done 11-11: the re-pin (13:31); DEC-1126 to DEC-1135; ten closes by DEC-953; ACT-MEMORY-AUDIT-INSTALL-1, ACT-OPERATOR-ROUNDS-1 (by hand) and ACT-NIGHTLY-RESTART-1 (agent, 18:30) applied; W2-170 tests DONE; three leads running from 18:18",
+    "Waiting on the owner: the yes on ACT-EXAMIN-SETS-1 (READY 97d45565) with C1-C8 and the two writer briefs; the yes on ACT-ACCEPTED-REDS-1 (READY 49e11172, by hand, after it); ACT-IDLE-GUARD-1 after its review",
+    "Now: W2-170 build, W2-81 land, W2-04 review (3 leads, the cap until ACT A); next slots: W2-105 (merge first), W2-11 (its conflicts by role); ACT A's companion tests then its review; the guard error-path and listing-rule ACTs, then set-up A; CIT-P FX1-FX9",
+    "Then: batches 1-3's second wave (W2-90b land, W2-66c tests, W2-149/W2-148 probes and closes, W2-173); W2-05's fix and close (gates batch 5)",
+    "After: EXAMIN's copy about 11-16; the first nightly under the new wrapper 11-12 04:00; the first memory audit 11-23; Wave 2's end about 11-24 (FORECAST-W2-3); usage 70 % at 18:09 (reset 11-15 09:00), the 80 % brake"
   ],
-  "owner_action": "P2: `yes ACT-NIGHTLY-RESTART-1 0e308cde` (READY r2, class (b), the operator agent); `yes ACT-EXAMIN-SETS-1 97d45565` (READY; + C1-C8, two writer briefs; by the agent after ~21:17 UTC 11-12); `yes ACT-MEMORY-AUDIT-INSTALL-1 0d017ae4` (READY, by hand); `yes ACT-ACCEPTED-REDS-1 49e11172` (READY, by hand, after EXAMIN-SETS-1); ACT-OPERATOR-ROUNDS-1 READY: \u00a75 by hand; after its tests: LOAD-BALANCER-A",
-  "last_report": "2026-11-11 17:06:38",
+  "owner_action": "P2: `yes ACT-EXAMIN-SETS-1 97d45565` (READY; + C1-C8, two writer briefs; by the agent after ~21:17 UTC 11-12); `yes ACT-ACCEPTED-REDS-1 49e11172` (READY, by hand, after EXAMIN-SETS-1); ACT-IDLE-GUARD-1 in review",
+  "last_report": "2026-11-11 18:32:32",
   "chain_spec": "../dispatch/ready.txt",
   "chain_log": "chain-2026-10-31f.log",
   "parked": [],
