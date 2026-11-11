@@ -14588,6 +14588,20 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
   - (5) The morning digest gives the lowest available memory, each lead's peak, the load and the usage spent overnight.
 - **Basis:** question 2 (measured capacity, with the protections that keep the machine up).
 
+### DEC-1139 — W2-175's role templates approved at 4c0c73472fd8 and promoted as version 1.0.1; three fixes for the next template delta
+- **Status:** ACCEPTED (owner, 2026-11-11, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-11)`) · **Under:** DEC-1116, DEC-1137 (2), (3), CAP-33, DEC-315 · **Source:** the owner's message (chat, 2026-11-11 ~22:10 UTC): "W2-175 templates approved at 4c0c73472fd8", on the table of `docs/changes/W2-175-CIT-P.md` §2 (13 files, base and new sha256 recomputed by the CTO at `w2/W2-175` `4c0c73472fd8`, all equal to the record)
+- **Decision:**
+  - (1) **Approved:** the seven role templates (`template/governance/kernel/templates/role-*.md`) and the six composed
+    `template/.rulesync/subagents/*.md` at the new sha256 of W2-175's CIT-P §2, at `4c0c73472fd8`; the seven templates are
+    promoted from 1.0.0 to 1.0.1 and the CIT-P moves to ACCEPTED (§4-5). The `.claude/templates/role-*.md` copies and the
+    root `.rulesync/subagents` follow by the copies ACT (class (b), DEC-315); then S6's re-run, the merge and the close.
+  - (2) **Three fixes for the next template delta,** carried by the one-bar CIT-P (DEC-1131; it edits these role files
+    anyway): (a) `role-engineer.md`: "failure messages as gov accept reports them", so the new C-E line agrees with its
+    item 6 (review RV1); (b) `role-lead.md` and `role-cto.md`: one line saying they read both the tests and the code, as
+    `role-reviewer.md` does (RV3); (c) the six composed files' "Wave 1" sections (the model tier and how leads start) are
+    stale against RUBRIC-2 (DEC-1120) and the dispatcher: routed to W2-33.
+- **Basis:** question 2 (the templates one approved source for every launched session, carrying the owner's three rules).
+
 | Version | Date | Change |
 |---|---|---|
 | 0.450 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1066. Next free id: DEC-1067. |
@@ -14662,3 +14676,4 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | 0.519 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1136 (the W1-01 exemption first, the two path-map ACTs rebuilt after; every ACT changing tests/acceptance/ carries its own exemption entry in its apply). Next free id: DEC-1137. |
 | 0.520 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1137 (W2-11's brief KPIs re-baselined, option (c); the role-template ticket before EXAMIN's copy, W2-27 depends on it). Next free id: DEC-1138. |
 | 0.521 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1138 (the lead cap five through 11-12's working day, measured; the safety nets kept; no new lead run after 03:00; the p95 ACT rewrites the working size and both peaks). Next free id: DEC-1139. |
+| 0.522 | 2026-11-11 | Owner (recorded by the orchestrator, DEC-861): DEC-1139 (W2-175's role templates approved at 4c0c73472fd8 and promoted as 1.0.1; three fixes for the next template delta, (c) to W2-33). Next free id: DEC-1140. |

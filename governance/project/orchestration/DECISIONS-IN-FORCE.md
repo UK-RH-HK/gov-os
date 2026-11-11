@@ -547,3 +547,6 @@ other restart is an ACT.
 - DEC-1138 (2026-11-11, (1) until the end of 11-12's working day): **the lead cap is five**, measured; the 3 GiB floor, `mem_guard`
   and **the hold below 5 GB available on any lead's next launch** stay; **no new lead run after 03:00** before the nightly;
   the p95 ACT rewrites the working size and both peak figures. Basis: question 2.
+- DEC-1139 (2026-11-11): **W2-175's role templates approved at `4c0c73472fd8`, promoted as 1.0.1** (the seven
+  `role-*.md` and six composed `template/.rulesync/subagents`); the copies by ACT (class (b)); three fixes ride the one-bar
+  CIT-P (RV1 engineer wording, RV3 lead/CTO read tests and code), the composed files' stale "Wave 1" sections to W2-33. Basis: question 2.
